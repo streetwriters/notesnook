@@ -68,6 +68,7 @@ export type RouteParams = {
   Monographs: NotesScreenParams;
   AppLock: AppLockRouteParams;
   Auth: AuthParams;
+  Reminders: GenericRouteParam;
 };
 
 export type RouteName = keyof RouteParams;

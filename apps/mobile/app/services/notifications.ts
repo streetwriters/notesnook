@@ -39,17 +39,11 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import SettingsService from "./settings";
 
-type ReferenceNode = {
-  id: string;
-  parentId?: string;
-  type: string;
-};
-
 export type Reminder = {
   id: string;
   type: string;
   title: string;
-  details?: string;
+  description?: string;
   priority: "silent" | "vibrate" | "urgent";
   date?: number;
   mode: "repeat" | "once" | "permanent";
@@ -57,7 +51,6 @@ export type Reminder = {
   selectedDays: number[];
   dateCreated: number;
   dateModified: number;
-  references?: ReferenceNode[];
 };
 
 let pinned: DisplayedNotification[] = [];
@@ -119,15 +112,15 @@ const onEvent = async ({ type, detail }: Event) => {
 
 async function scheduleNotification(reminder: Reminder, payload?: string) {
   try {
-    const { title, details, priority } = reminder;
+    const { title, description, priority } = reminder;
     const triggers = getTriggers(reminder);
     if (!triggers && reminder.mode === "permanent") {
       displayNotification({
         id: reminder.id,
         title: title,
-        message: details || "",
+        message: description || "",
         ongoing: true,
-        subtitle: details || ""
+        subtitle: description || ""
       });
       return;
     }
@@ -138,12 +131,12 @@ async function scheduleNotification(reminder: Reminder, payload?: string) {
         {
           id: trigger.id,
           title: title,
-          body: details,
+          body: description,
           data: {
             type: "reminder",
             payload: payload || ""
           },
-          subtitle: details,
+          subtitle: description,
           android: {
             channelId: await getChannelId(priority),
             smallIcon: "ic_stat_name",
@@ -151,11 +144,11 @@ async function scheduleNotification(reminder: Reminder, payload?: string) {
               id: "default",
               mainComponent: "notesnook"
             },
-            style: !details
+            style: !description
               ? undefined
               : {
                   type: AndroidStyle.BIGTEXT,
-                  text: details
+                  text: description
                 }
           },
           ios: {

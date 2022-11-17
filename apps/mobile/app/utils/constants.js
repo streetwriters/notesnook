@@ -119,6 +119,11 @@ export const MenuItemsList = [
     close: true
   },
   {
+    name: "Reminders",
+    icon: "clock-outline",
+    close: true
+  },
+  {
     name: "Monographs",
     icon: "text-box-multiple-outline",
     close: true,
