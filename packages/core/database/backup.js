@@ -176,6 +176,10 @@ export default class Backup {
         dbCollection: this._db.shortcuts
       },
       {
+        index: () => data["reminders"],
+        dbCollection: this._db.reminders
+      },
+      {
         index: () => data["notehistory"],
         dbCollection: this._db.noteHistory,
         type: "notehistory"

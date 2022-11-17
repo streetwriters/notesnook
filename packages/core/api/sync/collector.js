@@ -43,6 +43,7 @@ class Collector {
       notebook: this._db.notebooks.raw,
       content: await this._db.content.all(),
       attachment: this._db.attachments.syncable,
+      reminder: this._db.reminders.raw,
       settings: [this._db.settings.raw]
     };
 
