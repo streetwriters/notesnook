@@ -50,6 +50,10 @@ class Merger {
         get: (id) => this._db.reminders.reminder(id),
         set: (item) => this._db.reminders.merge(item)
       },
+      relation: {
+        get: (id) => this._db.relations.relation(id),
+        set: (item) => this._db.relations.merge(item)
+      },
       notebook: {
         threshold: 1000,
         get: (id) => this._db.notebooks.notebook(id),

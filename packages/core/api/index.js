@@ -48,6 +48,7 @@ import Pricing from "./pricing";
 import { logger } from "../logger";
 import Shortcuts from "../collections/shortcuts";
 import Reminders from "../collections/reminders";
+import Relations from "../collections/relations";
 
 /**
  * @type {EventSource}
@@ -146,6 +147,8 @@ class Database {
     this.shortcuts = await Shortcuts.new(this, "shortcuts");
     /**@type {Reminders} */
     this.reminders = await Reminders.new(this, "reminders");
+    /**@type {Relations} */
+    this.relations = await Relations.new(this, "relations");
 
     this.trash = new Trash(this);
 
