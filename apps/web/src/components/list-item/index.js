@@ -91,15 +91,16 @@ function ListItem(props) {
           .get()
           .selectedItems.filter((i) => i.type === props.item.type);
 
+        if (selectedItems.indexOf(props.item) === -1) {
+          selectedItems = [];
+          selectedItems.push(props.item);
+        }
+
         if (selectedItems.length > 1) {
           title = `${selectedItems.length} items selected`;
           items = items.filter((item) => item.multiSelect);
         } else if (Config.get("debugMode", false)) {
           items.push(...debugMenuItems(props.item.type));
-        }
-
-        if (selectedItems.indexOf(props.item) === -1) {
-          selectedItems.push(props.item);
         }
 
         if (items.length <= 0) return;
