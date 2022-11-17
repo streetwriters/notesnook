@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import getId from "../utils/id";
+import { makeId } from "../utils/id";
 import Collection from "./collection";
 
 /**
@@ -57,7 +57,7 @@ export default class Relations extends Collection {
       return;
 
     const relation = {
-      id: getId(),
+      id: generateId(from, to),
       type: "relation",
       dateCreated: Date.now(),
       dateModified: Date.now(),
@@ -145,4 +145,14 @@ export default class Relations extends Collection {
  */
 function compareItemReference(a, b) {
   return a.id === b.id && a.type === b.type;
+}
+
+/**
+ * Generate deterministic constant id from `a` & `b` item reference.
+ * @param {ItemReference} a
+ * @param {ItemReference} b
+ */
+function generateId(a, b) {
+  const str = `${a.id}${b.id}${a.type}${b.type}`;
+  return makeId(str);
 }
