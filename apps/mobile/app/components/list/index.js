@@ -38,6 +38,7 @@ import TagItem from "../list-items/tag";
 import { Empty } from "./empty";
 import { getTotalNotes } from "../../utils";
 import { useSettingStore } from "../../stores/use-setting-store";
+import ReminderItem from "../list-items/reminder";
 
 const renderItems = {
   note: NoteWrapper,
@@ -45,7 +46,8 @@ const renderItems = {
   topic: NotebookWrapper,
   tag: TagItem,
   section: SectionHeader,
-  header: SectionHeader
+  header: SectionHeader,
+  reminder: ReminderItem
 };
 
 const RenderItem = ({ item, index, type, ...restArgs }) => {
