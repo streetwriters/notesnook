@@ -83,6 +83,10 @@ class Migrations {
           dbCollection: this._db.shortcuts
         },
         {
+          index: () => this._db.reminders.raw,
+          dbCollection: this._db.reminders
+        },
+        {
           index: () => this._db.noteHistory.sessionContent.all(),
           dbCollection: this._db.noteHistory
         },

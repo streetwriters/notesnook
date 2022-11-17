@@ -47,6 +47,7 @@ import EventManager from "../utils/event-manager";
 import Pricing from "./pricing";
 import { logger } from "../logger";
 import Shortcuts from "../collections/shortcuts";
+import Reminders from "../collections/reminders";
 
 /**
  * @type {EventSource}
@@ -143,6 +144,8 @@ class Database {
     this.noteHistory = await NoteHistory.new(this, "notehistory", false);
     /**@type {Shortcuts} */
     this.shortcuts = await Shortcuts.new(this, "shortcuts");
+    /**@type {Reminders} */
+    this.reminders = await Reminders.new(this, "reminders");
 
     this.trash = new Trash(this);
 
