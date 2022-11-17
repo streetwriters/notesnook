@@ -58,6 +58,10 @@ export default class Lookup {
     return this._byTitle(array, query);
   }
 
+  reminders(array, query) {
+    return search(array, query, (n) => `${n.title} ${n.description || ""}`);
+  }
+
   trash(array, query) {
     return this._byTitle(array, query);
   }
