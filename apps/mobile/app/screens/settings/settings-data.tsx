@@ -811,6 +811,31 @@ export const settingsGroups: SettingSection[] = [
             notifNotes: !settings.notifNotes
           });
         }
+      },
+      {
+        id: "reminders",
+        type: "screen",
+        name: "Reminders",
+        icon: "clock-outline",
+        description: "Manage and configure reminders in app",
+        sections: [
+          {
+            id: "disable-reminders",
+            property: "disableReminderNotifications",
+            type: "switch",
+            name: "Turn off reminder notifications",
+            icon: "bell-cancel-outline",
+            onChange: (property) => {
+              if (property) {
+                Notifications.setupReminders();
+              } else {
+                Notifications.clearAllTriggers();
+              }
+            },
+            description:
+              "Disable reminder notifications on this device, this is useful when you have notesnook on multiple devices & want to recieve reminder notifications only on your primary device."
+          }
+        ]
       }
     ]
   },
