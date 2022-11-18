@@ -37,7 +37,7 @@ function generateMetaTags(metadata, createMetaTag) {
 export function buildPage(
   template,
   createMetaTag,
-  { metadata, title, headline, content, createdOn, editedOn }
+  { metadata, title, headline, content, createdOn, editedOn, tags }
 ) {
   let page = template;
 
@@ -52,5 +52,6 @@ export function buildPage(
   page = page.replace(/{{content}}/g, content);
   page = page.replace(/{{createdOn}}/g, formatDate(createdOn));
   page = page.replace(/{{editedOn}}/g, formatDate(editedOn));
+  page = page.replace(/{{tags}}/g, tags);
   return page;
 }

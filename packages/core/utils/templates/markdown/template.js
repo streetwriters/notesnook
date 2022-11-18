@@ -24,5 +24,7 @@ const template = `# {{title}}
 
 _Created on: {{createdOn}}_
 
-_Edited on: {{editedOn}}_`;
+_Edited on: {{editedOn}}_
+
+_Tags: {{tags}}_`;
 export default template;

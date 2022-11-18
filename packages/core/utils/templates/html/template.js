@@ -33,7 +33,8 @@ const template = `<!DOCTYPE html>
     {{content}}
     <br/>
     Created on: <b>{{createdOn}}</b><br/>
-    Edited on: <b>{{editedOn}}</b>
+    Edited on: <b>{{editedOn}}</b><br/>
+    Tags: <b>{{tags}}</b>
   </body>
 </html>
 `;
