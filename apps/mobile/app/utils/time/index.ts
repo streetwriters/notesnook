@@ -16,6 +16,102 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
+import isToday from "dayjs/plugin/isToday";
+import isTomorrow from "dayjs/plugin/isTomorrow";
+import isYesterday from "dayjs/plugin/isYesterday";
+import { Reminder } from "../../services/notifications";
+import { WeekDayNames } from "../constants";
+
+dayjs.extend(isTomorrow);
+dayjs.extend(isYesterday);
+dayjs.extend(isToday);
+dayjs.extend(isBetween);
+
+function isNext(time: number, type: "week" | "month") {
+  console.log(dayjs().endOf(type));
+  return (
+    dayjs(time).isAfter(dayjs().endOf(type)) &&
+    dayjs(time).isBetween(
+      dayjs().endOf(type),
+      dayjs(dayjs().endOf(type).add(1, "day")).endOf(type)
+    )
+  );
+}
+
+function isLast(time: number, type: "week" | "month") {
+  return (
+    dayjs(time).isBefore(dayjs().endOf(type)) &&
+    dayjs(time).isBetween(dayjs(time).startOf(type), dayjs().startOf(type))
+  );
+}
+
+function getUpcomingReminderTime(reminder: Reminder) {
+  const time = reminder.date;
+  const sorted = reminder.selectedDays.sort((a, b) => a - b);
+  // If all selected days have passed for current period, i.e week or month
+  if (
+    dayjs(time)
+      .day(sorted[sorted.length - 1])
+      .isBefore(dayjs())
+  ) {
+    // select first selected day of next month/week;
+    return dayjs(time)
+      .day(sorted[0])
+      .add(1, reminder.recurringMode)
+      .toDate()
+      .getTime();
+  }
+  // Choose the nearest reminder time
+  // If not all selected days have passed yet.
+  for (const day of reminder.selectedDays) {
+    if (dayjs(time).day(day).isAfter(dayjs())) {
+      return dayjs(time).day(day).toDate().getTime();
+    }
+  }
+  return time;
+}
+
+export function formatReminderTime(reminder: Reminder) {
+  const { date } = reminder;
+  let time = date as number;
+  if (reminder.mode === "repeat") {
+    time = getUpcomingReminderTime(reminder) as number;
+  }
+
+  if (dayjs(time).isTomorrow()) {
+    return `Tomorrow, ${dayjs(time).format("hh:mm A")}`;
+  }
+
+  if (dayjs(time).isYesterday()) {
+    return `Yesterday, ${dayjs(time).format("hh:mm A")}`;
+  }
+
+  if (dayjs(time).isToday()) {
+    return `Today, ${dayjs(time).format("hh:mm A")}`;
+  }
+
+  // if (isNext(time, "week")) {
+  //   return `Next ${
+  //     WeekDayNames[dayjs(time).day() as keyof typeof WeekDayNames]
+  //   }, ${dayjs(time).format("hh:mm A")}`;
+  // }
+
+  // if (isLast(time, "week")) {
+  //   return `Last ${
+  //     WeekDayNames[dayjs(time).day() as keyof typeof WeekDayNames]
+  //   }, ${dayjs(time).format("hh:mm A")}`;
+  // }
+
+  // if (isNext(time, "month")) {
+  //   return `${WeekDayNames[dayjs(time).day() as keyof typeof WeekDayNames]}, ${
+  //     dayjs(time).date() + nth(dayjs(time).date())
+  //   } of next month, ${dayjs(time).format("hh:mm A")}`;
+  // }
+
+  return dayjs(time).format("ddd, DD MMM,YYYY hh:mm A");
+}
 
 export const sleep = (duration: number) =>
   new Promise((resolve) => setTimeout(() => resolve(true), duration));
