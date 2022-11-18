@@ -26,7 +26,7 @@ import { useNotebookStore } from "./use-notebook-store";
 import { useNoteStore } from "./use-notes-store";
 import { useTagStore } from "./use-tag-store";
 import { useTrashStore } from "./use-trash-store";
-
+import { useReminderStore } from "./use-reminder-store";
 export function initAfterSync() {
   useMenuStore.getState().setColorNotes();
   useMenuStore.getState().setMenuPins();
@@ -45,6 +45,7 @@ export function initialize() {
     useTagStore.getState().setTags();
     useFavoriteStore.getState().setFavorites();
     useNoteStore.getState().setNotes();
+    useReminderStore.getState().setReminders();
   });
 }
 
@@ -56,4 +57,5 @@ export function clearAllStores() {
   useNoteStore.getState().clearNotes();
   useMenuStore.getState().clearAll();
   useTrashStore.getState().clearTrash();
+  useReminderStore.getState().cleareReminders();
 }

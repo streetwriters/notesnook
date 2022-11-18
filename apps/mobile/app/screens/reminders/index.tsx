@@ -19,8 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { db } from "../../common/database";
+import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import List from "../../components/list";
+import ReminderSheet from "../../components/sheets/reminder";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import SearchService from "../../services/search";
@@ -40,7 +42,10 @@ const prepareSearch = () => {
 const PLACEHOLDER_DATA = {
   heading: "Your reminders",
   paragraph: "You have not set any reminders yet.",
-  button: null,
+  button: "Set a new reminder",
+  action: () => {
+    ReminderSheet.present();
+  },
   loading: "Loading reminders"
 };
 
@@ -77,6 +82,13 @@ export const Reminders = ({
         loading={!isFocused}
         screen="Reminders"
         placeholderData={PLACEHOLDER_DATA}
+      />
+
+      <FloatingButton
+        title="Set a new reminder"
+        onPress={() => {
+          ReminderSheet.present();
+        }}
       />
     </DelayLayout>
   );

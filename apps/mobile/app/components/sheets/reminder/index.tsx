@@ -22,7 +22,8 @@ import ActionSheet from "react-native-actions-sheet";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {
   presentSheet,
-  PresentSheetOptions
+  PresentSheetOptions,
+  ToastEvent
 } from "../../../services/event-manager";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
@@ -32,7 +33,10 @@ import Input from "../../ui/input";
 import Notifications, { Reminder } from "../../../services/notifications";
 import Paragraph from "../../ui/typography/paragraph";
 import dayjs from "dayjs";
-
+import { db } from "../../../common/database";
+import Navigation from "../../../services/navigation";
+import { formatReminderTime } from "../../../utils/time";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheet>;
   close?: () => void;
@@ -82,21 +86,29 @@ export default function ReminderSheet({
   reminder
 }: ReminderSheetProps) {
   const colors = useThemeStore((state) => state.colors);
-  const [reminderMode, setReminderMode] = useState<string | undefined>(
-    ReminderModes.Once
+  const [reminderMode, setReminderMode] = useState<Reminder["mode"]>(
+    reminder?.mode || "once"
   );
-  const [recurringMode, setRecurringMode] = useState(RecurringModes.Week);
-  const [selectedDays, setSelectedDays] = useState<number[]>([]);
-  const [date, setDate] = useState<Date>(new Date(Date.now()));
-  const [time, setTime] = useState<string>(dayjs(Date.now()).format("HH:mm"));
-  const [reminderNotificationMode, setReminderNotificatioMode] = useState(
-    ReminderNotificationModes.Silent
+  const [recurringMode, setRecurringMode] = useState<Reminder["recurringMode"]>(
+    reminder?.recurringMode || "week"
   );
+  const [selectedDays, setSelectedDays] = useState<number[]>(
+    reminder?.selectedDays || []
+  );
+  const [date, setDate] = useState<Date>(
+    new Date(reminder?.date || Date.now())
+  );
+  const [time, setTime] = useState<string>(
+    dayjs(reminder?.date || Date.now()).format("hh:mm a")
+  );
+  const [reminderNotificationMode, setReminderNotificatioMode] = useState<
+    Reminder["priority"]
+  >(reminder?.priority || "silent");
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
   const [repeatFrequency, setRepeatFrequency] = useState(1);
-  const title = useRef<string>();
-  const details = useRef<string>();
+  const title = useRef<string | undefined>(reminder?.title);
+  const details = useRef<string | undefined>(reminder?.description);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -112,7 +124,7 @@ export default function ReminderSheet({
   };
 
   const handleConfirm = (date: Date) => {
-    setTime(dayjs(date).format("HH:mm"));
+    setTime(dayjs(date).format("hh:mm a"));
     setDate(date);
     hideDatePicker();
   };
@@ -138,6 +150,34 @@ export default function ReminderSheet({
     return text;
   }
 
+  async function saveReminder() {
+    if (!(await Notifications.checkAndRequestPermissions())) return;
+    if ((!date && reminderMode !== ReminderModes.Permanent) || !title.current)
+      return;
+    const reminderId = await db.reminders?.add({
+      id: reminder?.id,
+      date: date?.getTime(),
+      dateCreated: Date.now(),
+      dateModified: Date.now(),
+      priority: reminderNotificationMode,
+      title: title.current,
+      description: details.current,
+      recurringMode: recurringMode,
+      selectedDays: selectedDays,
+      mode: reminderMode
+    });
+
+    const _reminder = db.reminders?.reminder(reminderId);
+
+    if (!_reminder) {
+      ToastEvent.show({
+        heading: "Failed to add a new reminder"
+      });
+    }
+    Notifications.scheduleNotification(_reminder as Reminder);
+    Navigation.queueRoutesForUpdate("Reminders");
+  }
+
   return (
     <View
       style={{
@@ -152,7 +192,7 @@ export default function ReminderSheet({
       />
 
       <Input
-        defaultValue={reminder?.details}
+        defaultValue={reminder?.description}
         placeholder="Add a quick note"
         onChangeText={(text) => (details.current = text)}
         containerStyle={{ borderWidth: 0, borderBottomWidth: 1 }}
@@ -181,7 +221,9 @@ export default function ReminderSheet({
             }
             onPress={() => {
               setReminderMode(
-                ReminderModes[mode as keyof typeof ReminderModes]
+                ReminderModes[
+                  mode as keyof typeof ReminderModes
+                ] as Reminder["mode"]
               );
             }}
           />
@@ -204,7 +246,6 @@ export default function ReminderSheet({
               alignItems: "center"
             }}
           >
-            <Paragraph style={{ marginRight: 5 }}>Every</Paragraph>
             {/* {Platform.OS === "android" ? (
               <Input
                 containerStyle={{
@@ -249,7 +290,9 @@ export default function ReminderSheet({
                 }
                 onPress={() => {
                   setRecurringMode(
-                    RecurringModes[mode as keyof typeof RecurringModes]
+                    RecurringModes[
+                      mode as keyof typeof RecurringModes
+                    ] as Reminder["recurringMode"]
                   );
                   setSelectedDays([]);
                   setRepeatFrequency(1);
@@ -410,7 +453,7 @@ export default function ReminderSheet({
                 setReminderNotificatioMode(
                   ReminderNotificationModes[
                     mode as keyof typeof ReminderNotificationModes
-                  ]
+                  ] as Reminder["priority"]
                 );
               }}
             />
@@ -418,24 +461,30 @@ export default function ReminderSheet({
         </View>
       )}
 
-      <Paragraph
-        color={colors.icon}
-        size={SIZE.xs}
-        style={{ marginTop: 5, marginBottom: 12 }}
-      >
-        {reminderMode === ReminderModes.Once ||
-        reminderMode === ReminderModes.Permanent
-          ? undefined
-          : selectedDays.length === 7 && recurringMode === RecurringModes.Week
-          ? `The reminder will repeat daily at ${dayjs(date).format("HH:mm")}.`
-          : selectedDays.length === 0
-          ? recurringMode === RecurringModes.Week
-            ? "Select day of the week to repeat the reminder."
-            : "Select nth day of the month to repeat the reminder."
-          : `Repeats every${repeatFrequency > 1 ? " " + repeatFrequency : ""} ${
-              repeatFrequency > 1 ? recurringMode + "s" : recurringMode
-            } on ${getSelectedDaysText(selectedDays)}.`}
-      </Paragraph>
+      {reminderMode === ReminderModes.Once ||
+      reminderMode === ReminderModes.Permanent ? null : (
+        <Paragraph
+          color={colors.icon}
+          size={SIZE.xs}
+          style={{ marginTop: 5, marginBottom: 12 }}
+        >
+          {selectedDays.length === 7 && recurringMode === RecurringModes.Week
+            ? `The reminder will repeat daily at ${dayjs(date).format(
+                "hh:mm A"
+              )}.`
+            : selectedDays.length === 0
+            ? recurringMode === RecurringModes.Week
+              ? "Select day of the week to repeat the reminder."
+              : "Select nth day of the month to repeat the reminder."
+            : `Repeats every${
+                repeatFrequency > 1 ? " " + repeatFrequency : ""
+              } ${
+                repeatFrequency > 1 ? recurringMode + "s" : recurringMode
+              } on ${getSelectedDaysText(selectedDays)} at ${dayjs(date).format(
+                "hh:mm A"
+              )}.`}
+        </Paragraph>
+      )}
 
       <Button
         style={{
@@ -443,33 +492,40 @@ export default function ReminderSheet({
         }}
         title="Save"
         type="accent"
-        onPress={async () => {
-          if (!(await Notifications.checkAndRequestPermissions())) return;
-          if (
-            (!date && reminderMode !== ReminderModes.Permanent) ||
-            !title.current
-          )
-            return;
-          Notifications.scheduleNotification({
-            id: "test_1",
-            type: "reminder",
-            date: date?.getTime(),
-            dateCreated: Date.now(),
-            dateModified: Date.now(),
-            priority: reminderNotificationMode as any,
-            title: title.current,
-            details: details.current,
-            recurringMode: recurringMode as any,
-            selectedDays: selectedDays,
-            mode: reminderMode as any
-          });
-        }}
+        onPress={saveReminder}
       />
+
+      {reminder && reminder.date ? (
+        <View
+          style={{
+            backgroundColor: colors.nav,
+            borderRadius: 5,
+            flexDirection: "row",
+            paddingHorizontal: 5,
+            paddingVertical: 3,
+            alignItems: "center",
+            justifyContent: "flex-start",
+            alignSelf: "center",
+            marginTop: 12
+          }}
+        >
+          <>
+            <Icon name="clock-outline" size={SIZE.md} color={colors.accent} />
+            <Paragraph
+              size={SIZE.xs + 1}
+              color={colors.icon}
+              style={{ marginLeft: 5 }}
+            >
+              Upcoming: {formatReminderTime(reminder)}
+            </Paragraph>
+          </>
+        </View>
+      ) : null}
     </View>
   );
 }
 
-ReminderSheet.present = (reminder: Reminder) => {
+ReminderSheet.present = (reminder?: Reminder) => {
   presentSheet({
     component: (ref, close, update) => (
       <ReminderSheet

@@ -44,7 +44,7 @@ export const DateMeta = ({ item }) => {
   };
 
   const renderItem = (key) =>
-    key.startsWith("date") ? (
+    key.startsWith("date") && key !== "date" ? (
       <View
         key={key}
         style={{

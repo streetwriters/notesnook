@@ -122,6 +122,13 @@ export async function doInBackground(cb) {
   }
 }
 
+export function nth(n) {
+  return (
+    ["st", "nd", "rd"][(((((n < 0 ? -n : n) + 90) % 100) - 10) % 10) - 1] ||
+    "th"
+  );
+}
+
 export function setWidthHeight(size) {
   dWidth = size.width;
   dHeight = size.height;
