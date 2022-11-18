@@ -25,7 +25,8 @@ import notifee, {
   RepeatFrequency,
   Trigger,
   TriggerType,
-  Event
+  Event,
+  TriggerNotification
 } from "@notifee/react-native";
 import dayjs from "dayjs";
 import { Platform } from "react-native";
@@ -38,6 +39,7 @@ import { tabBarRef } from "../utils/global-refs";
 import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import SettingsService from "./settings";
+import { useSettingStore } from "../stores/use-setting-store";
 
 export type Reminder = {
   id: string;
@@ -111,6 +113,7 @@ const onEvent = async ({ type, detail }: Event) => {
 };
 
 async function scheduleNotification(reminder: Reminder, payload?: string) {
+  if (useSettingStore.getState().settings.disableReminderNotifications) return;
   try {
     const { title, description, priority } = reminder;
     const triggers = getTriggers(reminder);
@@ -134,7 +137,8 @@ async function scheduleNotification(reminder: Reminder, payload?: string) {
           body: description,
           data: {
             type: "reminder",
-            payload: payload || ""
+            payload: payload || "",
+            dateModified: reminder.dateModified + ""
           },
           subtitle: description,
           android: {
@@ -396,6 +400,7 @@ async function getScheduledNotificationIds() {
 }
 
 async function clearAllPendingTriggersForId(_id: string) {
+  if (!_id) return;
   const ids = await getScheduledNotificationIds();
   for (const id of ids) {
     if (id.startsWith(_id)) {
@@ -406,6 +411,10 @@ async function clearAllPendingTriggersForId(_id: string) {
 
 function clearAll() {
   notifee.cancelDisplayedNotifications();
+}
+
+function clearAllTriggers() {
+  notifee.cancelTriggerNotifications();
 }
 
 function getPinnedNotes(): DisplayedNotification[] {
@@ -454,6 +463,46 @@ async function pinQuickNote(launch: boolean) {
   });
 }
 
+/**
+ * A function that checks if reminders need to be reconfigured &
+ * reschedules them if anything has changed.
+ */
+async function setupReminders() {
+  const reminders = (db.reminders?.all as Reminder[]) || [];
+  const triggers = await notifee.getTriggerNotifications();
+
+  for (const reminder of reminders) {
+    const pending = triggers.filter((t) =>
+      t.notification.id?.startsWith(reminder.id)
+    );
+    let needsReschedule = pending.length === 0 ? true : false;
+    if (!needsReschedule) {
+      needsReschedule = pending[0].notification.data?.dateModified
+        ? parseInt(pending[0].notification.data?.dateModified as string) <
+          reminder.dateModified
+        : true;
+    }
+    if (needsReschedule) await scheduleNotification(reminder);
+  }
+  // Check for any triggers whose notifications
+  // have been removed.
+  const staleTriggers: TriggerNotification[] = [];
+  for (const trigger of triggers) {
+    if (
+      reminders.findIndex((r) => trigger.notification.id?.startsWith(r.id)) ===
+      -1
+    ) {
+      staleTriggers.push(trigger);
+    }
+  }
+  // Remove any stale triggers that are pending
+  staleTriggers.forEach(
+    (trigger) =>
+      trigger.notification.id &&
+      notifee.cancelTriggerNotification(trigger.notification.id as string)
+  );
+}
+
 const Notifications = {
   init,
   displayNotification,
@@ -466,7 +515,9 @@ const Notifications = {
   scheduleNotification,
   removeScheduledNotification,
   getScheduledNotificationIds,
-  checkAndRequestPermissions
+  checkAndRequestPermissions,
+  clearAllTriggers,
+  setupReminders
 };
 
 export default Notifications;
