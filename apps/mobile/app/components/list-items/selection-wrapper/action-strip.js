@@ -100,6 +100,7 @@ export const ActionStrip = ({ note, setActionStrip }) => {
         ? "Remove Shortcut from Menu"
         : "Add Shortcut to Menu",
       icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
+      visible: note.type !== "reminder",
       onPress: async () => {
         try {
           if (isPinnedToMenu) {
@@ -223,6 +224,21 @@ export const ActionStrip = ({ note, setActionStrip }) => {
       icon: "delete",
       visible: note.type !== "trash",
       onPress: async () => {
+        if (note.type === "reminder") {
+          presentDialog({
+            title: `Delete ${note.type}`,
+            paragraph: "This reminder will be removed",
+            positivePress: async () => {
+              const routes = [];
+              await db.reminders.remove(note.id);
+              routes.push("Reminders");
+              Navigation.queueRoutesForUpdate(...routes);
+            },
+            positiveText: "Delete",
+            positiveType: "errorShade"
+          });
+          return;
+        }
         try {
           await deleteItems(note);
         } catch (e) {
