@@ -27,6 +27,7 @@ import SearchService from "../../services/search";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { COLORS_NOTE } from "../../utils/color-scheme";
 import { SIZE } from "../../utils/size";
+import { formatReminderTime } from "../../utils/time";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { ColorTags } from "./color-tags";
@@ -37,6 +38,7 @@ import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { Tags } from "./tags";
 import { Topics } from "./topics";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 export const Properties = ({
   close = () => {},
   item,
@@ -98,7 +100,9 @@ export const Properties = ({
                 numberOfLines={2}
                 color={colors.icon}
               >
-                {(item.type === "notebook" || item.itemType === "notebook") &&
+                {(item.type === "notebook" ||
+                  item.itemType === "notebook" ||
+                  item.type === "reminder") &&
                 item?.description
                   ? item.description
                   : null}
@@ -107,6 +111,39 @@ export const Properties = ({
                   ? item.headline
                   : null}
               </Paragraph>
+            ) : null}
+
+            {item.type === "reminder" ? (
+              <View
+                style={{
+                  backgroundColor: colors.nav,
+                  borderRadius: 5,
+                  flexDirection: "row",
+                  paddingHorizontal: 5,
+                  paddingVertical: 3,
+                  alignItems: "center",
+                  justifyContent: "flex-start",
+                  alignSelf: "flex-start",
+                  marginBottom: 5
+                }}
+              >
+                {item.date ? (
+                  <>
+                    <Icon
+                      name="clock-outline"
+                      size={SIZE.md}
+                      color={colors.accent}
+                    />
+                    <Paragraph
+                      size={SIZE.xs + 1}
+                      color={colors.icon}
+                      style={{ marginLeft: 5 }}
+                    >
+                      {formatReminderTime(item)}
+                    </Paragraph>
+                  </>
+                ) : null}
+              </View>
             ) : null}
 
             {item.type === "note" ? <Tags close={close} item={item} /> : null}
@@ -202,6 +239,11 @@ Properties.present = (item, buttons = []) => {
       props[0] = db.tags.tag(item.id);
       props.push(["Add Shortcut", "Delete", "Rename Tag"]);
       break;
+    case "reminder": {
+      props[0] = db.reminders.reminder(item.id);
+      props.push(["Edit reminder", "Delete"]);
+      break;
+    }
   }
   if (!props[0]) return;
   presentSheet({

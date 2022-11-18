@@ -22,7 +22,6 @@ import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import List from "../../components/list";
-import ReminderSheet from "../../components/sheets/reminder";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import SearchService from "../../services/search";
@@ -80,9 +79,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
         placeholderData={PLACEHOLDER_DATA}
       />
 
-      <FloatingButton title="Create a new note" onPress={() => {
-        ReminderSheet.present();
-      }} />
+      <FloatingButton title="Create a new note" onPress={openEditor} />
     </DelayLayout>
   );
 };

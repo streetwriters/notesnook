@@ -27,6 +27,7 @@ import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
 import ExportNotesSheet from "../components/sheets/export-notes";
 import { MoveNotes } from "../components/sheets/move-notes/movenote";
+import ReminderSheet from "../components/sheets/reminder";
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -49,7 +50,8 @@ import { toggleDarkMode } from "../utils/color-scheme/utils";
 import {
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
-  eOpenAttachmentsDialog, eOpenLoginDialog,
+  eOpenAttachmentsDialog,
+  eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog
 } from "../utils/events";
@@ -435,28 +437,39 @@ export const useActions = ({ close = () => null, item }) => {
   async function deleteItem() {
     if (!checkNoteSynced()) return;
     close();
-    if (item.type === "tag") {
+    if (item.type === "tag" || item.type === "reminder") {
       await sleep(300);
       presentDialog({
-        title: "Delete tag",
-        paragraph: "This tag will be removed from all notes.",
+        title: `Delete ${item.type}`,
+        paragraph:
+          item.type === "reminder"
+            ? "This reminder will be removed"
+            : "This tag will be removed from all notes.",
         positivePress: async () => {
-          await db.tags.remove(item.id);
-          useTagStore.getState().setTags();
-          Navigation.queueRoutesForUpdate(
-            "TaggedNotes",
-            "ColoredNotes",
-            "TopicNotes",
-            "Favorites",
-            "Notes",
-            "Tags"
-          );
+          const routes = [];
+          if (item.type === "reminder") {
+            await db.reminders.remove(item.id);
+            routes.push("Reminders");
+          } else {
+            await db.tags.remove(item.id);
+            useTagStore.getState().setTags();
+            routes.push(
+              "TaggedNotes",
+              "ColoredNotes",
+              "TopicNotes",
+              "Favorites",
+              "Notes",
+              "Tags"
+            );
+          }
+          Navigation.queueRoutesForUpdate(...routes);
         },
         positiveText: "Delete",
         positiveType: "errorShade"
       });
       return;
     }
+
     if (item.locked) {
       await sleep(300);
       openVault({
@@ -781,6 +794,17 @@ export const useActions = ({ close = () => null, item }) => {
       close: false,
       nopremium: true,
       id: notesnook.ids.dialogs.actionsheet.night
+    },
+    {
+      name: "Edit reminder",
+      title: "Edit reminder",
+      icon: "clock-outline",
+      func: async () => {
+        close();
+        await sleep(300);
+        ReminderSheet.present(item);
+      },
+      close: false
     }
   ];
 
