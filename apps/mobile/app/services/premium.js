@@ -309,7 +309,8 @@ const subscriptions = {
       subscription = _subscriptions.length > 0 ? _subscriptions[0] : null;
     }
     if (subscription) {
-      await RNIap.finishTransactionIOS(subscription.transactionId);
+
+      await RNIap.finishTransaction(subscription.transactionId);
       await RNIap.clearTransactionIOS();
       await subscriptions.remove(subscription.transactionId);
     }
