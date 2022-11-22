@@ -17,6 +17,29 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
+    <queries>
+            <intent>
+                <action android:name="android.intent.action.VIEW" />
+                <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+                <data android:mimeType="application/pdf" />
+            </intent>
+            <intent>
+                <action android:name="android.intent.action.VIEW" />
+                <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+                <data android:mimeType="text/*" />
+            </intent>
+            <intent>
+                <action android:name="android.intent.action.VIEW" />
+                <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+
+                <data android:mimeType="video/*" />
+            </intent>
+            <intent>
+                <action android:name="android.intent.action.VIEW" />
+                <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+                <data android:mimeType="audio/*" />
+            </intent>
+        </queries>
 
     <application
         android:name=".MainApplication"
@@ -30,6 +53,7 @@
         android:supportsRtl="false"
         tools:replace="android:supportsRtl"
         android:usesCleartextTraffic="true">
+    
         <receiver android:exported="false" android:name=".NoteWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
