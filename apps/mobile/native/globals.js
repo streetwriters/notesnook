@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { setJSExceptionHandler } from 'react-native-exception-handler';
-
 global.Buffer = require('buffer').Buffer;
 //import { ScriptManager, Script } from '@callstack/repack/client';
 import '../app/common/logger/index';
@@ -21,13 +19,6 @@ import { DOMParser } from './worker.js';
 //   }
 // }
 global.DOMParser = DOMParser;
-
-//=================================================
-// ADVANCED use case:
-const exceptionhandler = (error, isFatal) => {
-  // TODO
-};
-setJSExceptionHandler(exceptionhandler, true);
 
 // try {
 //   const shared = ScriptManager.shared;

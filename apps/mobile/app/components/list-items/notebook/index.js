@@ -24,7 +24,7 @@ import { notesnook } from "../../../../e2e/test.ids";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { getTotalNotes, history } from "../../../utils";
+import { history } from "../../../utils";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { Button } from "../../ui/button";

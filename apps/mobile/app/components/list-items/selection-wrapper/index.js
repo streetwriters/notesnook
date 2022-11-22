@@ -29,6 +29,7 @@ import { PressableButton } from "../../ui/pressable";
 import { ActionStrip } from "./action-strip";
 import { Filler } from "./back-fill";
 import { SelectionIcon } from "./selection";
+import { useRef } from "react";
 
 const SelectionWrapper = ({
   children,
@@ -38,6 +39,7 @@ const SelectionWrapper = ({
   onPress,
   testID
 }) => {
+  const itemId = useRef(item.id);
   const colors = useThemeStore((state) => state.colors);
   const [actionStrip, setActionStrip] = useState(false);
   const notebooksListMode = useSettingStore(
@@ -50,6 +52,13 @@ const SelectionWrapper = ({
   const compactMode =
     (item.type === "notebook" || item.type === "note") &&
     listMode === "compact";
+
+  if (item.id !== itemId.current) {
+    itemId.current = item.id;
+    if (actionStrip) {
+      setActionStrip(false);
+    }
+  }
 
   const _onLongPress = () => {
     if (history.selectedItemsList.length > 0) return;

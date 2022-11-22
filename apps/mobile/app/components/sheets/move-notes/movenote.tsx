@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { FlashList } from "@shopify/flash-list";
 import { NotebookType, NoteType, TopicType } from "app/utils/types";
 import React, { RefObject, useState } from "react";
-import { Platform, View } from "react-native";
+import { Platform, useWindowDimensions, View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
-import { FlatList } from "react-native-gesture-handler";
 import { db } from "../../../common/database";
 import {
   eSendEvent,
@@ -62,7 +62,7 @@ export const MoveNotes = ({
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const [currentNotebook, setCurrentNotebook] = useState(notebook);
-
+  const { height } = useWindowDimensions();
   let notes = db.notes?.all as NoteType[];
 
   const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
@@ -74,22 +74,25 @@ export const MoveNotes = ({
     return noteIds.indexOf(note.id) === -1;
   });
 
-  const select = (id: string) => {
-    const index = selectedNoteIds.indexOf(id);
-    if (index > -1) {
-      setSelectedNoteIds((selectedNoteIds) => {
-        const next = [...selectedNoteIds];
-        next.splice(index, 1);
-        return next;
-      });
-    } else {
-      setSelectedNoteIds((selectedNoteIds) => {
-        const next = [...selectedNoteIds];
-        next.push(id);
-        return next;
-      });
-    }
-  };
+  const select = React.useCallback(
+    (id: string) => {
+      const index = selectedNoteIds.indexOf(id);
+      if (index > -1) {
+        setSelectedNoteIds((selectedNoteIds) => {
+          const next = [...selectedNoteIds];
+          next.splice(index, 1);
+          return next;
+        });
+      } else {
+        setSelectedNoteIds((selectedNoteIds) => {
+          const next = [...selectedNoteIds];
+          next.push(id);
+          return next;
+        });
+      }
+    },
+    [selectedNoteIds]
+  );
 
   const openAddTopicDialog = () => {
     presentDialog({
@@ -131,69 +134,76 @@ export const MoveNotes = ({
     return true;
   };
 
-  const renderItem = ({ item }: { item: CommonItemType }) => {
-    return (
-      <PressableButton
-        testID="listitem.select"
-        onPress={() => {
-          if (item.type == "topic") {
-            setTopic(topic || (item as TopicType));
-          } else {
-            select(item.id);
-          }
-        }}
-        type={"transparent"}
-        customStyle={{
-          paddingVertical: 12,
-          justifyContent: "space-between",
-          paddingHorizontal: 12,
-          flexDirection: "row"
-        }}
-      >
-        <View
-          style={{
-            flexShrink: 1
+  const renderItem = React.useCallback(
+    ({ item }: { item: CommonItemType }) => {
+      return (
+        <PressableButton
+          testID="listitem.select"
+          onPress={() => {
+            if (item.type == "topic") {
+              setTopic(topic || (item as TopicType));
+            } else {
+              select(item.id);
+            }
+          }}
+          type={"transparent"}
+          customStyle={{
+            paddingVertical: 12,
+            justifyContent: "space-between",
+            paddingHorizontal: 12,
+            flexDirection: "row"
           }}
         >
-          <Paragraph
-            numberOfLines={1}
-            color={item?.id === topic?.id ? colors.accent : colors.pri}
+          <View
+            style={{
+              flexShrink: 1
+            }}
           >
-            {item.title}
-          </Paragraph>
-          {item.type == "note" && item.headline ? (
-            <Paragraph numberOfLines={1} color={colors.icon} size={SIZE.xs + 1}>
-              {item.headline}
+            <Paragraph
+              numberOfLines={1}
+              color={item?.id === topic?.id ? colors.accent : colors.pri}
+            >
+              {item.title}
+            </Paragraph>
+            {item.type == "note" && item.headline ? (
+              <Paragraph
+                numberOfLines={1}
+                color={colors.icon}
+                size={SIZE.xs + 1}
+              >
+                {item.headline}
+              </Paragraph>
+            ) : null}
+          </View>
+
+          {item.type === "topic" ? (
+            <Paragraph
+              style={{
+                fontSize: SIZE.xs
+              }}
+              color={colors.icon}
+            >
+              {item.notes?.length} Notes
             </Paragraph>
           ) : null}
-        </View>
 
-        {item.type === "topic" ? (
-          <Paragraph
-            style={{
-              fontSize: SIZE.xs
-            }}
-            color={colors.icon}
-          >
-            {item.notes?.length} Notes
-          </Paragraph>
-        ) : null}
-
-        {selectedNoteIds.indexOf(item.id) > -1 ? (
-          <IconButton
-            customStyle={{
-              width: undefined,
-              height: undefined,
-              backgroundColor: "transparent"
-            }}
-            name="check"
-            type="grayAccent"
-            color={colors.accent}
-          />
-        ) : null}
-      </PressableButton>
-    );
-  };
+          {selectedNoteIds.indexOf(item.id) > -1 ? (
+            <IconButton
+              customStyle={{
+                width: undefined,
+                height: undefined,
+                backgroundColor: "transparent"
+              }}
+              name="check"
+              type="grayAccent"
+              color={colors.accent}
+            />
+          ) : null}
+        </PressableButton>
+      );
+    },
+    [colors.accent, colors.icon, colors.pri, select, selectedNoteIds, topic]
+  );
 
   /**
    *
@@ -202,7 +212,8 @@ export const MoveNotes = ({
     <View
       style={{
         paddingHorizontal: 12,
-        maxHeight: Platform.OS === "ios" ? "96%" : "97%"
+        maxHeight: Platform.OS === "ios" ? "96%" : "97%",
+        height: height * 0.9
       }}
     >
       <Dialog context="local" />
@@ -265,7 +276,7 @@ export const MoveNotes = ({
         </>
       )}
 
-      <FlatList
+      <FlashList
         nestedScrollEnabled
         onMomentumScrollEnd={() => {
           fwdRef.current?.handleChildScrollEnd();

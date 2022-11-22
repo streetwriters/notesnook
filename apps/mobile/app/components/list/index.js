@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useRef } from "react";
-import { FlatList, RefreshControl, View } from "react-native";
+import { RefreshControl, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { notesnook } from "../../../e2e/test.ids";
 import { eSendEvent } from "../../services/event-manager";
@@ -36,6 +37,7 @@ import { NotebookWrapper } from "../list-items/notebook/wrapper";
 import TagItem from "../list-items/tag";
 import { Empty } from "./empty";
 import { getTotalNotes } from "../../utils";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 const renderItems = {
   note: NoteWrapper,
@@ -97,6 +99,14 @@ const List = ({
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const scrollRef = useRef();
+  const [notesListMode, notebooksListMode] = useSettingStore((state) => [
+    state.settings.notesListMode,
+    state.settings.notebooksListMode
+  ]);
+  const isCompactModeEnabled =
+    (type === "notes" && notesListMode === "compact") ||
+    type === "notebooks" ||
+    notebooksListMode === "compact";
 
   const renderItem = React.useCallback(
     ({ item, index }) => (
@@ -148,20 +158,18 @@ const List = ({
         }}
         entering={type === "search" ? undefined : FadeInDown}
       >
-        <FlatList
+        <FlashList
           style={styles}
-          keyExtractor={_keyExtractor}
           ref={scrollRef}
           testID={notesnook.list.id}
           data={listData}
           renderItem={renderItem}
           onScroll={_onScroll}
-          windowSize={5}
           onMomentumScrollEnd={() => {
             tabBarRef.current?.unlock();
           }}
+          estimatedItemSize={isCompactModeEnabled ? 60 : 100}
           directionalLockEnabled={true}
-          initialNumToRender={10}
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="interactive"
           refreshControl={
