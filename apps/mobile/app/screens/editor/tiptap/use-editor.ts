@@ -410,7 +410,13 @@ export const useEditor = (
         }
         await commands.setStatus(timeConverter(note.dateEdited), "Saved");
       }
-
+      db.eventManager.subscribe(
+        EVENTS.syncCompleted,
+        async () => {
+          loadImages();
+        },
+        true
+      );
       lock.current = false;
     },
     [commands, postMessage, lockNoteWithVault]
