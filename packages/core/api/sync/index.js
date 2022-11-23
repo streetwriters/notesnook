@@ -33,6 +33,7 @@ import { AutoSync } from "./auto-sync";
 import { toChunks } from "../../utils/array";
 import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
 import { logger } from "../../logger";
+import { Mutex } from "async-mutex";
 
 /**
  * @typedef {{
@@ -105,6 +106,7 @@ class Sync {
     this.merger = new Merger(db);
     this.autoSync = new AutoSync(db, 1000);
     this.logger = logger.scope("Sync");
+    this.syncConnectionMutex = new Mutex();
 
     const tokenManager = new TokenManager(db.storage);
     this.connection = new signalr.HubConnectionBuilder()
@@ -388,21 +390,24 @@ class Sync {
   }
 
   async checkConnection() {
-    try {
-      if (this.connection.state !== signalr.HubConnectionState.Connected) {
-        if (this.connection.state !== signalr.HubConnectionState.Disconnected) {
-          await this.connection.stop();
-        }
+    await this.syncConnectionMutex.runExclusive(async () => {
+      try {
+        if (this.connection.state !== signalr.HubConnectionState.Connected) {
+          if (
+            this.connection.state !== signalr.HubConnectionState.Disconnected
+          ) {
+            await this.connection.stop();
+          }
 
-        await promiseTimeout(15000, this.connection.start());
+          await promiseTimeout(30000, () => this.connection.start());
+        }
+      } catch (e) {
+        this.logger.warn(e.message);
+        throw new Error(
+          "Could not connect to the Sync server. Please try again."
+        );
       }
-    } catch (e) {
-      this.connection.stop();
-      this.logger.warn(e.message);
-      throw new Error(
-        "Could not connect to the Sync server. Please try again."
-      );
-    }
+    });
   }
 }
 
