@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import Worker from "worker-loader?filename=static/workers/compressor.worker.[hash].js!./compressor.worker";
+import Worker from "worker-loader?filename=static/workers/compressor.worker.[contenthash].js!./compressor.worker";
 import type { Compressor as CompressorWorker } from "./compressor.worker";
 import { wrap, Remote } from "comlink";
 import { isDesktop } from "./platform";
