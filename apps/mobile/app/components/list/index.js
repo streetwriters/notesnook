@@ -168,6 +168,7 @@ const List = ({
           onMomentumScrollEnd={() => {
             tabBarRef.current?.unlock();
           }}
+          getItemType={(item) => item.itemType || item.type}
           estimatedItemSize={isCompactModeEnabled ? 60 : 100}
           directionalLockEnabled={true}
           keyboardShouldPersistTaps="always"
