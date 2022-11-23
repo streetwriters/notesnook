@@ -36,7 +36,6 @@ import {
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
-import useMobile from "../../hooks/use-mobile";
 import { Attachment } from "./picker";
 import { IEditor } from "./types";
 import {
