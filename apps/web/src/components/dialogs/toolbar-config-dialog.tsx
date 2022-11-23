@@ -97,8 +97,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
       positiveButton={{
         text: "Save",
         onClick: async () => {
-          const dummyTools = unflatten(items);
-          const tools = dummyTools.slice(0, dummyTools.length - 1);
+          const tools = unflatten(items).slice(0, -1);
 
           await db.settings?.setToolbarConfig("desktop", {
             preset: currentPreset.id,
