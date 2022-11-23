@@ -36,7 +36,7 @@ const useMediaQuery = (mediaQuery) => {
   if (!window.matchMedia) {
     // eslint-disable-next-line no-console
     console.warn(errorMessage);
-    return null;
+    return false;
   }
 
   const [isVerified, setIsVerified] = useState(

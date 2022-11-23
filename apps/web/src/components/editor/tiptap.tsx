@@ -66,6 +66,7 @@ type TipTapProps = {
   readonly?: boolean;
   nonce?: number;
   theme: Theme;
+  isMobile?: boolean;
 };
 
 const SAVE_INTERVAL = process.env.REACT_APP_TEST ? 100 : 300;
@@ -107,11 +108,11 @@ function TipTap(props: TipTapProps) {
     editorContainer,
     readonly,
     nonce,
-    theme
+    theme,
+    isMobile
   } = props;
 
   const isUserPremium = useIsUserPremium();
-  const isMobile = useMobile();
   const configure = useConfigureEditor();
   const doubleSpacedLines = useSettingsStore(
     (store) => store.doubleSpacedLines

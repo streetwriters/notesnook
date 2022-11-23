@@ -42,6 +42,7 @@ import { EV, EVENTS } from "@notesnook/core/common";
 import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
 import Titlebox from "./title-box";
+import useTablet from "../../hooks/use-tablet";
 
 type PreviewSession = {
   content: { data: string; type: string };
@@ -82,6 +83,9 @@ export default function EditorManager({
   const isReadonly = useStore((store) => store.session.readonly);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isPreviewSession = !!previewSession.current;
+
+  const isMobile = useMobile();
+  const isTablet = useTablet();
 
   useEffect(() => {
     const event = db.eventManager.subscribe(
@@ -184,7 +188,8 @@ export default function EditorManager({
           readonly: isReadonly || isPreviewSession,
           onRequestFocus: () => toggleProperties(false),
           onLoadMedia: loadMedia,
-          focusMode: isFocusMode
+          focusMode: isFocusMode,
+          isMobile: isMobile || isTablet
         }}
       />
       {arePropertiesVisible && (
@@ -201,6 +206,7 @@ export default function EditorManager({
 }
 
 type EditorOptions = {
+  isMobile?: boolean;
   headless?: boolean;
   readonly?: boolean;
   focusMode?: boolean;
@@ -214,10 +220,11 @@ type EditorProps = {
 };
 export function Editor(props: EditorProps) {
   const { content, nonce, options } = props;
-  const { readonly, headless, onLoadMedia } = options || {
+  const { readonly, headless, onLoadMedia, isMobile } = options || {
     headless: false,
     readonly: false,
-    focusMode: false
+    focusMode: false,
+    isMobile: false
   };
 
   const editor = useEditorInstance();
@@ -259,6 +266,7 @@ export function Editor(props: EditorProps) {
   return (
     <EditorChrome {...props}>
       <Tiptap
+        isMobile={isMobile}
         nonce={nonce}
         readonly={readonly}
         toolbarContainerId={headless ? undefined : "editorToolbar"}
@@ -289,12 +297,13 @@ export function Editor(props: EditorProps) {
 
 function EditorChrome(props: PropsWithChildren<EditorProps>) {
   const { options, children } = props;
-  const { readonly, focusMode, headless, onRequestFocus } = options || {
-    headless: false,
-    readonly: false,
-    focusMode: false
-  };
-  const isMobile: boolean | null = useMobile();
+  const { readonly, focusMode, headless, onRequestFocus, isMobile } =
+    options || {
+      headless: false,
+      readonly: false,
+      focusMode: false,
+      isMobile: false
+    };
 
   if (headless) return <>{children}</>;
 
@@ -303,7 +312,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       <Toolbar />
       <FlexScrollContainer
         className="editorScroll"
-        style={{ display: "flex", flexDirection: "column" }}
+        style={{ display: "flex", flexDirection: "column", flex: 1 }}
       >
         <Flex
           variant="columnFill"
