@@ -348,7 +348,7 @@ test("note content should not contain image base64 data after save", () =>
     const note = db.notes.note(id);
     const content = await note.content();
     expect(content).not.toContain(`src="data:image/png;`);
-    expect(content).toContain(`src=""`);
+    expect(content).not.toContain(`src=`);
   }));
 
 test("adding a note with an invalid tag should clean the tag array", () =>

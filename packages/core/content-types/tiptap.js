@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import showdown from "@streetwriters/showdown";
 import dataurl from "../utils/dataurl";
 import { extractFirstParagraph, getDummyDocument } from "../utils/html-parser";
-import { Attributes, HTMLParser, HTMLRewriter } from "../utils/html-rewriter";
+import { HTMLParser, HTMLRewriter } from "../utils/html-rewriter";
 import { convert } from "html-to-text";
 import { list } from "html-to-text/lib/formatter";
 
@@ -101,7 +101,7 @@ export class Tiptap {
     let hashes = [];
     new HTMLParser({
       ontag: (name, attr) => {
-        const hash = Attributes.get(attr, ATTRIBUTES.hash);
+        const hash = attr[ATTRIBUTES.hash];
         if (name === "img" && hash) hashes.push(hash);
       }
     }).parse(this.data);
@@ -119,12 +119,11 @@ export class Tiptap {
 
     return new HTMLRewriter({
       ontag: (name, attr) => {
-        const hash = Attributes.get(attr, ATTRIBUTES.hash);
+        const hash = attr[ATTRIBUTES.hash];
         if (name === "img" && hash) {
-          const src = images[Attributes.get(attr, ATTRIBUTES.hash)];
+          const src = images[hash];
           if (!src) return;
-
-          return { name, attr: Attributes.set(attr, ATTRIBUTES.src, src) };
+          attr[ATTRIBUTES.src] = src;
         }
       }
     }).transform(this.data);
@@ -137,8 +136,7 @@ export class Tiptap {
   removeAttachments(hashes) {
     return new HTMLRewriter({
       ontag: (_name, attr) => {
-        if (hashes.includes(Attributes.get(attr, ATTRIBUTES.hash)))
-          return false;
+        if (hashes.includes(attr[ATTRIBUTES.hash])) return false;
       }
     }).transform(this.data);
   }
@@ -147,8 +145,8 @@ export class Tiptap {
     let sources = [];
     new HTMLParser({
       ontag: (name, attr, pos) => {
-        const hash = Attributes.get(attr, ATTRIBUTES.hash);
-        const src = Attributes.get(attr, ATTRIBUTES.src);
+        const hash = attr[ATTRIBUTES.hash];
+        const src = attr[ATTRIBUTES.src];
         if (name === "img" && !hash && src) {
           sources.push({
             src,
@@ -178,16 +176,13 @@ export class Tiptap {
       ontag: (name, attr, pos) => {
         switch (name) {
           case "img": {
-            const hash = Attributes.get(attr, ATTRIBUTES.hash);
+            const hash = attr[ATTRIBUTES.hash];
 
             if (hash) {
               attachments.push({
                 hash
               });
-              return {
-                name,
-                attr: Attributes.set(attr, ATTRIBUTES.src, "")
-              };
+              delete attr[ATTRIBUTES.src];
             } else {
               const imageData = images[`${pos.start}${pos.end}`];
               if (!imageData) return imageData;
@@ -195,10 +190,8 @@ export class Tiptap {
               const { key, metadata, mime } = imageData;
               if (!metadata.hash) return;
 
-              const type =
-                Attributes.get(attr, ATTRIBUTES.mime) || mime || "image/jpeg";
-              const filename =
-                Attributes.get(attr, ATTRIBUTES.filename) || metadata.hash;
+              const type = attr[ATTRIBUTES.mime] || mime || "image/jpeg";
+              const filename = attr[ATTRIBUTES.filename] || metadata.hash;
 
               attachments.push({
                 type,
@@ -207,18 +200,13 @@ export class Tiptap {
                 key
               });
 
-              return {
-                name,
-                attr: Attributes.set(
-                  Attributes.set(attr, ATTRIBUTES.hash, metadata.hash),
-                  ATTRIBUTES.src,
-                  ""
-                )
-              };
+              attr[ATTRIBUTES.hash] = metadata.hash;
+              delete attr[ATTRIBUTES.src];
             }
+            break;
           }
           case "span": {
-            const hash = Attributes.get(attr, ATTRIBUTES.hash);
+            const hash = attr[ATTRIBUTES.hash];
             if (!hash) return;
             attachments.push({
               hash

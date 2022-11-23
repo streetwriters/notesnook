@@ -27,7 +27,7 @@ test("img src is empty after extract attachments", async () => {
   });
   expect(result.attachments).toHaveLength(1);
   expect(result.data).not.toContain(`src="data:image/png;`);
-  expect(result.data).toContain(`src=""`);
+  expect(result.data).not.toContain(`src=""`);
   expect(result.data).toContain(`data-hash="helloworld"`);
 });
 

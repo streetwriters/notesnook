@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Parser, Attributes } from "htmlparser2";
+import { Parser } from "htmlparser2";
 
 export class HTMLRewriter {
   /**
@@ -73,7 +73,12 @@ export class HTMLRewriter {
           }
 
           this.write(`<${name}`);
-          if (attr) this.write(` ${attr}`);
+          if (attr) {
+            for (const key in attr) {
+              if (!key) continue;
+              this.write(` ${key}="${attr[key]}"`);
+            }
+          }
           this.currentTag = name;
         },
         onclosetag: (name, isImplied) => {
@@ -111,8 +116,7 @@ export class HTMLRewriter {
         decodeEntities: false,
         lowerCaseAttributeNames: false,
         lowerCaseTags: false,
-        recognizeCDATA: false,
-        parseAttributes: false
+        recognizeCDATA: false
       }
     );
   }
@@ -171,8 +175,7 @@ export class HTMLParser {
         decodeEntities: false,
         lowerCaseAttributeNames: false,
         lowerCaseTags: false,
-        recognizeCDATA: false,
-        parseAttributes: false
+        recognizeCDATA: false
       }
     );
   }
@@ -182,5 +185,3 @@ export class HTMLParser {
     this.parser.reset();
   }
 }
-
-export { Attributes };
