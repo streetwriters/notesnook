@@ -149,8 +149,8 @@ export const PricingPlans = ({
         product?.productId,
         false,
         null,
-        null,
-        null,
+        -1,
+        user.id,
         user.id
       );
       setBuying(false);

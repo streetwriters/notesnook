@@ -32,6 +32,7 @@
     "@notesnook/editor-mobile": "*",
     "fflate": "^0.7.3",
     "react-native-actions-shortcuts": "^1.0.1",
-    "react-native-fingerprint-scanner": "https://github.com/ammarahm-ed/react-native-fingerprint-scanner.git"
+    "react-native-fingerprint-scanner": "https://github.com/ammarahm-ed/react-native-fingerprint-scanner.git",
+    "react-native-iap":"7.5.6"
   }
 }
