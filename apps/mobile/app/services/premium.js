@@ -61,7 +61,7 @@ async function setPremiumStatus() {
   } catch (e) {
     premiumStatus = 0;
   }
-  if (Config.GITHUB_RELEASE) return;
+  if (Config.GITHUB_RELEASE === "true") return;
 
   if (get()) {
     await subscriptions.clear();

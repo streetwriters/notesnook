@@ -51,7 +51,7 @@ export const Subscription = () => {
       return;
     }
 
-    if (Config.GITHUB_RELEASE) {
+    if (Config.GITHUB_RELEASE === "true") {
       presentSheet({
         paragraph:
           "This version of Notesnook app does not support in-app purchases. Kindly login on the Notesnook web app to make the purchase.",
@@ -111,7 +111,7 @@ export const Subscription = () => {
               : user.subscription?.type ===
                   SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
                 Platform.OS === "android" &&
-                !Config.GITHUB_RELEASE
+                Config.GITHUB_RELEASE !== "true"
               ? "Resubscribe from Google Playstore"
               : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
               ? `Resubscribe to Pro (${
