@@ -89,7 +89,28 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [],
+      : [
+          {
+            title: "Preview trash notes",
+            subtitle:
+              "You can now preview all your notes in the trash before restoring (or permanently deleting) them."
+          },
+          {
+            title: "Custom colors",
+            subtitle:
+              "All color palettes in the editor now support saving custom colors for later use."
+          },
+          {
+            title: "Better text exports",
+            subtitle:
+              "Exporting to text will now give a much more structured output preserving line spacing etc. Don't worry, it's not markdown."
+          },
+          {
+            title: "Clear completed tasks",
+            subtitle:
+              "Task list in the editor now allows you to quickly clear all completed tasks in a single click."
+          }
+        ],
     cta: {
       title: "Got it",
       icon: Checkmark,
