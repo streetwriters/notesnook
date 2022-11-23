@@ -162,7 +162,7 @@ class EditorStore extends BaseStore {
 
     const currentSession = this.get().session;
     if (currentSession.readonly && session.readonly !== false) return; // do not allow saving of readonly session
-    if (currentSession.saveState === 0 && !currentSession.id && !sessionId)
+    if (currentSession.saveState === 0 || currentSession.id !== sessionId)
       return;
 
     this.setSaveState(0);
@@ -281,7 +281,7 @@ class EditorStore extends BaseStore {
   };
 
   setSaveState = (saveState) => {
-    return this.set((state) => {
+    this.set((state) => {
       state.session.saveState = saveState;
     });
   };
