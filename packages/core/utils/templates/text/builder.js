@@ -17,11 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { buildPage } from "../helper";
 import TextTemplate from "./template";
 
 function buildText(templateData) {
-  return buildPage(TextTemplate, undefined, templateData);
+  return TextTemplate(templateData);
 }
 
 export default { buildText };

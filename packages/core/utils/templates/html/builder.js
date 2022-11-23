@@ -17,15 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { buildPage } from "../helper";
 import HTMLTemplate from "./template";
 
-function createMetaTag(name, content) {
-  return `<meta name="nn-${name}" content="${content}">`;
-}
-
 function buildHTML(templateData) {
-  return buildPage(HTMLTemplate, createMetaTag, templateData);
+  return HTMLTemplate(templateData);
 }
 
 export default { buildHTML };

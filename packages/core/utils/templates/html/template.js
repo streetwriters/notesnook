@@ -17,23 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const template = `<!DOCTYPE html>
+const template = (data) => `<!DOCTYPE html>
 <html lang="en-US">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
     <meta
       name="description"
-      content="{{headline}}"
+      content="${data.headline}"
     />
-    <title>{{title}} - Notesnook</title>
-    <meta name="created-on" content="{{createdOn}}" />
-    <meta name="last-edited-on" content="{{editedOn}}" />
-    <meta name="tags" content="{{tags}}" />
+    <title>${data.title} - Notesnook</title>
+    <meta name="created-on" content="${data.createdOn}" />
+    <meta name="last-edited-on" content="${data.editedOn}" />
+    ${data.tags ? `<meta name="tags" content="${data.tags}" />` : ""}
   </head>
   <body>
-    <h1>{{title}}</h1>
-    {{content}}
+    <h1>${data.title}</h1>
+    ${data.content}
   </body>
 </html>
 `;

@@ -17,16 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { buildPage } from "../helper";
 import MDTemplate from "./template";
 
-function createMetaTag(name, content) {
-  if (!content || content.length <= 0) return "";
-  return `[nn-${name}]:- "${content}"`;
-}
-
 function buildMarkdown(templateData) {
-  return buildPage(MDTemplate, createMetaTag, templateData);
+  return MDTemplate(templateData);
 }
 
 export default { buildMarkdown };
