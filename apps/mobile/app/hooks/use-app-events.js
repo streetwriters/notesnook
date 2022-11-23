@@ -380,6 +380,11 @@ export const useAppEvents = () => {
       if (
         await BackupService.checkBackupRequired(SettingsService.get().reminder)
       ) {
+        if (
+          !SettingsService.get().backupDirectoryAndroid &&
+          Platform.OS === "android"
+        )
+          return;
         sleep(2000).then(() => BackupService.run());
       }
     }
