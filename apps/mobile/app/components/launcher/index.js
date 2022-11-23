@@ -152,10 +152,10 @@ const Launcher = React.memo(
     }, [introCompleted]);
 
     const checkAppUpdateAvailable = async () => {
-      if (__DEV__) return;
+     if (__DEV__) return;
       try {
         const version =
-          Config.GITHUB_RELEASE !== "true"
+          Config.GITHUB_RELEASE === "true"
             ? await getGithubVersion()
             : await checkVersion();
         if (!version || !version?.needsUpdate) return false;
