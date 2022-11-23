@@ -40,6 +40,8 @@ import { PressableButton } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { eSendEvent } from "../../../services/event-manager";
+import { eCloseProgressDialog } from "../../../utils/events";
 
 const ExportNotesSheet = ({ notes, update }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -260,12 +262,13 @@ const ExportNotesSheet = ({ notes, update }) => {
                     borderRadius: 100
                   }}
                   onPress={async () => {
-                    close();
+                    eSendEvent(eCloseProgressDialog);
                     await sleep(500);
                     FileViewer.open(result.filePath, {
                       showOpenWithDialog: true,
                       showAppsSuggestions: true
-                    }).catch(() => {
+                    }).catch((e) => {
+                      console.log(e);
                       ToastEvent.show({
                         heading: "Cannot open",
                         message: `No application found to open ${result.name} file.`,
