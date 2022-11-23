@@ -29,6 +29,8 @@ import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
 import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store";
+import { ToolButton } from "../../toolbar/components/tool-button";
+import TaskItem from "@tiptap/extension-task-item";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
@@ -170,7 +172,42 @@ export function TaskListComponent(
               }}
             />
             <Flex sx={{ flexShrink: 0, pr: 2 }}>
-              <Icon path={Icons.checkbox} size={15} color="fontTertiary" />
+              <ToolButton
+                toggled={false}
+                title="Clear completed tasks"
+                icon="clear"
+                variant="small"
+                onClick={() => {
+                  if (!editor.current) return;
+                  const pos = getPos();
+                  // we need to get a fresh instance of the task list instead
+                  // of using the one we got via props.
+                  const node = editor.current.state.doc.nodeAt(pos);
+                  if (!node) return;
+
+                  editor.current?.commands.command(({ tr }) => {
+                    const taskItems = findChildren(
+                      node,
+                      (n) => n.type.name === TaskItem.name && n.attrs.checked
+                    );
+                    const mapping = tr.mapping;
+                    for (const item of taskItems) {
+                      const childPos = pos + item.pos + 1;
+                      tr.deleteRange(
+                        mapping.map(childPos),
+                        mapping.map(childPos + item.node.nodeSize)
+                      );
+                    }
+                    return true;
+                  });
+                }}
+              />
+              <Icon
+                path={Icons.checkbox}
+                size={15}
+                color="fontTertiary"
+                sx={{ ml: 1 }}
+              />
               <Text variant={"body"} sx={{ ml: 1, color: "fontTertiary" }}>
                 {stats.checked}/{stats.total}
               </Text>
@@ -192,7 +229,7 @@ export function TaskListComponent(
           li: {
             listStyleType: "none",
             position: "relative",
-            marginBottom: isNested ? [1, "3px"] : [2, "7px"]
+            marginBottom: isNested ? 1 : [2, 1]
           }
         }}
       />
