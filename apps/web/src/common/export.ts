@@ -56,7 +56,9 @@ export async function exportNotes(
       if (format === "pdf") {
         const note = db.notes?.note(noteIds[0]);
         if (!note) return false;
-        return await exportToPDF(note.title, await note.export("html", null));
+        const html = await note.export("html", null);
+        if (!html) return false;
+        return await exportToPDF(note.title, html);
       }
 
       const files = [];
@@ -70,7 +72,7 @@ export async function exportNotes(
           text: `Exporting "${note.title}"...`
         });
         console.log("Exporting", note.title);
-        const content: string = await note.export(format, null).catch((e) => {
+        const content = await note.export(format, null).catch((e) => {
           showToast("error", e.message);
         });
         if (!content) continue;
