@@ -399,7 +399,7 @@ class Sync {
             await this.connection.stop();
           }
 
-          await promiseTimeout(30000, () => this.connection.start());
+          await promiseTimeout(30000, this.connection.start());
         }
       } catch (e) {
         this.logger.warn(e.message);
