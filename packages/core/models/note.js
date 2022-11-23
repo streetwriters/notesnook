@@ -89,7 +89,8 @@ export default class Note {
       title: this.title,
       editedOn: this.dateEdited,
       headline: this.headline,
-      createdOn: this.data.dateCreated
+      createdOn: this.data.dateCreated,
+      tags: this.tags.join(", ")
     };
     const contentItem = await this._db.content.raw(this._note.contentId);
     if (!contentItem) return false;
