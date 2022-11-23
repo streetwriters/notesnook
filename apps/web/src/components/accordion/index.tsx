@@ -17,20 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@theme-ui/components";
-import { useEffect, useState } from "react";
+import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { Flex, FlexProps, Text } from "@theme-ui/components";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "../icons";
 
-export default function Accordion({
-  title,
-  children,
-  sx,
-  color,
-  isClosed = true,
-  testId,
-  ...restProps
-}) {
-  const [isContentHidden, setIsContentHidden] = useState();
+export type AccordionProps = {
+  title: string;
+  isClosed: boolean;
+  color?: keyof SchemeColors;
+  testId?: string;
+};
+
+export default function Accordion(
+  props: PropsWithChildren<AccordionProps> & FlexProps
+) {
+  const { isClosed, title, color, children, testId, sx, ...restProps } = props;
+  const [isContentHidden, setIsContentHidden] = useState(false);
 
   useEffect(() => {
     setIsContentHidden(isClosed);

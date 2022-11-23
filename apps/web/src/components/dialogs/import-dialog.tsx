@@ -17,27 +17,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Flex, Text } from "@theme-ui/components";
-import * as Icon from "../icons";
 import Dialog from "./dialog";
 import { db } from "../../common/db";
 import { useDropzone } from "react-dropzone";
 import { Input } from "@theme-ui/components";
 import Accordion from "../accordion";
 import { store as appStore } from "../../stores/app-store";
-import { Importer } from "../../utils/importer";
+import { importFiles } from "../../utils/importer";
+import { Perform } from "../../common/dialog-controller";
+import { pluralize } from "../../utils/string";
 
-function ImportDialog(props) {
-  const [progress, setProgress] = useState({
-    total: 0,
-    current: 0,
-    done: false
-  });
-  const [files, setFiles] = useState([]);
-  const [notes, setNotes] = useState([]);
-  const [errors, setErrors] = useState([]);
-  const selectedNotes = useMemo(() => notes.filter((n) => n.selected), [notes]);
+type ImportDialogProps = {
+  onClose: Perform;
+};
+function ImportDialog(props: ImportDialogProps) {
+  const [isDone, setIsDone] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
+  const [errors, setErrors] = useState<Error[]>([]);
+  const notesCounter = useRef<HTMLSpanElement>(null);
+  const importProgress = useRef<HTMLDivElement>(null);
 
   const onDrop = useCallback((acceptedFiles) => {
     setFiles((files) => {
@@ -45,31 +46,25 @@ function ImportDialog(props) {
       return newFiles;
     });
   }, []);
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: [".zip"]
   });
 
-  useEffect(() => {
-    (async () => {
-      const notes = await Importer.getNotesFromImport(files);
-      setNotes(
-        notes.map((note) => {
-          note.selected = true;
-          return note;
-        })
-      );
-    })();
-  }, [files]);
-
   return (
     <Dialog
       isOpen={true}
-      title={"Import notes"}
-      description="Use the Importer to import your notes from other notes apps."
-      onClose={props.onClose}
+      title={isImporting ? "Importing your notes" : "Import notes"}
+      description={
+        isImporting
+          ? "This might taking a while..."
+          : isDone
+          ? "You're all set up!"
+          : "Use the Importer to import your notes from other notes apps."
+      }
       negativeButton={
-        progress.done
+        isDone || isImporting
           ? undefined
           : {
               text: "Cancel",
@@ -77,50 +72,78 @@ function ImportDialog(props) {
             }
       }
       positiveButton={
-        progress.done
+        isDone
           ? {
               onClick: props.onClose,
               text: "Close"
             }
           : {
               onClick: async () => {
-                await db.syncer.acquireLock(async () => {
-                  setProgress({ total: selectedNotes.length, current: 0 });
-                  for (let note of selectedNotes) {
-                    try {
-                      await Importer.importNote(note);
-                    } catch (e) {
-                      e.message = `${e.message} (${note.title})`;
-                      setErrors((errors) => [...errors, e]);
-                    } finally {
-                      setProgress((p) => ({ ...p, current: ++p.current }));
+                setIsDone(false);
+                setIsImporting(true);
+
+                await db.syncer?.acquireLock(async () => {
+                  try {
+                    for await (const {
+                      count,
+                      filesRead,
+                      totalFiles
+                    } of importFiles(files)) {
+                      if (notesCounter.current)
+                        notesCounter.current.innerText = `${count}`;
+                      if (importProgress.current)
+                        importProgress.current.style.width = `${
+                          (filesRead / totalFiles) * 100
+                        }%`;
+                    }
+                  } catch (e) {
+                    console.error(e);
+                    if (e instanceof Error) {
+                      setErrors((errors) => [...errors, e as Error]);
                     }
                   }
-                  await appStore.refresh();
-                  setProgress({ done: true });
                 });
+
+                await appStore.refresh();
+
+                setIsDone(true);
+                setIsImporting(false);
               },
               text:
-                notes.length > 0
-                  ? `Import ${selectedNotes.length} notes`
+                files.length > 0
+                  ? `Import notes from ${pluralize(
+                      files.length,
+                      "file",
+                      "files"
+                    )}`
                   : "Import",
-              loading: progress.current > 0,
-              disabled: notes.length <= 0 || progress.current > 0
+              loading: isImporting,
+              disabled: files.length <= 0 || isImporting
             }
       }
     >
       <Flex sx={{ flexDirection: "column", justifyContent: "center" }}>
-        {progress.current > 0 ? (
+        {isImporting ? (
           <>
             <Text variant="body" my={4} sx={{ textAlign: "center" }}>
-              Importing notes {progress.current} of {progress.total}...
+              <span ref={notesCounter}>0</span> notes imported.
             </Text>
+
+            <Flex
+              ref={importProgress}
+              sx={{
+                alignSelf: "start",
+                borderRadius: "default",
+                height: "5px",
+                bg: "primary",
+                width: `0%`
+              }}
+            />
           </>
-        ) : progress.done ? (
+        ) : isDone ? (
           <>
             <Text variant="body" my={2} sx={{ textAlign: "center" }}>
-              Imported {notes.length - errors.length} notes. {errors.length}{" "}
-              errors occured.
+              Import successful. {errors.length} errors occured.
             </Text>
             {errors.length > 0 && (
               <Flex my={1} bg="errorBg" p={1} sx={{ flexDirection: "column" }}>
@@ -167,7 +190,7 @@ function ImportDialog(props) {
                   <Text variant="subBody">Only .zip files are supported.</Text>
                 </Text>
               </Flex>
-              <Flex mt={1} sx={{ flexDirection: "column" }}>
+              <Flex my={1} sx={{ flexDirection: "column" }}>
                 {files.map((file, i) => (
                   <Text
                     key={file.name}
@@ -213,44 +236,6 @@ function ImportDialog(props) {
                 </Text>
               </Text>
             </Accordion>
-            {files.length > 0 && (
-              <Accordion
-                title={`${notes.length} notes found`}
-                sx={{ mt: 1 }}
-                testId={"importer-dialog-notes"}
-              >
-                <Flex mt={1} sx={{ flexDirection: "column" }}>
-                  {notes.map((note, i) => (
-                    <Flex
-                      key={note.title}
-                      data-test-id={`note-${i}`}
-                      p={1}
-                      sx={{
-                        ":hover": { bg: "hover" },
-                        cursor: "pointer",
-                        borderRadius: "default"
-                      }}
-                      onClick={() => {
-                        setNotes((notes) => {
-                          const cloned = notes.slice();
-                          cloned[i].selected = !cloned[i].selected;
-                          return cloned;
-                        });
-                      }}
-                    >
-                      {note.selected ? (
-                        <Icon.CheckCircle color="primary" size={16} />
-                      ) : (
-                        <Icon.CheckCircleOutline size={16} />
-                      )}
-                      <Text variant="body" ml={1}>
-                        {note.title}
-                      </Text>
-                    </Flex>
-                  ))}
-                </Flex>
-              </Accordion>
-            )}
           </>
         )}
       </Flex>

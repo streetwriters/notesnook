@@ -118,6 +118,9 @@ export default class Notebooks extends Collection {
     return this._collection.getRaw();
   }
 
+  /**
+   * @return {any[]}
+   */
   get all() {
     return this._collection.getItems();
   }
