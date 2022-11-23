@@ -21,19 +21,25 @@ import { Dimensions, PixelRatio, Platform } from "react-native";
 import DeviceInfo from "react-native-device-info";
 
 let windowSize = Dimensions.get("window");
-
+let screenSize = Dimensions.get("screen");
 export class DeviceDetectionService {
   constructor() {
     this.setNewValues();
   }
 
+  isTablet() {
+    return DeviceInfo.isTablet();
+  }
   setNewValues() {
+    screenSize = Dimensions.get("screen");
     windowSize = Dimensions.get("window");
     this.pixelDensity = PixelRatio.get();
     this.width = windowSize.width;
     this.height = windowSize.height;
     this.adjustedWidth = this.width * this.pixelDensity;
     this.adjustedHeight = this.height * this.pixelDensity;
+    this.screenWidth = screenSize.width;
+    this.screenHeight = screenSize.height;
     this.isPhoneOrTablet();
     this.isIosOrAndroid();
     this.detectIphoneX();
@@ -53,22 +59,24 @@ export class DeviceDetectionService {
   }
 
   getDeviceSize = () => {
-    let dpi = this.pixelDensity * 160;
-    let deviceWidthInInches = this.adjustedWidth / dpi;
-    let deviceHeightInInches = this.adjustedHeight / dpi;
-    let diagonalSize = Math.sqrt(
-      Math.pow(deviceWidthInInches, 2) + Math.pow(deviceHeightInInches, 2)
-    );
-    return Platform.isPad ? diagonalSize + 2 : diagonalSize;
+    let size = this.width / 100;
+    return size;
+  };
+
+  getScreenSize = () => {
+    let size = this.screenWidth / 100;
+    return size;
   };
 
   checkSmallTab(orientation) {
-    this.width = Dimensions.get("screen").width;
-    this.height = Dimensions.get("screen").height;
     let deviceSize = this.getDeviceSize();
+    let screenSize = this.getScreenSize();
+    console.log(orientation);
     if (
-      (!DeviceInfo.isTablet() && orientation === "LANDSCAPE") ||
-      (DeviceInfo.isTablet() && (orientation === "PORTRAIT" || deviceSize < 9))
+      (!this.isTablet() && orientation?.startsWith("LANDSCAPE")) ||
+      (this.isTablet() &&
+        (orientation === "PORTRAIT" ||
+          (deviceSize < screenSize - 1 && deviceSize > 5.5)))
     ) {
       this.isTab = true;
       this.isPhone = false;
@@ -82,7 +90,7 @@ export class DeviceDetectionService {
       this.isPhone = false;
       this.isSmallTab = false;
     } else {
-      if (!DeviceInfo.isTablet()) {
+      if (!this.isTablet() || deviceSize < 5.5) {
         this.isTab = false;
         this.isPhone = true;
         this.isSmallTab = false;
@@ -95,7 +103,7 @@ export class DeviceDetectionService {
   }
 
   isPhoneOrTablet() {
-    if (DeviceInfo.isTablet()) {
+    if (this.isTablet()) {
       this.isTab = true;
       this.isPhone = false;
     } else {

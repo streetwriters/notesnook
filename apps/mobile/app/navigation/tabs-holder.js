@@ -27,7 +27,9 @@ import {
   addSpecificOrientationListener,
   getInitialOrientation,
   getSpecificOrientation,
-  removeSpecificOrientationListener
+  removeSpecificOrientationListener,
+  addOrientationListener,
+  removeOrientationListener
 } from "react-native-orientation";
 import Animated, {
   useAnimatedStyle,
@@ -118,9 +120,13 @@ const _TabsHolder = () => {
     if (Platform.OS === "ios") {
       addSpecificOrientationListener(onOrientationChange);
       getSpecificOrientation && getSpecificOrientation(onOrientationChange);
+    } else {
+      addOrientationListener(onOrientationChange);
     }
+
     return () => {
       removeSpecificOrientationListener(onOrientationChange);
+      removeOrientationListener(onOrientationChange);
     };
   }, []);
 
