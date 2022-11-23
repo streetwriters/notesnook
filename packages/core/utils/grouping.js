@@ -24,6 +24,10 @@ const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
 const MILLISECONDS_IN_WEEK = MILLISECONDS_IN_DAY * 7;
 
 const comparators = {
+  dateModified: {
+    asc: (a, b) => a.dateModified - b.dateModified,
+    desc: (a, b) => b.dateModified - a.dateModified
+  },
   dateEdited: {
     asc: (a, b) => a.dateEdited - b.dateEdited,
     desc: (a, b) => b.dateEdited - a.dateEdited
