@@ -1,6 +1,7 @@
-- Auto & real time sync enabled for all users
-- Added Quick actions & shortcuts to launcher
-- Splashscreen will now follow system theme
-- Many bug fixes and improvements
+- Preview notes in trash
+- Improved editor performance
+- Attachments will now download in realtime sync
+- Improved sync performance & fixed "Failed to sync"
+errors on app launch
 
 Thank you for using Notesnook!
