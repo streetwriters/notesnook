@@ -23,8 +23,6 @@ const template = `{{title}}
 {{content}}
 
 ----------
-Created on: {{createdOn}}
-Edited on: {{editedOn}}
 Tags: {{tags}}`;
 
 export default template;

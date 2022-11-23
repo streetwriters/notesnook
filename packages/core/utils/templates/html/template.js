@@ -26,15 +26,14 @@ const template = `<!DOCTYPE html>
       name="description"
       content="{{headline}}"
     />
-    <title>{{title}} - Notesnook</title> 
+    <title>{{title}} - Notesnook</title>
+    <meta name="created-on" content="{{createdOn}}" />
+    <meta name="last-edited-on" content="{{editedOn}}" />
+    <meta name="tags" content="{{tags}}" />
   </head>
   <body>
     <h1>{{title}}</h1>
     {{content}}
-    <br/>
-    Created on: <b>{{createdOn}}</b><br/>
-    Edited on: <b>{{editedOn}}</b><br/>
-    Tags: <b>{{tags}}</b>
   </body>
 </html>
 `;
