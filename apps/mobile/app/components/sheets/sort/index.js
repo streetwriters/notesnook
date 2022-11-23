@@ -141,6 +141,7 @@ const Sort = ({ type, screen }) => {
         ) : (
           Object.keys(SORT).map((item) =>
             (item === "title" && groupOptions.groupBy !== "none") ||
+            (screen !== "Tags" && item === "dateModified") ||
             (screen === "Tags" && item === "dateEdited") ? null : (
               <Button
                 key={item}
