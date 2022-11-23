@@ -42,7 +42,6 @@ export function onBackspacePressed(
     return false;
 
   const isEmpty = isListItemEmpty(type, editor.state);
-
   if (isEmpty) {
     if (isFirstOfType(type, editor.state)) {
       const parentList = getListFromListItem(type, editor.state);
@@ -100,7 +99,6 @@ const isFirstOfType = (type: NodeType, state: EditorState) => {
   if (!block) return false;
   const { pos } = block;
   const resolved = state.doc.resolve(pos);
-  console.log("isFirstOfType", resolved);
   return !resolved.nodeBefore;
 };
 

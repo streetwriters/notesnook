@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Button, Flex, Text } from "@theme-ui/components";
+import { Box, Flex, Text } from "@theme-ui/components";
 import { ReactNodeViewProps } from "../react";
 import { Node } from "prosemirror-model";
-import { Editor, findChildren, getNodeType } from "@tiptap/core";
+import { findChildren, getNodeType } from "@tiptap/core";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -29,7 +29,8 @@ import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
 import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store";
-import TaskList from "@tiptap/extension-task-list";
+import { ToolButton } from "../../toolbar/components/tool-button";
+import TaskItem from "@tiptap/extension-task-item";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
@@ -171,17 +172,42 @@ export function TaskListComponent(
               }}
             />
             <Flex sx={{ flexShrink: 0, pr: 2 }}>
-              <Button
-                sx={{ flexShrink: 0, py: 0, mr: 4, zIndex: 5 }}
+              <ToolButton
+                toggled={false}
+                title="Clear completed tasks"
+                icon="clear"
+                variant="small"
                 onClick={() => {
-                  node.forEach(() => {
-                    deleteListItems(node, editor);
+                  if (!editor.current) return;
+                  const pos = getPos();
+                  // we need to get a fresh instance of the task list instead
+                  // of using the one we got via props.
+                  const node = editor.current.state.doc.nodeAt(pos);
+                  if (!node) return;
+
+                  editor.current?.commands.command(({ tr }) => {
+                    const taskItems = findChildren(
+                      node,
+                      (n) => n.type.name === TaskItem.name && n.attrs.checked
+                    );
+                    const mapping = tr.mapping;
+                    for (const item of taskItems) {
+                      const childPos = pos + item.pos + 1;
+                      tr.deleteRange(
+                        mapping.map(childPos),
+                        mapping.map(childPos + item.node.nodeSize)
+                      );
+                    }
+                    return true;
                   });
                 }}
-              >
-                Delete Completed Tasks
-              </Button>
-              <Icon path={Icons.checkbox} size={15} color="fontTertiary" />
+              />
+              <Icon
+                path={Icons.checkbox}
+                size={15}
+                color="fontTertiary"
+                sx={{ ml: 1 }}
+              />
               <Text variant={"body"} sx={{ ml: 1, color: "fontTertiary" }}>
                 {stats.checked}/{stats.total}
               </Text>
@@ -203,33 +229,12 @@ export function TaskListComponent(
           li: {
             listStyleType: "none",
             position: "relative",
-            marginBottom: isNested ? [1, "3px"] : [2, "7px"]
+            marginBottom: isNested ? 1 : [2, 1]
           }
         }}
       />
     </>
   );
-}
-
-function deleteListItems(node: Node, editor: Editor) {
-  editor.commands.command(({ tr }) => {
-    findChildren(
-      editor.state.doc,
-      (n) => n.type.name === TaskList.name
-    ).forEach((item, index, array) => {
-      if (item.node.eq(node)) {
-        node.forEach((item2, offset, index2) => {
-          if (item2.attrs.checked) {
-            tr.delete(
-              tr.mapping.map(item.pos + offset),
-              tr.mapping.map(item.pos + offset + item2.nodeSize)
-            );
-          }
-        });
-      }
-    });
-    return true;
-  });
 }
 
 function areAllChecked(node: Node, pos: number, doc: Node) {
