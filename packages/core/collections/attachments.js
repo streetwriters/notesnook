@@ -196,7 +196,7 @@ export default class Attachments extends Collection {
   async _canDetach(attachment) {
     await this._db.notes.init();
     for (let noteId of attachment.noteIds) {
-      const note = this._db.notes.note(noteId)._note;
+      const note = this._db.notes.note(noteId).data;
       if (note.locked) return false;
     }
 
