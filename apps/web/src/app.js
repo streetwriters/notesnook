@@ -33,6 +33,7 @@ import { ViewLoader } from "./components/loaders/view-loader";
 import NavigationMenu from "./components/navigation-menu";
 import StatusBar from "./components/status-bar";
 import { EditorLoader } from "./components/loaders/editor-loader";
+import { FlexScrollContainer } from "./components/scroll-container";
 
 const GlobalMenuWrapper = React.lazy(() =>
   import("./components/global-menu-wrapper")
@@ -191,10 +192,10 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
 
 function MobileAppContents({ isAppLoaded }) {
   return (
-    <Flex
-      id="slider"
-      variant="rowFill"
-      sx={{
+    <FlexScrollContainer
+      style={{
+        display: "flex",
+        flexDirection: "row",
         overflowY: "hidden",
         scrollSnapType: "x mandatory",
         scrollBehavior: "smooth",
@@ -204,63 +205,68 @@ function MobileAppContents({ isAppLoaded }) {
         overflowX: "auto"
       }}
     >
-      <Flex
-        sx={{
-          scrollSnapAlign: "start",
-          scrollSnapStop: "always",
-          width: [300, 60],
-          flexShrink: 0
-        }}
-      >
-        <NavigationMenu toggleNavigationContainer={() => {}} isTablet={false} />
-      </Flex>
-      <Flex
-        className="listMenu"
-        variant="columnFill"
-        sx={{
-          position: "relative",
-          scrollSnapAlign: "start",
-          scrollSnapStop: "always",
-          flexShrink: 0,
-          width: "100vw"
-        }}
-      >
-        <SuspenseLoader
-          condition={isAppLoaded}
-          component={CachedRouter}
-          fallback={<ViewLoader />}
-        />
-        <Box
-          id="overlay"
+      <Flex id="slider" variant="rowFill">
+        <Flex
           sx={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            top: 0,
-            left: 0,
-            zIndex: 999,
-            opacity: 0,
-            visibility: "visible",
-            pointerEvents: "none"
+            scrollSnapAlign: "start",
+            scrollSnapStop: "always",
+            width: [300, 60],
+            flexShrink: 0
           }}
-          bg="black"
-        />
+        >
+          <NavigationMenu
+            toggleNavigationContainer={() => {}}
+            isTablet={false}
+          />
+        </Flex>
+        <Flex
+          className="listMenu"
+          variant="columnFill"
+          sx={{
+            position: "relative",
+            scrollSnapAlign: "start",
+            scrollSnapStop: "always",
+            flexShrink: 0,
+            width: "100vw"
+          }}
+        >
+          <SuspenseLoader
+            condition={isAppLoaded}
+            component={CachedRouter}
+            fallback={<ViewLoader />}
+          />
+          <Box
+            id="overlay"
+            sx={{
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              top: 0,
+              left: 0,
+              zIndex: 999,
+              opacity: 0,
+              visibility: "visible",
+              pointerEvents: "none"
+            }}
+            bg="black"
+          />
+        </Flex>
+        <Flex
+          sx={{
+            scrollSnapAlign: "start",
+            scrollSnapStop: "always",
+            flexDirection: "column",
+            flexShrink: 0,
+            width: "100vw"
+          }}
+        >
+          <SuspenseLoader
+            fallback={<EditorLoader />}
+            component={HashRouter}
+            condition={isAppLoaded}
+          />
+        </Flex>
       </Flex>
-      <Flex
-        sx={{
-          scrollSnapAlign: "start",
-          scrollSnapStop: "always",
-          flexDirection: "column",
-          flexShrink: 0,
-          width: "100vw"
-        }}
-      >
-        <SuspenseLoader
-          fallback={<EditorLoader />}
-          component={HashRouter}
-          condition={isAppLoaded}
-        />
-      </Flex>
-    </Flex>
+    </FlexScrollContainer>
   );
 }
