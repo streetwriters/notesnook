@@ -1269,7 +1269,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook;
 				PRODUCT_NAME = Notesnook;
-				PROVISIONING_PROFILE_SPECIFIER = "Notesnook Dist 21-22";
+				PROVISIONING_PROFILE_SPECIFIER = "Notesnook Distribution 2023";
 				SWIFT_OBJC_BRIDGING_HEADER = "Notesnook-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1476,7 +1476,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.notewidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "Notesnook Widget Dist 21-22";
+				PROVISIONING_PROFILE_SPECIFIER = "Notesnook Widget Distribution 2023";
 				SKIP_INSTALL = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -1683,7 +1683,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.share;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "Notesnook Share Dist 21-22";
+				PROVISIONING_PROFILE_SPECIFIER = "Notesnook Share Distrubution 2023";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Make Note/Make Note-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
