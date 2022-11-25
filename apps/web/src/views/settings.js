@@ -874,7 +874,8 @@ function OptionsItem(props) {
         sx={{
           borderRadius: "default",
           overflow: "hidden",
-          justifyContent: "space-evenly"
+          justifyContent: "space-evenly",
+          flexWrap: "wrap"
         }}
       >
         {options.map((option, index) => (
@@ -895,7 +896,8 @@ function OptionsItem(props) {
               ":hover": { color: selectedOption === index ? "static" : "text" },
               flex: 1,
               textAlign: "center",
-              color: selectedOption === index ? "static" : "bgSecondaryText"
+              color: selectedOption === index ? "static" : "bgSecondaryText",
+              minWidth: 100
             }}
           >
             {option}
