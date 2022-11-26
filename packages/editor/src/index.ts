@@ -107,6 +107,7 @@ const useTiptap = (
   const PortalProviderAPI = usePortalProvider();
   const setIsMobile = useToolbarStore((store) => store.setIsMobile);
   const setTheme = useToolbarStore((store) => store.setTheme);
+  const closeAllPopups = useToolbarStore((store) => store.closeAllPopups);
   const setIsKeyboardOpen = useToolbarStore((store) => store.setIsKeyboardOpen);
 
   useEffect(() => {
@@ -121,6 +122,10 @@ const useTiptap = (
     setTheme,
     setIsKeyboardOpen
   ]);
+
+  useEffect(() => {
+    closeAllPopups();
+  }, deps);
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({

@@ -37,6 +37,7 @@ interface ToolbarState {
   openPopup: (ref: PopupRef) => void;
   closePopup: (popupId: string) => void;
   closePopupGroup: (groupId: string, excluded: string[]) => void;
+  closeAllPopups: () => void;
 }
 
 export const useToolbarStore = create<ToolbarState>((set, get) => ({
@@ -83,6 +84,12 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
         if (ref && ref.group === group && !excluded.includes(ref.id)) {
           state.openedPopups[key] = false;
         }
+      }
+    }),
+  closeAllPopups: () =>
+    set((state) => {
+      for (const key in state.openedPopups) {
+        state.openedPopups[key] = false;
       }
     })
 }));
