@@ -37,7 +37,12 @@ export function EmbedSettings(props: ToolProps) {
       {...props}
       autoCloseOnUnmount
       popupId="embedSettings"
-      tools={[]}
+      tools={[
+        "embedAlignLeft",
+        "embedAlignCenter",
+        "embedAlignRight",
+        "embedProperties"
+      ]}
     />
   );
 }
