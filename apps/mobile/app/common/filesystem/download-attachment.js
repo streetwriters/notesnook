@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { Platform } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";
-import Sodium from "react-native-sodium";
+import Sodium from "@ammarahmed/react-native-sodium";
 import RNFetchBlob from "rn-fetch-blob";
 import { ShareComponent } from "../../components/sheets/export-notes/share";
 import { presentSheet, ToastEvent } from "../../services/event-manager";
@@ -68,7 +68,7 @@ export default async function downloadAttachment(hash, global = true) {
       chunkSize: attachment.chunkSize
     };
 
-    let fileUri = await Sodium.decryptFile(key, info, false);
+    let fileUri = await Sodium.decryptFile(key, info, "file");
     ToastEvent.show({
       heading: "Download successful",
       message: attachment.metadata.filename + " downloaded",
@@ -112,5 +112,46 @@ export default async function downloadAttachment(hash, global = true) {
         .catch(console.log);
     }
     useAttachmentStore.getState().remove(attachment.metadata.hash);
+  }
+}
+
+
+export default async function readAttachment(hash) {
+  let attachment = db.attachments.attachment(hash);
+  if (!attachment) {
+    console.log("attachment not found");
+    return;
+  }
+
+  try {
+    await db.fs.downloadFile(
+      attachment.metadata.hash,
+      attachment.metadata.hash
+    );
+    if (
+      !(await RNFetchBlob.fs.exists(`${cacheDir}/${attachment.metadata.hash}`))
+    )
+      return;
+
+    let key = await db.attachments.decryptKey(attachment.key);
+    let info = {
+      iv: attachment.iv,
+      salt: attachment.salt,
+      length: attachment.length,
+      alg: attachment.alg,
+      hash: attachment.metadata.hash,
+      hashType: attachment.metadata.hashType,
+      mime: attachment.metadata.type,
+      fileName: attachment.metadata.filename,
+      chunkSize: attachment.chunkSize
+    };
+    return await Sodium.decryptFile(key, info, "text");
+  } catch (e) {
+    console.log("download attachment error: ", e);
+    if (attachment.dateUploaded) {
+      RNFetchBlob.fs
+        .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
+        .catch(console.log);
+    }
   }
 }

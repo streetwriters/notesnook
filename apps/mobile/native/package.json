@@ -45,7 +45,7 @@
     "react-native-screens": "^3.13.1",
     "react-native-securerandom": "^1.0.1",
     "react-native-share": "^7.2.0",
-    "react-native-sodium": "github:ammarahm-ed/react-native-sodium",
+    "@ammarahmed/react-native-sodium": "1.0.0",
     "react-native-svg": "^12.3.0",
     "react-native-tooltips": "^1.0.3",
     "react-native-vector-icons": "^9.0.0",

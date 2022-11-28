@@ -21,7 +21,7 @@ import React from "react";
 import { Platform, View } from "react-native";
 import DocumentPicker from "react-native-document-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
-import Sodium from "react-native-sodium";
+import Sodium from "@ammarahmed/react-native-sodium";
 import RNFetchBlob from "rn-fetch-blob";
 import { db } from "../../../common/database";
 import { AttachmentItem } from "../../../components/attachments/attachment-item";
