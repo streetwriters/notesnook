@@ -299,6 +299,26 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: "Embed properties",
     conditional: true
   },
+  webclipSettings: {
+    icon: "webclipSettings",
+    title: "Web clip settings",
+    conditional: true
+  },
+  webclipFullScreen: {
+    icon: "fullscreen",
+    title: "Full screen",
+    conditional: true
+  },
+  webclipOpenExternal: {
+    icon: "openLink",
+    title: "Open in new tab",
+    conditional: true
+  },
+  webclipOpenSource: {
+    icon: "openSource",
+    title: "Open source",
+    conditional: true
+  },
   outdent: {
     icon: "outdent",
     title: "Lift list item",
