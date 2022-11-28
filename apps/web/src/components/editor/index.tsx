@@ -37,7 +37,7 @@ import Header from "./header";
 import { Attachment } from "../icons";
 import { useEditorInstance } from "./context";
 import { attachFile, AttachmentProgress, insertAttachment } from "./picker";
-import { downloadAttachment } from "../../common/attachments";
+import { downloadAttachment, readAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core/common";
 import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
@@ -277,6 +277,9 @@ export function Editor(props: EditorProps) {
         onChange={onEditorChange}
         onDownloadAttachment={(attachment) =>
           downloadAttachment(attachment.hash)
+        }
+        onReadAttachment={(hash) =>
+          readAttachment(hash) as Promise<string | undefined>
         }
         onInsertAttachment={(type) => {
           const mime = type === "file" ? "*/*" : "image/*";

@@ -205,6 +205,7 @@ export class Tiptap {
             }
             break;
           }
+          case "iframe":
           case "span": {
             const hash = attr[ATTRIBUTES.hash];
             if (!hash) return;
