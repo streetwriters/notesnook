@@ -3,7 +3,7 @@
   "description": "Your private note taking space",
   "version": "2.2.3",
   "private": true,
-  "main": "./src/App.js",
+  "main": "./src/app.js",
   "homepage": "https://notesnook.com/",
   "repository": "https://github.com/streetwriters/notesnook",
   "license": "GPL-3.0-or-later",
@@ -135,8 +135,5 @@
     "name": "Streetwriters (Private) Ltd.",
     "email": "support@streetwriters.co",
     "url": "https://streetwriters.co"
-  },
-  "volta": {
-    "node": "16.15.1"
   }
 }
