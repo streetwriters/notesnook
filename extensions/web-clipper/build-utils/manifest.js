@@ -33,7 +33,7 @@ const ACTION = {
 
 const common = {
   name: "Notesnook Web Clipper",
-  version: "1.0",
+  version: "0.1",
   description: "Clip web pages.",
   permissions: [
     "activeTab",
@@ -42,7 +42,6 @@ const common = {
     "contextMenus",
     "notifications"
   ],
-  key: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmXQb9xwsSWbvAbBVnWa+DwsXLtRLbjfLyWRZtT5KF8bjCrEg3InvntWlk1PrNo73lsTov1m8Y5K9fJcCVKuYZkTCmNf4iGsHqOafi9ny5MX53oQ53+/s7gao2ZicHtTylnCIqn8f/l+RkV3tHO8BwANDLX2TTe7zCYLzFH19jiKAI+7qmUDZvyCH/OMVohluUCQO94s7sghslalwPbAcQQLpAKxYdd5GJDn4FryitsCMTYX962X+O6Tivq2QPML/Gm7BrZqJsU1enFRH1ss0UK0b9COpEYqqPhZ+GJP5K6WOL46NX+CvZnQmux1ehTZgIhw64IQJ57TvG2kIQTA8ZQIDAQAB",
   content_scripts: [
     {
       js: ["nnContentScript.bundle.js"],

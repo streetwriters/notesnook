@@ -5,8 +5,7 @@
     "allowJs": true,
     "jsx": "react-jsx",
     "maxNodeModuleJsDepth": 5,
-    "declaration": false,
-    "noEmit": true
+    "declaration": false
   },
   "include": ["src", "global.d.ts"]
 }

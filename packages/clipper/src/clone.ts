@@ -293,8 +293,10 @@ function clonePseudoElements(
 }
 
 function copyUserInput(original: HTMLElement, clone: HTMLElement) {
-  if (original instanceof HTMLTextAreaElement) clone.innerHTML = original.value;
-  if (original instanceof HTMLInputElement)
+  if (
+    original instanceof HTMLInputElement ||
+    original instanceof HTMLTextAreaElement
+  )
     clone.setAttribute("value", original.value);
 }
 
