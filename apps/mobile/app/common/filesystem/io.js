@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Platform } from "react-native";
-import Sodium from "react-native-sodium";
+import Sodium from "@ammarahmed/react-native-sodium";
 import RNFetchBlob from "rn-fetch-blob";
 import { cacheDir, getRandomId } from "./utils";
 
@@ -36,7 +36,7 @@ export async function readEncrypted(filename, key, cipherData) {
         ...cipherData,
         hash: filename
       },
-      true
+      "base64"
     );
     return output;
   } catch (e) {

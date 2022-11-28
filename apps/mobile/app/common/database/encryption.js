@@ -21,7 +21,7 @@ import { Platform } from "react-native";
 import "react-native-get-random-values";
 import * as Keychain from "react-native-keychain";
 import { generateSecureRandom } from "react-native-securerandom";
-import Sodium from "react-native-sodium";
+import Sodium from "@ammarahmed/react-native-sodium";
 
 const KEYSTORE_CONFIG = Platform.select({
   ios: {
