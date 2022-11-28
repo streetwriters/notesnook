@@ -199,13 +199,7 @@ const Launcher = React.memo(
     };
 
     const onUnlockBiometrics = useCallback(async () => {
-      if (!(await BiometricService.isBiometryAvailable())) {
-        ToastEvent.show({
-          heading: "Biometrics unavailable",
-          message: "Try unlocking the app with your account password"
-        });
-        return;
-      }
+      if (!(await BiometricService.isBiometryAvailable())) return;
       let verified = await BiometricService.validateUser(
         "Unlock to access your notes",
         ""
