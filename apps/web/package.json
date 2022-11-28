@@ -19,6 +19,7 @@
     "@notesnook/core": "*",
     "@notesnook/crypto": "*",
     "@notesnook/crypto-worker": "*",
+    "@notesnook/web-clipper": "*",
     "@notesnook/desktop": "file:desktop",
     "@notesnook/editor": "*",
     "@notesnook/logger": "*",

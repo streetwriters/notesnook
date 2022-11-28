@@ -175,7 +175,8 @@ import {
   mdiArrowCollapseHorizontal,
   mdiSpeedometer,
   mdiFormatLineSpacing,
-  mdiCalendarClockOutline
+  mdiCalendarClockOutline,
+  mdiPuzzleOutline
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { AnimatedFlex } from "../animated";
@@ -441,3 +442,4 @@ export const Resize = createIcon(mdiArrowCollapseHorizontal);
 export const Performance = createIcon(mdiSpeedometer);
 export const Date = createIcon(mdiCalendarClockOutline);
 export const LineSpacing = createIcon(mdiFormatLineSpacing);
+export const Extension = createIcon(mdiPuzzleOutline);
