@@ -429,10 +429,9 @@ function getElementViewportInfo(el: HTMLElement) {
 }
 
 function toDocument(head: HTMLElement, body: HTMLElement) {
-  const newHTMLDocument = document.implementation.createHTMLDocument();
-  newHTMLDocument.head.outerHTML = head.outerHTML;
-  newHTMLDocument.body.outerHTML = body.outerHTML;
-  return newHTMLDocument;
+  const doc = document.implementation.createHTMLDocument();
+  doc.documentElement.replaceChildren(head, body);
+  return doc;
 }
 
 function cleanup() {
@@ -475,7 +474,7 @@ async function getPage(
 
   const head = document.createElement("head");
   const title = document.createElement("title");
-  title.innerHTML = document.title;
+  title.innerText = document.title;
   head.appendChild(title);
 
   return {
