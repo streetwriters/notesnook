@@ -37,9 +37,7 @@
   "dependencies": {
     "@mozilla/readability": "^0.4.2",
     "css-what": "^6.1.0",
-    "dompurify": "^2.4.0",
     "hyperapp": "^2.0.22",
-    "jest-environment-jsdom": "^29.0.3",
     "specificity": "^0.4.1"
   }
 }

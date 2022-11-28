@@ -17,17 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import purify from "dompurify";
 import { Readability } from "@mozilla/readability";
 import { injectCss } from "./utils";
 import { app, h, text } from "hyperapp";
-import {
-  getInlinedNode,
-  toBlob,
-  toJpeg,
-  toPixelData,
-  toPng
-} from "./domtoimage";
+import { getInlinedNode, toBlob, toJpeg, toPng } from "./domtoimage";
 import { InlineOptions } from "./types";
 import { FetchOptions } from "./fetch";
 
@@ -56,42 +49,6 @@ const inlineOptions: InlineOptions = {
   stylesheets: true
 };
 
-async function getPage(
-  document: Document,
-  styles: boolean,
-  onlyVisible = false
-) {
-  const body = await getInlinedNode(document.body, {
-    raster: true,
-    fetchOptions,
-    inlineOptions,
-    filter: (node) => {
-      return !onlyVisible || isElementInViewport(node);
-    }
-  });
-
-  if (!body) return {};
-
-  const head = document.createElement("head");
-  head.title = document.title;
-
-  return {
-    body,
-    head
-  };
-}
-
-function toDocument(head: HTMLElement, body: HTMLElement) {
-  const newHTMLDocument = document.implementation.createHTMLDocument();
-  newHTMLDocument.open();
-  newHTMLDocument.write(head.outerHTML, body.outerHTML);
-  newHTMLDocument.close();
-
-  // newHTMLDocument.insertBefore(documentType, newHTMLDocument.childNodes[0]);
-
-  return newHTMLDocument;
-}
-
 async function clipPage(
   document: Document,
   withStyles: boolean,
@@ -101,31 +58,6 @@ async function clipPage(
   if (!body || !head) return null;
   const result = toDocument(head, body).documentElement.outerHTML;
   return `<!doctype html>\n${result}`;
-}
-
-const cleanup = () => {
-  setTimeout(() => {
-    document.querySelectorAll(`.${CLASSES.nodeSelected}`).forEach((node) => {
-      if (node instanceof HTMLElement) {
-        node.classList.remove(CLASSES.nodeSelected);
-      }
-    });
-
-    document
-      .querySelectorAll(`.${CLASSES.nodeSelectionContainer}`)
-      .forEach((node) => node.remove());
-
-    removeHoverListeners(document);
-    removeClickHandlers(document);
-  }, 0);
-};
-
-function clipNode(
-  element: HTMLElement | null | undefined,
-  keepStyles = true
-): string | null {
-  if (!element) return null;
-  return purifyBody(element.outerHTML, keepStyles).outerHTML;
 }
 
 async function clipArticle(
@@ -150,32 +82,12 @@ async function clipArticle(
     "valign",
     "vspace"
   ];
+
   const result = readability.parse();
 
-  return `<html>${head?.outerHTML || ""}<body>${
+  return `<!DOCTYPE html><html>${head?.outerHTML || ""}<body>${
     result?.content || ""
   }</body></html>`;
-}
-
-// async function clipSimplifiedArticle(doc: Document): Promise<string | null> {
-//   const article = await clipArticle(doc);
-//   if (!article) return null;
-//   return purifyBody(article, false).outerHTML;
-// }
-
-function purifyBody(htmlString: string, keepStyles = true) {
-  return purify.sanitize(htmlString, {
-    RETURN_DOM: true,
-    KEEP_CONTENT: false,
-    ADD_TAGS: keepStyles ? ["use"] : [],
-    ADD_ATTR: keepStyles ? ["style", "class", "id"] : [],
-    FORBID_ATTR: !keepStyles ? ["style", "class", "id"] : [],
-    FORBID_TAGS: !keepStyles ? ["style"] : [],
-    ADD_DATA_URI_TAGS: ["style"],
-    CUSTOM_ELEMENT_HANDLING: {
-      attributeNameCheck: /notesnook/ // allow all attributes containing "baz"
-    }
-  }) as HTMLElement;
 }
 
 async function clipScreenshot<
@@ -202,7 +114,8 @@ async function clipScreenshot<
       fonts: true,
       images: true,
       stylesheets: true
-    }
+    },
+    styles: true
   });
 
   if (output === "jpeg" || output === "png")
@@ -279,6 +192,8 @@ function enterNodeSelectionMode(doc: Document) {
   return new Promise((resolve, reject) => {
     injectNodeSelectionControls(
       async () => {
+        cleanup();
+
         const selectedNodes = document.querySelectorAll(
           `.${CLASSES.nodeSelected}`
         );
@@ -294,7 +209,6 @@ function enterNodeSelectionMode(doc: Document) {
           if (!inlined) continue;
           div.appendChild(inlined);
         }
-        cleanup();
         resolve(div?.outerHTML);
       },
       () => reject("Cancelled.")
@@ -306,7 +220,6 @@ export {
   clipPage,
   clipArticle,
   cleanup,
-  clipNode,
   clipScreenshot,
   enterNodeSelectionMode
 };
@@ -315,7 +228,6 @@ const mod = {
   clipPage,
   clipArticle,
   cleanup,
-  clipNode,
   clipScreenshot,
   enterNodeSelectionMode
 };
@@ -332,7 +244,7 @@ function injectStyles() {
     border: 2px solid green;
     cursor: pointer;
   }
-  
+
   .${CLASSES.nodeSelectionContainer} {
     position: fixed;
     bottom: 0px;
@@ -352,9 +264,11 @@ function injectNodeSelectionControls(
     document.body.appendChild(controlContainer);
   }, 0);
 
-  app({
-    init: {},
-    view: () =>
+  app<{ isClipping: boolean }>({
+    init: {
+      isClipping: false
+    },
+    view: ({ isClipping }) =>
       h(
         "div",
         {
@@ -378,7 +292,11 @@ function injectNodeSelectionControls(
                 fontStyle: "italic"
               }
             },
-            [text("Click on any element to select it.")]
+            [
+              isClipping
+                ? text("Clipping selected elements. Please wait...")
+                : text("Click on any element to select it.")
+            ]
           ),
           h(
             "div",
@@ -392,18 +310,29 @@ function injectNodeSelectionControls(
               h(
                 "button",
                 {
-                  onclick: (_state) => onDone?.(),
-                  style: { marginRight: "5px" }
+                  onclick: (state) => {
+                    return [
+                      { ...state, isClipping: true },
+                      (dispatch) => {
+                        onDone?.();
+                        dispatch({ isClipping: false });
+                      }
+                    ];
+                  },
+                  style: { marginRight: "5px" },
+                  disabled: isClipping
                 },
-                [text("Done")]
+                [isClipping ? text("Clipping...") : text("Clip")]
               ),
               h(
                 "button",
                 {
-                  onclick: (_state) => {
+                  onclick: (state) => {
                     cleanup();
                     onCancel?.();
-                  }
+                    return state;
+                  },
+                  disabled: isClipping
                 },
                 [text("Cancel")]
               )
@@ -497,4 +426,60 @@ function getElementViewportInfo(el: HTMLElement) {
   result.isPartiallyInViewport = result.isInViewport && result.isOnEdge;
 
   return result;
+}
+
+function toDocument(head: HTMLElement, body: HTMLElement) {
+  const newHTMLDocument = document.implementation.createHTMLDocument();
+  newHTMLDocument.head.outerHTML = head.outerHTML;
+  newHTMLDocument.body.outerHTML = body.outerHTML;
+  return newHTMLDocument;
+}
+
+function cleanup() {
+  setTimeout(() => {
+    document.querySelectorAll(`.${CLASSES.nodeSelected}`).forEach((node) => {
+      if (node instanceof HTMLElement) {
+        node.classList.remove(CLASSES.nodeSelected);
+      }
+    });
+
+    document
+      .querySelectorAll(`.${CLASSES.nodeSelectionContainer}`)
+      .forEach((node) => node.remove());
+
+    removeHoverListeners(document);
+    removeClickHandlers(document);
+  }, 0);
+}
+
+async function getPage(
+  document: Document,
+  styles: boolean,
+  onlyVisible = false
+) {
+  const body = await getInlinedNode(document.body, {
+    raster: true,
+    fetchOptions,
+    inlineOptions: {
+      fonts: false,
+      images: true,
+      stylesheets: styles
+    },
+    styles,
+    filter: (node) => {
+      return !onlyVisible || isElementInViewport(node);
+    }
+  });
+
+  if (!body) return {};
+
+  const head = document.createElement("head");
+  const title = document.createElement("title");
+  title.innerHTML = document.title;
+  head.appendChild(title);
+
+  return {
+    body,
+    head
+  };
 }

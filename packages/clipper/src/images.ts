@@ -22,8 +22,6 @@ import { isDataUrl } from "./utils";
 
 async function inlineAllImages(root: HTMLElement, options: FetchOptions) {
   const imageNodes = root.querySelectorAll("img");
-  console.log("total images", imageNodes.length);
-
   const promises: Promise<any>[] = [];
   for (let i = 0; i < imageNodes.length; ++i) {
     const image = imageNodes[i];
