@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, Text } from "@theme-ui/components";
-import { ReactNodeViewProps } from "../react";
+import { SelectionBasedReactNodeViewProps } from "../react";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { Node } from "prosemirror-model";
@@ -33,7 +33,7 @@ import {
 import { isiOS } from "../../utils/platform";
 
 export function TaskItemComponent(
-  props: ReactNodeViewProps<TaskItemAttributes>
+  props: SelectionBasedReactNodeViewProps<TaskItemAttributes>
 ) {
   const { editor, updateAttributes, getPos, forwardRef, node } = props;
   const { checked } = props.node.attrs;
@@ -81,6 +81,9 @@ export function TaskItemComponent(
           borderRadius: "default",
           ":hover > .dragHandle": {
             opacity: editor.isEditable ? 1 : 0
+          },
+          ":hover > .trashItem": {
+            opacity: 1
           }
         }}
       >
@@ -158,6 +161,25 @@ export function TaskItemComponent(
                 opacity: 1
               },
             flex: 1
+          }}
+        />
+        <Icon
+          className="trashItem"
+          path={Icons.delete}
+          sx={{
+            alignSelf: "flex-start",
+            opacity: 0,
+            ":hover": { cursor: "pointer" }
+          }}
+          onClick={() => {
+            editor.commands.command(({ tr }) => {
+              let mapping = tr.mapping;
+              tr.delete(
+                mapping.map(props.getPos()),
+                mapping.map(props.getPos() + props.node.nodeSize)
+              );
+              return true;
+            });
           }}
         />
       </Flex>
