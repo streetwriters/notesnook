@@ -64,3 +64,27 @@ export function getTotalSize(attachments) {
   }
   return size;
 }
+
+export async function readAttachment(hash) {
+  const attachment = db.attachments.attachment(hash);
+  if (!attachment) return;
+  const downloadResult = await db.fs.downloadFile(
+    attachment.metadata.hash,
+    attachment.metadata.hash,
+    attachment.chunkSize,
+    attachment.metadata
+  );
+  if (!downloadResult) throw new Error("Failed to download file.");
+
+  const key = await db.attachments.decryptKey(attachment.key);
+  if (!key) throw new Error("Invalid key for attachment.");
+
+  return await FS.readEncrypted(attachment.metadata.hash, key, {
+    chunkSize: attachment.chunkSize,
+    iv: attachment.iv,
+    salt: attachment.salt,
+    length: attachment.length,
+    alg: attachment.alg,
+    outputType: "text"
+  });
+}

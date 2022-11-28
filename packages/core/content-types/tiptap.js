@@ -217,6 +217,7 @@ export class Tiptap {
               };
             }
           }
+          case "iframe":
           case "span": {
             const hash = Attributes.get(attr, ATTRIBUTES.hash);
             if (!hash) return;

@@ -181,6 +181,8 @@ async function readEncrypted(filename, key, cipherData) {
 
   return cipherData.outputType === "base64"
     ? Buffer.from(plainText).toString("base64")
+    : cipherData.outputType === "text"
+    ? new TextDecoder().decode(plainText)
     : plainText;
 }
 
