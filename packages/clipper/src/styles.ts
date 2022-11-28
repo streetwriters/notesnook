@@ -114,7 +114,6 @@ async function downloadStylesheet(href: string, options: FetchOptions) {
     if (!response.ok) return false;
     style.innerText = await response.text();
     style.setAttribute("href", href);
-    console.log(href);
     return style;
   } catch (e) {
     console.error("Failed to inline stylesheet", href);

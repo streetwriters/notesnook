@@ -39,14 +39,13 @@ export type InlineOptions = {
 
 export type Options = {
   filter?: Filter;
-  onCloned?: (document: HTMLElement) => void;
   backgroundColor?: CSSStyleDeclaration["backgroundColor"];
   width?: number;
   height?: number;
-  style?: CSSStyleDeclaration;
   quality?: number;
   raster?: boolean;
   scale?: number;
   fetchOptions?: FetchOptions;
   inlineOptions?: InlineOptions;
+  styles?: boolean;
 };

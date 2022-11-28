@@ -23,7 +23,6 @@ import { inlineAllImages } from "./images";
 import { Options } from "./types";
 import { canvasToBlob, delay, escapeXhtml, height, width } from "./utils";
 import { cacheStylesheets, inlineStylesheets } from "./styles";
-import purify from "dompurify";
 
 // Default impl options
 const defaultOptions: Options = {
@@ -34,36 +33,27 @@ const defaultOptions: Options = {
 async function getInlinedNode(node: HTMLElement, options: Options) {
   const { fonts, images, stylesheets } = options.inlineOptions || {};
 
-  console.time("inline styles");
   if (stylesheets) await inlineStylesheets(options.fetchOptions || {});
-  console.timeEnd("inline styles");
 
   const documentStyles = getComputedStyle(document.documentElement);
 
-  console.time("cache styles");
-  const styleCache = cacheStylesheets(documentStyles);
-  console.timeEnd("cache styles");
+  const styleCache = stylesheets ? cacheStylesheets(documentStyles) : undefined;
 
-  console.time("clone");
   let clone = await cloneNode(node, {
+    styles: options.styles,
     filter: options.filter,
     root: true,
     vector: !options.raster,
     fetchOptions: options.fetchOptions,
-    getElementStyles: styleCache.get,
-    getPseudoElementStyles: styleCache.getPseudo
+    getElementStyles: styleCache?.get,
+    getPseudoElementStyles: styleCache?.getPseudo
   });
-  console.timeEnd("clone");
 
   if (!clone || clone instanceof Text) return;
 
-  console.time("embed fonts");
   if (fonts) clone = await embedFonts(clone, options.fetchOptions || {});
-  console.timeEnd("embed fonts");
 
-  console.time("inline images");
   if (images) await inlineAllImages(clone, options.fetchOptions || {});
-  console.timeEnd("inline images");
 
   finalize(clone);
   return clone;
@@ -82,12 +72,6 @@ async function toSvg(node: HTMLElement, options: Options) {
 
   clone = applyOptions(clone, options);
 
-  clone = purify.sanitize(clone, {
-    RETURN_DOM: true,
-    KEEP_CONTENT: false,
-    ADD_ATTR: ["style"]
-  });
-
   return makeSvgDataUri(
     clone,
     options.width || width(node),
@@ -101,15 +85,6 @@ function applyOptions(clone: HTMLElement, options: Options) {
   if (options.width) clone.style.width = options.width + "px";
   if (options.height) clone.style.height = options.height + "px";
 
-  if (options.style) {
-    const style = options.style;
-    Object.keys(style).forEach(function (property) {
-      clone.style.setProperty(property, style.getPropertyValue(property));
-      // clone.style[property] = style[property];
-    });
-  }
-
-  options.onCloned?.(clone);
   return clone;
 }
 

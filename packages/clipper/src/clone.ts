@@ -105,6 +105,7 @@ type CloneProps = {
   filter?: Filter;
   root: boolean;
   vector: boolean;
+  styles?: boolean;
   getElementStyles?: (element: HTMLElement) => CSSStyleDeclaration | undefined;
   getPseudoElementStyles?: (
     element: HTMLElement,
@@ -210,8 +211,10 @@ function processClone(
 
   // if (clone instanceof HTMLElement) removeAttributes(clone);
 
-  copyStyle(original, clone, options);
-  clonePseudoElements(original, clone, options);
+  if (options.styles) {
+    copyStyle(original, clone, options);
+    clonePseudoElements(original, clone, options);
+  }
 
   copyUserInput(original, clone);
   fixSvg(clone);
