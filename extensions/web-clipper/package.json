@@ -32,16 +32,6 @@
     "dev:firefox": "MANIFEST_VERSION=2 node build-utils/dev.js",
     "build": "tsc"
   },
-  "eslintConfig": {
-    "extends": "react-app",
-    "env": {
-      "browser": true,
-      "commonjs": true,
-      "es6": true,
-      "node": true,
-      "webextensions": true
-    }
-  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -106,5 +96,13 @@
       ],
       "extensions": "ts,js,json,tsx,jsx"
     }
-  }
+  },
+  "license": "GPL-3.0-or-later",
+  "author": {
+    "name": "Streetwriters (Private) Ltd.",
+    "email": "support@streetwriters.co",
+    "url": "https://streetwriters.co"
+  },
+  "homepage": "https://notesnook.com/",
+  "repository": "https://github.com/streetwriters/notesnook"
 }

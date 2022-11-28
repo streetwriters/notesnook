@@ -1,21 +1,8 @@
-/*
-This file is part of the Notesnook project (https://notesnook.com/)
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable header/header */
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+// Taken from https://github.com/samdenty/comlink-extension
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 import * as Comlink from "comlink";
 import { Runtime, browser } from "webextension-polyfill-ts";
 
@@ -25,7 +12,7 @@ export type Port = Runtime.Port;
 export type OnPortCallback = (port: Port) => void;
 
 export type PortResolver = (id: string, onPort: OnPortCallback) => void;
-export type PortDeserializer = (id: string) => MessagePort;
+export type PortDeserializer = (id: string) => MessagePort | undefined;
 
 function _resolvePort(id: string, onPort: OnPortCallback) {
   onPort(browser.runtime.connect({ name: id }));
@@ -51,7 +38,7 @@ export function createEndpoint(
 
   function serialize(data: any): void {
     if (Array.isArray(data)) {
-      data.forEach((value, i) => {
+      data.forEach((value) => {
         serialize(value);
       });
     } else if (data && typeof data === "object") {
@@ -123,7 +110,7 @@ export function createEndpoint(
   }
 
   return {
-    postMessage: (message, transfer: MessagePort[]) => {
+    postMessage: (message, _transfer: MessagePort[]) => {
       serialize(message);
       port.postMessage(message);
     },
@@ -183,12 +170,13 @@ function serializePort(id: string, onPort: OnPortCallback) {
   if (!portCallbacks.has(id)) {
     portCallbacks.set(id, []);
   }
-  const callbacks = portCallbacks.get(id)!;
-  callbacks.push(onPort);
+  const callbacks = portCallbacks.get(id);
+  callbacks?.push(onPort);
 }
 
 function deserializePort(id: string) {
-  const port = ports.get(id)!;
+  const port = ports.get(id);
+  if (!port) return;
   const { port1, port2 } = new MessageChannel();
   forward(port2, port, serializePort, deserializePort);
   return port1;
