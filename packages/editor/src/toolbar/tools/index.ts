@@ -81,6 +81,12 @@ import {
   EmbedSettings
 } from "./embed";
 import { AddLink, EditLink, RemoveLink, LinkSettings, OpenLink } from "./link";
+import {
+  WebClipFullScreen,
+  WebClipSettings,
+  WebClipOpenExternal,
+  WebClipOpenSource
+} from "./web-clip";
 
 export type ToolId = keyof typeof tools;
 const tools = {
@@ -121,6 +127,11 @@ const tools = {
   embedAlignRight: EmbedAlignRight,
   embedProperties: EmbedProperties,
   embedSettings: EmbedSettings,
+
+  webclipFullScreen: WebClipFullScreen,
+  webclipOpenExternal: WebClipOpenExternal,
+  webclipOpenSource: WebClipOpenSource,
+  webclipSettings: WebClipSettings,
 
   attachmentSettings: AttachmentSettings,
   downloadAttachment: DownloadAttachment,
