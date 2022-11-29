@@ -52,7 +52,7 @@ export function useKeyboardListNavigation(
   } = options;
   const cursor = useRef(-1);
   const anchor = useRef(-1);
-
+  let selectedItems: number[] = [];
   // const { reset, select, deselect } = useSelection();
 
   const direction = useCallback(() => {
@@ -69,6 +69,7 @@ export function useKeyboardListNavigation(
 
   const resetSelection = useCallback(() => {
     reset();
+    selectedItems = [];
     anchor.current = -1;
   }, [reset]);
 
@@ -83,7 +84,13 @@ export function useKeyboardListNavigation(
   const onMouseDown = useCallback(
     (e: MouseEvent, itemIndex: number) => {
       if (e.ctrlKey || e.metaKey) {
-        select(itemIndex);
+        if (!selectedItems.includes(itemIndex)) {
+          select(itemIndex);
+          selectedItems.push(itemIndex);
+        } else {
+          deselect(itemIndex);
+          selectedItems = selectedItems.filter((item) => item !== itemIndex);
+        }
       } else if (e.shiftKey) {
         const startIndex =
           itemIndex > cursor.current ? cursor.current : itemIndex;
@@ -98,6 +105,7 @@ export function useKeyboardListNavigation(
       } else if (e.button === 0) {
         resetSelection();
         select(itemIndex);
+        selectedItems.push(itemIndex);
       }
     },
     [select, resetSelection, bulkSelect, focusItemAt]
