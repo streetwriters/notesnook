@@ -75,5 +75,5 @@ function getTextBetween(slice: Slice, schema: Schema): string {
     }
   });
 
-  return text;
+  return text.trim();
 }
