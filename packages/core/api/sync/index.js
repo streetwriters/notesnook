@@ -267,13 +267,14 @@ class Sync {
 
   /**
    *
-   * @param {{ items: any[]; vaultKey: any; }} data
+   * @param {{ items: any[]; vaultKey: any; types: string[]; }} data
    * @param {number} lastSynced
    * @returns {Promise<boolean>}
    */
   async send(data, lastSynced) {
     await this.uploadAttachments();
 
+    if (data.types.length === 1 && data.types[0] === "vaultKey") return false;
     if (data.items.length <= 0) return false;
 
     let total = data.items.length;
