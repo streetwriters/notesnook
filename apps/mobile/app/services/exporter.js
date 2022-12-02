@@ -390,7 +390,7 @@ async function save(path, data, fileName, extension) {
       data,
       fileName + `.${extension}`,
       MIMETypes[extension],
-      "utf8",
+      extension === "pdf" ? "base64" : "utf8",
       false
     );
     await releasePermissions(path);
