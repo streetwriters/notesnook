@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export function h(
   tag: keyof HTMLElementTagNameMap | "text",
   children: (HTMLElement | string)[] = [],
-  attr: Record<string, string> = {}
+  attr: Record<string, string | undefined> = {}
 ) {
   const element = document.createElement(tag);
   element.append(
@@ -29,7 +29,8 @@ export function h(
     )
   );
   for (const key in attr) {
-    element.setAttribute(key, attr[key]);
+    const value = attr[key];
+    if (value) element.setAttribute(key, value);
   }
   return element;
 }

@@ -206,7 +206,7 @@ export default class Attachments extends Collection {
   /**
    * Get specified type of attachments of a note
    * @param {string} noteId
-   * @param {"files"|"images"|"all"} type
+   * @param {"files"|"images"|"webclips"|"all"} type
    * @returns {Array}
    */
   ofNote(noteId, type) {
@@ -214,6 +214,7 @@ export default class Attachments extends Collection {
 
     if (type === "files") attachments = this.files;
     else if (type === "images") attachments = this.images;
+    else if (type === "webclips") attachments = this.webclips;
     else if (type === "all") attachments = this.all;
 
     return attachments.filter((attachment) =>
@@ -228,9 +229,10 @@ export default class Attachments extends Collection {
 
   /**
    * @param {string} hash
+   * @param {"base64" | "text"} outputType
    * @returns {Promise<string>} dataurl formatted string
    */
-  async read(hash) {
+  async read(hash, outputType) {
     const attachment = this.all.find((a) => a.metadata.hash === hash);
     if (!attachment) return;
 
@@ -244,10 +246,12 @@ export default class Attachments extends Collection {
         salt: attachment.salt,
         length: attachment.length,
         alg: attachment.alg,
-        outputType: "base64"
+        outputType
       }
     );
-    return dataurl.fromObject({ type: attachment.metadata.type, data });
+    return outputType === "base64"
+      ? dataurl.fromObject({ type: attachment.metadata.type, data })
+      : data;
   }
 
   attachment(hashOrId) {
@@ -284,14 +288,14 @@ export default class Attachments extends Collection {
     return { key, metadata };
   }
 
-  async downloadImages(noteId) {
-    const attachments = this.images.filter((attachment) =>
+  async downloadMedia(noteId) {
+    const attachments = this.media.filter((attachment) =>
       hasItem(attachment.noteIds, noteId)
     );
     try {
       for (let i = 0; i < attachments.length; i++) {
         const attachment = attachments[i];
-        await this._downloadMedia(attachment, {
+        await this._download(attachment, {
           total: attachments.length,
           current: i,
           groupId: noteId
@@ -302,7 +306,7 @@ export default class Attachments extends Collection {
     }
   }
 
-  async _downloadMedia(attachment, { total, current, groupId }, notify = true) {
+  async _download(attachment, { total, current, groupId }, notify = true) {
     const { metadata, chunkSize } = attachment;
     const filename = metadata.hash;
 
@@ -315,13 +319,14 @@ export default class Attachments extends Collection {
     );
     if (!isDownloaded) return;
 
-    const src = await this.read(metadata.hash);
+    const src = await this.read(metadata.hash, getOutputType(attachment));
     if (!src) return;
 
     if (notify)
       EV.publish(EVENTS.mediaAttachmentDownloaded, {
         groupId,
         hash: metadata.hash,
+        attachmentType: getAttachmentType(attachment),
         src
       });
 
@@ -370,12 +375,32 @@ export default class Attachments extends Collection {
     );
   }
 
-  get files() {
+  get webclips() {
     return this.all.filter(
-      (attachment) => !attachment.metadata.type.startsWith("image/")
+      (attachment) =>
+        attachment.metadata.type === "application/vnd.notesnook.web-clip"
     );
   }
 
+  get media() {
+    return this.all.filter(
+      (attachment) =>
+        attachment.metadata.type.startsWith("image/") ||
+        attachment.metadata.type === "application/vnd.notesnook.web-clip"
+    );
+  }
+
+  get files() {
+    return this.all.filter(
+      (attachment) =>
+        !attachment.metadata.type.startsWith("image/") &&
+        attachment.metadata.type !== "application/vnd.notesnook.web-clip"
+    );
+  }
+
+  /**
+   * @returns {any[]}
+   */
   get all() {
     return this._collection.getItems();
   }
@@ -403,4 +428,17 @@ export default class Attachments extends Collection {
       );
     return this.key;
   }
+}
+
+function getOutputType(attachment) {
+  if (attachment.metadata.type === "application/vnd.notesnook.web-clip")
+    return "text";
+  else if (attachment.metadata.type.startsWith("image/")) return "base64";
+}
+
+function getAttachmentType(attachment) {
+  if (attachment.metadata.type === "application/vnd.notesnook.web-clip")
+    return "webclip";
+  else if (attachment.metadata.type.startsWith("image/")) return "image";
+  else return "generic";
 }

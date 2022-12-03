@@ -57,7 +57,7 @@ export function findSelectedNode(
       : findParentNode((node) => node.type.name === type)(
           editor.state.selection
         )?.pos;
-  if (!pos) return null;
+  if (pos === undefined) return null;
 
   return editor.state.doc.nodeAt(pos);
 }

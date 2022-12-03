@@ -104,7 +104,6 @@ const useTiptap = (
     onOpenAttachmentPicker,
     onOpenLink,
     onBeforeCreate,
-    onLoadWebClip,
     ...restOptions
   } = options;
   const PortalProviderAPI = usePortalProvider();
@@ -228,9 +227,7 @@ const useTiptap = (
         SelectionPersist,
         DateTime,
         KeyMap,
-        WebClipNode.configure({
-          onLoadWebClip
-        })
+        WebClipNode
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.portalProviderAPI = PortalProviderAPI;
@@ -243,8 +240,7 @@ const useTiptap = (
       onOpenAttachmentPicker,
       PortalProviderAPI,
       onBeforeCreate,
-      onOpenLink,
-      onLoadWebClip
+      onOpenLink
     ]
   );
 

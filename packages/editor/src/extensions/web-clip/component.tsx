@@ -21,7 +21,7 @@ import { Box, Flex, Text } from "@theme-ui/components";
 import { useEffect, useRef, useState } from "react";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { Icon, Icons } from "../../toolbar";
-import { WebClipAttributes, WebClipOptions } from "./web-clip";
+import { WebClipAttributes } from "./web-clip";
 import { DesktopOnly } from "../../components/responsive";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 
@@ -40,23 +40,18 @@ export function WebClipComponent(
   const [isLoading, setIsLoading] = useState(true);
   const embedRef = useRef<HTMLIFrameElement>(null);
   const resizeObserverRef = useRef<ResizeObserver>();
-  const { src, title, hash, fullscreen } = node.attrs;
-  const { onLoadWebClip } = editor.storage.webclip as WebClipOptions;
-
+  const { src, title, fullscreen, html } = node.attrs;
+  console.log(node.attrs);
   useEffect(() => {
-    (async function () {
-      const iframe = embedRef.current;
-      if (!iframe || !iframe.contentDocument) return;
-      iframe.contentDocument.open();
-      iframe.contentDocument.write(
-        (await onLoadWebClip(editor, hash)) || FAILED_CONTENT
-      );
-      iframe.contentDocument.close();
-      iframe.contentDocument.head.innerHTML += `<base target="_blank">`;
+    const iframe = embedRef.current;
+    if (!iframe || !iframe.contentDocument || !isLoading || !html) return;
+    iframe.contentDocument.open();
+    iframe.contentDocument.write(html || FAILED_CONTENT);
+    iframe.contentDocument.close();
+    iframe.contentDocument.head.innerHTML += `<base target="_blank">`;
 
-      setIsLoading(false);
-    })();
-  }, [hash, onLoadWebClip]);
+    setIsLoading(false);
+  }, [html]);
 
   useEffect(() => {
     function fullscreenchanged() {
@@ -65,7 +60,7 @@ export function WebClipComponent(
         resetIframeSize(embedRef.current);
       } else {
         updateAttributes({ fullscreen: false });
-        resizeIframe(embedRef.current);
+        resizeIframe(node.attrs, embedRef.current);
 
         if (embedRef.current?.contentDocument) {
           resizeObserverRef.current?.observe(
@@ -80,6 +75,17 @@ export function WebClipComponent(
       document.removeEventListener("fullscreenchange", fullscreenchanged);
     };
   }, [updateAttributes]);
+
+  useEffect(() => {
+    if (embedRef.current?.contentDocument) {
+      resizeObserverRef.current = new ResizeObserver(() => {
+        resizeIframe(node.attrs, embedRef.current);
+      });
+      resizeObserverRef.current.observe(
+        embedRef.current?.contentDocument?.body
+      );
+    }
+  }, []);
 
   return (
     <>
@@ -167,23 +173,14 @@ export function WebClipComponent(
           <Box sx={{ overflow: "hidden" }}>
             <iframe
               ref={embedRef}
-              width="100%"
+              width="auto"
               frameBorder={"0"}
               scrolling={fullscreen ? "yes" : "no"}
               style={{ transformOrigin: "0 0", overflow: "hidden" }}
               onLoad={() => {
                 if (fullscreen) return;
 
-                resizeIframe(embedRef.current);
-
-                if (embedRef.current?.contentDocument) {
-                  resizeObserverRef.current = new ResizeObserver(() => {
-                    resizeIframe(embedRef.current);
-                  });
-                  resizeObserverRef.current.observe(
-                    embedRef.current?.contentDocument?.body
-                  );
-                }
+                resizeIframe(node.attrs, embedRef.current);
               }}
             />
           </Box>
@@ -207,12 +204,20 @@ export function WebClipComponent(
   );
 }
 
-function resizeIframe(iframe?: HTMLIFrameElement | null) {
+function resizeIframe(
+  attributes: WebClipAttributes,
+  iframe?: HTMLIFrameElement | null
+) {
   if (!iframe || !iframe.contentDocument || !iframe.contentDocument.body)
     return;
 
-  const height = iframe.contentDocument.body.scrollHeight;
-  const width = iframe.contentDocument.body.scrollWidth;
+  const height = attributes.height
+    ? parseInt(attributes.height)
+    : iframe.contentDocument.body.scrollHeight;
+
+  const width = attributes.width
+    ? parseInt(attributes.width)
+    : iframe.contentDocument.body.scrollWidth;
 
   iframe.style.height = `${height}px`;
   iframe.style.width = `${width}px`;
