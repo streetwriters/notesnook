@@ -164,7 +164,8 @@ export default function ReminderSheet({
       description: details.current,
       recurringMode: recurringMode,
       selectedDays: selectedDays,
-      mode: reminderMode
+      mode: reminderMode,
+      localOnly: reminderMode === "permanent"
     });
 
     const _reminder = db.reminders?.reminder(reminderId);
