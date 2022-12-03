@@ -33,6 +33,7 @@ import Collection from "./collection";
  *  selectedDays?: number[];
  *  dateCreated: number;
  *  dateModified: number;
+ *  localOnly: boolean;
  * }} Reminder
  *
  */
@@ -72,7 +73,8 @@ export default class Reminders extends Collection {
       priority: reminder.priority || "vibrate",
       recurringMode: reminder.recurringMode,
       selectedDays: reminder.selectedDays || [],
-      title: reminder.title
+      title: reminder.title,
+      localOnly: reminder.localOnly
     };
 
     await this._collection.addItem(reminder);
