@@ -176,6 +176,7 @@ const Editor = React.memo(
             allowFileAccess={true}
             scalesPageToFit={true}
             hideKeyboardAccessoryView={false}
+            allowsFullscreenVideo={true}
             allowFileAccessFromFileURLs={true}
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={["*"]}

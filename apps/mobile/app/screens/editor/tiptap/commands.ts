@@ -218,7 +218,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
 
   updateWebclip = async ({ src, hash }: ImageAttributes) => {
     await this.doAsync(
-      `editor && editor.commands.updateWebclip(${JSON.stringify({
+      `editor && editor.commands.updateWebClip(${JSON.stringify({
         hash
       })},${JSON.stringify({ src })})`
     );
