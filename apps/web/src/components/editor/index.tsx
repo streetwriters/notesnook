@@ -37,7 +37,7 @@ import Header from "./header";
 import { Attachment } from "../icons";
 import { useEditorInstance } from "./context";
 import { attachFile, AttachmentProgress, insertAttachment } from "./picker";
-import { downloadAttachment, readAttachment } from "../../common/attachments";
+import { downloadAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core/common";
 import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
@@ -139,7 +139,7 @@ export default function EditorManager({
         true
       );
     } else if (noteId && editorstore.get().session.content) {
-      await db.attachments?.downloadImages(noteId);
+      await db.attachments?.downloadMedia(noteId);
     }
   }, [noteId]);
 
@@ -246,14 +246,20 @@ export function Editor(props: EditorProps) {
       ({
         groupId,
         hash,
+        attachmentType,
         src
       }: {
         groupId?: string;
+        attachmentType: "image" | "webclip" | "generic";
         hash: string;
         src: string;
       }) => {
         if (groupId?.startsWith("monograph")) return;
-        editor.current?.loadImage(hash, src);
+        if (attachmentType === "image") {
+          editor.current?.loadImage(hash, src);
+        } else if (attachmentType === "webclip") {
+          editor.current?.loadWebClip(hash, src);
+        }
       }
     );
 
@@ -277,9 +283,6 @@ export function Editor(props: EditorProps) {
         onChange={onEditorChange}
         onDownloadAttachment={(attachment) =>
           downloadAttachment(attachment.hash)
-        }
-        onReadAttachment={(hash) =>
-          readAttachment(hash) as Promise<string | undefined>
         }
         onInsertAttachment={(type) => {
           const mime = type === "file" ? "*/*" : "image/*";

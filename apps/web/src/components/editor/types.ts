@@ -32,6 +32,7 @@ export interface IEditor {
   redo: () => void;
   updateContent: (content: string) => void;
   attachFile: (file: Attachment) => void;
+  loadWebClip: (hash: string, html: string) => void;
   loadImage: (hash: string, src: string) => void;
   sendAttachmentProgress: (
     hash: string,

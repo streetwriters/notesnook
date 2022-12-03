@@ -33,7 +33,7 @@ export function WebClipSettings(props: ToolProps) {
       {...props}
       autoCloseOnUnmount
       popupId="webclipSettings"
-      tools={["webclipFullScreen"]}
+      tools={["webclipFullScreen", "webclipOpenSource"]}
     />
   );
 }

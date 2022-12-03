@@ -58,7 +58,6 @@ type TipTapProps = {
   onChange?: (id: string, sessionId: string, content: string) => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
-  onReadAttachment?: (hash: string) => Promise<string | undefined>;
   onAttachFile?: (file: File) => void;
   onFocus?: () => void;
   content?: string;
@@ -101,7 +100,6 @@ function TipTap(props: TipTapProps) {
     onChange,
     onInsertAttachment,
     onDownloadAttachment,
-    onReadAttachment,
     onAttachFile,
     onFocus = () => {},
     content,
@@ -221,9 +219,6 @@ function TipTap(props: TipTapProps) {
       onDownloadAttachment: (_editor, attachment) => {
         onDownloadAttachment?.(attachment);
         return true;
-      },
-      async onLoadWebClip(_editor, attachmentHash) {
-        return await onReadAttachment?.(attachmentHash);
       },
       onOpenLink: (url) => {
         window.open(url, "_blank");
@@ -361,6 +356,8 @@ function toIEditor(editor: Editor): IEditor {
         editor.current?.commands.insertImage({ ...file, src: file.dataurl });
       } else editor.current?.commands.insertAttachment(file);
     },
+    loadWebClip: (hash, src) =>
+      editor.current?.commands.updateWebClip({ hash }, { src }),
     loadImage: (hash, src) =>
       editor.current?.commands.updateImage(
         { hash },

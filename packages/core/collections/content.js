@@ -125,11 +125,7 @@ export default class Content extends Collection {
         groupId
       };
 
-      return this._db.attachments._downloadMedia(
-        attachment,
-        progressData,
-        notify
-      );
+      return this._db.attachments._download(attachment, progressData, notify);
     });
     return contentItem;
   }
