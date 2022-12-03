@@ -75,22 +75,24 @@ export const NotePicker = (props: NotePickerProps) => {
           </Text>
           <Icon path={Icons.chevronDown} color="text" size={18} />
         </Button>
-        <Button
-          variant="tool"
-          onClick={() => onSelected(undefined)}
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexShrink: 0,
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0,
-            height: 33
-          }}
-          title={"Clear selection"}
-        >
-          <Icon path={Icons.close} color="text" size={16} />
-        </Button>
+        {selectedNote && (
+          <Button
+            variant="tool"
+            onClick={() => onSelected(undefined)}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexShrink: 0,
+              borderTopLeftRadius: 0,
+              borderBottomLeftRadius: 0,
+              height: 33
+            }}
+            title={"Clear selection"}
+          >
+            <Icon path={Icons.close} color="text" size={16} />
+          </Button>
+        )}
       </Flex>
 
       <Picker onClose={close} isOpen={modalVisible}>

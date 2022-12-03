@@ -40,7 +40,8 @@ const common = {
     "tabs",
     "storage",
     "contextMenus",
-    "notifications"
+    "notifications",
+    "<all_urls>"
   ],
   content_scripts: [
     {
@@ -51,14 +52,14 @@ const common = {
       js: ["contentScript.bundle.js"],
       matches: ["http://*/*", "https://*/*"],
       exclude_matches: ["*://app.notesnook.com/*", "*://localhost/*"]
-    },
+    }
   ],
   browser_specific_settings: {
     gecko: {
       strict_min_version: "105.0"
     }
   },
-  icons: ICONS,
+  icons: ICONS
 };
 
 const v2 = {

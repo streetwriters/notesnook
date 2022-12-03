@@ -27,7 +27,7 @@ import {
   Server,
   Clip,
   WEB_EXTENSION_CHANNEL_EVENTS
-} from "@notesnook/web-clipper/src/common/bridge";
+} from "@notesnook/web-clipper/dist/common/bridge";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { store as themestore } from "../stores/theme-store";
 import { store as appstore } from "../stores/app-store";
@@ -133,6 +133,8 @@ class WebExtensionServer implements Server {
         "data-mime": attachment.type,
         src: clip.url,
         title: clip.pageTitle || clip.title,
+        width: clip.width ? `${clip.width}` : undefined,
+        height: clip.height ? `${clip.height}` : undefined,
         class: "web-clip"
       }).outerHTML;
     }
