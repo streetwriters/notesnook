@@ -38,7 +38,7 @@ const BLACKLIST = [CLASSES.nodeSelected, CLASSES.nodeSelectionContainer];
 
 const fetchOptions: FetchOptions = {
   bypassCors: true,
-  corsHost: "https://cors.eu.org",
+  corsHost: "https://cors.notesnook.com",
   crossOrigin: "anonymous",
   noCache: true
 };
