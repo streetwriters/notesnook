@@ -353,7 +353,8 @@ export const STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
     "linkSettings",
     "codeRemove",
     "outdent",
-    "indent"
+    "indent",
+    "webclipSettings"
   ]
 ];
 
