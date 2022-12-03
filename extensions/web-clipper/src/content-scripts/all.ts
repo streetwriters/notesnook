@@ -26,22 +26,41 @@ import {
 } from "@notesnook/clipper";
 import { ClipArea, ClipMode } from "../common/bridge";
 
-browser.runtime.onMessage.addListener((request) => {
-  const message = request as {
-    type?: string;
-    mode?: ClipMode;
-    area?: ClipArea;
-  };
+type ClipMessage = {
+  type: "clip";
+  mode?: ClipMode;
+  area?: ClipArea;
+};
 
-  if (message.type === "viewport") {
-    return Promise.resolve({
-      x: 0,
-      y: 0,
-      height: document.body.clientHeight,
-      width: document.body.clientWidth
-    });
+type ViewportMessage = {
+  type: "viewport";
+};
+
+browser.runtime.onMessage.addListener(async (request) => {
+  const message = request as ClipMessage | ViewportMessage;
+
+  switch (message.type) {
+    case "clip": {
+      const sizeable =
+        message.area === "full-page" &&
+        (message.mode === "complete" || message.mode === "screenshot");
+      return {
+        height: sizeable ? document.body.clientHeight : 0,
+        width: sizeable ? document.body.clientWidth : 0,
+        data: await clip(request)
+      };
+    }
+    case "viewport":
+      return {
+        x: 0,
+        y: 0,
+        height: document.body.clientHeight,
+        width: document.body.clientWidth
+      };
   }
+});
 
+function clip(message: ClipMessage) {
   try {
     const isScreenshot = message.mode === "screenshot";
     const withStyles = message.mode === "complete" || isScreenshot;
@@ -64,4 +83,4 @@ browser.runtime.onMessage.addListener((request) => {
   } finally {
     if (message.area !== "selection") cleanup();
   }
-});
+}

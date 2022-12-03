@@ -17,12 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-declare global {
-  interface Window {
-    WEB_EXTENSION_CHANNEL?: MessageChannel;
-  }
-}
-
 export type ClipArea = "full-page" | "visible" | "selection" | "article";
 
 export type ClipMode = "simplified" | "screenshot" | "complete";
@@ -59,6 +53,8 @@ export type Clip = {
   data: string;
   area: ClipArea;
   mode: ClipMode;
+  width?: number;
+  height?: number;
   pageTitle?: string;
   tags?: string[];
   note?: ItemReference;
@@ -77,3 +73,9 @@ export const WEB_EXTENSION_CHANNEL_EVENTS = {
   ON_CREATED: "web-extension-channel-created",
   ON_READY: "web-extension-channel-ready"
 } as const;
+
+export type ClipData = {
+  height?: number;
+  width?: number;
+  data: string;
+};

@@ -28,7 +28,8 @@ import {
   ItemReference,
   SelectedNotebook,
   ClipArea,
-  ClipMode
+  ClipMode,
+  ClipData,
 } from "../common/bridge";
 import { usePersistentState } from "../hooks/use-persistent-state";
 import { deleteClip, getClip } from "../utils/storage";
@@ -101,7 +102,7 @@ export function Main() {
   const [notebook, setNotebook] =
     usePersistentState<SelectedNotebook>("notebook");
   const [tags, setTags] = usePersistentState<string[]>("tags", []);
-  const [clipData, setClipData] = useState<string>();
+  const [clipData, setClipData] = useState<ClipData>();
   const pageTitle = useRef<string>();
 
   useEffect(() => {
@@ -165,6 +166,7 @@ export function Main() {
               setClipArea(item.id);
               setClipNonce((s) => ++s);
             }}
+            disabled={isClipping}
             sx={{
               display: "flex",
               borderRadius: "default",
@@ -207,7 +209,7 @@ export function Main() {
               setClipMode(item.id);
               setClipNonce((s) => ++s);
             }}
-            disabled={item.pro && !isPremium}
+            disabled={isClipping || (item.pro && !isPremium)}
             sx={{
               display: "flex",
               borderRadius: "default",
@@ -253,7 +255,7 @@ export function Main() {
             onClick={async () => {
               if (!clipData) return;
               const winUrl = URL.createObjectURL(
-                new Blob(["\ufeff", clipData], { type: "text/html" })
+                new Blob(["\ufeff", clipData.data], { type: "text/html" })
               );
               await browser.windows.create({
                 url: winUrl
@@ -266,7 +268,7 @@ export function Main() {
 
         {error && (
           <Text
-            variant="text"
+            variant="body"
             sx={{
               mt: 1,
               bg: "errorBg",
@@ -346,17 +348,16 @@ export function Main() {
               setError("You are not connected to Notesnook.");
               return;
             }
-
             await notesnook.saveClip({
               url,
               title,
-              data: clipData,
               area: clipArea,
               mode: clipMode,
               tags,
               note,
               notebook,
-              pageTitle: pageTitle.current
+              pageTitle: pageTitle.current,
+              ...clipData
             });
 
             setClipData(undefined);
@@ -386,11 +387,11 @@ export function Main() {
 export async function clip(
   area: ClipArea,
   mode: ClipMode
-): Promise<string | undefined> {
+): Promise<ClipData | undefined> {
   const clipData = await getClip();
   if (area === "selection" && typeof clipData === "string") {
     await deleteClip();
-    return clipData;
+    return { data: clipData };
   }
 
   const [tab] = await browser.tabs.query({ active: true });
@@ -403,8 +404,11 @@ export async function clip(
       format: "jpeg",
       quality: 100
     });
-    return `<img src="${result}" width="${tab.width}px" height="${tab.height}px"/>`;
+
+    return {
+      data: `<img src="${result}" width="${tab.width}px" height="${tab.height}px"/>`
+    };
   }
 
-  return await browser.tabs.sendMessage(tab.id, { mode, area });
+  return await browser.tabs.sendMessage(tab.id, { type: "clip", mode, area });
 }
