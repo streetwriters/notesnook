@@ -98,17 +98,26 @@ const Editor = React.memo(
         ({
           hash,
           groupId,
-          src
+          src,
+          attachmentType
         }: {
           hash: string;
           groupId: string;
           src: string;
+          attachmentType: string;
         }) => {
           if (groupId !== editor.note.current?.id) return;
-          editor.commands.updateImage({
-            hash: hash,
-            src: src
-          });
+          if (attachmentType === "webclip") {
+            editor.commands.updateWebclip({
+              hash: hash,
+              src: src
+            });
+          } else {
+            editor.commands.updateImage({
+              hash: hash,
+              src: src
+            });
+          }
         },
         [editor.commands, editor.note]
       );
@@ -129,7 +138,7 @@ const Editor = React.memo(
 
       useLayoutEffect(() => {
         onLoad && onLoad();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [onLoad]);
 
       if (withController) {

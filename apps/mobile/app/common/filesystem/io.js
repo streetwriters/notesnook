@@ -36,13 +36,12 @@ export async function readEncrypted(filename, key, cipherData) {
         ...cipherData,
         hash: filename
       },
-      "base64"
+      cipherData.outputType === "base64" ? "base64" : "text"
     );
     return output;
   } catch (e) {
     RNFetchBlob.fs.unlink(path).catch(console.log);
     console.log(e);
-    console.log("error");
     return false;
   }
 }
