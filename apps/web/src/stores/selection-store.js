@@ -57,6 +57,10 @@ class SelectionStore extends BaseStore {
     }
   };
 
+  isSelected = (item) => {
+    return this.get().selectedItems.indexOf(item) > -1;
+  };
+
   setSelectedItems = (items) => {
     this.set((state) => (state.selectedItems = items));
   };
