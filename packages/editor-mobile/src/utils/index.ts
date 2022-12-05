@@ -142,14 +142,18 @@ export const EventTypes = {
   monograph: "editor-event:monograph",
   properties: "editor-event:properties",
   fullscreen: "editor-event:fullscreen",
-  link: "editor-event:link"
+  link: "editor-event:link",
+  contentchange: "editor-event:content-change"
 } as const;
 
 export function isReactNative(): boolean {
   return !!window.ReactNativeWebView;
 }
 
-export function logger(type: "info" | "warn" | "error", ...logs: unknown[]):void {
+export function logger(
+  type: "info" | "warn" | "error",
+  ...logs: unknown[]
+): void {
   const logString = logs
     .map((log) => {
       return typeof log !== "string" ? JSON.stringify(log) : log;
@@ -162,7 +166,7 @@ export function logger(type: "info" | "warn" | "error", ...logs: unknown[]):void
 export function post<T extends keyof typeof EventTypes>(
   type: typeof EventTypes[T],
   value?: unknown
-):void {
+): void {
   if (isReactNative()) {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({

@@ -73,7 +73,7 @@ export const useEditor = (
   const insets = useGlobalSafeAreaInsets();
   const isDefaultEditor = editorId === "";
   const saveCount = useRef(0);
-  const lastSuccessfulSaveTime = useRef<number>(0);
+  const lastContentChangeTime = useRef<number>(0);
   const lock = useRef(false);
 
   const postMessage = useCallback(
@@ -158,7 +158,7 @@ export const useEditor = (
       saveCount.current = 0;
       useEditorStore.getState().setReadonly(false);
       postMessage(EditorEvents.title, "");
-      lastSuccessfulSaveTime.current = 0;
+      lastContentChangeTime.current = 0;
       await commands.clearContent();
       await commands.clearTags();
       if (resetState) {
@@ -250,7 +250,7 @@ export const useEditor = (
           note = db.notes?.note(id)?.data as Note;
           await commands.setStatus(timeConverter(note.dateEdited), "Saved");
 
-          lastSuccessfulSaveTime.current = note.dateEdited;
+          lastContentChangeTime.current = note.dateEdited;
 
           if (
             saveCount.current < 2 ||
@@ -307,7 +307,7 @@ export const useEditor = (
         sessionHistoryId.current = Date.now();
         await commands.setSessionId(nextSessionId);
         await commands.focus();
-        lastSuccessfulSaveTime.current = 0;
+        lastContentChangeTime.current = 0;
         useEditorStore.getState().setReadonly(false);
       } else {
         if (!item.forced && currentNote.current?.id === item.id) return;
@@ -315,7 +315,7 @@ export const useEditor = (
         overlay(true, item);
         currentNote.current && (await reset(false));
         await loadContent(item as NoteType);
-        lastSuccessfulSaveTime.current = item.dateEdited;
+        lastContentChangeTime.current = item.dateEdited;
         const nextSessionId = makeSessionId(item as NoteType);
         sessionHistoryId.current = Date.now();
         setSessionId(nextSessionId);
@@ -371,8 +371,10 @@ export const useEditor = (
       if (!currentNote.current || noteId !== currentNote.current.id) return;
       const isContentEncrypted = typeof (data as Content)?.data === "object";
       const note = db.notes?.note(currentNote.current?.id).data as NoteType;
-      lock.current = true;
+      
+      if (lastContentChangeTime.current >= note.dateEdited) return;
 
+      lock.current = true;
       if (data.type === "tiptap") {
         if (!currentNote.current.locked && isContentEncrypted) {
           lockNoteWithVault(note);
@@ -388,11 +390,10 @@ export const useEditor = (
           }
         } else {
           const _nextContent = await db.content?.raw(note.contentId);
-          lastSuccessfulSaveTime.current = note.dateEdited;
-          if (_nextContent !== currentContent.current?.data) {
-            await postMessage(EditorEvents.updatehtml, _nextContent.data);
-            currentContent.current = _nextContent;
-          }
+          if (_nextContent === currentContent.current?.data) return;
+          lastContentChangeTime.current = note.dateEdited;
+          await postMessage(EditorEvents.updatehtml, _nextContent.data);
+          currentContent.current = _nextContent;
         }
       } else {
         const note = data as NoteType;
@@ -438,6 +439,7 @@ export const useEditor = (
       content?: string;
       type: string;
     }) => {
+      lastContentChangeTime.current = Date.now();
       if (lock.current) return;
       if (type === EditorEvents.content) {
         currentContent.current = {
@@ -537,6 +539,10 @@ export const useEditor = (
     loadNote
   ]);
 
+  const onContentChanged = () => {
+    lastContentChangeTime.current = Date.now();
+  };
+
   return {
     ref: editorRef,
     onLoad,
@@ -550,6 +556,7 @@ export const useEditor = (
     note: currentNote,
     onReady,
     saveContent,
+    onContentChanged,
     editorId: editorId
   };
 };

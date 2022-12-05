@@ -77,10 +77,12 @@ export function useEditorController(update: () => void): EditorController {
   const selectionChange = useCallback((_editor: Editor) => {}, []);
 
   const titleChange = useCallback((title: string) => {
+    post(EventTypes.contentchange);
     post(EventTypes.title, title);
   }, []);
 
   const contentChange = useCallback((editor: Editor) => {
+    post(EventTypes.contentchange);
     if (!editor) return;
     if (typeof timers.current.change === "number") {
       clearTimeout(timers.current?.change);

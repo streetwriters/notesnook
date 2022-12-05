@@ -76,7 +76,8 @@ export const EventTypes = {
   monograph: "editor-event:monograph",
   properties: "editor-event:properties",
   fullscreen: "editor-event:fullscreen",
-  link: "editor-event:link"
+  link: "editor-event:link",
+  contentchange: "editor-event:content-change"
 };
 
 const publishNote = async (editor: useEditorType) => {
@@ -296,6 +297,9 @@ export const useEditorEvents = (
       switch (editorMessage.type) {
         case EventTypes.logger:
           logger.info("[WEBVIEW LOG]", editorMessage.value);
+          break;
+        case EventTypes.contentchange:
+          editor.onContentChanged();
           break;
         case EventTypes.content:
           editor.saveContent({
