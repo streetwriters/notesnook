@@ -109,7 +109,7 @@ export default function EditorManager({
           db.eventManager.subscribe(
             EVENTS.syncCompleted,
             async () => {
-              await db.attachments?.downloadImages(id);
+              await db.attachments?.downloadMedia(id);
             },
             true
           );
