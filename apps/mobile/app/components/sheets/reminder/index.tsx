@@ -37,11 +37,13 @@ import { db } from "../../../common/database";
 import Navigation from "../../../services/navigation";
 import { formatReminderTime } from "../../../utils/time";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useReminderStore } from "../../../stores/use-reminder-store";
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheet>;
   close?: () => void;
   update?: (options: PresentSheetOptions) => void;
   reminder?: Reminder;
+  reference?: { id: string; type: string };
 };
 
 const ReminderModes =
@@ -83,7 +85,8 @@ export default function ReminderSheet({
   actionSheetRef,
   close,
   update,
-  reminder
+  reminder,
+  reference
 }: ReminderSheetProps) {
   const colors = useThemeStore((state) => state.colors);
   const [reminderMode, setReminderMode] = useState<Reminder["mode"]>(
@@ -157,8 +160,6 @@ export default function ReminderSheet({
     const reminderId = await db.reminders?.add({
       id: reminder?.id,
       date: date?.getTime(),
-      dateCreated: Date.now(),
-      dateModified: Date.now(),
       priority: reminderNotificationMode,
       title: title.current,
       description: details.current,
@@ -175,8 +176,15 @@ export default function ReminderSheet({
         heading: "Failed to add a new reminder"
       });
     }
+    if (reference) {
+      db.relations?.add(reference, {
+        id: _reminder?.id as string,
+        type: _reminder?.type as string
+      });
+    }
     Notifications.scheduleNotification(_reminder as Reminder);
-    Navigation.queueRoutesForUpdate("Reminders");
+    useReminderStore.getState().setReminders();
+    close?.();
   }
 
   return (
@@ -487,27 +495,17 @@ export default function ReminderSheet({
         </Paragraph>
       )}
 
-      <Button
-        style={{
-          width: "100%"
-        }}
-        title="Save"
-        type="accent"
-        onPress={saveReminder}
-      />
-
       {reminder && reminder.date ? (
         <View
           style={{
-            backgroundColor: colors.nav,
             borderRadius: 5,
             flexDirection: "row",
             paddingHorizontal: 5,
             paddingVertical: 3,
             alignItems: "center",
             justifyContent: "flex-start",
-            alignSelf: "center",
-            marginTop: 12
+            marginTop: 12,
+            marginBottom: 4
           }}
         >
           <>
@@ -517,23 +515,38 @@ export default function ReminderSheet({
               color={colors.icon}
               style={{ marginLeft: 5 }}
             >
-              Upcoming: {formatReminderTime(reminder)}
+              {formatReminderTime(reminder)}
             </Paragraph>
           </>
         </View>
       ) : null}
+
+      <Button
+        style={{
+          width: "100%"
+        }}
+        title="Save"
+        type="accent"
+        onPress={saveReminder}
+      />
     </View>
   );
 }
 
-ReminderSheet.present = (reminder?: Reminder) => {
+ReminderSheet.present = (
+  reminder?: Reminder,
+  reference?: { id: string; type: string },
+  isSheet?: boolean
+) => {
   presentSheet({
+    context: isSheet ? "local" : undefined,
     component: (ref, close, update) => (
       <ReminderSheet
         actionSheetRef={ref}
         close={close}
         update={update}
         reminder={reminder}
+        reference={reference}
       />
     )
   });

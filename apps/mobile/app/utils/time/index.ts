@@ -80,16 +80,20 @@ export function formatReminderTime(reminder: Reminder) {
     time = getUpcomingReminderTime(reminder) as number;
   }
 
+  const isPast = dayjs(time).isBefore(dayjs());
+
   if (dayjs(time).isTomorrow()) {
-    return `Tomorrow, ${dayjs(time).format("hh:mm A")}`;
+    return `"Upcoming": Tomorrow, ${dayjs(time).format("hh:mm A")}`;
   }
 
   if (dayjs(time).isYesterday()) {
-    return `Yesterday, ${dayjs(time).format("hh:mm A")}`;
+    return `Last occurrence: Yesterday, ${dayjs(time).format("hh:mm A")}`;
   }
 
   if (dayjs(time).isToday()) {
-    return `Today, ${dayjs(time).format("hh:mm A")}`;
+    return `${isPast ? "Last occurrence" : "Upcoming"}: Today, ${dayjs(
+      time
+    ).format("hh:mm A")}`;
   }
 
   // if (isNext(time, "week")) {
@@ -110,7 +114,10 @@ export function formatReminderTime(reminder: Reminder) {
   //   } of next month, ${dayjs(time).format("hh:mm A")}`;
   // }
 
-  return dayjs(time).format("ddd, DD MMM,YYYY hh:mm A");
+  return (
+    `${isPast ? "Last occurrence" : "Upcoming"}: ` +
+    dayjs(time).format("ddd, DD MMM,YYYY hh:mm A")
+  );
 }
 
 export const sleep = (duration: number) =>

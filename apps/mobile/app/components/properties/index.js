@@ -64,7 +64,7 @@ export const Properties = ({
         paddingHorizontal: 0,
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
-        maxHeight: "95%"
+        maxHeight: "100%"
       }}
     >
       {!item || !item.id ? (
@@ -192,7 +192,7 @@ export const Properties = ({
   );
 };
 
-Properties.present = (item, buttons = []) => {
+Properties.present = (item, buttons = [], isSheet) => {
   if (!item) return;
   let type = item?.type;
   let props = [];
@@ -207,6 +207,7 @@ Properties.present = (item, buttons = []) => {
       props[0] = db.notes.note(item.id).data;
       props.push([
         "Add to notebook",
+        "Add-Reminder",
         "Share",
         "Export",
         "Copy",
@@ -219,6 +220,7 @@ Properties.present = (item, buttons = []) => {
         "RemoveTopic",
         "History",
         "ReadOnly",
+        "Reminders",
         "Local only",
         "Duplicate",
         ...android,
@@ -247,6 +249,7 @@ Properties.present = (item, buttons = []) => {
   }
   if (!props[0]) return;
   presentSheet({
+    context:isSheet ? "local" : undefined,
     component: (ref, close) => (
       <Properties
         close={() => {
