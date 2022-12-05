@@ -32,10 +32,18 @@ import ReminderSheet from "../../sheets/reminder";
 import { formatReminderTime } from "../../../utils/time/index";
 
 const ReminderItem = React.memo(
-  ({ item, index }: { item: Reminder; index: number }) => {
+  ({
+    item,
+    index,
+    isSheet
+  }: {
+    item: Reminder;
+    index: number;
+    isSheet: boolean;
+  }) => {
     const colors = useThemeStore((state) => state.colors);
     const openReminder = () => {
-      ReminderSheet.present(item);
+      ReminderSheet.present(item, undefined, isSheet);
     };
     return (
       <SelectionWrapper
@@ -44,6 +52,7 @@ const ReminderItem = React.memo(
         height={100}
         onPress={openReminder}
         item={item}
+        isSheet={isSheet}
       >
         <View>
           <Heading
@@ -136,7 +145,7 @@ const ReminderItem = React.memo(
           color={colors.pri}
           name="dots-horizontal"
           size={SIZE.xl}
-          onPress={() => Properties.present(item)}
+          onPress={() => Properties.present(item, [], isSheet)}
           customStyle={{
             justifyContent: "center",
             height: 35,

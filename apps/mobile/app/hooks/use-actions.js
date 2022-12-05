@@ -57,6 +57,7 @@ import {
 } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { sleep } from "../utils/time";
+import { RelationsList } from "../components/sheets/reminders-list/index";
 
 export const useActions = ({ close = () => null, item }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -604,6 +605,15 @@ export const useActions = ({ close = () => null, item }) => {
       func: addTo
     },
     {
+      name: "Add-Reminder",
+      title: "Add reminder",
+      icon: "bell-plus",
+      func: () => {
+        ReminderSheet.present(null, { id: item.id, type: "note" });
+      },
+      close: true
+    },
+    {
       name: "Move notes",
       title: "Add notes",
       icon: "plus",
@@ -798,13 +808,27 @@ export const useActions = ({ close = () => null, item }) => {
     {
       name: "Edit reminder",
       title: "Edit reminder",
-      icon: "clock-outline",
+      icon: "pencil",
       func: async () => {
         close();
         await sleep(300);
         ReminderSheet.present(item);
       },
       close: false
+    },
+    {
+      name: "Reminders",
+      title: "Reminders",
+      icon: "bell",
+      func: () => {
+        RelationsList.present({
+          reference: item,
+          referenceType: "reminder",
+          relationType: "from",
+          title: "Reminders"
+        });
+      },
+      close: true
     }
   ];
 

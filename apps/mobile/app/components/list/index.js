@@ -56,7 +56,6 @@ const RenderItem = ({ item, index, type, ...restArgs }) => {
   const groupOptions = db.settings?.getGroupOptions(type);
   const dateBy =
     groupOptions.sortBy !== "title" ? groupOptions.sortBy : "dateEdited";
-
   const totalNotes = getTotalNotes(item);
   const tags =
     item.tags
@@ -97,7 +96,8 @@ const List = ({
   },
   screen,
   ListHeader,
-  warning
+  warning,
+  isSheet = false
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const scrollRef = useRef();
@@ -115,13 +115,14 @@ const List = ({
       <RenderItem
         item={item}
         index={index}
-        color={headerProps.color}
-        title={headerProps.heading}
+        color={headerProps?.color}
+        title={headerProps?.heading}
         type={screen === "Notes" ? "home" : type}
         screen={screen}
+        isSheet={isSheet}
       />
     ),
-    [headerProps.color, headerProps.heading, screen, type]
+    [headerProps?.color, headerProps?.heading, screen, type, isSheet]
   );
 
   const _onRefresh = async () => {
@@ -185,20 +186,22 @@ const List = ({
             />
           }
           ListEmptyComponent={
-            <Empty
-              loading={loading}
-              placeholderData={placeholderData}
-              headerProps={headerProps}
-              type={type}
-              screen={screen}
-            />
+            placeholderData ? (
+              <Empty
+                loading={loading}
+                placeholderData={placeholderData}
+                headerProps={headerProps}
+                type={type}
+                screen={screen}
+              />
+            ) : null
           }
           ListFooterComponent={<Footer />}
           ListHeaderComponent={
             <>
               {ListHeader ? (
                 ListHeader
-              ) : (
+              ) : !headerProps ? null : (
                 <Header
                   title={headerProps.heading}
                   color={headerProps.color}
