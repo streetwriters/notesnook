@@ -74,6 +74,7 @@ import { DateTime } from "./extensions/date-time";
 import { OpenLink, OpenLinkOptions } from "./extensions/open-link";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import { KeyMap } from "./extensions/key-map";
+import { WebClipNode, WebClipOptions } from "./extensions/web-clip";
 
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
@@ -81,7 +82,8 @@ const CoreExtensions = Object.entries(TiptapCoreExtensions)
   .map(([, extension]) => extension);
 
 type TiptapOptions = EditorOptions &
-  AttachmentOptions &
+  Omit<AttachmentOptions, "HTMLAttributes"> &
+  Omit<WebClipOptions, "HTMLAttributes"> &
   OpenLinkOptions & {
     theme: Theme;
     isMobile?: boolean;
@@ -229,7 +231,8 @@ const useTiptap = (
         KeepInView,
         SelectionPersist,
         DateTime,
-        KeyMap
+        KeyMap,
+        WebClipNode
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.portalProviderAPI = PortalProviderAPI;

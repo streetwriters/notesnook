@@ -139,7 +139,7 @@ export default function EditorManager({
         true
       );
     } else if (noteId && editorstore.get().session.content) {
-      await db.attachments?.downloadImages(noteId);
+      await db.attachments?.downloadMedia(noteId);
     }
   }, [noteId]);
 
@@ -246,14 +246,20 @@ export function Editor(props: EditorProps) {
       ({
         groupId,
         hash,
+        attachmentType,
         src
       }: {
         groupId?: string;
+        attachmentType: "image" | "webclip" | "generic";
         hash: string;
         src: string;
       }) => {
         if (groupId?.startsWith("monograph")) return;
-        editor.current?.loadImage(hash, src);
+        if (attachmentType === "image") {
+          editor.current?.loadImage(hash, src);
+        } else if (attachmentType === "webclip") {
+          editor.current?.loadWebClip(hash, src);
+        }
       }
     );
 

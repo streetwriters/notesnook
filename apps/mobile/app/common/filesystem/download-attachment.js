@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { Platform } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";
-import Sodium from "react-native-sodium";
+import Sodium from "@ammarahmed/react-native-sodium";
 import RNFetchBlob from "rn-fetch-blob";
 import { ShareComponent } from "../../components/sheets/export-notes/share";
 import { presentSheet, ToastEvent } from "../../services/event-manager";
@@ -68,7 +68,7 @@ export default async function downloadAttachment(hash, global = true) {
       chunkSize: attachment.chunkSize
     };
 
-    let fileUri = await Sodium.decryptFile(key, info, false);
+    let fileUri = await Sodium.decryptFile(key, info, "file");
     ToastEvent.show({
       heading: "Download successful",
       message: attachment.metadata.filename + " downloaded",
@@ -114,3 +114,4 @@ export default async function downloadAttachment(hash, global = true) {
     useAttachmentStore.getState().remove(attachment.metadata.hash);
   }
 }
+

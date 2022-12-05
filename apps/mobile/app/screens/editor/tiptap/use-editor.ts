@@ -346,13 +346,7 @@ export const useEditor = (
           true
         );
       } else {
-        const images = db.attachments?.ofNote(
-          currentNote.current?.id,
-          "images"
-        );
-        if (images && images.length > 0) {
-          db.attachments?.downloadImages(currentNote.current.id);
-        }
+        db.attachments?.downloadMedia(currentNote.current?.id);
       }
     }, 300);
   };

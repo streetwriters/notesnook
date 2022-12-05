@@ -356,6 +356,8 @@ function toIEditor(editor: Editor): IEditor {
         editor.current?.commands.insertImage({ ...file, src: file.dataurl });
       } else editor.current?.commands.insertAttachment(file);
     },
+    loadWebClip: (hash, src) =>
+      editor.current?.commands.updateWebClip({ hash }, { src }),
     loadImage: (hash, src) =>
       editor.current?.commands.updateImage(
         { hash },

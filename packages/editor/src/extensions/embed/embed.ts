@@ -59,6 +59,7 @@ export const EmbedNode = Node.create<EmbedOptions>({
   content: "",
   marks: "",
   draggable: true,
+  priority: 50,
 
   addOptions() {
     return {

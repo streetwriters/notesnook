@@ -100,6 +100,9 @@ export default class Tags extends Collection {
     return this._collection.getRaw();
   }
 
+  /**
+   * @return {any[]}
+   */
   get all() {
     return this._collection.getItems((item) => {
       item.alias = this._db.settings.getAlias(item.id) || item.title;

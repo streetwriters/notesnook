@@ -82,6 +82,7 @@ export type Content = {
   data?: string;
   type: string;
   noteId: string;
+  id?:string
 };
 
 export type SavePayload = {
