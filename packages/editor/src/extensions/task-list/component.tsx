@@ -171,7 +171,7 @@ export function TaskListComponent(
                 );
               }}
             />
-            <Flex sx={{ flexShrink: 0, pr: 2 }}>
+            <Flex sx={{ flexShrink: 0, pr: 2, zIndex: 1 }}>
               <ToolButton
                 toggled={false}
                 title="Clear completed tasks"
