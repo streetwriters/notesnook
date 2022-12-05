@@ -49,7 +49,7 @@ const comparators = {
 };
 
 function getTitle(item) {
-  return item.alias || item.title;
+  return item.alias || item.title || "";
 }
 
 const KEY_SELECTORS = {
