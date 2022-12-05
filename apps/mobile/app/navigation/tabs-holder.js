@@ -133,7 +133,7 @@ const _TabsHolder = () => {
   const showFullScreenEditor = useCallback(() => {
     setFullscreen(true);
     if (deviceMode === "smallTablet") {
-      tabBarRef.current?.openDrawer();
+      tabBarRef.current?.openDrawer(false);
     }
     editorRef.current?.setNativeProps({
       style: {
@@ -147,30 +147,36 @@ const _TabsHolder = () => {
     });
   }, [deviceMode, dimensions.width, setFullscreen]);
 
-  const closeFullScreenEditor = useCallback(() => {
-    if (deviceMode === "smallTablet") {
-      tabBarRef.current?.closeDrawer();
-    }
-    setFullscreen(false);
-    editorController.current?.commands.updateSettings({
-      fullscreen: false
-    });
-    editorRef.current?.setNativeProps({
-      style: {
-        width:
-          deviceMode === "smallTablet"
-            ? dimensions.width - valueLimiter(dimensions.width * 0.4, 300, 450)
-            : dimensions.width * 0.55,
-        zIndex: null,
-        paddingHorizontal: 0
+  const closeFullScreenEditor = useCallback(
+    (current) => {
+      const _deviceMode = current || deviceMode;
+      if (_deviceMode === "smallTablet") {
+        tabBarRef.current?.closeDrawer(false);
       }
-    });
-    if (deviceMode === "smallTablet") {
-      setTimeout(() => {
-        tabBarRef.current?.goToIndex(1);
-      }, 100);
-    }
-  }, [deviceMode, dimensions.width, setFullscreen]);
+      setFullscreen(false);
+      editorController.current?.commands.updateSettings({
+        fullscreen: false
+      });
+      editorRef.current?.setNativeProps({
+        style: {
+          width:
+            _deviceMode === "smallTablet"
+              ? dimensions.width -
+                valueLimiter(dimensions.width * 0.4, 300, 450)
+              : dimensions.width * 0.55,
+          zIndex: null,
+          paddingHorizontal: 0
+        }
+      });
+      if (_deviceMode === "smallTablet") {
+        tabBarRef.current?.goToIndex(1, false);
+      }
+      if (_deviceMode === "mobile") {
+        tabBarRef.current?.goToIndex(2, false);
+      }
+    },
+    [deviceMode, dimensions.width, setFullscreen]
+  );
 
   useEffect(() => {
     if (!tabBarRef.current?.isDrawerOpen()) {
@@ -205,9 +211,7 @@ const _TabsHolder = () => {
       return;
     }
 
-    layoutTimer = setTimeout(async () => {
-      checkDeviceType(size);
-    }, 500);
+    checkDeviceType(size);
   };
 
   function checkDeviceType(size) {
@@ -217,32 +221,19 @@ const _TabsHolder = () => {
     });
     setWidthHeight(size);
     DDS.setSize(size, orientation);
-    if (DDS.isLargeTablet()) {
-      setDeviceMode("tablet", size);
-      setTimeout(() => {
-        introCompleted && tabBarRef.current?.goToIndex(0);
-      }, 500);
-    } else if (DDS.isSmallTab) {
-      setDeviceMode("smallTablet", size);
-      if (!fullscreen) {
-        setTimeout(() => {
-          introCompleted && tabBarRef.current?.closeDrawer();
-        }, 500);
-      } else {
-        setTimeout(() => {
-          introCompleted && tabBarRef.current?.openDrawer();
-        }, 500);
-      }
-    } else {
-      setDeviceMode("mobile", size);
-    }
+    const nextDeviceMode = DDS.isLargeTablet()
+      ? "tablet"
+      : DDS.isSmallTab
+      ? "smallTablet"
+      : "mobile";
+    setDeviceMode(nextDeviceMode, size);
   }
 
   function setDeviceMode(current, size) {
     setDeviceModeState(current);
     let needsUpdate = current !== deviceMode;
 
-    if (fullscreen) {
+    if (fullscreen && current !== "mobile") {
       editorRef.current?.setNativeProps({
         style: {
           width: size.width,
@@ -252,6 +243,7 @@ const _TabsHolder = () => {
         }
       });
     } else {
+      eSendEvent(eCloseFullscreenEditor, current);
       editorRef.current?.setNativeProps({
         style: {
           position: "relative",
@@ -270,14 +262,24 @@ const _TabsHolder = () => {
       return;
     }
     setTimeout(() => {
-      if (current === "tablet") {
-        tabBarRef.current?.goToIndex(0);
-      } else {
-        if (!editorState().movedAway) {
-          tabBarRef.current?.goToIndex(2);
-        } else {
-          tabBarRef.current?.goToIndex(1);
-        }
+      switch (current) {
+        case "tablet":
+          introCompleted && tabBarRef.current?.goToIndex(0, false);
+          break;
+        case "smallTablet":
+          if (!fullscreen) {
+            introCompleted && tabBarRef.current?.closeDrawer(false);
+          } else {
+            introCompleted && tabBarRef.current?.openDrawer(false);
+          }
+          break;
+        case "mobile":
+          if (!editorState().movedAway && useEditorStore.getState().currentEditingNote) {
+            tabBarRef.current?.goToIndex(2, false);
+          } else {
+            tabBarRef.current?.goToIndex(1, false);
+          }
+          break;
       }
     }, 1);
   }
@@ -340,7 +342,6 @@ const _TabsHolder = () => {
       c: 0
     }
   };
-
   const widths = {
     mobile: {
       a: dimensions.width * 0.75,
@@ -353,9 +354,15 @@ const _TabsHolder = () => {
       c: dimensions.width - valueLimiter(dimensions.width * 0.4, 300, 450)
     },
     tablet: {
-      a: dimensions.width * 0.15,
+      a:
+        dimensions.width > 1100
+          ? dimensions.width * 0.15
+          : dimensions.width * 0.2,
       b: dimensions.width * 0.3,
-      c: dimensions.width * 0.55
+      c:
+        dimensions.width > 1100
+          ? dimensions.width * 0.55
+          : dimensions.width * 0.5
     }
   };
 

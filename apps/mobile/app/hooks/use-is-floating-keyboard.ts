@@ -29,10 +29,9 @@ const useIsFloatingKeyboard = () => {
   const { width } = useWindowDimensions();
 
   const [floating, setFloating] = useState<boolean>(false);
-
   const onKeyboardWillChangeFrame = useCallback(
     (event: KeyboardEvent) => {
-      setFloating(event.endCoordinates.width !== width);
+      setFloating(event.endCoordinates.width < width);
     },
     [width]
   );

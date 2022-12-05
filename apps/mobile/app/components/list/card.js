@@ -47,7 +47,7 @@ export const Card = ({ color, warning }) => {
           width: "95%",
           flexDirection: "row",
           alignItems: "center",
-          justifyContent: "flex-start",
+          justifyContent: "space-between",
           paddingHorizontal: 0
         }}
       >
@@ -59,7 +59,6 @@ export const Card = ({ color, warning }) => {
                 ? hexToRGBA(colors.red, 0.15)
                 : hexToRGBA(color, 0.15),
             height: 40,
-            marginLeft: 10,
             borderRadius: 100,
             alignItems: "center",
             justifyContent: "center"
@@ -77,7 +76,8 @@ export const Card = ({ color, warning }) => {
         <View
           style={{
             marginLeft: 10,
-            maxWidth: "70%"
+            flexShrink: 1,
+            marginRight: 10
           }}
         >
           <Paragraph color={colors.icon} size={SIZE.xs}>
@@ -85,7 +85,8 @@ export const Card = ({ color, warning }) => {
           </Paragraph>
           <Paragraph
             style={{
-              maxWidth: "100%"
+              flexWrap: "wrap",
+              flexShrink: 1
             }}
             color={colors.heading}
           >
@@ -98,9 +99,7 @@ export const Card = ({ color, warning }) => {
             width: 40,
             height: 40,
             justifyContent: "center",
-            alignItems: "center",
-            position: "absolute",
-            right: 6
+            alignItems: "center"
           }}
         >
           <Icon

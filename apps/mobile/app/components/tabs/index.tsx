@@ -51,12 +51,12 @@ interface TabProps extends ViewProps {
 }
 
 export interface TabsRef {
-  goToPage: (page: number, animated?:boolean) => void;
-  goToIndex: (index: number) => 0 | undefined;
+  goToPage: (page: number, animated?: boolean) => void;
+  goToIndex: (index: number, animated?: boolean) => 0 | undefined;
   unlock: () => boolean;
   lock: () => boolean;
-  openDrawer: () => void;
-  closeDrawer: () => void;
+  openDrawer: (animated: boolean) => void;
+  closeDrawer: (animated: boolean) => void;
   page: number;
   setScrollEnabled: () => true;
   isDrawerOpen: () => boolean;
@@ -149,7 +149,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
     (): TabsRef => ({
       goToPage: (page: number, animated = true) => {
         if (deviceMode === "tablet") {
-          translateX.value = withTiming(0);
+          translateX.value = animated ? withTiming(0) : 0;
           return;
         }
         page = page + 1;
@@ -167,20 +167,22 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
           currentTab.value = 2;
         }
       },
-      goToIndex: (index: number) => {
+      goToIndex: (index: number, animated = true) => {
         if (deviceMode === "tablet") {
-          translateX.value = withTiming(0);
+          translateX.value = animated ? withTiming(0) : 0;
           return;
         }
         if (index === 0) {
           onDrawerStateChange(true);
-          return (translateX.value = withSpring(0));
+          return (translateX.value = animated ? withSpring(0) : 0);
         }
         if (index === 1) {
-          translateX.value = withTiming(homePosition);
+          translateX.value = animated ? withTiming(homePosition) : homePosition;
           currentTab.value = 1;
         } else if (index === 2) {
-          translateX.value = withTiming(editorPosition);
+          translateX.value = animated
+            ? withTiming(editorPosition)
+            : editorPosition;
           currentTab.value = 2;
         }
       },
@@ -193,19 +195,21 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
         return true;
       },
       isDrawerOpen: () => isDrawerOpen.value,
-      openDrawer: () => {
-        translateX.value = withSpring(drawerPosition, {
-          mass: 0.5
-        });
+      openDrawer: (animated = true) => {
+        translateX.value = animated
+          ? withSpring(drawerPosition, {
+              mass: 0.5
+            })
+          : drawerPosition;
         isDrawerOpen.value = true;
         onDrawerStateChange(true);
       },
-      closeDrawer: () => {
+      closeDrawer: (animated = true) => {
         if (deviceMode === "tablet") {
-          translateX.value = withTiming(0);
+          translateX.value = animated ? withTiming(0) : 0;
           return;
         }
-        translateX.value = withTiming(homePosition);
+        translateX.value = animated ? withTiming(homePosition) : homePosition;
         onDrawerStateChange(false);
         isDrawerOpen.value = false;
       },
