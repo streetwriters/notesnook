@@ -52,7 +52,6 @@ export function useKeyboardListNavigation(
   } = options;
   const cursor = useRef(-1);
   const anchor = useRef(-1);
-
   // const { reset, select, deselect } = useSelection();
 
   const direction = useCallback(() => {

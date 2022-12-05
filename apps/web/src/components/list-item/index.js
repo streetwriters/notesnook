@@ -145,7 +145,7 @@ function ListItem(props) {
         }
       }}
       onClick={(e) => {
-        if (props.onClick) {
+        if (!e.metaKey && !e.shiftKey && !e.ctrlKey && props.onClick) {
           props.onClick();
         }
       }}

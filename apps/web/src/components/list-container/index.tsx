@@ -74,6 +74,7 @@ function ListContainer(props: ListContainerProps) {
 
   const [announcements, removeAnnouncement] = useAnnouncements();
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
+  const isSelected = useSelectionStore((store) => store.isSelected);
   const selectItem = useSelectionStore((store) => store.selectItem);
   const deselectItem = useSelectionStore((store) => store.deselectItem);
   const toggleSelection = useSelectionStore(
@@ -98,7 +99,10 @@ function ListContainer(props: ListContainerProps) {
     length: items.length,
     reset: () => toggleSelection(false),
     deselect: (index) => deselectItem(items[index]),
-    select: (index) => selectItem(items[index]),
+    select: (index) =>
+      isSelected(items[index])
+        ? deselectItem(items[index])
+        : selectItem(items[index]),
     bulkSelect: (indices) => setSelectedItems(indices.map((i) => items[i])),
     focusItemAt: (index) => {
       const item = items[index];
