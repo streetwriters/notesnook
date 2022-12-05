@@ -200,7 +200,10 @@ function Properties(props) {
                     showMonthDropdown
                     showYearDropdown
                     selected={startDate || item.value(session[item.key])}
-                    onChange={(date) => setStartDate(date)}
+                    onChange={async (date) => {
+                      setStartDate(date);
+                      await noteStore.dateCreated(sessionId, date);
+                    }}
                     dropdownMode="select"
                     timeInputLabel="Time:"
                     dateFormat="MMM d, yyyy, h:mm aa"

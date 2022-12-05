@@ -129,6 +129,12 @@ class NoteStore extends BaseStore {
     });
   };
 
+  dateCreated = async (id, dateCreated) => {
+    await db.notes.add({ id, dateCreated });
+    this._syncEditor(id, "dateCreated", dateCreated);
+    this.refresh();
+  };
+
   lock = async (id) => {
     await Vault.lockNote(id);
     this.refreshItem(id);
