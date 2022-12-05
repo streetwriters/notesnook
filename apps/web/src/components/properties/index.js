@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useState } from "react";
 import * as Icon from "../icons";
-import { Flex, Text } from "@theme-ui/components";
+import { Flex, Text, Input } from "@theme-ui/components";
 import { useStore, store } from "../../stores/editor-store";
 import { COLORS } from "../../common/constants";
 import { db } from "../../common/db";
@@ -37,6 +37,8 @@ import TimeAgo from "../time-ago";
 import Attachment from "../attachment";
 import { formatBytes } from "../../utils/filename";
 import { getTotalSize } from "../../common/attachments";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const tools = [
   { key: "pin", property: "pinned", icon: Icon.Pin, label: "Pin" },
@@ -65,7 +67,7 @@ const metadataItems = [
   {
     key: "dateCreated",
     label: "Created at",
-    value: (date) => formatDate(date || Date.now())
+    value: (date) => date || Date.now()
   },
   {
     key: "dateEdited",
@@ -78,6 +80,7 @@ function Properties(props) {
   const { onOpenPreviewSession } = props;
 
   const [versionHistory, setVersionHistory] = useState([]);
+  const [startDate, setStartDate] = useState();
 
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
@@ -185,16 +188,33 @@ function Properties(props) {
                   justifyContent: "space-between"
                 }}
               >
-                <Text variant="body" sx={{ color: "fontTertiary" }}>
+                <Text
+                  variant="body"
+                  sx={{ color: "fontTertiary", whiteSpace: "nowrap" }}
+                >
                   {item.label}
                 </Text>
-                <Text
-                  className="selectable"
-                  variant="body"
-                  sx={{ color: "fontTertiary" }}
-                >
-                  {item.value(session[item.key])}
-                </Text>
+                {item.key === "dateCreated" ? (
+                  <DatePicker
+                    customInput={<CustomInput />}
+                    showMonthDropdown
+                    showYearDropdown
+                    selected={startDate || item.value(session[item.key])}
+                    onChange={(date) => setStartDate(date)}
+                    dropdownMode="select"
+                    timeInputLabel="Time:"
+                    dateFormat="MMM d, yyyy, h:mm aa"
+                    showTimeInput
+                  ></DatePicker>
+                ) : (
+                  <Text
+                    className="selectable"
+                    variant="body"
+                    sx={{ color: "fontTertiary" }}
+                  >
+                    {item.value(session[item.key])}
+                  </Text>
+                )}
               </Flex>
             ))}
             {!isPreviewMode && (
@@ -433,3 +453,21 @@ function Card({ title, subtitle, button, children }) {
     </Flex>
   );
 }
+
+const CustomInput = forwardRef((props, refs) => {
+  return (
+    <Input
+      ref={refs}
+      type="text"
+      variant="clean"
+      sx={{
+        color: "fontTertiary",
+        fontSize: "body",
+        textAlign: "right",
+        m: 0,
+        p: 0
+      }}
+      {...props}
+    />
+  );
+});
