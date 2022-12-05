@@ -73,6 +73,7 @@ export default function EditorManager({
   // stored in refs. Update this value to trigger an
   // update.
   const [timestamp, setTimestamp] = useState<number>(0);
+  const lastSavedTime = useRef<number>(0);
 
   const previewSession = useRef<PreviewSession>();
   const [dropRef, overlayRef] = useDragOverlay();
@@ -90,8 +91,13 @@ export default function EditorManager({
   useEffect(() => {
     const event = db.eventManager.subscribe(
       EVENTS.syncItemMerged,
-      async (item?: Record<string, string>) => {
-        if (!item) return;
+      async (item?: Record<string, string | number>) => {
+        if (
+          !item ||
+          lastSavedTime.current >= item.dateEdited ||
+          isPreviewSession
+        )
+          return;
 
         const { id, contentId, locked } = editorstore.get().session;
         const isContent = item.type === "tiptap" && item.id === contentId;
@@ -104,7 +110,7 @@ export default function EditorManager({
             else EV.publish(EVENTS.vaultLocked);
           }
 
-          editorInstance.current?.updateContent(item.data);
+          editorInstance.current?.updateContent(item.data as string);
 
           db.eventManager.subscribe(
             EVENTS.syncCompleted,
@@ -123,11 +129,13 @@ export default function EditorManager({
     return () => {
       event.unsubscribe();
     };
-  }, [editorInstance]);
+  }, [editorInstance, isPreviewSession]);
 
   const openSession = useCallback(async (noteId: string | number) => {
     await editorstore.get().openSession(noteId);
     previewSession.current = undefined;
+
+    lastSavedTime.current = Date.now();
     setTimestamp(Date.now());
   }, []);
 
@@ -149,6 +157,7 @@ export default function EditorManager({
     (async function () {
       await editorstore.newSession(nonce);
 
+      lastSavedTime.current = 0;
       setTimestamp(Date.now());
     })();
   }, [isNewSession, nonce]);
@@ -171,7 +180,6 @@ export default function EditorManager({
         flexDirection: "column"
       }}
     >
-      {/* <UpdatesPendingNotice /> */}
       {previewSession.current && (
         <PreviewModeNotice
           {...previewSession.current}
@@ -184,6 +192,7 @@ export default function EditorManager({
           previewSession.current?.content?.data ||
           editorstore.get().session?.content?.data
         }
+        onContentChange={() => (lastSavedTime.current = Date.now())}
         options={{
           readonly: isReadonly || isPreviewSession,
           onRequestFocus: () => toggleProperties(false),
@@ -217,9 +226,10 @@ type EditorProps = {
   content: string;
   nonce?: number;
   options?: EditorOptions;
+  onContentChange?: () => void;
 };
 export function Editor(props: EditorProps) {
-  const { content, nonce, options } = props;
+  const { content, nonce, options, onContentChange } = props;
   const { readonly, headless, onLoadMedia, isMobile } = options || {
     headless: false,
     readonly: false,
@@ -280,6 +290,7 @@ export function Editor(props: EditorProps) {
         onLoad={() => {
           if (onLoadMedia) onLoadMedia();
         }}
+        onContentChange={onContentChange}
         onChange={onEditorChange}
         onDownloadAttachment={(attachment) =>
           downloadAttachment(attachment.hash)

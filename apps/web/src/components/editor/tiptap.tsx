@@ -56,6 +56,7 @@ type TipTapProps = {
   editorContainer: HTMLElement;
   onLoad?: () => void;
   onChange?: (id: string, sessionId: string, content: string) => void;
+  onContentChange?: () => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
   onAttachFile?: (file: File) => void;
@@ -101,6 +102,7 @@ function TipTap(props: TipTapProps) {
     onInsertAttachment,
     onDownloadAttachment,
     onAttachFile,
+    onContentChange,
     onFocus = () => {},
     content,
     toolbarContainerId,
@@ -166,6 +168,8 @@ function TipTap(props: TipTapProps) {
         if (onLoad) onLoad();
       },
       onUpdate: ({ editor, transaction }) => {
+        onContentChange?.();
+
         const preventSave = transaction?.getMeta("preventSave") as boolean;
         const { id, sessionId } = editorstore.get().session;
         const content = editor.state.doc.content;
