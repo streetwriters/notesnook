@@ -23,6 +23,7 @@ import TextBuilder from "../utils/templates/text/builder";
 import { getContentFromData } from "../content-types";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { addItem, deleteItem } from "../utils/array";
+import { formatDate } from "../utils/date"
 
 export default class Note {
   /**
@@ -87,9 +88,9 @@ export default class Note {
     const templateData = {
       metadata: this.data,
       title: this.title,
-      editedOn: this.dateEdited,
+      editedOn: formatDate(this.dateEdited),
       headline: this.headline,
-      createdOn: this.data.dateCreated,
+      createdOn: formatDate(this.data.dateCreated),
       tags: this.tags.join(", ")
     };
     const contentItem = await this._db.content.raw(this._note.contentId);

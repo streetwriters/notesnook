@@ -29,7 +29,7 @@ enum DIRECTION {
 type UseKeyboardListNavigationOptions = {
   length: number;
   reset: () => void;
-  select: (index: number) => void;
+  select: (index: number, toggleable?: boolean) => void;
   deselect: (index: number) => void;
   bulkSelect: (indices: number[]) => void;
   focusItemAt: (index: number) => void;
@@ -82,7 +82,7 @@ export function useKeyboardListNavigation(
   const onMouseDown = useCallback(
     (e: MouseEvent, itemIndex: number) => {
       if (e.ctrlKey || e.metaKey) {
-        select(itemIndex);
+        select(itemIndex, true);
       } else if (e.shiftKey) {
         const startIndex =
           itemIndex > cursor.current ? cursor.current : itemIndex;

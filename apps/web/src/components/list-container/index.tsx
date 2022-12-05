@@ -99,8 +99,8 @@ function ListContainer(props: ListContainerProps) {
     length: items.length,
     reset: () => toggleSelection(false),
     deselect: (index) => deselectItem(items[index]),
-    select: (index) =>
-      isSelected(items[index])
+    select: (index, toggleable) =>
+      toggleable && isSelected(items[index])
         ? deselectItem(items[index])
         : selectItem(items[index]),
     bulkSelect: (indices) => setSelectedItems(indices.map((i) => items[i])),

@@ -8,8 +8,8 @@
       content="This is Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1"
     />
     <title>Test 1 - Notesnook</title>
-    <meta name="created-on" content="1669202032300" />
-    <meta name="last-edited-on" content="1669202033184" />
+    <meta name="created-on" content="xxx" />
+    <meta name="last-edited-on" content="xxx" />
     
   </head>
   <body>

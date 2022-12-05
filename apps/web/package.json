@@ -112,7 +112,7 @@
     "build:desktop": "env-cmd -e all,desktop react-scripts build",
     "deploy": "./scripts/deploy.sh",
     "debug": "env-cmd -e all,dev,web,silent react-scripts start",
-    "test": "playwright test",
+    "test": "playwright test -u",
     "eject": "react-scripts eject",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "postinstall": "patch-package"
