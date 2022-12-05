@@ -50,17 +50,19 @@ const ScrollContainer = ({
 export default ScrollContainer;
 
 type FlexScrollContainerProps = {
+  id?: string;
   className?: string;
   style?: React.CSSProperties;
 };
 
 export function FlexScrollContainer({
+  id,
   children,
   style,
   className
 }: PropsWithChildren<FlexScrollContainerProps>) {
   return (
-    <MacScrollbar className={className} style={style} minThumbSize={40}>
+    <MacScrollbar id={id} className={className} style={style} minThumbSize={40}>
       {children}
     </MacScrollbar>
   );

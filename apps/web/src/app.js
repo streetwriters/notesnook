@@ -33,6 +33,7 @@ import { ViewLoader } from "./components/loaders/view-loader";
 import NavigationMenu from "./components/navigation-menu";
 import StatusBar from "./components/status-bar";
 import { EditorLoader } from "./components/loaders/editor-loader";
+import { FlexScrollContainer } from "./components/scroll-container";
 
 const GlobalMenuWrapper = React.lazy(() =>
   import("./components/global-menu-wrapper")
@@ -191,17 +192,19 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
 
 function MobileAppContents({ isAppLoaded }) {
   return (
-    <Flex
+    <FlexScrollContainer
       id="slider"
-      variant="rowFill"
-      sx={{
+      style={{
+        display: "flex",
+        flexDirection: "row",
         overflowY: "hidden",
         scrollSnapType: "x mandatory",
         scrollBehavior: "smooth",
         WebkitOverflowScrolling: "touch",
         scrollSnapStop: "always",
         overscrollBehavior: "contain",
-        overflowX: "auto"
+        overflowX: "auto",
+        flex: 1
       }}
     >
       <Flex
@@ -261,6 +264,6 @@ function MobileAppContents({ isAppLoaded }) {
           condition={isAppLoaded}
         />
       </Flex>
-    </Flex>
+    </FlexScrollContainer>
   );
 }
