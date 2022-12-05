@@ -72,7 +72,6 @@ import { NavigationStack } from "./navigation-stack";
 
 const _TabsHolder = () => {
   const colors = useThemeStore((state) => state.colors);
-
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const setFullscreen = useSettingStore((state) => state.setFullscreen);
   const fullscreen = useSettingStore((state) => state.fullscreen);
@@ -163,7 +162,9 @@ const _TabsHolder = () => {
             _deviceMode === "smallTablet"
               ? dimensions.width -
                 valueLimiter(dimensions.width * 0.4, 300, 450)
-              : dimensions.width * 0.55,
+              : dimensions.width > 1100
+              ? dimensions.width * 0.55
+              : dimensions.width * 0.5,
           zIndex: null,
           paddingHorizontal: 0
         }
@@ -243,13 +244,15 @@ const _TabsHolder = () => {
         }
       });
     } else {
-      eSendEvent(eCloseFullscreenEditor, current);
+      if (fullscreen) eSendEvent(eCloseFullscreenEditor, current);
       editorRef.current?.setNativeProps({
         style: {
           position: "relative",
           width:
             current === "tablet"
-              ? size.width * 0.55
+              ? size.width > 1100
+                ? size.width * 0.55
+                : size.width * 0.5
               : current === "smallTablet"
               ? size.width - valueLimiter(size.width * 0.4, 300, 450)
               : size.width,
@@ -274,9 +277,14 @@ const _TabsHolder = () => {
           }
           break;
         case "mobile":
-          if (!editorState().movedAway && useEditorStore.getState().currentEditingNote) {
+          if (
+            !editorState().movedAway &&
+            useEditorStore.getState().currentEditingNote
+          ) {
+            console.log("editor");
             tabBarRef.current?.goToIndex(2, false);
           } else {
+            console.log("home");
             tabBarRef.current?.goToIndex(1, false);
           }
           break;
