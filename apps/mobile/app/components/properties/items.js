@@ -112,6 +112,7 @@ export const Items = ({ item, buttons, close }) => {
     <FlatList
       data={data}
       keyExtractor={(item) => item.title}
+      key={columnItemsCount + "key"}
       numColumns={columnItemsCount}
       style={{
         marginTop: item.type !== "note" ? 10 : 0,
