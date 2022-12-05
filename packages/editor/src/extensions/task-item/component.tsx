@@ -31,6 +31,7 @@ import {
   useIsMobile
 } from "../../toolbar/stores/toolbar-store";
 import { isiOS } from "../../utils/platform";
+import { DesktopOnly } from "../../components/responsive";
 
 export function TaskItemComponent(
   props: ReactNodeViewProps<TaskItemAttributes>
@@ -81,6 +82,9 @@ export function TaskItemComponent(
           borderRadius: "default",
           ":hover > .dragHandle": {
             opacity: editor.isEditable ? 1 : 0
+          },
+          ":hover > .taskItemTools": {
+            opacity: 1
           }
         }}
       >
@@ -118,6 +122,7 @@ export function TaskItemComponent(
             alignSelf: "start",
             mr: 2,
             p: "1px",
+            mt: "4px",
             cursor: editor.isEditable ? "pointer" : "unset",
             ":hover": {
               borderColor: "checked"
@@ -160,6 +165,43 @@ export function TaskItemComponent(
             flex: 1
           }}
         />
+        <DesktopOnly>
+          <Flex
+            className="taskItemTools"
+            sx={{
+              bg: "background",
+              position: "absolute",
+              right: 0,
+              top: "4px",
+              opacity: 0,
+              alignItems: "center"
+            }}
+          >
+            <Icon
+              className="deleleTaskItem"
+              title="Delete this task item"
+              path={Icons.close}
+              size={18}
+              sx={{
+                cursor: "pointer"
+              }}
+              onClick={() => {
+                if (!editor.current) return;
+                const pos = getPos();
+
+                // we need to get a fresh instance of the task list instead
+                // of using the one we got via props.
+                const node = editor.current.state.doc.nodeAt(pos);
+                if (!node) return;
+
+                editor.commands.command(({ tr }) => {
+                  tr.deleteRange(pos, pos + node.nodeSize);
+                  return true;
+                });
+              }}
+            />
+          </Flex>
+        </DesktopOnly>
       </Flex>
     </>
   );
