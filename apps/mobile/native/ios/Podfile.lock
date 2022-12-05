@@ -267,7 +267,7 @@ PODS:
     - RCTTypeSafety
     - React-Core
     - ReactCommon/turbomodule/core
-  - react-native-sodium (1.0.0):
+  - react-native-sodium (1.1.0):
     - React
   - react-native-webview (11.23.1):
     - React-Core
@@ -454,7 +454,7 @@ DEPENDENCIES:
   - "react-native-netinfo (from `../../node_modules/@react-native-community/netinfo`)"
   - react-native-orientation (from `../../node_modules/react-native-orientation`)
   - react-native-safe-area-context (from `../../node_modules/react-native-safe-area-context`)
-  - react-native-sodium (from `../../node_modules/react-native-sodium`)
+  - "react-native-sodium (from `../../node_modules/@ammarahmed/react-native-sodium`)"
   - react-native-webview (from `../../node_modules/react-native-webview`)
   - React-perflogger (from `../../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -575,7 +575,7 @@ EXTERNAL SOURCES:
   react-native-safe-area-context:
     :path: "../../node_modules/react-native-safe-area-context"
   react-native-sodium:
-    :path: "../../node_modules/react-native-sodium"
+    :path: "../../node_modules/@ammarahmed/react-native-sodium"
   react-native-webview:
     :path: "../../node_modules/react-native-webview"
   React-perflogger:
@@ -700,7 +700,7 @@ SPEC CHECKSUMS:
   react-native-netinfo: 3d3769f0d65de15c83a9bf1346f8be71de5a24bf
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-safe-area-context: 99b24a0c5acd0d5dcac2b1a7f18c49ea317be99a
-  react-native-sodium: 5d17851375e399a532d3c571d0703de4312da31c
+  react-native-sodium: be21b1b4273f00e5e19572f5a7dc1c9d07993633
   react-native-webview: d33e2db8925d090871ffeb232dfa50cb3a727581
   React-perflogger: 8e832d4e21fdfa613033c76d58d7e617341e804b
   React-RCTActionSheet: 9ca778182a9523991bff6381045885b6e808bb73
