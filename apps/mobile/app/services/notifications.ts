@@ -128,9 +128,10 @@ async function scheduleNotification(reminder: Reminder, payload?: string) {
       return;
     }
     await clearAllPendingTriggersForId(reminder.id);
+
     if (!triggers) return;
     for (const trigger of triggers) {
-      await notifee.createTriggerNotification(
+      const notif = await notifee.createTriggerNotification(
         {
           id: trigger.id,
           title: title,
@@ -162,6 +163,7 @@ async function scheduleNotification(reminder: Reminder, payload?: string) {
         },
         trigger
       );
+      console.log(notif);
     }
   } catch (e) {
     console.log(e);
@@ -306,8 +308,8 @@ async function checkAndRequestPermissions() {
 function getTriggers(
   reminder: Reminder
 ): (Trigger & { id: string })[] | undefined {
-  const { date, recurringMode, selectedDays, type } = reminder;
-  switch (type) {
+  const { date, recurringMode, selectedDays, mode } = reminder;
+  switch (mode) {
     case "once":
       return [
         {
@@ -321,7 +323,7 @@ function getTriggers(
       ];
     case "permanent":
       return undefined;
-    case "recurring": {
+    case "repeat" : {
       switch (recurringMode) {
         case "day":
           return [
