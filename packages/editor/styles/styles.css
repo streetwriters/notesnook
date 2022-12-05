@@ -1,3 +1,7 @@
+.ProseMirror span * {
+  font-family: inherit;
+}
+
 .ProseMirror p.is-editor-empty:first-child::before {
   color: var(--placeholder);
   content: attr(data-placeholder);

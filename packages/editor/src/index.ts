@@ -30,7 +30,7 @@ import Superscript from "@tiptap/extension-superscript";
 import FontSize from "./extensions/font-size";
 import TextDirection from "./extensions/text-direction";
 import TextStyle from "@tiptap/extension-text-style";
-import FontFamily from "@tiptap/extension-font-family";
+import FontFamily from "./extensions/font-family";
 import BulletList from "./extensions/bullet-list";
 import OrderedList from "./extensions/ordered-list";
 import Color from "@tiptap/extension-color";
