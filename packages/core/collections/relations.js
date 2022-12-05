@@ -125,14 +125,15 @@ export default class Relations extends Collection {
     const items = [];
     for (const relation of relations) {
       const reference = resolveType === "from" ? relation.from : relation.to;
-
+      
       let item = null;
       switch (reference.type) {
         case "reminder":
           item = this._db.reminders.reminder(reference.id);
           break;
       }
-      if (!item) await this.remove(relation.id);
+      if (item) items.push(item);
+      else await this.remove(relation.id);
     }
     return items;
   }
