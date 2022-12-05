@@ -88,45 +88,7 @@ export function TaskListComponent(
         }}
         className="task-list-tools"
       >
-        {isNested ? (
-          <Flex
-            sx={{
-              position: "absolute",
-              top: 0,
-              right: 0
-            }}
-            contentEditable={false}
-          >
-            {collapsed && (
-              <Text variant={"body"} sx={{ color: "fontTertiary", mr: 35 }}>
-                {stats.checked}/{stats.total}
-              </Text>
-            )}
-            <Icon
-              className="toggleSublist"
-              path={collapsed ? Icons.chevronDown : Icons.chevronUp}
-              sx={{
-                opacity: isMobile || collapsed ? 1 : 0,
-                position: "absolute",
-                right: 0,
-                alignSelf: "start",
-                mr: 2,
-                cursor: "pointer",
-                ":hover": { opacity: 1 },
-                ".icon:hover path": {
-                  fill: "var(--checked) !important"
-                }
-              }}
-              size={isMobile ? 24 : 20}
-              onClick={() => {
-                updateAttributes(
-                  { collapsed: !collapsed },
-                  { addToHistory: false, preventUpdate: true }
-                );
-              }}
-            />
-          </Flex>
-        ) : (
+        {!isNested && (
           <Flex
             sx={{
               position: "relative",

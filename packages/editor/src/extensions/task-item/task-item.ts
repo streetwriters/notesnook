@@ -21,7 +21,7 @@ import { mergeAttributes } from "@tiptap/core";
 import { onArrowUpPressed, onBackspacePressed } from "../list-item/commands";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { TaskItemComponent } from "./component";
-import { createSelectionBasedNodeView } from "../react";
+import { createNodeView } from "../react";
 
 export type TaskItemAttributes = {
   checked: boolean;
@@ -81,14 +81,14 @@ export const TaskItemNode = TaskItem.extend({
   },
 
   addNodeView() {
-    return createSelectionBasedNodeView(TaskItemComponent, {
+    return createNodeView(TaskItemComponent, {
       contentDOMFactory: true,
-      wrapperFactory: () => document.createElement("li")
-      // shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
-      //   return (
-      //     prev.checked !== next.checked || prev.collapsed !== next.collapsed
-      //   );
-      // }
+      wrapperFactory: () => document.createElement("li"),
+      shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
+        return (
+          prev.checked !== next.checked || prev.collapsed !== next.collapsed
+        );
+      }
     });
   }
 });
