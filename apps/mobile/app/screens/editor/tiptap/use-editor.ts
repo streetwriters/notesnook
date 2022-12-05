@@ -371,8 +371,9 @@ export const useEditor = (
       if (!currentNote.current || noteId !== currentNote.current.id) return;
       const isContentEncrypted = typeof (data as Content)?.data === "object";
       const note = db.notes?.note(currentNote.current?.id).data as NoteType;
-      
-      if (lastContentChangeTime.current >= note.dateEdited) return;
+
+      if (lastContentChangeTime.current >= (data as NoteType).dateEdited)
+        return;
 
       lock.current = true;
       if (data.type === "tiptap") {
@@ -389,11 +390,11 @@ export const useEditor = (
             currentContent.current = decryptedContent;
           }
         } else {
-          const _nextContent = await db.content?.raw(note.contentId);
+          const _nextContent = data.data;
           if (_nextContent === currentContent.current?.data) return;
           lastContentChangeTime.current = note.dateEdited;
-          await postMessage(EditorEvents.updatehtml, _nextContent.data);
-          currentContent.current = _nextContent;
+          await postMessage(EditorEvents.updatehtml, _nextContent);
+          currentContent.current = data;
         }
       } else {
         const note = data as NoteType;
