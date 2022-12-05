@@ -53,6 +53,7 @@ function getTextBetween(slice: Slice, schema: Schema): string {
 
     if (textSerializer) {
       if (node.isBlock && !separated) {
+        console.log("ADDING separator");
         text += separator;
         separated = true;
       }
@@ -69,7 +70,7 @@ function getTextBetween(slice: Slice, schema: Schema): string {
     } else if (node.isText) {
       text += node?.text;
       separated = false;
-    } else if (node.isBlock) {
+    } else if (node.isBlock && !!text) {
       text += separator;
       separated = true;
     }
