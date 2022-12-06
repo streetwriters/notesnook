@@ -118,7 +118,7 @@ export async function cloneNode(node: HTMLElement, options: CloneProps) {
   const { root, filter } = options;
   if (!root && filter && !filter(node)) return null;
 
-  let clone = await makeNodeCopy(node, options.fetchOptions || {});
+  let clone = await makeNodeCopy(node, options.fetchOptions);
 
   if (!clone) return null;
   clone = await cloneChildren(node, clone, options);
@@ -127,7 +127,7 @@ export async function cloneNode(node: HTMLElement, options: CloneProps) {
   return processed;
 }
 
-function makeNodeCopy(original: HTMLElement, options: FetchOptions) {
+function makeNodeCopy(original: HTMLElement, options?: FetchOptions) {
   try {
     if (original instanceof HTMLCanvasElement)
       return createImage(original.toDataURL(), options);

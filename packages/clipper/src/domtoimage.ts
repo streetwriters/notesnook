@@ -26,14 +26,13 @@ import { cacheStylesheets, inlineStylesheets } from "./styles";
 
 // Default impl options
 const defaultOptions: Options = {
-  fetchOptions: {},
   inlineOptions: {}
 };
 
 async function getInlinedNode(node: HTMLElement, options: Options) {
   const { fonts, images, stylesheets } = options.inlineOptions || {};
 
-  if (stylesheets) await inlineStylesheets(options.fetchOptions || {});
+  if (stylesheets) await inlineStylesheets(options.fetchOptions);
 
   const documentStyles = getComputedStyle(document.documentElement);
 
@@ -51,9 +50,9 @@ async function getInlinedNode(node: HTMLElement, options: Options) {
 
   if (!clone || clone instanceof Text) return;
 
-  if (fonts) clone = await embedFonts(clone, options.fetchOptions || {});
+  if (fonts) clone = await embedFonts(clone, options.fetchOptions);
 
-  if (images) await inlineAllImages(clone, options.fetchOptions || {});
+  if (images) await inlineAllImages(clone, options.fetchOptions);
 
   finalize(clone);
   return clone;
@@ -125,7 +124,7 @@ function toCanvas(node: HTMLElement, options: Options) {
 function draw(domNode: HTMLElement, options: Options) {
   options = { ...defaultOptions, ...options };
   return toSvg(domNode, options)
-    .then((uri) => (uri ? createImage(uri, options.fetchOptions || {}) : null))
+    .then((uri) => (uri ? createImage(uri, options.fetchOptions) : null))
     .then(delay(0))
     .then(function (image) {
       const scale = typeof options.scale !== "number" ? 1 : options.scale;
@@ -158,7 +157,7 @@ function newCanvas(node: HTMLElement, scale: number, options: Options) {
   return canvas;
 }
 
-function embedFonts(node: HTMLElement, options: FetchOptions) {
+function embedFonts(node: HTMLElement, options?: FetchOptions) {
   return resolveAll(options).then(function (cssText) {
     const styleNode = document.createElement("style");
     node.appendChild(styleNode);

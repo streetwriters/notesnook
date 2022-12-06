@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { FetchOptions } from "./fetch";
 import { inlineAll, shouldProcess } from "./inliner";
 
-async function resolveAll(options: FetchOptions) {
+async function resolveAll(options?: FetchOptions) {
   const fonts = readAll();
   const cssStrings: string[] = [];
   for (const font of fonts) {
@@ -54,7 +54,7 @@ function getWebFonts(styleSheets: StyleSheetList) {
 
 function newWebFont(webFontRule: CSSFontFaceRule) {
   return {
-    resolve: function resolve(options: FetchOptions) {
+    resolve: function resolve(options?: FetchOptions) {
       const baseUrl = (webFontRule.parentStyleSheet || {}).href || undefined;
       return inlineAll(webFontRule.cssText, options, baseUrl);
     },

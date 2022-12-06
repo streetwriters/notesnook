@@ -39,7 +39,7 @@ function readUrls(string: string) {
 async function inline(
   string: string,
   url: string,
-  options: FetchOptions,
+  options?: FetchOptions,
   baseUrl?: string
 ) {
   url = baseUrl ? resolveUrl(url, baseUrl) : url;
@@ -54,7 +54,7 @@ function urlAsRegex(urlValue: string) {
 
 async function inlineAll(
   string: string,
-  options: FetchOptions,
+  options?: FetchOptions,
   baseUrl?: string
 ) {
   if (!shouldProcess(string)) return string;

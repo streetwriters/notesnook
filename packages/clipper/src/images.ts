@@ -20,7 +20,7 @@ import { FetchOptions, fetchResource } from "./fetch";
 import { inlineAll } from "./inliner";
 import { isDataUrl } from "./utils";
 
-async function inlineAllImages(root: HTMLElement, options: FetchOptions) {
+async function inlineAllImages(root: HTMLElement, options?: FetchOptions) {
   const imageNodes = root.querySelectorAll("img");
   const promises: Promise<any>[] = [];
   for (let i = 0; i < imageNodes.length; ++i) {
@@ -40,7 +40,7 @@ async function inlineAllImages(root: HTMLElement, options: FetchOptions) {
 }
 export { inlineAllImages };
 
-async function inlineImage(element: HTMLImageElement, options: FetchOptions) {
+async function inlineImage(element: HTMLImageElement, options?: FetchOptions) {
   if (isDataUrl(element.currentSrc)) return Promise.resolve(null);
 
   const dataURL = await fetchResource(
@@ -69,7 +69,7 @@ async function inlineImage(element: HTMLImageElement, options: FetchOptions) {
 
 async function inlineBackground(
   backgroundNode: HTMLElement,
-  options: FetchOptions
+  options?: FetchOptions
 ) {
   const background = backgroundNode.style.getPropertyValue("background-image");
   if (!background) return backgroundNode;

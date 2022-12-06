@@ -68,7 +68,7 @@ const SHORTHANDS = [
   "transition"
 ];
 
-export async function inlineStylesheets(options: FetchOptions) {
+export async function inlineStylesheets(options?: FetchOptions) {
   for (const sheet of document.styleSheets) {
     if (skipStyleSheet(sheet)) continue;
 
@@ -86,7 +86,7 @@ export async function inlineStylesheets(options: FetchOptions) {
   await resolveImports(options);
 }
 
-async function resolveImports(options: FetchOptions) {
+async function resolveImports(options?: FetchOptions) {
   let index = 0;
   for (const sheet of document.styleSheets) {
     if (skipStyleSheet(sheet)) continue;
@@ -107,7 +107,7 @@ async function resolveImports(options: FetchOptions) {
   }
 }
 
-async function downloadStylesheet(href: string, options: FetchOptions) {
+async function downloadStylesheet(href: string, options?: FetchOptions) {
   try {
     const style = document.createElement("style");
     const response = await fetch(constructUrl(href, options));
