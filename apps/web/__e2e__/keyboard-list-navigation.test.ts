@@ -120,7 +120,7 @@ test("pressing Enter should open focused note", async ({ page }) => {
   expect(await notes.editor.getTitle()).toBe(await notesList[2].getTitle());
 });
 
-test.only("pressing Shift+ArrowDown should select next note", async ({ page }) => {
+test("pressing Shift+ArrowDown should select next note", async ({ page }) => {
   const { notesList, notes } = await populateList(page);
   await notes.focus();
 
