@@ -1,7 +1,6 @@
-- Preview notes in trash
-- Improved editor performance
-- Attachments will now download in realtime sync
-- Improved sync performance & fixed "Failed to sync"
-errors on app launch
+- Added support for displaying webclips in editor
+- Fixed pdf export saves corrupted files
+- Fixed multi-window support
+- Fixed a bug in sync causing sync to get stuck on some devices
 
 Thank you for using Notesnook!
