@@ -90,26 +90,24 @@ const features: Record<FeatureKeys, Feature> = {
           }
         ]
       : [
+
           {
-            title: "Preview trash notes",
+            title: "Web clipper",
             subtitle:
-              "You can now preview all your notes in the trash before restoring (or permanently deleting) them."
+              <>
+              You can manually download &amp; install the web clipper from <Code text="here" href="https://github.com/streetwriters/notesnook/releases/tag/v2.3.0"/> until it gets released on Firefox Addons & Chrome Web Store.
+              </>
           },
           {
-            title: "Custom colors",
+            title: "Delete individual task items",
             subtitle:
-              "All color palettes in the editor now support saving custom colors for later use."
+              "You can now delete individual task items with a click of a button."
           },
           {
-            title: "Better text exports",
+            title: "Diacritics & extended glyphs support",
             subtitle:
-              "Exporting to text will now give a much more structured output preserving line spacing etc. Don't worry, it's not markdown."
+              "Notesnook now fully supports all glyphs & diacritics everywhere. No more broken fonts when writing in Polish."
           },
-          {
-            title: "Clear completed tasks",
-            subtitle:
-              "Task list in the editor now allows you to quickly clear all completed tasks in a single click."
-          }
         ],
     cta: {
       title: "Got it",
