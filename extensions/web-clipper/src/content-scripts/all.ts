@@ -25,11 +25,13 @@ import {
   enterNodeSelectionMode
 } from "@notesnook/clipper";
 import { ClipArea, ClipMode } from "../common/bridge";
+import type { Config } from "@notesnook/clipper/dist/types";
 
 type ClipMessage = {
   type: "clip";
   mode?: ClipMode;
   area?: ClipArea;
+  settings?: Config;
 };
 
 type ViewportMessage = {
@@ -62,21 +64,22 @@ browser.runtime.onMessage.addListener(async (request) => {
 
 function clip(message: ClipMessage) {
   try {
+    const config = message.settings;
     const isScreenshot = message.mode === "screenshot";
     const withStyles = message.mode === "complete" || isScreenshot;
 
     if (isScreenshot && message.area === "full-page") {
-      return clipScreenshot(document.body, "jpeg");
+      return clipScreenshot(document.body, "jpeg", config);
     } else if (message.area === "full-page") {
-      return clipPage(document, withStyles, false);
+      return clipPage(document, withStyles, false, config);
     } else if (message.area === "selection") {
-      enterNodeSelectionMode(document).then((result) =>
+      enterNodeSelectionMode(document, config).then((result) =>
         browser.runtime.sendMessage({ type: "manual", data: result })
       );
     } else if (message.area === "article") {
-      return clipArticle(document, withStyles);
+      return clipArticle(document, withStyles, config);
     } else if (message.area === "visible") {
-      return clipPage(document, withStyles, true);
+      return clipPage(document, withStyles, true, config);
     }
   } catch (e) {
     console.error(e);

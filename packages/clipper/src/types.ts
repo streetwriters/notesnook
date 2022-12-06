@@ -49,3 +49,7 @@ export type Options = {
   inlineOptions?: InlineOptions;
   styles?: boolean;
 };
+
+export type Config = {
+  corsProxy?: string;
+};

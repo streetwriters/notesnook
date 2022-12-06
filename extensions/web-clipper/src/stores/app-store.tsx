@@ -27,8 +27,10 @@ interface AppStore {
   notes: ItemReference[];
   notebooks: NotebookReference[];
   tags: ItemReference[];
+  route: string;
 
   login(openNew?: boolean): Promise<void>;
+  navigate(route: string): void;
 }
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -37,6 +39,11 @@ export const useAppStore = create<AppStore>((set) => ({
   notebooks: [],
   notes: [],
   tags: [],
+  route: "/login",
+
+  navigate(route) {
+    set({ route });
+  },
 
   async login(openNew = false) {
     set({ isLoggingIn: true });

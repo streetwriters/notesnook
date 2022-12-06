@@ -37,7 +37,8 @@ import {
   mdiNewspaper,
   mdiMagnify,
   mdiViewDayOutline,
-  mdiViewDashboardOutline
+  mdiViewDashboardOutline,
+  mdiArrowLeft
 } from "@mdi/js";
 
 export const Icons = {
@@ -66,7 +67,8 @@ export const Icons = {
   chevronUp: mdiChevronUp,
   chevronRight: mdiChevronRight,
 
-  none: ""
+  none: "",
+  back: mdiArrowLeft
 };
 
 export type IconNames = keyof typeof Icons;

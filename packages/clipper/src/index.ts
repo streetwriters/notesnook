@@ -21,7 +21,7 @@ import { Readability } from "@mozilla/readability";
 import { injectCss } from "./utils";
 import { app, h, text } from "hyperapp";
 import { getInlinedNode, toBlob, toJpeg, toPng } from "./domtoimage";
-import { InlineOptions } from "./types";
+import { Config, InlineOptions } from "./types";
 import { FetchOptions } from "./fetch";
 
 type ReadabilityEnhanced = Readability<string> & {
@@ -36,13 +36,6 @@ const CLASSES = {
 
 const BLACKLIST = [CLASSES.nodeSelected, CLASSES.nodeSelectionContainer];
 
-const fetchOptions: FetchOptions = {
-  bypassCors: true,
-  corsHost: "https://cors.notesnook.com",
-  crossOrigin: "anonymous",
-  noCache: true
-};
-
 const inlineOptions: InlineOptions = {
   fonts: false,
   images: true,
@@ -52,9 +45,15 @@ const inlineOptions: InlineOptions = {
 async function clipPage(
   document: Document,
   withStyles: boolean,
-  onlyVisible: boolean
+  onlyVisible: boolean,
+  config?: Config
 ): Promise<string | null> {
-  const { body, head } = await getPage(document, withStyles, onlyVisible);
+  const { body, head } = await getPage(
+    document,
+    withStyles,
+    config,
+    onlyVisible
+  );
   if (!body || !head) return null;
   const result = toDocument(head, body).documentElement.outerHTML;
   return `<!doctype html>\n${result}`;
@@ -62,9 +61,10 @@ async function clipPage(
 
 async function clipArticle(
   doc: Document,
-  withStyles: boolean
+  withStyles: boolean,
+  config?: Config
 ): Promise<string | null> {
-  const { body, head } = await getPage(doc, withStyles);
+  const { body, head } = await getPage(doc, withStyles, config);
   if (!body || !head) return null;
   const newDoc = toDocument(head, body);
 
@@ -99,7 +99,8 @@ async function clipScreenshot<
     : Blob | undefined
 >(
   target?: HTMLElement,
-  output: TOutputFormat = "jpeg" as TOutputFormat
+  output: TOutputFormat = "jpeg" as TOutputFormat,
+  config?: Config
 ): Promise<TOutput> {
   const screenshotTarget = target || document.body;
 
@@ -109,7 +110,7 @@ async function clipScreenshot<
     backgroundColor: "white",
     width: document.body.scrollWidth,
     height: document.body.scrollHeight,
-    fetchOptions,
+    fetchOptions: resolveFetchOptions(config),
     inlineOptions: {
       fonts: true,
       images: true,
@@ -181,7 +182,7 @@ function removeClickHandlers(doc: Document) {
   doc.body.removeEventListener("click", onMouseClick);
 }
 
-function enterNodeSelectionMode(doc: Document) {
+function enterNodeSelectionMode(doc: Document, config?: Config) {
   setTimeout(() => {
     registerClickListeners(doc);
     registerHoverListeners(doc);
@@ -203,7 +204,7 @@ function enterNodeSelectionMode(doc: Document) {
           node.classList.remove(CLASSES.nodeSelected);
           const inlined = await getInlinedNode(node as HTMLElement, {
             raster: false,
-            fetchOptions,
+            fetchOptions: resolveFetchOptions(config),
             inlineOptions
           });
           if (!inlined) continue;
@@ -454,11 +455,12 @@ function cleanup() {
 async function getPage(
   document: Document,
   styles: boolean,
+  config?: Config,
   onlyVisible = false
 ) {
   const body = await getInlinedNode(document.body, {
     raster: true,
-    fetchOptions,
+    fetchOptions: resolveFetchOptions(config),
     inlineOptions: {
       fonts: false,
       images: true,
@@ -481,4 +483,15 @@ async function getPage(
     body,
     head
   };
+}
+
+function resolveFetchOptions(config?: Config): FetchOptions | undefined {
+  return config?.corsProxy
+    ? {
+        bypassCors: true,
+        corsHost: config.corsProxy,
+        crossOrigin: "anonymous",
+        noCache: true
+      }
+    : undefined;
 }

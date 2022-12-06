@@ -29,13 +29,15 @@ import {
   SelectedNotebook,
   ClipArea,
   ClipMode,
-  ClipData,
+  ClipData
 } from "../common/bridge";
 import { usePersistentState } from "../hooks/use-persistent-state";
 import { deleteClip, getClip } from "../utils/storage";
 import { useAppStore } from "../stores/app-store";
 import { connectApi } from "../api";
 import { FlexScrollContainer } from "../components/scroll-container";
+import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./settings";
+import type { Config } from "@notesnook/clipper/dist/types";
 
 const clipAreas: { name: string; id: ClipArea; icon: string }[] = [
   {
@@ -86,6 +88,9 @@ export function Main() {
   // const [colorMode, setColorMode] = useColorMode();
 
   const isPremium = useAppStore((s) => s.user?.pro);
+  const navigate = useAppStore((s) => s.navigate);
+
+  const [settings] = usePersistentState<Config>(SETTINGS_KEY, DEFAULT_SETTINGS);
   const [title, setTitle] = useState<string>();
   const [url, setUrl] = useState<string>();
   const [clipNonce, setClipNonce] = useState(0);
@@ -375,7 +380,13 @@ export function Main() {
             justifyContent: "flex-end"
           }}
         >
-          <Button variant="icon" sx={{ p: 1 }}>
+          <Button
+            variant="icon"
+            sx={{ p: 1 }}
+            onClick={() => {
+              navigate("/settings");
+            }}
+          >
             <Icon path={Icons.settings} color="text" size={16} />
           </Button>
         </Flex>
@@ -386,7 +397,8 @@ export function Main() {
 
 export async function clip(
   area: ClipArea,
-  mode: ClipMode
+  mode: ClipMode,
+  settings: Config = DEFAULT_SETTINGS
 ): Promise<ClipData | undefined> {
   const clipData = await getClip();
   if (area === "selection" && typeof clipData === "string") {
@@ -410,5 +422,10 @@ export async function clip(
     };
   }
 
-  return await browser.tabs.sendMessage(tab.id, { type: "clip", mode, area });
+  return await browser.tabs.sendMessage(tab.id, {
+    type: "clip",
+    mode,
+    area,
+    settings
+  });
 }
