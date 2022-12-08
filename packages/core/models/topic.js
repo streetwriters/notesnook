@@ -55,10 +55,11 @@ export default class Topic {
   clear() {
     const noteIds = this._db.notes.topicReferences.get(this.id);
     if (!noteIds.length) return;
-
-    return this._db.notes.deleteFromNotebook(
-      this._notebookId,
-      this.id,
+    return this._db.notes.removeFromNotebook(
+      {
+        id: this._notebookId,
+        topic: this.id
+      },
       ...noteIds
     );
   }

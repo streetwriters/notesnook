@@ -350,6 +350,12 @@ export function showMoveNoteDialog(noteIds: string[]) {
   ));
 }
 
+export function showMoveTopicsDialog(topics: [], id: String) {
+  return showDialog("MoveTopicsDialog", (Dialog, perform) => (
+    <Dialog topics={topics} id={id} onClose={(res: boolean) => perform(res)} />
+  ));
+}
+
 function getDialogData(type: string) {
   switch (type) {
     case "create_vault":

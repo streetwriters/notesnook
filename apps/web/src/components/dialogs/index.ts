@@ -29,6 +29,7 @@ const ImportDialog = React.lazy(() => import("./import-dialog"));
 const LoadingDialog = React.lazy(() => import("./loading-dialog"));
 const ProgressDialog = React.lazy(() => import("./progress-dialog"));
 const MoveDialog = React.lazy(() => import("./move-note-dialog"));
+const MoveTopicsDialog = React.lazy(() => import("./move-topics-dialog"));
 const PasswordDialog = React.lazy(() => import("./password-dialog"));
 const RecoveryKeyDialog = React.lazy(() => import("./recovery-key-dialog"));
 const ItemDialog = React.lazy(() => import("./item-dialog"));
@@ -60,6 +61,7 @@ export const Dialogs = {
   EmailVerificationDialog,
   LoadingDialog,
   MoveDialog,
+  MoveTopicsDialog,
   PasswordDialog,
   RecoveryKeyDialog,
   ItemDialog,

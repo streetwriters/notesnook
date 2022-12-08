@@ -26,6 +26,7 @@ import { Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import { Multiselect } from "../../common/multi-select";
 import { pluralize } from "../../utils/string";
+import { showMoveTopicsDialog } from "../../common/dialog-controller";
 
 function Topic({ item, index, onClick }) {
   const { id, notebookId } = item;
@@ -86,6 +87,16 @@ const menuItems = [
       db.shortcuts.exists(topic.id) ? "Remove shortcut" : "Create shortcut",
     icon: Icon.Shortcut,
     onClick: ({ topic }) => appStore.addToShortcuts(topic)
+  },
+  {
+    key: "move",
+    title: "Move Topic",
+    icon: Icon.Move,
+    onClick: ({ items, notebookId }) => {
+      console.log(items);
+      showMoveTopicsDialog(items, notebookId);
+    },
+    multiSelect: true
   },
   {
     key: "delete",

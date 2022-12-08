@@ -155,4 +155,28 @@ export default class Notebooks extends Collection {
       await this._db.trash.add(notebookData);
     }
   }
+
+  async moveTopics(id, items) {
+    if (!id) throw new Error("The destination notebook cannot be undefined.");
+    if (!items.length) throw new Error("You must select one or more topics");
+
+    let topicIds = [];
+    let lastNotebookId = items[0].notebookId;
+    let noteIds = [];
+
+    for (let index = 0; index < items.length; index++) {
+      topicIds.push(items[index].id);
+      items[index].notebookId = id;
+      await this._db.notes.addToNotebook(
+        { id, topic: items[index].id },
+        ...this._db.notes.topicReferences.get(items[index].id)
+      );
+      noteIds.push(...this._db.notes.topicReferences.get(items[index].id));
+    }
+
+    await this._db.notebooks.notebook(id).topics.add(...items);
+    await this._db.notebooks
+      .notebook(lastNotebookId)
+      .topics.delete(...topicIds);
+  }
 }
