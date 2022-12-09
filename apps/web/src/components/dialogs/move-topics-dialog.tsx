@@ -57,6 +57,7 @@ function MoveDialog({ onClose, topics, id }: MoveDialogProps) {
         disabled: !selected.length,
         onClick: async () => {
           await db?.notebooks?.moveTopics(selected, topics);
+          refreshNotebooks();
           onClose(true);
         }
       }}
