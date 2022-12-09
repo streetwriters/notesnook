@@ -78,10 +78,76 @@ class UserManager {
     return await this._login({ email, password, hashedPassword });
   }
 
+  async authenticateEmail(email) {
+    if (!email) throw new Error("Email is required.");
+
+    email = email.toLowerCase();
+
+    await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
+      email,
+      grant_type: "email",
+      client_id: "notesnook"
+    });
+  }
+
+  async authenticateMultiFactorCode(code, method, token) {
+    if (!code || !method || !token)
+      throw new Error("code, method & token are required.");
+
+    await http.post(
+      `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+      {
+        grant_type: "mfa",
+        client_id: "notesnook",
+        "mfa:code": code,
+        "mfa:method": method
+      },
+      token
+    );
+    return true;
+  }
+
+  async authenticatePassword(email, password, token, hashedPassword = null) {
+    if (!email || !password || !token)
+      throw new Error("email, password & token are required.");
+
+    email = email.toLowerCase();
+    if (!hashedPassword) {
+      hashedPassword = await this._storage.hash(password, email);
+    }
+
+    await this.tokenManager.saveToken(
+      await http.post(
+        `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+        {
+          grant_type: "mfa_password",
+          client_id: "notesnook",
+          scope: "notesnook.sync offline_access IdentityServerApi",
+          password: hashedPassword
+        },
+        token
+      )
+    );
+
+    const user = await this.fetchUser();
+    await this._storage.deriveCryptoKey(`_uk_@${user.email}`, {
+      password,
+      salt: user.salt
+    });
+
+    EV.publish(EVENTS.userLoggedIn, user);
+  }
+
+  /**
+   * @deprecated Please use `authenticateEmail`, `authenticateMultiFactorCode` & `authenticatePassword` for login
+   */
   async login(email, password, hashedPassword = undefined) {
     return this._login({ email, password, hashedPassword });
   }
 
+  /**
+   * @deprecated Please use `authenticateEmail`, `authenticateMultiFactorCode` & `authenticatePassword` for login
+   */
   async mfaLogin(email, password, { code, method }) {
     return this._login({ email, password, code, method });
   }
@@ -90,9 +156,9 @@ class UserManager {
    * @private
    */
   async _login({ email, password, hashedPassword, code, method }) {
-    email = email.toLowerCase();
+    email = email && email.toLowerCase();
 
-    if (!hashedPassword) {
+    if (!hashedPassword && password) {
       hashedPassword = await this._storage.hash(password, email);
     }
 
@@ -100,7 +166,7 @@ class UserManager {
       await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
         username: email,
         password: hashedPassword,
-        grant_type: "password",
+        grant_type: code ? "mfa" : "password",
         scope: "notesnook.sync offline_access openid IdentityServerApi",
         client_id: "notesnook",
         "mfa:code": code,
