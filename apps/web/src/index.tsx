@@ -76,19 +76,23 @@ const routes = {
   },
   "/login": {
     component: () => import("./views/auth"),
-    props: { route: "login" }
+    props: { route: "login:email" }
+  },
+  "/login/password": {
+    component: () => import("./views/auth"),
+    props: { route: "login:email" }
   },
   "/recover": {
     component: () => import("./views/auth"),
     props: { route: "recover" }
   },
-  "/mfa/code": {
+  "/login/mfa/code": {
     component: () => import("./views/auth"),
-    props: { route: "login" }
+    props: { route: "login:email" }
   },
-  "/mfa/select": {
+  "/login/mfa/select": {
     component: () => import("./views/auth"),
-    props: { route: "login" }
+    props: { route: "login:email" }
   },
   default: { component: () => import("./app"), props: null }
 } as const;
@@ -97,8 +101,9 @@ const sessionExpiryExceptions: Routes[] = [
   "/recover",
   "/account/recovery",
   "/sessionexpired",
-  "/mfa/code",
-  "/mfa/select"
+  "/login/mfa/code",
+  "/login/mfa/select",
+  "/login/password"
 ];
 
 const serviceWorkerWhitelist: Routes[] = ["default"];
@@ -158,7 +163,7 @@ async function renderApp() {
 
   const { default: Component } = await component();
   render(
-    <Component route={props?.route || "login"} />,
+    <Component route={props?.route || "login:email"} />,
     document.getElementById("root"),
     () => {
       logger.measure("app render");

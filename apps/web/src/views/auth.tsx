@@ -49,25 +49,31 @@ import {
   showLogoutConfirmation
 } from "../common/dialog-controller";
 
-type LoginFormData = {
+type EmailFormData = {
   email: string;
-  password: string;
 };
 
-type MFALoginFormData = LoginFormData & {
+type PasswordFormData = EmailFormData & {
+  password: string;
+  token: string;
+};
+
+type MFALoginFormData = EmailFormData & {
   code?: string;
   method?: MFAMethodType;
+  token: string;
 };
 
-type SignupFormData = LoginFormData & {
-  "confirm-password": string;
-};
+type SignupFormData = EmailFormData &
+  PasswordFormData & {
+    "confirm-password": string;
+  };
 
 type AccountRecoveryFormData = {
   email: string;
 };
 
-type MFAFormData = LoginFormData & {
+type MFAFormData = EmailFormData & {
   selectedMethod: MFAMethodType;
   primaryMethod: MFAMethodType;
   code?: string;
@@ -83,10 +89,15 @@ type MFAErrorData = {
   phoneNumber?: string;
 };
 
+type PasswordRequiredErrorData = {
+  token: string;
+};
+
 type AuthFormData = {
-  login: LoginFormData;
+  "login:email": EmailFormData;
+  "login:password": PasswordFormData;
   signup: SignupFormData;
-  sessionExpiry: LoginFormData;
+  sessionExpiry: EmailFormData & PasswordFormData;
   recover: AccountRecoveryFormData;
   "mfa:code": MFAFormData;
   "mfa:select": MFAFormData;
@@ -94,7 +105,8 @@ type AuthFormData = {
 
 type BaseFormData =
   | MFAFormData
-  | LoginFormData
+  | EmailFormData
+  | PasswordFormData
   | AccountRecoveryFormData
   | SignupFormData;
 
@@ -108,7 +120,8 @@ type BaseAuthComponentProps<TRoute extends AuthRoutes> = {
 };
 type AuthRoutes =
   | "sessionExpiry"
-  | "login"
+  | "login:email"
+  | "login:password"
   | "signup"
   | "recover"
   | "mfa:code"
@@ -123,8 +136,10 @@ function getRouteComponent<TRoute extends AuthRoutes>(
   route: TRoute
 ): AuthComponent<TRoute> | undefined {
   switch (route) {
-    case "login":
-      return Login as AuthComponent<TRoute>;
+    case "login:email":
+      return LoginEmail as AuthComponent<TRoute>;
+    case "login:password":
+      return LoginPassword as AuthComponent<TRoute>;
     case "signup":
       return Signup as AuthComponent<TRoute>;
     case "sessionExpiry":
@@ -140,16 +155,18 @@ function getRouteComponent<TRoute extends AuthRoutes>(
 }
 
 const routePaths: Record<AuthRoutes, string> = {
-  login: "/login",
+  "login:email": "/login",
+  "login:password": "/login/password",
+  "mfa:code": "/login/mfa/code",
+  "mfa:select": "/login/mfa/select",
   recover: "/recover",
   sessionExpiry: "/sessionexpired",
-  signup: "/signup",
-  "mfa:code": "/mfa/code",
-  "mfa:select": "/mfa/select"
+  signup: "/signup"
 };
 
 const authorizedRoutes: AuthRoutes[] = [
-  "login",
+  "login:email",
+  "login:password",
   "signup",
   "mfa:code",
   "mfa:select",
@@ -190,7 +207,9 @@ function Auth(props: AuthProps) {
           flexDirection: "column"
         }}
       >
-        {route === "login" || route === "signup" || route === "recover" ? (
+        {route === "login:email" ||
+        route === "signup" ||
+        route === "recover" ? (
           <Button
             sx={{
               display: "flex",
@@ -252,12 +271,12 @@ function Auth(props: AuthProps) {
 }
 export default Auth;
 
-function Login(props: BaseAuthComponentProps<"login">) {
+function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
   const { navigate } = props;
 
   return (
     <AuthForm
-      type="login"
+      type="login:email"
       title="Welcome back!"
       subtitle={
         <SubtitleWithAction
@@ -271,16 +290,58 @@ function Login(props: BaseAuthComponentProps<"login">) {
       }}
       onSubmit={(form) => login(form, navigate)}
     >
-      {(form?: LoginFormData) => (
+      {(form?: EmailFormData) => (
         <>
           <AuthField
             id="email"
             type="email"
             autoComplete="email"
             label="Enter email"
-            autoFocus={!form?.password}
+            autoFocus
             defaultValue={form?.email}
           />
+          <SubmitButton text="Login to your account" />
+        </>
+      )}
+    </AuthForm>
+  );
+}
+
+function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
+  const { navigate, formData } = props;
+
+  if (!formData) {
+    openURL("/");
+    return null;
+  }
+
+  return (
+    <AuthForm
+      type="login:password"
+      title="Welcome back!"
+      subtitle={
+        <SubtitleWithAction
+          text="Don't have an account?"
+          action={{ text: "Sign up", onClick: () => navigate("signup") }}
+        />
+      }
+      loading={{
+        title: "Logging you in",
+        subtitle: "Please wait while you are authenticated."
+      }}
+      onSubmit={(form) => {
+        return login(
+          {
+            password: form.password,
+            email: formData.email,
+            token: formData.token
+          },
+          navigate
+        );
+      }}
+    >
+      {(form?: PasswordFormData) => (
+        <>
           <AuthField
             id="password"
             type="password"
@@ -315,7 +376,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
       subtitle={
         <SubtitleWithAction
           text="Already have an account?"
-          action={{ text: "Log in", onClick: () => navigate("login") }}
+          action={{ text: "Log in", onClick: () => navigate("login:email") }}
         />
       }
       loading={{
@@ -467,7 +528,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
       subtitle={
         <SubtitleWithAction
           text="Remembered your password?"
-          action={{ text: "Log in", onClick: () => navigate("login") }}
+          action={{ text: "Log in", onClick: () => navigate("login:email") }}
         />
       }
       loading={{
@@ -598,8 +659,10 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
     return null;
   }
 
-  const { selectedMethod, token } = formData;
+  const { selectedMethod } = formData;
   const texts = getTexts(formData)[selectedMethod];
+
+  if (!texts) return null;
 
   return (
     <AuthForm
@@ -612,10 +675,10 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
       }}
       onSubmit={async (form) => {
         const loginForm: MFALoginFormData = {
-          email: formData.email,
-          password: formData.password,
           code: form.code,
-          method: formData.selectedMethod
+          email: formData.email,
+          method: formData.selectedMethod,
+          token: formData.token
         };
         await login(loginForm, navigate);
       }}
@@ -645,7 +708,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                   </Text>
                 ),
                 onClick: async () => {
-                  await sendCode(selectedMethod, token);
+                  await sendCode(selectedMethod, formData.token);
                 }
               }
             : undefined
@@ -941,7 +1004,7 @@ export function SubmitButton(props: SubmitButtonProps) {
 }
 
 async function login(
-  form: LoginFormData | MFALoginFormData,
+  form: EmailFormData | PasswordFormData | MFALoginFormData,
   navigate: NavigateFunction
 ) {
   try {
@@ -949,6 +1012,7 @@ async function login(
     Config.set("sessionExpired", false);
     openURL("/");
   } catch (e) {
+    console.error(e);
     const error = e as Error & { code?: string; data?: unknown };
     if (error.code === "mfa_required") {
       const { primaryMethod, phoneNumber, secondaryMethod, token } =
@@ -961,11 +1025,20 @@ async function login(
 
       navigate("mfa:code", {
         ...form,
-        token,
         selectedMethod: primaryMethod,
         primaryMethod,
         phoneNumber,
-        secondaryMethod
+        secondaryMethod,
+        token
+      });
+    } else if (error.code === "password_required") {
+      const { token } = error.data as PasswordRequiredErrorData;
+
+      navigate("login:password", {
+        ...form,
+        token,
+        // TODO
+        password: ""
       });
     } else throw e;
   }

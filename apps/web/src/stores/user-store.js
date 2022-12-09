@@ -124,11 +124,16 @@ class UserStore extends BaseStore {
 
   login = async (form, skipInit = false) => {
     this.set((state) => (state.isLoggingIn = true));
-    const { email, password, code, method } = form;
+    const { email, password, code, method, token } = form;
 
     try {
-      if (code) await db.user.mfaLogin(email, password, { code, method });
-      else await db.user.login(email, password);
+      if (code) {
+        await db.user.authenticateMultiFactorCode(code, method, token);
+      } else if (password) {
+        await db.user.authenticatePassword(email, password, token, null);
+      } else if (email) {
+        await db.user.authenticateEmail(email);
+      }
 
       if (skipInit) return true;
       return this.init();
