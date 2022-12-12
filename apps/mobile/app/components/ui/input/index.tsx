@@ -250,7 +250,7 @@ const Input = ({
           <TextInput
             {...restProps}
             ref={fwdRef}
-            editable={!loading}
+            editable={!loading && restProps.editable}
             onChangeText={onChange}
             onBlur={onBlur}
             keyboardType={

@@ -43,8 +43,16 @@ import { SVG } from "./background";
 import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import TwoFactorVerification from "./two-factor";
+
+const LoginSteps = {
+  emailAuth: 1,
+  mfaAuth: 2,
+  passwordAuth: 3
+};
+
 export const Login = ({ changeMode }) => {
   const colors = useThemeStore((state) => state.colors);
+  const [step, setStep] = useState(LoginSteps.emailAuth);
   const email = useRef();
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -56,7 +64,10 @@ export const Login = ({ changeMode }) => {
   const setUser = useUserStore((state) => state.setUser);
 
   const validateInfo = () => {
-    if (!password.current || !email.current) {
+    if (
+      (!password.current && step === LoginSteps.passwordAuth) ||
+      (!email.current && step === LoginSteps.emailAuth)
+    ) {
       ToastEvent.show({
         heading: "All fields required",
         message: "Fill all the fields and try again",
@@ -72,69 +83,91 @@ export const Login = ({ changeMode }) => {
 
   useEffect(() => {
     async () => {
+      setStep(LoginSteps.emailAuth);
       await sleep(500);
       emailInputRef.current?.focus();
       setFocused(true);
     };
+    return () => {
+      setStep(LoginSteps.emailAuth);
+    };
   }, []);
 
-  const login = async (mfa, callback) => {
+  const login = async () => {
     if (!validateInfo() || error) return;
-    setLoading(true);
-    let user;
     try {
-      if (mfa) {
-        await db.user.mfaLogin(
-          email.current.toLowerCase(),
-          password.current,
-          mfa
-        );
-      } else {
-        await db.user.login(email.current.toLowerCase(), password.current);
-      }
-      callback && callback(true);
-
-      user = await db.user.getUser();
-      if (!user) throw new Error("Email or password incorrect!");
-      PremiumService.setPremiumStatus();
-      setUser(user);
-      clearMessage();
-      ToastEvent.show({
-        heading: "Login successful",
-        message: `Logged in as ${user.email}`,
-        type: "success",
-        context: "global"
-      });
-      hideAuth();
-      SettingsService.set({
-        sessionExpired: false,
-        userEmailConfirmed: user?.isEmailConfirmed
-      });
-      eSendEvent("userLoggedIn", true);
-      await sleep(500);
-      Progress.present();
-    } catch (e) {
-      callback && callback(false);
-      if (e.message === "Multifactor authentication required.") {
-        setLoading(false);
-        await sleep(300);
-        TwoFactorVerification.present(async (mfa) => {
-          if (mfa) {
-            await login(mfa);
-          } else {
-            setLoading(false);
+      setLoading(true);
+      switch (step) {
+        case LoginSteps.emailAuth: {
+          const mfaInfo = await db.user.authenticateEmail(email.current);
+          if (mfaInfo) {
+            TwoFactorVerification.present(async (mfa, callback) => {
+              try {
+                const success = await db.user.authenticateMultiFactorCode(
+                  mfa.code,
+                  mfa.method
+                );
+                if (success) {
+                  setStep(LoginSteps.passwordAuth);
+                  setLoading(false);
+                  setTimeout(() => {
+                    passwordInputRef.current?.focus();
+                  }, 1);
+                  callback && callback(true);
+                }
+                callback && callback(false);
+              } catch (e) {
+                callback && callback(false);
+                if (e.message === "invalid_grant") {
+                  eSendEvent(eCloseProgressDialog, "two_factor_verify");
+                  setLoading(false);
+                }
+              }
+            }, mfaInfo);
           }
-        }, e.data);
-      } else {
-        setLoading(false);
-        ToastEvent.show({
-          heading: user ? "Failed to sync" : "Login failed",
-          message: e.message,
-          type: "error",
-          context: "local"
-        });
+        }
+        case LoginSteps.passwordAuth: {
+          await db.user.authenticatePassword(email.current, password.current);
+          finishLogin();
+        }
       }
+      setLoading(false);
+    } catch (e) {
+      finishWithError(e);
     }
+  };
+
+  const finishWithError = async (e) => {
+    setLoading(false);
+    ToastEvent.show({
+      heading: user ? "Failed to sync" : "Login failed",
+      message: e.message,
+      type: "error",
+      context: "local"
+    });
+  };
+
+  const finishLogin = async () => {
+    const user = await db.user.getUser();
+    if (!user) throw new Error("Email or password incorrect!");
+    PremiumService.setPremiumStatus();
+    setUser(user);
+    clearMessage();
+    ToastEvent.show({
+      heading: "Login successful",
+      message: `Logged in as ${user.email}`,
+      type: "success",
+      context: "global"
+    });
+    hideAuth();
+    SettingsService.set({
+      sessionExpired: false,
+      userEmailConfirmed: user?.isEmailConfirmed
+    });
+    eSendEvent("userLoggedIn", true);
+    await sleep(500);
+    Progress.present();
+    setLoading(false);
   };
 
   return (
@@ -228,48 +261,54 @@ export const Login = ({ changeMode }) => {
             autoCorrect={false}
             autoCapitalize="none"
             errorMessage="Email is invalid"
-            placeholder="Email"
+            placeholder="Enter your email"
+            defaultValue={email.current}
+            editable={step === LoginSteps.emailAuth}
             onSubmit={() => {
               passwordInputRef.current?.focus();
             }}
           />
 
-          <Input
-            fwdRef={passwordInputRef}
-            onChangeText={(value) => {
-              password.current = value;
-            }}
-            testID="input.password"
-            returnKeyLabel="Done"
-            returnKeyType="done"
-            secureTextEntry
-            autoComplete="password"
-            autoCapitalize="none"
-            autoCorrect={false}
-            placeholder="Password"
-            marginBottom={0}
-            onSubmit={() => login()}
-          />
-          <Button
-            title="Forgot your password?"
-            style={{
-              alignSelf: "flex-end",
-              height: 30,
-              paddingHorizontal: 0
-            }}
-            onPress={() => {
-              SheetManager.show("forgotpassword_sheet", email.current);
-            }}
-            textStyle={{
-              textDecorationLine: "underline"
-            }}
-            fontSize={SIZE.xs}
-            type="gray"
-          />
+          {step === LoginSteps.passwordAuth && (
+            <>
+              <Input
+                fwdRef={passwordInputRef}
+                onChangeText={(value) => {
+                  password.current = value;
+                }}
+                testID="input.password"
+                returnKeyLabel="Done"
+                returnKeyType="done"
+                secureTextEntry
+                autoComplete="password"
+                autoCapitalize="none"
+                autoCorrect={false}
+                placeholder="Password"
+                marginBottom={0}
+                defaultValue={password.current}
+                onSubmit={() => login()}
+              />
+              <Button
+                title="Forgot your password?"
+                style={{
+                  alignSelf: "flex-end",
+                  height: 30,
+                  paddingHorizontal: 0
+                }}
+                onPress={() => {
+                  SheetManager.show("forgotpassword_sheet", email.current);
+                }}
+                textStyle={{
+                  textDecorationLine: "underline"
+                }}
+                fontSize={SIZE.xs}
+                type="gray"
+              />
+            </>
+          )}
 
           <View
             style={{
-              // position: 'absolute',
               marginTop: 25,
               alignSelf: "center"
             }}
@@ -280,11 +319,36 @@ export const Login = ({ changeMode }) => {
                 borderRadius: 100
               }}
               loading={loading}
-              onPress={() => login()}
-              //  width="100%"
+              onPress={login}
               type="accent"
-              title={loading ? null : "Login to your account"}
+              title={
+                loading
+                  ? null
+                  : step === LoginSteps.emailAuth
+                  ? "Login to your account"
+                  : "Complete login"
+              }
             />
+
+            {step === LoginSteps.passwordAuth && (
+              <Button
+                title="Cancel logging in"
+                style={{
+                  alignSelf: "center",
+                  height: 30,
+                  marginTop: 10
+                }}
+                onPress={() => {
+                  setStep(LoginSteps.emailAuth);
+                  setLoading(false);
+                }}
+                textStyle={{
+                  textDecorationLine: "underline"
+                }}
+                fontSize={SIZE.xs}
+                type="errorShade"
+              />
+            )}
           </View>
         </View>
       </Animated.View>
