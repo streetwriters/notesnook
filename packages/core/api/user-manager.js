@@ -83,33 +83,42 @@ class UserManager {
 
     email = email.toLowerCase();
 
-    await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
+    const result = await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
       email,
       grant_type: "email",
       client_id: "notesnook"
     });
+
+    await this.tokenManager.saveToken(result);
+    return result.additional_data;
   }
 
-  async authenticateMultiFactorCode(code, method, token) {
-    if (!code || !method || !token)
-      throw new Error("code, method & token are required.");
+  async authenticateMultiFactorCode(code, method) {
+    if (!code || !method) throw new Error("code & method are required.");
 
-    await http.post(
-      `${constants.AUTH_HOST}${ENDPOINTS.token}`,
-      {
-        grant_type: "mfa",
-        client_id: "notesnook",
-        "mfa:code": code,
-        "mfa:method": method
-      },
-      token
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) throw new Error("Unauthorized.");
+
+    await this.tokenManager.saveToken(
+      await http.post(
+        `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+        {
+          grant_type: "mfa",
+          client_id: "notesnook",
+          "mfa:code": code,
+          "mfa:method": method
+        },
+        token
+      )
     );
     return true;
   }
 
-  async authenticatePassword(email, password, token, hashedPassword = null) {
-    if (!email || !password || !token)
-      throw new Error("email, password & token are required.");
+  async authenticatePassword(email, password, hashedPassword = null) {
+    if (!email || !password) throw new Error("email & password are required.");
+
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) throw new Error("Unauthorized.");
 
     email = email.toLowerCase();
     if (!hashedPassword) {

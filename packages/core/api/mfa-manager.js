@@ -123,11 +123,11 @@ class MFAManager {
 
   /**
    * @param {"sms" | "email"} method
-   * @param {string} phoneNumber
    * @returns
    */
-  async sendCode(method, token) {
-    if (!token) throw new Error("Token is required to make this request.");
+  async sendCode(method) {
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) throw new Error("Unauthorized.");
 
     return await http.post(
       `${constants.AUTH_HOST}${ENDPOINTS.send}`,

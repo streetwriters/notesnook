@@ -49,7 +49,8 @@ class TokenManager {
       accessToken: token.access_token.slice(0, 10)
     });
 
-    if (forceRenew || (renew && this._isTokenExpired(token))) {
+    const isExpired = renew && this._isTokenExpired(token);
+    if (this._isTokenRefreshable(token) && (forceRenew || isExpired)) {
       await this._refreshToken(forceRenew);
       return await this.getToken();
     }
@@ -61,6 +62,12 @@ class TokenManager {
     const { t, expires_in } = token;
     const expiryMs = t + expires_in * 1000;
     return Date.now() >= expiryMs;
+  }
+
+  _isTokenRefreshable(token) {
+    const { scope, refresh_token } = token;
+    const scopes = scope.split(" ");
+    return scopes.includes("offline_access") && Boolean(refresh_token);
   }
 
   async getAccessToken(forceRenew = false) {
