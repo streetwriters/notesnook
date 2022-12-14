@@ -21,10 +21,31 @@ import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { iterateList } from "./utils";
 
+type Sort = {
+  orderBy: "ascendingOrder" | "descendingOrder";
+  sortBy: "dateCreated" | "dateEdited";
+  groupBy: "abc" | "none" | "default" | "year" | "month" | "week";
+};
+
 export class BaseViewModel {
   protected readonly page: Page;
   protected readonly list: Locator;
   private readonly listPlaceholder: Locator;
+  private readonly sortByButton: Locator;
+  private readonly groupBy: Locator;
+  private readonly orderBy: Locator;
+  private readonly sortBy: Locator;
+  private readonly ascendingOrder: Locator;
+  private readonly descendingOrder: Locator;
+  private readonly abcOrder: Locator;
+  private readonly dateCreated: Locator;
+  private readonly dateEdited: Locator;
+  private readonly title: Locator;
+  private readonly none: Locator;
+  private readonly default: Locator;
+  private readonly year: Locator;
+  private readonly month: Locator;
+  private readonly week: Locator;
 
   constructor(page: Page, pageId: string) {
     this.page = page;
@@ -32,6 +53,25 @@ export class BaseViewModel {
     this.listPlaceholder = page.locator(
       `#${pageId} >> ${getTestId("list-placeholder")}`
     );
+
+    this.sortByButton = page.locator(getTestId("sort-icon-button"));
+
+    this.groupBy = page.locator(getTestId("menuitem-groupBy"));
+    this.abcOrder = page.locator(getTestId("menuitem-abc"));
+    this.none = page.locator(getTestId("menuitem-none"));
+    this.default = page.locator(getTestId("menuitem-default"));
+    this.year = page.locator(getTestId("menuitem-year"));
+    this.month = page.locator(getTestId("menuitem-month"));
+    this.week = page.locator(getTestId("menuitem-week"));
+
+    this.orderBy = page.locator(getTestId("menuitem-sortDirection"));
+    this.ascendingOrder = page.locator(getTestId("menuitem-asc"));
+    this.descendingOrder = page.locator(getTestId("menuitem-desc"));
+
+    this.sortBy = page.locator(getTestId("menuitem-sortBy"));
+    this.dateCreated = page.locator(getTestId("menuitem-dateCreated"));
+    this.dateEdited = page.locator(getTestId("menuitem-dateEdited"));
+    this.title = page.locator(getTestId("menuitem-title"));
   }
 
   async findGroup(groupName: string) {
@@ -93,5 +133,48 @@ export class BaseViewModel {
     const itemList = this.list.locator(getTestId(`virtuoso-item-list`));
     await itemList.press(key);
     await this.page.waitForTimeout(300);
+  }
+
+  async sort(sort: Sort, isTopic: boolean = false) {
+    if (isTopic) await this.sortByButton.last().click();
+    else await this.sortByButton.first().click();
+    if (sort.orderBy === "ascendingOrder") {
+      await this.orderBy.first().click();
+      await this.ascendingOrder.first().click();
+    } else if (sort.orderBy === "descendingOrder") {
+      await this.orderBy.first().click();
+      await this.descendingOrder.first().click();
+    }
+
+    if (isTopic) await this.sortByButton.last().click();
+    else await this.sortByButton.first().click();
+    if (sort.sortBy === "dateCreated") {
+      this.sortBy.first().click();
+      this.dateCreated.first().click;
+    } else if (sort.sortBy === "dateEdited") {
+      this.sortBy.first().click();
+      this.dateEdited.first().click;
+    }
+
+    //await this.sortByButton.first().click();
+    if (sort.groupBy === "abc") {
+      this.groupBy.first().click();
+      this.abcOrder.first().click();
+    } else if (sort.groupBy === "default") {
+      this.groupBy.first().click();
+      this.default.first().click();
+    } else if (sort.groupBy === "month") {
+      this.groupBy.first().click();
+      this.month.first().click();
+    } else if (sort.groupBy === "none") {
+      this.groupBy.first().click();
+      this.none.first().click();
+    } else if (sort.groupBy === "week") {
+      this.groupBy.first().click();
+      this.week.first().click();
+    } else if (sort.groupBy === "year") {
+      this.groupBy.first().click();
+      this.year.first().click();
+    }
   }
 }
