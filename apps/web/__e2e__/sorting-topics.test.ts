@@ -21,7 +21,7 @@ import { test, expect, Page } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { ItemModel } from "./models/item.model";
 import { ItemsViewModel } from "./models/items-view.model";
-import { getTestId, NOTEBOOK } from "./utils";
+import { NOTEBOOK } from "./utils";
 
 async function populateList(page: Page) {
   const app = new AppModel(page);
@@ -31,13 +31,7 @@ async function populateList(page: Page) {
   const notebook = await notebooks.createNotebook(NOTEBOOK);
   const topics = await notebook?.openNotebook();
   const topicList: ItemModel[] = [];
-  //   let titles = ["title1", "title2", "title3", "title4", "title5"];
 
-  //   for (let title of titles) {
-  //     let topic = await topics?.createItem({ title });
-  //     if (!topic) continue;
-  //     topicList.push(topic);
-  //   }
   return { topics, app, topicList: topicList.reverse() };
 }
 
