@@ -55,13 +55,11 @@ type EmailFormData = {
 
 type PasswordFormData = EmailFormData & {
   password: string;
-  token: string;
 };
 
-type MFALoginFormData = EmailFormData & {
+type MFALoginFormData = {
   code?: string;
   method?: MFAMethodType;
-  token: string;
 };
 
 type SignupFormData = EmailFormData &
@@ -77,20 +75,14 @@ type MFAFormData = EmailFormData & {
   selectedMethod: MFAMethodType;
   primaryMethod: MFAMethodType;
   code?: string;
-  token: string;
   secondaryMethod?: MFAMethodType;
   phoneNumber?: string;
 };
 
 type MFAErrorData = {
   primaryMethod: MFAMethodType;
-  token: string;
   secondaryMethod?: MFAMethodType;
   phoneNumber?: string;
-};
-
-type PasswordRequiredErrorData = {
-  token: string;
 };
 
 type AuthFormData = {
@@ -207,27 +199,7 @@ function Auth(props: AuthProps) {
           flexDirection: "column"
         }}
       >
-        {route === "login:email" ||
-        route === "signup" ||
-        route === "recover" ? (
-          <Button
-            sx={{
-              display: "flex",
-              mt: 2,
-              mr: 2,
-              alignSelf: "end",
-              alignItems: "center"
-            }}
-            variant={"secondary"}
-            onClick={() => {
-              if (route === "signup")
-                trackEvent(ANALYTICS_EVENTS.signupSkipped);
-              openURL("/notes/");
-            }}
-          >
-            Jump to app <ArrowRight size={18} sx={{ ml: 1 }} />
-          </Button>
-        ) : route === "sessionExpiry" ? (
+        {route === "sessionExpiry" && (
           <>
             <Button
               variant={"secondary"}
@@ -254,7 +226,7 @@ function Auth(props: AuthProps) {
               permanently
             </Button>
           </>
-        ) : null}
+        )}
 
         {Route && (
           <Route
@@ -278,6 +250,7 @@ function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
     <AuthForm
       type="login:email"
       title="Welcome back!"
+      canSkip
       subtitle={
         <SubtitleWithAction
           text="Don't have an account?"
@@ -285,10 +258,21 @@ function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
         />
       }
       loading={{
-        title: "Logging you in",
+        title: "Verifying your email",
         subtitle: "Please wait while you are authenticated."
       }}
-      onSubmit={(form) => login(form, navigate)}
+      onSubmit={async (form) => {
+        const { primaryMethod, phoneNumber, secondaryMethod } =
+          (await userstore.login(form)) as MFAErrorData;
+
+        navigate("mfa:code", {
+          email: form.email,
+          selectedMethod: primaryMethod,
+          primaryMethod,
+          phoneNumber,
+          secondaryMethod
+        });
+      }}
     >
       {(form?: EmailFormData) => (
         <>
@@ -300,7 +284,7 @@ function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
             autoFocus
             defaultValue={form?.email}
           />
-          <SubmitButton text="Login to your account" />
+          <SubmitButton text="Continue" />
         </>
       )}
     </AuthForm>
@@ -318,26 +302,19 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
   return (
     <AuthForm
       type="login:password"
-      title="Welcome back!"
-      subtitle={
-        <SubtitleWithAction
-          text="Don't have an account?"
-          action={{ text: "Sign up", onClick: () => navigate("signup") }}
-        />
-      }
+      title="Your account password"
+      subtitle={"Your password is always hashed before leaving this device."}
       loading={{
         title: "Logging you in",
         subtitle: "Please wait while you are authenticated."
       }}
-      onSubmit={(form) => {
-        return login(
-          {
-            password: form.password,
-            email: formData.email,
-            token: formData.token
-          },
-          navigate
-        );
+      onSubmit={async (form) => {
+        await userstore.login({
+          password: form.password,
+          email: formData.email
+        });
+        Config.set("sessionExpired", false);
+        openURL("/");
       }}
     >
       {(form?: PasswordFormData) => (
@@ -373,6 +350,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
     <AuthForm
       type="signup"
       title="Create an account"
+      canSkip
       subtitle={
         <SubtitleWithAction
           text="Already have an account?"
@@ -484,7 +462,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
       }}
       onSubmit={async (form) => {
         if (!user) return;
-        await login({ email: user.email, password: form.password }, navigate);
+        // await login({ email: user.email, password: form.password }, navigate);
       }}
     >
       <AuthField
@@ -622,10 +600,10 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
   );
 
   const sendCode = useCallback(
-    async (selectedMethod: "sms" | "email", token: string) => {
+    async (selectedMethod: "sms" | "email") => {
       setIsSending(true);
       try {
-        await db.mfa?.sendCode(selectedMethod, token);
+        await db.mfa?.sendCode(selectedMethod);
         setEnabled(false);
       } catch (e) {
         const error = e as Error;
@@ -641,16 +619,14 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
   useEffect(() => {
     if (
       !formData ||
+      !formData.selectedMethod ||
       formData.selectedMethod === "recoveryCode" ||
       formData.selectedMethod === "app"
     )
       return;
 
     (async function () {
-      await sendCode(
-        formData.selectedMethod as "sms" | "email",
-        formData.token
-      );
+      await sendCode(formData.selectedMethod as "sms" | "email");
     })();
   }, [formData, sendCode]);
 
@@ -670,17 +646,20 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
       title="Two-factor authentication"
       subtitle={texts.subtitle}
       loading={{
-        title: "Logging you in",
+        title: "Verifying 2FA code",
         subtitle: "Please wait while you are authenticated."
       }}
       onSubmit={async (form) => {
         const loginForm: MFALoginFormData = {
           code: form.code,
-          email: formData.email,
-          method: formData.selectedMethod,
-          token: formData.token
+          method: formData.selectedMethod
         };
-        await login(loginForm, navigate);
+        await userstore.login(loginForm);
+        navigate("login:password", {
+          email: formData.email,
+          // TODO
+          password: ""
+        });
       }}
     >
       <AuthField
@@ -708,7 +687,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                   </Text>
                 ),
                 onClick: async () => {
-                  await sendCode(selectedMethod, formData.token);
+                  await sendCode(selectedMethod);
                 }
               }
             : undefined
@@ -828,13 +807,14 @@ type AuthFormProps<TType extends AuthRoutes> = {
   loading: { title: string; subtitle: string };
   type: TType;
   onSubmit: (form: AuthFormData[TType]) => Promise<void>;
+  canSkip?: boolean;
   children?:
     | React.ReactNode
     | ((form?: AuthFormData[TType]) => React.ReactNode);
 };
 
 export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
-  const { title, subtitle, children } = props;
+  const { title, subtitle, children, type, canSkip } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
   const formRef = useRef<HTMLFormElement>(null);
@@ -887,8 +867,29 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
         {subtitle}
       </Text>
       {typeof children === "function" ? children(form) : children}
+      {canSkip && (
+        <Button
+          type="button"
+          variant="anchor"
+          sx={{
+            mt: 5,
+            color: "text",
+            textDecoration: "none",
+            ":hover": {
+              color: "bgSecondaryText"
+            }
+          }}
+          onClick={() => {
+            if (type === "signup") trackEvent(ANALYTICS_EVENTS.signupSkipped);
+            openURL("/notes/");
+          }}
+        >
+          Skip & go directly to the app
+        </Button>
+      )}
+
       {error && (
-        <Flex bg="errorBg" p={1} mt={2} sx={{ borderRadius: "default" }}>
+        <Flex bg="errorBg" p={1} mt={5} sx={{ borderRadius: "default" }}>
           <ErrorIcon size={15} color="error" />
           <Text variant="error" ml={1}>
             {error}
@@ -910,18 +911,21 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
   return (
     <>
       {props.text}{" "}
-      <Text
+      <Button
+        type="button"
+        variant="anchor"
         sx={{
           textDecoration: "underline",
           ":hover": { color: "dimPrimary" },
-          cursor: "pointer",
-          color: "text"
+          fontWeight: "bold",
+          fontSize: "subtitle",
+          color: "text",
+          cursor: "pointer"
         }}
-        as="b"
         onClick={props.action.onClick}
       >
         {props.action.text}
-      </Text>
+      </Button>
     </>
   );
 }
@@ -1001,47 +1005,6 @@ export function SubmitButton(props: SubmitButtonProps) {
       {props.loading ? <Loading color="static" /> : props.text}
     </Button>
   );
-}
-
-async function login(
-  form: EmailFormData | PasswordFormData | MFALoginFormData,
-  navigate: NavigateFunction
-) {
-  try {
-    await userstore.login(form);
-    Config.set("sessionExpired", false);
-    openURL("/");
-  } catch (e) {
-    console.error(e);
-    const error = e as Error & { code?: string; data?: unknown };
-    if (error.code === "mfa_required") {
-      const { primaryMethod, phoneNumber, secondaryMethod, token } =
-        error.data as MFAErrorData;
-
-      if (!primaryMethod)
-        throw new Error(
-          "Multi-factor is required but the server didn't send a primary MFA method."
-        );
-
-      navigate("mfa:code", {
-        ...form,
-        selectedMethod: primaryMethod,
-        primaryMethod,
-        phoneNumber,
-        secondaryMethod,
-        token
-      });
-    } else if (error.code === "password_required") {
-      const { token } = error.data as PasswordRequiredErrorData;
-
-      navigate("login:password", {
-        ...form,
-        token,
-        // TODO
-        password: ""
-      });
-    } else throw e;
-  }
 }
 
 function openURL(url: string, force?: boolean) {
