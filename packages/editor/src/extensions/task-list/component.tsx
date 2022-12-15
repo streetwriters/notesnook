@@ -140,6 +140,7 @@ export function TaskListComponent(
                 icon="clear"
                 variant="small"
                 onClick={() => {
+                  if (!editor.isEditable) return;
                   if (!editor.current) return;
                   const pos = getPos();
                   // we need to get a fresh instance of the task list instead

@@ -183,9 +183,10 @@ export function TaskItemComponent(
               path={Icons.close}
               size={18}
               sx={{
-                cursor: "pointer"
+                cursor: editor.isEditable ? "pointer" : "text"
               }}
               onClick={() => {
+                if (!editor.isEditable) return;
                 if (!editor.current) return;
                 const pos = getPos();
 
