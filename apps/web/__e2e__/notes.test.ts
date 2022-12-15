@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
 import { AppModel } from "./models/app.model";
+import { Sort } from "./models/base-view.model";
 import { NOTE, PASSWORD } from "./utils";
 
 test("create a note", async ({ page }) => {
@@ -273,3 +274,47 @@ test("change title of a locked note", async ({ page }) => {
   expect(await note?.getTitle()).toContain(title);
   expect(await notes.editor.getTitle()).toContain(title);
 });
+
+test.setTimeout(100 * 1000);
+
+test("sorting notes", async ({ page }) => {
+  const { notes } = await populateList(page);
+
+  const orderBy: Sort["orderBy"][] = ["ascendingOrder", "descendingOrder"];
+  const sortBy: Sort["sortBy"][] = ["dateCreated", "dateEdited"];
+  const groupBy: Sort["groupBy"][] = [
+    "abc",
+    "none",
+    "default",
+    "year",
+    "month",
+    "week"
+  ];
+
+  for (let group of groupBy) {
+    for (let sort of sortBy) {
+      for (let order of orderBy) {
+        await notes?.sort({
+          groupBy: group,
+          orderBy: order,
+          sortBy: sort
+        });
+        expect(await notes.isListFilled()).toBeTruthy();
+      }
+    }
+  }
+});
+
+async function populateList(page: Page) {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  let titles = ["G ", "C ", "Gz", "2 ", "A "];
+  for (let title of titles) {
+    const note = await notes.createNote({
+      title: `${title} is Title`,
+      content: "This is test".repeat(10)
+    });
+  }
+  return { notes, app };
+}

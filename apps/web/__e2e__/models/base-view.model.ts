@@ -1,3 +1,4 @@
+import { ContextMenuModel } from "./context-menu.model";
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
@@ -21,9 +22,9 @@ import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { iterateList } from "./utils";
 
-type Sort = {
+export type Sort = {
   orderBy: "ascendingOrder" | "descendingOrder";
-  sortBy: "dateCreated" | "dateEdited";
+  sortBy: "dateCreated" | "dateEdited" | "dateModified";
   groupBy: "abc" | "none" | "default" | "year" | "month" | "week";
 };
 
@@ -32,20 +33,6 @@ export class BaseViewModel {
   protected readonly list: Locator;
   private readonly listPlaceholder: Locator;
   private readonly sortByButton: Locator;
-  private readonly groupBy: Locator;
-  private readonly orderBy: Locator;
-  private readonly sortBy: Locator;
-  private readonly ascendingOrder: Locator;
-  private readonly descendingOrder: Locator;
-  private readonly abcOrder: Locator;
-  private readonly dateCreated: Locator;
-  private readonly dateEdited: Locator;
-  private readonly title: Locator;
-  private readonly none: Locator;
-  private readonly default: Locator;
-  private readonly year: Locator;
-  private readonly month: Locator;
-  private readonly week: Locator;
 
   constructor(page: Page, pageId: string) {
     this.page = page;
@@ -54,24 +41,7 @@ export class BaseViewModel {
       `#${pageId} >> ${getTestId("list-placeholder")}`
     );
 
-    this.sortByButton = page.locator(getTestId("sort-icon-button"));
-
-    this.groupBy = page.locator(getTestId("menuitem-groupBy"));
-    this.abcOrder = page.locator(getTestId("menuitem-abc"));
-    this.none = page.locator(getTestId("menuitem-none"));
-    this.default = page.locator(getTestId("menuitem-default"));
-    this.year = page.locator(getTestId("menuitem-year"));
-    this.month = page.locator(getTestId("menuitem-month"));
-    this.week = page.locator(getTestId("menuitem-week"));
-
-    this.orderBy = page.locator(getTestId("menuitem-sortDirection"));
-    this.ascendingOrder = page.locator(getTestId("menuitem-asc"));
-    this.descendingOrder = page.locator(getTestId("menuitem-desc"));
-
-    this.sortBy = page.locator(getTestId("menuitem-sortBy"));
-    this.dateCreated = page.locator(getTestId("menuitem-dateCreated"));
-    this.dateEdited = page.locator(getTestId("menuitem-dateEdited"));
-    this.title = page.locator(getTestId("menuitem-title"));
+    this.sortByButton = this.list.locator(getTestId("sort-icon-button"));
   }
 
   async findGroup(groupName: string) {
@@ -135,46 +105,55 @@ export class BaseViewModel {
     await this.page.waitForTimeout(300);
   }
 
-  async sort(sort: Sort, isTopic: boolean = false) {
-    if (isTopic) await this.sortByButton.last().click();
-    else await this.sortByButton.first().click();
+  async sort(sort: Sort) {
+    const contextMenu: ContextMenuModel = new ContextMenuModel(this.page);
+
+    await contextMenu.open(this.sortByButton, "left");
     if (sort.orderBy === "ascendingOrder") {
-      await this.orderBy.first().click();
-      await this.ascendingOrder.first().click();
+      await contextMenu.clickOnItem("sortDirection");
+      await contextMenu.clickOnItem("asc");
     } else if (sort.orderBy === "descendingOrder") {
-      await this.orderBy.first().click();
-      await this.descendingOrder.first().click();
+      await contextMenu.clickOnItem("sortDirection");
+      await contextMenu.clickOnItem("desc");
     }
 
-    if (isTopic) await this.sortByButton.last().click();
-    else await this.sortByButton.first().click();
+    contextMenu.open(this.sortByButton, "left");
     if (sort.sortBy === "dateCreated") {
-      this.sortBy.first().click();
-      this.dateCreated.first().click;
+      await contextMenu.clickOnItem("sortBy");
+      await contextMenu.clickOnItem("dateCreated");
     } else if (sort.sortBy === "dateEdited") {
-      this.sortBy.first().click();
-      this.dateEdited.first().click;
+      await contextMenu.clickOnItem("sortBy");
+      await contextMenu.clickOnItem("dateEdited");
+    } else if (sort.sortBy === "dateModified") {
+      await contextMenu.clickOnItem("sortBy");
+      await contextMenu.clickOnItem("dateModified");
     }
 
-    //await this.sortByButton.first().click();
+    contextMenu.open(this.sortByButton, "left");
     if (sort.groupBy === "abc") {
-      this.groupBy.first().click();
-      this.abcOrder.first().click();
+      await contextMenu.clickOnItem("groupBy");
+      await contextMenu.clickOnItem("abc");
     } else if (sort.groupBy === "default") {
-      this.groupBy.first().click();
-      this.default.first().click();
+      await contextMenu.clickOnItem("groupBy");
+      await contextMenu.clickOnItem("default");
     } else if (sort.groupBy === "month") {
-      this.groupBy.first().click();
-      this.month.first().click();
+      await contextMenu.clickOnItem("groupBy");
+      await contextMenu.clickOnItem("month");
     } else if (sort.groupBy === "none") {
-      this.groupBy.first().click();
-      this.none.first().click();
+      await contextMenu.clickOnItem("groupBy");
+      await contextMenu.clickOnItem("none");
     } else if (sort.groupBy === "week") {
-      this.groupBy.first().click();
-      this.week.first().click();
+      await contextMenu.clickOnItem("groupBy");
+      await contextMenu.clickOnItem("week");
     } else if (sort.groupBy === "year") {
-      this.groupBy.first().click();
-      this.year.first().click();
+      await contextMenu.clickOnItem("groupBy");
+      await contextMenu.clickOnItem("year");
     }
+  }
+
+  async isListFilled() {
+    let itemCount = await this.page.locator(getTestId("list-item")).count();
+    if (itemCount !== 5) return false;
+    return true;
   }
 }

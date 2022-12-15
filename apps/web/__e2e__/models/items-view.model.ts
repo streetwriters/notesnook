@@ -52,12 +52,13 @@ export class ItemsViewModel extends BaseViewModel {
     return undefined;
   }
 
-  async getList() {
+  async isItemListFilled() {
     let list: String[] = [];
     for await (const _item of this.iterateItems()) {
       const itemModel = new ItemModel(_item);
       list.push(await itemModel.getTitle());
     }
-    return list;
+    if (list.length !== 5) return false;
+    return true;
   }
 }

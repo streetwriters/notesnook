@@ -17,10 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
 import { AppModel } from "./models/app.model";
+import { Sort } from "./models/base-view.model";
 import { Item, Notebook } from "./models/types";
 import { NOTE, NOTEBOOK } from "./utils";
+
+async function populateList(page: Page) {
+  const app = new AppModel(page);
+  await app.goto();
+  const notebooks = await app.goToNotebooks();
+  let titles = ["G ", "C ", "Gz", "2 ", "A "];
+  for (let title of titles) {
+    NOTEBOOK.title = title + NOTEBOOK.title;
+    const notebook = await notebooks.createNotebook(NOTEBOOK);
+  }
+  return { notebooks, app };
+}
 
 test("create a notebook", async ({ page }) => {
   const app = new AppModel(page);
@@ -222,4 +235,34 @@ test("remove shortcut of a topic", async ({ page }) => {
   expect(await topic?.isShortcut()).toBe(false);
   const allShortcuts = await app.navigation.getShortcuts();
   expect(allShortcuts.includes(NOTEBOOK.topics[0])).toBeFalsy();
+});
+
+test.setTimeout(100 * 1000);
+
+test("sorting notebooks", async ({ page }) => {
+  const { notebooks } = await populateList(page);
+
+  const orderBy: Sort["orderBy"][] = ["ascendingOrder", "descendingOrder"];
+  const sortBy: Sort["sortBy"][] = ["dateCreated", "dateEdited"];
+  const groupBy: Sort["groupBy"][] = [
+    "abc",
+    "none",
+    "default",
+    "year",
+    "month",
+    "week"
+  ];
+
+  for (let group of groupBy) {
+    for (let sort of sortBy) {
+      for (let order of orderBy) {
+        await notebooks?.sort({
+          groupBy: group,
+          orderBy: order,
+          sortBy: sort
+        });
+        expect(await notebooks.isListFilled()).toBeTruthy();
+      }
+    }
+  }
 });
