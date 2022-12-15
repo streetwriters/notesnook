@@ -104,13 +104,13 @@ const list: ThemeUIStyleObject = {
 const anchor: ThemeUIStyleObject = {
   variant: "buttons.default",
   color: "primary",
-  fontSize: "subBody",
   p: 0,
   m: 0,
   px: 0,
   py: 0,
+  textDecoration: "underline",
   ":hover": {
-    textDecoration: "underline"
+    color: "dimPrimary"
   }
 };
 

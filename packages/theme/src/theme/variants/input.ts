@@ -22,18 +22,16 @@ import { ThemeUIStyleObject } from "@theme-ui/core";
 const defaultVariant: ThemeUIStyleObject = {
   borderRadius: "default",
   border: "none",
-  // borderColor: "border",
-  boxShadow: "0px 0px 0px 1px var(--border) inset",
+  outline: "1.5px solid var(--border)",
   fontFamily: "body",
   fontWeight: "body",
   fontSize: "input",
   color: "text",
-  outline: "none",
   ":focus": {
-    boxShadow: "0px 0px 0px 1.5px var(--primary) inset"
+    outline: "2px solid var(--primary)"
   },
   ":hover:not(:focus)": {
-    boxShadow: "0px 0px 0px 1px var(--dimPrimary) inset"
+    outline: "1.5px solid var(--dimPrimary)"
   }
 };
 
