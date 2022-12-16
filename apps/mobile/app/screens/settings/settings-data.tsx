@@ -391,7 +391,7 @@ export const settingsGroups: SettingSection[] = [
             id: "auto-sync",
             name: "Disable auto sync",
             description:
-              "Turn of automatic syncing. Changes from this client will be synced only when you run sync manually.",
+              "Turn off automatic syncing. Changes from this client will be synced only when you run sync manually.",
             type: "switch",
             property: "disableAutoSync"
           },
