@@ -172,3 +172,5 @@ export interface GroupHeader
   extends Omit<Entity<"header">, "id" | "dateCreated" | "dateModified"> {
   title: string;
 }
+
+export type ItemReference = { id: string; type: string };

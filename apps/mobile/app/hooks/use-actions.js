@@ -57,7 +57,7 @@ import {
 } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { sleep } from "../utils/time";
-import { RelationsList } from "../components/sheets/reminders-list/index";
+import { RelationsList } from "../components/sheets/relations-list/index";
 
 export const useActions = ({ close = () => null, item }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -820,15 +820,23 @@ export const useActions = ({ close = () => null, item }) => {
       name: "Reminders",
       title: "Reminders",
       icon: "bell",
-      func: () => {
+      func: async () => {
+        close();
         RelationsList.present({
           reference: item,
           referenceType: "reminder",
           relationType: "from",
-          title: "Reminders"
+          title: "Reminders",
+          onAdd: () => ReminderSheet.present(null, item, true),
+          button: {
+            title: "Add",
+            type: "accent",
+            onPress: () => ReminderSheet.present(null, item, true),
+            icon:"plus"
+          }
         });
       },
-      close: true
+      close: false
     }
   ];
 

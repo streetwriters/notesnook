@@ -35,6 +35,10 @@ import { IconButton } from "../../ui/icon-button";
 import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { getUpcomingReminder } from "../../../utils/time";
+import { formatReminderTime } from "../../../utils/time/index";
+import { TouchableOpacity } from "react-native";
+import ReminderSheet from "../../sheets/reminder";
 
 const navigateToTopic = (topic) => {
   TopicNotes.navigate(topic, true);
@@ -86,6 +90,8 @@ const NoteItem = ({
   const compactMode = notesListMode === "compact";
   const attachmentCount = db.attachments?.ofNote(item.id, "all")?.length || 0;
   const notebooks = React.useMemo(() => getNotebook(item), [item]);
+  const reminders = db.relations.from(item, "reminder");
+  const current = getUpcomingReminder(reminders);
 
   return (
     <>
@@ -152,6 +158,37 @@ const NoteItem = ({
               level: EntityLevel.HTML
             })}
           </Paragraph>
+        ) : null}
+
+        {current && current.date ? (
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => {
+              Properties.present(item);
+            }}
+            style={{                                          
+              backgroundColor: colors.nav,
+              borderRadius: 5,
+              flexDirection: "row",
+              paddingHorizontal: 5,
+              paddingVertical: 3,
+              alignItems: "center",
+              marginTop: 5,
+              justifyContent: "flex-start",
+              alignSelf: "flex-start"
+            }}
+          >
+            <>
+              <Icon name="clock-outline" size={SIZE.md} color={colors.accent} />
+              <Paragraph
+                size={SIZE.xs + 1}
+                color={colors.icon}
+                style={{ marginLeft: 5 }}
+              >
+                {formatReminderTime(current)}
+              </Paragraph>
+            </>
+          </TouchableOpacity>
         ) : null}
 
         <View

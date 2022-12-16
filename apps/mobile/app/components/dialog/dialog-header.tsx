@@ -35,6 +35,7 @@ type DialogHeaderProps = {
     loading?: boolean;
     title?: string;
     type?: PressableButtonProps["type"];
+    icon?: string
   };
   paragraphColor?: string;
   padding?: number;
@@ -96,6 +97,7 @@ const DialogHeader = ({
                 loading={button.loading}
                 fontSize={13}
                 title={button.title}
+                icon={button.icon}
                 type={button.type || "grayBg"}
                 height={25}
               />
