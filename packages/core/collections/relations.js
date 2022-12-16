@@ -120,8 +120,10 @@ export default class Relations extends Collection {
    * @param {Relation[]} relations
    * @param {"from" | "to"} resolveType
    * @private
+   * 
+   * @returns {Relation[]}
    */
-  async resolve(relations, resolveType) {
+  resolve(relations, resolveType) {
     const items = [];
     for (const relation of relations) {
       const reference = resolveType === "from" ? relation.from : relation.to;
@@ -136,9 +138,29 @@ export default class Relations extends Collection {
           break;
       }
       if (item) items.push(item);
-      else await this.remove(relation.id);
     }
     return items;
+  }
+
+  async cleanup() {
+    const relations = this._collection.getItems();
+    for (const relation of relations) {
+      const references = [relation.to, relation.from];
+      for (let reference of references) {
+        const exists = false;
+        switch (reference.type) {
+          case "reminder":
+            exists = this._db.reminders.exists(reference.id);
+            break;
+          case "note":
+            exists =
+              this._db.notes.exists(reference.id) ||
+              this._db.trash.exists(reference.id);
+            break;
+        }
+        if (!exists) await this.remove(relation.id);
+      }
+    }
   }
 }
 
