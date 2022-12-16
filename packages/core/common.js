@@ -29,6 +29,13 @@ export async function checkIsUserPremium(type) {
   return results.some((r) => r.type === type && r.result === true);
 }
 
+export async function checkSyncStatus(type) {
+  const results = await EV.publishWithResult(EVENTS.syncCheckStatus, type);
+  if (typeof results === "boolean") return results;
+  else if (typeof results === "undefined") return true;
+  return results.some((r) => r.type === type && r.result === true);
+}
+
 export function sendAttachmentsProgressEvent(type, groupId, total, current) {
   EV.publish(EVENTS.attachmentsLoading, {
     type,
@@ -65,6 +72,11 @@ export const CHECK_IDS = {
   backupEncrypt: "backup:encrypt"
 };
 
+export const SYNC_CHECK_IDS = {
+  autoSync: "autoSync",
+  sync: "sync"
+};
+
 export const EVENTS = {
   userCheckStatus: "user:checkStatus",
   userSubscriptionUpdated: "user:subscriptionUpdated",
@@ -78,6 +90,7 @@ export const EVENTS = {
   syncProgress: "sync:progress",
   syncCompleted: "sync:completed",
   syncItemMerged: "sync:itemMerged",
+  syncCheckStatus: "sync:checkStatus",
   databaseUpdated: "db:updated",
   databaseCollectionInitiated: "db:collectionInitiated",
   appRefreshRequested: "app:refreshRequested",

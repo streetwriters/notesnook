@@ -29,8 +29,9 @@ import { store as monographStore } from "./monograph-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
-import { EV, EVENTS } from "@notesnook/core/common";
+import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/common";
 import { logger } from "../utils/logger";
+import Config from "../utils/config";
 
 var syncStatusTimeout = 0;
 const BATCH_SIZE = 50;
@@ -40,6 +41,8 @@ class AppStore extends BaseStore {
   isFocusMode = false;
   isEditorOpen = false;
   isVaultCreated = false;
+  isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
+  isSyncEnabled = Config.get("syncEnabled", true);
   syncStatus = {
     key: "synced",
     progress: null,
@@ -71,6 +74,27 @@ class AppStore extends BaseStore {
           count = 0;
           this.refresh();
         }
+      }
+    );
+
+    EV.subscribe(EVENTS.syncCheckStatus, async (type) => {
+      const { isAutoSyncEnabled, isSyncEnabled } = this.get();
+      switch (type) {
+        case SYNC_CHECK_IDS.sync:
+          return { type, result: isSyncEnabled };
+        case SYNC_CHECK_IDS.autoSync:
+          return { type, result: isAutoSyncEnabled };
+        default:
+          return { type, result: true };
+      }
+    });
+
+    db.eventManager.subscribe(
+      EVENTS.databaseSyncRequested,
+      async (full, force) => {
+        if (!this.get().isAutoSyncEnabled) return;
+
+        await this.get().sync(full, force);
       }
     );
 
@@ -108,6 +132,21 @@ class AppStore extends BaseStore {
 
   toggleFocusMode = () => {
     this.set((state) => (state.isFocusMode = !state.isFocusMode));
+  };
+
+  toggleAutoSync = () => {
+    Config.set("autoSyncEnabled", !this.get().isAutoSyncEnabled);
+    this.set((state) => (state.isAutoSyncEnabled = !state.isAutoSyncEnabled));
+  };
+
+  toggleSync = () => {
+    const { isSyncEnabled } = this.get();
+    Config.set("syncEnabled", !isSyncEnabled);
+    this.set((state) => (state.isSyncEnabled = !state.isSyncEnabled));
+
+    if (isSyncEnabled) {
+      db.syncer.stop();
+    }
   };
 
   toggleSideMenu = (toggleState) => {
@@ -200,6 +239,7 @@ class AppStore extends BaseStore {
   };
 
   sync = async (full = true, force = false) => {
+    if (!this.get().isSyncEnabled) return;
     if (this.isSyncing()) return;
 
     clearTimeout(syncStatusTimeout);

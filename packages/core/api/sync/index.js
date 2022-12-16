@@ -18,10 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  checkSyncStatus,
   EV,
   EVENTS,
   sendAttachmentsProgressEvent,
-  sendSyncProgressEvent
+  sendSyncProgressEvent,
+  SYNC_CHECK_IDS
 } from "../../common";
 import Constants from "../../utils/constants";
 import TokenManager from "../token-manager";
@@ -167,6 +169,11 @@ class Sync {
    * @param {number} serverLastSynced
    */
   async start(full, force, serverLastSynced) {
+    if (!(await checkSyncStatus(SYNC_CHECK_IDS.sync))) {
+      await this.connection.stop();
+      return;
+    }
+
     this.logger.info("Starting sync", { full, force, serverLastSynced });
 
     this.connection.onclose((error) => {
@@ -196,6 +203,10 @@ class Sync {
     } else {
       this.logger.info("Nothing to do.");
       await this.stop(serverLastSynced || oldLastSynced);
+    }
+
+    if (!(await checkSyncStatus(SYNC_CHECK_IDS.autoSync))) {
+      await this.connection.stop();
     }
   }
 
