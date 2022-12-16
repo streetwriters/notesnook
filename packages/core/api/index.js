@@ -106,6 +106,7 @@ class Database {
         case "notes": {
           await this.monographs.init();
           await this.trash.init();
+          await this.relations.cleanup();
           break;
         }
       }
