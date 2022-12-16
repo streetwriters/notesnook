@@ -104,7 +104,8 @@ const SelectionWrapper = ({
         overflow: "hidden",
         paddingHorizontal: 12,
         paddingVertical: compactMode ? 8 : 12,
-        borderRadius:isSheet ? 10 : 0
+        borderRadius: isSheet ? 10 : 0,
+        marginBottom: isSheet ? 12 : undefined
       }}
     >
       {item.type === "note" ? (

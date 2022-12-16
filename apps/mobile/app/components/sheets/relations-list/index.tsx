@@ -16,20 +16,25 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React, { RefObject, useState } from "react";
+import React, { RefObject, useEffect, useState } from "react";
 import { View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
 import {
-  presentSheet,
-  PresentSheetOptions
+  PresentSheetOptions,
+  presentSheet
 } from "../../../services/event-manager";
+import { Reminder } from "../../../services/notifications";
+import { useRelationStore } from "../../../stores/use-relation-store";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { SIZE } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
 import List from "../../list";
-import { useEffect } from "react";
-import { Reminder } from "../../../services/notifications";
-import { PressableButtonProps } from "../../ui/pressable";
 import SheetProvider from "../../sheet-provider";
+import { Button } from "../../ui/button";
+import { PressableButtonProps } from "../../ui/pressable";
+import Paragraph from "../../ui/typography/paragraph";
 
 type RelationsListProps = {
   actionSheetRef: RefObject<ActionSheet>;
@@ -40,6 +45,7 @@ type RelationsListProps = {
   relationType: "to" | "from";
   title: string;
   button?: Button;
+  onAdd: () => void;
 };
 
 type Button = {
@@ -47,6 +53,11 @@ type Button = {
   loading?: boolean | undefined;
   title?: string | undefined;
   type?: PressableButtonProps["type"];
+  icon?: string;
+};
+
+const IconsByType = {
+  reminder: "bell"
 };
 
 export const RelationsList = ({
@@ -57,27 +68,68 @@ export const RelationsList = ({
   referenceType,
   relationType,
   title,
-  button
+  button,
+  onAdd
 }: RelationsListProps) => {
+  const relations = useRelationStore();
   const [items, setItems] = useState<Reminder[]>([]);
+  const colors = useThemeStore((state) => state.colors);
+  const hasNoReminders = !items || items.length === 0;
 
   useEffect(() => {
-    db.relations?.[relationType]?.(
-      { id: item?.id, type: item.type },
-      referenceType
-    ).then((items) => setItems(items as any));
-  }, [item?.id, item?.type, referenceType, relationType]);
+    setItems(
+      db.relations?.[relationType]?.(
+        { id: item?.id, type: item.type },
+        referenceType
+      ) as any
+    );
+  }, [item?.id, item?.type, referenceType, relationType, relations.updater]);
+  console.log(items);
   return (
-    <View style={{ paddingHorizontal: 12, height: "100%" }}>
+    <View
+      style={{ paddingHorizontal: 12, height: hasNoReminders ? 300 : "100%" }}
+    >
       <SheetProvider context="local" />
-      <DialogHeader title={title} button={button} />
-      <List
-        listData={items}
-        loading={false}
-        type={referenceType}
-        headerProps={null}
-        isSheet={true}
+      <DialogHeader
+        title={title}
+        button={hasNoReminders ? undefined : button}
       />
+      {hasNoReminders ? (
+        <View
+          style={{
+            height: "85%",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <Icon
+            name={IconsByType[referenceType as keyof typeof IconsByType]}
+            size={60}
+            color={colors.icon}
+          />
+          <Paragraph>
+            No {referenceType}s linked to this {item.type}.
+          </Paragraph>
+          <Button
+            onPress={() => {
+              onAdd?.();
+            }}
+            fontSize={SIZE.sm}
+            //  width="100%"
+            type="inverted"
+            icon="plus"
+            title={`Add a ${referenceType}`}
+          />
+        </View>
+      ) : (
+        <List
+          listData={items}
+          loading={false}
+          type={referenceType}
+          headerProps={null}
+          isSheet={true}
+        />
+      )}
     </View>
   );
 };
@@ -87,13 +139,15 @@ RelationsList.present = ({
   referenceType,
   relationType,
   title,
-  button
+  button,
+  onAdd
 }: {
   reference: { id: string; type: string };
   referenceType: string;
   relationType: "to" | "from";
   title: string;
-  button: Button;
+  button?: Button;
+  onAdd: () => void;
 }) => {
   presentSheet({
     component: (ref, close, update) => (
@@ -106,6 +160,7 @@ RelationsList.present = ({
         relationType={relationType}
         title={title}
         button={button}
+        onAdd={onAdd}
       />
     )
   });

@@ -124,7 +124,8 @@ export const Properties = ({
                   alignItems: "center",
                   justifyContent: "flex-start",
                   alignSelf: "flex-start",
-                  marginBottom: 5
+                  marginBottom: 5,
+                  marginTop: !item.description ? 5 : 0
                 }}
               >
                 {item.date ? (
@@ -249,7 +250,7 @@ Properties.present = (item, buttons = [], isSheet) => {
   }
   if (!props[0]) return;
   presentSheet({
-    context:isSheet ? "local" : undefined,
+    context: isSheet ? "local" : undefined,
     component: (ref, close) => (
       <Properties
         close={() => {

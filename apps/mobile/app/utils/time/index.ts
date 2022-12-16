@@ -120,6 +120,15 @@ export function formatReminderTime(reminder: Reminder) {
   );
 }
 
+export function getUpcomingReminder(reminders: Reminder[]) {
+  const sorted = reminders.sort((a, b) => {
+    const d1 = a.mode === "repeat" ? getUpcomingReminderTime(a) : a.date;
+    const d2 = a.mode === "repeat" ? getUpcomingReminderTime(b) : b.date;
+    return !d1 || !d2 ? 0 : d1 - d2;
+  });
+  return sorted[0];
+}
+
 export const sleep = (duration: number) =>
   new Promise((resolve) => setTimeout(() => resolve(true), duration));
 

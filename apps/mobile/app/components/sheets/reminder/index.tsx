@@ -21,23 +21,23 @@ import { Platform, ScrollView, View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {
-  presentSheet,
   PresentSheetOptions,
-  ToastEvent
+  ToastEvent,
+  presentSheet
 } from "../../../services/event-manager";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 
-import Notifications, { Reminder } from "../../../services/notifications";
-import Paragraph from "../../ui/typography/paragraph";
 import dayjs from "dayjs";
-import { db } from "../../../common/database";
-import Navigation from "../../../services/navigation";
-import { formatReminderTime } from "../../../utils/time";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { db } from "../../../common/database";
+import Notifications, { Reminder } from "../../../services/notifications";
 import { useReminderStore } from "../../../stores/use-reminder-store";
+import { formatReminderTime } from "../../../utils/time";
+import Paragraph from "../../ui/typography/paragraph";
+import DialogHeader from "../../dialog/dialog-header";
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheet>;
   close?: () => void;
@@ -62,7 +62,6 @@ const RecurringModes = {
   Week: "week",
   Month: "month"
 };
-
 const WeekDays = new Array(7).fill(true);
 const MonthDays = new Array(31).fill(true);
 const WeekDayNames = {
@@ -80,6 +79,9 @@ const ReminderNotificationModes = {
   Vibrate: "vibrate",
   Urgent: "urgent"
 };
+
+
+
 
 export default function ReminderSheet({
   actionSheetRef,
@@ -431,7 +433,7 @@ export default function ReminderSheet({
         <View
           style={{
             flexDirection: "row",
-            marginBottom: 12
+            marginBottom: 12,
           }}
         >
           {Object.keys(ReminderNotificationModes).map((mode) => (

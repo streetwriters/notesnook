@@ -60,19 +60,31 @@ let pinned: DisplayedNotification[] = [];
 const onEvent = async ({ type, detail }: Event) => {
   const { notification, pressAction, input } = detail;
   if (type === EventType.PRESS) {
-    if (notification?.data?.type !== "pinnedNote") return;
+    if (notification?.data?.type === "quickNote") return;
     editorState().movedAway = false;
     MMKV.removeItem("appState");
+    let noteId = notification?.id;
+    if (notification?.data?.type === "reminder") {
+      const notes = db.relations?.to(
+        { type: "reminder", id: notification.id?.split("_")[0] as string },
+        "note"
+      );
+      if (!notes || notes.length === 0) return;
+      if (notes && notes.length > 0) {
+        noteId = notes[0].id;
+      } 
+    }
+
     if (useNoteStore?.getState()?.loading === false) {
       await db.init();
       await db.notes?.init();
-      loadNote(notification?.id as string, false);
+      loadNote(noteId as string, false);
       return;
     }
     const unsub = useNoteStore.subscribe(
       (loading) => {
         if (loading === false) {
-          loadNote(notification?.id as string, true);
+          loadNote(noteId as string, true);
         }
         unsub();
       },
@@ -184,6 +196,7 @@ function loadNote(id: string, jump: boolean) {
     }
   }, 2000);
 }
+
 async function getChannelId(id: "silent" | "vibrate" | "urgent" | "default") {
   switch (id) {
     case "default":
@@ -323,7 +336,7 @@ function getTriggers(
       ];
     case "permanent":
       return undefined;
-    case "repeat" : {
+    case "repeat": {
       switch (recurringMode) {
         case "day":
           return [

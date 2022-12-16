@@ -143,7 +143,8 @@ export const EventTypes = {
   properties: "editor-event:properties",
   fullscreen: "editor-event:fullscreen",
   link: "editor-event:link",
-  contentchange: "editor-event:content-change"
+  contentchange: "editor-event:content-change",
+  reminders: "editor-event:reminders"
 } as const;
 
 export function isReactNative(): boolean {
