@@ -1,3 +1,4 @@
+import { ContextMenuModel } from "./models/context-menu.model";
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
@@ -254,4 +255,67 @@ test("select notes using Shift+Click upwards", async ({ page }, info) => {
     expect(await notesList[i].isSelected()).toBeTruthy();
   }
   expect(await notesList[0].isFocused()).toBeTruthy();
+});
+
+test("Ctrl+Click to select unselect notes", async ({ page }, info) => {
+  info.setTimeout(60 * 1000);
+  const { notesList, notes } = await populateList(page, 10);
+  await notes.focus();
+
+  await page.keyboard.down("Control");
+  for (let i = 2; i < 10; i += 2) {
+    await notesList[i].click();
+  }
+  await page.keyboard.up("Control");
+
+  for (let i = 2; i < 10; i += 2) {
+    expect(await notesList[i].isSelected()).toBeTruthy();
+  }
+
+  await page.keyboard.down("Control");
+  for (let i = 2; i < 10; i += 2) {
+    await notesList[i].click();
+  }
+  await page.keyboard.up("Control");
+
+  for (let i = 2; i < 10; i += 2) {
+    expect(await notesList[i].isSelected()).toBeFalsy();
+  }
+});
+
+test.only("Right Click notes", async ({ page }, info) => {
+  info.setTimeout(60 * 1000);
+  const { notesList, notes } = await populateList(page, 10);
+  await notes.focus();
+
+  const noteSelected = 4;
+
+  await notesList[0].click();
+  await notesList[noteSelected].contextMenu.open();
+  expect(
+    (await notesList[noteSelected].contextMenu.title()) ===
+      (await notesList[noteSelected].getTitle())
+  ).toBeTruthy();
+  await notesList[noteSelected].contextMenu.close();
+
+  await page.keyboard.down("Control");
+  let itemsSelected = 1;
+  for (let i = 2; i < 10; i += 2) {
+    await notesList[i].click();
+    itemsSelected++;
+  }
+  await page.keyboard.up("Control");
+  await notesList[noteSelected].contextMenu.open();
+
+  expect(
+    (await notesList[noteSelected].contextMenu.title()) ===
+      `${itemsSelected} items selected`
+  ).toBeTruthy();
+  await notesList[noteSelected].contextMenu.close();
+
+  await notesList[noteSelected - 1].contextMenu.open();
+  expect(
+    (await notesList[noteSelected - 1].contextMenu.title()) ===
+      (await notesList[noteSelected - 1].getTitle())
+  ).toBeTruthy();
 });
