@@ -57,6 +57,18 @@ export async function fillNotebookDialog(
   await confirmDialog(page);
 }
 
+export async function fillMoveTopicDialog(page: Page, notebookTitle: string) {
+  const notebookList = page.locator(getTestId("notebook-list"));
+  const notebookTitles = notebookList.locator(getTestId("title"));
+  const dialogConfirm = page.locator(getTestId("dialog-yes"));
+  for await (const title of iterateList(notebookTitles)) {
+    if (notebookTitle === (await title.textContent())) {
+      await title.click();
+    }
+  }
+  await confirmDialog(page);
+}
+
 export async function fillItemDialog(page: Page, item: Item) {
   const titleInput = page.locator(getTestId("title-input"));
   await titleInput.waitFor({ state: "visible" });

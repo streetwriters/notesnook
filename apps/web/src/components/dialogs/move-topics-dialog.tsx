@@ -96,7 +96,6 @@ function MoveDialog({ onClose, topics, id }: MoveDialogProps) {
                   justifyContent: "space-between"
                 }}
                 onClick={(e) => {
-                  console.log("143 move topic dialog", notebook);
                   setSelected(notebook.id);
                   refresh();
                 }}

@@ -22,7 +22,7 @@ import { BaseItemModel } from "./base-item.model";
 import { ContextMenuModel } from "./context-menu.model";
 import { NotesViewModel } from "./notes-view.model";
 import { Item } from "./types";
-import { fillItemDialog } from "./utils";
+import { fillItemDialog, fillMoveTopicDialog } from "./utils";
 
 export class ItemModel extends BaseItemModel {
   private readonly contextMenu: ContextMenuModel;
@@ -68,5 +68,11 @@ export class ItemModel extends BaseItemModel {
       "Remove shortcut";
     await this.contextMenu.close();
     return state;
+  }
+
+  async moveItem(notebookTitle: string) {
+    await this.contextMenu.open(this.locator);
+    await this.contextMenu.clickOnItem("move");
+    await fillMoveTopicDialog(this.page, notebookTitle);
   }
 }
