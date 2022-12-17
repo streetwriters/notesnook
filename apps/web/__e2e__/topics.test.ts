@@ -43,7 +43,7 @@ test.only("Move topic to notebook", async ({ page }) => {
   const topic = await topics?.findItem({ title: NOTEBOOK1.topics[0] });
   await topic?.moveItem(NOTEBOOK2.title);
 
-  await page.locator(getTestId("go-back")).click();
+  await app.goback();
   const topics2 = await notebook2?.openNotebook();
   const topic2 = await topics2?.findItem({ title: NOTEBOOK1.topics[0] });
 

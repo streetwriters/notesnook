@@ -51,6 +51,10 @@ export class AppModel {
     await this.getRouteHeader();
   }
 
+  async goback() {
+    await this.page.locator(getTestId("go-back")).click();
+  }
+
   async goToNotes() {
     await this.navigateTo("Notes");
     return new NotesViewModel(this.page, "home");
