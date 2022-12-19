@@ -24,7 +24,7 @@ import { iterateList } from "./utils";
 
 export type Sort = {
   orderBy: "ascendingOrder" | "descendingOrder";
-  sortBy: "dateCreated" | "dateEdited" | "dateModified";
+  sortBy: "dateCreated" | "dateEdited" | "dateModified" | "title";
   groupBy: "abc" | "none" | "default" | "year" | "month" | "week";
 };
 
@@ -108,27 +108,6 @@ export class BaseViewModel {
   async sort(sort: Sort) {
     const contextMenu: ContextMenuModel = new ContextMenuModel(this.page);
 
-    await contextMenu.open(this.sortByButton, "left");
-    if (sort.orderBy === "ascendingOrder") {
-      await contextMenu.clickOnItem("sortDirection");
-      await contextMenu.clickOnItem("asc");
-    } else if (sort.orderBy === "descendingOrder") {
-      await contextMenu.clickOnItem("sortDirection");
-      await contextMenu.clickOnItem("desc");
-    }
-
-    contextMenu.open(this.sortByButton, "left");
-    if (sort.sortBy === "dateCreated") {
-      await contextMenu.clickOnItem("sortBy");
-      await contextMenu.clickOnItem("dateCreated");
-    } else if (sort.sortBy === "dateEdited") {
-      await contextMenu.clickOnItem("sortBy");
-      await contextMenu.clickOnItem("dateEdited");
-    } else if (sort.sortBy === "dateModified") {
-      await contextMenu.clickOnItem("sortBy");
-      await contextMenu.clickOnItem("dateModified");
-    }
-
     contextMenu.open(this.sortByButton, "left");
     if (sort.groupBy === "abc") {
       await contextMenu.clickOnItem("groupBy");
@@ -148,6 +127,30 @@ export class BaseViewModel {
     } else if (sort.groupBy === "year") {
       await contextMenu.clickOnItem("groupBy");
       await contextMenu.clickOnItem("year");
+    }
+
+    await contextMenu.open(this.sortByButton, "left");
+    if (sort.orderBy === "ascendingOrder") {
+      await contextMenu.clickOnItem("sortDirection");
+      await contextMenu.clickOnItem("asc");
+    } else if (sort.orderBy === "descendingOrder") {
+      await contextMenu.clickOnItem("sortDirection");
+      await contextMenu.clickOnItem("desc");
+    }
+
+    contextMenu.open(this.sortByButton, "left");
+    if (sort.sortBy === "dateCreated") {
+      await contextMenu.clickOnItem("sortBy");
+      await contextMenu.clickOnItem("dateCreated");
+    } else if (sort.sortBy === "dateEdited") {
+      await contextMenu.clickOnItem("sortBy");
+      await contextMenu.clickOnItem("dateEdited");
+    } else if (sort.sortBy === "dateModified") {
+      await contextMenu.clickOnItem("sortBy");
+      await contextMenu.clickOnItem("dateModified");
+    } else if (sort.sortBy === "title") {
+      await contextMenu.clickOnItem("sortBy");
+      await contextMenu.clickOnItem("title");
     }
   }
 

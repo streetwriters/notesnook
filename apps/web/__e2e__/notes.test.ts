@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { test, expect, Page } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { Sort } from "./models/base-view.model";
-import { NOTE, PASSWORD } from "./utils";
+import { getTestId, NOTE, PASSWORD } from "./utils";
 
 test("create a note", async ({ page }) => {
   const app = new AppModel(page);
@@ -305,11 +305,42 @@ test("sorting notes", async ({ page }) => {
   }
 });
 
-async function populateList(page: Page) {
+test.only("Sort numbered notes", async ({ page }) => {
+  const { notes } = await populateList(page, [
+    "00",
+    "1",
+    "10",
+    "2",
+    "20",
+    "3",
+    "30",
+    "4",
+    "40"
+  ]);
+
+  let expectedList = ["00", "1", "2", "3", "4", "10", "20", "30", "40"];
+
+  await notes?.sort({
+    groupBy: "none",
+    orderBy: "ascendingOrder",
+    sortBy: "title"
+  });
+
+  let list = await page.locator(getTestId("list-item")).allInnerTexts();
+  let index = 0;
+  for (let note of list) {
+    expect(note.substring(0, 2) === expectedList[index]);
+    index++;
+  }
+});
+
+async function populateList(
+  page: Page,
+  titles = ["G ", "C ", "Gz", "2 ", "A "]
+) {
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
-  let titles = ["G ", "C ", "Gz", "2 ", "A "];
   for (let title of titles) {
     const note = await notes.createNote({
       title: `${title} is Title`,

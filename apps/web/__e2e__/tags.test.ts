@@ -180,7 +180,7 @@ test("delete the last note of a tag that is also a shortcut", async ({
 
 test.setTimeout(100 * 1000);
 
-test.only("sorting tags", async ({ page }) => {
+test("sorting tags", async ({ page }) => {
   const { tags } = await populateList(page);
 
   const orderBy: Sort["orderBy"][] = ["ascendingOrder", "descendingOrder"];
