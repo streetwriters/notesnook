@@ -19,6 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import getId from "../utils/id";
 import Collection from "./collection";
+import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
+import isToday from "dayjs/plugin/isToday";
+import isTomorrow from "dayjs/plugin/isTomorrow";
+import isYesterday from "dayjs/plugin/isYesterday";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
+dayjs.extend(isTomorrow);
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isYesterday);
+dayjs.extend(isToday);
+dayjs.extend(isBetween);
 
 /**
  * @typedef {{
@@ -105,4 +117,77 @@ export default class Reminders extends Collection {
       await this._collection.removeItem(id);
     }
   }
+}
+
+/**
+ * @param {Reminder} reminder
+ */
+export function formatReminderTime(reminder) {
+  const { date } = reminder;
+  let time = date;
+  if (reminder.mode === "repeat") {
+    time = getUpcomingReminderTime(reminder);
+  }
+
+  if (dayjs(time).isTomorrow()) {
+    return `Upcoming: Tomorrow, ${dayjs(time).format("hh:mm A")}`;
+  }
+
+  if (dayjs(time).isYesterday()) {
+    return `Last: Yesterday, ${dayjs(time).format("hh:mm A")}`;
+  }
+
+  if (dayjs(time).isToday()) {
+    return `Upcoming: Today, ${dayjs(time).format("hh:mm A")}`;
+  }
+
+  const isPast = dayjs(time).isBefore(dayjs());
+  return dayjs(time).format(
+    `${isPast ? "[Last]:" : "[Upcoming]:"} ddd, YYYY-MM-DD hh:mm A`
+  );
+}
+
+/**
+ * @param {Reminder} reminder
+ */
+function getUpcomingReminderTime(reminder) {
+  // this is only the time (hour & minutes); date is not included
+  const time = dayjs(reminder.date);
+  const now = dayjs();
+  const relativeTime = now.clone().hour(time.hour()).minute(time.minute());
+
+  const isPast = relativeTime.isBefore(now);
+
+  const isDay = reminder.recurringMode === "day";
+  const isWeek = reminder.recurringMode === "week";
+  const isMonth = reminder.recurringMode === "month";
+
+  if (isDay) {
+    if (isPast) return relativeTime.add(1, "day").valueOf();
+    else return relativeTime.valueOf();
+  }
+
+  if (!reminder.selectedDays || !reminder.selectedDays.length)
+    return relativeTime.valueOf();
+
+  const sorted = reminder.selectedDays.sort((a, b) => a - b);
+  const lastSelectedDay = sorted[sorted.length - 1];
+
+  if (isWeek) {
+    if (now.day() > lastSelectedDay)
+      return relativeTime.day(sorted[0]).add(1, "week").valueOf();
+    else {
+      for (const day of reminder.selectedDays)
+        if (now.day() < day) return relativeTime.day(day).valueOf();
+    }
+  } else if (isMonth) {
+    if (now.date() > lastSelectedDay)
+      return relativeTime.date(sorted[0]).add(1, "month").valueOf();
+    else {
+      for (const day of reminder.selectedDays)
+        if (now.date() < day) return relativeTime.date(day).valueOf();
+    }
+  }
+
+  return relativeTime.valueOf();
 }
