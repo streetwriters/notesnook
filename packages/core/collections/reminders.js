@@ -137,14 +137,13 @@ export function formatReminderTime(reminder) {
     return `Last: Yesterday, ${dayjs(time).format("hh:mm A")}`;
   }
 
+  const isPast = dayjs(time).isSameOrBefore(dayjs());
+  const tag = isPast ? "Last" : "Upcoming";
   if (dayjs(time).isToday()) {
-    return `Upcoming: Today, ${dayjs(time).format("hh:mm A")}`;
+    return `${tag}: Today, ${dayjs(time).format("hh:mm A")}`;
   }
 
-  const isPast = dayjs(time).isBefore(dayjs());
-  return dayjs(time).format(
-    `${isPast ? "[Last]:" : "[Upcoming]:"} ddd, YYYY-MM-DD hh:mm A`
-  );
+  return dayjs(time).format(`[${tag}]: ddd, YYYY-MM-DD hh:mm A`);
 }
 
 /**
