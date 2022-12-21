@@ -86,11 +86,11 @@ describe("format reminder time", () => {
   test("weekly reminder [current week, today]", () => {
     const reminder = {
       recurringMode: "week",
-      date: new Date(0).setHours(3),
+      date: new Date(0).setHours(21),
       selectedDays: [0, 1],
       mode: "repeat"
     };
-    expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 03:00 AM");
+    expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 09:00 PM");
   });
 
   test("monthly reminder [current month]", () => {
@@ -120,11 +120,11 @@ describe("format reminder time", () => {
   test("monthly reminder [current month, today]", () => {
     const reminder = {
       recurringMode: "month",
-      date: new Date(0).setHours(3),
+      date: new Date(0).setHours(21),
       selectedDays: [6],
       mode: "repeat"
     };
-    expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 03:00 AM");
+    expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 09:00 PM");
   });
 
   test("today", () => {
@@ -149,5 +149,21 @@ describe("format reminder time", () => {
       mode: "once"
     };
     expect(formatReminderTime(reminder)).toBe("Last: Yesterday, 08:05 AM");
+  });
+
+  test("exactly on time", () => {
+    const reminder = {
+      date: new Date(2022, 5, 6, 5, 5).getTime(),
+      mode: "once"
+    };
+    expect(formatReminderTime(reminder)).toBe("Last: Today, 05:05 AM");
+  });
+
+  test("past but still on the same day", () => {
+    const reminder = {
+      date: new Date(2022, 5, 6, 3, 5).getTime(),
+      mode: "once"
+    };
+    expect(formatReminderTime(reminder)).toBe("Last: Today, 03:05 AM");
   });
 });
