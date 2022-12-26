@@ -30,6 +30,7 @@ import Trash from "../views/trash";
 import { store as notestore } from "../stores/note-store";
 import { store as nbstore } from "../stores/notebook-store";
 import { showToast } from "../utils/toast";
+import Reminders from "../views/reminders";
 
 const routes = {
   "/notes": () => ({
@@ -113,6 +114,19 @@ const routes = {
       buttons: {
         search: {
           title: "Search favorite notes"
+        }
+      }
+    };
+  },
+  "/reminders": () => {
+    return {
+      key: "notes",
+      title: "Reminders",
+      type: "reminders",
+      component: <Reminders />,
+      buttons: {
+        search: {
+          title: "Search reminders"
         }
       }
     };

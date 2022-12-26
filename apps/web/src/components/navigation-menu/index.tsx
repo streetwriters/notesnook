@@ -34,7 +34,8 @@ import {
   LightMode,
   Login,
   Circle,
-  Icon
+  Icon,
+  Reminders
 } from "../icons";
 import { AnimatedFlex } from "../animated";
 import NavigationItem from "./navigation-item";
@@ -87,6 +88,11 @@ const routes: Route[] = [
     title: "Monographs",
     path: "/monographs",
     icon: Monographs
+  },
+  {
+    title: "Reminders",
+    path: "/reminders",
+    icon: Reminders
   },
   { title: "Trash", path: "/trash", icon: Trash }
 ];

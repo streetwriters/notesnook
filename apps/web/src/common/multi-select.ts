@@ -21,6 +21,7 @@ import { showMultiDeleteConfirmation } from "./dialog-controller";
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as attachmentStore } from "../stores/attachment-store";
+import { store as reminderStore } from "../stores/reminder-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
 import Vault from "./vault";
@@ -73,8 +74,6 @@ async function moveNotebooksToTrash(notebooks: Item[]) {
   const isMultiselect = notebooks.length > 1;
   if (isMultiselect) {
     if (!(await showMultiDeleteConfirmation(notebooks.length))) return;
-  } else {
-    if (item.locked && !(await Vault.unlockNote(item.id))) return;
   }
 
   await TaskManager.startTask({
@@ -152,7 +151,35 @@ async function deleteAttachments(attachments: Item[]) {
   );
 }
 
+async function moveRemindersToTrash(reminders: Item[]) {
+  const isMultiselect = reminders.length > 1;
+  if (isMultiselect) {
+    if (!(await showMultiDeleteConfirmation(reminders.length))) return;
+  }
+
+  await TaskManager.startTask({
+    type: "status",
+    id: "deleteReminders",
+    action: async (report) => {
+      report({
+        text: `Deleting ${pluralize(
+          reminders.length,
+          "reminder",
+          "reminders"
+        )}...`
+      });
+      await reminderStore.delete(...reminders.map((i) => i.id));
+    }
+  });
+
+  showToast(
+    "success",
+    `${pluralize(reminders.length, "reminder", "reminders")} moved to trash`
+  );
+}
+
 export const Multiselect = {
+  moveRemindersToTrash,
   moveNotebooksToTrash,
   moveNotesToTrash,
   deleteTopics,

@@ -26,6 +26,7 @@ import { ReactComponent as Tag } from "../../assets/tag.svg";
 import { ReactComponent as Trash } from "../../assets/trash.svg";
 import { ReactComponent as Fav } from "../../assets/fav.svg";
 import { ReactComponent as Attachment } from "../../assets/attachment.svg";
+import { ReactComponent as Reminder } from "../../assets/reminder.svg";
 
 const Placeholders = {
   note: Note,
@@ -36,7 +37,8 @@ const Placeholders = {
   tag: Tag,
   trash: Trash,
   favorites: Fav,
-  attachments: Attachment
+  attachments: Attachment,
+  reminder: Reminder
 };
 
 export default function PlaceholderLoader({ name, onLoad, ...restProps }) {
