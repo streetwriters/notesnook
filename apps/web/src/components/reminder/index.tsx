@@ -105,7 +105,7 @@ const menuItems: {
   {
     key: "edit",
     title: "Edit",
-    icon: Icon.NotebookEdit,
+    icon: Icon.Edit,
     onClick: ({ reminder }) => hashNavigate(`/reminders/${reminder.id}/edit`)
   },
   {
