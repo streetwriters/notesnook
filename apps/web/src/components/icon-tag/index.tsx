@@ -17,9 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Theme } from "@notesnook/theme";
 import { Flex, Text } from "@theme-ui/components";
+import { ThemeUICSSObject } from "@theme-ui/core";
+import { Icon } from "../icons";
 
-function IconTag({ text, title, icon: Icon, onClick, styles, testId }) {
+type IconTagProps = {
+  text: string;
+  title?: string;
+  icon: Icon;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+  styles?: {
+    icon?: ThemeUICSSObject & { color: keyof Theme["colors"] };
+    container?: ThemeUICSSObject;
+    text?: ThemeUICSSObject;
+  };
+  testId?: string;
+};
+
+function IconTag(props: IconTagProps) {
+  const { icon: Icon, text, title, onClick, styles, testId } = props;
+
   return (
     <Flex
       data-test-id={testId}
@@ -35,10 +53,12 @@ function IconTag({ text, title, icon: Icon, onClick, styles, testId }) {
         border: "1px solid",
         borderColor: "border",
         lineHeight: "initial",
-        ":hover": {
-          bg: "hover",
-          filter: "brightness(95%)"
-        },
+        ":hover": onClick
+          ? {
+              bg: "hover",
+              filter: "brightness(95%)"
+            }
+          : {},
         maxWidth: "100%",
         px: 1,
         mr: 1,
