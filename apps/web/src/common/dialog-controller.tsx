@@ -40,6 +40,7 @@ import { Period } from "../components/dialogs/buy-dialog/types";
 import { FeatureKeys } from "../components/dialogs/feature-dialog";
 import { AuthenticatorType } from "../components/dialogs/mfa/types";
 import { Suspense } from "react";
+import { Reminder } from "@notesnook/core/collections/reminders";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -614,6 +615,12 @@ export function showReminderDialog(reminderKey: string) {
         perform(res);
       }}
     />
+  ));
+}
+
+export function showReminderPreviewDialog(reminder: Reminder) {
+  return showDialog("ReminderPreviewDialog", (Dialog, perform) => (
+    <Dialog reminder={reminder} onClose={perform} />
   ));
 }
 
