@@ -22,6 +22,7 @@ import { db } from "../common/db";
 import BaseStore from "./index";
 import { groupArray } from "@notesnook/core/utils/grouping";
 import { TaskScheduler } from "../utils/task-scheduler";
+import { showReminderPreviewDialog } from "../common/dialog-controller";
 import dayjs from "dayjs";
 
 class ReminderStore extends BaseStore {
@@ -89,6 +90,7 @@ function scheduleReminder(id, reminder, cron) {
     });
 
     notification.onclick = function () {
+      showReminderPreviewDialog(reminder);
     };
 
     store.refresh(false);
