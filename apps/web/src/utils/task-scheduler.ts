@@ -58,6 +58,10 @@ export class TaskScheduler {
     await scheduler?.stopAll();
     worker?.terminate();
   }
+
+  static async stopAllWithPrefix(prefix: string) {
+    await scheduler?.stopAllWithPrefix(prefix);
+  }
 }
 
 function init() {

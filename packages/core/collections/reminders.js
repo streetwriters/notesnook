@@ -45,7 +45,9 @@ dayjs.extend(isBetween);
  *  selectedDays?: number[];
  *  dateCreated: number;
  *  dateModified: number;
- *  localOnly: boolean;
+ *  localOnly?: boolean;
+ *  disabled?: boolean;
+ *  snoozeUntil?: number;
  * }} Reminder
  *
  */
@@ -86,7 +88,9 @@ export default class Reminders extends Collection {
       recurringMode: reminder.recurringMode,
       selectedDays: reminder.selectedDays || [],
       title: reminder.title,
-      localOnly: reminder.localOnly
+      localOnly: reminder.localOnly,
+      disabled: reminder.disabled,
+      snoozeUntil: reminder.snoozeUntil
     };
 
     await this._collection.addItem(reminder);
