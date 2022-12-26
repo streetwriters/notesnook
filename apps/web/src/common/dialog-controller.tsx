@@ -623,6 +623,18 @@ export function showTrackingDetailsDialog() {
   ));
 }
 
+export function showAddReminderDialog() {
+  return showDialog("AddReminderDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} />
+  ));
+}
+
+export function showEditReminderDialog(reminderId: string) {
+  return showDialog("AddReminderDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} reminderId={reminderId} />
+  ));
+}
+
 export function showAnnouncementDialog(
   announcement: { id: string },
   remove: (id: string) => void
