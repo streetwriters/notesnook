@@ -19,8 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Vault from "../common/vault";
 import {
+  showAddReminderDialog,
   showBuyDialog,
   showCreateTagDialog,
+  showEditReminderDialog,
   showEditTagDialog,
   showEmailVerificationDialog,
   showFeatureDialog,
@@ -60,6 +62,12 @@ const hashroutes = {
   },
   "/topics/create": () => {
     showCreateTopicDialog();
+  },
+  "/reminders/create": () => {
+    showAddReminderDialog();
+  },
+  "/reminders/:reminderId/edit": ({ reminderId }) => {
+    showEditReminderDialog(reminderId);
   },
   "/notebooks/:notebookId/topics/:topicId/edit": ({ notebookId, topicId }) => {
     showEditTopicDialog(notebookId, topicId);
