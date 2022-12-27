@@ -27,7 +27,7 @@ import { isTesting } from "./utils/platform";
 import { initalizeLogger, logger } from "./utils/logger";
 import { Buffer } from "buffer";
 import { AuthProps } from "./views/auth";
-global.Buffer = Buffer;
+window.Buffer = Buffer;
 
 initalizeLogger();
 if (process.env.REACT_APP_PLATFORM === "desktop") require("./commands");

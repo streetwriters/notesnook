@@ -19,7 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import Worker from "worker-loader?filename=static/workers/task-scheduler.worker.[contenthash].js!./task-scheduler.worker";
+// import Worker from "worker-loader?filename=static/workers/task-scheduler.worker.[contenthash].js!./task-scheduler.worker";
+import Worker from "./task-scheduler.worker.js?worker";
 import type {
   TaskScheduler as TaskSchedulerType,
   TaskSchedulerEvent

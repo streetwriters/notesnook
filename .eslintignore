@@ -15,6 +15,7 @@ apps/mobile/e2e/
 
 # web
 apps/web/public/an.js
+apps/web/vite.config.ts
 
 # editor
 packages/editor/styles/

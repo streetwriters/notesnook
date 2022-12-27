@@ -42,7 +42,7 @@ import {
   showCreateTopicDialog
 } from "../common/dialog-controller";
 import { hashNavigate } from ".";
-import EditorPlaceholder from "../components/editor/-placeholder";
+import EditorPlaceholder from "../components/editor/placeholder";
 import Editor from "../components/editor";
 
 const hashroutes = {

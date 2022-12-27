@@ -31,7 +31,7 @@ import {
   PricingInfo
 } from "./types";
 
-// const isDev = false; // process.env.NODE_ENV === "development";
+// const isDev = false; //import.meta.env.NODE_ENV === "development";
 // const VENDOR_ID = isDev ? 1506 : 128190;
 const PADDLE_ORIGIN = "https://buy.paddle.com";
 

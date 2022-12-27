@@ -207,13 +207,16 @@ class AppStore extends BaseStore {
 
     this.updateSyncStatus("syncing");
     try {
+      console.log("SYNCING");
       const result = await db.sync(full, force);
+      console.log("result", result);
 
       if (!result) return this.updateSyncStatus("failed");
       else if (full) this.updateSyncStatus("completed");
 
       await this.updateLastSynced();
     } catch (err) {
+      console.error(err);
       logger.error(err);
       if (err.code === "MERGE_CONFLICT") {
         if (editorstore.get().session.id)

@@ -69,7 +69,7 @@ type TipTapProps = {
   isMobile?: boolean;
 };
 
-const SAVE_INTERVAL = process.env.REACT_APP_TEST ? 100 : 300;
+const SAVE_INTERVAL =import.meta.env.REACT_APP_TEST ? 100 : 300;
 
 function save(
   sessionId: string,

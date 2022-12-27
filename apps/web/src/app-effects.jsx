@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
@@ -206,7 +206,7 @@ export default function AppEffects({ setShow }) {
     setTheme(isSystemThemeDark ? "dark" : "light");
   }, [isSystemThemeDark, followSystemTheme, setTheme]);
 
-  return <React.Fragment />;
+  return null;
 }
 
 function getProcessingStatusFromType(type) {

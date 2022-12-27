@@ -101,8 +101,8 @@ self.addEventListener("message", (event) => {
       break;
     case "GET_VERSION":
       {
-        const VERSION = process.env.REACT_APP_VERSION;
-        const HASH = process.env.REACT_APP_GIT_HASH;
+        const VERSION = import.meta.env.REACT_APP_VERSION;
+        const HASH = import.meta.env.REACT_APP_GIT_HASH;
         event.source.postMessage({
           type: data.type,
           version: VERSION,
