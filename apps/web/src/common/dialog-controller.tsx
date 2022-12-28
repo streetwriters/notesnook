@@ -305,23 +305,26 @@ export function showMigrationDialog() {
   ));
 }
 
-type LoadingDialogProps = {
+type LoadingDialogProps<T> = {
   title: string;
   message?: string;
   subtitle: string;
-  action: () => void;
+  action: () => T | Promise<T>;
 };
-export function showLoadingDialog(dialogData: LoadingDialogProps) {
+export function showLoadingDialog<T>(dialogData: LoadingDialogProps<T>) {
   const { title, message, subtitle, action } = dialogData;
-  return showDialog("LoadingDialog", (Dialog, perform) => (
-    <Dialog
-      title={title}
-      subtitle={subtitle}
-      message={message}
-      action={action}
-      onDone={(e: boolean) => perform(e)}
-    />
-  ));
+  return showDialog<"LoadingDialog", T | boolean>(
+    "LoadingDialog",
+    (Dialog, perform) => (
+      <Dialog
+        title={title}
+        description={subtitle}
+        message={message}
+        action={action}
+        onClose={(e) => perform(e as T | boolean)}
+      />
+    )
+  );
 }
 
 type ProgressDialogProps = {
