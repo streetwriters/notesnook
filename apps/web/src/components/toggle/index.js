@@ -25,7 +25,16 @@ import { Flex } from "@theme-ui/components";
 import Switch from "../switch";
 
 function Toggle(props) {
-  const { title, onTip, offTip, isToggled, onToggled, onlyIf, premium } = props;
+  const {
+    title,
+    onTip,
+    offTip,
+    isToggled,
+    onToggled,
+    onlyIf,
+    premium,
+    testId
+  } = props;
   const onClick = useCallback(async () => {
     if (isUserPremium() || !premium || isToggled) onToggled();
     else {
@@ -37,6 +46,7 @@ function Toggle(props) {
   return (
     <Flex
       onClick={onClick}
+      data-test-id={testId}
       py={2}
       sx={{
         cursor: "pointer",

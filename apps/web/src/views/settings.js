@@ -54,7 +54,7 @@ import { appVersion } from "../utils/version";
 import { CHECK_IDS } from "@notesnook/core/common";
 import Tip from "../components/tip";
 import Toggle from "../components/toggle";
-import { isDesktop, isMacStoreApp } from "../utils/platform";
+import { isDesktop, isMacStoreApp, isTesting } from "../utils/platform";
 import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { Slider } from "@theme-ui/components";
@@ -495,6 +495,7 @@ function Settings() {
           </>
         )}
         <Header
+          testId={"backup-restore"}
           title="Backup & restore"
           isOpen={groups.backup}
           onClick={() => {
@@ -505,8 +506,14 @@ function Settings() {
         {groups.backup && (
           <>
             <Button
+              data-test-id={"backup-data"}
               variant="list"
               onClick={async () => {
+                console.log(
+                  512,
+                  !isUserPremium() && encryptBackups,
+                  await verifyAccount()
+                );
                 if (!isUserPremium() && encryptBackups) toggleEncryptBackups();
                 if (await verifyAccount()) await createBackup();
               }}
@@ -540,6 +547,7 @@ function Settings() {
             {isLoggedIn && (
               <>
                 <Button
+                  data-test-id="restore-backup"
                   variant="list"
                   onClick={async () => {
                     await importBackup();
@@ -553,6 +561,7 @@ function Settings() {
                 </Button>
                 <Toggle
                   title="Encrypt backups"
+                  testId="encrypt-backups"
                   onTip="All backup files will be encrypted"
                   offTip="Backup files will not be encrypted"
                   onToggled={toggleEncryptBackups}

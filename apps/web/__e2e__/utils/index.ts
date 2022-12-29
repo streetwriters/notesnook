@@ -104,6 +104,21 @@ async function downloadAndReadFile(
   return fs.readFileSync(path, { encoding });
 }
 
+async function uploadAndReadFile(page: Page, action: Locator) {
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent("filechooser"),
+    await action.click()
+  ]);
+
+  await fileChooser.setFiles(
+    path.join(
+      __dirname,
+      "../data",
+      "notesnook-backup-12-22-2022-10-47-35-am.nnbackup"
+    )
+  );
+}
+
 function isTestAll() {
   return process.env.TEST_ALL === "true";
 }
@@ -118,5 +133,6 @@ export {
   createNote,
   editNote,
   downloadAndReadFile,
+  uploadAndReadFile,
   isTestAll
 };

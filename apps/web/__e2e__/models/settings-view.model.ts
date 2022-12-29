@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Locator, Page } from "@playwright/test";
-import { getTestId } from "../utils";
+import { downloadAndReadFile, getTestId, uploadAndReadFile } from "../utils";
 import { confirmDialog, fillPasswordDialog, waitToHaveText } from "./utils";
 
 export class SettingsViewModel {
@@ -26,6 +26,10 @@ export class SettingsViewModel {
   private readonly logoutButton: Locator;
   private readonly accountStatusContainer: Locator;
   private readonly backupRecoveryKeyButton: Locator;
+  private readonly backupRestoreContainer: Locator;
+  private readonly backupData: Locator;
+  private readonly restoreBackup: Locator;
+  private readonly encyptBackups: Locator;
   constructor(page: Page) {
     this.page = page;
     this.logoutButton = page.locator(getTestId("settings-logout"));
@@ -33,6 +37,10 @@ export class SettingsViewModel {
     this.backupRecoveryKeyButton = page.locator(
       getTestId("backup-recovery-key")
     );
+    this.backupRestoreContainer = page.locator(getTestId("backup-restore"));
+    this.backupData = page.locator(getTestId("backup-data"));
+    this.restoreBackup = page.locator(getTestId("restore-backup"));
+    this.encyptBackups = page.locator(getTestId("encrypt-backups"));
   }
 
   async logout() {
@@ -58,5 +66,19 @@ export class SettingsViewModel {
 
   async isLoggedIn() {
     return await this.accountStatusContainer.isVisible();
+  }
+
+  async createBackup(encryptBackups: boolean = false, password = "") {
+    await this.backupRestoreContainer.click();
+    if (encryptBackups) await this.encyptBackups.click();
+    await this.backupData.click();
+    if (encryptBackups) await fillPasswordDialog(this.page, password);
+    return await downloadAndReadFile(this.page, this.backupData, "utf-8");
+  }
+
+  async restoreData() {
+    await this.backupRestoreContainer.click();
+    await this.restoreBackup.click();
+    await uploadAndReadFile(this.page, this.restoreBackup);
   }
 }

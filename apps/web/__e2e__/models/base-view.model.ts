@@ -94,4 +94,10 @@ export class BaseViewModel {
     await itemList.press(key);
     await this.page.waitForTimeout(300);
   }
+
+  async isListFilled() {
+    let itemCount = await this.page.locator(getTestId("list-item")).count();
+    if (itemCount > 0) return true;
+    return false;
+  }
 }
