@@ -134,37 +134,41 @@ export function TaskListComponent(
               }}
             />
             <Flex sx={{ flexShrink: 0, pr: 2, zIndex: 1 }}>
-              <ToolButton
-                toggled={false}
-                title="Clear completed tasks"
-                icon="clear"
-                variant="small"
-                onClick={() => {
-                  if (!editor.isEditable) return;
-                  if (!editor.current) return;
-                  const pos = getPos();
-                  // we need to get a fresh instance of the task list instead
-                  // of using the one we got via props.
-                  const node = editor.current.state.doc.nodeAt(pos);
-                  if (!node) return;
+              {editor.isEditable ? (
+                <ToolButton
+                  toggled={false}
+                  title="Clear completed tasks"
+                  icon="clear"
+                  variant="small"
+                  onClick={() => {
+                    if (!editor.isEditable) return;
+                    if (!editor.current) return;
+                    const pos = getPos();
+                    // we need to get a fresh instance of the task list instead
+                    // of using the one we got via props.
+                    const node = editor.current.state.doc.nodeAt(pos);
+                    if (!node) return;
 
-                  editor.current?.commands.command(({ tr }) => {
-                    const taskItems = findChildren(
-                      node,
-                      (n) => n.type.name === TaskItem.name && n.attrs.checked
-                    );
-                    const mapping = tr.mapping;
-                    for (const item of taskItems) {
-                      const childPos = pos + item.pos + 1;
-                      tr.deleteRange(
-                        mapping.map(childPos),
-                        mapping.map(childPos + item.node.nodeSize)
+                    editor.current?.commands.command(({ tr }) => {
+                      const taskItems = findChildren(
+                        node,
+                        (n) => n.type.name === TaskItem.name && n.attrs.checked
                       );
-                    }
-                    return true;
-                  });
-                }}
-              />
+                      const mapping = tr.mapping;
+                      for (const item of taskItems) {
+                        const childPos = pos + item.pos + 1;
+                        tr.deleteRange(
+                          mapping.map(childPos),
+                          mapping.map(childPos + item.node.nodeSize)
+                        );
+                      }
+                      return true;
+                    });
+                  }}
+                />
+              ) : (
+                ""
+              )}
               <Icon
                 path={Icons.checkbox}
                 size={15}
