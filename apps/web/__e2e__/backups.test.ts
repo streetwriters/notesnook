@@ -20,27 +20,24 @@ import { test, Browser, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { NOTE, USER } from "./utils";
 
-test("Create a backup", async ({ page }) => {
+test.only("Create a backup", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
   await notes.createNote(NOTE);
   const settings = await app.goToSettings();
   const backup = await settings.createBackup();
-
-  expect(backup).toMatchSnapshot(`export-json.txt`);
+  expect(backup.length > 0).toBeTruthy();
 });
 
 test.setTimeout(45 * 1000);
-test("Restore a backup", async ({ page }) => {
+test.only("Restore a backup", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
 
-  const notes = await app.goToNotes();
-  await notes.createNote(NOTE);
   const settings = await app.goToSettings();
-  const backup = await settings.restoreData();
-  await app.goToNotes();
+  const backup = await settings.restoreData("backup.nnbackup");
+  const notes = await app.goToNotes();
   expect(await notes.isListFilled()).toBeTruthy();
   const notebooks = await app.goToNotebooks();
   expect(await notebooks.isListFilled()).toBeTruthy();
@@ -53,12 +50,25 @@ test("Restore a backup", async ({ page }) => {
 test.only("Create an encrypted backup", async ({ page }) => {
   const app = new AppModel(page);
   await app.auth.goto();
-  console.log(56, USER.CURRENT);
   await app.auth.login(USER.CURRENT);
-  //const notes = await app.goToNotes();
-  //await notes.createNote(NOTE);
   const settings = await app.goToSettings();
   const backup = await settings.createBackup(true, USER.CURRENT.password);
 
-  //expect(backup).toMatchSnapshot(`export-json.txt`);
+  expect(backup.length > 0).toBeTruthy();
+});
+
+test.only("Restore an encrypted backup", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+
+  const settings = await app.goToSettings();
+  const backup = await settings.restoreData("encrypted.nnbackup", true);
+  const notes = await app.goToNotes();
+  expect(await notes.isListFilled()).toBeTruthy();
+  const notebooks = await app.goToNotebooks();
+  expect(await notebooks.isListFilled()).toBeTruthy();
+  const favotites = await app.goToFavorites();
+  expect(await favotites.isListFilled()).toBeTruthy();
+  const tags = await app.goToTags();
+  expect(await tags.isListFilled()).toBeTruthy();
 });

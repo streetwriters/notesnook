@@ -509,11 +509,6 @@ function Settings() {
               data-test-id={"backup-data"}
               variant="list"
               onClick={async () => {
-                console.log(
-                  512,
-                  !isUserPremium() && encryptBackups,
-                  await verifyAccount()
-                );
                 if (!isUserPremium() && encryptBackups) toggleEncryptBackups();
                 if (await verifyAccount()) await createBackup();
               }}
@@ -544,7 +539,7 @@ function Settings() {
                 );
               }}
             />
-            {isLoggedIn && (
+            {(isLoggedIn || isTesting()) && (
               <>
                 <Button
                   data-test-id="restore-backup"

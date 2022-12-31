@@ -104,19 +104,17 @@ async function downloadAndReadFile(
   return fs.readFileSync(path, { encoding });
 }
 
-async function uploadAndReadFile(page: Page, action: Locator) {
+async function uploadAndReadFile(
+  page: Page,
+  action: Locator,
+  filename: string
+) {
   const [fileChooser] = await Promise.all([
     page.waitForEvent("filechooser"),
     await action.click()
   ]);
 
-  await fileChooser.setFiles(
-    path.join(
-      __dirname,
-      "../data",
-      "notesnook-backup-12-22-2022-10-47-35-am.nnbackup"
-    )
-  );
+  await fileChooser.setFiles(path.join(__dirname, "../data", filename));
 }
 
 function isTestAll() {

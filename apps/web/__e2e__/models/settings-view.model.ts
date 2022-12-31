@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Locator, Page } from "@playwright/test";
-import { downloadAndReadFile, getTestId, uploadAndReadFile } from "../utils";
+import {
+  downloadAndReadFile,
+  getTestId,
+  uploadAndReadFile,
+  USER
+} from "../utils";
 import { confirmDialog, fillPasswordDialog, waitToHaveText } from "./utils";
 
 export class SettingsViewModel {
@@ -68,7 +73,7 @@ export class SettingsViewModel {
     return await this.accountStatusContainer.isVisible();
   }
 
-  async createBackup(encryptBackups: boolean = false, password = "") {
+  async createBackup(encryptBackups = false, password = "") {
     await this.backupRestoreContainer.click();
     if (encryptBackups) await this.encyptBackups.click();
     await this.backupData.click();
@@ -76,9 +81,10 @@ export class SettingsViewModel {
     return await downloadAndReadFile(this.page, this.backupData, "utf-8");
   }
 
-  async restoreData() {
+  async restoreData(filename: string, encrypted = false) {
     await this.backupRestoreContainer.click();
     await this.restoreBackup.click();
-    await uploadAndReadFile(this.page, this.restoreBackup);
+    await uploadAndReadFile(this.page, this.restoreBackup, filename);
+    if (encrypted) await fillPasswordDialog(this.page, USER.CURRENT.password!);
   }
 }
