@@ -53,7 +53,7 @@ import { AndroidModule } from "../../utils";
 import { getColorScheme, toggleDarkMode } from "../../utils/color-scheme/utils";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import {
-  eCloseProgressDialog,
+  eCloseSheet,
   eCloseSimpleDialog,
   eOpenAttachmentsDialog,
   eOpenLoginDialog,
@@ -276,7 +276,7 @@ export const settingsGroups: SettingSection[] = [
                   await PremiumService.subscriptions.verify(
                     currentSubscription
                   );
-                  eSendEvent(eCloseProgressDialog);
+                  eSendEvent(eCloseSheet);
                 },
                 icon: "information-outline",
                 actionText: "Verify"
@@ -401,7 +401,7 @@ export const settingsGroups: SettingSection[] = [
             description:
               "Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device.",
             type: "switch",
-            property: "disableSync",
+            property: "disableSync"
           },
           {
             id: "sync-issues-fix",
@@ -416,11 +416,11 @@ export const settingsGroups: SettingSection[] = [
                 negativeText: "Cancel",
                 positiveText: "Start",
                 positivePress: async () => {
-                  eSendEvent(eCloseProgressDialog);
+                  eSendEvent(eCloseSheet);
                   await sleep(300);
                   Progress.present();
                   Sync.run("global", true, true, () => {
-                    eSendEvent(eCloseProgressDialog);
+                    eSendEvent(eCloseSheet);
                   });
                 }
               });

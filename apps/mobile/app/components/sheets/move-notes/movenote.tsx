@@ -31,7 +31,7 @@ import {
 import Navigation from "../../../services/navigation";
 import SearchService from "../../../services/search";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { eCloseProgressDialog } from "../../../utils/events";
+import { eCloseSheet } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
@@ -332,7 +332,7 @@ export const MoveNotes = ({
               "Notebooks"
             );
             SearchService.updateAndSearch();
-            eSendEvent(eCloseProgressDialog);
+            eSendEvent(eCloseSheet);
           }}
           title="Move selected notes"
           type="accent"

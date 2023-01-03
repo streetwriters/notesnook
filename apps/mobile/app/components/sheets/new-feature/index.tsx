@@ -24,7 +24,7 @@ import { features } from "../../../features";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { eCloseProgressDialog } from "../../../utils/events";
+import { eCloseSheet } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
@@ -78,7 +78,7 @@ const NewFeature = ({ features }: { features: FeatureType[] }) => {
           borderRadius: 100
         }}
         onPress={() => {
-          eSendEvent(eCloseProgressDialog);
+          eSendEvent(eCloseSheet);
         }}
       />
     </View>

@@ -5,3 +5,4 @@ dist
 .DS_STORE
 nx-cloud.env
 .idea
+.eslintcache

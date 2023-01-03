@@ -25,7 +25,7 @@ import RNFetchBlob from "rn-fetch-blob";
 import { presentDialog } from "../components/dialog/functions";
 import { DatabaseLogger, db } from "../common/database";
 import storage from "../common/database/storage";
-import { eCloseProgressDialog } from "../utils/events";
+import { eCloseSheet } from "../utils/events";
 import { sanitizeFilename } from "../utils/sanitizer";
 import { sleep } from "../utils/time";
 import { eSendEvent, presentSheet, ToastEvent } from "./event-manager";
@@ -130,7 +130,7 @@ async function presentBackupCompleteSheet(backupFilePath) {
       },
       {
         action: async () => {
-          eSendEvent(eCloseProgressDialog);
+          eSendEvent(eCloseSheet);
           SettingsService.set({
             showBackupCompleteSheet: false
           });
@@ -173,7 +173,7 @@ async function run(progress, context) {
     if (!backup) throw new Error("Backup returned empty.");
   } catch (e) {
     await sleep(300);
-    eSendEvent(eCloseProgressDialog);
+    eSendEvent(eCloseSheet);
     ToastEvent.error(e, "Backup failed!");
     return null;
   }
@@ -216,11 +216,11 @@ async function run(progress, context) {
     if (showBackupCompleteSheet) {
       presentBackupCompleteSheet(backupFilePath);
     } else {
-      progress && eSendEvent(eCloseProgressDialog);
+      progress && eSendEvent(eCloseSheet);
     }
     return backupFilePath;
   } catch (e) {
-    progress && eSendEvent(eCloseProgressDialog);
+    progress && eSendEvent(eCloseSheet);
     ToastEvent.error(e, "Backup failed!");
     return null;
   }

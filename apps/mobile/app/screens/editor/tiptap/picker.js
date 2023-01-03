@@ -31,7 +31,7 @@ import {
   ToastEvent
 } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
-import { eCloseProgressDialog } from "../../../utils/events";
+import { eCloseSheet } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
 import { editorController, editorState } from "./utils";
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
@@ -131,7 +131,7 @@ const file = async (fileOptions) => {
       size: file.size
     });
     setTimeout(() => {
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
     }, 1000);
   } catch (e) {
     ToastEvent.show({
@@ -147,7 +147,7 @@ const file = async (fileOptions) => {
 const camera = async (options) => {
   try {
     await db.attachments.generateKey();
-    eSendEvent(eCloseProgressDialog);
+    eSendEvent(eCloseSheet);
     await sleep(400);
     launchCamera(
       {
@@ -170,7 +170,7 @@ const camera = async (options) => {
 const gallery = async (options) => {
   try {
     await db.attachments.generateKey();
-    eSendEvent(eCloseProgressDialog);
+    eSendEvent(eCloseSheet);
     await sleep(400);
     launchImageLibrary(
       {

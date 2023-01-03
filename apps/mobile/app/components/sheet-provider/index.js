@@ -26,7 +26,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { eCloseProgressDialog, eOpenProgressDialog } from "../../utils/events";
+import { eCloseSheet, eOpenSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
@@ -43,11 +43,11 @@ const SheetProvider = ({ context = "global" }) => {
   });
 
   useEffect(() => {
-    eSubscribeEvent(eOpenProgressDialog, open);
-    eSubscribeEvent(eCloseProgressDialog, close);
+    eSubscribeEvent(eOpenSheet, open);
+    eSubscribeEvent(eCloseSheet, close);
     return () => {
-      eUnSubscribeEvent(eOpenProgressDialog, open);
-      eUnSubscribeEvent(eCloseProgressDialog, close);
+      eUnSubscribeEvent(eOpenSheet, open);
+      eUnSubscribeEvent(eCloseSheet, close);
     };
   }, [close, open, visible]);
 

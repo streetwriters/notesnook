@@ -27,7 +27,7 @@ import {
   ToastEvent
 } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { eCloseProgressDialog } from "../../utils/events";
+import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
@@ -77,7 +77,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
       },
       (result) => {
         if (result) {
-          eSendEvent(eCloseProgressDialog, "two_factor_verify");
+          eSendEvent(eCloseSheet, "two_factor_verify");
         }
         setLoading(false);
       }

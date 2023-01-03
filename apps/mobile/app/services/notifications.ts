@@ -28,7 +28,7 @@ import notifee, {
   Event,
   TriggerNotification
 } from "@notifee/react-native";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { Platform } from "react-native";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
@@ -40,6 +40,8 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import SettingsService from "./settings";
 import { useSettingStore } from "../stores/use-setting-store";
+import ReminderNotify from "../components/sheets/reminder-notify";
+import { sleep } from "../utils/time";
 
 export type Reminder = {
   id: string;
@@ -47,37 +49,65 @@ export type Reminder = {
   title: string;
   description?: string;
   priority: "silent" | "vibrate" | "urgent";
-  date?: number;
+  date: number;
   mode: "repeat" | "once" | "permanent";
-  recurringMode: "week" | "month" | "day";
-  selectedDays: number[];
+  recurringMode?: "week" | "month" | "day";
+  selectedDays?: number[];
   dateCreated: number;
   dateModified: number;
+  localOnly?: boolean;
+  snoozeUntil?: number;
+  disabled?: boolean;
 };
 
 let pinned: DisplayedNotification[] = [];
 
+/**
+ *
+ * @platform android
+ */
+async function getNextMonthlyReminderDate(
+  reminder: Reminder,
+  year: number
+): Promise<Dayjs> {
+  const currentMonth = dayjs().month();
+  for (let i = currentMonth; i < 12; i++) {
+    for (const day of reminder.selectedDays as number[]) {
+      const date = dayjs(reminder.date).year(year).month(i).date(day);
+      if (date.daysInMonth() < day || dayjs().isAfter(date)) continue;
+      if (date.isBefore(dayjs())) continue;
+      console.log("Next reminder set on", date.year(),date.month(),date.date(),day);
+      return date;
+    }
+  }
+  return await getNextMonthlyReminderDate(reminder, dayjs().year() + 1);
+}
+
 const onEvent = async ({ type, detail }: Event) => {
   const { notification, pressAction, input } = detail;
+  if (type === EventType.DELIVERED && Platform.OS === "android") {
+    const reminder = db.reminders?.reminder(notification?.id?.split("_")[0]);
+    if (reminder && reminder.recurringMode === "month") {
+      await db.init();
+      await db.notes?.init();
+      await scheduleNotification(reminder);
+    }
+    return;
+  }
   if (type === EventType.PRESS) {
     if (notification?.data?.type === "quickNote") return;
     editorState().movedAway = false;
     MMKV.removeItem("appState");
-    let noteId = notification?.id;
+    await db.init();
+    await db.notes?.init();
     if (notification?.data?.type === "reminder") {
-      const notes = db.relations?.to(
-        { type: "reminder", id: notification.id?.split("_")[0] as string },
-        "note"
-      );
-      if (!notes || notes.length === 0) return;
-      if (notes && notes.length > 0) {
-        noteId = notes[0].id;
-      } 
+      const reminder = db.reminders?.reminder(notification.id?.split("_")[0]);
+      await sleep(1000);
+      ReminderNotify.present(reminder);
     }
 
+    const noteId = notification?.id;
     if (useNoteStore?.getState()?.loading === false) {
-      await db.init();
-      await db.notes?.init();
       loadNote(noteId as string, false);
       return;
     }
@@ -124,11 +154,18 @@ const onEvent = async ({ type, detail }: Event) => {
   }
 };
 
-async function scheduleNotification(reminder: Reminder, payload?: string) {
+async function scheduleNotification(
+  reminder: Reminder | undefined,
+  payload?: string
+) {
+  if (!reminder) return;
   if (useSettingStore.getState().settings.disableReminderNotifications) return;
   try {
     const { title, description, priority } = reminder;
-    const triggers = getTriggers(reminder);
+
+    await clearAllPendingTriggersForId(reminder.id);
+    if (reminder.disabled) return;
+    const triggers = await getTriggers(reminder);
     if (!triggers && reminder.mode === "permanent") {
       displayNotification({
         id: reminder.id,
@@ -139,10 +176,15 @@ async function scheduleNotification(reminder: Reminder, payload?: string) {
       });
       return;
     }
-    await clearAllPendingTriggersForId(reminder.id);
 
     if (!triggers) return;
     for (const trigger of triggers) {
+      //@ts-ignore
+      console.log(reminder.title, dayjs(trigger.timestamp));
+      const iosProperties: { [name: string]: any } = {};
+      if (priority === "urgent") {
+        iosProperties["sound"] = "default";
+      }
       const notif = await notifee.createTriggerNotification(
         {
           id: trigger.id,
@@ -169,8 +211,8 @@ async function scheduleNotification(reminder: Reminder, payload?: string) {
                 }
           },
           ios: {
-            sound: priority === "urgent" ? "default" : undefined,
-            interruptionLevel: priority === "silent" ? "passive" : "active"
+            interruptionLevel: priority === "silent" ? "passive" : "active",
+            ...iosProperties
           }
         },
         trigger
@@ -318,85 +360,132 @@ async function checkAndRequestPermissions() {
   }
 }
 
-function getTriggers(
+async function getTriggers(
   reminder: Reminder
-): (Trigger & { id: string })[] | undefined {
-  const { date, recurringMode, selectedDays, mode } = reminder;
+): Promise<(Trigger & { id: string })[] | undefined> {
+  const { date, recurringMode, selectedDays, mode, snoozeUntil } = reminder;
+  const triggers: (Trigger & { id: string })[] = [];
+
+  if (snoozeUntil && snoozeUntil > Date.now()) {
+    triggers.push({
+      timestamp: snoozeUntil as number,
+      type: TriggerType.TIMESTAMP,
+      id: reminder.id + "_snz",
+      alarmManager: {
+        allowWhileIdle: true
+      }
+    });
+  }
   switch (mode) {
     case "once":
-      return [
-        {
-          timestamp: date as number,
-          type: TriggerType.TIMESTAMP,
-          id: reminder.id,
-          alarmManager: {
-            allowWhileIdle: true
-          }
+      if (date < Date.now()) break;
+      triggers.push({
+        timestamp: date as number,
+        type: TriggerType.TIMESTAMP,
+        id: reminder.id,
+        alarmManager: {
+          allowWhileIdle: true
         }
-      ];
+      });
+      break;
     case "permanent":
       return undefined;
     case "repeat": {
       switch (recurringMode) {
         case "day":
-          return [
-            {
-              timestamp: date as number,
+          triggers.push({
+            timestamp: date as number,
+            type: TriggerType.TIMESTAMP,
+            repeatFrequency: RepeatFrequency.DAILY,
+            id: reminder.id,
+            alarmManager: {
+              allowWhileIdle: true
+            }
+          });
+          break;
+        case "week":
+          if (!selectedDays) break;
+          triggers.concat(
+            selectedDays.length === 7
+              ? [
+                  {
+                    timestamp: date as number,
+                    type: TriggerType.TIMESTAMP,
+                    repeatFrequency: RepeatFrequency.DAILY,
+                    id: reminder.id,
+                    alarmManager: {
+                      allowWhileIdle: true
+                    }
+                  }
+                ]
+              : (selectedDays
+                  .map((day) => ({
+                    timestamp: dayjs(date)
+                      .day(day)
+                      .toDate()
+                      .getTime() as number,
+                    type: TriggerType.TIMESTAMP,
+                    repeatFrequency: RepeatFrequency.WEEKLY,
+                    id: `${reminder.id}_${day}`,
+                    alarmManager: {
+                      allowWhileIdle: true
+                    }
+                  }))
+                  .filter(
+                    (trigger) => trigger.timestamp > Date.now()
+                  ) as (Trigger & { id: string })[])
+          );
+          break;
+        case "month":
+          if (!selectedDays) break;
+          if (selectedDays.length === 31) {
+            triggers.concat([
+              {
+                timestamp: date as number,
+                type: TriggerType.TIMESTAMP,
+                repeatFrequency: RepeatFrequency.DAILY,
+                id: reminder.id,
+                alarmManager: {
+                  allowWhileIdle: true
+                }
+              }
+            ]);
+            break;
+          }
+          if (Platform.OS === "ios") {
+            selectedDays
+              .map((day) => ({
+                timestamp: dayjs(date).date(day).toDate().getTime() as number,
+                type: TriggerType.TIMESTAMP,
+                repeatFrequency: RepeatFrequency.MONTHLY,
+                id: `${reminder.id}_${day}`,
+                alarmManager: {
+                  allowWhileIdle: true
+                }
+              }))
+              .filter(
+                (trigger) => trigger.timestamp > Date.now()
+              ) as (Trigger & { id: string })[];
+          } else {
+            const reminderDate = await getNextMonthlyReminderDate(
+              reminder,
+              dayjs().year()
+            );
+            triggers.push({
+              timestamp: reminderDate.toDate().getTime() as number,
               type: TriggerType.TIMESTAMP,
-              repeatFrequency: RepeatFrequency.DAILY,
               id: reminder.id,
               alarmManager: {
                 allowWhileIdle: true
               }
-            }
-          ];
-        case "week":
-          return selectedDays.length === 7
-            ? [
-                {
-                  timestamp: date as number,
-                  type: TriggerType.TIMESTAMP,
-                  repeatFrequency: RepeatFrequency.DAILY,
-                  id: reminder.id,
-                  alarmManager: {
-                    allowWhileIdle: true
-                  }
-                }
-              ]
-            : selectedDays.map((day) => ({
-                timestamp: dayjs(date).day(day).toDate().getTime() as number,
-                type: TriggerType.TIMESTAMP,
-                repeatFrequency: RepeatFrequency.WEEKLY,
-                id: `${reminder.id}_${day}`,
-                alarmManager: {
-                  allowWhileIdle: true
-                }
-              }));
-        case "month":
-          return selectedDays.length === 31
-            ? [
-                {
-                  timestamp: date as number,
-                  type: TriggerType.TIMESTAMP,
-                  repeatFrequency: RepeatFrequency.DAILY,
-                  id: reminder.id,
-                  alarmManager: {
-                    allowWhileIdle: true
-                  }
-                }
-              ]
-            : selectedDays.map((day) => ({
-                timestamp: dayjs(date).date(day).toDate().getTime() as number,
-                type: TriggerType.TIMESTAMP,
-                repeatFrequency: RepeatFrequency.WEEKLY,
-                id: `${reminder.id}_${day}`,
-                alarmManager: {
-                  allowWhileIdle: true
-                }
-              }));
+            });
+          }
+
+          break;
       }
     }
   }
+  return triggers;
 }
 
 async function unpinQuickNote() {

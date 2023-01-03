@@ -84,6 +84,11 @@ const RenderItem = ({ item, index, type, ...restArgs }) => {
   );
 };
 
+/**
+ * 
+ * @param {any} param0 
+ * @returns 
+ */
 const List = ({
   listData,
   type,
@@ -97,7 +102,8 @@ const List = ({
   screen,
   ListHeader,
   warning,
-  isSheet = false
+  isSheet = false,
+  onMomentumScrollEnd
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const scrollRef = useRef();
@@ -168,8 +174,10 @@ const List = ({
           data={listData}
           renderItem={renderItem}
           onScroll={_onScroll}
+          nestedScrollEnabled={true}
           onMomentumScrollEnd={() => {
             tabBarRef.current?.unlock();
+            onMomentumScrollEnd?.();
           }}
           getItemType={(item) => item.itemType || item.type}
           estimatedItemSize={isCompactModeEnabled ? 60 : 100}

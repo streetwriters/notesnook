@@ -58,6 +58,7 @@ import {
 import { deleteItems } from "../utils/functions";
 import { sleep } from "../utils/time";
 import { RelationsList } from "../components/sheets/relations-list/index";
+import { useRelationStore } from "../stores/use-relation-store";
 
 export const useActions = ({ close = () => null, item }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -448,20 +449,20 @@ export const useActions = ({ close = () => null, item }) => {
             : "This tag will be removed from all notes.",
         positivePress: async () => {
           const routes = [];
+          routes.push(
+            "TaggedNotes",
+            "ColoredNotes",
+            "Notes",
+            "NotesPage",
+            "Reminders",
+            "Favorites"
+          );
           if (item.type === "reminder") {
             await db.reminders.remove(item.id);
-            routes.push("Reminders");
           } else {
             await db.tags.remove(item.id);
             useTagStore.getState().setTags();
-            routes.push(
-              "TaggedNotes",
-              "ColoredNotes",
-              "TopicNotes",
-              "Favorites",
-              "Notes",
-              "Tags"
-            );
+            routes.push("Tags");
           }
           Navigation.queueRoutesForUpdate(...routes);
         },
@@ -832,11 +833,48 @@ export const useActions = ({ close = () => null, item }) => {
             title: "Add",
             type: "accent",
             onPress: () => ReminderSheet.present(null, item, true),
-            icon:"plus"
+            icon: "plus"
           }
         });
       },
       close: false
+    },
+    {
+      name: "ReminderOnOff",
+      title: !item.disabled ? "Turn off reminder" : "Turn on reminder",
+      icon: !item.disabled ? "bell-off-outline" : "bell",
+      func: async () => {
+        close();
+        await db.reminders.add({
+          ...item,
+          disabled: !item.disabled
+        });
+        Notifications.scheduleNotification(item);
+        useRelationStore.getState().update();
+        Navigation.queueRoutesForUpdate(
+          "TaggedNotes",
+          "ColoredNotes",
+          "TopicNotes",
+          "Favorites",
+          "Notes",
+          "NotesPage",
+          "Reminders"
+        );
+      }
+    },
+    {
+      name: "ReferencedIn",
+      title: "References",
+      icon: "link",
+      func: async () => {
+        close();
+        RelationsList.present({
+          reference: item,
+          referenceType: "note",
+          title: "Referenced in",
+          relationType: "to"
+        });
+      }
     }
   ];
 

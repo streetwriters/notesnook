@@ -23,9 +23,10 @@ import { RefObject } from "react";
 import ActionSheet from "react-native-actions-sheet";
 import Config from "react-native-config";
 import {
+  eCloseSheet,
   eHideToast,
   eOnNoteEdited,
-  eOpenProgressDialog,
+  eOpenSheet,
   eOpenVaultDialog,
   eShowToast
 } from "../utils/events";
@@ -97,7 +98,7 @@ export type PresentSheetOptions = {
     | JSX.Element
     | ((
         ref: RefObject<ActionSheet>,
-        close?: () => void,
+        close?: (ctx?: string) => void,
         update?: (props: PresentSheetOptions) => void
       ) => JSX.Element);
   disableClosing: boolean;
@@ -116,7 +117,11 @@ export type PresentSheetOptions = {
 };
 
 export function presentSheet(data: Partial<PresentSheetOptions>) {
-  eSendEvent(eOpenProgressDialog, data);
+  eSendEvent(eOpenSheet, data);
+}
+
+export function hideSheet() {
+  eSendEvent(eCloseSheet);
 }
 
 export type ShowToastEvent = {

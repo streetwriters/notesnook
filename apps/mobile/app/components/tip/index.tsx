@@ -23,7 +23,7 @@ import { MMKV } from "../../common/database/mmkv";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { TTip } from "../../services/tip-manager";
 import { ThemeStore, useThemeStore } from "../../stores/use-theme-store";
-import { eCloseProgressDialog } from "../../utils/events";
+import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
@@ -90,7 +90,7 @@ export const Tip = ({
             iconSize={SIZE.xs}
             onPress={() => {
               MMKV.setItem("neverShowSheetTips", "true");
-              eSendEvent(eCloseProgressDialog);
+              eSendEvent(eCloseSheet);
             }}
             style={{
               width: undefined,
