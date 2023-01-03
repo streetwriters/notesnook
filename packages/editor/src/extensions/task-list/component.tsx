@@ -166,7 +166,7 @@ export function TaskListComponent(
                     });
                   }}
                 />
-              ) : null}
+              )}
               <Icon
                 path={Icons.checkbox}
                 size={15}
