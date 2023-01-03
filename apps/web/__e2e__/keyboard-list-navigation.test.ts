@@ -283,7 +283,7 @@ test("Ctrl+Click to select unselect notes", async ({ page }, info) => {
   }
 });
 
-test.only("Right Click notes", async ({ page }, info) => {
+test("opening a note & right clicking on another note should show note properties menu", async ({ page }, info) => {
   info.setTimeout(60 * 1000);
   const { notesList, notes } = await populateList(page, 10);
   await notes.focus();
