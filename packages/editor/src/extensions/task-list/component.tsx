@@ -134,7 +134,7 @@ export function TaskListComponent(
               }}
             />
             <Flex sx={{ flexShrink: 0, pr: 2, zIndex: 1 }}>
-              {editor.isEditable ? (
+              {editor.isEditable && (
                 <ToolButton
                   toggled={false}
                   title="Clear completed tasks"
@@ -166,9 +166,7 @@ export function TaskListComponent(
                     });
                   }}
                 />
-              ) : (
-                ""
-              )}
+              ) : null}
               <Icon
                 path={Icons.checkbox}
                 size={15}

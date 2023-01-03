@@ -177,7 +177,7 @@ export function TaskItemComponent(
               alignItems: "center"
             }}
           >
-            {editor.isEditable ? (
+            {editor.isEditable && (
               <Icon
                 className="deleleTaskItem"
                 title="Delete this task item"
@@ -201,8 +201,6 @@ export function TaskItemComponent(
                   });
                 }}
               />
-            ) : (
-              ""
             )}
           </Flex>
         </DesktopOnly>
