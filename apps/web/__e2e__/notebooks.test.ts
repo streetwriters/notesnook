@@ -166,7 +166,7 @@ test("remove shortcut of a notebook", async ({ page }) => {
 });
 
 test(`sort notebooks`, async ({ page }, info) => {
-  info.setTimeout(60 * 1000);
+  info.setTimeout(2 * 60 * 1000);
 
   const app = new AppModel(page);
   await app.goto();

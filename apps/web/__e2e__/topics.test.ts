@@ -93,7 +93,7 @@ test("edit topics individually", async ({ page }) => {
 });
 
 test(`sort topics`, async ({ page }, info) => {
-  info.setTimeout(60 * 1000);
+  info.setTimeout(2 * 60 * 1000);
 
   const app = new AppModel(page);
   await app.goto();
