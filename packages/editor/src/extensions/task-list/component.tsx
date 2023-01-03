@@ -38,7 +38,7 @@ export function TaskListComponent(
   const isMobile = useIsMobile();
   const { editor, getPos, node, updateAttributes, forwardRef } = props;
   const taskItemType = getNodeType(TaskItemNode.name, editor.schema);
-  const { title, collapsed } = node.attrs;
+  const { title } = node.attrs;
   const [stats, setStats] = useState({ checked: 0, total: 0, percentage: 0 });
 
   const getParent = useCallback(() => {
@@ -185,7 +185,7 @@ export function TaskListComponent(
         ref={forwardRef}
         sx={{
           ul: {
-            display: collapsed ? "none" : "block",
+            display: "block",
             paddingInlineStart: 0,
             marginBlockStart: isNested ? 10 : 0,
             marginBlockEnd: 0,

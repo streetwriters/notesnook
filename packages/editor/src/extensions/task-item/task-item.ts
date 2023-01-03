@@ -85,9 +85,7 @@ export const TaskItemNode = TaskItem.extend({
       contentDOMFactory: true,
       wrapperFactory: () => document.createElement("li"),
       shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
-        return (
-          prev.checked !== next.checked || prev.collapsed !== next.collapsed
-        );
+        return prev.checked !== next.checked;
       }
     });
   }
