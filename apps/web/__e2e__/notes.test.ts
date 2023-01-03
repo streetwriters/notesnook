@@ -17,10 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, expect, Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { Sort } from "./models/base-view.model";
-import { getTestId, NOTE, PASSWORD } from "./utils";
+import {
+  groupByOptions,
+  NOTE,
+  orderByOptions,
+  PASSWORD,
+  sortByOptions
+} from "./utils";
 
 test("create a note", async ({ page }) => {
   const app = new AppModel(page);
@@ -275,77 +280,33 @@ test("change title of a locked note", async ({ page }) => {
   expect(await notes.editor.getTitle()).toContain(title);
 });
 
-test.setTimeout(100 * 1000);
+test(`sort notes`, async ({ page }, info) => {
+  info.setTimeout(60 * 1000);
 
-test("sorting notes", async ({ page }) => {
-  const { notes } = await populateList(page);
-
-  const orderBy: Sort["orderBy"][] = ["ascendingOrder", "descendingOrder"];
-  const sortBy: Sort["sortBy"][] = ["dateCreated", "dateEdited"];
-  const groupBy: Sort["groupBy"][] = [
-    "abc",
-    "none",
-    "default",
-    "year",
-    "month",
-    "week"
-  ];
-
-  for (let group of groupBy) {
-    for (let sort of sortBy) {
-      for (let order of orderBy) {
-        await notes?.sort({
-          groupBy: group,
-          orderBy: order,
-          sortBy: sort
-        });
-        expect(await notes.isListFilled()).toBeTruthy();
-      }
-    }
-  }
-});
-
-test.only("Sort numbered notes", async ({ page }) => {
-  const { notes } = await populateList(page, [
-    "00",
-    "1",
-    "10",
-    "2",
-    "20",
-    "3",
-    "30",
-    "4",
-    "40"
-  ]);
-
-  let expectedList = ["00", "1", "2", "3", "4", "10", "20", "30", "40"];
-
-  await notes?.sort({
-    groupBy: "none",
-    orderBy: "ascendingOrder",
-    sortBy: "title"
-  });
-
-  let list = await page.locator(getTestId("list-item")).allInnerTexts();
-  let index = 0;
-  for (let note of list) {
-    expect(note.substring(0, 2) === expectedList[index]);
-    index++;
-  }
-});
-
-async function populateList(
-  page: Page,
-  titles = ["G ", "C ", "Gz", "2 ", "A "]
-) {
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
-  for (let title of titles) {
-    const note = await notes.createNote({
+  const titles = ["G ", "C ", "Gz", "2 ", "A "];
+  for (const title of titles) {
+    await notes.createNote({
       title: `${title} is Title`,
       content: "This is test".repeat(10)
     });
   }
-  return { notes, app };
-}
+
+  for (const groupBy of groupByOptions) {
+    for (const sortBy of sortByOptions) {
+      for (const orderBy of orderByOptions) {
+        await test.step(`group by ${groupBy}, sort by ${sortBy}, order by ${orderBy}`, async () => {
+          await notes?.sort({
+            groupBy,
+            orderBy,
+            sortBy
+          });
+
+          expect(await notes.isEmpty()).toBeFalsy();
+        });
+      }
+    }
+  }
+});

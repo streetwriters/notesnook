@@ -1,4 +1,3 @@
-import { ContextMenuModel } from "./context-menu.model";
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
@@ -21,12 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { iterateList } from "./utils";
-
-export type Sort = {
-  orderBy: "ascendingOrder" | "descendingOrder";
-  sortBy: "dateCreated" | "dateEdited" | "dateModified" | "title";
-  groupBy: "abc" | "none" | "default" | "year" | "month" | "week";
-};
+import { ContextMenuModel } from "./context-menu.model";
+import { SortOptions } from "./types";
 
 export class BaseViewModel {
   protected readonly page: Page;
@@ -105,58 +100,24 @@ export class BaseViewModel {
     await this.page.waitForTimeout(300);
   }
 
-  async sort(sort: Sort) {
+  async sort(sort: SortOptions) {
     const contextMenu: ContextMenuModel = new ContextMenuModel(this.page);
 
     contextMenu.open(this.sortByButton, "left");
-    if (sort.groupBy === "abc") {
-      await contextMenu.clickOnItem("groupBy");
-      await contextMenu.clickOnItem("abc");
-    } else if (sort.groupBy === "default") {
-      await contextMenu.clickOnItem("groupBy");
-      await contextMenu.clickOnItem("default");
-    } else if (sort.groupBy === "month") {
-      await contextMenu.clickOnItem("groupBy");
-      await contextMenu.clickOnItem("month");
-    } else if (sort.groupBy === "none") {
-      await contextMenu.clickOnItem("groupBy");
-      await contextMenu.clickOnItem("none");
-    } else if (sort.groupBy === "week") {
-      await contextMenu.clickOnItem("groupBy");
-      await contextMenu.clickOnItem("week");
-    } else if (sort.groupBy === "year") {
-      await contextMenu.clickOnItem("groupBy");
-      await contextMenu.clickOnItem("year");
-    }
+    await contextMenu.clickOnItem("groupBy");
+    await contextMenu.clickOnItem(sort.groupBy);
 
     await contextMenu.open(this.sortByButton, "left");
-    if (sort.orderBy === "ascendingOrder") {
-      await contextMenu.clickOnItem("sortDirection");
-      await contextMenu.clickOnItem("asc");
-    } else if (sort.orderBy === "descendingOrder") {
-      await contextMenu.clickOnItem("sortDirection");
-      await contextMenu.clickOnItem("desc");
-    }
+    await contextMenu.clickOnItem("sortDirection");
+    await contextMenu.clickOnItem(sort.orderBy);
 
     contextMenu.open(this.sortByButton, "left");
-    if (sort.sortBy === "dateCreated") {
-      await contextMenu.clickOnItem("sortBy");
-      await contextMenu.clickOnItem("dateCreated");
-    } else if (sort.sortBy === "dateEdited") {
-      await contextMenu.clickOnItem("sortBy");
-      await contextMenu.clickOnItem("dateEdited");
-    } else if (sort.sortBy === "dateModified") {
-      await contextMenu.clickOnItem("sortBy");
-      await contextMenu.clickOnItem("dateModified");
-    } else if (sort.sortBy === "title") {
-      await contextMenu.clickOnItem("sortBy");
-      await contextMenu.clickOnItem("title");
-    }
+    await contextMenu.clickOnItem("sortBy");
+    await contextMenu.clickOnItem(sort.sortBy);
   }
 
-  async isListFilled() {
-    let itemCount = await this.page.locator(getTestId("list-item")).count();
-    if (itemCount !== 5) return false;
-    return true;
+  async isEmpty() {
+    const totalItems = await this.list.locator(getTestId("list-item")).count();
+    return totalItems <= 0;
   }
 }

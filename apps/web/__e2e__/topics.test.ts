@@ -1,4 +1,3 @@
-import { Sort } from "./models/base-view.model";
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
@@ -18,48 +17,38 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, expect, Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { ItemModel } from "./models/item.model";
-import { ItemsViewModel } from "./models/items-view.model";
-import { NOTEBOOK } from "./utils";
+import {
+  groupByOptions,
+  NOTEBOOK,
+  sortByOptions,
+  orderByOptions
+} from "./utils";
 
-async function populateList(page: Page) {
+test(`sort topics`, async ({ page }, info) => {
+  info.setTimeout(60 * 1000);
+
   const app = new AppModel(page);
   await app.goto();
   const notebooks = await app.goToNotebooks();
-  NOTEBOOK.topics = ["title1", "title2", "title3", "title4", "title5"];
-  const notebook = await notebooks.createNotebook(NOTEBOOK);
+  const notebook = await notebooks.createNotebook({
+    ...NOTEBOOK,
+    topics: ["title1", "title2", "title3", "title4", "title5"]
+  });
   const topics = await notebook?.openNotebook();
 
-  return { topics, app };
-}
-
-test.setTimeout(100 * 1000);
-
-test("sorting topics", async ({ page }) => {
-  const { topics } = await populateList(page);
-
-  const orderBy: Sort["orderBy"][] = ["ascendingOrder", "descendingOrder"];
-  const sortBy: Sort["sortBy"][] = ["dateCreated", "dateEdited"];
-  const groupBy: Sort["groupBy"][] = [
-    "abc",
-    "none",
-    "default",
-    "year",
-    "month",
-    "week"
-  ];
-
-  for (let group of groupBy) {
-    for (let sort of sortBy) {
-      for (let order of orderBy) {
-        await topics?.sort({
-          groupBy: group,
-          orderBy: order,
-          sortBy: sort
+  for (const groupBy of groupByOptions) {
+    for (const sortBy of sortByOptions) {
+      for (const orderBy of orderByOptions) {
+        await test.step(`group by ${groupBy}, sort by ${sortBy}, order by ${orderBy}`, async () => {
+          await topics?.sort({
+            groupBy,
+            orderBy,
+            sortBy
+          });
+          expect(await topics?.isEmpty()).toBeFalsy();
         });
-        expect(await topics?.isItemListFilled()).toBeTruthy();
       }
     }
   }
