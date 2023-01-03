@@ -93,7 +93,7 @@ const NoteItem = ({
   const notebooks = React.useMemo(() => getNotebook(item), [item]);
   const reminders = db.relations.from(item, "reminder");
   const current = getUpcomingReminder(reminders);
-  useRelationStore((state) => state.updater);
+  const _update = useRelationStore((state) => state.updater);
 
   return (
     <>
