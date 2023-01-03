@@ -257,7 +257,7 @@ test("select notes using Shift+Click upwards", async ({ page }, info) => {
   expect(await notesList[0].isFocused()).toBeTruthy();
 });
 
-test("Ctrl+Click to select unselect notes", async ({ page }, info) => {
+test("Ctrl+Click to select/unselect notes", async ({ page }, info) => {
   info.setTimeout(60 * 1000);
   const { notesList, notes } = await populateList(page, 10);
   await notes.focus();
