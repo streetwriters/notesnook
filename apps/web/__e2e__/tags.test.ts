@@ -193,11 +193,12 @@ test(`sort tags`, async ({ page }, info) => {
     for (const sortBy of sortByOptions) {
       for (const orderBy of orderByOptions) {
         await test.step(`group by ${groupBy}, sort by ${sortBy}, order by ${orderBy}`, async () => {
-          await tags?.sort({
+          const sortResult = await tags?.sort({
             groupBy,
             orderBy,
             sortBy
           });
+          if (!sortResult) return;
 
           expect(await tags.isEmpty()).toBeFalsy();
         });

@@ -103,17 +103,31 @@ export class BaseViewModel {
   async sort(sort: SortOptions) {
     const contextMenu: ContextMenuModel = new ContextMenuModel(this.page);
 
-    contextMenu.open(this.sortByButton, "left");
+    await contextMenu.open(this.sortByButton, "left");
     await contextMenu.clickOnItem("groupBy");
+    if (!(await contextMenu.hasItem(sort.groupBy))) {
+      await contextMenu.close();
+      return false;
+    }
     await contextMenu.clickOnItem(sort.groupBy);
 
     await contextMenu.open(this.sortByButton, "left");
     await contextMenu.clickOnItem("sortDirection");
+    if (!(await contextMenu.hasItem(sort.orderBy))) {
+      await contextMenu.close();
+      return false;
+    }
     await contextMenu.clickOnItem(sort.orderBy);
 
-    contextMenu.open(this.sortByButton, "left");
+    await contextMenu.open(this.sortByButton, "left");
     await contextMenu.clickOnItem("sortBy");
+    if (!(await contextMenu.hasItem(sort.sortBy))) {
+      await contextMenu.close();
+      return false;
+    }
     await contextMenu.clickOnItem(sort.sortBy);
+
+    return true;
   }
 
   async isEmpty() {

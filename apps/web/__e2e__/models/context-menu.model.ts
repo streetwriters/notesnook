@@ -46,6 +46,13 @@ export class ContextMenuModel {
     return this.page.locator(getTestId(`menuitem-${id}`));
   }
 
+  async hasItem(id: string) {
+    return (
+      (await this.getItem(id).isVisible()) &&
+      (await this.getItem(id).isEnabled())
+    );
+  }
+
   async close() {
     await this.page.keyboard.press("Escape");
   }

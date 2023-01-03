@@ -110,7 +110,12 @@ function isTestAll() {
 }
 
 const orderByOptions: OrderByOptions[] = ["asc", "desc"];
-const sortByOptions: SortByOptions[] = ["dateCreated", "dateEdited"];
+const sortByOptions: SortByOptions[] = [
+  "dateCreated",
+  "dateEdited",
+  "dateModified",
+  "dateDeleted"
+];
 const groupByOptions: GroupByOptions[] = [
   "abc",
   "none",

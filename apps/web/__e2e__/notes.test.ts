@@ -298,11 +298,12 @@ test(`sort notes`, async ({ page }, info) => {
     for (const sortBy of sortByOptions) {
       for (const orderBy of orderByOptions) {
         await test.step(`group by ${groupBy}, sort by ${sortBy}, order by ${orderBy}`, async () => {
-          await notes?.sort({
+          const sortResult = await notes?.sort({
             groupBy,
             orderBy,
             sortBy
           });
+          if (!sortResult) return;
 
           expect(await notes.isEmpty()).toBeFalsy();
         });

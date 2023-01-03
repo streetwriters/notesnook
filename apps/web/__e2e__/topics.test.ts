@@ -42,11 +42,13 @@ test(`sort topics`, async ({ page }, info) => {
     for (const sortBy of sortByOptions) {
       for (const orderBy of orderByOptions) {
         await test.step(`group by ${groupBy}, sort by ${sortBy}, order by ${orderBy}`, async () => {
-          await topics?.sort({
+          const sortResult = await topics?.sort({
             groupBy,
             orderBy,
             sortBy
           });
+          if (!sortResult) return;
+
           expect(await topics?.isEmpty()).toBeFalsy();
         });
       }

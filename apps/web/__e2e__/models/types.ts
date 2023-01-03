@@ -34,6 +34,7 @@ export type SortByOptions =
   | "dateCreated"
   | "dateEdited"
   | "dateModified"
+  | "dateDeleted"
   | "title";
 export type GroupByOptions =
   | "abc"
