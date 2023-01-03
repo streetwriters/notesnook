@@ -29,7 +29,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper from "../selection-wrapper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ReminderSheet from "../../sheets/reminder";
-import { formatReminderTime } from "../../../utils/time/index";
+import { formatReminderTime } from "@notesnook/core/collections/reminders";
 
 const ReminderItem = React.memo(
   ({
@@ -54,7 +54,12 @@ const ReminderItem = React.memo(
         item={item}
         isSheet={isSheet}
       >
-        <View>
+        <View
+          style={{
+            flexWrap: "wrap",
+            flexShrink: 1
+          }}
+        >
           <Heading
             numberOfLines={1}
             style={{
@@ -78,10 +83,41 @@ const ReminderItem = React.memo(
 
           <View
             style={{
-              flexDirection: "row"
+              flexDirection: "row",
+              flexWrap: "wrap"
             }}
           >
-            {item.mode === "repeat" ? (
+            
+            {item.disabled ? (
+              <View
+                style={{
+                  backgroundColor: colors.nav,
+                  borderRadius: 5,
+                  flexDirection: "row",
+                  paddingHorizontal: 5,
+                  paddingVertical: 3,
+                  alignItems: "center",
+                  marginTop: 5,
+                  justifyContent: "flex-start",
+                  alignSelf: "flex-start",
+                  marginRight: 10
+                }}
+              >
+                <Icon
+                  name="bell-off-outline"
+                  size={SIZE.md}
+                  color={colors.errorText}
+                />
+                <Paragraph
+                  size={SIZE.xs + 1}
+                  color={colors.icon}
+                  style={{ marginLeft: 5 }}
+                >
+                  Disabled
+                </Paragraph>
+              </View>
+            ) : null}
+            {item.mode === "repeat" && item.recurringMode ? (
               <View
                 style={{
                   backgroundColor: colors.nav,
@@ -108,20 +144,20 @@ const ReminderItem = React.memo(
                 </Paragraph>
               </View>
             ) : null}
-            <View
-              style={{
-                backgroundColor: colors.nav,
-                borderRadius: 5,
-                flexDirection: "row",
-                paddingHorizontal: 5,
-                paddingVertical: 3,
-                alignItems: "center",
-                marginTop: 5,
-                justifyContent: "flex-start",
-                alignSelf: "flex-start"
-              }}
-            >
-              {item.date ? (
+            {item.date ? (
+              <View
+                style={{
+                  backgroundColor: colors.nav,
+                  borderRadius: 5,
+                  flexDirection: "row",
+                  paddingHorizontal: 5,
+                  paddingVertical: 3,
+                  alignItems: "center",
+                  marginTop: 5,
+                  justifyContent: "flex-start",
+                  alignSelf: "flex-start"
+                }}
+              >
                 <>
                   <Icon
                     name="clock-outline"
@@ -136,8 +172,8 @@ const ReminderItem = React.memo(
                     {formatReminderTime(item)}
                   </Paragraph>
                 </>
-              ) : null}
-            </View>
+              </View>
+            ) : null}
           </View>
         </View>
         <IconButton

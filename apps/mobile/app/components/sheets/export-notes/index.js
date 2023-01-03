@@ -41,7 +41,7 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { eSendEvent } from "../../../services/event-manager";
-import { eCloseProgressDialog } from "../../../utils/events";
+import { eCloseSheet } from "../../../utils/events";
 
 const ExportNotesSheet = ({ notes, update }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -262,7 +262,7 @@ const ExportNotesSheet = ({ notes, update }) => {
                     borderRadius: 100
                   }}
                   onPress={async () => {
-                    eSendEvent(eCloseProgressDialog);
+                    eSendEvent(eCloseSheet);
                     await sleep(500);
                     FileViewer.open(result.filePath, {
                       showOpenWithDialog: true,

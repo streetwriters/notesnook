@@ -37,7 +37,7 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { formatBytes } from "../../utils";
 import {
   eCloseAttachmentDialog,
-  eCloseProgressDialog
+  eCloseSheet
 } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -71,7 +71,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
           useAttachmentStore.getState().remove(attachment.metadata.hash);
         }
         downloadAttachment(attachment.metadata.hash, false);
-        eSendEvent(eCloseProgressDialog, contextId);
+        eSendEvent(eCloseSheet, contextId);
       },
       icon: "download"
     },
@@ -150,7 +150,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
       onPress: async () => {
         await db.attachments.remove(attachment.metadata.hash, false);
         setAttachments([...db.attachments.all]);
-        eSendEvent(eCloseProgressDialog, contextId);
+        eSendEvent(eCloseSheet, contextId);
       },
       icon: "delete-outline"
     }
@@ -293,7 +293,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
                     });
                     return;
                   }
-                  eSendEvent(eCloseProgressDialog, contextId);
+                  eSendEvent(eCloseSheet, contextId);
                   await sleep(150);
                   eSendEvent(eCloseAttachmentDialog);
                   await sleep(300);

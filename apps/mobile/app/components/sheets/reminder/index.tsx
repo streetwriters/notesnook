@@ -21,26 +21,26 @@ import { Platform, ScrollView, View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {
+  presentSheet,
   PresentSheetOptions,
-  ToastEvent,
-  presentSheet
+  ToastEvent
 } from "../../../services/event-manager";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 
+import { formatReminderTime } from "@notesnook/core/collections/reminders";
 import dayjs from "dayjs";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
+import Navigation from "../../../services/navigation";
 import Notifications, { Reminder } from "../../../services/notifications";
-import { useReminderStore } from "../../../stores/use-reminder-store";
-import { formatReminderTime } from "../../../utils/time";
+import { useRelationStore } from "../../../stores/use-relation-store";
 import Paragraph from "../../ui/typography/paragraph";
-import DialogHeader from "../../dialog/dialog-header";
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheet>;
-  close?: () => void;
+  close?: (ctx?: string) => void;
   update?: (options: PresentSheetOptions) => void;
   reminder?: Reminder;
   reference?: { id: string; type: string };
@@ -59,6 +59,7 @@ const ReminderModes =
       };
 
 const RecurringModes = {
+  Daily: "day",
   Week: "week",
   Month: "month"
 };
@@ -79,9 +80,6 @@ const ReminderNotificationModes = {
   Vibrate: "vibrate",
   Urgent: "urgent"
 };
-
-
-
 
 export default function ReminderSheet({
   actionSheetRef,
@@ -129,9 +127,9 @@ export default function ReminderSheet({
   };
 
   const handleConfirm = (date: Date) => {
+    hideDatePicker();
     setTime(dayjs(date).format("hh:mm a"));
     setDate(date);
-    hideDatePicker();
   };
   function nth(n: number) {
     return (
@@ -149,7 +147,7 @@ export default function ReminderSheet({
         const joinWith = isSecondLast ? " & " : isLast ? "" : ", ";
         return recurringMode === RecurringModes.Week
           ? WeekDayNames[day as keyof typeof WeekDayNames] + joinWith
-          : `${day + 1}${nth(day + 1)} ${joinWith}`;
+          : `${day}${nth(day)} ${joinWith}`;
       })
       .join("");
     return text;
@@ -159,6 +157,7 @@ export default function ReminderSheet({
     if (!(await Notifications.checkAndRequestPermissions())) return;
     if ((!date && reminderMode !== ReminderModes.Permanent) || !title.current)
       return;
+    date.setSeconds(0, 0);
     const reminderId = await db.reminders?.add({
       id: reminder?.id,
       date: date?.getTime(),
@@ -185,8 +184,17 @@ export default function ReminderSheet({
       });
     }
     Notifications.scheduleNotification(_reminder as Reminder);
-    useReminderStore.getState().setReminders();
-    close?.();
+    useRelationStore.getState().update();
+    Navigation.queueRoutesForUpdate(
+      "TaggedNotes",
+      "ColoredNotes",
+      "Notes",
+      "NotesPage",
+      "Reminders",
+      "Favorites",
+      "TopicNotes"
+    );
+    close?.("local");
   }
 
   return (
@@ -253,7 +261,7 @@ export default function ReminderSheet({
           <View
             style={{
               flexDirection: "row",
-              marginBottom: 12,
+              marginBottom: recurringMode === "day" ? 0 : 12,
               alignItems: "center"
             }}
           >
@@ -313,7 +321,9 @@ export default function ReminderSheet({
           </View>
 
           <ScrollView showsHorizontalScrollIndicator={false} horizontal>
-            {recurringMode === RecurringModes.Week
+            {recurringMode === RecurringModes.Daily
+              ? null
+              : recurringMode === RecurringModes.Week
               ? WeekDays.map((item, index) => (
                   <Button
                     key={WeekDayNames[index as keyof typeof WeekDayNames]}
@@ -348,7 +358,9 @@ export default function ReminderSheet({
                   <Button
                     key={index + "monthday"}
                     title={index + 1 + ""}
-                    type={selectedDays.indexOf(index) > -1 ? "accent" : "gray"}
+                    type={
+                      selectedDays.indexOf(index + 1) > -1 ? "accent" : "gray"
+                    }
                     fontSize={SIZE.sm - 1}
                     style={{
                       width: 40,
@@ -356,17 +368,17 @@ export default function ReminderSheet({
                       borderRadius: 100,
                       marginRight: 10,
                       backgroundColor:
-                        selectedDays.indexOf(index) > -1
+                        selectedDays.indexOf(index + 1) > -1
                           ? colors.accent
                           : colors.bg
                     }}
                     onPress={() => {
                       setSelectedDays((days) => {
-                        if (days.indexOf(index) > -1) {
-                          days.splice(days.indexOf(index), 1);
+                        if (days.indexOf(index + 1) > -1) {
+                          days.splice(days.indexOf(index + 1), 1);
                           return [...days];
                         }
-                        days.push(index);
+                        days.push(index + 1);
                         return [...days];
                       });
                     }}
@@ -433,7 +445,7 @@ export default function ReminderSheet({
         <View
           style={{
             flexDirection: "row",
-            marginBottom: 12,
+            marginBottom: 12
           }}
         >
           {Object.keys(ReminderNotificationModes).map((mode) => (
@@ -471,30 +483,43 @@ export default function ReminderSheet({
           ))}
         </View>
       )}
-
       {reminderMode === ReminderModes.Once ||
       reminderMode === ReminderModes.Permanent ? null : (
-        <Paragraph
-          color={colors.icon}
-          size={SIZE.xs}
-          style={{ marginTop: 5, marginBottom: 12 }}
+        <View
+          style={{
+            borderRadius: 5,
+            flexDirection: "row",
+            paddingVertical: 6,
+            paddingHorizontal: 12,
+            alignItems: "center",
+            justifyContent: "flex-start",
+            marginBottom: 10,
+            backgroundColor: colors.nav
+          }}
         >
-          {selectedDays.length === 7 && recurringMode === RecurringModes.Week
-            ? `The reminder will repeat daily at ${dayjs(date).format(
-                "hh:mm A"
-              )}.`
-            : selectedDays.length === 0
-            ? recurringMode === RecurringModes.Week
-              ? "Select day of the week to repeat the reminder."
-              : "Select nth day of the month to repeat the reminder."
-            : `Repeats every${
-                repeatFrequency > 1 ? " " + repeatFrequency : ""
-              } ${
-                repeatFrequency > 1 ? recurringMode + "s" : recurringMode
-              } on ${getSelectedDaysText(selectedDays)} at ${dayjs(date).format(
-                "hh:mm A"
-              )}.`}
-        </Paragraph>
+          <>
+            <Paragraph size={SIZE.xs + 1} color={colors.icon}>
+              {recurringMode === RecurringModes.Daily
+                ? "Repeats daily " + `at ${dayjs(date).format("hh:mm A")}.`
+                : selectedDays.length === 7 &&
+                  recurringMode === RecurringModes.Week
+                ? `The reminder will repeat daily at ${dayjs(date).format(
+                    "hh:mm A"
+                  )}.`
+                : selectedDays.length === 0
+                ? recurringMode === RecurringModes.Week
+                  ? "Select day of the week to repeat the reminder."
+                  : "Select nth day of the month to repeat the reminder."
+                : `Repeats every${
+                    repeatFrequency > 1 ? " " + repeatFrequency : ""
+                  } ${
+                    repeatFrequency > 1 ? recurringMode + "s" : recurringMode
+                  } on ${getSelectedDaysText(selectedDays)} at ${dayjs(
+                    date
+                  ).format("hh:mm A")}.`}
+            </Paragraph>
+          </>
+        </View>
       )}
 
       {reminder && reminder.date ? (
@@ -502,12 +527,12 @@ export default function ReminderSheet({
           style={{
             borderRadius: 5,
             flexDirection: "row",
-            paddingHorizontal: 5,
-            paddingVertical: 3,
+            paddingVertical: 6,
+            paddingHorizontal: 12,
             alignItems: "center",
             justifyContent: "flex-start",
-            marginTop: 12,
-            marginBottom: 4
+            marginBottom: 10,
+            backgroundColor: colors.nav
           }}
         >
           <>

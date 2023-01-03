@@ -48,7 +48,7 @@ import {
 } from "../../services/event-manager";
 import { ThemeStore, useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { eCloseProgressDialog } from "../../utils/events";
+import { eCloseSheet } from "../../utils/events";
 import { sanitizeFilename } from "../../utils/sanitizer";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -547,7 +547,7 @@ export const MFARecoveryCodes = ({
               if (isSetup) {
                 onSuccess && onSuccess(method);
               } else {
-                eSendEvent(eCloseProgressDialog);
+                eSendEvent(eCloseSheet);
               }
             }}
             style={{
@@ -604,7 +604,7 @@ const MFASuccess = ({ recovery }: MFAStepProps) => {
         type="accent"
         width={250}
         onPress={() => {
-          eSendEvent(eCloseProgressDialog);
+          eSendEvent(eCloseSheet);
         }}
         style={{
           borderRadius: 100,

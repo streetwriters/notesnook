@@ -26,7 +26,7 @@ import { eSendEvent, ToastEvent } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { useUserStore } from "../../../stores/use-user-store";
-import { eCloseProgressDialog } from "../../../utils/events";
+import { eCloseSheet } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
@@ -69,7 +69,7 @@ Logged in: ${user ? "yes" : "no"}`,
         userId: user?.id
       });
       setLoading(false);
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
       await sleep(300);
       presentDialog({
         title: "Issue reported",

@@ -74,7 +74,7 @@ export const RelationsList = ({
   const relations = useRelationStore();
   const [items, setItems] = useState<Reminder[]>([]);
   const colors = useThemeStore((state) => state.colors);
-  const hasNoReminders = !items || items.length === 0;
+  const hasNoRelations = !items || items.length === 0;
 
   useEffect(() => {
     setItems(
@@ -84,17 +84,16 @@ export const RelationsList = ({
       ) as any
     );
   }, [item?.id, item?.type, referenceType, relationType, relations.updater]);
-  console.log(items);
   return (
     <View
-      style={{ paddingHorizontal: 12, height: hasNoReminders ? 300 : "100%" }}
+      style={{ paddingHorizontal: 12, height: hasNoRelations ? 300 : "100%" }}
     >
       <SheetProvider context="local" />
       <DialogHeader
         title={title}
-        button={hasNoReminders ? undefined : button}
+        button={hasNoRelations ? undefined : button}
       />
-      {hasNoReminders ? (
+      {hasNoRelations ? (
         <View
           style={{
             height: "85%",
@@ -128,6 +127,9 @@ export const RelationsList = ({
           type={referenceType}
           headerProps={null}
           isSheet={true}
+          onMomentumScrollEnd={() => {
+            actionSheetRef?.current?.handleChildScrollEnd();
+          }}
         />
       )}
     </View>

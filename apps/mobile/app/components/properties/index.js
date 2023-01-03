@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { Platform, View } from "react-native";
+import { Platform, View, TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
@@ -27,7 +27,6 @@ import SearchService from "../../services/search";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { COLORS_NOTE } from "../../utils/color-scheme";
 import { SIZE } from "../../utils/size";
-import { formatReminderTime } from "../../utils/time";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { ColorTags } from "./color-tags";
@@ -39,6 +38,10 @@ import { Synced } from "./synced";
 import { Tags } from "./tags";
 import { Topics } from "./topics";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import {
+  formatReminderTime,
+  getUpcomingReminder
+} from "@notesnook/core/collections/reminders";
 export const Properties = ({
   close = () => {},
   item,
@@ -48,6 +51,8 @@ export const Properties = ({
   const colors = useThemeStore((state) => state.colors);
   const alias = item.alias || item.title;
   const isColor = !!COLORS_NOTE[item.title];
+  const reminders = db.relations.from(item, "reminder");
+  const current = getUpcomingReminder(reminders);
 
   const onScrollEnd = () => {
     getRef().current?.handleChildScrollEnd();
@@ -244,7 +249,7 @@ Properties.present = (item, buttons = [], isSheet) => {
       break;
     case "reminder": {
       props[0] = db.reminders.reminder(item.id);
-      props.push(["Edit reminder", "Delete"]);
+      props.push(["Edit reminder", "Delete", "ReminderOnOff", "ReferencedIn"]);
       break;
     }
   }
