@@ -230,16 +230,18 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
             {formatBytes(attachment.length)}
           </Paragraph>
 
-          <Paragraph
-            style={{
-              marginRight: 10
-            }}
-            size={SIZE.xs + 1}
-            color={colors.icon}
-          >
-            {attachment.noteIds.length} note
-            {attachment.noteIds.length > 1 ? "s" : ""}
-          </Paragraph>
+          {attachment.noteIds ? (
+            <Paragraph
+              style={{
+                marginRight: 10
+              }}
+              size={SIZE.xs + 1}
+              color={colors.icon}
+            >
+              {attachment.noteIds.length} note
+              {attachment.noteIds.length > 1 ? "s" : ""}
+            </Paragraph>
+          ) : null}
           <Paragraph
             onPress={() => {
               Clipboard.setString(attachment.metadata.hash);
