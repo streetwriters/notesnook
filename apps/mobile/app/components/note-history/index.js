@@ -115,8 +115,10 @@ export default function NoteHistory({ note, fwdRef }) {
         style={{
           paddingHorizontal: 12
         }}
+        nestedScrollEnabled
         keyExtractor={(item) => item.id}
         data={history}
+        ListFooterComponent={<View style={{ height: 250 }} />}
         ListEmptyComponent={
           <View
             style={{
