@@ -30,8 +30,11 @@ export class ContextMenuModel {
     return await this.titleText.textContent();
   }
 
-  async open(locator: Locator) {
-    await locator.click({ button: "right" });
+  async open(
+    locator: Locator,
+    button: "left" | "right" | "middle" | undefined = "right"
+  ) {
+    await locator.click({ button });
     await this.titleText.waitFor();
   }
 

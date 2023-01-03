@@ -21,6 +21,7 @@ import fs from "fs";
 import dotenv from "dotenv";
 import path from "path";
 import { Locator, Page } from "@playwright/test";
+import { GroupByOptions, OrderByOptions, SortByOptions } from "../models/types";
 
 type Note = {
   title: string;
@@ -108,6 +109,17 @@ function isTestAll() {
   return process.env.TEST_ALL === "true";
 }
 
+const orderByOptions: OrderByOptions[] = ["asc", "desc"];
+const sortByOptions: SortByOptions[] = ["dateCreated", "dateEdited"];
+const groupByOptions: GroupByOptions[] = [
+  "abc",
+  "none",
+  "default",
+  "year",
+  "month",
+  "week"
+];
+
 export {
   USER,
   NOTE,
@@ -118,5 +130,8 @@ export {
   createNote,
   editNote,
   downloadAndReadFile,
-  isTestAll
+  isTestAll,
+  orderByOptions,
+  sortByOptions,
+  groupByOptions
 };

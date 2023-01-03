@@ -20,7 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { Item, Notebook } from "./models/types";
-import { NOTE, NOTEBOOK } from "./utils";
+import {
+  groupByOptions,
+  NOTE,
+  NOTEBOOK,
+  orderByOptions,
+  sortByOptions
+} from "./utils";
 
 test("create a notebook", async ({ page }) => {
   const app = new AppModel(page);
@@ -222,4 +228,33 @@ test("remove shortcut of a topic", async ({ page }) => {
   expect(await topic?.isShortcut()).toBe(false);
   const allShortcuts = await app.navigation.getShortcuts();
   expect(allShortcuts.includes(NOTEBOOK.topics[0])).toBeFalsy();
+});
+
+test(`sort notebooks`, async ({ page }, info) => {
+  info.setTimeout(60 * 1000);
+
+  const app = new AppModel(page);
+  await app.goto();
+  const notebooks = await app.goToNotebooks();
+  const titles = ["G ", "C ", "Gz", "2 ", "A "];
+  for (const title of titles) {
+    NOTEBOOK.title = title + NOTEBOOK.title;
+    await notebooks.createNotebook(NOTEBOOK);
+  }
+
+  for (const groupBy of groupByOptions) {
+    for (const sortBy of sortByOptions) {
+      for (const orderBy of orderByOptions) {
+        await test.step(`group by ${groupBy}, sort by ${sortBy}, order by ${orderBy}`, async () => {
+          await notebooks?.sort({
+            groupBy,
+            orderBy,
+            sortBy
+          });
+
+          expect(await notebooks.isEmpty()).toBeFalsy();
+        });
+      }
+    }
+  }
 });
