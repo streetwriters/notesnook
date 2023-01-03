@@ -177,29 +177,31 @@ export function TaskItemComponent(
               alignItems: "center"
             }}
           >
-            <Icon
-              className="deleleTaskItem"
-              title="Delete this task item"
-              path={Icons.close}
-              size={18}
-              sx={{
-                cursor: "pointer"
-              }}
-              onClick={() => {
-                if (!editor.current) return;
-                const pos = getPos();
+            {editor.isEditable && (
+              <Icon
+                className="deleleTaskItem"
+                title="Delete this task item"
+                path={Icons.close}
+                size={18}
+                sx={{
+                  cursor: "pointer"
+                }}
+                onClick={() => {
+                  if (!editor.current) return;
+                  const pos = getPos();
 
-                // we need to get a fresh instance of the task list instead
-                // of using the one we got via props.
-                const node = editor.current.state.doc.nodeAt(pos);
-                if (!node) return;
+                  // we need to get a fresh instance of the task list instead
+                  // of using the one we got via props.
+                  const node = editor.current.state.doc.nodeAt(pos);
+                  if (!node) return;
 
-                editor.commands.command(({ tr }) => {
-                  tr.deleteRange(pos, pos + node.nodeSize);
-                  return true;
-                });
-              }}
-            />
+                  editor.commands.command(({ tr }) => {
+                    tr.deleteRange(pos, pos + node.nodeSize);
+                    return true;
+                  });
+                }}
+              />
+            )}
           </Flex>
         </DesktopOnly>
       </Flex>
