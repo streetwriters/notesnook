@@ -242,6 +242,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
 
       if (onChangeTab) {
         runOnJS(onChangeTab)({ i: result, from: previousTab.value });
+        previousTab.value = result;
       }
     },
     []
