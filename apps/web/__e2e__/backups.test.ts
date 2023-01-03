@@ -20,7 +20,7 @@ import { test, Browser, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { NOTE, USER } from "./utils";
 
-test.only("Create a backup", async ({ page }) => {
+test("Create a backup", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
@@ -31,7 +31,7 @@ test.only("Create a backup", async ({ page }) => {
 });
 
 test.setTimeout(45 * 1000);
-test.only("Restore a backup", async ({ page }) => {
+test("Restore a backup", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
 
@@ -47,17 +47,17 @@ test.only("Restore a backup", async ({ page }) => {
   expect(await tags.isListFilled()).toBeTruthy();
 });
 
-test.only("Create an encrypted backup", async ({ page }) => {
+test("Create an encrypted backup", async ({ page }) => {
   const app = new AppModel(page);
   await app.auth.goto();
   await app.auth.login(USER.CURRENT);
   const settings = await app.goToSettings();
-  const backup = await settings.createBackup(true, USER.CURRENT.password);
+  const backup = await settings.createBackup(USER.CURRENT.password);
 
   expect(backup.length > 0).toBeTruthy();
 });
 
-test.only("Restore an encrypted backup", async ({ page }) => {
+test("Restore an encrypted backup", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
 

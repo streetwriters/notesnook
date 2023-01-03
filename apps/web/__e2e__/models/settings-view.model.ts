@@ -21,7 +21,7 @@ import { Locator, Page } from "@playwright/test";
 import {
   downloadAndReadFile,
   getTestId,
-  uploadAndReadFile,
+  uploadAndReadFile as uploadFile,
   USER
 } from "../utils";
 import { confirmDialog, fillPasswordDialog, waitToHaveText } from "./utils";
@@ -73,18 +73,18 @@ export class SettingsViewModel {
     return await this.accountStatusContainer.isVisible();
   }
 
-  async createBackup(encryptBackups = false, password = "") {
+  async createBackup(password: string | undefined = undefined) {
     await this.backupRestoreContainer.click();
-    if (encryptBackups) await this.encyptBackups.click();
+    if (password) await this.encyptBackups.click();
     await this.backupData.click();
-    if (encryptBackups) await fillPasswordDialog(this.page, password);
+    if (password) await fillPasswordDialog(this.page, password);
     return await downloadAndReadFile(this.page, this.backupData, "utf-8");
   }
 
   async restoreData(filename: string, encrypted = false) {
     await this.backupRestoreContainer.click();
     await this.restoreBackup.click();
-    await uploadAndReadFile(this.page, this.restoreBackup, filename);
+    await uploadFile(this.page, this.restoreBackup, filename);
     if (encrypted) await fillPasswordDialog(this.page, USER.CURRENT.password!);
   }
 }

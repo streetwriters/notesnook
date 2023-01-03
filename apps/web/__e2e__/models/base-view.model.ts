@@ -96,7 +96,7 @@ export class BaseViewModel {
   }
 
   async isListFilled() {
-    let itemCount = await this.page.locator(getTestId("list-item")).count();
+    let itemCount = await this.list.locator(getTestId("list-item")).count();
     if (itemCount > 0) return true;
     return false;
   }

@@ -247,7 +247,6 @@ function GroupHeader(props) {
       {index === 0 && (
         <Flex mr={1}>
           <IconButton
-            testId={"sort-icon-button"}
             icon={
               groupOptions.sortDirection === "asc"
                 ? Icon.SortAsc
@@ -293,7 +292,6 @@ function IconButton(props) {
   const isMobile = useMobile();
   return (
     <Button
-      data-test-id={props.testId}
       variant="secondary"
       bg="transparent"
       title={title}
