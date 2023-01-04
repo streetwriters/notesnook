@@ -188,7 +188,8 @@ export default function ReminderSheet({
       mode: reminderMode,
       localOnly: reminderMode === "permanent",
       snoozeUntil:
-        date?.getTime() > Date.now() ? undefined : reminder?.snoozeUntil
+        date?.getTime() > Date.now() ? undefined : reminder?.snoozeUntil,
+      disabled: false
     });
 
     const _reminder = db.reminders?.reminder(reminderId);

@@ -128,9 +128,12 @@ const onEvent = async ({ type, detail }: Event) => {
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
         );
+        const reminderTime = parseInt(
+          SettingsService.get().defaultSnoozeTime || "5"
+        );
         await db.reminders?.add({
           ...reminder,
-          snoozeUntil: Date.now() + 10 * 60000
+          snoozeUntil: Date.now() + reminderTime * 60000
         });
         await Notifications.scheduleNotification(
           db.reminders?.reminder(reminder?.id)
@@ -186,6 +189,7 @@ async function setupIOSCategories() {
   try {
     if (Platform.OS === "ios") {
       const categories = await notifee.getNotificationCategories();
+      const reminderTime = SettingsService.get().defaultSnoozeTime;
       if (categories.findIndex((c) => c.id === "REMINDER") === -1) {
         await notifee.setNotificationCategories([
           {
@@ -205,7 +209,7 @@ async function setupIOSCategories() {
               {
                 id: "REMINDER_SNOOZE",
                 foreground: false,
-                title: "Remind in 10 min",
+                title: `Remind in ${reminderTime} min`,
                 authenticationRequired: false
               },
               {
@@ -254,9 +258,10 @@ async function scheduleNotification(
         iosProperties["sound"] = "default";
       }
 
+      const reminderTime = SettingsService.get().defaultSnoozeTime;
       const androidActions = [
         {
-          title: "Remind in 10 min",
+          title: `Remind in ${reminderTime} min`,
           pressAction: {
             id: "REMINDER_SNOOZE"
           }

@@ -66,6 +66,7 @@ export type Settings = {
   disableAutoSync?: boolean;
   disableSync?: boolean;
   disableReminderNotifications?: boolean;
+  defaultSnoozeTime?: string;
 };
 
 type DimensionsType = {
@@ -138,7 +139,8 @@ export const useSettingStore = create<SettingStore>((set) => ({
     sessionExpired: false,
     version: null,
     doubleSpacedLines: true,
-    disableReminderNotifications: false
+    disableReminderNotifications: false,
+    defaultSnoozeTime: "5"
   },
   sheetKeyboardHandler: true,
   fullscreen: false,

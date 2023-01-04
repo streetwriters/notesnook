@@ -138,7 +138,7 @@ export function groupArray(
 /**
  * @param {any[]} array
  * @param {GroupOptions} options
- * @returns Grouped array
+ * @returns {(Reminder | {type: "header", title: string})[]} Grouped array
  */
 export function groupReminders(array) {
   const groups = new Map([
