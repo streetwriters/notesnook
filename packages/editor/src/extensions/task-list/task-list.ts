@@ -28,21 +28,12 @@ import { findChildrenByType } from "prosemirror-utils";
 
 export type TaskListAttributes = {
   title: string;
-  collapsed: boolean;
 };
 
 const stateKey = new PluginKey("task-item-drop-override");
 export const TaskListNode = TaskList.extend({
   addAttributes() {
     return {
-      collapsed: {
-        default: false,
-        keepOnSplit: false,
-        parseHTML: (element) => element.dataset.collapsed === "true",
-        renderHTML: (attributes) => ({
-          "data-collapsed": attributes.collapsed === true
-        })
-      },
       title: {
         default: null,
         keepOnSplit: false,
