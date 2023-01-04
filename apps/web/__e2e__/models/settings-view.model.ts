@@ -73,7 +73,7 @@ export class SettingsViewModel {
     return await this.accountStatusContainer.isVisible();
   }
 
-  async createBackup(password: string | undefined = undefined) {
+  async createBackup(password?: string) {
     await this.backupRestoreContainer.click();
     if (password) await this.encyptBackups.click();
     await this.backupData.click();
