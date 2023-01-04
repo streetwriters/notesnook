@@ -60,7 +60,8 @@ function ListItem(props) {
       background: "background"
     },
     isFocused,
-    isCompact
+    isCompact,
+    isDisabled
   } = props;
 
   const listItemRef = useRef();
@@ -117,6 +118,7 @@ function ListItem(props) {
       pl={1}
       tabIndex={-1}
       sx={{
+        opacity: isDisabled ? 0.7 : 1,
         height: "inherit",
         cursor: "pointer",
         position: "relative",
