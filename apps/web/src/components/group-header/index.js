@@ -246,26 +246,28 @@ function GroupHeader(props) {
 
       {index === 0 && (
         <Flex mr={1}>
-          <IconButton
-            testId="sort-icon-button"
-            icon={
-              groupOptions.sortDirection === "asc"
-                ? Icon.SortAsc
-                : Icon.SortDesc
-            }
-            title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy]}`}
-            onClick={() => {
-              const groupOptions = db.settings.getGroupOptions(type);
-              setGroupOptions(groupOptions);
+          {type && (
+            <IconButton
+              testId="sort-icon-button"
+              icon={
+                groupOptions.sortDirection === "asc"
+                  ? Icon.SortAsc
+                  : Icon.SortDesc
+              }
+              title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy]}`}
+              onClick={() => {
+                const groupOptions = db.settings.getGroupOptions(type);
+                setGroupOptions(groupOptions);
 
-              openMenu(menuItems, {
-                title: "Group & sort",
-                groupOptions,
-                refresh,
-                type
-              });
-            }}
-          />
+                openMenu(menuItems, {
+                  title: "Group & sort",
+                  groupOptions,
+                  refresh,
+                  type
+                });
+              }}
+            />
+          )}
           {viewMode && (
             <IconButton
               icon={

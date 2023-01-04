@@ -56,7 +56,7 @@ const CustomScrollbarsVirtualList = forwardRef<HTMLDivElement, ScrollerProps>(
 type ListContainerProps = {
   type: keyof typeof ListProfiles;
   items: Item[];
-  groupType: string;
+  groupType?: string;
   context?: Context;
   refresh: () => void;
   header?: JSX.Element;
