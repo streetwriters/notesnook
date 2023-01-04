@@ -26,6 +26,8 @@ import { useEffect, useState } from "react";
 import { db } from "../../common/db";
 import { useStore } from "../../stores/reminder-store";
 import { showToast } from "../../utils/toast";
+import { useIsUserPremium } from "../../hooks/use-is-user-premium";
+import { Pro } from "../icons";
 
 export type AddReminderDialogProps = {
   onClose: Perform;
@@ -68,7 +70,8 @@ const modes = [
   },
   {
     id: Modes.REPEAT,
-    title: "Repeat"
+    title: "Repeat",
+    premium: true
   }
 ];
 const priorities = [
@@ -119,6 +122,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
   const [title, setTitle] = useState<string>();
   const [description, setDescription] = useState<string>();
   const refresh = useStore((state) => state.refresh);
+  const isUserPremium = useIsUserPremium();
 
   useEffect(() => {
     setSelectedDays([]);
@@ -238,9 +242,16 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
               name="mode"
               defaultChecked={m.id === Modes.ONCE}
               checked={m.id === mode}
-              onChange={() => setMode(m.id)}
+              disabled={m.premium && !isUserPremium}
+              onChange={() => {
+                if (m.premium && !isUserPremium) return;
+                setMode(m.id);
+              }}
             />
             {m.title}
+            {m.premium && !isUserPremium && (
+              <Pro size={18} color="primary" sx={{ ml: 1 }} />
+            )}
           </Label>
         ))}
       </Flex>
