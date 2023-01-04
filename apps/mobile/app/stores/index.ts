@@ -28,6 +28,7 @@ import { useTagStore } from "./use-tag-store";
 import { useTrashStore } from "./use-trash-store";
 import { useReminderStore } from "./use-reminder-store";
 import Notifications from "../services/notifications";
+import { useRelationStore } from "./use-relation-store";
 export function initAfterSync() {
   useMenuStore.getState().setColorNotes();
   useMenuStore.getState().setMenuPins();
@@ -37,6 +38,7 @@ export function initAfterSync() {
   // Whenever sync completes, try to reschedule
   // any new/updated reminders.
   Notifications.setupReminders();
+  useRelationStore.getState().update();
 }
 
 export function initialize() {
