@@ -175,6 +175,7 @@ export default function ReminderSheet({
     }
 
     date.setSeconds(0, 0);
+
     const reminderId = await db.reminders?.add({
       id: reminder?.id,
       date: date?.getTime(),
@@ -184,7 +185,9 @@ export default function ReminderSheet({
       recurringMode: recurringMode,
       selectedDays: selectedDays,
       mode: reminderMode,
-      localOnly: reminderMode === "permanent"
+      localOnly: reminderMode === "permanent",
+      snoozeUntil:
+        date?.getTime() > Date.now() ? undefined : reminder?.snoozeUntil
     });
 
     const _reminder = db.reminders?.reminder(reminderId);
