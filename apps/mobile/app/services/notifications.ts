@@ -76,7 +76,6 @@ async function getNextMonthlyReminderDate(
       const date = dayjs(reminder.date).year(year).month(i).date(day);
       if (date.daysInMonth() < day || dayjs().isAfter(date)) continue;
       if (date.isBefore(dayjs())) continue;
-      console.log("Next reminder set on", date.year(),date.month(),date.date(),day);
       return date;
     }
   }
@@ -124,6 +123,32 @@ const onEvent = async ({ type, detail }: Event) => {
 
   if (type === EventType.ACTION_PRESS) {
     switch (pressAction?.id) {
+      case "REMINDER_SNOOZE": {
+        const reminder = db.reminders?.reminder(
+          notification?.id?.split("_")[0]
+        );
+        await db.reminders?.add({
+          ...reminder,
+          snoozeUntil: Date.now() + 10 * 60000
+        });
+        await Notifications.scheduleNotification(
+          db.reminders?.reminder(reminder?.id)
+        );
+        break;
+      }
+      case "REMINDER_DISABLE": {
+        const reminder = db.reminders?.reminder(
+          notification?.id?.split("_")[0]
+        );
+        await db.reminders?.add({
+          ...reminder,
+          disabled: true
+        });
+        await Notifications.scheduleNotification(
+          db.reminders?.reminder(reminder?.id)
+        );
+        break;
+      }
       case "UNPIN":
         remove(notification?.id as string);
         break;
@@ -154,6 +179,48 @@ const onEvent = async ({ type, detail }: Event) => {
   }
 };
 
+async function setupIOSCategories() {
+  try {
+    if (Platform.OS === "ios") {
+      const categories = await notifee.getNotificationCategories();
+      if (categories.findIndex((c) => c.id === "REMINDER") === -1) {
+        await notifee.setNotificationCategories([
+          {
+            id: "REMINDER",
+            actions: [
+              {
+                id: "REMINDER_SNOOZE",
+                foreground: false,
+                title: "Remind in 10 min",
+                authenticationRequired: false
+              }
+            ]
+          },
+          {
+            id: "REMINDER_RECURRING",
+            actions: [
+              {
+                id: "REMINDER_SNOOZE",
+                foreground: false,
+                title: "Remind in 10 min",
+                authenticationRequired: false
+              },
+              {
+                id: "REMINDER_DISABLE",
+                foreground: false,
+                title: "Disable",
+                authenticationRequired: false
+              }
+            ]
+          }
+        ]);
+      }
+    }
+  } catch (e) {
+    console.log("ERROR in setupIOSCategories", e);
+  }
+}
+
 async function scheduleNotification(
   reminder: Reminder | undefined,
   payload?: string
@@ -176,16 +243,32 @@ async function scheduleNotification(
       });
       return;
     }
-
+    await setupIOSCategories();
     if (!triggers) return;
     for (const trigger of triggers) {
-      //@ts-ignore
-      console.log(reminder.title, dayjs(trigger.timestamp));
       const iosProperties: { [name: string]: any } = {};
       if (priority === "urgent") {
         iosProperties["sound"] = "default";
       }
-      const notif = await notifee.createTriggerNotification(
+
+      const androidActions = [
+        {
+          title: "Remind in 10 min",
+          pressAction: {
+            id: "REMINDER_SNOOZE"
+          }
+        }
+      ];
+      if (reminder.mode === "repeat") {
+        androidActions.push({
+          title: "Disable",
+          pressAction: {
+            id: "REMINDER_DISABLE"
+          }
+        });
+      }
+
+      await notifee.createTriggerNotification(
         {
           id: trigger.id,
           title: title,
@@ -203,6 +286,7 @@ async function scheduleNotification(
               id: "default",
               mainComponent: "notesnook"
             },
+            actions: androidActions,
             style: !description
               ? undefined
               : {
@@ -212,12 +296,13 @@ async function scheduleNotification(
           },
           ios: {
             interruptionLevel: priority === "silent" ? "passive" : "active",
+            categoryId:
+              reminder.mode === "repeat" ? "REMINDER_RECURRING" : "REMINDER",
             ...iosProperties
           }
         },
         trigger
       );
-      console.log(notif);
     }
   } catch (e) {
     console.log(e);
