@@ -76,7 +76,7 @@ export class SettingsViewModel {
     return await downloadAndReadFile(this.page, this.backupData, "utf-8");
   }
 
-  async restoreData(filename: string, password: string | undefined) {
+  async restoreData(filename: string, password?: string) {
     await this.backupRestoreContainer.click();
     await this.restoreBackup.click();
     await uploadFile(this.page, this.restoreBackup, filename);
