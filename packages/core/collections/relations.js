@@ -120,7 +120,7 @@ export default class Relations extends Collection {
    * @param {Relation[]} relations
    * @param {"from" | "to"} resolveType
    * @private
-   * 
+   *
    * @returns {Relation[]}
    */
   resolve(relations, resolveType) {
@@ -147,7 +147,7 @@ export default class Relations extends Collection {
     for (const relation of relations) {
       const references = [relation.to, relation.from];
       for (let reference of references) {
-        const exists = false;
+        let exists = false;
         switch (reference.type) {
           case "reminder":
             exists = this._db.reminders.exists(reference.id);
