@@ -62,7 +62,10 @@ test("Restore an encrypted backup", async ({ page }) => {
   await app.goto();
 
   const settings = await app.goToSettings();
-  const backup = await settings.restoreData("encrypted.nnbackup", true);
+  const backup = await settings.restoreData(
+    "encrypted.nnbackup",
+    USER.CURRENT.password
+  );
   const notes = await app.goToNotes();
   expect(await notes.isListFilled()).toBeTruthy();
   const notebooks = await app.goToNotebooks();

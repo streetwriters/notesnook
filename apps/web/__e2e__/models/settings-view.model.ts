@@ -81,10 +81,10 @@ export class SettingsViewModel {
     return await downloadAndReadFile(this.page, this.backupData, "utf-8");
   }
 
-  async restoreData(filename: string, encrypted = false) {
+  async restoreData(filename: string, password: string | undefined) {
     await this.backupRestoreContainer.click();
     await this.restoreBackup.click();
     await uploadFile(this.page, this.restoreBackup, filename);
-    if (encrypted) await fillPasswordDialog(this.page, USER.CURRENT.password!);
+    if (password) await fillPasswordDialog(this.page, password);
   }
 }
