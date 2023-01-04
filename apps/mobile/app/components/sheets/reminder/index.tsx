@@ -38,6 +38,7 @@ import Navigation from "../../../services/navigation";
 import Notifications, { Reminder } from "../../../services/notifications";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import Paragraph from "../../ui/typography/paragraph";
+import PremiumService from "../../../services/premium";
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheet>;
   close?: (ctx?: string) => void;
@@ -254,6 +255,7 @@ export default function ReminderSheet({
               borderRadius: 100,
               minWidth: 70
             }}
+            proTag={mode === "Repeat"}
             height={35}
             type={
               reminderMode === ReminderModes[mode as keyof typeof ReminderModes]
@@ -261,6 +263,7 @@ export default function ReminderSheet({
                 : "gray"
             }
             onPress={() => {
+              if (mode === "Repeat" && !PremiumService.get()) return;
               setReminderMode(
                 ReminderModes[
                   mode as keyof typeof ReminderModes
@@ -287,31 +290,6 @@ export default function ReminderSheet({
               alignItems: "center"
             }}
           >
-            {/* {Platform.OS === "android" ? (
-              <Input
-                containerStyle={{
-                  width: 40,
-                  height: 30,
-                  borderWidth: 0,
-                  borderBottomWidth: 1,
-                  borderColor: colors.accent
-                }}
-                inputStyle={{
-                  fontFamily: "mono",
-                  textAlign: "center"
-                }}
-                onChangeText={(text) => {
-                  setRepeatFrequency(!text ? 1 : parseInt(text));
-                }}
-                keyboardType="decimal-pad"
-                fontSize={SIZE.sm}
-                defaultValue="1"
-                height={30}
-                marginBottom={0}
-                marginRight={0}
-                flexGrow={0}
-              />
-            ) : null} */}
             {Object.keys(RecurringModes).map((mode) => (
               <Button
                 key={mode}
