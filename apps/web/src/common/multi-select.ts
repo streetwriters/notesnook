@@ -174,7 +174,7 @@ async function moveRemindersToTrash(reminders: Item[]) {
 
   showToast(
     "success",
-    `${pluralize(reminders.length, "reminder", "reminders")} moved to trash`
+    `${pluralize(reminders.length, "reminder", "reminders")} deleted.`
   );
 }
 
