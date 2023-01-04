@@ -105,6 +105,15 @@ async function downloadAndReadFile(
   return fs.readFileSync(path, { encoding });
 }
 
+async function uploadFile(page: Page, action: Locator, filename: string) {
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent("filechooser"),
+    await action.click()
+  ]);
+
+  await fileChooser.setFiles(path.join(__dirname, "../data", filename));
+}
+
 function isTestAll() {
   return process.env.TEST_ALL === "true";
 }
@@ -135,6 +144,7 @@ export {
   createNote,
   editNote,
   downloadAndReadFile,
+  uploadFile,
   isTestAll,
   orderByOptions,
   sortByOptions,
