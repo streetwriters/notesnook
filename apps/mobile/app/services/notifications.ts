@@ -42,6 +42,7 @@ import SettingsService from "./settings";
 import { useSettingStore } from "../stores/use-setting-store";
 import ReminderNotify from "../components/sheets/reminder-notify";
 import { sleep } from "../utils/time";
+import { useRelationStore } from "../stores/use-relation-store";
 
 export type Reminder = {
   id: string;
@@ -134,6 +135,7 @@ const onEvent = async ({ type, detail }: Event) => {
         await Notifications.scheduleNotification(
           db.reminders?.reminder(reminder?.id)
         );
+        useRelationStore.getState().update();
         break;
       }
       case "REMINDER_DISABLE": {
@@ -147,6 +149,7 @@ const onEvent = async ({ type, detail }: Event) => {
         await Notifications.scheduleNotification(
           db.reminders?.reminder(reminder?.id)
         );
+        useRelationStore.getState().update();
         break;
       }
       case "UNPIN":
