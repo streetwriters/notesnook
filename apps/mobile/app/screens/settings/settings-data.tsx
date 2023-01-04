@@ -381,27 +381,52 @@ export const settingsGroups: SettingSection[] = [
         ]
       },
       {
-        id: "sync-issues-fix",
-        name: "Having problems with sync",
-        description: "Try force sync to resolve issues with syncing",
-        icon: "sync-alert",
-        modifer: async () => {
-          presentDialog({
-            title: "Force sync",
-            paragraph:
-              "If your data on two devices is out of sync even after trying to sync normally. You can run force sync to solve such problems. Usually you should never need to run this otherwise. Force sync means that all your data on this device is reuploaded to the server.",
-            negativeText: "Cancel",
-            positiveText: "Start",
-            positivePress: async () => {
-              eSendEvent(eCloseProgressDialog);
-              await sleep(300);
-              Progress.present();
-              Sync.run("global", true, true, () => {
-                eSendEvent(eCloseProgressDialog);
+        id: "sync-settings",
+        name: "Sync settings",
+        description: "Configure syncing for this device",
+        type: "screen",
+        icon: "autorenew",
+        sections: [
+          {
+            id: "auto-sync",
+            name: "Disable auto sync",
+            description:
+              "Turn off automatic syncing. Changes from this client will be synced only when you run sync manually.",
+            type: "switch",
+            property: "disableAutoSync"
+          },
+          {
+            id: "disable-sync",
+            name: "Disable syncing",
+            description:
+              "Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device.",
+            type: "switch",
+            property: "disableSync",
+          },
+          {
+            id: "sync-issues-fix",
+            name: "Having problems with sync",
+            description: "Try force sync to resolve issues with syncing",
+            icon: "sync-alert",
+            modifer: async () => {
+              presentDialog({
+                title: "Force sync",
+                paragraph:
+                  "If your data on two devices is out of sync even after trying to sync normally. You can run force sync to solve such problems. Usually you should never need to run this otherwise. Force sync means that all your data on this device is reuploaded to the server.",
+                negativeText: "Cancel",
+                positiveText: "Start",
+                positivePress: async () => {
+                  eSendEvent(eCloseProgressDialog);
+                  await sleep(300);
+                  Progress.present();
+                  Sync.run("global", true, true, () => {
+                    eSendEvent(eCloseProgressDialog);
+                  });
+                }
               });
             }
-          });
-        }
+          }
+        ]
       }
     ]
   },

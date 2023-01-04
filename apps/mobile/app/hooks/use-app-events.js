@@ -277,6 +277,7 @@ export const useAppEvents = () => {
   };
 
   const onRequestPartialSync = async (full, force) => {
+    if (SettingsService.get().disableAutoSync) return;
     DatabaseLogger.info(`onRequestPartialSync full:${full}, force:${force}`);
     if (full || force) {
       await Sync.run("global", force, full);

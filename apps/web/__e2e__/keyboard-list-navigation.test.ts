@@ -255,3 +255,58 @@ test("select notes using Shift+Click upwards", async ({ page }, info) => {
   }
   expect(await notesList[0].isFocused()).toBeTruthy();
 });
+
+test("Ctrl+Click to select/unselect notes", async ({ page }, info) => {
+  info.setTimeout(60 * 1000);
+  const { notesList, notes } = await populateList(page, 10);
+  await notes.focus();
+
+  await page.keyboard.down("Control");
+  for (let i = 2; i < 10; i += 2) {
+    await notesList[i].click();
+  }
+  await page.keyboard.up("Control");
+
+  for (let i = 2; i < 10; i += 2) {
+    expect(await notesList[i].isSelected()).toBeTruthy();
+  }
+
+  const selectedNote = notesList[2];
+  await selectedNote.contextMenu.open();
+  expect(
+    (await selectedNote.contextMenu.title()) === `5 items selected`
+  ).toBeTruthy();
+  await selectedNote.contextMenu.close();
+
+  await page.keyboard.down("Control");
+  for (let i = 2; i < 10; i += 2) {
+    await notesList[i].click();
+  }
+  await page.keyboard.up("Control");
+
+  for (let i = 2; i < 10; i += 2) {
+    expect(await notesList[i].isSelected()).toBeFalsy();
+  }
+
+  await selectedNote.contextMenu.open();
+  expect(
+    (await selectedNote.contextMenu.title()) === (await selectedNote.getTitle())
+  ).toBeTruthy();
+});
+
+test("opening a note & right clicking on another note should show note properties menu", async ({
+  page
+}, info) => {
+  info.setTimeout(60 * 1000);
+  const { notesList, notes } = await populateList(page, 10);
+  await notes.focus();
+
+  const noteSelected = 4;
+  const selectedNote = notesList[noteSelected];
+
+  await notesList[0].click();
+  await selectedNote.contextMenu.open();
+  expect(
+    (await selectedNote.contextMenu.title()) === (await selectedNote.getTitle())
+  ).toBeTruthy();
+});

@@ -22,27 +22,32 @@ import { Box, Text } from "@theme-ui/components";
 import Dialog from "./dialog";
 import * as Icon from "../icons";
 
-function LoadingDialog(props) {
+type LoadingDialogProps<T> = {
+  onClose: (result: T | boolean) => void;
+  action: () => T | Promise<T>;
+  title: string;
+  description: string;
+  message?: string;
+};
+
+function LoadingDialog<T>(props: LoadingDialogProps<T>) {
+  const { onClose, action, description, message, title } = props;
   useEffect(() => {
     (async function () {
       try {
-        props.onDone(await props.action());
+        onClose(await action());
       } catch (e) {
-        props.onDone(e);
+        onClose(false);
+        throw e;
       }
     })();
-  }, [props]);
+  }, [onClose, action]);
 
   return (
-    <Dialog
-      isOpen={true}
-      title={props.title}
-      description={props.subtitle}
-      onClose={() => {}}
-    >
+    <Dialog isOpen={true} title={title} description={description}>
       <Box>
         <Text as="span" variant="body">
-          {props.message}
+          {message}
         </Text>
         <Icon.Loading rotate sx={{ my: 2 }} color="primary" />
       </Box>

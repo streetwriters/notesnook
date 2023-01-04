@@ -50,7 +50,6 @@ const relay = new WebExtensionRelay();
 
 export default function AppEffects({ setShow }) {
   const refreshNavItems = useStore((store) => store.refreshNavItems);
-  const sync = useStore((store) => store.sync);
   const updateLastSynced = useStore((store) => store.updateLastSynced);
   const isFocusMode = useStore((store) => store.isFocusMode);
   const addReminder = useStore((store) => store.addReminder);
@@ -83,13 +82,6 @@ export default function AppEffects({ setShow }) {
         }
       );
 
-      db.eventManager.subscribe(
-        EVENTS.databaseSyncRequested,
-        async (full, force) => {
-          await sync(full, force);
-        }
-      );
-
       initStore();
       initAttachments();
       refreshNavItems();
@@ -118,7 +110,6 @@ export default function AppEffects({ setShow }) {
       initEditorStore,
       initStore,
       initAttachments,
-      sync,
       updateLastSynced,
       refreshNavItems,
       initUser,

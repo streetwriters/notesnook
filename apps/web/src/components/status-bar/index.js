@@ -27,7 +27,8 @@ import {
   SyncError,
   Checkmark,
   Alert,
-  Issue
+  Issue,
+  SyncOff
 } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -203,12 +204,28 @@ function statusToInfoText(status) {
 function SyncStatus() {
   const syncStatus = useAppStore((state) => state.syncStatus);
   const lastSynced = useAppStore((state) => state.lastSynced);
+  const isSyncEnabled = useAppStore((state) => state.isSyncEnabled);
   const sync = useAppStore((state) => state.sync);
   const user = useUserStore((state) => state.user);
 
   const status = syncStatusFilters.find((f) =>
     f.check(syncStatus.key, user, lastSynced)
   );
+
+  if (!isSyncEnabled)
+    return (
+      <Button
+        variant="statusitem"
+        sx={{ alignItems: "center", justifyContent: "center", display: "flex" }}
+        title={"Sync is disabled"}
+        data-test-id={`sync-status-disabled`}
+      >
+        <SyncOff size={12} color={"error"} />
+        <Text variant="subBody" ml={status.text ? "3px" : 0}>
+          Sync disabled
+        </Text>
+      </Button>
+    );
 
   return (
     <Button

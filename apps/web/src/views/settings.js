@@ -127,6 +127,7 @@ const otherItems = [
 
 function Settings() {
   const [groups, setGroups] = useState({
+    sync: false,
     appearance: false,
     editor: false,
     mfa: false,
@@ -137,6 +138,10 @@ function Settings() {
     other: true
   });
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
+  const isSyncEnabled = useAppStore((store) => store.isSyncEnabled);
+  const isAutoSyncEnabled = useAppStore((store) => store.isAutoSyncEnabled);
+  const toggleAutoSync = useAppStore((store) => store.toggleAutoSync);
+  const toggleSync = useAppStore((store) => store.toggleSync);
   const setIsVaultCreated = useAppStore((store) => store.setIsVaultCreated);
   const refreshApp = useAppStore((store) => store.refresh);
   const refreshNotes = useNoteStore((store) => store.refresh);
@@ -253,7 +258,7 @@ function Settings() {
                   }
                 );
                 if (result) {
-                  await showToast("success", "Account password changed!");
+                  showToast("success", "Account password changed!");
                 }
               }}
             >
@@ -266,12 +271,6 @@ function Settings() {
               <Tip
                 text="Manage attachments"
                 tip="Re-upload, delete & manage your attachments."
-              />
-            </Button>
-            <Button variant="list" onClick={() => sync(true, true)}>
-              <Tip
-                text="Having problems with syncing?"
-                tip="Try force sync to resolve issues with syncing"
               />
             </Button>
             <Button
@@ -384,6 +383,41 @@ function Settings() {
                   </Button>
                 </>
               ))}
+          </>
+        )}
+        {isLoggedIn && (
+          <>
+            <Header
+              title="Sync settings"
+              isOpen={groups.sync}
+              onClick={() => {
+                setGroups((g) => ({ ...g, sync: !g.sync }));
+              }}
+            />
+            {groups.sync && (
+              <>
+                <Toggle
+                  title="Disable sync"
+                  onTip="Changes on this device won't sync to your other devices."
+                  offTip="Your changes will be synced to other devices."
+                  onToggled={toggleSync}
+                  isToggled={!isSyncEnabled}
+                />
+                <Toggle
+                  title="Disable auto sync"
+                  onTip="You will have to manually run the sync to transfer your changes to other devices."
+                  offTip="All changes will automatically sync to your other device."
+                  onToggled={toggleAutoSync}
+                  isToggled={!isAutoSyncEnabled}
+                />
+                <Button variant="list" onClick={() => sync(true, true)}>
+                  <Tip
+                    text="Having problems with syncing?"
+                    tip="Try force sync to resolve issues with syncing"
+                  />
+                </Button>
+              </>
+            )}
           </>
         )}
         <Header

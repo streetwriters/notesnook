@@ -25,6 +25,7 @@ import { doInBackground } from "../utils";
 import { db } from "../common/database";
 import { DatabaseLogger } from "../common/database/index";
 import { ToastEvent } from "./event-manager";
+import SettingsService from "./settings";
 
 NetInfo.configure({
   reachabilityUrl: "https://notesnook.com",
@@ -56,7 +57,11 @@ const run = async (
     if (!status.isInternetReachable) {
       DatabaseLogger.warn("Internet not reachable");
     }
-    if (!user || !status.isInternetReachable) {
+    if (
+      !user ||
+      !status.isInternetReachable ||
+      SettingsService.get().disableSync
+    ) {
       initAfterSync();
       return onCompleted?.(false);
     }

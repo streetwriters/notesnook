@@ -30,8 +30,11 @@ export class ContextMenuModel {
     return await this.titleText.textContent();
   }
 
-  async open(locator: Locator) {
-    await locator.click({ button: "right" });
+  async open(
+    locator: Locator,
+    button: "left" | "right" | "middle" | undefined = "right"
+  ) {
+    await locator.click({ button });
     await this.titleText.waitFor();
   }
 
@@ -41,6 +44,13 @@ export class ContextMenuModel {
 
   getItem(id: string) {
     return this.page.locator(getTestId(`menuitem-${id}`));
+  }
+
+  async hasItem(id: string) {
+    return (
+      (await this.getItem(id).isVisible()) &&
+      (await this.getItem(id).isEnabled())
+    );
   }
 
   async close() {

@@ -574,7 +574,7 @@ function parseS3Error(data) {
   if (!(data instanceof ArrayBuffer)) {
     return {
       Code: "UNKNOWN",
-      Message: "An unknown error occured while uploading the attachment."
+      Message: typeof data === "object" ? JSON.stringify(data) : data
     };
   }
   const xml = new TextDecoder().decode(data);

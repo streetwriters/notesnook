@@ -63,6 +63,8 @@ export type Settings = {
   sessionExpired: boolean;
   version: string | null;
   doubleSpacedLines?: boolean;
+  disableAutoSync?: boolean;
+  disableSync?: boolean;
 };
 
 type DimensionsType = {

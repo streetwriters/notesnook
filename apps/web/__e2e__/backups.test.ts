@@ -20,7 +20,7 @@ import { test, Browser, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { NOTE, USER } from "./utils";
 
-test("Create a backup", async ({ page }) => {
+test("create a backup", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
@@ -31,23 +31,23 @@ test("Create a backup", async ({ page }) => {
 });
 
 test.setTimeout(45 * 1000);
-test("Restore a backup", async ({ page }) => {
+test("restore a backup", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
 
   const settings = await app.goToSettings();
-  const backup = await settings.restoreData("backup.nnbackup");
+  await settings.restoreData("backup.nnbackup", USER.CURRENT.password);
   const notes = await app.goToNotes();
-  expect(await notes.isListFilled()).toBeTruthy();
+  expect(await notes.isEmpty()).toBeTruthy();
   const notebooks = await app.goToNotebooks();
-  expect(await notebooks.isListFilled()).toBeTruthy();
+  expect(await notebooks.isEmpty()).toBeTruthy();
   const favotites = await app.goToFavorites();
-  expect(await favotites.isListFilled()).toBeTruthy();
+  expect(await favotites.isEmpty()).toBeTruthy();
   const tags = await app.goToTags();
-  expect(await tags.isListFilled()).toBeTruthy();
+  expect(await tags.isEmpty()).toBeTruthy();
 });
 
-test("Create an encrypted backup", async ({ page }) => {
+test("create an encrypted backup", async ({ page }) => {
   const app = new AppModel(page);
   await app.auth.goto();
   await app.auth.login(USER.CURRENT);
@@ -57,21 +57,18 @@ test("Create an encrypted backup", async ({ page }) => {
   expect(backup.length > 0).toBeTruthy();
 });
 
-test("Restore an encrypted backup", async ({ page }) => {
+test("restore an encrypted backup", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
 
   const settings = await app.goToSettings();
-  const backup = await settings.restoreData(
-    "encrypted.nnbackup",
-    USER.CURRENT.password
-  );
+  await settings.restoreData("encrypted.nnbackup", USER.CURRENT.password);
   const notes = await app.goToNotes();
-  expect(await notes.isListFilled()).toBeTruthy();
+  expect(await notes.isEmpty()).toBeTruthy();
   const notebooks = await app.goToNotebooks();
-  expect(await notebooks.isListFilled()).toBeTruthy();
+  expect(await notebooks.isEmpty()).toBeTruthy();
   const favotites = await app.goToFavorites();
-  expect(await favotites.isListFilled()).toBeTruthy();
+  expect(await favotites.isEmpty()).toBeTruthy();
   const tags = await app.goToTags();
-  expect(await tags.isListFilled()).toBeTruthy();
+  expect(await tags.isEmpty()).toBeTruthy();
 });
