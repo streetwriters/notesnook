@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React, { RefObject, useRef, useState } from "react";
-import { Platform, ScrollView, View } from "react-native";
+import { Platform, ScrollView, View, TextInput } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {
@@ -112,7 +112,7 @@ export default function ReminderSheet({
   const [repeatFrequency, setRepeatFrequency] = useState(1);
   const title = useRef<string | undefined>(reminder?.title);
   const details = useRef<string | undefined>(reminder?.description);
-
+  const titleRef = useRef<TextInput>(null);
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -155,8 +155,25 @@ export default function ReminderSheet({
 
   async function saveReminder() {
     if (!(await Notifications.checkAndRequestPermissions())) return;
-    if ((!date && reminderMode !== ReminderModes.Permanent) || !title.current)
+    if (!date && reminderMode !== ReminderModes.Permanent) return;
+    if (!title.current) {
+      ToastEvent.show({
+        heading: "Please set title of the reminder",
+        type: "error",
+        context: "local"
+      });
       return;
+    }
+    if (date.getTime() < Date.now()) {
+      ToastEvent.show({
+        heading: "Reminder date must be set in future",
+        type: "error",
+        context: "local"
+      });
+      titleRef?.current?.focus();
+      return;
+    }
+
     date.setSeconds(0, 0);
     const reminderId = await db.reminders?.add({
       id: reminder?.id,
@@ -195,6 +212,7 @@ export default function ReminderSheet({
       "TopicNotes"
     );
     close?.("local");
+    close?.();
   }
 
   return (
@@ -204,6 +222,7 @@ export default function ReminderSheet({
       }}
     >
       <Input
+        fwdRef={titleRef}
         defaultValue={reminder?.title}
         placeholder="Remind me of..."
         onChangeText={(text) => (title.current = text)}
