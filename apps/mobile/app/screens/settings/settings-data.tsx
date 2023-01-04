@@ -833,7 +833,24 @@ export const settingsGroups: SettingSection[] = [
               }
             },
             description:
-              "Disable reminder notifications on this device, this is useful when you have notesnook on multiple devices & want to recieve reminder notifications only on your primary device."
+              "Disable reminder notifications on this device, this is useful when you have Notesnook on multiple devices & want to recieve reminder notifications only on your primary device."
+          },
+          {
+            id: "snooze-time",
+            property: "defaultSnoozeTime",
+            type: "input",
+            icon: "snooze",
+            name: "Default snooze time",
+            description:
+              "Set the default time to snooze a reminder to when you press the snooze button on a notification",
+            inputProperties: {
+              keyboardType: "decimal-pad",
+              defaultValue: 5 + "",
+              placeholder: "Set snooze time in minutes",
+              onSubmitEditing:() => {
+                Notifications.setupReminders();
+              }
+            }
           }
         ]
       }

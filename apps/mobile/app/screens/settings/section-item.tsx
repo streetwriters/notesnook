@@ -22,16 +22,17 @@ import {
   StackActions,
   useNavigation
 } from "@react-navigation/native";
-import React from "react";
-import { View } from "react-native";
+import React, { useRef } from "react";
+import { View, TextInput } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ToggleSwitch from "toggle-switch-react-native";
+import Input from "../../components/ui/input";
 import { PressableButton } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
 import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useSettingStore } from "../../stores/use-setting-store";
+import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { components } from "./components";
@@ -43,6 +44,8 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   const navigation = useNavigation<NavigationProp<RouteParams>>();
   const current = item.useHook && item.useHook(item);
   const isHidden = item.hidden && item.hidden(item.property || current);
+  const inputRef = useRef<TextInput>(null);
+
   const onChangeSettings = () => {
     if (item.modifer) {
       item.modifer(item.property || current);
@@ -61,7 +64,6 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           backgroundColor: colors.errorBg
         }
       : {};
-
   return isHidden ? null : (
     <PressableButton
       disabled={item.type === "component"}
@@ -72,7 +74,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         paddingVertical: 20,
-        borderRadius:0,
+        borderRadius: 0,
         ...styles
       }}
       onPress={() => {
@@ -154,6 +156,31 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               <Seperator half />
               {components[item.component]}
             </>
+          )}
+
+          {item.type === "input" && (
+            <Input
+              {...item.inputProperties}
+              onSubmit={(e) => {
+                if (e.nativeEvent.text) {
+                  SettingsService.set({
+                    [item.property as string]: e.nativeEvent.text
+                  });
+                }
+                item.inputProperties?.onSubmitEditing?.(e);
+              }}
+              containerStyle={{ marginTop: 12 }}
+              fwdRef={inputRef}
+              onLayout={() => {
+                inputRef?.current?.setNativeProps({
+                  text:
+                    SettingsService.get()[
+                      item.property as keyof SettingStore["settings"]
+                    ] + ""
+                });
+              }}
+              defaultValue={item.inputProperties?.defaultValue}
+            />
           )}
         </View>
       </View>
