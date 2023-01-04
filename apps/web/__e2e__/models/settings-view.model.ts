@@ -18,12 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Locator, Page } from "@playwright/test";
-import {
-  downloadAndReadFile,
-  getTestId,
-  uploadAndReadFile as uploadFile,
-  USER
-} from "../utils";
+import { downloadAndReadFile, getTestId, uploadFile } from "../utils";
 import { confirmDialog, fillPasswordDialog, waitToHaveText } from "./utils";
 
 export class SettingsViewModel {

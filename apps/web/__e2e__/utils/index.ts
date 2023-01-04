@@ -104,11 +104,7 @@ async function downloadAndReadFile(
   return fs.readFileSync(path, { encoding });
 }
 
-async function uploadAndReadFile(
-  page: Page,
-  action: Locator,
-  filename: string
-) {
+async function uploadFile(page: Page, action: Locator, filename: string) {
   const [fileChooser] = await Promise.all([
     page.waitForEvent("filechooser"),
     await action.click()
@@ -131,6 +127,6 @@ export {
   createNote,
   editNote,
   downloadAndReadFile,
-  uploadAndReadFile,
+  uploadFile,
   isTestAll
 };
