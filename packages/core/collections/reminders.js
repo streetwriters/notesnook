@@ -109,7 +109,7 @@ export default class Reminders extends Collection {
   }
 
   exists(itemId) {
-    return !!this.shortcut(itemId);
+    return !!this.reminder(itemId);
   }
 
   reminder(id) {
