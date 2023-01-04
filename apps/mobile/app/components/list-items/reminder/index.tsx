@@ -57,7 +57,8 @@ const ReminderItem = React.memo(
         <View
           style={{
             flexWrap: "wrap",
-            flexShrink: 1
+            flexShrink: 1, 
+            opacity: item.disabled ? 0.5 : 1
           }}
         >
           <Heading
@@ -144,7 +145,7 @@ const ReminderItem = React.memo(
                 </Paragraph>
               </View>
             ) : null}
-            {item.date ? (
+            {item.date && !item.disabled ? (
               <View
                 style={{
                   backgroundColor: colors.nav,
