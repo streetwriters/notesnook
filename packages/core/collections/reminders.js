@@ -198,8 +198,8 @@ function getUpcomingReminderTime(reminder) {
 export function getUpcomingReminder(reminders) {
   const sorted = reminders.sort((a, b) => {
     const d1 = a.mode === "repeat" ? getUpcomingReminderTime(a) : a.date;
-    const d2 = a.mode === "repeat" ? getUpcomingReminderTime(b) : b.date;
-    return !d1 || !d2 ? 0 : d1 - d2;
+    const d2 = b.mode === "repeat" ? getUpcomingReminderTime(b) : b.date;
+    return !d1 || !d2 ? 0 : d2 - d1;
   });
   return sorted[0];
 }
