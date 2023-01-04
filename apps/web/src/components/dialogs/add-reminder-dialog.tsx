@@ -159,7 +159,9 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
         text: reminderId ? "Save" : "Add",
         disabled:
           !title ||
-          (recurringMode !== RecurringModes.DAY && !selectedDays.length),
+          (mode !== Modes.ONCE &&
+            recurringMode !== RecurringModes.DAY &&
+            !selectedDays.length),
         onClick: async () => {
           if (!("Notification" in window))
             showToast(
