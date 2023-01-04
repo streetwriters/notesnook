@@ -208,3 +208,15 @@ export function getUpcomingReminder(reminders) {
   });
   return sorted[0];
 }
+
+/**
+ * @param {Reminder} reminder
+ */
+
+export function isReminderActive(reminder) {
+  const time = getUpcomingReminderTime(reminder);
+  return (
+    !reminder.disabled &&
+    (time > Date.now() || reminder.snoozeUntil > Date.now())
+  );
+}

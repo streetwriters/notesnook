@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { isReminderActive } from "../collections/reminders";
 import "../types";
 import { getWeekGroupFromTimestamp, MONTHS_FULL } from "./date";
 
@@ -131,16 +132,26 @@ export function groupArray(
     addToGroup(groups, groupTitle, item);
   });
 
-  let items = [];
-  for (let [groupTitle, groupItems] of groups.entries()) {
-    if (!groupItems.length) continue;
+  return flattenGroups(groups);
+}
 
-    let group = { title: groupTitle, type: "header" };
-    items.push(group);
-    groupItems.forEach((item) => items.push(item));
-  }
+/**
+ * @param {any[]} array
+ * @param {GroupOptions} options
+ * @returns Grouped array
+ */
+export function groupReminders(array) {
+  const groups = new Map([
+    ["Active", []],
+    ["Inactive", []]
+  ]);
 
-  return items;
+  array.forEach((item) => {
+    const groupTitle = isReminderActive(item) ? "Active" : "Inactive";
+    addToGroup(groups, groupTitle, item);
+  });
+
+  return flattenGroups(groups);
 }
 
 function addToGroup(groups, groupTitle, item) {
@@ -153,4 +164,17 @@ const REGEX = /\S/;
 function getFirstCharacter(str) {
   if (!str) return "-";
   return REGEX.exec(str)[0].toUpperCase();
+}
+
+function flattenGroups(groups) {
+  let items = [];
+  for (let [groupTitle, groupItems] of groups.entries()) {
+    if (!groupItems.length) continue;
+
+    let group = { title: groupTitle, type: "header" };
+    items.push(group);
+    groupItems.forEach((item) => items.push(item));
+  }
+
+  return items;
 }
