@@ -140,7 +140,7 @@ const ReminderItem = React.memo(
                   style={{ marginLeft: 5 }}
                 >
                   {item.recurringMode.slice(0, 1).toUpperCase() +
-                    item.recurringMode.slice(1) +
+                    item.recurringMode.replace("y", "i").slice(1) +
                     "ly"}
                 </Paragraph>
               </View>
