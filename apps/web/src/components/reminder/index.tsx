@@ -53,16 +53,15 @@ function Reminder({ item, index }: { item: ReminderType; index: number }) {
       item={reminder}
       title={reminder.title}
       body={reminder.description}
+      isDisabled={reminder.disabled}
       footer={
         <Flex
           sx={{
             alignItems: "center"
           }}
         >
-          {reminder.disabled ? (
-            <Icon.ReminderOff size={16} color="fontTertiary" sx={{ mr: 1 }} />
-          ) : (
-            <PriorityIcon size={16} color="fontTertiary" sx={{ mr: 1 }} />
+          {reminder.disabled ? null : (
+            <PriorityIcon size={14} color="fontTertiary" sx={{ mr: 1 }} />
           )}
           {reminder.mode === "repeat" && reminder.recurringMode && (
             <IconTag
@@ -70,7 +69,15 @@ function Reminder({ item, index }: { item: ReminderType; index: number }) {
               text={RECURRING_MODE_MAP[reminder.recurringMode]}
             />
           )}
-          <IconTag icon={Icon.Clock} text={formatReminderTime(reminder)} />
+          {reminder.disabled ? (
+            <IconTag
+              icon={Icon.ReminderOff}
+              text={"Disabled"}
+              styles={{ icon: { color: "error" } }}
+            />
+          ) : (
+            <IconTag icon={Icon.Clock} text={formatReminderTime(reminder)} />
+          )}
         </Flex>
       }
       index={index}
