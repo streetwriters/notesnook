@@ -129,6 +129,11 @@ export default class Reminders extends Collection {
 export function formatReminderTime(reminder) {
   const { date } = reminder;
   let time = date;
+
+  if (reminder.snoozeUntil && reminder.snoozeUntil > Date.now()) {
+    return `Snoozed until ${dayjs(reminder.snoozeUntil).format("hh:mm A")}`;
+  }
+
   if (reminder.mode === "repeat") {
     time = getUpcomingReminderTime(reminder);
   }
