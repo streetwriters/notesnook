@@ -47,7 +47,10 @@ export function DownloadAttachment(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() => {
-        const attachmentNode = findSelectedNode(editor, "attachment");
+        const attachmentNode =
+          findSelectedNode(editor, "attachment") ||
+          findSelectedNode(editor, "image");
+
         const attachment = (attachmentNode?.attrs || {}) as Attachment;
         editor.current?.chain().focus().downloadAttachment(attachment).run();
       }}
