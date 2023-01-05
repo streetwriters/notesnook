@@ -145,7 +145,6 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
     setTime(dayjs(reminder.date).format("HH:mm"));
     setTitle(reminder.title);
     setDescription(reminder.description);
-    console.log(reminder);
   }, [reminderId]);
 
   const repeatsDaily =
@@ -200,7 +199,9 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             selectedDays,
             date: dateTime.valueOf(),
             title,
-            description
+            description,
+            disabled: false,
+            ...(dateTime.isAfter(dayjs()) ? { snoozeUntil: 0 } : {})
           });
           refresh();
           props.onClose(true);
