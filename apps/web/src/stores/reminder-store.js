@@ -24,6 +24,7 @@ import { groupReminders } from "@notesnook/core/utils/grouping";
 import { TaskScheduler } from "../utils/task-scheduler";
 import { showReminderPreviewDialog } from "../common/dialog-controller";
 import dayjs from "dayjs";
+import Config from "../utils/config";
 
 class ReminderStore extends BaseStore {
   reminders = [];
@@ -74,6 +75,8 @@ async function resetReminders(reminders) {
 
 function scheduleReminder(id, reminder, cron) {
   return TaskScheduler.register(`reminder:${id}`, cron, () => {
+    if (!Config.get("reminderNotifications", true)) return;
+
     const notification = new Notification(reminder.title, {
       body: reminder.description,
       vibrate: reminder.priority === "vibrate",
