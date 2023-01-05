@@ -194,7 +194,8 @@ export const SessionExpired = () => {
             width: focused ? "100%" : "99.9%",
             padding: 12,
             justifyContent: "center",
-            flex: 1
+            flex: 1,
+            backgroundColor:colors.bg
           }}
         >
           <View
