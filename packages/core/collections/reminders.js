@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import getId from "../utils/id";
 import Collection from "./collection";
 import dayjs from "dayjs";
-import isBetween from "dayjs/plugin/isBetween";
 import isToday from "dayjs/plugin/isToday";
 import isTomorrow from "dayjs/plugin/isTomorrow";
 import isYesterday from "dayjs/plugin/isYesterday";
@@ -30,7 +29,6 @@ dayjs.extend(isTomorrow);
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isYesterday);
 dayjs.extend(isToday);
-dayjs.extend(isBetween);
 
 /**
  * @typedef {{
@@ -164,7 +162,7 @@ function getUpcomingReminderTime(reminder) {
   const now = dayjs();
   const relativeTime = now.clone().hour(time.hour()).minute(time.minute());
 
-  const isPast = relativeTime.isBefore(now);
+  const isPast = relativeTime.isSameOrBefore(now);
 
   const isDay = reminder.recurringMode === "day";
   const isWeek = reminder.recurringMode === "week";
