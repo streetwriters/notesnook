@@ -383,7 +383,6 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
 function scrollIntoView(editor: Editor, from: number) {
   setTimeout(() => {
     const domNode = document.querySelector(".search-result.selected");
-
     if (!(domNode instanceof HTMLElement)) return;
 
     domNode.scrollIntoView({
