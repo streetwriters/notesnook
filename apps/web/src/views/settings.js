@@ -542,7 +542,7 @@ function Settings() {
         {groups.notifications && (
           <>
             <Toggle
-              title="Show reminder notifications"
+              title="Reminder notifications"
               onTip="Reminder notifications will be shown on this device"
               offTip="Reminder notifications will not be shown on this device"
               onToggled={() => setShowReminderNotifications((s) => !s)}
