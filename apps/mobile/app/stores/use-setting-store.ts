@@ -65,7 +65,7 @@ export type Settings = {
   doubleSpacedLines?: boolean;
   disableAutoSync?: boolean;
   disableSync?: boolean;
-  disableReminderNotifications?: boolean;
+  reminderNotifications?: boolean;
   defaultSnoozeTime?: string;
 };
 
@@ -139,7 +139,7 @@ export const useSettingStore = create<SettingStore>((set) => ({
     sessionExpired: false,
     version: null,
     doubleSpacedLines: true,
-    disableReminderNotifications: false,
+    reminderNotifications: true,
     defaultSnoozeTime: "5"
   },
   sheetKeyboardHandler: true,
