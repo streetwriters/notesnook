@@ -166,4 +166,13 @@ describe("format reminder time", () => {
     };
     expect(formatReminderTime(reminder)).toBe("Last: Today, 03:05 AM");
   });
+
+  test("the exact current time tomorrow", () => {
+    const reminder = {
+      date: new Date(2022, 5, 6, 5, 5).getTime(),
+      mode: "repeat",
+      recurringMode: "day"
+    };
+    expect(formatReminderTime(reminder)).toBe("Upcoming: Tomorrow, 05:05 AM");
+  });
 });
