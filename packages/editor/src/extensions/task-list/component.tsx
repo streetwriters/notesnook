@@ -17,20 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex, Text } from "@theme-ui/components";
-import { ReactNodeViewProps } from "../react";
-import { Node } from "prosemirror-model";
+import { Box, Flex, Input, Text } from "@theme-ui/components";
 import { findChildren, getNodeType } from "@tiptap/core";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
+import TaskItem from "@tiptap/extension-task-item";
+import { Node } from "prosemirror-model";
+import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Input } from "@theme-ui/components";
+import { ToolButton } from "../../toolbar/components/tool-button";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
+import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
-import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store";
-import { ToolButton } from "../../toolbar/components/tool-button";
-import TaskItem from "@tiptap/extension-task-item";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
@@ -93,7 +90,7 @@ export function TaskListComponent(
             sx={{
               position: "relative",
               bg: "bgSecondary",
-              py: 1,
+              py: "5px",
               borderRadius: "default",
               mb: 2,
               alignItems: "center",
@@ -123,7 +120,7 @@ export function TaskListComponent(
                 px: 2,
                 zIndex: 1,
                 color: "fontTertiary",
-                fontSize: "body"
+                fontSize: "title"
               }}
               placeholder="Untitled"
               onChange={(e) => {
@@ -133,7 +130,9 @@ export function TaskListComponent(
                 );
               }}
             />
-            <Flex sx={{ flexShrink: 0, pr: 2, zIndex: 1 }}>
+            <Flex
+              sx={{ flexShrink: 0, pr: 2, zIndex: 1, alignItems: "center" }}
+            >
               {editor.isEditable && (
                 <ToolButton
                   toggled={false}
@@ -167,12 +166,6 @@ export function TaskListComponent(
                   }}
                 />
               )}
-              <Icon
-                path={Icons.checkbox}
-                size={15}
-                color="fontTertiary"
-                sx={{ ml: 1 }}
-              />
               <Text variant={"body"} sx={{ ml: 1, color: "fontTertiary" }}>
                 {stats.checked}/{stats.total}
               </Text>
