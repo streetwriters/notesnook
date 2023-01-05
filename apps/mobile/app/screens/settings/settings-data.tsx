@@ -839,10 +839,9 @@ export const settingsGroups: SettingSection[] = [
             id: "snooze-time",
             property: "defaultSnoozeTime",
             type: "input",
-            icon: "snooze",
             name: "Default snooze time",
             description:
-              "Set the default time to snooze a reminder to when you press the snooze button on a notification",
+              "Set the default time to snooze a reminder to when you press the snooze button on a notification.",
             inputProperties: {
               keyboardType: "decimal-pad",
               defaultValue: 5 + "",
