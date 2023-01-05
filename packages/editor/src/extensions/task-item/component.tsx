@@ -105,7 +105,8 @@ export function TaskItemComponent(
               cursor: "grab",
               ".icon:hover path": {
                 fill: "var(--checked) !important"
-              }
+              },
+              mt: "1px"
             }}
             size={isMobile ? 24 : 20}
           />
@@ -122,14 +123,14 @@ export function TaskItemComponent(
             alignSelf: "start",
             mr: 2,
             p: "1px",
-            mt: "4px",
+            mt: "2px",
             cursor: editor.isEditable ? "pointer" : "unset",
             ":hover": {
               borderColor: "checked"
             },
             ":hover .icon path": {
               fill: "var(--checked) !important"
-            }
+            },
           }}
           onMouseDown={(e) => {
             if (useIsKeyboardOpen.current) {
@@ -162,7 +163,8 @@ export function TaskItemComponent(
               {
                 opacity: 1
               },
-            flex: 1
+            flex: 1,
+            mt: "1px"
           }}
         />
         <DesktopOnly>
