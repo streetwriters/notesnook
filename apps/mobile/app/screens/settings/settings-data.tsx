@@ -820,11 +820,11 @@ export const settingsGroups: SettingSection[] = [
         description: "Manage and configure reminders in app",
         sections: [
           {
-            id: "disable-reminders",
-            property: "disableReminderNotifications",
+            id: "enable-reminders",
+            property: "reminderNotifications",
             type: "switch",
-            name: "Turn off reminder notifications",
-            icon: "bell-cancel-outline",
+            name: "Reminder notifications",
+            icon: "bell-outline",
             onChange: (property) => {
               if (property) {
                 Notifications.setupReminders();
@@ -833,7 +833,7 @@ export const settingsGroups: SettingSection[] = [
               }
             },
             description:
-              "Disable reminder notifications on this device, this is useful when you have Notesnook on multiple devices & want to recieve reminder notifications only on your primary device."
+              "Controls whether this device should receive reminder notifications."
           },
           {
             id: "snooze-time",
