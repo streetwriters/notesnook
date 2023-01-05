@@ -381,18 +381,14 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
 });
 
 function scrollIntoView(editor: Editor, from: number) {
-  // const { top } = posToDOMRect(editor.view, from, to);
-  let { node: domNode } = editor.view.domAtPos(from);
-  if (domNode.nodeType === Node.TEXT_NODE && domNode.parentNode)
-    domNode = domNode.parentNode;
-  if (!domNode) return;
-
   setTimeout(() => {
+    const domNode = document.querySelector(".search-result.selected");
+
     if (!(domNode instanceof HTMLElement)) return;
 
     domNode.scrollIntoView({
       behavior: "smooth",
-      block: "nearest"
+      block: "center"
     });
   });
 }
