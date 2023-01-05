@@ -46,7 +46,7 @@ import { SearchReplace } from "./extensions/search-replace";
 import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
 import { ListItem } from "./extensions/list-item";
-import { Link } from "@tiptap/extension-link";
+import { Link } from "./extensions/link";
 import { Codemark } from "./extensions/code-mark";
 import { MathInline, MathBlock } from "./extensions/math";
 import {
