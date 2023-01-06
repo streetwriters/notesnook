@@ -204,6 +204,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
               placeholder={
                 currentMethod.method === "recoveryCode" ? "xxxxxxxx" : "xxxxxx"
               }
+              testID={"input.totp"}
               maxLength={currentMethod.method === "recoveryCode" ? 8 : 6}
               fwdRef={inputRef}
               textAlign="center"
