@@ -29,14 +29,10 @@ let page: Page;
 let app: AppModel;
 
 test.beforeAll(async ({ browser }) => {
-  const { email, key, password } = USER.CURRENT;
-  if (!email || !password) throw new Error("Failed to load user credentials.");
-
-  // Create page yourself and sign in.
   page = await browser.newPage();
   app = new AppModel(page);
   await app.auth.goto();
-  await app.auth.login({ email, key, password });
+  await app.auth.login(USER.CURRENT);
 });
 
 test.afterAll(async () => {
