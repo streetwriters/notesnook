@@ -668,8 +668,8 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
         autoComplete={"one-time-code"}
         label={texts.label}
         autoFocus
-        pattern="[0-9]*"
-        inputMode="numeric"
+        pattern={selectedMethod !== "recoveryCode" ? "[0-9]*" : undefined}
+        inputMode={selectedMethod !== "recoveryCode" ? "numeric" : undefined}
         helpText={texts.instructions}
         action={
           selectedMethod === "sms" || selectedMethod === "email"
