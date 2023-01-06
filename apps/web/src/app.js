@@ -110,12 +110,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
     () => Config.get("paneSizes", defaultSizes),
     [defaultSizes]
   );
-  const [isNarrow, setIsNarrow] = useState(isTablet);
   const panesRef = useRef();
-
-  useEffect(() => {
-    setIsNarrow(isTablet);
-  }, [isTablet]);
 
   return (
     <>
@@ -130,7 +125,6 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
           proportionalLayout={false}
           onChange={(sizes) => {
             Config.set("paneSizes", sizes);
-            setIsNarrow(sizes[0] <= 55);
           }}
         >
           <Allotment.Pane
@@ -145,7 +139,6 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
                 toggleNavigationContainer={(state) => {
                   setShow(state || !show);
                 }}
-                isTablet={isNarrow}
               />
             </Flex>
           </Allotment.Pane>

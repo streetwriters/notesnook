@@ -59,7 +59,7 @@ function ReminderBar() {
           <Text variant="body" sx={{ fontSize: "body" }}>
             {reminder.title}
           </Text>
-          <Text variant="subBody" sx={{ display: ["block", "none", "block"] }}>
+          <Text variant="subBody" sx={{ display: "block" }}>
             {reminder.subtitle}
           </Text>
         </Flex>
