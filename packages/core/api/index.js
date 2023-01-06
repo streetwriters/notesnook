@@ -47,6 +47,8 @@ import EventManager from "../utils/event-manager";
 import Pricing from "./pricing";
 import { logger } from "../logger";
 import Shortcuts from "../collections/shortcuts";
+import Reminders from "../collections/reminders";
+import Relations from "../collections/relations";
 
 /**
  * @type {EventSource}
@@ -104,6 +106,7 @@ class Database {
         case "notes": {
           await this.monographs.init();
           await this.trash.init();
+          await this.relations.cleanup();
           break;
         }
       }
@@ -143,6 +146,10 @@ class Database {
     this.noteHistory = await NoteHistory.new(this, "notehistory", false);
     /**@type {Shortcuts} */
     this.shortcuts = await Shortcuts.new(this, "shortcuts");
+    /**@type {Reminders} */
+    this.reminders = await Reminders.new(this, "reminders");
+    /**@type {Relations} */
+    this.relations = await Relations.new(this, "relations");
 
     this.trash = new Trash(this);
 

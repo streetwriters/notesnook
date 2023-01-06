@@ -25,7 +25,7 @@ import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
 import {
   eCloseAnnouncementDialog,
-  eCloseProgressDialog
+  eCloseSheet
 } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -60,11 +60,11 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
         )
       });
     } else if (item.type === "force-sync") {
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
       await sleep(300);
       Progress.present();
       Sync.run("global", true, true, () => {
-        eSendEvent(eCloseProgressDialog);
+        eSendEvent(eCloseSheet);
       });
     }
   };

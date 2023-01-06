@@ -127,11 +127,16 @@ class UserStore extends BaseStore {
     const { email, password, code, method } = form;
 
     try {
-      if (code) await db.user.mfaLogin(email, password, { code, method });
-      else await db.user.login(email, password);
+      if (code) {
+        return await db.user.authenticateMultiFactorCode(code, method);
+      } else if (password) {
+        await db.user.authenticatePassword(email, password, null);
 
-      if (skipInit) return true;
-      return this.init();
+        if (skipInit) return true;
+        return this.init();
+      } else if (email) {
+        return await db.user.authenticateEmail(email);
+      }
     } finally {
       this.set((state) => (state.isLoggingIn = false));
     }

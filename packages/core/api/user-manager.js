@@ -78,37 +78,69 @@ class UserManager {
     return await this._login({ email, password, hashedPassword });
   }
 
-  async login(email, password, hashedPassword = undefined) {
-    return this._login({ email, password, hashedPassword });
-  }
+  async authenticateEmail(email) {
+    if (!email) throw new Error("Email is required.");
 
-  async mfaLogin(email, password, { code, method }) {
-    return this._login({ email, password, code, method });
-  }
-
-  /**
-   * @private
-   */
-  async _login({ email, password, hashedPassword, code, method }) {
     email = email.toLowerCase();
 
+    const result = await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
+      email,
+      grant_type: "email",
+      client_id: "notesnook"
+    });
+
+    await this.tokenManager.saveToken(result);
+    return result.additional_data;
+  }
+
+  async authenticateMultiFactorCode(code, method) {
+    if (!code || !method) throw new Error("code & method are required.");
+
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) throw new Error("Unauthorized.");
+
+    await this.tokenManager.saveToken(
+      await http.post(
+        `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+        {
+          grant_type: "mfa",
+          client_id: "notesnook",
+          "mfa:code": code,
+          "mfa:method": method
+        },
+        token
+      )
+    );
+    return true;
+  }
+
+  async authenticatePassword(email, password, hashedPassword = null) {
+    if (!email || !password) throw new Error("email & password are required.");
+
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) throw new Error("Unauthorized.");
+
+    email = email.toLowerCase();
     if (!hashedPassword) {
       hashedPassword = await this._storage.hash(password, email);
     }
 
     await this.tokenManager.saveToken(
-      await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
-        username: email,
-        password: hashedPassword,
-        grant_type: "password",
-        scope: "notesnook.sync offline_access openid IdentityServerApi",
-        client_id: "notesnook",
-        "mfa:code": code,
-        "mfa:method": method
-      })
+      await http.post(
+        `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+        {
+          grant_type: "mfa_password",
+          client_id: "notesnook",
+          scope: "notesnook.sync offline_access IdentityServerApi",
+          password: hashedPassword
+        },
+        token
+      )
     );
 
     const user = await this.fetchUser();
+    if (!user) throw new Error("Unauthorized.");
+
     await this._storage.deriveCryptoKey(`_uk_@${user.email}`, {
       password,
       salt: user.salt
@@ -209,7 +241,7 @@ class UserManager {
 
   /**
    *
-   * @returns {Promise<User>}
+   * @returns {Promise<User | undefined>}
    */
   async fetchUser() {
     try {

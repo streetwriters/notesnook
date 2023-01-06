@@ -107,8 +107,9 @@ jobs:
       - name: Add environment variables
         run: |
           echo "USER_EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
-          echo "CURRENT_USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
-          echo "CURRENT_USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
+          echo "USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
+          echo "USER_TOTP_SECRET=${{ secrets.USER_TOTP_SECRET }}" >> $GITHUB_ENV
+          echo "USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
 
       - name: Run tests
         run: npx playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }}

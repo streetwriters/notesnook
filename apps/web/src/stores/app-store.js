@@ -26,6 +26,7 @@ import { store as tagStore } from "./tag-store";
 import { store as editorstore } from "./editor-store";
 import { store as attachmentStore } from "./attachment-store";
 import { store as monographStore } from "./monograph-store";
+import { store as reminderStore } from "./reminder-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
@@ -55,6 +56,9 @@ class AppStore extends BaseStore {
   lastSynced = 0;
 
   init = () => {
+    // this needs to happen here so reminders can be set on app load.
+    reminderStore.refresh();
+
     let count = 0;
     EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
 
@@ -114,6 +118,7 @@ class AppStore extends BaseStore {
     await resetReminders();
     noteStore.refresh();
     notebookStore.refresh();
+    reminderStore.refresh();
     trashStore.refresh();
     tagStore.refresh();
     attachmentStore.refresh();

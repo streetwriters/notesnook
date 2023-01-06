@@ -176,7 +176,12 @@ import {
   mdiSpeedometer,
   mdiFormatLineSpacing,
   mdiCalendarClockOutline,
-  mdiPuzzleOutline
+  mdiPuzzleOutline,
+  mdiBellRingOutline,
+  mdiClockTimeFiveOutline,
+  mdiBellOffOutline,
+  mdiVibrate,
+  mdiBellCancelOutline
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { AnimatedFlex } from "../animated";
@@ -361,6 +366,7 @@ export const Colors = createIcon(mdiPaletteOutline);
 export const Published = createIcon(mdiCloudCheckOutline);
 export const Copy = createIcon(mdiContentCopy);
 export const Refresh = createIcon(mdiRefresh);
+export const Clock = createIcon(mdiClockTimeFiveOutline);
 export const Duplicate = createIcon(mdiContentDuplicate);
 export const Select = createIcon(mdiCheckboxMultipleMarkedCircleOutline);
 export const NotebookEdit = createIcon(mdiBookEditOutline);
@@ -443,3 +449,9 @@ export const Performance = createIcon(mdiSpeedometer);
 export const Date = createIcon(mdiCalendarClockOutline);
 export const LineSpacing = createIcon(mdiFormatLineSpacing);
 export const Extension = createIcon(mdiPuzzleOutline);
+
+export const Reminders = createIcon(mdiBellRingOutline);
+export const ReminderOff = createIcon(mdiBellCancelOutline);
+export const Silent = createIcon(mdiBellOffOutline);
+export const Vibrate = createIcon(mdiVibrate);
+export const Loud = createIcon(mdiBellRingOutline);

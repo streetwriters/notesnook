@@ -34,6 +34,7 @@ import { ColoredNotes } from "../screens/notes/colored";
 import { Monographs } from "../screens/notes/monographs";
 import { TaggedNotes } from "../screens/notes/tagged";
 import { TopicNotes } from "../screens/notes/topic-notes";
+import Reminders from "../screens/reminders";
 import { Search } from "../screens/search";
 import Settings from "../screens/settings";
 import AppLock from "../screens/settings/app-lock";
@@ -155,6 +156,11 @@ const _Tabs = () => {
         options={{ lazy: true }}
         name="ColoredNotes"
         component={ColoredNotes}
+      />
+      <NativeStack.Screen
+        options={{ lazy: true }}
+        name="Reminders"
+        component={Reminders}
       />
       <NativeStack.Screen
         options={{ lazy: true }}

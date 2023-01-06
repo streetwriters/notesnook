@@ -30,7 +30,7 @@ import {
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { eCloseProgressDialog } from "../../../utils/events";
+import { eCloseSheet } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
@@ -103,7 +103,7 @@ export default function Migrate() {
         return;
       }
       await db.migrations?.migrate();
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
       await sleep(500);
       setLoading(false);
     } catch (e) {

@@ -64,11 +64,13 @@ function Field(props) {
     inputRef,
     disabled,
     defaultValue,
+    value,
     placeholder,
     validatePassword,
     onError,
     inputMode,
     pattern,
+    min,
     variant = "input",
     as = "input"
   } = props;
@@ -120,6 +122,8 @@ function Field(props) {
           inputMode={inputMode}
           pattern={pattern}
           type={type || "text"}
+          min={min}
+          value={value}
           sx={{
             ...styles.input,
             ":disabled": {

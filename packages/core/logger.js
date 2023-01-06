@@ -136,10 +136,10 @@ class DatabaseLogManager {
   }
 }
 
-function initalize(storage) {
+function initalize(storage,disableConsoleLogs) {
   if (storage) {
     let reporters = [new DatabaseLogReporter(storage)];
-    if (process.env.NODE_ENV !== "production") reporters.push(consoleReporter);
+    if (process.env.NODE_ENV !== "production" && !disableConsoleLogs) reporters.push(consoleReporter);
     logger = new Logger({
       reporter: combineReporters(reporters),
       lastTime: Date.now()

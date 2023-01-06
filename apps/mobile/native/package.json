@@ -38,7 +38,6 @@
     "react-native-mmkv-storage": "^0.8.0",
     "react-native-orientation": "https://github.com/yamill/react-native-orientation.git",
     "react-native-privacy-snapshot": "https://github.com/standardnotes/react-native-privacy-snapshot.git",
-    "react-native-push-notification": "github:ammarahm-ed/react-native-push-notification",
     "react-native-reanimated": "2.13.0",
     "react-native-safe-area-context": "^4.3.1",
     "react-native-scoped-storage": "^1.9.3",
@@ -53,7 +52,11 @@
     "rn-extensions-share": "^2.4.0",
     "rn-fetch-blob": "^0.12.0",
     "react-native-gzip":"1.0.0",
-    "@shopify/flash-list":"1.4.0"
+    "@shopify/flash-list":"1.4.0",
+    "@notifee/react-native": "7.1.0",
+    "react-native-modal-datetime-picker":"14.0.0",
+    "@react-native-community/datetimepicker":"6.6.0"
+
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

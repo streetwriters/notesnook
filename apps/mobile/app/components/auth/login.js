@@ -17,18 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
-import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
-import { eSendEvent, ToastEvent } from "../../services/event-manager";
-import { clearMessage } from "../../services/message";
-import PremiumService from "../../services/premium";
-import SettingsService from "../../services/settings";
+import { eSendEvent } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { useUserStore } from "../../stores/use-user-store";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
@@ -42,100 +37,47 @@ import Paragraph from "../ui/typography/paragraph";
 import { SVG } from "./background";
 import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
-import TwoFactorVerification from "./two-factor";
+import { useLogin } from "./use-login";
+
+const LoginSteps = {
+  emailAuth: 1,
+  mfaAuth: 2,
+  passwordAuth: 3
+};
+
 export const Login = ({ changeMode }) => {
   const colors = useThemeStore((state) => state.colors);
-  const email = useRef();
-  const emailInputRef = useRef();
-  const passwordInputRef = useRef();
-  const password = useRef();
   const [focused, setFocused] = useState(false);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const setUser = useUserStore((state) => state.setUser);
-
-  const validateInfo = () => {
-    if (!password.current || !email.current) {
-      ToastEvent.show({
-        heading: "All fields required",
-        message: "Fill all the fields and try again",
-        type: "error",
-        context: "local"
-      });
-
-      return false;
-    }
-
-    return true;
-  };
+  const {
+    step,
+    setStep,
+    password,
+    email,
+    emailInputRef,
+    passwordInputRef,
+    loading,
+    setLoading,
+    setError,
+    login
+  } = useLogin(async () => {
+    hideAuth();
+    eSendEvent("userLoggedIn", true);
+    await sleep(500);
+    Progress.present();
+  });
 
   useEffect(() => {
     async () => {
+      setStep(LoginSteps.emailAuth);
       await sleep(500);
       emailInputRef.current?.focus();
       setFocused(true);
     };
+    return () => {
+      setStep(LoginSteps.emailAuth);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const login = async (mfa, callback) => {
-    if (!validateInfo() || error) return;
-    setLoading(true);
-    let user;
-    try {
-      if (mfa) {
-        await db.user.mfaLogin(
-          email.current.toLowerCase(),
-          password.current,
-          mfa
-        );
-      } else {
-        await db.user.login(email.current.toLowerCase(), password.current);
-      }
-      callback && callback(true);
-
-      user = await db.user.getUser();
-      if (!user) throw new Error("Email or password incorrect!");
-      PremiumService.setPremiumStatus();
-      setUser(user);
-      clearMessage();
-      ToastEvent.show({
-        heading: "Login successful",
-        message: `Logged in as ${user.email}`,
-        type: "success",
-        context: "global"
-      });
-      hideAuth();
-      SettingsService.set({
-        sessionExpired: false,
-        userEmailConfirmed: user?.isEmailConfirmed
-      });
-      eSendEvent("userLoggedIn", true);
-      await sleep(500);
-      Progress.present();
-    } catch (e) {
-      callback && callback(false);
-      if (e.message === "Multifactor authentication required.") {
-        setLoading(false);
-        await sleep(300);
-        TwoFactorVerification.present(async (mfa) => {
-          if (mfa) {
-            await login(mfa);
-          } else {
-            setLoading(false);
-          }
-        }, e.data);
-      } else {
-        setLoading(false);
-        ToastEvent.show({
-          heading: user ? "Failed to sync" : "Login failed",
-          message: e.message,
-          type: "error",
-          context: "local"
-        });
-      }
-    }
-  };
 
   return (
     <>
@@ -228,48 +170,54 @@ export const Login = ({ changeMode }) => {
             autoCorrect={false}
             autoCapitalize="none"
             errorMessage="Email is invalid"
-            placeholder="Email"
+            placeholder="Enter your email"
+            defaultValue={email.current}
+            editable={step === LoginSteps.emailAuth}
             onSubmit={() => {
               passwordInputRef.current?.focus();
             }}
           />
 
-          <Input
-            fwdRef={passwordInputRef}
-            onChangeText={(value) => {
-              password.current = value;
-            }}
-            testID="input.password"
-            returnKeyLabel="Done"
-            returnKeyType="done"
-            secureTextEntry
-            autoComplete="password"
-            autoCapitalize="none"
-            autoCorrect={false}
-            placeholder="Password"
-            marginBottom={0}
-            onSubmit={() => login()}
-          />
-          <Button
-            title="Forgot your password?"
-            style={{
-              alignSelf: "flex-end",
-              height: 30,
-              paddingHorizontal: 0
-            }}
-            onPress={() => {
-              SheetManager.show("forgotpassword_sheet", email.current);
-            }}
-            textStyle={{
-              textDecorationLine: "underline"
-            }}
-            fontSize={SIZE.xs}
-            type="gray"
-          />
+          {step === LoginSteps.passwordAuth && (
+            <>
+              <Input
+                fwdRef={passwordInputRef}
+                onChangeText={(value) => {
+                  password.current = value;
+                }}
+                testID="input.password"
+                returnKeyLabel="Done"
+                returnKeyType="done"
+                secureTextEntry
+                autoComplete="password"
+                autoCapitalize="none"
+                autoCorrect={false}
+                placeholder="Password"
+                marginBottom={0}
+                defaultValue={password.current}
+                onSubmit={() => login()}
+              />
+              <Button
+                title="Forgot your password?"
+                style={{
+                  alignSelf: "flex-end",
+                  height: 30,
+                  paddingHorizontal: 0
+                }}
+                onPress={() => {
+                  SheetManager.show("forgotpassword_sheet", email.current);
+                }}
+                textStyle={{
+                  textDecorationLine: "underline"
+                }}
+                fontSize={SIZE.xs}
+                type="gray"
+              />
+            </>
+          )}
 
           <View
             style={{
-              // position: 'absolute',
               marginTop: 25,
               alignSelf: "center"
             }}
@@ -280,11 +228,36 @@ export const Login = ({ changeMode }) => {
                 borderRadius: 100
               }}
               loading={loading}
-              onPress={() => login()}
-              //  width="100%"
+              onPress={login}
               type="accent"
-              title={loading ? null : "Login to your account"}
+              title={
+                loading
+                  ? null
+                  : step === LoginSteps.emailAuth
+                  ? "Login"
+                  : "Continue"
+              }
             />
+
+            {step === LoginSteps.passwordAuth && (
+              <Button
+                title="Cancel logging in"
+                style={{
+                  alignSelf: "center",
+                  height: 30,
+                  marginTop: 10
+                }}
+                onPress={() => {
+                  setStep(LoginSteps.emailAuth);
+                  setLoading(false);
+                }}
+                textStyle={{
+                  textDecorationLine: "underline"
+                }}
+                fontSize={SIZE.xs}
+                type="errorShade"
+              />
+            )}
           </View>
         </View>
       </Animated.View>

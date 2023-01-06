@@ -135,6 +135,7 @@ function Settings() {
     importer: false,
     privacy: false,
     developer: false,
+    notifications: false,
     other: true
   });
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
@@ -179,6 +180,8 @@ function Settings() {
     "telemetry",
     true
   );
+  const [showReminderNotifications, setShowReminderNotifications] =
+    usePersistentState("reminderNotifications", true);
 
   useEffect(() => {
     (async () => {
@@ -526,6 +529,25 @@ function Settings() {
                 tip="Customize the editor toolbar to fit your needs."
               />
             </Button>
+          </>
+        )}
+
+        <Header
+          title="Notifications"
+          isOpen={groups.notifications}
+          onClick={() => {
+            setGroups((g) => ({ ...g, notifications: !g.notifications }));
+          }}
+        />
+        {groups.notifications && (
+          <>
+            <Toggle
+              title="Reminder notifications"
+              onTip="Reminder notifications will be shown on this device"
+              offTip="Reminder notifications will not be shown on this device"
+              onToggled={() => setShowReminderNotifications((s) => !s)}
+              isToggled={showReminderNotifications}
+            />
           </>
         )}
         <Header

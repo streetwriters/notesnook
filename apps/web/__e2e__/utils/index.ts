@@ -34,12 +34,14 @@ const USER = {
   NEW: {
     email: process.env.USER_EMAIL,
     password: process.env.NEW_USER_PASSWORD,
-    key: process.env.NEW_USER_KEY
+    key: process.env.NEW_USER_KEY,
+    totpSecret: process.env.USER_TOTP_SECRET
   },
   CURRENT: {
     email: process.env.USER_EMAIL,
-    password: process.env.CURRENT_USER_PASSWORD,
-    key: process.env.CURRENT_USER_KEY
+    password: process.env.USER_PASSWORD,
+    key: process.env.USER_KEY,
+    totpSecret: process.env.USER_TOTP_SECRET
   }
 };
 

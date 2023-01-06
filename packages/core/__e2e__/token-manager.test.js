@@ -19,20 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import DB from "../api";
 import StorageInterface from "../__mocks__/storage.mock";
-
-const user = {
-  email: process.env.EMAIL,
-  password: process.env.PASSWORD,
-  hashedPassword: process.env.HASHED_PASSWORD
-};
+import { login } from "./utils";
 
 test("refresh token concurrently", async () => {
   const db = new DB(StorageInterface);
   await db.init();
 
-  await expect(
-    db.user.login(user.email, user.password, user.hashedPassword)
-  ).resolves.not.toThrow();
+  await expect(login(db)).resolves.not.toThrow();
 
   const token = await db.user.tokenManager.getToken();
   expect(token).toBeDefined();
@@ -51,9 +44,7 @@ test("refresh token using the same refresh_token multiple time", async () => {
   const db = new DB(StorageInterface);
   await db.init();
 
-  await expect(
-    db.user.login(user.email, user.password, user.hashedPassword)
-  ).resolves.not.toThrow();
+  await expect(login(db)).resolves.not.toThrow();
 
   const token = await db.user.tokenManager.getToken();
   expect(token).toBeDefined();

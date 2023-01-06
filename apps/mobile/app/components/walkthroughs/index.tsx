@@ -22,7 +22,7 @@ import { LayoutAnimation, View } from "react-native";
 import { MMKV } from "../../common/database/mmkv";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { eCloseProgressDialog } from "../../utils/events";
+import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
@@ -98,7 +98,7 @@ export const Walkthrough = ({
               next();
               return;
             case "done":
-              eSendEvent(eCloseProgressDialog);
+              eSendEvent(eCloseSheet);
               await sleep(300);
               step.button?.action && step.button.action();
               return;
@@ -119,7 +119,7 @@ export const Walkthrough = ({
             textDecorationLine: "underline"
           }}
           onPress={async () => {
-            eSendEvent(eCloseProgressDialog);
+            eSendEvent(eCloseSheet);
           }}
           type="gray"
           title="Skip introduction"

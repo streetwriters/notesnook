@@ -6,11 +6,12 @@
     "baseUrl": "./",
     "jsx": "react-native",
     "noEmit": true,
-    "maxNodeModuleJsDepth": 6,
+    "maxNodeModuleJsDepth": 5,
     "types": ["node", "jest", "detox"],
     "paths": {
       "@notesnook/*": ["../../packages"]
-    }
+    },
+    "incremental": true
   },
   "exclude": ["native"]
 }

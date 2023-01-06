@@ -26,6 +26,8 @@ import TrashItem from "../trash-item";
 import Attachment from "../attachment";
 import { db } from "../../common/db";
 import { getTotalNotes } from "../../common";
+import Reminder from "../reminder";
+import type { Reminder as ReminderType } from "@notesnook/core/collections/reminders";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
@@ -46,14 +48,16 @@ type NotebookReference = Item & { topics: string[] };
 type NotebookType = Item & { topics: Item[] };
 
 export type Context = { type: string } & Record<string, unknown>;
-type ItemWrapperProps = {
+type ItemWrapperProps<TItem = Item> = {
   index: number;
-  item: Item;
+  item: TItem;
   type: keyof typeof ListProfiles;
-  context: Context;
+  context?: Context;
 };
 
-type ItemWrapper = (props: ItemWrapperProps) => JSX.Element;
+type ItemWrapper<TItem = Item> = (
+  props: ItemWrapperProps<TItem>
+) => JSX.Element;
 
 const NotesProfile: ItemWrapper = ({ index, item, type, context }) => (
   <Note
@@ -84,8 +88,14 @@ const TopicsProfile: ItemWrapper = ({ index, item, context }) => (
   <Topic
     index={index}
     item={item}
-    onClick={() => navigate(`/notebooks/${context.notebookId}/${item.id}`)}
+    onClick={() =>
+      context ? navigate(`/notebooks/${context.notebookId}/${item.id}`) : null
+    }
   />
+);
+
+const RemindersProfile: ItemWrapper<ReminderType> = ({ index, item }) => (
+  <Reminder item={item} index={index} />
 );
 
 const TrashProfile: ItemWrapper = ({ index, item, type }) => (
@@ -100,6 +110,7 @@ export const ListProfiles = {
   home: NotesProfile,
   notebooks: NotebooksProfile,
   notes: NotesProfile,
+  reminders: RemindersProfile,
   tags: TagsProfile,
   topics: TopicsProfile,
   trash: TrashProfile,
@@ -128,7 +139,7 @@ type NotebookResult =
 
 function getNotebook(
   notebooks: Item[],
-  contextType: string
+  contextType?: string
 ): NotebookResult | undefined {
   if (contextType === "topic" || !notebooks?.length) return;
 

@@ -17,14 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import {
+  formatReminderTime,
+  getUpcomingReminder
+} from "@notesnook/core/collections/reminders";
 import { decode, EntityLevel } from "entities";
 import React from "react";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { db } from "../../../common/database";
 import { TaggedNotes } from "../../../screens/notes/tagged";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
+import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { COLORS_NOTE } from "../../../utils/color-scheme";
@@ -86,6 +91,9 @@ const NoteItem = ({
   const compactMode = notesListMode === "compact";
   const attachmentCount = db.attachments?.ofNote(item.id, "all")?.length || 0;
   const notebooks = React.useMemo(() => getNotebook(item), [item]);
+  const reminders = db.relations.from(item, "reminder");
+  const current = getUpcomingReminder(reminders);
+  const _update = useRelationStore((state) => state.updater);
 
   return (
     <>
@@ -152,6 +160,39 @@ const NoteItem = ({
               level: EntityLevel.HTML
             })}
           </Paragraph>
+        ) : null}
+
+        {current &&
+        current.date &&
+        (current.mode !== "once" || current.date > Date.now() || current.snoozeUntil > Date.now()) ? (
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => {
+              Properties.present(current);
+            }}
+            style={{
+              backgroundColor: colors.nav,
+              borderRadius: 5,
+              flexDirection: "row",
+              paddingHorizontal: 5,
+              paddingVertical: 3,
+              alignItems: "center",
+              marginTop: 5,
+              justifyContent: "flex-start",
+              alignSelf: "flex-start"
+            }}
+          >
+            <>
+              <Icon name="clock-outline" size={SIZE.md} color={colors.accent} />
+              <Paragraph
+                size={SIZE.xs + 1}
+                color={colors.icon}
+                style={{ marginLeft: 5 }}
+              >
+                {formatReminderTime(current)}
+              </Paragraph>
+            </>
+          </TouchableOpacity>
         ) : null}
 
         <View

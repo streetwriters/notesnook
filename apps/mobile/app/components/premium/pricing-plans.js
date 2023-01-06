@@ -33,7 +33,7 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import {
   eClosePremiumDialog,
-  eCloseProgressDialog,
+  eCloseSheet,
   eCloseSimpleDialog,
   eOpenLoginDialog
 } from "../../utils/events";
@@ -154,7 +154,7 @@ export const PricingPlans = ({
         user.id
       );
       setBuying(false);
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
       eSendEvent(eClosePremiumDialog);
       await sleep(500);
       presentSheet({
@@ -162,7 +162,7 @@ export const PricingPlans = ({
         paragraph:
           "Your Notesnook Pro subscription will be activated soon. If your account is not upgraded to Notesnook Pro, your money will be refunded to you. In case of any issues, please reach out to us at support@streetwriters.co",
         action: async () => {
-          eSendEvent(eCloseProgressDialog);
+          eSendEvent(eCloseSheet);
         },
         icon: "check",
         actionText: "Continue"
@@ -226,7 +226,7 @@ export const PricingPlans = ({
               try {
                 await db.user.activateTrial();
                 eSendEvent(eClosePremiumDialog);
-                eSendEvent(eCloseProgressDialog);
+                eSendEvent(eCloseSheet);
                 await sleep(300);
                 Walkthrough.present("trialstarted", false, true);
               } catch (e) {
@@ -393,7 +393,7 @@ export const PricingPlans = ({
                   <Button
                     onPress={() => {
                       eSendEvent(eClosePremiumDialog);
-                      eSendEvent(eCloseProgressDialog);
+                      eSendEvent(eCloseSheet);
                       setTimeout(() => {
                         eSendEvent(eOpenLoginDialog, 1);
                       }, 400);

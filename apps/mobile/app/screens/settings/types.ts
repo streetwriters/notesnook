@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { TextInput } from "react-native";
 import { Settings } from "../../stores/use-setting-store";
 
 export type SettingSection = {
   id: string;
-  type?: "screen" | "switch" | "component" | "danger";
+  type?: "screen" | "switch" | "component" | "danger" | "input";
   name?: string | ((current?: unknown) => string);
   description?: string | ((current: unknown) => string);
   icon?: string;
@@ -33,6 +34,7 @@ export type SettingSection = {
   useHook?: (...args: unknown[]) => unknown;
   hidden?: (current: unknown) => boolean;
   onChange?: (property: boolean) => void;
+  inputProperties?: TextInput["props"];
 };
 
 export type SettingsGroup = {

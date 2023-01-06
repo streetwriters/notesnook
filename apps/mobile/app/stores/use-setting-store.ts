@@ -65,6 +65,8 @@ export type Settings = {
   doubleSpacedLines?: boolean;
   disableAutoSync?: boolean;
   disableSync?: boolean;
+  reminderNotifications?: boolean;
+  defaultSnoozeTime?: string;
 };
 
 type DimensionsType = {
@@ -136,7 +138,9 @@ export const useSettingStore = create<SettingStore>((set) => ({
     showBackupCompleteSheet: true,
     sessionExpired: false,
     version: null,
-    doubleSpacedLines: true
+    doubleSpacedLines: true,
+    reminderNotifications: true,
+    defaultSnoozeTime: "5"
   },
   sheetKeyboardHandler: true,
   fullscreen: false,

@@ -157,7 +157,7 @@ function Properties(props) {
                 data-test-id="properties-close"
                 onClick={() => toggleProperties(false)}
                 size={18}
-                sx={{ mr: 1 }}
+                sx={{ mr: 1, cursor: "pointer" }}
               />
             }
           >

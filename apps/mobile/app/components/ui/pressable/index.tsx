@@ -47,6 +47,7 @@ export interface PressableButtonProps extends PressableProps {
   customOpacity?: number;
   fwdRef?: RefObject<View>;
   animatedViewProps?: Animated.AnimateProps<View>;
+  hidden?:boolean
 }
 
 export const PressableButton = ({
@@ -65,7 +66,8 @@ export const PressableButton = ({
   customSelectedColor,
   customAlpha,
   customOpacity,
-  fwdRef
+  fwdRef,
+  hidden
 }: PressableButtonProps) => {
   const colors = useThemeStore((state) => state.colors);
 
@@ -109,7 +111,7 @@ export const PressableButton = ({
     [alpha, selectedColor, opacity, primaryColor, noborder, customStyle]
   );
 
-  return (
+  return hidden ? null : (
     <Pressable
       testID={testID}
       ref={fwdRef}

@@ -45,7 +45,7 @@ import { DatabaseLogger, db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import {
   eClearEditor,
-  eCloseProgressDialog,
+  eCloseSheet,
   eOnLoadNote,
   refreshNotesPage
 } from "../utils/events";
@@ -219,7 +219,7 @@ export const useAppEvents = () => {
   const onSyncComplete = useCallback(async () => {
     initAfterSync();
     setLastSynced(await db.lastSynced());
-    eSendEvent(eCloseProgressDialog, "sync_progress");
+    eSendEvent(eCloseSheet, "sync_progress");
   }, [setLastSynced]);
 
   const onUrlRecieved = useCallback(
