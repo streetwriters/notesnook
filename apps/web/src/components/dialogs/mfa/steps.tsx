@@ -832,8 +832,6 @@ function VerifyAuthenticatorForm(props: VerifyAuthenticatorFormProps) {
         sx={{ alignItems: "center", mt: 2 }}
         required
         placeholder="010101"
-        min={99999}
-        max={999999}
         type="number"
         variant="clean"
         styles={{
