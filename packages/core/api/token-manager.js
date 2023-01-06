@@ -117,6 +117,7 @@ class TokenManager {
   }
 
   saveToken(tokenResponse) {
+    if (!tokenResponse) return;
     let token = { ...tokenResponse, t: Date.now() };
     return this._storage.write("token", token);
   }
