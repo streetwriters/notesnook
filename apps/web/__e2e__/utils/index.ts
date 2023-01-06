@@ -39,8 +39,8 @@ const USER = {
   },
   CURRENT: {
     email: process.env.USER_EMAIL,
-    password: process.env.CURRENT_USER_PASSWORD,
-    key: process.env.CURRENT_USER_KEY,
+    password: process.env.USER_PASSWORD,
+    key: process.env.USER_KEY,
     totpSecret: process.env.USER_TOTP_SECRET
   }
 };
