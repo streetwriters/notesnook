@@ -18,12 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { databaseTest, noteTest, StorageInterface } from "../__tests__/utils";
-
-const user = {
-  email: process.env.EMAIL,
-  password: process.env.PASSWORD,
-  hashedPassword: process.env.HASHED_PASSWORD
-};
+import { login } from "./utils";
 
 jest.setTimeout(15 * 1000);
 
@@ -53,7 +48,7 @@ afterAll(async () => {
 
 test("publish a monograph", () =>
   noteTest().then(async ({ db, id }) => {
-    await db.user.login(user.email, user.password, user.hashedPassword);
+    await login(db);
     await db.monographs.init();
 
     const monographId = await db.monographs.publish(id);
@@ -68,7 +63,7 @@ test("publish a monograph", () =>
 
 test("update a published monograph", () =>
   noteTest().then(async ({ db, id }) => {
-    await db.user.login(user.email, user.password, user.hashedPassword);
+    await login(db);
     await db.monographs.init();
 
     const monographId = await db.monographs.publish(id);
@@ -85,7 +80,7 @@ test("update a published monograph", () =>
 
 test("unpublish a monograph", () =>
   noteTest().then(async ({ db, id }) => {
-    await db.user.login(user.email, user.password, user.hashedPassword);
+    await login(db);
     await db.monographs.init();
 
     await db.monographs.publish(id);
