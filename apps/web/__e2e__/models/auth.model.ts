@@ -70,6 +70,8 @@ export class AuthModel {
 
     if (user.password) {
       await this.passwordInput.fill(user.password);
+
+      await this.submitButton.click();
     }
 
     await this.page
