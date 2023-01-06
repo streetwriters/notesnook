@@ -27,7 +27,6 @@ import {
   MfaSms,
   MfaEmail,
   MfaRecoveryCode,
-  ArrowRight,
   Logout,
   Icon
 } from "../components/icons";
@@ -89,7 +88,7 @@ type AuthFormData = {
   "login:email": EmailFormData;
   "login:password": PasswordFormData;
   signup: SignupFormData;
-  sessionExpiry: EmailFormData & PasswordFormData;
+  sessionExpiry: EmailFormData;
   recover: AccountRecoveryFormData;
   "mfa:code": MFAFormData;
   "mfa:select": MFAFormData;
@@ -460,9 +459,19 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         title: "Logging you in",
         subtitle: "Please wait while you are authenticated."
       }}
-      onSubmit={async (form) => {
+      onSubmit={async () => {
         if (!user) return;
-        // await login({ email: user.email, password: form.password }, navigate);
+
+        const { primaryMethod, phoneNumber, secondaryMethod } =
+          (await userstore.login(user)) as MFAErrorData;
+
+        navigate("mfa:code", {
+          email: user.email,
+          selectedMethod: primaryMethod,
+          primaryMethod,
+          phoneNumber,
+          secondaryMethod
+        });
       }}
     >
       <AuthField
@@ -473,12 +482,6 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         defaultValue={user ? maskEmail(user.email) : undefined}
         autoFocus
         disabled
-      />
-      <AuthField
-        id="password"
-        type="password"
-        autoComplete="current-password"
-        label="Enter password"
       />
       <Button
         data-test-id="auth-forgot-password"
