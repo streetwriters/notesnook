@@ -30,11 +30,6 @@ const template = (data) => `<!DOCTYPE html>
     <meta name="created-on" content="${data.createdOn}" />
     <meta name="last-edited-on" content="${data.editedOn}" />
     ${data.tags ? `<meta name="tags" content="${data.tags}" />` : ""}
-    
-    <link
-    rel="stylesheet"
-    href="https://unpkg.com/dracula-prism/dist/css/dracula-prism.css"
-    />
     <style>
     img {
       max-width: 100% !important;
@@ -160,6 +155,47 @@ const template = (data) => `<!DOCTYPE html>
     }
     table p {
       margin: 0;
+    }
+
+    code[class*="language-"],
+    pre[class*="language-"] 
+    {
+      color: #F8F8F2;
+      background:  #282A36;
+      text-shadow: none;
+      font-family: PT Mono, Consolas, Monaco, "Andale Mono", "Ubuntu Mono",
+        monospace;
+      text-align: left;
+      white-space: pre;
+      word-spacing: normal;
+      word-break: normal;
+      word-wrap: normal;
+      line-height: 1.5;
+
+      -moz-tab-size: 4;
+      -o-tab-size: 4;
+      tab-size: 4;
+
+      -webkit-hyphens: none;
+      -moz-hyphens: none;
+      -ms-hyphens: none;
+      hyphens: none;
+    }
+
+    pre[class*="language-"] 
+    {
+      background: #282A36;
+      border-radius: 0.5em;
+      padding: 1em;
+      margin: 0.5em 0;
+      overflow: auto;
+      height: auto;
+    }
+    
+    :not(pre) > code[class*="language-"],
+    pre[class*="language-"] 
+    {
+      background: #282A36;
     }
     </style>
   </head>
