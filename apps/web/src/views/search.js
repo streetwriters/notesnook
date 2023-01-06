@@ -57,18 +57,6 @@ async function typeToItems(type, context) {
   }
 }
 
-function getContext(type) {
-  console.log("type", type);
-  if (type === "topics") {
-    return {
-      type: "topics",
-      notebookId: notebookstore.get().selectedNotebookId
-    };
-  } else {
-    return noteStore.context;
-  }
-}
-
 function Search({ type }) {
   const [searchState, setSearchState] = useState({
     isSearching: false,
