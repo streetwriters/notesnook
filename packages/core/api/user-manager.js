@@ -139,6 +139,8 @@ class UserManager {
     );
 
     const user = await this.fetchUser();
+    if (!user) throw new Error("Unauthorized.");
+
     await this._storage.deriveCryptoKey(`_uk_@${user.email}`, {
       password,
       salt: user.salt
@@ -239,7 +241,7 @@ class UserManager {
 
   /**
    *
-   * @returns {Promise<User>}
+   * @returns {Promise<User | undefined>}
    */
   async fetchUser() {
     try {
