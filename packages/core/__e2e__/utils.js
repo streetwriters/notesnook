@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { authenticator } from "otplib";
 
 export const user = {
-  email: process.env.EMAIL,
-  password: process.env.PASSWORD,
-  hashed: process.env.HASHED_PASSWORD,
-  totpSecret: process.env.TOTP_SECRET
+  email: process.env.USER_EMAIL,
+  password: process.env.USER_PASSWORD,
+  hashed: process.env.USER_HASHED_PASSWORD,
+  totpSecret: process.env.USER_TOTP_SECRET
 };
 
 export async function login(db) {
