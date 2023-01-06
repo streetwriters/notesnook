@@ -43,7 +43,7 @@ class TokenManager {
 
   async getToken(renew = true, forceRenew = false) {
     let token = await this._storage.read("token");
-    if (!token) return;
+    if (!token || !token.access_token) return;
 
     this.logger.info("Access token requested", {
       accessToken: token.access_token.slice(0, 10)
