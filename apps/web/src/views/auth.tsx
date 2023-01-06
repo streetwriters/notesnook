@@ -841,6 +841,10 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
           await props.onSubmit(form);
         } catch (e) {
           const error = e as Error;
+          if (error.message === "invalid_grant") {
+            hardNavigate("/login");
+            return;
+          }
           setError(error.message);
         } finally {
           setIsSubmitting(false);
