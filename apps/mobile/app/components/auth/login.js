@@ -17,19 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
-import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
-import { eSendEvent, ToastEvent } from "../../services/event-manager";
-import { clearMessage } from "../../services/message";
-import PremiumService from "../../services/premium";
-import SettingsService from "../../services/settings";
+import { eSendEvent } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { useUserStore } from "../../stores/use-user-store";
-import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
@@ -43,7 +37,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { SVG } from "./background";
 import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
-import TwoFactorVerification from "./two-factor";
+import { useLogin } from "./use-login";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -53,34 +47,24 @@ const LoginSteps = {
 
 export const Login = ({ changeMode }) => {
   const colors = useThemeStore((state) => state.colors);
-  const [step, setStep] = useState(LoginSteps.emailAuth);
-  const email = useRef();
-  const emailInputRef = useRef();
-  const passwordInputRef = useRef();
-  const password = useRef();
   const [focused, setFocused] = useState(false);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const setUser = useUserStore((state) => state.setUser);
-
-  const validateInfo = () => {
-    if (
-      (!password.current && step === LoginSteps.passwordAuth) ||
-      (!email.current && step === LoginSteps.emailAuth)
-    ) {
-      ToastEvent.show({
-        heading: "All fields required",
-        message: "Fill all the fields and try again",
-        type: "error",
-        context: "local"
-      });
-
-      return false;
-    }
-
-    return true;
-  };
+  const {
+    step,
+    setStep,
+    password,
+    email,
+    emailInputRef,
+    passwordInputRef,
+    loading,
+    setLoading,
+    setError,
+    login
+  } = useLogin(undefined, async () => {
+    hideAuth();
+    eSendEvent("userLoggedIn", true);
+    await sleep(500);
+    Progress.present();
+  });
 
   useEffect(() => {
     async () => {
@@ -92,86 +76,8 @@ export const Login = ({ changeMode }) => {
     return () => {
       setStep(LoginSteps.emailAuth);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const login = async () => {
-    if (!validateInfo() || error) return;
-    try {
-      setLoading(true);
-      switch (step) {
-        case LoginSteps.emailAuth: {
-          const mfaInfo = await db.user.authenticateEmail(email.current);
-          if (mfaInfo) {
-            TwoFactorVerification.present(async (mfa, callback) => {
-              try {
-                const success = await db.user.authenticateMultiFactorCode(
-                  mfa.code,
-                  mfa.method
-                );
-                if (success) {
-                  setStep(LoginSteps.passwordAuth);
-                  setLoading(false);
-                  setTimeout(() => {
-                    passwordInputRef.current?.focus();
-                  }, 1);
-                  callback && callback(true);
-                }
-                callback && callback(false);
-              } catch (e) {
-                callback && callback(false);
-                if (e.message === "invalid_grant") {
-                  eSendEvent(eCloseSheet, "two_factor_verify");
-                  setLoading(false);
-                }
-              }
-            }, mfaInfo);
-          }
-          break;
-        }
-        case LoginSteps.passwordAuth: {
-          await db.user.authenticatePassword(email.current, password.current);
-          finishLogin();
-          break;
-        }
-      }
-      setLoading(false);
-    } catch (e) {
-      finishWithError(e);
-    }
-  };
-
-  const finishWithError = async (e) => {
-    setLoading(false);
-    ToastEvent.show({
-      heading: "Login failed",
-      message: e.message,
-      type: "error",
-      context: "local"
-    });
-  };
-
-  const finishLogin = async () => {
-    const user = await db.user.getUser();
-    if (!user) throw new Error("Email or password incorrect!");
-    PremiumService.setPremiumStatus();
-    setUser(user);
-    clearMessage();
-    ToastEvent.show({
-      heading: "Login successful",
-      message: `Logged in as ${user.email}`,
-      type: "success",
-      context: "global"
-    });
-    hideAuth();
-    SettingsService.set({
-      sessionExpired: false,
-      userEmailConfirmed: user?.isEmailConfirmed
-    });
-    eSendEvent("userLoggedIn", true);
-    await sleep(500);
-    Progress.present();
-    setLoading(false);
-  };
 
   return (
     <>
