@@ -29,6 +29,7 @@ import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
+import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
@@ -119,16 +120,18 @@ export const Login = ({ changeMode }) => {
               } catch (e) {
                 callback && callback(false);
                 if (e.message === "invalid_grant") {
-                  eSendEvent(eCloseProgressDialog, "two_factor_verify");
+                  eSendEvent(eCloseSheet, "two_factor_verify");
                   setLoading(false);
                 }
               }
             }, mfaInfo);
           }
+          break;
         }
         case LoginSteps.passwordAuth: {
           await db.user.authenticatePassword(email.current, password.current);
           finishLogin();
+          break;
         }
       }
       setLoading(false);
@@ -140,7 +143,7 @@ export const Login = ({ changeMode }) => {
   const finishWithError = async (e) => {
     setLoading(false);
     ToastEvent.show({
-      heading: user ? "Failed to sync" : "Login failed",
+      heading: "Login failed",
       message: e.message,
       type: "error",
       context: "local"
@@ -325,8 +328,8 @@ export const Login = ({ changeMode }) => {
                 loading
                   ? null
                   : step === LoginSteps.emailAuth
-                  ? "Login to your account"
-                  : "Complete login"
+                  ? "Login"
+                  : "Continue"
               }
             />
 
