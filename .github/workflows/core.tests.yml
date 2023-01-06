@@ -45,9 +45,10 @@ jobs:
           npm ci --prefer-offline --no-audit
       - name: Add environment variables
         run: |
-          echo "EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
-          echo "PASSWORD='${{ secrets.USER_PASSWORD }}'" >> $GITHUB_ENV
-          echo "HASHED_PASSWORD=${{ secrets.USER_HASHED_PASSWORD }}" >> $GITHUB_ENV
+          echo "USER_EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
+          echo "USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
+          echo "USER_TOTP_SECRET=${{ secrets.USER_TOTP_SECRET }}" >> $GITHUB_ENV
+          echo "USER_HASHED_PASSWORD=${{ secrets.USER_HASHED_PASSWORD }}" >> $GITHUB_ENV
           echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
       - name: Run all @notesnook/core tests

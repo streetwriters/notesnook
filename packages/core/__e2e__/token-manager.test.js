@@ -21,12 +21,6 @@ import DB from "../api";
 import StorageInterface from "../__mocks__/storage.mock";
 import { login } from "./utils";
 
-const user = {
-  email: process.env.EMAIL,
-  password: process.env.PASSWORD,
-  hashedPassword: process.env.HASHED_PASSWORD
-};
-
 test("refresh token concurrently", async () => {
   const db = new DB(StorageInterface);
   await db.init();
