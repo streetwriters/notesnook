@@ -23,7 +23,10 @@ import SearchPlaceholder from "../components/placeholders/search-placeholder";
 import { db } from "../common/db";
 import SearchBox from "../components/search";
 import ProgressBar from "../components/progress-bar";
-import { useStore as useNoteStore } from "../stores/note-store";
+import {
+  useStore as useNoteStore,
+  store as noteStore
+} from "../stores/note-store";
 import { Flex, Text } from "@theme-ui/components";
 import { showToast } from "../utils/toast";
 import { store as notebookstore } from "../stores/notebook-store";
@@ -54,15 +57,36 @@ async function typeToItems(type, context) {
   }
 }
 
+function getContext(type) {
+  console.log("type", type);
+  if (type === "topics") {
+    return {
+      type: "topics",
+      notebookId: notebookstore.get().selectedNotebookId
+    };
+  } else {
+    return noteStore.context;
+  }
+}
+
 function Search({ type }) {
   const [searchState, setSearchState] = useState({
     isSearching: false,
     totalItems: 0
   });
   const [results, setResults] = useState([]);
-  const context = useNoteStore((store) => store.context);
   const nonce = useNoteStore((store) => store.nonce);
   const cachedQuery = useRef();
+  const context = useMemo(() => {
+    if (type === "topics") {
+      return {
+        type: "topics",
+        notebookId: notebookstore.get().selectedNotebookId
+      };
+    } else {
+      return noteStore.context;
+    }
+  }, [type]);
 
   const onSearch = useCallback(
     async (query) => {
