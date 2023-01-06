@@ -25,9 +25,6 @@ import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import { useUserStore } from "../../stores/use-user-store";
 import { eCloseSheet } from "../../utils/events";
-import { sleep } from "../../utils/time";
-import { Progress } from "../sheets/progress";
-import { hideAuth } from "./common";
 import TwoFactorVerification from "./two-factor";
 
 export const LoginSteps = {
@@ -36,12 +33,12 @@ export const LoginSteps = {
   passwordAuth: 3
 };
 
-export const useLogin = (defaultEmail, onFinishLogin) => {
+export const useLogin = (onFinishLogin) => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const [step, setStep] = useState(LoginSteps.emailAuth);
-  const email = useRef(defaultEmail);
+  const email = useRef();
   const password = useRef();
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -92,6 +89,7 @@ export const useLogin = (defaultEmail, onFinishLogin) => {
                 if (e.message === "invalid_grant") {
                   eSendEvent(eCloseSheet, "two_factor_verify");
                   setLoading(false);
+                  setStep(LoginSteps.emailAuth);
                 }
               }
             }, mfaInfo);
@@ -111,6 +109,7 @@ export const useLogin = (defaultEmail, onFinishLogin) => {
   };
 
   const finishWithError = async (e) => {
+    if (e.message === "invalid_grant") setStep(LoginSteps.emailAuth);
     setLoading(false);
     ToastEvent.show({
       heading: "Login failed",

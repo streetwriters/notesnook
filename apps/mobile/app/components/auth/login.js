@@ -59,7 +59,7 @@ export const Login = ({ changeMode }) => {
     setLoading,
     setError,
     login
-  } = useLogin(undefined, async () => {
+  } = useLogin(async () => {
     hideAuth();
     eSendEvent("userLoggedIn", true);
     await sleep(500);

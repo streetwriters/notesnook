@@ -22,6 +22,7 @@ import { Modal, View } from "react-native";
 import { db } from "../../common/database";
 import BiometricService from "../../services/biometrics";
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
@@ -57,8 +58,8 @@ export const SessionExpired = () => {
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(false);
   const { step, password, email, passwordInputRef, loading, login } = useLogin(
-    undefined,
     () => {
+      eSendEvent("userLoggedIn", true);
       setVisible(false);
     }
   );
