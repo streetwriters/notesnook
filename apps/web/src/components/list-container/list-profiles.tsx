@@ -84,13 +84,11 @@ const TagsProfile: ItemWrapper = ({ index, item }) => (
   <Tag item={item} index={index} />
 );
 
-const TopicsProfile: ItemWrapper = ({ index, item, context }) => (
+const TopicsProfile: ItemWrapper = ({ index, item }) => (
   <Topic
     index={index}
     item={item}
-    onClick={() =>
-      context ? navigate(`/notebooks/${context.notebookId}/${item.id}`) : null
-    }
+    onClick={() => navigate(`/notebooks/${item.notebookId}/${item.id}`)}
   />
 );
 
