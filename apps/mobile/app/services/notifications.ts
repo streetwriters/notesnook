@@ -26,7 +26,8 @@ import notifee, {
   Trigger,
   TriggerType,
   Event,
-  TriggerNotification
+  TriggerNotification,
+  TimestampTrigger
 } from "@notifee/react-native";
 import dayjs, { Dayjs } from "dayjs";
 import { Platform } from "react-native";
@@ -73,10 +74,10 @@ async function getNextMonthlyReminderDate(
 ): Promise<Dayjs> {
   const currentMonth = dayjs().month();
   for (let i = currentMonth; i < 12; i++) {
-    for (const day of reminder.selectedDays as number[]) {
+    const sortedDays = reminder.selectedDays?.sort((a, b) => a - b);
+    for (const day of sortedDays as number[]) {
       const date = dayjs(reminder.date).year(year).month(i).date(day);
       if (date.daysInMonth() < day || dayjs().isAfter(date)) continue;
-      if (date.isBefore(dayjs())) continue;
       return date;
     }
   }
@@ -233,7 +234,8 @@ async function scheduleNotification(
   payload?: string
 ) {
   if (!reminder) return;
-  if (useSettingStore.getState().settings.disableReminderNotifications) return;
+  if (!useSettingStore.getState().settings.reminderNotifications) return;
+
   try {
     const { title, description, priority } = reminder;
 
@@ -253,6 +255,11 @@ async function scheduleNotification(
     await setupIOSCategories();
     if (!triggers) return;
     for (const trigger of triggers) {
+      if (
+        (trigger as TimestampTrigger).timestamp < Date.now() &&
+        reminder.mode === "once"
+      )
+        continue;
       const iosProperties: { [name: string]: any } = {};
       if (priority === "urgent") {
         iosProperties["sound"] = "default";
@@ -457,7 +464,7 @@ async function getTriggers(
   reminder: Reminder
 ): Promise<(Trigger & { id: string })[] | undefined> {
   const { date, recurringMode, selectedDays, mode, snoozeUntil } = reminder;
-  const triggers: (Trigger & { id: string })[] = [];
+  let triggers: (Trigger & { id: string })[] = [];
 
   if (snoozeUntil && snoozeUntil > Date.now()) {
     triggers.push({
@@ -469,6 +476,7 @@ async function getTriggers(
       }
     });
   }
+  const relativeTime = dayjs(date);
   switch (mode) {
     case "once":
       if (date < Date.now()) break;
@@ -498,41 +506,8 @@ async function getTriggers(
           break;
         case "week":
           if (!selectedDays) break;
-          triggers.concat(
-            selectedDays.length === 7
-              ? [
-                  {
-                    timestamp: date as number,
-                    type: TriggerType.TIMESTAMP,
-                    repeatFrequency: RepeatFrequency.DAILY,
-                    id: reminder.id,
-                    alarmManager: {
-                      allowWhileIdle: true
-                    }
-                  }
-                ]
-              : (selectedDays
-                  .map((day) => ({
-                    timestamp: dayjs(date)
-                      .day(day)
-                      .toDate()
-                      .getTime() as number,
-                    type: TriggerType.TIMESTAMP,
-                    repeatFrequency: RepeatFrequency.WEEKLY,
-                    id: `${reminder.id}_${day}`,
-                    alarmManager: {
-                      allowWhileIdle: true
-                    }
-                  }))
-                  .filter(
-                    (trigger) => trigger.timestamp > Date.now()
-                  ) as (Trigger & { id: string })[])
-          );
-          break;
-        case "month":
-          if (!selectedDays) break;
-          if (selectedDays.length === 31) {
-            triggers.concat([
+          if (selectedDays.length === 7) {
+            triggers = [
               {
                 timestamp: date as number,
                 type: TriggerType.TIMESTAMP,
@@ -542,23 +517,65 @@ async function getTriggers(
                   allowWhileIdle: true
                 }
               }
-            ]);
+            ];
+            break;
+          }
+
+          for (const day of selectedDays) {
+            const timestamp = dayjs()
+              .day(day)
+              .hour(relativeTime.hour())
+              .minute(relativeTime.minute());
+
+            if (timestamp.isBefore(dayjs())) continue;
+
+            triggers.push({
+              timestamp: timestamp.toDate().getTime() as number,
+              type: TriggerType.TIMESTAMP,
+              repeatFrequency: RepeatFrequency.WEEKLY,
+              id: `${reminder.id}_${day}`,
+              alarmManager: {
+                allowWhileIdle: true
+              }
+            });
+          }
+
+          break;
+        case "month":
+          if (!selectedDays) break;
+          if (selectedDays.length === 31) {
+            triggers = [
+              {
+                timestamp: date as number,
+                type: TriggerType.TIMESTAMP,
+                repeatFrequency: RepeatFrequency.DAILY,
+                id: reminder.id,
+                alarmManager: {
+                  allowWhileIdle: true
+                }
+              }
+            ];
             break;
           }
           if (Platform.OS === "ios") {
-            selectedDays
-              .map((day) => ({
-                timestamp: dayjs(date).date(day).toDate().getTime() as number,
+            for (const day of selectedDays) {
+              const timestamp = dayjs()
+                .date(day)
+                .hour(relativeTime.hour())
+                .minute(relativeTime.minute());
+
+              if (timestamp.isBefore(dayjs())) continue;
+
+              triggers.push({
+                timestamp: timestamp.toDate().getTime() as number,
                 type: TriggerType.TIMESTAMP,
                 repeatFrequency: RepeatFrequency.MONTHLY,
                 id: `${reminder.id}_${day}`,
                 alarmManager: {
                   allowWhileIdle: true
                 }
-              }))
-              .filter(
-                (trigger) => trigger.timestamp > Date.now()
-              ) as (Trigger & { id: string })[];
+              });
+            }
           } else {
             const reminderDate = await getNextMonthlyReminderDate(
               reminder,
@@ -664,7 +681,7 @@ async function pinQuickNote(launch: boolean) {
  * A function that checks if reminders need to be reconfigured &
  * reschedules them if anything has changed.
  */
-async function setupReminders() {
+async function setupReminders(checkNeedsScheduling = false) {
   const reminders = (db.reminders?.all as Reminder[]) || [];
   const triggers = await notifee.getTriggerNotifications();
 
@@ -674,12 +691,18 @@ async function setupReminders() {
     );
     let needsReschedule = pending.length === 0 ? true : false;
     if (!needsReschedule) {
+      console.log(
+        pending[0].notification.data?.dateModified,
+        reminder.dateModified
+      );
+
       needsReschedule = pending[0].notification.data?.dateModified
         ? parseInt(pending[0].notification.data?.dateModified as string) <
           reminder.dateModified
         : true;
     }
-    if (needsReschedule) await scheduleNotification(reminder);
+    if (!needsReschedule && !checkNeedsScheduling) continue;
+    await scheduleNotification(reminder);
   }
   // Check for any triggers whose notifications
   // have been removed.
