@@ -37,7 +37,7 @@ export function initAfterSync() {
   );
   // Whenever sync completes, try to reschedule
   // any new/updated reminders.
-  Notifications.setupReminders();
+  Notifications.setupReminders(true);
   useRelationStore.getState().update();
 }
 
@@ -52,6 +52,7 @@ export function initialize() {
     useFavoriteStore.getState().setFavorites();
     useNoteStore.getState().setNotes();
     useReminderStore.getState().setReminders();
+    Notifications.setupReminders();
   });
 }
 
