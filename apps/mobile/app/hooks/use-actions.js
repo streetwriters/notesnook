@@ -465,6 +465,7 @@ export const useActions = ({ close = () => null, item }) => {
             routes.push("Tags");
           }
           Navigation.queueRoutesForUpdate(...routes);
+          useRelationStore.getState().update();
         },
         positiveText: "Delete",
         positiveType: "errorShade"

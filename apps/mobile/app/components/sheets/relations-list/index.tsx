@@ -71,7 +71,7 @@ export const RelationsList = ({
   button,
   onAdd
 }: RelationsListProps) => {
-  const relations = useRelationStore();
+  const updater = useRelationStore((state) => state.updater);
   const [items, setItems] = useState<Reminder[]>([]);
   const colors = useThemeStore((state) => state.colors);
   const hasNoRelations = !items || items.length === 0;
@@ -83,7 +83,7 @@ export const RelationsList = ({
         referenceType
       ) as any
     );
-  }, [item?.id, item?.type, referenceType, relationType, relations.updater]);
+  }, [item?.id, item?.type, referenceType, relationType, updater]);
   return (
     <View
       style={{ paddingHorizontal: 12, height: hasNoRelations ? 300 : "100%" }}

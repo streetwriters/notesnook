@@ -26,6 +26,7 @@ import { openVault, ToastEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useMenuStore } from "../../../stores/use-menu-store";
 import { useNotebookStore } from "../../../stores/use-notebook-store";
+import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { useTrashStore } from "../../../stores/use-trash-store";
@@ -100,7 +101,6 @@ export const ActionStrip = ({ note, setActionStrip }) => {
         ? "Remove Shortcut from Menu"
         : "Add Shortcut to Menu",
       icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
-      visible: note.type !== "reminder",
       onPress: async () => {
         try {
           if (isPinnedToMenu) {
@@ -139,7 +139,7 @@ export const ActionStrip = ({ note, setActionStrip }) => {
           console.error(e);
         }
       },
-      visible: note.type !== "note"
+      visible: note.type !== "note" && note.type !== "reminder"
     },
     {
       title: "Copy Note",
@@ -233,6 +233,7 @@ export const ActionStrip = ({ note, setActionStrip }) => {
               await db.reminders.remove(note.id);
               routes.push("Reminders");
               Navigation.queueRoutesForUpdate(...routes);
+              useRelationStore.getState().update();
             },
             positiveText: "Delete",
             positiveType: "errorShade"
