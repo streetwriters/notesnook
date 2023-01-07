@@ -129,6 +129,8 @@ export function formatReminderTime(reminder) {
   const { date } = reminder;
   let time = date;
 
+  if (reminder.mode === "permanent") return `Pinned to Notifications`;
+
   if (reminder.snoozeUntil && reminder.snoozeUntil > Date.now()) {
     return `Snoozed until ${dayjs(reminder.snoozeUntil).format("hh:mm A")}`;
   }
