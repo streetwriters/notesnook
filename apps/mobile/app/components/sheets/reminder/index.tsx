@@ -165,7 +165,7 @@ export default function ReminderSheet({
       });
       return;
     }
-    if (date.getTime() < Date.now()) {
+    if (date.getTime() < Date.now() && reminderMode === "once") {
       ToastEvent.show({
         heading: "Reminder date must be set in future",
         type: "error",
@@ -200,13 +200,12 @@ export default function ReminderSheet({
       });
     }
     if (reference) {
-      db.relations?.add(reference, {
+      await db.relations?.add(reference, {
         id: _reminder?.id as string,
         type: _reminder?.type as string
       });
     }
     Notifications.scheduleNotification(_reminder as Reminder);
-    useRelationStore.getState().update();
     Navigation.queueRoutesForUpdate(
       "TaggedNotes",
       "ColoredNotes",
@@ -216,6 +215,7 @@ export default function ReminderSheet({
       "Favorites",
       "TopicNotes"
     );
+    useRelationStore.getState().update();
     close?.("local");
     close?.();
   }
@@ -555,6 +555,7 @@ export default function ReminderSheet({
         }}
         title="Save"
         type="accent"
+        fontSize={SIZE.md}
         onPress={saveReminder}
       />
     </View>
