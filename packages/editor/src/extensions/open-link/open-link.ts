@@ -31,14 +31,14 @@ declare module "@tiptap/core" {
 }
 
 export type OpenLinkOptions = {
-    onOpenLink: (url: string) => boolean;
+  onOpenLink: (url: string) => boolean;
 };
 
 export const OpenLink = Extension.create<OpenLinkOptions>({
   name: "openlink",
   addOptions() {
     return {
-        onOpenLink: () => false
+      onOpenLink: () => false
     };
   },
   addCommands() {
