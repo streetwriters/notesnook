@@ -117,6 +117,7 @@ export default class Reminders extends Collection {
   async remove(...reminderIds) {
     for (const id of reminderIds) {
       await this._collection.removeItem(id);
+      await this._db.relations.cleanup();
     }
   }
 }
@@ -134,6 +135,7 @@ export function formatReminderTime(reminder) {
 
   if (reminder.mode === "repeat") {
     time = getUpcomingReminderTime(reminder);
+    console.log("reminder mode repeat");
   }
 
   if (dayjs(time).isTomorrow()) {
@@ -167,7 +169,6 @@ function getUpcomingReminderTime(reminder) {
   const isDay = reminder.recurringMode === "day";
   const isWeek = reminder.recurringMode === "week";
   const isMonth = reminder.recurringMode === "month";
-
   if (isDay) {
     if (isPast) return relativeTime.add(1, "day").valueOf();
     else return relativeTime.valueOf();
@@ -178,16 +179,15 @@ function getUpcomingReminderTime(reminder) {
 
   const sorted = reminder.selectedDays.sort((a, b) => a - b);
   const lastSelectedDay = sorted[sorted.length - 1];
-
   if (isWeek) {
-    if (now.day() > lastSelectedDay)
+    if (now.day() > lastSelectedDay || isPast)
       return relativeTime.day(sorted[0]).add(1, "week").valueOf();
     else {
       for (const day of reminder.selectedDays)
         if (now.day() < day) return relativeTime.day(day).valueOf();
     }
   } else if (isMonth) {
-    if (now.date() > lastSelectedDay)
+    if (now.date() > lastSelectedDay || isPast)
       return relativeTime.date(sorted[0]).add(1, "month").valueOf();
     else {
       for (const day of reminder.selectedDays)
