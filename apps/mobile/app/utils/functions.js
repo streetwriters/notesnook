@@ -26,6 +26,7 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { useMenuStore } from "../stores/use-menu-store";
 import { db } from "../common/database";
 import { eClearEditor } from "./events";
+import { useRelationStore } from "../stores/use-relation-store";
 
 export const deleteItems = async (item) => {
   if (item && db.monographs.isPublished(item.id)) {
@@ -47,43 +48,48 @@ export const deleteItems = async (item) => {
     (i) => i.type === "notebook"
   );
   let topics = history.selectedItemsList.filter((i) => i.type === "topic");
+  let reminders = history.selectedItemsList.filter(
+    (i) => i.type === "reminder"
+  );
+
+  let routesForUpdate = [
+    "TaggedNotes",
+    "ColoredNotes",
+    "TopicNotes",
+    "Favorites",
+    "Notes"
+  ];
+
+  if (reminders.length > 0) {
+    for (let reminder of reminders) {
+      await db.reminders.remove(reminder.id);
+    }
+    routesForUpdate.push("Reminders");
+    useRelationStore.getState().update();
+  }
 
   if (notes?.length > 0) {
-    let ids = notes
-      .map((i) => {
-        if (db.monographs.isPublished(i.id)) {
-          ToastEvent.show({
-            heading: "Some notes are published",
-            message: "Unpublish published notes to delete them",
-            type: "error",
-            context: "global"
-          });
-          return null;
-        }
-        return i.id;
-      })
-      .filter((n) => n !== null);
-
-    await db.notes.delete(...ids);
-
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes",
-      "Trash"
-    );
+    for (const note of notes) {
+      if (db.monographs.isPublished(note.id)) {
+        ToastEvent.show({
+          heading: "Some notes are published",
+          message: "Unpublish published notes to delete them",
+          type: "error",
+          context: "global"
+        });
+        continue;
+      }
+      await db.notes.delete(note.id);
+    }
+    routesForUpdate.push("Trash");
     eSendEvent(eClearEditor);
   }
-  if (topics?.length > 0) {
-    for (var i = 0; i < topics.length; i++) {
-      let it = topics[i];
-      await db.notebooks.notebook(it.notebookId).topics.delete(it.id);
-    }
 
-    // layoutmanager.withAnimation(150);
-    Navigation.queueRoutesForUpdate("Notebook", "Notebooks");
+  if (topics?.length > 0) {
+    for (const topic of topics) {
+      await db.notebooks.notebook(topic.notebookId).topics.delete(topic.id);
+    }
+    routesForUpdate.push("Notebook", "Notebooks");
     useMenuStore.getState().setMenuPins();
     ToastEvent.show({
       heading: "Topics deleted",
@@ -94,25 +100,21 @@ export const deleteItems = async (item) => {
   if (notebooks?.length > 0) {
     let ids = notebooks.map((i) => i.id);
     await db.notebooks.delete(...ids);
-
-    //layoutmanager.withAnimation(150);
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes",
-      "Notebooks",
-      "Trash"
-    );
+    routesForUpdate.push("Notebook", "Notebooks");
     useMenuStore.getState().setMenuPins();
   }
+
+  Navigation.queueRoutesForUpdate(...routesForUpdate);
 
   let msgPart = history.selectedItemsList.length === 1 ? " item" : " items";
   let message = history.selectedItemsList.length + msgPart + " moved to trash.";
 
   let itemsCopy = [...history.selectedItemsList];
-  if (topics.length === 0 && (notes.length > 0 || notebooks.length > 0)) {
+  if (
+    topics.length === 0 &&
+    reminders.length === 0 &&
+    (notes.length > 0 || notebooks.length > 0)
+  ) {
     ToastEvent.show({
       heading: message,
       type: "success",
@@ -126,17 +128,7 @@ export const deleteItems = async (item) => {
         }
         await db.trash.restore(...ids);
 
-        //layoutmanager.withAnimation(150);
-        Navigation.queueRoutesForUpdate(
-          "TaggedNotes",
-          "ColoredNotes",
-          "TopicNotes",
-          "Favorites",
-          "Notes",
-          "Notebook",
-          "Notebooks",
-          "Trash"
-        );
+        Navigation.queueRoutesForUpdate(routesForUpdate);
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
         ToastEvent.hide();
@@ -149,7 +141,6 @@ export const deleteItems = async (item) => {
   useSelectionStore.getState().clearSelection(true);
   useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();
-
   SearchService.updateAndSearch();
 };
 
