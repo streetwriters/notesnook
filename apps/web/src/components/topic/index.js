@@ -93,7 +93,6 @@ const menuItems = [
     title: "Move Topic",
     icon: Icon.Move,
     onClick: ({ items, notebookId }) => {
-      console.log(items);
       showMoveTopicsDialog(items, notebookId);
     },
     multiSelect: true

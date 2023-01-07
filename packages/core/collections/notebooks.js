@@ -156,27 +156,24 @@ export default class Notebooks extends Collection {
     }
   }
 
-  async moveTopics(id, items) {
-    if (!id) throw new Error("The destination notebook cannot be undefined.");
-    if (!items.length) throw new Error("You must select one or more topics");
+  async moveTopics(notebookId, topics) {
+    if (!notebookId)
+      throw new Error("The destination notebook cannot be undefined.");
+    if (!topics.length) throw new Error("You must select one or more topics");
 
-    let topicIds = [];
-    let lastNotebookId = items[0].notebookId;
-    let noteIds = [];
-
-    for (let index = 0; index < items.length; index++) {
-      topicIds.push(items[index].id);
-      items[index].notebookId = id;
+    for (const topic of topics) {
+      let notesInTopic = [...this._db.notes.topicReferences.get(topic.id)];
       await this._db.notes.addToNotebook(
-        { id, topic: items[index].id },
-        ...this._db.notes.topicReferences.get(items[index].id)
+        { id: notebookId, topic: topic.id },
+        ...notesInTopic
       );
-      noteIds.push(...this._db.notes.topicReferences.get(items[index].id));
+      await this._db.notebooks
+        .notebook(topic.notebookId)
+        .topics.delete(topic.id);
+
+      topic.notebookId = notebookId;
     }
 
-    await this._db.notebooks.notebook(id).topics.add(...items);
-    await this._db.notebooks
-      .notebook(lastNotebookId)
-      .topics.delete(...topicIds);
+    await this._db.notebooks.notebook(notebookId).topics.add(...topics);
   }
 }
