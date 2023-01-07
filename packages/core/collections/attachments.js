@@ -282,9 +282,15 @@ export default class Attachments extends Collection {
     return this._collection.updateItem(attachment);
   }
 
-  async save(data, type) {
+  async save(data, type, mimeType) {
     const key = await this._db.attachments.generateKey();
-    const metadata = await this._db.fs.writeEncrypted(null, data, type, key);
+    const metadata = await this._db.fs.writeEncrypted(
+      null,
+      data,
+      type,
+      key,
+      mimeType
+    );
     return { key, metadata };
   }
 

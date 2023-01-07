@@ -163,7 +163,7 @@ export default class Content extends Collection {
     const content = getContentFromData(contentItem.type, contentItem.data);
     if (!content) return contentItem;
     const { data, attachments } = await content.extractAttachments(
-      (data, type) => this._db.attachments.save(data, type)
+      (data, type, mimeType) => this._db.attachments.save(data, type, mimeType)
     );
 
     const noteAttachments = allAttachments.filter((attachment) =>

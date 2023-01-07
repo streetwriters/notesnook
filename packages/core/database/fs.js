@@ -73,11 +73,12 @@ export default class FileStorage {
     return this.fs.readEncrypted(filename, encryptionKey, cipherData);
   }
 
-  writeEncrypted(filename, data, type, encryptionKey) {
+  writeEncrypted(filename, data, type, encryptionKey, mimeType) {
     return this.fs.writeEncrypted(filename, {
       data,
       type,
-      key: encryptionKey
+      key: encryptionKey,
+      mimeType
     });
   }
 
