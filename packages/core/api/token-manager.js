@@ -66,6 +66,8 @@ class TokenManager {
 
   _isTokenRefreshable(token) {
     const { scope, refresh_token } = token;
+    if (!refresh_token || !scope) return false;
+
     const scopes = scope.split(" ");
     return scopes.includes("offline_access") && Boolean(refresh_token);
   }
@@ -88,7 +90,9 @@ class TokenManager {
       }
 
       const { refresh_token, scope } = token;
-      if (!refresh_token || !scope) return;
+      if (!refresh_token || !scope) {
+        throw new Error("Token not found.");
+      }
 
       const refreshTokenResponse = await await http.post(
         `${constants.AUTH_HOST}${ENDPOINTS.token}`,
