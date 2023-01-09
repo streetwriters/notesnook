@@ -55,7 +55,8 @@
     "@shopify/flash-list":"1.4.0",
     "@notifee/react-native": "7.1.0",
     "react-native-modal-datetime-picker":"14.0.0",
-    "@react-native-community/datetimepicker":"6.6.0"
+    "@react-native-community/datetimepicker":"6.6.0",
+    "react-native-date-picker": "4.2.6"
 
   },
   "devDependencies": {

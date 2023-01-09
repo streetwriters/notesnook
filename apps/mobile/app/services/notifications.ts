@@ -44,6 +44,7 @@ import { useSettingStore } from "../stores/use-setting-store";
 import ReminderNotify from "../components/sheets/reminder-notify";
 import { sleep } from "../utils/time";
 import { useRelationStore } from "../stores/use-relation-store";
+import { useReminderStore } from "../stores/use-reminder-store";
 
 export type Reminder = {
   id: string;
@@ -140,6 +141,7 @@ const onEvent = async ({ type, detail }: Event) => {
           db.reminders?.reminder(reminder?.id)
         );
         useRelationStore.getState().update();
+        useReminderStore.getState().setReminders();
         break;
       }
       case "REMINDER_DISABLE": {
@@ -154,11 +156,25 @@ const onEvent = async ({ type, detail }: Event) => {
           db.reminders?.reminder(reminder?.id)
         );
         useRelationStore.getState().update();
+        useReminderStore.getState().setReminders();
         break;
       }
-      case "UNPIN":
+      case "UNPIN": {
         remove(notification?.id as string);
+        const reminder = db.reminders?.reminder(
+          notification?.id?.split("_")[0]
+        );
+        if (reminder) {
+          await db.reminders?.add({
+            ...reminder,
+            disabled: true
+          });
+          useRelationStore.getState().update();
+          useReminderStore.getState().setReminders();
+        }
         break;
+      }
+
       case "Hide":
         unpinQuickNote();
         break;
@@ -240,6 +256,7 @@ async function scheduleNotification(
     const { title, description, priority } = reminder;
 
     await clearAllPendingTriggersForId(reminder.id);
+    await remove(reminder.id);
     if (reminder.disabled) return;
     const triggers = await getTriggers(reminder);
     if (!triggers && reminder.mode === "permanent") {
@@ -248,7 +265,8 @@ async function scheduleNotification(
         title: title,
         message: description || "",
         ongoing: true,
-        subtitle: description || ""
+        subtitle: description || "",
+        actions: ["UNPIN"]
       });
       return;
     }
