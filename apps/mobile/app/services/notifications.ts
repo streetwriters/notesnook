@@ -511,9 +511,16 @@ async function getTriggers(
       return undefined;
     case "repeat": {
       switch (recurringMode) {
-        case "day":
+        case "day": {
+          let timestamp = dayjs()
+            .hour(relativeTime.hour())
+            .minute(relativeTime.minute());
+          if (timestamp.isBefore(dayjs())) {
+            timestamp = timestamp.add(1, "day");
+            timestamp.second(0);
+          }
           triggers.push({
-            timestamp: date as number,
+            timestamp: timestamp.valueOf() as number,
             type: TriggerType.TIMESTAMP,
             repeatFrequency: RepeatFrequency.DAILY,
             id: reminder.id,
@@ -521,7 +528,10 @@ async function getTriggers(
               allowWhileIdle: true
             }
           });
+
           break;
+        }
+
         case "week":
           if (!selectedDays) break;
           if (selectedDays.length === 7) {
@@ -707,19 +717,16 @@ async function setupReminders(checkNeedsScheduling = false) {
     const pending = triggers.filter((t) =>
       t.notification.id?.startsWith(reminder.id)
     );
+
     let needsReschedule = pending.length === 0 ? true : false;
     if (!needsReschedule) {
-      console.log(
-        pending[0].notification.data?.dateModified,
-        reminder.dateModified
-      );
-
       needsReschedule = pending[0].notification.data?.dateModified
         ? parseInt(pending[0].notification.data?.dateModified as string) <
           reminder.dateModified
         : true;
     }
-    if (!needsReschedule && !checkNeedsScheduling) continue;
+    if (!needsReschedule && checkNeedsScheduling) continue;
+
     await scheduleNotification(reminder);
   }
   // Check for any triggers whose notifications
