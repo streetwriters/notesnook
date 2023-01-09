@@ -32,7 +32,8 @@ import {
   AttachmentType,
   usePermissionHandler,
   getHTMLFromFragment,
-  Fragment
+  Fragment,
+  type DownloadOptions
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
@@ -67,6 +68,7 @@ type TipTapProps = {
   nonce?: number;
   theme: Theme;
   isMobile?: boolean;
+  downloadOptions?: DownloadOptions;
 };
 
 const SAVE_INTERVAL = process.env.REACT_APP_TEST ? 100 : 300;
@@ -110,7 +112,8 @@ function TipTap(props: TipTapProps) {
     readonly,
     nonce,
     theme,
-    isMobile
+    isMobile,
+    downloadOptions
   } = props;
 
   const isUserPremium = useIsUserPremium();
@@ -144,6 +147,7 @@ function TipTap(props: TipTapProps) {
           }
         }
       },
+      downloadOptions,
       doubleSpacedLines,
       isKeyboardOpen: true,
       isMobile: isMobile || false,

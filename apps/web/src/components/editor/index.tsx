@@ -43,6 +43,7 @@ import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
 import Titlebox from "./title-box";
 import useTablet from "../../hooks/use-tablet";
+import Config from "../../utils/config";
 
 type PreviewSession = {
   content: { data: string; type: string };
@@ -287,6 +288,9 @@ export function Editor(props: EditorProps) {
         readonly={readonly}
         toolbarContainerId={headless ? undefined : "editorToolbar"}
         content={content}
+        downloadOptions={{
+          corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
+        }}
         onLoad={() => {
           if (onLoadMedia) onLoadMedia();
         }}
