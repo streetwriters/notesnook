@@ -50,12 +50,12 @@ describe("format reminder time", () => {
   test("weekly reminder [current week]", () => {
     const reminder = {
       recurringMode: "week",
-      date: new Date(0).setHours(3),
+      date: new Date(0).setHours(8),
       selectedDays: [3, 5],
       mode: "repeat"
     };
     expect(formatReminderTime(reminder)).toBe(
-      "Upcoming: Wed, 2022-06-08 03:00 AM"
+      "Upcoming: Wed, 2022-06-08 08:00 AM"
     );
   });
 
@@ -74,12 +74,12 @@ describe("format reminder time", () => {
   test("weekly reminder [current week, multiple days]", () => {
     const reminder = {
       recurringMode: "week",
-      date: new Date(0).setHours(3),
+      date: new Date(0).setHours(8),
       selectedDays: [0, 5, 6],
       mode: "repeat"
     };
     expect(formatReminderTime(reminder)).toBe(
-      "Upcoming: Fri, 2022-06-10 03:00 AM"
+      "Upcoming: Fri, 2022-06-10 08:00 AM"
     );
   });
 
@@ -96,12 +96,12 @@ describe("format reminder time", () => {
   test("monthly reminder [current month]", () => {
     const reminder = {
       recurringMode: "month",
-      date: new Date(0).setHours(3),
+      date: new Date(0).setHours(8),
       selectedDays: [12, 18],
       mode: "repeat"
     };
     expect(formatReminderTime(reminder)).toBe(
-      "Upcoming: Sun, 2022-06-12 03:00 AM"
+      "Upcoming: Sun, 2022-06-12 08:00 AM"
     );
   });
 
@@ -174,5 +174,17 @@ describe("format reminder time", () => {
       recurringMode: "day"
     };
     expect(formatReminderTime(reminder)).toBe("Upcoming: Tomorrow, 05:05 AM");
+  });
+
+  test("same day next week because time has passed today", () => {
+    const reminder = {
+      recurringMode: "week",
+      date: new Date(0).setHours(3),
+      selectedDays: [1],
+      mode: "repeat"
+    };
+    expect(formatReminderTime(reminder)).toBe(
+      "Upcoming: Mon, 2022-06-13 03:00 AM"
+    );
   });
 });
