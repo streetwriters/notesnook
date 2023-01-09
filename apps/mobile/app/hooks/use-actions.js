@@ -863,20 +863,20 @@ export const useActions = ({ close = () => null, item }) => {
         );
       }
     },
-    {
-      name: "ReferencedIn",
-      title: "References",
-      icon: "link",
-      func: async () => {
-        close();
-        RelationsList.present({
-          reference: item,
-          referenceType: "note",
-          title: "Referenced in",
-          relationType: "to"
-        });
-      }
-    }
+    // {
+    //   name: "ReferencedIn",
+    //   title: "References",
+    //   icon: "link",
+    //   func: async () => {
+    //     close();
+    //     RelationsList.present({
+    //       reference: item,
+    //       referenceType: "note",
+    //       title: "Referenced in",
+    //       relationType: "to",
+    //     });
+    //   }
+    // }
   ];
 
   return actions;

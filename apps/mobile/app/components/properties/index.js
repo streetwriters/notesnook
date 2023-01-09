@@ -249,7 +249,7 @@ Properties.present = (item, buttons = [], isSheet) => {
       break;
     case "reminder": {
       props[0] = db.reminders.reminder(item.id);
-      props.push(["Edit reminder", "Delete", "ReminderOnOff", "ReferencedIn"]);
+      props.push(["Edit reminder", "Delete", "ReminderOnOff"]);
       break;
     }
   }
