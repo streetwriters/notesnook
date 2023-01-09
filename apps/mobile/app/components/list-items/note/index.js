@@ -163,7 +163,7 @@ const NoteItem = ({
         ) : null}
 
         {current &&
-        current.date &&
+        current.date && !current.disabled &&
         (current.mode !== "once" || current.date > Date.now() || current.snoozeUntil > Date.now()) ? (
           <TouchableOpacity
             activeOpacity={1}
