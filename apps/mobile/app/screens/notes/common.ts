@@ -29,6 +29,7 @@ import { tabBarRef } from "../../utils/global-refs";
 import { editorController, editorState } from "../editor/tiptap/utils";
 import { NotesScreenParams } from "../../stores/use-navigation-store";
 import { TopicType } from "../../utils/types";
+import { ChangeEmail } from "../../components/sheets/change-email";
 
 export function toCamelCase(title: string) {
   return title.slice(0, 1).toUpperCase() + title.slice(1);

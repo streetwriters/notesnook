@@ -83,6 +83,9 @@ const SheetWrapper = ({
       testIDs={{
         backdrop: "sheet-backdrop"
       }}
+      indicatorStyle={{
+        width: 100
+      }}
       drawUnderStatusBar={false}
       containerStyle={style}
       gestureEnabled={gestureEnabled}

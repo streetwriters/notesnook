@@ -27,6 +27,7 @@ import { db } from "../../common/database";
 import { MMKV } from "../../common/database/mmkv";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
+import { ChangeEmail } from "../../components/sheets/change-email";
 import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
 import { Progress } from "../../components/sheets/progress";
@@ -156,6 +157,14 @@ export const settingsGroups: SettingSection[] = [
               ChangePassword.present();
             },
             description: "Setup a new password for your account."
+          },
+          {
+            id: "change-email",
+            name: "Change email",
+            modifer: async () => {
+              ChangeEmail.present();
+            },
+            description: "Setup a new email for your account."
           },
           {
             id: "2fa-settings",
