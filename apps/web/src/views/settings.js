@@ -40,7 +40,8 @@ import {
   showMultifactorDialog,
   showAttachmentsDialog,
   show2FARecoveryCodesDialog,
-  showToolbarConfigDialog
+  showToolbarConfigDialog,
+  showPromptDialog
 } from "../common/dialog-controller";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { createBackup, importBackup, verifyAccount } from "../common";
@@ -182,6 +183,10 @@ function Settings() {
   );
   const [showReminderNotifications, setShowReminderNotifications] =
     usePersistentState("reminderNotifications", true);
+  const [corsProxy, setCorsProxy] = usePersistentState(
+    "corsProxy",
+    "https://cors.notesnook.com"
+  );
 
   useEffect(() => {
     (async () => {
@@ -756,6 +761,34 @@ function Settings() {
                 />
               </Button>
             )}
+            <Button
+              variant="list"
+              onClick={async () => {
+                const result = await showPromptDialog({
+                  title: "CORS bypass proxy",
+                  description:
+                    "You can set a custom proxy URL to increase your privacy.",
+                  defaultValue: corsProxy
+                });
+                if (!result) return;
+                const url = new URL(result);
+                setCorsProxy(`${url.protocol}//${url.hostname}`);
+              }}
+            >
+              <Tip
+                text="Custom CORS proxy"
+                tip={
+                  <>
+                    <em>{corsProxy}</em>
+                    <br />
+                    CORS proxy is required to directly download images from
+                    within the Notesnook app. It allows Notesnook to bypass
+                    browser restrictions by using a proxy. You can set a custom
+                    proxy URL to increase your privacy.
+                  </>
+                }
+              />
+            </Button>
             <Toggle
               title="Enable telemetry"
               onTip="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
