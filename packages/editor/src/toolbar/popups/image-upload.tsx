@@ -23,6 +23,7 @@ import { Flex, Text } from "@theme-ui/components";
 import { ImageAttributes } from "../../extensions/image";
 import { Popup } from "../components/popup";
 import { downloadImage, toDataURL } from "../../utils/downloader";
+import { useToolbarStore } from "../stores/toolbar-store";
 
 export type ImageUploadPopupProps = {
   onInsert: (image: ImageAttributes) => void;
@@ -33,6 +34,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string>();
   const [url, setUrl] = useState<string>("");
+  const downloadOptions = useToolbarStore((store) => store.downloadOptions);
 
   return (
     <Popup
@@ -47,7 +49,10 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
           setError(undefined);
 
           try {
-            const { blob, size, type } = await downloadImage(url);
+            const { blob, size, type } = await downloadImage(
+              url,
+              downloadOptions
+            );
             onInsert({ src: await toDataURL(blob), size, type });
           } catch (e) {
             if (e instanceof Error) setError(e.message);
