@@ -91,6 +91,9 @@ const Tiptap = ({
       doubleSpacedLines: settings.doubleSpacedLines,
       onOpenLink: (url) => {
         return global.editorController.openLink(url);
+      },
+      downloadOptions: {
+        corsHost: settings.corsProxy
       }
     },
     [layout, settings.readonly, tick]

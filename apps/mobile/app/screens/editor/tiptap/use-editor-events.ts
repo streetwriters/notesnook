@@ -149,6 +149,7 @@ export const useEditorEvents = (
 ) => {
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
+  const  corsProxy = useSettingStore(state => state.settings.corsProxy);
   const handleBack = useRef<NativeEventSubscription>();
   const readonly = useEditorStore((state) => state.readonly);
   const isPremium = useUserStore((state) => state.premium);
@@ -168,7 +169,8 @@ export const useEditorEvents = (
       noHeader: noHeader,
       noToolbar: readonly || editorPropReadonly || noToolbar,
       keyboardShown: keyboardShown || false,
-      doubleSpacedLines: doubleSpacedLines
+      doubleSpacedLines: doubleSpacedLines,
+      corsProxy:corsProxy
     });
   }, [
     fullscreen,
@@ -183,7 +185,8 @@ export const useEditorEvents = (
     doubleSpacedLines,
     editorPropReadonly,
     noHeader,
-    noToolbar
+    noToolbar,
+    corsProxy
   ]);
 
   const onBackPress = useCallback(async () => {

@@ -67,6 +67,7 @@ export type Settings = {
   disableSync?: boolean;
   reminderNotifications?: boolean;
   defaultSnoozeTime?: string;
+  corsProxy: string;
 };
 
 type DimensionsType = {
@@ -140,7 +141,8 @@ export const useSettingStore = create<SettingStore>((set) => ({
     version: null,
     doubleSpacedLines: true,
     reminderNotifications: true,
-    defaultSnoozeTime: "5"
+    defaultSnoozeTime: "5",
+    corsProxy: "https://cors.notesnook.com"
   },
   sheetKeyboardHandler: true,
   fullscreen: false,
