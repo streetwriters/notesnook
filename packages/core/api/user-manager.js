@@ -322,14 +322,40 @@ class UserManager {
     }
   }
 
-  async sendVerificationEmail() {
+  async sendVerificationEmail(newEmail) {
     let token = await this.tokenManager.getAccessToken();
     if (!token) return;
     await http.post(
       `${constants.AUTH_HOST}${ENDPOINTS.verifyUser}`,
-      null,
+      { newEmail },
       token
     );
+  }
+
+  async changeEmail(newEmail, password, code) {
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+
+    const user = await this.getUser();
+    if (!user) return;
+
+    const email = newEmail.toLowerCase();
+
+    await http.patch(
+      `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
+      {
+        type: "change_email",
+        new_email: newEmail,
+        password: await this._storage.hash(password, email),
+        verification_code: code
+      },
+      token
+    );
+
+    await this._storage.deriveCryptoKey(`_uk_@${newEmail}`, {
+      password,
+      salt: user.salt
+    });
   }
 
   recoverAccount(email) {

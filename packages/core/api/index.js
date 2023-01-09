@@ -256,8 +256,12 @@ class Database {
             await this.user.logout(false, "Account Deleted");
             break;
           }
+          case "userEmailChanged": {
+            await this.user.logout(true, "Email changed");
+            break;
+          }
           case "userPasswordChanged": {
-            await this.user.logout(true, "Password Changed");
+            await this.user.logout(true, "Password changed");
             break;
           }
           case "emailConfirmed": {
