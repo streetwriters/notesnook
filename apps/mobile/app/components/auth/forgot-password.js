@@ -97,6 +97,9 @@ export const ForgotPassword = () => {
             text: email.current
           });
         }}
+        indicatorStyle={{
+          width: 100
+        }}
         gestureEnabled
         id="forgotpassword_sheet"
       >

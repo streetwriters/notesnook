@@ -89,7 +89,7 @@ export const COLOR_SCHEME_LIGHT = {
   light: "#ffffff",
   transGray: "#00000010",
   border: "#E8E8E8",
-  placeholder: "#a9a9a9"
+  placeholder: "#b6b6b6"
 };
 export const COLOR_SCHEME_PITCH_BLACK = {
   ...fixedColors,
