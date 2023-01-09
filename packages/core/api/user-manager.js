@@ -149,6 +149,37 @@ class UserManager {
     EV.publish(EVENTS.userLoggedIn, user);
   }
 
+  /**
+   * @private
+   */
+  async _login({ email, password, hashedPassword, code, method }) {
+    email = email && email.toLowerCase();
+
+    if (!hashedPassword && password) {
+      hashedPassword = await this._storage.hash(password, email);
+    }
+
+    await this.tokenManager.saveToken(
+      await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
+        username: email,
+        password: hashedPassword,
+        grant_type: code ? "mfa" : "password",
+        scope: "notesnook.sync offline_access openid IdentityServerApi",
+        client_id: "notesnook",
+        "mfa:code": code,
+        "mfa:method": method
+      })
+    );
+
+    const user = await this.fetchUser();
+    await this._storage.deriveCryptoKey(`_uk_@${user.email}`, {
+      password,
+      salt: user.salt
+    });
+
+    EV.publish(EVENTS.userLoggedIn, user);
+  }
+
   async getSessions() {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
