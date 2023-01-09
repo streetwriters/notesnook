@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Page } from "@playwright/test";
+import { Page, Locator } from "@playwright/test";
 import { getTestId } from "../utils";
 import { AuthModel } from "./auth.model";
 import { CheckoutModel } from "./checkout.model";
@@ -25,6 +25,7 @@ import { ItemsViewModel } from "./items-view.model";
 import { NavigationMenuModel } from "./navigation-menu.model";
 import { NotebooksViewModel } from "./notebooks-view.model";
 import { NotesViewModel } from "./notes-view.model";
+import { SearchViewModel } from "./search-view-model";
 import { SettingsViewModel } from "./settings-view.model";
 import { ToastsModel } from "./toasts.model";
 import { TrashViewModel } from "./trash-view.model";
@@ -35,6 +36,9 @@ export class AppModel {
   readonly navigation: NavigationMenuModel;
   readonly auth: AuthModel;
   readonly checkout: CheckoutModel;
+  private readonly openSearch: Locator;
+  private readonly searchinput: Locator;
+  private readonly searchButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -42,6 +46,9 @@ export class AppModel {
     this.navigation = new NavigationMenuModel(page);
     this.auth = new AuthModel(page);
     this.checkout = new CheckoutModel(page);
+    this.searchinput = page.locator(getTestId("search-input"));
+    this.searchButton = page.locator(getTestId("search-button"));
+    this.openSearch = page.locator(getTestId("open-search"));
   }
 
   async goto() {
@@ -111,5 +118,12 @@ export class AppModel {
     await this.page
       .locator(getTestId(`sync-status-${state}`), { hasText: text })
       .waitFor({ state: "visible" });
+  }
+
+  async search(query: string) {
+    await this.openSearch.click();
+    await this.searchinput.fill(query);
+    await this.searchButton.click();
+    return new SearchViewModel(this.page);
   }
 }
