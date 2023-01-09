@@ -192,6 +192,13 @@ export function showPromptDialog(props: {
   ));
 }
 
+export function showEmailChangeDialog() {
+  return showDialog<"EmailChangeDialog", string | null>(
+    "EmailChangeDialog",
+    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
+  );
+}
+
 export function showToolbarConfigDialog() {
   return showDialog<"ToolbarConfigDialog", string | null>(
     "ToolbarConfigDialog",
