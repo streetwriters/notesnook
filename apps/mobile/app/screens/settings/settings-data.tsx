@@ -516,6 +516,18 @@ export const settingsGroups: SettingSection[] = [
         property: "telemetry"
       },
       {
+        id: "cors-bypass",
+        type: "input",
+        name: "CORS bypass proxy",
+        description: "You can set a custom proxy URL to increase your privacy.",
+        inputProperties: {
+          defaultValue: "https://cors.notesnook.com"
+        },
+        property: "corsProxy",
+        icon: "arrow-decision-outline"
+      },
+
+      {
         id: "vault",
         type: "screen",
         name: "Vault",
@@ -846,7 +858,7 @@ export const settingsGroups: SettingSection[] = [
               keyboardType: "decimal-pad",
               defaultValue: 5 + "",
               placeholder: "Set snooze time in minutes",
-              onSubmitEditing:() => {
+              onSubmitEditing: () => {
                 Notifications.setupReminders();
               }
             }

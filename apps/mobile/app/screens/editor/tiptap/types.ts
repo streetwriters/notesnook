@@ -47,6 +47,7 @@ export type Settings = {
   noHeader?: boolean;
   keyboardShown?: boolean;
   doubleSpacedLines?: boolean;
+  corsProxy: string;
 };
 
 export type EditorProps = {
@@ -82,7 +83,7 @@ export type Content = {
   data?: string;
   type: string;
   noteId: string;
-  id?:string
+  id?: string;
 };
 
 export type SavePayload = {
