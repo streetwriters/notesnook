@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Text } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import { useCallback, useRef, useState } from "react";
 import { db } from "../../common/db";
 import { Perform } from "../../common/dialog-controller";
@@ -74,13 +74,25 @@ export default function EmailChangeDialog(props: EmailChangeDialogProps) {
         text: "Next",
         disabled: isLoading,
         loading: isLoading,
-        onClick: async () => {
+        props: { form: "changeEmailForm" }
+      }}
+      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+    >
+      <Flex
+        id="changeEmailForm"
+        as="form"
+        onSubmit={async (e) => {
+          e.preventDefault();
           try {
-            setError(undefined);
             setIsLoading(true);
+            setError(undefined);
+
+            const formData = new FormData(e.target as HTMLFormElement);
+            const { password, newEmail, code } = Object.fromEntries(
+              formData.entries() as IterableIterator<[string, string]>
+            );
 
             if (emailChangeState) {
-              const code = codeRef.current?.value;
               if (!code || code.length < 6) {
                 setError("Please enter a valid verification code.");
                 return;
@@ -92,79 +104,78 @@ export default function EmailChangeDialog(props: EmailChangeDialogProps) {
                 code
               );
               props.onClose(true);
-            } else {
-              const password = passwordRef.current?.value;
-              if (!password || !(await db.user?.verifyPassword(password))) {
-                setError("Password is not correct.");
-                return;
-              }
-
-              const newEmail = emailRef.current?.value;
-              if (!newEmail) {
-                setError("Email is required.");
-                return;
-              }
-              await db.user?.sendVerificationEmail(newEmail);
-
-              setEmailChangeState({ newEmail, password });
+              return;
             }
+
+            if (!newEmail.trim() || !password.trim()) return;
+
+            if (!password || !(await db.user?.verifyPassword(password))) {
+              setError("Password is not correct.");
+              return;
+            }
+
+            await db.user?.sendVerificationEmail(newEmail);
+            setEmailChangeState({ newEmail, password });
           } catch (e) {
-            setError((e as Error).message);
+            if (e instanceof Error) setError(e.message);
           } finally {
             setIsLoading(false);
           }
-        }
-      }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
-    >
-      {emailChangeState ? (
-        <Field
-          inputRef={codeRef}
-          id="code"
-          name="code"
-          label="6-digit code"
-          helpText={`Enter 6-digit code sent to ${emailChangeState.newEmail}`}
-          type="email"
-          required
-          action={{
-            disabled: isSending || !enabled,
-            component: (
-              <Text variant={"body"}>
-                {isSending ? (
-                  <Loading size={18} />
-                ) : enabled ? (
-                  `Resend code`
-                ) : (
-                  `Resend in ${elapsed}`
-                )}
-              </Text>
-            ),
-            onClick: async () => {
-              await sendCode(emailChangeState);
-            }
-          }}
-        />
-      ) : (
-        <>
+        }}
+        sx={{ flexDirection: "column" }}
+      >
+        {emailChangeState ? (
           <Field
-            inputRef={emailRef}
-            id="new_email"
-            name="new_email"
-            label="New email"
-            type="email"
+            inputRef={codeRef}
+            id="code"
+            name="code"
+            label="6-digit code"
+            helpText={`Enter 6-digit code sent to ${emailChangeState.newEmail}`}
+            type="text"
             required
+            action={{
+              disabled: isSending || !enabled,
+              component: (
+                <Text variant={"body"}>
+                  {isSending ? (
+                    <Loading size={18} />
+                  ) : enabled ? (
+                    `Resend code`
+                  ) : (
+                    `Resend in ${elapsed}`
+                  )}
+                </Text>
+              ),
+              onClick: async () => {
+                await sendCode(emailChangeState);
+              }
+            }}
           />
-          <Field
-            inputRef={passwordRef}
-            id="password"
-            name="password"
-            label="Your account password"
-            type="password"
-            required
-          />
-        </>
-      )}
-      {error && <Text variant="error">{error}</Text>}
+        ) : (
+          <>
+            <Field
+              inputRef={emailRef}
+              id="newEmail"
+              name="newEmail"
+              label="New email"
+              type="email"
+              required
+            />
+            <Field
+              inputRef={passwordRef}
+              id="password"
+              name="password"
+              label="Your account password"
+              type="password"
+              required
+            />
+            <Text variant="subBody" sx={{ mt: 1 }}>
+              You will be logged out from all your other devices.
+            </Text>
+          </>
+        )}
+        {error && <Text variant="error">{error}</Text>}
+      </Flex>
     </Dialog>
   );
 }

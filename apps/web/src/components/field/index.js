@@ -78,7 +78,9 @@ function Field(props) {
   const [rules, setRules] = useState(passwordValidationRules);
 
   return (
-    <Flex sx={{ ...sx, ...styles.container, flexDirection: "column" }}>
+    <Flex
+      sx={{ ...sx, ...styles.container, flexDirection: "column", m: "1.5px" }}
+    >
       <Label
         htmlFor={id}
         sx={{
