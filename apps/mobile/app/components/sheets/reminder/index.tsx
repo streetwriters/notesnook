@@ -39,6 +39,8 @@ import Notifications, { Reminder } from "../../../services/notifications";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import Paragraph from "../../ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
+import DatePicker from "react-native-date-picker";
+
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheet>;
   close?: (ctx?: string) => void;
@@ -102,14 +104,10 @@ export default function ReminderSheet({
   const [date, setDate] = useState<Date>(
     new Date(reminder?.date || Date.now())
   );
-  const [time, setTime] = useState<string>(
-    dayjs(reminder?.date || Date.now()).format("hh:mm a")
-  );
   const [reminderNotificationMode, setReminderNotificatioMode] = useState<
     Reminder["priority"]
   >(reminder?.priority || "silent");
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
   const [repeatFrequency, setRepeatFrequency] = useState(1);
   const title = useRef<string | undefined>(reminder?.title);
   const details = useRef<string | undefined>(reminder?.description);
@@ -118,19 +116,14 @@ export default function ReminderSheet({
     setDatePickerVisibility(true);
   };
 
-  const showTimePicker = () => {
-    setTimePickerVisibility(true);
-  };
-
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
-    setTimePickerVisibility(false);
   };
 
   const handleConfirm = (date: Date) => {
     hideDatePicker();
-    setTime(dayjs(date).format("hh:mm a"));
     setDate(date);
+    console.log(date);
   };
   function nth(n: number) {
     return (
@@ -393,9 +386,10 @@ export default function ReminderSheet({
         <View
           style={{
             width: "100%",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginBottom: 12
+            flexDirection: "column",
+            justifyContent: "center",
+            marginBottom: 12,
+            alignItems: "center"
           }}
         >
           <DateTimePickerModal
@@ -406,39 +400,30 @@ export default function ReminderSheet({
             date={date || new Date(Date.now())}
           />
 
-          <DateTimePickerModal
-            isVisible={isTimePickerVisible}
-            mode="time"
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
-            date={date || new Date(Date.now())}
+          <DatePicker
+            date={date}
+            onDateChange={handleConfirm}
+            textColor={colors.night ? "#ffffff" : "#000000"}
+            fadeToColor={colors.bg}
+            theme={colors.night ? "dark" : "light"}
+            is24hourSource="locale"
+            mode={reminderMode === ReminderModes.Repeat ? "time" : "datetime"}
           />
 
           {reminderMode === ReminderModes.Repeat ? null : (
             <Button
               style={{
-                width: "48.5%"
+                width: "100%"
               }}
               title={date ? date.toLocaleDateString() : "Select date"}
               type={date ? "grayAccent" : "grayBg"}
               icon="calendar"
+              fontSize={SIZE.md}
               onPress={() => {
                 showDatePicker();
               }}
             />
           )}
-
-          <Button
-            style={{
-              width: reminderMode === ReminderModes.Repeat ? "100%" : "48.5%"
-            }}
-            title={time || "Select time"}
-            type={time ? "grayAccent" : "grayBg"}
-            icon="clock"
-            onPress={() => {
-              showTimePicker();
-            }}
-          />
         </View>
       )}
 
@@ -446,7 +431,10 @@ export default function ReminderSheet({
         <View
           style={{
             flexDirection: "row",
-            marginBottom: 12
+            marginBottom: 12,
+            paddingTop: 12,
+            borderTopWidth: 1,
+            borderTopColor: colors.nav
           }}
         >
           {Object.keys(ReminderNotificationModes).map((mode) => (
