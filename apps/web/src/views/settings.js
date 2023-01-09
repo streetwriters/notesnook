@@ -41,7 +41,8 @@ import {
   showAttachmentsDialog,
   show2FARecoveryCodesDialog,
   showToolbarConfigDialog,
-  showPromptDialog
+  showPromptDialog,
+  showEmailChangeDialog
 } from "../common/dialog-controller";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { createBackup, importBackup, verifyAccount } from "../common";
@@ -253,6 +254,18 @@ function Settings() {
             </Button>
             <Button
               variant="list"
+              onClick={async () => {
+                await showEmailChangeDialog();
+                await refreshUser();
+              }}
+            >
+              <Tip
+                text="Change account email"
+                tip="Set a new email for your account"
+              />
+            </Button>
+            <Button
+              variant="list"
               data-test-id="settings-change-password"
               onClick={async () => {
                 const result = await showPasswordDialog(
@@ -275,6 +288,7 @@ function Settings() {
                 tip="Set a new password for your account"
               />
             </Button>
+
             <Button variant="list" onClick={() => showAttachmentsDialog()}>
               <Tip
                 text="Manage attachments"

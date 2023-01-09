@@ -53,6 +53,7 @@ const AttachmentsDialog = React.lazy(() => import("./attachments-dialog"));
 const Prompt = React.lazy(() => import("./prompt"));
 const ToolbarConfigDialog = React.lazy(() => import("./toolbar-config-dialog"));
 const MigrationDialog = React.lazy(() => import("./migration-dialog"));
+const EmailChangeDialog = React.lazy(() => import("./email-change-dialog"));
 
 export const Dialogs = {
   AddNotebookDialog,
@@ -79,5 +80,6 @@ export const Dialogs = {
   AttachmentsDialog,
   MigrationDialog,
   AddReminderDialog,
-  ReminderPreviewDialog
+  ReminderPreviewDialog,
+  EmailChangeDialog
 };
