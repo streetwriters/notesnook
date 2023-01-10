@@ -122,8 +122,7 @@ test(`sort topics`, async ({ page }, info) => {
   }
 });
 
-test.setTimeout(60 * 1000);
-test.only("search topics", async ({ page }) => {
+test("search topics", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const notebooks = await app.goToNotebooks();
