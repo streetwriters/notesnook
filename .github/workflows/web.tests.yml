@@ -112,7 +112,10 @@ jobs:
           echo "USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
 
       - name: Run tests
-        run: npx playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        run: |
+          ls node_modules/@otplib
+          ls otplib
+          npx playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }}
         working-directory: apps/web
 
       - name: Upload test results
