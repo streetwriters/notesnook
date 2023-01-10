@@ -277,7 +277,7 @@ test("creating a new note and toggling read-only mode should not empty editor co
   expect(await notes.editor.getContent("text")).toBe(NOTE.content);
 });
 
-test.only("count number of words in an opened note", async ({ page }) => {
+test("count number of words in an opened note", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
