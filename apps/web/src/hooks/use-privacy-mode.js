@@ -32,7 +32,7 @@ export default function usePrivacyMode() {
 
   const set = useCallback((privacyMode) => {
     setPrivacyMode(privacyMode);
-    setPrivacy(privacyMode);
+    _setPrivacyMode(privacyMode);
   }, []);
 
   return [privacy, set];
