@@ -95,7 +95,7 @@ jobs:
       - name: Install packages
         run: |
           npm i --ignore-scripts --prefer-offline --no-audit
-          npm install -D @playwright/test
+          npm install -D @playwright/test otplib
 
       - name: Validate build extraction
         run: ls -ld ./apps/web/build/index.html
