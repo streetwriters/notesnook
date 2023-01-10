@@ -248,4 +248,12 @@ export class EditorModel {
     await this.previewRestoreButton.click();
     await this.previewNotice.waitFor({ state: "hidden" });
   }
+
+  async getWordCount() {
+    return parseInt(
+      (await this.wordCountText.allInnerTexts())
+        .toString()
+        .replace(" words", "")
+    );
+  }
 }
