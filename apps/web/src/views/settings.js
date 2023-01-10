@@ -68,6 +68,7 @@ import { debounce } from "../utils/debounce";
 import { clearLogs, downloadLogs } from "../utils/logger";
 import { exportNotes } from "../common/export";
 import { scheduleBackups } from "../common/reminders";
+import usePrivacyMode from "../hooks/use-privacy-mode";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -182,6 +183,7 @@ function Settings() {
     "telemetry",
     true
   );
+  const [privacyMode, setPrivacyMode] = usePrivacyMode();
   const [showReminderNotifications, setShowReminderNotifications] =
     usePersistentState("reminderNotifications", true);
   const [corsProxy, setCorsProxy] = usePersistentState(
@@ -818,6 +820,17 @@ function Settings() {
                 tip="Read details of all usage data we collect."
               />
             </Button>
+            {isDesktop() && (
+              <Toggle
+                title="Privacy Mode"
+                onTip="Disable screenshot taking in the app."
+                offTip="Enable screenshot taking in the app"
+                onToggled={() => {
+                  setPrivacyMode(!privacyMode);
+                }}
+                isToggled={privacyMode}
+              />
+            )}
           </>
         )}
 
