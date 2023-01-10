@@ -153,7 +153,7 @@ const SheetProvider = ({ context = "global" }) => {
       </View>
 
       {typeof dialogData.component === "function"
-        ? dialogData.component(actionSheetRef, close, (data) => {
+        ? dialogData.component(actionSheetRef, () => close(context), (data) => {
             if (!data) return;
             setDialogData((prevData) => {
               return {
