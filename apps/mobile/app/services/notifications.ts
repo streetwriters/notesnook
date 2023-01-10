@@ -215,7 +215,7 @@ async function setupIOSCategories() {
               {
                 id: "REMINDER_SNOOZE",
                 foreground: false,
-                title: "Remind in 10 min",
+                title: `Remind in ${reminderTime} min`,
                 authenticationRequired: false
               }
             ]
@@ -259,6 +259,7 @@ async function scheduleNotification(
     await remove(reminder.id);
     if (reminder.disabled) return;
     const triggers = await getTriggers(reminder);
+    console.log(triggers);
     if (!triggers && reminder.mode === "permanent") {
       displayNotification({
         id: reminder.id,
@@ -300,7 +301,7 @@ async function scheduleNotification(
           }
         });
       }
-
+      console.log(trigger);
       await notifee.createTriggerNotification(
         {
           id: trigger.id,
@@ -328,7 +329,11 @@ async function scheduleNotification(
                 }
           },
           ios: {
-            interruptionLevel: priority === "silent" ? "passive" : "active",
+            interruptionLevel: "active",
+            critical:
+              reminder.priority === "silent" || reminder.priority === "urgent"
+                ? false
+                : true,
             categoryId:
               reminder.mode === "repeat" ? "REMINDER_RECURRING" : "REMINDER",
             ...iosProperties
@@ -516,8 +521,10 @@ async function getTriggers(
             .hour(relativeTime.hour())
             .minute(relativeTime.minute());
           if (timestamp.isBefore(dayjs())) {
-            timestamp = timestamp.add(1, "day");
-            timestamp.second(0);
+            do {
+              timestamp = timestamp.add(1, "day");
+              timestamp.second(0);
+            } while (timestamp.isBefore(dayjs()));
           }
           triggers.push({
             timestamp: timestamp.valueOf() as number,
@@ -550,12 +557,16 @@ async function getTriggers(
           }
 
           for (const day of selectedDays) {
-            const timestamp = dayjs()
+            let timestamp = dayjs()
               .day(day)
               .hour(relativeTime.hour())
               .minute(relativeTime.minute());
 
-            if (timestamp.isBefore(dayjs())) continue;
+            if (timestamp.isBefore(dayjs())) {
+              do {
+                timestamp = timestamp.add(1, "week");
+              } while (timestamp.isBefore(dayjs()));
+            }
 
             triggers.push({
               timestamp: timestamp.toDate().getTime() as number,
@@ -587,13 +598,16 @@ async function getTriggers(
           }
           if (Platform.OS === "ios") {
             for (const day of selectedDays) {
-              const timestamp = dayjs()
+              let timestamp = dayjs()
                 .date(day)
                 .hour(relativeTime.hour())
                 .minute(relativeTime.minute());
 
-              if (timestamp.isBefore(dayjs())) continue;
-
+              if (timestamp.isBefore(dayjs())) {
+                do {
+                  timestamp = timestamp.add(1, "month");
+                } while (timestamp.isBefore(dayjs()));
+              }
               triggers.push({
                 timestamp: timestamp.toDate().getTime() as number,
                 type: TriggerType.TIMESTAMP,
@@ -674,7 +688,6 @@ function get(): Promise<DisplayedNotification[]> {
 }
 
 function init() {
-  if (Platform.OS === "ios") return;
   notifee.onBackgroundEvent(onEvent);
   notifee.onForegroundEvent(onEvent);
 }
