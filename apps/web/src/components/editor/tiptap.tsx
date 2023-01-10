@@ -84,7 +84,7 @@ function save(
   configureEditor({
     statistics: {
       words: {
-        total: countWords(content.textBetween(0, content.size)),
+        total: countWords(content.textBetween(0, content.size, "\n", " ")),
         selected: 0
       }
     }
@@ -210,7 +210,7 @@ function TipTap(props: TipTapProps) {
             words: {
               total:
                 old.statistics?.words.total ||
-                countWords(content.textBetween(0, content.size)),
+                countWords(content.textBetween(0, content.size, "\n", " ")),
               selected: getSelectedWords(
                 editor as Editor,
                 transaction.selection
@@ -424,5 +424,6 @@ function countWords(str: string) {
   }
 
   if (shouldCount) ++count;
+
   return count;
 }
