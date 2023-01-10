@@ -36,9 +36,6 @@ export class AppModel {
   readonly navigation: NavigationMenuModel;
   readonly auth: AuthModel;
   readonly checkout: CheckoutModel;
-  private readonly openSearch: Locator;
-  private readonly searchinput: Locator;
-  private readonly searchButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -46,9 +43,6 @@ export class AppModel {
     this.navigation = new NavigationMenuModel(page);
     this.auth = new AuthModel(page);
     this.checkout = new CheckoutModel(page);
-    this.searchinput = page.locator(getTestId("search-input"));
-    this.searchButton = page.locator(getTestId("search-button"));
-    this.openSearch = page.locator(getTestId("open-search"));
   }
 
   async goto() {
@@ -121,9 +115,13 @@ export class AppModel {
   }
 
   async search(query: string) {
-    await this.openSearch.click();
-    await this.searchinput.fill(query);
-    await this.searchButton.click();
+    const searchinput = this.page.locator(getTestId("search-input"));
+    const searchButton = this.page.locator(getTestId("search-button"));
+    const openSearch = this.page.locator(getTestId("open-search"));
+
+    await openSearch.click();
+    await searchinput.fill(query);
+    await searchButton.click();
     return new SearchViewModel(this.page);
   }
 }
