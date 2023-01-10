@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React, { RefObject, useRef, useState } from "react";
-import { Platform, ScrollView, View, TextInput } from "react-native";
+import {
+  Platform,
+  ScrollView,
+  View,
+  TextInput,
+  useWindowDimensions
+} from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {
@@ -112,6 +118,7 @@ export default function ReminderSheet({
   const title = useRef<string | undefined>(reminder?.title);
   const details = useRef<string | undefined>(reminder?.description);
   const titleRef = useRef<TextInput>(null);
+  const { height } = useWindowDimensions();
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -148,69 +155,70 @@ export default function ReminderSheet({
   }
 
   async function saveReminder() {
-    if (!(await Notifications.checkAndRequestPermissions())) return;
-    if (!date && reminderMode !== ReminderModes.Permanent) return;
-    if (!title.current) {
-      ToastEvent.show({
-        heading: "Please set title of the reminder",
-        type: "error",
-        context: "local"
-      });
-      return;
-    }
-    if (date.getTime() < Date.now() && reminderMode === "once") {
-      ToastEvent.show({
-        heading: "Reminder date must be set in future",
-        type: "error",
-        context: "local"
-      });
-      titleRef?.current?.focus();
-      return;
-    }
+    try {
+      if (!(await Notifications.checkAndRequestPermissions()))
+        throw new Error(
+          "App does not have permission to schedule notifications"
+        );
+      if (!date && reminderMode !== ReminderModes.Permanent) return;
+      if (
+        reminderMode === ReminderModes.Repeat &&
+        recurringMode !== "day" &&
+        selectedDays.length === 0
+      )
+        throw new Error("Please select the day to repeat the reminder on");
 
-    date.setSeconds(0, 0);
+      if (!title.current) throw new Error("Please set title of the reminder");
+      if (date.getTime() < Date.now() && reminderMode === "once") {
+        titleRef?.current?.focus();
+        throw new Error("Reminder date must be set in future");
+      }
 
-    const reminderId = await db.reminders?.add({
-      id: reminder?.id,
-      date: date?.getTime(),
-      priority: reminderNotificationMode,
-      title: title.current,
-      description: details.current,
-      recurringMode: recurringMode,
-      selectedDays: selectedDays,
-      mode: reminderMode,
-      localOnly: reminderMode === "permanent",
-      snoozeUntil:
-        date?.getTime() > Date.now() ? undefined : reminder?.snoozeUntil,
-      disabled: false
-    });
+      date.setSeconds(0, 0);
 
-    const _reminder = db.reminders?.reminder(reminderId);
-
-    if (!_reminder) {
-      ToastEvent.show({
-        heading: "Failed to add a new reminder"
+      const reminderId = await db.reminders?.add({
+        id: reminder?.id,
+        date: date?.getTime(),
+        priority: reminderNotificationMode,
+        title: title.current,
+        description: details.current,
+        recurringMode: recurringMode,
+        selectedDays: selectedDays,
+        mode: reminderMode,
+        localOnly: reminderMode === "permanent",
+        snoozeUntil:
+          date?.getTime() > Date.now() ? undefined : reminder?.snoozeUntil,
+        disabled: false
       });
+
+      const _reminder = db.reminders?.reminder(reminderId);
+
+      if (!_reminder) {
+        ToastEvent.show({
+          heading: "Failed to add a new reminder"
+        });
+      }
+      if (reference) {
+        await db.relations?.add(reference, {
+          id: _reminder?.id as string,
+          type: _reminder?.type as string
+        });
+      }
+      Notifications.scheduleNotification(_reminder as Reminder);
+      Navigation.queueRoutesForUpdate(
+        "TaggedNotes",
+        "ColoredNotes",
+        "Notes",
+        "NotesPage",
+        "Reminders",
+        "Favorites",
+        "TopicNotes"
+      );
+      useRelationStore.getState().update();
+      close?.();
+    } catch (e) {
+      ToastEvent.error(e as Error);
     }
-    if (reference) {
-      await db.relations?.add(reference, {
-        id: _reminder?.id as string,
-        type: _reminder?.type as string
-      });
-    }
-    Notifications.scheduleNotification(_reminder as Reminder);
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "Notes",
-      "NotesPage",
-      "Reminders",
-      "Favorites",
-      "TopicNotes"
-    );
-    useRelationStore.getState().update();
-    close?.("local");
-    close?.();
   }
 
   return (
@@ -219,324 +227,333 @@ export default function ReminderSheet({
         paddingHorizontal: 12
       }}
     >
-      <Input
-        fwdRef={titleRef}
-        defaultValue={reminder?.title}
-        placeholder="Remind me of..."
-        onChangeText={(text) => (title.current = text)}
-        containerStyle={{ borderWidth: 0, borderBottomWidth: 1 }}
-      />
-
-      <Input
-        defaultValue={reminder?.description}
-        placeholder="Add a quick note"
-        onChangeText={(text) => (details.current = text)}
-        containerStyle={{ borderWidth: 0, borderBottomWidth: 1 }}
-      />
-
-      <View
+      <ScrollView
+        onScrollEndDrag={() => actionSheetRef.current?.handleChildScrollEnd()}
         style={{
-          flexDirection: "row",
-          marginBottom: 12
+          maxHeight: height * 0.85
         }}
       >
-        {Object.keys(ReminderModes).map((mode) => (
-          <Button
-            key={mode}
-            title={mode}
-            style={{
-              marginRight: 12,
-              borderRadius: 100,
-              minWidth: 70
-            }}
-            proTag={mode === "Repeat"}
-            height={35}
-            type={
-              reminderMode === ReminderModes[mode as keyof typeof ReminderModes]
-                ? "grayAccent"
-                : "gray"
-            }
-            onPress={() => {
-              if (mode === "Repeat" && !PremiumService.get()) return;
-              setReminderMode(
-                ReminderModes[
-                  mode as keyof typeof ReminderModes
-                ] as Reminder["mode"]
-              );
-            }}
-          />
-        ))}
-      </View>
+        <Input
+          fwdRef={titleRef}
+          defaultValue={reminder?.title}
+          placeholder="Remind me of..."
+          onChangeText={(text) => (title.current = text)}
+          containerStyle={{ borderWidth: 0, borderBottomWidth: 1 }}
+        />
 
-      {reminderMode === ReminderModes.Repeat ? (
-        <View
-          style={{
-            backgroundColor: colors.nav,
-            padding: 12,
-            borderRadius: 5,
-            marginBottom: 12
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              marginBottom: recurringMode === "day" ? 0 : 12,
-              alignItems: "center"
-            }}
-          >
-            {Object.keys(RecurringModes).map((mode) => (
-              <Button
-                key={mode}
-                title={
-                  !repeatFrequency || repeatFrequency <= 1 ? mode : mode + "s"
-                }
-                style={{
-                  marginRight: 6,
-                  borderRadius: 100
-                }}
-                height={35}
-                type={
-                  recurringMode ===
-                  RecurringModes[mode as keyof typeof RecurringModes]
-                    ? "grayAccent"
-                    : "gray"
-                }
-                onPress={() => {
-                  setRecurringMode(
-                    RecurringModes[
-                      mode as keyof typeof RecurringModes
-                    ] as Reminder["recurringMode"]
-                  );
-                  setSelectedDays([]);
-                  setRepeatFrequency(1);
-                }}
-              />
-            ))}
-          </View>
+        <Input
+          defaultValue={reminder?.description}
+          placeholder="Add a quick note"
+          onChangeText={(text) => (details.current = text)}
+          containerStyle={{ borderWidth: 0, borderBottomWidth: 1 }}
+        />
 
-          <ScrollView showsHorizontalScrollIndicator={false} horizontal>
-            {recurringMode === RecurringModes.Daily
-              ? null
-              : recurringMode === RecurringModes.Week
-              ? WeekDays.map((item, index) => (
-                  <Button
-                    key={WeekDayNames[index as keyof typeof WeekDayNames]}
-                    title={WeekDayNames[
-                      index as keyof typeof WeekDayNames
-                    ].slice(0, 1)}
-                    type={selectedDays.indexOf(index) > -1 ? "accent" : "gray"}
-                    fontSize={SIZE.sm - 1}
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 100,
-                      marginRight: 10,
-                      backgroundColor:
-                        selectedDays.indexOf(index) > -1
-                          ? colors.accent
-                          : colors.bg
-                    }}
-                    onPress={() => {
-                      setSelectedDays((days) => {
-                        if (days.indexOf(index) > -1) {
-                          days.splice(days.indexOf(index), 1);
-                          return [...days];
-                        }
-                        days.push(index);
-                        return [...days];
-                      });
-                    }}
-                  />
-                ))
-              : MonthDays.map((item, index) => (
-                  <Button
-                    key={index + "monthday"}
-                    title={index + 1 + ""}
-                    type={
-                      selectedDays.indexOf(index + 1) > -1 ? "accent" : "gray"
-                    }
-                    fontSize={SIZE.sm - 1}
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 100,
-                      marginRight: 10,
-                      backgroundColor:
-                        selectedDays.indexOf(index + 1) > -1
-                          ? colors.accent
-                          : colors.bg
-                    }}
-                    onPress={() => {
-                      setSelectedDays((days) => {
-                        if (days.indexOf(index + 1) > -1) {
-                          days.splice(days.indexOf(index + 1), 1);
-                          return [...days];
-                        }
-                        days.push(index + 1);
-                        return [...days];
-                      });
-                    }}
-                  />
-                ))}
-          </ScrollView>
-        </View>
-      ) : null}
-
-      {reminderMode === ReminderModes.Permanent ? null : (
-        <View
-          style={{
-            width: "100%",
-            flexDirection: "column",
-            justifyContent: "center",
-            marginBottom: 12,
-            alignItems: "center"
-          }}
-        >
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode="date"
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
-            date={date || new Date(Date.now())}
-          />
-
-          <DatePicker
-            date={date}
-            onDateChange={handleConfirm}
-            textColor={colors.night ? "#ffffff" : "#000000"}
-            fadeToColor={colors.bg}
-            theme={colors.night ? "dark" : "light"}
-            is24hourSource="locale"
-            mode={reminderMode === ReminderModes.Repeat ? "time" : "datetime"}
-          />
-
-          {reminderMode === ReminderModes.Repeat ? null : (
-            <Button
-              style={{
-                width: "100%"
-              }}
-              title={date ? date.toLocaleDateString() : "Select date"}
-              type={date ? "grayAccent" : "grayBg"}
-              icon="calendar"
-              fontSize={SIZE.md}
-              onPress={() => {
-                showDatePicker();
-              }}
-            />
-          )}
-        </View>
-      )}
-
-      {reminderMode === ReminderModes.Permanent ? null : (
         <View
           style={{
             flexDirection: "row",
-            marginBottom: 12,
-            paddingTop: 12,
-            borderTopWidth: 1,
-            borderTopColor: colors.nav
+            marginBottom: 12
           }}
         >
-          {Object.keys(ReminderNotificationModes).map((mode) => (
+          {Object.keys(ReminderModes).map((mode) => (
             <Button
               key={mode}
               title={mode}
               style={{
                 marginRight: 12,
-                borderRadius: 100
+                borderRadius: 100,
+                minWidth: 70
               }}
-              icon={
-                mode === "Silent"
-                  ? "minus-circle"
-                  : mode === "Vibrate"
-                  ? "vibrate"
-                  : "volume-high"
-              }
+              proTag={mode === "Repeat"}
               height={35}
               type={
-                reminderNotificationMode ===
-                ReminderNotificationModes[
-                  mode as keyof typeof ReminderNotificationModes
-                ]
+                reminderMode ===
+                ReminderModes[mode as keyof typeof ReminderModes]
                   ? "grayAccent"
                   : "gray"
               }
               onPress={() => {
-                setReminderNotificatioMode(
-                  ReminderNotificationModes[
-                    mode as keyof typeof ReminderNotificationModes
-                  ] as Reminder["priority"]
+                if (mode === "Repeat" && !PremiumService.get()) return;
+                setReminderMode(
+                  ReminderModes[
+                    mode as keyof typeof ReminderModes
+                  ] as Reminder["mode"]
                 );
               }}
             />
           ))}
         </View>
-      )}
-      {reminderMode === ReminderModes.Once ||
-      reminderMode === ReminderModes.Permanent ? null : (
-        <View
-          style={{
-            borderRadius: 5,
-            flexDirection: "row",
-            paddingVertical: 6,
-            paddingHorizontal: 12,
-            alignItems: "center",
-            justifyContent: "flex-start",
-            marginBottom: 10,
-            backgroundColor: colors.nav
-          }}
-        >
-          <>
-            <Paragraph size={SIZE.xs + 1} color={colors.icon}>
-              {recurringMode === RecurringModes.Daily
-                ? "Repeats daily " + `at ${dayjs(date).format("hh:mm A")}.`
-                : selectedDays.length === 7 &&
-                  recurringMode === RecurringModes.Week
-                ? `The reminder will repeat daily at ${dayjs(date).format(
-                    "hh:mm A"
-                  )}.`
-                : selectedDays.length === 0
-                ? recurringMode === RecurringModes.Week
-                  ? "Select day of the week to repeat the reminder."
-                  : "Select nth day of the month to repeat the reminder."
-                : `Repeats every${
-                    repeatFrequency > 1 ? " " + repeatFrequency : ""
-                  } ${
-                    repeatFrequency > 1 ? recurringMode + "s" : recurringMode
-                  } on ${getSelectedDaysText(selectedDays)} at ${dayjs(
-                    date
-                  ).format("hh:mm A")}.`}
-            </Paragraph>
-          </>
-        </View>
-      )}
 
-      {reminder && reminder.date ? (
-        <View
-          style={{
-            borderRadius: 5,
-            flexDirection: "row",
-            paddingVertical: 6,
-            paddingHorizontal: 12,
-            alignItems: "center",
-            justifyContent: "flex-start",
-            marginBottom: 10,
-            backgroundColor: colors.nav
-          }}
-        >
-          <>
-            <Icon name="clock-outline" size={SIZE.md} color={colors.accent} />
-            <Paragraph
-              size={SIZE.xs + 1}
-              color={colors.icon}
-              style={{ marginLeft: 5 }}
+        {reminderMode === ReminderModes.Repeat ? (
+          <View
+            style={{
+              backgroundColor: colors.nav,
+              padding: 12,
+              borderRadius: 5,
+              marginBottom: 12
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                marginBottom: recurringMode === "day" ? 0 : 12,
+                alignItems: "center"
+              }}
             >
-              {formatReminderTime(reminder)}
-            </Paragraph>
-          </>
-        </View>
-      ) : null}
+              {Object.keys(RecurringModes).map((mode) => (
+                <Button
+                  key={mode}
+                  title={
+                    !repeatFrequency || repeatFrequency <= 1 ? mode : mode + "s"
+                  }
+                  style={{
+                    marginRight: 6,
+                    borderRadius: 100
+                  }}
+                  height={35}
+                  type={
+                    recurringMode ===
+                    RecurringModes[mode as keyof typeof RecurringModes]
+                      ? "grayAccent"
+                      : "gray"
+                  }
+                  onPress={() => {
+                    setRecurringMode(
+                      RecurringModes[
+                        mode as keyof typeof RecurringModes
+                      ] as Reminder["recurringMode"]
+                    );
+                    setSelectedDays([]);
+                    setRepeatFrequency(1);
+                  }}
+                />
+              ))}
+            </View>
 
+            <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+              {recurringMode === RecurringModes.Daily
+                ? null
+                : recurringMode === RecurringModes.Week
+                ? WeekDays.map((item, index) => (
+                    <Button
+                      key={WeekDayNames[index as keyof typeof WeekDayNames]}
+                      title={WeekDayNames[
+                        index as keyof typeof WeekDayNames
+                      ].slice(0, 1)}
+                      type={
+                        selectedDays.indexOf(index) > -1 ? "accent" : "gray"
+                      }
+                      fontSize={SIZE.sm - 1}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 100,
+                        marginRight: 10,
+                        backgroundColor:
+                          selectedDays.indexOf(index) > -1
+                            ? colors.accent
+                            : colors.bg
+                      }}
+                      onPress={() => {
+                        setSelectedDays((days) => {
+                          if (days.indexOf(index) > -1) {
+                            days.splice(days.indexOf(index), 1);
+                            return [...days];
+                          }
+                          days.push(index);
+                          return [...days];
+                        });
+                      }}
+                    />
+                  ))
+                : MonthDays.map((item, index) => (
+                    <Button
+                      key={index + "monthday"}
+                      title={index + 1 + ""}
+                      type={
+                        selectedDays.indexOf(index + 1) > -1 ? "accent" : "gray"
+                      }
+                      fontSize={SIZE.sm - 1}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 100,
+                        marginRight: 10,
+                        backgroundColor:
+                          selectedDays.indexOf(index + 1) > -1
+                            ? colors.accent
+                            : colors.bg
+                      }}
+                      onPress={() => {
+                        setSelectedDays((days) => {
+                          if (days.indexOf(index + 1) > -1) {
+                            days.splice(days.indexOf(index + 1), 1);
+                            return [...days];
+                          }
+                          days.push(index + 1);
+                          return [...days];
+                        });
+                      }}
+                    />
+                  ))}
+            </ScrollView>
+          </View>
+        ) : null}
+
+        {reminderMode === ReminderModes.Permanent ? null : (
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "column",
+              justifyContent: "center",
+              marginBottom: 12,
+              alignItems: "center"
+            }}
+          >
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+              date={date || new Date(Date.now())}
+            />
+
+            <DatePicker
+              date={date}
+              onDateChange={handleConfirm}
+              textColor={colors.night ? "#ffffff" : "#000000"}
+              fadeToColor={colors.bg}
+              theme={colors.night ? "dark" : "light"}
+              is24hourSource="locale"
+              mode={reminderMode === ReminderModes.Repeat ? "time" : "datetime"}
+            />
+
+            {reminderMode === ReminderModes.Repeat ? null : (
+              <Button
+                style={{
+                  width: "100%"
+                }}
+                title={date ? date.toLocaleDateString() : "Select date"}
+                type={date ? "grayAccent" : "grayBg"}
+                icon="calendar"
+                fontSize={SIZE.md}
+                onPress={() => {
+                  showDatePicker();
+                }}
+              />
+            )}
+          </View>
+        )}
+
+        {reminderMode === ReminderModes.Permanent ? null : (
+          <View
+            style={{
+              flexDirection: "row",
+              marginBottom: 12,
+              paddingTop: 12,
+              borderTopWidth: 1,
+              borderTopColor: colors.nav
+            }}
+          >
+            {Object.keys(ReminderNotificationModes).map((mode) => (
+              <Button
+                key={mode}
+                title={mode}
+                style={{
+                  marginRight: 12,
+                  borderRadius: 100
+                }}
+                icon={
+                  mode === "Silent"
+                    ? "minus-circle"
+                    : mode === "Vibrate"
+                    ? "vibrate"
+                    : "volume-high"
+                }
+                height={35}
+                type={
+                  reminderNotificationMode ===
+                  ReminderNotificationModes[
+                    mode as keyof typeof ReminderNotificationModes
+                  ]
+                    ? "grayAccent"
+                    : "gray"
+                }
+                onPress={() => {
+                  setReminderNotificatioMode(
+                    ReminderNotificationModes[
+                      mode as keyof typeof ReminderNotificationModes
+                    ] as Reminder["priority"]
+                  );
+                }}
+              />
+            ))}
+          </View>
+        )}
+        {reminderMode === ReminderModes.Once ||
+        reminderMode === ReminderModes.Permanent ? null : (
+          <View
+            style={{
+              borderRadius: 5,
+              flexDirection: "row",
+              paddingVertical: 6,
+              paddingHorizontal: 12,
+              alignItems: "center",
+              justifyContent: "flex-start",
+              marginBottom: 10,
+              backgroundColor: colors.nav
+            }}
+          >
+            <>
+              <Paragraph size={SIZE.xs + 1} color={colors.icon}>
+                {recurringMode === RecurringModes.Daily
+                  ? "Repeats daily " + `at ${dayjs(date).format("hh:mm A")}.`
+                  : selectedDays.length === 7 &&
+                    recurringMode === RecurringModes.Week
+                  ? `The reminder will repeat daily at ${dayjs(date).format(
+                      "hh:mm A"
+                    )}.`
+                  : selectedDays.length === 0
+                  ? recurringMode === RecurringModes.Week
+                    ? "Select day of the week to repeat the reminder."
+                    : "Select nth day of the month to repeat the reminder."
+                  : `Repeats every${
+                      repeatFrequency > 1 ? " " + repeatFrequency : ""
+                    } ${
+                      repeatFrequency > 1 ? recurringMode + "s" : recurringMode
+                    } on ${getSelectedDaysText(selectedDays)} at ${dayjs(
+                      date
+                    ).format("hh:mm A")}.`}
+              </Paragraph>
+            </>
+          </View>
+        )}
+
+        {reminder && reminder.date ? (
+          <View
+            style={{
+              borderRadius: 5,
+              flexDirection: "row",
+              paddingVertical: 6,
+              paddingHorizontal: 12,
+              alignItems: "center",
+              justifyContent: "flex-start",
+              marginBottom: 10,
+              backgroundColor: colors.nav
+            }}
+          >
+            <>
+              <Icon name="clock-outline" size={SIZE.md} color={colors.accent} />
+              <Paragraph
+                size={SIZE.xs + 1}
+                color={colors.icon}
+                style={{ marginLeft: 5 }}
+              >
+                {formatReminderTime(reminder)}
+              </Paragraph>
+            </>
+          </View>
+        ) : null}
+      </ScrollView>
       <Button
         style={{
           width: "100%"
