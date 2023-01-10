@@ -129,7 +129,7 @@ export async function selectBackupFile() {
     });
     reader.readAsText(file);
   });
-  console.log(file, backup);
+
   return { file, backup };
 }
 

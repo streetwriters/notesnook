@@ -330,7 +330,7 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
             type="button"
             mt={2}
             variant="anchor"
-            onClick={() => navigate("recover")}
+            onClick={() => navigate("recover", { email: formData.email })}
             sx={{ color: "text", alignSelf: "end" }}
           >
             Forgot password?

@@ -30,6 +30,7 @@ import { AuthField, SubmitButton } from "./auth";
 import { createBackup, restoreBackupFile, selectBackupFile } from "../common";
 import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import Config from "../utils/config";
+import { EVENTS } from "@notesnook/core/common";
 
 type RecoveryMethodType = "key" | "backup" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;
@@ -323,6 +324,27 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
 
 function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
   const { navigate } = props;
+  const [progress, setProgress] = useState("0");
+
+  useEffect(() => {
+    db.eventManager.subscribe(
+      EVENTS.syncProgress,
+      ({
+        type,
+        total,
+        current
+      }: {
+        type: string;
+        total: number;
+        current: number;
+      }) => {
+        if (total === current) return;
+        if (type === "download") {
+          setProgress(((current / total) * 100).toFixed());
+        }
+      }
+    );
+  }, []);
 
   return (
     <RecoveryForm
@@ -331,10 +353,12 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       title="Recover your account"
       subtitle={"Use a data recovery key to reset your account password."}
       loading={{
-        title: "Downloading your data",
+        title: `Downloading your data (${progress}%)`,
         subtitle: "Please wait while your data is downloaded & decrypted."
       }}
       onSubmit={async (form) => {
+        setProgress("0");
+
         const user = await db.user?.getUser();
         if (!user) throw new Error("User not authenticated");
         await db.storage.write(`_uk_@${user.email}@_k`, form.recoveryKey);
@@ -370,6 +394,13 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
   const [backupFile, setBackupFile] =
     useState<BackupFileFormData["backupFile"]>();
 
+  useEffect(() => {
+    if (!backupFile) return;
+    const backupFileInput = document.getElementById("backupFile");
+    if (!(backupFileInput instanceof HTMLInputElement)) return;
+    backupFileInput.value = backupFile?.file?.name;
+  }, [backupFile]);
+
   return (
     <RecoveryForm
       testId="step-backup-file"
@@ -378,11 +409,13 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
       subtitle={
         <Text
           variant="body"
-          bg="background"
-          p={2}
-          mt={2}
-          sx={{ borderRadius: "default", color: "error" }}
-          ml={2}
+          sx={{
+            borderRadius: "default",
+            color: "error",
+            bg: "errorBg",
+            px: 1,
+            mt: 2
+          }}
         >
           All the data in your account will be overwritten with the data in the
           backup file. There is no way to reverse this action.
@@ -398,7 +431,6 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
         label="Select backup file"
         helpText="Backup files have .nnbackup extension"
         autoComplete="none"
-        defaultValue={backupFile?.file?.name}
         autoFocus
         disabled
         action={{
@@ -451,6 +483,17 @@ function BackupData(props: BaseRecoveryComponentProps<"backup">) {
 
 function NewPassword(props: BaseRecoveryComponentProps<"new">) {
   const { navigate, formData } = props;
+  const [progress, setProgress] = useState("0");
+
+  useEffect(() => {
+    db.eventManager.subscribe(
+      EVENTS.syncProgress,
+      ({ total, current }: { total: number; current: number }) => {
+        if (total === current) return;
+        setProgress(((current / total) * 100).toFixed());
+      }
+    );
+  }, []);
 
   return (
     <RecoveryForm
@@ -461,10 +504,12 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
         "Notesnook is E2E encrypted — your password never leaves this device."
       }
       loading={{
-        title: "Resetting account password",
+        title: `Resetting account password (${progress}%)`,
         subtitle: "Please wait while we reset your account password."
       }}
       onSubmit={async (form) => {
+        setProgress("0");
+
         if (form.password !== form.confirmPassword)
           throw new Error("Passwords do not match.");
 
