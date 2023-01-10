@@ -35,5 +35,5 @@ export default function usePrivacyMode() {
     _setPrivacyMode(privacyMode);
   }, []);
 
-  return [privacy, set];
+  return [_privacyMode, set];
 }
