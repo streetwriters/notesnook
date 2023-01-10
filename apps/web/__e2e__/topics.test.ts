@@ -121,3 +121,19 @@ test(`sort topics`, async ({ page }, info) => {
     }
   }
 });
+
+test("search topics", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notebooks = await app.goToNotebooks();
+  const notebook = await notebooks.createNotebook({
+    ...NOTEBOOK,
+    topics: ["title1", "title2", "title3", "title4", "title5"]
+  });
+  await notebook?.openNotebook();
+
+  const search = await app.search("1");
+  const topic = await search?.findItem({ title: "title1" });
+
+  expect((await topic?.getTitle()) === "title1").toBeTruthy();
+});

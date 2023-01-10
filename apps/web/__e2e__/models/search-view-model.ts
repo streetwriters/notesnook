@@ -17,34 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Locator, Page } from "@playwright/test";
-import { getTestId } from "../utils";
+import { Page } from "@playwright/test";
 import { BaseViewModel } from "./base-view.model";
 import { ItemModel } from "./item.model";
-import { SearchViewModel } from "./search-view-model";
 import { Item } from "./types";
-import { fillItemDialog } from "./utils";
 
-export class ItemsViewModel extends BaseViewModel {
-  private readonly createButton: Locator;
-
-  constructor(page: Page, private readonly id: "topics" | "tags") {
-    super(page, id);
-    this.createButton = page.locator(getTestId(`${id}-action-button`));
-  }
-
-  async createItem(item: Item) {
-    const titleToCompare = this.id === "tags" ? `#${item.title}` : item.title;
-
-    await this.createButton.first().click();
-    await fillItemDialog(this.page, item);
-
-    await this.waitForItem(titleToCompare);
-    return await this.findItem(item);
+export class SearchViewModel extends BaseViewModel {
+  constructor(page: Page) {
+    super(page, "general");
   }
 
   async findItem(item: Item) {
-    const titleToCompare = this.id === "tags" ? `#${item.title}` : item.title;
+    const titleToCompare = item.title;
     for await (const _item of this.iterateItems()) {
       const itemModel = new ItemModel(_item);
       const title = await itemModel.getTitle();
