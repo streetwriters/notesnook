@@ -26,7 +26,7 @@ export default function usePrivacyMode() {
   useEffect(() => {
     if (!window.config) return;
     (async function () {
-      setPrivacy(await window.config.privacyMode());
+      _setPrivacyMode(await window.config.privacyMode());
     })();
   }, []);
 
