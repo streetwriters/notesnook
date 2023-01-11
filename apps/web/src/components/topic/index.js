@@ -26,6 +26,7 @@ import { Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import { Multiselect } from "../../common/multi-select";
 import { pluralize } from "../../utils/string";
+import { confirm } from "../../common/dialog-controller";
 
 function Topic({ item, index, onClick }) {
   const { id, notebookId } = item;
@@ -88,6 +89,24 @@ const menuItems = [
     color: "error",
     iconColor: "error",
     onClick: async ({ items, notebookId }) => {
+      let showDeleteNotesDialog = confirm({
+        title: `Delete Contained Notes?`,
+        message: `Do you also want to delete notes within ${items.length > 1 ? "this topic" : "these topics"}?`,
+        yesText: `Yes`,
+        noText: "No"
+      });
+
+      let notes = [];
+      if (await showDeleteNotesDialog) {
+        for (const item of items) {
+          for (const note of db.notebooks
+            .notebook(notebookId)
+            .topics.topic(item.id).all) {
+            notes.push(note);
+          }
+        }
+        await Multiselect.moveNotesToTrash(notes, false);
+      }
       await Multiselect.deleteTopics(notebookId, items);
     },
     multiSelect: true

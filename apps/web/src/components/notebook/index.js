@@ -30,6 +30,7 @@ import IconTag from "../icon-tag";
 import { showToast } from "../../utils/toast";
 import { Multiselect } from "../../common/multi-select";
 import { pluralize } from "../../utils/string";
+import { confirm } from "../../common/dialog-controller";
 
 function Notebook(props) {
   const { item, index, totalNotes, date, simplified } = props;
@@ -150,6 +151,25 @@ const menuItems = [
     iconColor: "error",
     icon: Icon.Trash,
     onClick: async ({ items }) => {
+      const shouldDeleteNotes = await confirm({
+        title: `Delete Contained Notes?`,
+        message: `Do you also want to delete notes within ${items.length > 1 ? "this notebook" : "these notebooks"}?`,
+        yesText: `Yes`,
+        noText: "No"
+      });
+
+      let notes = [];
+      if (shouldDeleteNotes) {
+        for (const item of items) {
+          const topics = db.notebooks.notebook(item.id).topics;
+          for (const topic of topics.all) {
+            for (const note of topics.topic(topic.id).all) {
+              notes.push(note);
+            }
+          }
+        }
+        await Multiselect.moveNotesToTrash(notes, false);
+      }
       await Multiselect.moveNotebooksToTrash(items);
     },
     multiSelect: true
