@@ -59,7 +59,9 @@ function _ListTool<TListStyleTypes extends string>(
       onClick={onClick}
       toggled={isOpen}
       sx={{ mr: 0 }}
-      onOpen={() => setIsOpen((s) => !s)}
+      onOpen={() => {
+        setIsOpen((s) => !s);
+      }}
     >
       <PopupWrapper
         isOpen={isOpen}
@@ -97,7 +99,7 @@ function _ListTool<TListStyleTypes extends string>(
                   if (type === "bulletList") chain = chain.toggleBulletList();
                   else chain = chain.toggleOrderedList();
                 }
-
+                setIsOpen(false);
                 return chain
                   .updateAttributes(type, { listType: item.type })
                   .run();
