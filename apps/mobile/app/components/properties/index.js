@@ -42,6 +42,7 @@ import {
   formatReminderTime,
   getUpcomingReminder
 } from "@notesnook/core/collections/reminders";
+import { ReminderTime } from "../ui/reminder-time";
 export const Properties = ({
   close = () => {},
   item,
@@ -119,37 +120,16 @@ export const Properties = ({
             ) : null}
 
             {item.type === "reminder" ? (
-              <View
+              <ReminderTime
+                reminder={item}
                 style={{
-                  backgroundColor: colors.nav,
-                  borderRadius: 5,
-                  flexDirection: "row",
-                  paddingHorizontal: 5,
-                  paddingVertical: 3,
-                  alignItems: "center",
                   justifyContent: "flex-start",
-                  alignSelf: "flex-start",
-                  marginBottom: 5,
-                  marginTop: !item.description ? 5 : 0
+                  borderWidth: 0,
+                  height: 30,
+                  alignSelf: "flex-start"
                 }}
-              >
-                {item.date ? (
-                  <>
-                    <Icon
-                      name="clock-outline"
-                      size={SIZE.md}
-                      color={colors.accent}
-                    />
-                    <Paragraph
-                      size={SIZE.xs + 1}
-                      color={colors.icon}
-                      style={{ marginLeft: 5 }}
-                    >
-                      {formatReminderTime(item)}
-                    </Paragraph>
-                  </>
-                ) : null}
-              </View>
+                fontSize={SIZE.xs + 1}
+              />
             ) : null}
 
             {item.type === "note" ? <Tags close={close} item={item} /> : null}

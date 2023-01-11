@@ -30,6 +30,7 @@ import SelectionWrapper from "../selection-wrapper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ReminderSheet from "../../sheets/reminder";
 import { formatReminderTime } from "@notesnook/core/collections/reminders";
+import { ReminderTime } from "../../ui/reminder-time";
 
 const ReminderItem = React.memo(
   ({
@@ -57,7 +58,7 @@ const ReminderItem = React.memo(
         <View
           style={{
             flexWrap: "wrap",
-            flexShrink: 1, 
+            flexShrink: 1,
             opacity: item.disabled ? 0.5 : 1
           }}
         >
@@ -88,7 +89,6 @@ const ReminderItem = React.memo(
               flexWrap: "wrap"
             }}
           >
-            
             {item.disabled ? (
               <View
                 style={{
@@ -145,36 +145,19 @@ const ReminderItem = React.memo(
                 </Paragraph>
               </View>
             ) : null}
-            {item.date && !item.disabled ? (
-              <View
-                style={{
-                  backgroundColor: colors.nav,
-                  borderRadius: 5,
-                  flexDirection: "row",
-                  paddingHorizontal: 5,
-                  paddingVertical: 3,
-                  alignItems: "center",
-                  marginTop: 5,
-                  justifyContent: "flex-start",
-                  alignSelf: "flex-start"
-                }}
-              >
-                <>
-                  <Icon
-                    name="clock-outline"
-                    size={SIZE.md}
-                    color={colors.accent}
-                  />
-                  <Paragraph
-                    size={SIZE.xs + 1}
-                    color={colors.icon}
-                    style={{ marginLeft: 5 }}
-                  >
-                    {formatReminderTime(item)}
-                  </Paragraph>
-                </>
-              </View>
-            ) : null}
+
+            <ReminderTime
+              reminder={item}
+              checkIsActive={false}
+              fontSize={SIZE.xs + 1}
+              style={{
+                justifyContent: "flex-start",
+                borderWidth: 0,
+                height: 30,
+                alignSelf: "flex-start",
+                marginTop: 5
+              }}
+            />
           </View>
         </View>
         <IconButton

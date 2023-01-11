@@ -46,6 +46,7 @@ import { useRelationStore } from "../../../stores/use-relation-store";
 import Paragraph from "../../ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
 import DatePicker from "react-native-date-picker";
+import { ReminderTime } from "../../ui/reminder-time";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheet>;
@@ -528,31 +529,17 @@ export default function ReminderSheet({
           </View>
         )}
 
-        {reminder && reminder.date ? (
-          <View
-            style={{
-              borderRadius: 5,
-              flexDirection: "row",
-              paddingVertical: 6,
-              paddingHorizontal: 12,
-              alignItems: "center",
-              justifyContent: "flex-start",
-              marginBottom: 10,
-              backgroundColor: colors.nav
-            }}
-          >
-            <>
-              <Icon name="clock-outline" size={SIZE.md} color={colors.accent} />
-              <Paragraph
-                size={SIZE.xs + 1}
-                color={colors.icon}
-                style={{ marginLeft: 5 }}
-              >
-                {formatReminderTime(reminder)}
-              </Paragraph>
-            </>
-          </View>
-        ) : null}
+        <ReminderTime
+          reminder={reminder}
+          style={{
+            width: "100%",
+            justifyContent: "flex-start",
+            borderWidth: 0,
+            height: 30,
+            alignSelf: "flex-start"
+          }}
+        />
+        
       </ScrollView>
       <Button
         style={{

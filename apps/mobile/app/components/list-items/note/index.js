@@ -37,6 +37,7 @@ import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
+import { ReminderTime } from "../../ui/reminder-time";
 import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
@@ -92,9 +93,9 @@ const NoteItem = ({
   const attachmentCount = db.attachments?.ofNote(item.id, "all")?.length || 0;
   const notebooks = React.useMemo(() => getNotebook(item), [item]);
   const reminders = db.relations.from(item, "reminder");
-  const current = getUpcomingReminder(reminders);
+  const reminder = getUpcomingReminder(reminders);
   const _update = useRelationStore((state) => state.updater);
-
+  const noteColor = COLORS_NOTE[item.color?.toLowerCase()];
   return (
     <>
       <View
@@ -110,14 +111,15 @@ const NoteItem = ({
               alignItems: "center",
               zIndex: 10,
               elevation: 10,
-              marginBottom: 2.5
+              marginBottom: 2.5,
+              flexWrap: "wrap"
             }}
           >
             {notebooks?.map((_item) => (
               <Button
                 title={_item.title}
                 key={_item}
-                height={20}
+                height={25}
                 icon="book-outline"
                 type="grayBg"
                 fontSize={SIZE.xs}
@@ -130,11 +132,23 @@ const NoteItem = ({
                   marginRight: 5,
                   borderWidth: 0.5,
                   borderColor: colors.icon,
-                  paddingHorizontal: 6
+                  paddingHorizontal: 6,
+                  marginBottom: 5
                 }}
                 onPress={() => navigateToTopic(_item.topic)}
               />
             ))}
+
+            <ReminderTime
+              reminder={reminder}
+              color={noteColor}
+              onPress={() => {
+                Properties.present(reminder);
+              }}
+              style={{
+                height: 25
+              }}
+            />
           </View>
         ) : null}
 
@@ -160,39 +174,6 @@ const NoteItem = ({
               level: EntityLevel.HTML
             })}
           </Paragraph>
-        ) : null}
-
-        {current &&
-        current.date && !current.disabled &&
-        (current.mode !== "once" || current.date > Date.now() || current.snoozeUntil > Date.now()) ? (
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => {
-              Properties.present(current);
-            }}
-            style={{
-              backgroundColor: colors.nav,
-              borderRadius: 5,
-              flexDirection: "row",
-              paddingHorizontal: 5,
-              paddingVertical: 3,
-              alignItems: "center",
-              marginTop: 5,
-              justifyContent: "flex-start",
-              alignSelf: "flex-start"
-            }}
-          >
-            <>
-              <Icon name="clock-outline" size={SIZE.md} color={colors.accent} />
-              <Paragraph
-                size={SIZE.xs + 1}
-                color={colors.icon}
-                style={{ marginLeft: 5 }}
-              >
-                {formatReminderTime(current)}
-              </Paragraph>
-            </>
-          </TouchableOpacity>
         ) : null}
 
         <View

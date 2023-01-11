@@ -837,7 +837,7 @@ export const settingsGroups: SettingSection[] = [
         id: "reminders",
         type: "screen",
         name: "Reminders",
-        icon: "clock-outline",
+        icon: "bell",
         description: "Manage and configure reminders in app",
         sections: [
           {

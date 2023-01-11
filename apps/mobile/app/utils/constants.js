@@ -130,7 +130,7 @@ export const MenuItemsList = [
   },
   {
     name: "Reminders",
-    icon: "clock-outline",
+    icon: "bell",
     close: true
   },
   {

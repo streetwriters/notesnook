@@ -101,7 +101,7 @@ export default function ReminderNotify({
           alignItems: "center"
         }}
       >
-        <Icon name="clock-outline" size={20} color={colors.accent} />
+        <Icon name="bell" size={20} color={colors.accent} />
         <Paragraph style={{ marginLeft: 5 }}>
           {dayjs(reminder?.date).format("ddd, YYYY-MM-DD hh:mm A")}
         </Paragraph>
