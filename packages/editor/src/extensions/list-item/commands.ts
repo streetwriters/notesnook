@@ -44,7 +44,7 @@ export function onBackspacePressed(
     return false;
 
   const isEmpty = isListItemEmpty(type, editor.state);
-  console.log(44, isEmpty, isFirstOfType(type, editor.state));
+
   if (isEmpty) {
     if (isFirstOfType(type, editor.state)) {
       const parentList = getListFromListItem(type, editor.state);
