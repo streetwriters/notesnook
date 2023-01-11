@@ -59,14 +59,6 @@ contextBridge.exposeInMainWorld("config", {
   }
 });
 
-contextBridge.exposeInMainWorld("config", {
-  privacyMode: () => {
-    return ipcRenderer.invoke("fromRenderer", {
-      type: "getPrivacyMode"
-    });
-  }
-});
-
 contextBridge.exposeInMainWorld("native", {
   selectDirectory: ({ title, buttonLabel, defaultPath }) => {
     return ipcRenderer.invoke("fromRenderer", {

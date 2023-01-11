@@ -56,7 +56,12 @@ import { appVersion } from "../utils/version";
 import { CHECK_IDS } from "@notesnook/core/common";
 import Tip from "../components/tip";
 import Toggle from "../components/toggle";
-import { isDesktop, isMacStoreApp, isTesting } from "../utils/platform";
+import {
+  getPlatform,
+  isDesktop,
+  isMacStoreApp,
+  isTesting
+} from "../utils/platform";
 import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { Slider } from "@theme-ui/components";
@@ -820,7 +825,7 @@ function Settings() {
                 tip="Read details of all usage data we collect."
               />
             </Button>
-            {isDesktop() && (
+            {isDesktop() && getPlatform() !== "linux" && (
               <Toggle
                 title="Privacy Mode"
                 onTip="Allow screen capturing of the Notesnook app."
