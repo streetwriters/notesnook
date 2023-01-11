@@ -56,7 +56,12 @@ import { appVersion } from "../utils/version";
 import { CHECK_IDS } from "@notesnook/core/common";
 import Tip from "../components/tip";
 import Toggle from "../components/toggle";
-import { isDesktop, isMacStoreApp, isTesting } from "../utils/platform";
+import {
+  getPlatform,
+  isDesktop,
+  isMacStoreApp,
+  isTesting
+} from "../utils/platform";
 import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { Slider } from "@theme-ui/components";
@@ -68,6 +73,7 @@ import { debounce } from "../utils/debounce";
 import { clearLogs, downloadLogs } from "../utils/logger";
 import { exportNotes } from "../common/export";
 import { scheduleBackups } from "../common/reminders";
+import usePrivacyMode from "../hooks/use-privacy-mode";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -182,6 +188,7 @@ function Settings() {
     "telemetry",
     true
   );
+  const [privacyMode, setPrivacyMode] = usePrivacyMode();
   const [showReminderNotifications, setShowReminderNotifications] =
     usePersistentState("reminderNotifications", true);
   const [corsProxy, setCorsProxy] = usePersistentState(
@@ -818,6 +825,17 @@ function Settings() {
                 tip="Read details of all usage data we collect."
               />
             </Button>
+            {isDesktop() && getPlatform() !== "linux" && (
+              <Toggle
+                title="Privacy Mode"
+                onTip="Allow screen capturing of the Notesnook app."
+                offTip="Prevent screen capturing of the Notesnook app. (Apps like TeamViewer & AnyDesk won't be able to capture Notesnook)."
+                onToggled={() => {
+                  setPrivacyMode(!privacyMode);
+                }}
+                isToggled={privacyMode}
+              />
+            )}
           </>
         )}
 

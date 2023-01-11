@@ -17,31 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import changeAppTheme from "./changeAppTheme";
-import checkForUpdate from "./checkForUpdate";
-import downloadUpdate from "./downloadUpdate";
-import installUpdate from "./installUpdate";
-import open from "./open";
-import saveFile from "./saveFile";
-import setZoomFactor from "./setZoomFactor";
-import setPrivacyMode from "./setPrivacyMode";
+import { useCallback, useEffect, useState } from "react";
+import setPrivacyMode from "../commands/set-privacy-mode";
 
-const actions = {
-  changeAppTheme,
-  checkForUpdate,
-  downloadUpdate,
-  installUpdate,
-  open,
-  saveFile,
-  setZoomFactor,
-  setPrivacyMode
-};
+export default function usePrivacyMode() {
+  const [_privacyMode, _setPrivacyMode = useState(false);
 
-export function getAction(actionName) {
-  try {
-    if (!actions[actionName]) throw new Error("Invalid action name.");
-  } catch (e) {
-    console.error(e);
-  }
-  return actions[actionName];
+  useEffect(() => {
+    if (!window.config) return;
+    (async function () {
+      _setPrivacyMode(await window.config.privacyMode());
+    })();
+  }, []);
+
+  const set = useCallback((privacyMode) => {
+    setPrivacyMode(privacyMode);
+    _setPrivacyMode(privacyMode);
+  }, []);
+
+  return [_privacyMode, set];
 }

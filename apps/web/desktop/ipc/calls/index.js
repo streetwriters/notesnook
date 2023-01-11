@@ -18,11 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import getZoomFactor from "./getZoomFactor";
+import getPrivacyMode from "./getPrivacyMode";
 import selectDirectory from "./selectDirectory";
 import { gunzip, gzip } from "./gzip";
 
 const calls = {
   getZoomFactor,
+  getPrivacyMode,
   selectDirectory,
   gunzip,
   gzip

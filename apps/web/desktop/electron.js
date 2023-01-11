@@ -33,6 +33,7 @@ import { WindowState } from "./config/windowstate";
 import { sendMessageToRenderer } from "./ipc/utils";
 import { EVENTS } from "./events";
 import "./ipc/index.js";
+import getPrivacyMode from "./ipc/calls/getPrivacyMode";
 
 if (!RELEASE) {
   require("electron-reloader")(module);
@@ -80,6 +81,10 @@ async function createWindow() {
 
   if (isDevelopment())
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });
+
+  if (getPrivacyMode()) {
+    global.win.setContentProtection(true);
+  }
 
   try {
     await mainWindow.loadURL(

@@ -51,6 +51,11 @@ contextBridge.exposeInMainWorld("config", {
     return ipcRenderer.invoke("fromRenderer", {
       type: "getZoomFactor"
     });
+  },
+  privacyMode: () => {
+    return ipcRenderer.invoke("fromRenderer", {
+      type: "getPrivacyMode"
+    });
   }
 });
 
