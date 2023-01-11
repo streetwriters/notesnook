@@ -827,9 +827,9 @@ function Settings() {
             </Button>
             {isDesktop() && getPlatform() !== "linux" && (
               <Toggle
-                title="Privacy Mode"
-                onTip="Allow screen capturing of the Notesnook app."
-                offTip="Prevent screen capturing of the Notesnook app. (Apps like TeamViewer & AnyDesk won't be able to capture Notesnook)."
+                title="Privacy mode"
+                onTip="Prevent Notesnook app from being captured by any screen capturing software like TeamViewer & AnyDesk."
+                offTip="Allow screen capturing of the Notesnook app."
                 onToggled={() => {
                   setPrivacyMode(!privacyMode);
                 }}
