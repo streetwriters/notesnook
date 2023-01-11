@@ -34,7 +34,6 @@ export function onBackspacePressed(
 ) {
   const { selection } = editor.state;
   const { empty, $from } = selection;
-
   if (
     !empty ||
     !isInside(name, type, editor.state) ||
@@ -45,6 +44,7 @@ export function onBackspacePressed(
     return false;
 
   const isEmpty = isListItemEmpty(type, editor.state);
+  console.log(44, isEmpty, isFirstOfType(type, editor.state));
   if (isEmpty) {
     if (isFirstOfType(type, editor.state)) {
       const parentList = getListFromListItem(type, editor.state);
@@ -57,7 +57,7 @@ export function onBackspacePressed(
 
     return editor.commands.deleteNode(type);
   } else if (isFirstOfType(type, editor.state)) {
-    return editor.commands.liftListItem(type);
+    return false;
   } else {
     // we have to run join backward twice because on the first join
     // the two list items are joined i.e., the editor just puts their
