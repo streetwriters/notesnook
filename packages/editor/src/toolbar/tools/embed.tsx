@@ -23,7 +23,7 @@ import { useMemo, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
 import { MoreTools } from "../components/more-tools";
 import { useToolbarLocation } from "../stores/toolbar-store";
-import { findSelectedNode } from "../utils/prosemirror";
+import { findSelectedNode } from "../../utils/prosemirror";
 import { Embed } from "../../extensions/embed";
 import { EmbedPopup } from "../popups/embed-popup";
 

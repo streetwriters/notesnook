@@ -24,7 +24,7 @@ import { TaskListComponent } from "./component";
 import { Plugin, PluginKey, NodeSelection } from "prosemirror-state";
 import TaskItem from "@tiptap/extension-task-item";
 import { dropPoint } from "prosemirror-transform";
-import { findChildrenByType } from "prosemirror-utils";
+import { findChildrenByType } from "../../utils/prosemirror";
 
 export type TaskListAttributes = {
   title: string;

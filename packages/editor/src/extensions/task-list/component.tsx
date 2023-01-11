@@ -21,10 +21,9 @@ import { Box, Flex, Input, Text } from "@theme-ui/components";
 import { findChildren, getNodeType } from "@tiptap/core";
 import TaskItem from "@tiptap/extension-task-item";
 import { Node } from "prosemirror-model";
-import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToolButton } from "../../toolbar/components/tool-button";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store";
+import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
@@ -32,7 +31,7 @@ import { TaskListAttributes } from "./task-list";
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
 ) {
-  const isMobile = useIsMobile();
+  // const isMobile = useIsMobile();
   const { editor, getPos, node, updateAttributes, forwardRef } = props;
   const taskItemType = getNodeType(TaskItemNode.name, editor.schema);
   const { title } = node.attrs;

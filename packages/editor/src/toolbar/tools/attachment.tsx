@@ -21,7 +21,7 @@ import { ToolProps } from "../types";
 import { ToolButton } from "../components/tool-button";
 import { MoreTools } from "../components/more-tools";
 import { useToolbarLocation } from "../stores/toolbar-store";
-import { findSelectedNode } from "../utils/prosemirror";
+import { findSelectedNode } from "../../utils/prosemirror";
 import { Attachment } from "../../extensions/attachment";
 
 export function AttachmentSettings(props: ToolProps) {

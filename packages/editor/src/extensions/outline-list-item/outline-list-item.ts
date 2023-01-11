@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Node, mergeAttributes, findChildren, Editor } from "@tiptap/core";
 import { NodeType } from "prosemirror-model";
-import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
+import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { onArrowUpPressed, onBackspacePressed } from "../list-item/commands";
 import { OutlineList } from "../outline-list/outline-list";
 import { createNodeView } from "../react";

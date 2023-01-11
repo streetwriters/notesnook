@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Extension } from "@tiptap/core";
 import { isInTable } from "@_ueberdosis/prosemirror-tables";
-import { isListActive } from "../../toolbar/utils/prosemirror";
+import { isListActive } from "../../utils/prosemirror";
 
 export const KeyMap = Extension.create({
   name: "key-map",

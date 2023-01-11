@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useRef } from "react";
 import { showPopup } from "../../../components/popup-presenter";
 import { Editor } from "../../../types";
-import { NodeWithOffset } from "../../utils/prosemirror";
+import { NodeWithOffset } from "../../../utils/prosemirror";
 import { FloatingMenuProps } from "../types";
 import { LinkHoverPopupHandler } from "./link";
 

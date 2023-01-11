@@ -35,7 +35,7 @@ import {
 } from "../../toolbar/tools/table";
 import { getToolDefinition } from "../../toolbar/tool-definitions";
 import { getPosition } from "../../utils/position";
-import { findSelectedDOMNode } from "../../toolbar/utils/prosemirror";
+import { findSelectedDOMNode } from "../../utils/prosemirror";
 import { DesktopOnly } from "../../components/responsive";
 
 export function TableComponent(props: SelectionBasedReactNodeViewProps) {

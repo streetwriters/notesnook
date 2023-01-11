@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { EditorState } from "prosemirror-state";
 import { NodeType } from "prosemirror-model";
-import { findParentNodeOfType, hasParentNodeOfType } from "prosemirror-utils";
 import { Editor } from "@tiptap/core";
 
 // WORKAROUND: if we're at the start of a list item, we need to either
