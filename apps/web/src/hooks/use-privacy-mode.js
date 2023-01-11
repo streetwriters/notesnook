@@ -21,7 +21,7 @@ import { useCallback, useEffect, useState } from "react";
 import setPrivacyMode from "../commands/set-privacy-mode";
 
 export default function usePrivacyMode() {
-  const [_privacyMode, _setPrivacyMode = useState(false);
+  const [_privacyMode, _setPrivacyMode] = useState(false);
 
   useEffect(() => {
     if (!window.config) return;
