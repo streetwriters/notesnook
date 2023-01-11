@@ -125,11 +125,13 @@ export default class Reminders extends Collection {
 /**
  * @param {Reminder} reminder
  */
-export function formatReminderTime(reminder) {
+export function formatReminderTime(reminder, short = false) {
   const { date } = reminder;
   let time = date;
+  let tag = "";
+  let text = "";
 
-  if (reminder.mode === "permanent") return `Pinned to Notifications`;
+  if (reminder.mode === "permanent") return `Ongoing`;
 
   if (reminder.snoozeUntil && reminder.snoozeUntil > Date.now()) {
     return `Snoozed until ${dayjs(reminder.snoozeUntil).format("hh:mm A")}`;
@@ -137,24 +139,25 @@ export function formatReminderTime(reminder) {
 
   if (reminder.mode === "repeat") {
     time = getUpcomingReminderTime(reminder);
-    console.log("reminder mode repeat");
   }
 
   if (dayjs(time).isTomorrow()) {
-    return `Upcoming: Tomorrow, ${dayjs(time).format("hh:mm A")}`;
+    tag = "Upcoming";
+    text = `Tomorrow, ${dayjs(time).format("hh:mm A")}`;
+  } else if (dayjs(time).isYesterday()) {
+    tag = "Last";
+    text = `Yesterday, ${dayjs(time).format("hh:mm A")}`;
+  } else {
+    const isPast = dayjs(time).isSameOrBefore(dayjs());
+    tag = isPast ? "Last" : "Upcoming";
+    if (dayjs(time).isToday()) {
+      text = `Today, ${dayjs(time).format("hh:mm A")}`;
+    } else {
+      text = dayjs(time).format(`ddd, YYYY-MM-DD hh:mm A`);
+    }
   }
 
-  if (dayjs(time).isYesterday()) {
-    return `Last: Yesterday, ${dayjs(time).format("hh:mm A")}`;
-  }
-
-  const isPast = dayjs(time).isSameOrBefore(dayjs());
-  const tag = isPast ? "Last" : "Upcoming";
-  if (dayjs(time).isToday()) {
-    return `${tag}: Today, ${dayjs(time).format("hh:mm A")}`;
-  }
-
-  return dayjs(time).format(`[${tag}]: ddd, YYYY-MM-DD hh:mm A`);
+  return short ? text : `${tag}: ${text}`;
 }
 
 /**
@@ -217,6 +220,8 @@ export function isReminderActive(reminder) {
   const time = getUpcomingReminderTime(reminder);
   return (
     !reminder.disabled &&
-    (time > Date.now() || reminder.snoozeUntil > Date.now())
+    (reminder.mode !== "once" ||
+      time > Date.now() ||
+      reminder.snoozeUntil > Date.now())
   );
 }
