@@ -1,0 +1,1 @@
+A fully open source & end-to-end encrypted note taking app
