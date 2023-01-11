@@ -43,6 +43,7 @@ for (const route of routes) {
     const item = await app.navigation.findItem(route.header);
     await item?.click();
 
+    expect(item).toBeDefined();
     expect(await app.getRouteHeader()).toBe(route.header);
   });
 }
