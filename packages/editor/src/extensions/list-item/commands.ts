@@ -20,6 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EditorState } from "prosemirror-state";
 import { NodeType } from "prosemirror-model";
 import { Editor } from "@tiptap/core";
+import {
+  findParentNodeOfType,
+  hasParentNodeOfType
+} from "../../utils/prosemirror";
 
 // WORKAROUND: if we're at the start of a list item, we need to either
 // backspace directly to an empty list item above, or outdent this node

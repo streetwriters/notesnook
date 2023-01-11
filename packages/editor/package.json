@@ -67,8 +67,10 @@
     "react-dom": ">=17.0.0"
   },
   "scripts": {
-    "build": "zx ./scripts/build.mjs",
-    "watch": "zx ./scripts/build.mjs --watch",
+    "prebuild": "zx ./scripts/build.mjs",
+    "prewatch": "zx ./scripts/build.mjs",
+    "build": "tsc",
+    "watch": "tsc --watch",
     "prepub": "npm run build",
     "pub": "np",
     "postinstall": "npx patch-package"
