@@ -24,13 +24,14 @@ import * as Icon from "../icons";
 import IconTag from "../icon-tag";
 import {
   Reminder as ReminderType,
-  formatReminderTime
+  formatReminderTime,
+  isReminderToday
 } from "@notesnook/core/collections/reminders";
 import { hashNavigate } from "../../navigation";
 import { Multiselect } from "../../common/multi-select";
-import { showReminderPreviewDialog } from "../../common/dialog-controller";
 import { store } from "../../stores/reminder-store";
 import { db } from "../../common/db";
+import { showEditReminderDialog } from "../../common/dialog-controller";
 
 const RECURRING_MODE_MAP = {
   week: "Weekly",
@@ -44,7 +45,15 @@ const PRIORITY_ICON_MAP = {
   urgent: Icon.Loud
 } as const;
 
-function Reminder({ item, index }: { item: ReminderType; index: number }) {
+function Reminder({
+  item,
+  index,
+  simplified
+}: {
+  item: ReminderType;
+  index: number;
+  simplified?: boolean;
+}) {
   const reminder = item;
   const PriorityIcon = PRIORITY_ICON_MAP[reminder.priority];
   return (
@@ -54,21 +63,14 @@ function Reminder({ item, index }: { item: ReminderType; index: number }) {
       title={reminder.title}
       body={reminder.description}
       isDisabled={reminder.disabled}
+      isSimple={simplified}
+      onClick={() => showEditReminderDialog(reminder.id)}
       footer={
         <Flex
           sx={{
             alignItems: "center"
           }}
         >
-          {reminder.disabled ? null : (
-            <PriorityIcon size={14} color="fontTertiary" sx={{ mr: 1 }} />
-          )}
-          {reminder.mode === "repeat" && reminder.recurringMode && (
-            <IconTag
-              icon={Icon.Refresh}
-              text={RECURRING_MODE_MAP[reminder.recurringMode]}
-            />
-          )}
           {reminder.disabled ? (
             <IconTag
               icon={Icon.ReminderOff}
@@ -76,7 +78,20 @@ function Reminder({ item, index }: { item: ReminderType; index: number }) {
               styles={{ icon: { color: "error" } }}
             />
           ) : (
-            <IconTag icon={Icon.Clock} text={formatReminderTime(reminder)} />
+            <IconTag
+              icon={Icon.Clock}
+              text={formatReminderTime(reminder)}
+              highlight={isReminderToday(reminder)}
+            />
+          )}
+          {reminder.disabled ? null : (
+            <PriorityIcon size={14} color="fontTertiary" sx={{ ml: 1 }} />
+          )}
+          {reminder.mode === "repeat" && reminder.recurringMode && (
+            <IconTag
+              icon={Icon.Refresh}
+              text={RECURRING_MODE_MAP[reminder.recurringMode]}
+            />
           )}
         </Flex>
       }

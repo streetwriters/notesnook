@@ -33,10 +33,11 @@ type IconTagProps = {
     text?: ThemeUICSSObject;
   };
   testId?: string;
+  highlight?: boolean;
 };
 
 function IconTag(props: IconTagProps) {
-  const { icon: Icon, text, title, onClick, styles, testId } = props;
+  const { icon: Icon, text, title, onClick, styles, testId, highlight } = props;
 
   return (
     <Flex
@@ -47,7 +48,7 @@ function IconTag(props: IconTagProps) {
           onClick(e);
         }
       }}
-      title={text || title}
+      title={title || text}
       sx={{
         borderRadius: "default",
         border: "1px solid",
@@ -61,7 +62,7 @@ function IconTag(props: IconTagProps) {
           : {},
         maxWidth: "100%",
         px: 1,
-        mr: 1,
+        // mr: 1,
         cursor: onClick ? "pointer" : "default",
         overflow: "hidden",
         ...styles?.container,
@@ -74,7 +75,7 @@ function IconTag(props: IconTagProps) {
     >
       <Icon
         size={11}
-        color={styles?.icon?.color}
+        color={styles?.icon?.color || (highlight ? "primary" : "icon")}
         sx={{ ...styles?.icon, flexShrink: 0 }}
       />
       <Text
@@ -86,6 +87,7 @@ function IconTag(props: IconTagProps) {
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
           overflow: "hidden",
+          color: highlight ? "primary" : "text",
           ...styles?.text
         }}
       >
