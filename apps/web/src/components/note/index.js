@@ -36,10 +36,24 @@ import { COLORS } from "../../common/constants";
 import { exportNotes } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";
 import { store as selectionStore } from "../../stores/selection-store";
+import {
+  formatReminderTime,
+  isReminderActive,
+  isReminderToday
+} from "@notesnook/core/collections/reminders";
 
 function Note(props) {
-  const { tags, notebook, item, index, context, date } = props;
+  const {
+    tags,
+    notebook,
+    item,
+    index,
+    context,
+    date,
+    reminder,
+  } = props;
   const note = item;
+
   const isOpened = useStore((store) => store.selectedNote === note.id);
   const isCompact = useStore((store) => store.viewMode === "compact");
   const attachments = useAttachmentStore((store) =>
@@ -92,22 +106,34 @@ function Note(props) {
         }
       }}
       header={
-        notebook && (
-          <IconTag
-            styles={{
-              container: {
-                alignSelf: "flex-start",
-                justifySelf: "flex-start",
-                mb: 1
+        <Flex
+          sx={{ alignItems: "center", flexWrap: "wrap", gap: 1, mt: "small" }}
+        >
+          {notebook && (
+            <IconTag
+              onClick={() => {
+                navigate(`/notebooks/${notebook.id}/${notebook.topic.id}`);
+              }}
+              text={`${notebook.title} › ${notebook.topic.title}`}
+              icon={Icon.Notebook}
+            />
+          )}
+          {reminder && isReminderActive(reminder) && (
+            <IconTag
+              icon={Icon.Reminder}
+              text={formatReminderTime(reminder, true)}
+              title={reminder.title}
+              styles={
+                isReminderToday(reminder)
+                  ? {
+                      icon: { color: primary },
+                      text: { color: primary }
+                    }
+                  : {}
               }
-            }}
-            onClick={() => {
-              navigate(`/notebooks/${notebook.id}/${notebook.topic.id}`);
-            }}
-            text={`${notebook.title} › ${notebook.topic.title}`}
-            icon={Icon.Notebook}
-          />
-        )
+            />
+          )}
+        </Flex>
       }
       footer={
         <Flex
@@ -228,6 +254,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
     prevProps.notebook?.dateEdited === nextProps.notebook?.dateEdited &&
+    prevProps.reminder?.dateModified === nextProps.reminder?.dateModified &&
     JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags) &&
     JSON.stringify(prevProps.context) === JSON.stringify(nextProps.context)
   );

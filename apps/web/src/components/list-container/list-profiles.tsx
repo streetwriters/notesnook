@@ -66,6 +66,7 @@ const NotesProfile: ItemWrapper = ({ index, item, type, context }) => (
     item={item}
     tags={getTags(item)}
     notebook={getNotebook(item.notebooks as Item[], context?.type)}
+    reminder={getReminder(item.id)}
     date={getDate(item, type)}
     context={context}
   />
@@ -161,6 +162,10 @@ function getNotebook(
     } as NotebookResult;
   },
   undefined as NotebookResult);
+}
+
+function getReminder(noteId: string) {
+  return db.relations?.from({ id: noteId, type: "note" }, "reminder")[0];
 }
 
 function getDate(item: Item, groupType: keyof typeof ListProfiles) {
