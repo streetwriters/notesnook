@@ -100,7 +100,6 @@ export const Title = () => {
     if (!isTopic) return;
     Notebook.navigate(notebook, true);
   }
-  console.log(currentScreen);
   return (
     <View
       style={{

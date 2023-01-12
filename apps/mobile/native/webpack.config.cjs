@@ -86,6 +86,7 @@ module.exports = (env) => {
         "@notesnook": path.join(__dirname, "../../../packages"),
         "@streetwriters/showdown": path.join(__dirname, "../node_modules/@streetwriters/showdown"),
         "qclone": path.join(__dirname, "../node_modules/qclone"),
+        "@notifee/react-native": path.join(__dirname, "../node_modules/@ammarahmed/notifee-react-native")
       },
     },
     /**
