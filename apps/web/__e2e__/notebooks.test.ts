@@ -165,6 +165,29 @@ test("remove shortcut of a notebook", async ({ page }) => {
   expect(allShortcuts.includes(NOTEBOOK.title)).toBeFalsy();
 });
 
+test("delete all notes within a notebook", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notebooks = await app.goToNotebooks();
+  const notebook = await notebooks.createNotebook(NOTEBOOK);
+  const topics = await notebook?.openNotebook();
+  const topic = await topics?.findItem({ title: NOTEBOOK.topics[0] });
+  let notes = await topic?.open();
+  for (let i = 0; i < 2; ++i) {
+    await notes?.createNote({
+      title: `Note ${i}`,
+      content: NOTE.content
+    });
+  }
+  await app.goBack();
+  await app.goBack();
+
+  await notebook?.moveToTrash(true);
+
+  notes = await app.goToNotes();
+  expect(await notes.isEmpty()).toBe(true);
+});
+
 test(`sort notebooks`, async ({ page }, info) => {
   info.setTimeout(2 * 60 * 1000);
 

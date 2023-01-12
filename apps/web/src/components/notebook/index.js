@@ -152,20 +152,20 @@ const menuItems = [
     icon: Icon.Trash,
     onClick: async ({ items }) => {
       const shouldDeleteNotes = await confirm({
-        title: `Delete Contained Notes?`,
-        message: `Do you also want to delete notes within ${items.length > 1 ? "this notebook" : "these notebooks"}?`,
+        title: `Delete contained notes?`,
+        message: `Do you also want to delete notes within ${
+          items.length > 1 ? "this notebook" : "these notebooks"
+        }?`,
         yesText: `Yes`,
         noText: "No"
       });
 
-      let notes = [];
       if (shouldDeleteNotes) {
+        const notes = [];
         for (const item of items) {
           const topics = db.notebooks.notebook(item.id).topics;
           for (const topic of topics.all) {
-            for (const note of topics.topic(topic.id).all) {
-              notes.push(note);
-            }
+            notes.push(...topics.topic(topic.id).all);
           }
         }
         await Multiselect.moveNotesToTrash(notes, false);

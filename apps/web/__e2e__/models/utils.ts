@@ -77,6 +77,12 @@ export async function confirmDialog(page: Page) {
   // await dialogConfirm.waitFor({ state: "detached" });
 }
 
+export async function denyDialog(page: Page) {
+  const dialogConfirm = page.locator(getTestId("dialog-no"));
+  await dialogConfirm.click();
+  // await dialogConfirm.waitFor({ state: "detached" });
+}
+
 export async function waitToHaveText(page: Page, id: string) {
   await page.waitForFunction(
     ({ id }) => {
