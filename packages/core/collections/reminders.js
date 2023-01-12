@@ -164,6 +164,7 @@ export function formatReminderTime(reminder, short = false) {
  * @param {Reminder} reminder
  */
 function getUpcomingReminderTime(reminder) {
+  if (reminder.mode === "once") return reminder.date;
   // this is only the time (hour & minutes); date is not included
   const time = dayjs(reminder.date);
   const now = dayjs();
@@ -217,7 +218,11 @@ export function getUpcomingReminder(reminders) {
  */
 
 export function isReminderActive(reminder) {
-  const time = getUpcomingReminderTime(reminder);
+  const time =
+    reminder.mode === "once"
+      ? reminder.date
+      : getUpcomingReminderTime(reminder);
+
   return (
     !reminder.disabled &&
     (reminder.mode !== "once" ||
