@@ -32,6 +32,7 @@ import { Pro } from "../icons";
 export type AddReminderDialogProps = {
   onClose: Perform;
   reminderId?: string;
+  noteId?: string;
 };
 
 type ValueOf<T> = T[keyof T];
@@ -107,7 +108,7 @@ const recurringModes = [
 ];
 
 export default function AddReminderDialog(props: AddReminderDialogProps) {
-  const { reminderId } = props;
+  const { reminderId, noteId } = props;
 
   const [selectedDays, setSelectedDays] = useState<number[]>([]);
   const [recurringMode, setRecurringMode] = useState<
@@ -191,7 +192,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             return;
           }
 
-          await db.reminders?.add({
+          const id = await db.reminders?.add({
             id: reminderId,
             recurringMode,
             mode,
@@ -203,6 +204,14 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             disabled: false,
             ...(dateTime.isAfter(dayjs()) ? { snoozeUntil: 0 } : {})
           });
+
+          if (id && noteId) {
+            await db.relations?.add(
+              { id: noteId, type: "note" },
+              { id, type: "reminder" }
+            );
+          }
+
           refresh();
           props.onClose(true);
         }

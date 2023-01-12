@@ -22,7 +22,11 @@ import { Button, Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
-import { confirm, showMoveNoteDialog } from "../../common/dialog-controller";
+import {
+  confirm,
+  showAddReminderDialog,
+  showMoveNoteDialog
+} from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
 import { store as userstore } from "../../stores/user-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
@@ -324,6 +328,14 @@ const menuItems = [
       await showMoveNoteDialog(items.map((i) => i.id));
     },
     multiSelect: true
+  },
+  {
+    key: "addreminder",
+    title: "Add reminder",
+    icon: Icon.AddReminder,
+    onClick: async ({ note }) => {
+      await showAddReminderDialog(note.id);
+    }
   },
   {
     key: "colors",

@@ -181,7 +181,9 @@ import {
   mdiClockTimeFiveOutline,
   mdiBellOffOutline,
   mdiVibrate,
-  mdiBellCancelOutline
+  mdiBellCancelOutline,
+  mdiBellPlusOutline,
+  mdiBellOutline
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { AnimatedFlex } from "../animated";
@@ -451,7 +453,9 @@ export const LineSpacing = createIcon(mdiFormatLineSpacing);
 export const Extension = createIcon(mdiPuzzleOutline);
 
 export const Reminders = createIcon(mdiBellRingOutline);
+export const Reminder = createIcon(mdiBellOutline);
 export const ReminderOff = createIcon(mdiBellCancelOutline);
+export const AddReminder = createIcon(mdiBellPlusOutline);
 export const Silent = createIcon(mdiBellOffOutline);
 export const Vibrate = createIcon(mdiVibrate);
 export const Loud = createIcon(mdiBellRingOutline);

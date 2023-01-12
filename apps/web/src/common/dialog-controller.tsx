@@ -637,9 +637,9 @@ export function showTrackingDetailsDialog() {
   ));
 }
 
-export function showAddReminderDialog() {
+export function showAddReminderDialog(noteId?: string) {
   return showDialog("AddReminderDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} />
+    <Dialog onClose={(res: boolean) => perform(res)} noteId={noteId} />
   ));
 }
 

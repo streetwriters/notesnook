@@ -25,6 +25,7 @@ import { TaskScheduler } from "../utils/task-scheduler";
 import { showReminderPreviewDialog } from "../common/dialog-controller";
 import dayjs from "dayjs";
 import Config from "../utils/config";
+import { store as notestore } from "./note-store";
 
 class ReminderStore extends BaseStore {
   reminders = [];
@@ -32,7 +33,10 @@ class ReminderStore extends BaseStore {
   refresh = (reset = true) => {
     const reminders = db.reminders.all;
     this.set((state) => (state.reminders = groupReminders(reminders)));
-    if (reset) resetReminders(reminders);
+    if (reset) {
+      resetReminders(reminders);
+      notestore.refresh();
+    }
   };
 
   delete = async (...ids) => {
