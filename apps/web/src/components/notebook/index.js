@@ -58,7 +58,7 @@ function Notebook(props) {
         ) : (
           <>
             {notebook?.topics && (
-              <Flex mb={1}>
+              <Flex mb={1} sx={{ gap: 1 }}>
                 {notebook?.topics.slice(0, 3).map((topic) => (
                   <IconTag
                     key={topic.id}
@@ -81,12 +81,7 @@ function Notebook(props) {
               {notebook.pinned && (
                 <Icon.PinFilled color="primary" size={13} sx={{ mr: 1 }} />
               )}
-              <Text variant="subBody" sx={{ color: "primary" }}>
-                Notebook
-              </Text>
-              <Text as="span" mx={1} sx={{ color: "inherit" }}>
-                •
-              </Text>
+
               {new Date(date).toLocaleDateString("en", {
                 dateStyle: "medium"
               })}

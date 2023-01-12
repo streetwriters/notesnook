@@ -48,12 +48,6 @@ function Topic({ item, index, onClick }) {
             alignItems: "center"
           }}
         >
-          <Text variant="subBody" sx={{ color: "primary" }}>
-            Topic
-          </Text>
-          <Text as="span" mx={1}>
-            •
-          </Text>
           <Text variant="subBody">
             {pluralize(totalNotes || 0, "note", "notes")}
           </Text>
