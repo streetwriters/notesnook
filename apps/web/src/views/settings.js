@@ -148,9 +148,13 @@ function Settings() {
   });
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
   const isSyncEnabled = useAppStore((store) => store.isSyncEnabled);
+  const isRealtimeSyncEnabled = useAppStore(
+    (store) => store.isRealtimeSyncEnabled
+  );
   const isAutoSyncEnabled = useAppStore((store) => store.isAutoSyncEnabled);
   const toggleAutoSync = useAppStore((store) => store.toggleAutoSync);
   const toggleSync = useAppStore((store) => store.toggleSync);
+  const toggleRealtimeSync = useAppStore((store) => store.toggleRealtimeSync);
   const setIsVaultCreated = useAppStore((store) => store.setIsVaultCreated);
   const refreshApp = useAppStore((store) => store.refresh);
   const refreshNotes = useNoteStore((store) => store.refresh);
@@ -425,6 +429,13 @@ function Settings() {
             />
             {groups.sync && (
               <>
+                <Toggle
+                  title="Disable realtime sync in editor"
+                  onTip="All changes in the editor will be synced & updated in realtime."
+                  offTip="You will have to manually open/close a note to see new changes."
+                  onToggled={toggleRealtimeSync}
+                  isToggled={!isRealtimeSyncEnabled}
+                />
                 <Toggle
                   title="Disable sync"
                   onTip="Changes on this device won't sync to your other devices."
