@@ -57,6 +57,7 @@ type ListContainerProps = {
   type: keyof typeof ListProfiles;
   items: Item[];
   groupType?: string;
+  compact?: boolean;
   context?: Context;
   refresh: () => void;
   header?: JSX.Element;
@@ -68,7 +69,8 @@ type ListContainerProps = {
 };
 
 function ListContainer(props: ListContainerProps) {
-  const { type, groupType, items, context, refresh, header, button } = props;
+  const { type, groupType, items, context, refresh, header, button, compact } =
+    props;
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
@@ -228,11 +230,11 @@ function ListContainer(props: ListContainerProps) {
                   default:
                     return (
                       <Component
-                        //@ts-ignore
                         item={item}
                         context={context}
                         index={index}
                         type={type}
+                        compact={compact}
                       />
                     );
                 }

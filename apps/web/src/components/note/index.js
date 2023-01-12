@@ -55,11 +55,12 @@ function Note(props) {
     context,
     date,
     reminder,
+    simplified,
+    compact
   } = props;
   const note = item;
 
   const isOpened = useStore((store) => store.selectedNote === note.id);
-  const isCompact = useStore((store) => store.viewMode === "compact");
   const attachments = useAttachmentStore((store) =>
     store.attachments.filter((a) => a.noteIds.includes(note.id))
   );
@@ -77,7 +78,8 @@ function Note(props) {
     <ListItem
       selectable
       isFocused={isOpened}
-      isCompact={isCompact}
+      isCompact={compact}
+      isSimple={simplified}
       item={note}
       title={note.title}
       body={note.headline}
@@ -147,7 +149,7 @@ function Note(props) {
             alignItems: "center"
           }}
         >
-          {isCompact ? (
+          {compact ? (
             <>
               {note.conflicted && (
                 <Icon.Alert size={15} color="error" sx={{ mr: 1 }} />
@@ -257,6 +259,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.locked === nextItem.locked &&
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
+    prevProps.compact === nextProps.compact &&
     prevProps.notebook?.dateEdited === nextProps.notebook?.dateEdited &&
     prevProps.reminder?.dateModified === nextProps.reminder?.dateModified &&
     JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags) &&

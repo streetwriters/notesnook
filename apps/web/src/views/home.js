@@ -28,6 +28,7 @@ import useNavigate from "../hooks/use-navigate";
 function Home() {
   useStore((store) => store.nonce);
   const notes = useStore((store) => store.notes);
+  const isCompact = useStore((store) => store.viewMode === "compact");
   const refresh = useStore((store) => store.refresh);
   const clearContext = useStore((store) => store.clearContext);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,6 +62,7 @@ function Home() {
     <ListContainer
       type="home"
       groupType="home"
+      compact={isCompact}
       refresh={refresh}
       isLoading={isLoading}
       items={notes}

@@ -30,6 +30,7 @@ function Notes() {
   const context = useNotesStore((store) => store.context);
   const refreshContext = useNotesStore((store) => store.refreshContext);
   const type = context?.type === "favorite" ? "favorites" : "notes";
+  const isCompact = useNotesStore((store) => store.viewMode === "compact");
 
   useEffect(() => {
     if (context?.type === "color" && context?.notes?.length <= 0) {
@@ -43,6 +44,7 @@ function Notes() {
       type="notes"
       groupType={type}
       refresh={refreshContext}
+      compact={isCompact}
       context={{ ...context, notes: undefined }}
       items={groupArray(context.notes, db.settings.getGroupOptions(type))}
       placeholder={

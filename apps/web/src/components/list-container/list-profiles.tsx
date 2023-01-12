@@ -53,14 +53,16 @@ type ItemWrapperProps<TItem = Item> = {
   item: TItem;
   type: keyof typeof ListProfiles;
   context?: Context;
+  compact?: boolean;
 };
 
 type ItemWrapper<TItem = Item> = (
   props: ItemWrapperProps<TItem>
 ) => JSX.Element;
 
-const NotesProfile: ItemWrapper = ({ index, item, type, context }) => (
+const NotesProfile: ItemWrapper = ({ index, item, type, context, compact }) => (
   <Note
+    compact={compact}
     index={index}
     pinnable={!context}
     item={item}
@@ -93,8 +95,8 @@ const TopicsProfile: ItemWrapper = ({ index, item }) => (
   />
 );
 
-const RemindersProfile: ItemWrapper<ReminderType> = ({ index, item }) => (
-  <Reminder item={item} index={index} />
+const RemindersProfile: ItemWrapper = ({ index, item }) => (
+  <Reminder item={item as ReminderType} index={index} />
 );
 
 const TrashProfile: ItemWrapper = ({ index, item, type }) => (
