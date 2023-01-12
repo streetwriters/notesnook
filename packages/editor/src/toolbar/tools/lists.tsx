@@ -97,7 +97,7 @@ function _ListTool<TListStyleTypes extends string>(
                   if (type === "bulletList") chain = chain.toggleBulletList();
                   else chain = chain.toggleOrderedList();
                 }
-
+                setIsOpen(false);
                 return chain
                   .updateAttributes(type, { listType: item.type })
                   .run();
