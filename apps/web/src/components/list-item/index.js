@@ -61,7 +61,8 @@ function ListItem(props) {
     },
     isFocused,
     isCompact,
-    isDisabled
+    isDisabled,
+    isSimple
   } = props;
 
   const listItemRef = useRef();
@@ -153,16 +154,14 @@ function ListItem(props) {
       }}
       data-test-id={`list-item`}
     >
-      {!isCompact && props.header}
-
       <Text
         data-test-id={`title`}
-        variant={"subtitle"}
+        variant={isSimple ? "body" : "subtitle"}
         sx={{
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
-          fontWeight: isCompact ? "body" : "bold",
+          fontWeight: isCompact || isSimple ? "body" : "bold",
           color: text,
           display: "block"
         }}
@@ -170,7 +169,9 @@ function ListItem(props) {
         {props.title}
       </Text>
 
-      {!isCompact && props.body && (
+      {!isCompact && props.header}
+
+      {!isSimple && !isCompact && props.body && (
         <Text
           as="p"
           variant="body"

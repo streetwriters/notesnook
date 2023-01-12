@@ -28,8 +28,6 @@ import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { store as noteStore } from "../../stores/note-store";
 import { AnimatedFlex } from "../animated";
 import Toggle from "./toggle";
-import { navigate } from "../../navigation";
-import IconTag from "../icon-tag";
 import ScrollContainer from "../scroll-container";
 import { formatDate } from "@notesnook/core/utils/date";
 import Vault from "../../common/vault";
@@ -37,6 +35,9 @@ import TimeAgo from "../time-ago";
 import Attachment from "../attachment";
 import { formatBytes } from "../../utils/filename";
 import { getTotalSize } from "../../common/attachments";
+import Notebook from "../notebook";
+import { getTotalNotes } from "../../common";
+import Reminder from "../reminder";
 
 const tools = [
   { key: "pin", property: "pinned", icon: Icon.Pin, label: "Pin" },
@@ -87,6 +88,10 @@ function Properties(props) {
   );
   const { id: sessionId, color, notebooks, sessionType, dateCreated } = session;
   const isPreviewMode = sessionType === "preview";
+  const reminders = db.relations.from(
+    { id: session.id, type: "note" },
+    "reminder"
+  );
 
   const changeState = useCallback(
     function changeState(prop) {
@@ -242,68 +247,33 @@ function Properties(props) {
             )}
           </Card>
           {notebooks?.length > 0 && (
-            <Card title="Referenced In">
+            <Card title="Notebooks">
               {notebooks.map((ref) => {
-                const notebook = db.notebooks.notebook(ref.id);
+                const notebook = db.notebooks.notebook(ref.id)?._notebook;
                 if (!notebook) return null;
-                const topics = ref.topics.reduce((topics, topicId) => {
-                  const topic = notebook.topics.topic(topicId);
-                  if (!!topic && !!topic._topic) topics.push(topic._topic);
-                  return topics;
-                }, []);
 
                 return (
-                  <Flex
-                    key={notebook.id}
-                    py={1}
-                    px={2}
-                    sx={{
-                      borderBottom: "1px solid var(--border)",
-                      ":last-of-type": { borderBottom: "none" },
-                      cursor: "pointer",
-                      ":hover": {
-                        bg: "hover"
-                      },
-                      flexDirection: "column"
-                    }}
-                    onClick={() => {
-                      navigate(`/notebooks/${notebook.data.id}`);
-                    }}
-                  >
-                    <Text
-                      variant="body"
-                      sx={{ alignItems: "center", display: "flex" }}
-                    >
-                      <Icon.Notebook size={13} sx={{ flexShrink: 0, mr: 1 }} />
-                      {notebook.title}
-                    </Text>
-
-                    <Flex
-                      sx={{
-                        flexWrap: "wrap"
-                      }}
-                      mt={1}
-                    >
-                      {topics.map((topic) => (
-                        <IconTag
-                          title={topic.title}
-                          text={topic.title}
-                          key={topic.id}
-                          icon={Icon.Topic}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(
-                              `/notebooks/${notebook.data.id}/${topic.id}`
-                            );
-                          }}
-                        />
-                      ))}
-                    </Flex>
-                  </Flex>
+                  <Notebook
+                    key={ref.id}
+                    item={notebook}
+                    date={notebook.dateCreated}
+                    totalNotes={getTotalNotes(notebook)}
+                    simplified
+                  />
                 );
               })}
             </Card>
           )}
+          {reminders?.length > 0 && (
+            <Card title="Reminders">
+              {reminders.map((reminder) => {
+                return (
+                  <Reminder key={reminder.id} item={reminder} simplified />
+                );
+              })}
+            </Card>
+          )}
+
           {attachments?.length > 0 && (
             <Card
               title="Attachments"
@@ -325,7 +295,7 @@ function Properties(props) {
             title="Previous Sessions"
             subtitle={"Your session history is local only."}
           >
-            {versionHistory.map((session, index) => {
+            {versionHistory.map((session) => {
               const fromDate = formatDate(session.dateCreated, {
                 dateStyle: "short"
               });

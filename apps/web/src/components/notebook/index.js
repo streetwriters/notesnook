@@ -32,7 +32,7 @@ import { Multiselect } from "../../common/multi-select";
 import { pluralize } from "../../utils/string";
 
 function Notebook(props) {
-  const { item, index, totalNotes, date } = props;
+  const { item, index, totalNotes, date, simplified } = props;
   const notebook = item;
   const isCompact = useStore((store) => store.viewMode === "compact");
 
@@ -40,6 +40,7 @@ function Notebook(props) {
     <ListItem
       selectable
       isCompact={isCompact}
+      isSimple={simplified}
       item={notebook}
       onClick={() => {
         navigate(`/notebooks/${notebook.id}`);
