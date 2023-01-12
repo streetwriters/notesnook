@@ -17,13 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Dimensions } from "react-native";
+import { Dimensions,PlatformOSType } from "react-native";
 import Config from "react-native-config";
 import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
 import { ACCENT } from "../utils/color-scheme";
 import { initialWindowMetrics } from "react-native-safe-area-context";
 import { Reminder } from "../services/notifications";
+import { Sound } from "react-native-notification-sounds";
 
 export type Settings = {
   showToolbarOnTop?: boolean;
@@ -70,7 +71,8 @@ export type Settings = {
   defaultSnoozeTime?: string;
   reminderNotificationMode: Reminder["priority"];
   corsProxy: string;
-  disableRealtimeSync?:boolean
+  disableRealtimeSync?: boolean;
+  notificationSound?: Sound & { platform: PlatformOSType };
 };
 
 type DimensionsType = {
@@ -146,7 +148,8 @@ export const useSettingStore = create<SettingStore>((set) => ({
     reminderNotifications: true,
     defaultSnoozeTime: "5",
     corsProxy: "https://cors.notesnook.com",
-    reminderNotificationMode: "urgent"
+    reminderNotificationMode: "urgent",
+    notificationSound: undefined
   },
   sheetKeyboardHandler: true,
   fullscreen: false,

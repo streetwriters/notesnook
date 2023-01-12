@@ -68,6 +68,9 @@ import { useDragState } from "./editor/state";
 import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import notifee from "@notifee/react-native";
+
+type User = any;
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -876,6 +879,30 @@ export const settingsGroups: SettingSection[] = [
               placeholder: "Set snooze time in minutes",
               onSubmitEditing: () => {
                 Notifications.setupReminders();
+              }
+            }
+          },
+          {
+            id: "reminder-sound",
+            type: "screen",
+            name: "Change notification sound",
+            description:
+              "Set the notification sound for reminder notifications",
+            component: "sound-picker",
+            icon: "bell-ring",
+            hidden: () => Platform.OS === "android"
+          },
+          {
+            id: "reminder-sound",
+            name: "Change notification sound",
+            description:
+              "Set the notification sound for reminder notifications",
+            icon: "bell-ring",
+            hidden: () => Platform.OS === "ios",
+            modifer: async () => {
+              const id = await Notifications.getChannelId("urgent");
+              if (id) {
+                await notifee.openNotificationSettings(id);
               }
             }
           }

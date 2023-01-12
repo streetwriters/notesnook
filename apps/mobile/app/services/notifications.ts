@@ -280,8 +280,9 @@ async function scheduleNotification(
       )
         continue;
       const iosProperties: { [name: string]: any } = {};
+      const notificationSound = SettingsService.get().notificationSound;
       if (priority === "urgent") {
-        iosProperties["sound"] = "default";
+        iosProperties["sound"] = notificationSound?.url || "default";
       }
 
       const reminderTime = SettingsService.get().defaultSnoozeTime;
@@ -301,7 +302,6 @@ async function scheduleNotification(
           }
         });
       }
-      console.log(trigger);
       await notifee.createTriggerNotification(
         {
           id: trigger.id,
@@ -321,6 +321,7 @@ async function scheduleNotification(
               mainComponent: "notesnook"
             },
             actions: androidActions,
+            sound: notificationSound?.url,
             style: !description
               ? undefined
               : {
@@ -330,6 +331,7 @@ async function scheduleNotification(
           },
           ios: {
             interruptionLevel: "active",
+            criticalVolume: 1.0,
             critical:
               reminder.priority === "silent" || reminder.priority === "urgent"
                 ? false
@@ -363,6 +365,7 @@ function loadNote(id: string, jump: boolean) {
 }
 
 async function getChannelId(id: "silent" | "vibrate" | "urgent" | "default") {
+  const notificationSound = SettingsService.get().notificationSound;
   switch (id) {
     case "default":
       return await notifee.createChannel({
@@ -378,15 +381,18 @@ async function getChannelId(id: "silent" | "vibrate" | "urgent" | "default") {
     case "vibrate":
       return await notifee.createChannel({
         id: "com.streetwriters.notesnook.silent",
-        name: "Silent",
+        name: "Vibrate",
         vibration: true
       });
     case "urgent":
       return await notifee.createChannel({
         id: "com.streetwriters.notesnook.urgent",
         name: "Urgent",
+        description:
+          "This channel is used to show notifications with sound & vibration.",
         vibration: true,
-        sound: "default"
+        sound: notificationSound?.url || "default",
+        bypassDnd: true
       });
   }
 }
@@ -775,7 +781,8 @@ const Notifications = {
   getScheduledNotificationIds,
   checkAndRequestPermissions,
   clearAllTriggers,
-  setupReminders
+  setupReminders,
+  getChannelId
 };
 
 export default Notifications;

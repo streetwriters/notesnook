@@ -17,19 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
+import { NotesScreenParams } from "../../stores/use-navigation-store";
 import { useTagStore } from "../../stores/use-tag-store";
-import { db } from "../../common/database";
 import { eOnLoadNote } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
 import { tabBarRef } from "../../utils/global-refs";
-import { editorController, editorState } from "../editor/tiptap/utils";
-import { NotesScreenParams } from "../../stores/use-navigation-store";
 import { TopicType } from "../../utils/types";
-import { ChangeEmail } from "../../components/sheets/change-email";
+import { editorController, editorState } from "../editor/tiptap/utils";
 
 export function toCamelCase(title: string) {
   return title.slice(0, 1).toUpperCase() + title.slice(1);
