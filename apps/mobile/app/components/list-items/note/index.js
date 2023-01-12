@@ -17,13 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  formatReminderTime,
-  getUpcomingReminder
-} from "@notesnook/core/collections/reminders";
+import { getUpcomingReminder } from "@notesnook/core/collections/reminders";
 import { decode, EntityLevel } from "entities";
 import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { db } from "../../../common/database";

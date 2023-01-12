@@ -123,6 +123,22 @@ export const MenuItem = React.memo(
           ) : (
             <Paragraph size={SIZE.md}>{item.name}</Paragraph>
           )}
+          {item.isBeta ? (
+            <View
+              style={{
+                backgroundColor: colors.accent,
+                borderRadius: 100,
+                paddingHorizontal: 4,
+                paddingVertical: 2,
+                marginLeft: 2,
+                marginTop: -10
+              }}
+            >
+              <Paragraph color={colors.light} size={SIZE.xxs}>
+                BETA
+              </Paragraph>
+            </View>
+          ) : null}
         </View>
 
         {item.switch ? (

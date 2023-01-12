@@ -55,8 +55,8 @@ export interface TabsRef {
   goToIndex: (index: number, animated?: boolean) => 0 | undefined;
   unlock: () => boolean;
   lock: () => boolean;
-  openDrawer: (animated: boolean) => void;
-  closeDrawer: (animated: boolean) => void;
+  openDrawer: (animated?: boolean) => void;
+  closeDrawer: (animated?: boolean) => void;
   page: number;
   setScrollEnabled: () => true;
   isDrawerOpen: () => boolean;

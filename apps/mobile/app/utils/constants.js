@@ -131,7 +131,8 @@ export const MenuItemsList = [
   {
     name: "Reminders",
     icon: "bell",
-    close: true
+    close: true,
+    isBeta:true
   },
   {
     name: "Monographs",
