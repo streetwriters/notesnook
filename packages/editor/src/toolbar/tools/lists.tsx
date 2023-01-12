@@ -59,9 +59,7 @@ function _ListTool<TListStyleTypes extends string>(
       onClick={onClick}
       toggled={isOpen}
       sx={{ mr: 0 }}
-      onOpen={() => {
-        setIsOpen((s) => !s);
-      }}
+      onOpen={() => setIsOpen((s) => !s)}
     >
       <PopupWrapper
         isOpen={isOpen}
