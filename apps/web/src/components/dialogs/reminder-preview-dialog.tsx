@@ -19,27 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Perform } from "../../common/dialog-controller";
 import Dialog from "./dialog";
-import Field from "../field";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Flex,
-  Label,
-  Radio,
-  Text
-} from "@theme-ui/components";
-import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { Button, Flex, Text } from "@theme-ui/components";
 import { db } from "../../common/db";
-import { useStore } from "../../stores/reminder-store";
-import { showToast } from "../../utils/toast";
 import {
   formatReminderTime,
   Reminder
 } from "@notesnook/core/collections/reminders";
 import IconTag from "../icon-tag";
 import { Clock, Refresh } from "../icons";
+import Note from "../note";
 
 export type ReminderPreviewDialogProps = {
   onClose: Perform;
@@ -71,49 +59,10 @@ export default function ReminderPreviewDialog(
   props: ReminderPreviewDialogProps
 ) {
   const { reminder } = props;
-
-  //   const [selectedDays, setSelectedDays] = useState<number[]>([]);
-  //   const [recurringMode, setRecurringMode] = useState<
-  //     ValueOf<typeof RecurringModes>
-  //   >(RecurringModes.DAY);
-  //   const [mode, setMode] = useState<ValueOf<typeof Modes>>(Modes.ONCE);
-  //   const [priority, setPriority] = useState<ValueOf<typeof Priorities>>(
-  //     Priorities.VIBRATE
-  //   );
-  //   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
-  //   const [time, setTime] = useState(dayjs().format("HH:mm"));
-  //   const [title, setTitle] = useState<string>();
-  //   const [description, setDescription] = useState<string>();
-  //   const refresh = useStore((state) => state.refresh);
-  //
-  //   useEffect(() => {
-  //     setSelectedDays([]);
-  //   }, [recurringMode, mode]);
-  //
-  //   useEffect(() => {
-  //     setRecurringMode(RecurringModes.DAY);
-  //   }, [mode]);
-  //
-  //   useEffect(() => {
-  //     if (!reminderId) return;
-  //     const reminder = db.reminders?.reminder(reminderId);
-  //     if (!reminder) return;
-  //
-  //     setSelectedDays(reminder.selectedDays || []);
-  //     setRecurringMode(reminder.recurringMode || RecurringModes.DAY);
-  //     setMode(reminder.mode || Modes.ONCE);
-  //     setPriority(reminder.priority || Priorities.VIBRATE);
-  //     setDate(dayjs(reminder.date).format("YYYY-MM-DD"));
-  //     setTime(dayjs(reminder.date).format("HH:mm"));
-  //     setTitle(reminder.title);
-  //     setDescription(reminder.description);
-  //     console.log(reminder);
-  //   }, [reminderId]);
-  //
-  //   const repeatsDaily =
-  //     (selectedDays.length === 7 && recurringMode === RecurringModes.WEEK) ||
-  //     (selectedDays.length === 31 && recurringMode === RecurringModes.MONTH) ||
-  //     recurringMode === RecurringModes.DAY;
+  const referencedNotes = db.relations?.to(
+    { id: reminder.id, type: "reminder" },
+    "note"
+  );
 
   return (
     <Dialog
@@ -170,6 +119,20 @@ export default function ReminderPreviewDialog(
           </Button>
         ))}
       </Flex>
+      {referencedNotes && referencedNotes.length > 0 && (
+        <>
+          <Text variant="body">References:</Text>
+          {referencedNotes.map((item, index) => (
+            <Note
+              key={item.id}
+              index={index}
+              item={item}
+              date={item.dateCreated}
+              compact
+            />
+          ))}
+        </>
+      )}
     </Dialog>
   );
 }
