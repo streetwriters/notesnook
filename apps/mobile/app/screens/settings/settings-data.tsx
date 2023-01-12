@@ -890,7 +890,7 @@ export const settingsGroups: SettingSection[] = [
               "Set the notification sound for reminder notifications",
             component: "sound-picker",
             icon: "bell-ring",
-            hidden: () => Platform.OS === "android"
+            hidden: () => Platform.OS === "android" && Platform.Version > 25
           },
           {
             id: "reminder-sound",
@@ -898,7 +898,9 @@ export const settingsGroups: SettingSection[] = [
             description:
               "Set the notification sound for reminder notifications",
             icon: "bell-ring",
-            hidden: () => Platform.OS === "ios",
+            hidden: () =>
+              Platform.OS === "ios" ||
+              (Platform.OS === "android" && Platform.Version < 26),
             modifer: async () => {
               const id = await Notifications.getChannelId("urgent");
               if (id) {
