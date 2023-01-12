@@ -28,6 +28,7 @@ import { useStore } from "../../stores/reminder-store";
 import { showToast } from "../../utils/toast";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { Pro } from "../icons";
+import { usePersistentState } from "../../hooks/use-persistent-state";
 
 export type AddReminderDialogProps = {
   onClose: Perform;
@@ -115,9 +116,9 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
     ValueOf<typeof RecurringModes>
   >(RecurringModes.DAY);
   const [mode, setMode] = useState<ValueOf<typeof Modes>>(Modes.ONCE);
-  const [priority, setPriority] = useState<ValueOf<typeof Priorities>>(
-    Priorities.VIBRATE
-  );
+  const [priority, setPriority] = usePersistentState<
+    ValueOf<typeof Priorities>
+  >("reminders:default_priority", Priorities.VIBRATE);
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [time, setTime] = useState(dayjs().format("HH:mm"));
   const [title, setTitle] = useState<string>();
