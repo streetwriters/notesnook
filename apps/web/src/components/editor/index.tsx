@@ -27,7 +27,10 @@ import {
 import { Box, Button, Flex, Text } from "@theme-ui/components";
 import Properties from "../properties";
 import { useStore, store as editorstore } from "../../stores/editor-store";
-import { useStore as useAppStore } from "../../stores/app-store";
+import {
+  useStore as useAppStore,
+  store as appstore
+} from "../../stores/app-store";
 import Toolbar from "./toolbar";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
@@ -96,7 +99,8 @@ export default function EditorManager({
         if (
           !item ||
           lastSavedTime.current >= item.dateEdited ||
-          isPreviewSession
+          isPreviewSession ||
+          !appstore.get().isRealtimeSyncEnabled
         )
           return;
 

@@ -44,6 +44,7 @@ class AppStore extends BaseStore {
   isVaultCreated = false;
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);
+  isRealtimeSyncEnabled = Config.get("isRealtimeSyncEnabled", true);
   syncStatus = {
     key: "synced",
     progress: null,
@@ -152,6 +153,14 @@ class AppStore extends BaseStore {
     if (isSyncEnabled) {
       db.syncer.stop();
     }
+  };
+
+  toggleRealtimeSync = () => {
+    const { isRealtimeSyncEnabled } = this.get();
+    Config.set("realtimeSyncEnabled", !isRealtimeSyncEnabled);
+    this.set(
+      (state) => (state.isRealtimeSyncEnabled = !state.isRealtimeSyncEnabled)
+    );
   };
 
   toggleSideMenu = (toggleState) => {
