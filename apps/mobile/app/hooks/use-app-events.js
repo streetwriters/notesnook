@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import NetInfo from "@react-native-community/netinfo";
-import { EV, EVENTS } from "@notesnook/core/common";
+import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/common";
 import { useEffect, useRef } from "react";
 import {
   Appearance,
@@ -130,6 +130,18 @@ export const useAppEvents = () => {
     };
   }, [loading, onSyncComplete]);
 
+  const onSyncStatusCheck = useCallback(async (type) => {
+    const { disableSync, disableAutoSync } = SettingsService.get();
+    switch (type) {
+      case SYNC_CHECK_IDS.sync:
+        return { type, result: !disableSync };
+      case SYNC_CHECK_IDS.autoSync:
+        return { type, result: !disableAutoSync };
+      default:
+        return { type, result: true };
+    }
+  }, []);
+
   useEffect(() => {
     let subs = [
       Appearance.addChangeListener(SettingsService.setTheme),
@@ -139,6 +151,8 @@ export const useAppEvents = () => {
         onFileEncryptionProgress
       )
     ];
+
+    EV.subscribe(EVENTS.syncCheckStatus, onSyncStatusCheck);
 
     EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete);
     EV.subscribe(EVENTS.userLoggedOut, onLogout);
@@ -152,6 +166,8 @@ export const useAppEvents = () => {
     return () => {
       eUnSubscribeEvent("userLoggedIn", onUserUpdated);
 
+      EV.unsubscribe(EVENTS.syncCheckStatus, onSyncStatusCheck);
+
       EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
       EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
       EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
@@ -163,7 +179,13 @@ export const useAppEvents = () => {
 
       subs.forEach((sub) => sub?.remove());
     };
-  }, [onEmailVerified, onSyncComplete, onUrlRecieved, onUserUpdated]);
+  }, [
+    onEmailVerified,
+    onSyncComplete,
+    onSyncStatusCheck,
+    onUrlRecieved,
+    onUserUpdated
+  ]);
 
   const onSessionExpired = async () => {
     SettingsService.set({
