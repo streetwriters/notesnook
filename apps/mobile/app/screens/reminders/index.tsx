@@ -61,7 +61,8 @@ export const Reminders = ({
         Navigation.routeUpdateFunctions[route.name]
       );
       useNavigationStore.getState().update({
-        name: route.name
+        name: route.name,
+        beta:true
       });
 
       SearchService.prepareSearch = prepareSearch;

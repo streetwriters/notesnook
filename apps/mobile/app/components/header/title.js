@@ -32,6 +32,7 @@ import { SIZE } from "../../utils/size";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { useCallback } from "react";
+import Tag from "../ui/tag";
 
 const titleState = {};
 
@@ -99,12 +100,14 @@ export const Title = () => {
     if (!isTopic) return;
     Notebook.navigate(notebook, true);
   }
+  console.log(currentScreen);
   return (
     <View
       style={{
         opacity: 1,
         flexShrink: 1,
-        flexDirection: "row"
+        flexDirection: "row",
+        alignItems: "center"
       }}
     >
       {!hide && !isHidden ? (
@@ -135,6 +138,7 @@ export const Title = () => {
           {title}
         </Heading>
       ) : null}
+      <Tag visible={currentScreen.beta} text="BETA" />
     </View>
   );
 };
