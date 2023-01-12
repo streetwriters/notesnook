@@ -431,15 +431,15 @@ function Settings() {
               <>
                 <Toggle
                   title="Disable realtime sync in editor"
-                  onTip="All changes in the editor will be synced & updated in realtime."
-                  offTip="You will have to manually open/close a note to see new changes."
+                  onTip="You will have to manually open/close a note to see new changes."
+                  offTip="All changes in the editor will be synced & updated in realtime."
                   onToggled={toggleRealtimeSync}
                   isToggled={!isRealtimeSyncEnabled}
                 />
                 <Toggle
                   title="Disable sync"
-                  onTip="Changes on this device won't sync to your other devices."
-                  offTip="Your changes will be synced to other devices."
+                  onTip="All changes to or from this device won't be synced."
+                  offTip="All changes to or from this device will be synced."
                   onToggled={toggleSync}
                   isToggled={!isSyncEnabled}
                 />
