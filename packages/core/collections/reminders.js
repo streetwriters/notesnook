@@ -163,6 +163,22 @@ export function formatReminderTime(reminder, short = false) {
 /**
  * @param {Reminder} reminder
  */
+export function isReminderToday(reminder) {
+  const { date } = reminder;
+  let time = date;
+
+  if (reminder.mode === "permanent") return true;
+
+  if (reminder.mode === "repeat") {
+    time = getUpcomingReminderTime(reminder);
+  }
+
+  return dayjs(time).isToday();
+}
+
+/**
+ * @param {Reminder} reminder
+ */
 function getUpcomingReminderTime(reminder) {
   if (reminder.mode === "once") return reminder.date;
   // this is only the time (hour & minutes); date is not included
