@@ -23,6 +23,7 @@ import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
 import { ACCENT } from "../utils/color-scheme";
 import { initialWindowMetrics } from "react-native-safe-area-context";
+import { Reminder } from "../services/notifications";
 
 export type Settings = {
   showToolbarOnTop?: boolean;
@@ -67,6 +68,7 @@ export type Settings = {
   disableSync?: boolean;
   reminderNotifications?: boolean;
   defaultSnoozeTime?: string;
+  reminderNotificationMode: Reminder["priority"];
   corsProxy: string;
   disableRealtimeSync?:boolean
 };
@@ -143,7 +145,8 @@ export const useSettingStore = create<SettingStore>((set) => ({
     doubleSpacedLines: true,
     reminderNotifications: true,
     defaultSnoozeTime: "5",
-    corsProxy: "https://cors.notesnook.com"
+    corsProxy: "https://cors.notesnook.com",
+    reminderNotificationMode: "urgent"
   },
   sheetKeyboardHandler: true,
   fullscreen: false,

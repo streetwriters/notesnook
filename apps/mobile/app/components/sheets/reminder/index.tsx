@@ -20,9 +20,9 @@ import React, { RefObject, useRef, useState } from "react";
 import {
   Platform,
   ScrollView,
-  View,
   TextInput,
-  useWindowDimensions
+  useWindowDimensions,
+  View
 } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -36,17 +36,16 @@ import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 
-import { formatReminderTime } from "@notesnook/core/collections/reminders";
 import dayjs from "dayjs";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import DatePicker from "react-native-date-picker";
 import { db } from "../../../common/database";
 import Navigation from "../../../services/navigation";
 import Notifications, { Reminder } from "../../../services/notifications";
-import { useRelationStore } from "../../../stores/use-relation-store";
-import Paragraph from "../../ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
-import DatePicker from "react-native-date-picker";
+import SettingsService from "../../../services/settings";
+import { useRelationStore } from "../../../stores/use-relation-store";
 import { ReminderTime } from "../../ui/reminder-time";
+import Paragraph from "../../ui/typography/paragraph";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheet>;
@@ -113,7 +112,7 @@ export default function ReminderSheet({
   );
   const [reminderNotificationMode, setReminderNotificatioMode] = useState<
     Reminder["priority"]
-  >(reminder?.priority || "silent");
+  >(reminder?.priority || SettingsService.get().reminderNotificationMode);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [repeatFrequency, setRepeatFrequency] = useState(1);
   const title = useRef<string | undefined>(reminder?.title);
@@ -480,11 +479,13 @@ export default function ReminderSheet({
                     : "gray"
                 }
                 onPress={() => {
-                  setReminderNotificatioMode(
-                    ReminderNotificationModes[
-                      mode as keyof typeof ReminderNotificationModes
-                    ] as Reminder["priority"]
-                  );
+                  const _mode = ReminderNotificationModes[
+                    mode as keyof typeof ReminderNotificationModes
+                  ] as Reminder["priority"];
+                  SettingsService.set({
+                    reminderNotificationMode: _mode
+                  });
+                  setReminderNotificatioMode(_mode);
                 }}
               />
             ))}
@@ -539,7 +540,6 @@ export default function ReminderSheet({
             alignSelf: "flex-start"
           }}
         />
-        
       </ScrollView>
       <Button
         style={{
