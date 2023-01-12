@@ -23,7 +23,7 @@ import { ContextMenuModel } from "./context-menu.model";
 import { ToggleModel } from "./toggle.model";
 import { ItemsViewModel } from "./items-view.model";
 import { Notebook } from "./types";
-import { fillNotebookDialog } from "./utils";
+import { confirmDialog, denyDialog, fillNotebookDialog } from "./utils";
 
 export class NotebookItemModel extends BaseItemModel {
   private readonly contextMenu: ContextMenuModel;
@@ -44,12 +44,14 @@ export class NotebookItemModel extends BaseItemModel {
     await fillNotebookDialog(this.page, notebook, true);
   }
 
-  async moveToTrash() {
+  async moveToTrash(deleteContainedNotes = false) {
     await this.contextMenu.open(this.locator);
-    await Promise.all([
-      this.contextMenu.clickOnItem("movetotrash"),
-      this.waitFor("detached")
-    ]);
+    await this.contextMenu.clickOnItem("movetotrash");
+
+    if (deleteContainedNotes) await confirmDialog(this.page);
+    else await denyDialog(this.page);
+
+    await this.waitFor("detached");
   }
 
   async pin() {

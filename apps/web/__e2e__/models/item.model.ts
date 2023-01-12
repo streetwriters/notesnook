@@ -22,7 +22,7 @@ import { BaseItemModel } from "./base-item.model";
 import { ContextMenuModel } from "./context-menu.model";
 import { NotesViewModel } from "./notes-view.model";
 import { Item } from "./types";
-import { fillItemDialog } from "./utils";
+import { confirmDialog, denyDialog, fillItemDialog } from "./utils";
 
 export class ItemModel extends BaseItemModel {
   private readonly contextMenu: ContextMenuModel;
@@ -36,12 +36,14 @@ export class ItemModel extends BaseItemModel {
     return new NotesViewModel(this.page, "notes");
   }
 
-  async delete() {
+  async delete(deleteContainedNotes = false) {
     await this.contextMenu.open(this.locator);
-    await Promise.all([
-      this.contextMenu.clickOnItem("delete"),
-      this.waitFor("detached")
-    ]);
+    await this.contextMenu.clickOnItem("delete");
+
+    if (deleteContainedNotes) await confirmDialog(this.page);
+    else await denyDialog(this.page);
+
+    await this.waitFor("detached");
   }
 
   async editItem(item: Item) {

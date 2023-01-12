@@ -89,21 +89,20 @@ const menuItems = [
     color: "error",
     iconColor: "error",
     onClick: async ({ items, notebookId }) => {
-      let showDeleteNotesDialog = confirm({
-        title: `Delete Contained Notes?`,
-        message: `Do you also want to delete notes within ${items.length > 1 ? "this topic" : "these topics"}?`,
+      const shouldDeleteNotes = confirm({
+        title: `Delete contained notes?`,
+        message: `Do you also want to delete notes within ${
+          items.length > 1 ? "this topic" : "these topics"
+        }?`,
         yesText: `Yes`,
         noText: "No"
       });
 
-      let notes = [];
-      if (await showDeleteNotesDialog) {
+      if (shouldDeleteNotes) {
+        const notes = [];
         for (const item of items) {
-          for (const note of db.notebooks
-            .notebook(notebookId)
-            .topics.topic(item.id).all) {
-            notes.push(note);
-          }
+          const topic = db.notebooks.notebook(notebookId).topics.topic(item.id);
+          notes.push(...topic.all);
         }
         await Multiselect.moveNotesToTrash(notes, false);
       }

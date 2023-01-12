@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Page, Locator } from "@playwright/test";
+import { Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { AuthModel } from "./auth.model";
 import { CheckoutModel } from "./checkout.model";
@@ -48,6 +48,11 @@ export class AppModel {
   async goto() {
     await this.page.goto("/");
     await this.getRouteHeader();
+  }
+
+  goBack() {
+    const goBackButton = this.page.locator(getTestId("go-back"));
+    return goBackButton.click();
   }
 
   async goToNotes() {
@@ -92,8 +97,11 @@ export class AppModel {
     await this.page.waitForTimeout(1000);
   }
 
-  getRouteHeader() {
-    return this.page.locator(getTestId("routeHeader")).inputValue();
+  async getRouteHeader() {
+    const routeHeader = this.page.locator(getTestId("routeHeader"));
+    if (!(await routeHeader.isVisible())) return;
+
+    return await routeHeader.inputValue();
   }
 
   async isSynced() {
