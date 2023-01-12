@@ -68,6 +68,7 @@ export type Settings = {
   reminderNotifications?: boolean;
   defaultSnoozeTime?: string;
   corsProxy: string;
+  disableRealtimeSync?:boolean
 };
 
 type DimensionsType = {

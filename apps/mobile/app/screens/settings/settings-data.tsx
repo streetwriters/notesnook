@@ -405,6 +405,13 @@ export const settingsGroups: SettingSection[] = [
             property: "disableAutoSync"
           },
           {
+            id: "disable-realtime-sync",
+            name: "Disable realtime sync",
+            description: "Turn off realtime sync in the editor.",
+            type: "switch",
+            property: "disableRealtimeSync"
+          },
+          {
             id: "disable-sync",
             name: "Disable syncing",
             description:
