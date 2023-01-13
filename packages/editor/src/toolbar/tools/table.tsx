@@ -190,7 +190,7 @@ export function TableProperties(props: ToolProps) {
           target: buttonRef.current,
           isTargetAbsolute: true,
           location: "below",
-          yOffset: 5
+          yOffset: -25
         }}
         items={items}
       />
