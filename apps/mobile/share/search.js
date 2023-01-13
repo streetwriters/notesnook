@@ -160,6 +160,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote }) => {
           height: 50
         }}
       >
+        <Icon name="arrow-left" color={colors.pri} size={25} onPress={close} />
         <TextInput
           ref={inputRef}
           placeholder="Search for a note"
@@ -196,6 +197,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote }) => {
         keyboardDismissMode="none"
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
+        ListFooterComponent={<View style={{ height: 200 }} />}
         ListEmptyComponent={
           <View
             style={{

@@ -1,3 +1,21 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 import React, {
   useRef,
   useState,
@@ -8,7 +26,7 @@ import React, {
 } from "react";
 import { WebView } from "react-native-webview";
 import { EDITOR_URI } from "../app/screens/editor/source";
-import { Linking } from "react-native";
+import { Linking, Platform, View } from "react-native";
 import { EditorEvents, post } from "../app/screens/editor/tiptap/utils";
 import Commands from "../app/screens/editor/tiptap/commands";
 import { useShareStore } from "./store";
@@ -23,21 +41,26 @@ import { EventTypes } from "../app/screens/editor/tiptap/editor-events";
 
 const useEditor = () => {
   const ref = useRef();
-  const [sessionId, setSessionId] = useState("share-editor-session");
+  const [sessionId] = useState("share-editor-session");
   const colors = useShareStore((state) => state.colors);
   const accent = useShareStore((state) => state.accent);
   const commands = useMemo(() => new Commands(ref), [ref]);
   const currentNote = useRef();
-
+  const doubleSpacedLines = useSettingStore(
+    (state) => state.settings?.doubleSpacedLines
+  );
   const postMessage = useCallback(
     async (type, data) => post(ref, sessionId, type, data),
-    []
+    [sessionId]
   );
 
-  const loadNote = (note) => {
-    postMessage(EditorEvents.html, note.content.data);
-    currentNote.current = note;
-  };
+  const loadNote = useCallback(
+    (note) => {
+      postMessage(EditorEvents.html, note.content.data);
+      currentNote.current = note;
+    },
+    [postMessage]
+  );
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote + "shareEditor", loadNote);
@@ -49,12 +72,23 @@ const useEditor = () => {
   const onLoad = () => {
     postMessage(EditorEvents.theme, { ...colors, accent });
     commands.setInsets({ top: 0, left: 0, right: 0, bottom: 0 });
+    commands.setSettings({
+      deviceMode: "mobile",
+      fullscreen: false,
+      premium: false,
+      readonly: false,
+      tools: getDefaultPresets().default,
+      noHeader: true,
+      noToolbar: true,
+      keyboardShown: false,
+      doubleSpacedLines: doubleSpacedLines
+    });
   };
 
   return { ref, onLoad, sessionId, currentNote, commands };
 };
 
-const useEditorEvents = (editor,onChange) => {
+const useEditorEvents = (editor, onChange) => {
   const doubleSpacedLines = useSettingStore(
     (state) => state.settings?.doubleSpacedLines
   );
@@ -84,10 +118,10 @@ const useEditorEvents = (editor,onChange) => {
 
     switch (editorMessage.type) {
       case EventTypes.logger:
-        logger.info("[WEBVIEW LOG]", editorMessage.value);
+        console.log("[WEBVIEW LOG]", editorMessage.value);
         break;
       case EventTypes.content:
-        logger.info("[WEBVIEW LOG]", "EditorTypes.content");
+        console.log("[WEBVIEW LOG]", "EditorTypes.content");
         onChange(editorMessage.value);
         break;
     }
@@ -114,50 +148,107 @@ const style = {
 };
 
 export const Editor = ({ onChange, onLoad }) => {
+  const colors = useShareStore((state) => state.colors);
   const editor = useEditor();
   const onMessage = useEditorEvents(editor, onChange);
-
+  const [loading, setLoading] = useState(true);
   useLayoutEffect(() => {
     onLoad?.();
   }, [onLoad]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      onLoad?.();
+      setTimeout(() => setLoading(false));
+    }, 1000);
+  }, [onLoad]);
+
   return (
-    <WebView
-      ref={editor.ref}
-      onLoad={editor.onLoad}
-      nestedScrollEnabled
-      injectedJavaScriptBeforeContentLoaded={`
+    <View
+      style={{
+        flex: 1
+      }}
+    >
+      <WebView
+        ref={editor.ref}
+        onLoad={editor.onLoad}
+        nestedScrollEnabled
+        injectedJavaScriptBeforeContentLoaded={`
   globalThis.readonly=${false};
   globalThis.noToolbar=${true};
   globalThis.noHeader=${true};
   `}
-      injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
-      javaScriptEnabled={true}
-      focusable={true}
-      setSupportMultipleWindows={false}
-      overScrollMode="never"
-      scrollEnabled={false}
-      keyboardDisplayRequiresUserAction={false}
-      cacheMode="LOAD_DEFAULT"
-      cacheEnabled={true}
-      domStorageEnabled={true}
-      bounces={false}
-      setBuiltInZoomControls={false}
-      setDisplayZoomControls={false}
-      allowFileAccess={true}
-      scalesPageToFit={true}
-      hideKeyboardAccessoryView={false}
-      allowsFullscreenVideo={true}
-      allowFileAccessFromFileURLs={true}
-      allowUniversalAccessFromFileURLs={true}
-      onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-      originWhitelist={["*"]}
-      source={{
-        uri: EDITOR_URI
-      }}
-      style={style}
-      autoManageStatusBarEnabled={false}
-      onMessage={onMessage || undefined}
-    />
+        injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
+        javaScriptEnabled={true}
+        focusable={true}
+        setSupportMultipleWindows={false}
+        overScrollMode="never"
+        scrollEnabled={false}
+        keyboardDisplayRequiresUserAction={false}
+        cacheMode="LOAD_DEFAULT"
+        cacheEnabled={true}
+        domStorageEnabled={true}
+        bounces={false}
+        setBuiltInZoomControls={false}
+        setDisplayZoomControls={false}
+        allowFileAccess={true}
+        scalesPageToFit={true}
+        hideKeyboardAccessoryView={false}
+        allowsFullscreenVideo={true}
+        allowFileAccessFromFileURLs={true}
+        allowUniversalAccessFromFileURLs={true}
+        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        originWhitelist={["*"]}
+        source={{
+          uri: EDITOR_URI
+        }}
+        style={style}
+        autoManageStatusBarEnabled={false}
+        onMessage={onMessage || undefined}
+      />
+      {loading ? (
+        <View
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            backgroundColor: colors.bg,
+            alignItems: "flex-start",
+            zIndex: 999,
+            paddingHorizontal: 12
+          }}
+        >
+          <View
+            style={{
+              height: 16,
+              width: "100%",
+              backgroundColor: colors.nav,
+              borderRadius: 5,
+              marginTop: 10
+            }}
+          />
+
+          <View
+            style={{
+              height: 16,
+              width: "100%",
+              backgroundColor: colors.nav,
+              borderRadius: 5,
+              marginTop: 10
+            }}
+          />
+
+          <View
+            style={{
+              height: 16,
+              width: "60%",
+              backgroundColor: colors.nav,
+              borderRadius: 5,
+              marginTop: 10
+            }}
+          />
+        </View>
+      ) : null}
+    </View>
   );
 };

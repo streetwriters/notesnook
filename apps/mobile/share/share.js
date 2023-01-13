@@ -507,65 +507,6 @@ const ShareView = ({ quicknote = false }) => {
             paddingHorizontal: 12
           }}
         >
-          <ScrollView
-            horizontal
-            contentContainerStyle={{
-              alignItems: "center",
-              height: 50
-            }}
-            style={{
-              width: "100%",
-              height: 50,
-              borderRadius: 10,
-              flexDirection: "row",
-              bottom: -10
-            }}
-          >
-            <Button
-              color={colors.nav}
-              onPress={() => {
-                useShareStore.getState().setAppendNote(null);
-              }}
-              icon="plus"
-              iconSize={18}
-              iconColor={!appendNote ? accent.color : colors.icon}
-              title="New note"
-              textColor={!appendNote ? accent.color : colors.icon}
-              type="rounded"
-              textStyle={{
-                fontSize: 13
-              }}
-              style={{
-                paddingHorizontal: 12,
-                ...getElevation(1),
-                height: 35
-              }}
-            />
-
-            <Button
-              color={colors.nav}
-              onPress={() => {
-                setShowSearch(true);
-              }}
-              icon="text-short"
-              iconSize={18}
-              iconColor={appendNote ? accent.color : colors.icon}
-              title={`${
-                appendNote ? appendNote.title.slice(0, 25) : "Append to note"
-              }`}
-              textColor={appendNote ? accent.color : colors.icon}
-              type="rounded"
-              textStyle={{
-                fontSize: 13
-              }}
-              style={{
-                paddingHorizontal: 12,
-                ...getElevation(1),
-                height: 35
-              }}
-            />
-          </ScrollView>
-
           <View
             style={{
               width: "100%"
@@ -697,6 +638,65 @@ const ShareView = ({ quicknote = false }) => {
             }}
           />
         </View>
+        <View
+          style={{
+            width: "100%",
+            borderRadius: 10,
+            flexDirection: "column",
+            marginTop: 10,
+            alignSelf: "center",
+            alignItems: "center",
+            paddingHorizontal: 12
+          }}
+        >
+          <Button
+            color={colors.bg}
+            onPress={() => {
+              useShareStore.getState().setAppendNote(null);
+            }}
+            icon="plus"
+            iconSize={18}
+            iconColor={!appendNote ? accent.color : colors.icon}
+            title="New note"
+            textColor={!appendNote ? accent.color : colors.icon}
+            type="button"
+            textStyle={{
+              fontSize: 15
+            }}
+            style={{
+              paddingHorizontal: 0,
+              ...getElevation(1),
+              height: 45,
+              width: "100%",
+              marginRight: 0
+            }}
+          />
+
+          <Button
+            color={colors.bg}
+            onPress={() => {
+              setShowSearch(true);
+            }}
+            icon="text-short"
+            iconSize={18}
+            iconColor={appendNote ? accent.color : colors.icon}
+            title={`${
+              appendNote ? appendNote.title.slice(0, 25) : "Append to note"
+            }`}
+            textColor={appendNote ? accent.color : colors.icon}
+            type="button"
+            textStyle={{
+              fontSize: 15
+            }}
+            style={{
+              paddingHorizontal: 0,
+              ...getElevation(1),
+              height: 45,
+              width: "100%",
+              marginRight: 0
+            }}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -788,7 +788,7 @@ const Button = ({
               fontSize: fontSize || 18,
               fontFamily: "OpenSans-Regular",
               color: textColor,
-              marginLeft: loading ? 10 : 0
+              marginLeft: loading ? 10 : 5
             },
             types[type].textStyle,
             textStyle
