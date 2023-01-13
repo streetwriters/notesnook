@@ -23,7 +23,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { eSendEvent } from "../../../services/event-manager";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import {
-  eCloseProgressDialog,
+  eCloseSheet,
   eCloseResultDialog,
   eOpenPremiumDialog
 } from "../../../utils/events";
@@ -82,7 +82,7 @@ export const ProFeatures = ({ count = 6 }) => {
       <Paragraph
         onPress={async () => {
           eSendEvent(eCloseResultDialog);
-          eSendEvent(eCloseProgressDialog);
+          eSendEvent(eCloseSheet);
           await sleep(300);
           eSendEvent(eOpenPremiumDialog);
         }}

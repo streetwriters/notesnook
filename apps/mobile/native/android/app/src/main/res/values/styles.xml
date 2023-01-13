@@ -7,6 +7,7 @@
         <item name="android:editTextBackground">@drawable/edit_text</item>
         
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:datePickerDialogTheme">@style/DialogDatePicker.Theme</item>
     </style>
 
      <style name="Share.Window" parent="Theme.AppCompat">
@@ -32,6 +33,7 @@
         <item name="android:editTextBackground">@drawable/edit_text</item>
     </style>
 
-
-
+    <style name="DialogDatePicker.Theme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">#2b2b2b</item>
+    </style>
 </resources>

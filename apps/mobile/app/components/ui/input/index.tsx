@@ -73,6 +73,7 @@ interface InputProps extends TextInputProps {
   buttonLeft?: React.ReactNode;
   inputStyle?: TextInputProps["style"];
   containerStyle?: ViewStyle;
+  flexGrow?: number
 }
 
 const Input = ({
@@ -96,6 +97,7 @@ const Input = ({
   buttons,
   marginRight,
   buttonLeft,
+  flexGrow = 1,
   inputStyle = {},
   containerStyle = {},
   ...restProps
@@ -232,7 +234,7 @@ const Input = ({
         style={{
           height: height,
           marginBottom: marginBottom,
-          flexGrow: 1,
+          flexGrow: flexGrow,
           maxHeight: height,
           marginRight: marginRight
         }}
@@ -248,7 +250,7 @@ const Input = ({
           <TextInput
             {...restProps}
             ref={fwdRef}
-            editable={!loading}
+            editable={!loading && restProps.editable}
             onChangeText={onChange}
             onBlur={onBlur}
             keyboardType={

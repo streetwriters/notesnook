@@ -22,12 +22,14 @@ import { AccentColorPicker, HomagePageSelector } from "./appearance";
 import { AutomaticBackupsSelector } from "./backup-restore";
 import DebugLogs from "./debug";
 import { ConfigureToolbar } from "./editor/configure-toolbar";
+import SoundPicker from "./sound-picker";
 import { Subscription } from "./subscription";
 export const components: { [name: string]: ReactElement } = {
-  colorpicker: <AccentColorPicker wrap={true} />,
+  colorpicker: <AccentColorPicker />,
   homeselector: <HomagePageSelector />,
   autobackups: <AutomaticBackupsSelector />,
   subscription: <Subscription />,
   configuretoolbar: <ConfigureToolbar />,
-  "debug-logs": <DebugLogs />
+  "debug-logs": <DebugLogs />,
+  "sound-picker": <SoundPicker />
 };

@@ -19,8 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { EditorState } from "prosemirror-state";
 import { NodeType } from "prosemirror-model";
-import { findParentNodeOfType, hasParentNodeOfType } from "prosemirror-utils";
 import { Editor } from "@tiptap/core";
+import {
+  findParentNodeOfType,
+  hasParentNodeOfType
+} from "../../utils/prosemirror";
 
 // WORKAROUND: if we're at the start of a list item, we need to either
 // backspace directly to an empty list item above, or outdent this node
@@ -31,7 +34,6 @@ export function onBackspacePressed(
 ) {
   const { selection } = editor.state;
   const { empty, $from } = selection;
-
   if (
     !empty ||
     !isInside(name, type, editor.state) ||
@@ -42,6 +44,7 @@ export function onBackspacePressed(
     return false;
 
   const isEmpty = isListItemEmpty(type, editor.state);
+
   if (isEmpty) {
     if (isFirstOfType(type, editor.state)) {
       const parentList = getListFromListItem(type, editor.state);
@@ -54,7 +57,7 @@ export function onBackspacePressed(
 
     return editor.commands.deleteNode(type);
   } else if (isFirstOfType(type, editor.state)) {
-    return editor.commands.liftListItem(type);
+    return false;
   } else {
     // we have to run join backward twice because on the first join
     // the two list items are joined i.e., the editor just puts their

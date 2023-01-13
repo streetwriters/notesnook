@@ -17,9 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Editor, findParentNode } from "@tiptap/core";
-import { Node as ProsemirrorNode, Mark } from "prosemirror-model";
-import { EditorState } from "prosemirror-state";
+import {
+  Editor,
+  findParentNode,
+  NodeWithPos,
+  Predicate,
+  findParentNodeClosestToPos
+} from "@tiptap/core";
+import {
+  Node as ProsemirrorNode,
+  Mark,
+  NodeType,
+  ResolvedPos
+} from "prosemirror-model";
+import { EditorState, Selection } from "prosemirror-state";
 
 export type NodeWithOffset = {
   node?: ProsemirrorNode;
@@ -102,3 +113,71 @@ export function isListActive(editor: Editor): boolean {
 
   return isTaskList || isOutlineList || isList;
 }
+
+export const findChildren = (
+  node: ProsemirrorNode,
+  predicate: Predicate,
+  descend: boolean
+) => {
+  if (!node) {
+    throw new Error('Invalid "node" parameter');
+  } else if (!predicate) {
+    throw new Error('Invalid "predicate" parameter');
+  }
+  return walkNode(node, descend).filter((child) => predicate(child.node));
+};
+
+export function findChildrenByType(
+  node: ProsemirrorNode,
+  nodeType: NodeType,
+  descend = true
+): NodeWithPos[] {
+  return findChildren(node, (child) => child.type === nodeType, descend);
+}
+
+export const findParentNodeOfTypeClosestToPos = (
+  $pos: ResolvedPos,
+  nodeType: NodeType
+) => {
+  return findParentNodeClosestToPos($pos, (node) =>
+    equalNodeType(nodeType, node)
+  );
+};
+
+export function hasParentNode(predicate: Predicate) {
+  return function (selection: Selection) {
+    return !!findParentNode(predicate)(selection);
+  };
+}
+
+export function hasParentNodeOfType(nodeType: NodeType | NodeType[]) {
+  return hasParentNode((node) => equalNodeType(nodeType, node));
+}
+
+export function findParentNodeOfType(nodeType: NodeType | NodeType[]) {
+  return findParentNode((node) => equalNodeType(nodeType, node));
+}
+
+const walkNode = (node: ProsemirrorNode, descend = true) => {
+  if (!node) {
+    throw new Error('Invalid "node" parameter');
+  }
+  const result: NodeWithPos[] = [];
+  node.descendants((child, pos) => {
+    result.push({ node: child, pos });
+    if (!descend) {
+      return false;
+    }
+  });
+  return result;
+};
+
+const equalNodeType = (
+  nodeType: NodeType | NodeType[],
+  node: ProsemirrorNode
+) => {
+  return (
+    (Array.isArray(nodeType) && nodeType.indexOf(node.type) > -1) ||
+    node.type === nodeType
+  );
+};

@@ -46,6 +46,14 @@ class Merger {
         get: (id) => this._db.shortcuts.shortcut(id),
         set: (item) => this._db.shortcuts.merge(item)
       },
+      reminder: {
+        get: (id) => this._db.reminders.reminder(id),
+        set: (item) => this._db.reminders.merge(item)
+      },
+      relation: {
+        get: (id) => this._db.relations.relation(id),
+        set: (item) => this._db.relations.merge(item)
+      },
       notebook: {
         threshold: 1000,
         get: (id) => this._db.notebooks.notebook(id),
@@ -169,7 +177,13 @@ class Merger {
       return remoteItem;
     } else {
       const isResolved = localItem.dateResolved === remoteItem.dateModified;
-      const isModified = localItem.dateModified > this._lastSynced;
+      const isModified =
+        // the local item is modified if it was changed/modified after the last sync
+        // i.e. it wasn't synced yet.
+        // However, in case a sync is interrupted the local item's date modified will
+        // be ahead of last sync. In that case, we also have to check if the synced flag
+        // is false (it is only false if a user makes edits on the local device).
+        localItem.dateModified > this._lastSynced && !localItem.synced;
       if (isModified && !isResolved) {
         // If time difference between local item's edits & remote item's edits
         // is less than threshold, we shouldn't trigger a merge conflict; instead
@@ -192,7 +206,8 @@ class Merger {
           isModified,
           timeDiff,
           remote: remoteItem.dateModified,
-          local: localItem.dateModified
+          local: localItem.dateModified,
+          lastSynced: this._lastSynced
         });
 
         await markAsConflicted(localItem, remoteItem);

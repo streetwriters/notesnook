@@ -26,13 +26,19 @@ import { useNotebookStore } from "./use-notebook-store";
 import { useNoteStore } from "./use-notes-store";
 import { useTagStore } from "./use-tag-store";
 import { useTrashStore } from "./use-trash-store";
-
+import { useReminderStore } from "./use-reminder-store";
+import Notifications from "../services/notifications";
+import { useRelationStore } from "./use-relation-store";
 export function initAfterSync() {
   useMenuStore.getState().setColorNotes();
   useMenuStore.getState().setMenuPins();
   Navigation.queueRoutesForUpdate(
     ...(Object.keys(Navigation.routeUpdateFunctions) as unknown as RouteName[])
   );
+  // Whenever sync completes, try to reschedule
+  // any new/updated reminders.
+  Notifications.setupReminders(true);
+  useRelationStore.getState().update();
 }
 
 export function initialize() {
@@ -45,6 +51,8 @@ export function initialize() {
     useTagStore.getState().setTags();
     useFavoriteStore.getState().setFavorites();
     useNoteStore.getState().setNotes();
+    useReminderStore.getState().setReminders();
+    Notifications.setupReminders();
   });
 }
 
@@ -56,4 +64,5 @@ export function clearAllStores() {
   useNoteStore.getState().clearNotes();
   useMenuStore.getState().clearAll();
   useTrashStore.getState().clearTrash();
+  useReminderStore.getState().cleareReminders();
 }

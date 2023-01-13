@@ -178,11 +178,13 @@ export function ImageComponent(
                       tools={
                         float
                           ? [
+                              "downloadAttachment",
                               "imageAlignLeft",
                               "imageAlignRight",
                               "imageProperties"
                             ]
                           : [
+                              "downloadAttachment",
                               "imageAlignLeft",
                               "imageAlignCenter",
                               "imageAlignRight",

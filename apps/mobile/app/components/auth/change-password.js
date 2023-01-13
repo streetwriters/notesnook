@@ -26,7 +26,7 @@ import {
   ToastEvent
 } from "../../services/event-manager";
 import { useUserStore } from "../../stores/use-user-store";
-import { eCloseProgressDialog } from "../../utils/events";
+import { eCloseSheet } from "../../utils/events";
 import DialogHeader from "../dialog/dialog-header";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
@@ -72,7 +72,7 @@ export const ChangePassword = () => {
         context: "global"
       });
       setLoading(false);
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
     } catch (e) {
       setLoading(false);
       ToastEvent.show({

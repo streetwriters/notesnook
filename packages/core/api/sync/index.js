@@ -18,10 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  checkSyncStatus,
   EV,
   EVENTS,
   sendAttachmentsProgressEvent,
-  sendSyncProgressEvent
+  sendSyncProgressEvent,
+  SYNC_CHECK_IDS
 } from "../../common";
 import Constants from "../../utils/constants";
 import TokenManager from "../token-manager";
@@ -107,6 +109,7 @@ class Sync {
     this.autoSync = new AutoSync(db, 1000);
     this.logger = logger.scope("Sync");
     this.syncConnectionMutex = new Mutex();
+    let remoteSyncTimeout = 0;
 
     const tokenManager = new TokenManager(db.storage);
     this.connection = new signalr.HubConnectionBuilder()
@@ -122,8 +125,10 @@ class Sync {
                 return scopedLogger.fatal(new Error(message));
               case signalr.LogLevel.Debug:
                 return scopedLogger.debug(message);
-              case signalr.LogLevel.Error:
+              case signalr.LogLevel.Error: {
+                db.eventManager.publish(EVENTS.syncAborted, message);
                 return scopedLogger.error(new Error(message));
+              }
               case signalr.LogLevel.Information:
                 return scopedLogger.info(message);
               case signalr.LogLevel.None:
@@ -145,17 +150,23 @@ class Sync {
       this.autoSync.stop();
     });
 
-    this.connection.on("SyncItem", async (syncStatus) => {
-      await this.onSyncItem(syncStatus);
+    this.connection.on("SyncItem", async (payload) => {
+      clearTimeout(remoteSyncTimeout);
+      remoteSyncTimeout = setTimeout(() => {
+        db.eventManager.publish(EVENTS.syncAborted);
+      }, 15000);
+
+      await this.onSyncItem(payload);
       sendSyncProgressEvent(
         this.db.eventManager,
         "download",
-        syncStatus.total,
-        syncStatus.current
+        payload.total,
+        payload.current
       );
     });
 
     this.connection.on("RemoteSyncCompleted", (lastSynced) => {
+      clearTimeout(remoteSyncTimeout);
       this.onRemoteSyncCompleted(lastSynced);
     });
   }
@@ -167,6 +178,11 @@ class Sync {
    * @param {number} serverLastSynced
    */
   async start(full, force, serverLastSynced) {
+    if (!(await checkSyncStatus(SYNC_CHECK_IDS.sync))) {
+      await this.connection.stop();
+      return;
+    }
+
     this.logger.info("Starting sync", { full, force, serverLastSynced });
 
     this.connection.onclose((error) => {
@@ -197,6 +213,10 @@ class Sync {
       this.logger.info("Nothing to do.");
       await this.stop(serverLastSynced || oldLastSynced);
     }
+
+    if (!(await checkSyncStatus(SYNC_CHECK_IDS.autoSync))) {
+      await this.connection.stop();
+    }
   }
 
   async init(isForceSync) {
@@ -204,9 +224,7 @@ class Sync {
 
     await this.conflicts.recalculate();
     if (await this.conflicts.check()) {
-      throw new Error(
-        "Merge conflicts detected. Please resolve all conflicts to continue syncing."
-      );
+      this.conflicts.throw();
     }
 
     let lastSynced = await this.db.lastSynced();
@@ -251,9 +269,7 @@ class Sync {
     });
 
     if (await this.conflicts.check()) {
-      throw new Error(
-        "Merge conflicts detected. Please resolve all conflicts to continue syncing."
-      );
+      this.conflicts.throw();
     }
 
     return serverResponse;

@@ -29,7 +29,7 @@ import { useEditorStore } from "../../stores/use-editor-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useTrashStore } from "../../stores/use-trash-store";
-import { eCloseProgressDialog, eOnLoadNote } from "../../utils/events";
+import { eCloseSheet, eOnLoadNote } from "../../utils/events";
 import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
 import DialogHeader from "../dialog/dialog-header";
@@ -59,7 +59,7 @@ export default function NotePreview({ session, content, note }) {
         heading: "Restore successful",
         type: "success"
       });
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
       return;
     }
     await db.noteHistory.restore(session.id);
@@ -71,8 +71,8 @@ export default function NotePreview({ session, content, note }) {
         });
       }
     }
-    eSendEvent(eCloseProgressDialog, "note_history");
-    eSendEvent(eCloseProgressDialog);
+    eSendEvent(eCloseSheet, "note_history");
+    eSendEvent(eCloseSheet);
     Navigation.queueRoutesForUpdate(
       "Notes",
       "Favorites",
@@ -103,7 +103,7 @@ export default function NotePreview({ session, content, note }) {
           type: "success",
           context: "local"
         });
-        eSendEvent(eCloseProgressDialog);
+        eSendEvent(eCloseSheet);
       },
       positiveType:"error"
     });

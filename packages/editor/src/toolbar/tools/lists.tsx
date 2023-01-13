@@ -27,7 +27,7 @@ import { getToolbarElement } from "../utils/dom";
 import { PopupWrapper } from "../../components/popup-presenter";
 import React from "react";
 import { ToolButton } from "../components/tool-button";
-import { findListItemType, isListActive } from "../utils/prosemirror";
+import { findListItemType, isListActive } from "../../utils/prosemirror";
 
 type ListSubType<TListStyleTypes> = {
   items: string[];
@@ -97,7 +97,7 @@ function _ListTool<TListStyleTypes extends string>(
                   if (type === "bulletList") chain = chain.toggleBulletList();
                   else chain = chain.toggleOrderedList();
                 }
-
+                setIsOpen(false);
                 return chain
                   .updateAttributes(type, { listType: item.type })
                   .run();

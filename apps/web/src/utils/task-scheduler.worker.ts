@@ -52,6 +52,11 @@ const module = {
       delete RUNNING_TASKS[id];
     }
   },
+  stopAllWithPrefix: (prefix: string) => {
+    for (const id in RUNNING_TASKS) {
+      if (id.startsWith(prefix)) module.stop(id);
+    }
+  },
   stopAll: () => {
     for (const id in RUNNING_TASKS) {
       module.stop(id);

@@ -38,6 +38,7 @@ import TagItem from "../list-items/tag";
 import { Empty } from "./empty";
 import { getTotalNotes } from "../../utils";
 import { useSettingStore } from "../../stores/use-setting-store";
+import ReminderItem from "../list-items/reminder";
 
 const renderItems = {
   note: NoteWrapper,
@@ -45,7 +46,8 @@ const renderItems = {
   topic: NotebookWrapper,
   tag: TagItem,
   section: SectionHeader,
-  header: SectionHeader
+  header: SectionHeader,
+  reminder: ReminderItem
 };
 
 const RenderItem = ({ item, index, type, ...restArgs }) => {
@@ -54,7 +56,6 @@ const RenderItem = ({ item, index, type, ...restArgs }) => {
   const groupOptions = db.settings?.getGroupOptions(type);
   const dateBy =
     groupOptions.sortBy !== "title" ? groupOptions.sortBy : "dateEdited";
-
   const totalNotes = getTotalNotes(item);
   const tags =
     item.tags
@@ -83,6 +84,11 @@ const RenderItem = ({ item, index, type, ...restArgs }) => {
   );
 };
 
+/**
+ * 
+ * @param {any} param0 
+ * @returns 
+ */
 const List = ({
   listData,
   type,
@@ -95,7 +101,9 @@ const List = ({
   },
   screen,
   ListHeader,
-  warning
+  warning,
+  isSheet = false,
+  onMomentumScrollEnd
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const scrollRef = useRef();
@@ -113,13 +121,14 @@ const List = ({
       <RenderItem
         item={item}
         index={index}
-        color={headerProps.color}
-        title={headerProps.heading}
+        color={headerProps?.color}
+        title={headerProps?.heading}
         type={screen === "Notes" ? "home" : type}
         screen={screen}
+        isSheet={isSheet}
       />
     ),
-    [headerProps.color, headerProps.heading, screen, type]
+    [headerProps?.color, headerProps?.heading, screen, type, isSheet]
   );
 
   const _onRefresh = async () => {
@@ -165,8 +174,10 @@ const List = ({
           data={listData}
           renderItem={renderItem}
           onScroll={_onScroll}
+          nestedScrollEnabled={true}
           onMomentumScrollEnd={() => {
             tabBarRef.current?.unlock();
+            onMomentumScrollEnd?.();
           }}
           getItemType={(item) => item.itemType || item.type}
           estimatedItemSize={isCompactModeEnabled ? 60 : 100}
@@ -183,20 +194,22 @@ const List = ({
             />
           }
           ListEmptyComponent={
-            <Empty
-              loading={loading}
-              placeholderData={placeholderData}
-              headerProps={headerProps}
-              type={type}
-              screen={screen}
-            />
+            placeholderData ? (
+              <Empty
+                loading={loading}
+                placeholderData={placeholderData}
+                headerProps={headerProps}
+                type={type}
+                screen={screen}
+              />
+            ) : null
           }
           ListFooterComponent={<Footer />}
           ListHeaderComponent={
             <>
               {ListHeader ? (
                 ListHeader
-              ) : (
+              ) : !headerProps ? null : (
                 <Header
                   title={headerProps.heading}
                   color={headerProps.color}

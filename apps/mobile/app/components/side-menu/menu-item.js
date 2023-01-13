@@ -30,6 +30,7 @@ import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { useCallback } from "react";
+import Tag from "../ui/tag";
 
 export const MenuItem = React.memo(
   function MenuItem({ item, index, testID, rightBtn }) {
@@ -44,7 +45,10 @@ export const MenuItem = React.memo(
       if (item.func) {
         item.func();
       } else {
-        Navigation.navigate({ name: item.name }, { canGoBack: false });
+        Navigation.navigate(
+          { name: item.name, beta: item.isBeta },
+          { canGoBack: false }
+        );
       }
       if (item.close) {
         setImmediate(() => {
@@ -123,6 +127,8 @@ export const MenuItem = React.memo(
           ) : (
             <Paragraph size={SIZE.md}>{item.name}</Paragraph>
           )}
+
+          <Tag visible={item.isBeta} text="BETA" />
         </View>
 
         {item.switch ? (

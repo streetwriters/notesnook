@@ -68,6 +68,7 @@ export type RouteParams = {
   Monographs: NotesScreenParams;
   AppLock: AppLockRouteParams;
   Auth: AuthParams;
+  Reminders: GenericRouteParam;
 };
 
 export type RouteName = keyof RouteParams;
@@ -80,6 +81,7 @@ export type CurrentScreen = {
   color?: string | null;
   alias?: string;
   notebookId?: string;
+  beta?: boolean
 };
 
 export type HeaderRightButton = {
@@ -119,7 +121,6 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
       JSON.stringify(currentScreen) === JSON.stringify(get().currentScreenRaw)
     )
       return;
-
     set({
       currentScreen: {
         name: currentScreen.name,
@@ -128,7 +129,8 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
         title: currentScreen.alias || currentScreen.title || currentScreen.name,
         type: currentScreen.type,
         color: color,
-        notebookId: currentScreen.notebookId
+        notebookId: currentScreen.notebookId,
+        beta: currentScreen.beta
       },
       currentScreenRaw: currentScreen,
       canGoBack,

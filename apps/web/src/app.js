@@ -110,12 +110,8 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
     () => Config.get("paneSizes", defaultSizes),
     [defaultSizes]
   );
-  const [isNarrow, setIsNarrow] = useState(isTablet);
   const panesRef = useRef();
-
-  useEffect(() => {
-    setIsNarrow(isTablet);
-  }, [isTablet]);
+  const [isNarrow, setIsNarrow] = useState();
 
   return (
     <>

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import localforage from "localforage";
-import { extendPrototype } from "localforage-getitems";
+import { extendPrototype } from "@notesnook/localforage-getitems";
 import * as MemoryDriver from "localforage-driver-memory";
 import { getNNCrypto } from "./nncrypto.stub";
 import type { Cipher, SerializedKey } from "@notesnook/crypto/dist/src/types";

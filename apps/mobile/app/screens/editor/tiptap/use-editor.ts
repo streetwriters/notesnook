@@ -51,6 +51,7 @@ import {
   post
 } from "./utils";
 import { EVENTS } from "@notesnook/core/common";
+import SettingsService from "../../../services/settings";
 
 export const useEditor = (
   editorId = "",
@@ -365,6 +366,7 @@ export const useEditor = (
 
   const onSyncComplete = useCallback(
     async (data: NoteType | Content) => {
+      if (SettingsService.get().disableRealtimeSync) return;
       if (!data) return;
       const noteId = data.type === "tiptap" ? data.noteId : data.id;
 

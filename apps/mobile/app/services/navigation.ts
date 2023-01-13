@@ -28,6 +28,7 @@ import useNavigationStore, {
 } from "../stores/use-navigation-store";
 import { useNotebookStore } from "../stores/use-notebook-store";
 import { useNoteStore } from "../stores/use-notes-store";
+import { useReminderStore } from "../stores/use-reminder-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useTrashStore } from "../stores/use-trash-store";
 import { eOnNewTopicAdded } from "../utils/events";
@@ -59,7 +60,8 @@ const routeNames = {
   Welcome: "Welcome",
   AppLock: "AppLock",
   Login: "Login",
-  Signup: "Signup"
+  Signup: "Signup",
+  Reminders: "Reminders"
 };
 
 export type NavigationProps<T extends RouteName> = NativeStackScreenProps<
@@ -83,7 +85,8 @@ const routeUpdateFunctions: {
   TaggedNotes: (params) => eSendEvent("TaggedNotes", params),
   ColoredNotes: (params) => eSendEvent("ColoredNotes", params),
   TopicNotes: (params) => eSendEvent("TopicNotes", params),
-  Monographs: (params) => eSendEvent("Monographs", params)
+  Monographs: (params) => eSendEvent("Monographs", params),
+  Reminders: () => useReminderStore.getState().setReminders()
 };
 
 function clearRouteFromQueue(routeName: RouteName) {

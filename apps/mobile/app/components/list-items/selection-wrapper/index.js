@@ -37,7 +37,8 @@ const SelectionWrapper = ({
   background,
   onLongPress,
   onPress,
-  testID
+  testID,
+  isSheet
 }) => {
   const itemId = useRef(item.id);
   const colors = useThemeStore((state) => state.colors);
@@ -84,10 +85,9 @@ const SelectionWrapper = ({
       eUnSubscribeEvent("navigate", closeStrip);
     };
   }, []);
-
   return (
     <PressableButton
-      customColor="transparent"
+      customColor={isSheet ? colors.transGray : "transparent"}
       testID={testID}
       onLongPress={_onLongPress}
       onPress={_onPress}
@@ -99,10 +99,11 @@ const SelectionWrapper = ({
         justifyContent: "space-between",
         alignItems: "center",
         width: "100%",
-        borderRadius: 0,
         overflow: "hidden",
         paddingHorizontal: 12,
-        paddingVertical: compactMode ? 8 : 12
+        paddingVertical: compactMode ? 8 : 12,
+        borderRadius: isSheet ? 10 : 0,
+        marginBottom: isSheet ? 12 : undefined,
       }}
     >
       {item.type === "note" ? (

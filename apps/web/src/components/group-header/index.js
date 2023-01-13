@@ -246,25 +246,28 @@ function GroupHeader(props) {
 
       {index === 0 && (
         <Flex mr={1}>
-          <IconButton
-            icon={
-              groupOptions.sortDirection === "asc"
-                ? Icon.SortAsc
-                : Icon.SortDesc
-            }
-            title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy]}`}
-            onClick={() => {
-              const groupOptions = db.settings.getGroupOptions(type);
-              setGroupOptions(groupOptions);
+          {type && (
+            <IconButton
+              testId="sort-icon-button"
+              icon={
+                groupOptions.sortDirection === "asc"
+                  ? Icon.SortAsc
+                  : Icon.SortDesc
+              }
+              title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy]}`}
+              onClick={() => {
+                const groupOptions = db.settings.getGroupOptions(type);
+                setGroupOptions(groupOptions);
 
-              openMenu(menuItems, {
-                title: "Group & sort",
-                groupOptions,
-                refresh,
-                type
-              });
-            }}
-          />
+                openMenu(menuItems, {
+                  title: "Group & sort",
+                  groupOptions,
+                  refresh,
+                  type
+                });
+              }}
+            />
+          )}
           {viewMode && (
             <IconButton
               icon={
@@ -288,7 +291,7 @@ function GroupHeader(props) {
 export default GroupHeader;
 
 function IconButton(props) {
-  const { text, title, onClick } = props;
+  const { text, title, onClick, testId } = props;
   const isMobile = useMobile();
   return (
     <Button
@@ -297,6 +300,7 @@ function IconButton(props) {
       title={title}
       p={"2px"}
       mr={[2, 0]}
+      data-test-id={testId}
       sx={{ ":last-of-type": { mr: 0 }, alignItems: "center", display: "flex" }}
       onClick={(e) => {
         e.stopPropagation();

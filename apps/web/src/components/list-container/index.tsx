@@ -56,19 +56,21 @@ const CustomScrollbarsVirtualList = forwardRef<HTMLDivElement, ScrollerProps>(
 type ListContainerProps = {
   type: keyof typeof ListProfiles;
   items: Item[];
-  groupType: string;
-  context: Context;
+  groupType?: string;
+  compact?: boolean;
+  context?: Context;
   refresh: () => void;
-  header: JSX.Element;
+  header?: JSX.Element;
   placeholder: () => JSX.Element;
-  isLoading: boolean;
+  isLoading?: boolean;
   button?: {
     onClick: () => void;
   };
 };
 
 function ListContainer(props: ListContainerProps) {
-  const { type, groupType, items, context, refresh, header, button } = props;
+  const { type, groupType, items, context, refresh, header, button, compact } =
+    props;
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
@@ -232,6 +234,7 @@ function ListContainer(props: ListContainerProps) {
                         context={context}
                         index={index}
                         type={type}
+                        compact={compact}
                       />
                     );
                 }

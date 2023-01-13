@@ -276,3 +276,16 @@ test("creating a new note and toggling read-only mode should not empty editor co
   expect(await notes.editor.getContent("text")).not.toHaveLength(0);
   expect(await notes.editor.getContent("text")).toBe(NOTE.content);
 });
+
+test("#1468 count words separated by newlines", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+
+  await notes.createNote({
+    content: "1\n2\n3\na\nb\nc\nd\ne\nali\nwaqar",
+    title: NOTE.title
+  });
+
+  expect((await notes.editor.getWordCount()) === 10).toBeTruthy();
+});

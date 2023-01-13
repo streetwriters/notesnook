@@ -27,6 +27,7 @@ import { db } from "../../common/database";
 import { MMKV } from "../../common/database/mmkv";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
+import { ChangeEmail } from "../../components/sheets/change-email";
 import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
 import { Progress } from "../../components/sheets/progress";
@@ -53,7 +54,7 @@ import { AndroidModule } from "../../utils";
 import { getColorScheme, toggleDarkMode } from "../../utils/color-scheme/utils";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import {
-  eCloseProgressDialog,
+  eCloseSheet,
   eCloseSimpleDialog,
   eOpenAttachmentsDialog,
   eOpenLoginDialog,
@@ -67,6 +68,9 @@ import { useDragState } from "./editor/state";
 import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import notifee from "@notifee/react-native";
+
+type User = any;
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -156,6 +160,14 @@ export const settingsGroups: SettingSection[] = [
               ChangePassword.present();
             },
             description: "Setup a new password for your account."
+          },
+          {
+            id: "change-email",
+            name: "Change email",
+            modifer: async () => {
+              ChangeEmail.present();
+            },
+            description: "Setup a new email for your account."
           },
           {
             id: "2fa-settings",
@@ -276,7 +288,7 @@ export const settingsGroups: SettingSection[] = [
                   await PremiumService.subscriptions.verify(
                     currentSubscription
                   );
-                  eSendEvent(eCloseProgressDialog);
+                  eSendEvent(eCloseSheet);
                 },
                 icon: "information-outline",
                 actionText: "Verify"
@@ -381,27 +393,59 @@ export const settingsGroups: SettingSection[] = [
         ]
       },
       {
-        id: "sync-issues-fix",
-        name: "Having problems with sync",
-        description: "Try force sync to resolve issues with syncing",
-        icon: "sync-alert",
-        modifer: async () => {
-          presentDialog({
-            title: "Force sync",
-            paragraph:
-              "If your data on two devices is out of sync even after trying to sync normally. You can run force sync to solve such problems. Usually you should never need to run this otherwise. Force sync means that all your data on this device is reuploaded to the server.",
-            negativeText: "Cancel",
-            positiveText: "Start",
-            positivePress: async () => {
-              eSendEvent(eCloseProgressDialog);
-              await sleep(300);
-              Progress.present();
-              Sync.run("global", true, true, () => {
-                eSendEvent(eCloseProgressDialog);
+        id: "sync-settings",
+        name: "Sync settings",
+        description: "Configure syncing for this device",
+        type: "screen",
+        icon: "autorenew",
+        sections: [
+          {
+            id: "auto-sync",
+            name: "Disable auto sync",
+            description:
+              "Turn off automatic syncing. Changes from this client will be synced only when you run sync manually.",
+            type: "switch",
+            property: "disableAutoSync"
+          },
+          {
+            id: "disable-realtime-sync",
+            name: "Disable realtime sync",
+            description: "Turn off realtime sync in the editor.",
+            type: "switch",
+            property: "disableRealtimeSync"
+          },
+          {
+            id: "disable-sync",
+            name: "Disable syncing",
+            description:
+              "Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device.",
+            type: "switch",
+            property: "disableSync"
+          },
+          {
+            id: "sync-issues-fix",
+            name: "Having problems with sync",
+            description: "Try force sync to resolve issues with syncing",
+            icon: "sync-alert",
+            modifer: async () => {
+              presentDialog({
+                title: "Force sync",
+                paragraph:
+                  "If your data on two devices is out of sync even after trying to sync normally. You can run force sync to solve such problems. Usually you should never need to run this otherwise. Force sync means that all your data on this device is reuploaded to the server.",
+                negativeText: "Cancel",
+                positiveText: "Start",
+                positivePress: async () => {
+                  eSendEvent(eCloseSheet);
+                  await sleep(300);
+                  Progress.present();
+                  Sync.run("global", true, true, () => {
+                    eSendEvent(eCloseSheet);
+                  });
+                }
               });
             }
-          });
-        }
+          }
+        ]
       }
     ]
   },
@@ -490,6 +534,18 @@ export const settingsGroups: SettingSection[] = [
           "Contribute towards a better Notesnook. All tracking information is anonymous.",
         property: "telemetry"
       },
+      {
+        id: "cors-bypass",
+        type: "input",
+        name: "CORS bypass proxy",
+        description: "You can set a custom proxy URL to increase your privacy.",
+        inputProperties: {
+          defaultValue: "https://cors.notesnook.com"
+        },
+        property: "corsProxy",
+        icon: "arrow-decision-outline"
+      },
+
       {
         id: "vault",
         type: "screen",
@@ -786,6 +842,73 @@ export const settingsGroups: SettingSection[] = [
             notifNotes: !settings.notifNotes
           });
         }
+      },
+      {
+        id: "reminders",
+        type: "screen",
+        name: "Reminders",
+        icon: "bell",
+        description: "Manage and configure reminders in app",
+        sections: [
+          {
+            id: "enable-reminders",
+            property: "reminderNotifications",
+            type: "switch",
+            name: "Reminder notifications",
+            icon: "bell-outline",
+            onChange: (property) => {
+              if (property) {
+                Notifications.setupReminders();
+              } else {
+                Notifications.clearAllTriggers();
+              }
+            },
+            description:
+              "Controls whether this device should receive reminder notifications."
+          },
+          {
+            id: "snooze-time",
+            property: "defaultSnoozeTime",
+            type: "input",
+            name: "Default snooze time",
+            description:
+              "Set the default time to snooze a reminder to when you press the snooze button on a notification.",
+            inputProperties: {
+              keyboardType: "decimal-pad",
+              defaultValue: 5 + "",
+              placeholder: "Set snooze time in minutes",
+              onSubmitEditing: () => {
+                Notifications.setupReminders();
+              }
+            }
+          },
+          {
+            id: "reminder-sound",
+            type: "screen",
+            name: "Change notification sound",
+            description:
+              "Set the notification sound for reminder notifications",
+            component: "sound-picker",
+            icon: "bell-ring",
+            hidden: () => Platform.OS === "android" && Platform.Version > 25
+          },
+          {
+            id: "reminder-sound",
+            name: "Change notification sound",
+            description:
+              "Set the notification sound for reminder notifications",
+            icon: "bell-ring",
+            hidden: () =>
+              Platform.OS === "ios" ||
+              (Platform.OS === "android" && Platform.Version < 26),
+            modifer: async () => {
+              const id = await Notifications.getChannelId("urgent");
+              if (id) {
+                await notifee.openNotificationSettings(id);
+              }
+            }
+          }
+        ]
       }
     ]
   },

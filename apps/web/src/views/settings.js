@@ -40,7 +40,9 @@ import {
   showMultifactorDialog,
   showAttachmentsDialog,
   show2FARecoveryCodesDialog,
-  showToolbarConfigDialog
+  showToolbarConfigDialog,
+  showPromptDialog,
+  showEmailChangeDialog
 } from "../common/dialog-controller";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { createBackup, importBackup, verifyAccount } from "../common";
@@ -54,7 +56,12 @@ import { appVersion } from "../utils/version";
 import { CHECK_IDS } from "@notesnook/core/common";
 import Tip from "../components/tip";
 import Toggle from "../components/toggle";
-import { isDesktop, isMacStoreApp } from "../utils/platform";
+import {
+  getPlatform,
+  isDesktop,
+  isMacStoreApp,
+  isTesting
+} from "../utils/platform";
 import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { Slider } from "@theme-ui/components";
@@ -66,6 +73,7 @@ import { debounce } from "../utils/debounce";
 import { clearLogs, downloadLogs } from "../utils/logger";
 import { exportNotes } from "../common/export";
 import { scheduleBackups } from "../common/reminders";
+import usePrivacyMode from "../hooks/use-privacy-mode";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -127,6 +135,7 @@ const otherItems = [
 
 function Settings() {
   const [groups, setGroups] = useState({
+    sync: false,
     appearance: false,
     editor: false,
     mfa: false,
@@ -134,9 +143,18 @@ function Settings() {
     importer: false,
     privacy: false,
     developer: false,
+    notifications: false,
     other: true
   });
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
+  const isSyncEnabled = useAppStore((store) => store.isSyncEnabled);
+  const isRealtimeSyncEnabled = useAppStore(
+    (store) => store.isRealtimeSyncEnabled
+  );
+  const isAutoSyncEnabled = useAppStore((store) => store.isAutoSyncEnabled);
+  const toggleAutoSync = useAppStore((store) => store.toggleAutoSync);
+  const toggleSync = useAppStore((store) => store.toggleSync);
+  const toggleRealtimeSync = useAppStore((store) => store.toggleRealtimeSync);
   const setIsVaultCreated = useAppStore((store) => store.setIsVaultCreated);
   const refreshApp = useAppStore((store) => store.refresh);
   const refreshNotes = useNoteStore((store) => store.refresh);
@@ -173,6 +191,13 @@ function Settings() {
   const [enableTelemetry, setEnableTelemetry] = usePersistentState(
     "telemetry",
     true
+  );
+  const [privacyMode, setPrivacyMode] = usePrivacyMode();
+  const [showReminderNotifications, setShowReminderNotifications] =
+    usePersistentState("reminderNotifications", true);
+  const [corsProxy, setCorsProxy] = usePersistentState(
+    "corsProxy",
+    "https://cors.notesnook.com"
   );
 
   useEffect(() => {
@@ -240,6 +265,18 @@ function Settings() {
             </Button>
             <Button
               variant="list"
+              onClick={async () => {
+                await showEmailChangeDialog();
+                await refreshUser();
+              }}
+            >
+              <Tip
+                text="Change account email"
+                tip="Set a new email for your account"
+              />
+            </Button>
+            <Button
+              variant="list"
               data-test-id="settings-change-password"
               onClick={async () => {
                 const result = await showPasswordDialog(
@@ -253,7 +290,7 @@ function Settings() {
                   }
                 );
                 if (result) {
-                  await showToast("success", "Account password changed!");
+                  showToast("success", "Account password changed!");
                 }
               }}
             >
@@ -262,16 +299,11 @@ function Settings() {
                 tip="Set a new password for your account"
               />
             </Button>
+
             <Button variant="list" onClick={() => showAttachmentsDialog()}>
               <Tip
                 text="Manage attachments"
                 tip="Re-upload, delete & manage your attachments."
-              />
-            </Button>
-            <Button variant="list" onClick={() => sync(true, true)}>
-              <Tip
-                text="Having problems with syncing?"
-                tip="Try force sync to resolve issues with syncing"
               />
             </Button>
             <Button
@@ -386,6 +418,48 @@ function Settings() {
               ))}
           </>
         )}
+        {isLoggedIn && (
+          <>
+            <Header
+              title="Sync settings"
+              isOpen={groups.sync}
+              onClick={() => {
+                setGroups((g) => ({ ...g, sync: !g.sync }));
+              }}
+            />
+            {groups.sync && (
+              <>
+                <Toggle
+                  title="Disable realtime sync in editor"
+                  onTip="You will have to manually open/close a note to see new changes."
+                  offTip="All changes in the editor will be synced & updated in realtime."
+                  onToggled={toggleRealtimeSync}
+                  isToggled={!isRealtimeSyncEnabled}
+                />
+                <Toggle
+                  title="Disable sync"
+                  onTip="All changes to or from this device won't be synced."
+                  offTip="All changes to or from this device will be synced."
+                  onToggled={toggleSync}
+                  isToggled={!isSyncEnabled}
+                />
+                <Toggle
+                  title="Disable auto sync"
+                  onTip="You will have to manually run the sync to transfer your changes to other devices."
+                  offTip="All changes will automatically sync to your other device."
+                  onToggled={toggleAutoSync}
+                  isToggled={!isAutoSyncEnabled}
+                />
+                <Button variant="list" onClick={() => sync(true, true)}>
+                  <Tip
+                    text="Having problems with syncing?"
+                    tip="Try force sync to resolve issues with syncing"
+                  />
+                </Button>
+              </>
+            )}
+          </>
+        )}
         <Header
           title="Appearance"
           isOpen={groups.appearance}
@@ -494,7 +568,27 @@ function Settings() {
             </Button>
           </>
         )}
+
         <Header
+          title="Notifications"
+          isOpen={groups.notifications}
+          onClick={() => {
+            setGroups((g) => ({ ...g, notifications: !g.notifications }));
+          }}
+        />
+        {groups.notifications && (
+          <>
+            <Toggle
+              title="Reminder notifications"
+              onTip="Reminder notifications will be shown on this device"
+              offTip="Reminder notifications will not be shown on this device"
+              onToggled={() => setShowReminderNotifications((s) => !s)}
+              isToggled={showReminderNotifications}
+            />
+          </>
+        )}
+        <Header
+          testId={"backup-restore"}
           title="Backup & restore"
           isOpen={groups.backup}
           onClick={() => {
@@ -505,6 +599,7 @@ function Settings() {
         {groups.backup && (
           <>
             <Button
+              data-test-id={"backup-data"}
               variant="list"
               onClick={async () => {
                 if (!isUserPremium() && encryptBackups) toggleEncryptBackups();
@@ -537,9 +632,10 @@ function Settings() {
                 );
               }}
             />
-            {isLoggedIn && (
+            {(isLoggedIn || isTesting()) && (
               <>
                 <Button
+                  data-test-id="restore-backup"
                   variant="list"
                   onClick={async () => {
                     await importBackup();
@@ -553,6 +649,7 @@ function Settings() {
                 </Button>
                 <Toggle
                   title="Encrypt backups"
+                  testId="encrypt-backups"
                   onTip="All backup files will be encrypted"
                   offTip="Backup files will not be encrypted"
                   onToggled={toggleEncryptBackups}
@@ -696,6 +793,34 @@ function Settings() {
                 />
               </Button>
             )}
+            <Button
+              variant="list"
+              onClick={async () => {
+                const result = await showPromptDialog({
+                  title: "CORS bypass proxy",
+                  description:
+                    "You can set a custom proxy URL to increase your privacy.",
+                  defaultValue: corsProxy
+                });
+                if (!result) return;
+                const url = new URL(result);
+                setCorsProxy(`${url.protocol}//${url.hostname}`);
+              }}
+            >
+              <Tip
+                text="Custom CORS proxy"
+                tip={
+                  <>
+                    <em>{corsProxy}</em>
+                    <br />
+                    CORS proxy is required to directly download images from
+                    within the Notesnook app. It allows Notesnook to bypass
+                    browser restrictions by using a proxy. You can set a custom
+                    proxy URL to increase your privacy.
+                  </>
+                }
+              />
+            </Button>
             <Toggle
               title="Enable telemetry"
               onTip="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
@@ -711,6 +836,17 @@ function Settings() {
                 tip="Read details of all usage data we collect."
               />
             </Button>
+            {isDesktop() && getPlatform() !== "linux" && (
+              <Toggle
+                title="Privacy mode"
+                onTip="Prevent Notesnook app from being captured by any screen capturing software like TeamViewer & AnyDesk."
+                offTip="Allow screen capturing of the Notesnook app."
+                onToggled={() => {
+                  setPrivacyMode(!privacyMode);
+                }}
+                isToggled={privacyMode}
+              />
+            )}
           </>
         )}
 

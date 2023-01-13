@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Editor } from "../types";
 import { IconNames } from "./icons";
 import { ToolId } from "./tools";
-import { NodeWithOffset } from "./utils/prosemirror";
+import { NodeWithOffset } from "../utils/prosemirror";
 
 export type ToolButtonVariant = "small" | "normal";
 export type ToolProps = ToolDefinition & {

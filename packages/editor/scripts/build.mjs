@@ -44,5 +44,3 @@ fs.writeFileSync(
   path.join(ROOT_DIR, "src", "extensions", "code-block", "languages.json"),
   JSON.stringify(languagesList)
 );
-
-await $`cd ${ROOT_DIR} && npx tsc ${process.argv.slice(3)}`;

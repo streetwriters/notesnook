@@ -35,5 +35,12 @@ class Conflicts {
   check() {
     return this._db.storage.read("hasConflicts");
   }
+
+  throw() {
+    throw new Error(
+      "Merge conflicts detected. Please resolve all conflicts to continue syncing.",
+      { cause: "MERGE_CONFLICT" }
+    );
+  }
 }
 export default Conflicts;

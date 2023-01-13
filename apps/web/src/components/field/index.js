@@ -64,11 +64,13 @@ function Field(props) {
     inputRef,
     disabled,
     defaultValue,
+    value,
     placeholder,
     validatePassword,
     onError,
     inputMode,
     pattern,
+    min,
     variant = "input",
     as = "input"
   } = props;
@@ -76,7 +78,9 @@ function Field(props) {
   const [rules, setRules] = useState(passwordValidationRules);
 
   return (
-    <Flex sx={{ ...sx, ...styles.container, flexDirection: "column" }}>
+    <Flex
+      sx={{ ...sx, ...styles.container, flexDirection: "column", m: "1.5px" }}
+    >
       <Label
         htmlFor={id}
         sx={{
@@ -120,6 +124,8 @@ function Field(props) {
           inputMode={inputMode}
           pattern={pattern}
           type={type || "text"}
+          min={min}
+          value={value}
           sx={{
             ...styles.input,
             ":disabled": {

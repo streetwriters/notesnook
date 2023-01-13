@@ -105,7 +105,8 @@ export function TaskItemComponent(
               cursor: "grab",
               ".icon:hover path": {
                 fill: "var(--checked) !important"
-              }
+              },
+              mt: "1px"
             }}
             size={isMobile ? 24 : 20}
           />
@@ -122,14 +123,14 @@ export function TaskItemComponent(
             alignSelf: "start",
             mr: 2,
             p: "1px",
-            mt: "4px",
+            mt: "2px",
             cursor: editor.isEditable ? "pointer" : "unset",
             ":hover": {
               borderColor: "checked"
             },
             ":hover .icon path": {
               fill: "var(--checked) !important"
-            }
+            },
           }}
           onMouseDown={(e) => {
             if (useIsKeyboardOpen.current) {
@@ -162,7 +163,8 @@ export function TaskItemComponent(
               {
                 opacity: 1
               },
-            flex: 1
+            flex: 1,
+            mt: "1px"
           }}
         />
         <DesktopOnly>
@@ -177,29 +179,31 @@ export function TaskItemComponent(
               alignItems: "center"
             }}
           >
-            <Icon
-              className="deleleTaskItem"
-              title="Delete this task item"
-              path={Icons.close}
-              size={18}
-              sx={{
-                cursor: "pointer"
-              }}
-              onClick={() => {
-                if (!editor.current) return;
-                const pos = getPos();
+            {editor.isEditable && (
+              <Icon
+                className="deleleTaskItem"
+                title="Delete this task item"
+                path={Icons.close}
+                size={18}
+                sx={{
+                  cursor: "pointer"
+                }}
+                onClick={() => {
+                  if (!editor.current) return;
+                  const pos = getPos();
 
-                // we need to get a fresh instance of the task list instead
-                // of using the one we got via props.
-                const node = editor.current.state.doc.nodeAt(pos);
-                if (!node) return;
+                  // we need to get a fresh instance of the task list instead
+                  // of using the one we got via props.
+                  const node = editor.current.state.doc.nodeAt(pos);
+                  if (!node) return;
 
-                editor.commands.command(({ tr }) => {
-                  tr.deleteRange(pos, pos + node.nodeSize);
-                  return true;
-                });
-              }}
-            />
+                  editor.commands.command(({ tr }) => {
+                    tr.deleteRange(pos, pos + node.nodeSize);
+                    return true;
+                  });
+                }}
+              />
+            )}
           </Flex>
         </DesktopOnly>
       </Flex>

@@ -97,6 +97,16 @@ export const SUBSCRIPTION_PROVIDER = {
   }
 };
 
+export const WeekDayNames = {
+  0: "Sunday",
+  1: "Monday",
+  2: "Tuesday",
+  3: "Wednesday",
+  4: "Thursday",
+  5: "Friday",
+  6: "Saturday"
+};
+
 export const MenuItemsList = [
   {
     name: "Notes",
@@ -117,6 +127,12 @@ export const MenuItemsList = [
     name: "Tags",
     icon: "pound",
     close: true
+  },
+  {
+    name: "Reminders",
+    icon: "bell",
+    close: true,
+    isBeta:true
   },
   {
     name: "Monographs",

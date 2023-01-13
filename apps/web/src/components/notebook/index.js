@@ -32,7 +32,7 @@ import { Multiselect } from "../../common/multi-select";
 import { pluralize } from "../../utils/string";
 
 function Notebook(props) {
-  const { item, index, totalNotes, date } = props;
+  const { item, index, totalNotes, date, simplified } = props;
   const notebook = item;
   const isCompact = useStore((store) => store.viewMode === "compact");
 
@@ -40,6 +40,7 @@ function Notebook(props) {
     <ListItem
       selectable
       isCompact={isCompact}
+      isSimple={simplified}
       item={notebook}
       onClick={() => {
         navigate(`/notebooks/${notebook.id}`);
@@ -58,7 +59,7 @@ function Notebook(props) {
         ) : (
           <>
             {notebook?.topics && (
-              <Flex mb={1}>
+              <Flex mb={1} sx={{ gap: 1 }}>
                 {notebook?.topics.slice(0, 3).map((topic) => (
                   <IconTag
                     key={topic.id}
@@ -81,12 +82,7 @@ function Notebook(props) {
               {notebook.pinned && (
                 <Icon.PinFilled color="primary" size={13} sx={{ mr: 1 }} />
               )}
-              <Text variant="subBody" sx={{ color: "primary" }}>
-                Notebook
-              </Text>
-              <Text as="span" mx={1} sx={{ color: "inherit" }}>
-                •
-              </Text>
+
               {new Date(date).toLocaleDateString("en", {
                 dateStyle: "medium"
               })}

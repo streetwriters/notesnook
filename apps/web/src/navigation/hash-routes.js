@@ -19,8 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Vault from "../common/vault";
 import {
+  showAddReminderDialog,
   showBuyDialog,
   showCreateTagDialog,
+  showEditReminderDialog,
   showEditTagDialog,
   showEmailVerificationDialog,
   showFeatureDialog,
@@ -50,25 +52,31 @@ const hashroutes = {
     return !editorStore.get().session.state && <EditorPlaceholder />;
   },
   "/email/verify": () => {
-    showEmailVerificationDialog();
+    showEmailVerificationDialog().then(afterAction);
   },
   "/notebooks/create": () => {
-    showAddNotebookDialog();
+    showAddNotebookDialog().then(afterAction);
   },
   "/notebooks/:notebookId/edit": ({ notebookId }) => {
-    showEditNotebookDialog(notebookId);
+    showEditNotebookDialog(notebookId).then(afterAction);
   },
   "/topics/create": () => {
-    showCreateTopicDialog();
+    showCreateTopicDialog().then(afterAction);
+  },
+  "/reminders/create": () => {
+    showAddReminderDialog().then(afterAction);
+  },
+  "/reminders/:reminderId/edit": ({ reminderId }) => {
+    showEditReminderDialog(reminderId).then(afterAction);
   },
   "/notebooks/:notebookId/topics/:topicId/edit": ({ notebookId, topicId }) => {
-    showEditTopicDialog(notebookId, topicId);
+    showEditTopicDialog(notebookId, topicId).then(afterAction);
   },
   "/tags/create": () => {
-    showCreateTagDialog();
+    showCreateTagDialog().then(afterAction);
   },
   "/tags/:tagId/edit": ({ tagId }) => {
-    showEditTagDialog(tagId);
+    showEditTagDialog(tagId).then(afterAction);
   },
   "/notes/create": () => {
     closeOpenedDialog();
@@ -116,20 +124,24 @@ const hashroutes = {
     });
   },
   "/buy": () => {
-    showBuyDialog();
+    showBuyDialog().then(afterAction);
   },
   "/buy/:code": ({ code }) => {
-    showBuyDialog("monthly", code);
+    showBuyDialog("monthly", code).then(afterAction);
   },
   "/buy/:plan/:code": ({ plan, code }) => {
-    showBuyDialog(plan, code);
+    showBuyDialog(plan, code).then(afterAction);
   },
   "/welcome": () => {
-    showOnboardingDialog("new");
+    showOnboardingDialog("new").then(afterAction);
   },
   "/confirmed": () => {
-    showFeatureDialog("confirmed");
+    showFeatureDialog("confirmed").then(afterAction);
   }
 };
 
 export default hashroutes;
+
+function afterAction() {
+  window.location.hash = "";
+}

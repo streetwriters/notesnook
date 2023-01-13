@@ -21,7 +21,7 @@ import { ToolProps } from "../types";
 import { ToolButton } from "../components/tool-button";
 import { MoreTools } from "../components/more-tools";
 import { useToolbarLocation } from "../stores/toolbar-store";
-import { findSelectedNode } from "../utils/prosemirror";
+import { findSelectedNode } from "../../utils/prosemirror";
 import { Attachment } from "../../extensions/attachment";
 
 export function AttachmentSettings(props: ToolProps) {
@@ -47,7 +47,10 @@ export function DownloadAttachment(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() => {
-        const attachmentNode = findSelectedNode(editor, "attachment");
+        const attachmentNode =
+          findSelectedNode(editor, "attachment") ||
+          findSelectedNode(editor, "image");
+
         const attachment = (attachmentNode?.attrs || {}) as Attachment;
         editor.current?.chain().focus().downloadAttachment(attachment).run();
       }}

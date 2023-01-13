@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { Platform, View } from "react-native";
+import { Platform, View, TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
@@ -37,6 +37,12 @@ import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { Tags } from "./tags";
 import { Topics } from "./topics";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import {
+  formatReminderTime,
+  getUpcomingReminder
+} from "@notesnook/core/collections/reminders";
+import { ReminderTime } from "../ui/reminder-time";
 export const Properties = ({
   close = () => {},
   item,
@@ -46,6 +52,8 @@ export const Properties = ({
   const colors = useThemeStore((state) => state.colors);
   const alias = item.alias || item.title;
   const isColor = !!COLORS_NOTE[item.title];
+  const reminders = db.relations.from(item, "reminder");
+  const current = getUpcomingReminder(reminders);
 
   const onScrollEnd = () => {
     getRef().current?.handleChildScrollEnd();
@@ -62,7 +70,7 @@ export const Properties = ({
         paddingHorizontal: 0,
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
-        maxHeight: "95%"
+        maxHeight: "100%"
       }}
     >
       {!item || !item.id ? (
@@ -98,7 +106,9 @@ export const Properties = ({
                 numberOfLines={2}
                 color={colors.icon}
               >
-                {(item.type === "notebook" || item.itemType === "notebook") &&
+                {(item.type === "notebook" ||
+                  item.itemType === "notebook" ||
+                  item.type === "reminder") &&
                 item?.description
                   ? item.description
                   : null}
@@ -107,6 +117,19 @@ export const Properties = ({
                   ? item.headline
                   : null}
               </Paragraph>
+            ) : null}
+
+            {item.type === "reminder" ? (
+              <ReminderTime
+                reminder={item}
+                style={{
+                  justifyContent: "flex-start",
+                  borderWidth: 0,
+                  height: 30,
+                  alignSelf: "flex-start"
+                }}
+                fontSize={SIZE.xs + 1}
+              />
             ) : null}
 
             {item.type === "note" ? <Tags close={close} item={item} /> : null}
@@ -155,7 +178,7 @@ export const Properties = ({
   );
 };
 
-Properties.present = (item, buttons = []) => {
+Properties.present = (item, buttons = [], isSheet) => {
   if (!item) return;
   let type = item?.type;
   let props = [];
@@ -170,6 +193,7 @@ Properties.present = (item, buttons = []) => {
       props[0] = db.notes.note(item.id).data;
       props.push([
         "Add to notebook",
+        "Add-Reminder",
         "Share",
         "Export",
         "Copy",
@@ -182,6 +206,7 @@ Properties.present = (item, buttons = []) => {
         "RemoveTopic",
         "History",
         "ReadOnly",
+        "Reminders",
         "Local only",
         "Duplicate",
         ...android,
@@ -202,9 +227,15 @@ Properties.present = (item, buttons = []) => {
       props[0] = db.tags.tag(item.id);
       props.push(["Add Shortcut", "Delete", "Rename Tag"]);
       break;
+    case "reminder": {
+      props[0] = db.reminders.reminder(item.id);
+      props.push(["Edit reminder", "Delete", "ReminderOnOff"]);
+      break;
+    }
   }
   if (!props[0]) return;
   presentSheet({
+    context: isSheet ? "local" : undefined,
     component: (ref, close) => (
       <Properties
         close={() => {

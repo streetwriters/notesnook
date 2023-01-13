@@ -23,7 +23,7 @@ import { Flex, FlexProps } from "@theme-ui/components";
 import { Editor } from "../../types";
 import { MoreTools } from "./more-tools";
 import { getToolDefinition } from "../tool-definitions";
-import { NodeWithOffset } from "../utils/prosemirror";
+import { NodeWithOffset } from "../../utils/prosemirror";
 
 export type ToolbarGroupProps = FlexProps & {
   tools: ToolbarGroupDefinition;

@@ -28,7 +28,7 @@ import {
   ImageAlignmentOptions,
   ImageSizeOptions
 } from "../../extensions/image";
-import { findSelectedNode } from "../utils/prosemirror";
+import { findSelectedNode } from "../../utils/prosemirror";
 
 export function ImageSettings(props: ToolProps) {
   const { editor } = props;

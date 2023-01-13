@@ -30,7 +30,7 @@ import { useUserStore } from "../../stores/use-user-store";
 import { getElevation } from "../../utils";
 import {
   eClosePremiumDialog,
-  eCloseProgressDialog,
+  eCloseSheet,
   eOpenLoginDialog
 } from "../../utils/events";
 import { SIZE } from "../../utils/size";
@@ -194,7 +194,7 @@ export const Component = ({ close, promo }) => {
               try {
                 await db.user.activateTrial();
                 eSendEvent(eClosePremiumDialog);
-                eSendEvent(eCloseProgressDialog);
+                eSendEvent(eCloseSheet);
                 await sleep(300);
                 Walkthrough.present("trialstarted", false, true);
               } catch (e) {

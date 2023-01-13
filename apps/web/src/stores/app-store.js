@@ -26,11 +26,14 @@ import { store as tagStore } from "./tag-store";
 import { store as editorstore } from "./editor-store";
 import { store as attachmentStore } from "./attachment-store";
 import { store as monographStore } from "./monograph-store";
+import { store as reminderStore } from "./reminder-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
-import { EV, EVENTS } from "@notesnook/core/common";
+import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/common";
 import { logger } from "../utils/logger";
+import Config from "../utils/config";
+import { onPageVisibilityChanged } from "../utils/page-visibility";
 
 var syncStatusTimeout = 0;
 const BATCH_SIZE = 50;
@@ -40,8 +43,11 @@ class AppStore extends BaseStore {
   isFocusMode = false;
   isEditorOpen = false;
   isVaultCreated = false;
+  isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
+  isSyncEnabled = Config.get("syncEnabled", true);
+  isRealtimeSyncEnabled = Config.get("isRealtimeSyncEnabled", true);
   syncStatus = {
-    key: "synced",
+    key: navigator.onLine ? "synced" : "offline",
     progress: null,
     type: null
   };
@@ -52,6 +58,9 @@ class AppStore extends BaseStore {
   lastSynced = 0;
 
   init = () => {
+    // this needs to happen here so reminders can be set on app load.
+    reminderStore.refresh();
+
     let count = 0;
     EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
 
@@ -74,12 +83,52 @@ class AppStore extends BaseStore {
       }
     );
 
+    EV.subscribe(EVENTS.syncCheckStatus, async (type) => {
+      const { isAutoSyncEnabled, isSyncEnabled } = this.get();
+      switch (type) {
+        case SYNC_CHECK_IDS.sync:
+          return { type, result: isSyncEnabled };
+        case SYNC_CHECK_IDS.autoSync:
+          return { type, result: isAutoSyncEnabled };
+        default:
+          return { type, result: true };
+      }
+    });
+
+    db.eventManager.subscribe(
+      EVENTS.databaseSyncRequested,
+      async (full, force) => {
+        if (!this.get().isAutoSyncEnabled) return;
+
+        await this.get().sync(full, force);
+      }
+    );
+
+    db.eventManager.subscribe(EVENTS.syncAborted, (error) => {
+      if (error) showToast("error", error);
+      this.updateSyncStatus("failed");
+    });
+
     db.eventManager.subscribe(EVENTS.syncCompleted, () => {
       this.set((state) => {
         state.syncStatus = { key: "synced" };
       });
       count = 0;
       this.refresh();
+    });
+
+    onPageVisibilityChanged(async (type, documentHidden) => {
+      if (!documentHidden && type !== "offline") {
+        logger.info("Page visibility changed. Reconnecting SSE...");
+        if (type === "online") {
+          // a slight delay to make sure sockets are open and can be connected
+          // to. Otherwise, this fails miserably.
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        }
+        await db.connectSSE({ force: type === "online" }).catch(logger.error);
+      } else if (type === "offline") {
+        await this.abortSync("offline");
+      }
     });
   };
 
@@ -90,6 +139,7 @@ class AppStore extends BaseStore {
     await resetReminders();
     noteStore.refresh();
     notebookStore.refresh();
+    reminderStore.refresh();
     trashStore.refresh();
     tagStore.refresh();
     attachmentStore.refresh();
@@ -108,6 +158,29 @@ class AppStore extends BaseStore {
 
   toggleFocusMode = () => {
     this.set((state) => (state.isFocusMode = !state.isFocusMode));
+  };
+
+  toggleAutoSync = () => {
+    Config.set("autoSyncEnabled", !this.get().isAutoSyncEnabled);
+    this.set((state) => (state.isAutoSyncEnabled = !state.isAutoSyncEnabled));
+  };
+
+  toggleSync = () => {
+    const { isSyncEnabled } = this.get();
+    Config.set("syncEnabled", !isSyncEnabled);
+    this.set((state) => (state.isSyncEnabled = !state.isSyncEnabled));
+
+    if (isSyncEnabled) {
+      this.abortSync("disabled");
+    }
+  };
+
+  toggleRealtimeSync = () => {
+    const { isRealtimeSyncEnabled } = this.get();
+    Config.set("realtimeSyncEnabled", !isRealtimeSyncEnabled);
+    this.set(
+      (state) => (state.isRealtimeSyncEnabled = !state.isRealtimeSyncEnabled)
+    );
   };
 
   toggleSideMenu = (toggleState) => {
@@ -200,6 +273,7 @@ class AppStore extends BaseStore {
   };
 
   sync = async (full = true, force = false) => {
+    if (!this.get().isSyncEnabled || !navigator.onLine) return;
     if (this.isSyncing()) return;
 
     clearTimeout(syncStatusTimeout);
@@ -210,12 +284,12 @@ class AppStore extends BaseStore {
       const result = await db.sync(full, force);
 
       if (!result) return this.updateSyncStatus("failed");
-      else if (full) this.updateSyncStatus("completed");
+      else if (full) this.updateSyncStatus("completed", true);
 
       await this.updateLastSynced();
     } catch (err) {
       logger.error(err);
-      if (err.code === "MERGE_CONFLICT") {
+      if (err.cause === "MERGE_CONFLICT") {
         if (editorstore.get().session.id)
           editorstore.openSession(editorstore.get().session.id, true);
         await this.refresh();
@@ -227,21 +301,30 @@ class AppStore extends BaseStore {
       if (err?.message?.indexOf("Failed to fetch") > -1) return;
 
       showToast("error", err.message);
-    } finally {
-      if (this.get().syncStatus.key !== "conflicts")
-        syncStatusTimeout = setTimeout(() => {
-          this.updateSyncStatus("synced");
-        }, 3000);
     }
+  };
+
+  abortSync = async (status = "offline") => {
+    if (this.isSyncing()) this.updateSyncStatus("failed");
+    else this.updateSyncStatus(status);
+
+    await db.syncer.stop();
   };
 
   /**
    *
-   * @param {"synced" | "syncing" | "conflicts" | "failed" | "completed"} key
+   * @param {"synced" | "syncing" | "conflicts" | "failed" | "completed" | "offline" | "disabled"} key
    */
-  updateSyncStatus = (key) => {
+  updateSyncStatus = (key, reset = false) => {
     logger.info(`Sync status updated: ${key}`);
     this.set((state) => (state.syncStatus = { key }));
+
+    if (reset) {
+      syncStatusTimeout = setTimeout(() => {
+        if (this.get().syncStatus.key === key)
+          this.updateSyncStatus("synced", false);
+      }, 3000);
+    }
   };
 
   isSyncing = () => {

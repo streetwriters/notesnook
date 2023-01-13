@@ -19,7 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { NOTE, PASSWORD } from "./utils";
+import {
+  groupByOptions,
+  NOTE,
+  orderByOptions,
+  PASSWORD,
+  sortByOptions
+} from "./utils";
 
 test("create a note", async ({ page }) => {
   const app = new AppModel(page);
@@ -272,4 +278,36 @@ test("change title of a locked note", async ({ page }) => {
   await notes.editor.waitForLoading();
   expect(await note?.getTitle()).toContain(title);
   expect(await notes.editor.getTitle()).toContain(title);
+});
+
+test(`sort notes`, async ({ page }, info) => {
+  info.setTimeout(2 * 60 * 1000);
+
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const titles = ["G ", "C ", "Gz", "2 ", "A "];
+  for (const title of titles) {
+    await notes.createNote({
+      title: `${title} is Title`,
+      content: "This is test".repeat(10)
+    });
+  }
+
+  for (const groupBy of groupByOptions) {
+    for (const sortBy of sortByOptions) {
+      for (const orderBy of orderByOptions) {
+        await test.step(`group by ${groupBy}, sort by ${sortBy}, order by ${orderBy}`, async () => {
+          const sortResult = await notes?.sort({
+            groupBy,
+            orderBy,
+            sortBy
+          });
+          if (!sortResult) return;
+
+          expect(await notes.isEmpty()).toBeFalsy();
+        });
+      }
+    }
+  }
 });

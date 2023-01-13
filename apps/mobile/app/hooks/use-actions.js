@@ -27,6 +27,7 @@ import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
 import ExportNotesSheet from "../components/sheets/export-notes";
 import { MoveNotes } from "../components/sheets/move-notes/movenote";
+import ReminderSheet from "../components/sheets/reminder";
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -49,12 +50,15 @@ import { toggleDarkMode } from "../utils/color-scheme/utils";
 import {
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
-  eOpenAttachmentsDialog, eOpenLoginDialog,
+  eOpenAttachmentsDialog,
+  eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog
 } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { sleep } from "../utils/time";
+import { RelationsList } from "../components/sheets/relations-list/index";
+import { useRelationStore } from "../stores/use-relation-store";
 
 export const useActions = ({ close = () => null, item }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -86,7 +90,7 @@ export const useActions = ({ close = () => null, item }) => {
       return;
     }
 
-    let index = pinned.findIndex((notif) => notif.tag === item.id);
+    let index = pinned.findIndex((notif) => notif.id === item.id);
     if (index !== -1) {
       setNotifPinned(pinned[index]);
     } else {
@@ -176,14 +180,14 @@ export const useActions = ({ close = () => null, item }) => {
     if (item.locked) return;
     let html = await db.notes.note(item.id).content();
     let text = await toTXT(item);
-    Notifications.present({
+    Notifications.displayNotification({
       title: item.title,
       message: item.headline || text,
       subtitle: item.headline || text,
       bigText: html,
       ongoing: true,
       actions: ["UNPIN"],
-      tag: item.id
+      id: item.id
     });
     await sleep(1000);
     await Notifications.get();
@@ -435,28 +439,40 @@ export const useActions = ({ close = () => null, item }) => {
   async function deleteItem() {
     if (!checkNoteSynced()) return;
     close();
-    if (item.type === "tag") {
+    if (item.type === "tag" || item.type === "reminder") {
       await sleep(300);
       presentDialog({
-        title: "Delete tag",
-        paragraph: "This tag will be removed from all notes.",
+        title: `Delete ${item.type}`,
+        paragraph:
+          item.type === "reminder"
+            ? "This reminder will be removed"
+            : "This tag will be removed from all notes.",
         positivePress: async () => {
-          await db.tags.remove(item.id);
-          useTagStore.getState().setTags();
-          Navigation.queueRoutesForUpdate(
+          const routes = [];
+          routes.push(
             "TaggedNotes",
             "ColoredNotes",
-            "TopicNotes",
-            "Favorites",
             "Notes",
-            "Tags"
+            "NotesPage",
+            "Reminders",
+            "Favorites"
           );
+          if (item.type === "reminder") {
+            await db.reminders.remove(item.id);
+          } else {
+            await db.tags.remove(item.id);
+            useTagStore.getState().setTags();
+            routes.push("Tags");
+          }
+          Navigation.queueRoutesForUpdate(...routes);
+          useRelationStore.getState().update();
         },
         positiveText: "Delete",
         positiveType: "errorShade"
       });
       return;
     }
+
     if (item.locked) {
       await sleep(300);
       openVault({
@@ -589,6 +605,15 @@ export const useActions = ({ close = () => null, item }) => {
       title: "Add to notebook",
       icon: "book-outline",
       func: addTo
+    },
+    {
+      name: "Add-Reminder",
+      title: "Add reminder",
+      icon: "bell-plus",
+      func: () => {
+        ReminderSheet.present(null, { id: item.id, type: "note" });
+      },
+      close: true
     },
     {
       name: "Move notes",
@@ -781,7 +806,77 @@ export const useActions = ({ close = () => null, item }) => {
       close: false,
       nopremium: true,
       id: notesnook.ids.dialogs.actionsheet.night
-    }
+    },
+    {
+      name: "Edit reminder",
+      title: "Edit reminder",
+      icon: "pencil",
+      func: async () => {
+        close();
+        await sleep(300);
+        ReminderSheet.present(item);
+      },
+      close: false
+    },
+    {
+      name: "Reminders",
+      title: "Reminders",
+      icon: "bell",
+      func: async () => {
+        close();
+        RelationsList.present({
+          reference: item,
+          referenceType: "reminder",
+          relationType: "from",
+          title: "Reminders",
+          onAdd: () => ReminderSheet.present(null, item, true),
+          button: {
+            title: "Add",
+            type: "accent",
+            onPress: () => ReminderSheet.present(null, item, true),
+            icon: "plus"
+          }
+        });
+      },
+      close: false
+    },
+    {
+      name: "ReminderOnOff",
+      title: !item.disabled ? "Turn off reminder" : "Turn on reminder",
+      icon: !item.disabled ? "bell-off-outline" : "bell",
+      func: async () => {
+        close();
+        await db.reminders.add({
+          ...item,
+          disabled: !item.disabled
+        });
+        Notifications.scheduleNotification(item);
+        useRelationStore.getState().update();
+        Navigation.queueRoutesForUpdate(
+          "TaggedNotes",
+          "ColoredNotes",
+          "TopicNotes",
+          "Favorites",
+          "Notes",
+          "NotesPage",
+          "Reminders"
+        );
+      }
+    },
+    // {
+    //   name: "ReferencedIn",
+    //   title: "References",
+    //   icon: "link",
+    //   func: async () => {
+    //     close();
+    //     RelationsList.present({
+    //       reference: item,
+    //       referenceType: "note",
+    //       title: "Referenced in",
+    //       relationType: "to",
+    //     });
+    //   }
+    // }
   ];
 
   return actions;

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getUpcomingReminder } from "@notesnook/core/collections/reminders";
 import { decode, EntityLevel } from "entities";
 import React from "react";
 import { View } from "react-native";
@@ -25,6 +26,7 @@ import { notesnook } from "../../../../e2e/test.ids";
 import { db } from "../../../common/database";
 import { TaggedNotes } from "../../../screens/notes/tagged";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
+import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { COLORS_NOTE } from "../../../utils/color-scheme";
@@ -32,6 +34,7 @@ import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
+import { ReminderTime } from "../../ui/reminder-time";
 import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
@@ -86,7 +89,10 @@ const NoteItem = ({
   const compactMode = notesListMode === "compact";
   const attachmentCount = db.attachments?.ofNote(item.id, "all")?.length || 0;
   const notebooks = React.useMemo(() => getNotebook(item), [item]);
-
+  const reminders = db.relations.from(item, "reminder");
+  const reminder = getUpcomingReminder(reminders);
+  const _update = useRelationStore((state) => state.updater);
+  const noteColor = COLORS_NOTE[item.color?.toLowerCase()];
   return (
     <>
       <View
@@ -102,14 +108,15 @@ const NoteItem = ({
               alignItems: "center",
               zIndex: 10,
               elevation: 10,
-              marginBottom: 2.5
+              marginBottom: 2.5,
+              flexWrap: "wrap"
             }}
           >
             {notebooks?.map((_item) => (
               <Button
                 title={_item.title}
                 key={_item}
-                height={20}
+                height={25}
                 icon="book-outline"
                 type="grayBg"
                 fontSize={SIZE.xs}
@@ -122,11 +129,23 @@ const NoteItem = ({
                   marginRight: 5,
                   borderWidth: 0.5,
                   borderColor: colors.icon,
-                  paddingHorizontal: 6
+                  paddingHorizontal: 6,
+                  marginBottom: 5
                 }}
                 onPress={() => navigateToTopic(_item.topic)}
               />
             ))}
+
+            <ReminderTime
+              reminder={reminder}
+              color={noteColor}
+              onPress={() => {
+                Properties.present(reminder);
+              }}
+              style={{
+                height: 25
+              }}
+            />
           </View>
         ) : null}
 

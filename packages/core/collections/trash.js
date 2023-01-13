@@ -123,6 +123,14 @@ export default class Trash {
       return !contentId || this._db.content.exists(contentId);
     } else return true;
   }
+
+  /**
+   *
+   * @param {string} id
+   */
+  exists(id) {
+    return this.all.findIndex((item) => item.id === id) > -1;
+  }
 }
 
 function collectionNameFromItem(item) {

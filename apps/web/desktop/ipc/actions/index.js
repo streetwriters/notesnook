@@ -24,6 +24,7 @@ import installUpdate from "./installUpdate";
 import open from "./open";
 import saveFile from "./saveFile";
 import setZoomFactor from "./setZoomFactor";
+import setPrivacyMode from "./setPrivacyMode";
 
 const actions = {
   changeAppTheme,
@@ -32,7 +33,8 @@ const actions = {
   installUpdate,
   open,
   saveFile,
-  setZoomFactor
+  setZoomFactor,
+  setPrivacyMode
 };
 
 export function getAction(actionName) {

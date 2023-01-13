@@ -122,7 +122,7 @@ export const SectionHeader = React.memo(
             alignItems: "center"
           }}
         >
-          {index === 0 ? (
+          {index === 0 && (
             <>
               <Button
                 onPress={() => {
@@ -130,6 +130,7 @@ export const SectionHeader = React.memo(
                     component: <Sort screen={screen} type={type} />
                   });
                 }}
+                hidden={screen === "Reminders"}
                 tooltipText="Change sorting of items in list"
                 fwdRef={sortRef}
                 title={groupBy}
@@ -152,38 +153,35 @@ export const SectionHeader = React.memo(
                 iconPosition="right"
               />
 
-              {type === "notes" || type === "notebooks" || type === "home" ? (
-                <IconButton
-                  customStyle={{
-                    width: 25,
-                    height: 25
-                  }}
-                  testID="icon-compact-mode"
-                  tooltipText={
-                    listMode == "compact"
-                      ? "Switch to normal mode"
-                      : "Switch to compact mode"
-                  }
-                  fwdRef={compactModeRef}
-                  color={colors.icon}
-                  name={
-                    listMode == "compact" ? "view-list" : "view-list-outline"
-                  }
-                  onPress={() => {
-                    let settings = {};
-                    settings[
-                      type !== "notebooks"
-                        ? "notesListMode"
-                        : "notebooksListMode"
-                    ] = listMode === "normal" ? "compact" : "normal";
+              <IconButton
+                customStyle={{
+                  width: 25,
+                  height: 25
+                }}
+                hidden={
+                  type !== "notes" && type !== "notebooks" && type !== "home"
+                }
+                testID="icon-compact-mode"
+                tooltipText={
+                  listMode == "compact"
+                    ? "Switch to normal mode"
+                    : "Switch to compact mode"
+                }
+                fwdRef={compactModeRef}
+                color={colors.icon}
+                name={listMode == "compact" ? "view-list" : "view-list-outline"}
+                onPress={() => {
+                  let settings = {};
+                  settings[
+                    type !== "notebooks" ? "notesListMode" : "notebooksListMode"
+                  ] = listMode === "normal" ? "compact" : "normal";
 
-                    SettingsService.set(settings);
-                  }}
-                  size={SIZE.lg - 2}
-                />
-              ) : null}
+                  SettingsService.set(settings);
+                }}
+                size={SIZE.lg - 2}
+              />
             </>
-          ) : null}
+          )}
         </View>
       </View>
     );

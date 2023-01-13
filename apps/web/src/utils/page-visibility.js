@@ -32,6 +32,7 @@ if (typeof document.hidden !== "undefined") {
 
 export function onPageVisibilityChanged(handler) {
   onDeviceOnline(() => handler("online", false));
+  onDeviceOffline(() => handler("offline", false));
 
   // Handle page visibility change
   document.addEventListener(visibilityChange, () =>
@@ -41,6 +42,12 @@ export function onPageVisibilityChanged(handler) {
 
 function onDeviceOnline(handler) {
   window.addEventListener("online", function () {
+    handler && handler();
+  });
+}
+
+function onDeviceOffline(handler) {
+  window.addEventListener("offline", function () {
     handler && handler();
   });
 }

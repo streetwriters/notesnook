@@ -28,7 +28,7 @@ const _ignore = "";
  */
 
 /**
- * @typedef {"home" | "notes" | "notebooks" | "tags" | "topics" | "trash" | "favorites"} GroupingKey
+ * @typedef {"home" | "notes" | "notebooks" | "tags" | "topics" | "trash" | "favorites" | "reminders"} GroupingKey
  */
 
 /**

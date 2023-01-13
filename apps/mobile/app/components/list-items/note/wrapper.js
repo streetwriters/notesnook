@@ -20,24 +20,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import NoteItem from ".";
 import { notesnook } from "../../../../e2e/test.ids";
-import { useSelectionStore } from "../../../stores/use-selection-store";
-import { useTrashStore } from "../../../stores/use-trash-store";
-import { useEditorStore } from "../../../stores/use-editor-store";
+import { db } from "../../../common/database";
 import { DDS } from "../../../services/device-detection";
 import {
   eSendEvent,
+  hideSheet,
   openVault,
-  presentSheet,
-  ToastEvent
+  presentSheet
 } from "../../../services/event-manager";
-import Navigation from "../../../services/navigation";
+import { useEditorStore } from "../../../stores/use-editor-store";
+import { useSelectionStore } from "../../../stores/use-selection-store";
 import { history } from "../../../utils";
-import { db } from "../../../common/database";
 import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 import { presentDialog } from "../../dialog/functions";
-import SelectionWrapper from "../selection-wrapper";
 import NotePreview from "../../note-history/preview";
+import SelectionWrapper from "../selection-wrapper";
 
 const present = () =>
   presentDialog({
@@ -46,9 +44,9 @@ const present = () =>
     paragraph: "Please sync again to open this note for editing"
   });
 
-export const openNote = async (item, isTrash, setSelectedItem) => {
+export const openNote = async (item, isTrash, setSelectedItem, isSheet) => {
   let _note = item;
-
+  if (isSheet) hideSheet();
   if (!isTrash) {
     _note = db.notes.note(item.id).data;
     if (!db.notes.note(item.id)?.synced()) {
@@ -102,7 +100,7 @@ export const openNote = async (item, isTrash, setSelectedItem) => {
 };
 
 export const NoteWrapper = React.memo(
-  function NoteWrapper({ item, index, tags, dateBy }) {
+  function NoteWrapper({ item, index, tags, dateBy, isSheet }) {
     const isTrash = item.type === "trash";
     const setSelectedItem = useSelectionStore((state) => state.setSelectedItem);
 
@@ -111,7 +109,8 @@ export const NoteWrapper = React.memo(
         index={index}
         height={100}
         testID={notesnook.ids.note.get(index)}
-        onPress={() => openNote(item, isTrash, setSelectedItem)}
+        onPress={() => openNote(item, isTrash, setSelectedItem, isSheet)}
+        isSheet={isSheet}
         item={item}
       >
         <NoteItem item={item} dateBy={dateBy} tags={tags} isTrash={isTrash} />

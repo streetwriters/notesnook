@@ -26,6 +26,8 @@ import TrashItem from "../trash-item";
 import Attachment from "../attachment";
 import { db } from "../../common/db";
 import { getTotalNotes } from "../../common";
+import Reminder from "../reminder";
+import type { Reminder as ReminderType } from "@notesnook/core/collections/reminders";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
@@ -46,22 +48,27 @@ type NotebookReference = Item & { topics: string[] };
 type NotebookType = Item & { topics: Item[] };
 
 export type Context = { type: string } & Record<string, unknown>;
-type ItemWrapperProps = {
+type ItemWrapperProps<TItem = Item> = {
   index: number;
-  item: Item;
+  item: TItem;
   type: keyof typeof ListProfiles;
-  context: Context;
+  context?: Context;
+  compact?: boolean;
 };
 
-type ItemWrapper = (props: ItemWrapperProps) => JSX.Element;
+type ItemWrapper<TItem = Item> = (
+  props: ItemWrapperProps<TItem>
+) => JSX.Element;
 
-const NotesProfile: ItemWrapper = ({ index, item, type, context }) => (
+const NotesProfile: ItemWrapper = ({ index, item, type, context, compact }) => (
   <Note
+    compact={compact}
     index={index}
     pinnable={!context}
     item={item}
     tags={getTags(item)}
     notebook={getNotebook(item.notebooks as Item[], context?.type)}
+    reminder={getReminder(item.id)}
     date={getDate(item, type)}
     context={context}
   />
@@ -80,12 +87,16 @@ const TagsProfile: ItemWrapper = ({ index, item }) => (
   <Tag item={item} index={index} />
 );
 
-const TopicsProfile: ItemWrapper = ({ index, item, context }) => (
+const TopicsProfile: ItemWrapper = ({ index, item }) => (
   <Topic
     index={index}
     item={item}
-    onClick={() => navigate(`/notebooks/${context.notebookId}/${item.id}`)}
+    onClick={() => navigate(`/notebooks/${item.notebookId}/${item.id}`)}
   />
+);
+
+const RemindersProfile: ItemWrapper = ({ index, item }) => (
+  <Reminder item={item as ReminderType} index={index} />
 );
 
 const TrashProfile: ItemWrapper = ({ index, item, type }) => (
@@ -100,6 +111,7 @@ export const ListProfiles = {
   home: NotesProfile,
   notebooks: NotebooksProfile,
   notes: NotesProfile,
+  reminders: RemindersProfile,
   tags: TagsProfile,
   topics: TopicsProfile,
   trash: TrashProfile,
@@ -128,7 +140,7 @@ type NotebookResult =
 
 function getNotebook(
   notebooks: Item[],
-  contextType: string
+  contextType?: string
 ): NotebookResult | undefined {
   if (contextType === "topic" || !notebooks?.length) return;
 
@@ -152,6 +164,10 @@ function getNotebook(
     } as NotebookResult;
   },
   undefined as NotebookResult);
+}
+
+function getReminder(noteId: string) {
+  return db.relations?.from({ id: noteId, type: "note" }, "reminder")[0];
 }
 
 function getDate(item: Item, groupType: keyof typeof ListProfiles) {

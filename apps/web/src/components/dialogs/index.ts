@@ -37,6 +37,10 @@ const TrackingDetailsDialog = React.lazy(
   () => import("./tracking-details-dialog")
 );
 const ReminderDialog = React.lazy(() => import("./reminder-dialog"));
+const AddReminderDialog = React.lazy(() => import("./add-reminder-dialog"));
+const ReminderPreviewDialog = React.lazy(
+  () => import("./reminder-preview-dialog")
+);
 const AnnouncementDialog = React.lazy(() => import("./announcement-dialog"));
 const IssueDialog = React.lazy(() => import("./issue-dialog"));
 const MultifactorDialog = React.lazy(() => import("./mfa/multi-factor-dialog"));
@@ -49,6 +53,7 @@ const AttachmentsDialog = React.lazy(() => import("./attachments-dialog"));
 const Prompt = React.lazy(() => import("./prompt"));
 const ToolbarConfigDialog = React.lazy(() => import("./toolbar-config-dialog"));
 const MigrationDialog = React.lazy(() => import("./migration-dialog"));
+const EmailChangeDialog = React.lazy(() => import("./email-change-dialog"));
 
 export const Dialogs = {
   AddNotebookDialog,
@@ -73,5 +78,8 @@ export const Dialogs = {
   RecoveryCodesDialog,
   OnboardingDialog,
   AttachmentsDialog,
-  MigrationDialog
+  MigrationDialog,
+  AddReminderDialog,
+  ReminderPreviewDialog,
+  EmailChangeDialog
 };

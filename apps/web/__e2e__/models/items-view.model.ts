@@ -21,6 +21,7 @@ import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { BaseViewModel } from "./base-view.model";
 import { ItemModel } from "./item.model";
+import { SearchViewModel } from "./search-view-model";
 import { Item } from "./types";
 import { fillItemDialog } from "./utils";
 

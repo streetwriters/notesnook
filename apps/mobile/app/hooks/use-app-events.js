@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import NetInfo from "@react-native-community/netinfo";
-import { EV, EVENTS } from "@notesnook/core/common";
+import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/common";
 import { useEffect, useRef } from "react";
 import {
   Appearance,
@@ -45,13 +45,13 @@ import { DatabaseLogger, db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import {
   eClearEditor,
-  eCloseProgressDialog,
+  eCloseSheet,
   eOnLoadNote,
   refreshNotesPage
 } from "../utils/events";
 import Sync from "../services/sync";
 import { initAfterSync } from "../stores";
-import { useUserStore } from "../stores/use-user-store";
+import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { useMessageStore } from "../stores/use-message-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useAttachmentStore } from "../stores/use-attachment-store";
@@ -130,6 +130,23 @@ export const useAppEvents = () => {
     };
   }, [loading, onSyncComplete]);
 
+  const onSyncStatusCheck = useCallback(async (type) => {
+    const { disableSync, disableAutoSync } = SettingsService.get();
+    switch (type) {
+      case SYNC_CHECK_IDS.sync:
+        return { type, result: !disableSync };
+      case SYNC_CHECK_IDS.autoSync:
+        return { type, result: !disableAutoSync };
+      default:
+        return { type, result: true };
+    }
+  }, []);
+
+  const onSyncAborted = useCallback((error) => {
+    useUserStore.getState().setSyncing(false, SyncStatus.Failed);
+    if (error) ToastEvent.error(new Error(error));
+  }, []);
+
   useEffect(() => {
     let subs = [
       Appearance.addChangeListener(SettingsService.setTheme),
@@ -140,6 +157,8 @@ export const useAppEvents = () => {
       )
     ];
 
+    EV.subscribe(EVENTS.syncCheckStatus, onSyncStatusCheck);
+    EV.subscribe(EVENTS.syncAborted, onSyncAborted);
     EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete);
     EV.subscribe(EVENTS.userLoggedOut, onLogout);
     EV.subscribe(EVENTS.userEmailConfirmed, onEmailVerified);
@@ -152,6 +171,8 @@ export const useAppEvents = () => {
     return () => {
       eUnSubscribeEvent("userLoggedIn", onUserUpdated);
 
+      EV.unsubscribe(EVENTS.syncCheckStatus, onSyncStatusCheck);
+      EV.unsubscribe(EVENTS.syncAborted, onSyncAborted);
       EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
       EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
       EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
@@ -163,7 +184,14 @@ export const useAppEvents = () => {
 
       subs.forEach((sub) => sub?.remove());
     };
-  }, [onEmailVerified, onSyncComplete, onUrlRecieved, onUserUpdated]);
+  }, [
+    onEmailVerified,
+    onSyncComplete,
+    onSyncStatusCheck,
+    onUrlRecieved,
+    onUserUpdated,
+    onSyncAborted
+  ]);
 
   const onSessionExpired = async () => {
     SettingsService.set({
@@ -219,7 +247,7 @@ export const useAppEvents = () => {
   const onSyncComplete = useCallback(async () => {
     initAfterSync();
     setLastSynced(await db.lastSynced());
-    eSendEvent(eCloseProgressDialog, "sync_progress");
+    eSendEvent(eCloseSheet, "sync_progress");
   }, [setLastSynced]);
 
   const onUrlRecieved = useCallback(
@@ -277,6 +305,7 @@ export const useAppEvents = () => {
   };
 
   const onRequestPartialSync = async (full, force) => {
+    if (SettingsService.get().disableAutoSync) return;
     DatabaseLogger.info(`onRequestPartialSync full:${full}, force:${force}`);
     if (full || force) {
       await Sync.run("global", force, full);
@@ -490,6 +519,9 @@ export const useAppEvents = () => {
       let user = await db.user.getUser();
       if (user && state.isConnected && state.isInternetReachable) {
         await db.connectSSE();
+      } else {
+        useUserStore.getState().setSyncing(false);
+        await db.syncer.stop();
       }
       refValues.current.isReconnecting = false;
     } catch (e) {

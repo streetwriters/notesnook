@@ -17,36 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect } from "react";
-import { Box, Text } from "@theme-ui/components";
-import Dialog from "./dialog";
-import * as Icon from "../icons";
+import { setPrivacyMode } from "../../config/privacyMode";
 
-function LoadingDialog(props) {
-  useEffect(() => {
-    (async function () {
-      try {
-        props.onDone(await props.action());
-      } catch (e) {
-        props.onDone(e);
-      }
-    })();
-  }, [props]);
-
-  return (
-    <Dialog
-      isOpen={true}
-      title={props.title}
-      description={props.subtitle}
-      onClose={() => {}}
-    >
-      <Box>
-        <Text as="span" variant="body">
-          {props.message}
-        </Text>
-        <Icon.Loading rotate sx={{ my: 2 }} color="primary" />
-      </Box>
-    </Dialog>
-  );
-}
-export default LoadingDialog;
+export default (args) => {
+  if (!global.win) return;
+  const { privacyMode } = args;
+  global.win.setContentProtection(privacyMode);
+  setPrivacyMode(privacyMode);
+};

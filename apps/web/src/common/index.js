@@ -56,6 +56,10 @@ export const CREATE_BUTTON_MAP = {
   tags: {
     title: "Create a tag",
     onClick: () => hashNavigate(`/tags/create`)
+  },
+  reminders: {
+    title: "Add a reminder",
+    onClick: () => hashNavigate(`/reminders/create`)
   }
 };
 
@@ -125,7 +129,7 @@ export async function selectBackupFile() {
     });
     reader.readAsText(file);
   });
-  console.log(file, backup);
+
   return { file, backup };
 }
 

@@ -281,15 +281,11 @@ type UsePopupHandlerOptions = {
   onClosed?: () => void;
 };
 export function usePopupHandler(options: UsePopupHandlerOptions) {
-  const { isOpen, id, onClosed } = options;
-  const isBottom = useToolbarStore(
-    (store) => store.toolbarLocation === "bottom"
-  );
+  const { isOpen, id, onClosed, group } = options;
   const isPopupOpen = useToolbarStore((store) => !!store.openedPopups[id]);
   const openPopup = useToolbarStore((store) => store.openPopup);
   const closePopup = useToolbarStore((store) => store.closePopup);
   const closePopupGroup = useToolbarStore((store) => store.closePopupGroup);
-  const group = isBottom ? "popup" : options.group;
 
   useEffect(() => {
     if (isOpen) openPopup({ id, group });

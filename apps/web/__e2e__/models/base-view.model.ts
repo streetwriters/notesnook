@@ -20,11 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { iterateList } from "./utils";
+import { ContextMenuModel } from "./context-menu.model";
+import { SortOptions } from "./types";
 
 export class BaseViewModel {
   protected readonly page: Page;
   protected readonly list: Locator;
   private readonly listPlaceholder: Locator;
+  private readonly sortByButton: Locator;
 
   constructor(page: Page, pageId: string) {
     this.page = page;
@@ -32,6 +35,8 @@ export class BaseViewModel {
     this.listPlaceholder = page.locator(
       `#${pageId} >> ${getTestId("list-placeholder")}`
     );
+
+    this.sortByButton = this.list.locator(getTestId("sort-icon-button"));
   }
 
   async findGroup(groupName: string) {
@@ -93,5 +98,40 @@ export class BaseViewModel {
     const itemList = this.list.locator(getTestId(`virtuoso-item-list`));
     await itemList.press(key);
     await this.page.waitForTimeout(300);
+  }
+
+  async sort(sort: SortOptions) {
+    const contextMenu: ContextMenuModel = new ContextMenuModel(this.page);
+
+    await contextMenu.open(this.sortByButton, "left");
+    await contextMenu.clickOnItem("groupBy");
+    if (!(await contextMenu.hasItem(sort.groupBy))) {
+      await contextMenu.close();
+      return false;
+    }
+    await contextMenu.clickOnItem(sort.groupBy);
+
+    await contextMenu.open(this.sortByButton, "left");
+    await contextMenu.clickOnItem("sortDirection");
+    if (!(await contextMenu.hasItem(sort.orderBy))) {
+      await contextMenu.close();
+      return false;
+    }
+    await contextMenu.clickOnItem(sort.orderBy);
+
+    await contextMenu.open(this.sortByButton, "left");
+    await contextMenu.clickOnItem("sortBy");
+    if (!(await contextMenu.hasItem(sort.sortBy))) {
+      await contextMenu.close();
+      return false;
+    }
+    await contextMenu.clickOnItem(sort.sortBy);
+
+    return true;
+  }
+
+  async isEmpty() {
+    const totalItems = await this.list.locator(getTestId("list-item")).count();
+    return totalItems <= 0;
   }
 }

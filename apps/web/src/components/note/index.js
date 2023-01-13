@@ -22,7 +22,11 @@ import { Button, Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
-import { confirm, showMoveNoteDialog } from "../../common/dialog-controller";
+import {
+  confirm,
+  showAddReminderDialog,
+  showMoveNoteDialog
+} from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
 import { store as userstore } from "../../stores/user-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
@@ -36,12 +40,27 @@ import { COLORS } from "../../common/constants";
 import { exportNotes } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";
 import { store as selectionStore } from "../../stores/selection-store";
+import {
+  formatReminderTime,
+  isReminderActive,
+  isReminderToday
+} from "@notesnook/core/collections/reminders";
 
 function Note(props) {
-  const { tags, notebook, item, index, context, date } = props;
+  const {
+    tags,
+    notebook,
+    item,
+    index,
+    context,
+    date,
+    reminder,
+    simplified,
+    compact
+  } = props;
   const note = item;
+
   const isOpened = useStore((store) => store.selectedNote === note.id);
-  const isCompact = useStore((store) => store.viewMode === "compact");
   const attachments = useAttachmentStore((store) =>
     store.attachments.filter((a) => a.noteIds.includes(note.id))
   );
@@ -59,7 +78,8 @@ function Note(props) {
     <ListItem
       selectable
       isFocused={isOpened}
-      isCompact={isCompact}
+      isCompact={compact}
+      isSimple={simplified}
       item={note}
       title={note.title}
       body={note.headline}
@@ -92,22 +112,34 @@ function Note(props) {
         }
       }}
       header={
-        notebook && (
-          <IconTag
-            styles={{
-              container: {
-                alignSelf: "flex-start",
-                justifySelf: "flex-start",
-                mb: 1
+        <Flex
+          sx={{ alignItems: "center", flexWrap: "wrap", gap: 1, mt: "small" }}
+        >
+          {notebook && (
+            <IconTag
+              onClick={() => {
+                navigate(`/notebooks/${notebook.id}/${notebook.topic.id}`);
+              }}
+              text={`${notebook.title} › ${notebook.topic.title}`}
+              icon={Icon.Notebook}
+            />
+          )}
+          {reminder && isReminderActive(reminder) && (
+            <IconTag
+              icon={Icon.Reminder}
+              text={formatReminderTime(reminder, true)}
+              title={reminder.title}
+              styles={
+                isReminderToday(reminder)
+                  ? {
+                      icon: { color: primary },
+                      text: { color: primary }
+                    }
+                  : {}
               }
-            }}
-            onClick={() => {
-              navigate(`/notebooks/${notebook.id}/${notebook.topic.id}`);
-            }}
-            text={`${notebook.title} › ${notebook.topic.title}`}
-            icon={Icon.Notebook}
-          />
-        )
+            />
+          )}
+        </Flex>
       }
       footer={
         <Flex
@@ -117,7 +149,7 @@ function Note(props) {
             alignItems: "center"
           }}
         >
-          {isCompact ? (
+          {compact ? (
             <>
               {note.conflicted && (
                 <Icon.Alert size={15} color="error" sx={{ mr: 1 }} />
@@ -227,7 +259,9 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.locked === nextItem.locked &&
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
+    prevProps.compact === nextProps.compact &&
     prevProps.notebook?.dateEdited === nextProps.notebook?.dateEdited &&
+    prevProps.reminder?.dateModified === nextProps.reminder?.dateModified &&
     JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags) &&
     JSON.stringify(prevProps.context) === JSON.stringify(nextProps.context)
   );
@@ -297,6 +331,14 @@ const menuItems = [
       await showMoveNoteDialog(items.map((i) => i.id));
     },
     multiSelect: true
+  },
+  {
+    key: "addreminder",
+    title: "Add reminder",
+    icon: Icon.AddReminder,
+    onClick: async ({ note }) => {
+      await showAddReminderDialog(note.id);
+    }
   },
   {
     key: "colors",

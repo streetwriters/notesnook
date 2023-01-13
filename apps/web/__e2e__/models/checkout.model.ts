@@ -132,7 +132,14 @@ class PricingModel {
         .locator(getPaddleTestId("postcodeInput"))
         .fill(pinCode.toString());
 
-    await paddle.locator(getPaddleTestId("locationFormSubmitButton")).click();
+    let locationFormSubmitButton = paddle.locator(
+      getPaddleTestId("combinedAuthenticationLocationFormSubmitButton")
+    );
+    if (!(await locationFormSubmitButton.isVisible()))
+      locationFormSubmitButton = paddle.locator(
+        getPaddleTestId("locationFormSubmitButton")
+      );
+    await locationFormSubmitButton.click();
 
     await paddle
       .locator(getPaddleTestId("inlineComplianceBarContainer"))

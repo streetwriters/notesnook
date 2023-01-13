@@ -22,13 +22,16 @@ import {
   ActivityIndicator,
   ColorValue,
   TextStyle,
-  ViewStyle
+  ViewStyle,
+  View
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ColorKey, useThemeStore } from "../../../stores/use-theme-store";
+import { useUserStore } from "../../../stores/use-user-store";
 import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
 import { BUTTON_TYPES } from "../../../utils/constants";
 import { SIZE } from "../../../utils/size";
+import { ProTag } from "../../premium/pro-tag";
 import { PressableButton, PressableButtonProps } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
@@ -53,6 +56,7 @@ export interface ButtonProps extends PressableButtonProps {
   bold?: boolean;
   iconColor?: ColorValue;
   iconStyle?: TextStyle;
+  proTag?: boolean;
 }
 export const Button = ({
   height = 45,
@@ -76,10 +80,11 @@ export const Button = ({
   iconColor,
   fwdRef,
   iconStyle,
+  proTag,
   ...restProps
 }: ButtonProps) => {
   const colors = useThemeStore((state) => state.colors);
-
+  const premium = useUserStore((state) => state.premium);
   const textColor = buttonType?.text
     ? buttonType.text
     : (colors[
@@ -152,6 +157,15 @@ export const Button = ({
           {title}
         </Component>
       )}
+      {proTag && !premium ? (
+        <View
+          style={{
+            marginLeft: 10
+          }}
+        >
+          <ProTag size={10} width={40} background={colors.shade} />
+        </View>
+      ) : null}
 
       {icon && !loading && iconPosition === "right" ? (
         <Icon

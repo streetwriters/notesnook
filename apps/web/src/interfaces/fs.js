@@ -102,14 +102,14 @@ async function writeEncryptedFile(file, key, hash) {
  * 3. We encrypt the Uint8Array
  * 4. We save the encrypted Uint8Array
  */
-async function writeEncrypted(filename, { data, type, key }) {
+async function writeEncrypted(filename, { data, type, key, mimeType }) {
   if (type === "base64") data = new Uint8Array(Buffer.from(data, "base64"));
 
   const { hash, type: hashType } = await hashBuffer(data);
   if (!filename) filename = hash;
 
   const file = new File([data.buffer], filename, {
-    type: "application/octet-stream"
+    type: mimeType || "application/octet-stream"
   });
 
   const result = await writeEncryptedFile(file, key, hash);
@@ -291,6 +291,7 @@ async function uploadFile(filename, requestOptions) {
     await fileHandle.addAdditionalData("uploaded", true);
     // Keep the images cached; delete everything else.
     if (!fileHandle.file.type?.startsWith("image/")) {
+      console.log("DELETING FILE", fileHandle);
       await streamablefs.deleteFile(filename);
     }
     await checkUpload(filename);
@@ -574,7 +575,7 @@ function parseS3Error(data) {
   if (!(data instanceof ArrayBuffer)) {
     return {
       Code: "UNKNOWN",
-      Message: "An unknown error occured while uploading the attachment."
+      Message: typeof data === "object" ? JSON.stringify(data) : data
     };
   }
   const xml = new TextDecoder().decode(data);

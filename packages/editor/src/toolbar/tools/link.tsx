@@ -25,7 +25,7 @@ import { LinkPopup } from "../popups/link-popup";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
 import { MoreTools } from "../components/more-tools";
 import { useRefValue } from "../../hooks/use-ref-value";
-import { findMark, selectionToOffset } from "../utils/prosemirror";
+import { findMark, selectionToOffset } from "../../utils/prosemirror";
 import { TextSelection } from "prosemirror-state";
 import { Flex, Link } from "@theme-ui/components";
 import { ImageNode } from "../../extensions/image";

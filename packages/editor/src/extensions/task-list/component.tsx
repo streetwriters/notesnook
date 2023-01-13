@@ -17,28 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex, Text } from "@theme-ui/components";
-import { ReactNodeViewProps } from "../react";
-import { Node } from "prosemirror-model";
+import { Box, Flex, Input, Text } from "@theme-ui/components";
 import { findChildren, getNodeType } from "@tiptap/core";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
+import TaskItem from "@tiptap/extension-task-item";
+import { Node } from "prosemirror-model";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Input } from "@theme-ui/components";
+import { ToolButton } from "../../toolbar/components/tool-button";
+import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
+import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
-import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store";
-import { ToolButton } from "../../toolbar/components/tool-button";
-import TaskItem from "@tiptap/extension-task-item";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
 ) {
-  const isMobile = useIsMobile();
+  // const isMobile = useIsMobile();
   const { editor, getPos, node, updateAttributes, forwardRef } = props;
   const taskItemType = getNodeType(TaskItemNode.name, editor.schema);
-  const { title, collapsed } = node.attrs;
+  const { title } = node.attrs;
   const [stats, setStats] = useState({ checked: 0, total: 0, percentage: 0 });
 
   const getParent = useCallback(() => {
@@ -93,7 +89,7 @@ export function TaskListComponent(
             sx={{
               position: "relative",
               bg: "bgSecondary",
-              py: 1,
+              py: "5px",
               borderRadius: "default",
               mb: 2,
               alignItems: "center",
@@ -123,7 +119,7 @@ export function TaskListComponent(
                 px: 2,
                 zIndex: 1,
                 color: "fontTertiary",
-                fontSize: "body"
+                fontSize: "title"
               }}
               placeholder="Untitled"
               onChange={(e) => {
@@ -133,43 +129,42 @@ export function TaskListComponent(
                 );
               }}
             />
-            <Flex sx={{ flexShrink: 0, pr: 2, zIndex: 1 }}>
-              <ToolButton
-                toggled={false}
-                title="Clear completed tasks"
-                icon="clear"
-                variant="small"
-                onClick={() => {
-                  if (!editor.current) return;
-                  const pos = getPos();
-                  // we need to get a fresh instance of the task list instead
-                  // of using the one we got via props.
-                  const node = editor.current.state.doc.nodeAt(pos);
-                  if (!node) return;
+            <Flex
+              sx={{ flexShrink: 0, pr: 2, zIndex: 1, alignItems: "center" }}
+            >
+              {editor.isEditable && (
+                <ToolButton
+                  toggled={false}
+                  title="Clear completed tasks"
+                  icon="clear"
+                  variant="small"
+                  onClick={() => {
+                    if (!editor.isEditable) return;
+                    if (!editor.current) return;
+                    const pos = getPos();
+                    // we need to get a fresh instance of the task list instead
+                    // of using the one we got via props.
+                    const node = editor.current.state.doc.nodeAt(pos);
+                    if (!node) return;
 
-                  editor.current?.commands.command(({ tr }) => {
-                    const taskItems = findChildren(
-                      node,
-                      (n) => n.type.name === TaskItem.name && n.attrs.checked
-                    );
-                    const mapping = tr.mapping;
-                    for (const item of taskItems) {
-                      const childPos = pos + item.pos + 1;
-                      tr.deleteRange(
-                        mapping.map(childPos),
-                        mapping.map(childPos + item.node.nodeSize)
+                    editor.current?.commands.command(({ tr }) => {
+                      const taskItems = findChildren(
+                        node,
+                        (n) => n.type.name === TaskItem.name && n.attrs.checked
                       );
-                    }
-                    return true;
-                  });
-                }}
-              />
-              <Icon
-                path={Icons.checkbox}
-                size={15}
-                color="fontTertiary"
-                sx={{ ml: 1 }}
-              />
+                      const mapping = tr.mapping;
+                      for (const item of taskItems) {
+                        const childPos = pos + item.pos + 1;
+                        tr.deleteRange(
+                          mapping.map(childPos),
+                          mapping.map(childPos + item.node.nodeSize)
+                        );
+                      }
+                      return true;
+                    });
+                  }}
+                />
+              )}
               <Text variant={"body"} sx={{ ml: 1, color: "fontTertiary" }}>
                 {stats.checked}/{stats.total}
               </Text>
@@ -182,7 +177,7 @@ export function TaskListComponent(
         ref={forwardRef}
         sx={{
           ul: {
-            display: collapsed ? "none" : "block",
+            display: "block",
             paddingInlineStart: 0,
             marginBlockStart: isNested ? 10 : 0,
             marginBlockEnd: 0,

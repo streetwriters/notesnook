@@ -20,16 +20,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useEffect, useRef, useState } from "react";
 import { TextProps } from "react-native";
 import { timeSince } from "../../../utils/time";
+import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
 interface TimeSinceProps extends TextProps {
   updateFrequency: number;
   time: number;
+  bold?: boolean
 }
 
 export const TimeSince = ({
   time,
   style,
-  updateFrequency = 30000
+  updateFrequency = 30000,
+  bold
 }: TimeSinceProps) => {
   const [timeAgo, setTimeAgo] = useState<string | null>(null);
   const interval = useRef<NodeJS.Timer>();
@@ -46,5 +49,9 @@ export const TimeSince = ({
     };
   }, [time, updateFrequency]);
 
-  return <Paragraph style={style}>{timeAgo}</Paragraph>;
+  return bold ? (
+    <Heading style={style}>{timeAgo}</Heading>
+  ) : (
+    <Paragraph style={style}>{timeAgo}</Paragraph>
+  );
 };

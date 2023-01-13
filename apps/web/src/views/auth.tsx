@@ -27,7 +27,6 @@ import {
   MfaSms,
   MfaEmail,
   MfaRecoveryCode,
-  ArrowRight,
   Logout,
   Icon
 } from "../components/icons";
@@ -49,44 +48,47 @@ import {
   showLogoutConfirmation
 } from "../common/dialog-controller";
 
-type LoginFormData = {
+type EmailFormData = {
   email: string;
+};
+
+type PasswordFormData = EmailFormData & {
   password: string;
 };
 
-type MFALoginFormData = LoginFormData & {
+type MFALoginFormData = {
   code?: string;
   method?: MFAMethodType;
 };
 
-type SignupFormData = LoginFormData & {
-  "confirm-password": string;
-};
+type SignupFormData = EmailFormData &
+  PasswordFormData & {
+    "confirm-password": string;
+  };
 
 type AccountRecoveryFormData = {
   email: string;
 };
 
-type MFAFormData = LoginFormData & {
+type MFAFormData = EmailFormData & {
   selectedMethod: MFAMethodType;
   primaryMethod: MFAMethodType;
   code?: string;
-  token: string;
   secondaryMethod?: MFAMethodType;
   phoneNumber?: string;
 };
 
 type MFAErrorData = {
   primaryMethod: MFAMethodType;
-  token: string;
   secondaryMethod?: MFAMethodType;
   phoneNumber?: string;
 };
 
 type AuthFormData = {
-  login: LoginFormData;
+  "login:email": EmailFormData;
+  "login:password": PasswordFormData;
   signup: SignupFormData;
-  sessionExpiry: LoginFormData;
+  sessionExpiry: EmailFormData;
   recover: AccountRecoveryFormData;
   "mfa:code": MFAFormData;
   "mfa:select": MFAFormData;
@@ -94,7 +96,8 @@ type AuthFormData = {
 
 type BaseFormData =
   | MFAFormData
-  | LoginFormData
+  | EmailFormData
+  | PasswordFormData
   | AccountRecoveryFormData
   | SignupFormData;
 
@@ -108,7 +111,8 @@ type BaseAuthComponentProps<TRoute extends AuthRoutes> = {
 };
 type AuthRoutes =
   | "sessionExpiry"
-  | "login"
+  | "login:email"
+  | "login:password"
   | "signup"
   | "recover"
   | "mfa:code"
@@ -123,8 +127,10 @@ function getRouteComponent<TRoute extends AuthRoutes>(
   route: TRoute
 ): AuthComponent<TRoute> | undefined {
   switch (route) {
-    case "login":
-      return Login as AuthComponent<TRoute>;
+    case "login:email":
+      return LoginEmail as AuthComponent<TRoute>;
+    case "login:password":
+      return LoginPassword as AuthComponent<TRoute>;
     case "signup":
       return Signup as AuthComponent<TRoute>;
     case "sessionExpiry":
@@ -140,16 +146,18 @@ function getRouteComponent<TRoute extends AuthRoutes>(
 }
 
 const routePaths: Record<AuthRoutes, string> = {
-  login: "/login",
+  "login:email": "/login",
+  "login:password": "/login/password",
+  "mfa:code": "/login/mfa/code",
+  "mfa:select": "/login/mfa/select",
   recover: "/recover",
   sessionExpiry: "/sessionexpired",
-  signup: "/signup",
-  "mfa:code": "/mfa/code",
-  "mfa:select": "/mfa/select"
+  signup: "/signup"
 };
 
 const authorizedRoutes: AuthRoutes[] = [
-  "login",
+  "login:email",
+  "login:password",
   "signup",
   "mfa:code",
   "mfa:select",
@@ -190,25 +198,7 @@ function Auth(props: AuthProps) {
           flexDirection: "column"
         }}
       >
-        {route === "login" || route === "signup" || route === "recover" ? (
-          <Button
-            sx={{
-              display: "flex",
-              mt: 2,
-              mr: 2,
-              alignSelf: "end",
-              alignItems: "center"
-            }}
-            variant={"secondary"}
-            onClick={() => {
-              if (route === "signup")
-                trackEvent(ANALYTICS_EVENTS.signupSkipped);
-              openURL("/notes/");
-            }}
-          >
-            Jump to app <ArrowRight size={18} sx={{ ml: 1 }} />
-          </Button>
-        ) : route === "sessionExpiry" ? (
+        {route === "sessionExpiry" && (
           <>
             <Button
               variant={"secondary"}
@@ -235,7 +225,7 @@ function Auth(props: AuthProps) {
               permanently
             </Button>
           </>
-        ) : null}
+        )}
 
         {Route && (
           <Route
@@ -252,13 +242,14 @@ function Auth(props: AuthProps) {
 }
 export default Auth;
 
-function Login(props: BaseAuthComponentProps<"login">) {
+function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
   const { navigate } = props;
 
   return (
     <AuthForm
-      type="login"
+      type="login:email"
       title="Welcome back!"
+      canSkip
       subtitle={
         <SubtitleWithAction
           text="Don't have an account?"
@@ -266,34 +257,81 @@ function Login(props: BaseAuthComponentProps<"login">) {
         />
       }
       loading={{
-        title: "Logging you in",
+        title: "Verifying your email",
         subtitle: "Please wait while you are authenticated."
       }}
-      onSubmit={(form) => login(form, navigate)}
+      onSubmit={async (form) => {
+        const { primaryMethod, phoneNumber, secondaryMethod } =
+          (await userstore.login(form)) as MFAErrorData;
+
+        navigate("mfa:code", {
+          email: form.email,
+          selectedMethod: primaryMethod,
+          primaryMethod,
+          phoneNumber,
+          secondaryMethod
+        });
+      }}
     >
-      {(form?: LoginFormData) => (
+      {(form?: EmailFormData) => (
         <>
           <AuthField
             id="email"
             type="email"
             autoComplete="email"
             label="Enter email"
-            autoFocus={!form?.password}
+            autoFocus
             defaultValue={form?.email}
           />
+          <SubmitButton text="Continue" />
+        </>
+      )}
+    </AuthForm>
+  );
+}
+
+function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
+  const { navigate, formData } = props;
+
+  if (!formData) {
+    openURL("/");
+    return null;
+  }
+
+  return (
+    <AuthForm
+      type="login:password"
+      title="Your account password"
+      subtitle={"Your password is always hashed before leaving this device."}
+      loading={{
+        title: "Logging you in",
+        subtitle: "Please wait while you are authenticated."
+      }}
+      onSubmit={async (form) => {
+        await userstore.login({
+          password: form.password,
+          email: formData.email
+        });
+        Config.set("sessionExpired", false);
+        openURL("/");
+      }}
+    >
+      {(form?: PasswordFormData) => (
+        <>
           <AuthField
             id="password"
             type="password"
             autoComplete="current-password"
             label="Enter password"
-            autoFocus={!!form?.password}
+            autoFocus
+            defaultValue={form?.password}
           />
           <Button
             data-test-id="auth-forgot-password"
             type="button"
             mt={2}
             variant="anchor"
-            onClick={() => navigate("recover")}
+            onClick={() => navigate("recover", { email: formData.email })}
             sx={{ color: "text", alignSelf: "end" }}
           >
             Forgot password?
@@ -312,10 +350,11 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
     <AuthForm
       type="signup"
       title="Create an account"
+      canSkip
       subtitle={
         <SubtitleWithAction
           text="Already have an account?"
-          action={{ text: "Log in", onClick: () => navigate("login") }}
+          action={{ text: "Log in", onClick: () => navigate("login:email") }}
         />
       }
       loading={{
@@ -421,9 +460,19 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         title: "Logging you in",
         subtitle: "Please wait while you are authenticated."
       }}
-      onSubmit={async (form) => {
+      onSubmit={async () => {
         if (!user) return;
-        await login({ email: user.email, password: form.password }, navigate);
+
+        const { primaryMethod, phoneNumber, secondaryMethod } =
+          (await userstore.login(user)) as MFAErrorData;
+
+        navigate("mfa:code", {
+          email: user.email,
+          selectedMethod: primaryMethod,
+          primaryMethod,
+          phoneNumber,
+          secondaryMethod
+        });
       }}
     >
       <AuthField
@@ -434,12 +483,6 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         defaultValue={user ? maskEmail(user.email) : undefined}
         autoFocus
         disabled
-      />
-      <AuthField
-        id="password"
-        type="password"
-        autoComplete="current-password"
-        label="Enter password"
       />
       <Button
         data-test-id="auth-forgot-password"
@@ -467,7 +510,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
       subtitle={
         <SubtitleWithAction
           text="Remembered your password?"
-          action={{ text: "Log in", onClick: () => navigate("login") }}
+          action={{ text: "Log in", onClick: () => navigate("login:email") }}
         />
       }
       loading={{
@@ -561,10 +604,10 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
   );
 
   const sendCode = useCallback(
-    async (selectedMethod: "sms" | "email", token: string) => {
+    async (selectedMethod: "sms" | "email") => {
       setIsSending(true);
       try {
-        await db.mfa?.sendCode(selectedMethod, token);
+        await db.mfa?.sendCode(selectedMethod);
         setEnabled(false);
       } catch (e) {
         const error = e as Error;
@@ -580,16 +623,14 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
   useEffect(() => {
     if (
       !formData ||
+      !formData.selectedMethod ||
       formData.selectedMethod === "recoveryCode" ||
       formData.selectedMethod === "app"
     )
       return;
 
     (async function () {
-      await sendCode(
-        formData.selectedMethod as "sms" | "email",
-        formData.token
-      );
+      await sendCode(formData.selectedMethod as "sms" | "email");
     })();
   }, [formData, sendCode]);
 
@@ -598,8 +639,10 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
     return null;
   }
 
-  const { selectedMethod, token } = formData;
+  const { selectedMethod } = formData;
   const texts = getTexts(formData)[selectedMethod];
+
+  if (!texts) return null;
 
   return (
     <AuthForm
@@ -607,17 +650,20 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
       title="Two-factor authentication"
       subtitle={texts.subtitle}
       loading={{
-        title: "Logging you in",
+        title: "Verifying 2FA code",
         subtitle: "Please wait while you are authenticated."
       }}
       onSubmit={async (form) => {
         const loginForm: MFALoginFormData = {
-          email: formData.email,
-          password: formData.password,
           code: form.code,
           method: formData.selectedMethod
         };
-        await login(loginForm, navigate);
+        await userstore.login(loginForm);
+        navigate("login:password", {
+          email: formData.email,
+          // TODO
+          password: ""
+        });
       }}
     >
       <AuthField
@@ -626,8 +672,8 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
         autoComplete={"one-time-code"}
         label={texts.label}
         autoFocus
-        pattern="[0-9]*"
-        inputMode="numeric"
+        pattern={selectedMethod !== "recoveryCode" ? "[0-9]*" : undefined}
+        inputMode={selectedMethod !== "recoveryCode" ? "numeric" : undefined}
         helpText={texts.instructions}
         action={
           selectedMethod === "sms" || selectedMethod === "email"
@@ -645,7 +691,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                   </Text>
                 ),
                 onClick: async () => {
-                  await sendCode(selectedMethod, token);
+                  await sendCode(selectedMethod);
                 }
               }
             : undefined
@@ -765,13 +811,14 @@ type AuthFormProps<TType extends AuthRoutes> = {
   loading: { title: string; subtitle: string };
   type: TType;
   onSubmit: (form: AuthFormData[TType]) => Promise<void>;
+  canSkip?: boolean;
   children?:
     | React.ReactNode
     | ((form?: AuthFormData[TType]) => React.ReactNode);
 };
 
 export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
-  const { title, subtitle, children } = props;
+  const { title, subtitle, children, type, canSkip } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
   const formRef = useRef<HTMLFormElement>(null);
@@ -798,6 +845,10 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
           await props.onSubmit(form);
         } catch (e) {
           const error = e as Error;
+          if (error.message === "invalid_grant") {
+            hardNavigate("/login");
+            return;
+          }
           setError(error.message);
         } finally {
           setIsSubmitting(false);
@@ -824,8 +875,29 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
         {subtitle}
       </Text>
       {typeof children === "function" ? children(form) : children}
+      {canSkip && (
+        <Button
+          type="button"
+          variant="anchor"
+          sx={{
+            mt: 5,
+            color: "text",
+            textDecoration: "none",
+            ":hover": {
+              color: "bgSecondaryText"
+            }
+          }}
+          onClick={() => {
+            if (type === "signup") trackEvent(ANALYTICS_EVENTS.signupSkipped);
+            openURL("/notes/");
+          }}
+        >
+          Skip & go directly to the app
+        </Button>
+      )}
+
       {error && (
-        <Flex bg="errorBg" p={1} mt={2} sx={{ borderRadius: "default" }}>
+        <Flex bg="errorBg" p={1} mt={5} sx={{ borderRadius: "default" }}>
           <ErrorIcon size={15} color="error" />
           <Text variant="error" ml={1}>
             {error}
@@ -847,18 +919,21 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
   return (
     <>
       {props.text}{" "}
-      <Text
+      <Button
+        type="button"
+        variant="anchor"
         sx={{
           textDecoration: "underline",
           ":hover": { color: "dimPrimary" },
-          cursor: "pointer",
-          color: "text"
+          fontWeight: "bold",
+          fontSize: "subtitle",
+          color: "text",
+          cursor: "pointer"
         }}
-        as="b"
         onClick={props.action.onClick}
       >
         {props.action.text}
-      </Text>
+      </Button>
     </>
   );
 }
@@ -938,37 +1013,6 @@ export function SubmitButton(props: SubmitButtonProps) {
       {props.loading ? <Loading color="static" /> : props.text}
     </Button>
   );
-}
-
-async function login(
-  form: LoginFormData | MFALoginFormData,
-  navigate: NavigateFunction
-) {
-  try {
-    await userstore.login(form);
-    Config.set("sessionExpired", false);
-    openURL("/");
-  } catch (e) {
-    const error = e as Error & { code?: string; data?: unknown };
-    if (error.code === "mfa_required") {
-      const { primaryMethod, phoneNumber, secondaryMethod, token } =
-        error.data as MFAErrorData;
-
-      if (!primaryMethod)
-        throw new Error(
-          "Multi-factor is required but the server didn't send a primary MFA method."
-        );
-
-      navigate("mfa:code", {
-        ...form,
-        token,
-        selectedMethod: primaryMethod,
-        primaryMethod,
-        phoneNumber,
-        secondaryMethod
-      });
-    } else throw e;
-  }
 }
 
 function openURL(url: string, force?: boolean) {

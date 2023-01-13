@@ -63,7 +63,7 @@ jobs:
     name: 🧪 Test (${{ matrix.shard }}/${{ strategy.job-total }})
     strategy:
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -95,7 +95,7 @@ jobs:
       - name: Install packages
         run: |
           npm i --ignore-scripts --prefer-offline --no-audit
-          npm install -D @playwright/test
+          npm install -D @playwright/test otplib
 
       - name: Validate build extraction
         run: ls -ld ./apps/web/build/index.html
@@ -107,8 +107,9 @@ jobs:
       - name: Add environment variables
         run: |
           echo "USER_EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
-          echo "CURRENT_USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
-          echo "CURRENT_USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
+          echo "USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
+          echo "USER_TOTP_SECRET=${{ secrets.USER_TOTP_SECRET }}" >> $GITHUB_ENV
+          echo "USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
 
       - name: Run tests
         run: npx playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }}

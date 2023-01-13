@@ -16,8 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+export type DownloadOptions = {
+  corsHost: string;
+};
 
-export async function downloadImage(url: string) {
+export async function downloadImage(url: string, options?: DownloadOptions) {
+  if (options?.corsHost) url = `${options.corsHost}/${url}`;
   const response = await fetch(url);
   if (!response.ok) throw new Error(`invalid status code ${response.status}`);
 

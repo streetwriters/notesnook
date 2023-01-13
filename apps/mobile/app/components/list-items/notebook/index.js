@@ -131,15 +131,6 @@ export const NotebookItem = ({
             height: SIZE.md + 2
           }}
         >
-          <Paragraph
-            color={colors.accent}
-            size={SIZE.xs}
-            style={{
-              marginRight: 6
-            }}
-          >
-            {isTopic ? "Topic" : "Notebook"}
-          </Paragraph>
 
           {isTrash ? (
             <>

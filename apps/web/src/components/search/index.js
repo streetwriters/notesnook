@@ -24,6 +24,7 @@ import Field from "../field";
 function SearchBox(props) {
   return (
     <Field
+      data-test-id="search-input"
       autoFocus
       id="search"
       name="search"
@@ -35,6 +36,7 @@ function SearchBox(props) {
       }}
       action={{
         icon: Icon.Search,
+        testId: "search-button",
         onClick: () => {
           const searchField = document.getElementById("search");
           if (searchField && searchField.value && searchField.value.length) {

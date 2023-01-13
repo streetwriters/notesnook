@@ -225,7 +225,8 @@ export const SelectionHeader = React.memo(() => {
 
         {screen === "Trash" ||
         screen === "Notebooks" ||
-        screen === "Notebook" ? null : (
+        screen === "Notebook" ||
+        screen === "Reminders" ? null : (
           <>
             <IconButton
               onPress={async () => {

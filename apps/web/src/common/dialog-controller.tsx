@@ -40,6 +40,7 @@ import { Period } from "../components/dialogs/buy-dialog/types";
 import { FeatureKeys } from "../components/dialogs/feature-dialog";
 import { AuthenticatorType } from "../components/dialogs/mfa/types";
 import { Suspense } from "react";
+import { Reminder } from "@notesnook/core/collections/reminders";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -191,6 +192,13 @@ export function showPromptDialog(props: {
   ));
 }
 
+export function showEmailChangeDialog() {
+  return showDialog<"EmailChangeDialog", string | null>(
+    "EmailChangeDialog",
+    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
+  );
+}
+
 export function showToolbarConfigDialog() {
   return showDialog<"ToolbarConfigDialog", string | null>(
     "ToolbarConfigDialog",
@@ -305,23 +313,26 @@ export function showMigrationDialog() {
   ));
 }
 
-type LoadingDialogProps = {
+type LoadingDialogProps<T> = {
   title: string;
   message?: string;
   subtitle: string;
-  action: () => void;
+  action: () => T | Promise<T>;
 };
-export function showLoadingDialog(dialogData: LoadingDialogProps) {
+export function showLoadingDialog<T>(dialogData: LoadingDialogProps<T>) {
   const { title, message, subtitle, action } = dialogData;
-  return showDialog("LoadingDialog", (Dialog, perform) => (
-    <Dialog
-      title={title}
-      subtitle={subtitle}
-      message={message}
-      action={action}
-      onDone={(e: boolean) => perform(e)}
-    />
-  ));
+  return showDialog<"LoadingDialog", T | boolean>(
+    "LoadingDialog",
+    (Dialog, perform) => (
+      <Dialog
+        title={title}
+        description={subtitle}
+        message={message}
+        action={action}
+        onClose={(e) => perform(e as T | boolean)}
+      />
+    )
+  );
 }
 
 type ProgressDialogProps = {
@@ -614,9 +625,27 @@ export function showReminderDialog(reminderKey: string) {
   ));
 }
 
+export function showReminderPreviewDialog(reminder: Reminder) {
+  return showDialog("ReminderPreviewDialog", (Dialog, perform) => (
+    <Dialog reminder={reminder} onClose={perform} />
+  ));
+}
+
 export function showTrackingDetailsDialog() {
   return showDialog("TrackingDetailsDialog", (Dialog, perform) => (
     <Dialog onClose={(res: boolean) => perform(res)} />
+  ));
+}
+
+export function showAddReminderDialog(noteId?: string) {
+  return showDialog("AddReminderDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} noteId={noteId} />
+  ));
+}
+
+export function showEditReminderDialog(reminderId: string) {
+  return showDialog("AddReminderDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} reminderId={reminderId} />
   ));
 }
 

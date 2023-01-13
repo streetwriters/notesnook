@@ -60,7 +60,8 @@ import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { EditorEvents, editorState } from "./utils";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { EventTypes } from "./editor-events";
-
+import { RelationsList } from "../../../components/sheets/relations-list";
+import ReminderSheet from "../../../components/sheets/reminder";
 
 const publishNote = async (editor: useEditorType) => {
   const user = useUserStore.getState().user;
@@ -128,6 +129,7 @@ export const useEditorEvents = (
 ) => {
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
+  const  corsProxy = useSettingStore(state => state.settings.corsProxy);
   const handleBack = useRef<NativeEventSubscription>();
   const readonly = useEditorStore((state) => state.readonly);
   const isPremium = useUserStore((state) => state.premium);
@@ -147,7 +149,8 @@ export const useEditorEvents = (
       noHeader: noHeader,
       noToolbar: readonly || editorPropReadonly || noToolbar,
       keyboardShown: keyboardShown || false,
-      doubleSpacedLines: doubleSpacedLines
+      doubleSpacedLines: doubleSpacedLines,
+      corsProxy:corsProxy
     });
   }, [
     fullscreen,
@@ -162,7 +165,8 @@ export const useEditorEvents = (
     doubleSpacedLines,
     editorPropReadonly,
     noHeader,
-    noToolbar
+    noToolbar,
+    corsProxy
   ]);
 
   const onBackPress = useCallback(async () => {
@@ -297,8 +301,32 @@ export const useEditorEvents = (
             title: editorMessage.value as string
           });
           break;
+
+        case EventTypes.reminders:
+          if (!editor.note.current) {
+            ToastEvent.show({
+              heading: "Create a note first to add a reminder",
+              type: "success"
+            });
+            return;
+          }
+          RelationsList.present({
+            reference: editor.note.current as any,
+            referenceType: "reminder",
+            relationType: "from",
+            title: "Reminders",
+            onAdd: () =>
+              ReminderSheet.present(undefined, editor.note.current as any, true)
+          });
+          break;
         case EventTypes.newtag:
-          if (!editor.note.current) return;
+          if (!editor.note.current) {
+            ToastEvent.show({
+              heading: "Create a note first to add a tag",
+              type: "success"
+            });
+            return;
+          }
           eSendEvent(eOpenTagsDialog, editor.note.current);
           break;
         case EventTypes.tag:

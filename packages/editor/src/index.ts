@@ -75,6 +75,7 @@ import { OpenLink, OpenLinkOptions } from "./extensions/open-link";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import { KeyMap } from "./extensions/key-map";
 import { WebClipNode, WebClipOptions } from "./extensions/web-clip";
+import { DownloadOptions } from "./utils/downloader";
 
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
@@ -85,6 +86,7 @@ type TiptapOptions = EditorOptions &
   Omit<AttachmentOptions, "HTMLAttributes"> &
   Omit<WebClipOptions, "HTMLAttributes"> &
   OpenLinkOptions & {
+    downloadOptions?: DownloadOptions;
     theme: Theme;
     isMobile?: boolean;
     isKeyboardOpen?: boolean;
@@ -104,6 +106,7 @@ const useTiptap = (
     onOpenAttachmentPicker,
     onOpenLink,
     onBeforeCreate,
+    downloadOptions,
     ...restOptions
   } = options;
   const PortalProviderAPI = usePortalProvider();
@@ -111,19 +114,16 @@ const useTiptap = (
   const setTheme = useToolbarStore((store) => store.setTheme);
   const closeAllPopups = useToolbarStore((store) => store.closeAllPopups);
   const setIsKeyboardOpen = useToolbarStore((store) => store.setIsKeyboardOpen);
+  const setDownloadOptions = useToolbarStore(
+    (store) => store.setDownloadOptions
+  );
 
   useEffect(() => {
     setIsMobile(isMobile || false);
     setTheme(theme);
     setIsKeyboardOpen(isKeyboardOpen || false);
-  }, [
-    isMobile,
-    theme,
-    isKeyboardOpen,
-    setIsMobile,
-    setTheme,
-    setIsKeyboardOpen
-  ]);
+    setDownloadOptions(downloadOptions);
+  }, [isMobile, theme, isKeyboardOpen, downloadOptions]);
 
   useEffect(() => {
     closeAllPopups();
@@ -260,7 +260,13 @@ const useTiptap = (
   return editor;
 };
 
-export { useTiptap, Toolbar, usePermissionHandler, getHTMLFromFragment };
+export {
+  useTiptap,
+  Toolbar,
+  usePermissionHandler,
+  getHTMLFromFragment,
+  type DownloadOptions
+};
 export * from "./types";
 export * from "./extensions/react";
 export * from "./toolbar";
