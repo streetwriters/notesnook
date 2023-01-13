@@ -34,6 +34,7 @@ import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/common";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
 
+var syncStatusTimeout = 0;
 const BATCH_SIZE = 50;
 class AppStore extends BaseStore {
   // default state
@@ -260,6 +261,7 @@ class AppStore extends BaseStore {
     if (!this.get().isSyncEnabled) return;
     if (this.isSyncing()) return;
 
+    clearTimeout(syncStatusTimeout);
     this.updateLastSynced();
 
     this.updateSyncStatus("syncing");
@@ -267,7 +269,7 @@ class AppStore extends BaseStore {
       const result = await db.sync(full, force);
 
       if (!result) return this.updateSyncStatus("failed");
-      else if (full) this.updateSyncStatus("completed");
+      else if (full) this.updateSyncStatus("completed", true);
 
       await this.updateLastSynced();
     } catch (err) {
@@ -291,9 +293,15 @@ class AppStore extends BaseStore {
    *
    * @param {"synced" | "syncing" | "conflicts" | "failed" | "completed"} key
    */
-  updateSyncStatus = (key) => {
+  updateSyncStatus = (key, reset = false) => {
     logger.info(`Sync status updated: ${key}`);
     this.set((state) => (state.syncStatus = { key }));
+
+    if (reset) {
+      syncStatusTimeout = setTimeout(() => {
+        this.updateSyncStatus("synced", false);
+      }, 3000);
+    }
   };
 
   isSyncing = () => {
