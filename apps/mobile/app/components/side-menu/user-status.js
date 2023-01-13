@@ -25,7 +25,7 @@ import useSyncProgress from "../../hooks/use-sync-progress";
 import { eSendEvent } from "../../services/event-manager";
 import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { useUserStore } from "../../stores/use-user-store";
+import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { eOpenLoginDialog } from "../../utils/events";
 import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
@@ -33,12 +33,16 @@ import { PressableButton } from "../ui/pressable";
 import { TimeSince } from "../ui/time-since";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { useNetInfo } from "@react-native-community/netinfo";
 export const UserStatus = () => {
   const colors = useThemeStore((state) => state.colors);
   const user = useUserStore((state) => state.user);
   const syncing = useUserStore((state) => state.syncing);
+  const lastSyncStatus = useUserStore((state) => state.lastSyncStatus);
   const lastSynced = useUserStore((state) => state.lastSynced);
   const insets = useGlobalSafeAreaInsets();
+  const { isInternetReachable } = useNetInfo();
+  const isOffline = !isInternetReachable;
   const { progress } = useSyncProgress();
   return (
     <View
@@ -90,27 +94,29 @@ export const UserStatus = () => {
             >
               {!user ? (
                 "You are not logged in"
-              ) : !syncing ? (
-                lastSynced && lastSynced !== "Never" ? (
-                  <>
-                    Last synced{" "}
-                    <TimeSince
-                      style={{ fontSize: SIZE.xs, color: colors.icon }}
-                      time={lastSynced}
-                    />
-                  </>
-                ) : (
-                  "never"
-                )
+              ) : lastSynced && lastSynced !== "Never" ? (
+                <>
+                  Synced{" "}
+                  <TimeSince
+                    style={{ fontSize: SIZE.xs, color: colors.icon }}
+                    time={lastSynced}
+                    bold={true}
+                  />
+                  {isOffline ? " (offline)" : ""}
+                </>
               ) : (
-                `Syncing your notes${
-                  progress ? ` (${progress.current}/${progress.total})` : ""
-                }`
+                "never"
               )}{" "}
               <Icon
                 name="checkbox-blank-circle"
-                size={9}
-                color={!user ? colors.red : colors.green}
+                size={11}
+                color={
+                  !user || lastSyncStatus === SyncStatus.Failed
+                    ? colors.red
+                    : isOffline
+                    ? colors.orange
+                    : colors.green
+                }
               />
             </Heading>
 
@@ -122,15 +128,21 @@ export const UserStatus = () => {
             >
               {!user
                 ? "Login to sync your notes."
+                : lastSyncStatus === SyncStatus.Failed
+                ? "Last sync failed, tap to try again"
+                : syncing
+                ? `Syncing your notes${
+                    progress ? ` (${progress.current}/${progress.total})` : ""
+                  }`
                 : "Tap here to sync your notes."}
             </Paragraph>
           </View>
 
           {user ? (
             syncing ? (
-              <>
-                <ActivityIndicator color={colors.accent} size={SIZE.xl} />
-              </>
+              <ActivityIndicator color={colors.accent} size={SIZE.xl} />
+            ) : lastSyncStatus === SyncStatus.Failed ? (
+              <Icon color={colors.red} name="sync-alert" size={SIZE.lg} />
             ) : (
               <Icon color={colors.accent} name="sync" size={SIZE.lg} />
             )

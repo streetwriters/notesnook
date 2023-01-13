@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import NetInfo from "@react-native-community/netinfo";
 import { EVENTS } from "@notesnook/core/common";
 import { initAfterSync } from "../stores/index";
-import { useUserStore } from "../stores/use-user-store";
+import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { doInBackground } from "../utils";
 import { db } from "../common/database";
 import { DatabaseLogger } from "../common/database/index";
@@ -80,18 +80,19 @@ const run = async (
       });
       if (!res) {
         initAfterSync();
-        userstore.setSyncing(false);
+        userstore.setSyncing(false, SyncStatus.Failed);
         return onCompleted?.(false);
       }
       if (typeof res === "string") throw error;
       userstore.setSyncing(false);
       return onCompleted?.(true);
     } catch (e) {
+      error = e;
       if (
         !ignoredMessages.find((im) => e.message?.includes(im)) &&
         userstore.user
       ) {
-        userstore.setSyncing(false);
+        userstore.setSyncing(false, SyncStatus.Failed);
         if (status.isConnected && status.isInternetReachable) {
           ToastEvent.error(e, "Sync failed", context);
         }
@@ -99,12 +100,15 @@ const run = async (
       DatabaseLogger.error(e, "[Client] Failed to sync");
       onCompleted?.(false);
     } finally {
-      userstore.setSyncing(false);
+      userstore.setSyncing(
+        false,
+        error ? SyncStatus.Failed : SyncStatus.Passed
+      );
       if (full || forced) {
         db.eventManager.publish(EVENTS.syncCompleted);
       }
     }
-  }, 1000);
+  }, 300);
 };
 
 const Sync = {

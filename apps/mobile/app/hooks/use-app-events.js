@@ -51,7 +51,7 @@ import {
 } from "../utils/events";
 import Sync from "../services/sync";
 import { initAfterSync } from "../stores";
-import { useUserStore } from "../stores/use-user-store";
+import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { useMessageStore } from "../stores/use-message-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useAttachmentStore } from "../stores/use-attachment-store";
@@ -142,6 +142,11 @@ export const useAppEvents = () => {
     }
   }, []);
 
+  const onSyncAborted = useCallback((error) => {
+    useUserStore.getState().setSyncing(false, SyncStatus.Failed);
+    if (error) ToastEvent.error(new Error(error));
+  }, []);
+
   useEffect(() => {
     let subs = [
       Appearance.addChangeListener(SettingsService.setTheme),
@@ -153,7 +158,7 @@ export const useAppEvents = () => {
     ];
 
     EV.subscribe(EVENTS.syncCheckStatus, onSyncStatusCheck);
-
+    EV.subscribe(EVENTS.syncAborted, onSyncAborted);
     EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete);
     EV.subscribe(EVENTS.userLoggedOut, onLogout);
     EV.subscribe(EVENTS.userEmailConfirmed, onEmailVerified);
@@ -167,7 +172,7 @@ export const useAppEvents = () => {
       eUnSubscribeEvent("userLoggedIn", onUserUpdated);
 
       EV.unsubscribe(EVENTS.syncCheckStatus, onSyncStatusCheck);
-
+      EV.unsubscribe(EVENTS.syncAborted, onSyncAborted);
       EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
       EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
       EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
@@ -184,7 +189,8 @@ export const useAppEvents = () => {
     onSyncComplete,
     onSyncStatusCheck,
     onUrlRecieved,
-    onUserUpdated
+    onUserUpdated,
+    onSyncAborted
   ]);
 
   const onSessionExpired = async () => {
@@ -513,6 +519,9 @@ export const useAppEvents = () => {
       let user = await db.user.getUser();
       if (user && state.isConnected && state.isInternetReachable) {
         await db.connectSSE();
+      } else {
+        useUserStore.getState().setSyncing(false);
+        await db.syncer.stop();
       }
       refValues.current.isReconnecting = false;
     } catch (e) {
