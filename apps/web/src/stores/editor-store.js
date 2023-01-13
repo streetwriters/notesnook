@@ -125,8 +125,6 @@ class EditorStore extends BaseStore {
     }
 
     const note = db.notes.note(noteId)?.data || db.notes.trashed(noteId);
-    const isDeleted = note.type === "trash";
-
     if (!note) return;
 
     noteStore.setSelectedNote(note.id);
@@ -146,6 +144,8 @@ class EditorStore extends BaseStore {
         state: SESSION_STATES.new,
         attachmentsLength: db.attachments.ofNote(note.id, "all")?.length || 0
       };
+
+      const isDeleted = note.type === "trash";
       if (isDeleted) {
         state.session.isDeleted = true;
         state.session.readonly = true;
