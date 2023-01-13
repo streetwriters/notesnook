@@ -40,10 +40,8 @@ for (const route of routes) {
     const app = new AppModel(page);
     await app.goto();
 
-    const item = await app.navigation.findItem(route.header);
-    await item?.click();
+    await app.navigateTo(route.header);
 
-    expect(item).toBeDefined();
     expect(await app.getRouteHeader()).toBe(route.header);
   });
 }

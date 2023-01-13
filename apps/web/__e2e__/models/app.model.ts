@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { AuthModel } from "./auth.model";
 import { CheckoutModel } from "./checkout.model";
@@ -36,6 +36,7 @@ export class AppModel {
   readonly navigation: NavigationMenuModel;
   readonly auth: AuthModel;
   readonly checkout: CheckoutModel;
+  readonly routeHeader: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -43,11 +44,12 @@ export class AppModel {
     this.navigation = new NavigationMenuModel(page);
     this.auth = new AuthModel(page);
     this.checkout = new CheckoutModel(page);
+    this.routeHeader = this.page.locator(getTestId("routeHeader"));
   }
 
   async goto() {
     await this.page.goto("/");
-    await this.getRouteHeader();
+    await this.routeHeader.waitFor({ state: "visible" });
   }
 
   goBack() {
@@ -90,7 +92,7 @@ export class AppModel {
     return new SettingsViewModel(this.page);
   }
 
-  private async navigateTo(title: string) {
+  async navigateTo(title: string) {
     if ((await this.getRouteHeader()) === title) return;
     const item = await this.navigation.findItem(title);
     await item?.click();
@@ -98,10 +100,9 @@ export class AppModel {
   }
 
   async getRouteHeader() {
-    const routeHeader = this.page.locator(getTestId("routeHeader"));
-    if (!(await routeHeader.isVisible())) return;
+    if (!(await this.routeHeader.isVisible())) return;
 
-    return await routeHeader.inputValue();
+    return await this.routeHeader.inputValue();
   }
 
   async isSynced() {
