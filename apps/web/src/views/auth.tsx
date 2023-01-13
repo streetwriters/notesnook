@@ -323,7 +323,8 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
             type="password"
             autoComplete="current-password"
             label="Enter password"
-            autoFocus={!!form?.password}
+            autoFocus
+            defaultValue={form?.password}
           />
           <Button
             data-test-id="auth-forgot-password"
