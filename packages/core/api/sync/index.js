@@ -109,6 +109,7 @@ class Sync {
     this.autoSync = new AutoSync(db, 1000);
     this.logger = logger.scope("Sync");
     this.syncConnectionMutex = new Mutex();
+    this.devicesInSync = new Set();
 
     const tokenManager = new TokenManager(db.storage);
     this.connection = new signalr.HubConnectionBuilder()
@@ -149,17 +150,31 @@ class Sync {
       this.autoSync.stop();
     });
 
-    this.connection.on("SyncItem", async (syncStatus) => {
-      await this.onSyncItem(syncStatus);
+    this.connection.on("SyncItem", async (payload) => {
+      if (payload.sender) this.devicesInSync.add(payload.sender);
+
+      await this.onSyncItem(payload);
       sendSyncProgressEvent(
         this.db.eventManager,
         "download",
-        syncStatus.total,
-        syncStatus.current
+        payload.total,
+        payload.current
       );
     });
 
-    this.connection.on("RemoteSyncCompleted", (lastSynced) => {
+    this.connection.on("DeviceDisconnected", (device) => {
+      if (device && this.devicesInSync.has(device)) {
+        db.eventManager.publish(
+          EVENTS.syncAborted,
+          "The syncing device was disconnected."
+        );
+        this.devicesInSync.delete(device);
+      }
+    });
+
+    this.connection.on("RemoteSyncCompleted", (lastSynced, sender) => {
+      if (sender) this.devicesInSync.delete(sender);
+
       this.onRemoteSyncCompleted(lastSynced);
     });
   }
