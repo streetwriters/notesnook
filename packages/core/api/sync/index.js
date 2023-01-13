@@ -217,9 +217,7 @@ class Sync {
 
     await this.conflicts.recalculate();
     if (await this.conflicts.check()) {
-      throw new Error(
-        "Merge conflicts detected. Please resolve all conflicts to continue syncing."
-      );
+      this.conflicts.throw();
     }
 
     let lastSynced = await this.db.lastSynced();
@@ -264,9 +262,7 @@ class Sync {
     });
 
     if (await this.conflicts.check()) {
-      throw new Error(
-        "Merge conflicts detected. Please resolve all conflicts to continue syncing."
-      );
+      this.conflicts.throw();
     }
 
     return serverResponse;

@@ -274,7 +274,7 @@ class AppStore extends BaseStore {
       await this.updateLastSynced();
     } catch (err) {
       logger.error(err);
-      if (err.code === "MERGE_CONFLICT") {
+      if (err.cause === "MERGE_CONFLICT") {
         if (editorstore.get().session.id)
           editorstore.openSession(editorstore.get().session.id, true);
         await this.refresh();
