@@ -124,8 +124,10 @@ class Sync {
                 return scopedLogger.fatal(new Error(message));
               case signalr.LogLevel.Debug:
                 return scopedLogger.debug(message);
-              case signalr.LogLevel.Error:
+              case signalr.LogLevel.Error: {
+                db.eventManager.publish(EVENTS.syncAborted, message);
                 return scopedLogger.error(new Error(message));
+              }
               case signalr.LogLevel.Information:
                 return scopedLogger.info(message);
               case signalr.LogLevel.None:
