@@ -31,8 +31,7 @@ const config: PlaywrightTestConfig = {
   // Look for test files in thcleare "tests" directory, relative to this configuration file
   testDir: "__e2e__",
 
-  // Each test is given 30 seconds
-  timeout: 30000,
+  timeout: IS_CI ? 60 * 1000 : 30 * 1000,
   workers: IS_CI ? 2 : 2,
   reporter: "list",
   retries: IS_CI ? 1 : 0,
