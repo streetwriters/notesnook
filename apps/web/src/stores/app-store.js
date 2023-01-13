@@ -34,7 +34,6 @@ import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/common";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
 
-var syncStatusTimeout = 0;
 const BATCH_SIZE = 50;
 class AppStore extends BaseStore {
   // default state
@@ -102,6 +101,11 @@ class AppStore extends BaseStore {
         await this.get().sync(full, force);
       }
     );
+
+    db.eventManager.subscribe(EVENTS.syncAborted, (error) => {
+      showToast("error", error);
+      this.updateSyncStatus("failed");
+    });
 
     db.eventManager.subscribe(EVENTS.syncCompleted, () => {
       this.set((state) => {
@@ -256,7 +260,6 @@ class AppStore extends BaseStore {
     if (!this.get().isSyncEnabled) return;
     if (this.isSyncing()) return;
 
-    clearTimeout(syncStatusTimeout);
     this.updateLastSynced();
 
     this.updateSyncStatus("syncing");
@@ -281,11 +284,6 @@ class AppStore extends BaseStore {
       if (err?.message?.indexOf("Failed to fetch") > -1) return;
 
       showToast("error", err.message);
-    } finally {
-      if (this.get().syncStatus.key !== "conflicts")
-        syncStatusTimeout = setTimeout(() => {
-          this.updateSyncStatus("synced");
-        }, 3000);
     }
   };
 
