@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getPreviewData } from "@flyerhq/react-native-link-preview";
 import { parseHTML } from "@notesnook/core/utils/html-parser";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -42,14 +42,13 @@ import ShareExtension from "rn-extensions-share";
 import isURL from "validator/lib/isURL";
 import { db } from "../app/common/database";
 import Storage from "../app/common/database/storage";
-import Editor from "../app/screens/editor";
 import { eSendEvent } from "../app/services/event-manager";
 import { getElevation } from "../app/utils";
 import { eOnLoadNote } from "../app/utils/events";
+import { sleep } from "../app/utils/time";
 import { Search } from "./search";
 import { useShareStore } from "./store";
-import { useCallback } from "react";
-import { sleep } from "../app/utils/time";
+import { Editor } from "./editor";
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
 };
@@ -598,15 +597,6 @@ const ShareView = ({ quicknote = false }) => {
                 >
                   {!loadingExtension && (
                     <Editor
-                      ref={editorRef}
-                      theme={{
-                        ...colors,
-                        accent
-                      }}
-                      editorId="shareEditor"
-                      noHeader={true}
-                      noToolbar={true}
-                      readonly={false}
                       onLoad={onLoadEditor}
                       onChange={(html) => {
                         noteContent.current = html;
