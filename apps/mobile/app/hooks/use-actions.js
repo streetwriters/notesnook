@@ -486,6 +486,7 @@ export const useActions = ({ close = () => null, item }) => {
     } else {
       try {
         close();
+        await sleep(300);
         await deleteItems(item);
       } catch (e) {
         console.error(e);
