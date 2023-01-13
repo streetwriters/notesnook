@@ -151,11 +151,10 @@ const menuItems = [
     iconColor: "error",
     icon: Icon.Trash,
     onClick: async ({ items }) => {
+      const phrase = items.length > 1 ? "this notebook" : "these notebooks";
       const shouldDeleteNotes = await confirm({
-        title: `Delete contained notes?`,
-        message: `Do you also want to delete notes within ${
-          items.length > 1 ? "this notebook" : "these notebooks"
-        }?`,
+        title: `Delete notes in ${phrase}?`,
+        message: `These notes will be moved to trash and permanently deleted after 7 days.`,
         yesText: `Yes`,
         noText: "No"
       });
