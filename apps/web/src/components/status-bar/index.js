@@ -212,25 +212,10 @@ function SyncStatus() {
     f.check(syncStatus.key, user, lastSynced)
   );
 
-  if (!isSyncEnabled)
-    return (
-      <Button
-        variant="statusitem"
-        sx={{ alignItems: "center", justifyContent: "center", display: "flex" }}
-        title={"Sync is disabled"}
-        data-test-id={`sync-status-disabled`}
-      >
-        <SyncOff size={12} color={"error"} />
-        <Text variant="subBody" ml={status.text ? "3px" : 0}>
-          Sync disabled
-        </Text>
-      </Button>
-    );
-
   return (
     <Button
       variant="statusitem"
-      onClick={() => sync()}
+      onClick={() => (isSyncEnabled ? sync() : null)}
       sx={{ alignItems: "center", justifyContent: "center", display: "flex" }}
       title={status.tooltip}
       data-test-id={`sync-status-${status.key}`}
@@ -310,5 +295,24 @@ const syncStatusFilters = [
     color: "error",
     text: "Sync failed",
     tooltip: "Sync failed to completed. Please try again."
+  },
+  {
+    key: "offline",
+    check: (syncStatus) => syncStatus === "offline",
+    icon: SyncOff,
+    text: ({ lastSynced }) => (
+      <>
+        <TimeAgo live={true} locale="en_short" datetime={lastSynced} />{" "}
+        (offline)
+      </>
+    ),
+    tooltip: "You are offline."
+  },
+  {
+    key: "disabled",
+    check: (syncStatus) => syncStatus === "disabled",
+    icon: SyncOff,
+    text: () => "Sync disabled",
+    tooltip: "Sync is disabled."
   }
 ];

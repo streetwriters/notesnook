@@ -33,6 +33,7 @@ import { resetReminders } from "../common/reminders";
 import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/common";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
+import { onPageVisibilityChanged } from "../utils/page-visibility";
 
 var syncStatusTimeout = 0;
 const BATCH_SIZE = 50;
@@ -46,7 +47,7 @@ class AppStore extends BaseStore {
   isSyncEnabled = Config.get("syncEnabled", true);
   isRealtimeSyncEnabled = Config.get("isRealtimeSyncEnabled", true);
   syncStatus = {
-    key: "synced",
+    key: navigator.onLine ? "synced" : "offline",
     progress: null,
     type: null
   };
@@ -104,7 +105,7 @@ class AppStore extends BaseStore {
     );
 
     db.eventManager.subscribe(EVENTS.syncAborted, (error) => {
-      showToast("error", error);
+      if (error) showToast("error", error);
       this.updateSyncStatus("failed");
     });
 
@@ -114,6 +115,20 @@ class AppStore extends BaseStore {
       });
       count = 0;
       this.refresh();
+    });
+
+    onPageVisibilityChanged(async (type, documentHidden) => {
+      if (!documentHidden && type !== "offline") {
+        logger.info("Page visibility changed. Reconnecting SSE...");
+        if (type === "online") {
+          // a slight delay to make sure sockets are open and can be connected
+          // to. Otherwise, this fails miserably.
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        }
+        await db.connectSSE({ force: type === "online" }).catch(logger.error);
+      } else if (type === "offline") {
+        await this.abortSync("offline");
+      }
     });
   };
 
@@ -156,7 +171,7 @@ class AppStore extends BaseStore {
     this.set((state) => (state.isSyncEnabled = !state.isSyncEnabled));
 
     if (isSyncEnabled) {
-      db.syncer.stop();
+      this.abortSync("disabled");
     }
   };
 
@@ -258,7 +273,7 @@ class AppStore extends BaseStore {
   };
 
   sync = async (full = true, force = false) => {
-    if (!this.get().isSyncEnabled) return;
+    if (!this.get().isSyncEnabled || !navigator.onLine) return;
     if (this.isSyncing()) return;
 
     clearTimeout(syncStatusTimeout);
@@ -289,9 +304,16 @@ class AppStore extends BaseStore {
     }
   };
 
+  abortSync = async (status = "offline") => {
+    if (this.isSyncing()) this.updateSyncStatus("failed");
+    else this.updateSyncStatus(status);
+
+    await db.syncer.stop();
+  };
+
   /**
    *
-   * @param {"synced" | "syncing" | "conflicts" | "failed" | "completed"} key
+   * @param {"synced" | "syncing" | "conflicts" | "failed" | "completed" | "offline" | "disabled"} key
    */
   updateSyncStatus = (key, reset = false) => {
     logger.info(`Sync status updated: ${key}`);
@@ -299,7 +321,8 @@ class AppStore extends BaseStore {
 
     if (reset) {
       syncStatusTimeout = setTimeout(() => {
-        this.updateSyncStatus("synced", false);
+        if (this.get().syncStatus.key === key)
+          this.updateSyncStatus("synced", false);
       }, 3000);
     }
   };
