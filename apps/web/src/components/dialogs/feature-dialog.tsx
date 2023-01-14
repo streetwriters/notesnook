@@ -24,7 +24,16 @@ import { appVersion } from "../../utils/version";
 import Config from "../../utils/config";
 import { isTesting } from "../../utils/platform";
 import { useEffect } from "react";
-import { ArrowRight, Checkmark, Icon, Warn } from "../icons";
+import {
+  ArrowRight,
+  Checkmark,
+  Icon,
+  MfaEmail,
+  PDF,
+  Reminders,
+  SyncOff,
+  Warn
+} from "../icons";
 
 type CallToAction = {
   title: string;
@@ -90,24 +99,31 @@ const features: Record<FeatureKeys, Feature> = {
           }
         ]
       : [
-
           {
-            title: "Web clipper",
+            title: "Cross-platform reminders 🔔",
+            icon: Reminders,
             subtitle:
-              <>
-              You can manually download &amp; install the web clipper from <Code text="here" href="https://github.com/streetwriters/notesnook/releases/tag/v2.3.0"/> until it gets released on Firefox Addons & Chrome Web Store.
-              </>
+              "Finally reminders are here. You can set reminders on notes or independently. Go to Side Menu > Reminders to set your first reminder"
           },
           {
-            title: "Delete individual task items",
+            title: "Multi-factor auth default",
+            icon: MfaEmail,
             subtitle:
-              "You can now delete individual task items with a click of a button."
+              "2FA via email is enabled by default for all users to improve login security."
           },
           {
-            title: "Diacritics & extended glyphs support",
-            subtitle:
-              "Notesnook now fully supports all glyphs & diacritics everywhere. No more broken fonts when writing in Polish."
+            title: "Granular sync controls",
+            icon: SyncOff,
+            subtitle: `We are giving you full control over the whole syncing process.
+                Disable auto sync, real-time editor sync or all kinds of sync —
+                it's up to you.`
           },
+          {
+            title: "Improved PDF & HTML exports",
+            icon: PDF,
+            subtitle:
+              "Tables, checklists, codeblocks & quotes are now properly formatted & styled in PDF & HTML exports."
+          }
         ],
     cta: {
       title: "Got it",

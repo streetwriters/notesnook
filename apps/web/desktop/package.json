@@ -2,7 +2,7 @@
   "name": "@notesnook/desktop",
   "productName": "Notesnook",
   "description": "Your private note taking space",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "appAppleId": "1544027013",
   "private": true,
   "main": "./build/electron.js",
@@ -46,7 +46,7 @@
     "afterSign": "electron-builder-notarize",
     "afterPack": "./scripts/removeLocales.js",
     "mac": {
-      "bundleVersion": "222",
+      "bundleVersion": "240",
       "minimumSystemVersion": "10.12.0",
       "target": [
         {
