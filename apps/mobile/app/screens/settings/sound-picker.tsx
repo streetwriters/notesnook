@@ -32,6 +32,7 @@ import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
+import notifee from "@notifee/react-native";
 
 const SoundItem = ({
   playingSoundId,
@@ -48,7 +49,6 @@ const SoundItem = ({
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const isPlaying = playingSoundId === item.soundID;
-
   return (
     <PressableButton
       customStyle={{
@@ -128,17 +128,6 @@ export default function SoundPicker() {
   );
 
   useEffect(() => {
-    NotificationSounds.getNotifications("notification").then((results) =>
-      setSounds([
-        {
-          soundID: "defaultSound",
-          title: "Default sound",
-          url: ""
-        },
-        ...results
-      ])
-    );
-
     NotificationSounds.getNotifications("ringtone").then((results) =>
       setRingtones([
         {
@@ -148,6 +137,9 @@ export default function SoundPicker() {
         },
         ...results
       ])
+    );
+    NotificationSounds.getNotifications("notification").then((results) =>
+      setSounds([...results])
     );
   }, []);
 

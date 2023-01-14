@@ -821,7 +821,6 @@ export const settingsGroups: SettingSection[] = [
   {
     id: "productivity",
     name: "Productivity",
-    hidden: () => Platform.OS !== "android",
     sections: [
       {
         id: "notification-notes",
@@ -841,7 +840,8 @@ export const settingsGroups: SettingSection[] = [
           SettingsService.set({
             notifNotes: !settings.notifNotes
           });
-        }
+        },
+        hidden: () => Platform.OS !== "android"
       },
       {
         id: "reminders",
@@ -890,7 +890,9 @@ export const settingsGroups: SettingSection[] = [
               "Set the notification sound for reminder notifications",
             component: "sound-picker",
             icon: "bell-ring",
-            hidden: () => Platform.OS === "android" && Platform.Version > 25
+            hidden: () =>
+              Platform.OS === "ios" ||
+              (Platform.OS === "android" && Platform.Version > 25)
           },
           {
             id: "reminder-sound",
