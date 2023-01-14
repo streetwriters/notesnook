@@ -71,8 +71,7 @@ export const FeatureBlock = ({
       <Icon color={colors.icon} name={icon} size={SIZE.xl} />
       <Paragraph size={SIZE.md}>
         <Text style={{ color: colors.accent }}>{highlight}</Text>
-        {"\n"}
-        {content}
+        {content ? "\n" + content : null}
       </Paragraph>
 
       {pro ? (

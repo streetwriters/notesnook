@@ -56,6 +56,11 @@ export const CompactFeatures = ({
           icon: "shield"
         },
         {
+          highlight: "Daily, weekly & montly",
+          content: "recurring reminders",
+          icon: "bell"
+        },
+        {
           highlight: "Rich text",
           content: "editing",
           icon: "square-edit-outline"
