@@ -33,6 +33,7 @@ import ToolSheet from "./tool-sheet";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ToolId } from "@notesnook/editor/dist/toolbar/tools";
+import PremiumService from "../../../services/premium";
 
 export const Group = ({
   item,
@@ -60,6 +61,10 @@ export const Group = ({
   const colors = useThemeStore((state) => state.colors);
 
   const onDrop = (data: DraxDragWithReceiverEventData) => {
+    if (!PremiumService.get()) {
+      PremiumService.sheet("global");
+      return;
+    }
     const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;
     const dragged = data.dragged.payload;
     const reciever = data.receiver.payload;
@@ -120,6 +125,10 @@ export const Group = ({
     {
       name: "minus",
       onPress: () => {
+        if (!PremiumService.get()) {
+          PremiumService.sheet("global");
+          return;
+        }
         presentDialog({
           context: "global",
           title: "Delete group?",
@@ -139,6 +148,10 @@ export const Group = ({
     {
       name: "plus",
       onPress: () => {
+        if (!PremiumService.get()) {
+          PremiumService.sheet("global");
+          return;
+        }
         ToolSheet.present({
           item,
           index: groupIndex

@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
 import create, { State } from "zustand";
 import { persist, StateStorage } from "zustand/middleware";
-import { useNoteStore } from "../../../stores/use-notes-store";
-import { useSettingStore } from "../../../stores/use-setting-store";
 import { db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
+import { useNoteStore } from "../../../stores/use-notes-store";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { presets } from "./toolbar-definition";
 export type ToolDefinition = string | string[];
 
@@ -68,6 +68,7 @@ export const useDragState = create<DragState>(
       customPresetData: presets["custom"],
       setData: (data) => {
         const _data = clone(data);
+       
         presets["custom"] = _data;
         db.settings?.setToolbarConfig(
           useSettingStore.getState().deviceMode || "mobile",
