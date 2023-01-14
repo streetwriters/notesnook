@@ -632,12 +632,6 @@ const ShareView = ({ quicknote = false }) => {
           </View>
 
           <View
-            style={{
-              height: Platform.isPad ? 150 : Platform.OS === "ios" ? 110 : 0
-            }}
-          />
-        </View>
-        <View
           style={{
             width: "100%",
             borderRadius: 10,
@@ -645,7 +639,6 @@ const ShareView = ({ quicknote = false }) => {
             marginTop: 10,
             alignSelf: "center",
             alignItems: "center",
-            paddingHorizontal: 12
           }}
         >
           <Button
@@ -696,6 +689,14 @@ const ShareView = ({ quicknote = false }) => {
             }}
           />
         </View>
+
+          <View
+            style={{
+              height: Platform.isPad ? 150 : Platform.OS === "ios" ? 110 : 0
+            }}
+          />
+        </View>
+      
       </View>
     </SafeAreaView>
   );
