@@ -142,9 +142,9 @@ export const useAppEvents = () => {
     }
   }, []);
 
-  const onSyncAborted = useCallback((error) => {
+  const onSyncAborted = useCallback(() => {
     useUserStore.getState().setSyncing(false, SyncStatus.Failed);
-    if (error) ToastEvent.error(new Error(error));
+    //if (error) ToastEvent.error(new Error(error));
   }, []);
 
   useEffect(() => {
