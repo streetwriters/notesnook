@@ -1,6 +1,8 @@
-- Added support for displaying webclips in editor
-- Fixed pdf export saves corrupted files
-- Fixed multi-window support
-- Fixed a bug in sync causing sync to get stuck on some devices
+- Cross platform Reminders 🔔
+- Multi-factor auth is enabled by default for all users to improve login security
+- Now you can change account email from Settings -> Account Settings -> Change email
+- Added options to disable sync, auto-sync & real-time sync from settings.
+- Improved PDF exports styling
+- Many bug fixes and improvements
 
 Thank you for using Notesnook!

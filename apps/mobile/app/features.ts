@@ -19,4 +19,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FeatureType } from "./components/sheets/new-feature";
 
-export const features: FeatureType[] = [];
+export const features: FeatureType[] = [
+  {
+    title: "Cross platform Reminders 🔔",
+    body: "Finally reminders are here. You can set reminders on notes or independently. Go to Side Menu > Reminders to set your first reminder!"
+  },
+  {
+    title: "Multi-factor auth by default",
+    body: "Multi-factor auth is enabled by default for all users to improve login security."
+  },
+  {
+    title: "Change account email",
+    body: "Now you can go to Settings > Account Settings to change your email."
+  },
+  {
+    title: "Sync settings",
+    body: "Added options to disable sync, auto-sync & real-time sync from settings."
+  },
+  {
+    title: "Improved PDF exports styling",
+    body: "Tables, checklists, codeblocks, quotes are now properly formatted in PDF exports."
+  }
+];
