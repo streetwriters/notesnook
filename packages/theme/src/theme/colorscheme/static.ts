@@ -30,6 +30,8 @@ export type StaticColors = {
   success: string;
   warn: string;
   warnBg: string;
+  info: string;
+  infoBg: string;
   favorite: string;
 
   codeBg: string;
@@ -52,6 +54,8 @@ export function getStaticColors(accent: string): StaticColors {
     success: "#4F8A10",
     warn: "#FF5722",
     warnBg: "#FF572220",
+    info: "#17a2b8",
+    infoBg: "#17a2b820",
     favorite: "#ffd700",
 
     // dracula colors

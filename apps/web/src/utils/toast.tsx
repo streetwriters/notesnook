@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Button, Flex, Text } from "@theme-ui/components";
 import ThemeProvider from "../components/theme-provider";
-import { Error, Warn, Success } from "../components/icons";
+import { Error, Warn, Success, Info } from "../components/icons";
 import { store as appstore } from "../stores/app-store";
 import toast from "react-hot-toast";
 import { Theme } from "@notesnook/theme";
@@ -40,10 +40,16 @@ function showToast(
   if (appstore.get().isFocusMode) return { hide: () => {} }; // TODO
 
   const IconComponent =
-    type === "error" ? Error : type === "success" ? Success : Warn;
+    type === "error"
+      ? Error
+      : type === "success"
+      ? Success
+      : type === "warn"
+      ? Warn
+      : Info;
 
   const RenderedIcon = () => (
-    <IconComponent size={28} color={type as keyof Theme["colors"]} />
+    <IconComponent size={24} color={type as keyof Theme["colors"]} />
   );
 
   const id = toast(<ToastContainer message={message} actions={actions} />, {

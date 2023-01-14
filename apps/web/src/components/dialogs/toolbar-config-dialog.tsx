@@ -62,6 +62,8 @@ import {
   PresetId
 } from "../../common/toolbar-config";
 import { showToast } from "../../utils/toast";
+import { isUserPremium } from "../../hooks/use-is-user-premium";
+import { Pro } from "../icons";
 export type ToolbarConfigDialogProps = {
   onClose: Perform;
 };
@@ -126,12 +128,24 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
                   name="preset"
                   value={preset.id}
                   checked={preset.id === currentPreset.id}
+                  disabled={preset.id === "custom" && !isUserPremium()}
                   onChange={(e) => {
                     const { value } = e.target;
+                    if (preset.id === "custom" && !isUserPremium()) {
+                      showToast(
+                        "info",
+                        "You need to be Pro to use the custom preset."
+                      );
+                      return;
+                    }
+
                     setCurrentPreset(getPreset(value as PresetId));
                   }}
                 />
                 {preset.title}
+                {preset.id === "custom" && !isUserPremium() ? (
+                  <Pro color="primary" size={18} sx={{ ml: 1 }} />
+                ) : null}
               </Label>
             ))}
           </Flex>
@@ -159,6 +173,11 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragStart={(event) => {
+            if (!isUserPremium()) {
+              showToast("info", "You need to be Pro to customize the toolbar.");
+              return;
+            }
+
             if (currentPreset.id !== "custom") {
               setCurrentPreset((c) => ({
                 ...getPreset("custom"),
