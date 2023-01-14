@@ -29,7 +29,9 @@ export class NotebooksViewModel extends BaseViewModel {
 
   constructor(page: Page) {
     super(page, "notebooks");
-    this.createButton = this.list.locator(getTestId("notebooks-action-button"));
+    this.createButton = page
+      .locator(getTestId("notebooks-action-button"))
+      .first();
   }
 
   async createNotebook(notebook: Notebook) {

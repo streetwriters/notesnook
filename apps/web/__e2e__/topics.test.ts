@@ -67,7 +67,7 @@ test("delete a topic", async ({ page }) => {
   const topics = await notebook?.openNotebook();
   const topic = await topics?.findItem({ title: NOTEBOOK.topics[0] });
 
-  await topic?.delete();
+  await topic?.deleteWithNotes();
 
   expect(await app.toasts.waitForToast("1 topic deleted")).toBe(true);
   expect(await topics?.findItem({ title: NOTEBOOK.topics[0] })).toBeUndefined();
@@ -109,7 +109,7 @@ test("delete all notes within a topic", async ({ page }) => {
   }
   await app.goBack();
 
-  await topic?.delete(true);
+  await topic?.deleteWithNotes(true);
 
   notes = await app.goToNotes();
   expect(await notes.isEmpty()).toBe(true);
