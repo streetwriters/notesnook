@@ -104,8 +104,7 @@ class AppStore extends BaseStore {
       }
     );
 
-    db.eventManager.subscribe(EVENTS.syncAborted, (error) => {
-      if (error) showToast("error", error);
+    db.eventManager.subscribe(EVENTS.syncAborted, () => {
       this.updateSyncStatus("failed");
     });
 
