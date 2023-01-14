@@ -183,7 +183,8 @@ import {
   mdiVibrate,
   mdiBellCancelOutline,
   mdiBellPlusOutline,
-  mdiBellOutline
+  mdiBellOutline,
+  mdiGestureTapButton
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { AnimatedFlex } from "../animated";
@@ -459,3 +460,4 @@ export const AddReminder = createIcon(mdiBellPlusOutline);
 export const Silent = createIcon(mdiBellOffOutline);
 export const Vibrate = createIcon(mdiVibrate);
 export const Loud = createIcon(mdiBellRingOutline);
+export const CustomToolbar = createIcon(mdiGestureTapButton);

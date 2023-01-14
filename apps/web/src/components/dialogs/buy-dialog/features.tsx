@@ -58,7 +58,15 @@ import {
   File,
   Embed,
   Text as TextIcon,
-  ThemeIcon
+  ThemeIcon,
+  Sync,
+  Refresh,
+  Reminder,
+  MfaSms,
+  MfaAuthenticator,
+  MfaEmail,
+  CustomToolbar,
+  SyncOff
 } from "../../icons";
 
 type Feature = {
@@ -116,7 +124,24 @@ const sections: Section[] = [
     title: "Instant syncing",
     detail:
       "Seamlessly work from anywhere. Every change is synced instantly everywhere.",
-    pro: true
+    features: [
+      {
+        id: "unlimited-devices",
+        title: "Sync to unlimited devices",
+        icon: Cellphone
+      },
+      {
+        id: "real-time-sync",
+        title: "Real-time editor sync",
+        icon: Sync
+      },
+      {
+        id: "sync-controls",
+        title: "Granular sync controls*",
+        icon: SyncOff
+      }
+    ],
+    info: "* Disable sync completely, turn off auto sync, or just disable real-time editor sync."
   },
   {
     title: "100% cross platform",
@@ -159,6 +184,30 @@ const sections: Section[] = [
     ]
   },
   {
+    title: "Two-factor authentication",
+    detail:
+      "Improve your account security & prevent intruders from accessing your notes using 2FA.",
+    features: [
+      {
+        id: "email",
+        title: "Email*",
+        icon: MfaEmail
+      },
+      {
+        id: "auth-app",
+        title: "Authenticator app",
+        icon: MfaAuthenticator
+      },
+      {
+        id: "sms",
+        title: "SMS",
+        icon: MfaSms,
+        pro: true
+      }
+    ],
+    info: "* 2FA via email is enabled by default for all users"
+  },
+  {
     title: "Attach files & images",
     detail:
       "Add your documents, PDFs, images and videos, and keep them safe and organized.",
@@ -195,6 +244,23 @@ const sections: Section[] = [
     title: "No limit on notes",
     detail:
       "We don't have nonsense like blocks and whatnot. You can create as many notes as you want — no limits."
+  },
+  {
+    title: "Cross-platform reminders",
+    detail: "Stay updated on all your upcoming tasks with reminders.",
+    features: [
+      {
+        id: "one-time",
+        title: "One-time reminders",
+        icon: Reminder
+      },
+      {
+        id: "recurring",
+        title: "Daily, monthly & weekly recurring reminders",
+        icon: Refresh,
+        pro: true
+      }
+    ]
   },
   {
     title: "Safe publishing to the Internet",
@@ -253,7 +319,6 @@ const sections: Section[] = [
     title: "Rich tools for rich editing",
     detail:
       "Having the right tool at the right time is crucial for note taking. Lists, tables, codeblocks — you name it, we have it.",
-    pro: true,
     features: [
       {
         id: "lists-tables",
@@ -274,8 +339,15 @@ const sections: Section[] = [
         id: "md-shortcuts",
         title: "Markdown shortcuts",
         icon: Markdown
+      },
+      {
+        id: "custom-toolbar",
+        title: "Customizable toolbar*",
+        pro: true,
+        icon: CustomToolbar
       }
-    ]
+    ],
+    info: "* Free users can only choose from pre-defined toolbar presets."
   },
   {
     title: "Export and take your notes anywhere",
