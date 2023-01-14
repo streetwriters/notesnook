@@ -36,7 +36,14 @@ export class ItemModel extends BaseItemModel {
     return new NotesViewModel(this.page, "notes");
   }
 
-  async delete(deleteContainedNotes = false) {
+  async delete() {
+    await this.contextMenu.open(this.locator);
+    await this.contextMenu.clickOnItem("delete");
+
+    await this.waitFor("detached");
+  }
+
+  async deleteWithNotes(deleteContainedNotes = false) {
     await this.contextMenu.open(this.locator);
     await this.contextMenu.clickOnItem("delete");
 
