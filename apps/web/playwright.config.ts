@@ -42,6 +42,7 @@ const config: PlaywrightTestConfig = {
     baseURL: "http://localhost:3000/",
     headless: true,
     acceptDownloads: true,
+    permissions: ["notifications"],
 
     // Artifacts
     trace: "retain-on-failure",

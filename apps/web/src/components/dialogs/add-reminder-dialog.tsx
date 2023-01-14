@@ -224,6 +224,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
         label="Title"
         required
         value={title}
+        data-test-id="title-input"
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setTitle(e.target.value)
         }
@@ -231,6 +232,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
       <Field
         id="description"
         label="Description"
+        data-test-id="description-input"
         helpText="Optional"
         value={description}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -242,6 +244,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
           <Label
             key={m.id}
             variant="text.body"
+            data-test-id={`mode-${m.id}`}
             sx={{
               width: "auto",
               justifyContent: "center",
@@ -281,6 +284,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
               <Button
                 key={mode.id}
                 variant="tool"
+                data-test-id={`recurring-mode-${mode.id}`}
                 onClick={() => setRecurringMode(mode.id)}
                 sx={{
                   borderRadius: 100,
@@ -313,6 +317,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                   <Button
                     key={day}
                     variant="tool"
+                    data-test-id={`day-${i}`}
                     onClick={() => {
                       setSelectedDays((days) => {
                         const clone = days.slice();
@@ -348,6 +353,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             label="Date"
             required
             type="date"
+            data-test-id="date-input"
             min={dayjs().format("YYYY-MM-DD")}
             defaultValue={date}
             value={date}
@@ -362,6 +368,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
           label="Time"
           required
           type="time"
+          data-test-id="time-input"
           defaultValue={time}
           value={time}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -374,6 +381,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
           <Label
             key={p.id}
             variant="text.body"
+            data-test-id={`priority-${p.id}`}
             sx={{
               width: "auto",
               justifyContent: "center",

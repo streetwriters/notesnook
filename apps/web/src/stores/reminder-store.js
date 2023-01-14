@@ -26,6 +26,7 @@ import { showReminderPreviewDialog } from "../common/dialog-controller";
 import dayjs from "dayjs";
 import Config from "../utils/config";
 import { store as notestore } from "./note-store";
+import { isTesting } from "../utils/platform";
 
 class ReminderStore extends BaseStore {
   reminders = [];
@@ -54,7 +55,10 @@ export { useStore, store };
 async function resetReminders(reminders) {
   await TaskScheduler.stopAllWithPrefix("reminder:");
 
-  if (!("Notification" in window) || Notification.permission !== "granted")
+  if (
+    !isTesting() &&
+    (!("Notification" in window) || Notification.permission !== "granted")
+  )
     return;
 
   for (const reminder of reminders) {
@@ -80,6 +84,11 @@ async function resetReminders(reminders) {
 function scheduleReminder(id, reminder, cron) {
   return TaskScheduler.register(`reminder:${id}`, cron, () => {
     if (!Config.get("reminderNotifications", true)) return;
+
+    if (isTesting()) {
+      window.confirm("Reminder activated!");
+      return;
+    }
 
     const notification = new Notification(reminder.title, {
       body: reminder.description,

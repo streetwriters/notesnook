@@ -30,6 +30,7 @@ const routes = [
   createRoute("notebooks", "Notebooks"),
   createRoute("favorites", "Favorites"),
   createRoute("monographs", "Monographs"),
+  createRoute("reminders", "Reminders"),
   createRoute("tags", "Tags"),
   createRoute("trash", "Trash"),
   createRoute("settings", "Settings")

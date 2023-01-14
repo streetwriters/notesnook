@@ -120,7 +120,7 @@ const routes = {
   },
   "/reminders": () => {
     return {
-      key: "notes",
+      key: "reminders",
       title: "Reminders",
       type: "reminders",
       component: <Reminders />,
