@@ -20,32 +20,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { BaseViewModel } from "./base-view.model";
-import { NotebookItemModel } from "./notebook-item.model";
-import { Notebook } from "./types";
-import { fillNotebookDialog } from "./utils";
+import { ReminderItemModel } from "./reminder-item.model";
+import { Reminder } from "@notesnook/core/collections/reminders";
+import { fillReminderDialog } from "./utils";
 
-export class NotebooksViewModel extends BaseViewModel {
+export class RemindersViewModel extends BaseViewModel {
   private readonly createButton: Locator;
 
   constructor(page: Page) {
-    super(page, "notebooks");
-    this.createButton = this.list.locator(getTestId("notebooks-action-button"));
+    super(page, "reminders");
+    this.createButton = page
+      .locator(getTestId("reminders-action-button"))
+      .first();
   }
 
-  async createNotebook(notebook: Notebook) {
+  async createReminder(reminder: Partial<Reminder>) {
     await this.createButton.click();
 
-    await fillNotebookDialog(this.page, notebook);
+    await fillReminderDialog(this.page, reminder);
 
-    await this.waitForItem(notebook.title);
-    return await this.findNotebook(notebook);
+    if (reminder.title) await this.waitForItem(reminder.title);
+    return await this.findReminder(reminder);
   }
 
-  async findNotebook(notebook: Partial<Notebook>) {
+  async findReminder(reminder: Partial<Reminder>) {
     for await (const item of this.iterateItems()) {
-      const notebookModel = new NotebookItemModel(item);
-      if ((await notebookModel.getTitle()) === notebook.title)
-        return notebookModel;
+      const reminderModel = new ReminderItemModel(item);
+      if ((await reminderModel.getTitle()) === reminder.title)
+        return reminderModel;
     }
     return undefined;
   }

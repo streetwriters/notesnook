@@ -25,6 +25,7 @@ import { ItemsViewModel } from "./items-view.model";
 import { NavigationMenuModel } from "./navigation-menu.model";
 import { NotebooksViewModel } from "./notebooks-view.model";
 import { NotesViewModel } from "./notes-view.model";
+import { RemindersViewModel } from "./reminders-view.model";
 import { SearchViewModel } from "./search-view-model";
 import { SettingsViewModel } from "./settings-view.model";
 import { ToastsModel } from "./toasts.model";
@@ -70,6 +71,11 @@ export class AppModel {
   async goToFavorites() {
     await this.navigateTo("Favorites");
     return new NotesViewModel(this.page, "notes");
+  }
+
+  async goToReminders() {
+    await this.navigateTo("Reminders");
+    return new RemindersViewModel(this.page);
   }
 
   async goToTags() {

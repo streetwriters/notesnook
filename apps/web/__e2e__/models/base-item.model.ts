@@ -23,7 +23,7 @@ import { getTestId } from "../utils";
 export class BaseItemModel {
   protected readonly page: Page;
   private readonly titleText: Locator;
-  readonly descriptionText: Locator;
+  private readonly descriptionText: Locator;
 
   constructor(protected readonly locator: Locator) {
     this.page = locator.page();

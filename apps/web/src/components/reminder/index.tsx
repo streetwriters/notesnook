@@ -76,12 +76,14 @@ function Reminder({
               icon={Icon.ReminderOff}
               text={"Disabled"}
               styles={{ icon: { color: "error" } }}
+              testId={"disabled"}
             />
           ) : (
             <IconTag
               icon={Icon.Clock}
               text={formatReminderTime(reminder)}
               highlight={isReminderToday(reminder)}
+              testId={"reminder-time"}
             />
           )}
           {reminder.disabled ? null : (
@@ -91,6 +93,7 @@ function Reminder({
             <IconTag
               icon={Icon.Refresh}
               text={RECURRING_MODE_MAP[reminder.recurringMode]}
+              testId={`recurring-mode`}
             />
           )}
         </Flex>

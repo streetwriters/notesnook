@@ -7,5 +7,5 @@
     "maxNodeModuleJsDepth": 5,
     "noEmit": true
   },
-  "include": ["src", "global.d.ts"]
+  "include": ["src", "global.d.ts", "__e2e__"]
 }
