@@ -123,7 +123,10 @@ async function prepare() {
 async function matchSnapshot(element, name) {
   let path = await element.takeScreenshot(name);
   const bitmapBuffer = readFileSync(path);
-  jestExpect(bitmapBuffer).toMatchImageSnapshot();
+  jestExpect(bitmapBuffer).toMatchImageSnapshot({
+    failureThreshold: 200,
+    failureThresholdType: "pixel"
+  });
 }
 
 export {

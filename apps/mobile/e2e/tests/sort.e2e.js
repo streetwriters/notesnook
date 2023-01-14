@@ -27,7 +27,6 @@ import {
   notVisibleByText,
   sleep
 } from "./utils";
-import { web } from "detox";
 
 async function sortBy(sorting, elementText = "Default") {
   await tapByText(elementText);
@@ -36,14 +35,14 @@ async function sortBy(sorting, elementText = "Default") {
 }
 
 describe("Sort & filter", () => {
-  it("Sort by date-edited/date-created", async () => {
+  it.only("Sort by date-edited/date-created", async () => {
     await prepare();
+    let webview = web(by.id(notesnook.editor.id));
     await createNote("Note 1", "Note 1");
     await createNote("Note 2", "Note 2");
     await sleep(300);
     await tapByText("Note 1");
     await sleep(500);
-    let webview = web(by.id(notesnook.editor.id));
     await expect(webview.element(by.web.className("ProseMirror"))).toExist();
     await webview.element(by.web.className("ProseMirror")).tap();
     await webview

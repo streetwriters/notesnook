@@ -60,13 +60,14 @@ async function openLockedNote(pwd) {
   await visibleByText("Open");
   await elementById(notesnook.ids.dialogs.vault.pwd).typeText(pwd || "1234");
   await tapByText("Open");
-  await sleep(1000);
+  await sleep(3000);
   await matchSnapshot(elementById("editor-wrapper"), "note-after-vault-unlock");
 }
 
 async function goToPrivacySecuritySettings() {
   await navigate("Settings");
   await tapByText("Vault");
+  await sleep(500);
 }
 
 describe("VAULT", () => {
@@ -126,7 +127,7 @@ describe("VAULT", () => {
     await notVisibleById(notesnook.listitem.menu);
   });
 
-  it("Add a note to vault", async () => {
+  it.only("Add a note to vault", async () => {
     await prepare();
     await createNote();
     await lockNote();

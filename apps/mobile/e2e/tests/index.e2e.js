@@ -34,6 +34,7 @@ describe("APP LAUNCH AND NAVIGATION", () => {
     await navigate("Tags");
     await navigate("Settings");
     await navigate("Monographs");
+    await navigate("Reminders");
     await navigate("Notes");
   });
 });

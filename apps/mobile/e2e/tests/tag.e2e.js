@@ -62,7 +62,7 @@ describe("Tags", () => {
     await notVisibleByText("#testtag");
   });
 
-  it.only("Creat shortcut of a tag", async () => {
+  it("Creat shortcut of a tag", async () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);

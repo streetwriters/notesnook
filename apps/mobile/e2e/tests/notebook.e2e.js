@@ -250,9 +250,57 @@ describe("NOTEBOOKS", () => {
     await visibleByText("Notebook 1");
     await tapById(notesnook.ids.notebook.menu);
     await tapByText("Move to trash");
+    await sleep(2000);
+    await tapByText("No")
     await sleep(4000);
     await navigate("Trash");
     await visibleByText("Notebook 1");
+  });
+
+  it("Move notebook to trash with notes", async () => {
+    await prepare();
+    let note = await createNote();
+    await navigate("Notebooks");
+    await tapByText("Skip introduction");
+    await sleep(500);
+    await createNotebook("Notebook 1", false, true);
+    await sleep(500);
+    await tapByText("Topic");
+    await tapById("listitem.select");
+    await tapByText("Move selected notes");
+    await sleep(500);
+    await visibleByText("Notebook 1");
+    await tapById(notesnook.ids.notebook.menu);
+    await tapByText("Move to trash");
+    await sleep(2000);
+    await tapByText("Yes")
+    await sleep(4000);
+    await navigate("Trash");
+    await visibleByText("Notebook 1");
+    await visibleByText(note.body);
+  });
+
+  it("Move Topic to trash with notes", async () => {
+    await prepare();
+    let note = await createNote();
+    await navigate("Notebooks");
+    await tapByText("Skip introduction");
+    await sleep(500);
+    await createNotebook("Notebook 1", false, true);
+    await sleep(500);
+    await tapByText("Topic");
+    await tapById("listitem.select");
+    await tapByText("Move selected notes");
+    await sleep(500);
+    await tapByText("Notebook 1");
+    await tapById(notesnook.ids.notebook.menu);
+    await tapByText("Delete topic");
+    await sleep(2000);
+    await tapByText("Yes");
+    await device.pressBack();
+    await sleep(4000);
+    await navigate("Trash");
+    await visibleByText(note.body);
   });
 
   it("Pin notebook to side menu", async () => {

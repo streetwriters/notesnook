@@ -26,7 +26,6 @@ import {
   Keyboard,
   Platform,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
