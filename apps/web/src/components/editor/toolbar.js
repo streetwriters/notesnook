@@ -40,11 +40,14 @@ function Toolbar() {
   const toggleFocusMode = useAppStore((store) => store.toggleFocusMode);
   const setTitle = useStore((store) => store.setTitle);
   const toggleProperties = useStore((store) => store.toggleProperties);
+  const toggleEditorMargins = useStore((store) => store.toggleEditorMargins);
+  const editorMargins = useStore((store) => store.editorMargins);
   const clearSession = useStore((store) => store.clearSession);
   const title = useStore((store) => store.session.title);
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const [isTitleVisible, setIsTitleVisible] = useState(false);
+
   const monographs = useMonographStore((store) => store.monographs);
   const { canRedo, canUndo, redo, undo } = useHistory();
   const { toggleSearch } = useSearch();
@@ -89,6 +92,14 @@ function Toolbar() {
   const inlineTools = useMemo(
     () => [
       {
+        title: editorMargins
+          ? "Disable editor margins"
+          : "Enable editor margins",
+        icon: editorMargins ? Icon.EditorNormalWidth : Icon.EditorFullWidth,
+        enabled: true,
+        onClick: () => toggleEditorMargins()
+      },
+      {
         title: theme === "dark" ? "Light mode" : "Dark mode",
         icon: Icon.ThemeIcon,
         hidden: !isFocusMode,
@@ -97,7 +108,7 @@ function Toolbar() {
       },
       {
         title: isFocusMode ? "Normal mode" : "Focus mode",
-        icon: isFocusMode ? Icon.NormalMode : Icon.FocusMode,
+        icon: isFocusMode ? Icon.FocusMode : Icon.NormalMode,
         enabled: true,
         hideOnMobile: true,
         onClick: () => {
@@ -154,6 +165,8 @@ function Toolbar() {
       }
     ],
     [
+      editorMargins,
+      toggleEditorMargins,
       editor,
       undo,
       redo,
