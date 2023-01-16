@@ -32,7 +32,6 @@ import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
-import notifee from "@notifee/react-native";
 
 const SoundItem = ({
   playingSoundId,

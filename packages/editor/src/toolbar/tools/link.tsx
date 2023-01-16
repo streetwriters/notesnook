@@ -22,7 +22,7 @@ import { ToolButton } from "../components/tool-button";
 import { useCallback, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
 import { LinkPopup } from "../popups/link-popup";
-import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
+import { useToolbarLocation } from "../stores/toolbar-store";
 import { MoreTools } from "../components/more-tools";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { findMark, selectionToOffset } from "../../utils/prosemirror";

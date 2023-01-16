@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Extension, TextSerializer } from "@tiptap/core";
 import { Plugin, PluginKey } from "prosemirror-state";
-import { Node as ProseMirrorNode, Schema, Slice } from "prosemirror-model";
+import { Schema, Slice } from "prosemirror-model";
 
 export const ClipboardTextSerializer = Extension.create({
   name: "clipboardTextSerializer",

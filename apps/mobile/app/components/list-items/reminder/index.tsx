@@ -29,7 +29,6 @@ import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper from "../selection-wrapper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ReminderSheet from "../../sheets/reminder";
-import { formatReminderTime } from "@notesnook/core/collections/reminders";
 import { ReminderTime } from "../../ui/reminder-time";
 
 const ReminderItem = React.memo(

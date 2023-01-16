@@ -27,8 +27,7 @@ import { useAppState } from "../../hooks/use-app-state";
 import BiometricService from "../../services/biometrics";
 import {
   eSendEvent,
-  presentSheet,
-  ToastEvent
+  presentSheet
 } from "../../services/event-manager";
 import { setRateAppMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
