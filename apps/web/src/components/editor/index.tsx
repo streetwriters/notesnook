@@ -329,6 +329,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       focusMode: false,
       isMobile: false
     };
+  const editorMargins = useStore((store) => store.editorMargins);
 
   if (headless) return <>{children}</>;
 
@@ -344,7 +345,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
           className="editor"
           sx={{
             alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
-            maxWidth: "min(100%, 850px)",
+            maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
             width: "100%"
           }}
           px={6}

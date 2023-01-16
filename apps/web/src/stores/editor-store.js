@@ -27,6 +27,7 @@ import BaseStore from ".";
 import { EV, EVENTS } from "@notesnook/core/common";
 import { hashNavigate } from "../navigation";
 import { logger } from "../utils/logger";
+import Config from "../utils/config";
 
 const SESSION_STATES = {
   stale: "stale",
@@ -63,6 +64,7 @@ export const getDefaultSession = (sessionId = Date.now()) => {
 class EditorStore extends BaseStore {
   session = getDefaultSession();
   arePropertiesVisible = false;
+  editorMargins = Config.get("editor:margins", true);
 
   init = () => {
     EV.subscribe(EVENTS.userLoggedOut, () => {
@@ -292,6 +294,14 @@ class EditorStore extends BaseStore {
         (state.arePropertiesVisible =
           toggleState !== undefined ? toggleState : !state.arePropertiesVisible)
     );
+  };
+
+  toggleEditorMargins = (toggleState) => {
+    this.set((state) => {
+      state.editorMargins =
+        toggleState !== undefined ? toggleState : !state.editorMargins;
+      Config.set("editor:margins", state.editorMargins);
+    });
   };
 
   /**
