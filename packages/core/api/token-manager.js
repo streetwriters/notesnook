@@ -52,7 +52,7 @@ class TokenManager {
     const isExpired = renew && this._isTokenExpired(token);
     if (this._isTokenRefreshable(token) && (forceRenew || isExpired)) {
       await this._refreshToken(forceRenew);
-      return await this.getToken();
+      return await this.getToken(false, false);
     }
 
     return token;
@@ -94,7 +94,7 @@ class TokenManager {
         throw new Error("Token not found.");
       }
 
-      const refreshTokenResponse = await await http.post(
+      const refreshTokenResponse = await http.post(
         `${constants.AUTH_HOST}${ENDPOINTS.token}`,
         {
           refresh_token,

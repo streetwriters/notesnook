@@ -142,7 +142,6 @@ class Sync {
         }
       })
       .withHubProtocol(new MessagePackHubProtocol({ ignoreUndefined: true }))
-      .withAutomaticReconnect()
       .build();
 
     EV.subscribe(EVENTS.userLoggedOut, async () => {
