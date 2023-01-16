@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -152,7 +152,7 @@ const Launcher = React.memo(
     }, [introCompleted]);
 
     const checkAppUpdateAvailable = async () => {
-     if (__DEV__) return;
+      if (__DEV__) return;
       try {
         const version =
           Config.GITHUB_RELEASE === "true"

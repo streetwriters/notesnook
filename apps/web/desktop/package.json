@@ -27,14 +27,14 @@
     "pack": "rm -rf ./build && cp -r ../build ./ && npm run build && yarn electron-builder --linux AppImage && ./dist/notesnook_linux_x86_64.AppImage"
   },
   "author": {
-    "name": "Streetwriters (Private) Ltd.",
+    "name": "Streetwriters (Private) Limited",
     "email": "support@streetwriters.co",
     "url": "https://streetwriters.co"
   },
   "build": {
     "appId": "org.streetwriters.notesnook",
     "productName": "Notesnook",
-    "copyright": "Copyright © 2022 Streetwriters (Private) Ltd.",
+    "copyright": "Copyright © 2023 Streetwriters (Private) Limited",
     "artifactName": "notesnook_${os}_${arch}.${ext}",
     "files": [
       "!*.chunk.js.map",

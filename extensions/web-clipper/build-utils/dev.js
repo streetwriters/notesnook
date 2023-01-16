@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ for (var entryName in config.entry) {
   if (excludeEntriesToHotReload.indexOf(entryName) === -1) {
     config.entry[entryName] = [
       "webpack/hot/dev-server",
-      `webpack-dev-server/client?hot=true&hostname=localhost&port=${env.PORT}`,
+      `webpack-dev-server/client?hot=true&hostname=localhost&port=${env.PORT}`
     ].concat(config.entry[entryName]);
   }
 }
@@ -54,16 +54,16 @@ var server = new WebpackDevServer(
     host: "localhost",
     port: env.PORT,
     static: {
-      directory: path.join(__dirname, "../build"),
+      directory: path.join(__dirname, "../build")
     },
     devMiddleware: {
       publicPath: `http://localhost:${env.PORT}/`,
-      writeToDisk: true,
+      writeToDisk: true
     },
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": "*"
     },
-    allowedHosts: "all",
+    allowedHosts: "all"
   },
   compiler
 );

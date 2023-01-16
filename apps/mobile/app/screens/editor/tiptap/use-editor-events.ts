@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ export const useEditorEvents = (
 ) => {
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
-  const  corsProxy = useSettingStore(state => state.settings.corsProxy);
+  const corsProxy = useSettingStore((state) => state.settings.corsProxy);
   const handleBack = useRef<NativeEventSubscription>();
   const readonly = useEditorStore((state) => state.readonly);
   const isPremium = useUserStore((state) => state.premium);
@@ -150,7 +150,7 @@ export const useEditorEvents = (
       noToolbar: readonly || editorPropReadonly || noToolbar,
       keyboardShown: keyboardShown || false,
       doubleSpacedLines: doubleSpacedLines,
-      corsProxy:corsProxy
+      corsProxy: corsProxy
     });
   }, [
     fullscreen,
