@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -141,8 +141,10 @@ const Sort = ({ type, screen }) => {
         ) : (
           Object.keys(SORT).map((item) =>
             (item === "title" && groupOptions.groupBy !== "none") ||
-            ((screen !== "Tags" || screen !== "Reminders") && item === "dateModified") ||
-            ((screen === "Tags" || screen === "Reminders") && item === "dateEdited") ? null : (
+            ((screen !== "Tags" || screen !== "Reminders") &&
+              item === "dateModified") ||
+            ((screen === "Tags" || screen === "Reminders") &&
+              item === "dateEdited") ? null : (
               <Button
                 key={item}
                 type={groupOptions.sortBy === item ? "grayBg" : "gray"}

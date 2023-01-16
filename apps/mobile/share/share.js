@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -632,63 +632,63 @@ const ShareView = ({ quicknote = false }) => {
           </View>
 
           <View
-          style={{
-            width: "100%",
-            borderRadius: 10,
-            flexDirection: "column",
-            marginTop: 10,
-            alignSelf: "center",
-            alignItems: "center",
-          }}
-        >
-          <Button
-            color={colors.bg}
-            onPress={() => {
-              useShareStore.getState().setAppendNote(null);
-            }}
-            icon="plus"
-            iconSize={18}
-            iconColor={!appendNote ? accent.color : colors.icon}
-            title="New note"
-            textColor={!appendNote ? accent.color : colors.icon}
-            type="button"
-            textStyle={{
-              fontSize: 15
-            }}
             style={{
-              paddingHorizontal: 0,
-              ...getElevation(1),
-              height: 45,
               width: "100%",
-              marginRight: 0
+              borderRadius: 10,
+              flexDirection: "column",
+              marginTop: 10,
+              alignSelf: "center",
+              alignItems: "center"
             }}
-          />
+          >
+            <Button
+              color={colors.bg}
+              onPress={() => {
+                useShareStore.getState().setAppendNote(null);
+              }}
+              icon="plus"
+              iconSize={18}
+              iconColor={!appendNote ? accent.color : colors.icon}
+              title="New note"
+              textColor={!appendNote ? accent.color : colors.icon}
+              type="button"
+              textStyle={{
+                fontSize: 15
+              }}
+              style={{
+                paddingHorizontal: 0,
+                ...getElevation(1),
+                height: 45,
+                width: "100%",
+                marginRight: 0
+              }}
+            />
 
-          <Button
-            color={colors.bg}
-            onPress={() => {
-              setShowSearch(true);
-            }}
-            icon="text-short"
-            iconSize={18}
-            iconColor={appendNote ? accent.color : colors.icon}
-            title={`${
-              appendNote ? appendNote.title.slice(0, 25) : "Append to note"
-            }`}
-            textColor={appendNote ? accent.color : colors.icon}
-            type="button"
-            textStyle={{
-              fontSize: 15
-            }}
-            style={{
-              paddingHorizontal: 0,
-              ...getElevation(1),
-              height: 45,
-              width: "100%",
-              marginRight: 0
-            }}
-          />
-        </View>
+            <Button
+              color={colors.bg}
+              onPress={() => {
+                setShowSearch(true);
+              }}
+              icon="text-short"
+              iconSize={18}
+              iconColor={appendNote ? accent.color : colors.icon}
+              title={`${
+                appendNote ? appendNote.title.slice(0, 25) : "Append to note"
+              }`}
+              textColor={appendNote ? accent.color : colors.icon}
+              type="button"
+              textStyle={{
+                fontSize: 15
+              }}
+              style={{
+                paddingHorizontal: 0,
+                ...getElevation(1),
+                height: 45,
+                width: "100%",
+                marginRight: 0
+              }}
+            />
+          </View>
 
           <View
             style={{
@@ -696,7 +696,6 @@ const ShareView = ({ quicknote = false }) => {
             }}
           />
         </View>
-      
       </View>
     </SafeAreaView>
   );

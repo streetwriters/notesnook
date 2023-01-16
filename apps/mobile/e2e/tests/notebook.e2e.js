@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -251,7 +251,7 @@ describe("NOTEBOOKS", () => {
     await tapById(notesnook.ids.notebook.menu);
     await tapByText("Move to trash");
     await sleep(2000);
-    await tapByText("No")
+    await tapByText("No");
     await sleep(4000);
     await navigate("Trash");
     await visibleByText("Notebook 1");
@@ -273,7 +273,7 @@ describe("NOTEBOOKS", () => {
     await tapById(notesnook.ids.notebook.menu);
     await tapByText("Move to trash");
     await sleep(2000);
-    await tapByText("Yes")
+    await tapByText("Yes");
     await sleep(4000);
     await navigate("Trash");
     await visibleByText("Notebook 1");

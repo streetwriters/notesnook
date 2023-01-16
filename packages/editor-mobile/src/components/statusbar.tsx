@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -83,15 +83,15 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
     };
   }, [onScroll, container]);
 
-  const paragraphStyle:React.CSSProperties = {
+  const paragraphStyle: React.CSSProperties = {
     marginTop: 0,
     marginBottom: 0,
     fontSize: "12px",
     color: "var(--nn_icon)",
     marginRight: 8,
     paddingBottom: 0,
-    userSelect:"none",
-    pointerEvents:"none"
+    userSelect: "none",
+    pointerEvents: "none"
   };
 
   return (

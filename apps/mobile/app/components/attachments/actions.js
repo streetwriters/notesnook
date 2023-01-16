@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,10 +35,7 @@ import PremiumService from "../../services/premium";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { formatBytes } from "../../utils";
-import {
-  eCloseAttachmentDialog,
-  eCloseSheet
-} from "../../utils/events";
+import { eCloseAttachmentDialog, eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
