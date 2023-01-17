@@ -24,6 +24,7 @@ import { useStore as useNotesStore } from "./stores/note-store";
 import { useStore as useThemeStore } from "./stores/theme-store";
 import { useStore as useAttachmentStore } from "./stores/attachment-store";
 import { useStore as useEditorStore } from "./stores/editor-store";
+import { useStore as useAnnouncementStore } from "./stores/announcement-store";
 import { resetReminders, scheduleBackups } from "./common/reminders";
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
@@ -32,7 +33,6 @@ import { EV, EVENTS } from "@notesnook/core/common";
 import { EVENTS as DESKTOP_APP_EVENTS } from "@notesnook/desktop/events";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
-import useAnnouncements from "./hooks/use-announcements";
 import {
   showAnnouncementDialog,
   showBuyDialog,
@@ -63,7 +63,9 @@ export default function AppEffects({ setShow }) {
   const setTheme = useThemeStore((store) => store.setTheme);
   const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
   const initEditorStore = useEditorStore((store) => store.init);
-  const [announcements, remove] = useAnnouncements("dialog");
+  const dialogAnnouncements = useAnnouncementStore(
+    (store) => store.dialogAnnouncements
+  );
   const isSystemThemeDark = useSystemTheme();
 
   useEffect(
@@ -188,11 +190,11 @@ export default function AppEffects({ setShow }) {
   }, []);
 
   useEffect(() => {
-    if (!announcements.length || isTesting()) return;
+    if (!dialogAnnouncements.length || isTesting()) return;
     (async () => {
-      await showAnnouncementDialog(announcements[0], remove);
+      await showAnnouncementDialog(dialogAnnouncements[0]);
     })();
-  }, [announcements, remove]);
+  }, [dialogAnnouncements]);
 
   useEffect(() => {
     if (!followSystemTheme) return;

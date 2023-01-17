@@ -17,60 +17,60 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useState } from "react";
-import { SUBSCRIPTION_STATUS } from "../common/constants";
+import createStore from "../common/store";
 import { db } from "../common/db";
+import BaseStore from "./index";
 import Config from "../utils/config";
 import { isUserPremium } from "../hooks/use-is-user-premium";
+import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { appVersion } from "../utils/version";
+import { findItemAndDelete } from "@notesnook/core/utils/array";
 
-var CACHED_ANNOUNCEMENTS = [];
-var cancelled = false;
-/**
- *
- * @param {"inline"|"dialog"} type
- * @returns
- */
-export default function useAnnouncements(type = "inline") {
-  const [announcements, setAnnouncements] = useState([]);
+class AnnouncementStore extends BaseStore {
+  inlineAnnouncements = [];
+  dialogAnnouncements = [];
 
-  useEffect(() => {
-    (async function () {
-      cancelled = false;
-      try {
-        CACHED_ANNOUNCEMENTS = CACHED_ANNOUNCEMENTS.length
-          ? CACHED_ANNOUNCEMENTS
-          : await db.announcements();
-      } catch (e) {
-        console.error(e);
-      }
-
-      if (cancelled) return;
-      let announcements = [];
-      for (let announcement of CACHED_ANNOUNCEMENTS) {
+  refresh = async () => {
+    try {
+      const inlineAnnouncements = [];
+      const dialogAnnouncements = [];
+      for (let announcement of await db.announcements()) {
         if (!(await shouldShowAnnouncement(announcement))) continue;
-        announcements.push(announcement);
+        if (announcement.type === "inline")
+          inlineAnnouncements.push(announcement);
+        else if (announcement.type === "dialog")
+          dialogAnnouncements.push(announcement);
       }
-      setAnnouncements(announcements);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+      this.set((state) => {
+        state.inlineAnnouncements = inlineAnnouncements;
+        state.dialogAnnouncements = dialogAnnouncements;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
-  const remove = useCallback((id) => {
+  dismiss = (id) => {
     Config.set(id, "removed");
-    setAnnouncements((announcements) => {
-      const copy = announcements.slice();
-      const index = copy.findIndex((announcement) => announcement.id === id);
-      if (index <= -1) return copy;
-      copy.splice(index, 1);
-      return copy;
-    });
-  }, []);
+    this.set((state) => {
+      findItemAndDelete(
+        state.inlineAnnouncements,
+        (announcement) => announcement.id === id
+      );
 
-  return [announcements.filter((a) => a.type === type), remove];
+      findItemAndDelete(
+        state.dialogAnnouncements,
+        (announcement) => announcement.id === id
+      );
+    });
+  };
 }
+
+/**
+ * @type {[import("zustand").UseStore<AnnouncementStore>, AnnouncementStore]}
+ */
+const [useStore, store] = createStore(AnnouncementStore);
+export { useStore, store };
 
 export const allowedPlatforms = [
   "all",
