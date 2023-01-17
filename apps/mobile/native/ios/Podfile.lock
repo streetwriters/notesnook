@@ -345,6 +345,8 @@ PODS:
     - React-Core
   - rn-fetch-blob (0.12.0):
     - React-Core
+  - RNBackgroundFetch (4.1.7):
+    - React-Core
   - RNBootSplash (4.3.2):
     - React-Core
   - RNCCheckbox (0.5.12):
@@ -481,6 +483,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../../node_modules/react-native/ReactCommon`)
   - rn-extensions-share (from `../../node_modules/rn-extensions-share`)
   - rn-fetch-blob (from `../../node_modules/rn-fetch-blob`)
+  - RNBackgroundFetch (from `../../node_modules/react-native-background-fetch`)
   - RNBootSplash (from `../../node_modules/react-native-bootsplash`)
   - "RNCCheckbox (from `../../node_modules/@react-native-community/checkbox`)"
   - "RNCClipboard (from `../../node_modules/@react-native-clipboard/clipboard`)"
@@ -622,6 +625,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/rn-extensions-share"
   rn-fetch-blob:
     :path: "../../node_modules/rn-fetch-blob"
+  RNBackgroundFetch:
+    :path: "../../node_modules/react-native-background-fetch"
   RNBootSplash:
     :path: "../../node_modules/react-native-bootsplash"
   RNCCheckbox:
@@ -736,6 +741,7 @@ SPEC CHECKSUMS:
   ReactCommon: 1e783348b9aa73ae68236271df972ba898560a95
   rn-extensions-share: 3f0ecce20dfbca1f0358deb4ebfb9ee121a6d92a
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
+  RNBackgroundFetch: 13fbe7b23d4a082eac8caa7b08c5bcbeabd92f79
   RNBootSplash: 5f346163977573d6b2aeba1b25df9d2245c0d73c
   RNCCheckbox: ed1b4ca295475b41e7251ebae046360a703b6eb5
   RNCClipboard: 2834e1c4af68697089cdd455ee4a4cdd198fa7dd
