@@ -130,6 +130,8 @@
             android:stopWithTask="false" />
         <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />   
 
+        <service android:name="com.streetwriters.notesnook.BootTaskService" />
+
         <provider
         android:name="androidx.core.content.FileProvider"
         android:authorities="${applicationId}.provider"
@@ -150,22 +152,13 @@
                 android:resource="@xml/file_viewer_provider_paths" />
         </provider>
 
-         <!-- Change the value to true to enable pop-up for in foreground on receiving remote notifications (for prevent duplicating while showing local notifications set this to false) -->
-        <meta-data  android:name="com.dieam.reactnativepushnotification.notification_foreground"
-                    android:value="false"/>
-        <!-- Change the resource name to your App's accent color - or any other color you want -->
-        <meta-data  android:name="com.dieam.reactnativepushnotification.notification_color"
-                    android:resource="@android:color/white"/> <!-- or @android:color/{name} to use a standard color -->
-
-        <receiver android:exported="true" android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationActions" />
-        <receiver android:exported="true" android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationPublisher" />
-        <receiver android:exported="true" android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationBootEventReceiver">
+        <receiver android:exported="true" android:name=".BootRecieverService" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
+        
 
     </application>
 
