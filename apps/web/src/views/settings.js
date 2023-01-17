@@ -823,16 +823,11 @@ function Settings() {
             <Toggle
               title="Enable telemetry"
               onTip="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
-              offTip={
-                isTelemetryDisabled
-                  ? "All telemetry is disabled because of Do Not Track being enabled in your browser."
-                  : "Do not collect any data or crash reports"
-              }
+              offTip={"Do not collect any data or crash reports"}
               onToggled={() => {
                 setEnableTelemetry(!enableTelemetry);
               }}
               isToggled={enableTelemetry}
-              disabled={isTelemetryDisabled}
             />
             <Button variant="list" onClick={showTrackingDetailsDialog}>
               <Tip
