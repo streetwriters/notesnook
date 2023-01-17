@@ -94,9 +94,9 @@ NewFeature.present = () => {
     return;
   }
   if (version && version === getVersion()) return false;
-  // SettingsService.set({
-  //   version: getVersion()
-  // });
+  SettingsService.set({
+    version: getVersion()
+  });
   const _features = features?.filter(
     (feature) => !feature.platform || feature.platform === Platform.OS
   );
