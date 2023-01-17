@@ -112,7 +112,7 @@ export const useEditor = (
     (show: boolean, data = { type: "new" }) => {
       eSendEvent(
         "loadingNote" + editorId,
-        show ? currentNote.current || data : false
+        show ? data || currentNote.current : false
       );
     },
     [editorId]
