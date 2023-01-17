@@ -176,8 +176,9 @@ export default class Vault {
    * @param {string} password The password to unlock note with
    */
   async remove(noteId, password) {
-    const note = this._db.notes.note(noteId).data;
-    await this._unlockNote(note, password, true);
+    const note = this._db.notes.note(noteId);
+    if (!note) return;
+    await this._unlockNote(note.data, password, true);
   }
 
   /**
@@ -186,8 +187,10 @@ export default class Vault {
    * @param {string} password The password to open note with
    */
   async open(noteId, password) {
-    const note = this._db.notes.note(noteId).data;
-    const unlockedNote = await this._unlockNote(note, password, false);
+    const note = this._db.notes.note(noteId);
+    if (!note) return;
+
+    const unlockedNote = await this._unlockNote(note.data, password, false);
     this._password = password;
     return unlockedNote;
   }
@@ -271,7 +274,10 @@ export default class Vault {
   async _lockNote(note, password) {
     let { id, content: { type, data } = {}, sessionId, title } = note;
 
-    note = this._db.notes.note(id).data;
+    note = this._db.notes.note(id);
+    if (!note) return;
+
+    note = note.data;
     const contentId = note.contentId;
     if (!contentId) throw new Error("Cannot lock note because it is empty.");
 
