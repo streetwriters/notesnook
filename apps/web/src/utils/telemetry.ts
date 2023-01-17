@@ -22,7 +22,7 @@ import Config from "./config";
 export function isTelemetryEnabled() {
   return (
     process.env.NODE_ENV === "production" &&
-    (Config.get("telemetry", true) || !doNotTrack())
+    (Config.get("telemetry", doNotTrack()) || !doNotTrack())
   );
 }
 
