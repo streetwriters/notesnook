@@ -23,7 +23,7 @@ import { useMenuTrigger } from "../../hooks/use-menu";
 import useMobile from "../../hooks/use-mobile";
 import { PropsWithChildren } from "react";
 import { Theme } from "@notesnook/theme";
-import { Icon, Circle, Shortcut } from "../icons";
+import { Icon, Shortcut } from "../icons";
 
 type NavigationItemProps = {
   icon: Icon;
@@ -32,7 +32,7 @@ type NavigationItemProps = {
   isTablet?: boolean;
   isLoading?: boolean;
   isShortcut?: boolean;
-  isNew?: boolean;
+  tag?: string;
   selected?: boolean;
   onClick?: () => void;
   count?: number;
@@ -47,7 +47,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
     title,
     isLoading,
     isShortcut,
-    isNew,
+    tag,
     children,
     isTablet,
     selected,
@@ -102,13 +102,6 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
           color={color || (selected ? "primary" : "icon")}
           rotate={isLoading}
         />
-        {isNew && (
-          <Circle
-            size={6}
-            sx={{ position: "absolute", bottom: "8px", left: "23px" }}
-            color={"primary"}
-          />
-        )}
         {isShortcut && (
           <Shortcut
             size={8}
@@ -132,6 +125,21 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
           data-test-id="title"
         >
           {title}
+          {tag && (
+            <Text
+              variant="subBody"
+              as="span"
+              sx={{
+                bg: "primary",
+                color: "static",
+                ml: 1,
+                px: "small",
+                borderRadius: "default"
+              }}
+            >
+              {tag}
+            </Text>
+          )}
         </Text>
       </Button>
       {children ? (
