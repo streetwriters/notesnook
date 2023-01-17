@@ -298,7 +298,7 @@ function CalltoAction({ action, variant, sx, removeAnnouncement }) {
       onClick={async () => {
         if (removeAnnouncement) removeAnnouncement();
         closeOpenedDialog();
-        trackEvent(ANALYTICS_EVENTS.announcementCta, action.data);
+        trackEvent(ANALYTICS_EVENTS.announcementCta, action);
         switch (action.type) {
           case "link": {
             const url = new URL(action.data);

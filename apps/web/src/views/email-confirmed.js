@@ -156,7 +156,7 @@ function BlogPromoBanner() {
             title={account.title}
             onClick={() => {
               window.open(account.link, "_blank");
-              trackEvent(ANALYTICS_EVENTS.socialLink, account.title);
+              trackEvent(ANALYTICS_EVENTS.socialLink, { link: account.link });
             }}
             size={30}
             sx={{ mr: 1, cursor: "pointer" }}

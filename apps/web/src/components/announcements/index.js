@@ -51,10 +51,7 @@ function Announcements({ announcements, removeAnnouncement }) {
         }}
         title="Dismiss announcement"
         onClick={() => {
-          trackEvent(
-            ANALYTICS_EVENTS.announcementDismissed,
-            announcement.title
-          );
+          trackEvent(ANALYTICS_EVENTS.announcementDismissed, announcement);
           removeAnnouncement && removeAnnouncement(announcement.id);
         }}
       >

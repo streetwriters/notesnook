@@ -17,42 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Config from "./config";
 import { getPlatform } from "./platform";
+import { isTelemetryEnabled } from "./telemetry";
 import { appVersion } from "./version";
 
-declare global {
-  interface Window {
-    umami?: {
-      trackEvent: (
-        value: string,
-        type: string,
-        url?: string,
-        websiteId?: string
-      ) => void;
-      trackView: (url: string, referrer?: string, websiteId?: string) => void;
-    };
-  }
-}
+type PageView = {
+  type: "pageview";
+  referrer: string;
+  url?: string;
+};
 
-export function loadTrackerScript() {
-  if (Config.get("telemetry") === "false") return;
-  const script = document.createElement("script");
-  script.src = "/an.js";
-  script.async = true;
-  script.dataset.websiteId = "f16c07d9-c77b-4781-bfbd-f58e95640002";
-
-  if (process.env.REACT_APP_PLATFORM !== "desktop")
-    script.dataset.domains = "app.notesnook.com";
-  script.dataset.autoTrack = "false";
-  script.dataset.doNotTrack = "true";
-  script.dataset.hostUrl = "https://analytics.streetwriters.co";
-  const firstScriptElement = document.getElementsByTagName("script")[0];
-  script.onload = function () {
-    trackVisit();
-  };
-  firstScriptElement.parentNode?.insertBefore(script, firstScriptElement);
-}
+type Event = {
+  type: "event";
+  event_name: string;
+  event_data: Record<string, unknown>;
+};
 
 type TrackerEvent = {
   name: string;
@@ -104,22 +83,86 @@ export const ANALYTICS_EVENTS = {
   }
 } as const;
 
-export function trackEvent(event: TrackerEvent, eventMessage?: string) {
-  if (Config.get("telemetry") === "false") return;
-  if (!window.umami) return;
+const baseUrl = `https://analytics.streetwriters.co/api/collect`;
+
+async function trackUmamiView(url: string, referrer?: string) {
+  return collect({
+    type: "pageview",
+    referrer: referrer || window.document.referrer,
+    url
+  });
+}
+
+function trackUmamiEvent(name: string, data: Record<string, unknown>) {
+  return collect({
+    type: "event",
+    event_name: name,
+    event_data: data
+  });
+}
+
+async function collect(event: PageView | Event) {
+  const {
+    screen: { width, height },
+    navigator: { language },
+    location: { hostname, pathname, search }
+  } = window;
+
+  const screen = `${width}x${height}`;
+  const currentUrl =
+    (event.type === "pageview" && event.url) || `${pathname}${search}`;
+
+  const body = {
+    payload: {
+      website: `f16c07d9-c77b-4781-bfbd-f58e95640002`,
+      hostname,
+      screen,
+      language,
+      url: currentUrl,
+      ...event
+    },
+    type: event.type
+  };
+
+  try {
+    await fetch(baseUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body),
+      keepalive: true
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export function trackEvent(
+  event: TrackerEvent,
+  data?: Record<string, unknown>
+) {
+  if (isTelemetryEnabled()) return;
   if (event.type === "view") trackVisit(event.name);
-  else if (eventMessage) window.umami.trackEvent(eventMessage, event.name);
+  else if (data) trackUmamiEvent(event.name, data);
 }
 
 export function trackVisit(url = "/") {
-  if (Config.get("telemetry") === "false") return;
-  const platform = getPlatform();
-  if (!window.umami || !platform) return;
+  if (isTelemetryEnabled()) return;
 
-  window.umami.trackView(url, window.document.referrer);
+  const platform = getPlatform();
+  if (!platform) return;
+
+  trackUmamiView(window.document.referrer);
   if (url === "/")
-    trackEvent(
-      ANALYTICS_EVENTS.version,
-      `${appVersion.formatted}-${platform.toLowerCase()}`
-    );
+    trackEvent(ANALYTICS_EVENTS.version, {
+      version: appVersion.formatted,
+      platform
+    });
+}
+
+if (isTelemetryEnabled()) {
+  document.addEventListener("readystatechange", () => {
+    trackVisit();
+  });
 }
