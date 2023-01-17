@@ -133,9 +133,12 @@ export default class Relations extends Collection {
         case "reminder":
           item = this._db.reminders.reminder(reference.id);
           break;
-        case "note":
-          item = this._db.notes.note(reference.id)?.data;
+        case "note": {
+          const note = this._db.notes.note(reference.id);
+          if (!note) continue;
+          item = note.data;
           break;
+        }
       }
       if (item) items.push(item);
     }
