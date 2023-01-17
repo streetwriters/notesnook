@@ -29,6 +29,7 @@
 		65AA857E25E6DDEC00772A01 /* NotesWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AA857D25E6DDEC00772A01 /* NotesWidget.swift */; };
 		65AA858025E6DDEE00772A01 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65AA857F25E6DDEE00772A01 /* Assets.xcassets */; };
 		65AA858425E6DDEE00772A01 /* NotesWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 65AA857725E6DDEC00772A01 /* NotesWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		65B450AD2976AF0C00EA090B /* RNBackgroundFetch+AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B450AC2976AF0B00EA090B /* RNBackgroundFetch+AppDelegate.m */; };
 		65B5014425A672B200E2D264 /* ShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65B5014325A672B200E2D264 /* ShareViewController.m */; };
 		65B5014725A672B200E2D264 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65B5014525A672B200E2D264 /* MainInterface.storyboard */; };
 		65B5014B25A672B200E2D264 /* Make Note.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 65B5014025A672B200E2D264 /* Make Note.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -122,6 +123,7 @@
 		65AA857D25E6DDEC00772A01 /* NotesWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesWidget.swift; sourceTree = "<group>"; };
 		65AA857F25E6DDEE00772A01 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		65AA858125E6DDEE00772A01 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		65B450AC2976AF0B00EA090B /* RNBackgroundFetch+AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "RNBackgroundFetch+AppDelegate.m"; path = "../../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/RNBackgroundFetch+AppDelegate.m"; sourceTree = "<group>"; };
 		65B5014025A672B200E2D264 /* Make Note.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Make Note.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B5014325A672B200E2D264 /* ShareViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShareViewController.m; sourceTree = "<group>"; };
 		65B5014625A672B200E2D264 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
@@ -221,6 +223,7 @@
 		13B07FAE1A68108700A75B9A /* Notesnook */ = {
 			isa = PBXGroup;
 			children = (
+				65B450AC2976AF0B00EA090B /* RNBackgroundFetch+AppDelegate.m */,
 				6593E4A2281C345400492C50 /* AppDelegate.mm */,
 				6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */,
 				659BE46625E11A5100E05671 /* notesnook-text.png */,
@@ -941,6 +944,7 @@
 				65E0340B257B9FF100793428 /* File.swift in Sources */,
 				6593E4A3281C345400492C50 /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				65B450AD2976AF0C00EA090B /* RNBackgroundFetch+AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
