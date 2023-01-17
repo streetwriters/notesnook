@@ -28,13 +28,14 @@ import { Button } from "../../components/ui/button";
 import { IconButton } from "../../components/ui/icon-button";
 import Paragraph from "../../components/ui/typography/paragraph";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
+import { DDS } from "../../services/device-detection";
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { eClearEditor, eOnLoadNote } from "../../utils/events";
+import { eClearEditor } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { editorState } from "./tiptap/utils";
 const EditorOverlay = ({ editorId = "", editor }) => {
@@ -64,13 +65,8 @@ const EditorOverlay = ({ editorId = "", editor }) => {
         opacity.value = 1;
         translateValue.value = 0;
         timers.current.error = setTimeout(() => {
-          if (_loading) {
-            let note = _loading;
-            note.forced = true;
-            eSendEvent(eOnLoadNote + editorId, note);
-          }
           setError(true);
-        }, 4000);
+        }, 15 * 1000);
       } else {
         clearTimers();
         setTimeout(() => {
@@ -85,7 +81,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
         }, 100);
       }
     },
-    [editorId, opacity, translateValue]
+    [opacity, translateValue]
   );
 
   useEffect(() => {
@@ -144,15 +140,19 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               paddingRight: 12
             }}
           >
-            <IconButton
-              onPress={() => {
-                eSendEvent(eClearEditor);
-                opacity.value = 0;
-                translateValue.value = 6000;
-              }}
-              name="arrow-left"
-              color={colors.pri}
-            />
+            {DDS.isTablet() ? (
+              <View />
+            ) : (
+              <IconButton
+                onPress={() => {
+                  eSendEvent(eClearEditor);
+                  opacity.value = 0;
+                  translateValue.value = 6000;
+                }}
+                name="arrow-left"
+                color={colors.pri}
+              />
+            )}
 
             <View
               style={{
