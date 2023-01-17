@@ -38,6 +38,10 @@ export class RemindersViewModel extends BaseViewModel {
     await this.createButton.click();
 
     await fillReminderDialog(this.page, reminder);
+  }
+
+  async createReminderAndWait(reminder: Partial<Reminder>) {
+    await this.createReminder(reminder);
 
     if (reminder.title) await this.waitForItem(reminder.title);
     return await this.findReminder(reminder);
