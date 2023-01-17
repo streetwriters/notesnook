@@ -97,6 +97,7 @@ const onEvent = async ({ type, detail }: Event) => {
     return;
   }
   if (type === EventType.PRESS) {
+    notifee.decrementBadgeCount();
     if (notification?.data?.type === "quickNote") return;
     editorState().movedAway = false;
     MMKV.removeItem("appState");
@@ -125,8 +126,11 @@ const onEvent = async ({ type, detail }: Event) => {
   }
 
   if (type === EventType.ACTION_PRESS) {
+    notifee.decrementBadgeCount();
     switch (pressAction?.id) {
       case "REMINDER_SNOOZE": {
+        await db.init();
+        await db.notes?.init();
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
         );
@@ -145,6 +149,8 @@ const onEvent = async ({ type, detail }: Event) => {
         break;
       }
       case "REMINDER_DISABLE": {
+        await db.init();
+        await db.notes?.init();
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
         );
@@ -160,6 +166,8 @@ const onEvent = async ({ type, detail }: Event) => {
         break;
       }
       case "UNPIN": {
+        await db.init();
+        await db.notes?.init();
         remove(notification?.id as string);
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
@@ -254,21 +262,25 @@ async function scheduleNotification(
 
   try {
     const { title, description, priority } = reminder;
-
     await clearAllPendingTriggersForId(reminder.id);
-    await remove(reminder.id);
-    if (reminder.disabled) return;
+    if (reminder.disabled) {
+      remove(reminder.id);
+      return;
+    }
     const triggers = await getTriggers(reminder);
-    console.log(triggers);
-    if (!triggers && reminder.mode === "permanent") {
-      displayNotification({
-        id: reminder.id,
-        title: title,
-        message: description || "",
-        ongoing: true,
-        subtitle: description || "",
-        actions: ["UNPIN"]
-      });
+    if (reminder.mode === "permanent") {
+      const notifications = await get();
+      const pinned = notifications.findIndex((i) => i.id === reminder.id) > -1;
+      if (!pinned) {
+        displayNotification({
+          id: reminder.id,
+          title: title,
+          message: description || "",
+          ongoing: true,
+          subtitle: description || "",
+          actions: ["UNPIN"]
+        });
+      }
       return;
     }
     await setupIOSCategories();
@@ -320,6 +332,7 @@ async function scheduleNotification(
               id: "default",
               mainComponent: "notesnook"
             },
+            badgeCount: 1,
             actions: androidActions,
             sound: notificationSound?.url,
             style: !description
@@ -332,6 +345,7 @@ async function scheduleNotification(
           ios: {
             interruptionLevel: "active",
             criticalVolume: 1.0,
+            badgeCount: 1,
             critical:
               reminder.priority === "silent" || reminder.priority === "urgent"
                 ? false
@@ -370,7 +384,8 @@ async function getChannelId(id: "silent" | "vibrate" | "urgent" | "default") {
     case "default":
       return await notifee.createChannel({
         id: "com.streetwriters.notesnook",
-        name: "Default"
+        name: "Default",
+        vibration: false
       });
     case "silent":
       return await notifee.createChannel({
@@ -419,6 +434,7 @@ async function displayNotification({
   id?: string;
 }) {
   if (!(await checkAndRequestPermissions())) return;
+
   try {
     await notifee.displayNotification({
       id: id,
@@ -430,6 +446,7 @@ async function displayNotification({
       },
       android: {
         ongoing: ongoing,
+        smallIcon: "ic_stat_name",
         localOnly: true,
         channelId: await getChannelId("default"),
         autoCancel: false,
@@ -733,6 +750,9 @@ async function setupReminders(checkNeedsScheduling = false) {
   const triggers = await notifee.getTriggerNotifications();
 
   for (const reminder of reminders) {
+    if (reminder.mode === "permanent") {
+      await scheduleNotification(reminder);
+    }
     const pending = triggers.filter((t) =>
       t.notification.id?.startsWith(reminder.id)
     );

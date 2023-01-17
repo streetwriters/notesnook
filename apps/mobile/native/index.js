@@ -8,6 +8,8 @@ import Config from 'react-native-config';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import appJson from './app.json';
 import Notifications from '../app/services/notifications';
+import {BackgroundSync} from '../app/services/background-sync';
+
 const appName = appJson.name;
 if (Config.isTesting) {
   Date.prototype.toLocaleString = () => 'XX-XX-XX';
@@ -20,6 +22,7 @@ if (__DEV__) {
   LogBox.ignoreAllLogs();
 }
 let NotesnookShare;
+BackgroundSync.start();
 Notifications.init();
 let QuickNoteIOS;
 

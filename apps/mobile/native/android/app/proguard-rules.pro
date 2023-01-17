@@ -55,3 +55,6 @@
 # Wix
 -keep class org.apache.commons.lang3.** { *; }
 -keep class org.apache.commons.io.** { *; }
+
+# Background fetch
+-keep class com.transistorsoft.rnbackgroundfetch.HeadlessTask { *; }

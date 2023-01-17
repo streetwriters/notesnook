@@ -25,10 +25,7 @@ import { enabled } from "react-native-privacy-snapshot";
 import { DatabaseLogger, db, loadDatabase } from "../../common/database";
 import { useAppState } from "../../hooks/use-app-state";
 import BiometricService from "../../services/biometrics";
-import {
-  eSendEvent,
-  presentSheet
-} from "../../services/event-manager";
+import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { setRateAppMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
@@ -55,6 +52,8 @@ import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import Config from "react-native-config";
 import { getGithubVersion } from "../../utils/github-version";
+import notifee from "@notifee/react-native";
+
 
 const Launcher = React.memo(
   function Launcher() {
@@ -133,6 +132,7 @@ const Launcher = React.memo(
         eSendEvent("session_expired");
         return;
       }
+      notifee.setBadgeCount(0);
       await useMessageStore.getState().setAnnouncement();
       if (NewFeature.present()) return;
       if (await checkAppUpdateAvailable()) return;
