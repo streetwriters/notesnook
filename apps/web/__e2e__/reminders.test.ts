@@ -36,12 +36,33 @@ test("add a one-time reminder", async ({ page }, info) => {
   await app.goto();
   const reminders = await app.goToReminders();
 
-  const reminder = await reminders.createReminder(ONE_TIME_REMINDER);
+  const reminder = await reminders.createReminderAndWait(ONE_TIME_REMINDER);
 
   expect(reminder).toBeDefined();
 
   page.on("dialog", (dialog) => dialog.accept());
   await page.waitForEvent("dialog");
+});
+
+test("adding a one-time reminder before current time should not be possible", async ({
+  page
+}, info) => {
+  info.setTimeout(90 * 1000);
+
+  const app = new AppModel(page);
+  await app.goto();
+  const reminders = await app.goToReminders();
+
+  await reminders.createReminder({
+    ...ONE_TIME_REMINDER,
+    date: 0
+  });
+
+  expect(
+    await app.toasts.waitForToast(
+      "Reminder time cannot be earlier than the current time."
+    )
+  ).toBeTruthy();
 });
 
 for (const recurringMode of ["Daily", "Weekly", "Monthly"] as const) {
@@ -50,7 +71,7 @@ for (const recurringMode of ["Daily", "Weekly", "Monthly"] as const) {
     await app.goto();
     const reminders = await app.goToReminders();
 
-    const reminder = await reminders.createReminder({
+    const reminder = await reminders.createReminderAndWait({
       ...ONE_TIME_REMINDER,
       mode: "repeat",
       recurringMode:
@@ -67,11 +88,26 @@ for (const recurringMode of ["Daily", "Weekly", "Monthly"] as const) {
   });
 }
 
+test(`add a recurring reminder before current time`, async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const reminders = await app.goToReminders();
+
+  const reminder = await reminders.createReminderAndWait({
+    ...ONE_TIME_REMINDER,
+    mode: "repeat",
+    recurringMode: "day",
+    date: 0
+  });
+
+  expect(reminder).toBeDefined();
+});
+
 test("delete a reminder", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const reminders = await app.goToReminders();
-  const reminder = await reminders.createReminder(ONE_TIME_REMINDER);
+  const reminder = await reminders.createReminderAndWait(ONE_TIME_REMINDER);
 
   await reminder?.delete();
 
@@ -89,7 +125,7 @@ test("edit a reminder", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const reminders = await app.goToReminders();
-  const reminder = await reminders.createReminder(ONE_TIME_REMINDER);
+  const reminder = await reminders.createReminderAndWait(ONE_TIME_REMINDER);
   const beforeReminderTime = await reminder?.getReminderTime();
   const beforeDescription = await reminder?.getDescription();
   const beforeTitle = await reminder?.getTitle();
@@ -109,7 +145,7 @@ test("disable a reminder", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const reminders = await app.goToReminders();
-  const reminder = await reminders.createReminder(ONE_TIME_REMINDER);
+  const reminder = await reminders.createReminderAndWait(ONE_TIME_REMINDER);
 
   await reminder?.toggle();
 
@@ -122,7 +158,7 @@ test("enable a disabled reminder", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const reminders = await app.goToReminders();
-  const reminder = await reminders.createReminder(ONE_TIME_REMINDER);
+  const reminder = await reminders.createReminderAndWait(ONE_TIME_REMINDER);
   await reminder?.toggle();
 
   await reminder?.toggle();
