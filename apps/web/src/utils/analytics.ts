@@ -142,13 +142,13 @@ export function trackEvent(
   event: TrackerEvent,
   data?: Record<string, unknown>
 ) {
-  if (isTelemetryEnabled()) return;
+  if (!isTelemetryEnabled()) return;
   if (event.type === "view") trackVisit(event.name);
   else if (data) trackUmamiEvent(event.name, data);
 }
 
 export function trackVisit(url = "/") {
-  if (isTelemetryEnabled()) return;
+  if (!isTelemetryEnabled()) return;
 
   const platform = getPlatform();
   if (!platform) return;
