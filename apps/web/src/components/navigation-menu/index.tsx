@@ -53,7 +53,7 @@ type Route = {
   title: string;
   path: string;
   icon: Icon;
-  isNew?: boolean;
+  tag?: string;
 };
 
 const navigationHistory = new Map();
@@ -92,7 +92,8 @@ const routes: Route[] = [
   {
     title: "Reminders",
     path: "/reminders",
-    icon: Reminders
+    icon: Reminders,
+    tag: "Beta"
   },
   { title: "Trash", path: "/trash", icon: Trash }
 ];
@@ -169,7 +170,7 @@ function NavigationMenu(props: NavigationMenuProps) {
               key={item.path}
               title={item.title}
               icon={item.icon}
-              isNew={item.isNew}
+              tag={item.tag}
               selected={
                 item.path === "/"
                   ? location === item.path
