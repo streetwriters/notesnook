@@ -27,6 +27,7 @@ import { store as editorstore } from "./editor-store";
 import { store as attachmentStore } from "./attachment-store";
 import { store as monographStore } from "./monograph-store";
 import { store as reminderStore } from "./reminder-store";
+import { store as announcementStore } from "./announcement-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
@@ -60,6 +61,7 @@ class AppStore extends BaseStore {
   init = () => {
     // this needs to happen here so reminders can be set on app load.
     reminderStore.refresh();
+    announcementStore.refresh();
 
     let count = 0;
     EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
