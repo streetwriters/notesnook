@@ -185,7 +185,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
 
           const dateTime = dayjs(getDateTime(date, time));
 
-          if (dateTime.isBefore(dayjs())) {
+          if (mode !== Modes.REPEAT && dateTime.isBefore(dayjs())) {
             showToast(
               "error",
               "Reminder time cannot be earlier than the current time."
