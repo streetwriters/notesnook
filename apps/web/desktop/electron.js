@@ -45,6 +45,10 @@ if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
   app.exit();
 }
 
+if (process.platform === "win32") {
+  app.setAppUserModelId(app.name);
+}
+
 /**
  * @type {BrowserWindow}
  */
