@@ -33,7 +33,8 @@ function Toggle(props) {
     onToggled,
     onlyIf,
     premium,
-    testId
+    testId,
+    disabled
   } = props;
   const onClick = useCallback(async () => {
     if (isUserPremium() || !premium || isToggled) onToggled();
@@ -45,10 +46,11 @@ function Toggle(props) {
   if (onlyIf === false) return null;
   return (
     <Flex
-      onClick={onClick}
+      onClick={disabled ? null : onClick}
       data-test-id={testId}
       py={2}
       sx={{
+        opacity: disabled ? 0.7 : 1,
         cursor: "pointer",
         borderBottom: "1px solid",
         borderBottomColor: "border",
@@ -58,7 +60,7 @@ function Toggle(props) {
       }}
     >
       <Tip text={title} tip={isToggled ? onTip : offTip} sx={{ mr: 2 }} />
-      <Switch onClick={onClick} checked={isToggled} />
+      <Switch onClick={disabled ? null : onClick} checked={isToggled} />
     </Flex>
   );
 }

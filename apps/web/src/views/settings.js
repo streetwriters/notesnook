@@ -74,6 +74,7 @@ import { clearLogs, downloadLogs } from "../utils/logger";
 import { exportNotes } from "../common/export";
 import { scheduleBackups } from "../common/reminders";
 import usePrivacyMode from "../hooks/use-privacy-mode";
+import { useTelemetry } from "../hooks/use-telemetry";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -188,10 +189,8 @@ function Settings() {
     "backupStorageLocation",
     PATHS.backupsDirectory
   );
-  const [enableTelemetry, setEnableTelemetry] = usePersistentState(
-    "telemetry",
-    true
-  );
+  const [enableTelemetry, setEnableTelemetry, isTelemetryDisabled] =
+    useTelemetry();
   const [privacyMode, setPrivacyMode] = usePrivacyMode();
   const [showReminderNotifications, setShowReminderNotifications] =
     usePersistentState("reminderNotifications", true);
@@ -824,11 +823,16 @@ function Settings() {
             <Toggle
               title="Enable telemetry"
               onTip="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
-              offTip="Do not collect any data or crash reports"
+              offTip={
+                isTelemetryDisabled
+                  ? "All telemetry is disabled because of Do Not Track being enabled in your browser."
+                  : "Do not collect any data or crash reports"
+              }
               onToggled={() => {
                 setEnableTelemetry(!enableTelemetry);
               }}
               isToggled={enableTelemetry}
+              disabled={isTelemetryDisabled}
             />
             <Button variant="list" onClick={showTrackingDetailsDialog}>
               <Tip

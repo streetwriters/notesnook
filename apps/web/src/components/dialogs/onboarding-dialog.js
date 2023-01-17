@@ -41,6 +41,7 @@ import { useCallback, useState } from "react";
 import Config from "../../utils/config";
 import { getAllAccents } from "@notesnook/theme";
 import { isMacStoreApp } from "../../utils/platform";
+import { doNotTrack } from "../../utils/telemetry";
 
 const newUserSteps = [
   {
@@ -48,7 +49,7 @@ const newUserSteps = [
     subtitle: "Write with freedom. Never compromise on privacy again.",
     buttonText: "Get started",
     image: <Note width={120} />,
-    component: TrackingConsent
+    component: doNotTrack() ? null : TrackingConsent
   },
   {
     title: "Choose your style",

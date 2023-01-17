@@ -18,29 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import { initializeDatabase } from "../common/db";
-import "../utils/analytics";
+import {
+  doNotTrack,
+  isTelemetryEnabled,
+  setTelemetry
+} from "../utils/telemetry";
 
-if (process.env.NODE_ENV === "production") {
-  console.log = () => {};
-}
-
-const memory = {
-  isAppLoaded: false
-};
-export default function useDatabase(persistence) {
-  const [isAppLoaded, setIsAppLoaded] = useState(memory.isAppLoaded);
+export function useTelemetry() {
+  const [enabled, setEnabled] = useState(isTelemetryEnabled());
 
   useEffect(() => {
-    if (memory.isAppLoaded) return;
+    setTelemetry(enabled);
+  }, [enabled]);
 
-    (async () => {
-      await import("../app.css");
-      await initializeDatabase(persistence);
-      setIsAppLoaded(true);
-      memory.isAppLoaded = true;
-    })();
-  }, [persistence]);
-
-  return [isAppLoaded];
+  return [enabled, setEnabled, doNotTrack()] as const;
 }
