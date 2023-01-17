@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Config from "./config";
 
-export function isTelemetryEnabled() {
-  return !doNotTrack() && Config.get("telemetry", true);
+export function isTelemetryEnabled(ignoreDNT = false) {
+  return (ignoreDNT || !doNotTrack()) && Config.get("telemetry", true);
 }
 
 export function setTelemetry(state: boolean) {
