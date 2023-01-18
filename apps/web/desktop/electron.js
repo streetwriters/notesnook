@@ -79,6 +79,7 @@ async function createWindow() {
       preload: __dirname + "/preload.js"
     }
   });
+  mainWindow.setAutoHideMenuBar(true);
   mainWindowState.manage(mainWindow);
   global.win = mainWindow;
   setupMenu(mainWindow);
