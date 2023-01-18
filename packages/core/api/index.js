@@ -191,7 +191,9 @@ class Database {
         return;
       this.disconnectSSE();
 
-      let token = await this.user.tokenManager.getAccessToken();
+      const token = await this.user.tokenManager.getAccessToken();
+      if (!token) return;
+
       this.evtSource = new NNEventSource(`${Constants.SSE_HOST}/sse`, {
         headers: { Authorization: `Bearer ${token}` }
       });
