@@ -23,5 +23,6 @@ export const EVENTS = {
   updateDownloadProgress: "updateDownloadProgress",
   updateDownloadCompleted: "updateDownloadCompleted",
   updateNotAvailable: "updateNotAvailable",
-  themeChanged: "themeChanged"
+  themeChanged: "themeChanged",
+  notificationClicked: "notificationClicked"
 };
