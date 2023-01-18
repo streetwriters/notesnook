@@ -26,7 +26,9 @@ import { showReminderPreviewDialog } from "../common/dialog-controller";
 import dayjs from "dayjs";
 import Config from "../utils/config";
 import { store as notestore } from "./note-store";
-import { isTesting } from "../utils/platform";
+import { isDesktop, isTesting } from "../utils/platform";
+import showNotification from "../commands/show-notification";
+import bringToFront from "../commands/bring-to-front";
 
 class ReminderStore extends BaseStore {
   reminders = [];
@@ -81,6 +83,13 @@ async function resetReminders(reminders) {
   }
 }
 
+/**
+ *
+ * @param {string} id
+ * @param {import("@notesnook/core/collections/reminders").Reminder} reminder
+ * @param {string} cron
+ * @returns
+ */
 function scheduleReminder(id, reminder, cron) {
   return TaskScheduler.register(`reminder:${id}`, cron, () => {
     if (!Config.get("reminderNotifications", true)) return;
@@ -90,18 +99,42 @@ function scheduleReminder(id, reminder, cron) {
       return;
     }
 
-    const notification = new Notification(reminder.title, {
-      body: reminder.description,
-      vibrate: reminder.priority === "vibrate",
-      silent: reminder.priority === "silent",
-      tag: id,
-      renotify: true,
-      requireInteraction: true
-    });
+    if (isDesktop()) {
+      showNotification(
+        {
+          title: reminder.title,
+          body: reminder.description,
+          silent: reminder.priority === "silent",
+          timeoutType: reminder.priority === "urgent" ? "never" : "default",
+          urgency:
+            reminder.priority === "urgent"
+              ? "critical"
+              : reminder.priority === "vibrate"
+              ? "normal"
+              : "low",
+          focusOnClick: true,
+          tag: id
+        },
+        () => {
+          bringToFront();
+          showReminderPreviewDialog(reminder);
+        }
+      );
+    } else {
+      const notification = new Notification(reminder.title, {
+        body: reminder.description,
+        vibrate: reminder.priority === "vibrate",
+        silent: reminder.priority === "silent",
+        tag: id,
+        renotify: true,
+        requireInteraction: true
+      });
 
-    notification.onclick = function () {
-      showReminderPreviewDialog(reminder);
-    };
+      notification.onclick = function () {
+        window.focus();
+        showReminderPreviewDialog(reminder);
+      };
+    }
 
     store.refresh(false);
   });

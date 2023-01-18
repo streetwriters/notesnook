@@ -25,6 +25,8 @@ import open from "./open";
 import saveFile from "./saveFile";
 import setZoomFactor from "./setZoomFactor";
 import setPrivacyMode from "./setPrivacyMode";
+import showNotification from "./showNotification";
+import bringToFront from "./bringToFront";
 
 const actions = {
   changeAppTheme,
@@ -34,7 +36,9 @@ const actions = {
   open,
   saveFile,
   setZoomFactor,
-  setPrivacyMode
+  setPrivacyMode,
+  showNotification,
+  bringToFront
 };
 
 export function getAction(actionName) {

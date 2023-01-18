@@ -16,23 +16,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Notification, shell } from "electron";
+import { join } from "path";
+import { EVENTS } from "../../events";
+import { sendMessageToRenderer } from "../utils";
+import { platform } from "os";
 
-import { AppEventManager } from "../common/app-events";
-import { isDesktop } from "../utils/platform";
-
-export function invokeCommand(type, payload = {}) {
-  if (!isDesktop()) return;
-
-  window.api.send("fromRenderer", {
-    type,
-    ...payload
+export default (args) => {
+  if (!global.win) return;
+  const notification = new Notification({
+    ...args,
+    icon: join(
+      __dirname,
+      platform() === "win32" ? "app.ico" : "favicon-72x72.png"
+    )
   });
-}
+  notification.show();
+  if (args.urgency === "critical") {
+    shell.beep();
+  }
 
-if (isDesktop()) {
-  window.api.receive("fromMain", (args) => {
-    console.log(args);
-    const { type, ...other } = args;
-    AppEventManager.publish(type, other);
+  notification.addListener("click", () => {
+    sendMessageToRenderer(EVENTS.notificationClicked, { tag: args.tag });
   });
-}
+};
