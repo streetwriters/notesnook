@@ -23,5 +23,10 @@ export default (args) => {
   if (!global.win) return;
   const { privacyMode } = args;
   global.win.setContentProtection(privacyMode);
+  global.win.setThumbnailClip(
+    privacyMode
+      ? { x: 0, y: 0, width: 1, height: 1 }
+      : { x: 0, y: 0, width: 0, height: 0 }
+  );
   setPrivacyMode(privacyMode);
 };

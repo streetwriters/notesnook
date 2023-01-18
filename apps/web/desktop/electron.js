@@ -34,6 +34,7 @@ import { sendMessageToRenderer } from "./ipc/utils";
 import { EVENTS } from "./events";
 import "./ipc/index.js";
 import getPrivacyMode from "./ipc/calls/getPrivacyMode";
+import setPrivacyMode from "./ipc/actions/setPrivacyMode";
 
 if (!RELEASE) {
   require("electron-reloader")(module);
@@ -88,7 +89,7 @@ async function createWindow() {
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });
 
   if (getPrivacyMode()) {
-    global.win.setContentProtection(true);
+    setPrivacyMode({ privacyMode: getPrivacyMode() });
   }
 
   try {
