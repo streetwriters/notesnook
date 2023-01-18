@@ -69,6 +69,7 @@ import { clearAppState } from "../screens/editor/tiptap/utils";
 import { tabBarRef } from "../utils/global-refs";
 import BackupService from "../services/backup";
 import { sleep } from "../utils/time";
+import notifee from "@notifee/react-native";
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
@@ -444,6 +445,7 @@ export const useAppEvents = () => {
   const onAppStateChanged = useCallback(
     async (state) => {
       if (state === "active") {
+        notifee.setBadgeCount(0);
         updateStatusBarColor();
         if (
           SettingsService.get().appLockMode !== "background" &&
