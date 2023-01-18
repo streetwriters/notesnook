@@ -181,6 +181,7 @@ class Sync {
       await this.connection.stop();
       return;
     }
+    if (!(await this.db.user.getUser())) return;
 
     this.logger.info("Starting sync", { full, force, serverLastSynced });
 
