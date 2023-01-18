@@ -52,6 +52,7 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounceWithId } from "../../utils/debounce";
 import { store as editorstore } from "../../stores/editor-store";
+import Config from "../../utils/config";
 
 type TipTapProps = {
   editorContainer: HTMLElement;
@@ -278,6 +279,10 @@ function TipTap(props: TipTapProps) {
       editorContainer.removeEventListener("click", onClick);
     };
   }, [editor, editorContainer]);
+
+  useEffect(() => {
+    editorContainer.style.fontSize = `${Config.get("fontSize", 16)}px`;
+  });
 
   if (!toolbarContainerId) return null;
 

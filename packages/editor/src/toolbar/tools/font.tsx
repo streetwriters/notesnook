@@ -24,11 +24,13 @@ import { MenuItem } from "../../components/menu/types";
 import { useCallback, useMemo } from "react";
 import { Counter } from "../components/counter";
 import { useRefValue } from "../../hooks/use-ref-value";
+import { config } from "../../utils/config";
 
 export function FontSize(props: ToolProps) {
   const { editor } = props;
   const { fontSize: _fontSize } = editor.getAttributes("textStyle");
-  const fontSize = _fontSize || "16px";
+  const defaultFontSize = `${config.get("fontSize", 16)}px`;
+  const fontSize = _fontSize || defaultFontSize;
   const fontSizeAsNumber = useRefValue(parseInt(fontSize.replace("px", "")));
 
   const decreaseFontSize = useCallback(() => {
@@ -56,7 +58,9 @@ export function FontSize(props: ToolProps) {
           .setFontSize(`${increaseFontSize()}px`)
           .run();
       }}
-      onReset={() => editor.current?.chain().focus().setFontSize("16px").run()}
+      onReset={() =>
+        editor.current?.chain().focus().setFontSize(defaultFontSize).run()
+      }
       value={fontSize}
     />
   );

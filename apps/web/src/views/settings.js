@@ -74,6 +74,7 @@ import { clearLogs, downloadLogs } from "../utils/logger";
 import { exportNotes } from "../common/export";
 import { scheduleBackups } from "../common/reminders";
 import usePrivacyMode from "../hooks/use-privacy-mode";
+import { DefaultFont } from "../components/default-font";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -542,6 +543,12 @@ function Settings() {
         />
         {groups.editor && (
           <>
+            <Tip
+              text="Customize Default Font"
+              tip="Set default font size and family"
+              sx={{ py: 2 }}
+            />
+            <DefaultFont />
             <Toggle
               title="Use double spaced lines"
               onTip="New lines will be double spaced (old ones won't be affected)."
