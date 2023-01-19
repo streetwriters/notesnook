@@ -117,7 +117,7 @@ async function getBody(request) {
   /**
    * @type {Electron.Session}
    */
-  const session = global.win.webContents.session;
+  const session = globalThis.window.webContents.session;
 
   const blobParts = [];
   if (!request.uploadData || !request.uploadData.length) return null;

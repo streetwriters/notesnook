@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { setTheme } from "../../config/theme";
 
 export default (args) => {
-  if (!global.win) return;
+  if (!globalThis.window) return;
   const { theme } = args;
   setTheme(theme);
 };

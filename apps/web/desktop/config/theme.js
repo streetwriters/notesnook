@@ -26,7 +26,8 @@ function getTheme() {
 
 function setTheme(theme) {
   nativeTheme.themeSource = theme;
-  if (global.win) global.win.setBackgroundColor(getBackgroundColor(theme));
+  if (globalThis.window)
+    globalThis.window.setBackgroundColor(getBackgroundColor(theme));
   return JSONStorage.set("theme", theme);
 }
 
