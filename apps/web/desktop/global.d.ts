@@ -17,25 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ipcMain } from "electron";
-import { logger } from "../logger";
-import { getAction } from "./actions";
-import { getCall } from "./calls";
+import { BrowserWindow } from "electron";
 
-ipcMain.on("fromRenderer", async (event, args) => {
-  logger.info("Action requested by renderer", args);
-
-  const { type } = args;
-  const action = getAction(type);
-  if (!action) return;
-  await action(args);
-});
-
-ipcMain.handle("fromRenderer", async (event, args) => {
-  const { type } = args;
-  logger.info("Call requested by renderer", type);
-  const call = getCall(type);
-  if (!call) return;
-
-  return await call(args, globalThis.window);
-});
+declare global {
+  // eslint-disable-next-line no-var
+  var window: BrowserWindow;
+}

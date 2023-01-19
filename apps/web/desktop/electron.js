@@ -50,15 +50,10 @@ if (process.platform === "win32") {
   app.setAppUserModelId(app.name);
 }
 
-/**
- * @type {BrowserWindow}
- */
-let mainWindow;
-
 async function createWindow() {
   const mainWindowState = new WindowState({});
   setTheme(getTheme());
-  mainWindow = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     x: mainWindowState.x,
     y: mainWindowState.y,
     width: mainWindowState.width,
@@ -82,7 +77,7 @@ async function createWindow() {
   });
   mainWindow.setAutoHideMenuBar(true);
   mainWindowState.manage(mainWindow);
-  global.win = mainWindow;
+  globalThis.window = mainWindow;
   setupMenu(mainWindow);
 
   if (isDevelopment())
@@ -101,8 +96,7 @@ async function createWindow() {
   }
 
   mainWindow.on("closed", () => {
-    mainWindow = null;
-    global.win = null;
+    globalThis.window = null;
   });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -135,7 +129,7 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
-  if (mainWindow === null) {
+  if (globalThis.window === null) {
     createWindow();
   }
 });

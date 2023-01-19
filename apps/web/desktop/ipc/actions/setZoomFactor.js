@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { setZoomFactor } from "../../config/zoomfactor";
 
 export default (args) => {
-  if (!global.win) return;
+  if (!globalThis.window) return;
   const { zoomFactor } = args;
-  global.win.webContents.setZoomFactor(zoomFactor);
+  globalThis.window.webContents.setZoomFactor(zoomFactor);
   setZoomFactor(zoomFactor);
 };
