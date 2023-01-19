@@ -75,6 +75,7 @@ import { exportNotes } from "../common/export";
 import { scheduleBackups } from "../common/reminders";
 import usePrivacyMode from "../hooks/use-privacy-mode";
 import { useTelemetry } from "../hooks/use-telemetry";
+import useSpellChecker from "../hooks/use-spell-checker";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -189,8 +190,8 @@ function Settings() {
     "backupStorageLocation",
     PATHS.backupsDirectory
   );
-  const [enableTelemetry, setEnableTelemetry, isTelemetryDisabled] =
-    useTelemetry();
+  const [enableTelemetry, setEnableTelemetry] = useTelemetry();
+  const spellChecker = useSpellChecker();
   const [privacyMode, setPrivacyMode] = usePrivacyMode();
   const [showReminderNotifications, setShowReminderNotifications] =
     usePersistentState("reminderNotifications", true);
@@ -565,6 +566,12 @@ function Settings() {
                 tip="Customize the editor toolbar to fit your needs."
               />
             </Button>
+
+            <Toggle
+              title="Enable spellchecker"
+              onToggled={() => spellChecker.toggle(!spellChecker.enabled)}
+              isToggled={spellChecker.enabled}
+            />
           </>
         )}
 

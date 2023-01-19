@@ -56,6 +56,11 @@ contextBridge.exposeInMainWorld("config", {
     return ipcRenderer.invoke("fromRenderer", {
       type: "getPrivacyMode"
     });
+  },
+  spellChecker: () => {
+    return ipcRenderer.invoke("fromRenderer", {
+      type: "getSpellChecker"
+    });
   }
 });
 
