@@ -17,26 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import getZoomFactor from "./getZoomFactor";
-import getPrivacyMode from "./getPrivacyMode";
-import selectDirectory from "./selectDirectory";
-import { gunzip, gzip } from "./gzip";
-import getSpellChecker from "./getSpellChecker";
+import { invokeCommand } from "./index";
 
-const calls = {
-  getZoomFactor,
-  getPrivacyMode,
-  selectDirectory,
-  gunzip,
-  gzip,
-  getSpellChecker
-};
-
-export const getCall = function getAction(callName) {
-  try {
-    if (!calls[callName]) throw new Error("Invalid call name.");
-  } catch (e) {
-    console.error(e);
-  }
-  return calls[callName];
-};
+export default function toggleSpellChecker(enabled) {
+  invokeCommand("toggleSpellChecker", { enabled });
+}

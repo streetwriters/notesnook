@@ -27,6 +27,7 @@ import setZoomFactor from "./setZoomFactor";
 import setPrivacyMode from "./setPrivacyMode";
 import showNotification from "./showNotification";
 import bringToFront from "./bringToFront";
+import toggleSpellChecker from "./toggleSpellChecker";
 
 const actions = {
   changeAppTheme,
@@ -38,7 +39,8 @@ const actions = {
   setZoomFactor,
   setPrivacyMode,
   showNotification,
-  bringToFront
+  bringToFront,
+  toggleSpellChecker
 };
 
 export function getAction(actionName) {

@@ -35,6 +35,7 @@ import { EVENTS } from "./events";
 import "./ipc/index.js";
 import getPrivacyMode from "./ipc/calls/getPrivacyMode";
 import setPrivacyMode from "./ipc/actions/setPrivacyMode";
+import { getIsSpellCheckerEnabled } from "./config/spellChecker";
 
 if (!RELEASE) {
   require("electron-reloader")(module);
@@ -71,7 +72,7 @@ async function createWindow() {
       enableRemoteModule: false,
       contextIsolation: true,
       nativeWindowOpen: true,
-      spellcheck: false,
+      spellcheck: getIsSpellCheckerEnabled(),
       preload: __dirname + "/preload.js"
     }
   });
