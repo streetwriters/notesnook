@@ -27,7 +27,7 @@ const filePath = join(directory, filename);
 class JSONStorage {
   static get(key, def) {
     const json = this.readJson();
-    return json[key] || def;
+    return json[key] === undefined ? def : json[key];
   }
 
   static set(key, value) {
