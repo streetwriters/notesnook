@@ -199,6 +199,13 @@ export function showEmailChangeDialog() {
   );
 }
 
+export function showLanguageSelectorDialog() {
+  return showDialog<"LanguageSelectorDialog", string | null>(
+    "LanguageSelectorDialog",
+    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
+  );
+}
+
 export function showToolbarConfigDialog() {
   return showDialog<"ToolbarConfigDialog", string | null>(
     "ToolbarConfigDialog",

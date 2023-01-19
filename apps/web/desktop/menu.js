@@ -19,13 +19,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Menu, MenuItem, clipboard } from "electron";
 
-/**
- *
- * @param {import("@playwright/test").BrowserWindow} mainWindow
- */
-function setupMenu(mainWindow) {
-  mainWindow.webContents.on("context-menu", (event, params) => {
+function setupMenu() {
+  globalThis.window.webContents.on("context-menu", (_event, params) => {
     const menu = new Menu();
+
+    // Add each spelling suggestion
+    for (const suggestion of params.dictionarySuggestions) {
+      menu.append(
+        new MenuItem({
+          label: suggestion,
+          click: () =>
+            globalThis.window.webContents.replaceMisspelling(suggestion)
+        })
+      );
+    }
+
+    // Allow users to add the misspelled word to the dictionary
+    if (params.misspelledWord) {
+      menu.append(
+        new MenuItem({
+          label: "Add to dictionary",
+          click: () =>
+            globalThis.window.webContents.session.addWordToSpellCheckerDictionary(
+              params.misspelledWord
+            )
+        })
+      );
+    }
+
+    if (menu.items.length > 0)
+      menu.append(
+        new MenuItem({
+          type: "separator"
+        })
+      );
+
     if (params.isEditable) {
       menu.append(
         new MenuItem({
@@ -81,28 +109,6 @@ function setupMenu(mainWindow) {
         })
       );
 
-    // Add each spelling suggestion
-    // for (const suggestion of params.dictionarySuggestions) {
-    //   menu.append(
-    //     new MenuItem({
-    //       label: suggestion,
-    //       click: () => mainWindow.webContents.replaceMisspelling(suggestion),
-    //     })
-    //   );
-    // }
-
-    // Allow users to add the misspelled word to the dictionary
-    // if (params.misspelledWord) {
-    //   menu.append(
-    //     new MenuItem({
-    //       label: "Add to dictionary",
-    //       click: () =>
-    //         mainWindow.webContents.session.addWordToSpellCheckerDictionary(
-    //           params.misspelledWord
-    //         ),
-    //     })
-    //   );
-    // }
     menu.popup();
   });
 }

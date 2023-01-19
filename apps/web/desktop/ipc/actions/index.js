@@ -27,6 +27,7 @@ import setZoomFactor from "./setZoomFactor";
 import setPrivacyMode from "./setPrivacyMode";
 import showNotification from "./showNotification";
 import bringToFront from "./bringToFront";
+import setSpellCheckerLanguages from "./setSpellCheckerLanguages";
 import toggleSpellChecker from "./toggleSpellChecker";
 
 const actions = {
@@ -40,6 +41,7 @@ const actions = {
   setPrivacyMode,
   showNotification,
   bringToFront,
+  setSpellCheckerLanguages,
   toggleSpellChecker
 };
 
