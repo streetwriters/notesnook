@@ -17,33 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-type Language = { code: string; name: string };
-type SpellCheckerOptions = {
-  languages: Language[];
-  enabledLanguages: Language[];
-  enabled: boolean;
-};
-declare interface Window {
-  config: {
-    static spellChecker(): Promise<SpellCheckerOptions>;
-  };
-  native: {
-    static gzip({
-      data,
-      level
-    }: {
-      data: string;
-      level: number;
-    }): Promise<string>;
-    static gunzip({ data }: { data: string }): Promise<string>;
-    static selectDirectory({
-      title,
-      buttonLabel,
-      defaultPath
-    }: {
-      title?: string;
-      buttonLabel?: string;
-      defaultPath?: string;
-    }): Promise<string>;
-  };
+import { invokeCommand } from "./index";
+
+export default function setSpellCheckerLanguages(languages) {
+  invokeCommand("setSpellCheckerLanguages", { languages });
 }

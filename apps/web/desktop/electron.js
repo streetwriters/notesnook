@@ -79,7 +79,7 @@ async function createWindow() {
   mainWindow.setAutoHideMenuBar(true);
   mainWindowState.manage(mainWindow);
   globalThis.window = mainWindow;
-  setupMenu(mainWindow);
+  setupMenu();
 
   if (isDevelopment())
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });

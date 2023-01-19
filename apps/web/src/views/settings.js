@@ -42,7 +42,8 @@ import {
   show2FARecoveryCodesDialog,
   showToolbarConfigDialog,
   showPromptDialog,
-  showEmailChangeDialog
+  showEmailChangeDialog,
+  showLanguageSelectorDialog
 } from "../common/dialog-controller";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { createBackup, importBackup, verifyAccount } from "../common";
@@ -572,6 +573,20 @@ function Settings() {
               onToggled={() => spellChecker.toggle(!spellChecker.enabled)}
               isToggled={spellChecker.enabled}
             />
+            {isDesktop() && getPlatform() !== "darwin" && (
+              <Button
+                variant="list"
+                onClick={async () => {
+                  await showLanguageSelectorDialog();
+                }}
+              >
+                <Tip
+                  text="Spellchecker languages"
+                  tip="Choose languages for the spellchecker"
+                  sx={{ py: 2 }}
+                />
+              </Button>
+            )}
           </>
         )}
 

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useState } from "react";
+import setSpellCheckerLanguages from "../commands/set-spell-checker-languages";
 import toggleSpellChecker from "../commands/toggle-spell-checker";
 
 export default function useSpellChecker() {
@@ -44,10 +45,18 @@ export default function useSpellChecker() {
     [loadSpellChecker]
   );
 
+  const setLanguages = useCallback(
+    async (languages: string[]) => {
+      setSpellCheckerLanguages(languages);
+      await loadSpellChecker();
+    },
+    [loadSpellChecker]
+  );
 
   return {
     ...spellChecker,
     toggle,
+    setLanguages,
     loadSpellChecker
   };
 }
