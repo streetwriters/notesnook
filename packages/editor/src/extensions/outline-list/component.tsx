@@ -27,7 +27,7 @@ export function OutlineListComponent(
   props: ReactNodeViewProps<OutlineListAttributes>
 ) {
   const { editor, getPos, node, forwardRef } = props;
-  const { collapsed } = node.attrs;
+  const { collapsed, textDirection } = node.attrs;
 
   const isNested = useMemo(() => {
     const pos = editor.state.doc.resolve(getPos());
@@ -40,6 +40,7 @@ export function OutlineListComponent(
         className="outline-list"
         as={"div"}
         ref={forwardRef}
+        dir={textDirection}
         sx={{
           ul: {
             display: collapsed ? "none" : "block",

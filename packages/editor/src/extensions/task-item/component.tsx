@@ -172,9 +172,9 @@ export function TaskItemComponent(
             className="taskItemTools"
             sx={{
               bg: "background",
-              position: "absolute",
-              right: 0,
-              top: "4px",
+              ml: 0,
+              mt: "4px",
+              alignSelf: "end",
               opacity: 0,
               alignItems: "center"
             }}
