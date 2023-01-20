@@ -23,6 +23,7 @@ import { OutlineListComponent } from "./component";
 
 export type OutlineListAttributes = {
   collapsed: boolean;
+  textDirection: string;
 };
 
 export interface OutlineListOptions {
@@ -60,6 +61,17 @@ export const OutlineList = Node.create<OutlineListOptions>({
         renderHTML: (attributes) => ({
           "data-collapsed": attributes.collapsed === true
         })
+      },
+      textDirection: {
+        default: "ltr",
+        parseHTML: (element) => element.dir,
+        renderHTML(attributes) {
+          if (!attributes.textDirection) {
+            return {};
+          }
+
+          return { dir: attributes.textDirection };
+        }
       }
     };
   },

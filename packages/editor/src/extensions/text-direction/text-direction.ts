@@ -41,7 +41,14 @@ export const TextDirection = Extension.create<TextDirectionOptions>({
   name: "textDirection",
 
   defaultOptions: {
-    types: ["paragraph", "heading"],
+    types: [
+      "paragraph",
+      "heading",
+      "orderedList",
+      "bulletList",
+      "outlineList",
+      "taskList"
+    ],
     defaultDirection: "ltr"
   },
 
