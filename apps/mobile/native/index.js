@@ -8,7 +8,7 @@ import Config from 'react-native-config';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import appJson from './app.json';
 import Notifications from '../app/services/notifications';
-import {BackgroundSync} from '../app/services/background-sync';
+//import {BackgroundSync} from '../app/services/background-sync';
 
 const appName = appJson.name;
 if (Config.isTesting) {
@@ -22,8 +22,8 @@ if (__DEV__) {
   LogBox.ignoreAllLogs();
 }
 let NotesnookShare;
-BackgroundSync.start();
 Notifications.init();
+//BackgroundSync.registerHeadlessTask();
 let QuickNoteIOS;
 
 const AppProvider = () => {

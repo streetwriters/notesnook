@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 import BackgroundFetch from "react-native-background-fetch";
 import { DatabaseLogger, db } from "../common/database";
 import { AppState, AppRegistry } from "react-native";
@@ -67,10 +68,8 @@ const task = async (event: { taskId: string; timeout: boolean }) => {
     BackgroundFetch.finish(taskId);
     return;
   }
-  console.log(
-    "[BackgroundFetch HeadlessTask] start: ",
-    taskId,
-    AppState.currentState
+  DatabaseLogger.info(
+    "[BackgroundFetch HeadlessTask] start: " + taskId + AppState.currentState
   );
   await onBackgroundSyncStarted();
   BackgroundFetch.finish(taskId);
@@ -80,14 +79,14 @@ BackgroundFetch.registerHeadlessTask(task);
 
 async function onBackgroundSyncStarted() {
   try {
-    console.log("Background Sync", "start");
+    DatabaseLogger.info("Background Sync" + "start");
     await db.init();
     const user = await db.user?.getUser();
     if (user) {
       await db.sync(true, false);
     }
     await Notifications.setupReminders();
-    console.log("Background Sync", "end");
+    DatabaseLogger.info("Background Sync" + "end");
   } catch (e) {
     DatabaseLogger.error(e as Error);
     console.log("Background Sync Error", (e as Error).message);
@@ -96,26 +95,28 @@ async function onBackgroundSyncStarted() {
 
 const onBoot = async () => {
   try {
-    console.log("BOOT TASK STARTED");
+    DatabaseLogger.info("BOOT TASK STARTED");
     await db.init();
     await Notifications.setupReminders();
     SettingsService.init();
     if (SettingsService.get().notifNotes) {
       Notifications.pinQuickNote(false);
     }
-    console.log("BOOT TASK COMPLETE");
+    DatabaseLogger.info("BOOT TASK COMPLETE");
   } catch (e) {
     console.log(e);
   }
 };
 
-AppRegistry.registerHeadlessTask(
-  "com.streetwriters.notesnook.BOOT_TASK",
-  () => {
-    return onBoot;
-  }
-);
+const registerHeadlessTask = () =>
+  AppRegistry.registerHeadlessTask(
+    "com.streetwriters.notesnook.BOOT_TASK",
+    () => {
+      return onBoot;
+    }
+  );
 
 export const BackgroundSync = {
-  start
+  start,
+  registerHeadlessTask
 };

@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 public class BootTaskService extends HeadlessJsTaskService {
 
-  @Override
+    @Override
   protected @Nullable HeadlessJsTaskConfig getTaskConfig(Intent intent) {
       return new HeadlessJsTaskConfig(
               "com.streetwriters.notesnook.BOOT_TASK",
