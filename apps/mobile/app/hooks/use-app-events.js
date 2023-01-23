@@ -317,6 +317,10 @@ export const useAppEvents = () => {
 
   const onLogout = async (reason) => {
     console.log("Logged out", reason);
+    DatabaseLogger.log("User Logged Out" + reason);
+    SettingsService.set({
+      introCompleted: true
+    });
   };
 
   const unsubIAP = () => {
