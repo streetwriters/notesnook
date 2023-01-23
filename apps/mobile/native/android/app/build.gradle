@@ -193,6 +193,7 @@ android {
             }
         }
     }
+    dynamicFeatures = [':geckoview']
 
     if (isNewArchitectureEnabled()) {
         // We configure the NDK build only if you decide to opt-in for the New Architecture.
@@ -234,14 +235,21 @@ android {
         }
     }
 
-    splits {
+    // splits {
+    //     abi {
+    //         reset()
+    //         enable enableSeparateBuildPerCPUArchitecture
+    //         universalApk true  // If true, also generate a universal APK
+    //         include (*reactNativeArchitectures())
+    //     }
+    // }
+
+    bundle {
         abi {
-            reset()
-            enable enableSeparateBuildPerCPUArchitecture
-            universalApk false  // If true, also generate a universal APK
-            include (*reactNativeArchitectures())
+            enableSplit true
         }
     }
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -272,13 +280,29 @@ android {
         }
     }
 
+    packagingOptions {
+                exclude "lib/**/libmozglue.so"
+                exclude "lib/**/libxul.so"
+                exclude "lib/**/libnss3.so"
+                exclude "lib/**/libnssckbi.so"
+                exclude "lib/**/libmozavutil.so"
+                exclude "lib/**/libsoftokn3.so"
+                exclude "lib/**/libmozavcodec.so"
+                exclude "lib/**/libipcclientcerts.so"
+                exclude "lib/**/libfreebl3.so"
+                exclude "lib/**/libplugin-container.so"
+                exclude "lib/**/liblgpllibs.so"
+    }
+
     // applicationVariants are e.g. debug, release
-    applicationVariants.all { variant ->
+    applicationVariants.all { variant -> {
+        println(variant)
         variant.outputs.each { output ->
             // For each separate APK per architecture, set a unique version code as described here:
             // https://developer.android.com/studio/build/configure-apk-splits.html
             def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
             def abi = output.getFilter(OutputFile.ABI)
+            println(abi)
             if (abi != null) {  // null for the universal-debug, universal-release variants
                 output.versionCodeOverride =
                         versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
@@ -286,18 +310,15 @@ android {
 
         }
     }
-
-    
-    
-
-
-
+        
+    }
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
+    api 'com.google.android.play:feature-delivery:2.0.1'
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
     implementation 'androidx.multidex:multidex:2.0.1' 
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
@@ -361,8 +382,21 @@ task copyFiles(type: Copy) {
     from '../../../../../packages/editor-mobile/build.bundle'
     into './src/main/assets'
 }
+
+task deleteFilesMessaging(type: Delete) {
+  delete './src/main/assets/messaging'
+}
+
+task copyFilesMessaging(type: Copy) {
+    from '../../../node_modules/@ammarahmed/react-native-geckoview/extensions'
+    into './src/main/assets'
+}
+
+copyFilesMessaging.dependsOn(deleteFilesMessaging);
+preBuild.dependsOn(copyFilesMessaging);
+
 copyFiles.dependsOn(deleteFiles)
-preBuild.dependsOn(copyFiles)
+preBuild.dependsOn(copyFiles);
 
 
 project.ext.vectoricons = [

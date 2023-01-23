@@ -45,6 +45,7 @@ import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { editorController } from "./tiptap/utils";
 import { useLayoutEffect } from "react";
+import { useIsGeckoViewEnabled } from "../../utils/split-module-loader";
 
 const style: ViewStyle = {
   height: "100%",
@@ -53,6 +54,7 @@ const style: ViewStyle = {
   alignSelf: "center",
   backgroundColor: "transparent"
 };
+
 const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
   if (request.url.includes("https")) {
     if (Platform.OS === "ios" && !request.isTopFrame) return true;
@@ -63,6 +65,7 @@ const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
   }
 };
 
+let GeckoView: any = null;
 const Editor = React.memo(
   forwardRef<
     {
@@ -89,6 +92,8 @@ const Editor = React.memo(
         noToolbar,
         noHeader
       });
+      const { enabled: useGeckoView, loading, view } = useIsGeckoViewEnabled();
+      GeckoView = view.current;
 
       useImperativeHandle(ref, () => ({
         get: () => editor
@@ -124,8 +129,12 @@ const Editor = React.memo(
 
       const onError = useCallback(() => {
         editor.setLoading(true);
+        if (useGeckoView) {
+          //@ts-ignore
+          editor.ref?.connectMessagingPort();
+        }
         setTimeout(() => editor.setLoading(false), 10);
-      }, [editor]);
+      }, [editor, useGeckoView]);
 
       useEffect(() => {
         eSubscribeEvent("webview_reset", onError);
@@ -145,48 +154,71 @@ const Editor = React.memo(
         editorController.current = editor;
       }
 
-      return editor.loading ? null : (
+      return editor.loading || loading ? null : (
         <>
-          <WebView
-            testID={notesnook.editor.id}
-            ref={editor.ref}
-            onLoad={editor.onLoad}
-            onRenderProcessGone={onError}
-            nestedScrollEnabled
-            onError={onError}
-            injectedJavaScriptBeforeContentLoaded={`
+          {!useGeckoView || editorId !== "" ? (
+            <WebView
+              testID={notesnook.editor.id}
+              ref={editor.ref}
+              onLoad={editor.onLoad}
+              onRenderProcessGone={onError}
+              nestedScrollEnabled
+              onError={onError}
+              injectedJavaScriptBeforeContentLoaded={`
           globalThis.readonly=${readonly};
           globalThis.noToolbar=${noToolbar};
           globalThis.noHeader=${noHeader};
           `}
-            injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
-            javaScriptEnabled={true}
-            focusable={true}
-            setSupportMultipleWindows={false}
-            overScrollMode="never"
-            scrollEnabled={false}
-            keyboardDisplayRequiresUserAction={false}
-            onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-            cacheMode="LOAD_DEFAULT"
-            cacheEnabled={true}
-            domStorageEnabled={true}
-            bounces={false}
-            setBuiltInZoomControls={false}
-            setDisplayZoomControls={false}
-            allowFileAccess={true}
-            scalesPageToFit={true}
-            hideKeyboardAccessoryView={false}
-            allowsFullscreenVideo={true}
-            allowFileAccessFromFileURLs={true}
-            allowUniversalAccessFromFileURLs={true}
-            originWhitelist={["*"]}
-            source={{
-              uri: EDITOR_URI
-            }}
-            style={style}
-            autoManageStatusBarEnabled={false}
-            onMessage={onMessage || undefined}
-          />
+              injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
+              javaScriptEnabled={true}
+              focusable={true}
+              setSupportMultipleWindows={false}
+              overScrollMode="never"
+              scrollEnabled={false}
+              keyboardDisplayRequiresUserAction={false}
+              onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+              cacheMode="LOAD_DEFAULT"
+              cacheEnabled={true}
+              domStorageEnabled={true}
+              bounces={false}
+              setBuiltInZoomControls={false}
+              setDisplayZoomControls={false}
+              allowFileAccess={true}
+              scalesPageToFit={true}
+              hideKeyboardAccessoryView={false}
+              allowsFullscreenVideo={true}
+              allowFileAccessFromFileURLs={true}
+              allowUniversalAccessFromFileURLs={true}
+              originWhitelist={["*"]}
+              source={{
+                uri: EDITOR_URI
+              }}
+              style={style}
+              autoManageStatusBarEnabled={false}
+              onMessage={onMessage || undefined}
+            />
+          ) : (
+            <GeckoView
+              //@ts-ignore
+              ref={editor.ref}
+              source={{
+                uri: EDITOR_URI
+              }}
+              onLoadingStart={(e) => {
+                console.log(e.nativeEvent);
+              }}
+              injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
+              style={style}
+              onLoadingFinish={editor.onLoad}
+              onMessagingDisconnected={() => {
+                //@ts-ignore
+                editor.ref?.connectMessagingPort();
+              }}
+              onLoadingError={onError}
+              onMessage={onMessage}
+            />
+          )}
+
           {editorId === "shareEditor" ? null : (
             <AppSection editor={editor} editorId={editorId} />
           )}

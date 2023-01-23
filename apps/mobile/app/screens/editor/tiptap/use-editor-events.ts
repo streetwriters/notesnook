@@ -273,6 +273,10 @@ export const useEditorEvents = (
   const onMessage = useCallback(
     (event: WebViewMessageEvent) => {
       const data = event.nativeEvent.data;
+      if (data?.startsWith("Error")) {
+        console.log("WebView Error", data);
+        return;
+      }
       const editorMessage = JSON.parse(data) as EditorMessage;
       if (
         editorMessage.sessionId !== editor.sessionId &&

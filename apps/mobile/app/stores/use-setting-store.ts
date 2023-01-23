@@ -73,6 +73,7 @@ export type Settings = {
   corsProxy: string;
   disableRealtimeSync?: boolean;
   notificationSound?: Sound & { platform: PlatformOSType };
+  useGeckoView?:boolean
 };
 
 type DimensionsType = {

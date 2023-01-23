@@ -12,6 +12,7 @@ buildscript {
         androidXCoreVersion = "1.7.0"
         androidXCore = "1.7.0"
         androidXBrowser = "1.0.0"
+        geckoviewVersion = "109.0.20230112150232"
          if (System.properties['os.arch'] == "aarch64") {
             // For M1 Users we need to use the NDK 24 which added support for aarch64
             ndkVersion = "24.0.8215888"
@@ -72,5 +73,6 @@ allprojects {
         maven {
            url("${project(':react-native-background-fetch').projectDir}/libs")
         }
+        maven { url "https://maven.mozilla.org/maven2/" }
     }
 }

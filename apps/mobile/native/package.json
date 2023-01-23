@@ -57,7 +57,8 @@
     "@react-native-community/datetimepicker":"6.6.0",
     "react-native-date-picker": "4.2.6",
     "react-native-notification-sounds": "0.5.5",
-    "react-native-background-fetch": "4.1.7"
+    "react-native-background-fetch": "4.1.7",
+    "@ammarahmed/react-native-geckoview": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

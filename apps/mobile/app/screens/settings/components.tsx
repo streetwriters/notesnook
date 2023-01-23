@@ -22,6 +22,7 @@ import { AccentColorPicker, HomagePageSelector } from "./appearance";
 import { AutomaticBackupsSelector } from "./backup-restore";
 import DebugLogs from "./debug";
 import { ConfigureToolbar } from "./editor/configure-toolbar";
+import { GeckoViewLoader } from "./gecko-view-loader";
 import SoundPicker from "./sound-picker";
 import { Subscription } from "./subscription";
 export const components: { [name: string]: ReactElement } = {
@@ -31,5 +32,6 @@ export const components: { [name: string]: ReactElement } = {
   subscription: <Subscription />,
   configuretoolbar: <ConfigureToolbar />,
   "debug-logs": <DebugLogs />,
-  "sound-picker": <SoundPicker />
+  "sound-picker": <SoundPicker />,
+  "gecko-view-loader": <GeckoViewLoader />
 };

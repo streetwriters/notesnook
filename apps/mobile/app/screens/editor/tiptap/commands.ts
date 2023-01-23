@@ -31,7 +31,7 @@ import { sleep } from "../../../utils/time";
 import { NoteType } from "../../../utils/types";
 import { Settings } from "./types";
 import { getResponse, randId, textInput } from "./utils";
-
+import SettingsService from "../../../services/settings";
 type Action = { job: string; id: string };
 
 async function call(webview: RefObject<WebView | undefined>, action?: Action) {
@@ -78,13 +78,18 @@ class Commands {
   focus = async () => {
     if (!this.ref.current) return;
     if (Platform.OS === "android") {
-      //this.ref.current?.requestFocus();
-      setTimeout(async () => {
-        if (!this.ref) return;
-        textInput.current?.focus();
-        await this.doAsync("editor.commands.focus()");
-        this.ref?.current?.requestFocus();
-      }, 1);
+      const isGeckoView = SettingsService.get().useGeckoView;
+      setTimeout(
+        async () => {
+          if (!this.ref) return;
+          textInput.current?.focus();
+          setTimeout(async () => {
+            this.ref?.current?.requestFocus();
+            await this.doAsync("editor.commands.focus()");
+          }, 10);
+        },
+        isGeckoView ? 100 : 1
+      );
     } else {
       await sleep(200);
       await this.doAsync("editor.commands.focus()");

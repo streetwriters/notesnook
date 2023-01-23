@@ -1,0 +1,62 @@
+plugins {
+    id("com.android.dynamic-feature")
+}
+
+def DEFAULT_COMPILE_SDK_VERSION = 31
+def DEFAULT_BUILD_TOOLS_VERSION = '31.0.0'
+def DEFAULT_MIN_SDK_VERSION = 21
+def DEFAULT_TARGET_SDK_VERSION = 31
+// https://maven.mozilla.org/?prefix=maven2/org/mozilla/geckoview/geckoview/
+def DEFAULT_GECKOVIEW_VERSION = "109.0.20230112150232"
+
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+android {
+    compileSdkVersion safeExtGet('compileSdkVersion', DEFAULT_COMPILE_SDK_VERSION)
+    buildToolsVersion safeExtGet('buildToolsVersion', DEFAULT_BUILD_TOOLS_VERSION)
+    defaultConfig {
+        minSdkVersion safeExtGet('minSdkVersion', DEFAULT_MIN_SDK_VERSION)
+        targetSdkVersion safeExtGet('targetSdkVersion', DEFAULT_TARGET_SDK_VERSION)
+        missingDimensionStrategy "store", "play"
+    }
+    lintOptions {
+        abortOnError false
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    
+    packagingOptions {
+        //exclude "lib/**/liblgpllibs.so"
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+
+}
+
+repositories {
+    // ref: https://www.baeldung.com/maven-local-repository
+    mavenLocal()
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "$rootDir/../node_modules/react-native/android"
+    }
+    maven {
+        // Android JSC is installed from npm
+        url "$rootDir/../node_modules/jsc-android/dist"
+    }
+    google()
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    implementation project(':app')
+    def geckoviewVersion = safeExtGet('geckoviewVersion', DEFAULT_GECKOVIEW_VERSION)
+    //noinspection GradleDynamicVersion
+    implementation "org.mozilla.geckoview:geckoview:${geckoviewVersion}"
+}

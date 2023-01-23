@@ -5,7 +5,7 @@ artifacts/
 .DS_Store
 
 native/android/app/src/main/assets/
-
+native/android/geckoview/src/main/jniLibs/
 *Issues.md
 build_cache/
 #
