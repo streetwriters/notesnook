@@ -24,5 +24,6 @@ export const EVENTS = {
   updateDownloadCompleted: "updateDownloadCompleted",
   updateNotAvailable: "updateNotAvailable",
   themeChanged: "themeChanged",
-  notificationClicked: "notificationClicked"
+  notificationClicked: "notificationClicked",
+  createItem: "createItem"
 };

@@ -17,28 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import getZoomFactor from "./getZoomFactor";
-import getPrivacyMode from "./getPrivacyMode";
-import selectDirectory from "./selectDirectory";
-import { gunzip, gzip } from "./gzip";
-import getSpellChecker from "./getSpellChecker";
-import getDesktopIntegration from "./getDesktopIntegration";
+import { AutoLaunch } from "../../autolaunch";
+import { setDesktopIntegration } from "../../config/desktopIntegration";
 
-const calls = {
-  getZoomFactor,
-  getPrivacyMode,
-  selectDirectory,
-  gunzip,
-  gzip,
-  getSpellChecker,
-  getDesktopIntegration,
-};
+export default (args) => {
+  if (!globalThis.window) return;
 
-export const getCall = function getAction(callName) {
-  try {
-    if (!calls[callName]) throw new Error("Invalid call name.");
-  } catch (e) {
-    console.error(e);
+  if (args.autoStart) {
+    AutoLaunch.enable(args.startMinimized);
+  } else {
+    AutoLaunch.disable();
   }
-  return calls[callName];
+
+  setDesktopIntegration(args);
 };

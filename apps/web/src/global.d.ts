@@ -23,9 +23,18 @@ type SpellCheckerOptions = {
   enabledLanguages: Language[];
   enabled: boolean;
 };
+
+type DesktopIntegrationSettings = {
+  autoStart: boolean;
+  startMinimized: boolean;
+  minimizeToSystemTray: boolean;
+  closeToSystemTray: boolean;
+};
+
 declare interface Window {
   config: {
     static spellChecker(): Promise<SpellCheckerOptions>;
+    static desktopIntegration(): Promise<DesktopIntegrationSettings>;
   };
   native: {
     static gzip({

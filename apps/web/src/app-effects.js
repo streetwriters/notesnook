@@ -29,6 +29,7 @@ import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
 import { EV, EVENTS } from "@notesnook/core/common";
+import { EVENTS as DESKTOP_APP_EVENTS } from "@notesnook/desktop/events";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 import useAnnouncements from "./hooks/use-announcements";
@@ -45,6 +46,7 @@ import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";
 import { interruptedOnboarding } from "./components/dialogs/onboarding-dialog";
 import { WebExtensionRelay } from "./utils/web-extension-relay";
+import { hashNavigate } from "./navigation";
 
 const relay = new WebExtensionRelay();
 
@@ -196,6 +198,22 @@ export default function AppEffects({ setShow }) {
     if (!followSystemTheme) return;
     setTheme(isSystemThemeDark ? "dark" : "light");
   }, [isSystemThemeDark, followSystemTheme, setTheme]);
+
+  useEffect(() => {
+    AppEventManager.subscribe(DESKTOP_APP_EVENTS.createItem, ({ itemType }) => {
+      switch (itemType) {
+        case "note":
+          hashNavigate("/notes/create", { addNonce: true, replace: true });
+          break;
+        case "notebook":
+          hashNavigate("/notebooks/create", { replace: true });
+          break;
+        case "reminder":
+          hashNavigate("/reminders/create", { replace: true });
+          break;
+      }
+    });
+  }, []);
 
   return <React.Fragment />;
 }
