@@ -39,7 +39,7 @@ export const GeckoViewLoader = () => {
         useGeckoView: true
       });
     }
-  }, [state]);
+  }, [state?.status]);
 
   return (
     <View
