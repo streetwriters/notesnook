@@ -33,7 +33,6 @@ export const GeckoViewLoader = () => {
   const { enabled, installed } = useIsGeckoViewEnabled();
   const colors = useThemeStore((state) => state.colors);
   const state = useSplitInstallSessionState();
-
   useEffect(() => {
     if (state?.status === "installed") {
       SettingsService.set({
@@ -50,9 +49,18 @@ export const GeckoViewLoader = () => {
       }}
     >
       <>
+          <Paragraph
+            style={{ marginTop: 10,marginBottom:10 }}
+            color={colors.icon}
+            size={SIZE.sm}
+          >
+            {installed
+              ? "GeckoView is already downloaded & installed on this device."
+              : "Installing GeckoView will download additional data on your phone."}
+          </Paragraph>
         {!installed ? (
           <Button
-            title="Install feature"
+            title="Install GeckoView"
             type="accent"
             style={{
               borderRadius: 100,
@@ -72,7 +80,7 @@ export const GeckoViewLoader = () => {
           />
         ) : (
           <Button
-            title={enabled ? "Disable feature" : "Enable feature"}
+            title={enabled ? "Disable GeckoView" : "Enable GeckoView"}
             type="accent"
             style={{
               borderRadius: 100,
@@ -97,16 +105,6 @@ export const GeckoViewLoader = () => {
               </Paragraph>;
             })
           : null}
-
-        {installed ? (
-          <Paragraph
-            style={{ marginTop: 10 }}
-            color={colors.icon}
-            size={SIZE.xs + 1}
-          >
-            Feature is already downloaded & installed.
-          </Paragraph>
-        ) : null}
       </>
     </View>
   );

@@ -166,6 +166,7 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         missingDimensionStrategy "store", "play"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+        buildConfigField "boolean", "IS_GITHUB_RELEASE", isGithubRelease().toString()
         if (isNewArchitectureEnabled()) {
             // We configure the NDK build only if you decide to opt-in for the New Architecture.
             externalNativeBuild {
@@ -193,8 +194,7 @@ android {
             }
         }
     }
-    dynamicFeatures = [':geckoview']
-
+    
     if (isNewArchitectureEnabled()) {
         // We configure the NDK build only if you decide to opt-in for the New Architecture.
         externalNativeBuild {
@@ -235,20 +235,25 @@ android {
         }
     }
 
-    // splits {
-    //     abi {
-    //         reset()
-    //         enable enableSeparateBuildPerCPUArchitecture
-    //         universalApk true  // If true, also generate a universal APK
-    //         include (*reactNativeArchitectures())
-    //     }
-    // }
-
-    bundle {
-        abi {
-            enableSplit true
+    if (isGithubRelease()) {
+        splits {
+            abi {
+                reset()
+                enable enableSeparateBuildPerCPUArchitecture
+                universalApk false  // If true, also generate a universal APK
+                include (*reactNativeArchitectures())
+            }
         }
+    } else {
+       dynamicFeatures = [':geckoview']
+       bundle {
+            abi {
+                enableSplit true
+            }
+        } 
     }
+
+   
 
     signingConfigs {
         debug {
@@ -264,6 +269,7 @@ android {
             keyPassword 'android'
         }
     }
+    
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -280,7 +286,8 @@ android {
         }
     }
 
-    packagingOptions {
+    if (!isGeckoEnabled()) {
+        packagingOptions {
                 exclude "lib/**/libmozglue.so"
                 exclude "lib/**/libxul.so"
                 exclude "lib/**/libnss3.so"
@@ -293,6 +300,9 @@ android {
                 exclude "lib/**/libplugin-container.so"
                 exclude "lib/**/liblgpllibs.so"
     }
+    }
+
+      
 
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant -> {
@@ -318,7 +328,9 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
-    api 'com.google.android.play:feature-delivery:2.0.1'
+    if (!isGithubRelease()) {
+        implementation 'com.google.android.play:feature-delivery:2.0.1'
+    }
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
     implementation 'androidx.multidex:multidex:2.0.1' 
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
@@ -414,6 +426,14 @@ def isNewArchitectureEnabled() {
     // - Invoke gradle with `-newArchEnabled=true`
     // - Set an environment variable `ORG_GRADLE_PROJECT_newArchEnabled=true`
     return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
+def isGithubRelease() {
+    return project.hasProperty("GITHUB_RELEASE") && project.GITHUB_RELEASE == "true"
+}
+
+def isGeckoEnabled() {
+    return project.hasProperty("enableGecko") && project.enableGecko == "true"
 }
 
 

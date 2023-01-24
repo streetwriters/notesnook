@@ -35,11 +35,6 @@ import cl.json.RNShareModule;
 import px.tooltips.RNTooltipsModule;
 //import io.csie.kudo.reactnative.v8.executor.V8ExecutorFactory;
 import androidx.annotation.Nullable;
-import com.google.android.play.core.splitcompat.SplitCompat;
-import com.google.android.play.core.splitcompat.SplitCompatApplication;
-import com.google.android.play.core.splitinstall.SplitInstallManager;
-import com.google.android.play.core.splitinstall.SplitInstallManagerFactory;
-import com.google.android.play.core.splitinstall.SplitInstallRequest;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
 
@@ -117,8 +112,19 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
 
                         }
                     });
+                    if (!BuildConfig.IS_GITHUB_RELEASE) {
+                        try {
+                            /**
+                             * We use reflection here because SplitModulePackage is not
+                             * available in Github/Fdroid release.
+                             */
+                            Class<?> moduleLoader = Class.forName("com.streetwriters.notesnook.SplitModulePackage");
+                            packages.add((ReactPackage) moduleLoader.getConstructor().newInstance());
+                        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
+                            e.printStackTrace();
+                        }
 
-                    packages.add(new SplitModulePackage());
+                    }
                     return packages;
                 }
 
@@ -147,13 +153,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                 aClass
                         .getMethod("initializeFlipper", Context.class, ReactInstanceManager.class)
                         .invoke(null, context, reactInstanceManager);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
+            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }

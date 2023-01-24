@@ -961,7 +961,7 @@ export const settingsGroups: SettingSection[] = [
             type: "component",
             name: "Install GeckoView",
             description:
-              "If you edit large notes on your phone & have experienced lags & slow performance, you can use GeckoView for the editor which performs many times better than the default Android WebView.\n\n Installing this feature will download additional data on your phone.",
+              "If you edit large notes on your phone & have experienced lags & slow performance, you can use GeckoView for the editor which performs many times better than the default Android System WebView.",
             component: "gecko-view-loader"
           }
         ]

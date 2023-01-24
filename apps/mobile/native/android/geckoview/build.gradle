@@ -35,7 +35,9 @@ android {
             useLegacyPackaging = true
         }
     }
-
+    configurations {
+        extractSO
+    }
 }
 
 repositories {
@@ -58,5 +60,32 @@ dependencies {
     implementation project(':app')
     def geckoviewVersion = safeExtGet('geckoviewVersion', DEFAULT_GECKOVIEW_VERSION)
     //noinspection GradleDynamicVersion
-    implementation "org.mozilla.geckoview:geckoview:${geckoviewVersion}"
+    extractSO("org.mozilla.geckoview:geckoview:${geckoviewVersion}")
+}
+
+
+task extractSOFiles {
+    def exists = new File("${buildDir}/../src/main/jniLibs/arm64-v8a/libxul.so").exists();
+    if (exists) {
+        println("GeckoView .so files already copied to jniLibs folder");
+        return;
+    }
+    doLast {
+        configurations.extractSO.files.each {
+            def file = it.absoluteFile
+            copy {
+                from (zipTree(file)) {
+                    include "jni/**"
+                    eachFile { fcd ->
+                        fcd.relativePath = new RelativePath(true, fcd.relativePath.segments.drop(1))
+                    }
+                    includeEmptyDirs = false
+                }
+                into "${buildDir}/../src/main/jniLibs"
+            }
+        }
+    }
+}
+tasks.whenTaskAdded { task ->
+    task.dependsOn(extractSOFiles)
 }

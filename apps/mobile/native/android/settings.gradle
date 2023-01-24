@@ -8,4 +8,7 @@ if (settings.hasProperty("newArchEnabled") && settings.newArchEnabled == "true")
     include(":ReactAndroid:hermes-engine")
     project(":ReactAndroid:hermes-engine").projectDir = file('../../node_modules/react-native/ReactAndroid/hermes-engine')
 }
-include ':geckoview'
+
+if (!settings.hasProperty("GITHUB_RELEASE")) {
+    include ':geckoview'
+}
