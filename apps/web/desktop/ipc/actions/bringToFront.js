@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export default () => {
-  if (!global.win) return;
-  global.win.show();
-  global.win.moveTop();
+  if (!globalThis.window) return;
+  globalThis.window.show();
+  globalThis.window.moveTop();
 };

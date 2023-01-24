@@ -23,7 +23,6 @@ import { sendMessageToRenderer } from "../utils";
 import { platform } from "os";
 
 export default (args) => {
-  if (!global.win) return;
   const notification = new Notification({
     ...args,
     icon: join(
