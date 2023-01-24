@@ -2,6 +2,7 @@ package com.streetwriters.notesnook;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -42,7 +43,7 @@ public class SplitModuleLoader extends ReactContextBaseJavaModule implements Spl
         SplitCompat.install(rc.getCurrentActivity().getApplication());
         SplitInstallRequest request = SplitInstallRequest.newBuilder().addModule(name).build();
         manager.startInstall(request).addOnFailureListener(e -> {
-            Toast.makeText(getReactApplicationContext(),((SplitInstallException) e).getMessage(),Toast.LENGTH_LONG);
+            Toast.makeText(rc,((SplitInstallException) e).getMessage(),Toast.LENGTH_LONG);
             promise.reject(e);
         }).addOnSuccessListener(integer -> {
             promise.resolve(integer);
@@ -121,14 +122,14 @@ public class SplitModuleLoader extends ReactContextBaseJavaModule implements Spl
                 map.putString("status", "requires_user_confirmation");
                 try {
                     if (listener != null) {
-                        getReactApplicationContext().removeActivityEventListener(listener);
+                        rc.removeActivityEventListener(listener);
                         listener = null;
                     }
                     listener = new ActivityEventListener() {
                         @Override
                         public void onActivityResult(Activity activity, int code, int result, @Nullable Intent intent) {
                             if (listener != null) {
-                                getReactApplicationContext().removeActivityEventListener(listener);
+                                rc.removeActivityEventListener(listener);
                             }
                             if (code == REQUEST_CODE && result == Activity.RESULT_OK) {
                                 WritableMap map = Arguments.createMap();
@@ -145,7 +146,7 @@ public class SplitModuleLoader extends ReactContextBaseJavaModule implements Spl
 
                         }
                     };
-                    getReactApplicationContext().addActivityEventListener(listener);
+                    rc.addActivityEventListener(listener);
                     manager.startConfirmationDialogForResult(splitInstallSessionState,getCurrentActivity(),REQUEST_CODE);
                 } catch (Exception e) {
 
@@ -159,8 +160,7 @@ public class SplitModuleLoader extends ReactContextBaseJavaModule implements Spl
     }
 
     protected void dispatchEvent(String eventName, WritableMap event) {
-        getReactApplicationContext()
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+        rc.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(eventName, event);
     }
 }
