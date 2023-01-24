@@ -21,6 +21,11 @@ import { app } from "electron";
 import { join } from "path";
 import { statSync } from "fs";
 
+const APP_ICON_PATH = join(
+  __dirname,
+  process.platform === "win32" ? "app.ico" : "favicon-72x72.png"
+);
+
 function isDevelopment() {
   if (typeof electron === "string") {
     throw new TypeError("Not running in an Electron environment!");
@@ -47,4 +52,4 @@ function getPath(filePath) {
   }
 }
 
-export { getPath, isDevelopment };
+export { getPath, isDevelopment, APP_ICON_PATH };

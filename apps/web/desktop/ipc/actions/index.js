@@ -29,6 +29,7 @@ import showNotification from "./showNotification";
 import bringToFront from "./bringToFront";
 import setSpellCheckerLanguages from "./setSpellCheckerLanguages";
 import toggleSpellChecker from "./toggleSpellChecker";
+import setDesktopIntegration from "./setDesktopIntegration";
 
 const actions = {
   changeAppTheme,
@@ -42,7 +43,8 @@ const actions = {
   showNotification,
   bringToFront,
   setSpellCheckerLanguages,
-  toggleSpellChecker
+  toggleSpellChecker,
+  setDesktopIntegration,
 };
 
 export function getAction(actionName) {

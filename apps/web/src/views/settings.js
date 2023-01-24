@@ -77,6 +77,7 @@ import { scheduleBackups } from "../common/reminders";
 import usePrivacyMode from "../hooks/use-privacy-mode";
 import { useTelemetry } from "../hooks/use-telemetry";
 import useSpellChecker from "../hooks/use-spell-checker";
+import useDesktopIntegration from "../hooks/use-desktop-integration";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -147,6 +148,7 @@ function Settings() {
     privacy: false,
     developer: false,
     notifications: false,
+    desktop: false,
     other: true
   });
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
@@ -196,6 +198,8 @@ function Settings() {
   const [privacyMode, setPrivacyMode] = usePrivacyMode();
   const [showReminderNotifications, setShowReminderNotifications] =
     usePersistentState("reminderNotifications", true);
+  const [desktopIntegration, changeDesktopIntegration] =
+    useDesktopIntegration();
   const [corsProxy, setCorsProxy] = usePersistentState(
     "corsProxy",
     "https://cors.notesnook.com"
@@ -528,6 +532,61 @@ function Settings() {
                   onChange={debounce((e) => {
                     setZoomFactor(e.target.valueAsNumber);
                   }, 500)}
+                />
+              </>
+            )}
+          </>
+        )}
+
+        {isDesktop() && (
+          <>
+            <Header
+              title="Desktop integration"
+              isOpen={groups.desktop}
+              onClick={() => {
+                setGroups((g) => ({ ...g, desktop: !g.desktop }));
+              }}
+            />
+            {groups.desktop && (
+              <>
+                <Toggle
+                  title="Auto start on system startup"
+                  onToggled={() => {
+                    changeDesktopIntegration({
+                      autoStart: !desktopIntegration.autoStart
+                    });
+                  }}
+                  isToggled={desktopIntegration.autoStart}
+                />
+                {desktopIntegration.autoStart && (
+                  <Toggle
+                    title="Start minimized"
+                    onToggled={() => {
+                      changeDesktopIntegration({
+                        startMinimized: !desktopIntegration.startMinimized
+                      });
+                    }}
+                    isToggled={desktopIntegration.startMinimized}
+                  />
+                )}
+                <Toggle
+                  title="Minimize to system tray"
+                  onToggled={() => {
+                    changeDesktopIntegration({
+                      minimizeToSystemTray:
+                        !desktopIntegration.minimizeToSystemTray
+                    });
+                  }}
+                  isToggled={desktopIntegration.minimizeToSystemTray}
+                />
+                <Toggle
+                  title="Close to system tray"
+                  onToggled={() => {
+                    changeDesktopIntegration({
+                      closeToSystemTray: !desktopIntegration.closeToSystemTray
+                    });
+                  }}
+                  isToggled={desktopIntegration.closeToSystemTray}
                 />
               </>
             )}

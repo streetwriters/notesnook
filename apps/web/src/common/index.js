@@ -47,19 +47,19 @@ export const CREATE_BUTTON_MAP = {
   },
   notebooks: {
     title: "Create a notebook",
-    onClick: () => hashNavigate("/notebooks/create")
+    onClick: () => hashNavigate("/notebooks/create", { replace: true })
   },
   topics: {
     title: "Create a topic",
-    onClick: () => hashNavigate(`/topics/create`)
+    onClick: () => hashNavigate(`/topics/create`, { replace: true })
   },
   tags: {
     title: "Create a tag",
-    onClick: () => hashNavigate(`/tags/create`)
+    onClick: () => hashNavigate(`/tags/create`, { replace: true })
   },
   reminders: {
     title: "Add a reminder",
-    onClick: () => hashNavigate(`/reminders/create`)
+    onClick: () => hashNavigate(`/reminders/create`, { replace: true })
   }
 };
 

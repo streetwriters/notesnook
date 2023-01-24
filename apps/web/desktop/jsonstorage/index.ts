@@ -25,12 +25,12 @@ const directory = app.getPath("userData");
 const filename = "config.json";
 const filePath = join(directory, filename);
 class JSONStorage {
-  static get(key, def) {
+  static get<T>(key: string, def?: T): T {
     const json = this.readJson();
     return json[key] === undefined ? def : json[key];
   }
 
-  static set(key, value) {
+  static set(key: string, value: unknown) {
     const json = this.readJson();
     json[key] = value;
     this.writeJson(json);
@@ -40,10 +40,7 @@ class JSONStorage {
     this.writeJson({});
   }
 
-  /**
-   * @private
-   */
-  static readJson() {
+  private static readJson() {
     try {
       const json = readFileSync(filePath, "utf-8");
       return JSON.parse(json);
@@ -53,10 +50,7 @@ class JSONStorage {
     }
   }
 
-  /**
-   * @private
-   */
-  static writeJson(json) {
+  private static writeJson(json: Record<string, unknown>) {
     try {
       writeFileSync(filePath, JSON.stringify(json));
     } catch (e) {

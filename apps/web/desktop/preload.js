@@ -61,6 +61,11 @@ contextBridge.exposeInMainWorld("config", {
     return ipcRenderer.invoke("fromRenderer", {
       type: "getSpellChecker"
     });
+  },
+  desktopIntegration: () => {
+    return ipcRenderer.invoke("fromRenderer", {
+      type: "getDesktopIntegration"
+    });
   }
 });
 

@@ -17,28 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import getZoomFactor from "./getZoomFactor";
-import getPrivacyMode from "./getPrivacyMode";
-import selectDirectory from "./selectDirectory";
-import { gunzip, gzip } from "./gzip";
-import getSpellChecker from "./getSpellChecker";
-import getDesktopIntegration from "./getDesktopIntegration";
+import { JSONStorage } from "../jsonstorage";
 
-const calls = {
-  getZoomFactor,
-  getPrivacyMode,
-  selectDirectory,
-  gunzip,
-  gzip,
-  getSpellChecker,
-  getDesktopIntegration,
-};
+function getDesktopIntegration() {
+  return JSONStorage.get("desktopSettings", {
+    autoStart: false,
+    startMinimized: false,
+    minimizeToSystemTray: false,
+    closeToSystemTray: false
+  });
+}
 
-export const getCall = function getAction(callName) {
-  try {
-    if (!calls[callName]) throw new Error("Invalid call name.");
-  } catch (e) {
-    console.error(e);
-  }
-  return calls[callName];
-};
+function setDesktopIntegration(settings) {
+  return JSONStorage.set("desktopSettings", settings);
+}
+
+export { getDesktopIntegration, setDesktopIntegration };
