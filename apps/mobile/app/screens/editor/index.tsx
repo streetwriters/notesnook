@@ -94,7 +94,6 @@ const Editor = React.memo(
       });
       const { enabled: useGeckoView, loading, view } = useIsGeckoViewEnabled();
       GeckoView = view.current;
-
       useImperativeHandle(ref, () => ({
         get: () => editor
       }));
@@ -156,7 +155,7 @@ const Editor = React.memo(
 
       return editor.loading || loading ? null : (
         <>
-          {!useGeckoView || editorId !== "" ? (
+          {!useGeckoView || editorId !== "" || !GeckoView ? (
             <WebView
               testID={notesnook.editor.id}
               ref={editor.ref}

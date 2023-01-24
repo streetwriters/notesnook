@@ -18,10 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Clipboard from "@react-native-clipboard/clipboard";
-import { LogMessage } from "@streetwriters/logger";
+import { LogMessage } from "@notesnook/logger";
 import { format, LogLevel, logManager } from "@notesnook/core/logger";
 import React, { useEffect, useState } from "react";
-import { FlatList, Platform, TouchableOpacity, View } from "react-native";
+import { Platform, TouchableOpacity, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import * as ScopedStorage from "react-native-scoped-storage";
 import RNFetchBlob from "rn-fetch-blob";
 import Storage from "../../common/database/storage";
@@ -226,110 +227,102 @@ export default function DebugLogs() {
         />
       </View>
 
-      {currentLog && (
-        <FlatList
-          ListHeaderComponent={
-            <View
-              style={{
-                paddingHorizontal: 12,
-                marginBottom: 10,
-                flexDirection: "row",
-                alignItems: "center",
-                backgroundColor: colors.bg,
-                justifyContent: "space-between"
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center"
-                }}
-              >
-                <Paragraph>{currentLog.key}</Paragraph>
-
-                <IconButton
-                  customStyle={{
-                    width: 30,
-                    height: 30,
-                    marginHorizontal: 5
-                  }}
-                  onPress={() => {
-                    const index = logs.findIndex(
-                      (l) => l.key === currentLog.key
-                    );
-                    if (index === 0) return;
-                    setCurrentLog(logs[index - 1]);
-                  }}
-                  size={20}
-                  name="chevron-left"
-                  color={colors.icon}
-                />
-
-                <IconButton
-                  customStyle={{
-                    width: 30,
-                    height: 30
-                  }}
-                  onPress={() => {
-                    const index = logs.findIndex(
-                      (l) => l.key === currentLog.key
-                    );
-                    if (index === logs.length - 1) return;
-                    setCurrentLog(logs[index + 1]);
-                  }}
-                  size={20}
-                  name="chevron-right"
-                  color={colors.icon}
-                />
-              </View>
-
-              <View
-                style={{
-                  flexDirection: "row"
-                }}
-              >
-                <IconButton
-                  onPress={copyLogs}
-                  size={20}
-                  customStyle={{
-                    width: 30,
-                    height: 30,
-                    marginRight: 5
-                  }}
-                  name="content-copy"
-                  color={colors.gray}
-                />
-                <IconButton
-                  onPress={downloadLogs}
-                  customStyle={{
-                    width: 30,
-                    height: 30,
-                    marginRight: 5
-                  }}
-                  size={20}
-                  name="download"
-                  color={colors.gray}
-                />
-
-                <IconButton
-                  onPress={clearLogs}
-                  customStyle={{
-                    width: 30,
-                    height: 30,
-                    marginRight: 5
-                  }}
-                  size={20}
-                  name="delete"
-                  color={colors.gray}
-                />
-              </View>
-            </View>
-          }
+      {currentLog ? (
+        <View
           style={{
-            flex: 1,
-            width: "100%"
+            paddingHorizontal: 12,
+            marginBottom: 10,
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: colors.bg,
+            justifyContent: "space-between"
           }}
-          stickyHeaderIndices={[0]}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center"
+            }}
+          >
+            <Paragraph>{currentLog?.key}</Paragraph>
+
+            <IconButton
+              customStyle={{
+                width: 30,
+                height: 30,
+                marginHorizontal: 10
+              }}
+              onPress={() => {
+                const index = logs.findIndex((l) => l.key === currentLog?.key);
+                if (index === 0) return;
+                setCurrentLog(logs[index - 1]);
+              }}
+              size={24}
+              name="chevron-left"
+              color={colors.icon}
+            />
+
+            <IconButton
+              customStyle={{
+                width: 30,
+                height: 30
+              }}
+              onPress={() => {
+                const index = logs.findIndex((l) => l.key === currentLog?.key);
+                if (index === logs.length - 1) return;
+                setCurrentLog(logs[index + 1]);
+              }}
+              size={24}
+              name="chevron-right"
+              color={colors.icon}
+            />
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row"
+            }}
+          >
+            <IconButton
+              onPress={copyLogs}
+              size={24}
+              customStyle={{
+                width: 30,
+                height: 30,
+                marginRight: 10
+              }}
+              name="content-copy"
+              color={colors.gray}
+            />
+            <IconButton
+              onPress={downloadLogs}
+              customStyle={{
+                width: 30,
+                height: 30,
+                marginRight: 10
+              }}
+              size={24}
+              name="download"
+              color={colors.gray}
+            />
+
+            <IconButton
+              onPress={clearLogs}
+              customStyle={{
+                width: 30,
+                height: 30,
+                marginRight: 10
+              }}
+              size={24}
+              name="delete"
+              color={colors.gray}
+            />
+          </View>
+        </View>
+      ) : null}
+
+      {currentLog ? (
+        <FlashList
           ListFooterComponent={
             <View
               style={{
@@ -339,8 +332,9 @@ export default function DebugLogs() {
           }
           data={currentLog.logs}
           renderItem={renderItem}
+          estimatedItemSize={120}
         />
-      )}
+      ) : null}
     </View>
   );
 }

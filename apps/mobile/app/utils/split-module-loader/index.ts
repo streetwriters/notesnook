@@ -20,6 +20,7 @@ import { NativeModules, DeviceEventEmitter } from "react-native";
 import { useState, useEffect, useRef } from "react";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { Config } from "react-native-config";
+import { DatabaseLogger } from "../../common/database";
 interface SplitInstallSessionState {
   status:
     | "pending"
@@ -70,24 +71,31 @@ export const useIsGeckoViewEnabled = () => {
   useEffect(() => {
     if (Config.GITHUB_RELEASE === "true") {
       if (Config.enableGecko === "true") {
+        ref.current = require("@ammarahmed/react-native-geckoview").default;
         setEnabled(true);
+        DatabaseLogger.log("Using GeckoView");
+      } else {
+        DatabaseLogger.log("Using Android WebView");
       }
       setLoading(false);
       return;
     }
     SplitModuleLoader.getInstalledModules()
       .then((modules) => {
-        console.log(modules);
         if (modules?.includes("geckoview")) {
           ref.current = require("@ammarahmed/react-native-geckoview").default;
           setEnabled(true);
+          DatabaseLogger.log("Using GeckoView");
+        } else {
+          DatabaseLogger.log("Using Android WebView");
         }
         setLoading(false);
       })
       .catch((e) => {
-        console.log(e);
         setLoading(false);
         setEnabled(false);
+        DatabaseLogger.error(e);
+        DatabaseLogger.log("Using Android WebView");
       });
   }, [loading, useGeckoView, state?.status]);
   return {
