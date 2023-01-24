@@ -30,7 +30,7 @@ android {
     }
     
     packagingOptions {
-        //exclude "lib/**/liblgpllibs.so"
+        exclude "lib/**/liblgpllibs.so"
         jniLibs {
             useLegacyPackaging = true
         }

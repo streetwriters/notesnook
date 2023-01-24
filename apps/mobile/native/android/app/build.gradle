@@ -160,7 +160,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
-        versionCode 2027 + 1048576 * 4
+        versionCode 2028 + 1048576 * 4
         versionName getNpmVersion()
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -299,7 +299,7 @@ android {
                 exclude "lib/**/libipcclientcerts.so"
                 exclude "lib/**/libfreebl3.so"
                 exclude "lib/**/libplugin-container.so"
-                exclude "lib/**/liblgpllibs.so"
+                //exclude "lib/**/liblgpllibs.so"
     }
     }
 

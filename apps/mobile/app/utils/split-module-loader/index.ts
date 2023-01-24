@@ -46,6 +46,7 @@ export const useSplitInstallSessionState = () => {
     const subscription = DeviceEventEmitter.addListener(
       "onModuleLoaderStateUpdate",
       (data: SplitInstallSessionState) => {
+        DatabaseLogger.log("onModuleLoaderStateUpdate" + data?.status);
         setState(data);
       }
     );
