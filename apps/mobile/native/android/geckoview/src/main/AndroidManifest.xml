@@ -14,6 +14,6 @@ split="geckoview-module">
     <dist:fusing dist:include="true" />
 </dist:module>
 
-<application android:extractNativeLibs="true" android:hasCode="false">
+<application android:hasCode="false">
 </application>
 </manifest>

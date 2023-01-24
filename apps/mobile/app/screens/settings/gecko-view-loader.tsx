@@ -49,62 +49,70 @@ export const GeckoViewLoader = () => {
       }}
     >
       <>
-          <Paragraph
-            style={{ marginTop: 10,marginBottom:10 }}
-            color={colors.icon}
-            size={SIZE.sm}
-          >
-            {installed
-              ? "GeckoView is already downloaded & installed on this device."
-              : "Installing GeckoView will download additional data on your phone."}
-          </Paragraph>
-        {!installed ? (
-          <Button
-            title="Install GeckoView"
-            type="accent"
-            style={{
-              borderRadius: 100,
-              width: 250,
-              alignSelf: "flex-start"
-            }}
-            onPress={async () => {
-              try {
-                await SplitModuleLoader.installModule("geckoview");
-                SettingsService.set({
-                  useGeckoView: true
-                });
-              } catch (e) {
-                ToastEvent.error(e as Error);
-              }
-            }}
-          />
+        <Paragraph
+          style={{ marginTop: 10, marginBottom: 10 }}
+          color={colors.icon}
+          size={SIZE.sm}
+        >
+          {installed
+            ? "GeckoView is already downloaded & installed on this device."
+            : "Installing GeckoView will download additional data on your phone."}
+        </Paragraph>
+
+        {state?.status === "downloading" ||
+        state?.status === "installing" ||
+        state?.status === "pending" ? (
+          <Paragraph>Installing</Paragraph>
         ) : (
-          <Button
-            title={enabled ? "Disable GeckoView" : "Enable GeckoView"}
-            type="accent"
-            style={{
-              borderRadius: 100,
-              width: 250,
-              alignSelf: "flex-start"
-            }}
-            onPress={() => {
-              SettingsService.set({
-                useGeckoView: !enabled
-              });
-            }}
-          />
+          <>
+            {!installed ? (
+              <Button
+                title="Install GeckoView"
+                type="accent"
+                style={{
+                  borderRadius: 100,
+                  width: 250,
+                  alignSelf: "flex-start"
+                }}
+                onPress={async () => {
+                  try {
+                    await SplitModuleLoader.installModule("geckoview");
+                    SettingsService.set({
+                      useGeckoView: true
+                    });
+                  } catch (e) {
+                    ToastEvent.error(e as Error);
+                  }
+                }}
+              />
+            ) : (
+              <Button
+                title={enabled ? "Disable GeckoView" : "Enable GeckoView"}
+                type="accent"
+                style={{
+                  borderRadius: 100,
+                  width: 250,
+                  alignSelf: "flex-start"
+                }}
+                onPress={() => {
+                  SettingsService.set({
+                    useGeckoView: !enabled
+                  });
+                }}
+              />
+            )}
+          </>
         )}
-        {!installed && state
-          ? Object.keys(state).map((key) => {
-              <Paragraph
-                style={{ marginTop: 10 }}
-                color={colors.icon}
-                size={SIZE.xs + 1}
-              >
-                {key.toUpperCase()}: {state[key as never]}
-              </Paragraph>;
-            })
-          : null}
+
+        {state ? (
+          <Paragraph
+            style={{ marginTop: 10 }}
+            color={colors.icon}
+            size={SIZE.xs + 1}
+          >
+            {state.status}
+          </Paragraph>
+        ) : null}
       </>
     </View>
   );

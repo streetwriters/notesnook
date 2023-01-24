@@ -30,10 +30,16 @@ android {
     }
     
     packagingOptions {
-        exclude "lib/**/liblgpllibs.so"
-        jniLibs {
-            useLegacyPackaging = true
-        }
+                exclude "lib/**/liblgpllibs.so"
+                exclude "lib/**/libmozglue.so"
+                exclude "lib/**/libnss3.so"
+                exclude "lib/**/libnssckbi.so"
+                exclude "lib/**/libmozavutil.so"
+                exclude "lib/**/libsoftokn3.so"
+                exclude "lib/**/libmozavcodec.so"
+                exclude "lib/**/libipcclientcerts.so"
+                exclude "lib/**/libfreebl3.so"
+                exclude "lib/**/libplugin-container.so"
     }
     configurations {
         extractSO
