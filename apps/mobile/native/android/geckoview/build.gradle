@@ -64,8 +64,7 @@ dependencies {
 
 task extractSOFiles {
     def soFilesExist = new File("${buildDir}/../src/main/jniLibs/arm64-v8a/libxul.so").exists();
-    def assetsExist = new File("${buildDir}/../src/main/assets/omni.ja").exists();
-    if (soFilesExist && assetsExist) {
+    if (soFilesExist) {
         println("GeckoView .so files already copied to jniLibs folder");
         return;
     }
