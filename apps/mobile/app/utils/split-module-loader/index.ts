@@ -81,7 +81,7 @@ export const useIsGeckoViewEnabled = () => {
       setLoading(false);
       return;
     }
-    SplitModuleLoader.getInstalledModules()
+    SplitModuleLoader?.getInstalledModules()
       .then((modules) => {
         if (modules?.includes("geckoview")) {
           ref.current = require("@ammarahmed/react-native-geckoview").default;
