@@ -160,7 +160,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
-        versionCode 2029 + 1048576 * 4
+        versionCode 2030
         versionName getNpmVersion()
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -289,16 +289,16 @@ android {
 
     if (!isGeckoEnabled()) {
         packagingOptions {
-                //exclude "lib/**/libmozglue.so"
+                exclude "lib/**/libmozglue.so"
                 exclude "lib/**/libxul.so"
-                // exclude "lib/**/libnss3.so"
-                // exclude "lib/**/libnssckbi.so"
-                // exclude "lib/**/libmozavutil.so"
-                // exclude "lib/**/libsoftokn3.so"
-                // exclude "lib/**/libmozavcodec.so"
-                // exclude "lib/**/libipcclientcerts.so"
-                // exclude "lib/**/libfreebl3.so"
-                // exclude "lib/**/libplugin-container.so"
+                exclude "lib/**/libnss3.so"
+                exclude "lib/**/libnssckbi.so"
+                exclude "lib/**/libmozavutil.so"
+                exclude "lib/**/libsoftokn3.so"
+                exclude "lib/**/libmozavcodec.so"
+                exclude "lib/**/libipcclientcerts.so"
+                exclude "lib/**/libfreebl3.so"
+                exclude "lib/**/libplugin-container.so"
                 //exclude "lib/**/liblgpllibs.so"
         }
     }
@@ -307,16 +307,18 @@ android {
 
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant -> {
-        println(variant)
         variant.outputs.each { output ->
             // For each separate APK per architecture, set a unique version code as described here:
             // https://developer.android.com/studio/build/configure-apk-splits.html
-            def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
-            def abi = output.getFilter(OutputFile.ABI)
-            println(abi)
-            if (abi != null) {  // null for the universal-debug, universal-release variants
-                output.versionCodeOverride =
-                        versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
+            if (isGithubRelease()) {
+                def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
+                def abi = output.getFilter(OutputFile.ABI)
+                if (abi != null) {  // null for the universal-debug, universal-release variants
+                    output.versionCodeOverride =
+                            versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
+                }
+            } else {
+                output.versionCodeOverride = 4 * 1048576 + defaultConfig.versionCode
             }
 
         }

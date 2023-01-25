@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile",
-  "version": "2.4.6",
+  "version": "2.4.7",
   "private": true,
   "license": "GPL-3.0-or-later",
   "workspaces": [
@@ -21,7 +21,8 @@
     "bump": "cd native && npx react-native bump-version --skip-semver-for android",
     "release-android": "./scripts/gh-release.sh",
     "release-gecko-android": "./scripts/gh-geckoview-release.sh",
-    "release-android-bundle": "cd native/android && ./gradlew bundleRelease --no-daemon"
+    "release-android-bundle": "cd native/android && ./gradlew bundleRelease --no-daemon",
+    "debug-dynamic-module": "./scripts/debug-dynamic-module.sh"
   },
   "devDependencies": {
     "patch-package": "^6.4.7",

@@ -85,6 +85,7 @@ export const useIsGeckoViewEnabled = () => {
       .then((modules) => {
         if (modules?.includes("geckoview")) {
           ref.current = require("@ammarahmed/react-native-geckoview").default;
+          console.log(modules);
           setEnabled(true);
           DatabaseLogger.log("Using GeckoView");
         } else {

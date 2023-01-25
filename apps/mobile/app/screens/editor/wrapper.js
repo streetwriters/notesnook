@@ -34,12 +34,13 @@ import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { editorRef } from "../../utils/global-refs";
+import { useIsGeckoViewEnabled } from "../../utils/split-module-loader";
 import { ProgressBar } from "./progress";
 import { editorController, editorState, textInput } from "./tiptap/utils";
 export const EditorWrapper = ({ width }) => {
   const colors = useThemeStore((state) => state.colors);
   const deviceMode = useSettingStore((state) => state.deviceMode);
-  const loading = false;
+  const { loading } = useIsGeckoViewEnabled();
   const insets = useGlobalSafeAreaInsets();
   const floating = useIsFloatingKeyboard();
   const introCompleted = useSettingStore(

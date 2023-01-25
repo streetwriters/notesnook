@@ -13,6 +13,7 @@
     "test:web": "nx test @notesnook/web",
     "test:core": "nx test @notesnook/core",
     "start:android": "nx run-android @notesnook/mobile",
+    "start:android:dynamic-module": "nx debug-dynamic-module @notesnook/mobile",
     "start:ios": "nx run-ios @notesnook/mobile",
     "prepare:ios": "nx install-pods @notesnook/mobile",
     "build:ios": "nx build-ios @notesnook/mobile",

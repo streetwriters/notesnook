@@ -1,6 +1,5 @@
 package com.streetwriters.notesnook;
 
-import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
@@ -18,8 +17,6 @@ import java.util.Map;
 
 import androidx.multidex.MultiDexApplication;
 
-import com.facebook.react.bridge.JavaScriptExecutorFactory;
-//import com.facebook.react.modules.systeminfo.AndroidInfoHelpers;
 import com.facebook.react.TurboReactPackage;
 import com.facebook.react.module.model.ReactModuleInfo;
 import com.facebook.react.module.model.ReactModuleInfoProvider;
@@ -34,10 +31,8 @@ import com.streetwriters.notesnook.newarchitecture.MainApplicationReactNativeHos
 import cl.json.RNShareModule;
 import px.tooltips.RNTooltipsModule;
 //import io.csie.kudo.reactnative.v8.executor.V8ExecutorFactory;
-import androidx.annotation.Nullable;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
-
     private final ReactNativeHost mNewArchitectureNativeHost =
             new MainApplicationReactNativeHost(this);
 
@@ -115,14 +110,19 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                     if (!BuildConfig.IS_GITHUB_RELEASE) {
                         try {
                             /**
-                             * We use reflection here because SplitModulePackage is not
+                             * We use reflection here because SplitModulePackage & PlayCore libraries are not
                              * available in Github/Fdroid release.
                              */
-                            Class<?> moduleLoader = Class.forName("com.streetwriters.notesnook.SplitModulePackage");
-                            packages.add((ReactPackage) moduleLoader.getConstructor().newInstance());
+                            Class<?> SplitCompat = Class.forName("com.google.android.play.core.splitcompat.SplitCompat");
+                            SplitCompat.getMethod("install", Context.class)
+                                    .invoke(null, this.getApplication());
+
+                            Class<?> SplitModulePackage = Class.forName("com.streetwriters.notesnook.SplitModulePackage");
+                            packages.add((ReactPackage) SplitModulePackage.getConstructor().newInstance());
                         } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
                             e.printStackTrace();
                         }
+
 
                     }
                     return packages;

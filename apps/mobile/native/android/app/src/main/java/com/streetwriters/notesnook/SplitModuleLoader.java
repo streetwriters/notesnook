@@ -40,7 +40,6 @@ public class SplitModuleLoader extends ReactContextBaseJavaModule implements Spl
 
     @ReactMethod
     public void installModule(String name, Promise promise) {
-        SplitCompat.install(rc.getCurrentActivity().getApplication());
         SplitInstallRequest request = SplitInstallRequest.newBuilder().addModule(name).build();
         manager.startInstall(request).addOnFailureListener(e -> {
             Toast.makeText(rc,((SplitInstallException) e).getMessage(),Toast.LENGTH_LONG);

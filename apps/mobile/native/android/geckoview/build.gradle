@@ -28,22 +28,14 @@ android {
             minifyEnabled false
         }
     }
-    
-    packagingOptions {
-                exclude "lib/**/liblgpllibs.so"
-                exclude "lib/**/libmozglue.so"
-                exclude "lib/**/libnss3.so"
-                exclude "lib/**/libnssckbi.so"
-                exclude "lib/**/libmozavutil.so"
-                exclude "lib/**/libsoftokn3.so"
-                exclude "lib/**/libmozavcodec.so"
-                exclude "lib/**/libipcclientcerts.so"
-                exclude "lib/**/libfreebl3.so"
-                exclude "lib/**/libplugin-container.so"
-    }
+
     configurations {
         extractSO
     }
+
+     packagingOptions {
+                exclude "lib/**/liblgpllibs.so"
+        }
 }
 
 repositories {
@@ -71,8 +63,9 @@ dependencies {
 
 
 task extractSOFiles {
-    def exists = new File("${buildDir}/../src/main/jniLibs/arm64-v8a/libxul.so").exists();
-    if (exists) {
+    def soFilesExist = new File("${buildDir}/../src/main/jniLibs/arm64-v8a/libxul.so").exists();
+    def assetsExist = new File("${buildDir}/../src/main/assets/omni.ja").exists();
+    if (soFilesExist && assetsExist) {
         println("GeckoView .so files already copied to jniLibs folder");
         return;
     }
@@ -89,6 +82,17 @@ task extractSOFiles {
                 }
                 into "${buildDir}/../src/main/jniLibs"
             }
+
+            // copy {
+            //     from (zipTree(file)) {
+            //         include "assets/**"
+            //         eachFile { fcd ->
+            //             fcd.relativePath = new RelativePath(true, fcd.relativePath.segments.drop(1))
+            //         }
+            //         includeEmptyDirs = false
+            //     }
+            //     into "${buildDir}/../src/main/assets"
+            // }
         }
     }
 }

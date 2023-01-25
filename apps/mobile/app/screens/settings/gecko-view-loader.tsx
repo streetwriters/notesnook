@@ -19,16 +19,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { Button } from "../../components/ui/button";
+import { ProgressBarComponent } from "../../components/ui/svg/lazy";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { ToastEvent } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { useThemeStore } from "../../stores/use-theme-store";
+import { formatBytes } from "../../utils";
 import { SIZE } from "../../utils/size";
 import {
   SplitModuleLoader,
   useIsGeckoViewEnabled,
   useSplitInstallSessionState
 } from "../../utils/split-module-loader";
+import { toCamelCase } from "../notes/common";
 export const GeckoViewLoader = () => {
   const { enabled, installed } = useIsGeckoViewEnabled();
   const colors = useThemeStore((state) => state.colors);
@@ -49,21 +52,19 @@ export const GeckoViewLoader = () => {
       }}
     >
       <>
-        <Paragraph
-          style={{ marginTop: 10, marginBottom: 10 }}
-          color={colors.icon}
-          size={SIZE.sm}
-        >
-          {installed
-            ? "GeckoView is already downloaded & installed on this device."
-            : "Installing GeckoView will download additional data on your phone."}
-        </Paragraph>
+        {state && !installed ? null : (
+          <Paragraph
+            style={{ marginTop: 10, marginBottom: 10 }}
+            color={colors.icon}
+            size={SIZE.sm}
+          >
+            {installed
+              ? "GeckoView is already downloaded & installed on this device."
+              : "Installing GeckoView will download additional data on your phone."}
+          </Paragraph>
+        )}
 
-        {state?.status === "downloading" ||
-        state?.status === "installing" ||
-        state?.status === "pending" ? (
-          <Paragraph>Installing</Paragraph>
-        ) : (
+        {!installed && state ? null : (
           <>
             {!installed ? (
               <Button
@@ -76,10 +77,10 @@ export const GeckoViewLoader = () => {
                 }}
                 onPress={async () => {
                   try {
-                    await SplitModuleLoader.installModule("geckoview");
                     SettingsService.set({
                       useGeckoView: true
                     });
+                    await SplitModuleLoader.installModule("geckoview");
                   } catch (e) {
                     ToastEvent.error(e as Error);
                   }
@@ -104,14 +105,36 @@ export const GeckoViewLoader = () => {
           </>
         )}
 
-        {state ? (
-          <Paragraph
-            style={{ marginTop: 10 }}
-            color={colors.icon}
-            size={SIZE.xs + 1}
-          >
-            {state.status}
-          </Paragraph>
+        {!installed && state ? (
+          <>
+            <Paragraph
+              style={{ marginTop: 10, marginBottom: 5 }}
+              color={colors.icon}
+              size={SIZE.xs + 1}
+            >
+              {toCamelCase(state.status)}
+              {state.status === "downloading"
+                ? ` (${formatBytes(state.downloaded)}/${formatBytes(
+                    state.total
+                  )})`
+                : ""}
+            </Paragraph>
+            <ProgressBarComponent
+              height={5}
+              width={300}
+              animated={true}
+              useNativeDriver
+              indeterminate={state.status !== "downloading"}
+              progress={
+                state.status === "downloading"
+                  ? (state?.downloaded || 0) / (state?.total || 0)
+                  : undefined
+              }
+              unfilledColor={colors.nav}
+              color={colors.accent}
+              borderWidth={0}
+            />
+          </>
         ) : null}
       </>
     </View>
