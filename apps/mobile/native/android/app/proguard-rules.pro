@@ -58,3 +58,7 @@
 
 # Background fetch
 -keep class com.transistorsoft.rnbackgroundfetch.HeadlessTask { *; }
+
+# SplitModuleLoader
+-keep class com.streetwriters.notesnook.** { *; }
+-keep class com.google.android.play.core.** { *; }
