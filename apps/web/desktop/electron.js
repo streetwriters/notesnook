@@ -39,6 +39,9 @@ import { hideBin } from "yargs/helpers";
 import { getDesktopIntegration } from "./config/desktopIntegration";
 import { AutoLaunch } from "./autolaunch";
 import bringToFront from "./ipc/actions/bringToFront";
+import { setupJumplist } from "./jumplist";
+import { setupTray } from "./tray";
+import { parseArguments } from "./cli";
 
 if (!RELEASE) {
   require("electron-reloader")(module);
@@ -56,6 +59,8 @@ if (process.platform === "win32") {
 
 var mainWindowState;
 async function createWindow() {
+  const cliOptions = await parseArguments();
+
   mainWindowState = new WindowState({});
   setTheme(getTheme());
 
@@ -96,7 +101,6 @@ async function createWindow() {
     setPrivacyMode({ privacyMode: getPrivacyMode() });
   }
 
-  const cliOptions = await parseCli();
   try {
     await mainWindow.loadURL(`${createURL(cliOptions)}`);
   } catch (e) {
@@ -142,6 +146,9 @@ app.on("activate", () => {
   }
 });
 
+/**
+ * @param {import("./cli").CLIOptions} options
+ */
 function createURL(options) {
   const url = new URL(isDevelopment() ? "http://localhost:3000" : PROTOCOL_URL);
 
@@ -154,136 +161,6 @@ function createURL(options) {
     url.hash = `/notebooks/${options.notebook}`;
 
   return url;
-}
-
-async function parseCli() {
-  const result = {
-    note: false,
-    notebook: false,
-    reminder: false
-  };
-  await yargs(hideBin(process.argv))
-    .command("new", "Create a new item", (yargs) => {
-      return yargs
-        .command("note", "Create a new note", {}, () => (result.note = true))
-        .command(
-          "notebook",
-          "Create a new notebook",
-          {},
-          () => (result.notebook = true)
-        )
-        .command(
-          "reminder",
-          "Add a new reminder",
-          {},
-          () => (result.reminder = true)
-        );
-    })
-    .command("open", "Open a specific item", (yargs) => {
-      return yargs
-        .command(
-          "note",
-          "Open a note",
-          { id: { string: true, description: "Id of the note" } },
-          (args) => (result.note = args.id)
-        )
-        .command(
-          "notebook",
-          "Open a notebook",
-          { id: { string: true, description: "Id of the notebook" } },
-          (args) => (result.notebook = args.id)
-        )
-        .command(
-          "topic",
-          "Open a topic",
-          {
-            id: { string: true, description: "Id of the topic" },
-            notebookId: { string: true, description: "Id of the notebook" }
-          },
-          (args) => (result.notebook = `${args.notebookId}/${args.id}`)
-        );
-    })
-    .parse();
-  return result;
-}
-
-function setupJumplist() {
-  if (process.platform === "win32") {
-    app.setJumpList([
-      { type: "frequent" },
-      {
-        type: "tasks",
-        items: [
-          {
-            program: process.execPath,
-            iconPath: process.execPath,
-            args: "new note",
-            description: "Create a new note",
-            title: "New note",
-            type: "task"
-          },
-          {
-            program: process.execPath,
-            iconPath: process.execPath,
-            args: "new notebook",
-            description: "Create a new notebook",
-            title: "New notebook",
-            type: "task"
-          },
-          {
-            program: process.execPath,
-            iconPath: process.execPath,
-            args: "new reminder",
-            description: "Add a new reminder",
-            title: "New reminder",
-            type: "task"
-          }
-        ]
-      }
-    ]);
-  }
-}
-
-function setupTray() {
-  const tray = new Tray(APP_ICON_PATH);
-
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: "Show Notesnook",
-      type: "normal",
-      icon: APP_ICON_PATH,
-      click: bringToFront
-    },
-    { type: "separator" },
-    {
-      label: "New note",
-      type: "normal",
-      click: () => {
-        bringToFront();
-        sendMessageToRenderer(EVENTS.createItem, { itemType: "note" });
-      }
-    },
-    {
-      label: "New notebook",
-      type: "normal",
-      click: () => {
-        bringToFront();
-        sendMessageToRenderer(EVENTS.createItem, { itemType: "notebook" });
-      }
-    },
-    { type: "separator" },
-    {
-      label: "Quit Notesnook",
-      type: "normal",
-      click: () => {
-        app.exit(0);
-      }
-    }
-  ]);
-  tray.on("double-click", bringToFront);
-  tray.on("click", bringToFront);
-  tray.setToolTip("Notesnook");
-  tray.setContextMenu(contextMenu);
 }
 
 function setupDesktopIntegration() {
