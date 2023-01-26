@@ -34,7 +34,7 @@ function windows() {
       items: [
         {
           program: process.execPath,
-          iconPath: AssetManager.icon("note-add"),
+          iconPath: AssetManager.icon("note-add", "ico"),
           args: "new note",
           description: "Create a new note",
           title: "New note",
@@ -42,7 +42,7 @@ function windows() {
         },
         {
           program: process.execPath,
-          iconPath: AssetManager.icon("notebook-add"),
+          iconPath: AssetManager.icon("notebook-add", "ico"),
           args: "new notebook",
           description: "Create a new notebook",
           title: "New notebook",
@@ -50,7 +50,7 @@ function windows() {
         },
         {
           program: process.execPath,
-          iconPath: AssetManager.icon("reminder-add"),
+          iconPath: AssetManager.icon("reminder-add", "ico"),
           args: "new reminder",
           description: "Add a new reminder",
           title: "New reminder",
