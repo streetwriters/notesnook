@@ -21,7 +21,7 @@ import { JSONStorage } from "../jsonstorage";
 import { nativeTheme } from "electron";
 
 function getTheme() {
-  return JSONStorage.get("theme") || "light";
+  return JSONStorage.get("theme") || nativeTheme.themeSource;
 }
 
 function setTheme(theme) {
