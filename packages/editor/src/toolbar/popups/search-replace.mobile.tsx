@@ -17,17 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Input } from "@theme-ui/components";
+import { Input } from "@theme-ui/components";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Flex, Text } from "@theme-ui/components";
-import { SearchResult, SearchStorage } from "../../extensions/search-replace";
+import { SearchStorage } from "../../extensions/search-replace";
 import { ToolButton } from "../components/tool-button";
 import { Editor } from "../../types";
 
 export type SearchReplacePopupProps = { editor: Editor };
-export function SearchReplacePopup(props: SearchReplacePopupProps) {
+export function SearchReplacePopupMobile(props: SearchReplacePopupProps) {
   const { editor } = props;
-  const { selectedText, results, selectedIndex, focusNonce } = editor.storage
+  const { selectedText, results, selectedIndex } = editor.storage
     .searchreplace as SearchStorage;
 
   const [isReplacing, setIsReplacing] = useState(false);
@@ -68,33 +68,19 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
     }
   }, [selectedText, search]);
 
-  useEffect(() => {
-    if (searchInputRef.current) {
-      const input = searchInputRef.current;
-      setTimeout(() => {
-        input.focus();
-      }, 0);
-    }
-  }, [focusNonce]);
-
   return (
     <Flex
       sx={{
+        p: 1,
         bg: "background",
         flexDirection: "column",
-        width: 300,
-        flex: 1,
-        overflow: "hidden"
+        boxShadow: ["none", "menu"],
+        borderRadius: [0, "default"]
       }}
     >
-      <Flex sx={{ p: 1 }}>
+      <Flex>
         <Flex
-          sx={{
-            flexDirection: "column",
-            flex: 1,
-            width: 300,
-            mr: 1
-          }}
+          sx={{ flexDirection: "column", flex: 1, width: ["auto", 300], mr: 1 }}
         >
           <Flex
             sx={{
@@ -126,7 +112,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  editor.current?.commands.moveToNextResult();
+                  editor.commands.moveToNextResult();
                 }
               }}
             />
@@ -185,6 +171,17 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                   />
                 </>
               )}
+              <Text
+                variant={"subBody"}
+                sx={{
+                  flexShrink: 0,
+                  borderLeft: "1px solid var(--border)",
+                  color: "fontTertiary",
+                  px: 1
+                }}
+              >
+                {results ? `${selectedIndex + 1}/${results.length}` : ""}
+              </Text>
             </Flex>
           </Flex>
           {isReplacing && (
@@ -206,74 +203,6 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               sx={{ mr: 0 }}
               iconSize={"big"}
             />
-          </Flex>
-          {isReplacing && (
-            <Flex sx={{ alignItems: "center", height: "33.2px", mt: 1 }}>
-              <ToolButton
-                toggled={false}
-                title="Replace"
-                id="replace"
-                icon="replaceOne"
-                onClick={() =>
-                  editor.current?.commands.replace(replaceText.current)
-                }
-                sx={{ mr: 0 }}
-                iconSize={18}
-              />
-              <ToolButton
-                toggled={false}
-                title="Replace all"
-                id="replaceAll"
-                icon="replaceAll"
-                onClick={() =>
-                  editor.current?.commands.replaceAll(replaceText.current)
-                }
-                sx={{ mr: 0 }}
-                iconSize={18}
-              />
-            </Flex>
-          )}
-        </Flex>
-      </Flex>
-      <Flex
-        sx={{
-          flexDirection: "column",
-          mt: 1,
-          flex: 1,
-          overflowY: "auto",
-          overflowX: "hidden"
-        }}
-      >
-        {results?.map((result, index) => (
-          <SearchResultPreview
-            key={result.from}
-            index={index}
-            searchResult={result}
-            selectedIndex={selectedIndex}
-            onClick={() => editor.current?.commands.moveToResult(index)}
-          />
-        ))}
-      </Flex>
-      {!!results?.length && (
-        <Flex
-          sx={{
-            alignItems: "center",
-            justifyContent: "space-between",
-            p: 1,
-            // mt: 1,
-            borderTop: "1px solid var(--border)"
-          }}
-        >
-          <Text
-            variant={"subBody"}
-            sx={{
-              flexShrink: 0,
-              color: "fontTertiary"
-            }}
-          >
-            {`${selectedIndex + 1} of ${results.length} results`}
-          </Text>
-          <Flex>
             <ToolButton
               toggled={false}
               title="Previous match"
@@ -292,98 +221,40 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               sx={{ mr: 0 }}
               iconSize={"big"}
             />
+            <ToolButton
+              toggled={false}
+              title="Close"
+              id="close"
+              icon="close"
+              onClick={() => editor.chain().focus().endSearch().run()}
+              sx={{ mr: 0 }}
+              iconSize={"big"}
+            />
           </Flex>
+          {isReplacing && (
+            <Flex sx={{ alignItems: "center", height: "33.2px", mt: 1 }}>
+              <ToolButton
+                toggled={false}
+                title="Replace"
+                id="replace"
+                icon="replaceOne"
+                onClick={() => editor.commands.replace(replaceText.current)}
+                sx={{ mr: 0 }}
+                iconSize={18}
+              />
+              <ToolButton
+                toggled={false}
+                title="Replace all"
+                id="replaceAll"
+                icon="replaceAll"
+                onClick={() => editor.commands.replaceAll(replaceText.current)}
+                sx={{ mr: 0 }}
+                iconSize={18}
+              />
+            </Flex>
+          )}
         </Flex>
-      )}
+      </Flex>
     </Flex>
   );
 }
-
-function SearchResultPreview({
-  searchResult,
-  index,
-  selectedIndex,
-  onClick
-}: {
-  searchResult: SearchResult;
-  index: number;
-  selectedIndex: number;
-  onClick: () => void;
-}) {
-  const { end, match, start } = splitSearchResult(searchResult);
-  return (
-    <Button
-      variant="menuitem"
-      title={searchResult.preview.text}
-      sx={{
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        px: 1,
-        py: 1,
-        m: 0,
-        alignSelf: "start",
-        flexShrink: 0,
-        textAlign: "left",
-        width: "100%",
-        ...(selectedIndex === index
-          ? {
-              bg: "hover",
-              color: "primary"
-            }
-          : {})
-      }}
-      onClick={onClick}
-    >
-      <Text variant="subBody" sx={{ pr: 1 }}>
-        {index + 1}.
-      </Text>
-      <Text variant="body">{start}</Text>
-      <Text variant="body" sx={{ bg: "shade", color: "primary" }}>
-        {match}
-      </Text>
-      <Text variant="body">{end}</Text>
-    </Button>
-  );
-}
-
-function splitSearchResult(searchResult: SearchResult, maxLength = 50) {
-  const {
-    text,
-    match: { from, to }
-  } = searchResult.preview;
-  const remainingLength = maxLength - (to - from);
-  const partLength = remainingLength / 2;
-
-  const match = text.substring(from, to);
-  const start = truncate(text.substring(0, from), partLength, "start");
-  const end = truncate(
-    text.substring(to),
-    partLength + (start.length < partLength ? partLength - start.length : 0),
-    "end"
-  );
-
-  return {
-    start,
-    match,
-    end
-  };
-}
-
-function truncate(text: string, maxLength: number, type: "end" | "start") {
-  if (text.length <= maxLength) return text;
-  if (type === "end") {
-    return `${text.substring(0, maxLength)}...`;
-  } else {
-    return `...${text.slice(-maxLength)}`;
-  }
-}
-// <ToolButton
-//               toggled={false}
-//               title="Close"
-//               id="close"
-//               icon="close"
-//               onClick={() => editor.chain().focus().endSearch().run()}
-//               sx={{ mr: 0 }}
-//               iconSize={"big"}
-//             />
