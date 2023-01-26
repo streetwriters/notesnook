@@ -27,7 +27,7 @@ import { getBackgroundColor, getTheme, setTheme } from "./config/theme";
 import getZoomFactor from "./ipc/calls/getZoomFactor";
 import { logger } from "./logger";
 import { setupMenu } from "./menu";
-import { WindowState } from "./config/windowstate";
+import { WindowState } from "./config/window-state";
 import { sendMessageToRenderer } from "./ipc/utils";
 import { EVENTS } from "./events";
 import "./ipc/index.js";
@@ -38,6 +38,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { getDesktopIntegration } from "./config/desktopIntegration";
 import { AutoLaunch } from "./autolaunch";
+import bringToFront from "./ipc/actions/bringToFront";
 
 if (!RELEASE) {
   require("electron-reloader")(module);
@@ -251,14 +252,14 @@ function setupTray() {
       label: "Show Notesnook",
       type: "normal",
       icon: APP_ICON_PATH,
-      click: showApp
+      click: bringToFront
     },
     { type: "separator" },
     {
       label: "New note",
       type: "normal",
       click: () => {
-        showApp();
+        bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "note" });
       }
     },
@@ -266,7 +267,7 @@ function setupTray() {
       label: "New notebook",
       type: "normal",
       click: () => {
-        showApp();
+        bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "notebook" });
       }
     },
@@ -279,22 +280,10 @@ function setupTray() {
       }
     }
   ]);
-  tray.on("double-click", showApp);
-  tray.on("click", showApp);
+  tray.on("double-click", bringToFront);
+  tray.on("click", bringToFront);
   tray.setToolTip("Notesnook");
   tray.setContextMenu(contextMenu);
-}
-
-function showApp() {
-  if (globalThis.window.isMinimized()) {
-    if (mainWindowState.isMaximized) {
-      globalThis.window.maximize();
-    } else globalThis.window.restore();
-  }
-  globalThis.window.show();
-  globalThis.window.focus();
-  globalThis.window.moveTop();
-  globalThis.window.webContents.focus();
 }
 
 function setupDesktopIntegration() {

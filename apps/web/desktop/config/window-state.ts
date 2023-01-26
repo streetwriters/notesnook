@@ -18,36 +18,63 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { JSONStorage } from "../jsonstorage";
-import { screen as _screen, remote } from "electron";
-const screen = _screen || remote.screen;
+import { screen as _screen, BrowserWindow } from "electron";
+const screen = _screen;
 
-class WindowState {
-  constructor(options) {
-    this.winRef = null;
+type WindowStateOptions = {
+  storageKey: string;
+  maximize: boolean;
+  fullScreen: boolean;
+  defaultWidth: number;
+  defaultHeight: number;
+};
+
+type SerializableWindowState = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  displayBounds?: Electron.Rectangle;
+  isMaximized?: boolean;
+  isFullScreen?: boolean;
+};
+
+export class WindowState {
+  private readonly config: WindowStateOptions;
+  private state: SerializableWindowState;
+  private windowRef: BrowserWindow | undefined;
+  private readonly eventHandlingDelay = 100;
+  private stateChangeTimer: NodeJS.Timeout | undefined;
+
+  constructor(options?: Partial<WindowStateOptions>) {
+    this.windowRef = undefined;
     this.stateChangeTimer = undefined;
-    this.eventHandlingDelay = 100;
     this.config = {
       storageKey: "windowState",
       maximize: true,
       fullScreen: true,
+      defaultHeight: 800,
+      defaultWidth: 600,
       ...options
     };
 
     // Load previous state
-    this.state = JSONStorage.get(this.config.storageKey, {});
+    const defaultState: SerializableWindowState = {
+      width: this.config.defaultWidth,
+      height: this.config.defaultHeight,
+      x: 0,
+      y: 0
+    };
+    this.state = JSONStorage.get<SerializableWindowState>(
+      this.config.storageKey,
+      defaultState
+    );
 
     // Check state validity
-    this.validateState();
-
-    // Set state fallback values
-    this.state = {
-      width: this.config.defaultWidth || 800,
-      height: this.config.defaultHeight || 600,
-      ...this.state
-    };
+    this.validateState(defaultState);
   }
 
-  isNormal(win) {
+  isNormal(win: BrowserWindow) {
     return !win.isMaximized() && !win.isMinimized() && !win.isFullScreen();
   }
 
@@ -76,7 +103,9 @@ class WindowState {
     };
   }
 
-  windowWithinBounds(bounds) {
+  windowWithinBounds(bounds: Electron.Rectangle) {
+    if (!this.state) return false;
+
     return (
       this.state.x >= bounds.x &&
       this.state.y >= bounds.y &&
@@ -97,12 +126,12 @@ class WindowState {
     }
   }
 
-  validateState() {
+  validateState(defaultState: SerializableWindowState) {
     const isValid =
       this.state &&
       (this.hasBounds() || this.state.isMaximized || this.state.isFullScreen);
     if (!isValid) {
-      this.state = null;
+      this.state = defaultState;
       return;
     }
 
@@ -111,8 +140,8 @@ class WindowState {
     }
   }
 
-  updateState(win) {
-    win = win || this.winRef;
+  updateState(win?: BrowserWindow) {
+    win = win || this.windowRef;
     if (!win) {
       return;
     }
@@ -133,7 +162,7 @@ class WindowState {
     }
   }
 
-  saveState(win) {
+  saveState(win?: BrowserWindow) {
     // Update window state only if it was provided
     if (win) {
       this.updateState(win);
@@ -145,7 +174,7 @@ class WindowState {
 
   stateChangeHandler = () => {
     // Handles both 'resize' and 'move'
-    clearTimeout(this.stateChangeTimer);
+    if (this.stateChangeTimer) clearTimeout(this.stateChangeTimer);
     this.stateChangeTimer = setTimeout(
       () => this.updateState(),
       this.eventHandlingDelay
@@ -163,7 +192,7 @@ class WindowState {
     this.saveState();
   };
 
-  manage(win) {
+  manage(win: BrowserWindow) {
     if (this.config.maximize && this.state.isMaximized) {
       win.maximize();
     }
@@ -174,17 +203,17 @@ class WindowState {
     win.on("move", this.stateChangeHandler);
     win.on("close", this.closeHandler);
     win.on("closed", this.closedHandler);
-    this.winRef = win;
+    this.windowRef = win;
   }
 
   unmanage() {
-    if (this.winRef) {
-      this.winRef.removeListener("resize", this.stateChangeHandler);
-      this.winRef.removeListener("move", this.stateChangeHandler);
-      clearTimeout(this.stateChangeTimer);
-      this.winRef.removeListener("close", this.closeHandler);
-      this.winRef.removeListener("closed", this.closedHandler);
-      this.winRef = null;
+    if (this.windowRef) {
+      this.windowRef.removeListener("resize", this.stateChangeHandler);
+      this.windowRef.removeListener("move", this.stateChangeHandler);
+      if (this.stateChangeTimer) clearTimeout(this.stateChangeTimer);
+      this.windowRef.removeListener("close", this.closeHandler);
+      this.windowRef.removeListener("closed", this.closedHandler);
+      this.windowRef = undefined;
     }
   }
 
@@ -216,5 +245,3 @@ class WindowState {
     return this.state.isFullScreen;
   }
 }
-
-export { WindowState };
