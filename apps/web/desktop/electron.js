@@ -42,6 +42,7 @@ import bringToFront from "./ipc/actions/bringToFront";
 import { setupJumplist } from "./jumplist";
 import { setupTray } from "./tray";
 import { parseArguments } from "./cli";
+import { AssetManager } from "./asset-manager";
 
 if (!RELEASE) {
   require("electron-reloader")(module);
@@ -59,6 +60,7 @@ if (process.platform === "win32") {
 
 var mainWindowState;
 async function createWindow() {
+  await AssetManager.loadIcons();
   const cliOptions = await parseArguments();
 
   mainWindowState = new WindowState({});

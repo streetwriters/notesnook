@@ -17,20 +17,59 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { nativeTheme } from "electron";
+import { NativeImage, nativeImage, nativeTheme } from "electron";
 import path from "path";
 import { isDevelopment } from "./utils";
+import { parse, ParsedImage } from "icojs";
+import { readFileSync } from "fs";
 
-type Icons = "note-add" | "notebook-add" | "reminder-add" | "quit";
+type Formats = "ico" | "png" | "icns";
+type IconOptions<TFormat extends Formats> = {
+  size?: 16 | 24 | 32 | 48 | 64 | 128 | 256 | 512 | 1024;
+  format?: TFormat;
+};
+
+type IconNames = typeof icons[number];
+type Prefixes = typeof prefixes[number];
+
+type FlexibleIcon<TFormat extends Formats> = TFormat extends "ico"
+  ? string
+  : NativeImage;
+
 const APP_DIR = isDevelopment()
   ? process.cwd()
   : path.dirname(process.execPath);
+
+const prefixes = ["", ".dark"];
+const icons = ["note-add", "notebook-add", "reminder-add", "quit"] as const;
+
+const ALL_ICONS: {
+  id: IconNames;
+  prefix: Prefixes;
+  images: ParsedImage[];
+}[] = [];
+
 export class AssetManager {
-  static appIcon(options: {
-    size?: 16 | 24 | 32 | 48 | 64 | 128 | 256 | 512 | 1024;
-    format?: "ico" | "png" | "icns";
-  }) {
-    const { size = 32, format } = options;
+  static async loadIcons() {
+    if (ALL_ICONS.length) return;
+
+    for (const prefix of prefixes) {
+      for (const icon of icons) {
+        const icoPath = path.join(
+          APP_DIR,
+          "assets",
+          "icons",
+          `${icon}${prefix}.ico`
+        );
+        const icoBuffer = readFileSync(icoPath);
+        const images = await parse(icoBuffer, "image/png");
+        ALL_ICONS.push({ id: icon, images, prefix });
+      }
+    }
+  }
+
+  static appIcon(options: IconOptions<Formats>) {
+    const { size = 32, format = "png" } = options;
 
     if (format === "ico") return path.join("assets", "icons", "app.ico");
     if (format === "icns") return path.join("assets", "icons", "app.icns");
@@ -38,8 +77,29 @@ export class AssetManager {
     return path.join("assets", "icons", `${size}x${size}.png`);
   }
 
-  static icon(name: Icons, format: "png" | "ico" = "png") {
-    const prefix = nativeTheme.shouldUseDarkColors ? ".dark" : "";
-    return path.join(APP_DIR, "assets", "icons", `${name}${prefix}.${format}`);
+  static icon<TFormat extends Formats>(
+    name: IconNames,
+    options: IconOptions<TFormat>
+  ): FlexibleIcon<TFormat> | undefined {
+    const { size = 16, format = "png" } = options;
+
+    const prefix: Prefixes = nativeTheme.shouldUseDarkColors ? ".dark" : "";
+
+    const icoPath = path.join(
+      APP_DIR,
+      "assets",
+      "icons",
+      `${name}${prefix}.ico`
+    );
+    if (format === "ico") return icoPath as FlexibleIcon<TFormat>;
+
+    const icon = ALL_ICONS.find((a) => a.id === name && a.prefix === prefix);
+    if (!icon) return;
+
+    return nativeImage.createFromBuffer(
+      Buffer.from(
+        (icon.images.find((i) => i.height === size) || icon.images[0]).buffer
+      )
+    ) as FlexibleIcon<TFormat>;
   }
 }
