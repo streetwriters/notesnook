@@ -32,7 +32,7 @@ export function setupTray() {
     {
       label: "Show app",
       type: "normal",
-      icon: AssetManager.appIcon({ size: 32 }),
+      icon: AssetManager.appIcon({ size: 16 }),
       click: bringToFront
     },
     { type: "separator" },
