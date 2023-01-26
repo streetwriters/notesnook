@@ -17,8 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { WindowState } from "../../config/window-state";
+
 export default () => {
   if (!globalThis.window) return;
+
+  if (globalThis.window.isMinimized()) {
+    if (new WindowState({}).isMaximized) {
+      globalThis.window.maximize();
+    } else globalThis.window.restore();
+  }
   globalThis.window.show();
+  globalThis.window.focus();
   globalThis.window.moveTop();
+  globalThis.window.webContents.focus();
 };
