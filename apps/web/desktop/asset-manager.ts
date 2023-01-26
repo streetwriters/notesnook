@@ -21,6 +21,7 @@ import { nativeTheme } from "electron";
 import path from "path";
 import { isDevelopment } from "./utils";
 
+type Icons = "note-add" | "notebook-add" | "reminder-add" | "quit";
 const APP_DIR = isDevelopment()
   ? process.cwd()
   : path.dirname(process.execPath);
@@ -30,13 +31,15 @@ export class AssetManager {
     format?: "ico" | "png" | "icns";
   }) {
     const { size = 32, format } = options;
+
     if (format === "ico") return path.join("assets", "icons", "app.ico");
     if (format === "icns") return path.join("assets", "icons", "app.icns");
+
     return path.join("assets", "icons", `${size}x${size}.png`);
   }
 
-  static icon(name: "note-add" | "notebook-add" | "reminder-add" | "quit") {
+  static icon(name: Icons, format: "png" | "ico" = "png") {
     const prefix = nativeTheme.shouldUseDarkColors ? ".dark" : "";
-    return path.join(APP_DIR, "assets", "icons", `${name}${prefix}.png`);
+    return path.join(APP_DIR, "assets", "icons", `${name}${prefix}.${format}`);
   }
 }
