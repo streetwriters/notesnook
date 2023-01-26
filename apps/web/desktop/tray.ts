@@ -39,7 +39,7 @@ export function setupTray() {
     {
       label: "New note",
       type: "normal",
-      icon: AssetManager.icon("note-add"),
+      icon: AssetManager.icon("note-add", { size: 16 }),
       click: () => {
         bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "note" });
@@ -48,7 +48,7 @@ export function setupTray() {
     {
       label: "New notebook",
       type: "normal",
-      icon: AssetManager.icon("notebook-add"),
+      icon: AssetManager.icon("notebook-add", { size: 16 }),
       click: () => {
         bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "notebook" });
@@ -57,7 +57,7 @@ export function setupTray() {
     { type: "separator" },
     {
       label: "Quit",
-      icon: AssetManager.icon("quit"),
+      icon: AssetManager.icon("quit", { size: 16 }),
       type: "normal",
       click: () => {
         app.exit(0);
