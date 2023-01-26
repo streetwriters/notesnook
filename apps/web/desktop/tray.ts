@@ -18,25 +18,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { app, Menu, Tray } from "electron";
+import { AssetManager } from "./asset-manager";
 import { EVENTS } from "./events";
 import bringToFront from "./ipc/actions/bringToFront";
 import { sendMessageToRenderer } from "./ipc/utils";
-import { APP_ICON_PATH } from "./utils";
 
+let tray: Tray | undefined = undefined;
 export function setupTray() {
-  const tray = new Tray(APP_ICON_PATH);
+  if (tray) tray.destroy();
 
+  tray = new Tray(AssetManager.appIcon({ size: 32 }));
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: "Show Notesnook",
+      label: "Show app",
       type: "normal",
-      icon: APP_ICON_PATH,
+      icon: AssetManager.appIcon({ size: 32 }),
       click: bringToFront
     },
     { type: "separator" },
     {
       label: "New note",
       type: "normal",
+      icon: AssetManager.icon("note-add"),
       click: () => {
         bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "note" });
@@ -45,6 +48,7 @@ export function setupTray() {
     {
       label: "New notebook",
       type: "normal",
+      icon: AssetManager.icon("notebook-add"),
       click: () => {
         bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "notebook" });
@@ -52,7 +56,8 @@ export function setupTray() {
     },
     { type: "separator" },
     {
-      label: "Quit Notesnook",
+      label: "Quit",
+      icon: AssetManager.icon("quit"),
       type: "normal",
       click: () => {
         app.exit(0);

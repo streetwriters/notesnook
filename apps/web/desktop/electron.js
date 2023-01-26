@@ -91,8 +91,8 @@ async function createWindow() {
   globalThis.window = mainWindow;
   setupMenu();
   setupJumplist();
-  setupTray();
   setupDesktopIntegration();
+  setupTray();
 
   if (isDevelopment())
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });
@@ -117,6 +117,9 @@ async function createWindow() {
   });
 
   nativeTheme.on("updated", () => {
+    setupTray();
+    setupJumplist();
+
     if (getTheme() === "system") {
       sendMessageToRenderer(EVENTS.themeChanged, {
         theme: nativeTheme.shouldUseDarkColors ? "dark" : "light"

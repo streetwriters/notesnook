@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { app } from "electron";
+import { AssetManager } from "./asset-manager";
 
 export function setupJumplist() {
   if (process.platform === "win32") {
@@ -27,13 +28,13 @@ export function setupJumplist() {
 
 function windows() {
   app.setJumpList([
-    { type: "frequent" },
     {
-      type: "tasks",
+      type: "custom",
+      name: "Quick actions",
       items: [
         {
           program: process.execPath,
-          iconPath: process.execPath,
+          iconPath: AssetManager.icon("note-add"),
           args: "new note",
           description: "Create a new note",
           title: "New note",
@@ -41,7 +42,7 @@ function windows() {
         },
         {
           program: process.execPath,
-          iconPath: process.execPath,
+          iconPath: AssetManager.icon("notebook-add"),
           args: "new notebook",
           description: "Create a new notebook",
           title: "New notebook",
@@ -49,7 +50,7 @@ function windows() {
         },
         {
           program: process.execPath,
-          iconPath: process.execPath,
+          iconPath: AssetManager.icon("reminder-add"),
           args: "new reminder",
           description: "Add a new reminder",
           title: "New reminder",
