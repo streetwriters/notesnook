@@ -27,7 +27,7 @@ let tray: Tray | undefined = undefined;
 export function setupTray() {
   if (tray) tray.destroy();
 
-  tray = new Tray(AssetManager.appIcon({ size: 32 }));
+  tray = new Tray(AssetManager.appIcon({ size: process.platform === "darwin" ? 24 : 32 }));
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "Show app",
@@ -65,7 +65,7 @@ export function setupTray() {
     }
   ]);
   tray.on("double-click", bringToFront);
-  tray.on("click", bringToFront);
+  if (process.platform !==  "darwin") tray.on("click", bringToFront);
   tray.setToolTip("Notesnook");
   tray.setContextMenu(contextMenu);
 }

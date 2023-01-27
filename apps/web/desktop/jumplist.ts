@@ -98,21 +98,6 @@ function setDockMenuOnMacOs() {
         sendMessageToRenderer(EVENTS.createItem, { itemType: "reminder" });
       }
     },
-    { type: "separator" },
-    {
-      label: "Hide",
-      type: "normal",
-      icon: AssetManager.appIcon({ size: 16 }),
-      click: () => app.hide()
-    },
-    {
-      label: "Quit",
-      icon: AssetManager.icon("quit", { size: 16 }),
-      type: "normal",
-      click: () => {
-        app.exit(0);
-      }
-    }
   ]);
   app.dock.setMenu(contextMenu);
 }

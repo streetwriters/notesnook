@@ -175,12 +175,22 @@ function setupDesktopIntegration() {
   globalThis.window.on("close", (e) => {
     if (getDesktopIntegration().closeToSystemTray) {
       e.preventDefault();
-      globalThis.window.minimize();
-      globalThis.window.hide();
+      if (process.platform == "darwin") {
+        app.hide();
+      } else {
+        globalThis.window.minimize();
+        globalThis.window.hide();
+      }
     }
   });
 
   globalThis.window.on("minimize", () => {
-    if (getDesktopIntegration().minimizeToSystemTray) globalThis.window.hide();
+    if (getDesktopIntegration().minimizeToSystemTray) {
+      if (process.platform == "darwin") {
+        app.hide();
+      } else {
+        globalThis.window.hide();
+      }
+    }
   });
 }
