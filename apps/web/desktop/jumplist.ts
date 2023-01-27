@@ -74,7 +74,6 @@ function setDockMenuOnMacOs() {
     {
       label: "New note",
       type: "normal",
-      icon: AssetManager.icon("note-add", { size: 16 }),
       click: () => {
         bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "note" });
@@ -83,7 +82,6 @@ function setDockMenuOnMacOs() {
     {
       label: "New notebook",
       type: "normal",
-      icon: AssetManager.icon("notebook-add", { size: 16 }),
       click: () => {
         bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "notebook" });
@@ -92,12 +90,11 @@ function setDockMenuOnMacOs() {
     {
       label: "New reminder",
       type: "normal",
-      icon: AssetManager.icon("reminder-add", { size: 16 }),
       click: () => {
         bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "reminder" });
       }
-    },
+    }
   ]);
   app.dock.setMenu(contextMenu);
 }
