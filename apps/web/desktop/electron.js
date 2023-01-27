@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "isomorphic-fetch";
 import { app, BrowserWindow, nativeTheme, shell } from "electron";
-import { APP_ICON_PATH, isDevelopment } from "./utils";
+import { isDevelopment } from "./utils";
 import { registerProtocol, PROTOCOL_URL } from "./protocol";
 import { configureAutoUpdater } from "./autoupdate";
 import { getBackgroundColor, getTheme, setTheme } from "./config/theme";
@@ -69,15 +69,18 @@ async function createWindow() {
     width: mainWindowState.width,
     height: mainWindowState.height,
     fullscreen: mainWindowState.isFullScreen,
-
+    darkTheme: getTheme() === "dark",
     backgroundColor: getBackgroundColor(),
+
     autoHideMenuBar: true,
-    icon: APP_ICON_PATH,
+    icon: AssetManager.appIcon({
+      size: 512,
+      format: process.platform === "win32" ? "ico" : "png"
+    }),
     webPreferences: {
       zoomFactor: getZoomFactor(),
       devTools: true, // isDev,
       nodeIntegration: false, //true,
-      enableRemoteModule: false,
       contextIsolation: true,
       nativeWindowOpen: true,
       spellcheck: getIsSpellCheckerEnabled(),
@@ -85,7 +88,6 @@ async function createWindow() {
     }
   });
 
-  mainWindow.setAutoHideMenuBar(true);
   mainWindowState.manage(mainWindow);
   globalThis.window = mainWindow;
   setupMenu();

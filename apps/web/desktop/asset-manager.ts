@@ -26,7 +26,7 @@ import { getSystemTheme } from "./config/theme";
 
 type Formats = "ico" | "png" | "icns";
 type IconOptions<TFormat extends Formats> = {
-  size?: 16 | 24 | 32 | 48 | 64 | 128 | 256 | 512 | 1024;
+  size?: 16 | 22 | 24 | 32 | 48 | 64 | 128 | 256 | 512 | 1024;
   format?: TFormat;
 };
 
@@ -45,7 +45,13 @@ const RESOURCES_DIR = isDevelopment()
     );
 
 const prefixes = ["", ".dark"];
-const icons = ["note-add", "notebook-add", "reminder-add", "quit"] as const;
+const icons = [
+  "note-add",
+  "notebook-add",
+  "reminder-add",
+  "quit",
+  "tray-icon"
+] as const;
 
 const ALL_ICONS: {
   id: IconNames;
@@ -84,7 +90,7 @@ export class AssetManager {
   static icon<TFormat extends Formats>(
     name: IconNames,
     options: IconOptions<TFormat>
-  ): FlexibleIcon<TFormat> | undefined {
+  ): FlexibleIcon<TFormat> {
     const { size = 16, format = "png" } = options;
 
     const prefix: Prefixes = getSystemTheme() === "dark" ? ".dark" : "";
@@ -98,7 +104,10 @@ export class AssetManager {
     if (format === "ico") return icoPath as FlexibleIcon<TFormat>;
 
     const icon = ALL_ICONS.find((a) => a.id === name && a.prefix === prefix);
-    if (!icon) return;
+    if (!icon)
+      return nativeImage.createFromPath(
+        AssetManager.appIcon(options)
+      ) as FlexibleIcon<TFormat>;
 
     return nativeImage.createFromBuffer(
       Buffer.from(
