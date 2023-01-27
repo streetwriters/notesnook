@@ -25,7 +25,7 @@ function getTheme() {
 }
 
 function setTheme(theme) {
-  nativeTheme.themeSource = theme;
+  changeTheme(theme);
   if (globalThis.window)
     globalThis.window.setBackgroundColor(getBackgroundColor(theme));
   return JSONStorage.set("theme", theme);
@@ -35,4 +35,15 @@ function getBackgroundColor() {
   return nativeTheme.shouldUseDarkColors ? "#0f0f0f" : "#ffffff";
 }
 
-export { getTheme, setTheme, getBackgroundColor };
+
+function changeTheme(theme) {
+  const listeners = nativeTheme.rawListeners("updated");
+  nativeTheme.removeAllListeners("updated");
+
+  nativeTheme.themeSource = theme;
+
+  setTimeout(
+    () => listeners.forEach((a) => nativeTheme.addListener("updated", a)),
+    1000
+  );
+}
