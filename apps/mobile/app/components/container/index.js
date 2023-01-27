@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { KeyboardAvoidingView, Platform, SafeAreaView } from "react-native";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { Header } from "../header";
@@ -28,6 +29,7 @@ export const Container = ({ children }) => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
+  const insets = useGlobalSafeAreaInsets();
   return (
     <KeyboardAvoidingView
       behavior="padding"
@@ -36,10 +38,12 @@ export const Container = ({ children }) => {
         flex: 1
       }}
     >
-      <SafeAreaView
+      <View
         style={{
           flex: 1,
-          overflow: "hidden"
+          overflow: "hidden",
+          paddingTop: Platform.OS === "android" ? 0 : insets.top,
+          paddingBottom: Platform.OS === "android" ? 0 : insets.bottom
         }}
       >
         {!introCompleted ? null : (
@@ -50,7 +54,7 @@ export const Container = ({ children }) => {
         )}
 
         {children}
-      </SafeAreaView>
+      </View>
     </KeyboardAvoidingView>
   );
 };
