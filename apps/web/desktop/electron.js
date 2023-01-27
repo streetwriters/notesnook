@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* global MAC_APP_STORE, RELEASE */
 
 import "isomorphic-fetch";
-import { app, BrowserWindow, Menu, nativeTheme, shell, Tray } from "electron";
+import { app, BrowserWindow, nativeTheme, shell } from "electron";
 import { APP_ICON_PATH, isDevelopment } from "./utils";
 import { registerProtocol, PROTOCOL_URL } from "./protocol";
 import { configureAutoUpdater } from "./autoupdate";
@@ -34,11 +34,8 @@ import "./ipc/index.js";
 import getPrivacyMode from "./ipc/calls/getPrivacyMode";
 import setPrivacyMode from "./ipc/actions/setPrivacyMode";
 import { getIsSpellCheckerEnabled } from "./config/spellChecker";
-import yargs from "yargs";
-import { hideBin } from "yargs/helpers";
 import { getDesktopIntegration } from "./config/desktopIntegration";
 import { AutoLaunch } from "./autolaunch";
-import bringToFront from "./ipc/actions/bringToFront";
 import { setupJumplist } from "./jumplist";
 import { setupTray } from "./tray";
 import { parseArguments } from "./cli";
