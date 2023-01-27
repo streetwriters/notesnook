@@ -80,7 +80,6 @@ export const Button = ({
   iconColor,
   fwdRef,
   iconStyle,
-  proTag,
   ...restProps
 }: ButtonProps) => {
   const colors = useThemeStore((state) => state.colors);
