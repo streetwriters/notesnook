@@ -36,9 +36,12 @@ type FlexibleIcon<TFormat extends Formats> = TFormat extends "ico"
   ? string
   : NativeImage;
 
-const APP_DIR = isDevelopment()
+const RESOURCES_DIR = isDevelopment()
   ? process.cwd()
-  : path.dirname(process.execPath);
+  : path.join(
+      path.dirname(process.execPath),
+      process.platform === "darwin" ? "Resources" : "resources"
+    );
 
 const prefixes = ["", ".dark"];
 const icons = ["note-add", "notebook-add", "reminder-add", "quit"] as const;
@@ -56,7 +59,7 @@ export class AssetManager {
     for (const prefix of prefixes) {
       for (const icon of icons) {
         const icoPath = path.join(
-          APP_DIR,
+          RESOURCES_DIR,
           "assets",
           "icons",
           `${icon}${prefix}.ico`
@@ -86,7 +89,7 @@ export class AssetManager {
     const prefix: Prefixes = nativeTheme.shouldUseDarkColors ? ".dark" : "";
 
     const icoPath = path.join(
-      APP_DIR,
+      RESOURCES_DIR,
       "assets",
       "icons",
       `${name}${prefix}.ico`
