@@ -27,12 +27,17 @@ let tray: Tray | undefined = undefined;
 export function setupTray() {
   if (tray) tray.destroy();
 
-  tray = new Tray(AssetManager.appIcon({ size: process.platform === "darwin" ? 24 : 32 }));
+  tray = new Tray(
+    AssetManager.icon("tray-icon", {
+      size: process.platform === "darwin" ? 22 : 32
+    })
+  );
+
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "Show app",
       type: "normal",
-      icon: AssetManager.appIcon({ size: 16 }),
+      icon: AssetManager.icon("tray-icon", { size: 16 }),
       click: bringToFront
     },
     { type: "separator" },
@@ -65,7 +70,7 @@ export function setupTray() {
     }
   ]);
   tray.on("double-click", bringToFront);
-  if (process.platform !==  "darwin") tray.on("click", bringToFront);
+  if (process.platform !== "darwin") tray.on("click", bringToFront);
   tray.setToolTip("Notesnook");
   tray.setContextMenu(contextMenu);
 }
