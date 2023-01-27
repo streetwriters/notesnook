@@ -52,6 +52,7 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounceWithId } from "../../utils/debounce";
 import { store as editorstore } from "../../stores/editor-store";
+import { useStore as useNoteStore } from "../../stores/note-store";
 
 type TipTapProps = {
   editorContainer: HTMLElement;
@@ -121,6 +122,7 @@ function TipTap(props: TipTapProps) {
   const doubleSpacedLines = useSettingsStore(
     (store) => store.doubleSpacedLines
   );
+  const search = useNoteStore((store) => store.search);
   const { toolbarConfig } = useToolbarConfig();
   const { isSearching, toggleSearch } = useSearch();
 
@@ -170,6 +172,8 @@ function TipTap(props: TipTapProps) {
           }
         });
         if (onLoad) onLoad();
+
+        if (search && !isSearching) toggleSearch();
       },
       onUpdate: ({ editor, transaction }) => {
         onContentChange?.();
@@ -251,6 +255,20 @@ function TipTap(props: TipTapProps) {
     () => {
       const isEditorSearching = editor?.storage.searchreplace?.isSearching;
       if (isSearching && !isEditorSearching) toggleSearch();
+      if (search && !isSearching) toggleSearch();
+
+      if (search && isSearching && isEditorSearching) {
+        setTimeout(() => {
+          (
+            document.getElementById("search-replace-input") as HTMLInputElement
+          ).value = search["query"];
+          editor.commands.search(search["query"], {
+            enableRegex: true,
+            matchCase: false,
+            matchWholeWord: false
+          });
+        }, 500);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [toggleSearch, editor?.storage.searchreplace?.isSearching]

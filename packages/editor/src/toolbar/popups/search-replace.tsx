@@ -101,6 +101,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
             }}
           >
             <Input
+              id={"search-replace-input"}
               variant={"clean"}
               defaultValue={selectedText}
               ref={searchInputRef}

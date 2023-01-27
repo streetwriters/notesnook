@@ -35,6 +35,7 @@ class NoteStore extends BaseStore {
   selectedNote = 0;
   nonce = 0;
   viewMode = Config.get("notes:viewMode", "detailed");
+  search = undefined;
 
   setViewMode = (viewMode) => {
     this.set((state) => (state.viewMode = viewMode));
@@ -168,6 +169,14 @@ class NoteStore extends BaseStore {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  setSearch = (query) => {
+    this.set((state) => (state.search = { query }));
+  };
+
+  clearSearch = () => {
+    this.set((state) => (state.search = undefined));
   };
 
   /**

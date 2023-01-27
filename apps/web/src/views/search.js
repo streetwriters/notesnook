@@ -62,12 +62,14 @@ function Search({ type }) {
   const [results, setResults] = useState([]);
   const context = useNoteStore((store) => store.context);
   const nonce = useNoteStore((store) => store.nonce);
+  const setSearch = useNoteStore((store) => store.setSearch);
   const cachedQuery = useRef();
 
   const onSearch = useCallback(
     async (query) => {
       if (!query) return;
       cachedQuery.current = query;
+      setSearch(query);
 
       const [lookupType, items] = await typeToItems(type, context);
       setResults([]);
@@ -81,7 +83,7 @@ function Search({ type }) {
       setResults(results);
       setSearchState({ isSearching: false, totalItems: 0 });
     },
-    [context, type]
+    [context, type, setSearch]
   );
 
   const title = useMemo(() => {
@@ -161,7 +163,7 @@ function Search({ type }) {
         </Flex>
       ) : (
         <ListContainer
-          context={context}
+          context={{ type: "search" }}
           type={type}
           items={results}
           placeholder={() => (

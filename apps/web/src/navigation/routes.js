@@ -33,32 +33,39 @@ import { showToast } from "../utils/toast";
 import Reminders from "../views/reminders";
 
 const routes = {
-  "/notes": () => ({
-    key: "home",
-    type: "notes",
-    title: "Notes",
-    component: <Home />,
-    buttons: {
-      search: {
-        title: "Search notes"
+  "/notes": () => {
+    notestore.clearSearch();
+    return {
+      key: "home",
+      type: "notes",
+      title: "Notes",
+      component: <Home />,
+      buttons: {
+        search: {
+          title: "Search notes"
+        }
       }
-    }
-  }),
-  "/notebooks": () => ({
-    key: "notebooks",
-    type: "notebooks",
-    title: "Notebooks",
-    component: <Notebooks />,
-    buttons: {
-      search: {
-        title: "Search notebooks"
+    };
+  },
+  "/notebooks": () => {
+    notestore.clearSearch();
+    return {
+      key: "notebooks",
+      type: "notebooks",
+      title: "Notebooks",
+      component: <Notebooks />,
+      buttons: {
+        search: {
+          title: "Search notebooks"
+        }
       }
-    }
-  }),
+    };
+  },
   "/notebooks/:notebookId": ({ notebookId }) => {
     const notebook = db.notebooks.notebook(notebookId);
     if (!notebook) return false;
     nbstore.setSelectedNotebook(notebookId);
+    notestore.clearSearch();
     return {
       key: "topics",
       type: "topics",
@@ -82,6 +89,7 @@ const routes = {
       type: "topic",
       value: { id: notebookId, topic: topicId }
     });
+    notestore.clearSearch();
     return {
       key: "notes",
       type: "notes",
@@ -106,6 +114,7 @@ const routes = {
   },
   "/favorites": () => {
     notestore.setContext({ type: "favorite" });
+    notestore.clearSearch();
     return {
       key: "notes",
       title: "Favorites",
@@ -119,6 +128,7 @@ const routes = {
     };
   },
   "/reminders": () => {
+    notestore.clearSearch();
     return {
       key: "reminders",
       title: "Reminders",
@@ -131,34 +141,41 @@ const routes = {
       }
     };
   },
-  "/trash": () => ({
-    key: "trash",
-    type: "trash",
-    title: "Trash",
-    component: <Trash />,
-    buttons: {
-      search: {
-        title: "Search trash"
+  "/trash": () => {
+    notestore.clearSearch();
+    return {
+      key: "trash",
+      type: "trash",
+      title: "Trash",
+      component: <Trash />,
+      buttons: {
+        search: {
+          title: "Search trash"
+        }
       }
-    }
-  }),
-  "/tags": () => ({
-    key: "tags",
-    title: "Tags",
-    type: "tags",
-    component: <Tags />,
-    buttons: {
-      search: {
-        title: "Search tags"
+    };
+  },
+  "/tags": () => {
+    notestore.clearSearch();
+    return {
+      key: "tags",
+      title: "Tags",
+      type: "tags",
+      component: <Tags />,
+      buttons: {
+        search: {
+          title: "Search tags"
+        }
       }
-    }
-  }),
+    };
+  },
   "/tags/:tagId": ({ tagId }) => {
     const tag = db.tags.tag(tagId);
     if (!tag) return false;
     const { id } = tag;
     notestore.setContext({ type: "tag", value: id });
     const title = db.tags.alias(id);
+    notestore.clearSearch();
     return {
       key: "notes",
       type: "notes",
@@ -181,6 +198,7 @@ const routes = {
     const { id } = color;
     const title = db.colors.alias(id);
     notestore.setContext({ type: "color", value: id });
+    notestore.clearSearch();
     return {
       key: "notes",
       type: "notes",
@@ -193,13 +211,17 @@ const routes = {
       }
     };
   },
-  "/settings": () => ({
-    key: "settings",
-    title: "Settings",
-    component: <Settings />
-  }),
+  "/settings": () => {
+    notestore.clearSearch();
+    return {
+      key: "settings",
+      title: "Settings",
+      component: <Settings />
+    };
+  },
   "/monographs": () => {
     notestore.setContext({ type: "monographs" });
+    notestore.clearSearch();
     return {
       key: "notes",
       title: "Monographs",
@@ -212,17 +234,19 @@ const routes = {
       }
     };
   },
-  "/search/:type": ({ type }) => ({
-    type: "search",
-    title: "Search",
-    component: <Search type={type} />,
-    buttons: {
-      back: {
-        title: `Go back to ${type}`,
-        action: () => window.history.back()
+  "/search/:type": ({ type }) => {
+    return {
+      type: "search",
+      title: "Search",
+      component: <Search type={type} />,
+      buttons: {
+        back: {
+          title: `Go back to ${type}`,
+          action: () => window.history.back()
+        }
       }
-    }
-  })
+    };
+  }
 };
 
 export default routes;
