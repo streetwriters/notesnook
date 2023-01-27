@@ -3,5 +3,5 @@
   "useNx": true,
   "useWorkspaces": false,
   "version": "independent",
-  "packages": ["packages/*", "apps/*", "extensions/*"]
+  "packages": ["packages/*", "apps/*", "extensions/*", "apps/web/desktop"]
 }
