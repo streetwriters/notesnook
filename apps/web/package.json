@@ -20,7 +20,7 @@
     "@notesnook/core": "*",
     "@notesnook/crypto": "*",
     "@notesnook/crypto-worker": "*",
-    "@notesnook/desktop": "file:desktop",
+    "@notesnook/desktop": "*",
     "@notesnook/editor": "*",
     "@notesnook/localforage-getitems": "^1.4.4",
     "@notesnook/logger": "*",
