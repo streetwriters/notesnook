@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { NativeImage, nativeImage, nativeTheme } from "electron";
+import { NativeImage, nativeImage } from "electron";
 import path from "path";
 import { isDevelopment } from "./utils";
 import { parse, ParsedImage } from "icojs";
 import { readFileSync } from "fs";
+import { getSystemTheme } from "./config/theme";
 
 type Formats = "ico" | "png" | "icns";
 type IconOptions<TFormat extends Formats> = {
@@ -86,7 +87,7 @@ export class AssetManager {
   ): FlexibleIcon<TFormat> | undefined {
     const { size = 16, format = "png" } = options;
 
-    const prefix: Prefixes = nativeTheme.shouldUseDarkColors ? ".dark" : "";
+    const prefix: Prefixes = getSystemTheme() === "dark" ? ".dark" : "";
 
     const icoPath = path.join(
       RESOURCES_DIR,

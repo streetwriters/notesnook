@@ -35,6 +35,23 @@ function getBackgroundColor() {
   return nativeTheme.shouldUseDarkColors ? "#0f0f0f" : "#ffffff";
 }
 
+function getSystemTheme() {
+  const listeners = nativeTheme.rawListeners("updated");
+  nativeTheme.removeAllListeners("updated");
+
+  const oldThemeSource = nativeTheme.themeSource;
+  nativeTheme.themeSource = "system";
+  const currentTheme = nativeTheme.shouldUseDarkColors ? "dark" : "light";
+  nativeTheme.themeSource = oldThemeSource;
+
+  setTimeout(
+    () => listeners.forEach((a) => nativeTheme.addListener("updated", a)),
+    1000
+  );
+  return currentTheme;
+}
+
+export { getTheme, setTheme, getBackgroundColor, getSystemTheme };
 
 function changeTheme(theme) {
   const listeners = nativeTheme.rawListeners("updated");
