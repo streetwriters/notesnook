@@ -20,14 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { JSONStorage } from "../jsonstorage";
 import { nativeTheme } from "electron";
 
-function getTheme() {
-  return JSONStorage.get("theme") || nativeTheme.themeSource;
+type Theme = typeof nativeTheme.themeSource;
+function getTheme(): Theme {
+  return JSONStorage.get("theme", nativeTheme.themeSource);
 }
 
-function setTheme(theme) {
+function setTheme(theme: Theme) {
   changeTheme(theme);
   if (globalThis.window)
-    globalThis.window.setBackgroundColor(getBackgroundColor(theme));
+    globalThis.window.setBackgroundColor(getBackgroundColor());
   return JSONStorage.set("theme", theme);
 }
 
@@ -53,7 +54,7 @@ function getSystemTheme() {
 
 export { getTheme, setTheme, getBackgroundColor, getSystemTheme };
 
-function changeTheme(theme) {
+function changeTheme(theme: Theme) {
   const listeners = nativeTheme.rawListeners("updated");
   nativeTheme.removeAllListeners("updated");
 
