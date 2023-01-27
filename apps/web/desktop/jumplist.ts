@@ -17,16 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { app } from "electron";
+import { app, Menu } from "electron";
 import { AssetManager } from "./asset-manager";
+import { EVENTS } from "./events";
+import bringToFront from "./ipc/actions/bringToFront";
+import { sendMessageToRenderer } from "./ipc/utils";
 
 export function setupJumplist() {
   if (process.platform === "win32") {
-    windows();
+    setJumplistOnWindows();
+  } else if (process.platform === "darwin") {
+    setDockMenuOnMacOs();
   }
 }
 
-function windows() {
+function setJumplistOnWindows() {
   app.setJumpList([
     {
       type: "custom",
@@ -62,4 +67,52 @@ function windows() {
       ]
     }
   ]);
+}
+
+function setDockMenuOnMacOs() {
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "New note",
+      type: "normal",
+      icon: AssetManager.icon("note-add", { size: 16 }),
+      click: () => {
+        bringToFront();
+        sendMessageToRenderer(EVENTS.createItem, { itemType: "note" });
+      }
+    },
+    {
+      label: "New notebook",
+      type: "normal",
+      icon: AssetManager.icon("notebook-add", { size: 16 }),
+      click: () => {
+        bringToFront();
+        sendMessageToRenderer(EVENTS.createItem, { itemType: "notebook" });
+      }
+    },
+    {
+      label: "New reminder",
+      type: "normal",
+      icon: AssetManager.icon("reminder-add", { size: 16 }),
+      click: () => {
+        bringToFront();
+        sendMessageToRenderer(EVENTS.createItem, { itemType: "reminder" });
+      }
+    },
+    { type: "separator" },
+    {
+      label: "Hide",
+      type: "normal",
+      icon: AssetManager.appIcon({ size: 16 }),
+      click: () => app.hide()
+    },
+    {
+      label: "Quit",
+      icon: AssetManager.icon("quit", { size: 16 }),
+      type: "normal",
+      click: () => {
+        app.exit(0);
+      }
+    }
+  ]);
+  app.dock.setMenu(contextMenu);
 }
