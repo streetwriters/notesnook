@@ -33,6 +33,7 @@ declare module "@tiptap/core" {
     searchreplace: {
       startSearch: () => ReturnType;
       endSearch: () => ReturnType;
+      refreshSearch: () => ReturnType;
       search: (term: string, options?: SearchSettings) => ReturnType;
       moveToNextResult: () => ReturnType;
       moveToPreviousResult: () => ReturnType;
@@ -227,6 +228,11 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           editor.commands.focus();
           if (dispatch) updateView(state, dispatch);
           return true;
+        },
+      refreshSearch:
+        () =>
+        ({ commands }) => {
+          return commands.search(this.storage.searchTerm, this.storage);
         },
       search:
         (term, options?: SearchSettings) =>
