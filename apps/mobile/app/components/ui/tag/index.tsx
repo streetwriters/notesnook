@@ -36,7 +36,6 @@ export default function Tag({
   style?: ViewStyle;
 }) {
   const colors = useThemeColors();
-  console.log(textColor || colors.static.white);
   return !visible ? null : (
     <View
       style={{

@@ -116,7 +116,7 @@ export const MenuItem = React.memo(
                 ? colors.yellow
                 : isFocused
                 ? colors.primary.accent
-                : colors.primary.paragraph
+                : colors.primary.icon
             }
             size={SIZE.lg - 2}
           />

@@ -111,7 +111,9 @@ export const SideMenu = React.memo(
             width: "100%",
             backgroundColor: deviceMode !== "mobile" ? colors.secondary.background : colors.primary.background,
             paddingTop: insets.top,
-            borderRadius: 10
+            borderRadius: 10,
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0
           }}
         >
           <FlatList

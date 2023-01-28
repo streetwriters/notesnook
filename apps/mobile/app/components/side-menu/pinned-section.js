@@ -108,7 +108,7 @@ export const PinItem = React.memo(
     alias = item?.alias || item?.title;
     const [visible, setVisible] = useState(false);
     const [headerTextState, setHeaderTextState] = useState(null);
-    const color = headerTextState?.id === item.id ? colors.primary.accent : colors.primary.paragraph;
+    const color = headerTextState?.id === item.id ? colors.primary.accent : colors.primary.icon;
     const fwdRef = useRef();
 
     const onHeaderStateChange = useCallback(
