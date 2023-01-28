@@ -160,6 +160,9 @@ export function HighlighterPlugin({
 
           return decorationSet
             .map(transaction.mapping, transaction.doc)
+            .remove(
+              decorationSet.find(block.start, block.pos + block.node.nodeSize)
+            )
             .add(transaction.doc, newDecorations);
         }
 
