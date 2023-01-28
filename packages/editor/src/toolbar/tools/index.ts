@@ -160,7 +160,9 @@ const tools = {
   deleteTable: DeleteTable,
 
   outdent: Outdent,
-  indent: Indent
+  indent: Indent,
+
+  none: () => null
 };
 
 export function findTool(id: ToolId): React.FunctionComponent<ToolProps> {
