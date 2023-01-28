@@ -25,7 +25,10 @@ import { DesktopOnly } from "../../components/responsive";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store";
+import {
+  useIsMobile,
+  useToolbarStore
+} from "../../toolbar/stores/toolbar-store";
 import { Resizer } from "../../components/resizer";
 import {
   downloadImage,
@@ -47,6 +50,7 @@ export function ImageComponent(
   const imageRef = useRef<HTMLImageElement>(null);
   const [error, setError] = useState<string>();
   const [source, setSource] = useState<string>();
+  const downloadOptions = useToolbarStore((store) => store.downloadOptions);
 
   useEffect(
     () => {
@@ -55,7 +59,10 @@ export function ImageComponent(
         try {
           if (isDataUrl(src)) setSource(await toBlobURL(src));
           else {
-            const { url, size, blob, type } = await downloadImage(src);
+            const { url, size, blob, type } = await downloadImage(
+              src,
+              downloadOptions
+            );
             setSource(url);
             console.log(url, size, blob, type);
             editor.current?.commands.updateImage(
@@ -70,7 +77,7 @@ export function ImageComponent(
       })();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [src, imageRef]
+    [src, imageRef, downloadOptions]
   );
 
   return (
