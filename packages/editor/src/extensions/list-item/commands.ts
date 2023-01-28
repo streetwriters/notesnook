@@ -59,11 +59,14 @@ export function onBackspacePressed(
   } else if (isFirstOfType(type, editor.state)) {
     return false;
   } else {
-    // we have to run join backward twice because on the first join
-    // the two list items are joined i.e., the editor just puts their
-    // paragraphs next to each other. The next join merges the paragraphs
-    // like it should be.
-    return editor.chain().joinBackward().joinBackward().run();
+    const block = findParentNodeOfType(type)(selection);
+    if (block && block.start === $from.pos - 1) {
+      // we have to run join backward twice because on the first join
+      // the two list items are joined i.e., the editor just puts their
+      // paragraphs next to each other. The next join merges the paragraphs
+      // like it should be.
+      return editor.chain().joinBackward().joinBackward().run();
+    }
   }
 }
 
