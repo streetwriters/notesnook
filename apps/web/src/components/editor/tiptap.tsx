@@ -260,7 +260,9 @@ function TipTap(props: TipTapProps) {
     if (!editorContainer) return;
     const currentEditor = editor;
     function onClick(e: MouseEvent) {
-      if (e.target !== editorContainer) return;
+      if (e.target !== editorContainer || !currentEditor?.state.selection.empty)
+        return;
+
       const lastNode = currentEditor?.state.doc.lastChild;
       const isLastNodeParagraph = lastNode?.type.name === "paragraph";
       const isEmpty = lastNode?.nodeSize === 2;
