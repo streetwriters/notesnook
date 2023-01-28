@@ -35,12 +35,12 @@ import { DDS } from "../../services/device-detection";
 import { presentSheet, ToastEvent } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { getElevation } from "../../utils";
 import { SIZE } from "../../utils/size";
 const AppLock = ({ route }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const appLockMode = useSettingStore((state) => state.settings.appLockMode);
   const [step, setStep] = useState(0);
   const welcome = route?.params?.welcome;
@@ -50,13 +50,13 @@ const AppLock = ({ route }) => {
       title: "No privacy",
       value: "none",
       desc: "Your notes are always unlocked. Anyone who has access to your phone can read them.",
-      activeColor: colors.errorText
+      activeColor: colors.error.paragraph
     },
     {
       title: "Medium privacy",
       value: "launch",
       desc: "Your notes are locked when you exit the app but remain unlocked when you switch to other apps or background.",
-      activeColor: colors.accent
+      activeColor: colors.primary.accent
     },
     {
       title: "Maximum privacy (Recommended)",
@@ -66,7 +66,7 @@ const AppLock = ({ route }) => {
           ? "App contents are hidden in app switcher"
           : "Screenshots are disabled and app contents are hidden in app switcher."
       }`,
-      activeColor: colors.accent
+      activeColor: colors.primary.accent
     }
   ];
 
@@ -94,12 +94,12 @@ const AppLock = ({ route }) => {
                 alignSelf: "center",
                 minHeight: 125,
                 borderBottomWidth: 1,
-                borderBottomColor: welcome ? "transparent" : colors.nav
+                borderBottomColor: welcome ? "transparent" : colors.secondary.background
               }}
             >
               <Icon
                 name="shield-lock"
-                color={colors.border}
+                color={colors.secondary.icon}
                 size={100}
                 style={{
                   position: "absolute",
@@ -161,7 +161,7 @@ const AppLock = ({ route }) => {
                     marginBottom: 12,
                     borderWidth: 1,
                     borderColor:
-                      appLockMode === item.value ? item.activeColor : colors.nav
+                      appLockMode === item.value ? item.activeColor : colors.secondary.background
                   }}
                   style={{
                     marginBottom: 10
@@ -169,7 +169,7 @@ const AppLock = ({ route }) => {
                 >
                   <Heading
                     color={
-                      appLockMode === item.value ? item.activeColor : colors.pri
+                      appLockMode === item.value ? item.activeColor : colors.primary.paragraph
                     }
                     style={{ maxWidth: "95%" }}
                     size={SIZE.md}
@@ -180,7 +180,7 @@ const AppLock = ({ route }) => {
                     color={
                       appLockMode === item.value
                         ? item.activeColor
-                        : colors.icon
+                        : colors.secondary.paragraph
                     }
                     style={{ maxWidth: "95%" }}
                     size={SIZE.sm}
@@ -223,7 +223,7 @@ const AppLock = ({ route }) => {
           <WelcomeNotice />
         )}
 
-        {welcome && !colors.night ? (
+        {welcome && !colors.isDark ? (
           <BouncingView
             style={{
               position: "absolute",

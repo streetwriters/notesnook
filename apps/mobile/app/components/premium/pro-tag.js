@@ -20,16 +20,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import Paragraph from "../ui/typography/paragraph";
 
 export const ProTag = ({ width, size, background }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
 
   return (
     <View
       style={{
-        backgroundColor: background || colors.bg,
+        backgroundColor: background || colors.primary.background,
         borderRadius: 100,
         width: width || 60,
         justifyContent: "center",
@@ -43,10 +43,10 @@ export const ProTag = ({ width, size, background }) => {
           marginRight: 3
         }}
         size={size}
-        color={colors.accent}
+        color={colors.primary.accent}
         name="crown"
       />
-      <Paragraph size={size - 1.5} color={colors.accent}>
+      <Paragraph size={size - 1.5} color={colors.primary.accent}>
         PRO
       </Paragraph>
     </View>

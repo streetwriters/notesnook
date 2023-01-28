@@ -33,7 +33,7 @@ import {
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { formatBytes } from "../../utils";
 import { eCloseAttachmentDialog, eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
@@ -49,7 +49,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
 const Actions = ({ attachment, setAttachments, fwdRef }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const contextId = attachment.metadata.hash;
   const [filename, setFilename] = useState(attachment.metadata.filename);
   const [currentProgress] = useAttachmentProgress(attachment);
@@ -188,7 +188,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
       <View
         style={{
           borderBottomWidth: 1,
-          borderBottomColor: colors.nav,
+          borderBottomColor: colors.secondary.background,
           marginBottom: notes && notes.length > 0 ? 0 : 12
         }}
       >
@@ -213,7 +213,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
             style={{
               marginRight: 10
             }}
-            color={colors.icon}
+            color={colors.secondary.paragraph}
           >
             {attachment.metadata.type}
           </Paragraph>
@@ -222,7 +222,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
               marginRight: 10
             }}
             size={SIZE.xs}
-            color={colors.icon}
+            color={colors.secondary.paragraph}
           >
             {formatBytes(attachment.length)}
           </Paragraph>
@@ -233,7 +233,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
                 marginRight: 10
               }}
               size={SIZE.xs}
-              color={colors.icon}
+              color={colors.secondary.paragraph}
             >
               {attachment.noteIds.length} note
               {attachment.noteIds.length > 1 ? "s" : ""}
@@ -249,7 +249,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
               });
             }}
             size={SIZE.xs}
-            color={colors.icon}
+            color={colors.secondary.paragraph}
           >
             {attachment.metadata.hash}
           </Paragraph>
@@ -262,7 +262,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
         <View
           style={{
             borderBottomWidth: 1,
-            borderBottomColor: colors.nav,
+            borderBottomColor: colors.secondary.background,
             marginBottom: 12,
             paddingVertical: 12
           }}
@@ -316,10 +316,10 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
           key={item.name}
           buttonType={{
             text: item.on
-              ? colors.accent
+              ? colors.primary.accent
               : item.name === "Delete" || item.name === "PermDelete"
-              ? colors.errorText
-              : colors.pri
+              ? colors.error.paragraph
+              : colors.primary.paragraph
           }}
           onPress={item.onPress}
           title={item.name}

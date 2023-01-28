@@ -29,7 +29,7 @@ import {
   ToastEvent
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
@@ -56,7 +56,7 @@ type Progress = {
 };
 
 export default function Migrate() {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const [loading, setLoading] = useState(false);
   const [error, _setError] = useState<Error>();
   const [reset, setReset] = useState(false);
@@ -152,8 +152,8 @@ export default function Migrate() {
               animated={true}
               useNativeDriver
               indeterminate
-              unfilledColor={colors.nav}
-              color={colors.accent}
+              unfilledColor={colors.secondary.background}
+              color={colors.primary.accent}
               borderWidth={0}
             />
 

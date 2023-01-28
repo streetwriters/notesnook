@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React from "react";
 import { View, ViewStyle } from "react-native";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import Paragraph from "../typography/paragraph";
 
@@ -35,11 +35,12 @@ export default function Tag({
   visible?: boolean;
   style?: ViewStyle;
 }) {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
+  console.log(textColor || colors.static.white);
   return !visible ? null : (
     <View
       style={{
-        backgroundColor: background || colors.accent,
+        backgroundColor: background || colors.primary.accent,
         borderRadius: 100,
         paddingHorizontal: 4,
         paddingVertical: 2,
@@ -50,7 +51,7 @@ export default function Tag({
         ...style
       }}
     >
-      <Paragraph color={textColor || colors.light} size={SIZE.xxs}>
+      <Paragraph color={textColor || colors.static.white} size={SIZE.xxs}>
         {text}
       </Paragraph>
     </View>

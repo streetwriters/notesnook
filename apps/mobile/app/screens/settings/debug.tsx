@@ -31,7 +31,7 @@ import { Notice } from "../../components/ui/notice";
 import Paragraph from "../../components/ui/typography/paragraph";
 import useTimer from "../../hooks/use-timer";
 import { ToastEvent } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { hexToRGBA } from "../../utils/color-scheme/utils";
 import { sanitizeFilename } from "../../utils/sanitizer";
 // function getLevelString(level: number) {
@@ -52,7 +52,7 @@ import { sanitizeFilename } from "../../utils/sanitizer";
 // }
 
 export default function DebugLogs() {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const { seconds, start } = useTimer("debug_logs_timer");
   const [logs, setLogs] = useState<
     {
@@ -85,17 +85,17 @@ export default function DebugLogs() {
     ({ item }: { item: LogMessage; index: number }) => {
       const background =
         item.level === LogLevel.Error || item.level === LogLevel.Fatal
-          ? hexToRGBA(colors.red, 0.2)
+          ? hexToRGBA(colors.error.paragraph, 0.2)
           : item.level === LogLevel.Warn
-          ? hexToRGBA(colors.orange, 0.2)
+          ? hexToRGBA(colors.warning.icon, 0.2)
           : "transparent";
 
       const color =
         item.level === LogLevel.Error || item.level === LogLevel.Fatal
-          ? colors.red
+          ? colors.error.paragraph
           : item.level === LogLevel.Warn
-          ? colors.orange
-          : colors.pri;
+          ? colors.warning.icon
+          : colors.primary.paragraph;
 
       return !item ? null : (
         <TouchableOpacity
@@ -114,7 +114,7 @@ export default function DebugLogs() {
             backgroundColor: background,
             flexShrink: 1,
             borderBottomWidth: 1,
-            borderBottomColor: colors.nav
+            borderBottomColor: colors.secondary.background
           }}
         >
           <Paragraph
@@ -131,7 +131,7 @@ export default function DebugLogs() {
         </TouchableOpacity>
       );
     },
-    [colors.nav, colors.orange, colors.pri, colors.red]
+    [colors.secondary.background, colors.warning.icon, colors.primary.paragraph, colors.error.paragraph]
   );
 
   const downloadLogs = React.useCallback(async () => {
@@ -235,7 +235,7 @@ export default function DebugLogs() {
                 marginBottom: 10,
                 flexDirection: "row",
                 alignItems: "center",
-                backgroundColor: colors.bg,
+                backgroundColor: colors.primary.background,
                 justifyContent: "space-between"
               }}
             >
@@ -262,7 +262,7 @@ export default function DebugLogs() {
                   }}
                   size={20}
                   name="chevron-left"
-                  color={colors.icon}
+                  color={colors.primary.icon}
                 />
 
                 <IconButton
@@ -279,7 +279,7 @@ export default function DebugLogs() {
                   }}
                   size={20}
                   name="chevron-right"
-                  color={colors.icon}
+                  color={colors.primary.icon}
                 />
               </View>
 

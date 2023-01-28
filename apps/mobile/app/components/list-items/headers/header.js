@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useMessageStore } from "../../../stores/use-message-store";
 import { COLORS_NOTE } from "../../../utils/color-scheme";
 import { Announcement } from "../../announcements/announcement";
@@ -37,7 +37,7 @@ export const Header = React.memo(
     noAnnouncement,
     warning
   }) => {
-    const colors = useThemeStore((state) => state.colors);
+    const colors = useThemeColors();
     const announcements = useMessageStore((state) => state.announcements);
     const selectionMode = useSelectionStore((state) => state.selectionMode);
 
@@ -55,13 +55,13 @@ export const Header = React.memo(
               alignItems: "center"
             }}
           >
-            <Icon name="sync-alert" size={SIZE.md} color={colors.red} f />
-            <Paragraph style={{ marginLeft: 5 }} color={colors.red}>
+            <Icon name="sync-alert" size={SIZE.md} color={colors.error.icon} f />
+            <Paragraph style={{ marginLeft: 5 }} color={colors.error.icon}>
               {warning.title}
             </Paragraph>
           </View>
         ) : announcements.length !== 0 && !noAnnouncement ? (
-          <Announcement color={color || colors.accent} />
+          <Announcement color={color || colors.primary.accent} />
         ) : type === "search" ? null : !shouldShow ? (
           <View
             style={{
@@ -74,7 +74,7 @@ export const Header = React.memo(
           >
             {messageCard ? (
               <Card
-                color={COLORS_NOTE[color?.toLowerCase()] || colors.accent}
+                color={COLORS_NOTE[color?.toLowerCase()] || colors.primary.accent}
               />
             ) : null}
           </View>

@@ -25,14 +25,14 @@ import Navigation from "../../services/navigation";
 import SearchService from "../../services/search";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 
 export const RightMenus = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const rightButtons = useNavigationStore((state) => state.headerRightButtons);
   const currentScreen = useNavigationStore((state) => state.currentScreen.name);
@@ -51,7 +51,7 @@ export const RightMenus = () => {
           }}
           testID="icon-search"
           name="magnify"
-          color={colors.pri}
+          color={colors.primary.paragraph}
           customStyle={styles.rightBtn}
         />
       ) : null}
@@ -76,7 +76,7 @@ export const RightMenus = () => {
             borderRadius: 5,
             paddingHorizontal: 0,
             borderWidth: 1,
-            borderColor: colors.accent
+            borderColor: colors.primary.accent
           }}
         />
       ) : null}
@@ -87,7 +87,7 @@ export const RightMenus = () => {
           animationDuration={200}
           style={{
             borderRadius: 5,
-            backgroundColor: colors.bg
+            backgroundColor: colors.primary.background
           }}
           onRequestClose={() => {
             menuRef.current?.hide();
@@ -98,7 +98,7 @@ export const RightMenus = () => {
                 menuRef.current?.show();
               }}
               name="dots-vertical"
-              color={colors.pri}
+              color={colors.primary.paragraph}
               customStyle={styles.rightBtn}
             />
           }
@@ -112,7 +112,7 @@ export const RightMenus = () => {
               }}
               type="gray"
               buttonType={{
-                text: colors.pri
+                text: colors.primary.paragraph
               }}
               key={item.title}
               title={item.title}

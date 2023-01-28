@@ -52,7 +52,6 @@ import {
   makeSessionId,
   post
 } from "./utils";
-
 export const useEditor = (
   editorId = "",
   readonly?: boolean,

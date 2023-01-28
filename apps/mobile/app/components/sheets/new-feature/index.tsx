@@ -23,7 +23,7 @@ import { getVersion } from "react-native-device-info";
 import { features } from "../../../features";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
@@ -37,7 +37,7 @@ export type FeatureType = {
 };
 
 const NewFeature = ({ features }: { features: FeatureType[] }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
 
   return (
     <View
@@ -47,7 +47,7 @@ const NewFeature = ({ features }: { features: FeatureType[] }) => {
         paddingTop: 12
       }}
     >
-      <Heading color={colors.icon} size={SIZE.md}>
+      <Heading color={colors.secondary.heading} size={SIZE.md}>
         New Version Highlights 🎉
       </Heading>
 
@@ -57,7 +57,7 @@ const NewFeature = ({ features }: { features: FeatureType[] }) => {
         <View
           key={item.title}
           style={{
-            backgroundColor: colors.nav,
+            backgroundColor: colors.secondary.background,
             padding: 12,
             borderRadius: 10,
             width: "100%",

@@ -21,15 +21,15 @@ import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useMessageStore } from "../../stores/use-message-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { hexToRGBA } from "../../utils/color-scheme/utils";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 
 export const Card = ({ color, warning }) => {
-  const colors = useThemeStore((state) => state.colors);
-  color = color ? color : colors.accent;
+  const colors = useThemeColors();
+  color = color ? color : colors.primary.accent;
   const messageBoardState = useMessageStore((state) => state.message);
   const announcement = useMessageStore((state) => state.announcement);
 
@@ -62,7 +62,7 @@ export const Card = ({ color, warning }) => {
               width: 40,
               backgroundColor:
                 messageBoardState.type === "error"
-                  ? hexToRGBA(colors.red, 0.15)
+                  ? hexToRGBA(colors.static.red, 0.15)
                   : hexToRGBA(color, 0.15),
               height: 40,
               borderRadius: 100,
@@ -70,6 +70,39 @@ export const Card = ({ color, warning }) => {
               justifyContent: "center"
             }}
           >
+            <Icon
+              size={SIZE.lg}
+              color={
+                messageBoardState.type === "error" ? colors.error.icon : color
+              }
+              name={messageBoardState.icon}
+            />
+          </View>
+
+          <View
+            style={{
+              marginLeft: 10,
+              flexShrink: 1,
+              marginRight: 10
+            }}
+          >
+            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+              {messageBoardState.message}
+            </Paragraph>
+            <Paragraph
+              style={{
+                width: 40,
+                backgroundColor:
+                  messageBoardState.type === "error"
+                    ? hexToRGBA(colors.red, 0.15)
+                    : hexToRGBA(color, 0.15),
+                height: 40,
+                borderRadius: 100,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+              color={colors.primary.heading}
+            />
             <Icon
               size={SIZE.lg}
               color={
@@ -111,7 +144,9 @@ export const Card = ({ color, warning }) => {
         >
           <Icon
             name="chevron-right"
-            color={messageBoardState.type === "error" ? colors.red : color}
+            color={
+              messageBoardState.type === "error" ? colors.error.icon : color
+            }
             size={SIZE.lg}
           />
         </View>

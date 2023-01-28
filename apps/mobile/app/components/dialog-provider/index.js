@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { useNoteStore } from "../../stores/use-notes-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { AnnouncementDialog } from "../announcements";
 import AuthModal from "../auth/auth-modal";
 import { SessionExpired } from "../auth/session-expired";
@@ -38,7 +38,7 @@ import RecoveryKeySheet from "../sheets/recovery-key";
 import RestoreDataSheet from "../sheets/restore-data";
 
 const DialogProvider = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const loading = useNoteStore((state) => state.loading);
 
   return (

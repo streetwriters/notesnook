@@ -25,11 +25,11 @@ import { ToastEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import SearchService from "../../services/search";
 import { useSearchStore } from "../../stores/use-search-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 export const SearchBar = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const [value, setValue] = useState(null);
   const inputRef = useRef();
   const setSearchResults = useSearchStore((state) => state.setSearchResults);
@@ -98,7 +98,7 @@ export const SearchBar = () => {
           SearchService.setTerm(null);
           Navigation.goBack();
         }}
-        color={colors.pri}
+        color={colors.primary.paragraph}
         type="gray"
         customStyle={{
           paddingLeft: 0,
@@ -115,7 +115,7 @@ export const SearchBar = () => {
           fontFamily: "OpenSans-Regular",
           flexGrow: 1,
           height: "100%",
-          color: colors.pri
+          color: colors.primary.paragraph
         }}
         onChangeText={onChangeText}
         placeholder="Type a keyword"
@@ -124,7 +124,7 @@ export const SearchBar = () => {
         returnKeyType="search"
         autoCapitalize="none"
         autoCorrect={false}
-        placeholderTextColor={colors.placeholder}
+        placeholderTextColor={colors.primary.placeholder}
       />
 
       {value && value.length > 0 ? (
@@ -136,7 +136,7 @@ export const SearchBar = () => {
           right={20}
           onPress={onClear}
           type="grayBg"
-          color={colors.icon}
+          color={colors.primary.icon}
           customStyle={{
             width: 25,
             height: 25

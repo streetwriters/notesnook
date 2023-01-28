@@ -23,7 +23,7 @@ import { notesnook } from "../../../e2e/test.ids";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useTip } from "../../services/tip-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { COLORS_NOTE } from "../../utils/color-scheme";
 import { SIZE } from "../../utils/size";
 import { Tip } from "../tip";
@@ -40,7 +40,7 @@ export const Empty = React.memo(
     type,
     screen
   }) {
-    const colors = useThemeStore((state) => state.colors);
+    const colors = useThemeColors();
     const insets = useGlobalSafeAreaInsets();
     const { height } = useWindowDimensions();
     const introCompleted = useSettingStore(
@@ -87,12 +87,9 @@ export const Empty = React.memo(
                 iconPosition="right"
                 icon="arrow-right"
                 onPress={placeholderData.action}
-                accentColor={
-                  COLORS_NOTE[headerProps.color?.toLowerCase()]
-                    ? headerProps.color
-                    : "accent"
-                }
-                accentText="light"
+                buttonType={{
+                  text: colors.static[headerProps.color] || colors.primary.accent
+                }}
                 style={{
                   alignSelf: "flex-start",
                   borderRadius: 5,
@@ -118,7 +115,7 @@ export const Empty = React.memo(
               <ActivityIndicator
                 size={SIZE.lg}
                 color={
-                  COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent
+                  COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.primary.accent
                 }
               />
             </View>

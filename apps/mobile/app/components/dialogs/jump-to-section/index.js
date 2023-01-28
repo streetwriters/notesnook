@@ -25,7 +25,7 @@ import {
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import { useMessageStore } from "../../../stores/use-message-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { getElevation } from "../../../utils";
 import {
   eCloseJumpToDialog,
@@ -41,7 +41,7 @@ import { useCallback } from "react";
 const offsets = [];
 let timeout = null;
 const JumpToSectionDialog = ({ scrollRef, data, type }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const notes = data;
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
@@ -126,7 +126,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
         style={{
           ...getElevation(5),
           width: DDS.isTab ? 500 : "85%",
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           zIndex: 100,
           bottom: 20,
           maxHeight: "65%",
@@ -171,7 +171,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
                     <Paragraph
                       size={SIZE.sm}
                       color={
-                        currentIndex === index ? colors.light : colors.accent
+                        currentIndex === index ? colors.static.white : colors.primary.accent
                       }
                       style={{
                         textAlign: "center"

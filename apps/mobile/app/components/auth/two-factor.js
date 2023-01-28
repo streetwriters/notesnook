@@ -26,7 +26,7 @@ import {
   presentSheet,
   ToastEvent
 } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
@@ -39,7 +39,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { useCallback } from "react";
 
 const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const code = useRef();
   const [currentMethod, setCurrentMethod] = useState({
     method: mfaInfo?.primaryMethod,
@@ -157,7 +157,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
           }}
           size={50}
           name="key"
-          color={colors.accent}
+          color={colors.primary.accent}
         />
         <Heading
           style={{
@@ -281,7 +281,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                     marginRight: 10
                   }}
                   size={15}
-                  color={colors.accent}
+                  color={colors.primary.accent}
                   name={item.icon}
                 />
                 <View

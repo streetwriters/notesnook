@@ -23,7 +23,7 @@ import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useNoteStore } from "../../stores/use-notes-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { COLORS_NOTE } from "../../utils/color-scheme";
 import { db } from "../../common/database";
 import { normalize, SIZE } from "../../utils/size";
@@ -58,7 +58,7 @@ export const ColorSection = React.memo(
 
 const ColorItem = React.memo(
   function ColorItem({ item, alias }) {
-    const colors = useThemeStore((state) => state.colors);
+    const colors = useThemeColors();
     const setColorNotes = useMenuStore((state) => state.setColorNotes);
     const [headerTextState, setHeaderTextState] = useState(null);
     alias = db.colors.alias(item.id) || "";
@@ -117,7 +117,7 @@ const ColorItem = React.memo(
         }
         onLongPress={onLongPress}
         customSelectedColor={COLORS_NOTE[item.title.toLowerCase()]}
-        customAlpha={!colors.night ? -0.02 : 0.02}
+        customAlpha={!colors.isDark ? -0.02 : 0.02}
         customOpacity={0.12}
         onPress={() => onPress(item)}
         customStyle={{
@@ -157,11 +157,11 @@ const ColorItem = React.memo(
             />
           </View>
           {headerTextState?.id === item.id ? (
-            <Heading color={colors.heading} size={SIZE.md}>
+            <Heading color={colors.primary.heading} size={SIZE.md}>
               {alias.slice(0, 1).toUpperCase() + alias.slice(1)}
             </Heading>
           ) : (
-            <Paragraph color={colors.pri} size={SIZE.md}>
+            <Paragraph color={colors.primary.paragraph} size={SIZE.md}>
               {alias.slice(0, 1).toUpperCase() + alias.slice(1)}
             </Paragraph>
           )}

@@ -21,6 +21,7 @@ module.exports = {
     nodeModulesPaths,
     extraNodeModules: {
       "react": path.join(__dirname, "../node_modules/react"),
+      "@types/react": path.join(__dirname, "../node_modules/@types/react"),
       "react-dom": path.join(__dirname, "../node_modules/react-dom"),
       "@notesnook":  path.join(__dirname, "../../../packages"),
       "@notifee/react-native": path.join(__dirname, "../node_modules/@ammarahmed/notifee-react-native")

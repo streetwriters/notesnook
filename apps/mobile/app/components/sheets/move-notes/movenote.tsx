@@ -30,7 +30,7 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SearchService from "../../../services/search";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { Dialog } from "../../dialog";
@@ -60,7 +60,7 @@ export const MoveNotes = ({
   selectedTopic?: TopicType;
   fwdRef: RefObject<ActionSheetRef>;
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const [currentNotebook, setCurrentNotebook] = useState(notebook);
   const { height } = useWindowDimensions();
   let notes = db.notes?.all as NoteType[];
@@ -153,12 +153,12 @@ export const MoveNotes = ({
           >
             <Paragraph
               numberOfLines={1}
-              color={item?.id === topic?.id ? colors.accent : colors.pri}
+              color={item?.id === topic?.id ? colors.primary.accent : colors.primary.paragraph}
             >
               {item.title}
             </Paragraph>
             {item.type == "note" && item.headline ? (
-              <Paragraph numberOfLines={1} color={colors.icon} size={SIZE.xs}>
+              <Paragraph numberOfLines={1} color={colors.secondary.paragraph} size={SIZE.xs}>
                 {item.headline}
               </Paragraph>
             ) : null}
@@ -169,7 +169,7 @@ export const MoveNotes = ({
               style={{
                 fontSize: SIZE.xs
               }}
-              color={colors.icon}
+              color={colors.secondary.paragraph}
             >
               {item.notes?.length} Notes
             </Paragraph>
@@ -184,13 +184,13 @@ export const MoveNotes = ({
               }}
               name="check"
               type="grayAccent"
-              color={colors.accent}
+              color={colors.primary.accent}
             />
           ) : null}
         </PressableButton>
       );
     },
-    [colors.accent, colors.icon, colors.pri, select, selectedNoteIds, topic]
+    [colors.primary.accent, colors.secondary.paragraph, colors.primary.paragraph, select, selectedNoteIds, topic]
   );
 
   /**
@@ -241,7 +241,7 @@ export const MoveNotes = ({
               marginTop: 5
             }}
           >
-            <Paragraph color={colors.accent}>in {topic.title}</Paragraph>
+            <Paragraph color={colors.primary.accent}>in {topic.title}</Paragraph>
 
             <Paragraph
               style={{
@@ -273,7 +273,7 @@ export const MoveNotes = ({
               alignItems: "center"
             }}
           >
-            <Paragraph color={colors.icon}>
+            <Paragraph color={colors.secondary.paragraph}>
               {topic ? "No notes to show" : "No topics in this notebook"}
             </Paragraph>
 

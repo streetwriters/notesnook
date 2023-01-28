@@ -24,7 +24,7 @@ import { getVersion } from "react-native-device-info";
 import { db } from "../../../common/database";
 import { eSendEvent, ToastEvent } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../../stores/use-user-store";
 import { eCloseSheet } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
@@ -36,7 +36,7 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
 export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const body = useRef(defaultBody);
   const title = useRef(defaultTitle);
   const user = useUserStore((state) => state.user);
@@ -79,7 +79,7 @@ Logged in: ${user ? "yes" : "no"}`,
             <Text
               style={{
                 textDecorationLine: "underline",
-                color: colors.accent
+                color: colors.primary.accent
               }}
               onPress={() => {
                 Linking.openURL(issue_url);
@@ -136,15 +136,15 @@ Logged in: ${user ? "yes" : "no"}`,
         defaultValue={title.current}
         style={{
           borderWidth: 1,
-          borderColor: colors.nav,
+          borderColor: colors.secondary.background,
           borderRadius: 5,
           padding: 12,
           fontFamily: "OpenSans-Regular",
           marginBottom: 10,
           fontSize: SIZE.md,
-          color: colors.heading
+          color: colors.primary.heading
         }}
-        placeholderTextColor={colors.placeholder}
+        placeholderTextColor={colors.primary.placeholder}
       />
 
       <TextInput
@@ -173,20 +173,20 @@ For example:
         }}
         style={{
           borderWidth: 1,
-          borderColor: colors.nav,
+          borderColor: colors.secondary.background,
           borderRadius: 5,
           padding: 12,
           fontFamily: "OpenSans-Regular",
           maxHeight: 200,
           fontSize: SIZE.sm,
           marginBottom: 2.5,
-          color: colors.pri
+          color: colors.primary.paragraph
         }}
-        placeholderTextColor={colors.placeholder}
+        placeholderTextColor={colors.primary.placeholder}
       />
       <Paragraph
         size={SIZE.xs}
-        color={colors.icon}
+        color={colors.secondary.paragraph}
       >{`App version: ${getVersion()} Platform: ${Platform.OS} Model: ${
         Platform.constants.Brand
       }-${Platform.constants.Model}-${Platform.constants.Version}`}</Paragraph>
@@ -201,7 +201,7 @@ For example:
       />
 
       <Paragraph
-        color={colors.icon}
+        color={colors.secondary.paragraph}
         size={SIZE.xs}
         style={{
           marginTop: 10,
@@ -215,7 +215,7 @@ For example:
           }}
           style={{
             textDecorationLine: "underline",
-            color: colors.accent
+            color: colors.primary.accent
           }}
         >
           github.com/streetwriters/notesnook.
@@ -225,7 +225,7 @@ For example:
         <Text
           style={{
             textDecorationLine: "underline",
-            color: colors.accent
+            color: colors.primary.accent
           }}
           onPress={async () => {
             try {

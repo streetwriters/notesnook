@@ -30,7 +30,7 @@ import { TopicNotes } from "../../../screens/notes/topic-notes";
 import useNavigationStore from "../../../stores/use-navigation-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { COLORS_NOTE } from "../../../utils/color-scheme";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
@@ -98,7 +98,7 @@ const NoteItem = ({
   dateBy = "dateCreated",
   noOpen = false
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const notesListMode = useSettingStore(
     (state) => state.settings.notesListMode
   );
@@ -151,7 +151,7 @@ const NoteItem = ({
                   borderRadius: 5,
                   marginRight: 5,
                   borderWidth: 0.5,
-                  borderColor: colors.icon,
+                  borderColor: colors.primary.border,
                   paddingHorizontal: 6,
                   marginBottom: 5
                 }}
@@ -180,7 +180,7 @@ const NoteItem = ({
 
         <Heading
           numberOfLines={1}
-          color={COLORS_NOTE[item.color?.toLowerCase()] || colors.heading}
+          color={COLORS_NOTE[item.color?.toLowerCase()] || colors.primary.heading}
           style={{
             flexWrap: "wrap"
           }}
@@ -221,13 +221,13 @@ const NoteItem = ({
                     marginRight: 6
                   }}
                   size={SIZE.sm}
-                  color={colors.red}
+                  color={colors.error.icon}
                 />
               ) : null}
               <TimeSince
                 style={{
                   fontSize: SIZE.xs,
-                  color: colors.icon,
+                  color: colors.secondary.paragraph,
                   marginRight: 6
                 }}
                 time={item[dateBy]}
@@ -244,8 +244,8 @@ const NoteItem = ({
                     marginRight: 6
                   }}
                 >
-                  <Icon name="attachment" size={SIZE.md} color={colors.icon} />
-                  <Paragraph color={colors.icon} size={SIZE.xs}>
+                  <Icon name="attachment" size={SIZE.md} color={colors.primary.icon} />
+                  <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
                     {attachmentCount}
                   </Paragraph>
                 </View>
@@ -260,7 +260,7 @@ const NoteItem = ({
                     marginRight: 6
                   }}
                   color={
-                    COLORS_NOTE[item.color?.toLowerCase()] || colors.accent
+                    COLORS_NOTE[item.color?.toLowerCase()] || colors.primary.accent
                   }
                 />
               ) : null}
@@ -273,7 +273,7 @@ const NoteItem = ({
                   style={{
                     marginRight: 6
                   }}
-                  color={colors.icon}
+                  color={colors.primary.icon}
                 />
               ) : null}
 
@@ -318,7 +318,7 @@ const NoteItem = ({
           ) : (
             <>
               <Paragraph
-                color={colors.icon}
+                color={colors.secondary.paragraph}
                 size={SIZE.xs}
                 style={{
                   marginRight: 6
@@ -331,7 +331,7 @@ const NoteItem = ({
               </Paragraph>
 
               <Paragraph
-                color={colors.accent}
+                color={colors.primary.accent}
                 size={SIZE.xs}
                 style={{
                   marginRight: 6
@@ -345,7 +345,7 @@ const NoteItem = ({
       </View>
       <IconButton
         testID={notesnook.listitem.menu}
-        color={colors.pri}
+        color={colors.primary.paragraph}
         name="dots-horizontal"
         size={SIZE.xl}
         onPress={() => !noOpen && showActionSheet(item, isTrash)}

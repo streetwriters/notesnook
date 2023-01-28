@@ -35,7 +35,7 @@ import {
   validatePass,
   validateUsername
 } from "../../../services/validation";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { getElevation } from "../../../utils";
 import { SIZE } from "../../../utils/size";
 import { IconButton } from "../icon-button";
@@ -106,7 +106,7 @@ const Input = ({
   wrapperStyle = {},
   ...restProps
 }: InputProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const [error, setError] = useState(false);
   const [focus, setFocus] = useState(false);
   const [secureEntry, setSecureEntry] = useState(true);
@@ -116,10 +116,10 @@ const Input = ({
   });
   type ErrorKey = keyof typeof errorList;
   const color = error
-    ? colors.red
+    ? colors.error.paragraph
     : focus
-    ? customColor || colors.accent
-    : colors.nav;
+    ? customColor || colors.primary.accent
+    : colors.secondary.background;
 
   const validate = async (value: string) => {
     if (!validationType) return;
@@ -220,7 +220,7 @@ const Input = ({
   const textStyle: TextInputProps["style"] = {
     paddingHorizontal: 0,
     fontSize: fontSize,
-    color: onPress && loading ? colors.accent : colors.pri,
+    color: onPress && loading ? colors.primary.accent : colors.primary.paragraph,
     paddingVertical: 0,
     paddingBottom: 2.5,
     flexGrow: 1,
@@ -264,12 +264,12 @@ const Input = ({
             }
             importantForAutofill="yes"
             importantForAccessibility="yes"
-            keyboardAppearance={colors.night ? "dark" : "light"}
+            keyboardAppearance={colors.isDark ? "dark" : "light"}
             onFocus={onFocus}
             onSubmitEditing={onSubmit}
             style={textStyle}
             secureTextEntry={secureTextEntry && secureEntry}
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor={colors.primary.placeholder}
           />
 
           <View
@@ -294,7 +294,7 @@ const Input = ({
                   width: 25,
                   marginLeft: 5
                 }}
-                color={secureEntry ? colors.icon : colors.accent}
+                color={secureEntry ? colors.primary.icon : colors.primary.accent}
               />
             )}
 
@@ -325,7 +325,7 @@ const Input = ({
                   width: 25,
                   marginLeft: 5
                 }}
-                color={colors.errorText}
+                color={colors.error.icon}
               />
             )}
           </View>
@@ -334,7 +334,7 @@ const Input = ({
             <View
               style={{
                 position: "absolute",
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 paddingVertical: 3,
                 paddingHorizontal: 5,
                 borderRadius: 2.5,
@@ -352,7 +352,7 @@ const Input = ({
                 <Icon
                   name="alert-circle-outline"
                   size={SIZE.xs}
-                  color={colors.errorText}
+                  color={colors.error.icon}
                 />{" "}
                 {errorMessage}
               </Paragraph>

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
@@ -36,7 +36,7 @@ export const Notice = ({
   size = "large",
   selectable
 }: NoticeProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const isSmall = size === "small";
 
   return (
@@ -44,7 +44,7 @@ export const Notice = ({
       style={{
         padding: 12,
         flexDirection: "row",
-        backgroundColor: colors.nav,
+        backgroundColor: colors.secondary.background,
         borderRadius: isSmall ? 5 : 10,
         alignItems: "flex-start"
       }}
@@ -57,7 +57,7 @@ export const Notice = ({
           height: isSmall ? undefined : 40,
           alignSelf: "flex-start"
         }}
-        color={type === "alert" ? colors.errorText : colors.accent}
+        color={type === "alert" ? colors.error.icon : colors.primary.accent}
       />
       <Paragraph
         style={{

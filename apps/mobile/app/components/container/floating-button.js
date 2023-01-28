@@ -34,13 +34,14 @@ import { getElevation, showTooltip, TOOLTIP_POSITIONS } from "../../utils";
 import { normalize, SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
 import { useCallback } from "react";
-
+import {useThemeColors} from "@notesnook/theme";
 export const FloatingButton = ({
   title,
   onPress,
-  color = "accent",
+  color,
   shouldShow = false
 }) => {
+  const colors = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const translate = useSharedValue(0);
@@ -113,8 +114,10 @@ export const FloatingButton = ({
       <PressableButton
         testID={notesnook.buttons.add}
         type="accent"
-        accentColor={color || "accent"}
-        accentText="light"
+        buttonType={{
+          color: colors.static[color],
+          text: colors.static.white
+        }}
         customStyle={{
           ...getElevation(5),
           borderRadius: 100

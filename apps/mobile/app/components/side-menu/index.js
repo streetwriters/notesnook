@@ -26,7 +26,7 @@ import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useNoteStore } from "../../stores/use-notes-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { toggleDarkMode } from "../../utils/color-scheme/utils";
 import { MenuItemsList, SUBSCRIPTION_STATUS } from "../../utils/constants";
@@ -38,7 +38,7 @@ import { UserStatus } from "./user-status";
 
 export const SideMenu = React.memo(
   function SideMenu() {
-    const colors = useThemeStore((state) => state.colors);
+    const colors = useThemeColors();
     const deviceMode = useSettingStore((state) => state.deviceMode);
     const insets = useGlobalSafeAreaInsets();
     const subscriptionType = useUserStore(
@@ -51,11 +51,11 @@ export const SideMenu = React.memo(
     const noTextMode = false;
     const BottomItemsList = [
       {
-        name: colors.night ? "Day" : "Night",
+        name: colors.isDark ? "Day" : "Night",
         icon: "theme-light-dark",
         func: toggleDarkMode,
         switch: true,
-        on: !!colors.night,
+        on: !!colors.isDark,
         close: false
       },
       {
@@ -102,14 +102,14 @@ export const SideMenu = React.memo(
         style={{
           height: "100%",
           width: "100%",
-          backgroundColor: colors.nav
+          backgroundColor: colors.secondary.background
         }}
       >
         <View
           style={{
             height: "100%",
             width: "100%",
-            backgroundColor: deviceMode !== "mobile" ? colors.nav : colors.bg,
+            backgroundColor: deviceMode !== "mobile" ? colors.secondary.background : colors.primary.background,
             paddingTop: insets.top,
             borderRadius: 10
           }}

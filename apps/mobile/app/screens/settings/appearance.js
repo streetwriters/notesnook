@@ -28,7 +28,7 @@ import { ToastEvent } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import {
   hexToRGBA,
   RGB_Linear_Shade,
@@ -37,7 +37,7 @@ import {
 import { MenuItemsList } from "../../utils/constants";
 import { SIZE } from "../../utils/size";
 export const HomagePageSelector = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const settings = useSettingStore((state) => state.settings);
   const menuRef = useRef();
   const [width, setWidth] = useState(0);
@@ -55,7 +55,7 @@ export const HomagePageSelector = () => {
         animationDuration={200}
         style={{
           borderRadius: 5,
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           width: width,
           marginTop: 60
         }}
@@ -78,7 +78,7 @@ export const HomagePageSelector = () => {
             }}
           >
             <Paragraph>{settings.homepage}</Paragraph>
-            <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
+            <Icon color={colors.primary.icon} name="menu-down" size={SIZE.md} />
           </PressableButton>
         }
       >
@@ -99,7 +99,7 @@ export const HomagePageSelector = () => {
                 style={{
                   backgroundColor:
                     settings.homepage === item.name
-                      ? colors.nav
+                      ? colors.secondary.background
                       : "transparent",
                   width: "100%",
                   maxWidth: width
@@ -107,7 +107,7 @@ export const HomagePageSelector = () => {
                 textStyle={{
                   fontSize: SIZE.md,
                   color:
-                    settings.homepage === item.name ? colors.accent : colors.pri
+                    settings.homepage === item.name ? colors.primary.accent : colors.primary.paragraph
                 }}
               >
                 {item.name}
@@ -120,7 +120,7 @@ export const HomagePageSelector = () => {
 };
 
 export const AccentColorPicker = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   function changeAccentColor(color) {
     switchAccentColor(color);
   }
@@ -151,12 +151,12 @@ export const AccentColorPicker = () => {
         <PressableButton
           key={item}
           customColor={
-            colors.accent === item
-              ? RGB_Linear_Shade(!colors.night ? -0.2 : 0.2, hexToRGBA(item, 1))
+            colors.primary.accent === item
+              ? RGB_Linear_Shade(!colors.isDark ? -0.2 : 0.2, hexToRGBA(item, 1))
               : item
           }
           customSelectedColor={item}
-          alpha={!colors.night ? -0.1 : 0.1}
+          alpha={!colors.isDark ? -0.1 : 0.1}
           opacity={1}
           onPress={async () => {
             await PremiumService.verify(async () => {
@@ -180,7 +180,7 @@ export const AccentColorPicker = () => {
             borderRadius: 100
           }}
         >
-          {colors.accent === item ? (
+          {colors.primary.accent === item ? (
             <Icon
               size={DDS.isLargeTablet() ? SIZE.lg : SIZE.xxl}
               color="white"

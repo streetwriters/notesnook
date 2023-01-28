@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useCallback } from "react";
 import {
   ColorValue,
@@ -27,11 +28,6 @@ import {
   ViewStyle
 } from "react-native";
 import Animated from "react-native-reanimated";
-import {
-  ColorKey,
-  ThemeStore,
-  useThemeStore
-} from "../../../stores/use-theme-store";
 import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/color-scheme/utils";
 import { BUTTON_TYPES } from "../../../utils/constants";
 import { br } from "../../../utils/size";
@@ -39,8 +35,8 @@ export interface PressableButtonProps extends PressableProps {
   customStyle?: ViewStyle;
   noborder?: boolean;
   type?: keyof typeof BUTTON_TYPES;
-  accentColor?: keyof ThemeStore["colors"];
-  accentText?: keyof ThemeStore["colors"];
+  accentColor?: string;
+  accentText?: string;
   customColor?: ColorValue;
   customSelectedColor?: ColorValue;
   customAlpha?: number;
@@ -49,6 +45,102 @@ export interface PressableButtonProps extends PressableProps {
   animatedViewProps?: Animated.AnimateProps<View>;
   hidden?: boolean;
 }
+
+type ButtonTypes =
+  | "transparent"
+  | "accent"
+  | "shade"
+  | "gray"
+  | "grayBg"
+  | "grayAccent"
+  | "inverted"
+  | "white"
+  | "error"
+  | "errorShade"
+  | "warn";
+export const useButton = ({
+  type,
+  accent,
+  text
+}: {
+  accent?: string;
+  text?: string;
+  type: ButtonTypes;
+}): {
+  primary: string;
+  text: string;
+  selected: string;
+  colorOpacity?: number;
+} => {
+  const colors = useThemeColors();
+  const buttonTypes: {
+    [name: string]: {
+      primary: string;
+      text: string;
+      selected: string;
+      colorOpacity?: number;
+    };
+  } = {
+    transparent: {
+      primary: "transparent",
+      text: colors.primary.accent,
+      selected: colors.secondary.background
+    },
+    gray: {
+      primary: "transparent",
+      text: colors.secondary.paragraph,
+      selected: colors.primary.hover
+    },
+    grayBg: {
+      primary: colors.secondary.background,
+      text: colors.secondary.paragraph,
+      selected: colors.secondary.background
+    },
+    grayAccent: {
+      primary: colors.secondary.background,
+      text: colors.primary.accent,
+      selected: colors.secondary.background
+    },
+    accent: {
+      primary: accent || colors.primary.accent,
+      text: text || colors.primary.paragraph,
+      selected: accent || colors.primary.accent
+    },
+    inverted: {
+      primary: colors.primary.background,
+      text: colors.primary.accent,
+      selected: colors.primary.background
+    },
+    white: {
+      primary: "transparent",
+      text: colors.static.white,
+      selected: colors.primary.hover
+    },
+    shade: {
+      primary: colors.primary.shade,
+      text: colors.primary.accent,
+      selected: colors.primary.accent,
+      colorOpacity: 0.12
+    },
+    error: {
+      primary: colors.error.background,
+      text: colors.error.paragraph,
+      selected: colors.error.background
+    },
+    errorShade: {
+      primary: "transparent",
+      text: colors.error.paragraph,
+      selected: colors.error.background
+    },
+    warn: {
+      primary: colors.warning.background,
+      text: colors.warning.paragraph,
+      selected: colors.warning.background
+    }
+  };
+
+  return buttonTypes[type];
+};
 
 export const PressableButton = ({
   children,
@@ -60,8 +152,8 @@ export const PressableButton = ({
   disabled,
   type = "gray",
   noborder,
-  accentColor = "accent",
-  accentText = "light",
+  accentColor,
+  accentText = "#ffffff",
   customColor,
   customSelectedColor,
   customAlpha,
@@ -69,29 +161,20 @@ export const PressableButton = ({
   fwdRef,
   hidden
 }: PressableButtonProps) => {
-  const colors = useThemeStore((state) => state.colors);
-
-  const selectedColor =
-    customSelectedColor ||
-    colors[
-      type === "accent"
-        ? (BUTTON_TYPES[type](accentColor, accentText).selected as ColorKey)
-        : (BUTTON_TYPES[type].selected as ColorKey)
-    ];
-  const primaryColor =
-    customColor ||
-    colors[
-      type === "accent"
-        ? (BUTTON_TYPES[type](accentColor, accentText).primary as ColorKey)
-        : (BUTTON_TYPES[type].primary as ColorKey)
-    ];
+  const colors = useThemeColors();
+  const { primary, selected, colorOpacity } = useButton({
+    type,
+    accent: accentColor,
+    text: accentText
+  });
+  const selectedColor = customSelectedColor || selected;
+  const primaryColor = customColor || primary;
   const opacity = customOpacity
     ? customOpacity
     : type === "accent"
     ? 1
-    : //@ts-ignore
-      BUTTON_TYPES[type].opacity;
-  const alpha = customAlpha ? customAlpha : colors.night ? 0.04 : -0.04;
+    : colorOpacity;
+  const alpha = customAlpha ? customAlpha : colors.isDark ? 0.04 : -0.04;
 
   const getStyle = useCallback(
     ({ pressed }: PressableStateCallbackType): ViewStyle | ViewStyle[] => [

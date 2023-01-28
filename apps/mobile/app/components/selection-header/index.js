@@ -26,7 +26,7 @@ import Navigation from "../../services/navigation";
 import SearchService from "../../services/search";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { deleteItems } from "../../utils/functions";
 import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
@@ -38,7 +38,7 @@ import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
 
 export const SelectionHeader = React.memo(() => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const selectedItemsList = useSelectionStore(
     (state) => state.selectedItemsList
@@ -130,7 +130,7 @@ export const SelectionHeader = React.memo(() => {
         width: "100%",
         height: Platform.OS === "android" ? 50 + insets.top : 50,
         paddingTop: Platform.OS === "android" ? insets.top : null,
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: "row",
@@ -161,13 +161,13 @@ export const SelectionHeader = React.memo(() => {
             setSelectionMode(!selectionMode);
           }}
           size={SIZE.xl}
-          color={colors.icon}
+          color={colors.primary.icon}
           name="close"
         />
 
         <View
           style={{
-            backgroundColor: colors.nav,
+            backgroundColor: colors.secondary.background,
             height: 40,
             borderRadius: 100,
             paddingHorizontal: 16,
@@ -176,7 +176,7 @@ export const SelectionHeader = React.memo(() => {
             alignItems: "center"
           }}
         >
-          <Heading size={SIZE.md} color={colors.accent}>
+          <Heading size={SIZE.md} color={colors.primary.accent}>
             {selectedItemsList.length}
           </Heading>
         </View>
@@ -199,7 +199,7 @@ export const SelectionHeader = React.memo(() => {
           customStyle={{
             marginLeft: 10
           }}
-          color={allSelected ? colors.accent : colors.pri}
+          color={colors.primary.paragraph}
           name="select-all"
           size={SIZE.xl}
         />
@@ -218,9 +218,9 @@ export const SelectionHeader = React.memo(() => {
               customStyle={{
                 marginLeft: 10
               }}
-              color={colors.pri}
               tooltipText="Add to notebooks"
               tooltipPosition={4}
+              color={colors.primary.paragraph}
               name="plus"
               size={SIZE.xl}
             />
@@ -233,7 +233,7 @@ export const SelectionHeader = React.memo(() => {
               customStyle={{
                 marginLeft: 10
               }}
-              color={colors.pri}
+              color={colors.primary.paragraph}
               name="export"
               size={SIZE.xl}
             />
@@ -276,7 +276,7 @@ export const SelectionHeader = React.memo(() => {
             }`}
             tooltipPosition={4}
             testID="select-minus"
-            color={colors.pri}
+            color={colors.primary.paragraph}
             name="minus"
             size={SIZE.xl}
           />
@@ -290,7 +290,7 @@ export const SelectionHeader = React.memo(() => {
             }}
             tooltipText="Remove from favorites"
             tooltipPosition={4}
-            color={colors.pri}
+            color={colors.primary.paragraph}
             name="star-off"
             size={SIZE.xl}
           />
@@ -319,9 +319,9 @@ export const SelectionHeader = React.memo(() => {
 
               return;
             }}
-            color={colors.pri}
             tooltipText="Move to trash"
             tooltipPosition={1}
+            color={colors.primary.paragraph}
             name="delete"
             size={SIZE.xl}
           />
@@ -333,7 +333,7 @@ export const SelectionHeader = React.memo(() => {
               customStyle={{
                 marginLeft: 10
               }}
-              color={colors.pri}
+              color={colors.primary.paragraph}
               onPress={restoreItem}
               name="delete-restore"
               tooltipText="Restore"
@@ -345,7 +345,7 @@ export const SelectionHeader = React.memo(() => {
               customStyle={{
                 marginLeft: 10
               }}
-              color={colors.pri}
+              color={colors.primary.paragraph}
               onPress={deleteItem}
               tooltipText="Delete"
               tooltipPosition={4}

@@ -27,7 +27,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { getElevation } from "../../utils";
 import {
   eCloseActionSheet,
@@ -42,7 +42,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { useCallback } from "react";
 
 export const PremiumToast = ({ context = "global", offset = 0 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const [msg, setMsg] = useState(null);
   const timer = useRef();
 
@@ -94,7 +94,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
         exiting={FadeOutUp}
         style={{
           position: "absolute",
-          backgroundColor: colors.nav,
+          backgroundColor: colors.secondary.background,
           zIndex: 999,
           ...getElevation(20),
           padding: 12,
@@ -117,7 +117,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
             style={{
               flexWrap: "wrap"
             }}
-            color={colors.accent}
+            color={colors.primary.accent}
             size={SIZE.md}
           >
             {msg.title}
@@ -128,7 +128,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
               flexWrap: "wrap"
             }}
             size={SIZE.sm}
-            color={colors.pri}
+            color={colors.primary.paragraph}
           >
             {msg.desc}
           </Paragraph>

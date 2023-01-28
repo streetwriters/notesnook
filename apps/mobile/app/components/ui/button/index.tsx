@@ -17,22 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import {
   ActivityIndicator,
   ColorValue,
   TextStyle,
-  ViewStyle,
-  View
+  View,
+  ViewStyle
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { ColorKey, useThemeStore } from "../../../stores/use-theme-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
-import { BUTTON_TYPES } from "../../../utils/constants";
 import { SIZE } from "../../../utils/size";
 import { ProTag } from "../../premium/pro-tag";
-import { PressableButton, PressableButtonProps } from "../pressable";
+import { PressableButton, PressableButtonProps, useButton } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
 export interface ButtonProps extends PressableButtonProps {
@@ -69,8 +68,8 @@ export const Button = ({
   type = "transparent",
   iconSize = SIZE.md,
   style = {},
-  accentColor = "accent",
-  accentText = "light",
+  accentColor,
+  accentText = "#ffffff",
   onLongPress,
   tooltipText,
   textStyle,
@@ -79,18 +78,19 @@ export const Button = ({
   bold,
   iconColor,
   fwdRef,
+  proTag,
   iconStyle,
   ...restProps
 }: ButtonProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const premium = useUserStore((state) => state.premium);
-  const textColor = buttonType?.text
-    ? buttonType.text
-    : (colors[
-        type === "accent"
-          ? (BUTTON_TYPES[type](accentColor, accentText).text as ColorKey)
-          : (BUTTON_TYPES[type].text as ColorKey)
-      ] as ColorValue);
+  const { text } = useButton({
+    type,
+    accent: accentColor,
+    text: accentText
+  });
+  const textColor = buttonType?.text ? buttonType.text : text;
+
   const Component = bold ? Heading : Paragraph;
 
   return (
@@ -162,7 +162,7 @@ export const Button = ({
             marginLeft: 10
           }}
         >
-          <ProTag size={10} width={40} background={colors.shade} />
+          <ProTag size={10} width={40} background={colors.primary.shade} />
         </View>
       ) : null}
 

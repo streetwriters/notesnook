@@ -21,11 +21,11 @@ import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useSelectionStore } from "../../../stores/use-selection-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 
 export const SelectionIcon = ({ item }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
 
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const selectedItemsList = useSelectionStore(
@@ -61,17 +61,15 @@ export const SelectionIcon = ({ item }) => {
         marginRight: 10,
         borderWidth: 1,
         borderRadius: 100,
-        borderColor: colors.border
+        borderColor: colors.primary.border
       }}
       pointerEvents="none"
     >
-      {selected ? (
-        <Icon
-          size={SIZE.xl}
-          color={selected ? colors.accent : colors.icon}
-          name={"check"}
-        />
-      ) : null}
+      <Icon
+        size={SIZE.xl}
+        color={selected ? colors.primary.accent : colors.primary.icon}
+        name="check"
+      />
     </View>
   ) : null;
 };

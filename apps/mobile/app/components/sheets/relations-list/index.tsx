@@ -28,7 +28,7 @@ import {
 } from "../../../services/event-manager";
 import { Reminder } from "../../../services/notifications";
 import { useRelationStore } from "../../../stores/use-relation-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
 import List from "../../list";
@@ -72,7 +72,7 @@ export const RelationsList = ({
 }: RelationsListProps) => {
   const updater = useRelationStore((state) => state.updater);
   const [items, setItems] = useState<Reminder[]>([]);
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const hasNoRelations = !items || items.length === 0;
   useEffect(() => {
     setItems(
@@ -102,7 +102,7 @@ export const RelationsList = ({
           <Icon
             name={IconsByType[referenceType as keyof typeof IconsByType]}
             size={60}
-            color={colors.icon}
+            color={colors.primary.icon}
           />
           <Paragraph>
             No {referenceType}s linked to this {item.type}.

@@ -58,7 +58,7 @@ import {
 } from "../services/event-manager";
 import { useEditorStore } from "../stores/use-editor-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { useThemeStore } from "../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { setWidthHeight } from "../utils";
 import {
   eClearEditor,
@@ -72,7 +72,7 @@ import { NavigationStack } from "./navigation-stack";
 import changeNavigationBarColor from "react-native-navigation-bar-color";
 
 const _TabsHolder = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const setFullscreen = useSettingStore((state) => state.setFullscreen);
   const fullscreen = useSettingStore((state) => state.fullscreen);
@@ -398,7 +398,7 @@ const _TabsHolder = () => {
       style={{
         height: "100%",
         width: "100%",
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         paddingBottom: Platform.OS === "android" ? insets?.bottom : 0,
         marginRight:
           orientation === "LANDSCAPE-RIGHT" && Platform.OS === "ios"
@@ -411,7 +411,7 @@ const _TabsHolder = () => {
       }}
     >
       <StatusBar
-        barStyle={colors.night ? "light-content" : "dark-content"}
+        barStyle={colors.isDark ? "light-content" : "dark-content"}
         translucent={true}
         backgroundColor="transparent"
       />

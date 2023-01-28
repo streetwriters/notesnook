@@ -22,7 +22,7 @@ import { Linking, View } from "react-native";
 //import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import Sync from "../../services/sync";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { eCloseAnnouncementDialog, eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -33,7 +33,7 @@ import { Button } from "../ui/button";
 import { allowedOnPlatform, getStyle } from "./functions";
 
 export const Cta = ({ actions, style = {}, color, inline }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   let buttons =
     actions.filter((item) => allowedOnPlatform(item.platforms)) || [];
 
@@ -129,9 +129,9 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 title={item.title}
                 fontSize={SIZE.md}
                 buttonType={{
-                  color: color ? color : colors.accent,
-                  text: colors.light,
-                  selected: color ? color : colors.accent,
+                  color: color ? color : colors.primary.accent,
+                  text: colors.static.white,
+                  selected: color ? color : colors.primary.accent,
                   opacity: 1
                 }}
                 onPress={() => onPress(item)}

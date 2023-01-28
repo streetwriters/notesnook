@@ -25,7 +25,7 @@ import { DDS } from "../../services/device-detection";
 import { ToastEvent } from "../../services/event-manager";
 import { clearMessage, setEmailVerifyMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
@@ -39,7 +39,7 @@ import { SVG } from "./background";
 import { hideAuth } from "./common";
 
 export const Signup = ({ changeMode, trial }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const email = useRef();
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -101,7 +101,7 @@ export const Signup = ({ changeMode, trial }) => {
         exiting={FadeOutUp}
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           zIndex: 10,
           width: "100%",
           minHeight: "100%"
@@ -114,7 +114,7 @@ export const Signup = ({ changeMode, trial }) => {
           }}
         >
           <SvgView
-            src={SVG(colors.night ? colors.icon : "black")}
+            src={SVG(colors.isDark ? colors.primary.icon : "black")}
             height={700}
           />
         </View>
@@ -134,7 +134,7 @@ export const Signup = ({ changeMode, trial }) => {
               textAlign: "center"
             }}
             size={30}
-            color={colors.heading}
+            color={colors.primary.heading}
           >
             Create your account
           </Heading>
@@ -156,7 +156,7 @@ export const Signup = ({ changeMode, trial }) => {
           style={{
             width: DDS.isTab ? "50%" : "100%",
             padding: 12,
-            backgroundColor: colors.bg,
+            backgroundColor: colors.primary.background,
             flexGrow: 1,
             alignSelf: "center"
           }}
@@ -250,7 +250,7 @@ export const Signup = ({ changeMode, trial }) => {
               marginBottom: 20
             }}
             size={SIZE.xs}
-            color={colors.icon}
+            color={colors.secondary.paragraph}
           >
             By signing up, you agree to our{" "}
             <Paragraph
@@ -261,7 +261,7 @@ export const Signup = ({ changeMode, trial }) => {
               style={{
                 textDecorationLine: "underline"
               }}
-              color={colors.accent}
+              color={colors.primary.accent}
             >
               terms of service{" "}
             </Paragraph>
@@ -274,7 +274,7 @@ export const Signup = ({ changeMode, trial }) => {
               style={{
                 textDecorationLine: "underline"
               }}
-              color={colors.accent}
+              color={colors.primary.accent}
             >
               privacy policy.
             </Paragraph>

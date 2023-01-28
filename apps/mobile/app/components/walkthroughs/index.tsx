@@ -21,7 +21,7 @@ import React, { useState } from "react";
 import { LayoutAnimation, View } from "react-native";
 import { MMKV } from "../../common/database/mmkv";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -36,7 +36,7 @@ export const Walkthrough = ({
   steps: TStep[];
   canSkip: boolean;
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const [step, setStep] = useState<TStep>(steps && steps[0]);
 
   const next = () => {

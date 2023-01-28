@@ -32,12 +32,12 @@ import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { editorRef } from "../../utils/global-refs";
 import { ProgressBar } from "./progress";
 import { editorController, editorState, textInput } from "./tiptap/utils";
 export const EditorWrapper = ({ width }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const loading = false;
   const insets = useGlobalSafeAreaInsets();
@@ -82,9 +82,9 @@ export const EditorWrapper = ({ width }) => {
         width: width[!introCompleted ? "mobile" : deviceMode]?.c,
         height: "100%",
         minHeight: "100%",
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         borderLeftWidth: DDS.isTab ? 1 : 0,
-        borderLeftColor: DDS.isTab ? colors.nav : "transparent"
+        borderLeftColor: DDS.isTab ? colors.secondary.background : "transparent"
       }}
     >
       {loading || !introCompleted ? null : (

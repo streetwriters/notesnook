@@ -31,8 +31,8 @@ import SearchService from "../../../services/search";
 import { useNotebookStore } from "../../../stores/use-notebook-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
 import { eOnTopicSheetUpdate } from "../../../utils/events";
+import { useThemeColors } from "@notesnook/theme";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
@@ -45,7 +45,7 @@ import { useItemSelectionStore } from "./store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 
 const MoveNoteSheet = ({ note, actionSheetRef }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const notebooks = useNotebookStore((state) =>
     state.notebooks.filter((n) => n?.type === "notebook")
   );
@@ -385,7 +385,11 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
                     alignItems: "center"
                   }}
                 >
-                  <Icon name="book-outline" color={colors.icon} size={100} />
+                  <Icon
+                    name="book-outline"
+                    color={colors.primary.icon}
+                    size={100}
+                  />
                   <Paragraph style={{ marginBottom: 10 }}>
                     You do not have any notebooks.
                   </Paragraph>
@@ -431,7 +435,9 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
                 })}
                 icon={(expanded) => ({
                   name: expanded ? "chevron-up" : "chevron-down",
-                  color: expanded ? colors.accent : colors.pri
+                  color: expanded
+                    ? colors.primary.accent
+                    : colors.primary.paragraph
                 })}
                 onScrollEnd={() => {
                   actionSheetRef.current?.handleChildScrollEnd();

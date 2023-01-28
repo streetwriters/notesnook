@@ -26,7 +26,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { eScrollEvent } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import Heading from "../ui/typography/heading";
@@ -36,7 +36,7 @@ import Tag from "../ui/tag";
 const titleState = {};
 
 export const Title = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const currentScreen = useNavigationStore((state) => state.currentScreen);
   const isNotebook = currentScreen.name === "Notebook";
   const isTopic = currentScreen?.name === "TopicNotes";
@@ -115,10 +115,10 @@ export const Title = () => {
             flexWrap: "wrap",
             marginTop: Platform.OS === "ios" ? -1 : 0
           }}
-          color={currentScreen.color || colors.heading}
+          color={currentScreen.color || colors.primary.heading}
         >
           {isTag ? (
-            <Heading size={SIZE.xl} color={colors.accent}>
+            <Heading size={SIZE.xl} color={colors.primary.accent}>
               #
             </Heading>
           ) : null}

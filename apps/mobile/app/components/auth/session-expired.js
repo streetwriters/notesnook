@@ -29,7 +29,7 @@ import {
 } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
@@ -56,7 +56,7 @@ function getObfuscatedEmail(email) {
 }
 
 export const SessionExpired = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(false);
   const { step, password, email, passwordInputRef, loading, login } = useLogin(
@@ -136,7 +136,7 @@ export const SessionExpired = () => {
             padding: 12,
             justifyContent: "center",
             flex: 1,
-            backgroundColor: colors.bg
+            backgroundColor: colors.primary.background
           }}
         >
           <View
@@ -155,10 +155,10 @@ export const SessionExpired = () => {
                 height: 60
               }}
               name="alert"
-              color={colors.errorText}
+              color={colors.error.icon}
               size={50}
             />
-            <Heading size={SIZE.xxxl} color={colors.heading}>
+            <Heading size={SIZE.xxxl} color={colors.primary.heading}>
               Session expired
             </Heading>
             <Paragraph

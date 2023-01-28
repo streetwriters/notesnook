@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Image, TextStyle, View, ViewStyle } from "react-native";
 import { MMKV } from "../../common/database/mmkv";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { TTip } from "../../services/tip-manager";
-import { ThemeStore, useThemeStore } from "../../stores/use-theme-store";
 import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
@@ -41,9 +41,9 @@ export const Tip = ({
   textStyle?: TextStyle;
   neverShowAgain: boolean;
   noImage?: boolean;
-  color?: keyof ThemeStore["colors"];
+  color?: string;
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
 
   return tip ? (
     <View
@@ -54,7 +54,7 @@ export const Tip = ({
           width: "100%",
           alignSelf: "center",
           paddingVertical: 12,
-          backgroundColor: colors.nav
+          backgroundColor: colors.secondary.background
         },
         style
       ]}
@@ -77,7 +77,7 @@ export const Tip = ({
             alignSelf: "flex-start",
             borderRadius: 100,
             borderWidth: 1,
-            borderColor: colors[color as keyof typeof colors] as string
+            borderColor: colors.static[color as never] || colors.primary[color as never] as string
           }}
         />
 
@@ -99,14 +99,18 @@ export const Tip = ({
               alignSelf: "flex-start",
               borderRadius: 100,
               borderWidth: 1,
-              borderColor: colors.icon
+              borderColor: colors.primary.border
             }}
           />
         )}
       </View>
 
       <Seperator half />
-      <Paragraph style={textStyle} color={colors.pri} size={SIZE.md}>
+      <Paragraph
+        style={textStyle}
+        color={colors.primary.paragraph}
+        size={SIZE.md}
+      >
         {tip.text}
       </Paragraph>
       {tip.image && !noImage && (
@@ -133,8 +137,10 @@ export const Tip = ({
           title={tip.button.title}
           type="accent"
           icon={tip.button.icon}
-          accentText="light"
-          accentColor={color}
+          buttonType={{
+            color: colors.static[color as never],
+            text: colors.static.white
+          }}
           style={{
             marginTop: 10
           }}

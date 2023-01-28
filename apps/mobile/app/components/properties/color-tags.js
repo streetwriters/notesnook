@@ -30,7 +30,10 @@ import { COLORS_NOTE } from "../../utils/color-scheme";
 import { refreshNotesPage } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
+import {useThemeColors} from "@notesnook/theme";
+
 export const ColorTags = ({ item }) => {
+  const colors = useThemeColors();
   const [note, setNote] = useState(item);
   const setColorNotes = useMenuStore((state) => state.setColorNotes);
   const isTablet = useSettingStore((state) => state.deviceMode) !== "mobile";
@@ -56,7 +59,10 @@ export const ColorTags = ({ item }) => {
     return (
       <PressableButton
         type="accent"
-        accentColor={color.name.toLowerCase()}
+        buttonType={{
+          color: colors.static[color.name?.toLowerCase()],
+          text: colors.static.white
+        }}
         testID={notesnook.ids.dialogs.actionsheet.color(c)}
         key={color.value}
         onPress={() => changeColor(color)}

@@ -25,14 +25,14 @@ import { db } from "../../../common/database";
 import { presentSheet, ToastEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useTagStore } from "../../../stores/use-tag-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import Input from "../../ui/input";
 import { PressableButton } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 const ManageTagsSheet = (props) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const [note, setNote] = useState(props.note);
   const allTags = useTagStore((state) => state.tags);
   const [tags, setTags] = useState([]);
@@ -118,7 +118,7 @@ const ManageTagsSheet = (props) => {
       <Input
         button={{
           icon: "magnify",
-          color: colors.accent,
+          color: colors.primary.accent,
           size: SIZE.lg
         }}
         testID="tag-input"
@@ -155,10 +155,10 @@ const ManageTagsSheet = (props) => {
             onPress={onSubmit}
             type="accent"
           >
-            <Heading size={SIZE.sm} color={colors.light}>
+            <Heading size={SIZE.sm} color={colors.static.white}>
               Add {'"' + "#" + query + '"'}
             </Heading>
-            <Icon name="plus" color={colors.light} size={SIZE.lg} />
+            <Icon name="plus" color={colors.static.white} size={SIZE.lg} />
           </PressableButton>
         ) : null}
         {!allTags || allTags.length === 0 ? (
@@ -170,10 +170,10 @@ const ManageTagsSheet = (props) => {
               alignItems: "center"
             }}
           >
-            <Heading size={50} color={colors.icon}>
+            <Heading size={50} color={colors.secondary.heading}>
               #
             </Heading>
-            <Paragraph textBreakStrategy="balanced" color={colors.icon}>
+            <Paragraph textBreakStrategy="balanced" color={colors.secondary.paragraph}>
               You do not have any tags.
             </Paragraph>
           </View>
@@ -198,7 +198,7 @@ ManageTagsSheet.present = (note) => {
 export default ManageTagsSheet;
 
 const TagItem = ({ tag, note, setNote }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
 
   const onPress = async () => {
     let prevNote = { ...note };
@@ -239,8 +239,8 @@ const TagItem = ({ tag, note, setNote }) => {
         size={SIZE.sm}
         color={
           note && note?.tags.findIndex((t) => t === tag.title) !== -1
-            ? colors.accent
-            : colors.pri
+            ? colors.primary.accent
+            : colors.primary.paragraph
         }
       >
         {"#" + tag.title}
@@ -253,8 +253,8 @@ const TagItem = ({ tag, note, setNote }) => {
         }
         color={
           note && note?.tags.findIndex((t) => t === tag.title) !== -1
-            ? colors.accent
-            : colors.accent
+            ? colors.primary.accent
+            : colors.primary.accent
         }
         size={SIZE.lg}
       />

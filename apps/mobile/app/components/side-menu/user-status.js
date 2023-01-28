@@ -24,7 +24,7 @@ import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useSyncProgress from "../../hooks/use-sync-progress";
 import { eSendEvent } from "../../services/event-manager";
 import Sync from "../../services/sync";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { eOpenLoginDialog } from "../../utils/events";
 import { tabBarRef } from "../../utils/global-refs";
@@ -35,7 +35,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { useNetInfo } from "@react-native-community/netinfo";
 export const UserStatus = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const user = useUserStore((state) => state.user);
   const syncing = useUserStore((state) => state.syncing);
   const lastSyncStatus = useUserStore((state) => state.lastSyncStatus);
@@ -51,7 +51,7 @@ export const UserStatus = () => {
         alignSelf: "center",
         paddingBottom: Platform.OS === "ios" ? insets.bottom / 2 : null,
         borderTopWidth: 1,
-        borderTopColor: colors.nav
+        borderTopColor: colors.secondary.background
       }}
     >
       <View
@@ -90,7 +90,7 @@ export const UserStatus = () => {
                 flexWrap: "wrap"
               }}
               size={SIZE.xs}
-              color={colors.icon}
+              color={colors.secondary.heading}
             >
               {!user ? (
                 "You are not logged in"
@@ -98,7 +98,7 @@ export const UserStatus = () => {
                 <>
                   Synced{" "}
                   <TimeSince
-                    style={{ fontSize: SIZE.xs, color: colors.icon }}
+                    style={{ fontSize: SIZE.xs, color: colors.secondary.paragraph }}
                     time={lastSynced}
                     bold={true}
                   />
@@ -112,10 +112,10 @@ export const UserStatus = () => {
                 size={11}
                 color={
                   !user || lastSyncStatus === SyncStatus.Failed
-                    ? colors.red
+                    ? colors.error.icon
                     : isOffline
-                    ? colors.orange
-                    : colors.green
+                    ? colors.warning.icon
+                    : colors.success.icon
                 }
               />
             </Heading>
@@ -124,7 +124,7 @@ export const UserStatus = () => {
               style={{
                 flexWrap: "wrap"
               }}
-              color={colors.heading}
+              color={colors.primary.heading}
             >
               {!user
                 ? "Login to sync your notes."
@@ -140,11 +140,11 @@ export const UserStatus = () => {
 
           {user ? (
             syncing ? (
-              <ActivityIndicator color={colors.accent} size={SIZE.xl} />
+              <ActivityIndicator color={colors.primary.accent} size={SIZE.xl} />
             ) : lastSyncStatus === SyncStatus.Failed ? (
-              <Icon color={colors.red} name="sync-alert" size={SIZE.lg} />
+              <Icon color={colors.error.icon} name="sync-alert" size={SIZE.lg} />
             ) : (
-              <Icon color={colors.accent} name="sync" size={SIZE.lg} />
+              <Icon color={colors.primary.accent} name="sync" size={SIZE.lg} />
             )
           ) : null}
         </PressableButton>

@@ -35,7 +35,7 @@ import { initialize } from "../../stores";
 import { useMessageStore } from "../../stores/use-message-store";
 import { useNoteStore } from "../../stores/use-notes-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { AndroidModule } from "../../utils";
 import { eOpenAnnouncementDialog } from "../../utils/events";
@@ -57,7 +57,7 @@ import { Walkthrough } from "../walkthroughs";
 
 const Launcher = React.memo(
   function Launcher() {
-    const colors = useThemeStore((state) => state.colors);
+    const colors = useThemeColors();
     const setLoading = useNoteStore((state) => state.setLoading);
     const loading = useNoteStore((state) => state.loading);
     const user = useUserStore((state) => state.user);
@@ -242,7 +242,7 @@ const Launcher = React.memo(
     return verifyUser ? (
       <View
         style={{
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           width: "100%",
           height: "100%",
           position: "absolute",
@@ -255,7 +255,7 @@ const Launcher = React.memo(
             overflow: "hidden"
           }}
         >
-          <SvgView src={SVG(colors.night ? "white" : "black")} height={700} />
+          <SvgView src={SVG(colors.isDark ? "white" : "black")} height={700} />
         </View>
 
         <View
@@ -284,10 +284,10 @@ const Launcher = React.memo(
               marginTop: user ? 0 : 50
             }}
             onPress={onUnlockBiometrics}
-            color={colors.border}
+            color={colors.secondary.icon}
           />
           <Heading
-            color={colors.heading}
+            color={colors.primary.heading}
             style={{
               alignSelf: "center",
               textAlign: "center"
@@ -311,7 +311,7 @@ const Launcher = React.memo(
             style={{
               width: "100%",
               padding: 12,
-              backgroundColor: colors.bg,
+              backgroundColor: colors.primary.background,
               flexGrow: 1
             }}
           >

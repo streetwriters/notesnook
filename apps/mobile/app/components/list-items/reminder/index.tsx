@@ -20,7 +20,7 @@ import React from "react";
 import { View } from "react-native";
 import { notesnook } from "../../../../e2e/test.ids";
 import type { Reminder } from "../../../services/notifications";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { IconButton } from "../../ui/icon-button";
@@ -41,7 +41,7 @@ const ReminderItem = React.memo(
     index: number;
     isSheet: boolean;
   }) => {
-    const colors = useThemeStore((state) => state.colors);
+    const colors = useThemeColors();
     const openReminder = () => {
       ReminderSheet.present(item, undefined, isSheet);
     };
@@ -90,7 +90,7 @@ const ReminderItem = React.memo(
             {item.disabled ? (
               <View
                 style={{
-                  backgroundColor: colors.nav,
+                  backgroundColor: colors.secondary.background,
                   borderRadius: 5,
                   flexDirection: "row",
                   paddingHorizontal: 6,
@@ -105,11 +105,11 @@ const ReminderItem = React.memo(
                 <Icon
                   name="bell-off-outline"
                   size={SIZE.md}
-                  color={colors.errorText}
+                  color={colors.error.icon}
                 />
                 <Paragraph
                   size={SIZE.xs}
-                  color={colors.icon}
+                  color={colors.secondary.paragraph}
                   style={{ marginLeft: 5 }}
                 >
                   Disabled
@@ -119,7 +119,7 @@ const ReminderItem = React.memo(
             {item.mode === "repeat" && item.recurringMode ? (
               <View
                 style={{
-                  backgroundColor: colors.nav,
+                  backgroundColor: colors.secondary.background,
                   borderRadius: 5,
                   flexDirection: "row",
                   paddingHorizontal: 6,
@@ -131,10 +131,10 @@ const ReminderItem = React.memo(
                   height: 30
                 }}
               >
-                <Icon name="reload" size={SIZE.md} color={colors.accent} />
+                <Icon name="reload" size={SIZE.md} color={colors.primary.accent} />
                 <Paragraph
                   size={SIZE.xs}
-                  color={colors.icon}
+                  color={colors.secondary.paragraph}
                   style={{ marginLeft: 5 }}
                 >
                   {item.recurringMode.slice(0, 1).toUpperCase() +
@@ -160,7 +160,7 @@ const ReminderItem = React.memo(
         </View>
         <IconButton
           testID={notesnook.listitem.menu}
-          color={colors.pri}
+          color={colors.primary.paragraph}
           name="dots-horizontal"
           size={SIZE.xl}
           onPress={() => Properties.present(item, [], isSheet)}

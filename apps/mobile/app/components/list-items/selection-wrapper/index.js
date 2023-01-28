@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useRef } from "react";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { PressableButton } from "../../ui/pressable";
 import { Filler } from "./back-fill";
 import { SelectionIcon } from "./selection";
@@ -35,7 +35,7 @@ const SelectionWrapper = ({
   isSheet
 }) => {
   const itemId = useRef(item.id);
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const notebooksListMode = useSettingStore(
     (state) => state.settings.notebooksListMode
   );
@@ -63,12 +63,12 @@ const SelectionWrapper = ({
   };
   return (
     <PressableButton
-      customColor={isSheet ? colors.transGray : "transparent"}
+      customColor={isSheet ? colors.primary.hover : "transparent"}
       testID={testID}
       onLongPress={_onLongPress}
       onPress={_onPress}
-      customSelectedColor={colors.transGray}
-      customAlpha={!colors.night ? -0.02 : 0.02}
+      customSelectedColor={colors.primary.hover}
+      customAlpha={!colors.isDark ? -0.02 : 0.02}
       customOpacity={1}
       customStyle={{
         flexDirection: "row",

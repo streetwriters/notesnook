@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useRef, useState } from "react";
 import React from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useMenuStore } from "../../../stores/use-menu-store";
 import { ToastEvent } from "../../../services/event-manager";
 import { getTotalNotes } from "../../../utils";
@@ -31,7 +31,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
 export const NotebookHeader = ({ notebook, onEditNotebook }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(notebook.id)
   );
@@ -75,7 +75,7 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
         paddingTop: 25
       }}
     >
-      <Paragraph color={colors.icon} size={SIZE.xs}>
+      <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
         {new Date(notebook.dateEdited).toLocaleString()}
       </Paragraph>
       <View
@@ -110,7 +110,7 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
               height: 40
             }}
             type={isPinnedToMenu ? "grayBg" : "grayBg"}
-            color={isPinnedToMenu ? colors.accent : colors.icon}
+            color={isPinnedToMenu ? colors.primary.accent : colors.primary.icon}
             size={SIZE.lg}
           />
           <IconButton
@@ -119,7 +119,7 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
             tooltipText="Edit this notebook"
             name="pencil"
             type="grayBg"
-            color={colors.icon}
+            color={colors.primary.icon}
             customStyle={{
               width: 40,
               height: 40
@@ -129,7 +129,7 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
       </View>
 
       {notebook.description ? (
-        <Paragraph size={SIZE.md} color={colors.pri}>
+        <Paragraph size={SIZE.md} color={colors.primary.paragraph}>
           {notebook.description}
         </Paragraph>
       ) : null}
@@ -141,7 +141,7 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
           fontFamily: null
         }}
         size={SIZE.xs}
-        color={colors.icon}
+        color={colors.secondary.paragraph}
       >
         {notebook.topics.length === 1
           ? "1 topic"

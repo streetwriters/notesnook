@@ -27,7 +27,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { getElevation } from "../../utils";
 import { eHideToast, eShowToast } from "../../utils/events";
 import { SIZE } from "../../utils/size";
@@ -35,7 +35,7 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 export const Toast = ({ context = "global" }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const [data, setData] = useState({});
   const insets = useGlobalSafeAreaInsets();
   const hideTimeout = useRef();
@@ -138,7 +138,7 @@ export const Toast = ({ context = "global" }) => {
           style={{
             ...getElevation(5),
             maxWidth: "95%",
-            backgroundColor: colors.nav,
+            backgroundColor: colors.secondary.background,
             minWidth: data?.func ? "95%" : "50%",
             alignSelf: "center",
             borderRadius: 5,
@@ -173,7 +173,7 @@ export const Toast = ({ context = "global" }) => {
                 name={data?.type === "success" ? "check" : "close"}
                 size={SIZE.lg}
                 color={
-                  data?.type === "error" ? colors.errorText : colors.accent
+                  data?.type === "error" ? colors.error.icon : colors.primary.accent
                 }
               />
             </View>
@@ -186,7 +186,7 @@ export const Toast = ({ context = "global" }) => {
             >
               {data?.heading ? (
                 <Heading
-                  color={colors.pri}
+                  color={colors.primary.paragraph}
                   size={SIZE.md}
                   onPress={() => {
                     hide();
@@ -198,7 +198,7 @@ export const Toast = ({ context = "global" }) => {
 
               {data?.message ? (
                 <Paragraph
-                  color={colors.pri}
+                  color={colors.primary.paragraph}
                   style={{
                     maxWidth: "100%",
                     paddingRight: 10

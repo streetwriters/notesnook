@@ -26,7 +26,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import {
   eOpenPremiumDialog,
   eOpenResultDialog,
@@ -44,7 +44,7 @@ import { CompactFeatures } from "./compact-features";
 import { Offer } from "./offer";
 
 export const Expiring = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState({
     title: "Your trial is ending soon",
@@ -146,7 +146,7 @@ export const Expiring = () => {
                   size={SIZE.xs}
                   style={{
                     textDecorationLine: "underline",
-                    color: colors.icon,
+                    color: colors.secondary.paragraph,
                     marginTop: 10
                   }}
                 >
@@ -159,7 +159,7 @@ export const Expiring = () => {
 
             <View
               style={{
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 width: "100%",
                 borderBottomRightRadius: 10,
                 borderBottomLeftRadius: 10

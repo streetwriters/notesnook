@@ -25,14 +25,14 @@ import { Button } from "../../../components/ui/button";
 import { Notice } from "../../../components/ui/notice";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { Group } from "./group";
 import { DragState, useDragState } from "./state";
 export const ConfigureToolbar = () => {
   const data = useDragState((state) => state.data);
   const preset = useDragState((state) => state.preset);
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
 
   const renderGroups = () => {
     return data?.map((item, index) => (
@@ -62,7 +62,7 @@ export const ConfigureToolbar = () => {
               marginTop: 10
             }}
             size={SIZE.xs}
-            color={colors.icon}
+            color={colors.secondary.paragraph}
           >
             PRESETS
           </Paragraph>

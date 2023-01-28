@@ -23,7 +23,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ToggleSwitch from "toggle-switch-react-native";
 import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { normalize, SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import { PressableButton } from "../ui/pressable";
@@ -34,7 +34,7 @@ import Tag from "../ui/tag";
 
 export const MenuItem = React.memo(
   function MenuItem({ item, index, testID, rightBtn }) {
-    const colors = useThemeStore((state) => state.colors);
+    const colors = useThemeColors();
     const [headerTextState, setHeaderTextState] = useState(
       useNavigationStore.getState().currentScreen
     );
@@ -115,13 +115,13 @@ export const MenuItem = React.memo(
               item.icon === "crown"
                 ? colors.yellow
                 : isFocused
-                ? colors.accent
-                : colors.pri
+                ? colors.primary.accent
+                : colors.primary.paragraph
             }
             size={SIZE.lg - 2}
           />
           {isFocused ? (
-            <Heading color={colors.heading} size={SIZE.md}>
+            <Heading color={colors.primary.heading} size={SIZE.md}>
               {item.name}
             </Heading>
           ) : (
@@ -134,8 +134,8 @@ export const MenuItem = React.memo(
         {item.switch ? (
           <ToggleSwitch
             isOn={item.on}
-            onColor={colors.accent}
-            offColor={colors.icon}
+            onColor={colors.primary.accent}
+            offColor={colors.primary.icon}
             size="small"
             animationSpeed={150}
             onToggle={_onPress}

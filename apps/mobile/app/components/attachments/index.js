@@ -23,7 +23,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
 import { presentSheet } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import DialogHeader from "../dialog/dialog-header";
 import Input from "../ui/input";
@@ -33,7 +33,7 @@ import { AttachmentItem } from "./attachment-item";
 import { FlatList } from "react-native-actions-sheet";
 
 export const AttachmentDialog = ({ data }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const [note, setNote] = useState(data);
   const [attachments, setAttachments] = useState(
     data
@@ -146,14 +146,14 @@ export const AttachmentDialog = ({ data }) => {
       />
 
       <Paragraph
-        color={colors.icon}
+        color={colors.secondary.paragraph}
         size={SIZE.xs}
         style={{
           textAlign: "center",
           marginTop: 10
         }}
       >
-        <Icon name="shield-key-outline" size={SIZE.xs} color={colors.icon} />
+        <Icon name="shield-key-outline" size={SIZE.xs} color={colors.primary.icon} />
         {"  "}All attachments are end-to-end encrypted.
       </Paragraph>
     </View>

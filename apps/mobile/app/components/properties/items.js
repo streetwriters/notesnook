@@ -23,13 +23,13 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useActions } from "../../hooks/use-actions";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import { PressableButton } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 export const Items = ({ item, buttons, close }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const dimensions = useSettingStore((state) => state.dimensions);
   const actions = useActions({ item, close });
   const data = actions.filter((i) => buttons.indexOf(i.id) > -1 && !i.hidden);
@@ -70,10 +70,10 @@ export const Items = ({ item, buttons, close }) => {
           size={DDS.isTab ? SIZE.xxl : SIZE.lg}
           color={
             item.on
-              ? colors.accent
+              ? colors.primary.accent
               : item.id.match(/(delete|trash)/g)
-              ? colors.errorText
-              : colors.icon
+              ? colors.error.icon
+              : colors.primary.icon
           }
         />
       </PressableButton>
@@ -89,10 +89,10 @@ export const Items = ({ item, buttons, close }) => {
       key={item.name + item.title}
       buttonType={{
         text: item.on
-          ? colors.accent
+          ? colors.primary.accent
           : item.name === "Delete" || item.name === "PermDelete"
-          ? colors.errorText
-          : colors.pri
+          ? colors.error.paragraph
+          : colors.primary.paragraph
       }}
       onPress={item.func}
       title={item.title}

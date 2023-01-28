@@ -414,7 +414,7 @@ const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        backgroundColor: colors.nav,
+        backgroundColor: colors.secondary.background,
         borderRadius: 5,
         marginVertical: 5
       }}
@@ -437,11 +437,11 @@ const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
         style={[
           styles.topicInput,
           {
-            color: colors.pri
+            color: colors.primary.paragraph
           }
         ]}
         defaultValue={item}
-        placeholderTextColor={colors.placeholder}
+        placeholderTextColor={colors.primary.placeholder}
       />
 
       <View
@@ -460,7 +460,7 @@ const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
           }}
           name="pencil"
           size={SIZE.lg - 5}
-          color={colors.icon}
+          color={colors.primary.icon}
         />
         <IconButton
           onPress={() => {
@@ -468,7 +468,7 @@ const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
           }}
           name="minus"
           size={SIZE.lg}
-          color={colors.icon}
+          color={colors.primary.icon}
         />
       </View>
     </View>

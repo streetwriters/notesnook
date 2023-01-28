@@ -24,10 +24,10 @@ import Backup from "../../services/backup";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 export const AutomaticBackupsSelector = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const settings = useSettingStore((state) => state.settings);
   const updateAskForBackup = async () => {
     SettingsService.set({
@@ -84,17 +84,17 @@ export const AutomaticBackupsSelector = () => {
           key={item.value}
           style={{
             backgroundColor:
-              settings.reminder === item.value ? colors.accent : colors.nav,
+              settings.reminder === item.value ? colors.primary.accent : colors.secondary.background,
             justifyContent: "center",
             alignItems: "center",
             width: "25%",
             height: 35,
             borderRightWidth: index !== 3 ? 1 : 0,
-            borderRightColor: colors.border
+            borderRightColor: colors.primary.border
           }}
         >
           <Paragraph
-            color={settings.reminder === item.value ? "white" : colors.icon}
+            color={settings.reminder === item.value ? "white" : colors.secondary.paragraph}
             size={SIZE.sm - 1}
           >
             {item.title}

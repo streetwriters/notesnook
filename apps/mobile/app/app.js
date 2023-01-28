@@ -32,6 +32,9 @@ import { useUserStore } from "./stores/use-user-store";
 import { View } from "react-native";
 import { useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
+import { ThemeProvider } from "@notesnook/theme";
+import { ThemeLight } from "@notesnook/theme";
+//import { BackgroundSync } from "./services/background-sync";
 NetInfo.configure({
   reachabilityUrl: "https://notesnook.com",
   reachabilityTest: (response) => {
@@ -62,36 +65,43 @@ const App = () => {
     }, 100);
   }, []);
   return (
-    <View
-      style={{
-        height: "100%",
-        width: "100%"
+    <ThemeProvider
+      value={{
+        theme: ThemeLight,
+        setTheme: () => null
       }}
     >
       <View
-        style={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          zIndex: -1
-        }}
-        pointerEvents="none"
-      >
-        <SafeAreaProvider>
-          <GlobalSafeAreaProvider />
-        </SafeAreaProvider>
-      </View>
-
-      <GestureHandlerRootView
         style={{
           height: "100%",
           width: "100%"
         }}
       >
-        <ApplicationHolder />
-        {init && <Launcher />}
-      </GestureHandlerRootView>
-    </View>
+        <View
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            zIndex: -1
+          }}
+          pointerEvents="none"
+        >
+          <SafeAreaProvider>
+            <GlobalSafeAreaProvider />
+          </SafeAreaProvider>
+        </View>
+
+        <GestureHandlerRootView
+          style={{
+            height: "100%",
+            width: "100%"
+          }}
+        >
+          <ApplicationHolder />
+          {init && <Launcher />}
+        </GestureHandlerRootView>
+      </View>
+    </ThemeProvider>
   );
 };
 

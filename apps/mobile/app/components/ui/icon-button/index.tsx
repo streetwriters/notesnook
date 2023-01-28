@@ -21,11 +21,11 @@ import React from "react";
 import { ColorValue, GestureResponderEvent, ViewStyle } from "react-native";
 import Animated, { Layout } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { ColorKey, useThemeStore } from "../../../stores/use-theme-store";
 import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
 import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/color-scheme/utils";
 import { SIZE } from "../../../utils/size";
 import { PressableButton, PressableButtonProps } from "../pressable";
+import { useThemeColors } from "@notesnook/theme";
 interface IconButtonProps extends PressableButtonProps {
   name: string;
   color?: ColorValue;
@@ -59,7 +59,7 @@ export const IconButton = ({
   tooltipPosition = TOOLTIP_POSITIONS.TOP,
   ...restProps
 }: IconButtonProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
 
   const _onLongPress = (event: GestureResponderEvent) => {
     if (onLongPress) {
@@ -94,8 +94,8 @@ export const IconButton = ({
         style={iconStyle}
         color={
           restProps.disabled
-            ? RGB_Linear_Shade(-0.05, hexToRGBA(colors.nav))
-            : (colors[color as ColorKey] as ColorValue) || color
+            ? RGB_Linear_Shade(-0.05, hexToRGBA(colors.secondary.background))
+            : colors.static[color as never] || color
         }
         size={size}
       />

@@ -25,7 +25,7 @@ import { ViewStyle } from "react-native";
 
 import { Reminder } from "../../../services/notifications";
 import { Button, ButtonProps } from "../button";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 
 export const ReminderTime = ({
@@ -40,7 +40,7 @@ export const ReminderTime = ({
   style?: ViewStyle;
   checkIsActive?: boolean;
 } & ButtonProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const reminder = props.reminder;
   const time = !reminder ? undefined : formatReminderTime(reminder);
   const isTodayOrTomorrow =
@@ -61,7 +61,7 @@ export const ReminderTime = ({
       buttonType={
         isTodayOrTomorrow
           ? {
-              text: props.color || colors.accent
+              text: props.color || colors.primary.accent
             }
           : undefined
       }
@@ -72,7 +72,7 @@ export const ReminderTime = ({
         borderRadius: 5,
         marginRight: 5,
         borderWidth: 0.5,
-        borderColor: colors.icon,
+        borderColor: colors.primary.border,
         paddingHorizontal: 6,
         marginBottom: 5,
         ...(style as ViewStyle)

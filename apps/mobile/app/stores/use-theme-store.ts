@@ -19,19 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Appearance } from "react-native";
 import create, { State } from "zustand";
-import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from "../utils/color-scheme";
-
+import { ThemeLight, useThemeColors } from "@notesnook/theme";
 const darkScheme = Appearance.getColorScheme() === "dark";
 export interface ThemeStore extends State {
-  colors: typeof COLOR_SCHEME_LIGHT;
-  setColors: (colors: typeof COLOR_SCHEME_LIGHT) => void;
+  colors: Partial<ReturnType<typeof useThemeColors>>;
+  setColors: (colors: ReturnType<typeof useThemeColors>) => void;
 }
 
 export const useThemeStore = create<ThemeStore>((set) => ({
-  colors: darkScheme ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT,
+  colors: ThemeLight.scopes["base"],
   setColors: (colors) => {
-    set({ colors });
+    // TODO
+    //set({ colors });
   }
 }));
-
-export type ColorKey = keyof ThemeStore["colors"];

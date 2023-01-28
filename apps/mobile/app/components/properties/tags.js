@@ -21,14 +21,14 @@ import React from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import { TaggedNotes } from "../../screens/notes/tagged";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import ManageTagsSheet from "../sheets/manage-tags";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
 export const Tags = ({ item, close }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
 
   return item.id ? (
     <View
@@ -50,7 +50,7 @@ export const Tags = ({ item, close }) => {
           ManageTagsSheet.present(item);
         }}
         buttonType={{
-          text: colors.accent
+          text: colors.primary.accent
         }}
         title="Add tags"
         type="grayBg"

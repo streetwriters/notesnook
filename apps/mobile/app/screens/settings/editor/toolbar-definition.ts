@@ -42,11 +42,13 @@ export function findToolById(id: keyof typeof tools): {
 
 export function getToolIcon(id: ToolId) {
   const icon = Icons[id as keyof typeof Icons];
+  //TODO
   const colors = useThemeStore.getState().colors;
+  
   return (id as "none") === "none"
     ? null
     : `<svg width="20" height="20"  >
-  <path d="${icon}" fill="${colors.icon}" />
+  <path d="${icon}" fill="${colors.primary?.icon}" />
 </svg>`;
 }
 

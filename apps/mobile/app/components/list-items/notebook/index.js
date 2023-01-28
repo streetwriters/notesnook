@@ -23,7 +23,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { history } from "../../../utils";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
@@ -48,7 +48,7 @@ export const NotebookItem = ({
   dateBy,
   totalNotes
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const colors = useThemeColors();
   const notebooksListMode = useSettingStore(
     (state) => state.settings.notebooksListMode
   );
@@ -111,7 +111,7 @@ export const NotebookItem = ({
                   maxWidth: 120,
                   borderWidth: 0.5,
                   paddingVertical: 2.5,
-                  borderColor: colors.icon,
+                  borderColor: colors.primary.border,
                   paddingHorizontal: 6,
                   marginVertical: 5,
                   marginRight: 5
@@ -134,7 +134,7 @@ export const NotebookItem = ({
           {isTrash ? (
             <>
               <Paragraph
-                color={colors.icon}
+                color={colors.secondary.paragraph}
                 size={SIZE.xs}
                 style={{
                   textAlignVertical: "center",
@@ -145,7 +145,7 @@ export const NotebookItem = ({
                   new Date(item.dateDeleted).toISOString().slice(0, 10)}
               </Paragraph>
               <Paragraph
-                color={colors.accent}
+                color={colors.primary.accent}
                 size={SIZE.xs}
                 style={{
                   textAlignVertical: "center",
@@ -157,7 +157,7 @@ export const NotebookItem = ({
             </>
           ) : (
             <Paragraph
-              color={colors.icon}
+              color={colors.secondary.paragraph}
               size={SIZE.xs}
               style={{
                 marginRight: 6
@@ -167,7 +167,7 @@ export const NotebookItem = ({
             </Paragraph>
           )}
           <Paragraph
-            color={colors.icon}
+            color={colors.secondary.paragraph}
             size={SIZE.xs}
             style={{
               marginRight: 6
@@ -188,13 +188,13 @@ export const NotebookItem = ({
                 marginRight: 10,
                 marginTop: 2
               }}
-              color={colors.accent}
+              color={colors.primary.accent}
             />
           ) : null}
         </View>
       </View>
       <IconButton
-        color={colors.heading}
+        color={colors.primary.heading}
         name="dots-horizontal"
         testID={notesnook.ids.notebook.menu}
         size={SIZE.xl}
