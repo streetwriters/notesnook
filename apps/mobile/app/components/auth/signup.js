@@ -114,7 +114,7 @@ export const Signup = ({ changeMode, trial }) => {
           }}
         >
           <SvgView
-            src={SVG(colors.isDark ? colors.primary.icon : "black")}
+            src={SVG(colors.primary.icon)}
             height={700}
           />
         </View>

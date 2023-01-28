@@ -100,7 +100,7 @@ export const Login = ({ changeMode }) => {
           }}
         >
           <SvgView
-            src={SVG(colors.isDark ? colors.primary.icon : "black")}
+            src={SVG(colors.primary.icon)}
             height={700}
           />
         </View>

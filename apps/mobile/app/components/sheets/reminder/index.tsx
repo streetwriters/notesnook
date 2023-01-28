@@ -463,7 +463,7 @@ export default function ReminderSheet({
               date={date}
               maximumDate={dayjs(date).add(3, "months").toDate()}
               onDateChange={handleConfirm}
-              textColor={colors.isDark ? "#ffffff" : "#000000"}
+              textColor={colors.isDark ? colors.static.white : colors.static.black}
               fadeToColor={colors.primary.background}
               theme={colors.isDark ? "dark" : "light"}
               is24hourSource="locale"
