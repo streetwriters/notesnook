@@ -19,17 +19,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Appearance } from "react-native";
 import create, { State } from "zustand";
-import { ThemeLight, useThemeColors } from "@notesnook/theme";
-const darkScheme = Appearance.getColorScheme() === "dark";
+import { useThemeColors, ThemeType } from "@notesnook/theme";
+import SettingsService from "../services/settings";
 export interface ThemeStore extends State {
   colors: Partial<ReturnType<typeof useThemeColors>>;
+  lightTheme: ThemeType;
+  darkTheme: ThemeType;
+  colorScheme: "dark" | "light";
   setColors: (colors: ReturnType<typeof useThemeColors>) => void;
+  setDarkTheme: (theme: ThemeType) => void;
+  setLightTheme: (theme: ThemeType) => void;
+  setColorScheme: (colorScheme: "dark" | "light") => void;
 }
 
 export const useThemeStore = create<ThemeStore>((set) => ({
-  colors: ThemeLight.scopes["base"],
-  setColors: (colors) => {
+  colors: SettingsService.get().lighTheme.scopes["base"],
+  lightTheme: SettingsService.get().lighTheme,
+  darkTheme: SettingsService.get().darkTheme,
+  colorScheme: SettingsService.get().useSystemTheme
+    ? (Appearance.getColorScheme() as "dark" | "light")
+    : SettingsService.get().colorScheme,
+  setColors: () => {
     // TODO
     //set({ colors });
+  },
+  setDarkTheme: (darkTheme: ThemeType) => {
+    set({ darkTheme });
+  },
+  setLightTheme: (lightTheme: ThemeType) => {
+    set({ lightTheme });
+  },
+  setColorScheme: (colorScheme: "dark" | "light") => {
+    set({ colorScheme });
+    if (!SettingsService.get().useSystemTheme) {
+      SettingsService.set({
+        colorScheme: colorScheme
+      });
+    }
   }
 }));

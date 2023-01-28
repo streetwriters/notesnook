@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import "react-native-gesture-handler";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { ThemeProvider } from "@notesnook/theme";
+import NetInfo from "@react-native-community/netinfo";
+import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { withErrorBoundry } from "./components/exception-handler";
@@ -28,12 +31,8 @@ import { ApplicationHolder } from "./navigation";
 import Notifications from "./services/notifications";
 import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
+import { useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
-import { View } from "react-native";
-import { useState } from "react";
-import NetInfo from "@react-native-community/netinfo";
-import { ThemeProvider } from "@notesnook/theme";
-import { ThemeLight } from "@notesnook/theme";
 //import { BackgroundSync } from "./services/background-sync";
 NetInfo.configure({
   reachabilityUrl: "https://notesnook.com",
@@ -46,6 +45,11 @@ NetInfo.configure({
 SettingsService.init();
 SettingsService.checkOrientation();
 const App = () => {
+  const [colorScheme, darkTheme, lightTheme] = useThemeStore((state) => [
+    state.colorScheme,
+    state.darkTheme,
+    state.lightTheme
+  ]);
   useAppEvents();
   const [init, setInit] = useState(false);
   useEffect(() => {
@@ -67,7 +71,7 @@ const App = () => {
   return (
     <ThemeProvider
       value={{
-        theme: ThemeLight,
+        theme: colorScheme === "dark" ? darkTheme : lightTheme,
         setTheme: () => null
       }}
     >

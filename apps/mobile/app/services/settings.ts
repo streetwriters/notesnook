@@ -100,8 +100,23 @@ function toggle(id: keyof SettingStore["settings"]) {
   MMKV.setString("appSettings", JSON.stringify(settings));
 }
 
-function get() {
+function get(): SettingStore["settings"] {
   return { ...useSettingStore.getState().settings };
+}
+
+function getProperty<K extends keyof SettingStore["settings"]>(
+  property: K
+): SettingStore["settings"][K] {
+  return useSettingStore.getState().settings[property];
+}
+
+function setProperty<K extends keyof SettingStore["settings"]>(
+  property: K,
+  value: SettingStore["settings"][K]
+): void {
+  SettingsService.set({
+    [property]: value
+  });
 }
 
 function onFirstLaunch() {
@@ -140,7 +155,9 @@ const SettingsService = {
   toggle,
   onFirstLaunch,
   checkOrientation,
-  reset
+  reset,
+  getProperty,
+  setProperty
 };
 
 export default SettingsService;

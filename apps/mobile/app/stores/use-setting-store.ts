@@ -25,7 +25,7 @@ import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
 import { Reminder } from "../services/notifications";
 import { ACCENT } from "../utils/color-scheme";
-
+import { ThemeDark, ThemeLight, ThemeType } from "@notesnook/theme";
 export type Settings = {
   showToolbarOnTop?: boolean;
   showKeyboardOnOpen?: boolean;
@@ -75,6 +75,9 @@ export type Settings = {
   notificationSound?: Sound & { platform: PlatformOSType };
   defaultFontSize: string;
   defaultFontFamily: string;
+  colorScheme: "dark" | "light";
+  lighTheme: ThemeType;
+  darkTheme: ThemeType;
 };
 
 type DimensionsType = {
@@ -153,7 +156,10 @@ export const useSettingStore = create<SettingStore>((set) => ({
     reminderNotificationMode: "urgent",
     notificationSound: undefined,
     defaultFontFamily: "sans-serif",
-    defaultFontSize: "16"
+    defaultFontSize: "16",
+    colorScheme: "light",
+    lighTheme: ThemeLight,
+    darkTheme: ThemeDark
   },
   sheetKeyboardHandler: true,
   fullscreen: false,
