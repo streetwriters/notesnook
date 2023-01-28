@@ -59,7 +59,7 @@ declare module "@tiptap/core" {
       insertImage: (options: ImageAttributes) => ReturnType;
       updateImage: (
         query: { src?: string; hash?: string },
-        options: ImageAttributes & { preventUpdate?: boolean }
+        options: Partial<ImageAttributes> & { preventUpdate?: boolean }
       ) => ReturnType;
       setImageAlignment: (options: ImageAlignmentOptions) => ReturnType;
       setImageSize: (options: ImageSizeOptions) => ReturnType;

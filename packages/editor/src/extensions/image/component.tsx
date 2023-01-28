@@ -44,7 +44,7 @@ export function ImageComponent(
 ) {
   const { editor, node, selected } = props;
   const isMobile = useIsMobile();
-  const { src, alt, title, width, height, align } = node.attrs;
+  const { src, alt, title, width, height, align, hash } = node.attrs;
   const float = isMobile ? false : node.attrs.float;
 
   const imageRef = useRef<HTMLImageElement>(null);
@@ -64,7 +64,6 @@ export function ImageComponent(
               downloadOptions
             );
             setSource(url);
-            console.log(url, size, blob, type);
             editor.current?.commands.updateImage(
               { src },
               { src: await toDataURL(blob), size, type }
@@ -103,7 +102,8 @@ export function ImageComponent(
         {!source || error ? (
           <Flex
             sx={{
-              width,
+              width: width || "100%",
+              height: height || "100%",
               maxWidth: "100%",
               minWidth: 135,
               bg: "bgSecondary",
@@ -125,7 +125,7 @@ export function ImageComponent(
                   ? Icons.imageDownload
                   : Icons.image
               }
-              size={72}
+              size={width ? width * 0.2 : 72}
               color="gray"
             />
 
@@ -227,6 +227,15 @@ export function ImageComponent(
                   ? "2px solid var(--primary)"
                   : "2px solid transparent",
                 borderRadius: "default"
+              }}
+              onLoad={(e) => {
+                const { clientWidth, clientHeight } = e.currentTarget;
+                if (!width && !height) {
+                  editor.current?.commands.updateImage(
+                    { src },
+                    { width: clientWidth, height: clientHeight }
+                  );
+                }
               }}
               {...props}
             />
