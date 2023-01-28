@@ -170,6 +170,7 @@ function TipTap(props: TipTapProps) {
           }
         });
         if (onLoad) onLoad();
+        editor.commands.refreshSearch();
       },
       onUpdate: ({ editor, transaction }) => {
         onContentChange?.();
