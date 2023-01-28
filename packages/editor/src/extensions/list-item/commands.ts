@@ -68,6 +68,7 @@ export function onBackspacePressed(
       return editor.chain().joinBackward().joinBackward().run();
     }
   }
+  return false;
 }
 
 export function onArrowUpPressed(editor: Editor, name: string, type: NodeType) {
