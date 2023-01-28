@@ -26,6 +26,7 @@ export type Colors = {
   separator: string;
   placeholder: string;
   hover: string;
+  shade: string;
 };
 
 export type ColorsType<TRequired extends boolean = false> = {

@@ -19,83 +19,89 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Theme } from "../types";
 
 export const ThemeLight: Theme = {
-    name: "Default theme",
-    author: "Notesnook",
-    colorScheme: "light",
-    compatibilityVersion: "1.0",
-    description: "The default theme for Notesnook app",
-    homepage: "https://notesnook.com",
-    id: "notesnook-default-theme",
-    tags: ["theme"],
-    version: "1.0",
-    scopes: {
-      base: {
-        primary: {
-          accent: "#008837",
-          background: "#ffffff",
-          border: "#E8E8E8",
-          placeholder: "#a9a9a9",
-          heading: "#212121",
-          paragraph: "#505050",
-          icon: "#808080",
-          separator: "#E8E8E8",
-          hover: "#00000010"
-        },
-        secondary: {
-          accent: "#008837",
-          background: "#f7f7f7",
-          border: "#E8E8E8",
-          placeholder: "#a9a9a9",
-          heading: "#808080",
-          paragraph: "#818589",
-          icon: "#808080",
-          separator: "#E8E8E8",
-          hover: "#00000010"
-        },
-        disabled: {
-          accent: "#008837",
-          background: "#ffffff",
-          border: "#E8E8E8",
-          placeholder: "#a9a9a9",
-          heading: "#212121",
-          paragraph: "#505050",
-          icon: "#808080",
-          separator: "#E8E8E8",
-          hover: "#00000010"
-        },
-        error: {
-          accent: "#008837",
-          background: "#f4433620",
-          border: "#E8E8E8",
-          placeholder: "#a9a9a9",
-          heading: "#ff6961",
-          paragraph: "#ff6961",
-          icon: "#ff6961",
-          separator: "#E8E8E8",
-          hover: "#00000010"
-        },
-        warning: {
-          accent: "#008837",
-          background: "#ffffff",
-          border: "#E8E8E8",
-          placeholder: "#a9a9a9",
-          heading: "#212121",
-          paragraph: "#505050",
-          icon: "#808080",
-          separator: "#E8E8E8",
-          hover: "#00000010"
-        },
-        success: {
-          accent: "#008837",
-          background: "#00FF0020",
-          border: "#E8E8E8",
-          placeholder: "#a9a9a9",
-          heading: "#4F8A10",
-          paragraph: "#4F8A10",
-          icon: "#4F8A10",
-          separator: "#E8E8E8",
-          hover: "#00000010"
-        }
+  name: "Default theme",
+  author: "Notesnook",
+  colorScheme: "light",
+  compatibilityVersion: "1.0",
+  description: "The default theme for Notesnook app",
+  homepage: "https://notesnook.com",
+  id: "notesnook-default-theme",
+  tags: ["theme"],
+  version: "1.0",
+  scopes: {
+    base: {
+      primary: {
+        accent: "#008837",
+        background: "#ffffff",
+        border: "#E8E8E8",
+        placeholder: "#a9a9a9",
+        heading: "#212121",
+        paragraph: "#505050",
+        icon: "#808080",
+        separator: "#E8E8E8",
+        hover: "#00000010",
+        shade: "#00883712"
+      },
+      secondary: {
+        accent: "#008837",
+        background: "#f7f7f7",
+        border: "#E8E8E8",
+        placeholder: "#a9a9a9",
+        heading: "#808080",
+        paragraph: "#818589",
+        icon: "#808080",
+        separator: "#E8E8E8",
+        hover: "#00000010",
+        shade: "#00883712"
+      },
+      disabled: {
+        accent: "#008837",
+        background: "#ffffff",
+        border: "#E8E8E8",
+        placeholder: "#a9a9a9",
+        heading: "#212121",
+        paragraph: "#505050",
+        icon: "#808080",
+        separator: "#E8E8E8",
+        hover: "#00000010",
+        shade: "#00883712"
+      },
+      error: {
+        accent: "#008837",
+        background: "#f4433620",
+        border: "#E8E8E8",
+        placeholder: "#a9a9a9",
+        heading: "#ff6961",
+        paragraph: "#ff6961",
+        icon: "#ff6961",
+        separator: "#E8E8E8",
+        hover: "#00000010",
+        shade: "#00883712"
+      },
+      warning: {
+        accent: "#008837",
+        background: "#ffffff",
+        border: "#E8E8E8",
+        placeholder: "#a9a9a9",
+        heading: "#212121",
+        paragraph: "#505050",
+        icon: "#808080",
+        separator: "#E8E8E8",
+        hover: "#00000010",
+        shade: "#00883712"
+      },
+      success: {
+        accent: "#008837",
+        background: "#00FF0020",
+        border: "#E8E8E8",
+        placeholder: "#a9a9a9",
+        heading: "#4F8A10",
+        paragraph: "#4F8A10",
+        icon: "#4F8A10",
+        separator: "#E8E8E8",
+        hover: "#00000010",
+        shade: "#00883712"
       }
     }
-  };
+  }
+};

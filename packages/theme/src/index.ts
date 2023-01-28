@@ -20,3 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export * from "./theme/accents";
 export * from "./themeprovider";
 export * from "./theme";
+export {
+  ScopedThemeProvider,
+  ThemeProvider,
+  useThemeColors,
+  useThemeProvider
+} from "./theme-engine";
+export { ThemeDark } from "./theme-engine/themes/dark";
+export { ThemeLight } from "./theme-engine/themes/light";
+export type { ThemeScopes, Colors, ColorsType } from "./theme-engine/types";
