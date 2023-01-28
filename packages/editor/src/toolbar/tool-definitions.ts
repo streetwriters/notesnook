@@ -21,6 +21,10 @@ import { ToolbarDefinition, ToolDefinition } from "./types";
 import { ToolId } from "./tools";
 
 const tools: Record<ToolId, ToolDefinition> = {
+  none: {
+    icon: "none",
+    title: ""
+  },
   bold: {
     icon: "bold",
     title: "Bold"

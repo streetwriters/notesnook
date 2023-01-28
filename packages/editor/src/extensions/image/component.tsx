@@ -175,22 +175,13 @@ export function ImageComponent(
                   >
                     <ToolbarGroup
                       editor={editor}
-                      tools={
-                        float
-                          ? [
-                              "downloadAttachment",
-                              "imageAlignLeft",
-                              "imageAlignRight",
-                              "imageProperties"
-                            ]
-                          : [
-                              "downloadAttachment",
-                              "imageAlignLeft",
-                              "imageAlignCenter",
-                              "imageAlignRight",
-                              "imageProperties"
-                            ]
-                      }
+                      tools={[
+                        hash ? "downloadAttachment" : "none",
+                        "imageAlignLeft",
+                        float ? "none" : "imageAlignCenter",
+                        "imageAlignRight",
+                        "imageProperties"
+                      ]}
                       sx={{
                         boxShadow: "menu",
                         borderRadius: "default",
