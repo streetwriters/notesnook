@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { createContext, useContext, useMemo } from "react";
 import { ThemeLight } from "./themes/light";
-import { Theme, ThemeScopes } from "./types";
+import { Theme, ThemeScopes, VariantsWithStaticColors } from "./types";
 
 const ThemeContext = createContext<{
   theme: Theme;
@@ -32,8 +32,12 @@ const ThemeScope = createContext<keyof ThemeScopes>("base");
 const useCurrentThemeScope = () => useContext(ThemeScope);
 
 export const useThemeColors = (
-  scope?: keyof ThemeScopes,
-) => {
+  scope?: keyof ThemeScopes
+): {
+  colors: VariantsWithStaticColors<true>;
+  scope: string;
+  isDark: boolean;
+} => {
   const currentScope = useCurrentThemeScope();
   const { theme } = useThemeProvider();
   const themeScope = useMemo(
@@ -43,40 +47,42 @@ export const useThemeColors = (
 
   const currentTheme = useMemo(
     () => ({
-      primary: {
-        ...theme.scopes.base.primary,
-        ...themeScope.primary
-      },
-      secondary: {
-        ...theme.scopes.base.secondary,
-        ...themeScope.secondary
-      },
-      disabled: {
-        ...theme.scopes.base.disabled,
-        ...themeScope.disabled
-      },
-      error: {
-        ...theme.scopes.base.error,
-        ...themeScope.error
-      },
-      warning: {
-        ...theme.scopes.base.warning,
-        ...themeScope.warning
-      },
-      success: {
-        ...theme.scopes.base.success,
-        ...themeScope.success
-      },
-      static: {
-        red: "#f44336",
-        orange: "#FF9800",
-        yellow: "#FFD600",
-        green: "#4CAF50",
-        blue: "#2196F3",
-        purple: "#673AB7",
-        gray: "#9E9E9E",
-        black: "#000000",
-        white: "#ffffff"
+      colors: {
+        primary: {
+          ...theme.scopes.base.primary,
+          ...themeScope.primary
+        },
+        secondary: {
+          ...theme.scopes.base.secondary,
+          ...themeScope.secondary
+        },
+        disabled: {
+          ...theme.scopes.base.disabled,
+          ...themeScope.disabled
+        },
+        error: {
+          ...theme.scopes.base.error,
+          ...themeScope.error
+        },
+        warning: {
+          ...theme.scopes.base.warning,
+          ...themeScope.warning
+        },
+        success: {
+          ...theme.scopes.base.success,
+          ...themeScope.success
+        },
+        static: {
+          red: "#f44336",
+          orange: "#FF9800",
+          yellow: "#FFD600",
+          green: "#4CAF50",
+          blue: "#2196F3",
+          purple: "#673AB7",
+          gray: "#9E9E9E",
+          black: "#000000",
+          white: "#ffffff"
+        }
       },
       isDark: theme.colorScheme === "dark",
       scope: currentScope

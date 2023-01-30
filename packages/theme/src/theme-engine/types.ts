@@ -27,7 +27,21 @@ export type Colors = {
   placeholder: string;
   hover: string;
   shade: string;
-};
+
+export type VariantsWithStaticColors<TRequired extends boolean = false> =
+  Variants<TRequired> & {
+    static: {
+      red: string;
+      orange: string;
+      yellow: string;
+      green: string;
+      blue: string;
+      purple: string;
+      gray: string;
+      black: string;
+      white: string;
+    };
+  };
 
 export type Variants<TRequired extends boolean = false> = {
   primary: TRequired extends true ? Colors : Partial<Colors>;
