@@ -127,14 +127,6 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
   const isUserPremium = useIsUserPremium();
 
   useEffect(() => {
-    setSelectedDays([]);
-  }, [recurringMode, mode]);
-
-  useEffect(() => {
-    setRecurringMode(RecurringModes.DAY);
-  }, [mode]);
-
-  useEffect(() => {
     if (!reminderId) return;
     const reminder = db.reminders?.reminder(reminderId);
     if (!reminder) return;
@@ -260,6 +252,8 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
               onChange={() => {
                 if (m.premium && !isUserPremium) return;
                 setMode(m.id);
+                setRecurringMode(RecurringModes.DAY);
+                setSelectedDays([]);
               }}
             />
             {m.title}
