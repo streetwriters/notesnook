@@ -58,7 +58,7 @@ import {
 } from "../services/event-manager";
 import { useEditorStore } from "../stores/use-editor-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
+import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import { setWidthHeight } from "../utils";
 import {
   eClearEditor,
@@ -435,7 +435,9 @@ const _TabsHolder = () => {
                 : widths[!introCompleted ? "mobile" : deviceMode]?.a
             }}
           >
-            <SideMenu />
+            <ScopedThemeProvider value="navigationMenu">
+              <SideMenu />
+            </ScopedThemeProvider>
           </View>
 
           <View
@@ -467,11 +469,14 @@ const _TabsHolder = () => {
                 ref={overlayRef}
               />
             ) : null}
-
-            <NavigationStack />
+            <ScopedThemeProvider value="list">
+              <NavigationStack />
+            </ScopedThemeProvider>
           </View>
 
-          <EditorWrapper key="3" width={widths} dimensions={dimensions} />
+          <ScopedThemeProvider value="editor">
+            <EditorWrapper key="3" width={widths} dimensions={dimensions} />
+          </ScopedThemeProvider>
         </FluidTabs>
       ) : null}
     </View>

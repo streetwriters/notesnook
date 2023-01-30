@@ -47,7 +47,7 @@ export const Header = React.memo(
           <View
             style={{
               padding: 12,
-              backgroundColor: colors.errorBg,
+              backgroundColor: colors.error.background,
               width: "95%",
               alignSelf: "center",
               borderRadius: 5,
