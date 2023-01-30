@@ -449,27 +449,28 @@ const _TabsHolder = () => {
                 : widths[!introCompleted ? "mobile" : deviceMode]?.b
             }}
           >
-            {deviceMode === "mobile" ? (
-              <Animated.View
-                onTouchEnd={() => {
-                  tabBarRef.current?.closeDrawer();
-                  animatedOpacity.value = withTiming(0);
-                  animatedTranslateY.value = withTiming(-9999);
-                }}
-                style={[
-                  {
-                    position: "absolute",
-                    width: "100%",
-                    height: "100%",
-                    zIndex: 999,
-                    backgroundColor: "rgba(0,0,0,0.2)"
-                  },
-                  animatedStyle
-                ]}
-                ref={overlayRef}
-              />
-            ) : null}
             <ScopedThemeProvider value="list">
+              {deviceMode === "mobile" ? (
+                <Animated.View
+                  onTouchEnd={() => {
+                    tabBarRef.current?.closeDrawer();
+                    animatedOpacity.value = withTiming(0);
+                    animatedTranslateY.value = withTiming(-9999);
+                  }}
+                  style={[
+                    {
+                      position: "absolute",
+                      width: "100%",
+                      height: "100%",
+                      zIndex: 999,
+                      backgroundColor: "rgba(0,0,0,0.2)"
+                    },
+                    animatedStyle
+                  ]}
+                  ref={overlayRef}
+                />
+              ) : null}
+
               <NavigationStack />
             </ScopedThemeProvider>
           </View>

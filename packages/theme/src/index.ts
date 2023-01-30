@@ -29,6 +29,7 @@ export {
 export { ThemeDark } from "./theme-engine/themes/dark";
 export { ThemeLight } from "./theme-engine/themes/light";
 export { ThemePitchBlack } from "./theme-engine/themes/pitch-black";
+export {ThemeDracula} from "./theme-engine/themes/dracula";
 export type {
   ThemeScopes,
   Colors,
