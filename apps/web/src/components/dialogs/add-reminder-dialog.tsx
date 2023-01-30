@@ -306,13 +306,13 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                   <Button
                     key={day}
                     variant="tool"
-                    data-test-id={`day-${i}`}
+                    data-test-id={`day-${day}`}
                     onClick={() => {
                       setSelectedDays((days) => {
                         const clone = days.slice();
-                        if (clone.indexOf(i) > -1)
-                          clone.splice(clone.indexOf(i), 1);
-                        else clone.push(i);
+                        if (clone.indexOf(day) > -1)
+                          clone.splice(clone.indexOf(day), 1);
+                        else clone.push(day);
                         return clone;
                       });
                     }}
@@ -322,8 +322,8 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                       px: 2,
                       flexShrink: 0,
                       textAlign: "left",
-                      bg: selectedDays.includes(i) ? "shade" : "bgSecondary",
-                      color: selectedDays.includes(i) ? "primary" : "text"
+                      bg: selectedDays.includes(day) ? "shade" : "bgSecondary",
+                      color: selectedDays.includes(day) ? "primary" : "text"
                     }}
                   >
                     {mode.id === "week" ? WEEK_DAYS[i] : day}
@@ -431,7 +431,7 @@ function getSelectedDaysText(
       const joinWith = isSecondLast ? " & " : isLast ? "" : ", ";
       return recurringMode === RecurringModes.WEEK
         ? WEEK_DAYS[day] + joinWith
-        : `${day + 1}${nth(day + 1)} ${joinWith}`;
+        : `${day}${nth(day)} ${joinWith}`;
     })
     .join("");
   return text;
