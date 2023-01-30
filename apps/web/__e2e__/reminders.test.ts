@@ -167,3 +167,27 @@ test("enable a disabled reminder", async ({ page }) => {
   expect(await reminders.findGroup("Active")).toBeDefined();
   expect(await reminder?.isDisabled()).toBeFalsy();
 });
+
+test("editing a weekly recurring reminder should not revert it to daily", async ({
+  page
+}) => {
+  const RECURRING_REMINDER: Partial<Reminder> = {
+    ...ONE_TIME_REMINDER,
+    recurringMode: "week",
+    selectedDays: [0, 2],
+    mode: "repeat"
+  };
+
+  const app = new AppModel(page);
+  await app.goto();
+  const reminders = await app.goToReminders();
+  const reminder = await reminders.createReminderAndWait(RECURRING_REMINDER);
+
+  await reminder?.edit({
+    description: "An edited reminder"
+  });
+
+  expect(await reminder?.isPresent()).toBe(true);
+  expect(await reminder?.getRecurringMode()).toBe("Weekly");
+  expect(await reminder?.getDescription()).toBe("An edited reminder");
+});
