@@ -22,18 +22,9 @@ import Dialog from "./dialog";
 import { getHomeRoute, hardNavigate } from "../../navigation";
 import { appVersion } from "../../utils/version";
 import Config from "../../utils/config";
-import { isTesting } from "../../utils/platform";
+import { isDesktop, isTesting } from "../../utils/platform";
 import { useEffect } from "react";
-import {
-  ArrowRight,
-  Checkmark,
-  Icon,
-  MfaEmail,
-  PDF,
-  Reminders,
-  SyncOff,
-  Warn
-} from "../icons";
+import { ArrowRight, Checkmark, Icon, Warn } from "../icons";
 
 type CallToAction = {
   title: string;
@@ -98,33 +89,20 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [
+      : isDesktop()
+      ? [
           {
-            title: "Cross-platform reminders 🔔",
-            icon: Reminders,
+            title: "Multi-language spell check",
             subtitle:
-              "Finally reminders are here. You can set reminders on notes or independently. Go to Side Menu > Reminders to set your first reminder"
+              "Spell checking support is finally here. You can enable/disable & add new languages support from settings. The spell checker supports multiple languages at once so feel free to add as many as you'd like."
           },
           {
-            title: "Multi-factor auth default",
-            icon: MfaEmail,
+            title: "Better OS integration",
             subtitle:
-              "2FA via email is enabled by default for all users to improve login security."
-          },
-          {
-            title: "Granular sync controls",
-            icon: SyncOff,
-            subtitle: `We are giving you full control over the whole syncing process.
-                Disable auto sync, real-time editor sync or all kinds of sync —
-                it's up to you.`
-          },
-          {
-            title: "Improved PDF & HTML exports",
-            icon: PDF,
-            subtitle:
-              "Tables, checklists, codeblocks & quotes are now properly formatted & styled in PDF & HTML exports."
+              "Notesnook now supports all the standard desktop integration features like auto start on startup, minimize to system tray, shortcuts from jumplist, dock menu etc. There are some other goodies as well like native notifications for reminders."
           }
-        ],
+        ]
+      : [],
     cta: {
       title: "Got it",
       icon: Checkmark,
