@@ -39,10 +39,9 @@ type FlexibleIcon<TFormat extends Formats> = TFormat extends "ico"
 
 const RESOURCES_DIR = isDevelopment()
   ? process.cwd()
-  : path.join(
-      path.dirname(process.execPath),
-      process.platform === "darwin" ? "Resources" : "resources"
-    );
+  : process.platform === "darwin"
+  ? path.normalize(path.join(path.dirname(process.execPath), "..", "Resources"))
+  : path.join(path.dirname(process.execPath), "resources");
 
 const prefixes = ["", ".dark"];
 const icons = [

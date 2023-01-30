@@ -53,8 +53,8 @@ export class WindowState {
       storageKey: "windowState",
       maximize: true,
       fullScreen: true,
-      defaultHeight: 800,
-      defaultWidth: 600,
+      defaultWidth: 1024,
+      defaultHeight: 700,
       ...options
     };
 
