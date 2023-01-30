@@ -668,7 +668,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
     >
       <AuthField
         id="code"
-        type="number"
+        type={selectedMethod !== "recoveryCode" ? "number" : "text"}
         autoComplete={"one-time-code"}
         label={texts.label}
         autoFocus
