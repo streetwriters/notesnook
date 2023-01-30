@@ -271,7 +271,10 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                 key={mode.id}
                 variant="tool"
                 data-test-id={`recurring-mode-${mode.id}`}
-                onClick={() => setRecurringMode(mode.id)}
+                onClick={() => {
+                  setRecurringMode(mode.id);
+                  setSelectedDays([]);
+                }}
                 sx={{
                   borderRadius: 100,
                   py: 1,
