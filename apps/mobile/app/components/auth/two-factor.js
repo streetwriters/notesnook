@@ -39,7 +39,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { useCallback } from "react";
 
 const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const code = useRef();
   const [currentMethod, setCurrentMethod] = useState({
     method: mfaInfo?.primaryMethod,

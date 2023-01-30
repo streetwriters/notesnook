@@ -58,7 +58,7 @@ export const ColorSection = React.memo(
 
 const ColorItem = React.memo(
   function ColorItem({ item, alias }) {
-    const colors = useThemeColors();
+    const { colors, isDark } = useThemeColors();
     const setColorNotes = useMenuStore((state) => state.setColorNotes);
     const [headerTextState, setHeaderTextState] = useState(null);
     alias = db.colors.alias(item.id) || "";
@@ -117,7 +117,7 @@ const ColorItem = React.memo(
         }
         onLongPress={onLongPress}
         customSelectedColor={COLORS_NOTE[item.title.toLowerCase()]}
-        customAlpha={!colors.isDark ? -0.02 : 0.02}
+        customAlpha={!isDark ? -0.02 : 0.02}
         customOpacity={0.12}
         onPress={() => onPress(item)}
         customStyle={{

@@ -29,7 +29,7 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 export const Synced = ({ item, close }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const lastSynced = useUserStore((state) => state.lastSynced);
 

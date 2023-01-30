@@ -33,7 +33,7 @@ import { AttachmentItem } from "./attachment-item";
 import { FlatList } from "react-native-actions-sheet";
 
 export const AttachmentDialog = ({ data }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [note, setNote] = useState(data);
   const [attachments, setAttachments] = useState(
     data

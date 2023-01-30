@@ -25,7 +25,7 @@ import { SIZE } from "../../utils/size";
 import { SectionItem } from "./section-item";
 import { SettingSection } from "./types";
 export const SectionGroup = ({ item }: { item: SettingSection }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const current = item.useHook && item.useHook();
   const isHidden = item.hidden && item.hidden(current);
   return isHidden ? null : (

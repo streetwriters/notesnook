@@ -93,7 +93,7 @@ const List = ({
   handlers,
   ScrollComponent
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const scrollRef = useRef();
   const [notesListMode, notebooksListMode] = useSettingStore((state) => [
     state.settings.notesListMode,

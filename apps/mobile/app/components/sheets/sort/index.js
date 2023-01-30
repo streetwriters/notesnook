@@ -31,7 +31,7 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 const Sort = ({ type, screen }) => {
   const isTopicSheet = screen === "TopicSheet";
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [groupOptions, setGroupOptions] = useState(
     db.settings.getGroupOptions(type)
   );

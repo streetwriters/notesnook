@@ -37,7 +37,7 @@ export type FeatureType = {
 };
 
 const NewFeature = ({ features }: { features: FeatureType[] }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   return (
     <View

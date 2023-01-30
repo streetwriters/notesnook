@@ -38,7 +38,7 @@ import RecoveryKeySheet from "../sheets/recovery-key";
 import RestoreDataSheet from "../sheets/restore-data";
 
 const DialogProvider = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const loading = useNoteStore((state) => state.loading);
 
   return (

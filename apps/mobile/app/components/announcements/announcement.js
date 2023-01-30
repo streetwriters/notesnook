@@ -25,7 +25,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { allowedOnPlatform, renderItem } from "./functions";
 
 export const Announcement = ({ color }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const announcements = useMessageStore((state) => state.announcements);
   let announcement = announcements.length > 0 ? announcements[0] : null;
   const selectionMode = useSelectionStore((state) => state.selectionMode);

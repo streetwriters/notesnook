@@ -98,7 +98,7 @@ const NoteItem = ({
   dateBy = "dateCreated",
   noOpen = false
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const notesListMode = useSettingStore(
     (state) => state.settings.notesListMode
   );

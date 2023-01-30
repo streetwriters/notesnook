@@ -45,7 +45,7 @@ const LoginSteps = {
 };
 
 export const Login = ({ changeMode }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [focused, setFocused] = useState(false);
   const {
     step,

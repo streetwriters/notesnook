@@ -37,7 +37,7 @@ export const Header = React.memo(
     noAnnouncement,
     warning
   }) => {
-    const colors = useThemeColors();
+    const { colors } = useThemeColors();
     const announcements = useMessageStore((state) => state.announcements);
     const selectionMode = useSelectionStore((state) => state.selectionMode);
 

@@ -52,7 +52,7 @@ import { sanitizeFilename } from "../../utils/sanitizer";
 // }
 
 export default function DebugLogs() {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const { seconds, start } = useTimer("debug_logs_timer");
   const [logs, setLogs] = useState<
     {

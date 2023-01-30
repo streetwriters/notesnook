@@ -95,7 +95,7 @@ export default function ReminderSheet({
   reminder,
   reference
 }: ReminderSheetProps) {
-  const colors = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const [reminderMode, setReminderMode] = useState<Reminder["mode"]>(
     reminder?.mode || "once"
   );
@@ -463,9 +463,9 @@ export default function ReminderSheet({
               date={date}
               maximumDate={dayjs(date).add(3, "months").toDate()}
               onDateChange={handleConfirm}
-              textColor={colors.isDark ? colors.static.white : colors.static.black}
+              textColor={isDark ? colors.static.white : colors.static.black}
               fadeToColor={colors.primary.background}
-              theme={colors.isDark ? "dark" : "light"}
+              theme={isDark ? "dark" : "light"}
               is24hourSource="locale"
               androidVariant="nativeAndroid"
               mode={reminderMode === ReminderModes.Repeat ? "time" : "datetime"}

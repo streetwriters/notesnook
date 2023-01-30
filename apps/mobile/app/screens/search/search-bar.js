@@ -29,7 +29,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 export const SearchBar = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [value, setValue] = useState(null);
   const inputRef = useRef();
   const setSearchResults = useSearchStore((state) => state.setSearchResults);

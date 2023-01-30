@@ -60,7 +60,7 @@ export const MoveNotes = ({
   selectedTopic?: TopicType;
   fwdRef: RefObject<ActionSheetRef>;
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [currentNotebook, setCurrentNotebook] = useState(notebook);
   const { height } = useWindowDimensions();
   let notes = db.notes?.all as NoteType[];

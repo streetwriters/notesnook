@@ -33,7 +33,7 @@ import { PressableButton } from "../ui/pressable";
 import {useThemeColors} from "@notesnook/theme";
 
 export const ColorTags = ({ item }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [note, setNote] = useState(item);
   const setColorNotes = useMenuStore((state) => state.setColorNotes);
   const isTablet = useSettingStore((state) => state.deviceMode) !== "mobile";

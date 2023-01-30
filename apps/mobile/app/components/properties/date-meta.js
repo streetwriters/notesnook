@@ -24,7 +24,7 @@ import { SIZE } from "../../utils/size";
 import { timeConverter } from "../../utils/time";
 import Paragraph from "../ui/typography/paragraph";
 export const DateMeta = ({ item }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   const getNameFromKey = (key) => {
     switch (key) {

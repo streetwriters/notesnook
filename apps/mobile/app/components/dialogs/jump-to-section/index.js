@@ -41,7 +41,7 @@ import { useCallback } from "react";
 const offsets = [];
 let timeout = null;
 const JumpToSectionDialog = ({ scrollRef, data, type }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const notes = data;
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);

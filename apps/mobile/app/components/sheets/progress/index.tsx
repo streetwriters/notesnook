@@ -28,7 +28,7 @@ import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 export const Progress = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const { progress } = useSyncProgress();
   const [currentProgress, setCurrentProgress] = useState(0.1);
 

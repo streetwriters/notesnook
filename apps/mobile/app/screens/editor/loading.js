@@ -39,7 +39,7 @@ import { eClearEditor } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { editorState } from "./tiptap/utils";
 const EditorOverlay = ({ editorId = "", editor }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [error, setError] = useState(false);
   const opacity = useSharedValue(1);
   const translateValue = useSharedValue(0);

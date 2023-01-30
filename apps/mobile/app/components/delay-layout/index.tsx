@@ -42,7 +42,7 @@ export default function DelayLayout({
   animated = true,
   ...props
 }: IDelayLayoutProps) {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const loading = useDelayLayout(
     !props.delay || props.delay < 300 ? 300 : props.delay
   );

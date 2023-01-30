@@ -61,7 +61,7 @@ import { deleteItems } from "../utils/functions";
 import { sleep } from "../utils/time";
 
 export const useActions = ({ close = () => null, item }) => {
-  const colors = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const clearSelection = useSelectionStore((state) => state.clearSelection);
   const setSelectedItem = useSelectionStore((state) => state.setSelectedItem);
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
@@ -725,7 +725,7 @@ export const useActions = ({ close = () => null, item }) => {
       icon: "theme-light-dark",
       func: switchTheme,
       switch: true,
-      on: colors.isDark ? true : false,
+      on: isDark ? true : false,
       close: false,
       pro: true
     },

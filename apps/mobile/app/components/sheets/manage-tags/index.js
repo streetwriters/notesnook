@@ -32,7 +32,7 @@ import { PressableButton } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 const ManageTagsSheet = (props) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [note, setNote] = useState(props.note);
   const allTags = useTagStore((state) => state.tags);
   const [tags, setTags] = useState([]);
@@ -198,7 +198,7 @@ ManageTagsSheet.present = (note) => {
 export default ManageTagsSheet;
 
 const TagItem = ({ tag, note, setNote }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   const onPress = async () => {
     let prevNote = { ...note };

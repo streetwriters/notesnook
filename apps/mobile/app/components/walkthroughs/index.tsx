@@ -36,7 +36,7 @@ export const Walkthrough = ({
   steps: TStep[];
   canSkip: boolean;
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [step, setStep] = useState<TStep>(steps && steps[0]);
 
   const next = () => {

@@ -44,7 +44,7 @@ import { CompactFeatures } from "./compact-features";
 import { Offer } from "./offer";
 
 export const Expiring = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState({
     title: "Your trial is ending soon",

@@ -33,7 +33,7 @@ export const FeatureBlock = ({
   pro,
   proTagBg
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   return vertical ? (
     <View

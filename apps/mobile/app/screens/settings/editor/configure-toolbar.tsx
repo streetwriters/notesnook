@@ -32,7 +32,7 @@ import { DragState, useDragState } from "./state";
 export const ConfigureToolbar = () => {
   const data = useDragState((state) => state.data);
   const preset = useDragState((state) => state.preset);
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   const renderGroups = () => {
     return data?.map((item, index) => (

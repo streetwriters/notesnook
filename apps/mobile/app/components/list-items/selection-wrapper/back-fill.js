@@ -24,7 +24,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { hexToRGBA } from "../../../utils/color-scheme/utils";
 
 export const Filler = ({ item }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   const currentEditingNote = useEditorStore(
     (state) => state.currentEditingNote

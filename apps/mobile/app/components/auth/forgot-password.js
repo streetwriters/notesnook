@@ -34,7 +34,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
 export const ForgotPassword = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const email = useRef();
   const emailInputRef = useRef();
   const [error, setError] = useState(false);

@@ -37,7 +37,7 @@ import { editorRef } from "../../utils/global-refs";
 import { ProgressBar } from "./progress";
 import { editorController, editorState, textInput } from "./tiptap/utils";
 export const EditorWrapper = ({ width }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const loading = false;
   const insets = useGlobalSafeAreaInsets();

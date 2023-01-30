@@ -30,7 +30,7 @@ import { useState } from "react";
 import { eCloseLoading, eOpenLoading } from "../../../utils/events";
 
 export const LoadingDialog = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {

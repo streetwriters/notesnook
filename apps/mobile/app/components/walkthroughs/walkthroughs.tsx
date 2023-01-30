@@ -57,7 +57,7 @@ export type TStep = {
 };
 
 const NotebookWelcome = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const data = useRotator([
     {
       title: "Work and office",

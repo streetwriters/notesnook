@@ -109,7 +109,7 @@ const RestoreDataSheet = () => {
 export default RestoreDataSheet;
 
 const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [backupDirectoryAndroid, setBackupDirectoryAndroid] = useState(false);

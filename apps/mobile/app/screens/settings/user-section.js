@@ -38,7 +38,7 @@ export const getTimeLeft = (t2) => {
 };
 
 const SettingsUserSection = ({ item }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const lastSynced = useUserStore((state) => state.lastSynced);
 

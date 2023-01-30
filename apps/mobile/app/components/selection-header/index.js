@@ -38,7 +38,7 @@ import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
 
 export const SelectionHeader = React.memo(() => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const selectedItemsList = useSelectionStore(
     (state) => state.selectedItemsList

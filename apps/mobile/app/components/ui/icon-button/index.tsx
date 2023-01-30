@@ -59,7 +59,7 @@ export const IconButton = ({
   tooltipPosition = TOOLTIP_POSITIONS.TOP,
   ...restProps
 }: IconButtonProps) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   const _onLongPress = (event: GestureResponderEvent) => {
     if (onLongPress) {

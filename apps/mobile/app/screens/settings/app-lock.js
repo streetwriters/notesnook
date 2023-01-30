@@ -40,7 +40,7 @@ import { useUserStore } from "../../stores/use-user-store";
 import { getElevation } from "../../utils";
 import { SIZE } from "../../utils/size";
 const AppLock = ({ route }) => {
-  const colors = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const appLockMode = useSettingStore((state) => state.settings.appLockMode);
   const [step, setStep] = useState(0);
   const welcome = route?.params?.welcome;
@@ -223,7 +223,7 @@ const AppLock = ({ route }) => {
           <WelcomeNotice />
         )}
 
-        {welcome && !colors.isDark ? (
+        {welcome && !isDark ? (
           <BouncingView
             style={{
               position: "absolute",

@@ -48,7 +48,7 @@ export const NotebookItem = ({
   dateBy,
   totalNotes
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const notebooksListMode = useSettingStore(
     (state) => state.settings.notebooksListMode
   );

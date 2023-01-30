@@ -28,7 +28,7 @@ export const Offer = ({
   text = "on yearly plan, offer ends soon",
   padding = 0
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   return (
     <Paragraph

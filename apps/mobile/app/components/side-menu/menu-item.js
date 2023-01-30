@@ -34,7 +34,7 @@ import Tag from "../ui/tag";
 
 export const MenuItem = React.memo(
   function MenuItem({ item, index, testID, rightBtn }) {
-    const colors = useThemeColors();
+    const { colors } = useThemeColors();
     const [headerTextState, setHeaderTextState] = useState(
       useNavigationStore.getState().currentScreen
     );

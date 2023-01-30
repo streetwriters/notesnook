@@ -25,7 +25,7 @@ import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 export const ProgressBar = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const loading = useAttachmentStore((state) => state.loading);
   const [prog, setProg] = useState(0);
   const [visible, setVisible] = useState(false);

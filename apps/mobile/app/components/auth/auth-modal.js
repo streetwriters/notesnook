@@ -43,7 +43,7 @@ export const AuthMode = {
 };
 
 const AuthModal = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [currentAuthMode, setCurrentAuthMode] = useState(AuthMode.login);
   const actionSheetRef = useRef();

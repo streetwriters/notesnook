@@ -40,7 +40,7 @@ export const ReminderTime = ({
   style?: ViewStyle;
   checkIsActive?: boolean;
 } & ButtonProps) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const reminder = props.reminder;
   const time = !reminder ? undefined : formatReminderTime(reminder);
   const isTodayOrTomorrow =

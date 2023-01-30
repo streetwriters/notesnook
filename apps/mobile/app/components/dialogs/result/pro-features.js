@@ -31,7 +31,7 @@ import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import Paragraph from "../../ui/typography/paragraph";
 export const ProFeatures = ({ count = 6 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   return (
     <>

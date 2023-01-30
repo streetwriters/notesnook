@@ -72,7 +72,7 @@ export const useButton = ({
   selected: string;
   colorOpacity?: number;
 } => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const buttonTypes: {
     [name: string]: {
       primary: string;
@@ -161,7 +161,7 @@ export const PressableButton = ({
   fwdRef,
   hidden
 }: PressableButtonProps) => {
-  const colors = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const { primary, selected, colorOpacity } = useButton({
     type,
     accent: accentColor,
@@ -174,7 +174,7 @@ export const PressableButton = ({
     : type === "accent"
     ? 1
     : colorOpacity;
-  const alpha = customAlpha ? customAlpha : colors.isDark ? 0.04 : -0.04;
+  const alpha = customAlpha ? customAlpha : isDark ? 0.04 : -0.04;
 
   const getStyle = useCallback(
     ({ pressed }: PressableStateCallbackType): ViewStyle | ViewStyle[] => [

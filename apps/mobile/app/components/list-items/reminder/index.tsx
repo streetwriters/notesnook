@@ -41,7 +41,7 @@ const ReminderItem = React.memo(
     index: number;
     isSheet: boolean;
   }) => {
-    const colors = useThemeColors();
+    const { colors } = useThemeColors();
     const openReminder = () => {
       ReminderSheet.present(item, undefined, isSheet);
     };

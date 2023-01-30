@@ -37,7 +37,7 @@ import NotePreview from "./preview";
 export default function NoteHistory({ note, fwdRef }) {
   const [history, setHistory] = useState([]);
   const [_loading, setLoading] = useState(true);
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   useEffect(() => {
     (async () => {

@@ -50,7 +50,7 @@ export const Tool = ({
   ]);
   const [_recieving, setRecieving] = React.useState(false);
   const [recievePosition, setRecievePosition] = React.useState("above");
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const isSubgroup = typeof item === "object";
   const isDragged = !dragged
     ? false

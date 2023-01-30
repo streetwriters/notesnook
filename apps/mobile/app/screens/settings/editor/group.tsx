@@ -58,7 +58,7 @@ export const Group = ({
     height: 0,
     width: 0
   });
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   const onDrop = (data: DraxDragWithReceiverEventData) => {
     if (!PremiumService.get()) {

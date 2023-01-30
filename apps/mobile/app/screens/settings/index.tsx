@@ -55,7 +55,7 @@ const SettingsStack = createNativeStackNavigator<RouteParams>();
 // };
 
 export const Settings = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   return (
     <SettingsStack.Navigator
       initialRouteName="SettingsHome"

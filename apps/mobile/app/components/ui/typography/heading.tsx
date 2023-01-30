@@ -41,7 +41,7 @@ const Heading = ({
   animated,
   ...restProps
 }: HeadingProps) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const Component = useMemo(() => (animated ? AnimatedText : Text), [animated]);
 
   return (

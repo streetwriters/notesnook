@@ -27,7 +27,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 export const AutomaticBackupsSelector = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const settings = useSettingStore((state) => state.settings);
   const updateAskForBackup = async () => {
     SettingsService.set({

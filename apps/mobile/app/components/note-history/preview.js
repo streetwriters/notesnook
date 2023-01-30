@@ -38,7 +38,7 @@ import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
 
 export default function NotePreview({ session, content, note }) {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const editorId = ":noteHistory";
 
   async function restore() {

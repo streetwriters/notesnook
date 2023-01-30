@@ -41,7 +41,7 @@ export const FloatingButton = ({
   color,
   shouldShow = false
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const translate = useSharedValue(0);

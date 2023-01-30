@@ -40,7 +40,7 @@ export const Empty = React.memo(
     type,
     screen
   }) {
-    const colors = useThemeColors();
+    const { colors } = useThemeColors();
     const insets = useGlobalSafeAreaInsets();
     const { height } = useWindowDimensions();
     const introCompleted = useSettingStore(

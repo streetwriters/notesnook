@@ -35,7 +35,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { useNetInfo } from "@react-native-community/netinfo";
 export const UserStatus = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const syncing = useUserStore((state) => state.syncing);
   const lastSyncStatus = useUserStore((state) => state.lastSyncStatus);

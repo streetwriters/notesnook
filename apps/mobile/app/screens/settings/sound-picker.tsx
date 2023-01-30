@@ -46,7 +46,7 @@ const SoundItem = ({
   index: number;
   setPlaying: (sound: Sound | undefined) => void;
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const isPlaying = playingSoundId === item.soundID;
   return (
     <PressableButton

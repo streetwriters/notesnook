@@ -35,7 +35,7 @@ const SelectionWrapper = ({
   isSheet
 }) => {
   const itemId = useRef(item.id);
-  const colors = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const notebooksListMode = useSettingStore(
     (state) => state.settings.notebooksListMode
   );
@@ -68,7 +68,7 @@ const SelectionWrapper = ({
       onLongPress={_onLongPress}
       onPress={_onPress}
       customSelectedColor={colors.primary.hover}
-      customAlpha={!colors.isDark ? -0.02 : 0.02}
+      customAlpha={!isDark ? -0.02 : 0.02}
       customOpacity={1}
       customStyle={{
         flexDirection: "row",

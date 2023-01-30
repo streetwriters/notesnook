@@ -25,7 +25,7 @@ import { COLORS_NOTE } from "../../utils/color-scheme";
 import { hexToRGBA } from "../../utils/color-scheme/utils";
 
 export const DefaultPlaceholder = ({ color }: { color: string }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const message = useMessageStore((state) => state.message);
   const annoucements = useMessageStore((state) => state.announcements);
   const hasAnnoucements = annoucements.length > 0;

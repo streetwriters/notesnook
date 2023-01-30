@@ -41,7 +41,7 @@ import { useCallback } from "react";
 
 export const SectionHeader = React.memo(
   function SectionHeader({ item, index, type, color, screen }) {
-    const colors = useThemeColors();
+    const { colors } = useThemeColors();
     const { fontScale } = useWindowDimensions();
     const [groupOptions, setGroupOptions] = useState(
       db.settings?.getGroupOptions(type)

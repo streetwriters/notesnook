@@ -51,7 +51,7 @@ export const hideAllTooltips = async () => {
  * @returns
  */
 const useTooltip = () => {
-  const colors = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const parent = useRef();
   const keyboard = useKeyboard();
 
@@ -79,7 +79,7 @@ const useTooltip = () => {
       //TipManager.markPopupUsed(popup.id);
       RNTooltips.Show(target.current, parent.current, {
         text: popup.text,
-        tintColor: colors.isDark ? colors.secondary.background : "#404040",
+        tintColor: isDark ? colors.secondary.background : "#404040",
         corner: Platform.OS === "ios" ? 5 : 50,
         textSize: 15,
         position: positions[position],

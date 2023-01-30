@@ -56,7 +56,7 @@ function getObfuscatedEmail(email) {
 }
 
 export const SessionExpired = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(false);
   const { step, password, email, passwordInputRef, loading, login } = useLogin(

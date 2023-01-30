@@ -27,7 +27,7 @@ import { FeatureBlock } from "./feature";
 import { ProTag } from "./pro-tag";
 
 export const Group = ({ item, index }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   return (
     <View

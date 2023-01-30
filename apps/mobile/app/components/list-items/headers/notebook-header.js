@@ -31,7 +31,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
 export const NotebookHeader = ({ notebook, onEditNotebook }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(notebook.id)
   );

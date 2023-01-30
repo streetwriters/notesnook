@@ -72,7 +72,7 @@ export const RelationsList = ({
 }: RelationsListProps) => {
   const updater = useRelationStore((state) => state.updater);
   const [items, setItems] = useState<Reminder[]>([]);
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const hasNoRelations = !items || items.length === 0;
   useEffect(() => {
     setItems(

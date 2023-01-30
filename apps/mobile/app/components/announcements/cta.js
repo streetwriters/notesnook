@@ -33,7 +33,7 @@ import { Button } from "../ui/button";
 import { allowedOnPlatform, getStyle } from "./functions";
 
 export const Cta = ({ actions, style = {}, color, inline }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   let buttons =
     actions.filter((item) => allowedOnPlatform(item.platforms)) || [];
 

@@ -103,7 +103,7 @@ export const TagsSection = React.memo(
 
 export const PinItem = React.memo(
   function PinItem({ item, onPress, placeholder, alias }) {
-    const colors = useThemeColors();
+    const { colors } = useThemeColors();
     const setMenuPins = useMenuStore((state) => state.setMenuPins);
     alias = item?.alias || item?.title;
     const [visible, setVisible] = useState(false);

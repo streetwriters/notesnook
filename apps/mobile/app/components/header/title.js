@@ -36,7 +36,7 @@ import Tag from "../ui/tag";
 const titleState = {};
 
 export const Title = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const currentScreen = useNavigationStore((state) => state.currentScreen);
   const isNotebook = currentScreen.name === "Notebook";
   const isTopic = currentScreen?.name === "TopicNotes";

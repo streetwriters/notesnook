@@ -52,7 +52,7 @@ const Line = ({ top = 6, bottom = 6 }) => {
 };
 
 export const Properties = ({ close = () => {}, item, buttons = [] }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const alias = item.alias || item.title;
   const isColor = !!COLORS_NOTE[item.title];
 

@@ -36,7 +36,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import { ProFeatures } from "./pro-features";
 
 const ResultDialog = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState({
     title: "Thank you for signing up!",

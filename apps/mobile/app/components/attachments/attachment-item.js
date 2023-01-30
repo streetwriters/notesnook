@@ -41,7 +41,7 @@ function getFileExtension(filename) {
  * @returns
  */
 export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [currentProgress, setCurrentProgress] = useAttachmentProgress(
     attachment,
     encryption

@@ -66,7 +66,7 @@ export const PricingPlans = ({
   heading = true,
   compact = false
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const [product, setProduct] = useState(null);
   const [buying, setBuying] = useState(false);

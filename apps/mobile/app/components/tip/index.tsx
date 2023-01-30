@@ -43,7 +43,7 @@ export const Tip = ({
   noImage?: boolean;
   color?: string;
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   return tip ? (
     <View

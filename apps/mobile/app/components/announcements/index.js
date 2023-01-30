@@ -35,7 +35,7 @@ import { allowedOnPlatform, renderItem } from "./functions";
 import { useCallback } from "react";
 
 export const AnnouncementDialog = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [info, setInfo] = useState(null);
   const remove = useMessageStore((state) => state.remove);

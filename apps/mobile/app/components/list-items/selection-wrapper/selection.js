@@ -25,7 +25,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 
 export const SelectionIcon = ({ item }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const selectedItemsList = useSelectionStore(

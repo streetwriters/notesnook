@@ -24,7 +24,7 @@ import { useThemeColors } from "@notesnook/theme";
 import Paragraph from "../ui/typography/paragraph";
 
 export const ProTag = ({ width, size, background }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   return (
     <View

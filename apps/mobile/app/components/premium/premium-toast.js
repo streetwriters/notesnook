@@ -42,7 +42,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { useCallback } from "react";
 
 export const PremiumToast = ({ context = "global", offset = 0 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [msg, setMsg] = useState(null);
   const timer = useRef();
 

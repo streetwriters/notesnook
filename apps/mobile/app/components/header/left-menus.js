@@ -28,7 +28,7 @@ import { tabBarRef } from "../../utils/global-refs";
 import { IconButton } from "../ui/icon-button";
 
 export const LeftMenus = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const canGoBack = useNavigationStore((state) => state.canGoBack);
   const isTablet = deviceMode === "tablet";

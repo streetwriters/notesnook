@@ -43,7 +43,7 @@ const keyExtractor = (item: SettingSection) => item.id;
 const Home = ({
   navigation
 }: NativeStackScreenProps<RouteParams, "SettingsHome">) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [loading, setLoading] = useState(false);
 
   useNavigationFocus(navigation, {

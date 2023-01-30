@@ -82,7 +82,7 @@ export const Button = ({
   iconStyle,
   ...restProps
 }: ButtonProps) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const premium = useUserStore((state) => state.premium);
   const { text } = useButton({
     type,

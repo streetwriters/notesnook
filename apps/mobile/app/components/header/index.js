@@ -34,7 +34,7 @@ import { RightMenus } from "./right-menus";
 import { Title } from "./title";
 
 const _Header = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const insets = useGlobalSafeAreaInsets();
   const [hide, setHide] = useState(true);
   const selectionMode = useSelectionStore((state) => state.selectionMode);

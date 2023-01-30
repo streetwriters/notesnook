@@ -29,7 +29,7 @@ import { Button } from "../ui/button";
 import { PressableButton } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 export const Items = ({ item, buttons, close }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const dimensions = useSettingStore((state) => state.dimensions);
   const actions = useActions({ item, close });
   const data = actions.filter((i) => buttons.indexOf(i.id) > -1 && !i.hidden);

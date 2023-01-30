@@ -41,7 +41,7 @@ export default function ToolSheet({
   group: DraggableItem;
   fwdRef: RefObject<ActionSheetRef>;
 }) {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const data = useDragState((state) => state.data);
   const ungrouped = getUngroupedTools(data) as ToolId[];
 

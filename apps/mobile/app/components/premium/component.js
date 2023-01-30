@@ -49,7 +49,7 @@ import { Group } from "./group";
 import { PricingPlans } from "./pricing-plans";
 
 export const Component = ({ close, promo }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const userCanRequestTrial =
     user && (!user.subscription || !user.subscription.expiry) ? true : false;

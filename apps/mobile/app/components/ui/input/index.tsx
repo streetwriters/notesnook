@@ -106,7 +106,7 @@ const Input = ({
   wrapperStyle = {},
   ...restProps
 }: InputProps) => {
-  const colors = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const [error, setError] = useState(false);
   const [focus, setFocus] = useState(false);
   const [secureEntry, setSecureEntry] = useState(true);
@@ -264,7 +264,7 @@ const Input = ({
             }
             importantForAutofill="yes"
             importantForAccessibility="yes"
-            keyboardAppearance={colors.isDark ? "dark" : "light"}
+            keyboardAppearance={isDark ? "dark" : "light"}
             onFocus={onFocus}
             onSubmitEditing={onSubmit}
             style={textStyle}

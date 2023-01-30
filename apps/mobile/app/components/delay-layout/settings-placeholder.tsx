@@ -22,7 +22,7 @@ import { View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 
 export const SettingsPlaceholder = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   return (
     <View>

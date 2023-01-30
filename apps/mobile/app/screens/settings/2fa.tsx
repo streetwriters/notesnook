@@ -95,7 +95,7 @@ type MFAStepProps = {
   isSetup?: boolean;
 };
 export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
 
   const getMethods = () => {
@@ -160,7 +160,7 @@ export const MFASetup = ({
   setStep,
   recovery
 }: MFAStepProps) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const [authenticatorDetails, setAuthenticatorDetails] = useState({
     sharedKey: null,
@@ -400,7 +400,7 @@ export const MFARecoveryCodes = ({
   onSuccess,
   isSetup = true
 }: MFAStepProps) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [codes, setCodes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -578,7 +578,7 @@ const mfaSvg = (
 </svg>`;
 
 const MFASuccess = ({ recovery }: MFAStepProps) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   return (
     <View
       style={{

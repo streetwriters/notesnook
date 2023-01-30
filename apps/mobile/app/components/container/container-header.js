@@ -23,7 +23,7 @@ import { useSelectionStore } from "../../stores/use-selection-store";
 import { useThemeColors } from "@notesnook/theme";
 
 export const ContainerHeader = ({ children }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const selectionMode = useSelectionStore((state) => state.selectionMode);
 
   return !selectionMode ? (

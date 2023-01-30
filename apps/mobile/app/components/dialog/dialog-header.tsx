@@ -54,7 +54,7 @@ const DialogHeader = ({
   titlePart,
   style
 }: DialogHeaderProps) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   return (
     <>

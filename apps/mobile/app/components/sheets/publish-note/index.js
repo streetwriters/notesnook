@@ -37,7 +37,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
 const PublishNoteSheet = ({ note: item, update }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const actionSheetRef = useRef();
   const loading = useAttachmentStore((state) => state.loading);
   const [selfDestruct, setSelfDestruct] = useState(false);

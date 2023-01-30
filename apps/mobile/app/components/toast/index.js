@@ -35,7 +35,7 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 export const Toast = ({ context = "global" }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [data, setData] = useState({});
   const insets = useGlobalSafeAreaInsets();
   const hideTimeout = useRef();

@@ -44,7 +44,7 @@ import { eSendEvent } from "../../../services/event-manager";
 import { eCloseSheet } from "../../../utils/events";
 
 const ExportNotesSheet = ({ notes, update }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [exporting, setExporting] = useState(false);
   const [complete, setComplete] = useState(false);
   const [result, setResult] = useState({});

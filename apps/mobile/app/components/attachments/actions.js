@@ -49,7 +49,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
 const Actions = ({ attachment, setAttachments, fwdRef }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const contextId = attachment.metadata.hash;
   const [filename, setFilename] = useState(attachment.metadata.filename);
   const [currentProgress] = useAttachmentProgress(attachment);

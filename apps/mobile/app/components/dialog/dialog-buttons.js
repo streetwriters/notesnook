@@ -35,7 +35,7 @@ const DialogButtons = ({
   doneText,
   positiveType
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
 
   return (
     <View

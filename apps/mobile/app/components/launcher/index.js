@@ -57,7 +57,7 @@ import { Walkthrough } from "../walkthroughs";
 
 const Launcher = React.memo(
   function Launcher() {
-    const colors = useThemeColors();
+    const { colors, isDark } = useThemeColors();
     const setLoading = useNoteStore((state) => state.setLoading);
     const loading = useNoteStore((state) => state.loading);
     const user = useUserStore((state) => state.user);
@@ -255,7 +255,7 @@ const Launcher = React.memo(
             overflow: "hidden"
           }}
         >
-          <SvgView src={SVG(colors.isDark ? "white" : "black")} height={700} />
+          <SvgView src={SVG(isDark ? "white" : "black")} height={700} />
         </View>
 
         <View

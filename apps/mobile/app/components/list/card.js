@@ -28,7 +28,7 @@ import { PressableButton } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 
 export const Card = ({ color, warning }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   color = color ? color : colors.primary.accent;
   const messageBoardState = useMessageStore((state) => state.message);
   const announcement = useMessageStore((state) => state.announcement);

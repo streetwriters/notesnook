@@ -56,7 +56,7 @@ type Progress = {
 };
 
 export default function Migrate() {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [loading, setLoading] = useState(false);
   const [error, _setError] = useState<Error>();
   const [reset, setReset] = useState(false);

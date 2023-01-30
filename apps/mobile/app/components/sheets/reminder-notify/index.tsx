@@ -47,7 +47,7 @@ export default function ReminderNotify({
   update,
   reminder
 }: ReminderSheetProps) {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const references = db.relations?.to(reminder as ItemReference, "note") || [];
 
   const QuickActions = [

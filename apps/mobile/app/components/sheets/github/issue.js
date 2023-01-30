@@ -36,7 +36,7 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
 export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const body = useRef(defaultBody);
   const title = useRef(defaultTitle);
   const user = useUserStore((state) => state.user);

@@ -37,7 +37,7 @@ import {
 import { MenuItemsList } from "../../utils/constants";
 import { SIZE } from "../../utils/size";
 export const HomagePageSelector = () => {
-  const colors = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const settings = useSettingStore((state) => state.settings);
   const menuRef = useRef();
   const [width, setWidth] = useState(0);
@@ -120,7 +120,7 @@ export const HomagePageSelector = () => {
 };
 
 export const AccentColorPicker = () => {
-  const colors = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   function changeAccentColor(color) {
     switchAccentColor(color);
   }
@@ -152,11 +152,11 @@ export const AccentColorPicker = () => {
           key={item}
           customColor={
             colors.primary.accent === item
-              ? RGB_Linear_Shade(!colors.isDark ? -0.2 : 0.2, hexToRGBA(item, 1))
+              ? RGB_Linear_Shade(!isDark ? -0.2 : 0.2, hexToRGBA(item, 1))
               : item
           }
           customSelectedColor={item}
-          alpha={!colors.isDark ? -0.1 : 0.1}
+          alpha={!isDark ? -0.1 : 0.1}
           opacity={1}
           onPress={async () => {
             await PremiumService.verify(async () => {

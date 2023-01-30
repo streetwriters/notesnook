@@ -31,7 +31,7 @@ import Paragraph from "../../ui/typography/paragraph";
 
 const TagItem = React.memo(
   ({ item, index }) => {
-    const colors = useThemeColors();
+    const { colors, isDark } = useThemeColors();
     const onPress = () => {
       TaggedNotes.navigate(item, true);
     };
@@ -41,7 +41,7 @@ const TagItem = React.memo(
         onPress={onPress}
         selectedColor={colors.secondary.background}
         testID={notesnook.ids.tag.get(index)}
-        alpha={!colors.isDark ? -0.02 : 0.02}
+        alpha={!isDark ? -0.02 : 0.02}
         opacity={1}
         customStyle={{
           paddingHorizontal: 12,

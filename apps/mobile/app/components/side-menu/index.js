@@ -38,7 +38,7 @@ import { UserStatus } from "./user-status";
 
 export const SideMenu = React.memo(
   function SideMenu() {
-    const colors = useThemeColors();
+    const { colors, isDark } = useThemeColors();
     const deviceMode = useSettingStore((state) => state.deviceMode);
     const insets = useGlobalSafeAreaInsets();
     const subscriptionType = useUserStore(
@@ -51,11 +51,11 @@ export const SideMenu = React.memo(
     const noTextMode = false;
     const BottomItemsList = [
       {
-        name: colors.isDark ? "Day" : "Night",
+        name: isDark ? "Day" : "Night",
         icon: "theme-light-dark",
         func: toggleDarkMode,
         switch: true,
-        on: !!colors.isDark,
+        on: !!isDark,
         close: false
       },
       {

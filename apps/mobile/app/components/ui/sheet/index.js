@@ -41,7 +41,7 @@ const SheetWrapper = ({
   enableGesturesInScrollView = false,
   bottomPadding = true
 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const sheetKeyboardHandler = useSettingStore(
     (state) => state.sheetKeyboardHandler

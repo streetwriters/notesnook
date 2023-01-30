@@ -39,7 +39,7 @@ import { SVG } from "./background";
 import { hideAuth } from "./common";
 
 export const Signup = ({ changeMode, trial }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const email = useRef();
   const emailInputRef = useRef();
   const passwordInputRef = useRef();

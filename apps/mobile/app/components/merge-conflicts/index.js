@@ -48,7 +48,7 @@ import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 
 const MergeConflicts = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [keep, setKeep] = useState(null);
   const [copy, setCopy] = useState(null);

@@ -36,7 +36,7 @@ export const Notice = ({
   size = "large",
   selectable
 }: NoticeProps) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const isSmall = size === "small";
 
   return (
