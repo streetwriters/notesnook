@@ -68,7 +68,8 @@ function Reminder({
       footer={
         <Flex
           sx={{
-            alignItems: "center"
+            alignItems: "center",
+            gap: 1
           }}
         >
           {reminder.disabled ? (
@@ -87,7 +88,7 @@ function Reminder({
             />
           )}
           {reminder.disabled ? null : (
-            <PriorityIcon size={14} color="fontTertiary" sx={{ ml: 1 }} />
+            <PriorityIcon size={14} color="fontTertiary" />
           )}
           {reminder.mode === "repeat" && reminder.recurringMode && (
             <IconTag
