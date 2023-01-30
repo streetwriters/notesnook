@@ -127,7 +127,9 @@ jobs:
           path: ./apps/web/desktop/build
 
       - name: Install packages
-        run: npm i
+        run: |
+          npm i
+          npm i dmg-license
         working-directory: ./apps/web/desktop
       
       - name: Install provisioning profile
