@@ -627,24 +627,28 @@ function Settings() {
               />
             </Button>
 
-            <Toggle
-              title="Enable spellchecker"
-              onToggled={() => spellChecker.toggle(!spellChecker.enabled)}
-              isToggled={spellChecker.enabled}
-            />
-            {isDesktop() && getPlatform() !== "darwin" && (
-              <Button
-                variant="list"
-                onClick={async () => {
-                  await showLanguageSelectorDialog();
-                }}
-              >
-                <Tip
-                  text="Spellchecker languages"
-                  tip="Choose languages for the spellchecker"
-                  sx={{ py: 2 }}
+            {isDesktop() && (
+              <>
+                <Toggle
+                  title="Enable spellchecker"
+                  onToggled={() => spellChecker.toggle(!spellChecker.enabled)}
+                  isToggled={spellChecker.enabled}
                 />
-              </Button>
+                {getPlatform() !== "darwin" && (
+                  <Button
+                    variant="list"
+                    onClick={async () => {
+                      await showLanguageSelectorDialog();
+                    }}
+                  >
+                    <Tip
+                      text="Spellchecker languages"
+                      tip="Choose languages for the spellchecker"
+                      sx={{ py: 2 }}
+                    />
+                  </Button>
+                )}
+              </>
             )}
           </>
         )}
