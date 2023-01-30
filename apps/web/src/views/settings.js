@@ -435,25 +435,25 @@ function Settings() {
             {groups.sync && (
               <>
                 <Toggle
-                  title="Disable realtime sync in editor"
-                  onTip="You will have to manually open/close a note to see new changes."
-                  offTip="All changes in the editor will be synced & updated in realtime."
-                  onToggled={toggleRealtimeSync}
-                  isToggled={!isRealtimeSyncEnabled}
-                />
-                <Toggle
-                  title="Disable sync"
+                  title="Enable sync"
                   onTip="All changes to or from this device won't be synced."
                   offTip="All changes to or from this device will be synced."
                   onToggled={toggleSync}
-                  isToggled={!isSyncEnabled}
+                  isToggled={isSyncEnabled}
                 />
                 <Toggle
-                  title="Disable auto sync"
+                  title="Enable auto sync"
                   onTip="You will have to manually run the sync to transfer your changes to other devices."
                   offTip="All changes will automatically sync to your other device."
                   onToggled={toggleAutoSync}
-                  isToggled={!isAutoSyncEnabled}
+                  isToggled={isAutoSyncEnabled}
+                />
+                <Toggle
+                  title="Enable realtime sync in editor"
+                  onTip="You will have to manually open/close a note to see new changes."
+                  offTip="All changes in the editor will be synced & updated in realtime."
+                  onToggled={toggleRealtimeSync}
+                  isToggled={isRealtimeSyncEnabled}
                 />
                 <Button variant="list" onClick={() => sync(true, true)}>
                   <Tip
