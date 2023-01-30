@@ -33,6 +33,7 @@ export const ThemeDark: Theme = {
         paragraph: "#505050",
         icon: "#808080",
         separator: "#383838",
+        backdrop: "#35353580",
         hover: "#ffffff10",
         shade: "#00883712"
       },
@@ -45,6 +46,7 @@ export const ThemeDark: Theme = {
         paragraph: "#818589",
         icon: "#808080",
         separator: "#383838",
+        backdrop: "#35353580",
         hover: "#ffffff10",
         shade: "#00883712"
       },
@@ -57,6 +59,7 @@ export const ThemeDark: Theme = {
         paragraph: "#505050",
         icon: "#808080",
         separator: "#383838",
+        backdrop: "#35353580",
         hover: "#ffffff10",
         shade: "#00883712"
       },
@@ -69,6 +72,7 @@ export const ThemeDark: Theme = {
         paragraph: "#ff6961",
         icon: "#ff6961",
         separator: "#383838",
+        backdrop: "#35353580",
         hover: "#ffffff10",
         shade: "#00883712"
       },
@@ -81,6 +85,7 @@ export const ThemeDark: Theme = {
         paragraph: "#505050",
         icon: "#808080",
         separator: "#383838",
+        backdrop: "#35353580",
         hover: "#ffffff10",
         shade: "#00883712"
       },
@@ -93,6 +98,7 @@ export const ThemeDark: Theme = {
         paragraph: "#4F8A10",
         icon: "#4F8A10",
         separator: "#383838",
+        backdrop: "#35353580",
         hover: "#ffffff10",
         shade: "#00883712"
       }

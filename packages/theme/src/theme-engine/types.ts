@@ -27,6 +27,8 @@ export type Colors = {
   placeholder: string;
   hover: string;
   shade: string;
+  backdrop: string;
+};
 
 export type VariantsWithStaticColors<TRequired extends boolean = false> =
   Variants<TRequired> & {
