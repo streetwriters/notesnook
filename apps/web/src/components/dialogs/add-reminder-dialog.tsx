@@ -56,15 +56,7 @@ const RecurringModes = {
   DAY: "day"
 } as const;
 
-const WEEK_DAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday"
-];
+const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const modes = [
   {
     id: Modes.ONCE,
@@ -99,7 +91,7 @@ const recurringModes = [
   {
     id: RecurringModes.WEEK,
     title: "Weekly",
-    options: WEEK_DAYS
+    options: new Array(7).fill(0).map((_, i) => i)
   },
   {
     id: RecurringModes.MONTH,
@@ -305,8 +297,8 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                   display: "grid",
                   gridTemplateColumns:
                     mode.id === RecurringModes.WEEK
-                      ? "1fr 1fr 1fr"
-                      : "1fr 1fr 1fr 1fr 1fr",
+                      ? "1fr 1fr 1fr 1fr 1fr 1fr 1fr"
+                      : "1fr 1fr 1fr 1fr 1fr 1fr 1fr",
                   mt: mode.options.length > 0 ? 1 : 0,
                   maxHeight: 150,
                   overflowY: "auto",
@@ -337,7 +329,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                       color: selectedDays.includes(i) ? "primary" : "text"
                     }}
                   >
-                    {day}
+                    {mode.id === "week" ? WEEK_DAYS[i] : day}
                   </Button>
                 ))}
               </Box>
