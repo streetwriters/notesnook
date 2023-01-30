@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ThemeDark, ThemePitchBlack } from "@notesnook/theme";
 import notifee from "@notifee/react-native";
-
 import dayjs from "dayjs";
 import React from "react";
 import { Linking, Platform } from "react-native";
@@ -51,10 +51,9 @@ import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
 import { clearAllStores } from "../../stores";
-import { useSettingStore } from "../../stores/use-setting-store";
+import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { AndroidModule } from "../../utils";
-import { getColorScheme, toggleDarkMode } from "../../utils/color-scheme/utils";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import {
   eCloseSheet,
@@ -70,7 +69,6 @@ import { useDragState } from "./editor/state";
 import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-
 type User = any;
 
 export const settingsGroups: SettingSection[] = [
@@ -488,26 +486,31 @@ export const settingsGroups: SettingSection[] = [
             type: "switch",
             name: "Dark mode",
             description: "Strain your eyes no more at night",
-            property: "theme",
+            property: "colorScheme",
             icon: "brightness-6",
             modifer: () => {
-              toggleDarkMode();
+              useThemeStore.getState().setColorScheme();
             },
-            getter: () => useSettingStore.getState().settings.theme.dark
+            getter: () => useThemeStore.getState().colorScheme === "dark"
           },
           {
             id: "pitch-black",
             type: "switch",
             name: "Pitch black",
             description: "Save battery on device with amoled screen at night.",
-            property: "pitchBlack",
+            property: "darkTheme",
             modifer: () => {
-              SettingsService.set({
-                pitchBlack: !SettingsService.get().pitchBlack
-              });
-              getColorScheme();
+              useThemeStore
+                .getState()
+                .setDarkTheme(
+                  useThemeStore.getState().darkTheme.id === ThemePitchBlack.id
+                    ? ThemeDark
+                    : ThemePitchBlack
+                );
             },
-            icon: "brightness-1"
+            icon: "brightness-1",
+            getter: () =>
+              useThemeStore.getState().darkTheme.id === ThemePitchBlack.id
           }
         ]
       },

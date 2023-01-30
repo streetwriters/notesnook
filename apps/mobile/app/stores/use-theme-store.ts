@@ -19,20 +19,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Appearance } from "react-native";
 import create, { State } from "zustand";
-import { useThemeColors, ThemeType } from "@notesnook/theme";
+import { useThemeColors, ThemeDefinition } from "@notesnook/theme";
 import SettingsService from "../services/settings";
 export interface ThemeStore extends State {
   colors: Partial<ReturnType<typeof useThemeColors>>;
-  lightTheme: ThemeType;
-  darkTheme: ThemeType;
+  lightTheme: ThemeDefinition;
+  darkTheme: ThemeDefinition;
   colorScheme: "dark" | "light";
   setColors: (colors: ReturnType<typeof useThemeColors>) => void;
-  setDarkTheme: (theme: ThemeType) => void;
-  setLightTheme: (theme: ThemeType) => void;
-  setColorScheme: (colorScheme: "dark" | "light") => void;
+  setDarkTheme: (theme: ThemeDefinition) => void;
+  setLightTheme: (theme: ThemeDefinition) => void;
+  setColorScheme: (colorScheme?: "dark" | "light") => void;
 }
 
-export const useThemeStore = create<ThemeStore>((set) => ({
+export const useThemeStore = create<ThemeStore>((set, get) => ({
   colors: SettingsService.get().lighTheme.scopes["base"],
   lightTheme: SettingsService.get().lighTheme,
   darkTheme: SettingsService.get().darkTheme,
@@ -43,17 +43,27 @@ export const useThemeStore = create<ThemeStore>((set) => ({
     // TODO
     //set({ colors });
   },
-  setDarkTheme: (darkTheme: ThemeType) => {
+  setDarkTheme: (darkTheme) => {
     set({ darkTheme });
+    SettingsService.setProperty("darkTheme", darkTheme);
   },
-  setLightTheme: (lightTheme: ThemeType) => {
+  setLightTheme: (lightTheme) => {
     set({ lightTheme });
+    SettingsService.setProperty("lighTheme", lightTheme);
   },
-  setColorScheme: (colorScheme: "dark" | "light") => {
-    set({ colorScheme });
-    if (!SettingsService.get().useSystemTheme) {
+  setColorScheme: (colorScheme) => {
+    const nextColorScheme =
+      colorScheme === undefined
+        ? get().colorScheme === "dark"
+          ? "light"
+          : "dark"
+        : colorScheme;
+    set({
+      colorScheme: nextColorScheme
+    });
+    if (!SettingsService.getProperty("useSystemTheme")) {
       SettingsService.set({
-        colorScheme: colorScheme
+        colorScheme: nextColorScheme
       });
     }
   }
