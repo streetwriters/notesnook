@@ -65,7 +65,7 @@ export type ThemeScopes = {
   editorToolbar?: Partial<Variants>;
 };
 
-export type Theme = {
+export type ThemeDefinition = {
   name: string;
   id: string;
   version: string;

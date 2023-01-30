@@ -28,4 +28,10 @@ export {
 } from "./theme-engine";
 export { ThemeDark } from "./theme-engine/themes/dark";
 export { ThemeLight } from "./theme-engine/themes/light";
-export type { ThemeScopes, Colors, Variants } from "./theme-engine/types";
+export { ThemePitchBlack } from "./theme-engine/themes/pitch-black";
+export type {
+  ThemeScopes,
+  Colors,
+  Variants,
+  ThemeDefinition
+} from "./theme-engine/types";

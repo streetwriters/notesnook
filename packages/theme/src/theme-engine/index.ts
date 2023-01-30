@@ -19,11 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { createContext, useContext, useMemo } from "react";
 import { ThemeLight } from "./themes/light";
-import { Theme, ThemeScopes, VariantsWithStaticColors } from "./types";
+import { ThemeDefinition, ThemeScopes, VariantsWithStaticColors } from "./types";
 
 const ThemeContext = createContext<{
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
+  theme: ThemeDefinition;
+  setTheme: (theme: ThemeDefinition) => void;
 }>({
   theme: ThemeLight,
   setTheme: () => null

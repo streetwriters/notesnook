@@ -16,10 +16,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Theme } from "../types";
+import { ThemeDefinition } from "../types";
 import { ThemeLight } from "./light";
 
-export const ThemeDark: Theme = {
+export const ThemeDark: ThemeDefinition = {
   ...ThemeLight,
   colorScheme: "dark",
   scopes: {
@@ -29,8 +29,8 @@ export const ThemeDark: Theme = {
         background: "#1f1f1f",
         border: "#383838",
         placeholder: "#404040",
-        heading: "#212121",
-        paragraph: "#505050",
+        heading: "#E8E8E8",
+        paragraph: "#C0C0C0",
         icon: "#808080",
         separator: "#383838",
         backdrop: "#35353580",
@@ -64,33 +64,33 @@ export const ThemeDark: Theme = {
         shade: "#00883712"
       },
       error: {
-        accent: "#008837",
+        accent: "#f54b42",
         background: "#f4433620",
         border: "#383838",
         placeholder: "#404040",
-        heading: "#ff6961",
-        paragraph: "#ff6961",
-        icon: "#ff6961",
+        heading: "#f54b42",
+        paragraph: "#f54b42",
+        icon: "#f54b42",
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
         shade: "#00883712"
       },
       warning: {
-        accent: "#008837",
-        background: "#ffffff",
+        accent: "#FFA500",
+        background: "#FFA50020",
         border: "#383838",
         placeholder: "#404040",
-        heading: "#212121",
-        paragraph: "#505050",
-        icon: "#808080",
+        heading: "#FFA500",
+        paragraph: "#FFA500",
+        icon: "#FFA500",
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
-        shade: "#00883712"
+        shade: "#FFA50012"
       },
       success: {
-        accent: "#008837",
+        accent: "#4F8A10",
         background: "#00FF0020",
         border: "#383838",
         placeholder: "#404040",
@@ -100,7 +100,7 @@ export const ThemeDark: Theme = {
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
-        shade: "#00883712"
+        shade: "#4F8A1012"
       }
     }
   }
