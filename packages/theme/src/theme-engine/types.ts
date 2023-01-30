@@ -29,7 +29,7 @@ export type Colors = {
   shade: string;
 };
 
-export type ColorsType<TRequired extends boolean = false> = {
+export type Variants<TRequired extends boolean = false> = {
   primary: TRequired extends true ? Colors : Partial<Colors>;
   secondary: TRequired extends true ? Colors : Partial<Colors>;
   disabled: TRequired extends true ? Colors : Partial<Colors>;
@@ -39,14 +39,14 @@ export type ColorsType<TRequired extends boolean = false> = {
 };
 
 export type ThemeScopes = {
-  base: ColorsType<true>;
-  statusBar?: Partial<ColorsType>;
-  list?: Partial<ColorsType>;
-  editor?: Partial<ColorsType>;
-  popup?: Partial<ColorsType>;
-  navigationMenu?: Partial<ColorsType>;
-  contextMenu?: Partial<ColorsType>;
-  editorToolbar?: Partial<ColorsType>;
+  base: Variants<true>;
+  statusBar?: Partial<Variants>;
+  list?: Partial<Variants>;
+  editor?: Partial<Variants>;
+  popup?: Partial<Variants>;
+  navigationMenu?: Partial<Variants>;
+  contextMenu?: Partial<Variants>;
+  editorToolbar?: Partial<Variants>;
 };
 
 export type Theme = {
