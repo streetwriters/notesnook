@@ -95,6 +95,10 @@ async function createWindow() {
   setupDesktopIntegration();
   setupTray();
 
+  mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
+    "http://dictionaries.notesnook.com/"
+  );
+
   if (isDevelopment())
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });
 
