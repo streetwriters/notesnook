@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import ListItem from "../list-item";
-import { Flex } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import IconTag from "../icon-tag";
 import {
@@ -31,7 +31,10 @@ import { hashNavigate } from "../../navigation";
 import { Multiselect } from "../../common/multi-select";
 import { store } from "../../stores/reminder-store";
 import { db } from "../../common/db";
-import { showEditReminderDialog } from "../../common/dialog-controller";
+import {
+  confirm,
+  showEditReminderDialog
+} from "../../common/dialog-controller";
 
 const RECURRING_MODE_MAP = {
   week: "Weekly",
@@ -154,7 +157,20 @@ const menuItems: {
     iconColor: "error",
     icon: Icon.Trash,
     onClick: async ({ items }) => {
-      await Multiselect.moveRemindersToTrash(items);
+      confirm({
+        yesText: "Delete",
+        yesAction: async () => {
+          await Multiselect.moveRemindersToTrash(items);
+        },
+        message: (
+          <Text>
+            Are you sure you want to
+            <Text sx={{ color: "primary" }}> delete these reminder(s)? </Text>
+            This action is IRREVERSIBLE.
+          </Text>
+        ),
+        title: `Delete ${items.length} Reminder(s)`
+      });
     },
     multiSelect: true
   }
