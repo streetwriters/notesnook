@@ -406,6 +406,8 @@ function getSelectedWords(
 function countWords(str: string) {
   let count = 0;
   let shouldCount = false;
+  const REGEX_CHINESE =
+    /^[\p{Script=Han}\p{Script=Katakana}\p{Script=Hiragana}\u3000-\u303f]/u;
 
   for (let i = 0; i < str.length; ++i) {
     const s = str[i];
@@ -416,9 +418,10 @@ function countWords(str: string) {
       s === "\n" ||
       s === "*" ||
       s === "/" ||
-      s === "&"
+      s === "&" ||
+      s.match(REGEX_CHINESE)
     ) {
-      if (!shouldCount) continue;
+      if (!shouldCount && !s.match(REGEX_CHINESE)) continue;
       ++count;
       shouldCount = false;
     } else {
