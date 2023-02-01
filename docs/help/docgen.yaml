@@ -1,0 +1,12 @@
+---
+title: "Notesnook"
+docs_dir: "./contents"
+logo: logo.png
+colors:
+  main: "#008837"
+navigation:
+  - path: contents/download-install.md
+  - path: contents/creating-note.md 
+  - path: contents/encryption.md
+  - path: contents/organization
+    children: "*"

@@ -29,7 +29,8 @@ const SCOPES = [
   "refactor",
   "misc",
   "common",
-  "global"
+  "global",
+  "docs"
 ];
 
 module.exports = {
