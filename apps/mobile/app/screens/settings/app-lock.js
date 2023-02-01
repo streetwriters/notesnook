@@ -50,7 +50,8 @@ const AppLock = ({ route }) => {
       title: "No privacy",
       value: "none",
       desc: "Your notes are always unlocked. Anyone who has access to your phone can read them.",
-      activeColor: colors.error.paragraph
+      activeColor: colors.error.paragraph,
+      activeType: "error"
     },
     {
       title: "Medium privacy",
@@ -94,7 +95,9 @@ const AppLock = ({ route }) => {
                 alignSelf: "center",
                 minHeight: 125,
                 borderBottomWidth: 1,
-                borderBottomColor: welcome ? "transparent" : colors.secondary.background
+                borderBottomColor: welcome
+                  ? "transparent"
+                  : colors.secondary.background
               }}
             >
               <Icon
@@ -136,7 +139,11 @@ const AppLock = ({ route }) => {
               {modes.map((item) => (
                 <PressableButton
                   key={item.title}
-                  type={appLockMode === item.value ? "grayBg" : "transparent"}
+                  type={
+                    appLockMode === item.value
+                      ? item.activeType || "grayBg"
+                      : "transparent"
+                  }
                   onPress={async () => {
                     if (
                       !(await BiometicService.isBiometryAvailable()) &&
@@ -161,7 +168,9 @@ const AppLock = ({ route }) => {
                     marginBottom: 12,
                     borderWidth: 1,
                     borderColor:
-                      appLockMode === item.value ? item.activeColor : colors.secondary.background
+                      appLockMode === item.value
+                        ? item.activeColor
+                        : colors.secondary.background
                   }}
                   style={{
                     marginBottom: 10
@@ -169,7 +178,9 @@ const AppLock = ({ route }) => {
                 >
                   <Heading
                     color={
-                      appLockMode === item.value ? item.activeColor : colors.primary.paragraph
+                      appLockMode === item.value
+                        ? item.activeColor
+                        : colors.primary.paragraph
                     }
                     style={{ maxWidth: "95%" }}
                     size={SIZE.md}
