@@ -1,0 +1,9 @@
+# Notesnook
+
+Notesnook is a free (as in speech) and open source note taking app focused on user privacy & ease of use. To ensure zero knowledge principles, Notesnook encrypts everything on your device using `XChaCha20-Poly1305` & `Argon2`.
+
+Notesnook is our **proof** that privacy does _not_ (always) have to come at the cost of convenience. Our goal is to provide users peace of mind & 100% confidence that their notes are safe and secure. The decision to go fully open source is one of the most crucial steps towards that.
+
+And with that convenience in mind, we believe that it is equally important to put together a simple & useful help website about everything Notesnook. Our help is a complete walkthrough of the Notesnook app and it's features.
+
+So let's get started with [installing Notesnook](/download-install) on all your devices.
