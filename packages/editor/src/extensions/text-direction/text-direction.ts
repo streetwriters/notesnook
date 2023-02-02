@@ -89,10 +89,13 @@ export const TextDirection = Extension.create<TextDirectionOptions>({
             // NOTE: for some reason setting this to undefined breaks enter behaviour
             // on Android for some keyboards (GBoard etc.). Empty string works fine.
             default: this.options.defaultDirection || "",
-            parseHTML: (element) => element.dir,
+            parseHTML: (element) => (element.dir === "rtl" ? "rtl" : undefined),
             keepOnSplit: true,
             renderHTML: (attributes) => {
-              if (!attributes.textDirection) {
+              if (
+                !attributes.textDirection ||
+                attributes.textDirection !== "rtl"
+              ) {
                 return {};
               }
 
