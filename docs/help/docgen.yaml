@@ -9,4 +9,12 @@ navigation:
   - path: contents/creating-note.md 
   - path: contents/encryption.md
   - path: contents/organization
+    children:
+      - path: contents/organization/notebooks.md
+      - path: contents/organization/how-do-i-add-tags-to-notes.md
+      - path: contents/organization/how-do-i-organize-notes-using-colors.md
+      - path: contents/organization/how-do-i-organize-notes-using-favorites.md
+      - path: contents/organization/how-do-i-pin-notes-and-notebooks.md
+      - path: contents/organization/how-do-i-add-shortcuts-to-side-menu.md
+  - path: contents/importing-notes
     children: "*"
