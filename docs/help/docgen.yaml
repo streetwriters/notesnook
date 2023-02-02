@@ -6,11 +6,11 @@ colors:
   main: "#008837"
 navigation:
   - path: contents/download-install.md
-  - path: contents/creating-note.md 
+  - path: contents/creating-note.md
   - path: contents/encryption.md
   - path: contents/organization
     children:
-      - path: contents/organization/notebooks.md
+      - path: contents/organization/organizing-notes-with-notebooks.md
       - path: contents/organization/how-do-i-add-tags-to-notes.md
       - path: contents/organization/how-do-i-organize-notes-using-colors.md
       - path: contents/organization/how-do-i-organize-notes-using-favorites.md
@@ -18,3 +18,8 @@ navigation:
       - path: contents/organization/how-do-i-add-shortcuts-to-side-menu.md
   - path: contents/importing-notes
     children: "*"
+  - path: contents/backup-and-restore-notes-in-notesnook.md
+  - path: contents/export-notes-from-notesnook.md
+  - path: contents/lock-notes-with-private-vault.md
+  - path: contents/note-sharing-with-monographs.md
+  - path: contents/versionhistory.md

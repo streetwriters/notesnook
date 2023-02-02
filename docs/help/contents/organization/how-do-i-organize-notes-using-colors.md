@@ -4,32 +4,52 @@ title: Colors
 
 # Organize notes with colors
 
-Colors are a simple and fast way to organize your notes.
+Colors are a simple and quick way to organize your notes.
 
-## Assign color to note
+## Assign color to a note
 
 # [Desktop/Web](#/tab/web)
 
-1. Click on the `three dot more` button or right click on a note to open `Note properties` menu
-2. Add note to the desired color
+1. Right click on a note
+2. Click on `Assign colors`
+3. Assign a color to the note.
+4. You can click on the color again to remove note from that color
 
-![](/static/color_note_desktop.png)
+# [Mobile](#/tab/mobile)
 
-3. You can click on the color again to remove note from the color
-   # [Mobile](#/tab/mobile)
-1. Press the `three-dot more` button on right side on note to open `Note properties` sheet
-
-<img style="width:300px;margin-bottom:15px" src="/static/color_note_step_1.jpg" alt="Click on the more button on right side of note."/>
-
-2. Add note to the desired color
-
-<img style="width:300px;margin-bottom:15px" src="/static/color_note_step_2.jpg" alt="Select the desired color from the Bottom Sheet Menu."/>
-
+1. Press the ![Three dot button](/three-dot-button.png) button
+2. Assign a color to a note from the color strip.
 3. You can press on the color again to remove note from the color
-   ---
+
+---
+
+{% info %}
+
+After you assign a color to a note, the note will adapt to that color.
+
+![Colored note](/colored-note.png)
+
+{% end %}
 
 ## Color Shortcuts
 
-A shortcut to notes of specific color appears on side menu by default. The shortcut will appear as long as there is at least one note in a color.
+Once you add some notes to a color, it will appear on the Side Menu.
 
-![](/static/color_pinned_side_desktop.png)
+![Colored note](/colored-note-sidemenu.png)
+
+## Renaming a color
+
+Colors can be renamed to anything you want.
+
+# [Desktop/Web](#/tab/web)
+
+1. Right click on a color in side menu
+2. Click on "Rename color"
+3. Edit the color and click "Save"
+
+# [Mobile](#/tab/mobile)
+
+1. Long press on a color in Side menu
+2. Edit the color name and click "Save"
+
+---
