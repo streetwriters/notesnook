@@ -6,8 +6,6 @@ title: Notesnook importer
 
 Notesnook importer is your one stop location to import all your notes from any notes app. We have added support for most of the popular note apps and common export formats such as markdown, html and text files.
 
-<img src="/static/notesnook_importer.png" alt="Notesnook importer"/>
-
 ## Try it out
 
 You can try out the importer by going to [https://importer.notesnook.com](https://importer.notesnook.com) to import your notes from any notes app.
