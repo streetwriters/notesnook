@@ -1,5 +1,6 @@
 ---
 title: Version History
+index: 9
 ---
 
 # Version history

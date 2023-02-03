@@ -1,5 +1,6 @@
 ---
 title: Tags
+index: 1
 ---
 
 # Tags

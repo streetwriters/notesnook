@@ -1,5 +1,6 @@
 ---
 title: How is my data encrypted
+index: 2
 ---
 
 # How is my data encrypted

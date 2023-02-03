@@ -1,5 +1,6 @@
 ---
 title: Pins
+index: 5
 ---
 
 # Pin notes and notebooks
