@@ -14,13 +14,11 @@ You are in a notes app, the first thing you want to do is make a note.
 
 ![First note web](/first-note-desktop.png)
 
-{% info %}
-
-The bottom right corner of the app will show the no. of words of current note & the last saved time.
-
-![Status bar desktop](/editor-status-bar-desktop.png)
-
-{% end %}
+> info
+>
+> The bottom right corner of the app will show the no. of words of current note & the last saved time.
+>
+> ![Status bar desktop](/editor-status-bar-desktop.png)
 
 # [Mobile](#/tab/mobile)
 
@@ -30,11 +28,9 @@ The bottom right corner of the app will show the no. of words of current note & 
 
 ![First note mobile](/first-note-mobile.png)
 
-{% info %}
-
-Below the note title is the editor status bar. It shows you the no. of words in the note and last saved time.
-
-{% end %}
+> info
+>
+> Below the note title is the editor status bar. It shows you the no. of words in the note and last saved time.
 
 ---
 
