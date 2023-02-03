@@ -1,5 +1,6 @@
 ---
 title: Notebooks
+index: 0
 ---
 
 # Organizing notes with notebooks

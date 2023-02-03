@@ -1,5 +1,6 @@
 ---
 title: Notesnook importer
+index: 4
 ---
 
 # Import notes from any notes app
@@ -20,10 +21,10 @@ You can try out the importer by going to [https://importer.notesnook.com](https:
 6. Standard Notes
 7. Simplenote
 8. Google Keep
-9. Bear notes app
-10. Joplin notes app
+9. Joplin
+10. Zoho Notebook
 
-**Don't see your notes app?** No worries, create an issue on [github](https://github.com/streetwriters/notesnook/issues)
+**Don't see your notes app?** No worries, create an issue on [Github](https://github.com/streetwriters/notesnook/issues)
 
 ## Is it safe to import?
 

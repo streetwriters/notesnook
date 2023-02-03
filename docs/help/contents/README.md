@@ -6,4 +6,4 @@ Notesnook is our **proof** that privacy does _not_ (always) have to come at the 
 
 And with that convenience in mind, we believe that it is equally important to put together a simple & useful help website about everything Notesnook. Our help is a complete walkthrough of the Notesnook app and it's features.
 
-So let's get started with [installing Notesnook](/download-install) on all your devices.
+So let's get started with [installing Notesnook](/installation) on all your devices.

@@ -1,5 +1,6 @@
 ---
 title: Backup and restore
+index: 5
 ---
 
 # How to Backup your notes

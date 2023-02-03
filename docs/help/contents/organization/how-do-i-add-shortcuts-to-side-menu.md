@@ -1,5 +1,6 @@
 ---
 title: Shortcuts
+index: 6
 ---
 
 # Add shortcuts to side menu

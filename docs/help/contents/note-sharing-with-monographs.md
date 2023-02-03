@@ -1,5 +1,6 @@
 ---
 title: Monographs
+index: 8
 ---
 
 # Monographs

@@ -1,5 +1,6 @@
 ---
 title: Locking notes
+index: 7
 ---
 
 # How do I lock notes with private vault?

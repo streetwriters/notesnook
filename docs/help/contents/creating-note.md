@@ -1,5 +1,6 @@
 ---
 title: Creating a note
+index: 1
 ---
 
 # Creating a note

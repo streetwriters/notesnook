@@ -1,25 +1,8 @@
 ---
-title: "Notesnook"
-docs_dir: "./contents"
+title: Notesnook
+subtitle: HELP
+docs_dir: ./contents
 logo: logo.png
-colors:
-  main: "#008837"
-navigation:
-  - path: contents/download-install.md
-  - path: contents/creating-note.md
-  - path: contents/encryption.md
-  - path: contents/organization
-    children:
-      - path: contents/organization/how-to-organize-notes-with-notebooks.md
-      - path: contents/organization/how-do-i-add-tags-to-notes.md
-      - path: contents/organization/how-do-i-organize-notes-using-colors.md
-      - path: contents/organization/how-do-i-organize-notes-using-favorites.md
-      - path: contents/organization/how-do-i-pin-notes-and-notebooks.md
-      - path: contents/organization/how-do-i-add-shortcuts-to-side-menu.md
-  - path: contents/importing-notes
-    children: "*"
-  - path: contents/backup-and-restore-notes-in-notesnook.md
-  - path: contents/export-notes-from-notesnook.md
-  - path: contents/lock-notes-with-private-vault.md
-  - path: contents/note-sharing-with-monographs.md
-  - path: contents/versionhistory.md
+
+footer:
+  copyright: Copyright © 2023 Streetwriters (Private) Limited

@@ -1,5 +1,6 @@
 ---
 title: Organization
+index: 3
 ---
 
 # Organization
