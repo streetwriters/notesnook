@@ -2,6 +2,8 @@
 title: How is my data encrypted
 ---
 
+# How is my data encrypted
+
 > warn Note
 >
 > This document is not a spec, only an explanation of the encryption process.
