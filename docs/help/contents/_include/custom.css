@@ -1,0 +1,34 @@
+html.light {
+  --primary: #008837;
+  --header-fg: #008837;
+  --link: #008837;
+}
+
+html.dark {
+  --primary: #008837;
+  --header-fg: #008837;
+  --link: #008837;
+  --page-bg: #1b1b1b;
+  --document-bg: #2b2b2b;
+
+  --button-bg: #3b3b3b;
+  --hover-bg: #4b4b4b;
+  --button-fg: #fff;
+
+  --input-bg: #2b2b2b;
+  --input-placeholder: #ababab;
+
+  --code-bg: #4b4b4b;
+  --selection-bg: #00883766;
+  --selection-fg: #fff;
+}
+
+.project-title a {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.project-subtitle {
+  color: var(--fg);
+  font-weight: 600;
+}
