@@ -15,14 +15,11 @@ Tags are a quick and simple way to organize your notes.
 3. Type the tag name & press enter to add it. The input supports auto complete for existing tags
 4. Clicking on a tag will remove it from the note.
 
-{% info %}
-
-Added tags also appear at the bottom of each note item in the notes list. Tapping on the tag takes you to the respective tag.
-
-![Tagged note](/tagged-note.png)
-
-{% end %}
-
+> info
+>
+> Added tags also appear at the bottom of each note item in the notes list. Tapping on the tag takes you to the respective tag.
+>
+> ![Tagged note](/tagged-note.png)
 
 # [Mobile](#/tab/mobile)
 
@@ -31,17 +28,15 @@ Added tags also appear at the bottom of each note item in the notes list. Tappin
 3. Type the tag name then press enter to add it
 4. Pressing on the tag will remove it.
 
-{% info %}
-
-When you open a note in editor, tags will appear on top of title on mobile. Tapping on a tag will remove if from the note.
-
-![Tags in editor mobile](/tags-in-editor.png)
-
-Added tags also appear at the bottom of each note item in the notes list. Tapping on the tag takes you to the respective tag.
-
-![Tagged note](/tagged-note-mobile.png)
-
-{% end %}
+> info
+>
+> When you open a note in editor, tags will appear on top of title on mobile. Tapping on a tag will remove if from the note.
+>
+> ![Tags in editor mobile](/tags-in-editor.png)
+>
+> Added tags also appear at the bottom of each note item in the notes list. Tapping on the tag takes you to the respective tag.
+>
+> ![Tagged note](/tagged-note-mobile.png)
 
 ---
 

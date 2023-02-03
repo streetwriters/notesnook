@@ -14,11 +14,9 @@ Notebooks consist of topics where you can add/create and edit your notes.
 2. Click on the ![Three dot button](/plus-button-desktop.png) button on top right corner.
 3. Add title for your notebook.
 
-{% info %}
-
-Adding a description & topics are optional.
-
-{% end %}
+> info
+>
+> Adding a description & topics are optional.
 
 4. Click on `Create` button.
 5. You have created your first notebook in Notesnook.
@@ -29,11 +27,9 @@ Adding a description & topics are optional.
 2. Press the ![Three dot button](/plus-button-desktop.png) button on bottom right corner
 3. Add title for your notebook.
 
-{% info %}
-
-Adding a description & topics are optional.
-
-{% end %}
+> info
+>
+> Adding a description & topics are optional.
 
 4. Press the `Create notebook` button.
 5. You have created your first notebook in Notesnook.
@@ -116,14 +112,11 @@ Adding a description & topics are optional.
 
 ---
 
-{% info %}
-
-Once a note is added to a notebook, it's refernence will show on top of the note in the list. Clicking on it will take you to the topic.
-
-![Notebook reference on a note](/notebook-ref.png)
-
-{% end %}
-
+> info
+>
+> Once a note is added to a notebook, it's refernence will show on top of the note in the list. Clicking on it will take you to the topic.
+>
+> ![Notebook reference on a note](/notebook-ref.png)
 
 ### Adding a note to a topic
 
@@ -147,11 +140,9 @@ Once a note is added to a notebook, it's refernence will show on top of the note
 
 ---
 
-{% info %}
-
-In Notesnook a single note can exist in multiple Notebooks and topics. However a note shows at most only one reference on top.
-
-{% end %}
+> info
+>
+> In Notesnook a single note can exist in multiple Notebooks and topics. However a note shows at most only one reference on top.
 
 ### Adding multiple notes to a topic
 

@@ -2,12 +2,9 @@
 title: How is my data encrypted
 ---
 
-{% warn %}
-
-Note: This document is not a spec, only an explanation of the encryption process.
-
-{% end %}
-
+> warn Note
+>
+> This document is not a spec, only an explanation of the encryption process.
 
 ## Algorithms & cryptographic library
 
@@ -31,12 +28,9 @@ When you sign up for an account, the app takes your password and hashes it using
 
 This predictable salt is generated using a `fixed client salt` + `your email`.
 
-
-{% info Your password never leaves your device %}
-
-Sending the hash over sending your plain text password ensures that there is no way for us (or anyone else) to get your password.
-
-{% end %}
+> info Your password never leaves your device
+>
+> Sending the hash over sending your plain text password ensures that there is no way for us (or anyone else) to get your password.
 
 After the hash is generated, it is sent to the server. This hash is used as a `password` and is hashed again to mitigate password passthrough attacks.
 
@@ -46,11 +40,9 @@ This process is repeated every time you sign in.
 
 After you are signed in, the app requests your user data which includes, among other things, your salt.
 
-{% info Salt generation %}
-
-When you create an account, the server generates a cryptographically secure random salt for you. This salt is used for key generation.
-
-{% end %}
+> info Salt generation
+>
+> When you create an account, the server generates a cryptographically secure random salt for you. This salt is used for key generation.
 
 You password & salt is then used to derive a strong irreversible key using Argon2 as the password key derivation function (PKDF).
 
@@ -83,13 +75,8 @@ Encryption only takes place when you sync. Each item in the database is encrypte
    4. Algorithm id `alg`
    5. ItemId `id`
 
-
-{% info %}
-
-See the whole process in action [here.](https://notesnook.com/#whynotesnook)
-
-{% end %}
+> info
+>
+> See the whole process in action [here.](https://notesnook.com/#whynotesnook)
 
 This object is then sent to the server for storage. The server performs no further operation on this data (because it can't).
-
-

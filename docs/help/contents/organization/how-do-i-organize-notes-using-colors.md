@@ -23,13 +23,11 @@ Colors are a simple and quick way to organize your notes.
 
 ---
 
-{% info %}
-
-After you assign a color to a note, the note will adapt to that color.
-
-![Colored note](/colored-note.png)
-
-{% end %}
+> info
+>
+> After you assign a color to a note, the note will adapt to that color.
+>
+> ![Colored note](/colored-note.png)
 
 ## Color Shortcuts
 
