@@ -6,7 +6,7 @@ title: Notebooks
 
 Notebooks consist of topics where you can add/create and edit your notes.
 
-### Creating a notebook
+## Creating a notebook
 
 # [Desktop/Web](#/tab/web)
 
@@ -36,7 +36,7 @@ Notebooks consist of topics where you can add/create and edit your notes.
 
 ---
 
-### Editing a notebook
+## Editing a notebook
 
 # [Desktop/Web](#/tab/web)
 
@@ -55,7 +55,7 @@ Notebooks consist of topics where you can add/create and edit your notes.
 
 ---
 
-### Create a new topic
+## Create a new topic
 
 # [Desktop/Web](#/tab/web)
 
@@ -75,7 +75,7 @@ Notebooks consist of topics where you can add/create and edit your notes.
 
 ---
 
-### Editing an existing topic
+## Editing an existing topic
 
 # [Desktop/Web](#/tab/web)
 
@@ -94,7 +94,7 @@ Notebooks consist of topics where you can add/create and edit your notes.
 
 ---
 
-### Creating a new note in a notebook
+## Creating a new note in a notebook
 
 # [Desktop/Web](#/tab/web)
 
@@ -118,7 +118,7 @@ Notebooks consist of topics where you can add/create and edit your notes.
 >
 > ![Notebook reference on a note](/notebook-ref.png)
 
-### Adding a note to a topic
+## Adding a note to a topic
 
 # [Desktop/Web](#/tab/web)
 
@@ -144,7 +144,7 @@ Notebooks consist of topics where you can add/create and edit your notes.
 >
 > In Notesnook a single note can exist in multiple Notebooks and topics. However a note shows at most only one reference on top.
 
-### Adding multiple notes to a topic
+## Adding multiple notes to a topic
 
 # [Desktop/Web](#/tab/web)
 
@@ -165,7 +165,7 @@ Notebooks consist of topics where you can add/create and edit your notes.
 
 ---
 
-### Remove note from a topic
+## Remove note from a topic
 
 # [Desktop/Web](#/tab/web)
 
@@ -185,7 +185,7 @@ Notebooks consist of topics where you can add/create and edit your notes.
 
 ---
 
-### Delete a topic
+## Delete a topic
 
 # [Desktop/Web](#/tab/web)
 
@@ -203,7 +203,7 @@ Notebooks consist of topics where you can add/create and edit your notes.
 
 ---
 
-### Move a notebook to trash
+## Move a notebook to trash
 
 # [Desktop/Web](#/tab/web)
 

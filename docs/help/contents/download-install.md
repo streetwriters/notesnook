@@ -35,7 +35,7 @@ Once installation completes, you can start Notesnook app from the Launchpad.
 
 ---
 
-# Windows
+## Windows
 
 # [Download .exe](#/tab/exe)
 
@@ -61,7 +61,7 @@ Start Notesnook from Windows Search.
 
 ---
 
-# Linux
+## Linux
 
 # [AppImage (Recommended)](#/tab/appimage)
 
@@ -89,7 +89,7 @@ Notesnook can be downloaded on any linux distro via Snapcraft.
 
 ---
 
-# Android
+## Android
 
 # [Google Playstore](#/tab/android)
 
@@ -106,7 +106,10 @@ You you want to download Notesnook app that is free of any google play services 
 - [x86.apk](https://notesnook.com/releases/android/notesnook-x86.apk)
 - [x86_64.apk](https://notesnook.com/releases/android/notesnook-x86_64.apk)
 
-# iOS
+---
+
+## iOS
+
 iOS users can get Notesnook from the AppStore.
 
 [AppStore](https://apps.apple.com/us/app/notesnook-take-private-notes/id1544027013)

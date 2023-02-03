@@ -2,7 +2,7 @@
 title: Backup and restore
 ---
 
-## How to Backup your notes
+# How to Backup your notes
 
 It is always a good practice to take a backup of your data so in case you lose access to your account, you don't lose your notes. Backing up your data is very simple in notesnook.
 
@@ -20,15 +20,15 @@ It is always a good practice to take a backup of your data so in case you lose a
 
 ---
 
-### Encrypted Backups
+## Encrypted Backups
 
 You can also enable encrypted backups option in app settings. This will encrypt all your backup files with your account password.
 
-### Backup Reminders (Desktop)
+## Backup Reminders (Desktop)
 
 The desktop app allows you to enable Backup Reminders which remind you to backup your data daily/weekly or monthly.
 
-### Automatic Backups (Mobile)
+## Automatic Backups (Mobile)
 
 On mobile apps you can enable automatic daily, weekly or monthly backups. Your data will backup automatically and backup file will be stored in your phone storage.
 

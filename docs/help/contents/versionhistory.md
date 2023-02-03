@@ -2,6 +2,8 @@
 title: Version History
 ---
 
+# Version history
+
 To improve the overall reliability of Notesnook we have introduced version history of notes in v1.7.0 of desktop and mobile apps. Version history is enabled by default for all your notes including notes in vault.
 
 ## How it works
