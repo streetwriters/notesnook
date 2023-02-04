@@ -46,6 +46,7 @@ import SettingsService from "../../../services/settings";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { ReminderTime } from "../../ui/reminder-time";
 import Paragraph from "../../ui/typography/paragraph";
+import { NoteType } from "../../../utils/types";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheet>;
@@ -119,6 +120,10 @@ export default function ReminderSheet({
   const details = useRef<string | undefined>(reminder?.description);
   const titleRef = useRef<TextInput>(null);
   const { height } = useWindowDimensions();
+  const referencedItem = reference
+    ? (db.notes?.note(reference.id)?.data as NoteType)
+    : null;
+
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -235,17 +240,30 @@ export default function ReminderSheet({
       >
         <Input
           fwdRef={titleRef}
-          defaultValue={reminder?.title}
+          defaultValue={reminder?.title || referencedItem?.title}
           placeholder="Remind me of..."
           onChangeText={(text) => (title.current = text)}
           containerStyle={{ borderWidth: 0, borderBottomWidth: 1 }}
         />
 
         <Input
-          defaultValue={reminder?.description}
+          defaultValue={reminder ? reminder?.description : referencedItem?.headline}
           placeholder="Add a quick note"
           onChangeText={(text) => (details.current = text)}
-          containerStyle={{ borderWidth: 0, borderBottomWidth: 1 }}
+          containerStyle={{
+            borderWidth: 0,
+            borderBottomWidth: 1,
+            maxHeight: 80,
+            marginTop: 10
+          }}
+          multiline
+          inputStyle={{
+            height: 80
+          }}
+          height={80}
+          wrapperStyle={{
+            marginBottom: 20
+          }}
         />
 
         <View
