@@ -19,9 +19,9 @@ index: 2
 
 On all three platforms we use the same exact library for all cryptographic functions. This ensures data integrity across platforms.
 
-!!!info Fun story
-When we first added encryption, we used AES-GCM-256 across platforms but the cross-platform compatbility was abyssmal. That is when I found out about the great libsodium. Written in C, wrappers available for all platforms...what more could I want?
-!!!
+> info Fun story
+>
+> When we first added encryption, we used AES-GCM-256 across platforms but the cross-platform compatbility was abyssmal. That is when I found out about the great libsodium. Written in C, wrappers available for all platforms...what more could I want?
 
 ## Process
 
