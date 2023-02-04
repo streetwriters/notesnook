@@ -35,6 +35,7 @@ import {
   confirm,
   showEditReminderDialog
 } from "../../common/dialog-controller";
+import { pluralize } from "../../utils/string";
 
 const RECURRING_MODE_MAP = {
   week: "Weekly",
@@ -158,18 +159,16 @@ const menuItems: {
     icon: Icon.Trash,
     onClick: async ({ items }) => {
       confirm({
-        yesText: "Delete",
-        yesAction: async () => {
-          await Multiselect.moveRemindersToTrash(items);
-        },
+        title: `Delete ${pluralize(items.length, "reminder", "reminders")}`,
         message: (
           <Text>
-            Are you sure you want to
-            <Text sx={{ color: "primary" }}> delete these reminder(s)? </Text>
-            This action is IRREVERSIBLE.
+            Are you sure you want to proceed?
+            <Text sx={{ color: "error" }}> This action is IRREVERSIBLE.</Text>
           </Text>
         ),
-        title: `Delete ${items.length} Reminder(s)`
+        yesText: "Yes",
+        noText: "No",
+        yesAction: () => Multiselect.moveRemindersToTrash(items)
       });
     },
     multiSelect: true
