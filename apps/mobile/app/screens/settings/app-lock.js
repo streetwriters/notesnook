@@ -130,7 +130,7 @@ const AppLock = ({ route }) => {
             <View
               style={{
                 paddingHorizontal: 12,
-                width: DDS.isTab && welcome ? "50%" : undefined,
+                width: DDS.isTab && welcome ? "50%" : "100%",
                 alignSelf: "center"
               }}
             >
