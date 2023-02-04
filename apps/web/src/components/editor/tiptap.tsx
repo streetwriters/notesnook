@@ -137,14 +137,15 @@ function TipTap(props: TipTapProps) {
     {
       editorProps: {
         handlePaste: (view, event) => {
-          if (event.clipboardData?.files?.length && onAttachFile) {
-            event.preventDefault();
-            event.stopPropagation();
-            for (const file of event.clipboardData.files) {
-              onAttachFile(file);
+          if (event.clipboardData?.getData("text/plain").length === 0)
+            if (event.clipboardData?.files?.length && onAttachFile) {
+              event.preventDefault();
+              event.stopPropagation();
+              for (const file of event.clipboardData.files) {
+                onAttachFile(file);
+              }
+              return true;
             }
-            return true;
-          }
         }
       },
       downloadOptions,
