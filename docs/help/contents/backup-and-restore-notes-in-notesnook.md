@@ -5,7 +5,7 @@ index: 5
 
 # How to Backup your notes
 
-It is always a good practice to take a backup of your data so in case you lose access to your account, you don't lose your notes.
+It is always a good practice to take a backup of your data so in case you lose access to your account, you don't lose your notes. Currently backups are local only.
 
 > warning
 >
@@ -26,7 +26,9 @@ It is always a good practice to take a backup of your data so in case you lose a
 
 > info
 >
-> On **android** when you take a backup first time, you will be asked to select a folder on your phone where you would like to store backup files. You can always change your backup files location from `Backups > Change backup location`
+> On **android** when you take a backup first time, you will be asked to select a folder on your phone where you would like to store backup files. You can always change your backup files location from `Backups > Change backup location`.
+> 
+> Regardless of the folder you select, Notesnook will create a folder "Notesnook/backups" inside it and store backup files there.
 
 ---
 

@@ -11,16 +11,16 @@ Notebooks consist of topics where you can add/create and edit your notes.
 
 # [Desktop/Web](#/tab/web)
 
-1. Go to `Notebooks` from side menu.
-2. Click on the ![Three dot button](/plus-button-desktop.png) button on top right corner.
-3. Add title for your notebook.
+1. Go to `Notebooks` from side menu
+2. Click on the ![Three dot button](/plus-button-desktop.png) button on top right corner
+3. Add title for your notebook
+4. Click on `Create` button
+5. You have created your first notebook in Notesnook
 
 > info
 >
 > Adding a description & topics are optional.
 
-4. Click on `Create` button.
-5. You have created your first notebook in Notesnook.
 
 # [Mobile](#/tab/mobile)
 
