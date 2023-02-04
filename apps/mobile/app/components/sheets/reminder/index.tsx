@@ -47,6 +47,7 @@ import { useRelationStore } from "../../../stores/use-relation-store";
 import { ReminderTime } from "../../ui/reminder-time";
 import Paragraph from "../../ui/typography/paragraph";
 import { NoteType } from "../../../utils/types";
+import { Dialog } from "../../dialog";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheet>;
@@ -161,7 +162,7 @@ export default function ReminderSheet({
 
   async function saveReminder() {
     try {
-      if (!(await Notifications.checkAndRequestPermissions()))
+      if (!(await Notifications.checkAndRequestPermissions(true)))
         throw new Error(
           "App does not have permission to schedule notifications"
         );
@@ -232,6 +233,7 @@ export default function ReminderSheet({
         paddingHorizontal: 12
       }}
     >
+      <Dialog context="local"/> 
       <ScrollView
         onScrollEndDrag={() => actionSheetRef.current?.handleChildScrollEnd()}
         style={{
