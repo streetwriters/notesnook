@@ -22,7 +22,7 @@ import { Locator } from "@playwright/test";
 import { getTestId } from "../utils";
 import { BaseItemModel } from "./base-item.model";
 import { ContextMenuModel } from "./context-menu.model";
-import { fillReminderDialog } from "./utils";
+import { confirmDialog, fillReminderDialog } from "./utils";
 
 export class ReminderItemModel extends BaseItemModel {
   private readonly contextMenu: ContextMenuModel;
@@ -47,6 +47,7 @@ export class ReminderItemModel extends BaseItemModel {
     await this.contextMenu.open(this.locator);
     await this.contextMenu.clickOnItem("delete");
 
+    await confirmDialog(this.page);
     await this.waitFor("detached");
   }
 
