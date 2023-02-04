@@ -56,7 +56,6 @@ const ReminderItem = React.memo(
       >
         <View
           style={{
-            flexWrap: "wrap",
             flexShrink: 1,
             opacity: item.disabled ? 0.5 : 1
           }}
