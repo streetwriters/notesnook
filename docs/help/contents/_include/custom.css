@@ -2,6 +2,7 @@ html.light {
   --primary: #008837;
   --header-fg: #008837;
   --link: #008837;
+  --heading: #000;
 }
 
 html.dark {
