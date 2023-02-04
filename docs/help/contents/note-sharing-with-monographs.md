@@ -22,8 +22,8 @@ You can share this url with anyone to view the contents of the note without down
 
 # [Mobile](#/tab/mobile)
 
-5. Tap on `three-dot menu` button on a note.
-6. Tap on `Publish` in Note properties sheet to open Publish note sheet
+5. Tap on ![Three dot button](/three-dot-button.png) button on a note.
+6. Tap on `Publish` to open Publish note sheet
 7. Tap on `Publish` button to publish note.
 8. Copy the url and send it to respective person.
 
@@ -42,13 +42,13 @@ Self destruct means that the published note can be viewed only once. Once someon
 # [Desktop/Web](#/tab/web)
 
 1. Right click on a note
-2. Click on `Publish` from Note properties to open publish note dialog.
-3. Click on `Unpublish` button to unpublish note.
+2. Click on `Publish` to open publish note popup
+3. Click on `Unpublish` button to unpublish note
 
 # [Mobile](#/tab/mobile)
 
-4. Tap on `three-dot menu` button on a note.
-5. Tap on `Publish` in Note properties sheet to open Publish note sheet
-6. Tap on `Unpublish` button to unpublish note.
+4. Tap on ![Three dot button](/three-dot-button.png) button on a published note
+5. Tap on `Publish` to open Publish note sheet
+6. Tap on `Unpublish` button to unpublish note
 
 ---
