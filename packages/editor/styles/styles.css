@@ -466,3 +466,32 @@ p > *::selection {
 .math-inline.math-select .math-render {
   padding-top: 2px;
 } */
+
+/* RTL */
+
+[dir="rtl"] * {
+  direction: rtl;
+}
+
+[dir="rtl"] ul {
+  margin-left: 0px !important;
+}
+
+blockquote[dir="rtl"] {
+  border-left: none;
+  padding-left: 0px;
+  border-right: 5px solid var(--border);
+  padding-right: 15px;
+}
+
+.outline-list-item-toggle.rtl {
+  display: none;
+}
+
+[dir="rtl"] .outline-list-item-toggle.rtl {
+  display: block;
+}
+
+[dir="rtl"] .outline-list-item-toggle:not(.rtl) {
+  display: none;
+}
