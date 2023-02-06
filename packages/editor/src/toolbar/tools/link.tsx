@@ -216,7 +216,14 @@ export function OpenLink(props: ToolProps) {
         }}
         target="_blank"
         variant="body"
-        sx={{ mr: 1 }}
+        sx={{
+          fontSize: "subBody",
+          mr: 1,
+          maxWidth: [150, 250],
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap"
+        }}
       >
         {href}
       </Link>
