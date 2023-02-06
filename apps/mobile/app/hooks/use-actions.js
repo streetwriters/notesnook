@@ -617,6 +617,61 @@ export const useActions = ({ close = () => null, item }) => {
       close: true
     },
     {
+      name: "Vault",
+      title: item.locked ? "Unlock" : "Lock",
+      icon: item.locked ? "shield-off-outline" : "shield-outline",
+      func: addToVault,
+      on: item.locked
+    },
+    {
+      name: "Publish",
+      title: isPublished ? "Published" : "Publish",
+      icon: "cloud-upload-outline",
+      on: isPublished,
+      func: publishNote
+    },
+
+    {
+      name: "Export",
+      title: "Export",
+      icon: "export",
+      func: exportNote
+    },
+    {
+      name: "Reminders",
+      title: "Reminders",
+      icon: "bell",
+      func: async () => {
+        close();
+        RelationsList.present({
+          reference: item,
+          referenceType: "reminder",
+          relationType: "from",
+          title: "Reminders",
+          onAdd: () => ReminderSheet.present(null, item, true),
+          button: {
+            title: "Add",
+            type: "accent",
+            onPress: () => ReminderSheet.present(null, item, true),
+            icon: "plus"
+          }
+        });
+      },
+      close: false
+    },
+    {
+      name: "Attachments",
+      title: "Attachments",
+      icon: "attachment",
+      func: showAttachments
+    },
+    {
+      name: "History",
+      title: "History",
+      icon: "history",
+      func: openHistory
+    },
+    {
       name: "Move notes",
       title: "Add notes",
       icon: "plus",
@@ -626,10 +681,9 @@ export const useActions = ({ close = () => null, item }) => {
         MoveNotes.present(db.notebooks.notebook(item.notebookId).data, item);
       }
     },
-
     {
       name: "Pin",
-      title: item.pinned ? "Unpin" : "Pin to top",
+      title: item.pinned ? "Unpin" : "Pin",
       icon: item.pinned ? "pin-off-outline" : "pin-outline",
       func: pinItem,
       close: false,
@@ -698,21 +752,6 @@ export const useActions = ({ close = () => null, item }) => {
     },
 
     {
-      name: "Publish",
-      title: isPublished ? "Published" : "Publish",
-      icon: "cloud-upload-outline",
-      on: isPublished,
-      func: publishNote
-    },
-    {
-      name: "Vault",
-      title: item.locked ? "Remove from vault" : "Add to vault",
-      icon: item.locked ? "shield-off-outline" : "shield-outline",
-      func: addToVault,
-      on: item.locked
-    },
-
-    {
       name: "Add Shortcut",
       title: isPinnedToMenu ? "Remove Shortcut" : "Add Shortcut",
       icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
@@ -736,41 +775,6 @@ export const useActions = ({ close = () => null, item }) => {
       func: shareNote
     },
     {
-      name: "Attachments",
-      title: "Attachments",
-      icon: "attachment",
-      func: showAttachments
-    },
-    {
-      name: "Export",
-      title: "Export",
-      icon: "export",
-      func: exportNote
-    },
-    {
-      name: "RemoveTopic",
-      title: "Remove from topic",
-      hidden: !isNoteInTopic(),
-      icon: "minus-circle-outline",
-      func: removeNoteFromTopic
-    },
-    {
-      name: "Delete",
-      title:
-        item.type !== "notebook" && item.type !== "note"
-          ? "Delete " + item.type
-          : "Move to trash",
-      icon: "delete-outline",
-      type: "error",
-      func: deleteItem
-    },
-    {
-      name: "PermDelete",
-      title: "Delete " + item.itemType,
-      icon: "delete",
-      func: deleteTrashItem
-    },
-    {
       name: "ReadOnly",
       title: "Read only",
       icon: "pencil-lock",
@@ -783,13 +787,6 @@ export const useActions = ({ close = () => null, item }) => {
       icon: "sync-off",
       func: toggleLocalOnly,
       on: item.localOnly
-    },
-
-    {
-      name: "History",
-      title: "History",
-      icon: "history",
-      func: openHistory
     },
     {
       name: "Duplicate",
@@ -819,28 +816,7 @@ export const useActions = ({ close = () => null, item }) => {
       },
       close: false
     },
-    {
-      name: "Reminders",
-      title: "Reminders",
-      icon: "bell",
-      func: async () => {
-        close();
-        RelationsList.present({
-          reference: item,
-          referenceType: "reminder",
-          relationType: "from",
-          title: "Reminders",
-          onAdd: () => ReminderSheet.present(null, item, true),
-          button: {
-            title: "Add",
-            type: "accent",
-            onPress: () => ReminderSheet.present(null, item, true),
-            icon: "plus"
-          }
-        });
-      },
-      close: false
-    },
+
     {
       name: "ReminderOnOff",
       title: !item.disabled ? "Turn off reminder" : "Turn on reminder",
@@ -863,6 +839,29 @@ export const useActions = ({ close = () => null, item }) => {
           "Reminders"
         );
       }
+    },
+    {
+      name: "RemoveTopic",
+      title: "Remove from topic",
+      hidden: !isNoteInTopic(),
+      icon: "minus-circle-outline",
+      func: removeNoteFromTopic
+    },
+    {
+      name: "Delete",
+      title:
+        item.type !== "notebook" && item.type !== "note"
+          ? "Delete " + item.type
+          : "Move to trash",
+      icon: "delete-outline",
+      type: "error",
+      func: deleteItem
+    },
+    {
+      name: "PermDelete",
+      title: "Delete " + item.itemType,
+      icon: "delete",
+      func: deleteTrashItem
     }
     // {
     //   name: "ReferencedIn",
