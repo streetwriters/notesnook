@@ -466,7 +466,5 @@ function isCJKChar(char: string) {
   const isIn = CJK_UNICODE_RANGES.some(
     (range) => code >= range[0] && code <= range[1]
   );
-  console.log(char, code, isIn);
-
   return isIn;
 }
