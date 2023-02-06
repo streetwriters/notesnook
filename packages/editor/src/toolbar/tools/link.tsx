@@ -38,6 +38,7 @@ export function LinkSettings(props: ToolProps) {
   return (
     <MoreTools
       {...props}
+      autoOpen
       autoCloseOnUnmount
       popupId="linkSettings"
       tools={["openLink", "editLink", "removeLink"]}
