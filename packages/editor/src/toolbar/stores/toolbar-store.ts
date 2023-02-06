@@ -32,7 +32,7 @@ interface ToolbarState {
   isKeyboardOpen: boolean;
   setIsKeyboardOpen: (isKeyboardOpen: boolean) => void;
   isMobile: boolean;
-  openedPopups: Record<string, PopupRef | false>;
+  openedPopups: Record<string, PopupRef | false | undefined>;
   setIsMobile: (isMobile: boolean) => void;
   toolbarLocation: ToolbarLocation;
   setToolbarLocation: (location: ToolbarLocation) => void;
