@@ -80,6 +80,7 @@ export function TaskItemComponent(
         sx={{
           bg: "background",
           borderRadius: "default",
+          gap: 2,
           ":hover > .dragHandle": {
             opacity: editor.isEditable ? 1 : 0
           },
@@ -100,7 +101,6 @@ export function TaskItemComponent(
             sx={{
               opacity: [1, 1, 0],
               alignSelf: "start",
-              mr: 2,
               bg: "transparent",
               cursor: "grab",
               ".icon:hover path": {
@@ -121,7 +121,6 @@ export function TaskItemComponent(
             borderColor: checked ? "checked" : "icon",
             borderRadius: "default",
             alignSelf: "start",
-            mr: 2,
             p: "1px",
             mt: "2px",
             cursor: editor.isEditable ? "pointer" : "unset",
@@ -172,10 +171,10 @@ export function TaskItemComponent(
             className="taskItemTools"
             sx={{
               bg: "background",
-              ml: 0,
-              mt: "4px",
-              alignSelf: "end",
               opacity: 0,
+              position: "absolute",
+              top: 1,
+              right: 0,
               alignItems: "center"
             }}
           >
