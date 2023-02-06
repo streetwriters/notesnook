@@ -28,7 +28,6 @@ import { findChildrenByType } from "../../utils/prosemirror";
 
 export type TaskListAttributes = {
   title: string;
-  textDirection: string;
 };
 
 const stateKey = new PluginKey("task-item-drop-override");
@@ -47,17 +46,6 @@ export const TaskListNode = TaskList.extend({
           return {
             "data-title": attributes.title
           };
-        }
-      },
-      textDirection: {
-        default: "ltr",
-        parseHTML: (element) => element.dir,
-        renderHTML(attributes) {
-          if (!attributes.textDirection) {
-            return {};
-          }
-
-          return { dir: attributes.textDirection };
         }
       }
     };
