@@ -25,6 +25,7 @@ import {
 } from "@tiptap/core";
 import { Attachment, getDataAttribute } from "../attachment";
 import { createSelectionBasedNodeView } from "../react";
+import { TextDirections } from "../text-direction";
 import { ImageComponent } from "./component";
 
 export interface ImageOptions {
@@ -38,6 +39,7 @@ export type ImageAttributes = Partial<ImageSizeOptions> &
     src: string;
     alt?: string;
     title?: string;
+    textDirection?: TextDirections;
   };
 
 export type ImageAlignmentOptions = {
@@ -106,7 +108,7 @@ export const ImageNode = Node.create<ImageOptions>({
 
       // TODO: maybe these should be stored as styles?
       float: getDataAttribute("float", false),
-      align: getDataAttribute("align", "left"),
+      align: getDataAttribute("align"),
 
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),

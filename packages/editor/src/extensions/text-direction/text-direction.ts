@@ -30,7 +30,8 @@ const TEXT_DIRECTION_TYPES = [
   "taskList",
   "table",
   "blockquote",
-  "embed"
+  "embed",
+  "image"
 ];
 
 type TextDirectionOptions = {
