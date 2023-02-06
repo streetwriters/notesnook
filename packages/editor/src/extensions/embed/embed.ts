@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Node, mergeAttributes } from "@tiptap/core";
 import { createSelectionBasedNodeView } from "../react";
+import { TextDirections } from "../text-direction";
 import { EmbedComponent } from "./component";
 
 export interface EmbedOptions {
@@ -31,6 +32,7 @@ export type EmbedAttributes = Partial<EmbedSizeOptions> & {
 
 export type EmbedAlignmentOptions = {
   align?: "center" | "left" | "right";
+  textDirection?: TextDirections;
 };
 
 export type Embed = Required<EmbedAttributes> & EmbedAlignmentOptions;
@@ -78,7 +80,7 @@ export const EmbedNode = Node.create<EmbedOptions>({
       },
       width: { default: null },
       height: { default: null },
-      align: { default: "left" }
+      align: { default: undefined }
     };
   },
 
