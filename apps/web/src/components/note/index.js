@@ -242,6 +242,7 @@ function Note(props) {
           )}
         </Flex>
       }
+      divider
     />
   );
 }

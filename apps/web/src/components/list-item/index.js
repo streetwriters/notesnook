@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex, Text } from "@theme-ui/components";
+import { Box, Flex, Text, Divider } from "@theme-ui/components";
 import * as Icon from "../icons";
 import {
   store as selectionStore,
@@ -78,6 +78,7 @@ function ListItem(props) {
   });
 
   return (
+  <>
     <Flex
       id={`id_${props.item.id}`}
       className={isSelected ? "selected" : ""}
@@ -198,7 +199,9 @@ function ListItem(props) {
           {props.footer}
         </Box>
       ) : null}
-    </Flex>
+      </Flex>
+      {props.divider && <Divider  sx={{margin: "0", color: "border"}} />}
+    </>  
   );
 }
 export default ListItem;

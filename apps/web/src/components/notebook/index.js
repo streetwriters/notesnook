@@ -97,6 +97,7 @@ function Notebook(props) {
           </>
         )
       }
+      divider
     />
   );
 }

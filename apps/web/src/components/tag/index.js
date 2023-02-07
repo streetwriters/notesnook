@@ -82,6 +82,7 @@ function Tag({ item, index }) {
       onClick={() => {
         navigate(`/tags/${id}`);
       }}
+      divider
     />
   );
 }

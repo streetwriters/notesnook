@@ -59,6 +59,7 @@ function Topic({ item, index, onClick }) {
         items: menuItems,
         extraData: { topic, notebookId: topic.notebookId }
       }}
+      divider
     />
   );
 }
