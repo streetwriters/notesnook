@@ -273,7 +273,9 @@ function NavigationMenu(props: NavigationMenuProps) {
           title={settings.title}
           icon={settings.icon}
           onClick={() => {
-            _navigate(settings.path);
+            if (!isMobile && location === settings.path)
+             return toggleNavigationContainer();
+              _navigate(settings.path);
           }}
           selected={location.startsWith(settings.path)}
         >
