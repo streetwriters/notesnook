@@ -126,6 +126,10 @@ export function isDesktop() {
   return "api" in window;
 }
 
+export function isMac() {
+  return getPlatform() === "macOS" || window.os === "darwin" || isMacStoreApp();
+}
+
 export function isMacStoreApp() {
   return window.os === "mas";
 }
