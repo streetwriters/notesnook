@@ -95,7 +95,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
       title={"Configure toolbar"}
       description={"Customize the editor toolbar to fit your needs."}
       width={500}
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
         text: "Save",
         onClick: async () => {
@@ -110,7 +110,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
           props.onClose(true);
         }
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
       <Flex sx={{ flexDirection: "column" }}>
         <Flex

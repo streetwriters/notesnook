@@ -152,7 +152,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
       isOpen={true}
       title={reminderId ? "Edit reminder" : "Add a reminder"}
       description={""}
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
         text: reminderId ? "Save" : "Add",
         disabled:
@@ -210,7 +210,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
           props.onClose(true);
         }
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
       <Field
         id="title"

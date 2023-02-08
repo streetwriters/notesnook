@@ -37,12 +37,12 @@ export default function Prompt(props: PromptDialogProps) {
       isOpen={true}
       title={props.title}
       description={props.description}
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
         text: "Done",
         onClick: () => props.onSave(inputRef.current?.value || "")
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
       <Field inputRef={inputRef} defaultValue={props.defaultValue} autoFocus />
     </Dialog>

@@ -63,12 +63,12 @@ export default function LanguageSelectorDialog(
       description={
         "Choose the languages you want to spell check while editing."
       }
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
         text: "Done",
-        onClick: props.onClose
+        onClick: () => props.onClose(true)
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
       <Input
         placeholder="Filter languages"
