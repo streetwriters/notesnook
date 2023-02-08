@@ -363,6 +363,21 @@ export default class Notes extends Collection {
     if (rebuildCache) this.topicReferences.rebuild();
   }
 
+  async removeFromAllNotebooks(...noteIds) {
+    for (const noteId of noteIds) {
+      const note = this.note(noteId);
+      if (!note || note.deleted || !note.notebooks) {
+        continue;
+      }
+
+      await this._db.notes.add({
+        id: noteId,
+        notebooks: []
+      });
+    }
+    this.topicReferences.rebuild();
+  }
+
   async _clearAllNotebookReferences(notebookId) {
     const notes = this._db.notes.all;
 
