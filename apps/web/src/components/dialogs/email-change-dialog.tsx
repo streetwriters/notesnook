@@ -69,14 +69,14 @@ export default function EmailChangeDialog(props: EmailChangeDialogProps) {
       description={
         "Your account email will be changed without affecting your subscription or any other settings."
       }
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
         text: "Next",
         disabled: isLoading,
         loading: isLoading,
-        props: { form: "changeEmailForm" }
+        form: "changeEmailForm"
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
       <Flex
         id="changeEmailForm"

@@ -52,16 +52,14 @@ function IssueDialog(props: IssueDialogProps) {
     <Dialog
       isOpen={true}
       title={"Report an issue"}
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
         text: "Submit",
-        props: {
-          form: "issueForm"
-        },
+        form: "issueForm",
         loading: isSubmitting,
         disabled: isSubmitting
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
       <Flex
         id="issueForm"

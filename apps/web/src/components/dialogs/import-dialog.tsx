@@ -68,13 +68,13 @@ function ImportDialog(props: ImportDialogProps) {
           ? undefined
           : {
               text: "Cancel",
-              onClick: props.onClose
+              onClick: () => props.onClose(false)
             }
       }
       positiveButton={
         isDone
           ? {
-              onClick: props.onClose,
+              onClick: () => props.onClose(true),
               text: "Close"
             }
           : {

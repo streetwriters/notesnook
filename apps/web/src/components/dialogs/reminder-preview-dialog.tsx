@@ -69,10 +69,10 @@ export default function ReminderPreviewDialog(
       isOpen={true}
       title={reminder.title}
       description={reminder.description}
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       negativeButton={{
         text: "Close",
-        onClick: props.onClose
+        onClick: () => props.onClose(false)
       }}
     >
       <Flex

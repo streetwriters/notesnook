@@ -144,7 +144,7 @@ function FeatureDialog(props: FeatureDialogProps) {
       isOpen={true}
       title={feature.title}
       description={feature.subtitle}
-      alignment="center"
+      textAlignment="center"
       positiveButton={{
         text: (
           <Flex>

@@ -42,7 +42,7 @@ export default function RecoveryCodesDialog(props: RecoveryCodesDialogProps) {
       width={500}
       positiveButton={{
         text: "Okay",
-        onClick: onClose
+        onClick: () => onClose(true)
       }}
     >
       {step.component && (
