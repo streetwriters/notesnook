@@ -44,7 +44,7 @@ function useMenuFocus(items, onAction, onClose) {
   const onKeyDown = useCallback(
     (e) => {
       const isSeperator = (i) =>
-        items && (items[i]?.type === "seperator" || items[i]?.isDisabled);
+        items && (items[i]?.type === "separator" || items[i]?.isDisabled);
       const moveDown = (i) => (i < items.length - 1 ? ++i : 0);
       const moveUp = (i) => (i > 0 ? --i : items.length - 1);
       const hasSubmenu = (i) => items && items[i]?.hasSubmenu;
