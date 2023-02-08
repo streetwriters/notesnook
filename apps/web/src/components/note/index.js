@@ -359,6 +359,13 @@ const menuItems = [
   },
   { key: "sep1", type: "separator" },
   {
+    key: "notebooks",
+    title: "Notebooks",
+    icon: Icon.Notebook,
+    items: notebooksMenuItems,
+    multiSelect: true
+  },
+  {
     key: "colors",
     title: "Assign color",
     icon: Icon.Colors,
@@ -523,4 +530,64 @@ function colorsToMenuItems() {
       }
     };
   });
+}
+
+function notebooksMenuItems({ note }) {
+  const menuItems = [];
+  menuItems.push({
+    key: "link-notebooks",
+    title: "Link to...",
+    icon: Icon.AddToNotebook,
+    onClick: async ({ items }) => {
+      await showMoveNoteDialog(items.map((i) => i.id));
+    }
+  });
+
+  if (note && note.notebooks?.length > 0) {
+    menuItems.push(
+      {
+        key: "remove-from-all-notebooks",
+        title: "Unlink from all",
+        icon: Icon.RemoveShortcutLink,
+        onClick: async () => {
+          await db.notes.removeFromAllNotebooks(note.id);
+          store.refresh();
+        }
+      },
+      { key: "sep", type: "separator" }
+    );
+    note.notebooks.forEach((ref) => {
+      // if (prev) return prev;
+      // const topicId = (curr as NotebookReference).topics[0];
+      const notebook = db.notebooks?.notebook(ref.id);
+      if (!notebook) return;
+      const notebookMenuItems = [];
+      for (const topicId of ref.topics) {
+        const topic = notebook.topics.topic(topicId)._topic;
+        notebookMenuItems.push({
+          key: topicId,
+          title: topic.title,
+          icon: Icon.Topic,
+          checked: true,
+          tooltip: "Click to remove from this topic",
+          onClick: async () => {
+            await db.notes.removeFromNotebook(
+              { id: ref.id, topic: topic.id },
+              note.id
+            );
+            store.refresh();
+          }
+        });
+      }
+
+      menuItems.push({
+        key: ref.id,
+        title: notebook.title,
+        icon: Icon.Notebook2,
+        items: notebookMenuItems
+      });
+    });
+  }
+
+  return menuItems;
 }
