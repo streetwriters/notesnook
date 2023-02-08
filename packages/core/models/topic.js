@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export default class Topic {
   /**
-   * @param {Object} topic
+   * @param {any} topic
    * @param {string} notebookId
    * @param {import('../api').default} db
    */
