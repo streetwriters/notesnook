@@ -82,6 +82,7 @@ const menuItems = [
     icon: Icon.Shortcut,
     onClick: ({ topic }) => appStore.addToShortcuts(topic)
   },
+  { key: "sep", type: "separator" },
   {
     key: "delete",
     title: "Delete",
