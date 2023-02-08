@@ -184,7 +184,12 @@ import {
   mdiBellCancelOutline,
   mdiBellPlusOutline,
   mdiBellOutline,
-  mdiGestureTapButton
+  mdiGestureTapButton,
+  mdiCloseCircleOutline,
+  mdiMinusCircleOutline,
+  mdiLightbulbOnOutline,
+  mdiNoteMultipleOutline,
+  mdiBookMultipleOutline
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { AnimatedFlex } from "../animated";
@@ -279,8 +284,10 @@ function createIcon(path: string, rotate = false) {
 
 export const Plus = createIcon(mdiPlus);
 export const Note = createIcon(mdiNoteOutline);
+export const Notes = createIcon(mdiNoteMultipleOutline);
 export const Minus = createIcon(mdiMinus);
 export const Notebook = createIcon(mdiBookOutline);
+export const Notebooks = createIcon(mdiBookMultipleOutline);
 export const Notebook2 = createIcon(mdiNotebookOutline);
 export const ArrowLeft = createIcon(mdiArrowLeft);
 export const ArrowRight = createIcon(mdiArrowRight);
@@ -334,6 +341,8 @@ export const ThemeIcon = createIcon(mdiThemeLightDark);
 export const Checkmark = createIcon(mdiCheck);
 export const DoubleCheckmark = createIcon(mdiCheckAll);
 export const CheckCircle = createIcon(mdiCheckCircle);
+export const CheckIntermediate = createIcon(mdiMinusCircleOutline);
+export const CheckRemove = createIcon(mdiCloseCircleOutline);
 export const CheckCircleOutline = createIcon(mdiCheckCircleOutline);
 export const Properties = createIcon(mdiDotsVertical);
 export const Markdown = createIcon(mdiLanguageMarkdownOutline);
@@ -468,3 +477,4 @@ export const EditorNormalWidth = createIcon(
 export const EditorFullWidth = createIcon(
   `M4 20q-.825 0-1.412-.587Q2 18.825 2 18V6q0-.825.588-1.412Q3.175 4 4 4h16q.825 0 1.413.588Q22 5.175 22 6v12q0 .825-.587 1.413Q20.825 20 20 20Zm0-2h1V6H4v12Zm3 0h10V6H7Zm12 0h1V6h-1ZM7 6v12Z`
 );
+export const Suggestion = createIcon(mdiLightbulbOnOutline);

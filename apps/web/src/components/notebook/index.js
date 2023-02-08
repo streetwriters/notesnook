@@ -139,11 +139,15 @@ const menuItems = [
   },
   {
     key: "shortcut",
-    icon: Icon.Shortcut,
+    icon: ({ notebook }) =>
+      db.shortcuts.exists(notebook.id)
+        ? Icon.RemoveShortcutLink
+        : Icon.Shortcut,
     title: ({ notebook }) =>
       db.shortcuts.exists(notebook.id) ? "Remove shortcut" : "Create shortcut",
     onClick: ({ notebook }) => appStore.addToShortcuts(notebook)
   },
+  { key: "sep", type: "separator" },
   {
     key: "movetotrash",
     title: "Move to trash",

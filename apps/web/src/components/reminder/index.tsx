@@ -122,16 +122,19 @@ type MenuActionParams = {
 };
 
 type MenuItemValue<T> = T | ((options: MenuActionParams) => T);
-
-const menuItems: {
+type MenuItem = {
+  type?: "separator";
   key: string;
-  title: MenuItemValue<string>;
-  icon: MenuItemValue<Icon.Icon>;
-  onClick: (options: MenuActionParams) => void;
+  title?: MenuItemValue<string>;
+  icon?: MenuItemValue<Icon.Icon>;
+  onClick?: (options: MenuActionParams) => void;
   color?: MenuItemValue<string>;
   iconColor?: MenuItemValue<string>;
   multiSelect?: boolean;
-}[] = [
+  items?: MenuItemValue<MenuItem[]>;
+};
+
+const menuItems: MenuItem[] = [
   {
     key: "edit",
     title: "Edit",
@@ -140,7 +143,7 @@ const menuItems: {
   },
   {
     key: "toggle",
-    title: ({ reminder }) => (reminder.disabled ? "Turn on" : "Turn off"),
+    title: ({ reminder }) => (reminder.disabled ? "Activate" : "Deactivate"),
     icon: ({ reminder }: MenuActionParams) =>
       reminder.disabled ? Icon.Reminders : Icon.ReminderOff,
     onClick: async ({ reminder }) => {
@@ -151,6 +154,7 @@ const menuItems: {
       store.refresh();
     }
   },
+  { key: "sep", type: "separator" },
   {
     key: "delete",
     title: "Delete",

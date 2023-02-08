@@ -331,28 +331,40 @@ const menuItems = [
     onClick: ({ note }) => store.favorite(note.id)
   },
   {
-    key: "addtonotebook",
-    title: "Add to notebook(s)",
-    icon: Icon.AddToNotebook,
-    onClick: async ({ items }) => {
-      await showMoveNoteDialog(items.map((i) => i.id));
+    key: "lock",
+    disabled: ({ note }) =>
+      !db.notes.note(note.id).synced() ? notFullySyncedText : false,
+    title: "Lock",
+    checked: ({ note }) => note.locked,
+    icon: Icon.Lock,
+    onClick: async ({ note }) => {
+      const { unlock, lock } = store.get();
+      if (!note.locked) {
+        if (await lock(note.id))
+          showToast("success", "Note locked successfully!");
+      } else {
+        if (await unlock(note.id))
+          showToast("success", "Note unlocked successfully!");
+      }
     },
-    multiSelect: true
+    isPro: true
   },
   {
-    key: "addreminder",
-    title: "Add reminder",
+    key: "remind-me",
+    title: "Remind me",
     icon: Icon.AddReminder,
     onClick: async ({ note }) => {
       await showAddReminderDialog(note.id);
     }
   },
+  { key: "sep1", type: "separator" },
   {
     key: "colors",
     title: "Assign color",
     icon: Icon.Colors,
     items: colorsToMenuItems()
   },
+  { key: "sep2", type: "separator" },
   {
     key: "publish",
     disabled: ({ note }) => {
@@ -386,6 +398,7 @@ const menuItems = [
         format.type === "pdf" && items.length > 1
           ? "Multiple notes cannot be exported as PDF."
           : false,
+      isPro: format.type !== "txt",
       onClick: async ({ items }) => {
         await exportNotes(
           format.type,
@@ -418,40 +431,22 @@ const menuItems = [
       }
     }
   },
+  { key: "sep3", type: "separator" },
   {
-    key: "lock",
-    disabled: ({ note }) =>
-      !db.notes.note(note.id).synced() ? notFullySyncedText : false,
-    title: "Lock",
-    checked: ({ note }) => note.locked,
-    icon: Icon.Lock,
-    onClick: async ({ note }) => {
-      const { unlock, lock } = store.get();
-      if (!note.locked) {
-        if (await lock(note.id))
-          showToast("success", "Note locked successfully!");
-      } else {
-        if (await unlock(note.id))
-          showToast("success", "Note unlocked successfully!");
-      }
-    },
-    isPro: true
-  },
-  {
-    key: "sync-disable",
+    key: "local-only",
     hidden: () => !userstore.get().isLoggedIn,
     disabled: ({ note }) =>
       !db.notes.note(note.id).synced() ? notFullySyncedText : false,
-    title: "Disable sync",
+    title: "Local only",
     checked: ({ note }) => note.localOnly,
     icon: ({ note }) => (note.localOnly ? Icon.Sync : Icon.SyncOff),
     onClick: async ({ note }) => {
       if (
         note.localOnly ||
         (await confirm({
-          title: "Disable sync for this item?",
+          title: "Prevent this item from syncing?",
           message:
-            "Turning sync off for this item will automatically delete it from all other devices. Are you sure you want to continue?",
+            "Turning sync off for this item will automatically delete it from all other devices & any future changes to this item won't get synced. Are you sure you want to continue?",
           yesText: "Yes",
           noText: "No"
         }))
