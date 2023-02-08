@@ -37,7 +37,7 @@ function MenuItem({ item, isFocused, onMouseEnter, onMouseLeave, onClick }) {
     modifier
   } = item;
   const itemRef = useRef();
-  if (type === "seperator")
+  if (type === "separator")
     return (
       <Box
         as="li"

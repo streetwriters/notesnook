@@ -193,9 +193,9 @@ function mapMenuItems(items, data) {
     const isHidden = hidden && hidden(data, item);
     if (isHidden) return prev;
 
-    const isSeperator = type === "seperator";
+    const isSeperator = type === "separator";
     if (isSeperator) {
-      prev.push({ isSeperator: true });
+      prev.push({ type });
       return prev;
     }
 
