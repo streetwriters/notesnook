@@ -317,6 +317,13 @@ const menuItems = [
     }
   },
   {
+    key: "readonly",
+    title: "Readonly",
+    checked: ({ note }) => note.readonly,
+    icon: Icon.Readonly,
+    onClick: ({ note }) => store.readonly(note.id)
+  },
+  {
     key: "favorite",
     title: "Favorite",
     checked: ({ note }) => note.favorite,
