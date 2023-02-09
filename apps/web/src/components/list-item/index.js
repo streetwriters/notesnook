@@ -180,6 +180,7 @@ function ListItem(props) {
             lineHeight: `1.2rem`,
             overflow: "hidden",
             textOverflow: "ellipsis",
+            whiteSpace: "pre-wrap",
             position: "relative",
             display: "-webkit-box",
             WebkitLineClamp: 4,
