@@ -11,7 +11,7 @@
   </head>
   <body>
     <h1>Test 1</h1>
-    <p dir="ltr" data-spacing="double">This is Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1</p>
+    <p  data-spacing="double">This is Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1</p>
     <br/>
     Created on: <b>xxx</b><br/>
     Edited on: <b>xxx</b>

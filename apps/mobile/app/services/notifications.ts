@@ -45,6 +45,7 @@ import ReminderNotify from "../components/sheets/reminder-notify";
 import { sleep } from "../utils/time";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useReminderStore } from "../stores/use-reminder-store";
+import { presentDialog } from "../components/dialog/functions";
 
 export type Reminder = {
   id: string;
@@ -477,7 +478,30 @@ async function displayNotification({
   }
 }
 
-async function checkAndRequestPermissions() {
+function openSettingsDialog(context: any) {
+  return new Promise((resolve) => {
+    presentDialog({
+      title: "Notifications disabled",
+      paragraph: `Reminders cannot be set because notifications have been disabled from app settings. If you want to keep receiving reminder notifications, enable notifications for Notesnook from app settings.`,
+      positiveText: Platform.OS === "ios" ? undefined : "Open settings",
+      negativeText: Platform.OS === "ios" ? "Close" : "Cancel",
+      positivePress:
+        Platform.OS === "ios"
+          ? undefined
+          : () => {
+              resolve(true);
+            },
+      onClose: () => {
+        resolve(false);
+      },
+      context: context
+    });
+  });
+}
+
+async function checkAndRequestPermissions(
+  promptUser?: boolean
+): Promise<boolean> {
   let permissionStatus = await notifee.getNotificationSettings();
   if (Platform.OS === "android") {
     if (
@@ -497,11 +521,22 @@ async function checkAndRequestPermissions() {
       permissionStatus.android.alarm === 1
     )
       return true;
+
+    if (promptUser) {
+      if (await openSettingsDialog("local")) {
+        await notifee.openNotificationSettings();
+        return false;
+      }
+    }
+
     return false;
   } else {
     permissionStatus = await notifee.requestPermission();
     if (permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED)
       return true;
+    if (promptUser) {
+      await openSettingsDialog("local");
+    }
     return false;
   }
 }

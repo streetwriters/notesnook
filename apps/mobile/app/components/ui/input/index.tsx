@@ -73,6 +73,7 @@ interface InputProps extends TextInputProps {
   buttonLeft?: React.ReactNode;
   inputStyle?: TextInputProps["style"];
   containerStyle?: ViewStyle;
+  wrapperStyle?: ViewStyle;
   flexGrow?: number;
 }
 
@@ -100,6 +101,7 @@ const Input = ({
   flexGrow = 1,
   inputStyle = {},
   containerStyle = {},
+  wrapperStyle = {},
   ...restProps
 }: InputProps) => {
   const colors = useThemeStore((state) => state.colors);
@@ -236,7 +238,8 @@ const Input = ({
           marginBottom: marginBottom,
           flexGrow: flexGrow,
           maxHeight: height,
-          marginRight: marginRight
+          marginRight: marginRight,
+          ...wrapperStyle
         }}
       >
         <TouchableOpacity

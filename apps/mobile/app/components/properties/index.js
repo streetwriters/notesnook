@@ -101,6 +101,7 @@ export const Properties = ({
             <Heading size={SIZE.xl} color={colors.accent}>
               #
             </Heading>
+
           ) : null}
           {alias}
         </Heading>
