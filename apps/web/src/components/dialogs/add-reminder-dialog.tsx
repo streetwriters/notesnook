@@ -223,11 +223,17 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
         }
       />
       <Field
+        as="textarea"
         id="description"
         label="Description"
         data-test-id="description-input"
         helpText="Optional"
         value={description}
+        styles={{
+          input: {
+            height: 100
+          }
+        }}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setDescription(e.target.value)
         }
