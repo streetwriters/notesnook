@@ -58,7 +58,7 @@ const SheetProvider = ({ context = "global" }) => {
       if (visible || dialogData) {
         setDialogData(null);
         setVisible(false);
-        await sleep(500);
+        await sleep(0);
       }
       setDialogData(data);
       setVisible(true);
