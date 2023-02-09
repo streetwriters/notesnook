@@ -66,7 +66,7 @@ function MenuItem({ item, isFocused, onMouseEnter, onMouseLeave, onClick }) {
         disabled={isDisabled}
         onClick={onClick}
         sx={{
-          bg: isFocused ? "hover" : "transparent",
+          bg: isFocused ? "border" : "transparent",
           alignItems: "center",
           justifyContent: "space-between",
           display: "flex"

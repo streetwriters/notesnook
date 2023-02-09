@@ -216,9 +216,9 @@ function MenuContainer({ title, children }) {
     <Flex
       className="menuContainer"
       tabIndex={-1}
-      bg="background"
       py={1}
       sx={{
+        bg: "bgSecondary",
         padding: 0,
         margin: 0,
         borderRadius: "default",
