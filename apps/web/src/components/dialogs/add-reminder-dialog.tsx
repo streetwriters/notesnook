@@ -133,6 +133,15 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
     setDescription(reminder.description);
   }, [reminderId]);
 
+  useEffect(() => {
+    if (!noteId) return;
+    const note = db.notes?.note(noteId);
+    if (!note) return;
+
+    setTitle(note.title);
+    setDescription(note.headline);
+  }, [noteId]);
+
   const repeatsDaily =
     (selectedDays.length === 7 && recurringMode === RecurringModes.WEEK) ||
     (selectedDays.length === 31 && recurringMode === RecurringModes.MONTH) ||
