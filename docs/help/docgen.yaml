@@ -4,6 +4,7 @@ subtitle: HELP
 docs_dir: ./contents
 logo: logo.png
 edit_root: https://github.com/streetwriters/notesnook/tree/help/docs/help
+base_url: https://docs.notesnook.com
 
 footer:
   copyright: Copyright © 2023 Streetwriters (Private) Limited
