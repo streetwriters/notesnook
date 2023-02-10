@@ -112,18 +112,24 @@ html.light {
   --font-family: "Open Sans", sans-serif;
   --monospace-font-family: "Fira Code", monospace;
   --primary: #008837;
+  --primary-fg: #fff;
   --header-fg: #008837;
   --link: #008837;
   --heading: #000;
-  --page-bg: #f7f7f7;
+  --page-bg: #fafafa;
+  --document-bg: #f3f3f3;
+  --selection-bg: #00883766;
+  --selection-fg: #fff;
 }
 
 html.dark {
   --primary: #008837;
+  --primary-fg: #fff;
   --header-fg: #008837;
   --link: #008837;
   --page-bg: #1b1b1b;
-  --document-bg: #2b2b2b;
+  --document-bg: #222;
+  --border: #333;
 
   --button-bg: #3b3b3b;
   --hover-bg: #4b4b4b;
