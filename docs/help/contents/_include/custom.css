@@ -120,6 +120,10 @@ html.light {
   --document-bg: #f3f3f3;
   --selection-bg: #00883766;
   --selection-fg: #fff;
+
+  --fg: #403f53;
+  --fg-dim: #403f53cc;
+  --fg-dimmer: #403f53bb;
 }
 
 html.dark {
