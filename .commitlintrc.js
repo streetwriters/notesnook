@@ -21,6 +21,7 @@ const SCOPES = [
   "theme",
   "core",
   "clipper",
+  "vscode",
   "config",
   "ci",
   "setup",

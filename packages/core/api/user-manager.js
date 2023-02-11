@@ -141,10 +141,14 @@ class UserManager {
     const user = await this.fetchUser();
     if (!user) throw new Error("Unauthorized.");
 
+    console.log("GOT USER", user);
+
     await this._storage.deriveCryptoKey(`_uk_@${user.email}`, {
       password,
       salt: user.salt
     });
+
+    console.log("KEY DERIVED");
 
     EV.publish(EVENTS.userLoggedIn, user);
   }

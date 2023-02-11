@@ -1,0 +1,94 @@
+{
+  "name": "@notesnook/vs-code",
+  "displayName": "Notesnook",
+  "description": "End-to-end encrypted notepad.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:notesnook.helloWorld"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsWelcome": [
+      {
+        "view": "notesnook.welcome",
+        "contents": "You are not logged in.\n[Login to Notesnook](command:notesnook.login)"
+      }
+    ],
+    "views": {
+      "notesnook": [
+        {
+          "id": "notesnook.welcome",
+          "name": "Not logged in",
+          "when": "!notesnook.isLoggedIn"
+        },
+        {
+          "id": "notesnook.notes",
+          "name": "Notes",
+          "when": "notesnook.isLoggedIn"
+        },
+        {
+          "id": "notesnook.notebooks",
+          "name": "Notebooks",
+          "when": "notesnook.isLoggedIn",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "notesnook.tags",
+          "name": "Tags",
+          "when": "notesnook.isLoggedIn",
+          "visibility": "collapsed"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "title": "Notesnook",
+          "icon": "assets/logo.svg",
+          "id": "notesnook"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.0.1",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.75.0",
+    "@typescript-eslint/eslint-plugin": "^5.49.0",
+    "@typescript-eslint/parser": "^5.49.0",
+    "@vscode/test-electron": "^2.2.2",
+    "eslint": "^8.33.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.1.0",
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.4",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
+  },
+  "dependencies": {
+    "@happy-dom/global-registrator": "^8.2.6",
+    "@notesnook/core": "*",
+    "@notesnook/crypto": "*",
+    "event-source-polyfill": "^1.0.31",
+    "eventsource": "^2.0.2",
+    "happy-dom": "^8.2.6"
+  }
+}
