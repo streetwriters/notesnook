@@ -267,15 +267,22 @@ function NavigationMenu(props: NavigationMenuProps) {
             }}
           />
         )}
-        <NavigationItem
+       <NavigationItem
           isTablet={isTablet}
           key={settings.path}
           title={settings.title}
           icon={settings.icon}
+          tag={settings.tag}
+          selected={
+            settings.path === "/"
+              ? location === settings.path
+              : location.startsWith(settings.path)
+          }
           onClick={() => {
+            if (!isMobile && location === settings.path)
+              return toggleNavigationContainer();
             _navigate(settings.path);
-          }}
-          selected={location.startsWith(settings.path)}
+          }}          
         >
           {isTablet ? null : (
             <Button
