@@ -23,31 +23,9 @@ export function isTelemetryEnabled() {
   // telemetry is always disabled in DEBUG/TEST mode
   if (process.env.NODE_ENV !== "production") return false;
 
-  return Config.get("telemetry", !doNotTrack());
+  return Config.get("telemetry", false);
 }
 
 export function setTelemetry(state: boolean) {
   Config.set("telemetry", state);
-}
-
-export function doNotTrack() {
-  const { navigator, external } = window;
-
-  const msTrackProtection = "msTrackingProtectionEnabled";
-  const msTracking = () => {
-    return (
-      external &&
-      msTrackProtection in external &&
-      typeof external[msTrackProtection] === "function" &&
-      external[msTrackProtection]()
-    );
-  };
-
-  const dnt =
-    ("doNotTrack" in window && window.doNotTrack) ||
-    navigator.doNotTrack ||
-    ("msDoNotTrack" in navigator && navigator.doNotTrack) ||
-    msTracking();
-
-  return dnt == "1" || dnt === "yes";
 }
