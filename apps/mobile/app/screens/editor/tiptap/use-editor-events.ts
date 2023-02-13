@@ -28,8 +28,9 @@ import {
   NativeEventSubscription
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
-import umami from "../../../common/analytics/index";
 import { db } from "../../../common/database";
+import { RelationsList } from "../../../components/sheets/relations-list";
+import ReminderSheet from "../../../components/sheets/reminder";
 import useKeyboard from "../../../hooks/use-keyboard";
 import { DDS } from "../../../services/device-detection";
 import {
@@ -53,15 +54,13 @@ import {
   eOpenPublishNoteDialog,
   eOpenTagsDialog
 } from "../../../utils/events";
+import { openLinkInBrowser } from "../../../utils/functions";
 import { tabBarRef } from "../../../utils/global-refs";
 import { NoteType } from "../../../utils/types";
 import { useDragState } from "../../settings/editor/state";
+import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { EditorEvents, editorState } from "./utils";
-import { openLinkInBrowser } from "../../../utils/functions";
-import { EventTypes } from "./editor-events";
-import { RelationsList } from "../../../components/sheets/relations-list";
-import ReminderSheet from "../../../components/sheets/reminder";
 
 const publishNote = async (editor: useEditorType) => {
   const user = useUserStore.getState().user;
@@ -363,7 +362,6 @@ export const useEditorEvents = (
           if (editor.state.current?.isFocused) {
             editor.state.current.isFocused = true;
           }
-          umami.pageView("/pro-screen", "/editor");
           eSendEvent(eOpenPremiumDialog);
           break;
         case EventTypes.monograph:

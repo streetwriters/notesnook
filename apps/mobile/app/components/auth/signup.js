@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useRef, useState } from "react";
 import { Dimensions, View } from "react-native";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
-import umami from "../../common/analytics";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { ToastEvent } from "../../services/event-manager";
@@ -79,7 +78,6 @@ export const Signup = ({ changeMode, trial }) => {
       clearMessage();
       setEmailVerifyMessage();
       hideAuth();
-      umami.pageView("/account-created", "/welcome/signup");
       await sleep(300);
       if (trial) {
         PremiumService.sheet(null, null, true);
