@@ -41,7 +41,6 @@ import { useCallback, useState } from "react";
 import Config from "../../utils/config";
 import { getAllAccents } from "@notesnook/theme";
 import { isMacStoreApp } from "../../utils/platform";
-import { doNotTrack } from "../../utils/telemetry";
 
 const newUserSteps = [
   {
@@ -49,7 +48,7 @@ const newUserSteps = [
     subtitle: "Write with freedom. Never compromise on privacy again.",
     buttonText: "Get started",
     image: <Note width={120} />,
-    component: doNotTrack() ? null : TrackingConsent
+    component: TrackingConsent
   },
   {
     title: "Choose your style",
@@ -400,7 +399,7 @@ function ThemeSelector() {
 function TrackingConsent() {
   const [enableTelemetry, setEnableTelemetry] = usePersistentState(
     "telemetry",
-    true
+    false
   );
   return (
     <Label variant="text.subBody" my={4} sx={{ width: "80%" }}>
