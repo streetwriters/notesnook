@@ -1,6 +1,6 @@
-# Share extensions
+# Share things from other apps
 
-Basic web clipping support is available on both android & ios apps via share extensions.
+Basic web clipping support is available on both Android & iOS apps via share extensions.
 
 We are going to use browser app as an example to demonstarte how you can clip information from webpages and other apps on your iPhone.
 

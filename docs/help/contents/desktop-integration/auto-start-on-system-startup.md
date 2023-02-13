@@ -1,4 +1,4 @@
-# Auto start
+# Auto start on system startup
 
 If your workflow requires Notesnook to be always opened, it's a good idea to enable auto start on system startup:
 

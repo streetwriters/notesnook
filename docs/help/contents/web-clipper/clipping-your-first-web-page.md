@@ -1,7 +1,3 @@
----
-index: 1
----
-
 # Clipping your first web page
 
 ## Connecting with the web app

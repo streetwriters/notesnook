@@ -1,6 +1,5 @@
 ---
-title: Notesnook importer
-index: 4
+title: Importing notes
 ---
 
 # Import notes from any notes app

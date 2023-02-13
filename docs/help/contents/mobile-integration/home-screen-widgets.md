@@ -1,6 +1,6 @@
 # Home screen widgets
 
-Basic home screen widgets are availble on both android & ios for quick note taking.
+Basic home screen widgets are availble on both Android & iOS for quick note taking.
 
 # [iOS](#/tab/ios)
 

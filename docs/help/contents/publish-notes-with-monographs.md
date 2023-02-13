@@ -1,15 +1,12 @@
 ---
 title: Monographs
-index: 8
 ---
 
-# Monographs
+# Publish notes with monographs
 
-Sharing a note with someone can be such a tedious task. You have to copy/download/export it to a file and upload it to some cloud storage and then attach it in an email and send it to them.
+Sharing a note with someone can be such a tedious task. You have to copy/download/export it to a file and then attach it in an email or upload it to some cloud storage.
 
-With Notesnook, you don't need to do that anymore. Monographs enable you to share your notes with anyone in just one click. Once a note is published as a monograph, you get a public url which you can send to the person who needs access to information in the note.
-
-You can share this url with anyone to view the contents of the note without downloading Notesnook. And the cool part is, you can encrypt(lock) monographs with a password.
+With Notesnook, you don't need to do that anymore. Monographs enable you to share your notes with anyone in a single click. Once a note is published as a monograph, you get a public url which you can share with anyone. They don't need to download Notesnook or install any extra software — it's just like a blog, only simpler.
 
 ## How to publish a note?
 

@@ -1,6 +1,6 @@
 # Privacy mode
 
-> error For Linux users
+> error Not available on Linux
 >
 > Privacy mode is not available on Linux.
 

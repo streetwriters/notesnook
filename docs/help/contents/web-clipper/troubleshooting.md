@@ -1,7 +1,3 @@
----
-index: 2
----
-
 # Troubleshooting
 
 ## What to do if the web clipper doesn't connect?

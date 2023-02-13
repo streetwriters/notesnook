@@ -1,11 +1,8 @@
----
-title: Exporting notes
-index: 6
----
-
-# How do I export a note from Notesnook?
+# Exporting notes
 
 You can export your notes as PDF, HTML, Markdown and Plain text files on desktop and mobile apps.
+
+## Exporting a single note
 
 # [Desktop/Web](#/tab/web)
 

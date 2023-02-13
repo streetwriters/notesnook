@@ -1,6 +1,4 @@
-# System tray
-
-## The system tray menu
+# System tray menu
 
 Notesnook features a system tray menu to give quick access to some common functions such as:
 
