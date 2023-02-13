@@ -75,11 +75,6 @@ export const ANALYTICS_EVENTS = {
     name: "/account/created",
     description: "Sent when you create an account.",
     type: "view"
-  },
-  signupSkipped: {
-    name: "/signup/skipped",
-    description: `Sent when you press "Jump to app" button on signup screen.`,
-    type: "view"
   }
 } as const;
 

@@ -888,7 +888,6 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
             }
           }}
           onClick={() => {
-            if (type === "signup") trackEvent(ANALYTICS_EVENTS.signupSkipped);
             openURL("/notes/");
           }}
         >
