@@ -15,14 +15,14 @@ footer:
 navigation:
   - path: installation.md
   - path: create-a-note-in-notesnook.md
-  - path: organization
+  - path: organizing-notes
     children:
-      - path: organization/organize-notes-using-notebooks.md
-      - path: organization/organize-notes-using-colors.md
-      - path: organization/organize-notes-using-tags.md
-      - path: organization/organize-notes-using-favorites.md
-      - path: organization/pin-notes-and-notebooks.md
-      - path: organization/side-menu-shortcuts.md
+      - path: organizing-notes/organize-notes-using-notebooks.md
+      - path: organizing-notes/organize-notes-using-colors.md
+      - path: organizing-notes/organize-notes-using-tags.md
+      - path: organizing-notes/organize-notes-using-favorites.md
+      - path: organizing-notes/pin-notes-and-notebooks.md
+      - path: organizing-notes/side-menu-shortcuts.md
 
   - path: importing-notes
     children:
