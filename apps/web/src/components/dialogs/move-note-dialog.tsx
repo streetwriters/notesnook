@@ -232,7 +232,7 @@ function NotebookItem(props: {
   const isSelected = isNotebookSelected(notebook, selected);
 
   return (
-    <Box as="li">
+    <Box as="li" data-test-id="notebook">
       <Box
         as="details"
         sx={{
@@ -272,6 +272,7 @@ function NotebookItem(props: {
             <SelectedCheck size={20} selected={isSelected} />
             <Text
               className="title"
+              data-test-id="notebook-title"
               variant="subtitle"
               sx={{ fontWeight: "body" }}
             >
@@ -282,10 +283,11 @@ function NotebookItem(props: {
               </Text>
             </Text>
           </Flex>
-          <Flex sx={{ alignItems: "center" }}>
+          <Flex data-test-id="notebook-tools" sx={{ alignItems: "center" }}>
             <Button
               variant="tool"
               className="create-topic"
+              data-test-id="create-topic"
               sx={{ display: "none", p: 1, mr: 1 }}
             >
               <Icon.Plus
@@ -328,7 +330,7 @@ function NotebookItem(props: {
               <SelectedCheck selected={false} />
               <Input
                 variant="clean"
-                data-test-id={`new-tree-item-input`}
+                data-test-id={`new-topic-input`}
                 autoFocus
                 sx={{
                   bg: "bgSecondary",
@@ -369,6 +371,7 @@ function TopicItem(props: { topic: Topic }) {
     <Flex
       as="li"
       key={topic.id}
+      data-test-id="topic"
       sx={{
         alignItems: "center",
         p: "small",

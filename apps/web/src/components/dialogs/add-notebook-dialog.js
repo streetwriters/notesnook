@@ -137,8 +137,8 @@ class AddNotebookDialog extends React.Component {
             this.createNotebook();
           }
         }}
-        onClose={props.onClose}
-        negativeButton={{ text: "Cancel", onClick: props.onClose }}
+        onClose={() => props.onClose(false)}
+        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
       >
         <Flex sx={{ overflowY: "auto", flexDirection: "column" }}>
           <Field

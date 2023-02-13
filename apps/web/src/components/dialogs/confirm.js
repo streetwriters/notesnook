@@ -28,16 +28,16 @@ function Confirm(props) {
       icon={props.icon}
       width={props.width}
       description={props.subtitle}
-      onClose={props.onNo}
+      onClose={() => props.onNo(false)}
       positiveButton={
         props.yesText && {
           text: props.yesText,
-          onClick: props.onYes,
+          onClick: () => props.onYes(true),
           autoFocus: !!props.yesText
         }
       }
       negativeButton={
-        props.noText && { text: props.noText, onClick: props.onNo }
+        props.noText && { text: props.noText, onClick: () => props.onNo(false) }
       }
     >
       <Box pb={!props.noText && !props.yesText ? 2 : 0}>

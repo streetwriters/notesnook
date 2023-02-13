@@ -250,7 +250,9 @@ export class NoteContextMenuModel extends BaseProperties {
 
   async addToNotebook(notebook: Notebook) {
     await this.open();
-    await this.menu.clickOnItem("addtonotebook");
+
+    await this.menu.clickOnItem("notebooks");
+    await this.menu.clickOnItem("link-notebooks");
 
     const filterInput = this.page.locator(getTestId("filter-input"));
     await filterInput.type(notebook.title);
@@ -263,14 +265,15 @@ export class NoteContextMenuModel extends BaseProperties {
 
     const notebookItems = this.page.locator(getTestId("notebook"));
     for await (const item of iterateList(notebookItems)) {
-      const treeItem = item.locator(getTestId(`tree-item`));
-      const title = treeItem.locator(getTestId("title"));
-      const newItemButton = treeItem.locator(getTestId("tree-item-new"));
+      await item.locator(getTestId("notebook-tools")).click();
+      const title = item.locator(getTestId("notebook-title"));
+      const createTopicButton = item.locator(getTestId("create-topic"));
+      const notebookTitle = await title.textContent();
 
-      if ((await title.textContent()) === notebook.title) {
+      if (notebookTitle?.includes(notebook.title)) {
         for (const topic of notebook.topics) {
-          await newItemButton.click();
-          const newItemInput = item.locator(getTestId("new-tree-item-input"));
+          await createTopicButton.click();
+          const newItemInput = item.locator(getTestId("new-topic-input"));
 
           await newItemInput.waitFor({ state: "visible" });
           await newItemInput.fill(topic);
@@ -281,8 +284,9 @@ export class NoteContextMenuModel extends BaseProperties {
 
         const topicItems = item.locator(getTestId("topic"));
         for await (const topicItem of iterateList(topicItems)) {
-          const treeItem = topicItem.locator(getTestId(`tree-item`));
-          await treeItem.click();
+          await this.page.keyboard.down("Control");
+          await topicItem.click();
+          await this.page.keyboard.up("Control");
         }
       }
     }
@@ -298,10 +302,6 @@ export class NoteContextMenuModel extends BaseProperties {
 
   async close() {
     await this.menu.close();
-  }
-
-  title() {
-    return this.menu.title();
   }
 }
 

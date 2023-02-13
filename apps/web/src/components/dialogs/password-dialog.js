@@ -55,17 +55,15 @@ function PasswordDialog(props) {
       title={props.title}
       description={props.subtitle}
       icon={props.icon}
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
-        props: {
-          form: "passwordForm",
-          type: "submit"
-        },
+        form: "passwordForm",
+        type: "submit",
         text: props.positiveButtonText,
         loading: isLoading,
         disabled: isLoading
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
       <Box
         id="passwordForm"

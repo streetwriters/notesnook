@@ -31,10 +31,10 @@ function TrackingDetailsDialog(props) {
       description={
         "List of all the events we send to our servers for diagnostics and analytics. The data is transmitted over SSL (fully encrypted) and does not pass through any 3rd party server. Furthermore, the data does not contain any personal info - not even your user id."
       }
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
         text: "Okay",
-        onClick: props.onClose
+        onClick: () => props.onClose(true)
       }}
     >
       <Box sx={{ overflowY: "auto" }}>
