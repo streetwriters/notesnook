@@ -1,13 +1,8 @@
----
-title: Locking notes
-index: 7
----
-
-# How do I lock notes with private vault?
+# Locking notes
 
 Notesnook is a private notes app. All your notes are encrypted and secure by default. We can not read them even if we want to on our servers. However you can still add an extra layer of security and encrypt your most important and sensitive notes by adding them to a vault.
 
-Adding notes to private vault is useful when you do not want anyone to read your notes, even if they have access to your phone.
+Adding notes to private vault is useful when you do not want anyone to read your notes, _even if they have access to your phone_.
 
 ## Creating a vault
 
@@ -30,7 +25,7 @@ Adding notes to private vault is useful when you do not want anyone to read your
 
 ---
 
-## Locking a note
+## Lock a note
 
 # [Desktop/Web](#/tab/web)
 
@@ -48,11 +43,11 @@ Adding notes to private vault is useful when you do not want anyone to read your
 
 ---
 
-## Open/Edit/Delete a locked note
+## Open/edit/delete a locked note
 
 To open, edit or delete a locked note, you must provide the password for the vault to unlock it.
 
-## Unlocking note permanently
+## Unlock a note permanently
 
 # [Desktop/Web](#/tab/web)
 
@@ -70,7 +65,7 @@ To open, edit or delete a locked note, you must provide the password for the vau
 
 ---
 
-## Changing vault password
+## Change vault password
 
 # [Desktop/Web](#/tab/web)
 

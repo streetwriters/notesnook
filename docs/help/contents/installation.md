@@ -1,6 +1,5 @@
 ---
 title: Installation
-index: 0
 ---
 
 # Installation
@@ -94,7 +93,7 @@ Notesnook can be downloaded on any linux distro via Snapcraft.
 
 # [Google Playstore](#/tab/android)
 
-If you have Google play services installed on your android phone, you can get Notesnook from Google Play store
+If you have Google play services installed on your Android phone, you can get Notesnook from Google Play store
 
 [Download from playstore](https://play.google.com/store/apps/details?id=com.streetwriters.notesnook)
 

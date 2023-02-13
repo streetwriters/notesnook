@@ -1,6 +1,5 @@
 ---
 title: Colors
-index: 3
 ---
 
 # Organize notes with colors

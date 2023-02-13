@@ -1,6 +1,5 @@
 ---
 title: Notebooks
-index: 0
 ---
 
 # Organizing notes with notebooks
@@ -20,7 +19,6 @@ Notebooks consist of topics where you can add/create and edit your notes.
 > info
 >
 > Adding a description & topics are optional.
-
 
 # [Mobile](#/tab/mobile)
 

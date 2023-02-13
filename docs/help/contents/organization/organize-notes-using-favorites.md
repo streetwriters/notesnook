@@ -1,6 +1,5 @@
 ---
 title: Favorites
-index: 4
 ---
 
 # Add notes to favorites

@@ -1,9 +1,4 @@
----
-title: How is my data encrypted
-index: 2
----
-
-# How is my data encrypted
+# How is my data encrypted?
 
 > warn Note
 >
@@ -80,6 +75,6 @@ Encryption only takes place when you sync. Each item in the database is encrypte
 
 > info
 >
-> See the whole process in action [here.](https://notesnook.com/#whynotesnook)
+> See the whole process in action [here.](https://vericrypt.notesnook.com/)
 
 This object is then sent to the server for storage. The server performs no further operation on this data (because it can't).

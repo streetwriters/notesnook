@@ -1,9 +1,4 @@
----
-title: Creating a note
-index: 1
----
-
-# Creating a note
+# Creating your first note
 
 You are in a notes app, the first thing you want to do is make a note.
 
