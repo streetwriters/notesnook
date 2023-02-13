@@ -25,17 +25,18 @@ import {
   tapByText,
   createNote,
   prepare,
-  visibleById,
   notVisibleById,
   navigate,
   elementByText,
-  sleep
+  sleep,
+  notVisibleByText
 } from "./utils";
 
 async function createNotebook(
   title = "Notebook 1",
   description = true,
-  topic = true
+  topic = true,
+  topicCount = 1
 ) {
   await tapByText("Add your first notebook");
   await elementById(notesnook.ids.dialogs.notebook.inputs.title).typeText(
@@ -47,10 +48,12 @@ async function createNotebook(
     ).typeText(`Description of ${title}`);
   }
   if (topic) {
-    await elementById(notesnook.ids.dialogs.notebook.inputs.topic).typeText(
-      "Topic"
-    );
-    await tapById("topic-add-button");
+    for (let i = 1; i <= topicCount; i++) {
+      await elementById(notesnook.ids.dialogs.notebook.inputs.topic).typeText(
+        i === 1 ? "Topic" : "Topic " + i
+      );
+      await tapById("topic-add-button");
+    }
   }
   await tapByText("Create notebook");
   await sleep(500);
@@ -67,7 +70,7 @@ describe("NOTEBOOKS", () => {
   it("Create a notebook with title only", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
+
     await sleep(500);
     await createNotebook("Notebook 1", false, false);
     await sleep(500);
@@ -79,7 +82,7 @@ describe("NOTEBOOKS", () => {
   it("Create a notebook title & description", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
+
     await sleep(500);
     await createNotebook("Notebook 1", true, false);
     await sleep(500);
@@ -91,7 +94,6 @@ describe("NOTEBOOKS", () => {
   it("Create a notebook with description and topics", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
     await sleep(500);
     await createNotebook("Notebook 1", false, false);
     await sleep(500);
@@ -104,7 +106,6 @@ describe("NOTEBOOKS", () => {
     await prepare();
     let note = await createNote();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
     await sleep(500);
     await createNotebook("Notebook 1", true, true);
     await sleep(500);
@@ -121,7 +122,6 @@ describe("NOTEBOOKS", () => {
   it("Add new topic to notebook", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
     await sleep(500);
     await createNotebook("Notebook 1", true, false);
     await sleep(500);
@@ -138,7 +138,6 @@ describe("NOTEBOOKS", () => {
   it("Edit topic", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
     await sleep(500);
     await createNotebook("Notebook 1", true, true);
     await sleep(500);
@@ -157,7 +156,6 @@ describe("NOTEBOOKS", () => {
   it("Add new note to topic", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
     await sleep(500);
     await createNotebook("Notebook 1", true, true);
     await sleep(500);
@@ -170,8 +168,6 @@ describe("NOTEBOOKS", () => {
   it("Remove note from topic", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
-    await sleep(500);
     await createNotebook("Notebook 1", true, true);
     await sleep(500);
     await device.pressBack();
@@ -184,31 +180,59 @@ describe("NOTEBOOKS", () => {
     await notVisibleById(note.title);
   });
 
-  it("Add/Remove note to notebook from home", async () => {
+  it.only("Add/Remove note to notebook from home", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
     await sleep(500);
-    await createNotebook("Notebook 1", true, true);
+    await createNotebook("Notebook 1", true, true, 3);
     await sleep(500);
     await device.pressBack();
     await sleep(500);
     await navigate("Notes");
     await createNote();
+    console.log("ADD TO A SINGLE TOPIC");
     await tapById(notesnook.listitem.menu);
     await tapById("icon-Add to notebook");
     await sleep(500);
     await tapByText("Notebook 1");
     await tapByText("Topic");
-    await visibleById("icon-check");
-    await tapByText("Topic");
-    await notVisibleById("icon-check");
+    await tapByText("Save");
+    await sleep(300);
+    await visibleByText("Notebook 1 › Topic");
+    console.log("MOVE FROM ONE TOPIC TO ANOTHER");
+    await tapById(notesnook.listitem.menu);
+    await tapById("icon-Add to notebook");
+    await tapByText("Notebook 1");
+    await tapByText("Topic 2");
+    await tapByText("Save");
+    await visibleByText("Notebook 1 › Topic 2");
+    console.log("REMOVE FROM TOPIC");
+    await tapById(notesnook.listitem.menu);
+    await tapById("icon-Add to notebook");
+    await tapByText("Notebook 1");
+    await tapByText("Topic 2");
+    await tapByText("Save");
+    await sleep(300);
+    await notVisibleByText("Notebook 1 › Topic 2");
+    console.log("MOVE TO MULTIPLE TOPICS");
+    await tapById(notesnook.listitem.menu);
+    await tapById("icon-Add to notebook");
+    await tapByText("Notebook 1");
+    await elementByText("Topic").longPress();
+    await visibleByText("Reset selection");
+    await tapByText("Topic 2");
+    await tapByText("Topic 3");
+    await tapByText("Save");
+    await sleep(300);
+    await tapById(notesnook.listitem.menu);
+    await visibleByText("Topic");
+    await visibleByText("Topic 2");
+    await visibleByText("Topic 3");
   });
 
   it("Edit notebook title, description and add a topic", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
     await sleep(500);
     await createNotebook();
     await sleep(500);
@@ -241,7 +265,7 @@ describe("NOTEBOOKS", () => {
   it("Move notebook to trash", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
+
     await sleep(500);
     await createNotebook("Notebook 1", false, false);
     await sleep(500);
@@ -261,7 +285,7 @@ describe("NOTEBOOKS", () => {
     await prepare();
     let note = await createNote();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
+
     await sleep(500);
     await createNotebook("Notebook 1", false, true);
     await sleep(500);
@@ -284,7 +308,7 @@ describe("NOTEBOOKS", () => {
     await prepare();
     let note = await createNote();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
+
     await sleep(500);
     await createNotebook("Notebook 1", false, true);
     await sleep(500);
@@ -306,7 +330,7 @@ describe("NOTEBOOKS", () => {
   it("Pin notebook to side menu", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
+
     await sleep(500);
     await createNotebook("Notebook 1", false, false);
     await sleep(500);
@@ -323,7 +347,7 @@ describe("NOTEBOOKS", () => {
   it("Pin topic to side menu", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
+
     await sleep(500);
     await createNotebook("Notebook 1");
     await sleep(500);

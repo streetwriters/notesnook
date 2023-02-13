@@ -41,7 +41,7 @@ type DialogHeaderProps = {
   padding?: number;
   centered?: boolean;
   titlePart?: string;
-  style: ViewStyle
+  style?: ViewStyle;
 };
 
 const DialogHeader = ({

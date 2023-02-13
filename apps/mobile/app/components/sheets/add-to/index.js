@@ -250,24 +250,25 @@ const MoveNoteComponent = ({ note }) => {
       const mergeState = {
         [item.id]: state
       };
-      if (item.type === "topic") {
-        const notebooks = db.notebooks.all;
-        const notebook = notebooks.find((n) => n.id === item.notebookId);
-        const intermediate = notebook.topics.some((topic) => {
-          return topic.id === item.id
-            ? state === "selected"
-            : itemState[topic.id] === "selected";
-        });
-        if (intermediate) mergeState[notebook.id] = "intermediate";
-        const selected = notebook.topics.every((topic) => {
-          return topic.id === item.id
-            ? state === "selected"
-            : itemState[topic.id] === "selected";
-        });
-        if (selected) mergeState[notebook.id] = "selected";
+      const notebooks = db.notebooks.all;
+      const notebook =
+        item.type === "notebook"
+          ? item
+          : notebooks.find((n) => n.id === item.notebookId);
+      const intermediate = notebook.topics.some((topic) => {
+        return topic.id === item.id
+          ? state === "selected"
+          : itemState[topic.id] === "selected";
+      });
+      if (intermediate) mergeState[notebook.id] = "intermediate";
+      const selected = notebook.topics.every((topic) => {
+        return topic.id === item.id
+          ? state === "selected"
+          : itemState[topic.id] === "selected";
+      });
+      if (selected) mergeState[notebook.id] = "selected";
+      if (!selected && !intermediate) mergeState[notebook.id] = "deselected";
 
-        if (!selected && !intermediate) mergeState[notebook.id] = "deselected";
-      }
       return {
         ...itemState,
         ...mergeState

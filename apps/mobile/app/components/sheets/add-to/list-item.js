@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
@@ -66,7 +66,6 @@ const _ListItem = ({
       });
     }
   }
-
   return (
     <View
       style={{
@@ -79,7 +78,7 @@ const _ListItem = ({
         onPress={() => {
           if (hasSubList) return setExpanded(!expanded);
           if (enabled) return selectItem();
-          onPress(item);
+          onPress?.(item);
         }}
         type={type}
         onLongPress={() => {
@@ -128,8 +127,17 @@ const _ListItem = ({
                 }
                 selectItem();
                 if (enabled) return;
-                onPress(item);
+                onPress?.(item);
               }}
+              testID={
+                removed
+                  ? "close-circle-outline"
+                  : isSelected
+                  ? "check-circle-outline"
+                  : intermediate
+                  ? "minus-circle-outline"
+                  : "checkbox-blank-circle-outline"
+              }
               name={
                 removed
                   ? "close-circle-outline"
@@ -163,6 +171,7 @@ const _ListItem = ({
             {onAddSublistItem ? (
               <IconButton
                 name={"plus"}
+                testID="add-item-icon"
                 color={colors}
                 size={SIZE.xl}
                 onPress={() => {

@@ -30,6 +30,8 @@ import SearchService from "../../services/search";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotebookStore } from "../../stores/use-notebook-store";
+import { Config } from "react-native-config";
+
 const onPressFloatingButton = () => {
   AddNotebookEvent();
 };
@@ -68,7 +70,7 @@ export const Notebooks = ({
       SearchService.prepareSearch = prepareSearch;
       useNavigationStore.getState().setButtonAction(onPressFloatingButton);
       //@ts-ignore need to update typings in core to fix this
-      if (db.notebooks.all.length === 0) {
+      if (db.notebooks.all.length === 0 && !Config.isTesting) {
         Walkthrough.present("notebooks");
       } else {
         Walkthrough.update("notebooks");
