@@ -18,11 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import {
-  doNotTrack,
-  isTelemetryEnabled,
-  setTelemetry
-} from "../utils/telemetry";
+import { isTelemetryEnabled, setTelemetry } from "../utils/telemetry";
 
 export function useTelemetry() {
   const [enabled, setEnabled] = useState(isTelemetryEnabled());
@@ -31,5 +27,5 @@ export function useTelemetry() {
     setTelemetry(enabled);
   }, [enabled]);
 
-  return [enabled, setEnabled, doNotTrack()] as const;
+  return [enabled, setEnabled] as const;
 }
