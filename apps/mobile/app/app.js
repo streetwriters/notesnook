@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+import "react-native-gesture-handler";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -33,7 +33,7 @@ import { View } from "react-native";
 import { useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
 //import { BackgroundSync } from "./services/background-sync";
-
+Notifications.init();
 NetInfo.configure({
   reachabilityUrl: "https://notesnook.com",
   reachabilityTest: (response) => {
