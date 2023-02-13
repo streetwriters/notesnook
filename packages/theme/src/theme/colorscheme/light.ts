@@ -25,7 +25,7 @@ export function getLightScheme(accent: string): SchemeColors {
   return {
     primary: accent,
     background: "white",
-    bgTransparent: "#ffffff99",
+    bgTransparent: "#f7f7f799",
     accent: "white",
     bgSecondary: "#f7f7f7",
     bgSecondaryText: "#5E5E5E",

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, View, ViewStyle } from "react-native";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
@@ -41,6 +41,7 @@ type DialogHeaderProps = {
   padding?: number;
   centered?: boolean;
   titlePart?: string;
+  style: ViewStyle
 };
 
 const DialogHeader = ({
@@ -50,7 +51,8 @@ const DialogHeader = ({
   paragraphColor,
   padding,
   centered,
-  titlePart
+  titlePart,
+  style
 }: DialogHeaderProps) => {
   const colors = useThemeStore((state) => state.colors);
 
@@ -62,7 +64,8 @@ const DialogHeader = ({
           alignItems: "center",
           justifyContent: "space-between",
           minHeight: 50,
-          paddingHorizontal: padding
+          paddingHorizontal: padding,
+          ...style
         }}
       >
         <View

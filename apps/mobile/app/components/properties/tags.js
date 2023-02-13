@@ -27,6 +27,7 @@ import { eOpenTagsDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
+import { ColorTags } from "./color-tags";
 export const Tags = ({ item, close }) => {
   const colors = useThemeStore((state) => state.colors);
 
@@ -34,41 +35,52 @@ export const Tags = ({ item, close }) => {
     <View
       style={{
         marginTop: 5,
-        marginBottom: 5
+        paddingTop: 6,
+        paddingBottom: 6,
+        flexDirection: "row",
+        flexWrap: "wrap",
+        alignItems: "center",
+        paddingHorizontal: 12
       }}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          flexWrap: "wrap",
-          alignItems: "center"
+      <Button
+        onPress={async () => {
+          close();
+          await sleep(300);
+          eSendEvent(eOpenTagsDialog, item);
         }}
-      >
-        <Button
-          onPress={async () => {
-            close();
-            await sleep(300);
-            eSendEvent(eOpenTagsDialog, item);
-          }}
-          buttonType={{
-            text: colors.accent
-          }}
-          title="Add tags"
-          type="grayBg"
-          icon="plus"
-          iconPosition="right"
-          height={25}
-          fontSize={SIZE.xs + 1}
-          style={{
-            marginRight: 5,
-            borderRadius: 100,
-            paddingHorizontal: 8
-          }}
-        />
-        {item.tags.map((item) =>
-          item ? <TagItem key={item} tag={item} close={close} /> : null
-        )}
-      </View>
+        buttonType={{
+          text: colors.accent
+        }}
+        title="Add tags"
+        type="grayBg"
+        icon="plus"
+        iconPosition="right"
+        height={30}
+        fontSize={SIZE.xs + 1}
+        style={{
+          marginRight: 5,
+          borderRadius: 100,
+          paddingHorizontal: 8
+        }}
+      />
+      <ColorTags item={item} />
+    </View>
+  ) : null;
+};
+
+export const TagStrip = ({ item, close }) => {
+  return item.tags?.length > 0 ? (
+    <View
+      style={{
+        flexDirection: "row",
+        flexWrap: "wrap",
+        alignItems: "center"
+      }}
+    >
+      {item.tags.map((item) =>
+        item ? <TagItem key={item} tag={item} close={close} /> : null
+      )}
     </View>
   ) : null;
 };
@@ -83,23 +95,24 @@ const TagItem = ({ tag, close }) => {
   };
 
   const style = {
-    paddingHorizontal: 8,
-    marginVertical: 5,
+    paddingHorizontal: 0,
     borderRadius: 100,
-    marginRight: 5
+    marginRight: 10,
+    marginTop: 0,
+    backgroundColor: "transparent"
   };
 
   return (
     <Button
       onPress={onPress}
       title={"#" + tag}
-      // buttonType={{
-      //   text: colors.accent
-      // }}
       type="grayBg"
-      height={25}
+      height={20}
       fontSize={SIZE.xs + 1}
       style={style}
+      textStyle={{
+        textDecorationLine: "underline"
+      }}
     />
   );
 };

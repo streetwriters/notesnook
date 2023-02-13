@@ -132,12 +132,12 @@ function Properties(props) {
           x: 0
         }}
         transition={{
-          duration: 0.3,
+          duration: 0.1,
           bounceDamping: 1,
           bounceStiffness: 1,
           ease: "easeOut"
         }}
-        initial={{ x: 800 }}
+        initial={{ x: 600 }}
         sx={{
           display: "flex",
           position: "absolute",

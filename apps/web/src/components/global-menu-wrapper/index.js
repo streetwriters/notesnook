@@ -96,7 +96,8 @@ function GlobalMenuWrapper() {
         content: {},
         overlay: {
           zIndex: 999,
-          background: "transparent"
+          background: "transparent",
+          transition: "none"
         }
       }}
     >

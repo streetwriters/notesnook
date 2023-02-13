@@ -59,8 +59,8 @@ const SheetWrapper = ({
       zIndex: 10,
       paddingTop: 5,
       paddingBottom: 0,
-      borderTopRightRadius: 10,
-      borderTopLeftRadius: 10,
+      borderTopRightRadius: 20,
+      borderTopLeftRadius: 20,
       alignSelf: "center",
       borderBottomRightRadius: 0,
       borderBottomLeftRadius: 0
@@ -104,12 +104,12 @@ const SheetWrapper = ({
       ExtraOverlayComponent={
         <>
           {overlay}
-          <Toast context="local" />
           <PremiumToast
             context="sheet"
             close={() => fwdRef?.current?.hide()}
             offset={50}
           />
+          <Toast context="local" />
         </>
       }
       onClose={_onClose}

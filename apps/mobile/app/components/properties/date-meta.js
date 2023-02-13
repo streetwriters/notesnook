@@ -74,10 +74,6 @@ export const DateMeta = ({ item }) => {
   return (
     <View
       style={{
-        paddingVertical: 5,
-        marginTop: 5,
-        borderTopWidth: 1,
-        borderTopColor: colors.nav,
         paddingHorizontal: 12
       }}
     >

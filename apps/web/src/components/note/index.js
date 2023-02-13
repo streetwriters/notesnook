@@ -99,7 +99,7 @@ function Note(props) {
         background: isOpened ? "bgSecondary" : "background"
       }}
       menu={{
-        items: context?.type === "topic" ? topicNoteMenuItems : menuItems,
+        items: menuItems,
         extraData: { note, context }
       }}
       onClick={() => {
@@ -317,6 +317,13 @@ const menuItems = [
     }
   },
   {
+    key: "readonly",
+    title: "Readonly",
+    checked: ({ note }) => note.readonly,
+    icon: Icon.Readonly,
+    onClick: ({ note }) => store.readonly(note.id)
+  },
+  {
     key: "favorite",
     title: "Favorite",
     checked: ({ note }) => note.favorite,
@@ -452,6 +459,33 @@ const menuItems = [
         await store.get().localOnly(note.id);
     }
   },
+  { key: "sep3", type: "separator" },
+  {
+    key: "removefromtopic",
+    title: "Remove from topic",
+    icon: Icon.TopicRemove,
+    hidden: ({ context }) => context?.type !== "topic",
+    onClick: async ({ items, context }) => {
+      try {
+        if (!context.value?.topic || !context.value?.id)
+          throw new Error("context is missing");
+
+        const ids = items.map((i) => i.id);
+
+        await db.notes.removeFromNotebook(
+          { id: context.value.id, topic: context.value.topic },
+          ...ids
+        );
+
+        store.refresh();
+
+        showToast("success", "Note removed from topic.");
+      } catch (e) {
+        showToast("error", `Failed to remove note from topic: ${e.message}.`);
+      }
+    },
+    multiSelect: true
+  },
   {
     key: "movetotrash",
     title: "Move to trash",
@@ -472,37 +506,6 @@ const menuItems = [
     },
     onClick: async ({ items }) => {
       await Multiselect.moveNotesToTrash(items, items.length > 1);
-    },
-    multiSelect: true
-  }
-];
-
-const topicNoteMenuItems = [
-  ...menuItems,
-  {
-    key: "removefromtopic",
-    title: "Remove from topic",
-    icon: Icon.TopicRemove,
-    color: "error",
-    iconColor: "error",
-    onClick: async ({ items, context }) => {
-      try {
-        if (!context.value?.topic || !context.value?.id)
-          throw new Error("context is missing");
-
-        const ids = items.map((i) => i.id);
-
-        await db.notes.removeFromNotebook(
-          { id: context.value.id, topic: context.value.topic },
-          ...ids
-        );
-
-        store.refresh();
-
-        showToast("success", "Note removed from topic.");
-      } catch (e) {
-        showToast("error", `Failed to remove note from topic: ${e.message}.`);
-      }
     },
     multiSelect: true
   }

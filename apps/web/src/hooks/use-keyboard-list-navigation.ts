@@ -113,7 +113,8 @@ export function useKeyboardListNavigation(
           resetSelection();
 
           let nextIndex = moveUpCyclic(cursor.current, max);
-          if (skip && skip(nextIndex)) nextIndex = moveUpCyclic(nextIndex, max);
+          while (skip && skip(nextIndex))
+            nextIndex = moveUpCyclic(nextIndex, max);
           focusItemAt(nextIndex);
           return true;
         },
@@ -121,7 +122,7 @@ export function useKeyboardListNavigation(
           resetSelection();
 
           let nextIndex = moveDownCyclic(cursor.current, max);
-          if (skip && skip(nextIndex))
+          while (skip && skip(nextIndex))
             nextIndex = moveDownCyclic(nextIndex, max);
           focusItemAt(nextIndex);
           return true;

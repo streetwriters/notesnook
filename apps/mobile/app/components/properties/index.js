@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getUpcomingReminder } from "@notesnook/core/collections/reminders";
 import React from "react";
 import { Platform, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
@@ -27,20 +28,32 @@ import SearchService from "../../services/search";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { COLORS_NOTE } from "../../utils/color-scheme";
 import { SIZE } from "../../utils/size";
+import SheetProvider from "../sheet-provider";
+import { ReminderTime } from "../ui/reminder-time";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { ColorTags } from "./color-tags";
 import { DateMeta } from "./date-meta";
 import { DevMode } from "./dev-mode";
 import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";
-import { Tags } from "./tags";
-import { Topics } from "./topics";
-import {
-  getUpcomingReminder
-} from "@notesnook/core/collections/reminders";
-import { ReminderTime } from "../ui/reminder-time";
+import { Tags, TagStrip } from "./tags";
+
+const Line = ({ top = 6, bottom = 6 }) => {
+  const colors = useThemeStore((state) => state.colors);
+  return (
+    <View
+      style={{
+        height: 1,
+        backgroundColor: colors.nav,
+        width: "100%",
+        marginTop: top,
+        marginBottom: bottom
+      }}
+    />
+  );
+};
+
 export const Properties = ({
   close = () => {},
   item,
@@ -50,13 +63,18 @@ export const Properties = ({
   const colors = useThemeStore((state) => state.colors);
   const alias = item.alias || item.title;
   const isColor = !!COLORS_NOTE[item.title];
-  const reminders = db.relations.from(item, "reminder");
-  const current = getUpcomingReminder(reminders);
 
   const onScrollEnd = () => {
     getRef().current?.handleChildScrollEnd();
   };
 
+  if (!item || !item.id) {
+    return (
+      <Paragraph style={{ marginVertical: 10, alignSelf: "center" }}>
+        Start writing to save your note.
+      </Paragraph>
+    );
+  }
   return (
     <ScrollView
       nestedScrollEnabled
@@ -71,85 +89,53 @@ export const Properties = ({
         maxHeight: "100%"
       }}
     >
-      {!item || !item.id ? (
-        <Paragraph style={{ marginVertical: 10, alignSelf: "center" }}>
-          Start writing to save your note.
-        </Paragraph>
-      ) : (
-        <View
-          style={{
-            marginTop: 5,
-            zIndex: 10
-          }}
-        >
-          <View
-            style={{
-              paddingHorizontal: 12
-            }}
-          >
-            <Heading size={SIZE.lg}>
-              {item.type === "tag" && !isColor ? (
-                <Heading size={SIZE.xl} color={colors.accent}>
-                  #
-                </Heading>
-              ) : null}
-              {alias}
+      <View
+        style={{
+          paddingHorizontal: 12,
+          marginTop: 5,
+          zIndex: 10
+        }}
+      >
+        <Heading size={SIZE.lg}>
+          {item.type === "tag" && !isColor ? (
+            <Heading size={SIZE.xl} color={colors.accent}>
+              #
             </Heading>
 
-            {item.headline || item.description ? (
-              <Paragraph
-                style={{
-                  marginBottom: 5
-                }}
-                color={colors.icon}
-              >
-                {(item.type === "notebook" ||
-                  item.itemType === "notebook" ||
-                  item.type === "reminder") &&
-                item?.description
-                  ? item.description
-                  : null}
-                {(item.type === "note" || item.itemType === "note") &&
-                item?.headline
-                  ? item.headline
-                  : null}
-              </Paragraph>
-            ) : null}
-
-            {item.type === "reminder" ? (
-              <ReminderTime
-                reminder={item}
-                style={{
-                  justifyContent: "flex-start",
-                  borderWidth: 0,
-                  height: 30,
-                  alignSelf: "flex-start"
-                }}
-                fontSize={SIZE.xs + 1}
-              />
-            ) : null}
-
-            {item.type === "note" ? <Tags close={close} item={item} /> : null}
-
-            <Topics item={item} close={close} />
-          </View>
-
-          {item.type === "note" ? (
-            <Notebooks note={item} close={close} />
           ) : null}
+          {alias}
+        </Heading>
 
-          <DateMeta item={item} />
-        </View>
-      )}
+        {item.type === "note" ? <TagStrip close={close} item={item} /> : null}
+
+        {item.type === "reminder" ? (
+          <ReminderTime
+            reminder={item}
+            style={{
+              justifyContent: "flex-start",
+              borderWidth: 0,
+              height: 30,
+              alignSelf: "flex-start",
+              backgroundColor: "transparent",
+              paddingHorizontal: 0
+            }}
+            fontSize={SIZE.xs + 1}
+          />
+        ) : null}
+      </View>
+      <Line top={12} />
+
+      <DateMeta item={item} />
+      <Line bottom={0} />
+      {item.type === "note" ? <Tags close={close} item={item} /> : null}
 
       <View
         style={{
-          borderTopWidth: 1,
-          borderColor: colors.nav
+          paddingHorizontal: 12
         }}
-      />
-
-      {item.type === "note" ? <ColorTags close={close} item={item} /> : null}
+      >
+        {item.notebooks ? <Notebooks note={item} close={close} /> : null}
+      </View>
 
       <Items
         item={item}
@@ -171,6 +157,7 @@ export const Properties = ({
           }}
         />
       ) : null}
+      <SheetProvider context="properties" />
     </ScrollView>
   );
 };
@@ -183,50 +170,50 @@ Properties.present = (item, buttons = [], isSheet) => {
   switch (type) {
     case "trash":
       props[0] = item;
-      props.push(["PermDelete", "Restore"]);
+      props.push(["delete", "restore"]);
       break;
     case "note":
-      android = Platform.OS === "android" ? ["PinToNotif"] : [];
+      android = Platform.OS === "android" ? ["pin-to-notifications"] : [];
       props[0] = db.notes.note(item.id).data;
       props.push([
-        "Add to notebook",
-        "Add-Reminder",
-        "Share",
-        "Export",
-        "Copy",
-        "Publish",
-        "Pin",
-        "Favorite",
-        "Attachments",
-        "Vault",
-        "Delete",
-        "RemoveTopic",
-        "History",
-        "ReadOnly",
-        "Reminders",
-        "Local only",
-        "Duplicate",
+        "notebooks",
+        "add-reminder",
+        "share",
+        "export",
+        "copy",
+        "publish",
+        "pin",
+        "favorite",
+        "attachments",
+        "lock-unlock",
+        "trash",
+        "remove-from-topic",
+        "history",
+        "read-only",
+        "reminders",
+        "local-only",
+        "duplicate",
         ...android,
         ...buttons
       ]);
       break;
     case "notebook":
       props[0] = db.notebooks.notebook(item.id).data;
-      props.push(["Edit Notebook", "Pin", "Add Shortcut", "Delete"]);
+      props.push(["edit-notebook", "pin", "add-shortcut", "trash"]);
       break;
     case "topic":
       props[0] = db.notebooks
         .notebook(item.notebookId)
         .topics.topic(item.id)._topic;
-      props.push(["Move notes", "Edit Topic", "Add Shortcut", "Delete"]);
+      props.push(["move-notes", "edit-topic", "add-shortcut", "trash"]);
       break;
     case "tag":
       props[0] = db.tags.tag(item.id);
-      props.push(["Add Shortcut", "Delete", "Rename Tag"]);
+      props.push(["add-shortcut", "trash", "rename-tag"]);
       break;
     case "reminder": {
       props[0] = db.reminders.reminder(item.id);
-      props.push(["Edit reminder", "Delete", "ReminderOnOff"]);
+      props.push(["edit-reminder", "trash", "disable-reminder"]);
       break;
     }
   }

@@ -106,20 +106,20 @@ function ListContainer(props: ListContainerProps) {
     bulkSelect: (indices) => setSelectedItems(indices.map((i) => items[i])),
     focusItemAt: (index) => {
       const item = items[index];
-      if (!item) return;
+      if (!item || !listRef.current) return;
 
-      const element = document.getElementById(`id_${item.id}`);
-      if (!element) return;
-      element.focus();
+      waitForElement(listRef.current, index, `id_${item.id}`, (element) =>
+        element.focus()
+      );
     },
     skip: (index) => items[index].type === "header",
     open: (index) => {
       const item = items[index];
-      if (!item) return;
+      if (!item || !listRef.current) return;
 
-      const element = document.getElementById(`id_${item.id}`);
-      if (!element) return;
-      element.click();
+      waitForElement(listRef.current, index, `id_${item.id}`, (element) =>
+        element.click()
+      );
     }
   });
 
@@ -155,7 +155,6 @@ function ListContainer(props: ListContainerProps) {
               totalCount={items.length}
               onBlur={() => setFocusedGroupIndex(-1)}
               onKeyDown={(e) => onKeyDown(e.nativeEvent)}
-              overscan={5}
               components={{
                 Scroller: CustomScrollbarsVirtualList,
                 Item: (props) => (
@@ -257,3 +256,38 @@ function ListContainer(props: ListContainerProps) {
   );
 }
 export default ListContainer;
+
+/**
+ * Scroll the element at the specified index into view and
+ * wait until it renders into the DOM. This function keeps
+ * running until the element is found or the max number of
+ * attempts have been made. Each attempt is separated by a
+ * 50ms interval.
+ */
+function waitForElement(
+  list: VirtuosoHandle,
+  index: number,
+  elementId: string,
+  callback: (element: HTMLElement) => void
+) {
+  let waitInterval = 0;
+  let maxAttempts = 3;
+  list.scrollIntoView({
+    index,
+    done: function scrollDone() {
+      if (!maxAttempts) return;
+      clearTimeout(waitInterval);
+
+      const element = document.getElementById(elementId);
+      if (!element) {
+        --maxAttempts;
+        waitInterval = setTimeout(() => {
+          scrollDone();
+        }, 50) as unknown as number;
+        return;
+      }
+
+      callback(element);
+    }
+  });
+}

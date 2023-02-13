@@ -24,7 +24,7 @@ import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
 
-export const SelectionIcon = ({ setActionStrip, item }) => {
+export const SelectionIcon = ({ item }) => {
   const colors = useThemeStore((state) => state.colors);
 
   const selectionMode = useSelectionStore((state) => state.selectionMode);
@@ -35,7 +35,6 @@ export const SelectionIcon = ({ setActionStrip, item }) => {
 
   useEffect(() => {
     if (selectionMode) {
-      setActionStrip(false);
       let exists = selectedItemsList.filter(
         (o) => o.dateCreated === item.dateCreated
       );
@@ -50,16 +49,9 @@ export const SelectionIcon = ({ setActionStrip, item }) => {
         }
       }
     }
-  }, [
-    selectedItemsList,
-    item.id,
-    selectionMode,
-    setActionStrip,
-    item.dateCreated,
-    selected
-  ]);
+  }, [selectedItemsList, item.id, selectionMode, item.dateCreated, selected]);
 
-  return selectionMode && selected ? (
+  return selectionMode ? (
     <View
       style={{
         width: 40,
@@ -73,11 +65,13 @@ export const SelectionIcon = ({ setActionStrip, item }) => {
       }}
       pointerEvents="none"
     >
-      <Icon
-        size={SIZE.xl}
-        color={selected ? colors.accent : colors.icon}
-        name="check"
-      />
+      {selected ? (
+        <Icon
+          size={SIZE.xl}
+          color={selected ? colors.accent : colors.icon}
+          name={"check"}
+        />
+      ) : null}
     </View>
   ) : null;
 };

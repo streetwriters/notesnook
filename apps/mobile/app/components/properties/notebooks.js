@@ -23,39 +23,34 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import Notebook from "../../screens/notebook";
 import { TopicNotes } from "../../screens/notes/topic-notes";
+import { presentSheet, ToastEvent } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
+import { useNotebookStore } from "../../stores/use-notebook-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
-import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
-export default function Notebooks({ note, close }) {
-  const colors = useThemeStore((state) => state.colors);
 
+export default function Notebooks({ note, close, full }) {
+  const colors = useThemeStore((state) => state.colors);
+  const notebooks = useNotebookStore((state) => state.notebooks);
   function getNotebooks(item) {
     if (!item.notebooks || item.notebooks.length < 1) return [];
-    let notebooks = [];
-    for (let notebook of item.notebooks) {
-      let item_notebook = db.notebooks.notebook(notebook.id);
-      if (item_notebook) {
-        let data = {
-          id: notebook.id,
-          title: item_notebook.title,
-          topics: notebook.topics
-            .map((item) => {
-              let topic = item_notebook.topics.topic(item)?._topic;
-              if (!topic) return null;
-              return {
-                id: topic.id,
-                title: topic.title
-              };
-            })
-            .filter((i) => i !== null)
-        };
-        notebooks.push(data);
+    let filteredNotebooks = [];
+    for (let notebookReference of item.notebooks) {
+      let notebook = {
+        ...(notebooks.find((item) => item.id === notebookReference.id) || {})
+      };
+      if (notebook.id) {
+        notebook.topics = notebook.topics.filter((topic) => {
+          return notebookReference.topics.findIndex((t) => t === topic.id) > -1;
+        });
+        filteredNotebooks.push(notebook);
       }
     }
-    return notebooks;
+    return filteredNotebooks;
   }
+  const noteNotebooks = getNotebooks(note);
 
   const navigateNotebook = (id) => {
     let item = db.notebooks.notebook(id)?.data;
@@ -69,84 +64,139 @@ export default function Notebooks({ note, close }) {
     TopicNotes.navigate(item, true);
   };
 
+  const renderItem = (item) => (
+    <View
+      key={item.id}
+      style={{
+        justifyContent: "flex-start",
+        paddingHorizontal: 12,
+        flexDirection: "row",
+        alignItems: "center",
+        flexShrink: 1,
+        flexGrow: 1,
+        padding: 6,
+        borderWidth: full ? 0 : 1,
+        borderColor: colors.nav,
+        borderRadius: 10,
+        backgroundColor: full ? "transparent" : colors.nav
+      }}
+    >
+      <Icon
+        name="book-outline"
+        color={colors.accent}
+        size={SIZE.sm}
+        style={{
+          marginRight: 5
+        }}
+      />
+      <Heading
+        numberOfLines={1}
+        style={{
+          maxWidth: "50%"
+        }}
+        size={SIZE.sm}
+        onPress={() => {
+          navigateNotebook(item.id);
+          close();
+        }}
+      >
+        {item.title}
+      </Heading>
+
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        style={{
+          flexDirection: "row",
+          marginLeft: 8,
+          borderLeftColor: colors.nav,
+          borderLeftWidth: 1,
+          paddingLeft: 8
+        }}
+      >
+        {item.topics.map((topic) => (
+          <Button
+            key={topic.id}
+            onPress={() => {
+              navigateTopic(topic.id, item.id);
+              close();
+            }}
+            onLongPress={async () => {
+              await db.notes.removeFromNotebook(
+                {
+                  id: item.id,
+                  topic: topic.id
+                },
+                note
+              );
+              useNotebookStore.getState().setNotebooks();
+              Navigation.queueRoutesForUpdate(
+                "Notes",
+                "Favorites",
+                "ColoredNotes",
+                "TaggedNotes",
+                "TopicNotes"
+              );
+              ToastEvent.show({
+                heading: "Note removed from topic",
+                context: "local",
+                type: "success"
+              });
+            }}
+            title={topic.title}
+            type="gray"
+            height={30}
+            fontSize={SIZE.xs + 1}
+            icon="bookmark-outline"
+            style={{
+              marginRight: 5,
+              borderRadius: 100,
+              paddingHorizontal: 8
+            }}
+          />
+        ))}
+        <View style={{ width: 10 }} />
+      </ScrollView>
+    </View>
+  );
+
   return !note.notebooks || note.notebooks.length === 0 ? null : (
     <View
       style={{
         width: "100%",
-        borderTopWidth: 1,
-        borderTopColor: colors.nav
+        borderRadius: 10,
+        marginTop: 6
       }}
     >
-      {getNotebooks(note).map((item) => (
-        <PressableButton
-          key={item.id}
-          onPress={() => {
-            navigateNotebook(item.id);
-            close();
-          }}
-          customStyle={{
-            justifyContent: "flex-start",
-            paddingHorizontal: 12,
-            flexDirection: "row",
-            alignItems: "center",
-            flexShrink: 1,
-            flexGrow: 1,
-            marginTop: 5,
-            paddingVertical: 6
-          }}
-        >
-          <Icon
-            name="book-outline"
-            color={colors.accent}
-            size={SIZE.sm + 1}
-            style={{
-              marginRight: 5
-            }}
-          />
-          <Heading
-            numberOfLines={1}
-            style={{
-              maxWidth: "50%"
-            }}
-            size={SIZE.sm}
-          >
-            {item.title}
-          </Heading>
+      {full
+        ? noteNotebooks.map(renderItem)
+        : noteNotebooks.slice(0, 1).map(renderItem)}
 
-          <ScrollView
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            style={{
-              flexDirection: "row",
-              marginLeft: 8,
-              borderLeftColor: colors.nav,
-              borderLeftWidth: 1,
-              paddingLeft: 8
-            }}
-          >
-            {item.topics.map((topic) => (
-              <Button
-                key={topic.id}
-                onPress={() => {
-                  navigateTopic(topic.id, item.id);
-                  close();
-                }}
-                title={topic.title}
-                type="grayBg"
-                height={22}
-                fontSize={SIZE.xs + 1}
-                icon="bookmark-outline"
-                style={{
-                  marginRight: 5,
-                  borderRadius: 100,
-                  paddingHorizontal: 8
-                }}
-              />
-            ))}
-            <View style={{ width: 10 }} />
-          </ScrollView>
-        </PressableButton>
-      ))}
+      {noteNotebooks.length > 1 && !full ? (
+        <Button
+          title={`See all linked notebooks`}
+          fontSize={SIZE.xs + 1}
+          style={{
+            alignSelf: "flex-end",
+            marginRight: 12,
+            paddingHorizontal: 0,
+            backgroundColor: "transparent"
+          }}
+          type="gray"
+          textStyle={{
+            textDecorationLine: "underline"
+          }}
+          height={20}
+          onPress={() => {
+            presentSheet({
+              context: "properties",
+              component: (ref, close) => (
+                <Notebooks note={note} close={close} full={true} />
+              )
+            });
+          }}
+        />
+      ) : undefined}
     </View>
   );
 }

@@ -159,7 +159,8 @@ export const SelectionHeader = React.memo(() => {
         alignItems: "center",
         flexDirection: "row",
         zIndex: 999,
-        paddingHorizontal: 12
+        paddingHorizontal: 12,
+        marginVertical: 10
       }}
     >
       <View

@@ -21,7 +21,6 @@ import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import Share from "react-native-share";
-import { notesnook } from "../../e2e/test.ids";
 import { db } from "../common/database";
 import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
@@ -602,29 +601,35 @@ export const useActions = ({ close = () => null, item }) => {
   };
   const actions = [
     {
-      name: "Add to notebook",
-      title: "Add to notebook",
+      id: "notebooks",
+      title: "Link Notebooks",
       icon: "book-outline",
       func: addTo
     },
     {
-      name: "Add-Reminder",
-      title: "Add reminder",
-      icon: "bell-plus",
+      id: "add-tag",
+      title: "Add tags",
+      icon: "pound",
+      func: addTo
+    },
+    {
+      id: "add-reminder",
+      title: "Remind me",
+      icon: "clock-plus-outline",
       func: () => {
         ReminderSheet.present(null, { id: item.id, type: "note" });
       },
       close: true
     },
     {
-      name: "Vault",
+      id: "lock-unlock",
       title: item.locked ? "Unlock" : "Lock",
-      icon: item.locked ? "shield-off-outline" : "shield-outline",
+      icon: item.locked ? "lock-open-outline" : "key-outline",
       func: addToVault,
       on: item.locked
     },
     {
-      name: "Publish",
+      id: "publish",
       title: isPublished ? "Published" : "Publish",
       icon: "cloud-upload-outline",
       on: isPublished,
@@ -632,15 +637,157 @@ export const useActions = ({ close = () => null, item }) => {
     },
 
     {
-      name: "Export",
+      id: "export",
       title: "Export",
       icon: "export",
       func: exportNote
     },
     {
-      name: "Reminders",
+      id: "move-notes",
+      title: "Add notes",
+      icon: "plus",
+      func: async () => {
+        close();
+        await sleep(500);
+        MoveNotes.present(db.notebooks.notebook(item.notebookId).data, item);
+      }
+    },
+    {
+      id: "pin",
+      title: item.pinned ? "Unpin" : "Pin",
+      icon: item.pinned ? "pin-off-outline" : "pin-outline",
+      func: pinItem,
+      close: false,
+      check: true,
+      on: item.pinned,
+      pro: true
+    },
+    {
+      id: "favorite",
+      title: !item.favorite ? "Favorite" : "Unfavorite",
+      icon: item.favorite ? "star-off" : "star-outline",
+      func: addToFavorites,
+      close: false,
+      check: true,
+      on: item.favorite,
+      pro: true,
+      color: "orange"
+    },
+    {
+      id: "pin-to-notifications",
+      title:
+        notifPinned !== null
+          ? "Unpin from Notifications"
+          : "Pin to notifications",
+      icon: "message-badge-outline",
+      on: notifPinned !== null,
+      func: pinToNotifications
+    },
+
+    {
+      id: "edit-notebook",
+      title: "Edit notebook",
+      icon: "square-edit-outline",
+      func: async () => {
+        close();
+        await sleep(300);
+        eSendEvent(eOpenAddNotebookDialog, item);
+      }
+    },
+    {
+      id: "edit-topic",
+      title: "Edit topic",
+      icon: "square-edit-outline",
+      func: async () => {
+        close();
+        await sleep(300);
+        eSendEvent(eOpenAddTopicDialog, {
+          notebookId: item.notebookId,
+          toEdit: item
+        });
+      }
+    },
+    {
+      id: "copy",
+      title: "Copy",
+      icon: "content-copy",
+      func: copyContent
+    },
+    {
+      id: "restore",
+      title: "Restore " + item.itemType,
+      icon: "delete-restore",
+      func: restoreTrashItem
+    },
+
+    {
+      id: "add-shortcut",
+      title: isPinnedToMenu ? "Remove Shortcut" : "Add Shortcut",
+      icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
+      func: createMenuShortcut,
+      close: false,
+      check: true,
+      on: isPinnedToMenu,
+      pro: true
+    },
+    {
+      id: "rename-tag",
+      title: "Rename tag",
+      icon: "square-edit-outline",
+      func: renameTag
+    },
+    {
+      id: "share",
+      title: "Share",
+      icon: "share-variant",
+      func: shareNote
+    },
+    {
+      id: "read-only",
+      title: "Read only",
+      icon: "pencil-lock",
+      func: toggleReadyOnlyMode,
+      on: item.readonly
+    },
+    {
+      id: "local-only",
+      title: "Local only",
+      icon: "sync-off",
+      func: toggleLocalOnly,
+      on: item.localOnly
+    },
+    {
+      id: "duplicate",
+      title: "Duplicate",
+      icon: "content-duplicate",
+      func: duplicateNote
+    },
+    {
+      id: "dark-mode",
+      title: "Dark mode",
+      icon: "theme-light-dark",
+      func: switchTheme,
+      switch: true,
+      on: colors.night ? true : false,
+      close: false,
+      pro: true
+    },
+    {
+      id: "edit-reminder",
+      title: "Edit reminder",
+      icon: "pencil",
+      func: async () => {
+        close();
+        await sleep(300);
+        ReminderSheet.present(item);
+      },
+      close: false
+    },
+
+    {
+      id: "reminders",
       title: "Reminders",
-      icon: "bell",
+      icon: "clock-outline",
       func: async () => {
         close();
         RelationsList.present({
@@ -660,165 +807,20 @@ export const useActions = ({ close = () => null, item }) => {
       close: false
     },
     {
-      name: "Attachments",
+      id: "attachments",
       title: "Attachments",
       icon: "attachment",
       func: showAttachments
     },
     {
-      name: "History",
+      id: "history",
       title: "History",
       icon: "history",
       func: openHistory
     },
-    {
-      name: "Move notes",
-      title: "Add notes",
-      icon: "plus",
-      func: async () => {
-        close();
-        await sleep(500);
-        MoveNotes.present(db.notebooks.notebook(item.notebookId).data, item);
-      }
-    },
-    {
-      name: "Pin",
-      title: item.pinned ? "Unpin" : "Pin",
-      icon: item.pinned ? "pin-off-outline" : "pin-outline",
-      func: pinItem,
-      close: false,
-      check: true,
-      on: item.pinned,
-      nopremium: true,
-      id: notesnook.ids.dialogs.actionsheet.pin
-    },
-    {
-      name: "Favorite",
-      title: !item.favorite ? "Favorite" : "Unfavorite",
-      icon: item.favorite ? "star-off" : "star-outline",
-      func: addToFavorites,
-      close: false,
-      check: true,
-      on: item.favorite,
-      nopremium: true,
-      id: notesnook.ids.dialogs.actionsheet.favorite,
-      color: "orange"
-    },
-    {
-      name: "PinToNotif",
-      title:
-        notifPinned !== null
-          ? "Unpin from Notifications"
-          : "Pin to Notifications",
-      icon: "bell",
-      on: notifPinned !== null,
-      func: pinToNotifications
-    },
 
     {
-      name: "Edit Notebook",
-      title: "Edit notebook",
-      icon: "square-edit-outline",
-      func: async () => {
-        close();
-        await sleep(300);
-        eSendEvent(eOpenAddNotebookDialog, item);
-      }
-    },
-    {
-      name: "Edit Topic",
-      title: "Edit topic",
-      icon: "square-edit-outline",
-      func: async () => {
-        close();
-        await sleep(300);
-        eSendEvent(eOpenAddTopicDialog, {
-          notebookId: item.notebookId,
-          toEdit: item
-        });
-      }
-    },
-    {
-      name: "Copy",
-      title: "Copy",
-      icon: "content-copy",
-      func: copyContent
-    },
-    {
-      name: "Restore",
-      title: "Restore " + item.itemType,
-      icon: "delete-restore",
-      func: restoreTrashItem
-    },
-
-    {
-      name: "Add Shortcut",
-      title: isPinnedToMenu ? "Remove Shortcut" : "Add Shortcut",
-      icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
-      func: createMenuShortcut,
-      close: false,
-      check: true,
-      on: isPinnedToMenu,
-      nopremium: true,
-      id: notesnook.ids.dialogs.actionsheet.pinMenu
-    },
-    {
-      name: "Rename Tag",
-      title: "Rename tag",
-      icon: "square-edit-outline",
-      func: renameTag
-    },
-    {
-      name: "Share",
-      title: "Share",
-      icon: "share-variant",
-      func: shareNote
-    },
-    {
-      name: "ReadOnly",
-      title: "Read only",
-      icon: "pencil-lock",
-      func: toggleReadyOnlyMode,
-      on: item.readonly
-    },
-    {
-      name: "Local only",
-      title: "Local only",
-      icon: "sync-off",
-      func: toggleLocalOnly,
-      on: item.localOnly
-    },
-    {
-      name: "Duplicate",
-      title: "Duplicate",
-      icon: "content-duplicate",
-      func: duplicateNote
-    },
-    {
-      name: "Dark Mode",
-      title: "Dark mode",
-      icon: "theme-light-dark",
-      func: switchTheme,
-      switch: true,
-      on: colors.night ? true : false,
-      close: false,
-      nopremium: true,
-      id: notesnook.ids.dialogs.actionsheet.night
-    },
-    {
-      name: "Edit reminder",
-      title: "Edit reminder",
-      icon: "pencil",
-      func: async () => {
-        close();
-        await sleep(300);
-        ReminderSheet.present(item);
-      },
-      close: false
-    },
-
-    {
-      name: "ReminderOnOff",
+      id: "disable-reminder",
       title: !item.disabled ? "Turn off reminder" : "Turn on reminder",
       icon: !item.disabled ? "bell-off-outline" : "bell",
       func: async () => {
@@ -841,14 +843,14 @@ export const useActions = ({ close = () => null, item }) => {
       }
     },
     {
-      name: "RemoveTopic",
+      id: "remove-from-topic",
       title: "Remove from topic",
       hidden: !isNoteInTopic(),
       icon: "minus-circle-outline",
       func: removeNoteFromTopic
     },
     {
-      name: "Delete",
+      id: "trash",
       title:
         item.type !== "notebook" && item.type !== "note"
           ? "Delete " + item.type
@@ -858,13 +860,13 @@ export const useActions = ({ close = () => null, item }) => {
       func: deleteItem
     },
     {
-      name: "PermDelete",
+      id: "delete",
       title: "Delete " + item.itemType,
       icon: "delete",
       func: deleteTrashItem
     }
     // {
-    //   name: "ReferencedIn",
+    //   id: "ReferencedIn",
     //   title: "References",
     //   icon: "link",
     //   func: async () => {

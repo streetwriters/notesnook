@@ -27,7 +27,6 @@ import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { dWidth } from "../../utils";
 import { COLORS_NOTE } from "../../utils/color-scheme";
 import { refreshNotesPage } from "../../utils/events";
 import { SIZE } from "../../utils/size";
@@ -71,8 +70,8 @@ export const ColorTags = ({ item }) => {
         key={color.value}
         onPress={() => changeColor(color)}
         customStyle={{
-          width: DDS.isTab ? width / 10 : dWidth / 9,
-          height: DDS.isTab ? width / 10 : dWidth / 9,
+          width: DDS.isTab ? width / 10 : 30,
+          height: DDS.isTab ? width / 10 : 30,
           borderRadius: 100,
           justifyContent: "center",
           alignItems: "center"
@@ -90,10 +89,9 @@ export const ColorTags = ({ item }) => {
       style={{
         flexDirection: "row",
         flexWrap: "wrap",
+        flexGrow: 1,
         paddingHorizontal: 12,
-        width: "100%",
-        marginVertical: 10,
-        marginTop: 20,
+        // width: "100%",
         alignItems: "center",
         justifyContent: "space-between"
       }}
