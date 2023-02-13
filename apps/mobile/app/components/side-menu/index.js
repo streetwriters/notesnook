@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useCallback } from "react";
 import { FlatList, View } from "react-native";
 import { notesnook } from "../../../e2e/test.ids";
-import umami from "../../common/analytics";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
@@ -76,7 +75,6 @@ export const SideMenu = React.memo(
       name: "Notesnook Pro",
       icon: "crown",
       func: () => {
-        umami.pageView("/pro-screen", "/sidemenu");
         eSendEvent(eOpenPremiumDialog);
       }
     };

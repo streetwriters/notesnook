@@ -18,9 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useState } from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, View } from "react-native";
 import { LAUNCH_ROCKET } from "../../assets/images/assets";
-import umami from "../../common/analytics";
 import { db } from "../../common/database";
 import { usePricing } from "../../hooks/use-pricing";
 import { DDS } from "../../services/device-detection";
@@ -48,7 +47,6 @@ import { Walkthrough } from "../walkthroughs";
 import { features } from "./features";
 import { Group } from "./group";
 import { PricingPlans } from "./pricing-plans";
-import { Platform } from "react-native";
 
 export const Component = ({ close, promo }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -60,7 +58,6 @@ export const Component = ({ close, promo }) => {
 
   const onPress = async () => {
     if (user) {
-      umami.pageView("/pro-plans", "/pro-screen");
       presentSheet({
         context: "pricing_plans",
         component: (
@@ -69,7 +66,6 @@ export const Component = ({ close, promo }) => {
       });
     } else {
       close();
-      umami.pageView("/signup", "/pro-screen");
       setTimeout(() => {
         eSendEvent(eOpenLoginDialog, AuthMode.trialSignup);
       }, 400);

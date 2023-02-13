@@ -21,7 +21,6 @@ import React, { useState } from "react";
 import { Dimensions, LayoutAnimation, Platform, View } from "react-native";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import umami from "../../common/analytics";
 import { SVG_Z } from "../../components/intro";
 import { WelcomeNotice } from "../../components/intro/welcome";
 import { Button } from "../../components/ui/button";
@@ -205,7 +204,6 @@ const AppLock = ({ route }) => {
                         type: "linear"
                       }
                     });
-                    umami.pageView("/privacymode", "/welcome");
                     setStep(1);
                   }}
                   style={{
