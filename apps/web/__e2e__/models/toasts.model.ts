@@ -22,7 +22,6 @@ import { getTestId } from "../utils";
 
 export class ToastsModel {
   private readonly toasts: Locator;
-  private readonly toastMessage: Locator;
 
   constructor(page: Page) {
     this.toasts = page.locator(".toasts-container > div");

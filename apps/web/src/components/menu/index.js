@@ -211,10 +211,11 @@ function Menu({ items, data, title, closeMenu }) {
 }
 export default React.memo(Menu);
 
-function MenuContainer({ title, children }) {
+function MenuContainer({ children }) {
   return (
     <Flex
       className="menuContainer"
+      data-test-id="menu-container"
       tabIndex={-1}
       py={1}
       sx={{

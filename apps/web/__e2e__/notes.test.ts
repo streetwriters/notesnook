@@ -95,7 +95,11 @@ test("add a note to notebook", async ({ page }) => {
     topics: ["Hello", "World", "Did", "what"]
   });
 
-  expect(await app.toasts.waitForToast("Added 1 note to 4 topics")).toBe(true);
+  expect(
+    await app.toasts.waitForToast(
+      "1 note added to 4 topics & removed from 0 topics."
+    )
+  ).toBe(true);
 });
 
 const actors = ["contextMenu", "properties"] as const;

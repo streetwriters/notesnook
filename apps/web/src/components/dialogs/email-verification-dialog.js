@@ -63,7 +63,7 @@ function EmailVerificationDialog(props) {
       description={
         "Check your spam folder if you haven't received an email yet."
       }
-      onClose={props.onCancel}
+      onClose={() => props.onCancel(false)}
       positiveButton={{
         text: canSendAgain || isSending ? "Resend" : `Resend (${resetTimer})`,
         onClick: async () => {
@@ -82,7 +82,7 @@ function EmailVerificationDialog(props) {
       }}
       negativeButton={{
         text: "Cancel",
-        onClick: props.onCancel,
+        onClick: () => props.onCancel(true),
         disabled: isSending
       }}
     >

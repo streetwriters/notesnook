@@ -98,7 +98,7 @@ function ReminderDialog(props) {
     <Dialog
       isOpen={true}
       title={reminder.title}
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       showCloseButton
       description={reminder.description}
       alignment="center"
