@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import './globals.js';
 import 'react-native-get-random-values';
-import 'react-native-gesture-handler';
 import React from 'react';
 import { AppRegistry, LogBox, Platform, UIManager } from 'react-native';
 import Config from 'react-native-config';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import appJson from './app.json';
-import Notifications from '../app/services/notifications';
 //import {BackgroundSync} from '../app/services/background-sync';
 
 const appName = appJson.name;
@@ -22,7 +20,7 @@ if (__DEV__) {
   LogBox.ignoreAllLogs();
 }
 let NotesnookShare;
-Notifications.init();
+
 //BackgroundSync.registerHeadlessTask();
 let QuickNoteIOS;
 

@@ -38,7 +38,7 @@
     "@microsoft/signalr": "^6.0.7",
     "@microsoft/signalr-protocol-msgpack": "^6.0.7",
     "@notesnook/logger": "*",
-    "@streetwriters/showdown": "^3.0.1-alpha",
+    "@streetwriters/showdown": "^3.0.1-alpha.2",
     "async-mutex": "^0.3.2",
     "dayjs": "^1.11.3",
     "entities": "^4.3.1",

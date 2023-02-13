@@ -5,24 +5,26 @@
   "tasks": [
     {
       "type": "shell",
-      "command": "yarn debug",
+      "command": "npm run debug",
       "group": {
-        "kind": "test",
+        "kind": "build",
         "isDefault": true
       },
+      "dependsOn": "Terminate All Tasks",
       "isBackground": true, //This prevents the launch.json to wait for the completion of the task
       "problemMatcher": {
+        "fileLocation": "relative",
         "owner": "custom", //This is not needed but, required by the problemMatcher Object
         "pattern": {
           "regexp": "^$" //This is not needed but, required by the problemMatcher Object
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "Compiling...", //Signals the begin of the Task
-          "endsPattern": "Compiled .*" //Signals that now the initialization of the task is complete
+          "beginsPattern": "^$",
+          "endsPattern": "^You can now view (.*) in the browser.$"
         }
       },
-      "label": "StartReactApp"
+      "label": "Start Notesnook (web)"
     },
     {
       "label": "Terminate All Tasks",

@@ -7,14 +7,21 @@
     {
       "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "StartReactApp",
+      "preLaunchTask": "Start Notesnook (web)",
       "postDebugTask": "Terminate All Tasks",
-      "name": "Launch Chrome against localhost",
+      "name": "Debug Chrome",
       "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}",
-      "env": { "DISPLAY": ":0" },
-      "runtimeExecutable": "/usr/bin/brave-browser",
-      "runtimeArgs": ["--remote-debugging-port=9222"]
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "type": "firefox",
+      "request": "launch",
+      "reAttach": true,
+      "preLaunchTask": "Start Notesnook (web)",
+      "postDebugTask": "Terminate All Tasks",
+      "name": "Debug Firefox",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}"
     }
   ]
 }

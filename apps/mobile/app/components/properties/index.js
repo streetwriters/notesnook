@@ -101,7 +101,6 @@ export const Properties = ({
                 style={{
                   marginBottom: 5
                 }}
-                numberOfLines={2}
                 color={colors.icon}
               >
                 {(item.type === "notebook" ||

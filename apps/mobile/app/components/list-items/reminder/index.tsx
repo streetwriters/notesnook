@@ -56,7 +56,6 @@ const ReminderItem = React.memo(
       >
         <View
           style={{
-            flexWrap: "wrap",
             flexShrink: 1,
             opacity: item.disabled ? 0.5 : 1
           }}
@@ -94,13 +93,13 @@ const ReminderItem = React.memo(
                   backgroundColor: colors.nav,
                   borderRadius: 5,
                   flexDirection: "row",
-                  paddingHorizontal: 5,
-                  paddingVertical: 3,
+                  paddingHorizontal: 6,
                   alignItems: "center",
                   marginTop: 5,
                   justifyContent: "flex-start",
                   alignSelf: "flex-start",
-                  marginRight: 10
+                  marginRight: 10,
+                  height: 30
                 }}
               >
                 <Icon
@@ -123,13 +122,13 @@ const ReminderItem = React.memo(
                   backgroundColor: colors.nav,
                   borderRadius: 5,
                   flexDirection: "row",
-                  paddingHorizontal: 5,
-                  paddingVertical: 3,
+                  paddingHorizontal: 6,
                   alignItems: "center",
                   marginTop: 5,
                   justifyContent: "flex-start",
                   alignSelf: "flex-start",
-                  marginRight: 10
+                  marginRight: 10,
+                  height: 30
                 }}
               >
                 <Icon name="reload" size={SIZE.md} color={colors.accent} />
