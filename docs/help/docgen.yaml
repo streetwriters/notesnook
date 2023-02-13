@@ -4,7 +4,7 @@ subtitle: HELP
 docs_dir: ./contents
 logo: logo.png
 edit_root: https://github.com/streetwriters/notesnook/tree/help/docs/help
-base_url: https://docs.notesnook.com
+base_url: https://help.notesnook.com
 
 meta:
   title: Notesnook Help
