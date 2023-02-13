@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useCallback, useRef, useEffect, useState } from "react";
-import { Flex } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import { getPosition } from "../../hooks/use-menu";
 import { FlexScrollContainer } from "../scroll-container";
 import MenuItem from "./menu-item";
@@ -211,7 +211,7 @@ function Menu({ items, data, title, closeMenu }) {
 }
 export default React.memo(Menu);
 
-function MenuContainer({ children }) {
+function MenuContainer({ title, children }) {
   return (
     <Flex
       className="menuContainer"
@@ -229,6 +229,23 @@ function MenuContainer({ children }) {
         flexDirection: "column"
       }}
     >
+      {title && (
+        <Text
+          py={"8px"}
+          px={3}
+          sx={{
+            borderBottom: "1px solid",
+            borderBottomColor: "border",
+            wordWrap: "break-word",
+            fontSize: "subtitle",
+            fontFamily: "body",
+            color: "primary"
+          }}
+          data-test-id="menu-title"
+        >
+          {title}
+        </Text>
+      )}
       <FlexScrollContainer>{children}</FlexScrollContainer>
     </Flex>
   );

@@ -90,7 +90,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
         onContextMenu={(e) => {
           if (!menuItems) return;
           e.preventDefault();
-          openMenu(menuItems, { title });
+          openMenu(menuItems);
         }}
         onClick={() => {
           if (isMobile) toggleSideMenu(false);

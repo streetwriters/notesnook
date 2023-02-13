@@ -303,6 +303,10 @@ export class NoteContextMenuModel extends BaseProperties {
   async close() {
     await this.menu.close();
   }
+
+  title() {
+    return this.menu.title();
+  }
 }
 
 class SessionHistoryItemModel {

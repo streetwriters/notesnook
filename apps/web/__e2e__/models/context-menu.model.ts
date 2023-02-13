@@ -22,8 +22,14 @@ import { getTestId } from "../utils";
 
 export class ContextMenuModel {
   readonly menuContainer: Locator;
+  readonly titleText: Locator;
   constructor(private readonly page: Page) {
     this.menuContainer = this.page.locator(getTestId(`menu-container`));
+    this.titleText = this.page.locator(getTestId(`menu-title`));
+  }
+
+  async title() {
+    return await this.titleText.textContent();
   }
 
   async open(
