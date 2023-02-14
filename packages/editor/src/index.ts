@@ -76,7 +76,6 @@ import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import { KeyMap } from "./extensions/key-map";
 import { WebClipNode, WebClipOptions } from "./extensions/web-clip";
 import { DownloadOptions } from "./utils/downloader";
-export { getTotalWords, countWords } from "./utils/word-counter";
 
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
@@ -273,3 +272,4 @@ export * from "./extensions/react";
 export * from "./toolbar";
 export { type AttachmentType, type Attachment } from "./extensions/attachment";
 export { type Fragment } from "prosemirror-model";
+export * from "./utils/word-counter";
