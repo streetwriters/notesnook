@@ -68,7 +68,6 @@ async function createWindow() {
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
-    fullscreen: mainWindowState.isFullScreen,
     darkTheme: getTheme() === "dark",
     backgroundColor: getBackgroundColor(),
 
