@@ -92,7 +92,6 @@ async function createWindow() {
   setupMenu();
   setupJumplist();
   setupDesktopIntegration();
-  setupTray();
 
   mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
     "http://dictionaries.notesnook.com/"
@@ -172,6 +171,13 @@ function createURL(options) {
 
 function setupDesktopIntegration() {
   const desktopIntegration = getDesktopIntegration();
+
+  if (
+    desktopIntegration.closeToSystemTray ||
+    desktopIntegration.minimizeToSystemTray
+  ) {
+    setupTray();
+  }
 
   // when close to system tray is enabled, it becomes nigh impossible
   // to "quit" the app. This is necessary in order to fix that.
