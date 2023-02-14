@@ -92,14 +92,27 @@ const features: Record<FeatureKeys, Feature> = {
       : isDesktop()
       ? [
           {
-            title: "Multi-language spell check",
+            title: "Full RTL support in editor",
             subtitle:
-              "Spell checking support is finally here. You can enable/disable & add new languages support from settings. The spell checker supports multiple languages at once so feel free to add as many as you'd like."
+              "The editor now supports RTL languages everywhere and correctly aligns them."
           },
           {
-            title: "Better OS integration",
+            title: "CJK character count",
             subtitle:
-              "Notesnook now supports all the standard desktop integration features like auto start on startup, minimize to system tray, shortcuts from jumplist, dock menu etc. There are some other goodies as well like native notifications for reminders."
+              "The editor word counter now correctly counds CJK characters."
+          },
+          {
+            title: "Telemetry is now opt-in by default"
+          },
+          {
+            title: "Revamped notebook linking dialog",
+            subtitle:
+              "The new dialog is much more user friendly & makes linking notebooks a breeze."
+          },
+          {
+            title: "A lot of UX improvements",
+            subtitle:
+              "The app should now behave much nicer on some actions. More UX improvements coming in next versions."
           }
         ]
       : [],
