@@ -27,7 +27,7 @@ let tray: Tray | undefined = undefined;
 export function setupTray() {
   if (tray) tray.destroy();
 
-  const trayIconSize = process.platform === "win32" ? 16 : 32;
+  const trayIconSize = process.platform === "win32" || process.platform === "darwin" ? 16 : 32;
 
   tray = new Tray(
     AssetManager.icon("tray-icon", {
