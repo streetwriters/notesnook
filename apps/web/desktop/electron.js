@@ -173,6 +173,12 @@ function createURL(options) {
 function setupDesktopIntegration() {
   const desktopIntegration = getDesktopIntegration();
 
+  // when close to system tray is enabled, it becomes nigh impossible
+  // to "quit" the app. This is necessary in order to fix that.
+  if (getDesktopIntegration().closeToSystemTray) {
+    app.on("before-quit", () => app.exit(0));
+  }
+
   globalThis.window.on("close", (e) => {
     if (getDesktopIntegration().closeToSystemTray) {
       e.preventDefault();
