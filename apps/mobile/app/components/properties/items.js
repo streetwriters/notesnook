@@ -108,7 +108,59 @@ export const Items = ({ item, buttons, close }) => {
     />
   );
 
-  const bottomBarItemsList = [
+  const renderTopBarItem = ({ item }) => {
+    return (
+      <PressableButton
+        onPress={item.func}
+        key={item.id}
+        testID={"icon-" + item.id}
+        customStyle={{
+          alignItems: "center",
+          width: topBarItemWidth,
+          marginBottom: 10,
+          marginRight: 10,
+          backgroundColor: "transparent"
+        }}
+      >
+        <PressableButton
+          onPress={item.func}
+          type={item.on ? "shade" : "gray"}
+          customStyle={{
+            height: topBarItemWidth,
+            width: topBarItemWidth,
+            justifyContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+            textAlignVertical: "center",
+            marginBottom: DDS.isTab ? 7 : 3.5,
+            borderRadius: 100
+          }}
+        >
+          <Icon
+            name={item.icon}
+            size={DDS.isTab ? SIZE.xxl : SIZE.md + 4}
+            color={
+              item.on
+                ? colors.accent
+                : item.name === "Delete" || item.name === "PermDelete"
+                ? colors.errorText
+                : colors.icon
+            }
+          />
+        </PressableButton>
+
+        <Paragraph
+          size={SIZE.xxs + 1}
+          style={{ textAlign: "center" }}
+          textBreakStrategy="simple"
+        >
+          {item.title}
+        </Paragraph>
+      </PressableButton>
+    );
+  };
+
+  const topBarItemsList = [
     "pin",
     "favorite",
     "copy",
@@ -118,14 +170,14 @@ export const Items = ({ item, buttons, close }) => {
     "publish"
   ];
   const bottomBarItems = data.filter(
-    (item) => bottomBarItemsList.indexOf(item.id) > -1
+    (item) => topBarItemsList.indexOf(item.id) > -1
   );
 
-  const gridItems = data.filter(
-    (item) => bottomBarItemsList.indexOf(item.id) === -1
+  const bottomGridItems = data.filter(
+    (item) => topBarItemsList.indexOf(item.id) === -1
   );
 
-  const bottomBarItemWidth =
+  const topBarItemWidth =
     (width - (bottomBarItems.length * 10 + 14)) / bottomBarItems.length;
 
   return item.type === "note" ? (
@@ -134,68 +186,20 @@ export const Items = ({ item, buttons, close }) => {
         data={bottomBarItems}
         keyExtractor={(item) => item.title}
         horizontal
+        disableVirtualization={true}
         style={{
           paddingHorizontal: 12,
           paddingTop: 12
         }}
-        renderItem={({ item }) => {
-          return (
-            <PressableButton
-              onPress={item.func}
-              key={item.id}
-              testID={"icon-" + item.id}
-              customStyle={{
-                alignItems: "center",
-                width: bottomBarItemWidth,
-                marginBottom: 10,
-                marginRight: 10,
-                backgroundColor: "transparent"
-              }}
-            >
-              <PressableButton
-                onPress={item.func}
-                type={item.on ? "shade" : "gray"}
-                customStyle={{
-                  height: bottomBarItemWidth,
-                  width: bottomBarItemWidth,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  textAlign: "center",
-                  textAlignVertical: "center",
-                  marginBottom: DDS.isTab ? 7 : 3.5,
-                  borderRadius: 100
-                }}
-              >
-                <Icon
-                  name={item.icon}
-                  size={DDS.isTab ? SIZE.xxl : SIZE.md + 4}
-                  color={
-                    item.on
-                      ? colors.accent
-                      : item.name === "Delete" || item.name === "PermDelete"
-                      ? colors.errorText
-                      : colors.icon
-                  }
-                />
-              </PressableButton>
-
-              <Paragraph
-                size={SIZE.xxs + 1}
-                style={{ textAlign: "center" }}
-                textBreakStrategy="simple"
-              >
-                {item.title}
-              </Paragraph>
-            </PressableButton>
-          );
-        }}
+        renderItem={renderTopBarItem}
       />
 
       <FlatList
-        data={gridItems}
+        data={bottomGridItems}
         keyExtractor={(item) => item.title}
         key={columnItemsCount + "key"}
         numColumns={columnItemsCount}
+        disableVirtualization={true}
         style={{
           marginTop: item.type !== "note" ? 10 : 0,
           paddingTop: 10
@@ -216,6 +220,7 @@ export const Items = ({ item, buttons, close }) => {
       data={data}
       keyExtractor={(item) => item.title}
       renderItem={renderColumnItem}
+      disableVirtualization={true}
     />
   );
 };

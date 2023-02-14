@@ -259,6 +259,7 @@ export default function ReminderSheet({
             marginTop: 10
           }}
           multiline
+          textAlignVertical="top"
           inputStyle={{
             height: 80
           }}

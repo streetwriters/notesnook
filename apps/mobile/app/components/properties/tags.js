@@ -40,7 +40,8 @@ export const Tags = ({ item, close }) => {
         flexDirection: "row",
         flexWrap: "wrap",
         alignItems: "center",
-        paddingHorizontal: 12
+        paddingHorizontal: 12,
+        alignSelf: "center"
       }}
     >
       <Button

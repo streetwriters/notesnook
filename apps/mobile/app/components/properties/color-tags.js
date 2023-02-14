@@ -22,7 +22,6 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
-import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
@@ -34,9 +33,7 @@ import { PressableButton } from "../ui/pressable";
 export const ColorTags = ({ item }) => {
   const [note, setNote] = useState(item);
   const setColorNotes = useMenuStore((state) => state.setColorNotes);
-  const dimensions = useSettingStore((state) => state.dimensions);
-  let width = dimensions.width > 600 ? 600 : 500;
-
+  const isTablet = useSettingStore((state) => state.deviceMode) !== "mobile";
   const changeColor = async (color) => {
     if (note.color === color.name) {
       await db.notes.note(note.id).uncolor();
@@ -70,11 +67,12 @@ export const ColorTags = ({ item }) => {
         key={color.value}
         onPress={() => changeColor(color)}
         customStyle={{
-          width: DDS.isTab ? width / 10 : 30,
-          height: DDS.isTab ? width / 10 : 30,
+          width: 30,
+          height: 30,
           borderRadius: 100,
           justifyContent: "center",
-          alignItems: "center"
+          alignItems: "center",
+          marginRight: isTablet ? 10 : undefined
         }}
       >
         {note.color?.toLowerCase() === color.name ? (
@@ -89,11 +87,10 @@ export const ColorTags = ({ item }) => {
       style={{
         flexDirection: "row",
         flexWrap: "wrap",
-        flexGrow: 1,
+        flexGrow: isTablet ? undefined : 1,
         paddingHorizontal: 12,
-        // width: "100%",
         alignItems: "center",
-        justifyContent: "space-between"
+        justifyContent: isTablet ? "center" : "space-between"
       }}
     >
       {Object.keys(COLORS_NOTE).map(_renderColor)}
