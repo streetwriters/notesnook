@@ -90,14 +90,15 @@ function setupMenu() {
         })
       );
 
-    menu.append(
-      new MenuItem({
-        label: "Copy",
-        role: "copy",
-        enabled: params.selectionText.length > 0,
-        accelerator: "CommandOrControl+C"
-      })
-    );
+    if (params.selectionText.length) {
+      menu.append(
+        new MenuItem({
+          label: "Copy",
+          role: "copy",
+          accelerator: "CommandOrControl+C"
+        })
+      );
+    }
 
     if (params.isEditable)
       menu.append(
