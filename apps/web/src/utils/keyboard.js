@@ -38,4 +38,9 @@ window.addEventListener("keyup", (e) => {
   KeyboardEventManager.publish("keyup", e);
 });
 
-export { GlobalKeyboard, KeyboardEventManager };
+const selectSearchInput = () => {
+  const input = document.getElementById("search-replace-input");
+  if (input) input.select();
+};
+
+export { GlobalKeyboard, KeyboardEventManager, selectSearchInput };

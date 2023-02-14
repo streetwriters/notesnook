@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import hotkeys from "hotkeys-js";
 import { navigate } from "../navigation";
 // import { store as themestore } from "../stores/theme-store";
-import { GlobalKeyboard } from "../utils/keyboard";
+import { GlobalKeyboard, selectSearchInput } from "../utils/keyboard";
 
 const KEYMAP = [
   // {
@@ -58,7 +58,10 @@ const KEYMAP = [
     description: "Search all notes",
     global: false,
     action: (e) => {
-      if (e.target?.classList.contains("ProseMirror")) return;
+      if (e.target?.classList.contains("ProseMirror")) {
+        selectSearchInput();
+        return;
+      }
       e.preventDefault();
 
       navigate("/search/notes");

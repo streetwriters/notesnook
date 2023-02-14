@@ -106,6 +106,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               ref={searchInputRef}
               autoFocus
               placeholder="Find"
+              id="search-replace-input"
               sx={{ p: 0 }}
               onChange={(e) => {
                 search(e.target.value);
