@@ -37,12 +37,14 @@ import { getToolDefinition } from "../../toolbar/tool-definitions";
 import { getPosition } from "../../utils/position";
 import { findSelectedDOMNode } from "../../utils/prosemirror";
 import { DesktopOnly } from "../../components/responsive";
+import { TextDirections } from "../text-direction";
 
 export function TableComponent(props: SelectionBasedReactNodeViewProps) {
   const { editor, node, forwardRef } = props;
   const colgroupRef = useRef<HTMLTableColElement>(null);
   const tableRef = useRef<HTMLTableElement>();
   const selected = editor.isActive("table");
+  const { textDirection } = node.attrs;
 
   useEffect(() => {
     if (!colgroupRef.current || !tableRef.current) return;
@@ -55,12 +57,20 @@ export function TableComponent(props: SelectionBasedReactNodeViewProps) {
       <DesktopOnly>
         {selected && (
           <>
-            <TableRowToolbar editor={editor} table={tableRef.current} />
-            <TableColumnToolbar editor={editor} table={tableRef.current} />
+            <TableRowToolbar
+              editor={editor}
+              table={tableRef.current}
+              textDirection={textDirection}
+            />
+            <TableColumnToolbar
+              editor={editor}
+              table={tableRef.current}
+              textDirection={textDirection}
+            />
           </>
         )}
       </DesktopOnly>
-      <div className="tableWrapper">
+      <div className="tableWrapper" dir={textDirection}>
         <table
           ref={(ref) => {
             forwardRef?.(ref);
@@ -110,10 +120,11 @@ export function TableNodeView(editor: Editor) {
 type TableToolbarProps = {
   editor: Editor;
   table?: HTMLTableElement;
+  textDirection: TextDirections;
 };
 
 function TableRowToolbar(props: TableToolbarProps) {
-  const { editor } = props;
+  const { editor, textDirection } = props;
   const rowToolsRef = useRef<HTMLDivElement>(null);
 
   useEffect(
@@ -133,10 +144,16 @@ function TableRowToolbar(props: TableToolbarProps) {
         yOffset: -3
       });
       rowToolsRef.current.style.top = `${pos.top}px`;
-      rowToolsRef.current.style.left = `${pos.left}px`;
+      if (textDirection) {
+        rowToolsRef.current.style.right = `${pos.left}px`;
+        rowToolsRef.current.style.left = `unset`;
+      } else {
+        rowToolsRef.current.style.left = `${pos.left}px`;
+        rowToolsRef.current.style.right = `unset`;
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [editor.state.selection]
+    [editor.state.selection, textDirection]
   );
 
   return (

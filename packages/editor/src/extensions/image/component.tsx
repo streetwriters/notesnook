@@ -44,8 +44,11 @@ export function ImageComponent(
 ) {
   const { editor, node, selected } = props;
   const isMobile = useIsMobile();
-  const { src, alt, title, width, height, align, hash } = node.attrs;
+  const { src, alt, title, width, height, textDirection, hash } = node.attrs;
   const float = isMobile ? false : node.attrs.float;
+
+  let align = node.attrs.align;
+  if (!align) align = textDirection ? "right" : "left";
 
   const imageRef = useRef<HTMLImageElement>(null);
   const [error, setError] = useState<string>();

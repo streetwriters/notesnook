@@ -137,7 +137,15 @@ function TipTap(props: TipTapProps) {
     {
       editorProps: {
         handlePaste: (view, event) => {
-          if (event.clipboardData?.files?.length && onAttachFile) {
+          const hasText = event.clipboardData?.types?.some((type) =>
+            type.startsWith("text/")
+          );
+
+          // we always give preference to text over files & skip any attached
+          // files if there is text.
+          // TODO: give user an actionable hint to allow them to select what they
+          // want to do in such cases.
+          if (!hasText && event.clipboardData?.files?.length && onAttachFile) {
             event.preventDefault();
             event.stopPropagation();
             for (const file of event.clipboardData.files) {
@@ -458,7 +466,5 @@ function isCJKChar(char: string) {
   const isIn = CJK_UNICODE_RANGES.some(
     (range) => code >= range[0] && code <= range[1]
   );
-  console.log(char, code, isIn);
-
   return isIn;
 }

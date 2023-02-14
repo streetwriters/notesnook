@@ -34,7 +34,7 @@ export function TaskListComponent(
   // const isMobile = useIsMobile();
   const { editor, getPos, node, updateAttributes, forwardRef } = props;
   const taskItemType = getNodeType(TaskItemNode.name, editor.schema);
-  const { title } = node.attrs;
+  const { title, textDirection } = node.attrs;
   const [stats, setStats] = useState({ checked: 0, total: 0, percentage: 0 });
 
   const getParent = useCallback(() => {
@@ -83,6 +83,7 @@ export function TaskListComponent(
           flexDirection: "column"
         }}
         className="task-list-tools"
+        dir={textDirection}
       >
         {!isNested && (
           <Flex
@@ -175,6 +176,7 @@ export function TaskListComponent(
       <Text
         as={"div"}
         ref={forwardRef}
+        dir={textDirection}
         sx={{
           ul: {
             display: "block",

@@ -34,7 +34,6 @@ import {
 } from "./list-profiles";
 import ReminderBar from "../reminder-bar";
 import Announcements from "../announcements";
-import useAnnouncements from "../../hooks/use-announcements";
 import { ListLoader } from "../loaders/list-loader";
 import ScrollContainer from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
@@ -74,7 +73,6 @@ function ListContainer(props: ListContainerProps) {
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
-  const [announcements, removeAnnouncement] = useAnnouncements();
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
   const isSelected = useSelectionStore((store) => store.isSelected);
   const selectItem = useSelectionStore((store) => store.selectItem);
@@ -172,17 +170,7 @@ function ListContainer(props: ListContainerProps) {
                     {props.children}
                   </div>
                 ),
-                Header: () =>
-                  header ? (
-                    header
-                  ) : announcements.length ? (
-                    <Announcements
-                      announcements={announcements}
-                      removeAnnouncement={removeAnnouncement}
-                    />
-                  ) : (
-                    <ReminderBar />
-                  )
+                Header: () => (header ? header : <Announcements />)
               }}
               itemContent={(index, item) => {
                 if (!item) return null;

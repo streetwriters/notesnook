@@ -656,18 +656,11 @@ export function showEditReminderDialog(reminderId: string) {
   ));
 }
 
-export function showAnnouncementDialog(
-  announcement: { id: string },
-  remove: (id: string) => void
-) {
+export function showAnnouncementDialog(announcement: { id: string }) {
   return showDialog("AnnouncementDialog", (Dialog, perform) => (
     <Dialog
       announcement={announcement}
-      removeAnnouncement={() => remove(announcement.id)}
-      onClose={(res: boolean) => {
-        remove(announcement.id);
-        perform(res);
-      }}
+      onClose={(res: boolean) => perform(res)}
     />
   ));
 }

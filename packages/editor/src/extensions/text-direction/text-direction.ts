@@ -17,15 +17,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Extension } from "@tiptap/core";
+import { Extension, Editor, findParentNode } from "@tiptap/core";
 import "@tiptap/extension-text-style";
+
+export type TextDirections = undefined | "rtl";
+const TEXT_DIRECTION_TYPES = [
+  "paragraph",
+  "heading",
+  "orderedList",
+  "bulletList",
+  "outlineList",
+  "taskList",
+  "table",
+  "blockquote",
+  "embed",
+  "image"
+];
 
 type TextDirectionOptions = {
   types: string[];
   defaultDirection: TextDirections;
 };
 
-type TextDirections = "ltr" | "rtl";
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     textDirection: {
@@ -37,12 +50,27 @@ declare module "@tiptap/core" {
   }
 }
 
+export function getTextDirection(editor: Editor): TextDirections {
+  const selection = editor.state.selection;
+  const { $anchor } = selection;
+  const selectedNode = editor.state.doc.nodeAt($anchor.pos);
+
+  if (!!selectedNode && !!selectedNode.attrs.textDirection)
+    return selectedNode.attrs.textDirection;
+
+  const parent = findParentNode((node) => !!node.attrs.textDirection)(
+    selection
+  );
+  if (!parent) return;
+  return parent.node.attrs.textDirection;
+}
+
 export const TextDirection = Extension.create<TextDirectionOptions>({
   name: "textDirection",
 
   defaultOptions: {
-    types: ["paragraph", "heading"],
-    defaultDirection: "ltr"
+    types: TEXT_DIRECTION_TYPES,
+    defaultDirection: undefined
   },
 
   addGlobalAttributes() {

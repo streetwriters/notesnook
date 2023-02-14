@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Flex, Text } from "@theme-ui/components";
-import { ReactNodeViewProps } from "../react";
+import { GetPosNode, ReactNodeViewProps } from "../react";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { Node as ProsemirrorNode } from "prosemirror-model";
@@ -26,6 +26,7 @@ import { findChildren } from "@tiptap/core";
 import { OutlineList } from "../outline-list/outline-list";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 import { Editor } from "../../types";
+import { TextDirections } from "../text-direction";
 
 export function OutlineListItemComponent(props: ReactNodeViewProps) {
   const { editor, node, getPos, forwardRef } = props;
@@ -45,36 +46,24 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
         }}
       >
         {isNested ? (
-          <Icon
-            path={isCollapsed ? Icons.chevronRight : Icons.chevronDown}
-            title={
-              isCollapsed
-                ? "Click to uncollapse list"
-                : "Click to collapse list"
-            }
-            sx={{
-              cursor: "pointer",
-              transition: "all .2s ease-in-out",
-              ":hover": {
-                transform: ["unset", "scale(1.3)"]
-              },
-              ":active": {
-                transform: ["scale(1.3)", "unset"]
-              },
-              ".icon:hover path": {
-                fill: "var(--checked) !important"
-              }
-            }}
-            size={isMobile ? 24 : 18}
-            onMouseDown={(e) => e.preventDefault()}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              toggleOutlineList(editor, node, isCollapsed, getPos());
-            }}
-            onClick={() => {
-              toggleOutlineList(editor, node, isCollapsed, getPos());
-            }}
-          />
+          <>
+            <ToggleIconButton
+              editor={editor}
+              isCollapsed={isCollapsed}
+              isMobile={isMobile}
+              node={node}
+              getPos={getPos}
+              textDirection={undefined}
+            />
+            <ToggleIconButton
+              editor={editor}
+              isCollapsed={isCollapsed}
+              isMobile={isMobile}
+              node={node}
+              getPos={getPos}
+              textDirection={"rtl"}
+            />
+          </>
         ) : (
           <Icon
             path={Icons.circle}
@@ -131,5 +120,56 @@ function toggleOutlineList(
   editor.current?.commands.toggleOutlineCollapse(
     pos + nodePos + 1,
     !isCollapsed
+  );
+}
+
+type ToggleIconButtonProps = {
+  textDirection: TextDirections;
+  isCollapsed: boolean;
+  isMobile: boolean;
+
+  editor: Editor;
+  node: ProsemirrorNode;
+  getPos: GetPosNode;
+};
+function ToggleIconButton(props: ToggleIconButtonProps) {
+  const { textDirection, isCollapsed, isMobile, editor, node, getPos } = props;
+
+  return (
+    <Icon
+      className={`outline-list-item-toggle ${textDirection || ""}`}
+      path={
+        isCollapsed
+          ? textDirection === "rtl"
+            ? Icons.chevronLeft
+            : Icons.chevronRight
+          : Icons.chevronDown
+      }
+      title={
+        isCollapsed ? "Click to uncollapse list" : "Click to collapse list"
+      }
+      sx={{
+        cursor: "pointer",
+        transition: "all .2s ease-in-out",
+        ":hover": {
+          transform: ["unset", "scale(1.3)"]
+        },
+        ":active": {
+          transform: ["scale(1.3)", "unset"]
+        },
+        ".icon:hover path": {
+          fill: "var(--checked) !important"
+        }
+      }}
+      size={isMobile ? 24 : 18}
+      onMouseDown={(e) => e.preventDefault()}
+      onTouchEnd={(e) => {
+        e.preventDefault();
+        toggleOutlineList(editor, node, isCollapsed, getPos());
+      }}
+      onClick={() => {
+        toggleOutlineList(editor, node, isCollapsed, getPos());
+      }}
+    />
   );
 }

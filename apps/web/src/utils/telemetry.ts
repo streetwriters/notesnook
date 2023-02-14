@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Config from "./config";
 
 export function isTelemetryEnabled() {
-  return (
-    process.env.NODE_ENV === "production" &&
-    (Config.get("telemetry", doNotTrack()) || !doNotTrack())
-  );
+  // telemetry is always disabled in DEBUG/TEST mode
+  if (process.env.NODE_ENV !== "production") return false;
+
+  return Config.get("telemetry", !doNotTrack());
 }
 
 export function setTelemetry(state: boolean) {

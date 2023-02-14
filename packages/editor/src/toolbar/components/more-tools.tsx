@@ -31,13 +31,14 @@ type MoreToolsProps = ToolProps & {
   popupId: string;
   tools: ToolId[];
   autoCloseOnUnmount?: boolean;
+  autoOpen?: boolean;
 };
 export function MoreTools(props: MoreToolsProps) {
-  const { popupId, editor, tools, autoCloseOnUnmount } = props;
+  const { popupId, editor, tools, autoCloseOnUnmount, autoOpen } = props;
   const toolbarLocation = useToolbarLocation();
   const isBottom = toolbarLocation === "bottom";
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(autoOpen || false);
   const onClosed = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   return (
