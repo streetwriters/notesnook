@@ -27,6 +27,8 @@ let tray: Tray | undefined = undefined;
 export function setupTray() {
   if (tray) tray.destroy();
 
+  const trayIconSize = process.platform === "win32" ? 16 : 32;
+
   tray = new Tray(
     AssetManager.icon("tray-icon", {
       size: process.platform === "darwin" ? 22 : 32
@@ -37,14 +39,14 @@ export function setupTray() {
     {
       label: "Show app",
       type: "normal",
-      icon: AssetManager.icon("tray-icon", { size: 16 }),
+      icon: AssetManager.icon("tray-icon", { size: trayIconSize }),
       click: bringToFront
     },
     { type: "separator" },
     {
       label: "New note",
       type: "normal",
-      icon: AssetManager.icon("note-add", { size: 16 }),
+      icon: AssetManager.icon("note-add", { size: trayIconSize }),
       click: () => {
         bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "note" });
@@ -53,7 +55,7 @@ export function setupTray() {
     {
       label: "New notebook",
       type: "normal",
-      icon: AssetManager.icon("notebook-add", { size: 16 }),
+      icon: AssetManager.icon("notebook-add", { size: trayIconSize }),
       click: () => {
         bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "notebook" });
@@ -62,7 +64,7 @@ export function setupTray() {
     { type: "separator" },
     {
       label: "Quit",
-      icon: AssetManager.icon("quit", { size: 16 }),
+      icon: AssetManager.icon("quit", { size: trayIconSize }),
       type: "normal",
       click: () => {
         app.exit(0);
