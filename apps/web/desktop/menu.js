@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Menu, MenuItem, clipboard } from "electron";
+import { Menu, MenuItem, clipboard, shell } from "electron";
 
 function setupMenu() {
   globalThis.window.webContents.on("context-menu", (_event, params) => {
@@ -53,6 +53,15 @@ function setupMenu() {
           type: "separator"
         })
       );
+
+    if (params.linkURL.length) {
+      menu.append(
+        new MenuItem({
+          label: "Open in browser",
+          click: () => shell.openExternal(params.linkURL)
+        })
+      );
+    }
 
     if (params.isEditable) {
       menu.append(
