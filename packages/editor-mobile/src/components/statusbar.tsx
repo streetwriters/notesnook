@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { RefObject, useEffect, useRef, useState } from "react";
+import { getTotalWords, Editor } from "@notesnook/editor";
 
 function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   const [status, setStatus] = useState({
@@ -66,7 +67,7 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   useEffect(() => {
     clearInterval(interval.current);
     interval.current = setInterval(() => {
-      const words = editor?.storage?.characterCount?.words() + " words";
+      const words = getTotalWords(editor as Editor) + " words";
       if (currentWords.current === words) return;
       setWords(words);
     }, 3000) as unknown as number;
