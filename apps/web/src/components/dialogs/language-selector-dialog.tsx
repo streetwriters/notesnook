@@ -18,10 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { deleteItem } from "@notesnook/core/utils/array";
-import { Flex, Input, Label } from "@theme-ui/components";
+import { Input, Label } from "@theme-ui/components";
 import { useCallback, useEffect, useState } from "react";
 import { Perform } from "../../common/dialog-controller";
 import useSpellChecker from "../../hooks/use-spell-checker";
+import { FlexScrollContainer } from "../scroll-container";
 import Dialog from "./dialog";
 
 export type LanguageSelectorDialogProps = {
@@ -75,9 +76,11 @@ export default function LanguageSelectorDialog(
         sx={{ mt: 1, mb: 2 }}
         onChange={(e) => filter(e.currentTarget.value)}
       />
-      <Flex style={{ maxHeight: 200, flexDirection: "column" }}>
+      <FlexScrollContainer
+        style={{ maxHeight: 200, flexDirection: "column", overflowY: "auto" }}
+      >
         {languages.map((lang) => (
-          <Label key={lang.code}>
+          <Label key={lang.code} variant="text.body">
             <input
               type="checkbox"
               checked={enabledLanguages.includes(lang.code)}
@@ -90,11 +93,12 @@ export default function LanguageSelectorDialog(
 
                 await spellChecker.setLanguages(copiedLanguages);
               }}
+              style={{ marginRight: 5 }}
             />
             {lang.name}
           </Label>
         ))}
-      </Flex>
+      </FlexScrollContainer>
     </Dialog>
   );
 }
