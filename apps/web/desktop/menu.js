@@ -110,7 +110,7 @@ function setupMenu() {
         })
       );
 
-    menu.popup();
+    if (menu.items.length > 0) menu.popup();
   });
 }
 export { setupMenu };
