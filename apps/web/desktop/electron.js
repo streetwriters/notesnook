@@ -177,7 +177,10 @@ function setupDesktopIntegration() {
     if (getDesktopIntegration().closeToSystemTray) {
       e.preventDefault();
       if (process.platform == "darwin") {
-        app.hide();
+        // on macOS window cannot be minimized/hidden if it is already fullscreen
+        // so we just close it.
+        if (globalThis.window.isFullScreen()) app.exit(0);
+        else app.hide();
       } else {
         globalThis.window.minimize();
         globalThis.window.hide();
