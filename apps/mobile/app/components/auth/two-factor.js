@@ -54,7 +54,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
     app: "Enter the 6 digit code from your authenticator app to continue logging in",
     sms: "Enter the 6 digit code sent to your phone number to continue logging in",
     email: "Enter the 6 digit code sent to your email to continue logging in",
-    recoveryCode: "Enter the 8 digit recovery code to continue logging in"
+    recoveryCode: "Enter the recovery code to continue logging in"
   };
 
   const secondaryMethodsText = {
@@ -65,7 +65,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   };
 
   const onNext = async () => {
-    const length = currentMethod.method === "recoveryCode" ? 8 : 6;
+    const length = currentMethod.method === "recoveryCode" ? 10 : 6;
 
     if (!code.current || code.current.length !== length) return;
     setLoading(true);
@@ -202,10 +202,12 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
           <>
             <Input
               placeholder={
-                currentMethod.method === "recoveryCode" ? "xxxxxxxx" : "xxxxxx"
+                currentMethod.method === "recoveryCode"
+                  ? "xxxxxxxxxx"
+                  : "xxxxxx"
               }
               testID={"input.totp"}
-              maxLength={currentMethod.method === "recoveryCode" ? 8 : 6}
+              maxLength={currentMethod.method === "recoveryCode" ? 10 : 6}
               fwdRef={inputRef}
               textAlign="center"
               onChangeText={(value) => {
@@ -217,7 +219,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                 height: 60,
                 textAlign: "center",
                 letterSpacing: 10,
-                width: null
+                width: 250
               }}
               keyboardType={
                 currentMethod.method === "recoveryCode" ? "default" : "numeric"
