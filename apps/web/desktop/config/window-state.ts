@@ -43,7 +43,7 @@ export class WindowState {
   private readonly config: WindowStateOptions;
   private state: SerializableWindowState;
   private windowRef: BrowserWindow | undefined;
-  private readonly eventHandlingDelay = 100;
+  private readonly eventHandlingDelay = 1000;
   private stateChangeTimer: NodeJS.Timeout | undefined;
 
   constructor(options?: Partial<WindowStateOptions>) {
@@ -176,7 +176,7 @@ export class WindowState {
     // Handles both 'resize' and 'move'
     if (this.stateChangeTimer) clearTimeout(this.stateChangeTimer);
     this.stateChangeTimer = setTimeout(
-      () => this.updateState(),
+      () => this.saveState(this.windowRef),
       this.eventHandlingDelay
     );
   };
@@ -199,8 +199,8 @@ export class WindowState {
     if (this.config.fullScreen && this.state.isFullScreen) {
       win.setFullScreen(true);
     }
-    win.on("resize", this.stateChangeHandler);
-    win.on("move", this.stateChangeHandler);
+    win.on("resized", this.stateChangeHandler);
+    win.on("moved", this.stateChangeHandler);
     win.on("close", this.closeHandler);
     win.on("closed", this.closedHandler);
     this.windowRef = win;
@@ -208,8 +208,8 @@ export class WindowState {
 
   unmanage() {
     if (this.windowRef) {
-      this.windowRef.removeListener("resize", this.stateChangeHandler);
-      this.windowRef.removeListener("move", this.stateChangeHandler);
+      this.windowRef.removeListener("resized", this.stateChangeHandler);
+      this.windowRef.removeListener("moved", this.stateChangeHandler);
       if (this.stateChangeTimer) clearTimeout(this.stateChangeTimer);
       this.windowRef.removeListener("close", this.closeHandler);
       this.windowRef.removeListener("closed", this.closedHandler);
