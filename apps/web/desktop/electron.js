@@ -174,10 +174,6 @@ function createURL(options) {
 function setupDesktopIntegration() {
   const desktopIntegration = getDesktopIntegration();
 
-  if (desktopIntegration.autoStart) {
-    AutoLaunch.enable(desktopIntegration.startMinimized);
-  }
-
   globalThis.window.on("close", (e) => {
     if (getDesktopIntegration().closeToSystemTray) {
       e.preventDefault();
@@ -199,4 +195,12 @@ function setupDesktopIntegration() {
       }
     }
   });
+
+  if (desktopIntegration.autoStart) {
+    AutoLaunch.enable(desktopIntegration.startMinimized);
+
+    if (process.platform === "win32" && desktopIntegration.startMinimized) {
+      globalThis.window.minimize();
+    }
+  }
 }
