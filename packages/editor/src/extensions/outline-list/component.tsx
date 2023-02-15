@@ -46,7 +46,7 @@ export function OutlineListComponent(
             display: collapsed ? "none" : "block",
             paddingInlineStart: 0,
             paddingLeft: 0,
-            marginBlockStart: isNested ? 5 : 0,
+            marginBlockStart: isNested ? 1 : 0,
             marginBlockEnd: 0
           },
           li: {
