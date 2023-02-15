@@ -95,7 +95,7 @@ jobs:
 
       - name: Publish to Playstore
         id: deploy
-        uses: r0adkll/upload-google-play@v1
+        uses: r0adkll/upload-google-play@v1.1.1
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.streetwriters.notesnook
