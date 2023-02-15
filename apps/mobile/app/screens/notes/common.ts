@@ -31,13 +31,14 @@ import { TopicType } from "../../utils/types";
 import { editorController, editorState } from "../editor/tiptap/utils";
 
 export function toCamelCase(title: string) {
+  if (!title) return "";
   return title.slice(0, 1).toUpperCase() + title.slice(1);
 }
 
 export function getAlias(params: Partial<NotesScreenParams>) {
   if (!params) return "";
   const { item } = params;
-  return (item as TopicType)?.alias || item?.title;
+  return (item as TopicType)?.alias || item?.title || "";
 }
 
 export function openMonographsWebpage() {
