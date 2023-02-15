@@ -58,7 +58,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.streetwriters.notesnook
-          releaseFile: ${{steps.sign_app.outputs.signedReleaseFile}}
+          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
           track: production
           status: completed
           whatsNewDirectory: apps/mobile/native/android/releasenotes/      
