@@ -75,6 +75,7 @@ export const useLogin = (onFinishLogin) => {
                   mfa.code,
                   mfa.method
                 );
+                
                 if (success) {
                   setStep(LoginSteps.passwordAuth);
                   setLoading(false);
