@@ -65,9 +65,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   };
 
   const onNext = async () => {
-    const length = currentMethod.method === "recoveryCode" ? 10 : 6;
-
-    if (!code.current || code.current.length !== length) return;
+    if (!code.current || code.current.length < 6) return;
     setLoading(true);
     inputRef.current?.blur();
     await onMfaLogin(
@@ -203,16 +201,16 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
             <Input
               placeholder={
                 currentMethod.method === "recoveryCode"
-                  ? "xxxxxxxxxx"
+                  ? "xxxxx-xxxxx"
                   : "xxxxxx"
               }
               testID={"input.totp"}
-              maxLength={currentMethod.method === "recoveryCode" ? 10 : 6}
+              maxLength={currentMethod.method === "recoveryCode" ? undefined : 6}
               fwdRef={inputRef}
               textAlign="center"
               onChangeText={(value) => {
                 code.current = value;
-                onNext();
+                //onNext();
               }}
               inputStyle={{
                 fontSize: SIZE.lg,
