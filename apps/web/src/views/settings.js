@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useMemo, useState } from "react";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Button, Flex, Input, Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useNoteStore } from "../stores/note-store";
@@ -149,6 +149,7 @@ function Settings() {
     developer: false,
     notifications: false,
     desktop: false,
+    trash: false,
     other: true
   });
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
@@ -185,6 +186,10 @@ function Settings() {
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const [backupReminderOffset, setBackupReminderOffset] = usePersistentState(
     "backupReminderOffset",
+    0
+  );
+  const [trashDuration, setTrashDuration] = usePersistentState(
+    "trashDuration",
     0
   );
   const [debugMode, setDebugMode] = usePersistentState("debugMode", false);
@@ -779,7 +784,30 @@ function Settings() {
             )}
           </>
         )}
-
+        <Header
+          title="Trash Settings"
+          isOpen={groups.trash}
+          testId="trash-settings"
+          onClick={() => {
+            setGroups((g) => ({ ...g, trash: !g.trash }));
+          }}
+        />
+        {groups.trash && (
+          <OptionsItem
+            title="Trash Duration"
+            tip={
+              isDesktop()
+                ? "Permanently delete trash after:"
+                : "Wipe out trash after:"
+            }
+            options={["7 Days", "A Month", "A Year", "Never"]}
+            premium="backups"
+            selectedOption={trashDuration}
+            onSelectionChanged={async (_option, index) =>
+              setTrashDuration(index)
+            }
+          />
+        )}
         <Header
           title="Notesnook Importer"
           isOpen={groups.importer}
