@@ -25,7 +25,7 @@ import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
 import { Reminder } from "../services/notifications";
 import { ACCENT } from "../utils/color-scheme";
-import { ThemeDark, ThemeLight, ThemeType } from "@notesnook/theme";
+import { ThemeDark, ThemeLight } from "@notesnook/theme";
 export type Settings = {
   showToolbarOnTop?: boolean;
   showKeyboardOnOpen?: boolean;
@@ -76,8 +76,8 @@ export type Settings = {
   defaultFontSize: string;
   defaultFontFamily: string;
   colorScheme: "dark" | "light";
-  lighTheme: ThemeType;
-  darkTheme: ThemeType;
+  lighTheme: typeof ThemeDark;
+  darkTheme: typeof ThemeDark;
 };
 
 type DimensionsType = {
