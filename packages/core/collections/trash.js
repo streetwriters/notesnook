@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import dayjs from "dayjs";
+import Config from "../../../apps/web/src/utils/config";
 
 export default class Trash {
   /**
@@ -38,10 +39,13 @@ export default class Trash {
 
   async cleanup() {
     const now = dayjs().unix();
-    for (const item of this.all) {
-      if (dayjs(item.dateDeleted).add(7, "days").unix() > now) continue;
-      await this.delete(item.id);
-    }
+    const duration = trashDuration(Config.get("trashDuration", 0));
+    if (duration)
+      for (const item of this.all) {
+        if (dayjs(item.dateDeleted).add(duration, "days").unix() > now)
+          continue;
+        await this.delete(item.id);
+      }
   }
 
   get all() {
@@ -143,5 +147,18 @@ function collectionNameFromItem(item) {
       return "notebooks";
     default:
       return null;
+  }
+}
+
+function trashDuration(option) {
+  switch (option) {
+    case 0:
+      return 7;
+    case 1:
+      return 30;
+    case 2:
+      return 365;
+    case 3:
+      return false;
   }
 }
