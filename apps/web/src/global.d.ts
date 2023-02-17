@@ -33,6 +33,9 @@ type DesktopIntegrationSettings = {
 
 declare interface Window {
   os: NodeJS.Platform | "mas";
+  currentViewType: string;
+  currentViewKey: string;
+
   config: {
     static spellChecker(): Promise<SpellCheckerOptions>;
     static desktopIntegration(): Promise<DesktopIntegrationSettings>;

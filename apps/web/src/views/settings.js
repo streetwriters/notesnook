@@ -259,7 +259,7 @@ function Settings() {
                     size: 35
                   }}
                 >
-                  <Icon.User size={20} color="primary" />
+                  <Icon.User size={20} color="accent" />
                 </Flex>
                 <Flex variant="columnCenter" sx={{ alignItems: "flex-start" }}>
                   <Text variant="subBody">You are not logged in</Text>
@@ -268,7 +268,7 @@ function Settings() {
                   </Text>
                 </Flex>
               </Flex>
-              <Icon.ChevronRight size={20} color="primary" />
+              <Icon.ChevronRight size={20} color="accent" />
             </Flex>
           </Flex>
         )}
@@ -1204,12 +1204,12 @@ function OptionsItem(props) {
             }}
             sx={{
               ":hover": {
-                color: selectedOption === option.value ? "static" : "text"
+                color: selectedOption === option.value ? "white" : "text"
               },
               flex: 1,
               textAlign: "center",
               color:
-                selectedOption === option.value ? "static" : "bgSecondaryText",
+                selectedOption === option.value ? "white" : "bgSecondaryText",
               minWidth: 70
             }}
           >
@@ -1477,7 +1477,7 @@ function Header(props) {
         {title}
       </Text>
       {isOpen ? (
-        <Icon.ChevronUp size={19} color="primary" />
+        <Icon.ChevronUp size={19} color="accent" />
       ) : (
         <Icon.ChevronDown size={19} color="fontTertiary" />
       )}

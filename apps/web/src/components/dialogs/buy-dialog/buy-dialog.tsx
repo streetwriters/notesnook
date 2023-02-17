@@ -106,7 +106,7 @@ export function BuyDialog(props: BuyDialogProps) {
         },
         overlay: {
           zIndex: 999,
-          background: theme.colors.overlay
+          background: theme.colors.backdrop
         }
       }}
     >
@@ -594,11 +594,11 @@ function CheckoutPricing(props: CheckoutPricingProps) {
         <Text as="div" variant="body" sx={{ textAlign: "end" }}>
           <Text
             data-test-id={`value`}
-            sx={{ fontSize: "heading", color: "text" }}
+            sx={{ fontSize: "heading", color: "paragraph" }}
           >
             {currentTotal}
           </Text>
-          <Text as="div" sx={{ fontSize: "body", color: "text" }}>
+          <Text as="div" sx={{ fontSize: "body", color: "paragraph" }}>
             {isDiscounted
               ? "forever"
               : `first ${getFullPeriod(period)} then ${recurringTotal}`}

@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getColors, SchemeColors } from "./colorscheme";
 import { variants } from "./variants";
 import { FontConfig, getFontConfig } from "./font";
 import { TransformerFactory, Transformers } from "./transformer";
 import { ThemeConfig } from "./types";
+import { Colors } from "../theme-engine/types";
+import { ThemeUIConfig } from "@theme-ui/css/dist/declarations/src/options";
 
 export type Theme = {
   breakpoints: string[];
@@ -34,16 +35,17 @@ export type Theme = {
     small: number;
   };
   shadows: { menu: string };
-  colors: SchemeColors;
+  colors: Colors;
   iconSizes: {
     small: number;
     medium: number;
     big: number;
   };
+  config: ThemeUIConfig;
 } & FontConfig &
   typeof variants;
 
-class ThemeFactory {
+export class ThemeFactory {
   transform(type: Transformers, theme: Theme) {
     const factory = new TransformerFactory();
     return factory.construct(type, theme);
@@ -56,15 +58,21 @@ class ThemeFactory {
       sizes: { full: "100%", half: "50%" },
       radii: { none: 0, default: 5, dialog: 10, small: 2.5 },
       iconSizes: { big: 18, medium: 16, small: 14 },
-      colors: getColors(config.theme, config.accent),
+      colors: config.colors,
       shadows:
-        config.theme === "dark"
+        config.colorScheme === "dark"
           ? {
               menu: "0px 0px 10px 0px #00000078"
             }
           : {
               menu: "0px 0px 10px 0px #00000022"
             },
+      config: {
+        useCustomProperties: false,
+        useRootStyles: false,
+        useLocalStorage: false,
+        useColorSchemeMediaQuery: false
+      },
       ...getFontConfig(),
       ...variants
     };
@@ -72,5 +80,3 @@ class ThemeFactory {
     return theme;
   }
 }
-
-export default ThemeFactory;

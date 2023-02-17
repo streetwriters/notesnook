@@ -95,7 +95,6 @@ export function Dropdown(props: DropdownProps) {
               : Icons.chevronDown
           }
           size={"small"}
-          color={"text"}
         />
       </Button>
 

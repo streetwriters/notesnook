@@ -22,7 +22,7 @@ import { Box, Button, Flex, Text } from "@theme-ui/components";
 import Config from "../../utils/config";
 import { getDownloadLink, getPlatform } from "../../utils/platform";
 import DropdownButton from "../dropdown-button";
-import ThemeProvider from "../theme-provider";
+import { BaseThemeProvider } from "../theme-provider";
 
 const nativeFeatures = [
   "Native high-performance encryption",
@@ -128,9 +128,9 @@ export function showInstallNotice() {
         resolve(result);
       };
       ReactDOM.render(
-        <ThemeProvider>
+        <BaseThemeProvider>
           <InstallNotice onClose={perform} />
-        </ThemeProvider>,
+        </BaseThemeProvider>,
         root
       );
     });

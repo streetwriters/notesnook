@@ -28,7 +28,7 @@ import { Icon } from "./icon";
 
 export type ToolButtonProps = ButtonProps & {
   icon: IconNames;
-  iconColor?: keyof SchemeColors;
+  iconColor?: SchemeColors;
   iconSize?: keyof Theme["iconSizes"] | number;
   toggled: boolean;
   buttonRef?: React.RefObject<HTMLButtonElement>;

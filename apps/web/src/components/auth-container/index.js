@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useMemo } from "react";
 import { Box, Flex, Image, Link, Text } from "@theme-ui/components";
-import ThemeProvider from "../theme-provider";
+import { BaseThemeProvider } from "../theme-provider";
 import Logo from "../../assets/logo.svg";
 import LogoDark from "../../assets/logo-dark.svg";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -82,7 +82,7 @@ function AuthContainer(props) {
   const title = useMemo(() => randomTitle(), []);
 
   return (
-    <ThemeProvider>
+    <BaseThemeProvider>
       <Flex sx={{ position: "relative", height: "100%", bg: "background" }}>
         <Box
           sx={{
@@ -234,7 +234,7 @@ function AuthContainer(props) {
           {props.children}
         </Flex>
       </Flex>
-    </ThemeProvider>
+    </BaseThemeProvider>
   );
 }
 export default AuthContainer;

@@ -460,7 +460,7 @@ export function Features() {
                 sx={{ borderRadius: 50, alignSelf: "start" }}
                 mb={1}
               >
-                <Pro color="primary" size={16} />
+                <Pro color="accent" size={16} />
                 <Text variant="body" ml={"2px"} sx={{ color: "primary" }}>
                   Pro
                 </Text>
@@ -493,13 +493,13 @@ export function Features() {
                     sx={{ flexDirection: "column", alignItems: "start" }}
                   >
                     {feature.icon && (
-                      <feature.icon size={20} color="text" sx={{ mb: 1 }} />
+                      <feature.icon size={20}  sx={{ mb: 1 }} />
                     )}
                     {feature.pro && (
                       <Flex
                         sx={{ alignItems: "center", justifyContent: "center" }}
                       >
-                        <Pro color="primary" size={14} />
+                        <Pro color="accent" size={14} />
                         <Text
                           variant="subBody"
                           ml={"2px"}

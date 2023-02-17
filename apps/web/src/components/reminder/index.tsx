@@ -80,7 +80,6 @@ function Reminder({
             <IconTag
               icon={Icon.ReminderOff}
               text={"Disabled"}
-              styles={{ icon: { color: "error" } }}
               testId={"disabled"}
             />
           ) : (

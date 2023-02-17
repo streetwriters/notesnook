@@ -79,7 +79,7 @@ export const TagPicker = (props: TagPickerProps) => {
           }}
           title="Click to assign more tags"
         >
-          <Icon path={Icons.plus} size={12} color="fontTertiary" />
+          <Icon path={Icons.plus} size={12} />
           <Text variant="subBody" sx={{ ml: "2px", color: "icon" }}>
             Assign a tag
           </Text>
@@ -139,7 +139,7 @@ function Tag(props: TagProps) {
       >
         #{tag.title}
       </Text>
-      {isSelected ? <Icon path={Icons.check} color="text" size={14} /> : null}
+      {isSelected ? <Icon path={Icons.check} size={14} /> : null}
     </Button>
   );
 }

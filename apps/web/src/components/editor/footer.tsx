@@ -50,7 +50,7 @@ function EditorFooter() {
         data-test-id="editor-word-count"
         variant="subBody"
         mr={2}
-        sx={{ color: "bgSecondaryText" }}
+        sx={{ color: "paragraph" }}
       >
         {words.total + " words"}
         {words.selected ? ` (${words.selected} selected)` : ""}
@@ -59,13 +59,13 @@ function EditorFooter() {
         className="selectable"
         variant="subBody"
         mr={2}
-        sx={{ color: "bgSecondaryText" }}
+        sx={{ color: "paragraph" }}
         data-test-id="editor-date-edited"
         title={dateEdited?.toString()}
       >
         {formatDate(dateEdited || Date.now())}
       </Text>
-      {SaveStateIcon && <SaveStateIcon size={13} color="bgSecondaryText" />}
+      {SaveStateIcon && <SaveStateIcon size={13} color="paragraph" />}
     </Flex>
   );
 }

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // import { useStore } from "../../stores/theme-store";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
-import { getDefaultAccentColor, useTheme } from "@notesnook/theme";
+import { getDefaultAccentColor, ThemeFactory } from "@notesnook/theme";
 import { ReactNode } from "react";
 
 type ThemeProviderProps = {
@@ -30,9 +30,13 @@ type ThemeProviderProps = {
 
 function ThemeProvider(props: ThemeProviderProps) {
   const { accent, children, theme } = props;
-  const themeProperties = useTheme({
-    accent: accent || getDefaultAccentColor(),
-    theme: theme || "light"
+  const themeProperties = new ThemeFactory().construct({
+    colorScheme: "dark",
+
+    // TODO:
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    variants: {}
   });
 
   // useEffect(() => {

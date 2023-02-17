@@ -19,8 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { formatDate } from "@notesnook/core/utils/date";
 import React, { useEffect, useRef } from "react";
-import { Text } from "@theme-ui/components";
-import { register, format, cancel, render } from "timeago.js";
+import { BoxProps, Text } from "@theme-ui/components";
+import { register, format, cancel, render, Opts } from "timeago.js";
+import { ForwardRef } from "@theme-ui/components/dist/declarations/src/types";
+import { ThemeUICSSObject } from "@theme-ui/core";
 
 const shortLocale = [
   ["now", "now"],
@@ -37,7 +39,7 @@ const shortLocale = [
   ["%smo", "in %smo"],
   ["1yr", "in 1yr"],
   ["%syr", "in %syr"]
-];
+] as [string, string][];
 
 const enShortLocale = [
   ["now", "now"],
@@ -54,12 +56,32 @@ const enShortLocale = [
   ["%smo ago", "in %smo"],
   ["1yr ago", "in 1yr"],
   ["%syr ago", "in %syr"]
-];
+] as [string, string][];
+
 register("short", (_n, index) => shortLocale[index]);
 register("en_short", (_n, index) => enShortLocale[index]);
 
-function TimeAgo({ datetime, live, locale, opts, sx, ...restProps }) {
-  const timeRef = useRef();
+export type TimeAgoProps = BoxProps & {
+  datetime: number | string | Date;
+  live?: boolean;
+  locale?: string;
+  opts?: Opts;
+};
+
+const Time = Text as ForwardRef<
+  HTMLTimeElement,
+  BoxProps & { dateTime: string }
+>;
+
+function TimeAgo({
+  datetime,
+  live,
+  locale,
+  opts,
+  sx,
+  ...restProps
+}: TimeAgoProps) {
+  const timeRef = useRef<HTMLTimeElement>();
   useEffect(() => {
     const element = timeRef.current;
     if (!element) return;
@@ -79,12 +101,12 @@ function TimeAgo({ datetime, live, locale, opts, sx, ...restProps }) {
   }, [datetime, live, locale, opts]);
 
   return (
-    <Text
-      ref={timeRef}
+    <Time
+      ref={(ref) => (timeRef.current = ref || undefined)}
       {...restProps}
       sx={{
         ...sx,
-        color: sx?.color || "inherit"
+        color: (sx as ThemeUICSSObject)?.color || "inherit"
       }}
       title={formatDate(datetime)}
       as="time"
@@ -92,7 +114,7 @@ function TimeAgo({ datetime, live, locale, opts, sx, ...restProps }) {
       dateTime={toDate(datetime).toISOString()}
     >
       {format(datetime, locale, opts)}
-    </Text>
+    </Time>
   );
 }
 
@@ -104,7 +126,7 @@ export default React.memo(TimeAgo);
  * @param input
  * @returns datetime string
  */
-const toDate = (input) => {
+const toDate = (input: number | string | Date) => {
   let date = null; // new Date();
   if (input instanceof Date) {
     date = input;

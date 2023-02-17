@@ -27,12 +27,27 @@ import {
 import checkForUpdate from "../commands/check-for-update";
 import { isDesktop } from "../utils/platform";
 
-var checkingForUpdateTimeout = 0;
+type UpdateAvailableStatus = {
+  type: "available" | "completed";
+  version: string;
+};
+
+type UpdateDownloadingStatus = {
+  type: "downloading";
+  progress: number;
+};
+
+export type UpdateStatus =
+  | UpdateAvailableStatus
+  | UpdateDownloadingStatus
+  | { type: "checking" | "updated" };
+
+let checkingForUpdateTimeout = 0;
 export default function useAutoUpdater() {
-  const [status, setStatus] = useState();
+  const [status, setStatus] = useState<UpdateStatus>();
 
   useEffect(() => {
-    function changeStatus(status) {
+    function changeStatus(status?: UpdateStatus) {
       clearTimeout(checkingForUpdateTimeout);
       setStatus(status);
     }
@@ -41,10 +56,10 @@ export default function useAutoUpdater() {
       changeStatus({ type: "checking" });
       checkingForUpdateTimeout = setTimeout(() => {
         changeStatus({ type: "updated" });
-      }, 10000);
+      }, 10000) as unknown as number;
     }
 
-    function updateAvailable(info) {
+    function updateAvailable(info: { version: string }) {
       changeStatus({
         type: "available",
         version: info.version
@@ -59,12 +74,12 @@ export default function useAutoUpdater() {
       else changeStatus();
     }
 
-    function updateDownloadCompleted(info) {
+    function updateDownloadCompleted(info: { version: string }) {
       changeStatus({ type: "completed", version: info.version });
       showUpdateReadyNotice({ version: info.version });
     }
 
-    function updateDownloadProgress(progressInfo) {
+    function updateDownloadProgress(progressInfo: { percent: number }) {
       changeStatus({ type: "downloading", progress: progressInfo.percent });
     }
 

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Button, Flex, Text } from "@theme-ui/components";
+import { Button, Flex, Text } from "@theme-ui/components";
 import EditorFooter from "../editor/footer";
 import {
   Circle,
@@ -28,13 +28,14 @@ import {
   Checkmark,
   Alert,
   Issue,
-  SyncOff
+  SyncOff,
+  Icon
 } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import TimeAgo from "../time-ago";
 import { hardNavigate, hashNavigate, navigate } from "../../navigation";
-import useAutoUpdater from "../../hooks/use-auto-updater";
+import useAutoUpdater, { UpdateStatus } from "../../hooks/use-auto-updater";
 import installUpdate from "../../commands/install-update";
 import checkForUpdate from "../../commands/check-for-update";
 import {
@@ -43,6 +44,8 @@ import {
 } from "../../common/dialog-controller";
 import useStatus from "../../hooks/use-status";
 import { getIconFromAlias } from "../icons/resolver";
+import { ScopedThemeProvider, ThemeVariant } from "../theme-provider";
+import { Variants } from "@notesnook/theme";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -51,8 +54,9 @@ function StatusBar() {
   const updateStatus = useAutoUpdater();
 
   return (
-    <Box
-      bg="bgSecondary"
+    <ScopedThemeProvider
+      scope="statusBar"
+      bg="background"
       sx={{
         borderTop: "1px solid",
         borderTopColor: "border",
@@ -77,15 +81,16 @@ function StatusBar() {
                 display: "flex"
               }}
             >
-              <Circle
-                size={7}
-                color={user.isEmailConfirmed ? "success" : "warn"}
-              />
+              <ThemeVariant
+                variant={user.isEmailConfirmed ? "success" : "warning"}
+              >
+                <Circle size={7} color={"icon"} />
+              </ThemeVariant>
               <Text
                 className="selectable"
                 variant="subBody"
                 ml={1}
-                sx={{ color: "bgSecondaryText" }}
+                sx={{ color: "paragraph" }}
               >
                 {user.email}
                 {user.isEmailConfirmed ? "" : " (not verified)"}
@@ -105,8 +110,10 @@ function StatusBar() {
             }}
             data-test-id="not-logged-in"
           >
-            <Circle size={7} color="error" />
-            <Text variant="subBody" ml={1} sx={{ color: "bgSecondaryText" }}>
+            <ThemeVariant variant="error">
+              <Circle size={7} />
+            </ThemeVariant>
+            <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
               Not logged in
             </Text>
           </Button>
@@ -122,12 +129,12 @@ function StatusBar() {
           title="Facing an issue? Click here to create a bug report."
         >
           <Issue size={12} />
-          <Text variant="subBody" ml={1} sx={{ color: "bgSecondaryText" }}>
+          <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
             Report an issue
           </Text>
         </Button>
         {statuses?.map(({ key, status, progress, icon }) => {
-          const Icon = getIconFromAlias(icon);
+          const Icon = icon && getIconFromAlias(icon);
           return (
             <Flex
               key={key}
@@ -135,7 +142,7 @@ function StatusBar() {
               sx={{ alignItems: "center", justifyContent: "center" }}
             >
               {Icon ? <Icon size={12} /> : <Loading size={12} />}
-              <Text variant="subBody" ml={1} sx={{ color: "bgSecondaryText" }}>
+              <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
                 {progress ? `${progress}% ${status}` : status}
               </Text>
             </Flex>
@@ -155,6 +162,7 @@ function StatusBar() {
               }
             }}
             sx={{
+              ml: 1,
               alignItems: "center",
               justifyContent: "center",
               display: "flex"
@@ -166,68 +174,70 @@ function StatusBar() {
                 updateStatus.type !== "completed" &&
                 updateStatus.type !== "available"
               }
-              color={
-                updateStatus.type === "available"
-                  ? "primary"
-                  : "bgSecondaryText"
-              }
+              color={updateStatus.type === "available" ? "accent" : "paragraph"}
               size={12}
             />
-            <Text variant="subBody" ml={1} sx={{ color: "bgSecondaryText" }}>
+            <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
               {statusToInfoText(updateStatus)}
             </Text>
           </Button>
         )}
       </Flex>
       <EditorFooter />
-    </Box>
+    </ScopedThemeProvider>
   );
 }
 
 export default StatusBar;
 
-function statusToInfoText(status) {
-  const { type, version, progress = 0 } = status;
+function statusToInfoText(status: UpdateStatus) {
+  const { type } = status;
   return type === "checking"
     ? "Checking for updates..."
     : type === "updated"
     ? "You are on latest version"
     : type === "downloading"
-    ? `${Math.round(progress)}% updating...`
+    ? `${Math.round(status.progress)}% updating...`
     : type === "completed"
-    ? `v${version} downloaded (restart required)`
+    ? `v${status.version} downloaded (restart required)`
     : type === "available"
-    ? `v${version} available`
+    ? `v${status.version} available`
     : "";
 }
 
 function SyncStatus() {
-  const syncStatus = useAppStore((state) => state.syncStatus);
+  const syncStatus = useAppStore(
+    (state) => state.syncStatus
+  ) /* TODO: remove this type coercing */ as unknown as SyncState;
   const lastSynced = useAppStore((state) => state.lastSynced);
   const isSyncEnabled = useAppStore((state) => state.isSyncEnabled);
   const sync = useAppStore((state) => state.sync);
   const user = useUserStore((state) => state.user);
 
   const status = syncStatusFilters.find((f) =>
-    f.check(syncStatus.key, user, lastSynced)
+    f.isActive(syncStatus.key, user, lastSynced)
   );
 
+  if (!status) return null;
   return (
     <Button
       variant="statusitem"
       onClick={() => (isSyncEnabled ? sync() : null)}
-      sx={{ alignItems: "center", justifyContent: "center", display: "flex" }}
+      sx={{
+        alignItems: "center",
+        justifyContent: "center",
+        display: "flex",
+        color: "paragraph"
+      }}
       title={status.tooltip}
       data-test-id={`sync-status-${status.key}`}
     >
       {syncStatus.progress ? (
         <Text variant={"subBody"}>{syncStatus.progress}%</Text>
       ) : (
-        <status.icon
-          size={12}
-          color={status.iconColor}
-          rotate={status.loading}
-        />
+        <ThemeVariant variant={status.variant || "primary"}>
+          <status.icon size={12} rotate={status.loading} />
+        </ThemeVariant>
       )}
       <Text variant="subBody" ml={status.text ? "3px" : 0}>
         {status.text ? (
@@ -235,7 +245,7 @@ function SyncStatus() {
             {typeof status.text === "string" ? (
               status.text
             ) : (
-              <status.text lastSynced={lastSynced} syncStatus={syncStatus} />
+              <status.text lastSynced={lastSynced} type={syncStatus.type} />
             )}{" "}
           </>
         ) : null}
@@ -244,61 +254,91 @@ function SyncStatus() {
   );
 }
 
-const syncStatusFilters = [
+type SyncState = {
+  key: SyncStatus;
+  progress: number;
+  type: SyncType;
+};
+type SyncType = "download" | "upload" | "sync";
+type SyncStatus =
+  | "synced"
+  | "syncing"
+  | "conflicts"
+  | "failed"
+  | "completed"
+  | "offline"
+  | "disabled";
+type SyncStatusFilter = {
+  key: SyncStatus | "emailNotConfirmed";
+  icon: Icon;
+  isActive: (syncStatus: SyncStatus, user: User, lastSynced: number) => boolean;
+  text:
+    | string
+    | ((props: {
+        type?: "download" | "upload" | "sync";
+        user?: User;
+        lastSynced: number;
+      }) => JSX.Element);
+  tooltip?: string;
+  variant?: keyof Variants;
+  loading?: boolean;
+};
+
+const syncStatusFilters: SyncStatusFilter[] = [
   {
     key: "synced",
-    check: (syncStatus) => syncStatus === "synced",
+    isActive: (syncStatus) => syncStatus === "synced",
     icon: Sync,
     text: ({ lastSynced }) =>
       lastSynced ? (
         <TimeAgo live={true} locale="en_short" datetime={lastSynced} />
       ) : (
-        "click to sync"
+        <>click to sync</>
       ),
     tooltip: "All changes are synced."
   },
   {
     key: "syncing",
-    check: (syncStatus) => syncStatus === "syncing",
+    isActive: (syncStatus) => syncStatus === "syncing",
     icon: Sync,
     loading: true,
-    text: ({ syncStatus }) => <>{syncStatus.type || "sync"}ing</>,
+    text: ({ type }) => <>{type || "sync"}ing</>,
     tooltip: "Syncing your notes..."
   },
   {
     key: "completed",
-    check: (syncStatus) => syncStatus === "completed",
+    isActive: (syncStatus) => syncStatus === "completed",
     icon: Checkmark,
-    iconColor: "success",
+    variant: "success",
     text: ""
   },
   {
     key: "conflicts",
-    check: (syncStatus) => syncStatus === "conflicts",
+    isActive: (syncStatus) => syncStatus === "conflicts",
     icon: Alert,
-    iconColor: "error",
+    variant: "error",
     text: "Merge conflicts",
     tooltip: "Please resolve all merge conflicts and run the sync again."
   },
   {
     key: "emailNotConfirmed",
-    check: (_syncStatus, user) => !user.isEmailConfirmed,
+    isActive: (_syncStatus, user) => !user.isEmailConfirmed,
     icon: Alert,
-    iconColor: "warn",
+    variant: "warning",
     text: "Sync disabled",
     tooltip: "Please confirm your email to start syncing."
   },
   {
     key: "failed",
-    check: (syncStatus) => syncStatus === "failed",
+    isActive: (syncStatus) => syncStatus === "failed",
     icon: SyncError,
-    color: "error",
+    variant: "error",
     text: "Sync failed",
     tooltip: "Sync failed to completed. Please try again."
   },
   {
     key: "offline",
-    check: (syncStatus) => syncStatus === "offline",
+    isActive: (syncStatus) => syncStatus === "offline",
     icon: SyncOff,
     text: ({ lastSynced }) => (
       <>
@@ -310,9 +350,10 @@ const syncStatusFilters = [
   },
   {
     key: "disabled",
-    check: (syncStatus) => syncStatus === "disabled",
+    variant: "disabled",
+    isActive: (syncStatus) => syncStatus === "disabled",
     icon: SyncOff,
-    text: () => "Sync disabled",
+    text: "Sync disabled",
     tooltip: "Sync is disabled."
   }
 ];

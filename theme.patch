@@ -1,0 +1,3353 @@
+diff --git a/apps/web/src/app.css b/apps/web/src/app.css
+index dceaff432..6fa8db24b 100644
+--- a/apps/web/src/app.css
++++ b/apps/web/src/app.css
+@@ -138,13 +138,13 @@ textarea,
+ 
+ ::-moz-selection {
+   /* Code for Firefox */
+-  background-color: var(--dimPrimary);
+-  color: var(--text);
++  background-color: var(--textSelection);
++  color: var(--paragraph);
+ }
+ 
+ ::selection {
+-  background-color: var(--dimPrimary);
+-  color: var(--text);
++  background-color: var(--textSelection);
++  color: var(--paragraph);
+ }
+ 
+ .middle-pane {
+@@ -165,8 +165,8 @@ textarea,
+   width: 1px !important;
+ }
+ 
+-:root {
+-  --focus-border: var(--primary);
++#app {
++  --focus-border: var(--accent);
+   --separator-border: var(--border);
+   --sash-size: 10px;
+   --sash-hover-size: 4px;
+diff --git a/apps/web/src/app.js b/apps/web/src/app.js
+index a0504ce58..27b31667a 100644
+--- a/apps/web/src/app.js
++++ b/apps/web/src/app.js
+@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ import React, { useState, Suspense, useMemo, useRef } from "react";
+ import { Box, Flex } from "@theme-ui/components";
+-import ThemeProvider from "./components/theme-provider";
++import { BaseThemeProvider } from "./components/theme-provider";
+ import useMobile from "./hooks/use-mobile";
+ import useTablet from "./hooks/use-tablet";
+ import { LazyMotion, domAnimation } from "framer-motion";
+@@ -50,7 +50,7 @@ function App() {
+ 
+   return (
+     <LazyMotion features={domAnimation} strict>
+-      <ThemeProvider>
++      <BaseThemeProvider sx={{ height: "100%" }}>
+         {isAppLoaded && (
+           <Suspense fallback={<div style={{ display: "none" }} />}>
+             <div id="menu-wrapper">
+@@ -82,7 +82,7 @@ function App() {
+           )}
+           <Toaster containerClassName="toasts-container" />
+         </Flex>
+-      </ThemeProvider>
++      </BaseThemeProvider>
+     </LazyMotion>
+   );
+ }
+diff --git a/apps/web/src/common/dialog-controller.tsx b/apps/web/src/common/dialog-controller.tsx
+index a8c863167..6369d4853 100644
+--- a/apps/web/src/common/dialog-controller.tsx
++++ b/apps/web/src/common/dialog-controller.tsx
+@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ import ReactDOM from "react-dom";
+ import { Dialogs } from "../components/dialogs";
+ import { hardNavigate } from "../navigation";
+-import ThemeProvider from "../components/theme-provider";
++import { BaseThemeProvider } from "../components/theme-provider";
+ import qclone from "qclone";
+ import { store as notebookStore } from "../stores/notebook-store";
+ import { store as tagStore } from "../stores/tag-store";
+@@ -69,11 +69,11 @@ function showDialog<TId extends DialogIds, TReturnType>(
+     };
+     const PropDialog = () => render(Dialogs[id], perform);
+     ReactDOM.render(
+-      <ThemeProvider>
++      <BaseThemeProvider>
+         <Suspense fallback={<div />}>
+           <PropDialog />
+         </Suspense>
+-      </ThemeProvider>,
++      </BaseThemeProvider>,
+       container,
+       () => (openDialogs[id] = true)
+     );
+diff --git a/apps/web/src/common/task-manager.ts b/apps/web/src/common/task-manager.ts
+index 2c5aca4d0..ab73e0b04 100644
+--- a/apps/web/src/common/task-manager.ts
++++ b/apps/web/src/common/task-manager.ts
+@@ -67,8 +67,7 @@ export class TaskManager {
+           updateStatus({
+             key: statusTask.id,
+             status: progress.text,
+-            progress: percentage,
+-            icon: null
++            progress: percentage
+           });
+         });
+         removeStatus(statusTask.id);
+diff --git a/apps/web/src/components/accent-item/index.js b/apps/web/src/components/accent-item/index.js
+index 4251405a7..2584cae3a 100644
+--- a/apps/web/src/components/accent-item/index.js
++++ b/apps/web/src/components/accent-item/index.js
+@@ -47,7 +47,7 @@ function AccentItem(props) {
+             zIndex: 1,
+             cursor: "pointer"
+           }}
+-          color="static"
++          color="white"
+           size={20}
+         />
+       )}
+diff --git a/apps/web/src/components/accordion/index.tsx b/apps/web/src/components/accordion/index.tsx
+index 3548e0bdc..70c5a4484 100644
+--- a/apps/web/src/components/accordion/index.tsx
++++ b/apps/web/src/components/accordion/index.tsx
+@@ -25,7 +25,7 @@ import { ChevronDown, ChevronUp } from "../icons";
+ export type AccordionProps = {
+   title: string;
+   isClosed: boolean;
+-  color?: keyof SchemeColors;
++  color?: SchemeColors;
+   testId?: string;
+ };
+ 
+diff --git a/apps/web/src/components/attachment/index.js b/apps/web/src/components/attachment/index.js
+index a27c08953..f576fc20c 100644
+--- a/apps/web/src/components/attachment/index.js
++++ b/apps/web/src/components/attachment/index.js
+@@ -92,7 +92,7 @@ function Attachment({ item, isCompact, index }) {
+             ) : attachment.dateUploaded ? (
+               <Icon.DoubleCheckmark
+                 sx={{ flexShrink: 0 }}
+-                color={"primary"}
++                color={"accent"}
+                 size={13}
+                 title={"Uploaded"}
+               />
+diff --git a/apps/web/src/components/auth-container/index.js b/apps/web/src/components/auth-container/index.js
+index b84c4ccf9..f192020b7 100644
+--- a/apps/web/src/components/auth-container/index.js
++++ b/apps/web/src/components/auth-container/index.js
+@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ import { useMemo } from "react";
+ import { Box, Flex, Image, Link, Text } from "@theme-ui/components";
+-import ThemeProvider from "../theme-provider";
++import { BaseThemeProvider } from "../theme-provider";
+ import Logo from "../../assets/logo.svg";
+ import LogoDark from "../../assets/logo-dark.svg";
+ import { useStore as useThemeStore } from "../../stores/theme-store";
+@@ -82,7 +82,7 @@ function AuthContainer(props) {
+   const title = useMemo(() => randomTitle(), []);
+ 
+   return (
+-    <ThemeProvider>
++    <BaseThemeProvider>
+       <Flex sx={{ position: "relative", height: "100%", bg: "background" }}>
+         <Box
+           sx={{
+@@ -234,7 +234,7 @@ function AuthContainer(props) {
+           {props.children}
+         </Flex>
+       </Flex>
+-    </ThemeProvider>
++    </BaseThemeProvider>
+   );
+ }
+ export default AuthContainer;
+diff --git a/apps/web/src/components/cached-router/index.js b/apps/web/src/components/cached-router/index.js
+index 932ddca1a..7dd3780b0 100644
+--- a/apps/web/src/components/cached-router/index.js
++++ b/apps/web/src/components/cached-router/index.js
+@@ -23,7 +23,7 @@ import { getHomeRoute, NavigationEvents } from "../../navigation";
+ import { store as selectionStore } from "../../stores/selection-store";
+ import useRoutes from "../../hooks/use-routes";
+ import RouteContainer from "../route-container";
+-import ThemeProvider from "../theme-provider";
++import { BaseThemeProvider } from "../theme-provider";
+ import routes from "../../navigation/routes";
+ 
+ var cache = {};
+@@ -69,7 +69,9 @@ function CachedRouter() {
+         routeContainer.appendChild(route);
+       }
+       ReactDOM.render(
+-        <ThemeProvider>{RouteResult.component}</ThemeProvider>,
++        <BaseThemeProvider injectCssVars={false}>
++          {RouteResult.component}
++        </BaseThemeProvider>,
+         route
+       );
+     }
+diff --git a/apps/web/src/components/dialogs/add-reminder-dialog.tsx b/apps/web/src/components/dialogs/add-reminder-dialog.tsx
+index 1e42a1a65..e93f01cea 100644
+--- a/apps/web/src/components/dialogs/add-reminder-dialog.tsx
++++ b/apps/web/src/components/dialogs/add-reminder-dialog.tsx
+@@ -264,7 +264,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
+             />
+             {m.title}
+             {m.premium && !isUserPremium && (
+-              <Pro size={18} color="primary" sx={{ ml: 1 }} />
++              <Pro size={18} color="accent" sx={{ ml: 1 }} />
+             )}
+           </Label>
+         ))}
+diff --git a/apps/web/src/components/dialogs/buy-dialog/buy-dialog.tsx b/apps/web/src/components/dialogs/buy-dialog/buy-dialog.tsx
+index c19e8410d..57296927a 100644
+--- a/apps/web/src/components/dialogs/buy-dialog/buy-dialog.tsx
++++ b/apps/web/src/components/dialogs/buy-dialog/buy-dialog.tsx
+@@ -104,7 +104,7 @@ export function BuyDialog(props: BuyDialogProps) {
+         },
+         overlay: {
+           zIndex: 999,
+-          background: theme.colors.overlay
++          background: theme.colors.backdrop
+         }
+       }}
+     >
+diff --git a/apps/web/src/components/dialogs/buy-dialog/features.tsx b/apps/web/src/components/dialogs/buy-dialog/features.tsx
+index ec752d2bb..a34880b0a 100644
+--- a/apps/web/src/components/dialogs/buy-dialog/features.tsx
++++ b/apps/web/src/components/dialogs/buy-dialog/features.tsx
+@@ -460,7 +460,7 @@ export function Features() {
+                 sx={{ borderRadius: 50, alignSelf: "start" }}
+                 mb={1}
+               >
+-                <Pro color="primary" size={16} />
++                <Pro color="accent" size={16} />
+                 <Text variant="body" ml={"2px"} sx={{ color: "primary" }}>
+                   Pro
+                 </Text>
+@@ -493,13 +493,13 @@ export function Features() {
+                     sx={{ flexDirection: "column", alignItems: "start" }}
+                   >
+                     {feature.icon && (
+-                      <feature.icon size={20} color="text" sx={{ mb: 1 }} />
++                      <feature.icon size={20}  sx={{ mb: 1 }} />
+                     )}
+                     {feature.pro && (
+                       <Flex
+                         sx={{ alignItems: "center", justifyContent: "center" }}
+                       >
+-                        <Pro color="primary" size={14} />
++                        <Pro color="accent" size={14} />
+                         <Text
+                           variant="subBody"
+                           ml={"2px"}
+diff --git a/apps/web/src/components/dialogs/dialog.js b/apps/web/src/components/dialogs/dialog.js
+index 9107a6f35..852c19b07 100644
+--- a/apps/web/src/components/dialogs/dialog.js
++++ b/apps/web/src/components/dialogs/dialog.js
+@@ -146,7 +146,7 @@ function Dialog(props) {
+                 variant="dialog"
+                 data-test-id="dialog-no"
+                 onClick={props.negativeButton.onClick}
+-                color="text"
++
+               >
+                 {props.negativeButton.text || "Cancel"}
+               </RebassButton>
+@@ -165,7 +165,7 @@ function Dialog(props) {
+                 }
+               >
+                 {props.positiveButton.loading ? (
+-                  <Icon.Loading size={16} color="primary" />
++                  <Icon.Loading size={16} color="accent" />
+                 ) : (
+                   props.positiveButton.text || "OK"
+                 )}
+diff --git a/apps/web/src/components/dialogs/feature-dialog.tsx b/apps/web/src/components/dialogs/feature-dialog.tsx
+index 051aa4d43..54deb9113 100644
+--- a/apps/web/src/components/dialogs/feature-dialog.tsx
++++ b/apps/web/src/components/dialogs/feature-dialog.tsx
+@@ -171,7 +171,7 @@ function FeatureDialog(props: FeatureDialogProps) {
+         text: (
+           <Flex>
+             {feature.cta.icon && (
+-              <feature.cta.icon color="primary" size={16} sx={{ mr: 1 }} />
++              <feature.cta.icon color="accent" size={16} sx={{ mr: 1 }} />
+             )}
+             {feature.cta.title}
+           </Flex>
+@@ -196,7 +196,7 @@ function FeatureDialog(props: FeatureDialogProps) {
+             }}
+           >
+             <Flex sx={{ alignItems: "center", justifyContent: "start" }}>
+-              {feature.icon && <feature.icon size={14} color="primary" />}
++              {feature.icon && <feature.icon size={14} color="accent" />}
+               <Text variant="subtitle" ml={1} sx={{ fontWeight: "normal" }}>
+                 {feature.title}
+               </Text>
+diff --git a/apps/web/src/components/dialogs/loading-dialog.tsx b/apps/web/src/components/dialogs/loading-dialog.tsx
+index 6bc1a6777..981ef1191 100644
+--- a/apps/web/src/components/dialogs/loading-dialog.tsx
++++ b/apps/web/src/components/dialogs/loading-dialog.tsx
+@@ -49,7 +49,7 @@ function LoadingDialog<T>(props: LoadingDialogProps<T>) {
+         <Text as="span" variant="body">
+           {message}
+         </Text>
+-        <Icon.Loading rotate sx={{ my: 2 }} color="primary" />
++        <Icon.Loading rotate sx={{ my: 2 }} color="accent" />
+       </Box>
+     </Dialog>
+   );
+diff --git a/apps/web/src/components/dialogs/move-note-dialog.tsx b/apps/web/src/components/dialogs/move-note-dialog.tsx
+index 2900f64f3..6dedfc063 100644
+--- a/apps/web/src/components/dialogs/move-note-dialog.tsx
++++ b/apps/web/src/components/dialogs/move-note-dialog.tsx
+@@ -292,7 +292,7 @@ function FilteredList<T extends Item>(props: FilteredListProps<T>) {
+             }}
+           >
+             <Text variant={"body"}>{`Add "${query}"`}</Text>
+-            <Icon.Plus size={16} color="primary" />
++            <Icon.Plus size={16} color="accent" />
+           </Button>
+         )}
+         {items.map((item, index) => renderItem(item, index, refresh))}
+diff --git a/apps/web/src/components/dialogs/onboarding-dialog.js b/apps/web/src/components/dialogs/onboarding-dialog.js
+index 1742e056b..9cc0d80c0 100644
+--- a/apps/web/src/components/dialogs/onboarding-dialog.js
++++ b/apps/web/src/components/dialogs/onboarding-dialog.js
+@@ -74,7 +74,7 @@ const newUserSteps = [
+     image: <Friends width={140} />
+   },
+   {
+-    image: <Icon.Pro size={60} color="primary" />,
++    image: <Icon.Pro size={60} color="accent" />,
+     title: "Notesnook Pro",
+     subtitle: "Experience the next level of private note taking",
+     component: TrialOffer
+diff --git a/apps/web/src/components/dialogs/toolbar-config-dialog.tsx b/apps/web/src/components/dialogs/toolbar-config-dialog.tsx
+index 23732f8e8..5f4abaeb5 100644
+--- a/apps/web/src/components/dialogs/toolbar-config-dialog.tsx
++++ b/apps/web/src/components/dialogs/toolbar-config-dialog.tsx
+@@ -144,7 +144,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
+                 />
+                 {preset.title}
+                 {preset.id === "custom" && !isUserPremium() ? (
+-                  <Pro color="primary" size={18} sx={{ ml: 1 }} />
++                  <Pro color="accent" size={18} sx={{ ml: 1 }} />
+                 ) : null}
+               </Label>
+             ))}
+@@ -164,7 +164,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
+                 showToast("success", "Group added successfully");
+               }}
+             >
+-              <Icon path={Icons.plus} color="text" size={18} />
++              <Icon path={Icons.plus}  size={18} />
+             </Button>
+           )}
+         </Flex>
+diff --git a/apps/web/src/components/dropdown-button/index.js b/apps/web/src/components/dropdown-button/index.js
+index a88d91048..5227ea0cb 100644
+--- a/apps/web/src/components/dropdown-button/index.js
++++ b/apps/web/src/components/dropdown-button/index.js
+@@ -42,7 +42,7 @@ export default function DropdownButton({ title, options }) {
+           }}
+           onClick={() => openMenu(options.slice(1), { title })}
+         >
+-          <ChevronDown color="static" size={18} />
++          <ChevronDown color="white" size={18} />
+         </Button>
+       )}
+     </Flex>
+diff --git a/apps/web/src/components/editor/-placeholder.js b/apps/web/src/components/editor/-placeholder.js
+index c143662cd..e536546b6 100644
+--- a/apps/web/src/components/editor/-placeholder.js
++++ b/apps/web/src/components/editor/-placeholder.js
+@@ -51,7 +51,7 @@ function EditorPlaceholder() {
+           hashNavigate("/notes/create", { addNonce: true, replace: true })
+         }
+       >
+-        <Icon.Plus size={18} color="primary" />
++        <Icon.Plus size={18} color="accent" />
+         <Text ml={1}>Make a new note</Text>
+       </Button>
+     </Flex>
+diff --git a/apps/web/src/components/editor/footer.tsx b/apps/web/src/components/editor/footer.tsx
+index 2b37dfc4b..a020184ba 100644
+--- a/apps/web/src/components/editor/footer.tsx
++++ b/apps/web/src/components/editor/footer.tsx
+@@ -50,7 +50,7 @@ function EditorFooter() {
+         data-test-id="editor-word-count"
+         variant="subBody"
+         mr={2}
+-        sx={{ color: "bgSecondaryText" }}
++        sx={{ color: "paragraph" }}
+       >
+         {words.total + " words"}
+         {words.selected ? ` (${words.selected} selected)` : ""}
+@@ -59,13 +59,13 @@ function EditorFooter() {
+         className="selectable"
+         variant="subBody"
+         mr={2}
+-        sx={{ color: "bgSecondaryText" }}
++        sx={{ color: "paragraph" }}
+         data-test-id="editor-date-edited"
+         title={dateEdited?.toString()}
+       >
+         {formatDate(dateEdited || Date.now())}
+       </Text>
+-      {SaveStateIcon && <SaveStateIcon size={13} color="bgSecondaryText" />}
++      {SaveStateIcon && <SaveStateIcon size={13} color="paragraph" />}
+     </Flex>
+   );
+ }
+diff --git a/apps/web/src/components/editor/loading.tsx b/apps/web/src/components/editor/loading.tsx
+index cea681d6a..940dc341c 100644
+--- a/apps/web/src/components/editor/loading.tsx
++++ b/apps/web/src/components/editor/loading.tsx
+@@ -30,7 +30,7 @@ function EditorLoading({ text }: { text?: string }) {
+         justifyContent: "center"
+       }}
+     >
+-      <Icon.Loading color="primary" sx={{ mt: 2 }} />
++      <Icon.Loading color="accent" sx={{ mt: 2 }} />
+       <Text variant="body" mt={2} sx={{ textAlign: "center" }}>
+         {text || "Loading editor. Please wait..."}
+       </Text>
+diff --git a/apps/web/src/components/editor/tiptap.tsx b/apps/web/src/components/editor/tiptap.tsx
+index 12531b203..b2e359e29 100644
+--- a/apps/web/src/components/editor/tiptap.tsx
++++ b/apps/web/src/components/editor/tiptap.tsx
+@@ -319,7 +319,7 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
+           style={{
+             flex: 1,
+             cursor: "text",
+-            color: theme.colors.text, // TODO!
++            color: theme.colors.paragraph, // TODO!
+             paddingBottom: 150
+           }}
+         />
+diff --git a/apps/web/src/components/editor/toolbar.js b/apps/web/src/components/editor/toolbar.js
+index 47d0a08e1..b3f9e06bf 100644
+--- a/apps/web/src/components/editor/toolbar.js
++++ b/apps/web/src/components/editor/toolbar.js
+@@ -304,7 +304,7 @@ function Toolbar() {
+                   sx={{
+                     borderRadius: "default",
+                     fontSize: 10,
+-                    color: "static"
++                    color: "white"
+                   }}
+                 >
+                   NEW
+diff --git a/apps/web/src/components/group-header/index.js b/apps/web/src/components/group-header/index.js
+index e4d124390..44b3bf520 100644
+--- a/apps/web/src/components/group-header/index.js
++++ b/apps/web/src/components/group-header/index.js
+@@ -25,6 +25,7 @@ import { useMenuTrigger } from "../../hooks/use-menu";
+ import { useStore as useNoteStore } from "../../stores/note-store";
+ import { useStore as useNotebookStore } from "../../stores/notebook-store";
+ import useMobile from "../../hooks/use-mobile";
++import { ThemeVariant } from "../theme-provider";
+ 
+ const groupByToTitleMap = {
+   [undefined]: "Default",
+@@ -190,102 +191,104 @@ function GroupHeader(props) {
+   ]);
+ 
+   return (
+-    <Flex
+-      ref={groupHeaderRef}
+-      onClick={(e) => {
+-        if (e.ctrlKey) {
+-          onSelectGroup();
+-          return;
+-        }
+-        if (groups.length <= 0) return;
+-        e.stopPropagation();
+-        const items = groups.map((group) => {
+-          const groupTitle = group.title.toString();
+-          return {
+-            key: groupTitle,
+-            title: () => groupTitle,
+-            onClick: () => onJump(groupTitle),
+-            checked: group.title === title
+-          };
+-        });
+-        openMenu(items, {
+-          title: "Jump to group",
+-          target: groupHeaderRef.current
+-        });
+-      }}
+-      mx={1}
+-      my={1}
+-      py={1}
+-      pl={1}
+-      pr={0}
+-      bg="bgSecondary"
+-      sx={{
+-        borderRadius: "default",
+-        cursor: "pointer",
+-        border: isMenuTarget ? "1px solid var(--primary)" : "none",
+-        ":focus": {
+-          border: "1px solid var(--primary)",
+-          outline: "none"
+-        },
+-        alignItems: "center",
+-        justifyContent: "space-between"
+-      }}
+-      tabIndex={0}
+-      data-test-id="group-header"
+-    >
+-      <Text
+-        data-test-id="title"
+-        variant="subtitle"
++    <ThemeVariant variant="secondary" injectCssVars>
++      <Flex
++        ref={groupHeaderRef}
++        onClick={(e) => {
++          if (e.ctrlKey) {
++            onSelectGroup();
++            return;
++          }
++          if (groups.length <= 0) return;
++          e.stopPropagation();
++          const items = groups.map((group) => {
++            const groupTitle = group.title.toString();
++            return {
++              key: groupTitle,
++              title: () => groupTitle,
++              onClick: () => onJump(groupTitle),
++              checked: group.title === title
++            };
++          });
++          openMenu(items, {
++            title: "Jump to group",
++            target: groupHeaderRef.current
++          });
++        }}
++        mx={1}
++        my={1}
++        py={1}
++        pl={1}
++        pr={0}
++        bg="background"
+         sx={{
+-          fontSize: "body",
+-          color: title === "Conflicted" ? "error" : "primary"
++          borderRadius: "default",
++          cursor: "pointer",
++          border: isMenuTarget ? "1px solid var(--accent)" : "none",
++          ":focus": {
++            border: "1px solid var(--accent)",
++            outline: "none"
++          },
++          alignItems: "center",
++          justifyContent: "space-between"
+         }}
++        tabIndex={0}
++        data-test-id="group-header"
+       >
+-        {title}
+-      </Text>
++        <Text
++          data-test-id="title"
++          variant="subtitle"
++          sx={{
++            fontSize: "body",
++            color: title === "Conflicted" ? "error" : "accent"
++          }}
++        >
++          {title}
++        </Text>
+ 
+-      {index === 0 && (
+-        <Flex mr={1}>
+-          {type && (
+-            <IconButton
+-              testId="sort-icon-button"
+-              icon={
+-                groupOptions.sortDirection === "asc"
+-                  ? Icon.SortAsc
+-                  : Icon.SortDesc
+-              }
+-              title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy]}`}
+-              onClick={() => {
+-                const groupOptions = db.settings.getGroupOptions(type);
+-                setGroupOptions(groupOptions);
++        {index === 0 && (
++          <Flex mr={1}>
++            {type && (
++              <IconButton
++                testId="sort-icon-button"
++                icon={
++                  groupOptions.sortDirection === "asc"
++                    ? Icon.SortAsc
++                    : Icon.SortDesc
++                }
++                title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy]}`}
++                onClick={() => {
++                  const groupOptions = db.settings.getGroupOptions(type);
++                  setGroupOptions(groupOptions);
+ 
+-                openMenu(menuItems, {
+-                  title: "Group & sort",
+-                  groupOptions,
+-                  refresh,
+-                  type
+-                });
+-              }}
+-            />
+-          )}
+-          {viewMode && (
+-            <IconButton
+-              icon={
+-                viewMode === "compact" ? Icon.DetailedView : Icon.CompactView
+-              }
+-              title={
+-                viewMode === "compact"
+-                  ? "Switch to detailed view"
+-                  : "Switch to compact view"
+-              }
+-              onClick={() =>
+-                setViewMode(viewMode === "compact" ? "detailed" : "compact")
+-              }
+-            />
+-          )}
+-        </Flex>
+-      )}
+-    </Flex>
++                  openMenu(menuItems, {
++                    title: "Group & sort",
++                    groupOptions,
++                    refresh,
++                    type
++                  });
++                }}
++              />
++            )}
++            {viewMode && (
++              <IconButton
++                icon={
++                  viewMode === "compact" ? Icon.DetailedView : Icon.CompactView
++                }
++                title={
++                  viewMode === "compact"
++                    ? "Switch to detailed view"
++                    : "Switch to compact view"
++                }
++                onClick={() =>
++                  setViewMode(viewMode === "compact" ? "detailed" : "compact")
++                }
++              />
++            )}
++          </Flex>
++        )}
++      </Flex>
++    </ThemeVariant>
+   );
+ }
+ export default GroupHeader;
+diff --git a/apps/web/src/components/icon-tag/index.tsx b/apps/web/src/components/icon-tag/index.tsx
+index fd2d3a851..770472907 100644
+--- a/apps/web/src/components/icon-tag/index.tsx
++++ b/apps/web/src/components/icon-tag/index.tsx
+@@ -75,7 +75,7 @@ function IconTag(props: IconTagProps) {
+     >
+       <Icon
+         size={11}
+-        color={styles?.icon?.color || (highlight ? "primary" : "icon")}
++        // color={styles?.icon?.color || (highlight ? "primary" : "icon")}
+         sx={{ ...styles?.icon, flexShrink: 0 }}
+       />
+       <Text
+diff --git a/apps/web/src/components/icons/index.tsx b/apps/web/src/components/icons/index.tsx
+index 4d22303da..9bbe599c6 100644
+--- a/apps/web/src/components/icons/index.tsx
++++ b/apps/web/src/components/icons/index.tsx
+@@ -191,12 +191,16 @@ import { AnimatedFlex } from "../animated";
+ import { Theme } from "@notesnook/theme";
+ import { FlexProps } from "@theme-ui/components";
+ import { MotionProps } from "framer-motion";
++import {
++  isThemeColor,
++  SchemeColors
++} from "@notesnook/theme/dist/theme/colorscheme";
+ 
+ type MDIIconWrapperProps = {
+   title?: string;
+   path: string;
+   size?: keyof Theme["iconSizes"] | number;
+-  color?: keyof Theme["colors"];
++  color?: SchemeColors;
+   rotate?: boolean;
+ };
+ function MDIIconWrapper({
+@@ -208,9 +212,10 @@ function MDIIconWrapper({
+ }: MDIIconWrapperProps) {
+   const theme = useTheme() as Theme;
+ 
+-  const themedColor: string = theme?.colors
+-    ? (theme.colors[color] as string)
+-    : color;
++  const themedColor: string =
++    theme?.colors && isThemeColor(color, theme.colors)
++      ? theme.colors[color]
++      : color;
+ 
+   return (
+     <MDIIcon
+@@ -235,7 +240,7 @@ function MDIIconWrapper({
+ type IconProps = FlexProps &
+   MotionProps &
+   Omit<MDIIconWrapperProps, "path"> & {
+-    hoverColor?: keyof Theme["colors"];
++    hoverColor?: SchemeColors;
+   };
+ 
+ export type Icon = {
+diff --git a/apps/web/src/components/icons/resolver.ts b/apps/web/src/components/icons/resolver.ts
+index 54e0cd25c..c8ee25518 100644
+--- a/apps/web/src/components/icons/resolver.ts
++++ b/apps/web/src/components/icons/resolver.ts
+@@ -20,9 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ import { toTitleCase, toCamelCase, KebabCase } from "../../utils/string";
+ import * as Icons from "./index";
+ 
+-export function getIconFromAlias<T extends KebabCase<keyof typeof Icons>>(
+-  alias: T
+-) {
++export type IconNames = KebabCase<keyof typeof Icons>;
++export function getIconFromAlias(alias: IconNames) {
+   if (!alias) return;
+   const iconName = toTitleCase(toCamelCase(alias));
+   return Icons[iconName as keyof typeof Icons];
+diff --git a/apps/web/src/components/install-notice/index.js b/apps/web/src/components/install-notice/index.js
+index e7db2b6b0..d101076c4 100644
+--- a/apps/web/src/components/install-notice/index.js
++++ b/apps/web/src/components/install-notice/index.js
+@@ -22,7 +22,7 @@ import { Box, Button, Flex, Text } from "@theme-ui/components";
+ import Config from "../../utils/config";
+ import { getDownloadLink, getPlatform } from "../../utils/platform";
+ import DropdownButton from "../dropdown-button";
+-import ThemeProvider from "../theme-provider";
++import { BaseThemeProvider } from "../theme-provider";
+ 
+ const nativeFeatures = [
+   "Native high-performance encryption",
+@@ -128,9 +128,9 @@ export function showInstallNotice() {
+         resolve(result);
+       };
+       ReactDOM.render(
+-        <ThemeProvider>
++        <BaseThemeProvider>
+           <InstallNotice onClose={perform} />
+-        </ThemeProvider>,
++        </BaseThemeProvider>,
+         root
+       );
+     });
+diff --git a/apps/web/src/components/list-container/index.tsx b/apps/web/src/components/list-container/index.tsx
+index e9f14ee7f..1b437e82a 100644
+--- a/apps/web/src/components/list-container/index.tsx
++++ b/apps/web/src/components/list-container/index.tsx
+@@ -262,7 +262,7 @@ function ListContainer(props: ListContainerProps) {
+             height: 45
+           }}
+         >
+-          <Icon.Plus color="static" />
++          <Icon.Plus color="white" />
+         </Button>
+       )}
+     </Flex>
+diff --git a/apps/web/src/components/menu/menu-item.js b/apps/web/src/components/menu/menu-item.js
+index 8a4c4fd1d..8de5c1895 100644
+--- a/apps/web/src/components/menu/menu-item.js
++++ b/apps/web/src/components/menu/menu-item.js
+@@ -86,7 +86,7 @@ function MenuItem({ item, isFocused, onMouseEnter, onMouseLeave, onClick }) {
+           >
+             {title}
+           </Text>
+-          {isPremium && <Pro size={14} color="primary" sx={{ ml: 1 }} />}
++          {isPremium && <Pro size={14} color="accent" sx={{ ml: 1 }} />}
+         </Flex>
+         <Flex data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}>
+           {isChecked && <Check size={14} />}
+diff --git a/apps/web/src/components/navigation-menu/index.tsx b/apps/web/src/components/navigation-menu/index.tsx
+index 3c7f08d6b..d2a831be9 100644
+--- a/apps/web/src/components/navigation-menu/index.tsx
++++ b/apps/web/src/components/navigation-menu/index.tsx
+@@ -48,6 +48,7 @@ import { useStore as useUserStore } from "../../stores/user-store";
+ import { useStore as useThemeStore } from "../../stores/theme-store";
+ import useLocation from "../../hooks/use-location";
+ import { FlexScrollContainer } from "../scroll-container";
++import { ScopedThemeProvider, ThemeVariant } from "../theme-provider";
+ 
+ type Route = {
+   title: string;
+@@ -140,170 +141,177 @@ function NavigationMenu(props: NavigationMenuProps) {
+   }, [location, previousLocation, state]);
+ 
+   return (
+-    <AnimatedFlex
+-      id="navigation-menu"
+-      data-test-id="navigation-menu"
+-      initial={{
+-        opacity: 1
+-      }}
+-      animate={{
+-        opacity: isFocusMode ? 0 : 1,
+-        visibility: isFocusMode ? "collapse" : "visible"
+-      }}
+-      transition={{ duration: 0.3, ease: "easeOut" }}
+-      sx={{
+-        zIndex: 1,
+-        height: "auto",
+-        position: "relative",
+-        flex: 1,
+-        flexDirection: "column",
+-        justifyContent: "space-between"
+-      }}
+-      bg={"bgSecondary"}
+-      px={0}
+-    >
+-      <FlexScrollContainer>
+-        <Flex sx={{ flexDirection: "column" }}>
+-          {routes.map((item) => (
+-            <NavigationItem
+-              isTablet={isTablet}
+-              key={item.path}
+-              title={item.title}
+-              icon={item.icon}
+-              tag={item.tag}
+-              selected={
+-                item.path === "/"
+-                  ? location === item.path
+-                  : location.startsWith(item.path)
+-              }
+-              onClick={() => {
+-                if (!isMobile && location === item.path)
+-                  return toggleNavigationContainer();
+-                _navigate(item.path);
+-              }}
+-            />
+-          ))}
+-          {colors.map((color) => (
+-            <NavigationItem
+-              isTablet={isTablet}
+-              key={color.id}
+-              title={db.colors?.alias(color.id)}
+-              icon={Circle}
+-              selected={location === `/colors/${color.id}`}
+-              color={color.title.toLowerCase()}
+-              onClick={() => {
+-                _navigate(`/colors/${color.id}`);
+-              }}
+-              menuItems={[
+-                {
+-                  key: "rename",
+-                  title: () => "Rename color",
+-                  onClick: async () => {
+-                    await showRenameColorDialog(color.id);
++    <ScopedThemeProvider scope="navigationMenu" injectCssVars={false}>
++      <AnimatedFlex
++        id="navigation-menu"
++        data-test-id="navigation-menu"
++        initial={{
++          opacity: 1
++        }}
++        animate={{
++          opacity: isFocusMode ? 0 : 1,
++          visibility: isFocusMode ? "collapse" : "visible"
++        }}
++        transition={{ duration: 0.3, ease: "easeOut" }}
++        sx={{
++          zIndex: 1,
++          height: "auto",
++          position: "relative",
++          flex: 1,
++          flexDirection: "column",
++          justifyContent: "space-between",
++          bg: "background"
++        }}
++      >
++        <FlexScrollContainer>
++          <ThemeVariant variant="secondary">
++            <Flex sx={{ flexDirection: "column" }}>
++              {routes.map((item) => (
++                <NavigationItem
++                  isTablet={isTablet}
++                  key={item.path}
++                  title={item.title}
++                  icon={item.icon}
++                  tag={item.tag}
++                  selected={
++                    item.path === "/"
++                      ? location === item.path
++                      : location.startsWith(item.path)
++                  }
++                  onClick={() => {
++                    if (!isMobile && location === item.path)
++                      return toggleNavigationContainer();
++                    _navigate(item.path);
++                  }}
++                />
++              ))}
++              {colors.map((color) => (
++                <NavigationItem
++                  isTablet={isTablet}
++                  key={color.id}
++                  title={db.colors?.alias(color.id)}
++                  icon={Circle}
++                  selected={location === `/colors/${color.id}`}
++                  color={color.title.toLowerCase()}
++                  onClick={() => {
++                    _navigate(`/colors/${color.id}`);
++                  }}
++                  menuItems={[
++                    {
++                      key: "rename",
++                      title: () => "Rename color",
++                      onClick: async () => {
++                        await showRenameColorDialog(color.id);
++                      }
++                    }
++                  ]}
++                />
++              ))}
++              <Box
++                bg="border"
++                my={1}
++                sx={{ width: "85%", height: "0.8px", alignSelf: "center" }}
++              />
++              {shortcuts.map((item) => (
++                <NavigationItem
++                  isTablet={isTablet}
++                  key={item.id}
++                  title={
++                    item.type === "tag" ? db.tags?.alias(item.id) : item.title
+                   }
+-                }
+-              ]}
+-            />
+-          ))}
+-          <Box
+-            bg="border"
+-            my={1}
+-            sx={{ width: "85%", height: "0.8px", alignSelf: "center" }}
+-          />
+-          {shortcuts.map((item) => (
++                  menuItems={[
++                    {
++                      key: "removeshortcut",
++                      title: () => "Remove shortcut",
++                      onClick: async () => {
++                        await db.shortcuts?.remove(item.id);
++                        refreshNavItems();
++                      }
++                    }
++                  ]}
++                  icon={
++                    item.type === "notebook"
++                      ? Notebook2
++                      : item.type === "tag"
++                      ? Tag2
++                      : Topic
++                  }
++                  isShortcut
++                  selected={shouldSelectNavItem(location, item)}
++                  onClick={() => {
++                    if (item.type === "notebook") {
++                      _navigate(`/notebooks/${item.id}`);
++                    } else if (item.type === "topic") {
++                      _navigate(`/notebooks/${item.notebookId}/${item.id}`);
++                    } else if (item.type === "tag") {
++                      _navigate(`/tags/${item.id}`);
++                    }
++                  }}
++                />
++              ))}
++            </Flex>
++          </ThemeVariant>
++        </FlexScrollContainer>
++        <ThemeVariant variant="secondary">
++          <Flex sx={{ flexDirection: "column" }}>
++            {isLoggedIn === false && (
++              <NavigationItem
++                isTablet={isTablet}
++                title="Login"
++                icon={Login}
++                onClick={() => hardNavigate("/login")}
++              />
++            )}
++            {isTablet && (
++              <NavigationItem
++                isTablet={isTablet}
++                title={theme === "dark" ? "Light mode" : "Dark mode"}
++                icon={theme === "dark" ? LightMode : DarkMode}
++                onClick={() => {
++                  setFollowSystemTheme(false);
++                  toggleNightMode();
++                }}
++              />
++            )}
+             <NavigationItem
+               isTablet={isTablet}
+-              key={item.id}
+-              title={item.type === "tag" ? db.tags?.alias(item.id) : item.title}
+-              menuItems={[
+-                {
+-                  key: "removeshortcut",
+-                  title: () => "Remove shortcut",
+-                  onClick: async () => {
+-                    await db.shortcuts?.remove(item.id);
+-                    refreshNavItems();
+-                  }
+-                }
+-              ]}
+-              icon={
+-                item.type === "notebook"
+-                  ? Notebook2
+-                  : item.type === "tag"
+-                  ? Tag2
+-                  : Topic
+-              }
+-              isShortcut
+-              selected={shouldSelectNavItem(location, item)}
+-              onClick={() => {
+-                if (item.type === "notebook") {
+-                  _navigate(`/notebooks/${item.id}`);
+-                } else if (item.type === "topic") {
+-                  _navigate(`/notebooks/${item.notebookId}/${item.id}`);
+-                } else if (item.type === "tag") {
+-                  _navigate(`/tags/${item.id}`);
+-                }
+-              }}
+-            />
+-          ))}
+-        </Flex>
+-      </FlexScrollContainer>
+-      <Flex sx={{ flexDirection: "column" }}>
+-        {isLoggedIn === false && (
+-          <NavigationItem
+-            isTablet={isTablet}
+-            title="Login"
+-            icon={Login}
+-            onClick={() => hardNavigate("/login")}
+-          />
+-        )}
+-        {isTablet && (
+-          <NavigationItem
+-            isTablet={isTablet}
+-            title={theme === "dark" ? "Light mode" : "Dark mode"}
+-            icon={theme === "dark" ? LightMode : DarkMode}
+-            onClick={() => {
+-              setFollowSystemTheme(false);
+-              toggleNightMode();
+-            }}
+-          />
+-        )}
+-        <NavigationItem
+-          isTablet={isTablet}
+-          key={settings.path}
+-          title={settings.title}
+-          icon={settings.icon}
+-          onClick={() => {
+-            _navigate(settings.path);
+-          }}
+-          selected={location.startsWith(settings.path)}
+-        >
+-          {isTablet ? null : (
+-            <Button
+-              variant={"icon"}
+-              title="Toggle dark/light mode"
+-              sx={{
+-                bg: "transparent",
+-                borderRadius: "default",
+-                ":hover:not(disabled)": {
+-                  bg: "bgSecondaryHover",
+-                  filter: "brightness(100%)"
+-                }
+-              }}
++              key={settings.path}
++              title={settings.title}
++              icon={settings.icon}
+               onClick={() => {
+-                setFollowSystemTheme(false);
+-                toggleNightMode();
++                _navigate(settings.path);
+               }}
++              selected={location.startsWith(settings.path)}
+             >
+-              {theme === "dark" ? (
+-                <LightMode size={16} />
+-              ) : (
+-                <DarkMode size={16} />
++              {isTablet ? null : (
++                <Button
++                  variant={"icon"}
++                  title="Toggle dark/light mode"
++                  sx={{
++                    bg: "transparent",
++                    borderRadius: "default",
++                    ":hover:not(disabled)": {
++                      bg: "bgSecondaryHover",
++                      filter: "brightness(100%)"
++                    }
++                  }}
++                  onClick={() => {
++                    setFollowSystemTheme(false);
++                    toggleNightMode();
++                  }}
++                >
++                  {theme === "dark" ? (
++                    <LightMode size={16} />
++                  ) : (
++                    <DarkMode size={16} />
++                  )}
++                </Button>
+               )}
+-            </Button>
+-          )}
+-        </NavigationItem>
+-      </Flex>
+-    </AnimatedFlex>
++            </NavigationItem>
++          </Flex>
++        </ThemeVariant>
++      </AnimatedFlex>
++    </ScopedThemeProvider>
+   );
+ }
+ export default NavigationMenu;
+diff --git a/apps/web/src/components/navigation-menu/navigation-item.tsx b/apps/web/src/components/navigation-menu/navigation-item.tsx
+index ba00a93f5..b9d313466 100644
+--- a/apps/web/src/components/navigation-menu/navigation-item.tsx
++++ b/apps/web/src/components/navigation-menu/navigation-item.tsx
+@@ -22,12 +22,12 @@ import { useStore as useAppStore } from "../../stores/app-store";
+ import { useMenuTrigger } from "../../hooks/use-menu";
+ import useMobile from "../../hooks/use-mobile";
+ import { PropsWithChildren } from "react";
+-import { Theme } from "@notesnook/theme";
+ import { Icon, Shortcut } from "../icons";
++import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+ 
+ type NavigationItemProps = {
+   icon: Icon;
+-  color?: keyof Theme["colors"];
++  color?: SchemeColors;
+   title: string;
+   isTablet?: boolean;
+   isLoading?: boolean;
+@@ -35,7 +35,6 @@ type NavigationItemProps = {
+   tag?: string;
+   selected?: boolean;
+   onClick?: () => void;
+-  count?: number;
+   // TODO: add proper typings here
+   menuItems?: any[];
+ };
+@@ -52,8 +51,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
+     isTablet,
+     selected,
+     onClick,
+-    menuItems,
+-    count
++    menuItems
+   } = props;
+   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
+   const { openMenu } = useMenuTrigger();
+@@ -61,7 +59,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
+ 
+   return (
+     <Flex
+-      bg={selected ? "bgSecondaryHover" : "transparent"}
++      bg={selected ? "hover" : "transparent"}
+       sx={{
+         borderRadius: "default",
+         mx: 1,
+@@ -71,7 +69,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
+         ":first-of-type": { mt: 1 },
+         ":last-of-type": { mb: 1 },
+         ":hover:not(:disabled)": {
+-          bg: "bgSecondaryHover",
++          bg: "hover",
+           filter: "brightness(100%)"
+         }
+       }}
+@@ -99,7 +97,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
+       >
+         <Icon
+           size={isTablet ? 16 : 15}
+-          color={color || (selected ? "primary" : "icon")}
++          color={color || (selected ? "accent" : "icon")}
+           rotate={isLoading}
+         />
+         {isShortcut && (
+@@ -130,8 +128,8 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
+               variant="subBody"
+               as="span"
+               sx={{
+-                bg: "primary",
+-                color: "static",
++                bg: "accent",
++                color: "white",
+                 ml: 1,
+                 px: "small",
+                 borderRadius: "default"
+@@ -142,16 +140,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
+           )}
+         </Text>
+       </Button>
+-      {children ? (
+-        children
+-      ) : !isTablet && count !== undefined ? (
+-        <Text
+-          variant="subBody"
+-          sx={{ mr: 1, bg: "hover", px: "3px", borderRadius: "default" }}
+-        >
+-          {count > 100 ? "100+" : count}
+-        </Text>
+-      ) : null}
++      {children}
+     </Flex>
+   );
+ }
+diff --git a/apps/web/src/components/notebook/index.js b/apps/web/src/components/notebook/index.js
+index c6089234b..25cfa09f1 100644
+--- a/apps/web/src/components/notebook/index.js
++++ b/apps/web/src/components/notebook/index.js
+@@ -81,7 +81,7 @@ function Notebook(props) {
+               }}
+             >
+               {notebook.pinned && (
+-                <Icon.PinFilled color="primary" size={13} sx={{ mr: 1 }} />
++                <Icon.PinFilled color="accent" size={13} sx={{ mr: 1 }} />
+               )}
+ 
+               {new Date(date).toLocaleDateString("en", {
+diff --git a/apps/web/src/components/placeholders/index.js b/apps/web/src/components/placeholders/index.js
+index f0f18c3fa..a1ec7ac7d 100644
+--- a/apps/web/src/components/placeholders/index.js
++++ b/apps/web/src/components/placeholders/index.js
+@@ -52,7 +52,7 @@ function Placeholder(props) {
+             variant="tool"
+             onClick={callToAction.onClick}
+           >
+-            <callToAction.icon size={18} color="primary" />
++            <callToAction.icon size={18} color="accent" />
+             <Text ml={1}>{callToAction.text}</Text>
+           </Button>
+         )}
+diff --git a/apps/web/src/components/properties/index.js b/apps/web/src/components/properties/index.js
+index ba5a67550..c687ace5c 100644
+--- a/apps/web/src/components/properties/index.js
++++ b/apps/web/src/components/properties/index.js
+@@ -235,7 +235,7 @@ function Properties(props) {
+                       />
+                       {label.toLowerCase() === color?.toLowerCase() && (
+                         <Icon.Checkmark
+-                          color="static"
++                          color="white"
+                           size={18}
+                           sx={{ position: "absolute", left: "8px" }}
+                         />
+diff --git a/apps/web/src/components/publish-view/index.js b/apps/web/src/components/publish-view/index.js
+index 8a3fa5dda..96c868142 100644
+--- a/apps/web/src/components/publish-view/index.js
++++ b/apps/web/src/components/publish-view/index.js
+@@ -25,7 +25,7 @@ import Toggle from "../toggle";
+ import Field from "../field";
+ import { db } from "../../common/db";
+ import * as clipboard from "clipboard-polyfill/text";
+-import ThemeProvider from "../theme-provider";
++import { BaseThemeProvider } from "../theme-provider";
+ import { showToast } from "../../utils/toast";
+ import { EV, EVENTS } from "@notesnook/core/common";
+ import { useStore } from "../../stores/monograph-store";
+@@ -162,7 +162,7 @@ function PublishView(props) {
+                       );
+                     }}
+                   >
+-                    <Icon.Copy size={20} color="primary" />
++                    <Icon.Copy size={20} color="accent" />
+                   </Button>
+                 </Flex>
+               </Flex>
+@@ -236,7 +236,7 @@ function PublishView(props) {
+         >
+           {isPublishing ? (
+             <>
+-              <Icon.Loading color="static" />
++              <Icon.Loading color="white" />
+             </>
+           ) : publishId ? (
+             "Update"
+@@ -307,7 +307,7 @@ export function showPublishView(noteId, location = "top") {
+         resolve(result);
+       };
+       ReactDOM.render(
+-        <ThemeProvider>
++        <BaseThemeProvider>
+           <PublishView
+             noteId={noteId}
+             position={{
+@@ -318,7 +318,7 @@ export function showPublishView(noteId, location = "top") {
+             }}
+             onClose={perform}
+           />
+-        </ThemeProvider>,
++        </BaseThemeProvider>,
+         root
+       );
+     });
+diff --git a/apps/web/src/components/reminder-bar/index.js b/apps/web/src/components/reminder-bar/index.js
+index 269e0ed6d..6b1141dbd 100644
+--- a/apps/web/src/components/reminder-bar/index.js
++++ b/apps/web/src/components/reminder-bar/index.js
+@@ -52,7 +52,7 @@ function ReminderBar() {
+       <Flex sx={{ flex: 1, alignItems: "center" }}>
+         <reminder.icon
+           size={18}
+-          color="primary"
++          color="accent"
+           sx={{ bg: "shade", mr: 2, p: 2, borderRadius: 80 }}
+         />
+         <Flex variant="columnCenter" sx={{ alignItems: "flex-start" }}>
+@@ -85,7 +85,7 @@ function ReminderBar() {
+           }}
+           variant="tool"
+         >
+-          <Icon.Dismiss size={20} color="primary" />
++          <Icon.Dismiss size={20} color="accent" />
+         </Button>
+       )}
+     </Flex>
+diff --git a/apps/web/src/components/reminder/index.tsx b/apps/web/src/components/reminder/index.tsx
+index 14633288f..1752f3516 100644
+--- a/apps/web/src/components/reminder/index.tsx
++++ b/apps/web/src/components/reminder/index.tsx
+@@ -75,7 +75,6 @@ function Reminder({
+             <IconTag
+               icon={Icon.ReminderOff}
+               text={"Disabled"}
+-              styles={{ icon: { color: "error" } }}
+               testId={"disabled"}
+             />
+           ) : (
+diff --git a/apps/web/src/components/route-container/index.js b/apps/web/src/components/route-container/index.js
+index fa920da95..15c732e86 100644
+--- a/apps/web/src/components/route-container/index.js
++++ b/apps/web/src/components/route-container/index.js
+@@ -71,7 +71,6 @@ function Header(props) {
+               title={buttons.back.title}
+               onClick={buttons.back.action}
+               sx={{ flexShrink: 0, mr: 2, cursor: "pointer" }}
+-              color="text"
+               data-test-id="go-back"
+             />
+           ) : (
+@@ -109,7 +108,7 @@ function Header(props) {
+           {!isMobile && createButtonData && (
+             <Icon.Plus
+               data-test-id={`${type}-action-button`}
+-              color="static"
++              color="white"
+               size={18}
+               sx={{
+                 bg: "primary",
+diff --git a/apps/web/src/components/status-bar/index.js b/apps/web/src/components/status-bar/index.js
+deleted file mode 100644
+index 1678450ab..000000000
+--- a/apps/web/src/components/status-bar/index.js
++++ /dev/null
+@@ -1,318 +0,0 @@
+-/*
+-This file is part of the Notesnook project (https://notesnook.com/)
+-
+-Copyright (C) 2023 Streetwriters (Private) Limited
+-
+-This program is free software: you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation, either version 3 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-*/
+-
+-import { Box, Button, Flex, Text } from "@theme-ui/components";
+-import EditorFooter from "../editor/footer";
+-import {
+-  Circle,
+-  Sync,
+-  Loading,
+-  Update,
+-  SyncError,
+-  Checkmark,
+-  Alert,
+-  Issue,
+-  SyncOff
+-} from "../icons";
+-import { useStore as useUserStore } from "../../stores/user-store";
+-import { useStore as useAppStore } from "../../stores/app-store";
+-import TimeAgo from "../time-ago";
+-import { hardNavigate, hashNavigate, navigate } from "../../navigation";
+-import useAutoUpdater from "../../hooks/use-auto-updater";
+-import installUpdate from "../../commands/install-update";
+-import checkForUpdate from "../../commands/check-for-update";
+-import {
+-  showIssueDialog,
+-  showUpdateAvailableNotice
+-} from "../../common/dialog-controller";
+-import useStatus from "../../hooks/use-status";
+-import { getIconFromAlias } from "../icons/resolver";
+-
+-function StatusBar() {
+-  const user = useUserStore((state) => state.user);
+-  const isLoggedIn = useUserStore((state) => state.isLoggedIn);
+-  const statuses = useStatus();
+-  const updateStatus = useAutoUpdater();
+-
+-  return (
+-    <Box
+-      bg="bgSecondary"
+-      sx={{
+-        borderTop: "1px solid",
+-        borderTopColor: "border",
+-        justifyContent: "space-between",
+-        display: ["none", "flex"]
+-      }}
+-      px={2}
+-    >
+-      <Flex>
+-        {isLoggedIn ? (
+-          <>
+-            <Button
+-              onClick={() =>
+-                user.isEmailConfirmed
+-                  ? navigate("/settings")
+-                  : hashNavigate("/email/verify")
+-              }
+-              variant="statusitem"
+-              sx={{
+-                alignItems: "center",
+-                justifyContent: "center",
+-                display: "flex"
+-              }}
+-            >
+-              <Circle
+-                size={7}
+-                color={user.isEmailConfirmed ? "success" : "warn"}
+-              />
+-              <Text
+-                className="selectable"
+-                variant="subBody"
+-                ml={1}
+-                sx={{ color: "bgSecondaryText" }}
+-              >
+-                {user.email}
+-                {user.isEmailConfirmed ? "" : " (not verified)"}
+-              </Text>
+-            </Button>
+-
+-            <SyncStatus />
+-          </>
+-        ) : isLoggedIn === false ? (
+-          <Button
+-            variant="statusitem"
+-            onClick={() => hardNavigate("/login")}
+-            sx={{
+-              alignItems: "center",
+-              justifyContent: "center",
+-              display: "flex"
+-            }}
+-            data-test-id="not-logged-in"
+-          >
+-            <Circle size={7} color="error" />
+-            <Text variant="subBody" ml={1} sx={{ color: "bgSecondaryText" }}>
+-              Not logged in
+-            </Text>
+-          </Button>
+-        ) : null}
+-        <Button
+-          variant="statusitem"
+-          onClick={() => showIssueDialog()}
+-          sx={{
+-            alignItems: "center",
+-            justifyContent: "center",
+-            display: "flex"
+-          }}
+-          title="Facing an issue? Click here to create a bug report."
+-        >
+-          <Issue size={12} />
+-          <Text variant="subBody" ml={1} sx={{ color: "bgSecondaryText" }}>
+-            Report an issue
+-          </Text>
+-        </Button>
+-        {statuses?.map(({ key, status, progress, icon }) => {
+-          const Icon = getIconFromAlias(icon);
+-          return (
+-            <Flex
+-              key={key}
+-              ml={1}
+-              sx={{ alignItems: "center", justifyContent: "center" }}
+-            >
+-              {Icon ? <Icon size={12} /> : <Loading size={12} />}
+-              <Text variant="subBody" ml={1} sx={{ color: "bgSecondaryText" }}>
+-                {progress ? `${progress}% ${status}` : status}
+-              </Text>
+-            </Flex>
+-          );
+-        })}
+-
+-        {updateStatus && (
+-          <Button
+-            variant="statusitem"
+-            onClick={async () => {
+-              if (updateStatus.type === "available") {
+-                await showUpdateAvailableNotice(updateStatus);
+-              } else if (updateStatus.type === "completed") {
+-                installUpdate();
+-              } else {
+-                checkForUpdate();
+-              }
+-            }}
+-            sx={{
+-              alignItems: "center",
+-              justifyContent: "center",
+-              display: "flex"
+-            }}
+-          >
+-            <Update
+-              rotate={
+-                updateStatus.type !== "updated" &&
+-                updateStatus.type !== "completed" &&
+-                updateStatus.type !== "available"
+-              }
+-              color={
+-                updateStatus.type === "available"
+-                  ? "primary"
+-                  : "bgSecondaryText"
+-              }
+-              size={12}
+-            />
+-            <Text variant="subBody" ml={1} sx={{ color: "bgSecondaryText" }}>
+-              {statusToInfoText(updateStatus)}
+-            </Text>
+-          </Button>
+-        )}
+-      </Flex>
+-      <EditorFooter />
+-    </Box>
+-  );
+-}
+-
+-export default StatusBar;
+-
+-function statusToInfoText(status) {
+-  const { type, version, progress = 0 } = status;
+-  return type === "checking"
+-    ? "Checking for updates..."
+-    : type === "updated"
+-    ? "You are on latest version"
+-    : type === "downloading"
+-    ? `${Math.round(progress)}% updating...`
+-    : type === "completed"
+-    ? `v${version} downloaded (restart required)`
+-    : type === "available"
+-    ? `v${version} available`
+-    : "";
+-}
+-
+-function SyncStatus() {
+-  const syncStatus = useAppStore((state) => state.syncStatus);
+-  const lastSynced = useAppStore((state) => state.lastSynced);
+-  const isSyncEnabled = useAppStore((state) => state.isSyncEnabled);
+-  const sync = useAppStore((state) => state.sync);
+-  const user = useUserStore((state) => state.user);
+-
+-  const status = syncStatusFilters.find((f) =>
+-    f.check(syncStatus.key, user, lastSynced)
+-  );
+-
+-  return (
+-    <Button
+-      variant="statusitem"
+-      onClick={() => (isSyncEnabled ? sync() : null)}
+-      sx={{ alignItems: "center", justifyContent: "center", display: "flex" }}
+-      title={status.tooltip}
+-      data-test-id={`sync-status-${status.key}`}
+-    >
+-      {syncStatus.progress ? (
+-        <Text variant={"subBody"}>{syncStatus.progress}%</Text>
+-      ) : (
+-        <status.icon
+-          size={12}
+-          color={status.iconColor}
+-          rotate={status.loading}
+-        />
+-      )}
+-      <Text variant="subBody" ml={status.text ? "3px" : 0}>
+-        {status.text ? (
+-          <>
+-            {typeof status.text === "string" ? (
+-              status.text
+-            ) : (
+-              <status.text lastSynced={lastSynced} syncStatus={syncStatus} />
+-            )}{" "}
+-          </>
+-        ) : null}
+-      </Text>
+-    </Button>
+-  );
+-}
+-
+-const syncStatusFilters = [
+-  {
+-    key: "synced",
+-    check: (syncStatus) => syncStatus === "synced",
+-    icon: Sync,
+-    text: ({ lastSynced }) =>
+-      lastSynced ? (
+-        <TimeAgo live={true} locale="en_short" datetime={lastSynced} />
+-      ) : (
+-        "click to sync"
+-      ),
+-    tooltip: "All changes are synced."
+-  },
+-  {
+-    key: "syncing",
+-    check: (syncStatus) => syncStatus === "syncing",
+-    icon: Sync,
+-    loading: true,
+-    text: ({ syncStatus }) => <>{syncStatus.type || "sync"}ing</>,
+-    tooltip: "Syncing your notes..."
+-  },
+-  {
+-    key: "completed",
+-    check: (syncStatus) => syncStatus === "completed",
+-    icon: Checkmark,
+-    iconColor: "success",
+-    text: ""
+-  },
+-  {
+-    key: "conflicts",
+-    check: (syncStatus) => syncStatus === "conflicts",
+-    icon: Alert,
+-    iconColor: "error",
+-    text: "Merge conflicts",
+-    tooltip: "Please resolve all merge conflicts and run the sync again."
+-  },
+-  {
+-    key: "emailNotConfirmed",
+-    check: (_syncStatus, user) => !user.isEmailConfirmed,
+-    icon: Alert,
+-    iconColor: "warn",
+-    text: "Sync disabled",
+-    tooltip: "Please confirm your email to start syncing."
+-  },
+-  {
+-    key: "failed",
+-    check: (syncStatus) => syncStatus === "failed",
+-    icon: SyncError,
+-    color: "error",
+-    text: "Sync failed",
+-    tooltip: "Sync failed to completed. Please try again."
+-  },
+-  {
+-    key: "offline",
+-    check: (syncStatus) => syncStatus === "offline",
+-    icon: SyncOff,
+-    text: ({ lastSynced }) => (
+-      <>
+-        <TimeAgo live={true} locale="en_short" datetime={lastSynced} />{" "}
+-        (offline)
+-      </>
+-    ),
+-    tooltip: "You are offline."
+-  },
+-  {
+-    key: "disabled",
+-    check: (syncStatus) => syncStatus === "disabled",
+-    icon: SyncOff,
+-    text: () => "Sync disabled",
+-    tooltip: "Sync is disabled."
+-  }
+-];
+diff --git a/apps/web/src/components/theme-provider/index.js b/apps/web/src/components/theme-provider/index.js
+deleted file mode 100644
+index 8da86ea09..000000000
+--- a/apps/web/src/components/theme-provider/index.js
++++ /dev/null
+@@ -1,43 +0,0 @@
+-/*
+-This file is part of the Notesnook project (https://notesnook.com/)
+-
+-Copyright (C) 2023 Streetwriters (Private) Limited
+-
+-This program is free software: you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation, either version 3 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-*/
+-
+-import { useStore } from "../../stores/theme-store";
+-import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
+-import { useTheme } from "@notesnook/theme";
+-import { useEffect } from "react";
+-
+-function ThemeProviderWrapper(props) {
+-  const theme = useStore((store) => store.theme);
+-  const accent = useStore((store) => store.accent);
+-  const themeProperties = useTheme({ accent, theme });
+-
+-  useEffect(() => {
+-    const root = document.querySelector("html");
+-    if (root) root.setAttribute("data-theme", theme);
+-  }, [theme]);
+-
+-  return (
+-    <EmotionThemeProvider theme={themeProperties}>
+-      {props.children instanceof Function
+-        ? props.children(themeProperties)
+-        : props.children}
+-    </EmotionThemeProvider>
+-  );
+-}
+-export default ThemeProviderWrapper;
+diff --git a/apps/web/src/components/time-ago/index.js b/apps/web/src/components/time-ago/index.js
+deleted file mode 100644
+index eed66e05f..000000000
+--- a/apps/web/src/components/time-ago/index.js
++++ /dev/null
+@@ -1,114 +0,0 @@
+-/*
+-This file is part of the Notesnook project (https://notesnook.com/)
+-
+-Copyright (C) 2023 Streetwriters (Private) Limited
+-
+-This program is free software: you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation, either version 3 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-*/
+-
+-import { formatDate } from "@notesnook/core/utils/date";
+-import React, { useEffect, useRef } from "react";
+-import { Text } from "@theme-ui/components";
+-import { register, format, cancel, render } from "timeago.js";
+-
+-const shortLocale = [
+-  ["now", "now"],
+-  ["%ss", "in %ss"],
+-  ["1m", "in 1m"],
+-  ["%sm", "in %sm"],
+-  ["1h", "in 1h"],
+-  ["%sh", "in %sh"],
+-  ["1d", "in 1d"],
+-  ["%sd", "in %sd"],
+-  ["1w", "in 1w"],
+-  ["%sw", "in %sw"],
+-  ["1mo", "in 1mo"],
+-  ["%smo", "in %smo"],
+-  ["1yr", "in 1yr"],
+-  ["%syr", "in %syr"]
+-];
+-
+-const enShortLocale = [
+-  ["now", "now"],
+-  ["%ss ago", "in %ss"],
+-  ["1m ago", "in 1m"],
+-  ["%sm ago", "in %sm"],
+-  ["1h ago", "in 1h"],
+-  ["%sh ago", "in %sh"],
+-  ["1d ago", "in 1d"],
+-  ["%sd ago", "in %sd"],
+-  ["1w ago", "in 1w"],
+-  ["%sw ago", "in %sw"],
+-  ["1mo ago", "in 1mo"],
+-  ["%smo ago", "in %smo"],
+-  ["1yr ago", "in 1yr"],
+-  ["%syr ago", "in %syr"]
+-];
+-register("short", (_n, index) => shortLocale[index]);
+-register("en_short", (_n, index) => enShortLocale[index]);
+-
+-function TimeAgo({ datetime, live, locale, opts, sx, ...restProps }) {
+-  const timeRef = useRef();
+-  useEffect(() => {
+-    const element = timeRef.current;
+-    if (!element) return;
+-
+-    // cancel all the interval
+-    cancel(element);
+-    // if is live
+-    if (live !== false) {
+-      // live render
+-      element.setAttribute("datetime", toDate(datetime).toISOString());
+-      render(element, locale, opts);
+-    }
+-
+-    return () => {
+-      cancel(element);
+-    };
+-  }, [datetime, live, locale, opts]);
+-
+-  return (
+-    <Text
+-      ref={timeRef}
+-      {...restProps}
+-      sx={{
+-        ...sx,
+-        color: sx?.color || "inherit"
+-      }}
+-      title={formatDate(datetime)}
+-      as="time"
+-      data-test-id="time"
+-      dateTime={toDate(datetime).toISOString()}
+-    >
+-      {format(datetime, locale, opts)}
+-    </Text>
+-  );
+-}
+-
+-export default React.memo(TimeAgo);
+-
+-/**
+- * Convert input to a valid datetime string of <time> tag
+- * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/time
+- * @param input
+- * @returns datetime string
+- */
+-const toDate = (input) => {
+-  let date = null; // new Date();
+-  if (input instanceof Date) {
+-    date = input;
+-  } else date = new Date(input);
+-
+-  return date;
+-};
+diff --git a/apps/web/src/hooks/use-auto-updater.js b/apps/web/src/hooks/use-auto-updater.js
+deleted file mode 100644
+index b59c1fe03..000000000
+--- a/apps/web/src/hooks/use-auto-updater.js
++++ /dev/null
+@@ -1,105 +0,0 @@
+-/*
+-This file is part of the Notesnook project (https://notesnook.com/)
+-
+-Copyright (C) 2023 Streetwriters (Private) Limited
+-
+-This program is free software: you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation, either version 3 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-*/
+-
+-import { useEffect, useState } from "react";
+-import { AppEventManager } from "../common/app-events";
+-import { EVENTS } from "@notesnook/desktop/events";
+-import {
+-  showUpdateAvailableNotice,
+-  showUpdateReadyNotice
+-} from "../common/dialog-controller";
+-import checkForUpdate from "../commands/check-for-update";
+-import { isDesktop } from "../utils/platform";
+-
+-var checkingForUpdateTimeout = 0;
+-export default function useAutoUpdater() {
+-  const [status, setStatus] = useState();
+-
+-  useEffect(() => {
+-    function changeStatus(status) {
+-      clearTimeout(checkingForUpdateTimeout);
+-      setStatus(status);
+-    }
+-
+-    function checkingForUpdate() {
+-      changeStatus({ type: "checking" });
+-      checkingForUpdateTimeout = setTimeout(() => {
+-        changeStatus({ type: "updated" });
+-      }, 10000);
+-    }
+-
+-    function updateAvailable(info) {
+-      changeStatus({
+-        type: "available",
+-        version: info.version
+-      });
+-      showUpdateAvailableNotice({
+-        version: info.version
+-      });
+-    }
+-
+-    function updateNotAvailable() {
+-      if (isDesktop()) changeStatus({ type: "updated" });
+-      else changeStatus();
+-    }
+-
+-    function updateDownloadCompleted(info) {
+-      changeStatus({ type: "completed", version: info.version });
+-      showUpdateReadyNotice({ version: info.version });
+-    }
+-
+-    function updateDownloadProgress(progressInfo) {
+-      changeStatus({ type: "downloading", progress: progressInfo.percent });
+-    }
+-
+-    const checkingForUpdateEvent = AppEventManager.subscribe(
+-      EVENTS.checkingForUpdate,
+-      checkingForUpdate
+-    );
+-    const updateAvailableEvent = AppEventManager.subscribe(
+-      EVENTS.updateAvailable,
+-      updateAvailable
+-    );
+-    const updateNotAvailableEvent = AppEventManager.subscribe(
+-      EVENTS.updateNotAvailable,
+-      updateNotAvailable
+-    );
+-    const updateCompletedEvent = AppEventManager.subscribe(
+-      EVENTS.updateDownloadCompleted,
+-      updateDownloadCompleted
+-    );
+-    const updateProgressEvent = AppEventManager.subscribe(
+-      EVENTS.updateDownloadProgress,
+-      updateDownloadProgress
+-    );
+-
+-    checkingForUpdate();
+-    checkForUpdate();
+-
+-    return () => {
+-      checkingForUpdateEvent.unsubscribe();
+-      updateAvailableEvent.unsubscribe();
+-      updateNotAvailableEvent.unsubscribe();
+-      updateCompletedEvent.unsubscribe();
+-      updateProgressEvent.unsubscribe();
+-    };
+-  }, []);
+-
+-  return status;
+-}
+diff --git a/apps/web/src/hooks/use-status.ts b/apps/web/src/hooks/use-status.ts
+index 352b81e55..796445c2c 100644
+--- a/apps/web/src/hooks/use-status.ts
++++ b/apps/web/src/hooks/use-status.ts
+@@ -19,12 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ import create from "zustand";
+ import produce from "immer";
++import { IconNames } from "../components/icons/resolver";
+ 
+ type Status = {
+   key: string;
+   status: string;
+   progress?: number;
+-  icon?: string | null;
++  icon?: IconNames;
+ };
+ interface IStatusStore {
+   statuses: Record<string, Status>;
+diff --git a/apps/web/src/utils/css.js b/apps/web/src/utils/css.js
+deleted file mode 100644
+index 241c77d9d..000000000
+--- a/apps/web/src/utils/css.js
++++ /dev/null
+@@ -1,65 +0,0 @@
+-/*
+-This file is part of the Notesnook project (https://notesnook.com/)
+-
+-Copyright (C) 2023 Streetwriters (Private) Limited
+-
+-This program is free software: you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation, either version 3 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-*/
+-
+-export function removeCss(id) {
+-  var link = document.getElementById(id);
+-  link.remove();
+-}
+-
+-export function injectCssSrc(id, src) {
+-  var head = document.head;
+-  var link = document.createElement("link");
+-
+-  link.id = id;
+-  link.type = "text/css";
+-  link.rel = "stylesheet";
+-  link.href = src;
+-
+-  head.appendChild(link);
+-}
+-
+-export function injectCss(rule) {
+-  let variableCss = document.getElementById("variables");
+-  let head = document.getElementsByTagName("head")[0];
+-  if (variableCss) {
+-    head.removeChild(variableCss);
+-  }
+-  let css = document.createElement("style");
+-  css.type = "text/css";
+-  css.id = "variables";
+-  // Support for IE
+-  if (css.styleSheet) css.styleSheet.cssText = rule;
+-  // Support for the rest
+-  else css.appendChild(document.createTextNode(rule));
+-  head.insertBefore(css, getRootStylesheet());
+-}
+-
+-function getRootStylesheet() {
+-  for (let sty of document.getElementsByTagName("style")) {
+-    if (sty.innerHTML.includes("#root")) {
+-      return sty;
+-    }
+-  }
+-}
+-
+-export function changeSvgTheme(newAccent) {
+-  var nodes = document.querySelectorAll('*[fill="#0560ff"]');
+-  for (var n = 0; n < nodes.length; ++n)
+-    nodes[n].setAttribute("fill", newAccent);
+-}
+diff --git a/apps/web/src/utils/toast.tsx b/apps/web/src/utils/toast.tsx
+index 8d015d60e..8d87c73d5 100644
+--- a/apps/web/src/utils/toast.tsx
++++ b/apps/web/src/utils/toast.tsx
+@@ -18,11 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+ import { Button, Flex, Text } from "@theme-ui/components";
+-import ThemeProvider from "../components/theme-provider";
++import { ScopedThemeProvider } from "../components/theme-provider";
+ import { Error, Warn, Success, Info } from "../components/icons";
+ import { store as appstore } from "../stores/app-store";
+ import toast from "react-hot-toast";
+-import { Theme } from "@notesnook/theme";
+ 
+ type ToastType = "success" | "error" | "warn" | "info";
+ type ToastAction = {
+@@ -48,9 +47,7 @@ function showToast(
+       ? Warn
+       : Info;
+ 
+-  const RenderedIcon = () => (
+-    <IconComponent size={24} color={type as keyof Theme["colors"]} />
+-  );
++  const RenderedIcon = () => <IconComponent size={24} />;
+ 
+   const id = toast(<ToastContainer message={message} actions={actions} />, {
+     duration: hideAfter || Infinity,
+@@ -73,7 +70,7 @@ type ToastContainerProps = {
+ function ToastContainer(props: ToastContainerProps) {
+   const { message, actions } = props;
+   return (
+-    <ThemeProvider>
++    <ScopedThemeProvider>
+       <Flex
+         bg={"background"}
+         data-test-id="toast"
+@@ -111,7 +108,7 @@ function ToastContainer(props: ToastContainerProps) {
+           </Button>
+         ))}
+       </Flex>
+-    </ThemeProvider>
++    </ScopedThemeProvider>
+   );
+ }
+ 
+diff --git a/apps/web/src/views/auth.tsx b/apps/web/src/views/auth.tsx
+index fe4251f39..e8faee42b 100644
+--- a/apps/web/src/views/auth.tsx
++++ b/apps/web/src/views/auth.tsx
+@@ -537,7 +537,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
+       {success ? (
+         <>
+           <Flex bg="background" p={2} mt={2} sx={{ borderRadius: "default" }}>
+-            <CheckCircle size={20} color="primary" />
++            <CheckCircle size={20} color="accent" />
+             <Text variant="body" ml={2} sx={{ color: "primary" }}>
+               {success}
+             </Text>
+@@ -1010,7 +1010,7 @@ export function SubmitButton(props: SubmitButtonProps) {
+       }}
+       disabled={props.disabled}
+     >
+-      {props.loading ? <Loading color="static" /> : props.text}
++      {props.loading ? <Loading color="white" /> : props.text}
+     </Button>
+   );
+ }
+diff --git a/apps/web/src/views/email-confirmed.js b/apps/web/src/views/email-confirmed.js
+index d5880c9a9..d474524b0 100644
+--- a/apps/web/src/views/email-confirmed.js
++++ b/apps/web/src/views/email-confirmed.js
+@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ import "../app.css";
+ import { useEffect } from "react";
+ import { Flex, Text } from "@theme-ui/components";
+-import ThemeProvider from "../components/theme-provider";
++import { BaseThemeProvider } from "../components/theme-provider";
+ import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
+ import { useQueryParams } from "../navigation";
+ import * as Icon from "../components/icons";
+@@ -32,7 +32,7 @@ function EmailConfirmed() {
+   }, [userId]);
+ 
+   return (
+-    <ThemeProvider>
++    <BaseThemeProvider>
+       <Flex
+         bg="background"
+         sx={{
+@@ -53,7 +53,7 @@ function EmailConfirmed() {
+           <Icon.MailCheck
+             sx={{ bg: "shade", borderRadius: 100, p: 5 }}
+             size={72}
+-            color="primary"
++            color="accent"
+           />
+           <Text
+             variant="heading"
+@@ -99,7 +99,7 @@ function EmailConfirmed() {
+           <BlogPromoBanner link="https://blog.notesnook.com/why-another-note-taking-app/" />
+         </Flex>
+       </Flex>
+-    </ThemeProvider>
++    </BaseThemeProvider>
+   );
+ }
+ export default EmailConfirmed;
+diff --git a/apps/web/src/views/settings.js b/apps/web/src/views/settings.js
+index 98e32f7ed..cb6a8f42e 100644
+--- a/apps/web/src/views/settings.js
++++ b/apps/web/src/views/settings.js
+@@ -237,7 +237,7 @@ function Settings() {
+                     size: 35
+                   }}
+                 >
+-                  <Icon.User size={20} color="primary" />
++                  <Icon.User size={20} color="accent" />
+                 </Flex>
+                 <Flex variant="columnCenter" sx={{ alignItems: "flex-start" }}>
+                   <Text variant="subBody">You are not logged in</Text>
+@@ -246,7 +246,7 @@ function Settings() {
+                   </Text>
+                 </Flex>
+               </Flex>
+-              <Icon.ChevronRight size={20} color="primary" />
++              <Icon.ChevronRight size={20} color="accent" />
+             </Flex>
+           </Flex>
+         )}
+@@ -1050,10 +1050,10 @@ function OptionsItem(props) {
+               }
+             }}
+             sx={{
+-              ":hover": { color: selectedOption === index ? "static" : "text" },
++              ":hover": { color: selectedOption === index ? "white" : "text" },
+               flex: 1,
+               textAlign: "center",
+-              color: selectedOption === index ? "static" : "bgSecondaryText",
++              color: selectedOption === index ? "white" : "bgSecondaryText",
+               minWidth: 100
+             }}
+           >
+@@ -1297,7 +1297,7 @@ function Header(props) {
+         {title}
+       </Text>
+       {isOpen ? (
+-        <Icon.ChevronUp size={19} color="primary" />
++        <Icon.ChevronUp size={19} color="accent" />
+       ) : (
+         <Icon.ChevronDown size={19} color="fontTertiary" />
+       )}
+diff --git a/extensions/web-clipper/src/components/icons/icon.tsx b/extensions/web-clipper/src/components/icons/icon.tsx
+index 681df0ea4..3ddc3b238 100644
+--- a/extensions/web-clipper/src/components/icons/icon.tsx
++++ b/extensions/web-clipper/src/components/icons/icon.tsx
+@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ import MDIIcon from "@mdi/react";
+-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
++import {
++  isThemeColor,
++  SchemeColors
++} from "@notesnook/theme/dist/theme/colorscheme";
+ import { Flex, FlexProps } from "@theme-ui/components";
+ import { useTheme } from "@emotion/react";
+ import { Theme } from "@notesnook/theme";
+@@ -26,7 +29,7 @@ type IconProps = {
+   title?: string;
+   path: string;
+   size?: number;
+-  color?: keyof SchemeColors;
++  color?: SchemeColors;
+   stroke?: string;
+   rotate?: boolean;
+ };
+@@ -40,9 +43,10 @@ function MDIIconWrapper({
+ }: IconProps) {
+   const theme = useTheme() as Theme;
+ 
+-  const themedColor: string = theme.colors
+-    ? (theme.colors[color] as string)
+-    : color;
++  const themedColor: string =
++    theme.colors && isThemeColor(color, theme.colors)
++      ? theme.colors[color]
++      : color;
+ 
+   return (
+     <MDIIcon
+diff --git a/extensions/web-clipper/src/components/note-picker/index.tsx b/extensions/web-clipper/src/components/note-picker/index.tsx
+index 5ca4e4d8f..d61958105 100644
+--- a/extensions/web-clipper/src/components/note-picker/index.tsx
++++ b/extensions/web-clipper/src/components/note-picker/index.tsx
+@@ -73,7 +73,7 @@ export const NotePicker = (props: NotePickerProps) => {
+               ? `Append to "${selectedNote?.title}"`
+               : `Select a note to append to`}
+           </Text>
+-          <Icon path={Icons.chevronDown} color="text" size={18} />
++          <Icon path={Icons.chevronDown} size={18} />
+         </Button>
+         {selectedNote && (
+           <Button
+@@ -90,7 +90,7 @@ export const NotePicker = (props: NotePickerProps) => {
+             }}
+             title={"Clear selection"}
+           >
+-            <Icon path={Icons.close} color="text" size={16} />
++            <Icon path={Icons.close} size={16} />
+           </Button>
+         )}
+       </Flex>
+diff --git a/extensions/web-clipper/src/components/notebook-picker/index.tsx b/extensions/web-clipper/src/components/notebook-picker/index.tsx
+index 34c8f2460..d68674cf6 100644
+--- a/extensions/web-clipper/src/components/notebook-picker/index.tsx
++++ b/extensions/web-clipper/src/components/notebook-picker/index.tsx
+@@ -72,7 +72,7 @@ export const NotebookPicker = (props: NotebookPickerProps) => {
+               ? `${selectedNotebook.title} > ${selectedNotebook.topic.title}`
+               : `Select a notebook`}
+           </Text>
+-          <Icon path={Icons.chevronDown} color="text" size={18} />
++          <Icon path={Icons.chevronDown}  size={18} />
+         </Button>
+         {selectedNotebook && (
+           <Button
+@@ -89,7 +89,7 @@ export const NotebookPicker = (props: NotebookPickerProps) => {
+             }}
+             title={"Clear selection"}
+           >
+-            <Icon path={Icons.close} color="text" size={16} />
++            <Icon path={Icons.close}  size={16} />
+           </Button>
+         )}
+       </Flex>
+@@ -162,7 +162,7 @@ function Notebook(props: NotebookProps) {
+         </Text>
+         <Icon
+           path={isExpanded ? Icons.chevronUp : Icons.chevronDown}
+-          color="text"
++
+           size={18}
+         />
+       </Button>
+diff --git a/extensions/web-clipper/src/components/tag-picker/index.tsx b/extensions/web-clipper/src/components/tag-picker/index.tsx
+index e8216c38c..ace63423f 100644
+--- a/extensions/web-clipper/src/components/tag-picker/index.tsx
++++ b/extensions/web-clipper/src/components/tag-picker/index.tsx
+@@ -79,7 +79,7 @@ export const TagPicker = (props: TagPickerProps) => {
+           }}
+           title="Click to assign more tags"
+         >
+-          <Icon path={Icons.plus} size={12} color="fontTertiary" />
++          <Icon path={Icons.plus} size={12} />
+           <Text variant="subBody" sx={{ ml: "2px", color: "icon" }}>
+             Assign a tag
+           </Text>
+@@ -139,7 +139,7 @@ function Tag(props: TagProps) {
+       >
+         #{tag.title}
+       </Text>
+-      {isSelected ? <Icon path={Icons.check} color="text" size={14} /> : null}
++      {isSelected ? <Icon path={Icons.check} size={14} /> : null}
+     </Button>
+   );
+ }
+diff --git a/extensions/web-clipper/src/components/theme-provider/index.tsx b/extensions/web-clipper/src/components/theme-provider/index.tsx
+index 2231d8760..f063c5f50 100644
+--- a/extensions/web-clipper/src/components/theme-provider/index.tsx
++++ b/extensions/web-clipper/src/components/theme-provider/index.tsx
+@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ // import { useStore } from "../../stores/theme-store";
+ import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
+-import { getDefaultAccentColor, useTheme } from "@notesnook/theme";
++import { getDefaultAccentColor, ThemeFactory } from "@notesnook/theme";
+ import { ReactNode } from "react";
+ 
+ type ThemeProviderProps = {
+@@ -30,9 +30,13 @@ type ThemeProviderProps = {
+ 
+ function ThemeProvider(props: ThemeProviderProps) {
+   const { accent, children, theme } = props;
+-  const themeProperties = useTheme({
+-    accent: accent || getDefaultAccentColor(),
+-    theme: theme || "light"
++  const themeProperties = new ThemeFactory().construct({
++    colorScheme: "dark",
++
++    // TODO:
++    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
++    // @ts-ignore
++    variants: {}
+   });
+ 
+   // useEffect(() => {
+diff --git a/extensions/web-clipper/src/views/main.tsx b/extensions/web-clipper/src/views/main.tsx
+index bc980116f..036deaf5a 100644
+--- a/extensions/web-clipper/src/views/main.tsx
++++ b/extensions/web-clipper/src/views/main.tsx
+@@ -191,7 +191,7 @@ export function Main() {
+             {clipArea === item.id && (
+               <Icon
+                 path={isClipping ? Icons.loading : Icons.check}
+-                color="text"
++
+                 size={16}
+                 rotate={isClipping}
+               />
+@@ -234,7 +234,7 @@ export function Main() {
+             {clipMode === item.id && (
+               <Icon
+                 path={isClipping ? Icons.loading : Icons.check}
+-                color="text"
++
+                 size={16}
+                 rotate={isClipping}
+               />
+@@ -387,7 +387,7 @@ export function Main() {
+               navigate("/settings");
+             }}
+           >
+-            <Icon path={Icons.settings} color="text" size={16} />
++            <Icon path={Icons.settings}  size={16} />
+           </Button>
+         </Flex>
+       </Flex>
+diff --git a/packages/core/utils/date.js b/packages/core/utils/date.js
+index 42f1a72c5..88e31357d 100644
+--- a/packages/core/utils/date.js
++++ b/packages/core/utils/date.js
+@@ -63,7 +63,7 @@ function getWeek(date) {
+ 
+ /**
+  *
+- * @param {number} date
++ * @param {number | string | Date} date
+  * @param {Intl.DateTimeFormatOptions} options
+  * @returns
+  */
+diff --git a/packages/editor/src/components/menu/menu-button.tsx b/packages/editor/src/components/menu/menu-button.tsx
+index b77b1eff4..49ba904cd 100644
+--- a/packages/editor/src/components/menu/menu-button.tsx
++++ b/packages/editor/src/components/menu/menu-button.tsx
+@@ -78,14 +78,7 @@ export function MenuButton(props: MenuButtonProps) {
+         }}
+       >
+         <Flex sx={{ fontSize: "inherit", fontFamily: "inherit" }}>
+-          {icon && (
+-            <Icon
+-              path={Icons[icon]}
+-              color={"text"}
+-              size={"medium"}
+-              sx={{ mr: 2 }}
+-            />
+-          )}
++          {icon && <Icon path={Icons[icon]} size={"medium"} sx={{ mr: 2 }} />}
+           <Text
+             as="span"
+             variant={"body"}
+diff --git a/packages/editor/src/components/resizer/index.tsx b/packages/editor/src/components/resizer/index.tsx
+index 15f0d3705..f2fb730dc 100644
+--- a/packages/editor/src/components/resizer/index.tsx
++++ b/packages/editor/src/components/resizer/index.tsx
+@@ -28,7 +28,7 @@ type ResizerProps = {
+   selected: boolean;
+   width?: number;
+   height?: number;
+-  handleColor?: keyof SchemeColors;
++  handleColor?: SchemeColors;
+   onResize: (width: number, height: number) => void;
+ };
+ export function Resizer(props: PropsWithChildren<ResizerProps>) {
+diff --git a/packages/editor/src/extensions/code-block/component.tsx b/packages/editor/src/extensions/code-block/component.tsx
+index 26d2d248e..ca17b9644 100644
+--- a/packages/editor/src/extensions/code-block/component.tsx
++++ b/packages/editor/src/extensions/code-block/component.tsx
+@@ -91,7 +91,7 @@ export function CodeblockComponent(
+             position: "relative",
+             lineHeight: "20px",
+             bg: "codeBg",
+-            color: "static",
++            color: "white",
+             overflowX: "auto",
+             display: "flex",
+             px: 2,
+diff --git a/packages/editor/src/extensions/embed/component.tsx b/packages/editor/src/extensions/embed/component.tsx
+index daf674add..dc5a1361e 100644
+--- a/packages/editor/src/extensions/embed/component.tsx
++++ b/packages/editor/src/extensions/embed/component.tsx
+@@ -48,7 +48,7 @@ export function EmbedComponent(
+         }}
+       >
+         <Resizer
+-          handleColor="primary"
++          handleColor="accent"
+           editor={editor}
+           selected={selected}
+           width={width}
+@@ -138,7 +138,7 @@ export function EmbedComponent(
+                 justifyContent: "center"
+               }}
+             >
+-              <Icon path={Icons.loading} rotate size={32} color="disabled" />
++              <Icon path={Icons.loading} rotate size={32} />
+             </Flex>
+           )}
+         </Resizer>
+diff --git a/packages/editor/src/extensions/image/component.tsx b/packages/editor/src/extensions/image/component.tsx
+index a402fd743..70da6953e 100644
+--- a/packages/editor/src/extensions/image/component.tsx
++++ b/packages/editor/src/extensions/image/component.tsx
+@@ -119,7 +119,6 @@ export function ImageComponent(
+                   : Icons.image
+               }
+               size={72}
+-              color="gray"
+             />
+ 
+             <Text
+diff --git a/packages/editor/src/extensions/web-clip/component.tsx b/packages/editor/src/extensions/web-clip/component.tsx
+index 583f3b5c8..75c9fc757 100644
+--- a/packages/editor/src/extensions/web-clip/component.tsx
++++ b/packages/editor/src/extensions/web-clip/component.tsx
+@@ -196,7 +196,7 @@ export function WebClipComponent(
+               justifyContent: "center"
+             }}
+           >
+-            <Icon path={Icons.loading} rotate size={32} color="disabled" />
++            <Icon path={Icons.loading} rotate size={32} />
+           </Flex>
+         )}
+       </Box>
+diff --git a/packages/editor/src/toolbar/components/icon.tsx b/packages/editor/src/toolbar/components/icon.tsx
+index 3f9427605..acb32a253 100644
+--- a/packages/editor/src/toolbar/components/icon.tsx
++++ b/packages/editor/src/toolbar/components/icon.tsx
+@@ -19,7 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ import MDIIcon from "@mdi/react";
+ import { Theme } from "@notesnook/theme";
+-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
++import {
++  isThemeColor,
++  SchemeColors
++} from "@notesnook/theme/dist/theme/colorscheme";
+ import { Flex, FlexProps } from "@theme-ui/components";
+ import { useTheme } from "@emotion/react";
+ 
+@@ -27,7 +30,7 @@ type IconProps = {
+   title?: string;
+   path: string;
+   size?: keyof Theme["iconSizes"] | number;
+-  color?: keyof SchemeColors;
++  color?: SchemeColors;
+   stroke?: string;
+   rotate?: boolean;
+ };
+@@ -41,9 +44,10 @@ function MDIIconWrapper({
+ }: IconProps) {
+   const theme = useTheme() as Theme;
+ 
+-  const themedColor: string = theme?.colors
+-    ? (theme.colors[color] as string)
+-    : color;
++  const themedColor: string =
++    theme?.colors && isThemeColor(color, theme.colors)
++      ? theme.colors[color]
++      : color;
+ 
+   return (
+     <MDIIcon
+diff --git a/packages/editor/src/toolbar/components/split-button.tsx b/packages/editor/src/toolbar/components/split-button.tsx
+index fd77dc01d..112bd465a 100644
+--- a/packages/editor/src/toolbar/components/split-button.tsx
++++ b/packages/editor/src/toolbar/components/split-button.tsx
+@@ -65,7 +65,7 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
+             path={
+               toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown
+             }
+-            color="text"
++
+             size={"small"}
+             sx={{ flexShrink: 0 }}
+           />
+diff --git a/packages/editor/src/toolbar/components/tool-button.tsx b/packages/editor/src/toolbar/components/tool-button.tsx
+index 13fed0f0d..24c11136d 100644
+--- a/packages/editor/src/toolbar/components/tool-button.tsx
++++ b/packages/editor/src/toolbar/components/tool-button.tsx
+@@ -28,7 +28,7 @@ import { Icon } from "./icon";
+ 
+ export type ToolButtonProps = ButtonProps & {
+   icon: IconNames;
+-  iconColor?: keyof SchemeColors;
++  iconColor?: SchemeColors;
+   iconSize?: keyof Theme["iconSizes"] | number;
+   toggled: boolean;
+   buttonRef?: React.RefObject<HTMLButtonElement>;
+diff --git a/packages/editor/src/toolbar/popups/color-picker.tsx b/packages/editor/src/toolbar/popups/color-picker.tsx
+index fef515448..4abed9359 100644
+--- a/packages/editor/src/toolbar/popups/color-picker.tsx
++++ b/packages/editor/src/toolbar/popups/color-picker.tsx
+@@ -185,7 +185,6 @@ export function ColorPicker(props: ColorPickerProps) {
+             {!deleteMode && (
+               <PaletteButton
+                 icon={Icons.colorClear}
+-                iconColor="text"
+                 onClick={onClear}
+                 title="Clear color"
+                 iconSize={15}
+@@ -206,7 +205,7 @@ export function ColorPicker(props: ColorPickerProps) {
+             {!deleteMode && (
+               <PaletteButton
+                 icon={Icons.palette}
+-                iconColor={tColor.isDark() ? "static" : "icon"}
++                iconColor={tColor.isDark() ? "white" : "icon"}
+                 onClick={() => setIsPickerOpen((s) => !s)}
+                 title="Choose custom color"
+                 iconSize={18}
+@@ -219,7 +218,7 @@ export function ColorPicker(props: ColorPickerProps) {
+                 title={deleteMode ? "Click to delete this color" : colorItem}
+                 bg={colorItem}
+                 iconSize={15}
+-                iconColor={"static"}
++                iconColor={"white"}
+                 icon={
+                   deleteMode && colors.includes(colorItem)
+                     ? Icons.close
+@@ -254,7 +253,7 @@ export function ColorPicker(props: ColorPickerProps) {
+ 
+ type PaletteButtonProps = ButtonProps & {
+   icon?: string;
+-  iconColor?: keyof SchemeColors;
++  iconColor?: SchemeColors;
+   iconSize?: number;
+   bg?: string;
+ };
+diff --git a/packages/editor/src/toolbar/tools/block.tsx b/packages/editor/src/toolbar/tools/block.tsx
+index 7f0e415d2..48ac6c5c1 100644
+--- a/packages/editor/src/toolbar/tools/block.tsx
++++ b/packages/editor/src/toolbar/tools/block.tsx
+@@ -76,7 +76,7 @@ export function InsertBlock(props: ToolProps) {
+         onMouseDown={(e) => e.preventDefault()}
+         onClick={() => setIsOpen((s) => !s)}
+       >
+-        <Icon path={Icons.plus} size={18} color={"primary"} />
++        <Icon path={Icons.plus} size={18} color={"accent"} />
+       </Button>
+ 
+       <ResponsivePresenter
+diff --git a/packages/editor/src/toolbar/tools/colors.tsx b/packages/editor/src/toolbar/tools/colors.tsx
+index 42dc59a2d..f31e7553b 100644
+--- a/packages/editor/src/toolbar/tools/colors.tsx
++++ b/packages/editor/src/toolbar/tools/colors.tsx
+@@ -57,7 +57,7 @@ export function ColorTool(props: ColorToolProps) {
+   return (
+     <SplitButton
+       {...toolProps}
+-      iconColor={activeColor && tColor.isDark() ? "static" : "icon"}
++      iconColor={activeColor && tColor.isDark() ? "white" : "icon"}
+       sx={{
+         mr: 0,
+         bg: activeColor || "transparent",
+diff --git a/packages/theme/src/css.ts b/packages/theme/src/css.ts
+deleted file mode 100644
+index f4934c914..000000000
+--- a/packages/theme/src/css.ts
++++ /dev/null
+@@ -1,65 +0,0 @@
+-/*
+-This file is part of the Notesnook project (https://notesnook.com/)
+-
+-Copyright (C) 2023 Streetwriters (Private) Limited
+-
+-This program is free software: you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation, either version 3 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-*/
+-
+-export function removeCss(id: string) {
+-  const link = document.getElementById(id);
+-  if (link) link.remove();
+-}
+-
+-export function injectCssSrc(id: string, src: string) {
+-  const head = document.head;
+-  const link = document.createElement("link");
+-
+-  link.id = id;
+-  link.type = "text/css";
+-  link.rel = "stylesheet";
+-  link.href = src;
+-
+-  head.appendChild(link);
+-}
+-
+-export function injectCss(rules: string) {
+-  const variableCss = document.getElementById("variables");
+-  const head = document.getElementsByTagName("head")[0];
+-  if (variableCss) {
+-    head.removeChild(variableCss);
+-  }
+-  const css = document.createElement("style");
+-  css.type = "text/css";
+-  css.id = "variables";
+-  // Support for the rest
+-  css.appendChild(document.createTextNode(rules));
+-
+-  head.insertBefore(css, getRootStylesheet());
+-}
+-
+-function getRootStylesheet() {
+-  for (const sty of document.getElementsByTagName("style")) {
+-    if (sty.innerHTML.includes("#root")) {
+-      return sty;
+-    }
+-  }
+-  return null;
+-}
+-
+-export function changeSvgTheme(newAccent: string) {
+-  const nodes = document.querySelectorAll('*[fill="#0560ff"]');
+-  for (let n = 0; n < nodes.length; ++n)
+-    nodes[n].setAttribute("fill", newAccent);
+-}
+diff --git a/packages/theme/src/index.ts b/packages/theme/src/index.ts
+index 608084a5c..6830fca7e 100644
+--- a/packages/theme/src/index.ts
++++ b/packages/theme/src/index.ts
+@@ -18,21 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+ export * from "./theme/accents";
+-export * from "./themeprovider";
+ export * from "./theme";
+-export {
+-  ScopedThemeProvider,
+-  ThemeProvider,
+-  useThemeColors,
+-  useThemeProvider
+-} from "./theme-engine";
+-export { ThemeDark } from "./theme-engine/themes/dark";
+-export { ThemeLight } from "./theme-engine/themes/light";
+-export { ThemePitchBlack } from "./theme-engine/themes/pitch-black";
+-export {ThemeDracula} from "./theme-engine/themes/dracula";
+-export type {
+-  ThemeScopes,
+-  Colors,
+-  Variants,
+-  ThemeDefinition
+-} from "./theme-engine/types";
++export * from "./theme-engine";
++export * from "./theme-engine/themes/dark";
++export * from "./theme-engine/themes/light";
++export * from "./theme-engine/themes/pitch-black";
++export * from "./theme-engine/themes/dracula";
++export * from "./theme-engine/types";
+diff --git a/packages/theme/src/theme-engine/index.ts b/packages/theme/src/theme-engine/index.ts
+index 3cfd133f2..86b2930a1 100644
+--- a/packages/theme/src/theme-engine/index.ts
++++ b/packages/theme/src/theme-engine/index.ts
+@@ -19,7 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ import { createContext, useContext, useMemo } from "react";
+ import { ThemeLight } from "./themes/light";
+-import { ThemeDefinition, ThemeScopes, VariantsWithStaticColors } from "./types";
++import {
++  ThemeDefinition,
++  ThemeScopes,
++  VariantsWithStaticColors
++} from "./types";
+ 
+ const ThemeContext = createContext<{
+   theme: ThemeDefinition;
+@@ -29,7 +33,6 @@ const ThemeContext = createContext<{
+   setTheme: () => null
+ });
+ const ThemeScope = createContext<keyof ThemeScopes>("base");
+-const useCurrentThemeScope = () => useContext(ThemeScope);
+ 
+ export const useThemeColors = (
+   scope?: keyof ThemeScopes
+@@ -94,5 +97,6 @@ export const useThemeColors = (
+ };
+ 
+ export const useThemeProvider = () => useContext(ThemeContext);
++export const useCurrentThemeScope = () => useContext(ThemeScope);
+ export const ThemeProvider = ThemeContext.Provider;
+ export const ScopedThemeProvider = ThemeScope.Provider;
+diff --git a/packages/theme/src/theme-engine/themes/light.ts b/packages/theme/src/theme-engine/themes/light.ts
+index 7f3c69de5..724ff5d8d 100644
+--- a/packages/theme/src/theme-engine/themes/light.ts
++++ b/packages/theme/src/theme-engine/themes/light.ts
+@@ -36,12 +36,13 @@ export const ThemeLight: ThemeDefinition = {
+         border: "#E8E8E8",
+         placeholder: "#a9a9a9",
+         heading: "#212121",
+-        paragraph: "#505050",
++        paragraph: "#303030",
+         icon: "#808080",
+         separator: "#E8E8E8",
+         backdrop: "#0000001a",
+         hover: "#00000010",
+-        shade: "#00883712"
++        shade: "#00883712",
++        textSelection: "#00883777"
+       },
+       secondary: {
+         accent: "#008837",
+@@ -53,8 +54,9 @@ export const ThemeLight: ThemeDefinition = {
+         icon: "#808080",
+         separator: "#E8E8E8",
+         backdrop: "#0000001a",
+-        hover: "#00000010",
+-        shade: "#00883712"
++        hover: "#dbdbdb",
++        shade: "#00883712",
++        textSelection: "#00883777"
+       },
+       disabled: {
+         accent: "#008837",
+@@ -67,7 +69,8 @@ export const ThemeLight: ThemeDefinition = {
+         separator: "#E8E8E8",
+         backdrop: "#0000001a",
+         hover: "#00000010",
+-        shade: "#00883712"
++        shade: "#00883712",
++        textSelection: "#00883777"
+       },
+       error: {
+         accent: "#f54b42",
+@@ -80,7 +83,8 @@ export const ThemeLight: ThemeDefinition = {
+         separator: "#E8E8E8",
+         backdrop: "#0000001a",
+         hover: "#00000010",
+-        shade: "#00883712"
++        shade: "#00883712",
++        textSelection: "#00883777"
+       },
+       warning: {
+         accent: "#FFA500",
+@@ -93,7 +97,8 @@ export const ThemeLight: ThemeDefinition = {
+         separator: "#E8E8E8",
+         backdrop: "#0000001a",
+         hover: "#00000010",
+-        shade: "#FFA50012"
++        shade: "#FFA50012",
++        textSelection: "#00883777"
+       },
+       success: {
+         accent: "#4F8A10",
+@@ -106,7 +111,23 @@ export const ThemeLight: ThemeDefinition = {
+         separator: "#E8E8E8",
+         backdrop: "#0000001a",
+         hover: "#00000010",
+-        shade: "#4F8A1012"
++        shade: "#4F8A1012",
++        textSelection: "#00883777"
++      }
++    },
++    statusBar: {
++      primary: {
++        background: "#f7f7f7",
++        paragraph: "#5E5E5E"
++      }
++    },
++    navigationMenu: {
++      primary: {
++        background: "#f7f7f7"
++      },
++      secondary: {
++        paragraph: "#303030",
++        icon: "#303030"
+       }
+     }
+   }
+diff --git a/packages/theme/src/theme-engine/types.ts b/packages/theme/src/theme-engine/types.ts
+index 36460f981..1a0facf91 100644
+--- a/packages/theme/src/theme-engine/types.ts
++++ b/packages/theme/src/theme-engine/types.ts
+@@ -28,6 +28,7 @@ export type Colors = {
+   hover: string;
+   shade: string;
+   backdrop: string;
++  textSelection: string;
+ };
+ 
+ export type VariantsWithStaticColors<TRequired extends boolean = false> =
+diff --git a/packages/theme/src/theme/colorscheme/dark.ts b/packages/theme/src/theme/colorscheme/dark.ts
+deleted file mode 100644
+index 829a7d403..000000000
+--- a/packages/theme/src/theme/colorscheme/dark.ts
++++ /dev/null
+@@ -1,55 +0,0 @@
+-/*
+-This file is part of the Notesnook project (https://notesnook.com/)
+-
+-Copyright (C) 2023 Streetwriters (Private) Limited
+-
+-This program is free software: you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation, either version 3 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-*/
+-
+-import tinycolor from "tinycolor2";
+-import { SchemeColors } from ".";
+-import { getStaticColors } from "./static";
+-
+-export function getDarkScheme(accent: string): SchemeColors {
+-  return {
+-    primary: accent,
+-    placeholder: tinycolor("#ffffff").setAlpha(0.6).toRgbString(),
+-    background: "#1b1b1b",
+-    bgTransparent: "#1f1f1f99",
+-    accent: "#000",
+-    bgSecondary: "#2b2b2b",
+-    bgSecondaryText: "#A1A1A1",
+-    bgSecondaryHover: "#3d3d3d",
+-    border: "#353535",
+-    hover: "#2f2f2f",
+-    fontSecondary: "#000",
+-    fontTertiary: "#A1A1A1",
+-    text: "#d3d3d3",
+-    overlay: "rgba(53, 53, 53, 0.5)",
+-    secondary: "black",
+-    icon: "#dbdbdb",
+-    disabled: "#5b5b5b",
+-    checked: "#6b6b6b",
+-    ...getStaticColors(accent),
+-
+-    // COLORS
+-    red: "#f44336",
+-    orange: "#FF9800",
+-    yellow: "#FFD600",
+-    green: "#4CAF50",
+-    blue: "#2196F3",
+-    purple: "#9568ED",
+-    gray: "#9E9E9E"
+-  };
+-}
+diff --git a/packages/theme/src/theme/colorscheme/index.ts b/packages/theme/src/theme/colorscheme/index.ts
+index fc4362136..f13b095fd 100644
+--- a/packages/theme/src/theme/colorscheme/index.ts
++++ b/packages/theme/src/theme/colorscheme/index.ts
+@@ -17,45 +17,27 @@ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+-import { getDarkScheme } from "./dark";
+-import { getLightScheme } from "./light";
+-import { StaticColors } from "./static";
+-
+-const colorSchemes = {
+-  dark: getDarkScheme,
+-  light: getLightScheme
+-};
+-
+-export type ColorSchemes = keyof typeof colorSchemes;
+-export function getColors(theme: ColorSchemes, accent: string) {
+-  return colorSchemes[theme](accent);
++import { Colors } from "../../theme-engine/types";
++import * as CSS from "csstype";
++
++export type SchemeColors = keyof Colors | CSS.Property.Color;
++
++export function isThemeColor(
++  color: string,
++  colors: Colors
++): color is keyof Colors {
++  return color in colors;
+ }
+ 
+-export type SchemeColors = StaticColors & {
+-  primary: string;
+-  placeholder: string;
+-  background: string;
+-  bgTransparent: string;
+-  accent: string;
+-  bgSecondary: string;
+-  bgSecondaryText: string;
+-  bgSecondaryHover: string;
+-  border: string;
+-  hover: string;
+-  fontSecondary: string;
+-  fontTertiary: string;
+-  text: string;
+-  overlay: string;
+-  secondary: string;
+-  icon: string;
+-  disabled: string;
+-  checked: string;
+-
+-  red: string;
+-  orange: string;
+-  yellow: string;
+-  green: string;
+-  blue: string;
+-  purple: string;
+-  gray: string;
+-};
++// export function getColors(variants: Variants): Colors {
++//   const colorScheme: ColorModesScale = {};
++
++//   // for (const variant in variants) {
++//   //   const colors = variants[variant as keyof Variants];
++//   //   for (const color in colors) {
++//   //     const colorValue = colors[color as keyof Colors];
++//   //     colorScheme[`${variant}.${color}`] = colorValue;
++//   //   }
++//   // }
++//   // return colorScheme;
++// }
+diff --git a/packages/theme/src/theme/colorscheme/light.ts b/packages/theme/src/theme/colorscheme/light.ts
+deleted file mode 100644
+index a0f479ca9..000000000
+--- a/packages/theme/src/theme/colorscheme/light.ts
++++ /dev/null
+@@ -1,54 +0,0 @@
+-/*
+-This file is part of the Notesnook project (https://notesnook.com/)
+-
+-Copyright (C) 2023 Streetwriters (Private) Limited
+-
+-This program is free software: you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation, either version 3 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-*/
+-
+-import tinycolor from "tinycolor2";
+-import { SchemeColors } from ".";
+-import { getStaticColors } from "./static";
+-
+-export function getLightScheme(accent: string): SchemeColors {
+-  return {
+-    primary: accent,
+-    background: "white",
+-    bgTransparent: "#ffffff99",
+-    accent: "white",
+-    bgSecondary: "#f7f7f7",
+-    bgSecondaryText: "#5E5E5E",
+-    bgSecondaryHover: "#dbdbdb",
+-    border: "#e5e5e5",
+-    hover: "#f0f0f0",
+-    fontSecondary: "white",
+-    fontTertiary: "#656565",
+-    text: "#202124",
+-    overlay: "rgba(0, 0, 0, 0.1)",
+-    secondary: "white",
+-    icon: "#3b3b3b",
+-    disabled: "#9b9b9b",
+-    placeholder: tinycolor("#000000").setAlpha(0.6).toRgbString(),
+-    checked: "#505050",
+-    ...getStaticColors(accent),
+-
+-    red: "#f44336",
+-    orange: "#FF9800",
+-    yellow: "#f0c800",
+-    green: "#4CAF50",
+-    blue: "#2196F3",
+-    purple: "#9568ED",
+-    gray: "#9E9E9E"
+-  };
+-}
+diff --git a/packages/theme/src/theme/colorscheme/static.ts b/packages/theme/src/theme/colorscheme/static.ts
+deleted file mode 100644
+index 97ab95fa1..000000000
+--- a/packages/theme/src/theme/colorscheme/static.ts
++++ /dev/null
+@@ -1,70 +0,0 @@
+-/*
+-This file is part of the Notesnook project (https://notesnook.com/)
+-
+-Copyright (C) 2023 Streetwriters (Private) Limited
+-
+-This program is free software: you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation, either version 3 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-*/
+-
+-import tinycolor from "tinycolor2";
+-
+-export type StaticColors = {
+-  shade: string;
+-  textSelection: string;
+-  dimPrimary: string;
+-  transparent: string;
+-  static: string;
+-  error: string;
+-  errorBg: string;
+-  success: string;
+-  warn: string;
+-  warnBg: string;
+-  info: string;
+-  infoBg: string;
+-  favorite: string;
+-
+-  codeBg: string;
+-  codeFg: string;
+-  codeHighlight: string;
+-  codeSelectionBg: string;
+-  codeSelectionFg: string;
+-  codeBorder: string;
+-  codeSelection: string;
+-};
+-export function getStaticColors(accent: string): StaticColors {
+-  return {
+-    shade: tinycolor(accent).setAlpha(0.1).toRgbString(),
+-    textSelection: tinycolor(accent).setAlpha(0.2).toRgbString(),
+-    dimPrimary: tinycolor(accent).setAlpha(0.7).toRgbString(),
+-    transparent: "transparent",
+-    static: "white",
+-    error: "#E53935",
+-    errorBg: "#E5393520",
+-    success: "#4F8A10",
+-    warn: "#FF5722",
+-    warnBg: "#FF572220",
+-    info: "#17a2b8",
+-    infoBg: "#17a2b820",
+-    favorite: "#ffd700",
+-
+-    // dracula colors
+-    codeBg: "#282a36",
+-    codeFg: "#6c7393",
+-    codeHighlight: "#50fa7b",
+-    codeSelectionFg: "#f8f8f2",
+-    codeSelectionBg: "#44475a",
+-    codeBorder: "#6c7393",
+-    codeSelection: "#9580ff1a"
+-  };
+-}
+diff --git a/packages/theme/src/theme/index.ts b/packages/theme/src/theme/index.ts
+index d314908eb..a1d8c0ce4 100644
+--- a/packages/theme/src/theme/index.ts
++++ b/packages/theme/src/theme/index.ts
+@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+-import { getColors, SchemeColors } from "./colorscheme";
+ import { variants } from "./variants";
+ import { FontConfig, getFontConfig } from "./font";
+ import { TransformerFactory, Transformers } from "./transformer";
+ import { ThemeConfig } from "./types";
++import { Colors } from "../theme-engine/types";
++import { ThemeUIConfig } from "@theme-ui/css/dist/declarations/src/options";
+ 
+ export type Theme = {
+   breakpoints: string[];
+@@ -34,16 +35,17 @@ export type Theme = {
+     small: number;
+   };
+   shadows: { menu: string };
+-  colors: SchemeColors;
++  colors: Colors;
+   iconSizes: {
+     small: number;
+     medium: number;
+     big: number;
+   };
++  config: ThemeUIConfig;
+ } & FontConfig &
+   typeof variants;
+ 
+-class ThemeFactory {
++export class ThemeFactory {
+   transform(type: Transformers, theme: Theme) {
+     const factory = new TransformerFactory();
+     return factory.construct(type, theme);
+@@ -56,15 +58,21 @@ class ThemeFactory {
+       sizes: { full: "100%", half: "50%" },
+       radii: { none: 0, default: 5, dialog: 10, small: 2.5 },
+       iconSizes: { big: 18, medium: 16, small: 14 },
+-      colors: getColors(config.theme, config.accent),
++      colors: config.colors,
+       shadows:
+-        config.theme === "dark"
++        config.colorScheme === "dark"
+           ? {
+               menu: "0px 0px 10px 0px #00000078"
+             }
+           : {
+               menu: "0px 0px 10px 0px #00000022"
+             },
++      config: {
++        useCustomProperties: true,
++        useRootStyles: true,
++        useLocalStorage: false,
++        useColorSchemeMediaQuery: false
++      },
+       ...getFontConfig(),
+       ...variants
+     };
+@@ -72,5 +80,3 @@ class ThemeFactory {
+     return theme;
+   }
+ }
+-
+-export default ThemeFactory;
+diff --git a/packages/theme/src/theme/transformer/css.ts b/packages/theme/src/theme/transformer/css.ts
+index 7bdbc798b..6e6213e66 100644
+--- a/packages/theme/src/theme/transformer/css.ts
++++ b/packages/theme/src/theme/transformer/css.ts
+@@ -18,13 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+ import { Theme } from "..";
+-import { SchemeColors } from "../colorscheme";
++import { Colors } from "../../theme-engine/types";
+ 
+ function transform(theme: Theme) {
+-  let root = ":root {";
++  let root = "";
+   for (const color in theme.colors) {
+-    root += `--${color}: ${theme.colors[color as keyof SchemeColors]};`;
++    root += `--${color}: ${theme.colors[color as keyof Colors]};`;
+   }
+-  return root + "}";
++  return root;
+ }
+ export default transform;
+diff --git a/packages/theme/src/theme/types.ts b/packages/theme/src/theme/types.ts
+index 9725a3913..518aa7e31 100644
+--- a/packages/theme/src/theme/types.ts
++++ b/packages/theme/src/theme/types.ts
+@@ -17,9 +17,8 @@ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+-import { ColorSchemes } from "./colorscheme";
+-
++import { Colors } from "../theme-engine/types";
+ export type ThemeConfig = {
+-  theme: ColorSchemes;
+-  accent: string;
++  colorScheme: "dark" | "light";
++  colors: Colors;
+ };
+diff --git a/packages/theme/src/theme/variants/button.ts b/packages/theme/src/theme/variants/button.ts
+index d3ee84906..7a5c875e8 100644
+--- a/packages/theme/src/theme/variants/button.ts
++++ b/packages/theme/src/theme/variants/button.ts
+@@ -48,7 +48,7 @@ const defaultVariant: ThemeUIStyleObject = {
+ 
+ const primary: ThemeUIStyleObject = {
+   variant: "buttons.default",
+-  color: "static",
++  color: "white",
+   bg: "primary"
+ };
+ 
+@@ -136,9 +136,8 @@ const tool: ThemeUIStyleObject = {
+ 
+ const statusItem: ThemeUIStyleObject = {
+   variant: "buttons.icon",
+-  p: 0,
+-  py: 1,
+-  px: 1
++  py: "small",
++  px: "small"
+ };
+ 
+ const menuItem: ThemeUIStyleObject = {
+diff --git a/packages/theme/src/theme/variants/text.ts b/packages/theme/src/theme/variants/text.ts
+index d5371c3ed..83f0b31ad 100644
+--- a/packages/theme/src/theme/variants/text.ts
++++ b/packages/theme/src/theme/variants/text.ts
+@@ -20,12 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ import { ThemeUIStyleObject } from "@theme-ui/core";
+ 
+ const defaultVariant: ThemeUIStyleObject = {
+-  color: "text",
++  color: "paragraph",
+   fontFamily: "body"
+ };
+ 
+ const heading: ThemeUIStyleObject = {
+   variant: "text.default",
++  color: "heading",
+   fontFamily: "heading",
+   fontWeight: "bold",
+   fontSize: "heading"
+@@ -33,12 +34,14 @@ const heading: ThemeUIStyleObject = {
+ 
+ const title: ThemeUIStyleObject = {
+   variant: "text.heading",
++  color: "heading",
+   fontSize: "title",
+   fontWeight: "bold"
+ };
+ 
+ const subtitle: ThemeUIStyleObject = {
+   variant: "text.heading",
++  color: "heading",
+   fontSize: "subtitle",
+   fontWeight: "bold"
+ };
+@@ -48,13 +51,13 @@ const body: ThemeUIStyleObject = { variant: "text.default", fontSize: "body" };
+ const subBody: ThemeUIStyleObject = {
+   variant: "text.default",
+   fontSize: "subBody",
+-  color: "fontTertiary"
++  color: "paragraph"
+ };
+ 
+ const error: ThemeUIStyleObject = {
+   variant: "text.default",
+   fontSize: "subBody",
+-  color: "error"
++  color: "paragraph"
+ };
+ 
+ export const textVariants = {
+diff --git a/packages/theme/src/themeprovider.ts b/packages/theme/src/themeprovider.ts
+deleted file mode 100644
+index 39acf631a..000000000
+--- a/packages/theme/src/themeprovider.ts
++++ /dev/null
+@@ -1,36 +0,0 @@
+-/*
+-This file is part of the Notesnook project (https://notesnook.com/)
+-
+-Copyright (C) 2023 Streetwriters (Private) Limited
+-
+-This program is free software: you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation, either version 3 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-*/
+-
+-import ThemeFactory from "./theme";
+-import { ThemeConfig } from "./theme/types";
+-import { injectCss } from "./css";
+-
+-const factory = new ThemeFactory();
+-
+-export function useTheme(config: ThemeConfig, inject = true) {
+-  const { theme, accent } = config;
+-
+-  const themeProperties = factory.construct({
+-    theme,
+-    accent
+-  });
+-  if (inject) injectCss(factory.transform("css", themeProperties));
+-
+-  return themeProperties;
+-}

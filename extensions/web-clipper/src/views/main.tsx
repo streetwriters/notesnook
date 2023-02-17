@@ -191,7 +191,7 @@ export function Main() {
             {clipArea === item.id && (
               <Icon
                 path={isClipping ? Icons.loading : Icons.check}
-                color="text"
+
                 size={16}
                 rotate={isClipping}
               />
@@ -234,7 +234,7 @@ export function Main() {
             {clipMode === item.id && (
               <Icon
                 path={isClipping ? Icons.loading : Icons.check}
-                color="text"
+
                 size={16}
                 rotate={isClipping}
               />
@@ -387,7 +387,7 @@ export function Main() {
               navigate("/settings");
             }}
           >
-            <Icon path={Icons.settings} color="text" size={16} />
+            <Icon path={Icons.settings}  size={16} />
           </Button>
         </Flex>
       </Flex>

@@ -20,6 +20,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Table as TiptapTable, TableOptions } from "@tiptap/extension-table";
 import { columnResizing, tableEditing } from "@tiptap/pm/tables";
 import { TableNodeView } from "./component";
+import { Plugin } from "prosemirror-state";
+import { NodeView } from "prosemirror-view";
+
+// TODO: send PR
+declare module "@tiptap/pm/tables" {
+  export function columnResizing(props: {
+    handleWidth?: number;
+    cellMinWidth?: number;
+    View?: NodeView;
+    lastColumnResizable?: boolean;
+  }): Plugin;
+}
 
 export const Table = TiptapTable.extend<TableOptions>({
   addProseMirrorPlugins() {

@@ -20,12 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ThemeUIStyleObject } from "@theme-ui/core";
 
 const defaultVariant: ThemeUIStyleObject = {
-  color: "text",
+  color: "paragraph",
   fontFamily: "body"
 };
 
 const heading: ThemeUIStyleObject = {
   variant: "text.default",
+  color: "heading",
   fontFamily: "heading",
   fontWeight: "bold",
   fontSize: "heading"
@@ -33,12 +34,14 @@ const heading: ThemeUIStyleObject = {
 
 const title: ThemeUIStyleObject = {
   variant: "text.heading",
+  color: "heading",
   fontSize: "title",
   fontWeight: "bold"
 };
 
 const subtitle: ThemeUIStyleObject = {
   variant: "text.heading",
+  color: "heading",
   fontSize: "subtitle",
   fontWeight: "bold"
 };
@@ -48,13 +51,13 @@ const body: ThemeUIStyleObject = { variant: "text.default", fontSize: "body" };
 const subBody: ThemeUIStyleObject = {
   variant: "text.default",
   fontSize: "subBody",
-  color: "fontTertiary"
+  color: "paragraph"
 };
 
 const error: ThemeUIStyleObject = {
   variant: "text.default",
   fontSize: "subBody",
-  color: "error"
+  color: "paragraph"
 };
 
 export const textVariants = {

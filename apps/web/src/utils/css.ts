@@ -19,9 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export function removeCss(id: string) {
   const link = document.getElementById(id);
-  if(link){
-    link.remove();
-  }
+  if (link) link.remove();
 }
 
 export function injectCssSrc(id: string, src: string) {
@@ -36,7 +34,7 @@ export function injectCssSrc(id: string, src: string) {
   head.appendChild(link);
 }
 
-export function injectCss(rule: string) {
+export function injectCss(rules: string) {
   const variableCss = document.getElementById("variables");
   const head = document.getElementsByTagName("head")[0];
   if (variableCss) {
@@ -45,7 +43,9 @@ export function injectCss(rule: string) {
   const css = document.createElement("style");
   css.type = "text/css";
   css.id = "variables";
-  css.appendChild(document.createTextNode(rule));
+  // Support for the rest
+  css.appendChild(document.createTextNode(rules));
+
   head.insertBefore(css, getRootStylesheet());
 }
 

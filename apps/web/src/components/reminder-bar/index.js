@@ -23,6 +23,7 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { Reminders } from "../../common/reminders";
 import * as Icon from "../icons";
 import Config from "../../utils/config";
+import { ThemeVariant } from "../theme-provider";
 
 function ReminderBar() {
   const reminders = useAppStore((store) => store.reminders);
@@ -53,16 +54,18 @@ function ReminderBar() {
       <Flex sx={{ flex: 1, alignItems: "center" }}>
         <reminder.icon
           size={18}
-          color="primary"
+          color="accent"
           sx={{ bg: "shade", mr: 2, p: 2, borderRadius: 80 }}
         />
         <Flex variant="columnCenter" sx={{ alignItems: "flex-start" }}>
           <Text variant="body" sx={{ fontSize: "body" }}>
             {reminder.title}
           </Text>
-          <Text variant="subBody" sx={{ display: "block" }}>
-            {reminder.subtitle}
-          </Text>
+          <ThemeVariant variant="secondary">
+            <Text variant="subBody" sx={{ display: "block" }}>
+              {reminder.subtitle}
+            </Text>
+          </ThemeVariant>
         </Flex>
       </Flex>
       {reminder.dismissable && (
@@ -86,7 +89,7 @@ function ReminderBar() {
           }}
           variant="tool"
         >
-          <Icon.Dismiss size={20} color="primary" />
+          <Icon.Dismiss size={20} color="accent" />
         </Button>
       )}
     </Flex>

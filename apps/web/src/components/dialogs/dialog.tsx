@@ -117,7 +117,7 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
             sx={{
               fontSize: "subheading",
               textAlign: props.textAlignment || "left",
-              color: "text"
+              color: "paragraph"
             }}
           >
             {props.title}

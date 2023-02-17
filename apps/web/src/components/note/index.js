@@ -45,6 +45,7 @@ import {
   isReminderActive,
   isReminderToday
 } from "@notesnook/core/collections/reminders";
+import { ThemeVariant } from "../theme-provider";
 
 function Note(props) {
   const {
@@ -70,7 +71,7 @@ function Note(props) {
   );
 
   const primary = useMemo(() => {
-    if (!note.color) return "primary";
+    if (!note.color) return "accent";
     return note.color.toLowerCase();
   }, [note.color]);
 
@@ -143,105 +144,110 @@ function Note(props) {
         </Flex>
       }
       footer={
-        <Flex
-          sx={{
-            fontSize: "subBody",
-            color: isOpened ? "bgSecondaryText" : "fontTertiary",
-            alignItems: "center"
-          }}
-        >
-          {compact ? (
-            <>
-              {note.conflicted && (
-                <Icon.Alert size={15} color="error" sx={{ mr: 1 }} />
-              )}
-              {note.locked && (
-                <Icon.Lock
-                  size={11}
-                  color={"fontTertiary"}
-                  sx={{ mr: 1 }}
-                  data-test-id={`locked`}
+        <ThemeVariant variant="secondary">
+          <Flex
+            sx={{
+              fontSize: "subBody",
+              color: "paragraph",
+              alignItems: "center"
+            }}
+          >
+            {compact ? (
+              <>
+                {note.conflicted && (
+                  <Icon.Alert size={15} color="error" sx={{ mr: 1 }} />
+                )}
+                {note.locked && (
+                  <Icon.Lock
+                    size={11}
+                    color={"fontTertiary"}
+                    sx={{ mr: 1 }}
+                    data-test-id={`locked`}
+                  />
+                )}
+                {note.favorite && (
+                  <Icon.Star color={primary} size={15} sx={{ mr: 1 }} />
+                )}
+                <TimeAgo live={true} datetime={date} locale="short" />
+              </>
+            ) : (
+              <>
+                {note.conflicted && (
+                  <Icon.Alert size={15} color="error" sx={{ mr: 1 }} />
+                )}
+
+                {note.localOnly && <Icon.SyncOff size={13} sx={{ mr: 1 }} />}
+
+                <TimeAgo
+                  sx={{ flexShrink: 0 }}
+                  locale="en_short"
+                  live={true}
+                  datetime={date}
+                  mr={1}
                 />
-              )}
-              {note.favorite && (
-                <Icon.Star color={primary} size={15} sx={{ mr: 1 }} />
-              )}
-              <TimeAgo live={true} datetime={date} locale="short" />
-            </>
-          ) : (
-            <>
-              {note.conflicted && (
-                <Icon.Alert size={15} color="error" sx={{ mr: 1 }} />
-              )}
 
-              {note.localOnly && <Icon.SyncOff size={13} sx={{ mr: 1 }} />}
+                {attachments.length > 0 && (
+                  <Flex mr={1}>
+                    <Icon.Attachment size={13} color="fontTertiary" />
+                    <Text ml={"2px"}>{attachments.length}</Text>
+                  </Flex>
+                )}
 
-              <TimeAgo
-                sx={{ flexShrink: 0 }}
-                locale="en_short"
-                live={true}
-                datetime={date}
-                mr={1}
-              />
-
-              {attachments.length > 0 && (
-                <Flex mr={1}>
-                  <Icon.Attachment size={13} color="fontTertiary" />
-                  <Text ml={"2px"}>{attachments.length}</Text>
-                </Flex>
-              )}
-
-              {failed.length > 0 && (
-                <Flex mr={1} title={`Errors in ${failed.length} attachments.`}>
-                  <Icon.AttachmentError size={13} color="error" />
-                  <Text ml={"2px"}>{failed.length}</Text>
-                </Flex>
-              )}
-
-              {note.pinned && !props.context && (
-                <Icon.Pin size={13} color={primary} sx={{ mr: 1 }} />
-              )}
-
-              {note.locked && (
-                <Icon.Lock
-                  size={13}
-                  color={"fontTertiary"}
-                  sx={{ mr: 1 }}
-                  data-test-id={`locked`}
-                />
-              )}
-
-              {note.favorite && (
-                <Icon.Star color={primary} size={15} sx={{ mr: 1 }} />
-              )}
-
-              {tags?.map((tag) => {
-                return (
-                  <Button
-                    data-test-id={`tag-item`}
-                    key={tag.id}
-                    variant="anchor"
+                {failed.length > 0 && (
+                  <Flex
                     mr={1}
-                    title={`Go to #${tag.alias}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!tag.id) return showToast("Tag not found.");
-                      navigate(`/tags/${tag.id}`);
-                    }}
-                    sx={{
-                      maxWidth: `calc(100% / ${tags.length})`,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      color: "fontTertiary"
-                    }}
+                    title={`Errors in ${failed.length} attachments.`}
                   >
-                    #{tag.alias}
-                  </Button>
-                );
-              })}
-            </>
-          )}
-        </Flex>
+                    <Icon.AttachmentError size={13} color="error" />
+                    <Text ml={"2px"}>{failed.length}</Text>
+                  </Flex>
+                )}
+
+                {note.pinned && !props.context && (
+                  <Icon.Pin size={13} color={primary} sx={{ mr: 1 }} />
+                )}
+
+                {note.locked && (
+                  <Icon.Lock
+                    size={13}
+                    color={"fontTertiary"}
+                    sx={{ mr: 1 }}
+                    data-test-id={`locked`}
+                  />
+                )}
+
+                {note.favorite && (
+                  <Icon.Star color={primary} size={15} sx={{ mr: 1 }} />
+                )}
+
+                {tags?.map((tag) => {
+                  return (
+                    <Button
+                      data-test-id={`tag-item`}
+                      key={tag.id}
+                      variant="anchor"
+                      mr={1}
+                      title={`Go to #${tag.alias}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!tag.id) return showToast("Tag not found.");
+                        navigate(`/tags/${tag.id}`);
+                      }}
+                      sx={{
+                        maxWidth: `calc(100% / ${tags.length})`,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        color: "fontTertiary"
+                      }}
+                    >
+                      #{tag.alias}
+                    </Button>
+                  );
+                })}
+              </>
+            )}
+          </Flex>
+        </ThemeVariant>
       }
     />
   );

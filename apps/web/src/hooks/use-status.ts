@@ -19,12 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import create from "zustand";
 import produce from "immer";
+import { IconNames } from "../components/icons/resolver";
 
 type Status = {
   key: string;
   status: string;
   progress?: number;
-  icon?: string | null;
+  icon?: IconNames;
 };
 interface IStatusStore {
   statuses: Record<string, Status>;

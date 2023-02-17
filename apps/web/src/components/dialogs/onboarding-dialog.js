@@ -73,7 +73,7 @@ const newUserSteps = [
     image: <Friends width={140} />
   },
   {
-    image: <Icon.Pro size={60} color="primary" />,
+    image: <Icon.Pro size={60} color="accent" />,
     title: "Notesnook Pro",
     subtitle: "Experience the next level of private note taking",
     component: TrialOffer

@@ -75,7 +75,7 @@ function IconTag(props: IconTagProps) {
     >
       <Icon
         size={11}
-        color={styles?.icon?.color || (highlight ? "primary" : "icon")}
+        // color={styles?.icon?.color || (highlight ? "primary" : "icon")}
         sx={{ ...styles?.icon, flexShrink: 0 }}
       />
       <Text

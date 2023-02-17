@@ -25,6 +25,7 @@ import { Menu, useMenuTrigger } from "../../hooks/use-menu";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import useMobile from "../../hooks/use-mobile";
+import { ThemeVariant } from "../theme-provider";
 
 const groupByToTitleMap = {
   [undefined]: "Default",
@@ -194,102 +195,104 @@ function GroupHeader(props) {
   ]);
 
   return (
-    <Flex
-      ref={groupHeaderRef}
-      onClick={(e) => {
-        if (e.ctrlKey) {
-          onSelectGroup();
-          return;
-        }
-        if (groups.length <= 0) return;
-        e.stopPropagation();
-        const items = groups.map((group) => {
-          const groupTitle = group.title.toString();
-          return {
-            key: groupTitle,
-            title: () => groupTitle,
-            onClick: () => onJump(groupTitle),
-            checked: group.title === title
-          };
-        });
-        openMenu(items, {
-          title: "Jump to group",
-          target: groupHeaderRef.current
-        });
-      }}
-      mx={1}
-      my={1}
-      py={1}
-      pl={1}
-      pr={0}
-      bg="bgSecondary"
-      sx={{
-        borderRadius: "default",
-        cursor: "pointer",
-        border: isMenuTarget ? "1px solid var(--primary)" : "none",
-        ":focus": {
-          border: "1px solid var(--primary)",
-          outline: "none"
-        },
-        alignItems: "center",
-        justifyContent: "space-between"
-      }}
-      tabIndex={0}
-      data-test-id="group-header"
-    >
-      <Text
-        data-test-id="title"
-        variant="subtitle"
-        sx={{
-          fontSize: "body",
-          color: title === "Conflicted" ? "error" : "primary"
+    <ThemeVariant variant="secondary" injectCssVars>
+      <Flex
+        ref={groupHeaderRef}
+        onClick={(e) => {
+          if (e.ctrlKey) {
+            onSelectGroup();
+            return;
+          }
+          if (groups.length <= 0) return;
+          e.stopPropagation();
+          const items = groups.map((group) => {
+            const groupTitle = group.title.toString();
+            return {
+              key: groupTitle,
+              title: () => groupTitle,
+              onClick: () => onJump(groupTitle),
+              checked: group.title === title
+            };
+          });
+          openMenu(items, {
+            title: "Jump to group",
+            target: groupHeaderRef.current
+          });
         }}
+        mx={1}
+        my={1}
+        py={1}
+        pl={1}
+        pr={0}
+        bg="background"
+        sx={{
+          borderRadius: "default",
+          cursor: "pointer",
+          border: isMenuTarget ? "1px solid var(--accent)" : "none",
+          ":focus": {
+            border: "1px solid var(--accent)",
+            outline: "none"
+          },
+          alignItems: "center",
+          justifyContent: "space-between"
+        }}
+        tabIndex={0}
+        data-test-id="group-header"
       >
-        {title}
-      </Text>
+        <Text
+          data-test-id="title"
+          variant="subtitle"
+          sx={{
+            fontSize: "body",
+            color: title === "Conflicted" ? "error" : "accent"
+          }}
+        >
+          {title}
+        </Text>
 
-      {index === 0 && (
-        <Flex mr={1}>
-          {type && (
-            <IconButton
-              testId={`${type}-sort-button`}
-              icon={
-                groupOptions.sortDirection === "asc"
-                  ? Icon.SortAsc
-                  : Icon.SortDesc
-              }
-              title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy]}`}
-              onClick={() => {
-                const groupOptions = db.settings.getGroupOptions(type);
-                setGroupOptions(groupOptions);
+        {index === 0 && (
+          <Flex mr={1}>
+            {type && (
+              <IconButton
+                testId={`${type}-sort-button`}
+                icon={
+                  groupOptions.sortDirection === "asc"
+                    ? Icon.SortAsc
+                    : Icon.SortDesc
+                }
+                title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy]}`}
+                onClick={() => {
+                  const groupOptions = db.settings.getGroupOptions(type);
+                  setGroupOptions(groupOptions);
 
-                openMenu([orderByMenu, sortByMenu, groupByMenu], {
-                  title: "Group & sort",
-                  groupOptions,
-                  refresh,
-                  type
-                });
-              }}
-            />
-          )}
-          {viewMode && (
-            <IconButton
-              icon={
-                viewMode === "compact" ? Icon.DetailedView : Icon.CompactView
-              }
-              title={
-                viewMode === "compact"
-                  ? "Switch to detailed view"
-                  : "Switch to compact view"
-              }
-              onClick={() =>
-                setViewMode(viewMode === "compact" ? "detailed" : "compact")
-              }
-            />
-          )}
-        </Flex>
-      )}
-    </Flex>
+                  openMenu([orderByMenu, sortByMenu, groupByMenu], {
+                    title: "Group & sort",
+                    groupOptions,
+                    refresh,
+                    type
+                  });
+                }}
+              />
+            )}
+            {viewMode && (
+              <IconButton
+                icon={
+                  viewMode === "compact" ? Icon.DetailedView : Icon.CompactView
+                }
+                title={
+                  viewMode === "compact"
+                    ? "Switch to detailed view"
+                    : "Switch to compact view"
+                }
+                onClick={() =>
+                  setViewMode(viewMode === "compact" ? "detailed" : "compact")
+                }
+              />
+            )}
+          </Flex>
+        )}
+      </Flex>
+    </ThemeVariant>
   );
 }
 export default GroupHeader;

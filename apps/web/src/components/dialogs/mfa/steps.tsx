@@ -385,7 +385,7 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
           sx={{
             flex: 1,
             overflowWrap: "anywhere",
-            color: "text",
+            color: "paragraph",
             fontSize: "body",
             fontFamily: "monospace"
           }}
@@ -682,7 +682,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
               fontFamily: "monospace",
               textAlign: "center",
               fontWeight: "body",
-              color: "text"
+              color: "paragraph"
             }}
           >
             {code}

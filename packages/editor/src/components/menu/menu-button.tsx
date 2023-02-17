@@ -78,14 +78,7 @@ export function MenuButton(props: MenuButtonProps) {
         }}
       >
         <Flex sx={{ fontSize: "inherit", fontFamily: "inherit" }}>
-          {icon && (
-            <Icon
-              path={Icons[icon]}
-              color={"text"}
-              size={"medium"}
-              sx={{ mr: 2 }}
-            />
-          )}
+          {icon && <Icon path={Icons[icon]} size={"medium"} sx={{ mr: 2 }} />}
           <Text
             as="span"
             variant={"body"}

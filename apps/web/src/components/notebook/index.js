@@ -81,7 +81,7 @@ function Notebook(props) {
               }}
             >
               {notebook.pinned && (
-                <Icon.PinFilled color="primary" size={13} sx={{ mr: 1 }} />
+                <Icon.PinFilled color="accent" size={13} sx={{ mr: 1 }} />
               )}
 
               {new Date(date).toLocaleDateString("en", {

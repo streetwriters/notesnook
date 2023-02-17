@@ -25,7 +25,7 @@ import Toggle from "../toggle";
 import Field from "../field";
 import { db } from "../../common/db";
 import * as clipboard from "clipboard-polyfill/text";
-import ThemeProvider from "../theme-provider";
+import { BaseThemeProvider } from "../theme-provider";
 import { showToast } from "../../utils/toast";
 import { EV, EVENTS } from "@notesnook/core/common";
 import { useStore } from "../../stores/monograph-store";
@@ -170,7 +170,7 @@ function PublishView(props) {
                       );
                     }}
                   >
-                    <Icon.Copy size={20} color="primary" />
+                    <Icon.Copy size={20} color="accent" />
                   </Button>
                 </Flex>
               </Flex>
@@ -244,7 +244,7 @@ function PublishView(props) {
         >
           {isPublishing ? (
             <>
-              <Icon.Loading color="static" />
+              <Icon.Loading color="white" />
             </>
           ) : publishId ? (
             "Update"
@@ -290,7 +290,7 @@ function PublishView(props) {
           sx={{
             ":hover": { bg: "bgSecondary" },
             fontWeight: "bold",
-            color: "text"
+            color: "paragraph"
           }}
           onClick={() => {
             onClose(false);
@@ -316,7 +316,7 @@ export function showPublishView(noteId, location = "top") {
         resolve(result);
       };
       ReactDOM.render(
-        <ThemeProvider>
+        <BaseThemeProvider>
           <PublishView
             noteId={noteId}
             position={{
@@ -327,7 +327,7 @@ export function showPublishView(noteId, location = "top") {
             }}
             onClose={perform}
           />
-        </ThemeProvider>,
+        </BaseThemeProvider>,
         root
       );
     });

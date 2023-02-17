@@ -197,12 +197,16 @@ import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
 import { Flex, FlexProps } from "@theme-ui/components";
 import { MotionProps } from "framer-motion";
+import {
+  isThemeColor,
+  SchemeColors
+} from "@notesnook/theme/dist/theme/colorscheme";
 
 type MDIIconWrapperProps = {
   title?: string;
   path: string;
   size?: keyof Theme["iconSizes"] | number;
-  color?: keyof Theme["colors"];
+  color?: SchemeColors;
   rotate?: boolean;
 };
 function MDIIconWrapper({
@@ -214,9 +218,10 @@ function MDIIconWrapper({
 }: MDIIconWrapperProps) {
   const theme = useTheme() as Theme;
 
-  const themedColor: string = theme?.colors
-    ? (theme.colors[color] as string)
-    : color;
+  const themedColor: string =
+    theme?.colors && isThemeColor(color, theme.colors)
+      ? theme.colors[color]
+      : color;
 
   return (
     <MDIIcon
@@ -241,7 +246,7 @@ function MDIIconWrapper({
 export type IconProps = FlexProps &
   MotionProps &
   Omit<MDIIconWrapperProps, "path"> & {
-    hoverColor?: keyof Theme["colors"];
+    hoverColor?: SchemeColors;
   };
 
 export type Icon = {

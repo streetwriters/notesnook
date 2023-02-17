@@ -265,7 +265,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             />
             {m.title}
             {m.premium && !isUserPremium && (
-              <Pro size={18} color="primary" sx={{ ml: 1 }} />
+              <Pro size={18} color="accent" sx={{ ml: 1 }} />
             )}
           </Label>
         ))}

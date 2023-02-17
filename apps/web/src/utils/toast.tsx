@@ -18,11 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, Text } from "@theme-ui/components";
-import ThemeProvider from "../components/theme-provider";
+import { ScopedThemeProvider } from "../components/theme-provider";
 import { Error, Warn, Success, Info } from "../components/icons";
 import { store as appstore } from "../stores/app-store";
 import toast from "react-hot-toast";
-import { Theme } from "@notesnook/theme";
 
 type ToastType = "success" | "error" | "warn" | "info";
 type ToastAction = {
@@ -48,9 +47,7 @@ function showToast(
       ? Warn
       : Info;
 
-  const RenderedIcon = () => (
-    <IconComponent size={24} color={type as keyof Theme["colors"]} />
-  );
+  const RenderedIcon = () => <IconComponent size={24} />;
 
   const id = toast(<ToastContainer message={message} actions={actions} />, {
     duration: hideAfter || Infinity,
@@ -73,7 +70,7 @@ type ToastContainerProps = {
 function ToastContainer(props: ToastContainerProps) {
   const { message, actions } = props;
   return (
-    <ThemeProvider>
+    <ScopedThemeProvider>
       <Flex
         bg={"background"}
         data-test-id="toast"
@@ -87,7 +84,7 @@ function ToastContainer(props: ToastContainerProps) {
           data-test-id="toast-message"
           variant="body"
           mr={2}
-          sx={{ fontSize: "body", color: "text" }}
+          sx={{ fontSize: "body", color: "paragraph" }}
         >
           {message}
         </Text>
@@ -111,7 +108,7 @@ function ToastContainer(props: ToastContainerProps) {
           </Button>
         ))}
       </Flex>
-    </ThemeProvider>
+    </ScopedThemeProvider>
   );
 }
 

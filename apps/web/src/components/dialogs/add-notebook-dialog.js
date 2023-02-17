@@ -242,7 +242,7 @@ function TopicItem(props) {
     >
       <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
         <Icon.Topic />
-        <Text as="span" ml={1} sx={{ fontSize: "body", color: "text" }}>
+        <Text as="span" ml={1} sx={{ fontSize: "body", color: "paragraph" }}>
           {title}
         </Text>
       </Flex>

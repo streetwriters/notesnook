@@ -17,15 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
+// import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { PropsWithChildren } from "react";
 import { useTheme } from "../../toolbar/stores/toolbar-store";
 
 export function ThemeProvider(props: PropsWithChildren<unknown>) {
   const theme = useTheme();
-  return (
-    <EmotionThemeProvider theme={theme || {}}>
-      {props.children}
-    </EmotionThemeProvider>
-  );
+  return null;
+  // return (
+  //   <EmotionThemeProvider theme={theme || {}}>
+  //     {props.children}
+  //   </EmotionThemeProvider>
+  // );
 }

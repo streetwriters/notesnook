@@ -26,17 +26,17 @@ const defaultVariant: ThemeUIStyleObject = {
   fontFamily: "body",
   fontWeight: "body",
   fontSize: "input",
-  color: "text",
+  color: "paragraph",
   ":-webkit-autofill": {
-    WebkitTextFillColor: "var(--text)",
-    caretColor: "var(--text)",
+    WebkitTextFillColor: "var(--paragraph)",
+    caretColor: "var(--paragraph)",
     fontSize: "inherit"
   },
   ":focus": {
-    outline: "2px solid var(--primary)"
+    outline: "2px solid var(--accent)"
   },
   ":hover:not(:focus)": {
-    outline: "1.5px solid var(--dimPrimary)"
+    outline: "1.5px solid var(--textSelection)"
   }
 };
 

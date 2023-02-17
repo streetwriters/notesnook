@@ -19,7 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { createContext, useContext, useMemo } from "react";
 import { ThemeLight } from "./themes/light";
-import { ThemeDefinition, ThemeScopes, VariantsWithStaticColors } from "./types";
+import {
+  ThemeDefinition,
+  ThemeScopes,
+  VariantsWithStaticColors
+} from "./types";
 
 const ThemeContext = createContext<{
   theme: ThemeDefinition;
@@ -29,7 +33,6 @@ const ThemeContext = createContext<{
   setTheme: () => null
 });
 const ThemeScope = createContext<keyof ThemeScopes>("base");
-const useCurrentThemeScope = () => useContext(ThemeScope);
 
 export const useThemeColors = (
   scope?: keyof ThemeScopes
@@ -94,5 +97,6 @@ export const useThemeColors = (
 };
 
 export const useThemeProvider = () => useContext(ThemeContext);
+export const useCurrentThemeScope = () => useContext(ThemeScope);
 export const ThemeProvider = ThemeContext.Provider;
 export const ScopedThemeProvider = ThemeScope.Provider;

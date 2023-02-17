@@ -67,7 +67,7 @@ export function ColorTool(props: ColorToolProps) {
   return (
     <SplitButton
       {...toolProps}
-      iconColor={activeColor && tColor.isDark() ? "static" : "icon"}
+      iconColor={activeColor && tColor.isDark() ? "white" : "icon"}
       sx={{
         mr: 0,
         bg: activeColor || "transparent",

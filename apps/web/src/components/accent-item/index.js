@@ -47,7 +47,7 @@ function AccentItem(props) {
             zIndex: 1,
             cursor: "pointer"
           }}
-          color="static"
+          color="white"
           size={20}
         />
       )}

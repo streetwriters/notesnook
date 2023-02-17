@@ -52,7 +52,7 @@ const reminders = {
     features,
     // footer: (
     //   <Flex bg="bgSecondary" pb={2}  sx={{justifyContent: "center"}}>
-    //     <Button variant="anchor"  sx={{color: "text"}}>
+    //     <Button variant="anchor"  sx={{color: "paragraph"}}>
     //       Can't decide yet? Extend your trial!
     //     </Button>
     //   </Flex>

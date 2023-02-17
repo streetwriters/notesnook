@@ -535,7 +535,7 @@ function FilteredTree<T extends Item>(props: FilteredTreeProps<T>) {
             }}
           >
             <Text variant={"body"}>{`Add "${query}"`}</Text>
-            <Icon.Plus size={16} color="primary" />
+            <Icon.Plus size={16} color="accent" />
           </Button>
         )}
         {items.map((item, index) => renderItem(item, index, refresh, !!query))}

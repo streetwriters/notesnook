@@ -185,7 +185,6 @@ export function ColorPicker(props: ColorPickerProps) {
             {!deleteMode && (
               <PaletteButton
                 icon={Icons.colorClear}
-                iconColor="text"
                 onClick={onClear}
                 title="Clear color"
                 iconSize={15}
@@ -206,7 +205,7 @@ export function ColorPicker(props: ColorPickerProps) {
             {!deleteMode && (
               <PaletteButton
                 icon={Icons.palette}
-                iconColor={tColor.isDark() ? "static" : "icon"}
+                iconColor={tColor.isDark() ? "white" : "icon"}
                 onClick={() => setIsPickerOpen((s) => !s)}
                 title="Choose custom color"
                 iconSize={18}
@@ -219,7 +218,7 @@ export function ColorPicker(props: ColorPickerProps) {
                 title={deleteMode ? "Click to delete this color" : colorItem}
                 bg={colorItem}
                 iconSize={15}
-                iconColor={"static"}
+                iconColor={"white"}
                 icon={
                   deleteMode && colors.includes(colorItem)
                     ? Icons.close
@@ -254,7 +253,7 @@ export function ColorPicker(props: ColorPickerProps) {
 
 type PaletteButtonProps = ButtonProps & {
   icon?: string;
-  iconColor?: keyof SchemeColors;
+  iconColor?: SchemeColors;
   iconSize?: number;
   bg?: string;
 };

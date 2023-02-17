@@ -196,7 +196,7 @@ export function WebClipComponent(
               justifyContent: "center"
             }}
           >
-            <Icon path={Icons.loading} rotate size={32} color="disabled" />
+            <Icon path={Icons.loading} rotate size={32} />
           </Flex>
         )}
       </Box>

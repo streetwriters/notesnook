@@ -92,7 +92,7 @@ function Attachment({ item, isCompact, index }) {
             ) : attachment.dateUploaded ? (
               <Icon.DoubleCheckmark
                 sx={{ flexShrink: 0 }}
-                color={"primary"}
+                color={"accent"}
                 size={13}
                 title={"Uploaded"}
               />

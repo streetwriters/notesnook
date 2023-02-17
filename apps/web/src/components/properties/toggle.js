@@ -39,7 +39,7 @@ function Toggle(props) {
     >
       <Text
         variant="body"
-        sx={{ alignItems: "center", color: "text", display: "flex" }}
+        sx={{ alignItems: "center", color: "paragraph", display: "flex" }}
         data-test-id={`toggle-state-${isOn ? "on" : "off"}`}
       >
         <ToggleIcon size={13} sx={{ flexShrink: 0, mr: 1 }} />

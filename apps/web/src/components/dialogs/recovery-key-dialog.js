@@ -80,7 +80,7 @@ function RecoveryKeyDialog(props) {
               overflowWrap: "anywhere",
               fontSize: "body",
               fontFamily: "monospace",
-              color: "text"
+              color: "paragraph"
             }}
           >
             {key}

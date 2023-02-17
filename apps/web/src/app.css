@@ -138,13 +138,13 @@ textarea,
 
 ::-moz-selection {
   /* Code for Firefox */
-  background-color: var(--dimPrimary);
-  color: var(--text);
+  background-color: var(--textSelection);
+  color: var(--paragraph);
 }
 
 ::selection {
-  background-color: var(--dimPrimary);
-  color: var(--text);
+  background-color: var(--textSelection);
+  color: var(--paragraph);
 }
 
 .middle-pane {
@@ -165,8 +165,8 @@ textarea,
   width: 1px !important;
 }
 
-:root {
-  --focus-border: var(--primary);
+#app {
+  --focus-border: var(--accent);
   --separator-border: var(--border);
   --sash-size: 10px;
   --sash-hover-size: 4px;

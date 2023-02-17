@@ -150,7 +150,7 @@ function ListItem(props) {
         },
         ":focus-visible": {
           outline: `1px solid var(--${
-            primary === "primary" ? "dimPrimary" : primary
+            primary === "accent" ? "dimPrimary" : primary
           })`,
           backgroundColor: isSelected ? "textSelection" : background
         }

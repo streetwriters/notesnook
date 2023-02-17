@@ -29,28 +29,30 @@ export const ThemeDracula: ThemeDefinition = {
       primary: {
         accent: "#bd93f9",
         background: "#282a36",
-        border: "#383838",
-        placeholder: "#404040",
+        border: "#191a21",
+        placeholder: "#6272a4",
         heading: "#f8f8f2",
         paragraph: "#f8f8f2",
         icon: "#808080",
         separator: "#383838",
         backdrop: "#35353580",
-        hover: "#bd93f912",
-        shade: "#bd93f912"
+        hover: "#44475a75",
+        shade: "#bd93f912",
+        textSelection: "#bd93f9"
       },
       secondary: {
         accent: "#bd93f9",
-        background: "#bd93f920",
+        background: "#343746",
         border: "#383838",
         placeholder: "#404040",
         heading: "#808080",
-        paragraph: "#818589",
-        icon: "#808080",
+        paragraph: "#c5c5c5",
+        icon: "#c5c5c5",
         separator: "#383838",
         backdrop: "#35353580",
-        hover: "#bd93f912",
-        shade: "#bd93f912"
+        hover: "#44475a",
+        shade: "#bd93f912",
+        textSelection: "#bd93f9"
       },
       disabled: {
         accent: "#bd93f9",
@@ -59,11 +61,12 @@ export const ThemeDracula: ThemeDefinition = {
         placeholder: "#404040",
         heading: "#212121",
         paragraph: "#505050",
-        icon: "#808080",
+        icon: "#c5c5c5",
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
-        shade: "#00883712"
+        shade: "#00883712",
+        textSelection: "#bd93f9"
       },
       error: {
         accent: "#ff5555",
@@ -76,7 +79,8 @@ export const ThemeDracula: ThemeDefinition = {
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
-        shade: "#ff555512"
+        shade: "#ff555512",
+        textSelection: "#ff555555"
       },
       warning: {
         accent: "#ffb86c",
@@ -89,7 +93,8 @@ export const ThemeDracula: ThemeDefinition = {
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
-        shade: "#ffb86c12"
+        shade: "#ffb86c12",
+        textSelection: "#ffb86c55"
       },
       success: {
         accent: "#50fa7b",
@@ -102,34 +107,57 @@ export const ThemeDracula: ThemeDefinition = {
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
-        shade: "#50fa7b12"
+        shade: "#50fa7b12",
+        textSelection: "#50fa7b55"
       }
     },
     navigationMenu: {
       primary: {
-        accent: "#bd93f9",
-        background: "#383a59",
-        border: "#383838",
-        placeholder: "#404040",
-        heading: "#bd93f9",
+        accent: "#ff79c6",
+        shade: "#bd93f910",
+        background: "#343746",
+        border: "#6272a4",
         paragraph: "#f8f8f2",
-        icon: "#282a36AA",
-        separator: "#383838",
-        backdrop: "#35353580",
-        hover: "#282a3612",
-        shade: "#bd93f912"
-      },
-      secondary: {
-        background: "#bd93f920"
+        icon: "#6272a4",
+        separator: "#6272a4",
+        hover: "#44475a"
+      }
+    },
+    list: {
+      primary: {
+        background: "#21222c"
+      }
+    },
+    statusBar: {
+      primary: {
+        background: "#191a21",
+        hover: "#ffffff1f",
+        paragraph: "#c5c5c5",
+        icon: "#c5c5c5"
+      }
+    },
+    editor: {
+      primary: {
+        textSelection: "#424450"
+      }
+    },
+    editorToolbar: {
+      primary: {
+        accent: "#50fa7b",
+        paragraph: "#c5c5c5",
+        icon: "#c5c5c5",
+        background: "#343746",
+        border: "#c5c5c512",
+        hover: "#44475a"
       }
     },
     popup: {
-        primary: {
-            background: "#282a36"
-        },
-        secondary: {
-            background: "#bd93f9"
-        }
+      primary: {
+        background: "#282a36"
+      },
+      secondary: {
+        background: "#bd93f9"
+      }
     }
   }
 };

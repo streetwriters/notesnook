@@ -25,7 +25,7 @@ import { ChevronDown, ChevronUp } from "../icons";
 export type AccordionProps = {
   title: string;
   isClosed: boolean;
-  color?: keyof SchemeColors;
+  color?: SchemeColors;
   testId?: string;
 };
 

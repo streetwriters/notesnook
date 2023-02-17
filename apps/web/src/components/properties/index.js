@@ -248,7 +248,7 @@ function Properties(props) {
                       />
                       {label.toLowerCase() === color?.toLowerCase() && (
                         <Icon.Checkmark
-                          color="static"
+                          color="white"
                           size={18}
                           sx={{ position: "absolute", left: "8px" }}
                         />

@@ -69,7 +69,7 @@ export function CodeblockComponent(
             position: "relative",
             lineHeight: "20px",
             bg: "codeBg",
-            color: "static",
+            color: "white",
             overflowX: "auto",
             display: "flex",
             px: 2,

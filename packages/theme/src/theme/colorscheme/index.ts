@@ -17,45 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getDarkScheme } from "./dark";
-import { getLightScheme } from "./light";
-import { StaticColors } from "./static";
+import { Colors } from "../../theme-engine/types";
+import * as CSS from "csstype";
 
-const colorSchemes = {
-  dark: getDarkScheme,
-  light: getLightScheme
-};
+export type SchemeColors = keyof Colors | CSS.Property.Color;
 
-export type ColorSchemes = keyof typeof colorSchemes;
-export function getColors(theme: ColorSchemes, accent: string) {
-  return colorSchemes[theme](accent);
+export function isThemeColor(
+  color: string,
+  colors: Colors
+): color is keyof Colors {
+  return color in colors;
 }
 
-export type SchemeColors = StaticColors & {
-  primary: string;
-  placeholder: string;
-  background: string;
-  bgTransparent: string;
-  accent: string;
-  bgSecondary: string;
-  bgSecondaryText: string;
-  bgSecondaryHover: string;
-  border: string;
-  hover: string;
-  fontSecondary: string;
-  fontTertiary: string;
-  text: string;
-  overlay: string;
-  secondary: string;
-  icon: string;
-  disabled: string;
-  checked: string;
+// export function getColors(variants: Variants): Colors {
+//   const colorScheme: ColorModesScale = {};
 
-  red: string;
-  orange: string;
-  yellow: string;
-  green: string;
-  blue: string;
-  purple: string;
-  gray: string;
-};
+//   // for (const variant in variants) {
+//   //   const colors = variants[variant as keyof Variants];
+//   //   for (const color in colors) {
+//   //     const colorValue = colors[color as keyof Colors];
+//   //     colorScheme[`${variant}.${color}`] = colorValue;
+//   //   }
+//   // }
+//   // return colorScheme;
+// }

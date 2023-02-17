@@ -35,7 +35,8 @@ export const ThemeDark: ThemeDefinition = {
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
-        shade: "#00883712"
+        shade: "#00883712",
+        textSelection: "#00883777"
       },
       secondary: {
         accent: "#008837",
@@ -48,7 +49,8 @@ export const ThemeDark: ThemeDefinition = {
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
-        shade: "#00883712"
+        shade: "#00883712",
+        textSelection: "#00883777"
       },
       disabled: {
         accent: "#008837",
@@ -61,7 +63,8 @@ export const ThemeDark: ThemeDefinition = {
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
-        shade: "#00883712"
+        shade: "#00883712",
+        textSelection: "#00883777"
       },
       error: {
         accent: "#f54b42",
@@ -74,7 +77,8 @@ export const ThemeDark: ThemeDefinition = {
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
-        shade: "#00883712"
+        shade: "#00883712",
+        textSelection: "#f54b4255"
       },
       warning: {
         accent: "#FFA500",
@@ -87,7 +91,8 @@ export const ThemeDark: ThemeDefinition = {
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
-        shade: "#FFA50012"
+        shade: "#FFA50012",
+        textSelection: "#FFA50055"
       },
       success: {
         accent: "#4F8A10",
@@ -100,7 +105,8 @@ export const ThemeDark: ThemeDefinition = {
         separator: "#383838",
         backdrop: "#35353580",
         hover: "#ffffff10",
-        shade: "#4F8A1012"
+        shade: "#4F8A1012",
+        textSelection: "#4F8A1055"
       }
     }
   }

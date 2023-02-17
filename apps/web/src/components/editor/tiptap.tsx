@@ -56,6 +56,7 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce, debounceWithId } from "../../utils/debounce";
 import { store as editorstore } from "../../stores/editor-store";
+import { ScopedThemeProvider } from "../theme-provider";
 
 type TipTapProps = {
   editorContainer: HTMLElement;
@@ -310,14 +311,16 @@ function TipTap(props: TipTapProps) {
   return (
     <>
       <Portal containerId={toolbarContainerId}>
-        <Toolbar
-          editor={editor}
-          theme={theme}
-          location={isMobile ? "bottom" : "top"}
-          tools={toolbarConfig}
-          defaultFontFamily={fontFamily}
-          defaultFontSize={fontSize}
-        />
+        <ScopedThemeProvider scope="editorToolbar">
+          <Toolbar
+            editor={editor}
+            theme={theme}
+            location={isMobile ? "bottom" : "top"}
+            tools={toolbarConfig}
+            defaultFontFamily={fontFamily}
+            defaultFontSize={fontSize}
+          />
+        </ScopedThemeProvider>
       </Portal>
     </>
   );
@@ -355,7 +358,7 @@ function TiptapWrapper(
           style={{
             flex: 1,
             cursor: "text",
-            color: theme.colors.text, // TODO!
+            color: theme.colors.paragraph, // TODO!
             paddingBottom: 150,
             fontSize: editorConfig.fontSize,
             fontFamily: getFontById(editorConfig.fontFamily)?.font

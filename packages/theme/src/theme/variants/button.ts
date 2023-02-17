@@ -28,17 +28,18 @@ const defaultVariant: ThemeUIStyleObject = {
   cursor: "pointer",
   p: 2,
   py: "7.5px",
-  transition: "filter 200ms ease-in, box-shadow 200ms ease-out",
+  // transition: "filter 200ms ease-in, box-shadow 200ms ease-out",
   ":hover:not(:disabled)": {
-    filter: "brightness(90%)"
+    // filter: "brightness(90%)"
+    bg: "hover"
   },
   ":active": {
-    filter: "brightness(98%)"
+    bg: "active"
   },
   outline: "none",
   ":focus-visible:not(:active)": {
     filter: "brightness(90%)",
-    bg: "bgSecondary"
+    bg: "background"
   },
   ":disabled": {
     opacity: 0.5,
@@ -48,7 +49,7 @@ const defaultVariant: ThemeUIStyleObject = {
 
 const primary: ThemeUIStyleObject = {
   variant: "buttons.default",
-  color: "static",
+  color: "white",
   bg: "primary"
 };
 
@@ -72,7 +73,8 @@ const dialog: ThemeUIStyleObject = {
 const secondary: ThemeUIStyleObject = {
   variant: "buttons.default",
   color: "text",
-  bg: "border"
+  bg: "background",
+  borderRadius: "default"
 };
 
 const tertiary: ThemeUIStyleObject = {
@@ -127,18 +129,14 @@ const icon: ThemeUIStyleObject = {
 const tool: ThemeUIStyleObject = {
   variant: "buttons.default",
   color: "text",
-  backgroundColor: "bgSecondary",
-  borderRadius: "default",
-  ":hover": {
-    backgroundColor: "hover"
-  }
+  backgroundColor: "background",
+  borderRadius: "default"
 };
 
 const statusItem: ThemeUIStyleObject = {
   variant: "buttons.icon",
-  p: 0,
-  py: 1,
-  px: 1
+  py: "small",
+  px: "small"
 };
 
 const menuItem: ThemeUIStyleObject = {

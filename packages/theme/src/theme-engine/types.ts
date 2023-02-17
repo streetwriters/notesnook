@@ -28,6 +28,7 @@ export type Colors = {
   hover: string;
   shade: string;
   backdrop: string;
+  textSelection: string;
 };
 
 export type VariantsWithStaticColors<TRequired extends boolean = false> =

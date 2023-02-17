@@ -301,7 +301,7 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
             mt={2}
             variant="anchor"
             onClick={() => navigate("recover", { email: formData.email })}
-            sx={{ color: "text", alignSelf: "end" }}
+            sx={{ color: "paragraph", alignSelf: "end" }}
           >
             Forgot password?
           </Button>
@@ -459,7 +459,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         mt={2}
         variant="anchor"
         onClick={() => user && navigate("recover", { email: user.email })}
-        sx={{ color: "text", alignSelf: "end" }}
+        sx={{ color: "paragraph", alignSelf: "end" }}
       >
         Forgot password?
       </Button>
@@ -532,7 +532,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
       {success ? (
         <>
           <Flex bg="background" p={2} mt={2} sx={{ borderRadius: "default" }}>
-            <CheckCircle size={20} color="primary" />
+            <CheckCircle size={20} color="accent" />
             <Text variant="body" ml={2} sx={{ color: "primary" }}>
               {success}
             </Text>
@@ -698,7 +698,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
         mt={4}
         variant={"anchor"}
         onClick={() => navigate("mfa:select", formData)}
-        sx={{ color: "text" }}
+        sx={{ color: "paragraph" }}
       >
         {texts.selector}
       </Button>
@@ -792,7 +792,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
         disabled={!isAppLoaded}
         loading={!isAppLoaded}
       /> */}
-      {/* <Button type="button" mt={4} variant={"anchor"}  sx={{color: "text"}}>
+      {/* <Button type="button" mt={4} variant={"anchor"}  sx={{color: "paragraph"}}>
         Don't have access to your {mfaMethodToPhrase(formData.primaryMethod)}?
       </Button> */}
     </AuthForm>
@@ -877,7 +877,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
           variant="anchor"
           sx={{
             mt: 5,
-            color: "text",
+            color: "paragraph",
             textDecoration: "none",
             ":hover": {
               color: "bgSecondaryText"
@@ -922,7 +922,7 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
           ":hover": { color: "dimPrimary" },
           fontWeight: "bold",
           fontSize: "subtitle",
-          color: "text",
+          color: "paragraph",
           cursor: "pointer"
         }}
         onClick={props.action.onClick}
@@ -1005,7 +1005,7 @@ export function SubmitButton(props: SubmitButtonProps) {
       }}
       disabled={props.disabled}
     >
-      {props.loading ? <Loading color="static" /> : props.text}
+      {props.loading ? <Loading color="white" /> : props.text}
     </Button>
   );
 }

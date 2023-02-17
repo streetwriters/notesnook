@@ -27,16 +27,8 @@ import { navigate } from "../../navigation";
 import { Input } from "@theme-ui/components";
 
 function RouteContainer(props) {
-  const {
-    id,
-    type,
-    title,
-    isEditable,
-    onChange,
-    subtitle,
-    buttons,
-    component
-  } = props;
+  const { id, type, title, isEditable, onChange, subtitle, buttons, children } =
+    props;
   return (
     <>
       <Header
@@ -47,7 +39,8 @@ function RouteContainer(props) {
         isEditable={isEditable}
         onChange={onChange}
       />
-      {component || <Flex id={id} sx={{ flex: 1, flexDirection: "column" }} />}
+      {/* {component || <Flex id={id} sx={{ flex: 1, flexDirection: "column" }} />} */}
+      {children}
     </>
   );
 }
@@ -71,7 +64,6 @@ function Header(props) {
               title={buttons.back.title}
               onClick={buttons.back.action}
               sx={{ flexShrink: 0, mr: 2, cursor: "pointer" }}
-              color="text"
               data-test-id="go-back"
             />
           ) : (
@@ -109,14 +101,14 @@ function Header(props) {
           {!isMobile && createButtonData && (
             <Icon.Plus
               data-test-id={`${type}-action-button`}
-              color="static"
+              color="white"
               size={18}
               sx={{
-                bg: "primary",
+                bg: "accent",
                 ml: 2,
                 borderRadius: 100,
                 size: 28,
-                ":hover": { boxShadow: "0px 0px 5px 0px var(--dimPrimary)" }
+                cursor: "pointer"
               }}
               title={createButtonData.title}
               onClick={createButtonData.onClick}
@@ -157,7 +149,7 @@ function RouteTitle({ title, subtitle, isEditable, onChange }) {
           bg: isEditing ? "bgSecondary" : "transparent",
 
           ":focus-visible": { outline: "none" },
-          color: "text"
+          color: "paragraph"
         }}
         onDoubleClick={(e) => {
           setIsEditing(isEditable && true);

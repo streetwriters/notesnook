@@ -18,13 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Theme } from "..";
-import { SchemeColors } from "../colorscheme";
+import { Colors } from "../../theme-engine/types";
 
 function transform(theme: Theme) {
-  let root = ":root {";
+  let root = "";
   for (const color in theme.colors) {
-    root += `--${color}: ${theme.colors[color as keyof SchemeColors]};`;
+    root += `--${color}: ${theme.colors[color as keyof Colors]};`;
   }
-  return root + "}";
+  return root;
 }
 export default transform;

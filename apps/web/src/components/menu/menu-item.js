@@ -90,7 +90,7 @@ function MenuItem({ item, isFocused, onMouseEnter, onMouseLeave, onClick }) {
           >
             {title}
           </Text>
-          {isPremium && <Pro size={14} color="primary" sx={{ ml: 1 }} />}
+          {isPremium && <Pro size={14} color="accent" sx={{ ml: 1 }} />}
         </Flex>
         <Flex data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}>
           {isChecked && <Check size={14} />}

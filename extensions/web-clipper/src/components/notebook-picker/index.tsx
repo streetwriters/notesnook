@@ -72,7 +72,7 @@ export const NotebookPicker = (props: NotebookPickerProps) => {
               ? `${selectedNotebook.title} > ${selectedNotebook.topic.title}`
               : `Select a notebook`}
           </Text>
-          <Icon path={Icons.chevronDown} color="text" size={18} />
+          <Icon path={Icons.chevronDown}  size={18} />
         </Button>
         {selectedNotebook && (
           <Button
@@ -89,7 +89,7 @@ export const NotebookPicker = (props: NotebookPickerProps) => {
             }}
             title={"Clear selection"}
           >
-            <Icon path={Icons.close} color="text" size={16} />
+            <Icon path={Icons.close}  size={16} />
           </Button>
         )}
       </Flex>
@@ -162,7 +162,7 @@ function Notebook(props: NotebookProps) {
         </Text>
         <Icon
           path={isExpanded ? Icons.chevronUp : Icons.chevronDown}
-          color="text"
+
           size={18}
         />
       </Button>

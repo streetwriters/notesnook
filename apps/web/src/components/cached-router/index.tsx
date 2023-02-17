@@ -17,16 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect } from "react";
-import ReactDOM from "react-dom";
+import { useEffect, useState } from "react";
 import { getHomeRoute, NavigationEvents } from "../../navigation";
 import { store as selectionStore } from "../../stores/selection-store";
 import useRoutes from "../../hooks/use-routes";
 import RouteContainer from "../route-container";
-import ThemeProvider from "../theme-provider";
 import routes from "../../navigation/routes";
 
-var cache = {};
+type RenderedRoute = {
+  active: boolean;
+  key: string;
+  component: React.Component;
+};
+
 function CachedRouter() {
   const [RouteResult, location] = useRoutes(routes, {
     fallbackRoute: getHomeRoute(),
@@ -34,46 +37,35 @@ function CachedRouter() {
       beforeNavigate: () => selectionStore.toggleSelectionMode(false)
     }
   });
+  const [renderedRoutes, setRenderedRoutes] = useState<RenderedRoute[]>([]);
 
   useEffect(() => {
     if (!RouteResult) return;
     NavigationEvents.publish("onNavigate", RouteResult, location);
+
     window.currentViewType = RouteResult.type;
     window.currentViewKey = RouteResult.key;
 
     const key = RouteResult.key || "general";
 
-    const routeContainer = document.getElementById("mainRouteContainer");
-    routeContainer.childNodes.forEach((node) => {
-      node.style.display = "none";
+    setRenderedRoutes((routes) => {
+      const clone = routes.slice();
+
+      const oldIndex = clone.findIndex((route) => route.active);
+      if (oldIndex > -1) {
+        clone[oldIndex].active = false;
+      }
+
+      const index = clone.findIndex((route) => route.key === key);
+      if (index > -1) {
+        clone[index].active = true;
+        if (key === "general") clone[index].component = RouteResult.component;
+      } else {
+        clone.push({ key, active: true, component: RouteResult.component });
+      }
+      return clone;
     });
-
-    var route = document.getElementById(key);
-    if (route) {
-      route.style.display = "flex";
-      if (key !== "general") return;
-      else {
-        route.remove();
-        route = undefined;
-      }
-    } else {
-      cache[key] = false;
-    }
-
-    if (!cache[key]) {
-      if (!route) {
-        cache[key] = key !== "general";
-        route = document.createElement("div");
-        route.id = key;
-        route.className = "route";
-        routeContainer.appendChild(route);
-      }
-      ReactDOM.render(
-        <ThemeProvider>{RouteResult.component}</ThemeProvider>,
-        route
-      );
-    }
-  }, [RouteResult, location]);
+  }, [location]);
 
   return (
     <RouteContainer
@@ -84,12 +76,19 @@ function CachedRouter() {
       buttons={RouteResult?.buttons}
       isEditable={RouteResult?.isEditable}
       onChange={RouteResult?.onChange}
-    />
+    >
+      {renderedRoutes.map((route) => (
+        <div
+          key={route.key}
+          id={route.key}
+          className="route"
+          style={{ display: route.active ? "flex" : "none" }}
+        >
+          {route.component}
+        </div>
+      ))}
+    </RouteContainer>
   );
-}
-
-export function clearRouteCache() {
-  cache = {};
 }
 
 export default CachedRouter;

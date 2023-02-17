@@ -381,7 +381,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         mt={4}
         variant={"anchor"}
         onClick={() => navigate("methods")}
-        sx={{ color: "text" }}
+        sx={{ color: "paragraph" }}
       >
         {`Don't have your recovery key?`}
       </Button>
@@ -447,7 +447,7 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
         mt={4}
         variant={"anchor"}
         onClick={() => navigate("methods")}
-        sx={{ color: "text" }}
+        sx={{ color: "paragraph" }}
       >
         {`Don't have a backup file?`}
       </Button>

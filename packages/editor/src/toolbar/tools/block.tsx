@@ -76,7 +76,7 @@ export function InsertBlock(props: ToolProps) {
         onMouseDown={(e) => e.preventDefault()}
         onClick={() => setIsOpen((s) => !s)}
       >
-        <Icon path={Icons.plus} size={18} color={"primary"} />
+        <Icon path={Icons.plus} size={18} color={"accent"} />
       </Button>
 
       <ResponsivePresenter

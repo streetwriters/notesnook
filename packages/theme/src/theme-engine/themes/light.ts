@@ -36,12 +36,13 @@ export const ThemeLight: ThemeDefinition = {
         border: "#E8E8E8",
         placeholder: "#a9a9a9",
         heading: "#212121",
-        paragraph: "#505050",
+        paragraph: "#303030",
         icon: "#808080",
         separator: "#E8E8E8",
         backdrop: "#0000001a",
         hover: "#00000010",
-        shade: "#00883712"
+        shade: "#00883712",
+        textSelection: "#00883777"
       },
       secondary: {
         accent: "#008837",
@@ -49,12 +50,13 @@ export const ThemeLight: ThemeDefinition = {
         border: "#E8E8E8",
         placeholder: "#a9a9a9",
         heading: "#808080",
-        paragraph: "#818589",
-        icon: "#808080",
+        paragraph: "#666",
+        icon: "#666",
         separator: "#E8E8E8",
         backdrop: "#0000001a",
-        hover: "#00000010",
-        shade: "#00883712"
+        hover: "#dbdbdb",
+        shade: "#00883712",
+        textSelection: "#00883777"
       },
       disabled: {
         accent: "#008837",
@@ -67,7 +69,8 @@ export const ThemeLight: ThemeDefinition = {
         separator: "#E8E8E8",
         backdrop: "#0000001a",
         hover: "#00000010",
-        shade: "#00883712"
+        shade: "#00883712",
+        textSelection: "#00883777"
       },
       error: {
         accent: "#f54b42",
@@ -80,7 +83,8 @@ export const ThemeLight: ThemeDefinition = {
         separator: "#E8E8E8",
         backdrop: "#0000001a",
         hover: "#00000010",
-        shade: "#00883712"
+        shade: "#00883712",
+        textSelection: "#00883777"
       },
       warning: {
         accent: "#FFA500",
@@ -93,7 +97,8 @@ export const ThemeLight: ThemeDefinition = {
         separator: "#E8E8E8",
         backdrop: "#0000001a",
         hover: "#00000010",
-        shade: "#FFA50012"
+        shade: "#FFA50012",
+        textSelection: "#00883777"
       },
       success: {
         accent: "#4F8A10",
@@ -106,7 +111,21 @@ export const ThemeLight: ThemeDefinition = {
         separator: "#E8E8E8",
         backdrop: "#0000001a",
         hover: "#00000010",
-        shade: "#4F8A1012"
+        shade: "#4F8A1012",
+        textSelection: "#00883777"
+      }
+    },
+    statusBar: {
+      primary: {
+        background: "#f7f7f7",
+        paragraph: "#5E5E5E"
+      }
+    },
+    navigationMenu: {
+      primary: {
+        background: "#f7f7f7",
+        paragraph: "#303030",
+        icon: "#303030"
       }
     }
   }

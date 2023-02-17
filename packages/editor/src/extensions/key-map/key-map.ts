@@ -44,9 +44,9 @@ export const KeyMap = Extension.create({
       },
       Backspace: ({ editor }) => {
         return joinUpWithLastListItem(editor);
-      },
+      }
     };
-  },
+  }
 });
 
 /**

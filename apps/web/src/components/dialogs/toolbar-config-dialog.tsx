@@ -144,7 +144,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
                 />
                 {preset.title}
                 {preset.id === "custom" && !isUserPremium() ? (
-                  <Pro color="primary" size={18} sx={{ ml: 1 }} />
+                  <Pro color="accent" size={18} sx={{ ml: 1 }} />
                 ) : null}
               </Label>
             ))}
@@ -164,7 +164,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
                 showToast("success", "Group added successfully");
               }}
             >
-              <Icon path={Icons.plus} color="text" size={18} />
+              <Icon path={Icons.plus}  size={18} />
             </Button>
           )}
         </Flex>

@@ -63,7 +63,7 @@ function getWeek(date) {
 
 /**
  *
- * @param {number} date
+ * @param {number | string | Date} date
  * @param {Intl.DateTimeFormatOptions} options
  * @returns
  */

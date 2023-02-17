@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "../app.css";
 import { useEffect } from "react";
 import { Flex, Text } from "@theme-ui/components";
-import ThemeProvider from "../components/theme-provider";
+import { BaseThemeProvider } from "../components/theme-provider";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { useQueryParams } from "../navigation";
 import * as Icon from "../components/icons";
@@ -32,7 +32,7 @@ function EmailConfirmed() {
   }, [userId]);
 
   return (
-    <ThemeProvider>
+    <BaseThemeProvider>
       <Flex
         bg="background"
         sx={{
@@ -53,7 +53,7 @@ function EmailConfirmed() {
           <Icon.MailCheck
             sx={{ bg: "shade", borderRadius: 100, p: 5 }}
             size={72}
-            color="primary"
+            color="accent"
           />
           <Text
             variant="heading"
@@ -99,7 +99,7 @@ function EmailConfirmed() {
           <BlogPromoBanner link="https://blog.notesnook.com/why-another-note-taking-app/" />
         </Flex>
       </Flex>
-    </ThemeProvider>
+    </BaseThemeProvider>
   );
 }
 export default EmailConfirmed;
