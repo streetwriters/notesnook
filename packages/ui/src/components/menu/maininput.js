@@ -98,11 +98,13 @@ const onKeyPress = {
   ArrowLeft: (e, props) => {
     if (e.target.selectionStart == 0) {
       props.focusInput(props.filters.length - 1);
+      e.preventDefault();
     }
   },
   ArrowRight: (e, props) => {
     if (e.target.selectionStart == e.target.value.length) {
       props.focusInput(0);
+      e.preventDefault();
     }
   },
   Backspace: (e, props) => {

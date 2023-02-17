@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { useEffect, forwardRef, useRef } from "react";
+import { useEffect, forwardRef } from "react";
 import { hexToRGB } from "../../utils/color";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -35,25 +35,13 @@ export function FilterInput(props) {
     getSuggestions,
     setSuggestions,
     onFocus,
-    onBlur,
-    inputRef,
-    searchDefinitions
+    onBlur
   } = props;
 
   useEffect(() => {
     focusInput(filters.length - 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.length]);
-
-  console.log();
-  // useEffect(() => {
-  //   (async () => {
-  //     console.log(filterRef.current.target.innerText);
-  //     //await checkErrors(props, inputRef.filter.target.innerText);
-  //     //addDefinition(item.input, searchDefinitions);
-  //   })();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [filterRef.current.target.innerText]);
 
   const setCalenderState = (state) => {
     setFilters((filters) => {
@@ -64,7 +52,7 @@ export function FilterInput(props) {
   };
 
   const setCalenderDate = () => {
-    document.getElementById(`inputId_${index}`).textContent =
+    document.getElementById(`inputId_${index}`).innerText =
       filters[index].input.date.formatted;
   };
   return !item.input.isDateFilter ? (
@@ -73,8 +61,8 @@ export function FilterInput(props) {
       id={`inputId_${index}`}
       bg={item.input.state.error ? "errorBg" : hexToRGB("#9E9E9E", 0.1)}
       onFocus={async (e) => {
-        await checkErrors(props, e.target.textContent);
-        setSuggestions(await getSuggestions(e.target.textContent, item.input));
+        await checkErrors(props, e.target.innerText);
+        setSuggestions(await getSuggestions(e.target.innerText, item.input));
         onFocus(e);
       }}
       onBlur={onBlur}
@@ -113,10 +101,7 @@ export function FilterInput(props) {
       }}
       onFocus={async (e) => {
         setCalenderState(true);
-        setSuggestions(
-          //shift to top
-          await getSuggestions(e.target.textContent, item.input)
-        );
+        setSuggestions(await getSuggestions(e.target.innerText, item.input));
         onFocus(e);
       }}
       onKeyDown={async (e) => {
@@ -180,30 +165,6 @@ const getCursorPosition = (editableDiv) => {
     }
   }
   return caretPos;
-};
-
-const addDefinition = (input, definitions) => {
-  //hard to understand// minimize if else
-  //for (let filter of filters) console.log(filter.input.state.result);
-  if (input.state.result) {
-    let isArrayEmpty = false;
-    for (let index = 0; index < definitions.length; index++) {
-      if (definitions[index].srNo === input.id) {
-        isArrayEmpty = true;
-        input.state.result.srNo = input.id;
-        definitions[index] = input.state.result;
-      }
-    }
-
-    if (!isArrayEmpty) {
-      input.state.result.srNo = input.id;
-      definitions.push(input.state.result);
-    }
-  }
-};
-
-const onClick = (props, query) => {
-  checkErrors(props, query);
 };
 
 const checkErrors = async (props, query) => {
@@ -276,8 +237,8 @@ const onKeyPress = async (e, props) => {
     suggestions,
     moveSelection
   } = props;
-  setSuggestions(await getSuggestions(e.target.textContent, item.input));
-  await checkErrors(props, e.target.textContent);
+  setSuggestions(await getSuggestions(e.target.innerText, item.input));
+  await checkErrors(props, e.target.innerText);
   return {
     Enter: async () => {
       props.onKeyDown(e);
@@ -285,8 +246,6 @@ const onKeyPress = async (e, props) => {
       let results = await filterSearchEngine(searchDefinitions);
       onSearch(results);
       setSuggestions([]);
-      //await checkErrors(props, e.target.innerText);
-      addDefinition(item.input, searchDefinitions, filters);
       e.preventDefault();
     },
     Escape: () => {
@@ -302,21 +261,21 @@ const onKeyPress = async (e, props) => {
     },
     ArrowLeft: () => {
       if (getCursorPosition(document.getElementById(e.target.id)) == 0) {
-        addDefinition(item.input, searchDefinitions);
         focusInput(index - 1);
+        e.preventDefault();
       }
     },
     ArrowRight: () => {
       if (
         getCursorPosition(document.getElementById(e.target.id)) ==
-        e.target.textContent.length
+        e.target.innerText.length
       ) {
-        addDefinition(item.input, searchDefinitions);
         focusInput(index + 1);
+        e.preventDefault();
       }
     },
     Backspace: () => {
-      if (e.target.textContent === "") {
+      if (e.target.innerText === "") {
         setSuggestions([]);
         setFilters(deleteFilter(filters, index));
         deleteDefinition(searchDefinitions, item.input.id);
