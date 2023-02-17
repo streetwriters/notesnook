@@ -51,42 +51,57 @@ the search will condense. The scope will decrease with the number of filters
 export const filterSearchEngine = async (definitions) => {
   //name is cumbersome
   let notes = [];
-  let searchlabels = [];
-  const organizingNotesFilters = ["notebook", "topic", "tag"];
-  let isOrganizingNotesFilter = false;
   await db.notes.init();
   console.log("search", definitions);
-  for (let definition of definitions) {
-    if (organizingNotesFilters.includes(definition.type))
-      isOrganizingNotesFilter = true;
-  }
-  for (let definition of definitions) {
-    switch (definition.type) {
-      case "notebook":
-        //isOrganizingNotesFilter = true; //this boolean should be done seperately
-        for (let topic of definition.topics) {
-          for (let note of topic.notes) {
-            if (db.notes.note(note)) notes.push(db.notes.note(note)._note);
-          }
-        }
-        break;
-      case "topic":
-        //isOrganizingNotesFilter = true;
-        for (let note of definition.notes) {
-          if (db.notes.note(note)) notes.push(db.notes.note(note)._note);
-        }
-        break;
-      case "tag":
-        //isOrganizingNotesFilter = true;
-        for (let note of definition.noteIds) {
-          if (db.notes.note(note)) notes.push(db.notes.note(note)._note);
-        }
-        break;
-      default:
-        searchlabels.push(definition);
-    }
-  }
 
+  for (let definition of definitions) {
+    console.log("search", definition.type);
+    console.log(beginSearch(definition)[definition.type]());
+    let _notes = beginSearch(definition)[definition.type]();
+    console.log("search", _notes);
+    let newNotes = [];
+    for (let note of notes)
+      for (let _note of _notes) {
+        console.log("search", JSON.stringify(note) == JSON.stringify(_note));
+        if (JSON.stringify(note) == JSON.stringify(_note)) newNotes.push(note);
+      }
+    if (notes.length > 0) notes = [];
+    notes.push(...newNotes);
+  }
+  return notes;
+  // for (let definition of definitions) {
+  //   switch (definition.type) {
+  //     case "notebook":
+  //       //isOrganizingNotesFilter = true; //this boolean should be done seperately
+  //       for (let topic of definition.topics) {
+  //         for (let note of topic.notes) {
+  //           if (db.notes.note(note)) notes.push(db.notes.note(note)._note);
+  //         }
+  //       }
+  //       break;
+  //     case "topic":
+  //       //isOrganizingNotesFilter = true;
+  //       for (let note of definition.notes) {
+  //         if (db.notes.note(note)) notes.push(db.notes.note(note)._note);
+  //       }
+  //       break;
+  //     case "tag":
+  //       //isOrganizingNotesFilter = true;
+  //       for (let note of definition.noteIds) {
+  //         if (db.notes.note(note)) notes.push(db.notes.note(note)._note);
+  //       }
+  //       break;
+  //     default:
+  //       searchlabels.push(definition);
+  //   }
+  // }
+
+  // let newNotes = [];
+  // for (let note of notes)
+  //   for (let nbNote of nbNotes)
+  //     if (assert.deepStrictEqual(nbNote, note)) newNotes.push(note);
+
+  // return newNotes;
   // for (let definition of definitions) { //switch statements or consts
   //   if (definition.type === "notebook") {
   //     isHigherlabelPresent = true;
@@ -117,69 +132,117 @@ export const filterSearchEngine = async (definitions) => {
   //   }
   // }
 
-  let result = [];
-  if (searchlabels.length > 0) {
-    for (let label of searchlabels) {
-      if (notes.length > 0) {
-        if (label.type === "notes") {
-          result = await db.lookup["notes"](notes, label.value);
-        } else if (label.type === "intitle") {
-          result = db.lookup["_byTitle"](notes, label.value);
-        } else {
-          result = await dateSearchEngine(label.value, label.type, notes);
-        }
-      } else if (!isOrganizingNotesFilter) {
-        let allNotes = db.notes.all;
-        if (label.type === "notes") {
-          let search = await db.lookup["notes"](allNotes, label.value);
-          result.push(...search);
-        } else if (label.type === "intitle") {
-          let search = await db.lookup["_byTitle"](allNotes, label.value);
-          result.push(...search);
-        } else {
-          result = await dateSearchEngine(label.value, label.type, allNotes);
-        }
-      }
-    }
-    return result;
-  } else {
-    return notes;
-  }
+  // let result = [];
+  // if (searchlabels.length > 0) {
+  //   for (let label of searchlabels) {
+  //     if (notes.length > 0) {
+  //       if (label.type === "notes") {
+  //         result = await db.lookup["notes"](notes, label.value);
+  //       } else if (label.type === "intitle") {
+  //         result = db.lookup["_byTitle"](notes, label.value);
+  //       } else {
+  //         result = await dateSearchEngine(label.value, label.type, notes);
+  //       }
+  //     } else if (!isOrganizingNotesFilter) {
+  //       let allNotes = db.notes.all;
+  //       if (label.type === "notes") {
+  //         let search = await db.lookup["notes"](allNotes, label.value);
+  //         result.push(...search);
+  //       } else if (label.type === "intitle") {
+  //         let search = await db.lookup["_byTitle"](allNotes, label.value);
+  //         result.push(...search);
+  //       } else {
+  //         result = await dateSearchEngine(label.value, label.type, allNotes);
+  //       }
+  //     }
+  //   }
+  //   return result;
+  // } else {
+  //   return notes;
+  // }
 };
 
 //definitions will first be sorted in following order: nbks> topics>tags>times>notes>intitle,
-// const someMethod = async (definition,notes) => {
-//   await db.notes.init();
-//   return {
-//     notebook: () => {
-//       for (let topic of definition.topics) { // noltebooks and topics will be sorted for search in one method
-//         for (let note of topic.notes) {
-//           if (db.notes.note(note)) notes.push(db.notes.note(note)._note);
-//         }
-//       }
-//     },
-//     topic: () => {
-//       for (let note of definition.notes) {
-//         if (db.notes.note(note)) notes.push(db.notes.note(note)._note);
-//       }
-//     },
-//     tag: () => { //all the notes from tag will be retrived and then mathched with already present notes to sort out relevent notes
-//       for (let note of definition.noteIds) {
-//         if (db.notes.note(note)) notes.push(db.notes.note(note)._note);
-//       }
-//     },
-//     before: () => {//all the notes within dates will be retrived but only those will be sorted out which match with already present notes
-//       let _notes = notes === [] ? db.notes.all : notes;
-//       for (let note of _notes) {
-//         if (note.dateCreated < unixTime) {
-//           result.push(note);
-//         }
-//       }
-//     },
-//     after: () => {},
-//     during: () => {}
-//   };
-// };
+const beginSearch = (definition) => {
+  let notes = [];
+  return {
+    notebook: () => {
+      console.log("beginSearch", definition.topics);
+      for (let topic of definition.topics) {
+        console.log("beginSearch", topic);
+        for (let note of db.notebooks
+          .notebook(topic.notebookId)
+          .topics.topic(topic.id).all) {
+          if (db.notes.note(note)) notes.push(db.notes.note(note)._note);
+        }
+      }
+      console.log("beginSearch", notes);
+      return notes;
+    },
+    topic: () => {
+      for (let note of definition.notes) {
+        if (db.notes.note(note)) notes.push(db.notes.note(note)._note);
+      }
+      console.log("beginSearch", notes);
+      return notes;
+    },
+    tag: () => {
+      for (let note of definition.noteIds) {
+        if (db.notes.note(note)) notes.push(db.notes.note(note)._note);
+      }
+      console.log("beginSearch", notes);
+      return notes;
+    },
+    before: () => {
+      let unixTime = new Date(definition.value).getTime();
+      let _notes = db.notes.all;
+      for (let note of _notes) {
+        if (note.dateCreated < unixTime) {
+          notes.push(note);
+        }
+      }
+      console.log("beginSearch", notes);
+      return notes;
+    },
+    after: () => {
+      let unixTime = new Date(definition.value).getTime();
+      let _notes = db.notes.all;
+      for (let note of _notes) {
+        if (note.dateCreated > unixTime) {
+          notes.push(note);
+        }
+      }
+      console.log("beginSearch", notes);
+      return notes;
+    },
+    during: () => {
+      let unixTime = new Date(definition.value).getTime();
+      let _notes = db.notes.all;
+      for (let note of _notes) {
+        let dateCreated = new Date(note.dateCreated);
+        let noteDate = dateFormat(dateCreated).DDMMYY;
+        let selectedUnix = new Date(unixTime);
+        let selectedDate = dateFormat(selectedUnix).DDMMYY;
+        if (noteDate === selectedDate) {
+          notes.push(note);
+        }
+      }
+      console.log("beginSearch", notes);
+      return notes;
+    },
+    notes: () => {
+      let allNotes = db.notes.all;
+      let notes = db.lookup["notes"](allNotes, definition.value);
+      return notes;
+    },
+    intitle: () => {
+      let allNotes = db.notes.all;
+      notes = db.lookup["_byTitle"](allNotes, definition.value);
+      console.log("beginSearch", notes);
+      return notes;
+    }
+  };
+};
 
 export const dateSearchEngine = async (date, label, notes) => {
   let unixTime = new Date(date).getTime();
