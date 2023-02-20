@@ -92,7 +92,7 @@ function ListItem(props) {
           .get()
           .selectedItems.filter((i) => i.type === props.item.type);
 
-        if (selectedItems.indexOf(props.item) === -1) {
+        if (selectedItems.findIndex((i) => i.id === props.item.id) === -1) {
           selectedItems = [];
           selectedItems.push(props.item);
         }
