@@ -6,8 +6,8 @@
   "dependencies": {
     "@emotion/react": "^11.10.0",
     "@hot-loader/react-dom": "^17.0.2",
-    "@mdi/js": "^6.5.95",
-    "@mdi/react": "^1.4.0",
+    "@mdi/js": "^6.9.96",
+    "@mdi/react": "^1.6.0",
     "@notesnook/clipper": "*",
     "@notesnook/theme": "*",
     "@theme-ui/components": "^0.14.7",
