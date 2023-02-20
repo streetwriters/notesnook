@@ -1,5 +1,5 @@
 
-const isGithubRelease =  process.env.GITHUB_RELEASE;
+const isGithubRelease = false;
 const config = {
   commands: require('@callstack/repack/commands'),
   project: {
