@@ -47,6 +47,8 @@ import useMobile from "../../hooks/use-mobile";
 import Titlebox from "./title-box";
 import useTablet from "../../hooks/use-tablet";
 import Config from "../../utils/config";
+import { AnimatedFlex } from "../animated";
+import { EditorLoader } from "../loaders/editor-loader";
 
 type PreviewSession = {
   content: { data: string; type: string };
@@ -241,6 +243,7 @@ export function Editor(props: EditorProps) {
     focusMode: false,
     isMobile: false
   };
+  const [isLoading, setIsLoading] = useState(true);
 
   const editor = useEditorInstance();
 
@@ -285,7 +288,7 @@ export function Editor(props: EditorProps) {
   }, [editor]);
 
   return (
-    <EditorChrome {...props}>
+    <EditorChrome isLoading={isLoading} {...props}>
       <Tiptap
         isMobile={isMobile}
         nonce={nonce}
@@ -297,6 +300,7 @@ export function Editor(props: EditorProps) {
         }}
         onLoad={() => {
           if (onLoadMedia) onLoadMedia();
+          if (nonce && nonce > 0) setIsLoading(false);
         }}
         onContentChange={onContentChange}
         onChange={onEditorChange}
@@ -320,8 +324,10 @@ export function Editor(props: EditorProps) {
   );
 }
 
-function EditorChrome(props: PropsWithChildren<EditorProps>) {
-  const { options, children } = props;
+function EditorChrome(
+  props: PropsWithChildren<EditorProps & { isLoading: boolean }>
+) {
+  const { options, children, isLoading } = props;
   const { readonly, focusMode, headless, onRequestFocus, isMobile } =
     options || {
       headless: false,
@@ -335,6 +341,23 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
 
   return (
     <>
+      {isLoading ? (
+        <AnimatedFlex
+          sx={{
+            position: "absolute",
+            overflow: "hidden",
+            flex: 1,
+            flexDirection: "column",
+            width: "100%",
+            height: "100%",
+            zIndex: 999,
+            bg: "background"
+          }}
+        >
+          <EditorLoader />
+        </AnimatedFlex>
+      ) : null}
+
       <Toolbar />
       <FlexScrollContainer
         className="editorScroll"
@@ -366,7 +389,13 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
           )}
           <Titlebox readonly={readonly || false} />
           <Header readonly={readonly} />
-          {children}
+          <AnimatedFlex
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isLoading ? 0 : 1 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            {children}
+          </AnimatedFlex>
         </Flex>
       </FlexScrollContainer>
 

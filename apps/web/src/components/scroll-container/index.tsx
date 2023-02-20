@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { PropsWithChildren } from "react";
-import { MacScrollbar } from "mac-scrollbar";
+import { MacScrollbar, MacScrollbarProps } from "mac-scrollbar";
 import "mac-scrollbar/dist/mac-scrollbar.css";
 
 type ScrollContainerProps = {
@@ -53,16 +53,23 @@ type FlexScrollContainerProps = {
   id?: string;
   className?: string;
   style?: React.CSSProperties;
-};
+} & MacScrollbarProps;
 
 export function FlexScrollContainer({
   id,
   children,
   style,
-  className
+  className,
+  ...restProps
 }: PropsWithChildren<FlexScrollContainerProps>) {
   return (
-    <MacScrollbar id={id} className={className} style={style} minThumbSize={40}>
+    <MacScrollbar
+      {...restProps}
+      id={id}
+      className={className}
+      style={style}
+      minThumbSize={40}
+    >
       {children}
     </MacScrollbar>
   );

@@ -34,13 +34,13 @@ import NavigationMenu from "./components/navigation-menu";
 import StatusBar from "./components/status-bar";
 import { EditorLoader } from "./components/loaders/editor-loader";
 import { FlexScrollContainer } from "./components/scroll-container";
+import CachedRouter from "./components/cached-router";
 
 const GlobalMenuWrapper = React.lazy(() =>
   import("./components/global-menu-wrapper")
 );
 const AppEffects = React.lazy(() => import("./app-effects"));
 const MobileAppEffects = React.lazy(() => import("./app-effects.mobile"));
-const CachedRouter = React.lazy(() => import("./components/cached-router"));
 const HashRouter = React.lazy(() => import("./components/hash-router"));
 
 function App() {
@@ -136,14 +136,12 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             visible={!isFocusMode}
             priority={LayoutPriority.Low}
           >
-            <Flex sx={{ overflow: "hidden", flex: 1 }}>
-              <NavigationMenu
-                toggleNavigationContainer={(state) => {
-                  setShow(state || !show);
-                }}
-                isTablet={isNarrow}
-              />
-            </Flex>
+            <NavigationMenu
+              toggleNavigationContainer={(state) => {
+                setShow(state || !show);
+              }}
+              isTablet={isNarrow}
+            />
           </Allotment.Pane>
           <Allotment.Pane
             className="pane middle-pane"
@@ -153,11 +151,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             priority={LayoutPriority.Normal}
           >
             <Flex className="listMenu" variant="columnFill">
-              <SuspenseLoader
-                condition={isAppLoaded}
-                component={CachedRouter}
-                fallback={<ViewLoader />}
-              />
+              {isAppLoaded && <CachedRouter />}
             </Flex>
           </Allotment.Pane>
           <Allotment.Pane
@@ -171,11 +165,13 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
                 flexDirection: "column"
               }}
             >
-              <SuspenseLoader
-                fallback={<EditorLoader />}
-                component={HashRouter}
-                condition={isAppLoaded}
-              />
+              {isAppLoaded && (
+                <SuspenseLoader
+                  fallback={<EditorLoader />}
+                  component={HashRouter}
+                  condition={isAppLoaded}
+                />
+              )}
             </Flex>
           </Allotment.Pane>
         </Allotment>

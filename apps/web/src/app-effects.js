@@ -93,6 +93,8 @@ export default function AppEffects({ setShow }) {
       initEditorStore();
 
       (async function () {
+        await resetReminders();
+
         await updateLastSynced();
         if (await initUser()) {
           showUpgradeReminderDialogs();
