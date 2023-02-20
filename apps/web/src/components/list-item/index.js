@@ -87,7 +87,7 @@ function ListItem(props) {
         e.stopPropagation();
 
         let items = props.menu?.items?.slice() || [];
-        let title = props.item.title;
+        let title = undefined;
         let selectedItems = selectionStore
           .get()
           .selectedItems.filter((i) => i.type === props.item.type);
