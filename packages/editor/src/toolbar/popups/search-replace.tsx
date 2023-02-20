@@ -27,7 +27,7 @@ import { Editor } from "../../types";
 export type SearchReplacePopupProps = { editor: Editor };
 export function SearchReplacePopup(props: SearchReplacePopupProps) {
   const { editor } = props;
-  const { selectedText, results, selectedIndex } = editor.storage
+  const { selectedText, results, selectedIndex, focusNonce } = editor.storage
     .searchreplace as SearchStorage;
 
   const [isReplacing, setIsReplacing] = useState(false);
@@ -67,6 +67,15 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
       search(selectedText);
     }
   }, [selectedText, search]);
+
+  useEffect(() => {
+    if (searchInputRef.current) {
+      const input = searchInputRef.current;
+      setTimeout(() => {
+        input.focus();
+      }, 0);
+    }
+  }, [focusNonce]);
 
   return (
     <Flex
