@@ -259,8 +259,10 @@ async function uploadFile(filename, requestOptions) {
           throw new S3Error(`Failed to upload part at offset ${i}`, e);
         });
 
-      if (!response.headers.etag)
-        throw new Error(`Failed to upload part at offset ${i}: no etag found.`);
+      if (!response.headers.etag || typeof response.headers.etag !== "string")
+        throw new Error(
+          `Failed to upload part at offset ${i}: invalid etag. ETag: ${response.headers.etag}`
+        );
 
       uploadedBytes += blob.size;
       uploadedChunks.push({
