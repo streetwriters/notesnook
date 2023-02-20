@@ -27,7 +27,6 @@ import {
   MfaSms,
   MfaEmail,
   MfaRecoveryCode,
-  Logout,
   Icon
 } from "../components/icons";
 import Field from "../components/field";
@@ -197,35 +196,6 @@ function Auth(props: AuthProps) {
           flexDirection: "column"
         }}
       >
-        {route === "sessionExpiry" && (
-          <>
-            <Button
-              variant={"secondary"}
-              sx={{
-                display: "flex",
-                mt: 2,
-                mr: 2,
-                alignSelf: "end",
-                alignItems: "center",
-                color: "error"
-              }}
-              onClick={async () => {
-                if (await showLogoutConfirmation()) {
-                  await showLoadingDialog({
-                    title: "You are being logged out",
-                    action: () => db.user?.logout(true),
-                    subtitle: "Please wait..."
-                  });
-                  openURL("/login");
-                }
-              }}
-            >
-              <Logout size={16} sx={{ mr: 1 }} color="error" /> Logout
-              permanently
-            </Button>
-          </>
-        )}
-
         {Route && (
           <Route
             navigate={(route, formData) => {
@@ -479,7 +449,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         type="email"
         autoComplete={"false"}
         label="Enter email"
-        defaultValue={user ? maskEmail(user.email) : undefined}
+        placeholder={user ? maskEmail(user.email) : undefined}
         autoFocus
         disabled
       />
@@ -494,6 +464,32 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         Forgot password?
       </Button>
       <SubmitButton text="Relogin to your account" />
+
+      <Button
+        type="button"
+        variant="anchor"
+        sx={{
+          mt: 5,
+          color: "error",
+          textDecoration: "none",
+          ":hover": {
+            color: "error",
+            opacity: 0.8
+          }
+        }}
+        onClick={async () => {
+          if (await showLogoutConfirmation()) {
+            await showLoadingDialog({
+              title: "You are being logged out",
+              action: () => db.user?.logout(true),
+              subtitle: "Please wait..."
+            });
+            openURL("/login");
+          }
+        }}
+      >
+        Logout permanently
+      </Button>
     </AuthForm>
   );
 }
@@ -817,7 +813,7 @@ type AuthFormProps<TType extends AuthRoutes> = {
 };
 
 export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
-  const { title, subtitle, children, type, canSkip } = props;
+  const { title, subtitle, children, canSkip } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
   const formRef = useRef<HTMLFormElement>(null);
