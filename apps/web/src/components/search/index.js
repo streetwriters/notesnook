@@ -29,7 +29,7 @@ function SearchBox(props) {
       id="search"
       name="search"
       type="text"
-      sx={{ mx: 2, mb: 2 }}
+      sx={{ m: 0, mx: 1, mt: 1 }}
       placeholder="Type your query here"
       onKeyDown={(e) => {
         if (e.key === "Enter") props.onSearch(e.target.value);

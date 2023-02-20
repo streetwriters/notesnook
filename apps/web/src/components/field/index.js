@@ -79,7 +79,13 @@ function Field(props) {
 
   return (
     <Flex
-      sx={{ ...sx, ...styles.container, flexDirection: "column", m: "1.5px" }}
+      sx={{
+        m: "2px",
+        mr: "2px",
+        ...sx,
+        ...styles.container,
+        flexDirection: "column"
+      }}
     >
       <Label
         htmlFor={id}
