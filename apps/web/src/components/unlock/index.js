@@ -93,7 +93,8 @@ function Unlock(props) {
       </Flex>
       <Text
         variant="subheading"
-        mt={20}
+        mt={1}
+        mb={4}
         sx={{ textAlign: "center", color: "fontTertiary" }}
       >
         Please enter the password to unlock this note
@@ -103,7 +104,7 @@ function Unlock(props) {
         data-test-id="unlock-note-password"
         inputRef={passwordRef}
         autoFocus
-        sx={{ mt: 2, width: ["95%", "95%", "50%"] }}
+        sx={{ width: ["95%", "95%", "30%"] }}
         placeholder="Enter password"
         type="password"
         onKeyUp={async (e) => {
