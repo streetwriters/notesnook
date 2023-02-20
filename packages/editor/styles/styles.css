@@ -64,6 +64,10 @@
   margin-bottom: 5px;
 }
 
+.ProseMirror ul ul, .ProseMirror ol ol {
+  margin-top: 5px;
+}
+
 .ProseMirror a {
   color: var(--primary);
   cursor: pointer;
