@@ -154,7 +154,7 @@ export function EditLink(props: ToolProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-
+  if (!editor.current?.isEditable) return null;
   return (
     <LinkTool
       {...props}
@@ -180,6 +180,7 @@ export function EditLink(props: ToolProps) {
 
 export function RemoveLink(props: ToolProps) {
   const { editor, selectedNode } = props;
+  if (!editor.current?.isEditable) return null;
   return (
     <ToolButton
       {...props}
