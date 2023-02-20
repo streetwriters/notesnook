@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useMemo, useState } from "react";
-import { Button, Flex, Input, Text } from "@theme-ui/components";
+import { Button, Flex, Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useNoteStore } from "../stores/note-store";
@@ -188,8 +188,8 @@ function Settings() {
     "backupReminderOffset",
     0
   );
-  const [trashDuration, setTrashDuration] = usePersistentState(
-    "trashDuration",
+  const [trashLifetime, setTrashLifetime] = usePersistentState(
+    "trashLifetime",
     0
   );
   const [debugMode, setDebugMode] = usePersistentState("debugMode", false);
@@ -785,7 +785,7 @@ function Settings() {
           </>
         )}
         <Header
-          title="Trash Settings"
+          title="Trash settings"
           isOpen={groups.trash}
           testId="trash-settings"
           onClick={() => {
@@ -794,17 +794,12 @@ function Settings() {
         />
         {groups.trash && (
           <OptionsItem
-            title="Trash Duration"
-            tip={
-              isDesktop()
-                ? "Permanently delete trash after:"
-                : "Wipe out trash after:"
-            }
-            options={["7 Days", "A Month", "A Year", "Never"]}
-            premium="backups"
-            selectedOption={trashDuration}
+            title="Clear trash interval"
+            tip={"Permanently delete all items in the trash"}
+            options={["Weekly", "Monthly", "Yearly", "Never"]}
+            selectedOption={trashLifetime}
             onSelectionChanged={async (_option, index) =>
-              setTrashDuration(index)
+              setTrashLifetime(index)
             }
           />
         )}
@@ -1145,7 +1140,7 @@ function OptionsItem(props) {
               flex: 1,
               textAlign: "center",
               color: selectedOption === index ? "static" : "bgSecondaryText",
-              minWidth: 100
+              minWidth: 70
             }}
           >
             {option}
