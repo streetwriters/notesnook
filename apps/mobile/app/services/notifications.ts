@@ -516,6 +516,7 @@ async function checkAndRequestPermissions(
       await notifee.openAlarmPermissionSettings();
     }
     permissionStatus = await notifee.getNotificationSettings();
+
     if (
       permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED &&
       permissionStatus.android.alarm === 1

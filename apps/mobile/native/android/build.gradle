@@ -69,8 +69,8 @@ allprojects {
         
     
         maven { url 'https://www.jitpack.io' }
-        maven {
-           url("${project(':react-native-background-fetch').projectDir}/libs")
-        }
+        // maven {
+        //    url("${project(':react-native-background-fetch').projectDir}/libs")
+        // }
     }
 }
