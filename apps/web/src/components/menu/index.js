@@ -145,7 +145,7 @@ function Menu({ items, data, title, closeMenu }) {
     }
 
     const { top, left } = getPosition(subMenuRef.current, {
-      yOffset: document.getElementById(item.key).offsetHeight,
+      yOffset: 0,
       relativeTo: document.getElementById(item.key),
       location: "right"
     });
