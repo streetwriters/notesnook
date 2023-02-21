@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node, mergeAttributes, wrappingInputRule } from "@tiptap/core";
-import { createNodeView } from "../react";
-import { OutlineListComponent } from "./component";
 
 export type OutlineListAttributes = {
   collapsed: boolean;
@@ -48,19 +46,6 @@ export const OutlineList = Node.create<OutlineListOptions>({
   addOptions() {
     return {
       HTMLAttributes: {}
-    };
-  },
-
-  addAttributes() {
-    return {
-      collapsed: {
-        default: false,
-        keepOnSplit: false,
-        parseHTML: (element) => element.dataset.collapsed === "true",
-        renderHTML: (attributes) => ({
-          "data-collapsed": attributes.collapsed === true
-        })
-      }
     };
   },
 
@@ -113,13 +98,13 @@ export const OutlineList = Node.create<OutlineListOptions>({
   },
 
   addNodeView() {
-    return createNodeView(OutlineListComponent, {
-      contentDOMFactory: () => {
-        const content = document.createElement("ul");
-        content.classList.add(`${this.name.toLowerCase()}-content-wrapper`);
-        content.style.whiteSpace = "inherit";
-        return { dom: content };
-      }
-    });
+    return () => {
+      const ul = document.createElement("ul");
+      ul.classList.add("outline-list");
+      return {
+        dom: ul,
+        contentDOM: ul
+      };
+    };
   }
 });

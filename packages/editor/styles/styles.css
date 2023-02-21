@@ -41,7 +41,7 @@
   border: 2px solid var(--primary);
 }
 
-.ProseMirror code:not(pre code){
+.ProseMirror code:not(pre code) {
   background-color: var(--bgSecondary);
   border: 1px solid var(--border);
   border-radius: 5px;
@@ -51,7 +51,7 @@
   font-size: 10pt !important;
 }
 
-.ProseMirror code > span  {
+.ProseMirror code > span {
   font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
     Menlo, monospace !important;
 }
@@ -64,7 +64,8 @@
   margin-bottom: 5px;
 }
 
-.ProseMirror ul ul, .ProseMirror ol ol {
+.ProseMirror ul ul,
+.ProseMirror ol ol {
   margin-top: 5px;
 }
 
@@ -90,8 +91,7 @@
 }
 
 .ProseMirror > div.codeblock-view-content-wrap,
-.ProseMirror > div.taskList-view-content-wrap,
-.ProseMirror > div.outlineList-view-content-wrap {
+.ProseMirror > div.taskList-view-content-wrap {
   margin-top: 1em;
   margin-bottom: 1em;
 }
@@ -470,6 +470,71 @@ p > *::selection {
 .math-inline.math-select .math-render {
   padding-top: 2px;
 } */
+
+/* Outline lists */
+
+.ProseMirror > .outline-list {
+  padding-left: 18px;
+}
+
+.outline-list {
+  list-style-type: none;
+  position: relative;
+}
+
+.outline-list li ul {
+  padding-left: 25px;
+}
+
+.outline-list li.collapsed .outline-list {
+  display: none;
+}
+.outline-list li > p {
+  position: relative;
+}
+
+.outline-list li > p::before {
+  position: absolute;
+  top: 4px;
+  left: -22px;
+  cursor: pointer;
+  content: "";
+  background-size: 18px;
+  width: 18px;
+  height: 18px;
+
+  background-color: var(--icon);
+  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik03LjQxIDguNThMMTIgMTMuMTdsNC41OS00LjU5TDE4IDEwbC02IDZsLTYtNmwxLjQxLTEuNDJaIi8+PC9zdmc+)
+    no-repeat 50% 50%;
+  mask-size: cover;
+  border: 1px solid var(--background);
+
+  transform: rotate(0);
+  transition: transform 250ms ease;
+}
+
+.outline-list li:not(.nested) > p::before {
+  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik0xMiAyQTEwIDEwIDAgMCAwIDIgMTJhMTAgMTAgMCAwIDAgMTAgMTBhMTAgMTAgMCAwIDAgMTAtMTBBMTAgMTAgMCAwIDAgMTIgMloiLz48L3N2Zz4=)
+    no-repeat 50% 50%;
+  scale: 0.4;
+}
+
+.outline-list li.collapsed > p::before {
+  transform: rotate(-90deg);
+}
+
+.outline-list li .outline-list::before {
+  content: " ";
+  position: absolute;
+  height: 100%;
+  left: -14px;
+  border-left: 1px solid var(--border);
+  transition: border 200ms ease-in-out;
+}
+
+.outline-list li .outline-list:hover:before {
+  border-left: 1px solid var(--bgSecondaryHover);
+}
 
 /* RTL */
 
