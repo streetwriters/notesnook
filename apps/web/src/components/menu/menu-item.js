@@ -50,12 +50,12 @@ function MenuItem({ item, isFocused, onMouseEnter, onMouseLeave, onClick }) {
   return (
     <Flex
       as="li"
+      id={`menuitem-${key}`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       sx={{ flex: 1, flexDirection: "column" }}
     >
       <Button
-        id={key}
         data-test-id={`menuitem-${key}`}
         key={key}
         ref={itemRef}
