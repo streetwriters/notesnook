@@ -22,8 +22,6 @@ import { NodeType } from "prosemirror-model";
 import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { onArrowUpPressed, onBackspacePressed } from "../list-item/commands";
 import { OutlineList } from "../outline-list/outline-list";
-import { createNodeView } from "../react";
-import { OutlineListItemComponent } from "./component";
 
 export interface ListItemOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -43,6 +41,19 @@ export const OutlineListItem = Node.create<ListItemOptions>({
   addOptions() {
     return {
       HTMLAttributes: {}
+    };
+  },
+
+  addAttributes() {
+    return {
+      collapsed: {
+        default: false,
+        keepOnSplit: false,
+        parseHTML: (element) => element.dataset.collapsed === "true",
+        renderHTML: (attributes) => ({
+          "data-collapsed": attributes.collapsed === true
+        })
+      }
     };
   },
 
@@ -114,10 +125,69 @@ export const OutlineListItem = Node.create<ListItemOptions>({
   },
 
   addNodeView() {
-    return createNodeView(OutlineListItemComponent, {
-      contentDOMFactory: true,
-      wrapperFactory: () => document.createElement("li")
-    });
+    return ({ node, getPos, editor }) => {
+      const isNested = node.lastChild?.type.name === OutlineList.name;
+
+      const li = document.createElement("li");
+
+      if (node.attrs.collapsed) li.classList.add("collapsed");
+      else li.classList.remove("collapsed");
+
+      if (isNested) li.classList.add("nested");
+      else li.classList.remove("nested");
+
+      function onClick(e: MouseEvent | TouchEvent) {
+        if (!(e.target instanceof HTMLParagraphElement)) return;
+        if (!li.classList.contains("nested")) return;
+
+        const clientX =
+          e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+        const clientY =
+          e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
+
+        const { x, y } = li.getBoundingClientRect();
+
+        const hitArea = { width: 26, height: 24 };
+        if (
+          clientX >= x - hitArea.width &&
+          clientX <= x &&
+          clientY >= y &&
+          clientY <= y + hitArea.height
+        ) {
+          const pos = typeof getPos === "function" ? getPos() : 0;
+          if (!pos) return;
+
+          e.preventDefault();
+          editor.commands.toggleOutlineCollapse(
+            pos,
+            !li.classList.contains("collapsed")
+          );
+        }
+      }
+
+      li.onmousedown = onClick;
+      li.ontouchstart = onClick;
+
+      return {
+        dom: li,
+        contentDOM: li,
+        update: (updatedNode) => {
+          if (updatedNode.type !== this.type) {
+            return false;
+          }
+          const isNested =
+            updatedNode.lastChild?.type.name === OutlineList.name;
+
+          if (updatedNode.attrs.collapsed) li.classList.add("collapsed");
+          else li.classList.remove("collapsed");
+
+          if (isNested) li.classList.add("nested");
+          else li.classList.remove("nested");
+
+          return true;
+        }
+      };
+    };
   }
 });
 
@@ -139,17 +209,4 @@ function findSublist(editor: Editor, type: NodeType) {
   const subListPos = listItem.pos + subList.pos + 1;
 
   return { isCollapsed, isNested, subListPos };
-  // return (
-  //   this.editor
-  //     .chain()
-  //     .command(({ tr }) => {
-  //       tr.setNodeMarkup(listItem.pos + subList.pos + 1, undefined, {
-  //         collapsed: !isCollapsed,
-  //       });
-  //       return true;
-  //     })
-  //     //.setTextSelection(listItem.pos + subList.pos + 1)
-  //     //.splitListItem(this.name)
-  //     .run()
-  // );
 }
