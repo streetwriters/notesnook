@@ -24,6 +24,9 @@ import { FlexScrollContainer } from "../scroll-container";
 import MenuItem from "./menu-item";
 import { store as selectionStore } from "../../stores/selection-store";
 
+function getMenuItemId(item) {
+  return `menuitem-${item.key}`;
+}
 function useMenuFocus(items, onAction, onClose) {
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
@@ -32,7 +35,7 @@ function useMenuFocus(items, onAction, onClose) {
     (index) => {
       const item = items[index];
       if (!item) return;
-      const element = document.getElementById(item.key);
+      const element = document.getElementById(getMenuItemId(item));
       if (!element) return;
       element.scrollIntoView({
         behavior: "auto"
@@ -146,7 +149,7 @@ function Menu({ items, data, title, closeMenu }) {
 
     const { top, left } = getPosition(subMenuRef.current, {
       yOffset: 0,
-      relativeTo: document.getElementById(item.key),
+      relativeTo: document.getElementById(getMenuItemId(item)),
       location: "right"
     });
 
