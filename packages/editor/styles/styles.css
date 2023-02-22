@@ -536,6 +536,20 @@ p > *::selection {
   border-left: 1px solid var(--bgSecondaryHover);
 }
 
+/* IMAGE */
+
+.image-view-content-wrap.ProseMirror-selectednode .resizer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  background-image: linear-gradient( -45deg, var(--bgTransparent) 5%, transparent 10%, transparent 90%, var(--bgTransparent) 99%);
+  pointer-events: none;
+}
+
 /* RTL */
 
 [dir="rtl"] * {
