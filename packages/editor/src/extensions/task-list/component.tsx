@@ -78,101 +78,103 @@ export function TaskListComponent(
 
   return (
     <>
-      <Flex
-        sx={{
-          flexDirection: "column"
-        }}
-        className="task-list-tools"
-        dir={textDirection}
-      >
-        {!isNested && (
-          <Flex
+      {!isNested && (
+        <Flex
+          sx={{
+            position: "relative",
+            bg: "bgSecondary",
+            py: 1,
+            borderRadius: "default",
+            mb: 2,
+            alignItems: "center",
+            justifyContent: "end",
+            overflow: "hidden"
+          }}
+          className="task-list-tools"
+          dir={textDirection}
+          contentEditable={false}
+        >
+          <Box
             sx={{
-              position: "relative",
-              bg: "bgSecondary",
-              py: "5px",
-              borderRadius: "default",
-              mb: 2,
-              alignItems: "center",
-              justifyContent: "end",
-              overflow: "hidden"
+              height: "100%",
+              width: `${stats.percentage}%`,
+              position: "absolute",
+              bg: "border",
+
+              zIndex: 0,
+              left: 0,
+              transition: "width 250ms ease-out"
             }}
-            contentEditable={false}
+          />
+          <Input
+            readOnly={!editor.isEditable}
+            value={title || ""}
+            variant={"clean"}
+            sx={{
+              p: 0,
+              px: 2,
+              zIndex: 1,
+              color: "fontTertiary",
+              fontSize: "title"
+            }}
+            placeholder="Untitled"
+            onChange={(e) => {
+              updateAttributes(
+                { title: e.target.value },
+                { addToHistory: true, preventUpdate: false }
+              );
+            }}
+          />
+          {editor.isEditable && (
+            <ToolButton
+              toggled={false}
+              title="Clear completed tasks"
+              icon="clear"
+              variant="small"
+              sx={{
+                zIndex: 1
+              }}
+              onClick={() => {
+                if (!editor.isEditable) return;
+                if (!editor.current) return;
+                const pos = getPos();
+                // we need to get a fresh instance of the task list instead
+                // of using the one we got via props.
+                const node = editor.current.state.doc.nodeAt(pos);
+                if (!node) return;
+
+                editor.current?.commands.command(({ tr }) => {
+                  const taskItems = findChildren(
+                    node,
+                    (n) => n.type.name === TaskItem.name && n.attrs.checked
+                  );
+                  const mapping = tr.mapping;
+                  for (const item of taskItems) {
+                    const childPos = pos + item.pos + 1;
+                    tr.deleteRange(
+                      mapping.map(childPos),
+                      mapping.map(childPos + item.node.nodeSize)
+                    );
+                  }
+                  return true;
+                });
+              }}
+            />
+          )}
+          <Text
+            variant={"body"}
+            sx={{
+              ml: 1,
+              mr: 2,
+              color: "fontTertiary",
+              flexShrink: 0,
+              zIndex: 1
+            }}
           >
-            <Box
-              sx={{
-                height: "100%",
-                width: `${stats.percentage}%`,
-                position: "absolute",
-                bg: "border",
-
-                zIndex: 0,
-                left: 0,
-                transition: "width 250ms ease-out"
-              }}
-            />
-            <Input
-              readOnly={!editor.isEditable}
-              value={title || ""}
-              variant={"clean"}
-              sx={{
-                p: 0,
-                px: 2,
-                zIndex: 1,
-                color: "fontTertiary",
-                fontSize: "title"
-              }}
-              placeholder="Untitled"
-              onChange={(e) => {
-                updateAttributes(
-                  { title: e.target.value },
-                  { addToHistory: true, preventUpdate: false }
-                );
-              }}
-            />
-            <Flex
-              sx={{ flexShrink: 0, pr: 2, zIndex: 1, alignItems: "center" }}
-            >
-              {editor.isEditable && (
-                <ToolButton
-                  toggled={false}
-                  title="Clear completed tasks"
-                  icon="clear"
-                  variant="small"
-                  onClick={() => {
-                    if (!editor.isEditable) return;
-                    if (!editor.current) return;
-                    const pos = getPos();
-                    // we need to get a fresh instance of the task list instead
-                    // of using the one we got via props.
-                    const node = editor.current.state.doc.nodeAt(pos);
-                    if (!node) return;
-
-                    editor.current?.commands.command(({ tr }) => {
-                      const taskItems = findChildren(
-                        node,
-                        (n) => n.type.name === TaskItem.name && n.attrs.checked
-                      );
-                      const mapping = tr.mapping;
-                      for (const item of taskItems) {
-                        const childPos = pos + item.pos + 1;
-                        tr.deleteRange(
-                          mapping.map(childPos),
-                          mapping.map(childPos + item.node.nodeSize)
-                        );
-                      }
-                      return true;
-                    });
-                  }}
-                />
-              )}
-              <Text variant={"body"} sx={{ ml: 1, color: "fontTertiary" }}>
-                {stats.checked}/{stats.total}
-              </Text>
-            </Flex>
-          </Flex>
-        )}
-      </Flex>
+            {stats.checked}/{stats.total}
+          </Text>
+        </Flex>
+      )}
       <Text
         as={"div"}
         ref={forwardRef}
@@ -188,7 +190,18 @@ export function TaskListComponent(
           li: {
             listStyleType: "none",
             position: "relative",
-            marginBottom: isNested ? 1 : [2, 1]
+            marginBottom: isNested ? 1 : [2, 1],
+
+            display: "flex",
+            bg: "background",
+            borderRadius: "default",
+            gap: 2,
+            ":hover > .dragHandle": {
+              opacity: editor.isEditable ? 1 : 0
+            },
+            ":hover > .taskItemTools": {
+              opacity: 1
+            }
           }
         }}
       />

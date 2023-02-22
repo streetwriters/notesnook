@@ -75,137 +75,122 @@ export function TaskItemComponent(
 
   return (
     <>
-      <Flex
-        data-drag-image
-        sx={{
-          bg: "background",
-          borderRadius: "default",
-          gap: 2,
-          ":hover > .dragHandle": {
-            opacity: editor.isEditable ? 1 : 0
-          },
-          ":hover > .taskItemTools": {
-            opacity: 1
-          }
-        }}
-      >
-        {editor.isEditable && (
-          <Icon
-            className="dragHandle"
-            draggable="true"
-            // NOTE: Turning this off somehow makes drag/drop stop working
-            // properly on touch devices.
-            // contentEditable={false}
-            data-drag-handle
-            path={Icons.dragHandle}
-            sx={{
-              opacity: [1, 1, 0],
-              alignSelf: "start",
-              bg: "transparent",
-              cursor: "grab",
-              ".icon:hover path": {
-                fill: "var(--checked) !important"
-              },
-              mt: "1px"
-            }}
-            size={isMobile ? 24 : 20}
-          />
-        )}
+      {editor.isEditable && (
         <Icon
-          path={checked ? Icons.check : ""}
-          stroke="1px"
-          contentEditable={false}
-          tabIndex={1}
+          className="dragHandle"
+          draggable="true"
+          // NOTE: Turning this off somehow makes drag/drop stop working
+          // properly on touch devices.
+          // contentEditable={false}
+          data-drag-handle
+          path={Icons.dragHandle}
           sx={{
-            border: "2px solid",
-            borderColor: checked ? "checked" : "icon",
-            borderRadius: "default",
+            opacity: [1, 1, 0],
             alignSelf: "start",
-            p: "1px",
-            mt: "2px",
-            cursor: editor.isEditable ? "pointer" : "unset",
-            ":hover": {
-              borderColor: "checked"
-            },
-            ":hover .icon path": {
+            bg: "transparent",
+            cursor: "grab",
+            ".icon:hover path": {
               fill: "var(--checked) !important"
-            }
-          }}
-          onMouseDown={(e) => {
-            if (useIsKeyboardOpen.current) {
-              e.preventDefault();
-            }
-            toggle();
-          }}
-          onTouchEnd={(e) => {
-            if (useIsKeyboardOpen.current || isiOS()) {
-              e.preventDefault();
-              toggle();
-            }
-          }}
-          color={checked ? "checked" : "icon"}
-          size={isMobile ? 16 : 14}
-        />
-
-        <Text
-          as="div"
-          ref={forwardRef}
-          sx={{
-            "> .taskitem-content-wrapper > p": {
-              textDecorationLine: checked ? "line-through" : "none",
-              opacity: checked ? 0.8 : 1
             },
-            // FIXME: this is quite fragile and will break if the structure
-            // changes. We should probably find a better & more robust
-            // solution for this.
-            "> .taskitem-content-wrapper > p:hover ~ div > div.task-list-tools .toggleSublist":
-              {
-                opacity: 1
-              },
-            flex: 1,
             mt: "1px"
           }}
+          size={isMobile ? 24 : 20}
         />
-        <DesktopOnly>
-          <Flex
-            className="taskItemTools"
-            sx={{
-              bg: "background",
-              opacity: 0,
-              position: "absolute",
-              top: 1,
-              right: 0,
-              alignItems: "center"
-            }}
-          >
-            {editor.isEditable && (
-              <Icon
-                className="deleleTaskItem"
-                title="Delete this task item"
-                path={Icons.close}
-                size={18}
-                sx={{
-                  cursor: "pointer"
-                }}
-                onClick={() => {
-                  if (!editor.current) return;
-                  const pos = getPos();
+      )}
+      <Icon
+        path={checked ? Icons.check : ""}
+        stroke="1px"
+        contentEditable={false}
+        tabIndex={1}
+        sx={{
+          border: "2px solid",
+          borderColor: checked ? "checked" : "icon",
+          borderRadius: "default",
+          alignSelf: "start",
+          p: "1px",
+          mt: "2px",
+          cursor: editor.isEditable ? "pointer" : "unset",
+          ":hover": {
+            borderColor: "checked"
+          },
+          ":hover .icon path": {
+            fill: "var(--checked) !important"
+          }
+        }}
+        onMouseDown={(e) => {
+          if (useIsKeyboardOpen.current) {
+            e.preventDefault();
+          }
+          toggle();
+        }}
+        onTouchEnd={(e) => {
+          if (useIsKeyboardOpen.current || isiOS()) {
+            e.preventDefault();
+            toggle();
+          }
+        }}
+        color={checked ? "checked" : "icon"}
+        size={isMobile ? 16 : 14}
+      />
 
-                  // we need to get a fresh instance of the task list instead
-                  // of using the one we got via props.
-                  const node = editor.current.state.doc.nodeAt(pos);
-                  if (!node) return;
+      <Text
+        as="div"
+        ref={forwardRef}
+        sx={{
+          "> .taskitem-content-wrapper > p": {
+            textDecorationLine: checked ? "line-through" : "none",
+            opacity: checked ? 0.8 : 1
+          },
+          // FIXME: this is quite fragile and will break if the structure
+          // changes. We should probably find a better & more robust
+          // solution for this.
+          "> .taskitem-content-wrapper > p:hover ~ div > div.task-list-tools .toggleSublist":
+            {
+              opacity: 1
+            },
+          flex: 1,
+          mt: "1px"
+        }}
+      />
+      <DesktopOnly>
+        <Flex
+          className="taskItemTools"
+          sx={{
+            bg: "background",
+            opacity: 0,
+            position: "absolute",
+            top: 1,
+            right: 0,
+            alignItems: "center"
+          }}
+        >
+          {editor.isEditable && (
+            <Icon
+              className="deleleTaskItem"
+              title="Delete this task item"
+              path={Icons.close}
+              size={18}
+              sx={{
+                cursor: "pointer"
+              }}
+              onClick={() => {
+                if (!editor.current) return;
+                const pos = getPos();
 
-                  editor.commands.command(({ tr }) => {
-                    tr.deleteRange(pos, pos + node.nodeSize);
-                    return true;
-                  });
-                }}
-              />
-            )}
-          </Flex>
-        </DesktopOnly>
-      </Flex>
+                // we need to get a fresh instance of the task list instead
+                // of using the one we got via props.
+                const node = editor.current.state.doc.nodeAt(pos);
+                if (!node) return;
+
+                editor.commands.command(({ tr }) => {
+                  tr.deleteRange(pos, pos + node.nodeSize);
+                  return true;
+                });
+              }}
+            />
+          )}
+        </Flex>
+      </DesktopOnly>
     </>
   );
 }

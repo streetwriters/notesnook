@@ -83,7 +83,11 @@ export const TaskItemNode = TaskItem.extend({
   addNodeView() {
     return createNodeView(TaskItemComponent, {
       contentDOMFactory: true,
-      wrapperFactory: () => document.createElement("li"),
+      wrapperFactory: () => {
+        const li = document.createElement("li");
+        li.dataset.dragImage = "true";
+        return li;
+      },
       shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
         return prev.checked !== next.checked;
       }
