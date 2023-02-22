@@ -23,6 +23,7 @@ import {
   mergeAttributes,
   findChildren
 } from "@tiptap/core";
+import { hasSameAttributes } from "../../utils/prosemirror";
 import { Attachment, getDataAttribute } from "../attachment";
 import { createSelectionBasedNodeView } from "../react";
 import { TextDirections } from "../text-direction";
@@ -133,7 +134,9 @@ export const ImageNode = Node.create<ImageOptions>({
   },
 
   addNodeView() {
-    return createSelectionBasedNodeView(ImageComponent);
+    return createSelectionBasedNodeView(ImageComponent, {
+      shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs)
+    });
   },
 
   addCommands() {

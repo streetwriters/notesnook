@@ -24,7 +24,7 @@ import { TaskListComponent } from "./component";
 import { Plugin, PluginKey, NodeSelection } from "prosemirror-state";
 import TaskItem from "@tiptap/extension-task-item";
 import { dropPoint } from "prosemirror-transform";
-import { findChildrenByType } from "../../utils/prosemirror";
+import { findChildrenByType, hasSameAttributes } from "../../utils/prosemirror";
 
 export type TaskListAttributes = {
   title: string;
@@ -106,6 +106,12 @@ export const TaskListNode = TaskList.extend({
         content.classList.add(`${this.name.toLowerCase()}-content-wrapper`);
         content.style.whiteSpace = "inherit";
         return { dom: content };
+      },
+      shouldUpdate: (prev, next) => {
+        return (
+          !hasSameAttributes(prev.attrs, next.attrs) ||
+          prev.childCount !== next.childCount
+        );
       }
     });
   },
