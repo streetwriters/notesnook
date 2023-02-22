@@ -54,7 +54,6 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounceWithId } from "../../utils/debounce";
 import { store as editorstore } from "../../stores/editor-store";
-import TurndownService from "turndown";
 
 type TipTapProps = {
   editorContainer: HTMLElement;
@@ -95,12 +94,7 @@ function save(
 
   if (preventSave) return;
   const html = getHTMLFromFragment(content, editor.schema);
-  const wrapper = document.createElement("div");
-  wrapper.innerHTML = html;
-  const normalizedTarget = normalizeWhiteSpace(wrapper);
-  const normalizedHTML = normalizedTarget.innerHTML;
-
-  onChange?.(noteId, sessionId, normalizedHTML);
+  onChange?.(noteId, sessionId, html);
 }
 
 const deferredSave = debounceWithId(save, SAVE_INTERVAL);
@@ -406,35 +400,4 @@ function getSelectedWords(
     ? ""
     : editor.state.doc.textBetween(selection.from, selection.to, "\n", " ");
   return countWords(selectedText);
-}
-
-export function getTextNodesIn(el: HTMLElement | Text | Node) {
-  const textNodes: Text[] = [];
-  if (el.nodeType === 3) {
-    textNodes.push(el as Text);
-  } else {
-    const children = el.childNodes;
-    for (let i in children) {
-      textNodes.push(...getTextNodesIn(children[i]));
-    }
-  }
-  return textNodes;
-}
-
-// @NOTE: Convert white space to &nbsp; before getting markdown
-function normalizeWhiteSpace(el: HTMLElement) {
-  const target = el.cloneNode(true) as HTMLElement;
-
-  target.normalize();
-
-  const nodes = getTextNodesIn(target);
-  for (let i in nodes) {
-    if (nodes[i].textContent)
-      nodes[i].textContent =
-        nodes[i].textContent?.replace(/ /g, "\u00a0") || "";
-    nodes[i].textContent =
-      nodes[i].textContent?.replace(/\t/g, "\u00a0\u00a0\u00a0\u00a0") || "";
-  }
-
-  return target;
 }
