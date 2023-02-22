@@ -24,9 +24,10 @@ import {
 } from "../react";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "../../types";
+import { Editor as TiptapEditor } from "@tiptap/core";
 import { useEffect, useRef } from "react";
-import { updateColumnsOnResize } from "@_ueberdosis/prosemirror-tables";
-import { NodeView } from "prosemirror-view";
+import { updateColumnsOnResize } from "@tiptap/pm/tables";
+import { EditorView, NodeView } from "prosemirror-view";
 import {
   InsertColumnRight,
   InsertRowBelow,
@@ -88,7 +89,7 @@ export function TableComponent(props: SelectionBasedReactNodeViewProps) {
   );
 }
 
-export function TableNodeView(editor: Editor) {
+export function TableNodeView(editor: TiptapEditor) {
   class TableNode
     extends SelectionBasedNodeView<SelectionBasedReactNodeViewProps<unknown>>
     implements NodeView
@@ -120,7 +121,11 @@ export function TableNodeView(editor: Editor) {
       super.init();
     }
   }
-  return TableNode as unknown as NodeView;
+  return TableNode as unknown as new (
+    node: ProsemirrorNode,
+    cellMinWidth: number,
+    view: EditorView
+  ) => NodeView;
 }
 
 type TableToolbarProps = {

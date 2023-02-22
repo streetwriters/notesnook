@@ -86,7 +86,6 @@ export const Paragraph = Node.create<ParagraphOptions>({
       setParagraph:
         () =>
         ({ commands }) => {
-          console.log("HELLO2");
           return commands.setNode(this.name);
         }
     };

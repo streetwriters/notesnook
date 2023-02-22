@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor } from "@tiptap/core";
-import { selectedRect, TableRect } from "@_ueberdosis/prosemirror-tables";
+import { selectedRect, TableRect } from "@tiptap/pm/tables";
 import { Transaction } from "prosemirror-state";
 import { Node } from "prosemirror-model";
 

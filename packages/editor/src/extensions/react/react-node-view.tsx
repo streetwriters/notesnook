@@ -29,9 +29,8 @@ import {
   ForwardRef,
   ContentDOM
 } from "./types";
-import { NodeViewRendererProps } from "@tiptap/core";
+import { Editor, NodeViewRendererProps } from "@tiptap/core";
 import { __serializeForClipboard, EditorView } from "prosemirror-view";
-import { Editor } from "../../types";
 import { ThemeProvider } from "../../components/theme-provider";
 
 // This is hacky workaround to manually handle serialization when
