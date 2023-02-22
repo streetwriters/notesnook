@@ -53,16 +53,24 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
         height: height || "auto",
         width: width || "auto"
       }}
+      className="resizer"
       maxWidth="100%"
       minWidth={135}
+      handleStyles={{
+        bottomRight: {
+          right: 0,
+          bottom: 0,
+          width: 30,
+          height: 30,
+          zIndex: 2
+        }
+      }}
       handleComponent={{
         bottomRight: (
           <Icon
             sx={{
               width: 25,
               height: 25,
-              marginLeft: -20,
-              marginTop: -20,
               borderTopLeftRadius: "default",
               borderBottomRightRadius: "default"
             }}

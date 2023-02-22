@@ -211,8 +211,8 @@ export function ImageComponent(
                 sx={{
                   cursor: "grab",
                   position: "absolute",
-                  top: 2,
-                  left: 2,
+                  top: 1,
+                  left: 1,
                   zIndex: 999
                 }}
               />
@@ -240,7 +240,6 @@ export function ImageComponent(
                   );
                 }
               }}
-              {...props}
             />
           </Resizer>
         )}
