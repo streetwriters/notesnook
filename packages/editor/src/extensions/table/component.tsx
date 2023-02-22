@@ -35,7 +35,10 @@ import {
 } from "../../toolbar/tools/table";
 import { getToolDefinition } from "../../toolbar/tool-definitions";
 import { getPosition } from "../../utils/position";
-import { findSelectedDOMNode } from "../../utils/prosemirror";
+import {
+  findSelectedDOMNode,
+  hasSameAttributes
+} from "../../utils/prosemirror";
 import { DesktopOnly } from "../../components/responsive";
 import { TextDirections } from "../text-direction";
 
@@ -59,12 +62,12 @@ export function TableComponent(props: SelectionBasedReactNodeViewProps) {
           <>
             <TableRowToolbar
               editor={editor}
-              table={tableRef.current}
+              table={tableRef}
               textDirection={textDirection}
             />
             <TableColumnToolbar
               editor={editor}
-              table={tableRef.current}
+              table={tableRef}
               textDirection={textDirection}
             />
           </>
@@ -98,7 +101,10 @@ export function TableNodeView(editor: Editor) {
         {
           component: TableComponent,
           shouldUpdate: (prev, next) => {
-            return prev.type === next.type;
+            return (
+              !hasSameAttributes(prev.attrs, next.attrs) ||
+              prev.childCount !== next.childCount
+            );
           },
           contentDOMFactory: () => {
             const dom = document.createElement("tbody");
@@ -119,7 +125,7 @@ export function TableNodeView(editor: Editor) {
 
 type TableToolbarProps = {
   editor: Editor;
-  table?: HTMLTableElement;
+  table?: React.MutableRefObject<HTMLTableElement | undefined>;
   textDirection: TextDirections;
 };
 
@@ -127,12 +133,11 @@ function TableRowToolbar(props: TableToolbarProps) {
   const { editor, textDirection } = props;
   const rowToolsRef = useRef<HTMLDivElement>(null);
 
-  useEffect(
-    () => {
+  useEffect(() => {
+    function onSelectionUpdate() {
       if (!rowToolsRef.current) {
         return;
       }
-
       const currentRow = findSelectedDOMNode(editor, ["tableRow"]);
       if (!currentRow) return;
 
@@ -151,10 +156,13 @@ function TableRowToolbar(props: TableToolbarProps) {
         rowToolsRef.current.style.left = `${pos.left}px`;
         rowToolsRef.current.style.right = `unset`;
       }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [editor.state.selection, textDirection]
-  );
+    }
+
+    editor.current?.on("selectionUpdate", onSelectionUpdate);
+    return () => {
+      editor.current?.off("selectionUpdate", onSelectionUpdate);
+    };
+  }, [textDirection]);
 
   return (
     <Flex
@@ -192,9 +200,10 @@ function TableRowToolbar(props: TableToolbarProps) {
 function TableColumnToolbar(props: TableToolbarProps) {
   const { editor, table } = props;
   const columnToolsRef = useRef<HTMLDivElement>(null);
-  useEffect(
-    () => {
-      if (!columnToolsRef.current || !table) {
+
+  useEffect(() => {
+    function onSelectionUpdate() {
+      if (!columnToolsRef.current || !table?.current) {
         return;
       }
 
@@ -209,16 +218,19 @@ function TableColumnToolbar(props: TableToolbarProps) {
         location: "top",
         align: "center",
         target: currentCell as HTMLElement,
-        yAnchor: table,
+        yAnchor: table.current,
         yOffset: 2
       });
 
       columnToolsRef.current.style.left = `${pos.left}px`;
       columnToolsRef.current.style.top = `${pos.top}px`;
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [editor.state.selection, table]
-  );
+    }
+
+    editor.current?.on("selectionUpdate", onSelectionUpdate);
+    return () => {
+      editor.current?.off("selectionUpdate", onSelectionUpdate);
+    };
+  }, []);
 
   return (
     <Flex

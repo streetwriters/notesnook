@@ -28,9 +28,19 @@ import {
   Node as ProsemirrorNode,
   Mark,
   NodeType,
-  ResolvedPos
+  ResolvedPos,
+  Attrs
 } from "prosemirror-model";
 import { EditorState, Selection } from "prosemirror-state";
+
+export function hasSameAttributes(prev: Attrs, next: Attrs) {
+  for (const key in prev) {
+    const prevValue = prev[key];
+    const nextValue = next[key];
+    if (prevValue !== nextValue) return false;
+  }
+  return true;
+}
 
 export type NodeWithOffset = {
   node?: ProsemirrorNode;
