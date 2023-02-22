@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Extension } from "@tiptap/core";
-import { isInTable } from "@_ueberdosis/prosemirror-tables";
+import { isInTable } from "@tiptap/pm/tables";
 import { isListActive } from "../../utils/prosemirror";
 
 export const KeyMap = Extension.create({
