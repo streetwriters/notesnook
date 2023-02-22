@@ -174,6 +174,20 @@ const useTiptap = (
                 }
               }
             ];
+          },
+          addAttributes() {
+            return {
+              margin: {
+                default: "margin",
+                renderHTML: (attributes) => {
+                  if (!attributes.margin) return;
+
+                  return {
+                    style: "margin-top: 4px; margin-bottom:-10px"
+                  };
+                }
+              }
+            };
           }
         }),
         CharacterCount,
