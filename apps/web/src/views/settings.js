@@ -436,22 +436,22 @@ function Settings() {
               <>
                 <Toggle
                   title="Enable sync"
-                  onTip="All changes to or from this device won't be synced."
-                  offTip="All changes to or from this device will be synced."
+                  onTip="All changes to or from this device will be synced."
+                  offTip="All changes to or from this device won't be synced."
                   onToggled={toggleSync}
                   isToggled={isSyncEnabled}
                 />
                 <Toggle
                   title="Enable auto sync"
-                  onTip="You will have to manually run the sync to transfer your changes to other devices."
-                  offTip="All changes will automatically sync to your other device."
+                  onTip="All changes will automatically sync to your other device."
+                  offTip="You will have to manually run the sync to transfer your changes to other devices."
                   onToggled={toggleAutoSync}
                   isToggled={isAutoSyncEnabled}
                 />
                 <Toggle
                   title="Enable realtime sync in editor"
-                  onTip="You will have to manually open/close a note to see new changes."
-                  offTip="All changes in the editor will be synced & updated in realtime."
+                  onTip="All changes in the editor will be synced & updated in realtime."
+                  offTip="You will have to manually open/close a note to see new changes."
                   onToggled={toggleRealtimeSync}
                   isToggled={isRealtimeSyncEnabled}
                 />
