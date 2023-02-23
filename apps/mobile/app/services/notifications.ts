@@ -41,7 +41,6 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import SettingsService from "./settings";
 import { useSettingStore } from "../stores/use-setting-store";
-import ReminderNotify from "../components/sheets/reminder-notify";
 import { sleep } from "../utils/time";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useReminderStore } from "../stores/use-reminder-store";
@@ -107,6 +106,8 @@ const onEvent = async ({ type, detail }: Event) => {
     if (notification?.data?.type === "reminder") {
       const reminder = db.reminders?.reminder(notification.id?.split("_")[0]);
       await sleep(1000);
+      const ReminderNotify =
+        require("../components/sheets/reminder-notify").default;
       ReminderNotify.present(reminder);
     }
 
@@ -451,6 +452,10 @@ async function displayNotification({
         localOnly: true,
         channelId: await getChannelId("default"),
         autoCancel: false,
+        pressAction: {
+          id: "default",
+          mainComponent: "notesnook"
+        },
         actions: actions?.map((action) => ({
           pressAction: {
             id: action

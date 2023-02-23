@@ -32,8 +32,6 @@ import { useUserStore } from "./stores/use-user-store";
 import { View } from "react-native";
 import { useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
-//import { BackgroundSync } from "./services/background-sync";
-Notifications.init();
 NetInfo.configure({
   reachabilityUrl: "https://notesnook.com",
   reachabilityTest: (response) => {
