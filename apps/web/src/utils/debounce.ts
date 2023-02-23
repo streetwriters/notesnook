@@ -48,3 +48,9 @@ export function debounceWithId<F extends (...args: never[]) => void>(
 
   return debounced;
 }
+
+const DEBOUNCE_TIMEOUTS: Record<string, NodeJS.Timeout> = {};
+export function inlineDebounce(id: string, func: () => void, waitFor: number) {
+  clearTimeout(DEBOUNCE_TIMEOUTS[id]);
+  DEBOUNCE_TIMEOUTS[id] = setTimeout(func, waitFor);
+}
