@@ -67,7 +67,8 @@ export const SelectionPersist = Extension.create({
             if (isBlurred) {
               return DecorationSet.create(tr.doc, [
                 Decoration.inline(from, to, {
-                  style: "background-color: var(--dimPrimary)"
+                  style:
+                    "background-color: var(--dimPrimary); font-family: inherit;"
                 })
               ]);
             } else if (isFocused) {
