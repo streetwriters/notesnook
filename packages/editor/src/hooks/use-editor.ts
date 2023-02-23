@@ -47,14 +47,10 @@ export const useEditor = (
       instance.on("transaction", () => {
         clearTimeout(updateTimeout.current);
         updateTimeout.current = setTimeout(() => {
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              if (isMounted) {
-                forceUpdate();
-              }
-            });
-          });
-        }, 100) as unknown as number;
+          if (isMounted) {
+            forceUpdate();
+          }
+        }, 200) as unknown as number;
       });
 
       return () => {
