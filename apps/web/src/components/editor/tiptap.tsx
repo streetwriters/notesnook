@@ -162,6 +162,7 @@ function TipTap(props: TipTapProps) {
       isMobile: isMobile || false,
       element: editorContainer,
       editable: !readonly,
+      parseOptions: { preserveWhitespace: "full" },
       content,
       autofocus: "start",
       onFocus,
@@ -364,7 +365,7 @@ function toIEditor(editor: Editor): IEditor {
           tr.setMeta("preventSave", true);
           return true;
         })
-        .setContent(content, true)
+        .setContent(content, true, { preserveWhitespace: "full" })
         .setTextSelection({
           from,
           to

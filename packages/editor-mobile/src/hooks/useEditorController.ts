@@ -115,7 +115,9 @@ export function useEditorController(update: () => void): EditorController {
           htmlContentRef.current = value;
           if (!editor) break;
           const { from, to } = editor.state.selection;
-          editor?.commands.setContent(htmlContentRef.current, false);
+          editor?.commands.setContent(htmlContentRef.current, false, {
+            preserveWhitespace: "full"
+          });
           editor.commands.setTextSelection({
             from,
             to

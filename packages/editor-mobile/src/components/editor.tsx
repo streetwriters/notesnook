@@ -85,6 +85,7 @@ const Tiptap = ({
       editorProps: {
         editable: () => !settings.readonly
       },
+      parseOptions: { preserveWhitespace: "full" },
       content: global.editorController?.content?.current,
       isMobile: true,
       isKeyboardOpen: settings.keyboardShown,

@@ -28,14 +28,11 @@ export const KeyMap = Extension.create({
     return {
       Tab: ({ editor }) => {
         if (isListActive(editor) || isInTable(editor.state)) return false;
-        return editor.commands.insertContent("\u00a0\u00a0\u00a0\u00a0");
+        return editor.commands.insertContent("\t");
       },
       "Shift-Tab": ({ editor }) => {
         if (isListActive(editor)) return false;
         return true;
-      },
-      Space: ({ editor }) => {
-        return editor.commands.insertContent("\u00a0");
       }
     };
   }
