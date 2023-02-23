@@ -27,6 +27,8 @@
   padding-bottom: 10px;
   cursor: pointer;
   position: relative;
+  margin-top: 4px; 
+  margin-bottom:-10px;
 }
 
 .ProseMirror hr::after {
