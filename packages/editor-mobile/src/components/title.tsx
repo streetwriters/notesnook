@@ -51,7 +51,7 @@ function Title({
       contentEditable={!readonly}
       disabled={readonly}
       style={{
-        height: 50,
+        height: 40,
         fontSize: 25,
         width: "100%",
         boxSizing: "border-box",
@@ -62,7 +62,8 @@ function Title({
         fontFamily: "Open Sans",
         backgroundColor: "transparent",
         color: "var(--nn_heading)",
-        caretColor: "var(--nn_accent)"
+        caretColor: "var(--nn_accent)",
+        borderRadius: 0
       }}
       maxLength={150}
       onChange={(event) => {
