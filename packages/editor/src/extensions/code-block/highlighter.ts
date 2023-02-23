@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Plugin, PluginKey } from "prosemirror-state";
+import { Plugin, PluginKey, EditorState } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import {
   findChildren,
@@ -104,7 +104,6 @@ export function HighlighterPlugin({
   const key = new PluginKey("highlighter");
   return new Plugin({
     key,
-
     state: {
       init: (config, state) => {
         const allDecorations: Decoration[] = [];
@@ -175,47 +174,50 @@ export function HighlighterPlugin({
         return key.getState(state);
       }
     },
-
-    appendTransaction: (transactions, oldState, newState) => {
-      const oldNodeName = oldState.selection.$head.parent.type.name;
-      const newNodeName = newState.selection.$head.parent.type.name;
-
-      const isDocChanged = transactions.some(
-        (transaction) => transaction.docChanged
-      );
-      const isInsideCodeblock = oldNodeName === name || newNodeName === name;
-      const isSelectionChanged =
-        isInsideCodeblock && !oldState.selection.eq(newState.selection);
-
-      if (isDocChanged || isSelectionChanged) {
-        const block = findParentNodeClosestToPos(
-          newState.selection.$head,
-          (node) => node.type.name === name
-        );
-        if (!block) return null;
-        const { tr } = newState;
-        const { node, pos } = block;
-        const attributes = { ...node.attrs };
-
-        if (isDocChanged || !attributes.lines?.length) {
-          const lines = toCodeLines(node.textContent, pos);
-          attributes.lines = lines.slice();
-        }
-
-        if (isDocChanged) {
-          const position = toCaretPosition(
-            newState.selection,
-            isDocChanged ? toCodeLines(node.textContent, pos) : undefined
-          );
-          attributes.caretPosition = position;
-        }
-
-        if (isDocChanged || isSelectionChanged) {
-          tr.setNodeMarkup(pos, node.type, attributes);
-        }
-
-        return tr;
-      }
+    appendTransaction(transactions, oldState, newState) {
+      const isDocChanged = transactions.some((tr) => tr.docChanged);
+      return updateSelection(name, oldState, newState, isDocChanged);
     }
   });
+}
+
+function updateSelection(
+  name: string,
+  oldState: EditorState,
+  newState: EditorState,
+  isDocChanged: boolean
+) {
+  const oldNodeName = oldState.selection.$head.parent.type.name;
+  const newNodeName = newState.selection.$head.parent.type.name;
+
+  const isInsideCodeblock = oldNodeName === name || newNodeName === name;
+  const isSelectionChanged =
+    isInsideCodeblock && !oldState.selection.eq(newState.selection);
+
+  if (isDocChanged || isSelectionChanged) {
+    const block = findParentNodeClosestToPos(
+      newState.selection.$head,
+      (node) => node.type.name === name
+    );
+    if (!block) return null;
+    const { node, pos } = block;
+    const attributes = { ...node.attrs };
+
+    if (isDocChanged || !attributes.lines?.length) {
+      const lines = toCodeLines(node.textContent, pos);
+      attributes.lines = lines.slice();
+    }
+
+    const position = toCaretPosition(
+      newState.selection,
+      isDocChanged ? toCodeLines(node.textContent, pos) : undefined
+    );
+    attributes.caretPosition = position;
+
+    const { tr } = newState;
+    tr.setMeta("preventUpdate", true);
+    tr.setMeta("addToHistory", false);
+    tr.setNodeMarkup(pos, node.type, attributes);
+    return tr;
+  }
 }
