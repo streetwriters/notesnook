@@ -288,8 +288,9 @@ android {
                 if (fdroidBuild()) {
                     output.versionCodeOverride =
                        defaultConfig.versionCode * 5 + versionCodes.get(abi)
-                    println("Version code: ${output.versionCodeOverride} for abi ${versionCodes.get(abi)}");
+                    println("Fdroid Version code: ${output.versionCodeOverride} for abi ${versionCodes.get(abi)}");
                 } else {
+                    println("Version code: ${output.versionCodeOverride} for abi ${versionCodes.get(abi)}");
                     output.versionCodeOverride =
                         versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
                 }
