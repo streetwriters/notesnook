@@ -48,9 +48,10 @@ export class AppModel {
     this.routeHeader = this.page.locator(getTestId("routeHeader"));
   }
 
-  async goto() {
+  async goto(isLoggedIn = false) {
     await this.page.goto("/");
     await this.routeHeader.waitFor({ state: "visible" });
+    if (!isLoggedIn) await this.navigation.waitForItem("Login");
   }
 
   goBack() {
@@ -101,7 +102,9 @@ export class AppModel {
   async navigateTo(title: string) {
     if ((await this.getRouteHeader()) === title) return;
     const item = await this.navigation.findItem(title);
-    await item?.click();
+    if (!item) throw new Error(`Could not find item to navigate to: ${title}`);
+
+    await item.click();
     await this.page.waitForTimeout(1000);
   }
 

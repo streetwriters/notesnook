@@ -40,7 +40,7 @@ test.afterAll(async () => {
 });
 
 test.afterEach(async () => {
-  await app.goto();
+  await app.goto(true);
 });
 
 function roundOffPrices(prices: PriceItem[]) {
@@ -142,7 +142,7 @@ test("apply coupon through url", async () => {
 
     planPrices[plan] = roundOffPrices(await pricing.getPrices());
 
-    await app.goto();
+    await app.goto(true);
   }
 
   for (const key in planPrices) {

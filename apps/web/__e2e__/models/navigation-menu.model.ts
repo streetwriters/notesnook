@@ -38,6 +38,12 @@ export class NavigationMenuModel {
     }
   }
 
+  waitForItem(title: string) {
+    return this.menu
+      .locator(getTestId(`navigation-item`), { hasText: title })
+      .waitFor();
+  }
+
   async getShortcuts() {
     const shortcuts: string[] = [];
     for await (const item of this.iterateList()) {

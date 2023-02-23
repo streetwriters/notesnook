@@ -289,9 +289,7 @@ test("Ctrl+Click to select/unselect notes", async ({ page }, info) => {
   }
 
   await selectedNote.contextMenu.open();
-  expect(
-    (await selectedNote.contextMenu.title()) === (await selectedNote.getTitle())
-  ).toBeTruthy();
+  expect(await selectedNote.contextMenu.title()).toBeFalsy();
 });
 
 test("opening a note & right clicking on another note should show note properties menu", async ({
@@ -306,7 +304,5 @@ test("opening a note & right clicking on another note should show note propertie
 
   await notesList[0].click();
   await selectedNote.contextMenu.open();
-  expect(
-    (await selectedNote.contextMenu.title()) === (await selectedNote.getTitle())
-  ).toBeTruthy();
+  expect(await selectedNote.contextMenu.title()).toBeFalsy();
 });

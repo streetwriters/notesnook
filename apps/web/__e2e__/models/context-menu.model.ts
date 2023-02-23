@@ -29,6 +29,7 @@ export class ContextMenuModel {
   }
 
   async title() {
+    if (!(await this.titleText.isVisible())) return null;
     return await this.titleText.textContent();
   }
 
