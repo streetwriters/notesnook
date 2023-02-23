@@ -198,6 +198,10 @@ img.ProseMirror-separator {
   vertical-align: top;
 }
 
+.ProseMirror table .selectedCell {
+  border-color: var(--primary);
+}
+
 .ProseMirror table td > *,
 .ProseMirror table th > * {
   margin-bottom: 0;
@@ -226,7 +230,7 @@ img.ProseMirror-separator {
   background-color: var(--primary);
   bottom: -2px;
   position: absolute;
-  right: -2px;
+  right: 0px;
   pointer-events: none;
   top: 0;
   width: 5px;

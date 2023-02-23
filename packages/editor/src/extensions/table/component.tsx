@@ -135,16 +135,21 @@ type TableToolbarProps = {
 };
 
 function TableRowToolbar(props: TableToolbarProps) {
-  const { editor, textDirection } = props;
+  const { editor, textDirection, table } = props;
   const rowToolsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function onSelectionUpdate() {
-      if (!rowToolsRef.current) {
+      if (!rowToolsRef.current || !table?.current) {
         return;
       }
+
       const currentRow = findSelectedDOMNode(editor, ["tableRow"]);
-      if (!currentRow) return;
+      if (!currentRow || !table.current.contains(currentRow)) {
+        rowToolsRef.current.style.display = "none";
+        return;
+      }
+      rowToolsRef.current.style.display = "flex";
 
       const pos = getPosition(rowToolsRef.current, {
         location: "left",
@@ -153,6 +158,7 @@ function TableRowToolbar(props: TableToolbarProps) {
         xOffset: -5,
         yOffset: -3
       });
+
       rowToolsRef.current.style.top = `${pos.top}px`;
       if (textDirection) {
         rowToolsRef.current.style.right = `${pos.left}px`;
@@ -173,6 +179,7 @@ function TableRowToolbar(props: TableToolbarProps) {
     <Flex
       ref={rowToolsRef}
       sx={{
+        display: "none",
         zIndex: 999,
         top: 0,
         left: 0,
@@ -216,7 +223,11 @@ function TableColumnToolbar(props: TableToolbarProps) {
         "tableCell",
         "tableHeader"
       ]);
-      if (!currentCell) return;
+      if (!currentCell || !table.current.contains(currentCell)) {
+        columnToolsRef.current.style.display = `none`;
+        return;
+      }
+      columnToolsRef.current.style.display = "flex";
 
       // tableRef.current
       const pos = getPosition(columnToolsRef.current, {
@@ -241,6 +252,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
     <Flex
       ref={columnToolsRef}
       sx={{
+        display: "none",
         zIndex: 999,
         top: 0,
         left: 0,
