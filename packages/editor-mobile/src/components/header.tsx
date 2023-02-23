@@ -209,7 +209,6 @@ export default function Header({
               </Button>
             )}
 
-
             <Button
               onPress={() => {
                 editor?.commands.startSearch();
