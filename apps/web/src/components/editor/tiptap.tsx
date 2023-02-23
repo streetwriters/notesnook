@@ -142,7 +142,6 @@ function TipTap(props: TipTapProps) {
           const hasText = event.clipboardData?.types?.some((type) =>
             type.startsWith("text/")
           );
-
           // we always give preference to text over files & skip any attached
           // files if there is text.
           // TODO: give user an actionable hint to allow them to select what they
@@ -163,6 +162,7 @@ function TipTap(props: TipTapProps) {
       isMobile: isMobile || false,
       element: editorContainer,
       editable: !readonly,
+      parseOptions: { preserveWhitespace: "full" },
       content,
       autofocus: "start",
       onFocus,
@@ -381,7 +381,7 @@ function toIEditor(editor: Editor): IEditor {
           tr.setMeta("preventSave", true);
           return true;
         })
-        .setContent(content, true)
+        .setContent(content, true, { preserveWhitespace: "full" })
         .setTextSelection({
           from,
           to
