@@ -26,12 +26,13 @@ import {
   Linking,
   NativeEventEmitter,
   NativeModules,
-  Platform
+  Platform,
+  Keyboard
 } from "react-native";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
 import { Walkthrough } from "../components/walkthroughs";
-import { editorState } from "../screens/editor/tiptap/utils";
+import { editorController, editorState } from "../screens/editor/tiptap/utils";
 import {
   clearMessage,
   setEmailVerifyMessage,
@@ -494,6 +495,10 @@ export const useAppEvents = () => {
           !useUserStore.getState().verifyUser
         ) {
           useUserStore.getState().setVerifyUser(true);
+          if (Platform.OS === "ios") {
+            editorController.current?.commands.blur();
+            Keyboard.dismiss();
+          }
         }
         if (
           SettingsService.get().privacyScreen ||
