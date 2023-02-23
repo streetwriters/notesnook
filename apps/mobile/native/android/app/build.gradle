@@ -139,6 +139,11 @@ def reactNativeArchitectures() {
     return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
+def fdroidBuild() {
+    def value = project.getProperties().get("fdroidBuild")
+    return value ? value : false
+}
+
 def getNpmVersion() {
     def inputFile = file("$rootDir/../../package.json")
     def jsonPackage = new JsonSlurper().parseText(inputFile.text)
@@ -280,17 +285,19 @@ android {
             def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
             def abi = output.getFilter(OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
-                output.versionCodeOverride =
+                if (fdroidBuild()) {
+                    output.versionCodeOverride =
+                       defaultConfig.versionCode * 5 + versionCodes.get(abi)
+                    println("Version code: ${output.versionCodeOverride} for abi ${versionCodes.get(abi)}");
+                } else {
+                    output.versionCodeOverride =
                         versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
+                }
+                
             }
 
         }
     }
-
-    
-    
-
-
 
 }
 
