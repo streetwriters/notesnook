@@ -30,7 +30,6 @@ import { useUserStore } from "../../stores/use-user-store";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import BaseDialog from "../dialog/base-dialog";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
 import { SvgView } from "../ui/svg";
@@ -97,9 +96,6 @@ export const Signup = ({ changeMode, trial }) => {
 
   return (
     <>
-      {loading ? (
-        <BaseDialog transparent={true} visible={true} animation="fade" />
-      ) : null}
       <Animated.View
         entering={FadeInDown}
         exiting={FadeOutUp}
@@ -148,6 +144,7 @@ export const Signup = ({ changeMode, trial }) => {
               textAlign: "center"
             }}
             onPress={() => {
+              if (loading) return;
               changeMode(0);
             }}
             size={SIZE.md}
@@ -235,7 +232,10 @@ export const Signup = ({ changeMode, trial }) => {
                 borderRadius: 100
               }}
               loading={loading}
-              onPress={signup}
+              onPress={() => {
+                if (loading) return;
+                signup();
+              }}
               type="accent"
               title={loading ? null : "Agree and continue"}
             />

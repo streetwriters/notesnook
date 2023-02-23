@@ -26,7 +26,6 @@ import { eSendEvent } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import BaseDialog from "../dialog/base-dialog";
 import SheetProvider from "../sheet-provider";
 import { Progress } from "../sheets/progress";
 import { Button } from "../ui/button";
@@ -83,9 +82,6 @@ export const Login = ({ changeMode }) => {
     <>
       <ForgotPassword />
       <SheetProvider context="two_factor_verify" />
-      {loading ? (
-        <BaseDialog transparent={true} visible={true} animation="fade" />
-      ) : null}
       <Animated.View
         entering={FadeInDown}
         exiting={FadeOutUp}
@@ -134,6 +130,7 @@ export const Login = ({ changeMode }) => {
               marginTop: 5
             }}
             onPress={() => {
+              if (loading) return;
               changeMode(1);
             }}
             size={SIZE.md}
@@ -172,7 +169,7 @@ export const Login = ({ changeMode }) => {
             errorMessage="Email is invalid"
             placeholder="Enter your email"
             defaultValue={email.current}
-            editable={step === LoginSteps.emailAuth}
+            editable={step === LoginSteps.emailAuth && !loading}
             onSubmit={() => {
               passwordInputRef.current?.focus();
             }}
@@ -194,6 +191,7 @@ export const Login = ({ changeMode }) => {
                 autoCorrect={false}
                 placeholder="Password"
                 marginBottom={0}
+                editable={!loading}
                 defaultValue={password.current}
                 onSubmit={() => login()}
               />
@@ -205,6 +203,7 @@ export const Login = ({ changeMode }) => {
                   paddingHorizontal: 0
                 }}
                 onPress={() => {
+                  if (loading) return;
                   SheetManager.show("forgotpassword_sheet", email.current);
                 }}
                 textStyle={{
@@ -228,7 +227,10 @@ export const Login = ({ changeMode }) => {
                 borderRadius: 100
               }}
               loading={loading}
-              onPress={login}
+              onPress={() => {
+                if (loading) return;
+                login();
+              }}
               type="accent"
               title={
                 loading
@@ -248,6 +250,7 @@ export const Login = ({ changeMode }) => {
                   marginTop: 10
                 }}
                 onPress={() => {
+                  if (loading) return;
                   setStep(LoginSteps.emailAuth);
                   setLoading(false);
                 }}
