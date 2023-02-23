@@ -1,8 +1,8 @@
-diff --git a/node_modules/@tiptap/core/dist/tiptap-core.esm.js b/node_modules/@tiptap/core/dist/tiptap-core.esm.js
-index 6ef6d0c..fd89f44 100644
---- a/node_modules/@tiptap/core/dist/tiptap-core.esm.js
-+++ b/node_modules/@tiptap/core/dist/tiptap-core.esm.js
-@@ -3120,8 +3120,7 @@ const Keymap = Extension.create({
+diff --git a/node_modules/@tiptap/core/dist/index.js b/node_modules/@tiptap/core/dist/index.js
+index 5f413ac..1ccdb49 100644
+--- a/node_modules/@tiptap/core/dist/index.js
++++ b/node_modules/@tiptap/core/dist/index.js
+@@ -3093,8 +3093,7 @@ const Keymap = Extension.create({
              new Plugin({
                  key: new PluginKey('clearDocument'),
                  appendTransaction: (transactions, oldState, newState) => {
@@ -12,7 +12,7 @@ index 6ef6d0c..fd89f44 100644
                      if (!docChanges) {
                          return;
                      }
-@@ -3129,10 +3128,14 @@ const Keymap = Extension.create({
+@@ -3102,10 +3101,14 @@ const Keymap = Extension.create({
                      const allFrom = Selection.atStart(oldState.doc).from;
                      const allEnd = Selection.atEnd(oldState.doc).to;
                      const allWasSelected = from === allFrom && to === allEnd;
