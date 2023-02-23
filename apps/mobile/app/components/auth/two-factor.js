@@ -205,7 +205,9 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                   : "xxxxxx"
               }
               testID={"input.totp"}
-              maxLength={currentMethod.method === "recoveryCode" ? undefined : 6}
+              maxLength={
+                currentMethod.method === "recoveryCode" ? undefined : 6
+              }
               fwdRef={inputRef}
               textAlign="center"
               onChangeText={(value) => {
@@ -300,7 +302,9 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
 
 TwoFactorVerification.present = (onMfaLogin, data, context) => {
   presentSheet({
-    component: <TwoFactorVerification onMfaLogin={onMfaLogin} mfaInfo={data} />,
+    component: () => (
+      <TwoFactorVerification onMfaLogin={onMfaLogin} mfaInfo={data} />
+    ),
     context: context || "two_factor_verify",
     onClose: () => {
       onMfaLogin();

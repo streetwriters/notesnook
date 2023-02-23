@@ -75,7 +75,7 @@ export const useLogin = (onFinishLogin) => {
                   mfa.code,
                   mfa.method
                 );
-                
+
                 if (success) {
                   setStep(LoginSteps.passwordAuth);
                   setLoading(false);
@@ -94,6 +94,8 @@ export const useLogin = (onFinishLogin) => {
                 }
               }
             }, mfaInfo);
+          } else {
+            finishWithError(new Error("Unable to send 2FA code"));
           }
           break;
         }
