@@ -450,8 +450,8 @@ function Settings() {
                 />
                 <Toggle
                   title="Enable realtime sync in editor"
-                  onTip="You will have to manually open/close a note to see new changes."
-                  offTip="All changes in the editor will be synced & updated in realtime."
+                  onTip="All changes in the editor will be synced & updated in realtime."
+                  offTip="You will have to manually open/close a note to see new changes."
                   onToggled={toggleRealtimeSync}
                   isToggled={isRealtimeSyncEnabled}
                 />
