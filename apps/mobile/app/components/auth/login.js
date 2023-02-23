@@ -26,7 +26,6 @@ import { eSendEvent } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import BaseDialog from "../dialog/base-dialog";
 import SheetProvider from "../sheet-provider";
 import { Progress } from "../sheets/progress";
 import { Button } from "../ui/button";
@@ -131,6 +130,7 @@ export const Login = ({ changeMode }) => {
               marginTop: 5
             }}
             onPress={() => {
+              if (loading) return;
               changeMode(1);
             }}
             size={SIZE.md}
