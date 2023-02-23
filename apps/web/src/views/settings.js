@@ -436,15 +436,15 @@ function Settings() {
               <>
                 <Toggle
                   title="Enable sync"
-                  onTip="All changes to or from this device won't be synced."
-                  offTip="All changes to or from this device will be synced."
+                  onTip="All changes to or from this device will be synced."
+                  offTip="All changes to or from this device won't be synced."
                   onToggled={toggleSync}
                   isToggled={isSyncEnabled}
                 />
                 <Toggle
                   title="Enable auto sync"
-                  onTip="You will have to manually run the sync to transfer your changes to other devices."
-                  offTip="All changes will automatically sync to your other device."
+                  onTip="All changes will automatically sync to your other device."
+                  offTip="You will have to manually run the sync to transfer your changes to other devices."
                   onToggled={toggleAutoSync}
                   isToggled={isAutoSyncEnabled}
                 />
