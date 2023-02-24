@@ -24,7 +24,6 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { PressableButton } from "../../components/ui/pressable";
 import Paragraph from "../../components/ui/typography/paragraph";
-import PremiumService from "../../services/premium";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 
@@ -59,7 +58,7 @@ export const TrashIntervalSelector = () => {
         anchor={
           <PressableButton
             onPress={async () => {
-              await PremiumService.verify(menuRef.current?.show);
+              menuRef.current?.show();
             }}
             type="grayBg"
             customStyle={{
