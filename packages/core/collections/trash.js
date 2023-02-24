@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import dayjs from "dayjs";
-import Config from "../../../apps/web/src/utils/config";
 
 export default class Trash {
   /**
@@ -39,13 +38,12 @@ export default class Trash {
 
   async cleanup() {
     const now = dayjs().unix();
-    const duration = trashDuration(Config.get("trashDuration", 0));
-    if (duration)
-      for (const item of this.all) {
-        if (dayjs(item.dateDeleted).add(duration, "days").unix() > now)
-          continue;
-        await this.delete(item.id);
-      }
+    const duration = this._db.settings.getTrashCleanupInterval();
+    if (duration === -1 || !duration) return;
+    for (const item of this.all) {
+      if (dayjs(item.dateDeleted).add(duration, "days").unix() > now) continue;
+      await this.delete(item.id);
+    }
   }
 
   get all() {
