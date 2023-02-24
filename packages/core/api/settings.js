@@ -124,6 +124,18 @@ class Settings {
   getAlias(id) {
     return this._settings.aliases[id];
   }
+  /**
+   * Setting to -1 means never clear trash.
+   * @param {7 | 30 | 365 | -1} time
+   */
+  async setTrashCleanupInterval(time) {
+    this._settings.trashCleanupInterval = time;
+    await this._saveSettings();
+  }
+
+  getTrashCleanupInterval() {
+    return this._settings.trashCleanupInterval || 7;
+  }
 
   _initSettings(settings) {
     this._settings = {
@@ -134,6 +146,7 @@ class Settings {
       aliases: {},
       dateModified: 0,
       dateCreated: 0,
+      trashCleanupInterval: 7,
       ...(settings || {})
     };
   }
