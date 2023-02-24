@@ -188,9 +188,8 @@ function Settings() {
     "backupReminderOffset",
     0
   );
-  const [trashLifetime, setTrashLifetime] = usePersistentState(
-    "trashLifetime",
-    0
+  const [trashCleanupInterval, setTrashCleanupInterval] = useState(
+    cleanupIntervalToOptions[db.settings.getTrashCleanupInterval()]
   );
   const [debugMode, setDebugMode] = usePersistentState("debugMode", false);
   const [homepage, setHomepage] = usePersistentState("homepage", 0);
@@ -797,10 +796,13 @@ function Settings() {
             title="Clear trash interval"
             tip={"Permanently delete all items in the trash"}
             options={["Weekly", "Monthly", "Yearly", "Never"]}
-            selectedOption={trashLifetime}
-            onSelectionChanged={async (_option, index) =>
-              setTrashLifetime(index)
-            }
+            selectedOption={trashCleanupInterval}
+            onSelectionChanged={async (_option, index) => {
+              setTrashCleanupInterval(index);
+              db.settings.setTrashCleanupInterval(
+                optionsToCleanupInterval[index]
+              );
+            }}
           />
         )}
         <Header
@@ -1390,3 +1392,17 @@ function Header(props) {
     </Flex>
   );
 }
+
+const optionsToCleanupInterval = {
+  0: 7,
+  1: 30,
+  2: 365,
+  3: -1
+};
+
+const cleanupIntervalToOptions = {
+  7: 0,
+  30: 1,
+  365: 2,
+  "-1": 3
+};
