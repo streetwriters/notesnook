@@ -57,7 +57,7 @@ function StatusBar() {
         borderTop: "1px solid",
         borderTopColor: "border",
         justifyContent: "space-between",
-        display: ["none", "flex"]
+        display: ["none", "none", "flex"]
       }}
       px={2}
     >
