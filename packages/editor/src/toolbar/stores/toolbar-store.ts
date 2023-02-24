@@ -74,7 +74,7 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
     set((state) => {
       state.openedPopups = {
         ...state.openedPopups,
-        [id]: false
+        [id]: undefined
       };
     }),
   isPopupOpen: (id) => !!get().openedPopups[id],
@@ -90,14 +90,14 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
       for (const key in state.openedPopups) {
         const ref = state.openedPopups[key];
         if (ref && ref.group === group && !excluded.includes(ref.id)) {
-          state.openedPopups[key] = false;
+          state.openedPopups[key] = undefined;
         }
       }
     }),
   closeAllPopups: () =>
     set((state) => {
       for (const key in state.openedPopups) {
-        state.openedPopups[key] = false;
+        state.openedPopups[key] = undefined;
       }
     })
 }));
