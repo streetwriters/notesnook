@@ -68,9 +68,11 @@ export function getTextDirection(editor: Editor): TextDirections {
 export const TextDirection = Extension.create<TextDirectionOptions>({
   name: "textDirection",
 
-  defaultOptions: {
-    types: TEXT_DIRECTION_TYPES,
-    defaultDirection: undefined
+  addOptions() {
+    return {
+      types: TEXT_DIRECTION_TYPES,
+      defaultDirection: undefined
+    };
   },
 
   addGlobalAttributes() {
@@ -79,7 +81,9 @@ export const TextDirection = Extension.create<TextDirectionOptions>({
         types: this.options.types,
         attributes: {
           textDirection: {
-            default: this.options.defaultDirection,
+            // NOTE: for some reason setting this to undefined breaks enter behaviour
+            // on Android for some keyboards (GBoard etc.). Empty string works fine.
+            default: this.options.defaultDirection || "",
             parseHTML: (element) => element.dir,
             renderHTML: (attributes) => {
               if (!attributes.textDirection) {
