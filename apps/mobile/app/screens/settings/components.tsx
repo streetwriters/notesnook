@@ -25,6 +25,7 @@ import { ConfigureToolbar } from "./editor/configure-toolbar";
 import { Licenses } from "./licenses";
 import SoundPicker from "./sound-picker";
 import { Subscription } from "./subscription";
+import { TrashIntervalSelector } from "./trash-interval-selector";
 export const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker />,
   homeselector: <HomagePageSelector />,
@@ -33,5 +34,6 @@ export const components: { [name: string]: ReactElement } = {
   configuretoolbar: <ConfigureToolbar />,
   "debug-logs": <DebugLogs />,
   "sound-picker": <SoundPicker />,
-  licenses: <Licenses />
+  licenses: <Licenses />,
+  "trash-interval-selector": <TrashIntervalSelector />
 };
