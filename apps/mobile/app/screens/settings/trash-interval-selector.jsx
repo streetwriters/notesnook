@@ -33,7 +33,6 @@ export const TrashIntervalSelector = () => {
   const [trashInterval, setTrashInterval] = useState(
     db.settings.getTrashCleanupInterval()
   );
-  console.log(db.settings.getTrashCleanupInterval());
   const menuRef = useRef();
   const [width, setWidth] = useState(0);
   return (
