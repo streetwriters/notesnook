@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { EVENTS } from "@notesnook/core/common";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import WebView from "react-native-webview";
 import { db } from "../../../common/database";
@@ -29,6 +30,7 @@ import {
   openVault
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
+import SettingsService from "../../../services/settings";
 import { TipManager } from "../../../services/tip-manager";
 import { useEditorStore } from "../../../stores/use-editor-store";
 import { useNoteStore } from "../../../stores/use-notes-store";
@@ -50,8 +52,6 @@ import {
   makeSessionId,
   post
 } from "./utils";
-import { EVENTS } from "@notesnook/core/common";
-import SettingsService from "../../../services/settings";
 
 export const useEditor = (
   editorId = "",
@@ -76,6 +76,8 @@ export const useEditor = (
   const saveCount = useRef(0);
   const lastContentChangeTime = useRef<number>(0);
   const lock = useRef(false);
+  const attachedImages = useRef<{ [name: string]: any }>({});
+  const loadedImages = useRef<{ [name: string]: any }>({});
 
   const postMessage = useCallback(
     async <T>(type: string, data: T) =>
@@ -154,7 +156,9 @@ export const useEditor = (
     async (resetState = true) => {
       currentNote.current?.id && db.fs.cancel(currentNote.current.id);
       currentNote.current = null;
+      attachedImages.current = [];
       currentContent.current = null;
+      clearTimeout(timers.current["loading-images"]);
       sessionHistoryId.current = undefined;
       saveCount.current = 0;
       useEditorStore.getState().setReadonly(false);
@@ -290,6 +294,52 @@ export const useEditor = (
     }
   }, []);
 
+  const getImagesToLoad = () => {
+    if (!currentNote.current?.id) return [];
+    const currentImages = [
+      ...(db.attachments?.ofNote(currentNote.current?.id, "images") || []),
+      ...(db.attachments?.ofNote(currentNote.current?.id, "webclips") || [])
+    ];
+    if (!currentImages || currentImages?.length === 0) return [];
+    const imagesToLoad: any[] = [];
+    for (const image of currentImages) {
+      if (!loadedImages.current[image.metadata.hash]) {
+        loadedImages.current[image.metadata.hash] = false;
+        imagesToLoad.push(image);
+      }
+      attachedImages.current[image.metadata.hash] = image;
+    }
+    return imagesToLoad;
+  };
+
+  const markImageLoaded = (hash: string) => {
+    const attachment = attachedImages.current[hash];
+    if (attachment) {
+      loadedImages.current[hash] = true;
+    }
+  };
+
+  const loadImages = useCallback(() => {
+    if (!currentNote.current?.id) return;
+    const timerId = "loading-images";
+    clearTimeout(timers.current[timerId]);
+    timers.current[timerId] = setTimeout(() => {
+      if (!currentNote.current?.id) return;
+      if (currentNote.current?.content?.isPreview) {
+        db.content?.downloadMedia(
+          currentNote.current?.id,
+          currentNote.current.content,
+          true
+        );
+      } else {
+        const images = getImagesToLoad();
+        if (images.length > 0) {
+          db.attachments?.downloadMedia(currentNote.current?.id, images);
+        }
+      }
+    }, 300);
+  }, []);
+
   const loadNote = useCallback(
     async (
       item: Omit<NoteType, "type"> & {
@@ -314,6 +364,7 @@ export const useEditor = (
         if (!item.forced && currentNote.current?.id === item.id) return;
         isDefaultEditor && editorState.setCurrentlyEditingNote(item.id);
         overlay(true, item);
+        attachedImages.current = [];
         currentNote.current && (await reset(false));
         await loadContent(item as NoteType);
         lastContentChangeTime.current = item.dateEdited;
@@ -333,24 +384,16 @@ export const useEditor = (
         loadImages();
       }
     },
-    [commands, isDefaultEditor, loadContent, overlay, postMessage, reset]
+    [
+      commands,
+      isDefaultEditor,
+      loadContent,
+      loadImages,
+      overlay,
+      postMessage,
+      reset
+    ]
   );
-
-  const loadImages = () => {
-    if (!currentNote.current?.id) return;
-    setTimeout(() => {
-      if (!currentNote.current?.id) return;
-      if (currentNote.current?.content?.isPreview) {
-        db.content?.downloadMedia(
-          currentNote.current?.id,
-          currentNote.current.content,
-          true
-        );
-      } else {
-        db.attachments?.downloadMedia(currentNote.current?.id);
-      }
-    }, 300);
-  };
 
   const lockNoteWithVault = useCallback((note: NoteType) => {
     eSendEvent(eClearEditor);
@@ -378,6 +421,7 @@ export const useEditor = (
         return;
 
       lock.current = true;
+
       if (data.type === "tiptap") {
         if (!currentNote.current.locked && isContentEncrypted) {
           lockNoteWithVault(note);
@@ -408,16 +452,19 @@ export const useEditor = (
         }
         await commands.setStatus(timeConverter(note.dateEdited), "Saved");
       }
-      db.eventManager.subscribe(
-        EVENTS.syncCompleted,
-        async () => {
-          loadImages();
-        },
-        true
-      );
       lock.current = false;
+      if (data.type === "tiptap") {
+        loadImages();
+        db.eventManager.subscribe(
+          EVENTS.syncCompleted,
+          () => {
+            loadImages();
+          },
+          true
+        );
+      }
     },
-    [commands, postMessage, lockNoteWithVault]
+    [loadImages, lockNoteWithVault, postMessage, commands]
   );
 
   useEffect(() => {
@@ -560,6 +607,7 @@ export const useEditor = (
     onReady,
     saveContent,
     onContentChanged,
-    editorId: editorId
+    editorId: editorId,
+    markImageLoaded
   };
 };
