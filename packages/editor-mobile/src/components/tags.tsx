@@ -39,6 +39,7 @@ export default function Tags(): JSX.Element {
 
   return (
     <div
+      className={styles.container}
       style={{
         padding: "0px 12px",
         display: "flex",

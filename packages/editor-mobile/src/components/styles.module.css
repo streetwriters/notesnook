@@ -19,3 +19,11 @@
 .titleBar::placeholder {
   color: var(--nn_placeholder);
 }
+
+.container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.container::-webkit-scrollbar {
+  display: none;
+}
