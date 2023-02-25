@@ -69,3 +69,44 @@ export function deleteCheckedItems(tr: Transaction, pos: number) {
   return tr;
 }
 
+export function sortList(tr: Transaction, pos: number) {
+  const node = tr.doc.nodeAt(pos);
+
+  const parent = node ? { node, pos } : null;
+  if (!parent || parent.node.type.name !== TaskList.name) return;
+
+  const sublists: NodeWithPos[] = [];
+  parent.node.descendants((node, nodePos) => {
+    if (node.type.name === TaskList.name)
+      sublists.push({ node, pos: pos + nodePos + 1 });
+  });
+  if (sublists.length > 1) sublists.reverse();
+  sublists.push(parent);
+
+  for (const list of sublists) {
+    const children: {
+      checked: number;
+      index: number;
+    }[] = [];
+
+    list.node.forEach((node, _, index) => {
+      children.push({
+        index,
+        checked: node.attrs.checked ? 1 : 0
+      });
+    });
+
+    tr.replaceWith(
+      tr.mapping.map(list.pos),
+      tr.mapping.map(list.pos + list.node.nodeSize),
+      Fragment.from(
+        children
+          .sort((a, b) => a.checked - b.checked)
+          .map((c) => list.node.child(c.index))
+      )
+    );
+  }
+
+  if (!tr.steps.length) return null;
+  return tr;
+}
