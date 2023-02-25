@@ -27,6 +27,7 @@ import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
+import { countCheckedItems } from "./utils";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
@@ -64,14 +65,7 @@ export function TaskListComponent(
   }, [editor.commands, editor.state.doc, getParent, node, node.childCount]);
 
   useEffect(() => {
-    let checked = 0;
-    let total = 0;
-    node.forEach((node) => {
-      if (node.type.name === TaskItemNode.name) {
-        if (node.attrs.checked) checked++;
-        total++;
-      }
-    });
+    const { checked, total } = countCheckedItems(node);
     const percentage = Math.round((checked / total) * 100);
     setStats({ checked, total, percentage });
   }, [isNested, node]);

@@ -21,7 +21,7 @@ import { Flex, Text } from "@theme-ui/components";
 import { ReactNodeViewProps } from "../react";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { Node } from "prosemirror-model";
+import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Transaction } from "prosemirror-state";
 import { findChildren, findChildrenInRange } from "@tiptap/core";
 import { useCallback } from "react";
@@ -196,7 +196,7 @@ export function TaskItemComponent(
 }
 
 function toggleChildren(
-  node: Node,
+  node: ProsemirrorNode,
   tr: Transaction,
   toggleState: boolean,
   parentPos: number

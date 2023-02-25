@@ -25,6 +25,7 @@ import { Plugin, PluginKey, NodeSelection } from "prosemirror-state";
 import TaskItem from "@tiptap/extension-task-item";
 import { dropPoint } from "prosemirror-transform";
 import { findChildrenByType, hasSameAttributes } from "../../utils/prosemirror";
+import { countCheckedItems } from "./utils";
 
 export type TaskListAttributes = {
   title: string;
@@ -110,7 +111,8 @@ export const TaskListNode = TaskList.extend({
       shouldUpdate: (prev, next) => {
         return (
           !hasSameAttributes(prev.attrs, next.attrs) ||
-          prev.childCount !== next.childCount
+          prev.childCount !== next.childCount ||
+          countCheckedItems(prev).checked !== countCheckedItems(next).checked
         );
       }
     });
