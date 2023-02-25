@@ -32,6 +32,32 @@ import {
   Attrs
 } from "prosemirror-model";
 import { EditorState, Selection } from "prosemirror-state";
+import BulletList from "../extensions/bullet-list";
+import { ListItem } from "../extensions/list-item";
+import OrderedList from "../extensions/ordered-list";
+import { OutlineList } from "../extensions/outline-list";
+import { OutlineListItem } from "../extensions/outline-list-item";
+import { TaskItemNode } from "../extensions/task-item";
+import { TaskListNode } from "../extensions/task-list";
+
+export type NodeWithOffset = {
+  node?: ProsemirrorNode;
+  from: number;
+  to: number;
+};
+
+export const LIST_NODE_TYPES = [
+  TaskListNode.name,
+  OutlineList.name,
+  BulletList.name,
+  OrderedList.name
+];
+
+export const LIST_ITEM_NODE_TYPES = [
+  TaskItemNode.name,
+  OutlineListItem.name,
+  ListItem.name
+];
 
 export function hasSameAttributes(prev: Attrs, next: Attrs) {
   for (const key in prev) {
@@ -42,11 +68,24 @@ export function hasSameAttributes(prev: Attrs, next: Attrs) {
   return true;
 }
 
-export type NodeWithOffset = {
-  node?: ProsemirrorNode;
-  from: number;
-  to: number;
-};
+export function findListItemType(editor: Editor): string | null {
+  const isTaskList = editor.isActive(TaskListNode.name);
+  const isOutlineList = editor.isActive(OutlineList.name);
+  const isList =
+    editor.isActive(BulletList.name) || editor.isActive(OrderedList.name);
+
+  return isList
+    ? ListItem.name
+    : isOutlineList
+    ? OutlineListItem.name
+    : isTaskList
+    ? TaskItemNode.name
+    : null;
+}
+
+export function isListActive(editor: Editor): boolean {
+  return LIST_NODE_TYPES.some((name) => editor.isActive(name));
+}
 
 export function findSelectedDOMNode(
   editor: Editor,
@@ -98,30 +137,6 @@ export function selectionToOffset(state: EditorState): NodeWithOffset {
     from,
     to: from + $from.node().nodeSize
   };
-}
-
-export function findListItemType(editor: Editor): string | null {
-  const isTaskList = editor.isActive("taskList");
-  const isOutlineList = editor.isActive("outlineList");
-  const isList =
-    editor.isActive("bulletList") || editor.isActive("orderedList");
-
-  return isList
-    ? "listItem"
-    : isOutlineList
-    ? "outlineListItem"
-    : isTaskList
-    ? "taskItem"
-    : null;
-}
-
-export function isListActive(editor: Editor): boolean {
-  const isTaskList = editor.isActive("taskList");
-  const isOutlineList = editor.isActive("outlineList");
-  const isList =
-    editor.isActive("bulletList") || editor.isActive("orderedList");
-
-  return isTaskList || isOutlineList || isList;
 }
 
 export const findChildren = (

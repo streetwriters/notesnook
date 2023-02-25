@@ -34,6 +34,7 @@ export function onBackspacePressed(
 ) {
   const { selection } = editor.state;
   const { empty, $from } = selection;
+
   if (
     !empty ||
     !isInside(name, type, editor.state) ||
@@ -52,12 +53,11 @@ export function onBackspacePressed(
       if (parentList.childCount > 1) {
         return editor.commands.liftListItem(type);
       }
-      return editor.commands.deleteNode(parentList.type);
     }
 
-    return editor.commands.deleteNode(type);
+    return editor.chain().joinBackward().joinBackward().run();
   } else if (isFirstOfType(type, editor.state)) {
-    return false;
+    return editor.commands.liftListItem(type);
   } else {
     const block = findParentNodeOfType(type)(selection);
     if (block && block.start === $from.pos - 1) {
