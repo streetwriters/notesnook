@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Box, Flex, Input, Text } from "@theme-ui/components";
 import { findChildren, getNodeType } from "@tiptap/core";
-import TaskItem from "@tiptap/extension-task-item";
 import { Node } from "prosemirror-model";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToolButton } from "../../toolbar/components/tool-button";
@@ -27,7 +26,7 @@ import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
-import { countCheckedItems, deleteCheckedItems } from "./utils";
+import { countCheckedItems, deleteCheckedItems, sortList } from "./utils";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
@@ -120,6 +119,26 @@ export function TaskListComponent(
             }}
           />
           {editor.isEditable && (
+            <>
+              <ToolButton
+                toggled={false}
+                title="Move all checked tasks to bottom"
+                icon="sortTaskList"
+                variant="small"
+                sx={{
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  const pos = getPos();
+                  editor.current
+                    ?.chain()
+                    .focus()
+                    .command(({ tr }) => {
+                      return !!sortList(tr, pos);
+                    })
+                    .run();
+                }}
+              />
               <ToolButton
                 toggled={false}
                 title="Clear completed tasks"
@@ -140,6 +159,7 @@ export function TaskListComponent(
                     .run();
                 }}
               />
+            </>
           )}
           <Text
             variant={"body"}
