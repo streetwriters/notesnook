@@ -27,7 +27,7 @@ import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
-import { countCheckedItems } from "./utils";
+import { countCheckedItems, deleteCheckedItems } from "./utils";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
@@ -120,40 +120,26 @@ export function TaskListComponent(
             }}
           />
           {editor.isEditable && (
-            <ToolButton
-              toggled={false}
-              title="Clear completed tasks"
-              icon="clear"
-              variant="small"
-              sx={{
-                zIndex: 1
-              }}
-              onClick={() => {
-                if (!editor.isEditable) return;
-                if (!editor.current) return;
-                const pos = getPos();
-                // we need to get a fresh instance of the task list instead
-                // of using the one we got via props.
-                const node = editor.current.state.doc.nodeAt(pos);
-                if (!node) return;
+              <ToolButton
+                toggled={false}
+                title="Clear completed tasks"
+                icon="clear"
+                variant="small"
+                sx={{
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  const pos = getPos();
 
-                editor.current?.commands.command(({ tr }) => {
-                  const taskItems = findChildren(
-                    node,
-                    (n) => n.type.name === TaskItem.name && n.attrs.checked
-                  );
-                  const mapping = tr.mapping;
-                  for (const item of taskItems) {
-                    const childPos = pos + item.pos + 1;
-                    tr.deleteRange(
-                      mapping.map(childPos),
-                      mapping.map(childPos + item.node.nodeSize)
-                    );
-                  }
-                  return true;
-                });
-              }}
-            />
+                  editor.current
+                    ?.chain()
+                    .focus()
+                    .command(({ tr }) => {
+                      return !!deleteCheckedItems(tr, pos);
+                    })
+                    .run();
+                }}
+              />
           )}
           <Text
             variant={"body"}
