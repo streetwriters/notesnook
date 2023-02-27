@@ -19,11 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Editor, Extension } from "@tiptap/core";
 import { isInTable } from "@tiptap/pm/tables";
-import {
-  isListActive,
-  LIST_ITEM_NODE_TYPES,
-  LIST_NODE_TYPES
-} from "../../utils/prosemirror";
+import { LIST_ITEM_NODE_TYPES, LIST_NODE_TYPES } from "../../utils/node-types";
+import { isListActive } from "../../utils/prosemirror";
 
 export const KeyMap = Extension.create({
   name: "key-map",
