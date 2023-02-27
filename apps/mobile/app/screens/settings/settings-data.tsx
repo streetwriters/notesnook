@@ -1088,6 +1088,14 @@ export const settingsGroups: SettingSection[] = [
           }
         },
         description: "Read our privacy policy"
+      },
+      {
+        id: "licenses",
+        name: "Open source Licenses",
+        type: "screen",
+        component: "licenses",
+        description: "Open source libraries used in Notesnook",
+        icon: "open-source-initiative"
       }
     ]
   },
