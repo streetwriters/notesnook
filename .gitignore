@@ -7,3 +7,4 @@ nx-cloud.env
 .idea
 .eslintcache
 .env.local
+.nyc_output

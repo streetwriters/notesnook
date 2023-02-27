@@ -57,11 +57,13 @@ export function deleteCheckedItems(tr: Transaction, pos: number) {
     listNode.forEach((node, _, index) => {
       if (!node.attrs.checked) children.push(listNode.child(index));
     });
+    // if all items are unchecked, skip
+    if (children.length === listNode.childCount) continue;
 
     tr.replaceWith(
-      tr.mapping.map(list.pos),
-      tr.mapping.map(list.pos + list.node.nodeSize),
-      listNode.copy(Fragment.from(children))
+      tr.mapping.map(list.pos + 1),
+      tr.mapping.map(list.pos + list.node.nodeSize - 1),
+      Fragment.from(children)
     );
   }
 
@@ -95,10 +97,16 @@ export function sortList(tr: Transaction, pos: number) {
         checked: node.attrs.checked ? 1 : 0
       });
     });
+    // if every item is checked or unchecked, skip
+    if (
+      children.every((a) => a.checked === 1) ||
+      children.every((a) => a.checked === 0)
+    )
+      continue;
 
     tr.replaceWith(
-      tr.mapping.map(list.pos),
-      tr.mapping.map(list.pos + list.node.nodeSize),
+      tr.mapping.map(list.pos + 1),
+      tr.mapping.map(list.pos + list.node.nodeSize - 1),
       Fragment.from(
         children
           .sort((a, b) => a.checked - b.checked)

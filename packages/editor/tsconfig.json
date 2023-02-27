@@ -3,9 +3,7 @@
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
-    "outDir": "./dist/",
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false
+    "outDir": "./dist/"
   },
   "include": ["src/"]
 }
