@@ -50,5 +50,5 @@ jobs:
         run: |
           echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
-      - name: Run all @notesnook/core tests
+      - name: Run all @notesnook/editor tests
         run: npx nx test @notesnook/editor
