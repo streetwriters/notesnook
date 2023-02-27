@@ -107,7 +107,6 @@ const Editor = React.memo(
           attachmentType: string;
         }) => {
           if (groupId !== editor.note.current?.id) return;
-          console.log("marking image as loaded", hash);
           editorController.current.markImageLoaded(hash);
           if (attachmentType === "webclip") {
             editor.commands.updateWebclip({

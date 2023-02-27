@@ -157,6 +157,7 @@ export const useEditor = (
       currentNote.current?.id && db.fs.cancel(currentNote.current.id);
       currentNote.current = null;
       attachedImages.current = [];
+      loadedImages.current = [];
       currentContent.current = null;
       clearTimeout(timers.current["loading-images"]);
       sessionHistoryId.current = undefined;
@@ -337,7 +338,7 @@ export const useEditor = (
           db.attachments?.downloadMedia(currentNote.current?.id, images);
         }
       }
-    }, 300);
+    }, 100);
   }, []);
 
   const loadNote = useCallback(
@@ -364,7 +365,6 @@ export const useEditor = (
         if (!item.forced && currentNote.current?.id === item.id) return;
         isDefaultEditor && editorState.setCurrentlyEditingNote(item.id);
         overlay(true, item);
-        attachedImages.current = [];
         currentNote.current && (await reset(false));
         await loadContent(item as NoteType);
         lastContentChangeTime.current = item.dateEdited;

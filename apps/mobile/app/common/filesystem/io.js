@@ -21,6 +21,8 @@ import { Platform } from "react-native";
 import Sodium from "@ammarahmed/react-native-sodium";
 import RNFetchBlob from "rn-fetch-blob";
 import { cacheDir, getRandomId } from "./utils";
+import { db } from "../database";
+import { compressToBase64 } from "./compress";
 
 export async function readEncrypted(filename, key, cipherData) {
   let path = `${cacheDir}/${filename}`;
@@ -29,6 +31,9 @@ export async function readEncrypted(filename, key, cipherData) {
     if (!exists) {
       return false;
     }
+    const attachment = db.attachments.attachment(filename);
+    const isPng = /(png)/g.test(attachment?.metadata.type);
+    const isJpeg = /(jpeg|jpg)/g.test(attachment?.metadata.type);
 
     let output = await Sodium.decryptFile(
       key,
@@ -36,8 +41,20 @@ export async function readEncrypted(filename, key, cipherData) {
         ...cipherData,
         hash: filename
       },
-      cipherData.outputType === "base64" ? "base64" : "text"
+      cipherData.outputType === "base64"
+        ? isPng || isJpeg
+          ? "cache"
+          : "base64"
+        : "text"
     );
+    if (cipherData.outputType === "base64" && (isPng || isJpeg)) {
+      const dCachePath = `${cacheDir}/${output}`;
+      output = await compressToBase64(
+        `file://${dCachePath}`,
+        isPng ? "PNG" : "JPEG"
+      );
+    }
+
     return output;
   } catch (e) {
     RNFetchBlob.fs.unlink(path).catch(console.log);

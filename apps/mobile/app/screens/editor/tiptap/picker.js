@@ -34,6 +34,7 @@ import PremiumService from "../../../services/premium";
 import { eCloseSheet } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
 import { editorController, editorState } from "./utils";
+import { compressToBase64 } from "../../../common/filesystem/compress";
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
@@ -124,6 +125,7 @@ const file = async (fileOptions) => {
     });
     if (!(await attachFile(uri, hash, file.type, file.name, fileOptions)))
       return;
+    if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
     editorController.current?.commands.insertAttachment({
       hash: hash,
       filename: file.name,
@@ -234,7 +236,7 @@ const handleImageResponse = async (response, options) => {
     });
     return;
   }
-  const b64 = `data:${image.type};base64, ` + image.base64;
+  let b64 = `data:${image.type};base64, ` + image.base64;
   const uri = decodeURI(image.uri);
   const hash = await Sodium.hashFile({
     uri: uri,
@@ -243,6 +245,15 @@ const handleImageResponse = async (response, options) => {
 
   let fileName = image.originalFileName || image.fileName;
   if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
+  const isPng = /(png)/g.test(image.type);
+  const isJpeg = /(jpeg|jpg)/g.test(image.type);
+  if (isPng || isJpeg) {
+    b64 =
+      `data:${image.type};base64, ` +
+      (await compressToBase64(image.uri, isPng ? "PNG" : "JPEG"));
+  }
+
+  if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
 
   editorController.current?.commands.insertImage({
     hash: hash,
@@ -289,7 +300,6 @@ async function attachFile(uri, hash, type, filename, options) {
       encryptionInfo,
       editorController.current?.note?.id
     );
-    if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
 
     return true;
   } catch (e) {
