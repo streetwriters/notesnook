@@ -185,7 +185,8 @@ export function TaskListComponent(
             paddingInlineStart: 0,
             marginBlockStart: isNested ? 10 : 0,
             marginBlockEnd: 0,
-            marginLeft: isNested ? (editor.isEditable ? -35 : -10) : 0
+            marginLeft: isNested ? (editor.isEditable ? -35 : -10) : 0,
+            padding: 0
           },
           li: {
             listStyleType: "none",
@@ -195,7 +196,6 @@ export function TaskListComponent(
             display: "flex",
             bg: "background",
             borderRadius: "default",
-            gap: 2,
             ":hover > .dragHandle": {
               opacity: editor.isEditable ? 1 : 0
             },

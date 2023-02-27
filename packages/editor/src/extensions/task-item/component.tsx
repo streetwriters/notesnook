@@ -92,7 +92,8 @@ export function TaskItemComponent(
             ".icon:hover path": {
               fill: "var(--checked) !important"
             },
-            mt: "1px"
+            mt: "1px",
+            mx: 1
           }}
           size={isMobile ? 24 : 20}
         />
@@ -109,6 +110,7 @@ export function TaskItemComponent(
           alignSelf: "start",
           p: "1px",
           mt: "2px",
+          mr: 1,
           cursor: editor.isEditable ? "pointer" : "unset",
           ":hover": {
             borderColor: "checked"
