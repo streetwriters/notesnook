@@ -57,7 +57,7 @@ const fn = (fn: string) => {
         if (DEV_MODE && typeof logger !== "undefined") logger('error', "webview: ", e.message, e.stack);
       }
       return true;
-    })();`,
+    })();true;`,
     id: id
   };
 };
