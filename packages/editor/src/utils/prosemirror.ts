@@ -32,9 +32,9 @@ import {
   Attrs
 } from "prosemirror-model";
 import { EditorState, Selection } from "prosemirror-state";
-import BulletList from "../extensions/bullet-list";
+import { BulletList } from "../extensions/bullet-list";
 import { ListItem } from "../extensions/list-item";
-import OrderedList from "../extensions/ordered-list";
+import { OrderedList } from "../extensions/ordered-list";
 import { OutlineList } from "../extensions/outline-list";
 import { OutlineListItem } from "../extensions/outline-list-item";
 import { TaskItemNode } from "../extensions/task-item";

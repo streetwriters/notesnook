@@ -66,9 +66,14 @@
   margin-bottom: 5px;
 }
 
+.ProseMirror ul.tasklist-content-wrapper {
+  padding-left: 0px;
+}
+
 .ProseMirror ul ul,
 .ProseMirror ol ol {
   margin-top: 5px;
+  padding-left: 15px;
 }
 
 .ProseMirror a {
