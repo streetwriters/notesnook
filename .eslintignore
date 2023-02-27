@@ -22,3 +22,6 @@ packages/editor/languages/
 
 # editor mobile
 packages/editor-mobile/build.bundle
+
+# snapshots
+tap-snapshots

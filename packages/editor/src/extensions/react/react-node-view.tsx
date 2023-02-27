@@ -103,8 +103,9 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   private renderReactComponent(
     component: () => React.ReactElement<unknown> | null
   ) {
+    if (process.env.NODE_ENV === "test") return;
     if (!this.domRef || !component || !this.portalProviderAPI) {
-      console.warn("Cannot render node view", this.editor.storage);
+      console.warn("Cannot render node view");
       return;
     }
 

@@ -28,8 +28,8 @@
     "@tiptap/extension-text-align": "^2.0.0-beta.218",
     "@tiptap/extension-text-style": "^2.0.0-beta.218",
     "@tiptap/extension-underline": "^2.0.0-beta.218",
-    "@tiptap/starter-kit": "^2.0.0-beta.218",
     "@tiptap/pm": "^2.0.0-beta.218",
+    "@tiptap/starter-kit": "^2.0.0-beta.218",
     "detect-indent": "^7.0.0",
     "katex": "^0.16.2",
     "prism-themes": "^1.9.0",
@@ -45,17 +45,24 @@
     "zustand": "^3.7.2"
   },
   "devDependencies": {
+    "@happy-dom/global-registrator": "^8.9.0",
     "@mdi/js": "^6.9.96",
     "@mdi/react": "^1.6.0",
+    "@swc/core": "^1.3.36",
     "@types/katex": "^0.14.0",
     "@types/prismjs": "^1.26.0",
     "@types/react": "17.0.2",
     "@types/react-color": "^3.0.6",
     "@types/react-dom": "17.0.2",
     "@types/react-modal": "^3.13.1",
+    "@types/tap": "^15.0.8",
     "@types/tinycolor2": "^1.4.3",
+    "expect": "^29.4.3",
     "framer-motion": "^6.5.1",
     "isomorphic-fetch": "^3.0.0",
+    "prosemirror-test-builder": "^1.1.0",
+    "tap": "^16.3.4",
+    "tsconfig-paths": "^3.14.2",
     "typescript": "^4.8.2",
     "web-vitals": "^2.1.4",
     "zx": "^7.0.8"
@@ -67,6 +74,7 @@
     "react-dom": ">=17.0.0"
   },
   "scripts": {
+    "test": "TS_NODE_PROJECT=tsconfig.tests.json tap --ts --no-check-coverage --test-env=NODE_ENV=test src/**/*.test.ts",
     "prebuild": "zx ./scripts/build.mjs",
     "prewatch": "zx ./scripts/build.mjs",
     "build": "tsc",
