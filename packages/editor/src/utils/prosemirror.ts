@@ -39,25 +39,13 @@ import { OutlineList } from "../extensions/outline-list";
 import { OutlineListItem } from "../extensions/outline-list-item";
 import { TaskItemNode } from "../extensions/task-item";
 import { TaskListNode } from "../extensions/task-list";
+import { LIST_NODE_TYPES } from "./node-types";
 
 export type NodeWithOffset = {
   node?: ProsemirrorNode;
   from: number;
   to: number;
 };
-
-export const LIST_NODE_TYPES = [
-  TaskListNode.name,
-  OutlineList.name,
-  BulletList.name,
-  OrderedList.name
-];
-
-export const LIST_ITEM_NODE_TYPES = [
-  TaskItemNode.name,
-  OutlineListItem.name,
-  ListItem.name
-];
 
 export function hasSameAttributes(prev: Attrs, next: Attrs) {
   for (const key in prev) {
