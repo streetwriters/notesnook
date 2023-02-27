@@ -41,6 +41,11 @@ import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
+import { keepLastLineInView } from "@notesnook/editor/dist/extensions/keep-in-view/keep-in-view";
+
+function isIOSBrowser() {
+  return /(iphone|applewebkit)/g.test(navigator.userAgent.toLowerCase());
+}
 
 const Tiptap = ({
   editorTheme,
@@ -69,7 +74,15 @@ const Tiptap = ({
         global.editorController.contentChange(editor as Editor);
       },
       onSelectionUpdate: (props) => {
-        props.transaction.scrollIntoView();
+        if (props.transaction.docChanged) {
+          if (isIOSBrowser()) {
+            setTimeout(() => {
+              keepLastLineInView(props.editor, 80, 1);
+            }, 1);
+          } else {
+            props.transaction.scrollIntoView();
+          }
+        }
       },
       onOpenAttachmentPicker: (editor, type) => {
         global.editorController.openFilePicker(type);
