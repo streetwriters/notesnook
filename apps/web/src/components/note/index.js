@@ -563,6 +563,7 @@ function notebooksMenuItems({ note }) {
       if (!notebook) return;
       const notebookMenuItems = [];
       for (const topicId of ref.topics) {
+        if (!notebook.topics.topic(topicId)) continue;
         const topic = notebook.topics.topic(topicId)._topic;
         notebookMenuItems.push({
           key: topicId,
