@@ -23,13 +23,22 @@ import { sanitizeFilename } from "./filename";
 const textEncoder = new TextEncoder();
 type File = { filename: string; content: string };
 async function zip(files: File[], format: string): Promise<Uint8Array> {
-  const obj: Unzipped = {};
+  const obj: Unzipped = Object.create(null);
   files.forEach((file) => {
-    obj[`${sanitizeFilename(file.filename)}.${format}`] = textEncoder.encode(
-      file.content
-    );
+    const name = sanitizeFilename(file.filename);
+    let counter = 0;
+    while (obj[makeFilename(name, format, counter)]) ++counter;
+
+    obj[makeFilename(name, format, counter)] = textEncoder.encode(file.content);
   });
   const { zipSync } = await import("fflate");
   return zipSync(obj);
 }
 export { zip };
+
+function makeFilename(filename: string, extension: string, counter: number) {
+  let final = filename;
+  if (counter) final += `-${counter}`;
+  final += `.${extension}`;
+  return final;
+}
