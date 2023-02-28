@@ -191,7 +191,8 @@ export function TaskListComponent(
           li: {
             listStyleType: "none",
             position: "relative",
-            marginBottom: isNested ? 1 : [2, 1],
+            marginTop: 2,
+            marginBottom: 0,
 
             display: "flex",
             bg: "background",

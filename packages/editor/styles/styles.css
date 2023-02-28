@@ -484,10 +484,6 @@ p > *::selection {
 
 /* Outline lists */
 
-.ProseMirror > .outline-list {
-  padding-left: 18px;
-}
-
 .outline-list {
   list-style-type: none;
   position: relative;
