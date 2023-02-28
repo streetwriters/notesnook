@@ -85,7 +85,7 @@ async function save(path, data, fileName, extension) {
     uri = await ScopedStorage.writeFile(
       path,
       data,
-      `${fileName}_${Date.now()}_.${extension}`,
+      `${fileName}.${extension}`,
       MIMETypes[extension],
       extension === "pdf" ? "base64" : "utf8",
       false
@@ -124,7 +124,6 @@ async function exportAs(type, note, bulk) {
     case "pdf":
       {
         let html = await makeHtml(note);
-        console.log(html);
         let fileName = sanitizeFilename(note.title + Date.now(), {
           replacement: "_"
         });
@@ -225,7 +224,7 @@ async function bulkExport(notes, type, callback) {
       let note = notes[i];
       if (note.locked) continue;
       let result = await exportAs(type, note);
-      let fileName = sanitizeFilename(note.title + Date.now(), {
+      let fileName = sanitizeFilename(note.title, {
         replacement: "_"
       });
       if (result) {
