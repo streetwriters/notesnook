@@ -92,27 +92,22 @@ const features: Record<FeatureKeys, Feature> = {
       : isDesktop()
       ? [
           {
-            title: "Full RTL support in editor",
+            title: "Smoother app loading animation",
             subtitle:
-              "The editor now supports RTL languages everywhere and correctly aligns them."
+              "Starting the app will now feel much, much smoother and less janky."
           },
           {
-            title: "CJK character count",
-            subtitle:
-              "The editor word counter now correctly counds CJK characters."
+            title: "Faster & less buggy outline list"
           },
           {
-            title: "Telemetry is now opt-in by default"
+            title: "Sortable task lists",
+            subtitle:
+              "Task lists can now be sorted by their status. This'll move all completed tasks to the bottom."
           },
           {
-            title: "Revamped notebook linking dialog",
+            title: "Faster editor",
             subtitle:
-              "The new dialog is much more user friendly & makes linking notebooks a breeze."
-          },
-          {
-            title: "A lot of UX improvements",
-            subtitle:
-              "The app should now behave much nicer on some actions. More UX improvements coming in next versions."
+              "Editor performance has been vastly improved in this version especially when you have a lot of images, task list etc."
           }
         ]
       : [],
