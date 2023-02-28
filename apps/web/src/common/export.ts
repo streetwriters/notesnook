@@ -22,6 +22,7 @@ import { TaskManager } from "./task-manager";
 import { zip } from "../utils/zip";
 import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
+import { sanitizeFilename } from "../utils/filename";
 
 export async function exportToPDF(
   title: string,
@@ -83,7 +84,7 @@ export async function exportNotes(
       if (files.length === 1) {
         saveAs(
           new Blob([Buffer.from(files[0].content, "utf-8")]),
-          `${files[0].filename}.${format}`
+          `${sanitizeFilename(files[0].filename)}.${format}`
         );
       } else {
         const zipped = await zip(files, format);
