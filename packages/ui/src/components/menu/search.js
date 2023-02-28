@@ -20,13 +20,13 @@ import { store } from "../../stores/note-store";
 import { db } from "../../common/db";
 import { filter, parse } from "liqe";
 
-export const mainSearchEngine = async (searchType, value) => {
+export const mainSearchEngine = async (filter, query) => {
   //name is cumbersome
   // better name? fetchResults
   const context = store.context;
-  const [lookupType, allData] = await filterItemsToType(searchType, context);
+  const [lookupType, allData] = await filterItemsToType(filter, context);
   if (lookupType !== undefined && allData !== undefined) {
-    let result = await db.lookup[lookupType](allData, value);
+    let result = await db.lookup[lookupType](allData, query);
     return { result, allData };
   } else {
     return { result: [], allData: [] };
@@ -65,7 +65,15 @@ const beginSearch = async (definition, type) => {
   console.log("beginSearch", definition);
   let notes = [];
   type = type.trim();
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+  db.notebooks.notebook();
+=======
 
+>>>>>>> Stashed changes
+=======
+
+>>>>>>> Stashed changes
   switch (type) {
     case "notebook": {
       console.log("beginSearch", definition.topics);
@@ -78,6 +86,20 @@ const beginSearch = async (definition, type) => {
         }
       }
       console.log("beginSearch notebook", notes);
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+      return notes;
+    }
+    case "notes": {
+      console.log("beginSearch notes", notes);
+      let allNotes = db.notes.all;
+      let notes = await db.lookup["notes"](allNotes, definition.value);
+<<<<<<< Updated upstream
+      return notes;
+    }
+=======
       return notes;
     }
     case "notes": {
@@ -86,6 +108,11 @@ const beginSearch = async (definition, type) => {
       let notes = await db.lookup["notes"](allNotes, definition.value);
       return notes;
     }
+>>>>>>> Stashed changes
+=======
+      return notes;
+    }
+>>>>>>> Stashed changes
     case "topic": {
       for (let note of definition.notes) {
         if (db.notes.note(note)) notes.push(db.notes.note(note)._note);

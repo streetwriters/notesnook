@@ -21,9 +21,8 @@ import { hexToRGB } from "../../utils/color";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./datepicker.css";
-import { filterSearchEngine } from "./search";
 import { Text } from "@theme-ui/components";
-import { mainSearchEngine } from "./search";
+import { db } from "../../common/db";
 
 export function FilterInput(props) {
   const {
@@ -59,7 +58,7 @@ export function FilterInput(props) {
     <CustomInput
       {...props}
       id={`inputId_${index}`}
-      bg={item.input.state.error ? "errorBg" : hexToRGB("#9E9E9E", 0.1)}
+      bg={item.input.error ? "errorBg" : hexToRGB("#9E9E9E", 0.1)}
       onFocus={async (e) => {
         await checkErrors(props, e.target.innerText);
         setSuggestions(await getSuggestions(e.target.innerText, item.input));
@@ -171,40 +170,14 @@ const checkErrors = async (props, query) => {
   const { setFilters, index, item } = props;
   query = query.trim();
   let input = item.input;
-  let result = await (await mainSearchEngine(input.type, query)).result;
+  let result = await (await db.search.filter(input.filterName, query)).result;
+  let error = true;
+  if (!input.hasSuggestions || result.length > 0) error = false;
   setFilters((filters) => {
     let _filters = [...filters];
-    _filters[index].input.state = filterInputState(input, result, query);
+    _filters[index].input.error = error;
     return _filters;
   });
-};
-
-const filterInputState = (input, result, query) => {
-  console.log(
-    "filterInputState",
-    input.id,
-    query,
-    !input.hasSuggestions,
-    result.length > 0
-  );
-  if (!input.hasSuggestions)
-    return {
-      error: false,
-      message: "",
-      result: { type: input.type, value: query }
-    };
-
-  if (result.length > 0)
-    return { error: false, message: "", result: result[0] };
-
-  return {
-    error: true,
-    message: `This ${input.type.replace(
-      "s",
-      ""
-    )} is not present in the database.`,
-    result: undefined
-  };
 };
 
 const deleteDefinition = (definitions, id) => {
@@ -243,7 +216,7 @@ const onKeyPress = async (e, props) => {
     Enter: async () => {
       props.onKeyDown(e);
       focusInput(index + 1);
-      let results = await filterSearchEngine(searchDefinitions);
+      let results = await db.search.filters(searchDefinitions);
       onSearch(results);
       setSuggestions([]);
       e.preventDefault();
