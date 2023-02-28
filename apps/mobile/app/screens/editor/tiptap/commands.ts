@@ -48,6 +48,7 @@ const fn = (fn: string) => {
   const id = randId("fn_");
   return {
     job: `(async () => {
+      if (typeof __PLATFORM__ === "undefined") __PLATFORM__ = "${Platform.OS}";
       try {
         let response = true;
         ${fn}

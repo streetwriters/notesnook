@@ -52,6 +52,7 @@ declare global {
       }>
     >;
   }>;
+  var __PLATFORM__: "ios" | "android";
   var readonly: boolean;
   var noToolbar: boolean;
   var noHeader: boolean;
@@ -95,7 +96,6 @@ declare global {
   };
 
   var editorTitle: RefObject<HTMLInputElement>;
-
   /**
    * Global ref to manage tags in editor.
    */
@@ -113,7 +113,7 @@ declare global {
    */
 
   function post<T extends keyof typeof EventTypes>(
-    type: typeof EventTypes[T],
+    type: (typeof EventTypes)[T],
     value?: unknown
   ): void;
   interface Window {
@@ -166,7 +166,7 @@ export function logger(
 }
 
 export function post<T extends keyof typeof EventTypes>(
-  type: typeof EventTypes[T],
+  type: (typeof EventTypes)[T],
   value?: unknown
 ): void {
   if (isReactNative()) {

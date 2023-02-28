@@ -44,7 +44,7 @@ import Title from "./title";
 import { keepLastLineInView } from "@notesnook/editor/dist/extensions/keep-in-view/keep-in-view";
 
 function isIOSBrowser() {
-  return /(iphone|applewebkit)/g.test(navigator.userAgent.toLowerCase());
+  return __PLATFORM__ !== "android";
 }
 
 const Tiptap = ({
