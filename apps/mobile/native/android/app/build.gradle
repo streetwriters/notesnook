@@ -140,8 +140,7 @@ def reactNativeArchitectures() {
 }
 
 def fdroidBuild() {
-    def value = project.getProperties().get("fdroidBuild")
-    return value ? value : false
+    return project.hasProperty("fdroidBuild") && project.fdroidBuild == "true"
 }
 
 def getNpmVersion() {
@@ -165,7 +164,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
-        versionCode 2035
+        versionCode 2036
         versionName getNpmVersion()
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
