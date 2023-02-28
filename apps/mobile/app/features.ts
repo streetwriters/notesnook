@@ -19,4 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FeatureType } from "./components/sheets/new-feature";
 
-export const features: FeatureType[] = [];
+export const features: FeatureType[] = [
+  {
+    title: "Improved editor performance",
+    body: "The editor perfomance is now much better especially with images"
+  },
+  {
+    title: "Sortable task lists",
+    body: "Now you can sort tasks by checked/unchecked in editor"
+  },
+  {
+    title: "Improved outline lists",
+    body: "Rewritten outline lists to be more performant and less buggy"
+  }
+];
