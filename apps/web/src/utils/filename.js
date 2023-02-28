@@ -45,11 +45,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @return {String}         Sanitized filename
  */
 var illegalRe = /[/?<>\\:*|"]/g;
-//var controlRe = /[x00-x1f\x80-\x9f]/g;
+// var controlRe = /[x00-x1f\x80-\x9f]/g;
 var reservedRe = /^\.+$/;
 var windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
 var windowsTrailingRe = /[. ]+$/;
-var whitespace = /\W+/g;
+var whitespace = /\s+/g;
 
 function sanitize(input, replacement) {
   if (typeof input !== "string") {
@@ -57,6 +57,7 @@ function sanitize(input, replacement) {
   }
   var sanitized = input
     .replace(whitespace, replacement)
+    //.replace(controlRe, replacement)
     .replace(illegalRe, replacement)
     .replace(reservedRe, replacement)
     .replace(windowsReservedRe, replacement)
