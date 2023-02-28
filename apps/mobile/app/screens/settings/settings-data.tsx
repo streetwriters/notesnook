@@ -474,7 +474,14 @@ export const settingsGroups: SettingSection[] = [
             description:
               "Automatically switch to dark mode when system theme changes",
             property: "useSystemTheme",
-            icon: "circle-half"
+            icon: "circle-half",
+            modifer: () => {
+              const current = SettingsService.get().useSystemTheme;
+              SettingsService.set({
+                useSystemTheme: !current
+              });
+              getColorScheme();
+            }
           },
           {
             id: "enable-dark-mode",
