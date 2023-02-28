@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React from "react";
 import { LICENSES } from "./license-data";
-import { FlatList, Linking } from "react-native";
+import { FlatList, Linking, Platform } from "react-native";
 import { PressableButton } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
 import { SIZE } from "../../utils/size";
@@ -34,6 +34,11 @@ type LicenseEntry = {
 
 export const Licenses = () => {
   const colors = useThemeStore((state) => state.colors);
+  const items =
+    Platform.OS === "ios"
+      ? LICENSES.filter((l) => l.name.indexOf("android") === -1)
+      : LICENSES;
+
   const renderItem = React.useCallback(
     ({ item }: { item: LicenseEntry }) => (
       <PressableButton
@@ -48,6 +53,7 @@ export const Licenses = () => {
           borderRadius: 0
         }}
         onPress={() => {
+          if (!item.link) return;
           Linking.openURL(item.link).catch(console.log);
         }}
       >
@@ -61,7 +67,7 @@ export const Licenses = () => {
   );
   return (
     <FlatList
-      data={LICENSES}
+      data={items}
       style={{
         width: "100%"
       }}
