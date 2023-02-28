@@ -48,7 +48,6 @@ export const useUserStore = create<UserStore>((set) => ({
   setUser: (user) => set({ user: user }),
   setPremium: (premium) => set({ premium: premium }),
   setSyncing: (syncing, status = SyncStatus.Passed) => {
-    console.log("set syncing", syncing, status);
     set({ syncing: syncing, lastSyncStatus: status });
   },
   setLastSynced: (lastSynced) => set({ lastSynced: lastSynced }),
