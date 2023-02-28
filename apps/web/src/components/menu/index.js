@@ -178,15 +178,18 @@ function Menu({ items, data, title, closeMenu }) {
                 setFocusIndex(-1);
                 return;
               }
+              if (!isSubmenuOpen) setFocusIndex(index);
 
               clearTimeout(hoverTimeout.current);
-              setFocusIndex(index);
-              setIsSubmenuOpen(false);
-              if (item.items?.length) {
-                hoverTimeout.current = setTimeout(() => {
+              hoverTimeout.current = setTimeout(() => {
+                if (isSubmenuOpen) {
+                  setFocusIndex(index);
+                  setIsSubmenuOpen(false);
+                }
+                if (item.items?.length) {
                   setIsSubmenuOpen(true);
-                }, 500);
-              }
+                }
+              }, 200);
             }}
             onMouseLeave={() => {
               clearTimeout(hoverTimeout.current);
