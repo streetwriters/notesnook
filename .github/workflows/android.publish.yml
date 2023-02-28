@@ -50,7 +50,18 @@ jobs:
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}        
+          keyPassword: ${{ secrets.KEY_PASSWORD }}  
+
+      - name: Publish to Playstore
+        id: deploy
+        uses: r0adkll/upload-google-play@v1.1.1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: com.streetwriters.notesnook
+          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
+          track: production
+          status: completed
+          whatsNewDirectory: apps/mobile/native/android/releasenotes/      
 
       - name: Build apks for Github release
         run: yarn release:android
@@ -91,15 +102,4 @@ jobs:
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-arm64-v8a.apk
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-armeabi-v7a.apk
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86.apk
-            apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86_64.apk
-
-      - name: Publish to Playstore
-        id: deploy
-        uses: r0adkll/upload-google-play@v1.1.1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: com.streetwriters.notesnook
-          releaseFile: ${{steps.sign_app.outputs.signedReleaseFile}}
-          track: production
-          status: completed
-          whatsNewDirectory: apps/mobile/native/android/releasenotes/             
+            apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86_64.apk           
