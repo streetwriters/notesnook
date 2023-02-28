@@ -17,50 +17,60 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import "@/tests.setup";
+import { createEditor, h, ul, li } from "@/test-utils";
 import tap from "tap";
 import expect from "expect";
-import { Editor, AnyExtension, Extensions } from "@tiptap/core";
 import { TaskListNode } from "../index";
 import { TaskItemNode } from "../../task-item";
-import StarterKit from "@tiptap/starter-kit";
-import { builders, doc, NodeBuilder, p, eq } from "prosemirror-test-builder";
-import { Node, Schema } from "@tiptap/pm/model";
+import { p, eq } from "prosemirror-test-builder";
 import { countCheckedItems, deleteCheckedItems, sortList } from "../utils";
-import { EditorState } from "@tiptap/pm/state";
 
-type Builder<TNodes extends string> = {
-  scheme: Schema;
-} & Record<TNodes, NodeBuilder>;
-
-type EditorOptions<TNodes extends string> = {
-  extensions: Record<TNodes, AnyExtension>;
-  initialDoc?: (builder: Builder<TNodes>) => Node;
-};
-
-function createEditor<TNodes extends string>(options: EditorOptions<TNodes>) {
-  const { extensions, initialDoc } = options;
-  const editor = new Editor({
-    extensions: [StarterKit, ...(Object.values(extensions) as Extensions)]
-  });
-
-  const builder = builders(editor.schema) as unknown as Builder<TNodes>;
-
-  if (initialDoc) {
-    const doc = initialDoc(builder);
-    editor.view.updateState(
-      EditorState.create({
-        schema: editor.view.state.schema,
-        doc,
-        plugins: editor.state.plugins
-      })
-    );
-
-    return { editor, builder, initialDoc: doc };
-  }
-
-  return { editor, builder, initialDoc: editor.state.doc };
+function taskList(...children: HTMLLIElement[]) {
+  return ul(children, { class: "checklist" });
 }
+
+function taskItem(
+  text: string,
+  attr: { checked?: boolean } = {},
+  subList?: HTMLUListElement
+) {
+  const children: HTMLElement[] = [h("p", [text])];
+  if (subList) children.push(subList);
+
+  return li(children, {
+    class: "checklist--item " + (attr.checked ? "checked" : "")
+  });
+}
+
+const NESTED_TASK_LIST = taskList(
+  taskItem("Task item 1", { checked: true }),
+  taskItem("Task item 2"),
+  taskItem(
+    "Task item 3",
+    { checked: false },
+    taskList(
+      taskItem("Task item 4", { checked: true }),
+      taskItem("Task item 5"),
+      taskItem(
+        "Task item 6",
+        { checked: false },
+        taskList(
+          taskItem("Task item 7", { checked: true }),
+          taskItem("Task item 8", { checked: true }),
+          taskItem(
+            "Task item 9",
+            { checked: false },
+            taskList(
+              taskItem("Task item 10", { checked: true }),
+              taskItem("Task item 11", { checked: true }),
+              taskItem("Task item 12")
+            )
+          )
+        )
+      )
+    )
+  )
+).outerHTML;
 
 tap.test(`count items in a task list`, async () => {
   const {
@@ -89,54 +99,24 @@ tap.test(`count items in a task list`, async () => {
 
 tap.test(`delete checked items in a task list`, async (t) => {
   const { editor } = createEditor({
-    initialDoc: ({ taskItem, taskList }) =>
-      doc(
-        taskList(
-          taskItem({ checked: true }, p("Task item 1")),
-          taskItem({ checked: false }, p("Task item 2"))
-        )
-      ),
+    initialContent: taskList(
+      taskItem("Task item 1", { checked: true }),
+      taskItem("Task item 2")
+    ).outerHTML,
     extensions: {
       taskItem: TaskItemNode,
       taskList: TaskListNode
     }
   });
 
-  let { tr } = editor.state;
-  tr = deleteCheckedItems(tr, 0) || tr;
-  editor.view.dispatch(tr);
+  editor.commands.command(({ tr }) => !!deleteCheckedItems(tr, 0));
 
   t.matchSnapshot(editor.state.doc.content.toJSON());
 });
 
 tap.test(`delete checked items in a nested task list`, async (t) => {
   const { editor } = createEditor({
-    initialDoc: ({ taskItem, taskList }) =>
-      doc(
-        taskList(
-          taskItem({ checked: true }, p("Task item 1")),
-          taskItem({ checked: false }, p("Task item 2")),
-          taskItem(
-            { checked: false },
-            p("Task item 3"),
-            taskList(
-              taskItem({ checked: true }, p("Task item 4")),
-              taskItem({ checked: false }, p("Task item 5")),
-              taskItem({ checked: false }, p("Task item 6")),
-              taskItem(
-                { checked: true },
-                p("Task item 7"),
-                taskList(
-                  taskItem({ checked: true }, p("Task item 8")),
-                  taskItem({ checked: true }, p("Task item 9")),
-                  taskItem({ checked: false }, p("Task item 10")),
-                  taskItem({ checked: true }, p("Task item 11"))
-                )
-              )
-            )
-          )
-        )
-      ),
+    initialContent: NESTED_TASK_LIST,
     extensions: {
       taskItem: TaskItemNode,
       taskList: TaskListNode
@@ -153,66 +133,36 @@ tap.test(`delete checked items in a nested task list`, async (t) => {
 tap.test(
   `delete checked items in a task list with no checked items should do nothing`,
   async () => {
-    const { editor, initialDoc } = createEditor({
-      initialDoc: ({ taskItem, taskList }) =>
-        doc(
+    const { editor } = createEditor({
+      initialContent: taskList(
+        taskItem("Task item 1", { checked: false }),
+        taskItem("Task item 2"),
+        taskItem(
+          "Task item 3",
+          { checked: false },
           taskList(
-            taskItem({ checked: false }, p("Task item 2")),
-            taskItem(
-              { checked: false },
-              p("Task item 3"),
-              taskList(
-                taskItem({ checked: false }, p("Task item 5")),
-                taskItem({ checked: false }, p("Task item 6")),
-                taskItem(
-                  { checked: false },
-                  p("Task item 7"),
-                  taskList(taskItem({ checked: false }, p("Task item 10")))
-                )
-              )
-            )
+            taskItem("Task item 4", { checked: false }),
+            taskItem("Task item 5"),
+            taskItem("Task item 6", { checked: false })
           )
-        ),
+        )
+      ).outerHTML,
       extensions: {
         taskItem: TaskItemNode,
         taskList: TaskListNode
       }
     });
 
+    const beforeDoc = editor.state.doc.copy(editor.state.doc.content);
     editor.commands.command(({ tr }) => !!deleteCheckedItems(tr, 0));
 
-    expect(eq(editor.state.doc, initialDoc)).toBe(true);
+    expect(eq(editor.state.doc, beforeDoc)).toBe(true);
   }
 );
 
 tap.test(`sort checked items to the bottom of the task list`, async (t) => {
   const { editor } = createEditor({
-    initialDoc: ({ taskItem, taskList }) =>
-      doc(
-        taskList(
-          taskItem({ checked: true }, p("Task item 1")),
-          taskItem({ checked: false }, p("Task item 2")),
-          taskItem(
-            { checked: false },
-            p("Task item 3"),
-            taskList(
-              taskItem({ checked: true }, p("Task item 4")),
-              taskItem({ checked: true }, p("Task item 5")),
-              taskItem({ checked: false }, p("Task item 6")),
-              taskItem(
-                { checked: false },
-                p("Task item 7"),
-                taskList(
-                  taskItem({ checked: true }, p("Task item 8")),
-                  taskItem({ checked: true }, p("Task item 9")),
-                  taskItem({ checked: false }, p("Task item 10")),
-                  taskItem({ checked: true }, p("Task item 11"))
-                )
-              )
-            )
-          )
-        )
-      ),
+    initialContent: NESTED_TASK_LIST,
     extensions: {
       taskItem: TaskItemNode,
       taskList: TaskListNode
@@ -227,21 +177,18 @@ tap.test(`sort checked items to the bottom of the task list`, async (t) => {
 tap.test(
   `sorting a task list with no checked items should do nothing`,
   async () => {
-    const { editor, initialDoc } = createEditor({
-      initialDoc: ({ taskItem, taskList }) =>
-        doc(
-          taskList(
-            taskItem({ checked: false }, p("Task item 1")),
-            taskItem({ checked: false }, p("Task item 2"))
-          )
-        ),
+    const { editor } = createEditor({
+      initialContent: taskList(taskItem("Task item 1"), taskItem("Task item 2"))
+        .outerHTML,
       extensions: {
         taskItem: TaskItemNode,
         taskList: TaskListNode
       }
     });
 
+    const beforeDoc = editor.state.doc.copy(editor.state.doc.content);
     editor.commands.command(({ tr }) => !!sortList(tr, 0));
-    expect(eq(editor.state.doc, initialDoc)).toBe(true);
+
+    expect(eq(editor.state.doc, beforeDoc)).toBe(true);
   }
 );

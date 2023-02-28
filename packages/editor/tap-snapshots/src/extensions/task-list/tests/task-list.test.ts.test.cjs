@@ -44,46 +44,85 @@ Array [
             "type": "paragraph",
           },
           Object {
-            "attrs": Null Object {
-              "title": null,
-            },
             "content": Array [
               Object {
-                "attrs": Null Object {
-                  "checked": false,
-                },
-                "content": Array [
-                  Object {
-                    "content": Array [
-                      Object {
-                        "text": "Task item 5",
-                        "type": "text",
-                      },
-                    ],
-                    "type": "paragraph",
-                  },
-                ],
-                "type": "taskItem",
-              },
-              Object {
-                "attrs": Null Object {
-                  "checked": false,
-                },
-                "content": Array [
-                  Object {
-                    "content": Array [
-                      Object {
-                        "text": "Task item 6",
-                        "type": "text",
-                      },
-                    ],
-                    "type": "paragraph",
-                  },
-                ],
-                "type": "taskItem",
+                "text": "Task item 4",
+                "type": "text",
               },
             ],
-            "type": "taskList",
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 5",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 6",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 7",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 8",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 9",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 10",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 11",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 12",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
           },
         ],
         "type": "taskItem",
@@ -163,156 +202,85 @@ Array [
             "type": "paragraph",
           },
           Object {
-            "attrs": Null Object {
-              "title": null,
-            },
             "content": Array [
               Object {
-                "attrs": Null Object {
-                  "checked": true,
-                },
-                "content": Array [
-                  Object {
-                    "content": Array [
-                      Object {
-                        "text": "Task item 4",
-                        "type": "text",
-                      },
-                    ],
-                    "type": "paragraph",
-                  },
-                ],
-                "type": "taskItem",
-              },
-              Object {
-                "attrs": Null Object {
-                  "checked": true,
-                },
-                "content": Array [
-                  Object {
-                    "content": Array [
-                      Object {
-                        "text": "Task item 5",
-                        "type": "text",
-                      },
-                    ],
-                    "type": "paragraph",
-                  },
-                ],
-                "type": "taskItem",
-              },
-              Object {
-                "attrs": Null Object {
-                  "checked": false,
-                },
-                "content": Array [
-                  Object {
-                    "content": Array [
-                      Object {
-                        "text": "Task item 6",
-                        "type": "text",
-                      },
-                    ],
-                    "type": "paragraph",
-                  },
-                ],
-                "type": "taskItem",
-              },
-              Object {
-                "attrs": Null Object {
-                  "checked": false,
-                },
-                "content": Array [
-                  Object {
-                    "content": Array [
-                      Object {
-                        "text": "Task item 7",
-                        "type": "text",
-                      },
-                    ],
-                    "type": "paragraph",
-                  },
-                  Object {
-                    "attrs": Null Object {
-                      "title": null,
-                    },
-                    "content": Array [
-                      Object {
-                        "attrs": Null Object {
-                          "checked": true,
-                        },
-                        "content": Array [
-                          Object {
-                            "content": Array [
-                              Object {
-                                "text": "Task item 8",
-                                "type": "text",
-                              },
-                            ],
-                            "type": "paragraph",
-                          },
-                        ],
-                        "type": "taskItem",
-                      },
-                      Object {
-                        "attrs": Null Object {
-                          "checked": true,
-                        },
-                        "content": Array [
-                          Object {
-                            "content": Array [
-                              Object {
-                                "text": "Task item 9",
-                                "type": "text",
-                              },
-                            ],
-                            "type": "paragraph",
-                          },
-                        ],
-                        "type": "taskItem",
-                      },
-                      Object {
-                        "attrs": Null Object {
-                          "checked": false,
-                        },
-                        "content": Array [
-                          Object {
-                            "content": Array [
-                              Object {
-                                "text": "Task item 10",
-                                "type": "text",
-                              },
-                            ],
-                            "type": "paragraph",
-                          },
-                        ],
-                        "type": "taskItem",
-                      },
-                      Object {
-                        "attrs": Null Object {
-                          "checked": true,
-                        },
-                        "content": Array [
-                          Object {
-                            "content": Array [
-                              Object {
-                                "text": "Task item 11",
-                                "type": "text",
-                              },
-                            ],
-                            "type": "paragraph",
-                          },
-                        ],
-                        "type": "taskItem",
-                      },
-                    ],
-                    "type": "taskList",
-                  },
-                ],
-                "type": "taskItem",
+                "text": "Task item 4",
+                "type": "text",
               },
             ],
-            "type": "taskList",
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 5",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 6",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 7",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 8",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 9",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 10",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 11",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          Object {
+            "content": Array [
+              Object {
+                "text": "Task item 12",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
           },
         ],
         "type": "taskItem",

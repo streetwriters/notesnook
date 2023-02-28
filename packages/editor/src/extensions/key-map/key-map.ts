@@ -48,7 +48,7 @@ export const KeyMap = Extension.create({
  * This function corrects this behavior and moves the cursor to the
  * end of the list.
  */
-function joinUpWithLastListItem(editor: Editor) {
+export function joinUpWithLastListItem(editor: Editor) {
   const { selection, doc } = editor.state;
   const { $from, empty } = selection;
 
