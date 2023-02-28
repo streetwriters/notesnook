@@ -71,8 +71,8 @@ export async function exportNotes(
           total: noteIds.length,
           text: `Exporting "${note.title}"...`
         });
-        console.log("Exporting", note.title);
-        const content = await note.export(format, null).catch((e) => {
+
+        const content = await note.export(format, null).catch((e: Error) => {
           showToast("error", e.message);
         });
         if (!content) continue;

@@ -80,6 +80,7 @@ export default class Note {
    *
    * @param {"html"|"md"|"txt"} format - Format to export into
    * @param {string?} rawContent - Use this raw content instead of generating itself
+   * @returns {Promise<string | false | undefined>}
    */
   async export(to = "html", rawContent) {
     if (to !== "txt" && !(await checkIsUserPremium(CHECK_IDS.noteExport)))
