@@ -85,7 +85,7 @@ async function save(path, data, fileName, extension) {
     uri = await ScopedStorage.writeFile(
       path,
       data,
-      fileName + `.${extension}`,
+      `${fileName}_${Date.now()}_.${extension}`,
       MIMETypes[extension],
       extension === "pdf" ? "base64" : "utf8",
       false
@@ -197,6 +197,19 @@ function zipsync(results) {
   return Buffer.from(data.buffer).toString("base64");
 }
 
+function getUniqueFileName(fileName, results) {
+  const chunks = fileName.split(".");
+  const ext = chunks.pop();
+  const name = chunks.join(".");
+  let resolvedName = fileName;
+  let count = 0;
+  while (results[resolvedName]) {
+    resolvedName = `${name}${++count}.${ext}`;
+  }
+
+  return resolvedName;
+}
+
 /**
  *
  * @param {"txt" | "pdf" | "md" | "html"} type
@@ -216,10 +229,8 @@ async function bulkExport(notes, type, callback) {
         replacement: "_"
       });
       if (result) {
-        results[fileName + `.${type}`] = Buffer.from(
-          result,
-          type === "pdf" ? "base64" : "utf-8"
-        );
+        results[getUniqueFileName(fileName + `.${type}`, results)] =
+          Buffer.from(result, type === "pdf" ? "base64" : "utf-8");
       }
       callback(`${i + 1}/${notes.length}`);
     } catch (e) {
