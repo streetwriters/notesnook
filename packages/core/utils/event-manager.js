@@ -53,16 +53,20 @@ class EventManager {
 
   publish(name, ...args) {
     this._registry.forEach((props, handler) => {
-      if (props.name === name) handler(...args);
-      if (props.once) this._registry.delete(handler);
+      if (props.name === name) {
+        handler(...args);
+        if (props.once) this._registry.delete(handler);
+      }
     });
   }
 
   async publishWithResult(name, ...args) {
     const handlers = [];
     this._registry.forEach((props, handler) => {
-      if (props.name === name) handlers.push(handler);
-      if (props.once) this._registry.delete(handler);
+      if (props.name === name) {
+        handlers.push(handler);
+        if (props.once) this._registry.delete(handler);
+      }
     });
 
     if (handlers.length <= 0) return true;
