@@ -119,13 +119,17 @@ export default function EditorManager({
 
           editorInstance.current?.updateContent(item.data as string);
 
-          db.eventManager.subscribe(
-            EVENTS.syncCompleted,
-            async () => {
-              await db.attachments?.downloadMedia(id);
-            },
-            true
-          );
+          if (appstore.get().isSyncing()) {
+            db.eventManager.subscribe(
+              EVENTS.syncCompleted,
+              async () => {
+                await db.attachments?.downloadMedia(id);
+              },
+              true
+            );
+          } else {
+            await db.attachments?.downloadMedia(id);
+          }
         } else if (isNote) {
           if (!locked && item.locked) return EV.publish(EVENTS.vaultLocked);
 
