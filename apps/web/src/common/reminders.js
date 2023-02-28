@@ -188,7 +188,11 @@ async function saveBackup() {
         },
         {
           text: "Download",
-          onClick: () => createBackup(),
+          onClick: async () => {
+            await createBackup();
+            openedToast?.hide();
+            openedToast = null;
+          },
           type: "primary"
         }
       ],
