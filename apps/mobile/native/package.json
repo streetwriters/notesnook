@@ -52,7 +52,7 @@
     "rn-fetch-blob": "^0.12.0",
     "react-native-gzip":"1.0.0",
     "@shopify/flash-list":"1.4.0",
-    "@ammarahmed/notifee-react-native": "7.4.3",
+    "@ammarahmed/notifee-react-native": "7.4.4",
     "react-native-modal-datetime-picker":"14.0.0",
     "@react-native-community/datetimepicker":"6.6.0",
     "react-native-date-picker": "4.2.6",
