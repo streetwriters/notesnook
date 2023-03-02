@@ -1,9 +1,3 @@
-- You can not sort task list items
-- Editor performance with images has been improved a lot
-- Fixed issue with images not loading in editor during real-time sync
-- Fix app not opening from notifications
-- Added oss licenses
-- Fix cursor goes behind keyboard on some devices
-- Many other bug fixes and improvements
+- Fixed reminders notifications on android
 
 Thank you for using Notesnook!
