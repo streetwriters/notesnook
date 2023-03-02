@@ -99,7 +99,6 @@ const onEvent = async ({ type, detail }: Event) => {
   if (type === EventType.PRESS) {
     notifee.decrementBadgeCount();
     if (notification?.data?.type === "quickNote") return;
-    editorState().movedAway = false;
     MMKV.removeItem("appState");
     await db.init();
     await db.notes?.init();
@@ -109,8 +108,9 @@ const onEvent = async ({ type, detail }: Event) => {
       const ReminderNotify =
         require("../components/sheets/reminder-notify").default;
       ReminderNotify.present(reminder);
+      return;
     }
-
+    editorState().movedAway = false;
     const noteId = notification?.id;
     if (useNoteStore?.getState()?.loading === false) {
       loadNote(noteId as string, false);
