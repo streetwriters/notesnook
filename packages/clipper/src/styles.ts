@@ -414,11 +414,20 @@ function parsePseudoSelector(selector: string) {
         (s.name === "after" || s.name === "before")
     );
     if (pseduoElementIndex <= -1) continue;
-
     output.push({
-      selector: stringify([part.slice(0, pseduoElementIndex)]),
+      selector: parseExtraCharacters(
+        stringify([part.slice(0, pseduoElementIndex)])
+      ),
       pseudoElement: stringify([part.slice(pseduoElementIndex)])
     });
   }
   return output;
+}
+
+function parseExtraCharacters(selector: string) {
+  const extraCharacters = ["%", "'"];
+  for (const character of extraCharacters) {
+    selector = selector.replace(new RegExp(character, "g"), `\\${character}`);
+  }
+  return selector;
 }
