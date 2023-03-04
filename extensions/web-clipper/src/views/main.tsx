@@ -83,6 +83,21 @@ const clipModes: { name: string; id: ClipMode; icon: string; pro?: boolean }[] =
     }
   ];
 
+const restrictedUrls = [
+  /chrome:\/\/newtab\//gm,
+  /https:\/\/app\.notesnook\.com\/.*/gm
+];
+
+const errors = {
+  connection: "Could not establish connection. Receiving end does not exist."
+};
+
+function getErrorText(error: string) {
+  if (error === errors.connection)
+    return "Please refresh this page to use the clipper";
+  else return error;
+}
+
 export function Main() {
   const [error, setError] = useState<string>();
   // const [colorMode, setColorMode] = useColorMode();
@@ -109,6 +124,7 @@ export function Main() {
   const [tags, setTags] = usePersistentState<string[]>("tags", []);
   const [clipData, setClipData] = useState<ClipData>();
   const pageTitle = useRef<string>();
+  const [restrictedUrl, setRestrictedUrl] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -117,6 +133,7 @@ export function Main() {
       setTitle(tab?.title ? tab.title : "Untitled");
       setUrl(tab?.url);
       pageTitle.current = tab.title;
+      setRestrictedUrl(restrictedUrls.some((rex) => rex.test(tab.url!)));
     })();
   }, []);
 
@@ -290,12 +307,17 @@ export function Main() {
               setClipNonce((s) => ++s);
             }}
           >
-            {error}
-            <br />
-            Click here to retry.
+            {restrictedUrl ? (
+              "This site is restricted"
+            ) : (
+              <>
+                {getErrorText(error)}
+                <br />
+                Click here to retry.
+              </>
+            )}
           </Text>
         )}
-
         <Text
           variant="subtitle"
           sx={{ mt: 1, mb: 2, color: "icon", fontSize: "body" }}

@@ -25,6 +25,7 @@ export function Login() {
   const [error, setError] = useState<string>();
   const isLoggingIn = useAppStore((s) => s.isLoggingIn);
   const login = useAppStore((s) => s.login);
+  const disconnectError = useAppStore((s) => s.error);
 
   useEffect(() => {
     (async () => {
@@ -69,6 +70,11 @@ export function Login() {
       {error && (
         <Text variant="error" sx={{ mt: 2 }}>
           {error}
+        </Text>
+      )}
+      {disconnectError && (
+        <Text variant="error" sx={{ mt: 2 }}>
+          {"Please refresh notesnook app to connect with clipper."}
         </Text>
       )}
     </Flex>

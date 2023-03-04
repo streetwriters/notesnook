@@ -28,6 +28,7 @@ interface AppStore {
   notebooks: NotebookReference[];
   tags: ItemReference[];
   route: string;
+  error: boolean;
 
   login(openNew?: boolean): Promise<void>;
   navigate(route: string): void;
@@ -40,6 +41,7 @@ export const useAppStore = create<AppStore>((set) => ({
   notes: [],
   tags: [],
   route: "/login",
+  error: false,
 
   navigate(route) {
     set({ route });
@@ -55,7 +57,8 @@ export const useAppStore = create<AppStore>((set) => ({
         isLoggingIn: false,
         notes: [],
         notebooks: [],
-        tags: []
+        tags: [],
+        error: true
       });
     });
 
