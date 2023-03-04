@@ -21,9 +21,11 @@ import * as Icon from "../icons";
 import "./search.css";
 import Field from "../field";
 import { useStore } from "../../stores/theme-store";
+import { getDarkScheme } from "@notesnook/theme/dist/theme/colorscheme/dark";
 
 function SearchBox(props) {
   const { theme } = useStore();
+  const {text} = getDarkScheme()
   return (
     <Field
       data-test-id="search-input"
@@ -37,7 +39,7 @@ function SearchBox(props) {
         mt: 1,
         ...(theme === "dark" && {
           "input:-webkit-autofill": {
-            WebkitTextFillColor: "rgba(231, 225, 225, 0.842)",
+            WebkitTextFillColor: text,
             caretColor: "white",
             fontSize: "inherit"
           }
