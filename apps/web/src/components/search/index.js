@@ -21,11 +21,11 @@ import * as Icon from "../icons";
 import "./search.css";
 import Field from "../field";
 import { useStore } from "../../stores/theme-store";
-import { getDarkScheme } from "@notesnook/theme/dist/theme/colorscheme/dark";
+import { getColors } from "@notesnook/theme/dist/theme/colorscheme";
 
 function SearchBox(props) {
   const { theme } = useStore();
-  const {text} = getDarkScheme()
+  const { text } = getColors(theme);
   return (
     <Field
       data-test-id="search-input"
@@ -37,13 +37,11 @@ function SearchBox(props) {
         m: 0,
         mx: 1,
         mt: 1,
-        ...(theme === "dark" && {
-          "input:-webkit-autofill": {
-            WebkitTextFillColor: text,
-            caretColor: "white",
-            fontSize: "inherit"
-          }
-        })
+        "input:-webkit-autofill": {
+          WebkitTextFillColor: text,
+          caretColor: text,
+          fontSize: "inherit"
+        }
       }}
       placeholder="Type your query here"
       onKeyDown={(e) => {
