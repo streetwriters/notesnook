@@ -16,21 +16,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 import * as Icon from "../icons";
 import "./search.css";
 import Field from "../field";
-import { useEffect } from "react";
 import { useStore } from "../../stores/theme-store";
+
 function SearchBox(props) {
   const { theme } = useStore();
-  useEffect(() => {
-    const search = document.getElementById("search");
-    if (theme === "dark") {
-      search.classList.add("darkModeSearch");
-    } else {
-      search.classList.remove("darkModeSearch");
+  const autoCompleteTextStyle = {
+    "input:-webkit-autofill": {
+      WebkitTextFillColor: "rgba(231, 225, 225, 0.842) !important",
+      caretColor: "white",
+      fontSize: "inherit !important"
     }
-  }, [theme]);
+  };
   return (
     <Field
       data-test-id="search-input"
@@ -38,7 +38,7 @@ function SearchBox(props) {
       id="search"
       name="search"
       type="text"
-      sx={{ m: 0, mx: 1, mt: 1 }}
+      sx={{ m: 0, mx: 1, mt: 1, ...(theme === "dark" && autoCompleteTextStyle) }}
       placeholder="Type your query here"
       onKeyDown={(e) => {
         if (e.key === "Enter") props.onSearch(e.target.value);
