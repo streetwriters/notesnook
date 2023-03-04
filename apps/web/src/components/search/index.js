@@ -24,13 +24,6 @@ import { useStore } from "../../stores/theme-store";
 
 function SearchBox(props) {
   const { theme } = useStore();
-  const autoCompleteTextStyle = {
-    "input:-webkit-autofill": {
-      WebkitTextFillColor: "rgba(231, 225, 225, 0.842) !important",
-      caretColor: "white",
-      fontSize: "inherit !important"
-    }
-  };
   return (
     <Field
       data-test-id="search-input"
@@ -38,7 +31,18 @@ function SearchBox(props) {
       id="search"
       name="search"
       type="text"
-      sx={{ m: 0, mx: 1, mt: 1, ...(theme === "dark" && autoCompleteTextStyle) }}
+      sx={{
+        m: 0,
+        mx: 1,
+        mt: 1,
+        ...(theme === "dark" && {
+          "input:-webkit-autofill": {
+            WebkitTextFillColor: "rgba(231, 225, 225, 0.842)",
+            caretColor: "white",
+            fontSize: "inherit"
+          }
+        })
+      }}
       placeholder="Type your query here"
       onKeyDown={(e) => {
         if (e.key === "Enter") props.onSearch(e.target.value);
