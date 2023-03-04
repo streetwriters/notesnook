@@ -17,11 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import * as Icon from "../icons";
-import "./search.css";
 import Field from "../field";
-
+import {useEffect} from "react"
+import { useStore } from "../../stores/theme-store";
 function SearchBox(props) {
+  const search = document.getElementById("search")
+  const {theme} = useStore()
+  useEffect(()=>{
+    if(theme === "dark"){
+      search.classList.add("darkModeSearch")
+    }
+    else{
+      search.classList.remove("darkModeSearch")
+    }
+  },[theme])
   return (
     <Field
       data-test-id="search-input"
