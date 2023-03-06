@@ -113,7 +113,7 @@ Notebooks consist of topics where you can add/create and edit your notes.
 
 > info
 >
-> Once a note is added to a notebook, it's refernence will show on top of the note in the list. Clicking on it will take you to the topic.
+> Once a note is added to a notebook, it's references will show on top of the note in the list. Clicking on it will take you to the topic.
 >
 > ![Notebook reference on a note](/notebook-ref.png)
 
@@ -125,7 +125,6 @@ Notebooks consist of topics where you can add/create and edit your notes.
 2. Select `Add to Notebook(s)`
 3. Select the notebook and topic in which you want to add the note
 4. Click "Finish" to add the notes to the topic.
-
 5. You should now see the notebook/topic below the note title. You can click on it to navigate to the topic directly.
 
 # [Mobile](#/tab/mobile)
@@ -134,7 +133,6 @@ Notebooks consist of topics where you can add/create and edit your notes.
 2. Press on `Add to notebook` button.
 3. Select the notebook and topic in which you want to add the note.
 4. Once done, swipe down to close the sheet.
-
 5. You should now see the notebook/topic on the top left side of the note. You can click on it to navigate to the topic directly.
 
 ---
