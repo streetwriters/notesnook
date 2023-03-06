@@ -18,13 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { createEditor, h } from "@/test-utils";
-import tap from "tap";
-import expect from "expect";
+import { test, expect } from "vitest";
 import BulletList from "../../bullet-list";
 import { ListItem } from "../../list-item";
 import { joinUpWithLastListItem } from "../key-map";
 
-tap.test(`join up with last list item in a flat list`, async (t) => {
+test(`join up with last list item in a flat list`, async () => {
   const { editor } = createEditor({
     initialContent: h("div", [
       h("ul", [h("li", ["Hello"]), h("li", ["World"])]),
@@ -40,10 +39,10 @@ tap.test(`join up with last list item in a flat list`, async (t) => {
   joinUpWithLastListItem(editor);
 
   expect(editor.state.selection.$from.parent.textContent).toBe("World");
-  t.matchSnapshot(editor.state.doc.content.toJSON());
+  expect(editor.state.doc.content.toJSON()).toMatchSnapshot();
 });
 
-tap.test(`join up with last list item in a nested list`, async (t) => {
+test(`join up with last list item in a nested list`, async () => {
   const { editor } = createEditor({
     initialContent: h("div", [
       h("ul", [
@@ -71,10 +70,10 @@ tap.test(`join up with last list item in a nested list`, async (t) => {
   expect(editor.state.selection.$from.parent.textContent).toBe(
     "A very nested world"
   );
-  t.matchSnapshot(editor.state.doc.content.toJSON());
+  expect(editor.state.doc.content.toJSON()).toMatchSnapshot();
 });
 
-tap.test(`join up with last list item in a nested list`, async (t) => {
+test(`join up with last list item in a nested list`, async () => {
   const { editor } = createEditor({
     initialContent: h("div", [
       h("ul", [
@@ -102,5 +101,5 @@ tap.test(`join up with last list item in a nested list`, async (t) => {
   expect(editor.state.selection.$from.parent.textContent).toBe(
     "A very nested world"
   );
-  t.matchSnapshot(editor.state.doc.content.toJSON());
+  expect(editor.state.doc.content.toJSON()).toMatchSnapshot();
 });
