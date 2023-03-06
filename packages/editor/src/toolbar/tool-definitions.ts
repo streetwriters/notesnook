@@ -351,6 +351,7 @@ export const STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
   [
     "insertBlock",
     "tableSettings",
+    "cellProperties",
     "imageSettings",
     "embedSettings",
     "attachmentSettings",

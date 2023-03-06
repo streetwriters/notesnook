@@ -32,9 +32,10 @@ type MoreToolsProps = ToolProps & {
   tools: ToolId[];
   autoCloseOnUnmount?: boolean;
   autoOpen?: boolean;
+  group?: string;
 };
 export function MoreTools(props: MoreToolsProps) {
-  const { popupId, editor, tools, autoCloseOnUnmount, autoOpen } = props;
+  const { popupId, editor, tools, autoCloseOnUnmount, autoOpen, group } = props;
   const toolbarLocation = useToolbarLocation();
   const isBottom = toolbarLocation === "bottom";
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -51,7 +52,7 @@ export function MoreTools(props: MoreToolsProps) {
       />
       <PopupWrapper
         isOpen={isOpen}
-        group={"toolbarGroup"}
+        group={group || "toolbarGroup"}
         id={popupId}
         onClosed={onClosed}
         position={{
