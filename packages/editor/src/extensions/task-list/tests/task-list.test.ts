@@ -18,8 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { createEditor, h, ul, li } from "@/test-utils";
-import tap from "tap";
-import expect from "expect";
+import { test, expect } from "vitest";
 import { TaskListNode } from "../index";
 import { TaskItemNode } from "../../task-item";
 import { p, eq } from "prosemirror-test-builder";
@@ -72,7 +71,7 @@ const NESTED_TASK_LIST = taskList(
   )
 ).outerHTML;
 
-tap.test(`count items in a task list`, async () => {
+test(`count items in a task list`, async () => {
   const {
     builder: { taskItem, taskList }
   } = createEditor({
@@ -97,7 +96,7 @@ tap.test(`count items in a task list`, async () => {
   expect(total).toBe(4);
 });
 
-tap.test(`delete checked items in a task list`, async (t) => {
+test(`delete checked items in a task list`, async () => {
   const { editor } = createEditor({
     initialContent: taskList(
       taskItem("Task item 1", { checked: true }),
@@ -111,10 +110,10 @@ tap.test(`delete checked items in a task list`, async (t) => {
 
   editor.commands.command(({ tr }) => !!deleteCheckedItems(tr, 0));
 
-  t.matchSnapshot(editor.state.doc.content.toJSON());
+  expect(editor.state.doc.content.toJSON()).toMatchSnapshot();
 });
 
-tap.test(`delete checked items in a nested task list`, async (t) => {
+test(`delete checked items in a nested task list`, async () => {
   const { editor } = createEditor({
     initialContent: NESTED_TASK_LIST,
     extensions: {
@@ -127,40 +126,37 @@ tap.test(`delete checked items in a nested task list`, async (t) => {
   tr = deleteCheckedItems(tr, 0) || tr;
   editor.view.dispatch(tr);
 
-  t.matchSnapshot(editor.state.doc.content.toJSON());
+  expect(editor.state.doc.content.toJSON()).toMatchSnapshot();
 });
 
-tap.test(
-  `delete checked items in a task list with no checked items should do nothing`,
-  async () => {
-    const { editor } = createEditor({
-      initialContent: taskList(
-        taskItem("Task item 1", { checked: false }),
-        taskItem("Task item 2"),
-        taskItem(
-          "Task item 3",
-          { checked: false },
-          taskList(
-            taskItem("Task item 4", { checked: false }),
-            taskItem("Task item 5"),
-            taskItem("Task item 6", { checked: false })
-          )
+test(`delete checked items in a task list with no checked items should do nothing`, async () => {
+  const { editor } = createEditor({
+    initialContent: taskList(
+      taskItem("Task item 1", { checked: false }),
+      taskItem("Task item 2"),
+      taskItem(
+        "Task item 3",
+        { checked: false },
+        taskList(
+          taskItem("Task item 4", { checked: false }),
+          taskItem("Task item 5"),
+          taskItem("Task item 6", { checked: false })
         )
-      ).outerHTML,
-      extensions: {
-        taskItem: TaskItemNode,
-        taskList: TaskListNode
-      }
-    });
+      )
+    ).outerHTML,
+    extensions: {
+      taskItem: TaskItemNode,
+      taskList: TaskListNode
+    }
+  });
 
-    const beforeDoc = editor.state.doc.copy(editor.state.doc.content);
-    editor.commands.command(({ tr }) => !!deleteCheckedItems(tr, 0));
+  const beforeDoc = editor.state.doc.copy(editor.state.doc.content);
+  editor.commands.command(({ tr }) => !!deleteCheckedItems(tr, 0));
 
-    expect(eq(editor.state.doc, beforeDoc)).toBe(true);
-  }
-);
+  expect(eq(editor.state.doc, beforeDoc)).toBe(true);
+});
 
-tap.test(`sort checked items to the bottom of the task list`, async (t) => {
+test(`sort checked items to the bottom of the task list`, async () => {
   const { editor } = createEditor({
     initialContent: NESTED_TASK_LIST,
     extensions: {
@@ -171,24 +167,21 @@ tap.test(`sort checked items to the bottom of the task list`, async (t) => {
 
   editor.commands.command(({ tr }) => !!sortList(tr, 0));
 
-  t.matchSnapshot(editor.state.doc.content.toJSON());
+  expect(editor.state.doc.content.toJSON()).toMatchSnapshot();
 });
 
-tap.test(
-  `sorting a task list with no checked items should do nothing`,
-  async () => {
-    const { editor } = createEditor({
-      initialContent: taskList(taskItem("Task item 1"), taskItem("Task item 2"))
-        .outerHTML,
-      extensions: {
-        taskItem: TaskItemNode,
-        taskList: TaskListNode
-      }
-    });
+test(`sorting a task list with no checked items should do nothing`, async () => {
+  const { editor } = createEditor({
+    initialContent: taskList(taskItem("Task item 1"), taskItem("Task item 2"))
+      .outerHTML,
+    extensions: {
+      taskItem: TaskItemNode,
+      taskList: TaskListNode
+    }
+  });
 
-    const beforeDoc = editor.state.doc.copy(editor.state.doc.content);
-    editor.commands.command(({ tr }) => !!sortList(tr, 0));
+  const beforeDoc = editor.state.doc.copy(editor.state.doc.content);
+  editor.commands.command(({ tr }) => !!sortList(tr, 0));
 
-    expect(eq(editor.state.doc, beforeDoc)).toBe(true);
-  }
-);
+  expect(eq(editor.state.doc, beforeDoc)).toBe(true);
+});

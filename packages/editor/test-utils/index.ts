@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import "./tests.setup";
 import { Editor, AnyExtension, Extensions } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { builders, NodeBuilder } from "prosemirror-test-builder";
@@ -28,6 +27,7 @@ type Builder<TNodes extends string> = {
 } & Record<TNodes, NodeBuilder>;
 
 type EditorOptions<TNodes extends string> = {
+  element?: HTMLElement;
   extensions: Record<TNodes, AnyExtension>;
   initialContent?: string;
 };
@@ -35,27 +35,24 @@ type EditorOptions<TNodes extends string> = {
 export function createEditor<TNodes extends string>(
   options: EditorOptions<TNodes>
 ) {
-  const { extensions, initialContent } = options;
+  const { extensions, initialContent, element } = options;
   const editor = new Editor({
+    element,
+    content: initialContent,
+    parseOptions: { preserveWhitespace: "full" },
     extensions: [
       StarterKit.configure({
         bulletList: false,
         listItem: false,
-        orderedList: false
+        orderedList: false,
+        codeBlock: false,
+        code: false
       }),
       ...(Object.values(extensions) as Extensions)
     ]
   });
 
   const builder = builders(editor.schema) as unknown as Builder<TNodes>;
-
-  if (initialContent) {
-    editor.commands.setContent(initialContent, true, {
-      preserveWhitespace: "full"
-    });
-
-    return { editor, builder };
-  }
 
   return { editor, builder };
 }

@@ -33,6 +33,8 @@ import { createNodeView } from "../react";
 import detectIndent from "detect-indent";
 import redent from "redent";
 import stripIndent from "strip-indent";
+import { nanoid } from "nanoid";
+import Languages from "./languages.json";
 
 interface Indent {
   type: "tab" | "space";
@@ -122,6 +124,11 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
   addAttributes() {
     return {
+      id: {
+        default: undefined,
+        rendered: false,
+        parseHTML: () => `codeblock-${nanoid(12)}`
+      },
       caretPosition: {
         default: undefined,
         rendered: false
@@ -165,8 +172,8 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         parseHTML: (element) => {
           const { languageClassPrefix } = this.options;
           const classNames = [
-            ...(element.classList || []),
-            ...(element?.firstElementChild?.classList || [])
+            ...element.classList.values(),
+            ...(element?.firstElementChild?.classList?.values() || [])
           ];
           const languages = classNames
             .filter((className) => className.startsWith(languageClassPrefix))
@@ -494,13 +501,11 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             if (!event.clipboardData) {
               return false;
             }
-
             const text = event.clipboardData.getData("text/plain");
-            const vscode = event.clipboardData.getData("vscode-editor-data");
-            const vscodeData = vscode ? JSON.parse(vscode) : undefined;
-            const language = vscodeData?.mode;
+            const { isCode, language } = detectCodeBlock(event.clipboardData);
 
-            if (!text || !language) {
+            const isInsideCodeBlock = this.editor.isActive(this.type.name);
+            if (!isInsideCodeBlock && !isCode) {
               return false;
             }
 
@@ -512,22 +517,16 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             const { tr } = view.state;
 
             // create an empty code block if not already within one
-            if (!this.editor.isActive(this.type.name)) {
+            if (isCode && !isInsideCodeBlock) {
               tr.replaceSelectionWith(
                 this.type.create({
+                  id: `codeblock-${nanoid(12)}`,
                   language,
                   indentType: indent.type,
                   indentLength: indent.amount
                 })
               );
             }
-
-            // // put cursor inside the newly created code block
-            // tr.setSelection(
-            //   TextSelection.near(
-            //     tr.doc.resolve(Math.max(0, tr.selection.from - 2))
-            //   )
-            // );
 
             // add text to code block
             // strip carriage return chars from text pasted as code
@@ -554,7 +553,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
       contentDOMFactory: () => {
         const content = document.createElement("div");
         content.classList.add("node-content-wrapper");
-        content.style.whiteSpace = "inherit";
+        content.style.whiteSpace = "pre";
         // caret is not visible if content element width is 0px
         content.style.minWidth = "20px";
         return { dom: content };
@@ -765,4 +764,44 @@ function fixIndentation(
     indent: type === "space" ? " " : "\t"
   });
   return { code: stripIndent(fixed), amount, type };
+}
+
+function detectCodeBlock(dataTransfer: DataTransfer) {
+  const html = dataTransfer.getData("text/html") || "";
+  const vscode = dataTransfer.getData("vscode-editor-data");
+  const vscodeData = vscode ? JSON.parse(vscode) : undefined;
+
+  const document = new DOMParser().parseFromString(html, "text/html");
+
+  const isGitHub = !!document.querySelector(
+    ".react-code-text.react-code-line-contents"
+  );
+  const isVSCode =
+    vscode ||
+    (document.body.firstElementChild instanceof HTMLDivElement &&
+      document.body.firstElementChild.style.fontFamily ===
+        `'Droid Sans Mono', 'monospace', monospace`);
+
+  const language =
+    vscodeData?.mode ||
+    (document.body.firstElementChild
+      ? inferLanguage(document.body.firstElementChild)
+      : undefined);
+
+  return { isCode: isVSCode || isGitHub || !!language, language };
+}
+
+const LANGUAGE_CLASS_REGEX = /(?:language|lang|brush)[-:](\s+\w+|\w+)/;
+export function inferLanguage(node: Element) {
+  const matches = LANGUAGE_CLASS_REGEX.exec(node.className);
+  let lang =
+    matches && matches.length > 1 ? matches[1] : node.getAttribute("lang");
+
+  if (!lang) return;
+
+  lang = lang.trim();
+  const language = Languages.find(
+    (l) => l.filename === lang || l.alias?.some((a) => a === lang)
+  );
+  return language?.filename;
 }

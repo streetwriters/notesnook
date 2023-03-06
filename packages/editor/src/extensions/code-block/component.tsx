@@ -17,9 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useRef, useState } from "react";
-import { isLanguageLoaded, loadLanguage } from "./loader";
-import { refractor } from "refractor/lib/core";
+import { useRef, useState } from "react";
 import { Flex, Text } from "@theme-ui/components";
 import Languages from "./languages.json";
 import { Input } from "@theme-ui/components";
@@ -44,26 +42,6 @@ export function CodeblockComponent(
   const languageDefinition = Languages.find(
     (l) => l.filename === language || l.alias?.some((a) => a === language)
   );
-
-  useEffect(() => {
-    (async function () {
-      if (!language || !languageDefinition || isLanguageLoaded(language))
-        return;
-
-      const syntax = await loadLanguage(languageDefinition.filename);
-      if (!syntax) return;
-
-      refractor.register(syntax);
-
-      const preventUpdate = language === languageDefinition.filename;
-      updateAttributes(
-        {
-          language: languageDefinition.filename
-        },
-        { preventUpdate, addToHistory: false, forceUpdate: true }
-      );
-    })();
-  }, [language, languageDefinition, updateAttributes]);
 
   return (
     <>
