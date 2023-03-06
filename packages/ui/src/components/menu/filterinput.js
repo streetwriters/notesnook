@@ -39,6 +39,7 @@ export function FilterInput(props) {
 
   useEffect(() => {
     focusInput(filters.length - 1);
+    document.getElementById(`inputId_${index}`).innerText = item.input.query;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.length]);
 
@@ -66,7 +67,7 @@ export function FilterInput(props) {
       }}
       onBlur={onBlur}
       onKeyDown={async (e) => {
-        (await onKeyPress(e, props))[e.key]();
+        await onKeyPress(e, props);
       }}
     />
   ) : (
@@ -139,33 +140,6 @@ const CustomInput = forwardRef((props, refs) => (
 ));
 CustomInput.displayName = "CustomInput";
 
-const getCursorPosition = (editableDiv) => {
-  //it is a general method, it should be somehwre else
-  var caretPos = 0,
-    sel,
-    range;
-  if (window.getSelection) {
-    sel = window.getSelection();
-    if (sel.rangeCount) {
-      range = sel.getRangeAt(0);
-      if (range.commonAncestorContainer.parentNode == editableDiv) {
-        caretPos = range.endOffset;
-      }
-    }
-  } else if (document.selection && document.selection.createRange) {
-    range = document.selection.createRange();
-    if (range.parentElement() == editableDiv) {
-      var tempEl = document.createElement("span");
-      editableDiv.insertBefore(tempEl, editableDiv.firstChild);
-      var tempRange = range.duplicate();
-      tempRange.moveToElementText(tempEl);
-      tempRange.setEndPoint("EndToEnd", range);
-      caretPos = tempRange.text.length;
-    }
-  }
-  return caretPos;
-};
-
 const checkErrors = async (props, query) => {
   const { setFilters, index, item } = props;
   query = query.trim();
@@ -208,37 +182,44 @@ const onKeyPress = async (e, props) => {
     searchDefinitions,
     setSelectionIndex,
     suggestions,
-    moveSelection
+    moveSelection,
+    getCursorPosition
   } = props;
   setSuggestions(await getSuggestions(e.target.innerText, item.input));
   await checkErrors(props, e.target.innerText);
-  return {
-    Enter: async () => {
+
+  switch (e.key) {
+    case "Enter": {
       props.onKeyDown(e);
       focusInput(index + 1);
       let results = await db.search.filters(searchDefinitions);
       onSearch(results);
       setSuggestions([]);
       e.preventDefault();
-    },
-    Escape: () => {
+      break;
+    }
+    case "Escape": {
       setSuggestions([]);
-    },
-    ArrowDown: () => {
+      break;
+    }
+    case "ArrowDown": {
       moveSelection(suggestions, setSelectionIndex).Down();
       e.preventDefault();
-    },
-    ArrowUp: () => {
+      break;
+    }
+    case "ArrowUp": {
       moveSelection(suggestions, setSelectionIndex).Up();
       e.preventDefault();
-    },
-    ArrowLeft: () => {
+      break;
+    }
+    case "ArrowLeft": {
       if (getCursorPosition(document.getElementById(e.target.id)) == 0) {
         focusInput(index - 1);
         e.preventDefault();
       }
-    },
-    ArrowRight: () => {
+      break;
+    }
+    case "ArrowRight": {
       if (
         getCursorPosition(document.getElementById(e.target.id)) ==
         e.target.innerText.length
@@ -246,14 +227,18 @@ const onKeyPress = async (e, props) => {
         focusInput(index + 1);
         e.preventDefault();
       }
-    },
-    Backspace: () => {
+      break;
+    }
+    case "Backspace": {
       if (e.target.innerText === "") {
         setSuggestions([]);
         setFilters(deleteFilter(filters, index));
         deleteDefinition(searchDefinitions, item.input.id);
         focusInput(index - 1);
       }
+      break;
     }
-  };
+    default:
+      break;
+  }
 };

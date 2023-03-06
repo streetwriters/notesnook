@@ -37,11 +37,12 @@ export function SuggestionRow(props) {
     >
       <Text
         variant="subtitle"
-        fontWeight={props.item.isFilterFocused ? "body" : "bold"}
+        fontWeight={props.item.filter ? "body" : "bold"}
         ml={1}
         sx={{ textOverflow: "ellipsis" }}
       >
-        {props.item.col1}
+        {props.item.main1}
+        {props.item.filter}
       </Text>
       <Text
         variant="subtitle"
@@ -49,7 +50,7 @@ export function SuggestionRow(props) {
         ml={1}
         sx={{ textOverflow: "ellipsis" }}
       >
-        {props.item.col2}
+        {props.item.main2}
       </Text>
     </Button>
   );

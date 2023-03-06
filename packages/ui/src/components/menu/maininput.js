@@ -16,25 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { useEffect, useState } from "react";
-import { db } from "../../common/db";
-import { addToSearchHistory } from "./search";
 import { Input } from "@theme-ui/components";
 
 export function MainInput(props) {
-  const [searchHistory, setSearchHistory] = useState();
-
-  useEffect(async () => {
-    //correct all the useEffects
-    //history file to be added in core for search history
-    let list = await db.searchHistory.getHistory();
-    if (props.filters.length < 1) {
-      setSearchHistory(list);
-    } else {
-      setSearchHistory([]);
-    }
-  }, [db.searchHistory, props.filters.length]);
-
   return (
     <Input
       {...props}
@@ -56,60 +40,66 @@ export function MainInput(props) {
       }}
       onChange={async (e) => {
         props.refreshFilters(e.target.value, props.setFilters);
-        props.setSuggestions(
-          await props.getSuggestions(e.target.value, undefined, searchHistory)
-        );
+        props.setSuggestions(await props.getSuggestions(e.target.value));
       }}
       onFocus={async (e) => {
         //shift to index
-        props.setSuggestions(
-          await props.getSuggestions(e.target.value, undefined, searchHistory)
-        );
+        props.setSuggestions(await props.getSuggestions(e.target.value));
         props.onFocus(e);
       }}
       onKeyDown={async (e) => {
         //keyActions(e);
         props.onKeyDown(e);
-        await onKeyPress[e.key](e, props);
+        await onKeyPress(e, props);
       }}
     />
   );
 }
 
-const onKeyPress = {
-  Enter: async (e, props) => {
-    props.onSearch(e.target.value);
-    await addToSearchHistory(e.target.value);
-    props.setSuggestions([]);
-    props.refreshFilters(e.target.value, props.setFilters);
-    e.preventDefault();
-  },
-  Escape: (e, props) => {
-    props.setSuggestions([]);
-  },
-  ArrowDown: (e, props) => {
-    props.moveSelection(props.suggestions, props.setSelectionIndex).Down();
-    e.preventDefault();
-  },
-  ArrowUp: (e, props) => {
-    props.moveSelection(props.suggestions, props.setSelectionIndex).Up();
-    e.preventDefault();
-  },
-  ArrowLeft: (e, props) => {
-    if (e.target.selectionStart == 0) {
-      props.focusInput(props.filters.length - 1);
+const onKeyPress = async (e, props) => {
+  switch (e.key) {
+    case "Enter": {
+      props.onSearch(e.target.value);
+      props.setSuggestions([]);
+      props.refreshFilters(e.target.value, props.setFilters);
       e.preventDefault();
+      break;
     }
-  },
-  ArrowRight: (e, props) => {
-    if (e.target.selectionStart == e.target.value.length) {
-      props.focusInput(0);
+    case "Escape": {
+      props.setSuggestions([]);
+      break;
+    }
+    case "ArrowDown": {
+      props.moveSelection(props.suggestions, props.setSelectionIndex).Down();
       e.preventDefault();
+      break;
     }
-  },
-  Backspace: (e, props) => {
-    if (e.target.selectionStart == 0) {
-      props.focusInput(props.filters.length - 1);
+    case "ArrowUp": {
+      props.moveSelection(props.suggestions, props.setSelectionIndex).Up();
+      e.preventDefault();
+      break;
     }
+    case "ArrowLeft": {
+      if (e.target.selectionStart == 0) {
+        props.focusInput(props.filters.length - 1);
+        e.preventDefault();
+      }
+      break;
+    }
+    case "ArrowRight": {
+      if (e.target.selectionStart == e.target.value.length) {
+        props.focusInput(0);
+        e.preventDefault();
+      }
+      break;
+    }
+    case "Backspace": {
+      if (e.target.selectionStart == 0) {
+        props.focusInput(props.filters.length - 1);
+      }
+      break;
+    }
+    default:
+      break;
   }
 };
