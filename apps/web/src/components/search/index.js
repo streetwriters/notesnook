@@ -20,12 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import * as Icon from "../icons";
 import "./search.css";
 import Field from "../field";
-import { useStore } from "../../stores/theme-store";
-import { getColors } from "@notesnook/theme/dist/theme/colorscheme";
 
 function SearchBox(props) {
-  const { theme } = useStore();
-  const { text } = getColors(theme);
+
   return (
     <Field
       data-test-id="search-input"
@@ -38,8 +35,8 @@ function SearchBox(props) {
         mx: 1,
         mt: 1,
         "input:-webkit-autofill": {
-          WebkitTextFillColor: text,
-          caretColor: text,
+          WebkitTextFillColor: 'var(--text)',
+          caretColor: 'var(--text)',
           fontSize: "inherit"
         }
       }}
