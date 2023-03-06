@@ -553,7 +553,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
       contentDOMFactory: () => {
         const content = document.createElement("div");
         content.classList.add("node-content-wrapper");
-        content.style.whiteSpace = "inherit";
+        content.style.whiteSpace = "pre";
         // caret is not visible if content element width is 0px
         content.style.minWidth = "20px";
         return { dom: content };
