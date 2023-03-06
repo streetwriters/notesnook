@@ -17,6 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { defineConfig } from "vitest/config";
 
-GlobalRegistrator.register();
+export default defineConfig({
+  test: {
+    alias: {
+      "@/": "./"
+    },
+    environment: "happy-dom",
+    typecheck: {
+      tsconfig: "./tsconfig.tests.json"
+    }
+  }
+});

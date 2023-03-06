@@ -21,6 +21,7 @@ import { Editor, Extension } from "@tiptap/core";
 import { isInTable } from "@tiptap/pm/tables";
 import { LIST_ITEM_NODE_TYPES, LIST_NODE_TYPES } from "../../utils/node-types";
 import { isListActive } from "../../utils/prosemirror";
+import { CodeBlock } from "../code-block";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -28,7 +29,13 @@ export const KeyMap = Extension.create({
   addKeyboardShortcuts() {
     return {
       Tab: ({ editor }) => {
-        if (isListActive(editor) || isInTable(editor.state)) return false;
+        if (
+          isListActive(editor) ||
+          isInTable(editor.state) ||
+          editor.isActive(CodeBlock.name)
+        )
+          return false;
+
         return editor.commands.insertContent("\t");
       },
       "Shift-Tab": ({ editor }) => {
@@ -37,9 +44,9 @@ export const KeyMap = Extension.create({
       },
       Backspace: ({ editor }) => {
         return joinUpWithLastListItem(editor);
-      }
+      },
     };
-  }
+  },
 });
 
 /**
