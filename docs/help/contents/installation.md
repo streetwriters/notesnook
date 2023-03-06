@@ -37,27 +37,41 @@ Once installation completes, you can start Notesnook app from the Launchpad.
 
 ## Windows
 
-# [Download .exe](#/tab/exe)
+# [Installing via .exe files](#/tab/exe)
 
-Download the latest `.exe` file from the link below.
+Download the latest **.exe** file from the links below:
 
-- [Notesnook](https://notesnook.com/releases/windows/notesnook_win_x64.exe)
-- [Notesnook portable](https://notesnook.com/releases/windows/notesnook_win_x64_portable.exe)
+- [Notesnook x64 (Setup)](https://notesnook.com/releases/windows/notesnook_win_x64.exe)
+- [Notesnook x64 (Portable)](https://notesnook.com/releases/windows/notesnook_win_x64_portable.exe)
 
-Once you have the .exe downloaded,
+Once you have the **.exe** downloaded:
 
-1. Double click to open the .exe file
-2.
+1. Double click to open the **.exe** file
+2. Follow the installation instructions to install the app.
 
-# [Install via Chocolatey](#/tab/choco)
+# [Installing via PowerShell](#/tab/terminal)
 
-If you have [Chocolatey](https://chocolatey.org/) installed on windows you can quickly install Notesnook via powershell:
+To install Notesnook, run the following command from the command line or from PowerShell:
 
-```
+#### [Chocolatey](https://community.chocolatey.org/packages/notesnook)
+
+```bash
 choco install notesnook
 ```
 
-Start Notesnook from Windows Search.
+#### [Winget](https://winget.run/pkg/Streetwriters/Notesnook)
+
+```bash
+winget install -e --id Streetwriters.Notesnook
+```
+
+#### [Scoop](https://scoop.sh/#/apps?q=notesnook&s=0&d=1&o=true)
+
+```bash
+scoop bucket add extras && scoop install notesnook
+```
+
+Start Notesnook from Windows Start Menu.
 
 ---
 

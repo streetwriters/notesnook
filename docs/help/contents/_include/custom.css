@@ -116,35 +116,56 @@ html.light {
   --header-fg: #008837;
   --link: #008837;
   --heading: #000;
-  --page-bg: #fafafa;
-  --document-bg: #f3f3f3;
+  --page-bg: #ffffff;
+  --document-bg: #f7f7f7;
   --selection-bg: #00883766;
   --selection-fg: #fff;
+  --border: #e8e8e8;
+  --input-border: #e8e8e8;
+
+  --hover-bg: #e8e8e8;
+  --info-dim: #00883720;
 
   --fg: #403f53;
   --fg-dim: #403f53cc;
   --fg-dimmer: #403f53bb;
+  --code-bg: #e8e8e8;
 }
 
 html.dark {
+  --font-family: "Open Sans", sans-serif;
+  --monospace-font-family: "Fira Code", monospace;
   --primary: #008837;
   --primary-fg: #fff;
   --header-fg: #008837;
   --link: #008837;
-  --page-bg: #1b1b1b;
-  --document-bg: #222;
-  --border: #333;
+  --page-bg: #0d0d0d;
+  --document-bg: #151515;
+  --border: #383838;
+
+  --info-dim: #00883720;
 
   --button-bg: #3b3b3b;
-  --hover-bg: #4b4b4b;
+  --hover-bg: #202020;
   --button-fg: #fff;
 
   --input-bg: #2b2b2b;
   --input-placeholder: #ababab;
 
-  --code-bg: #4b4b4b;
+  --code-bg: #202020;
   --selection-bg: #00883766;
   --selection-fg: #fff;
+  --border-dim: #383838;
+  --input-border: #383838;
+  --input-bg: #151515;
+}
+
+nav li:not(li.nested):hover {
+  background-color: var(--hover-bg);
+}
+
+pre {
+  border: 1px solid var(--border);
 }
 
 .project-title a {
@@ -155,4 +176,8 @@ html.dark {
 .project-subtitle {
   color: var(--fg);
   font-weight: 600;
+}
+
+.docgen-content {
+  box-shadow: none;
 }
