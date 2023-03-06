@@ -22,7 +22,6 @@ import "./search.css";
 import Field from "../field";
 
 function SearchBox(props) {
-
   return (
     <Field
       data-test-id="search-input"
@@ -30,16 +29,7 @@ function SearchBox(props) {
       id="search"
       name="search"
       type="text"
-      sx={{
-        m: 0,
-        mx: 1,
-        mt: 1,
-        "input:-webkit-autofill": {
-          WebkitTextFillColor: 'var(--text)',
-          caretColor: 'var(--text)',
-          fontSize: "inherit"
-        }
-      }}
+      sx={{m: 0,mx: 1,mt: 1}}
       placeholder="Type your query here"
       onKeyDown={(e) => {
         if (e.key === "Enter") props.onSearch(e.target.value);

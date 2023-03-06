@@ -27,6 +27,11 @@ const defaultVariant: ThemeUIStyleObject = {
   fontWeight: "body",
   fontSize: "input",
   color: "text",
+  ":-webkit-autofill": {
+    WebkitTextFillColor: "var(--text)",
+    caretColor: "red",
+    fontSize: "inherit"
+  },
   ":focus": {
     outline: "2px solid var(--primary)"
   },
