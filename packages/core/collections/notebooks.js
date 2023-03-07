@@ -144,6 +144,10 @@ export default class Notebooks extends Collection {
     return new Notebook(notebook, this._db);
   }
 
+  exists(id) {
+    return this._collection.exists(id);
+  }
+
   async delete(...ids) {
     for (let id of ids) {
       let notebook = this.notebook(id);

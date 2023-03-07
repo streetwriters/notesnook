@@ -25,7 +25,7 @@ import qclone from "qclone";
 import { deleteItem, findById } from "../utils/array";
 
 /**
- * @typedef {{ id: string, topic: string, rebuildCache?: boolean }} NotebookReference
+ * @typedef {{ id: string, topic?: string, rebuildCache?: boolean }} NotebookReference
  */
 
 export default class Notes extends Collection {
@@ -290,10 +290,7 @@ export default class Notes extends Collection {
    */
   async addToNotebook(to, ...noteIds) {
     if (!to) throw new Error("The destination notebook cannot be undefined.");
-    if (!to.id || !to.topic)
-      throw new Error(
-        "The destination notebook must contain notebookId and topic."
-      );
+    if (!to.id) throw new Error("The destination notebook must contain id.");
 
     const { id: notebookId, topic: topicId } = to;
 
@@ -301,28 +298,35 @@ export default class Notes extends Collection {
       let note = this._db.notes.note(noteId);
       if (!note || note.data.deleted) continue;
 
-      const notebooks = note.notebooks || [];
+      if (topicId) {
+        const notebooks = note.notebooks || [];
 
-      const noteNotebook = notebooks.find((nb) => nb.id === notebookId);
-      const noteHasNotebook = !!noteNotebook;
-      const noteHasTopic =
-        noteHasNotebook && noteNotebook.topics.indexOf(topicId) > -1;
-      if (noteHasNotebook && !noteHasTopic) {
-        // 1 note can be inside multiple topics
-        noteNotebook.topics.push(topicId);
-      } else if (!noteHasNotebook) {
-        notebooks.push({
-          id: notebookId,
-          topics: [topicId]
-        });
-      }
+        const noteNotebook = notebooks.find((nb) => nb.id === notebookId);
+        const noteHasNotebook = !!noteNotebook;
+        const noteHasTopic =
+          noteHasNotebook && noteNotebook.topics.indexOf(topicId) > -1;
+        if (noteHasNotebook && !noteHasTopic) {
+          // 1 note can be inside multiple topics
+          noteNotebook.topics.push(topicId);
+        } else if (!noteHasNotebook) {
+          notebooks.push({
+            id: notebookId,
+            topics: [topicId]
+          });
+        }
 
-      if (!noteHasNotebook || !noteHasTopic) {
-        await this._db.notes.add({
-          id: noteId,
-          notebooks
-        });
-        this.topicReferences.add(topicId, noteId);
+        if (!noteHasNotebook || !noteHasTopic) {
+          await this._db.notes.add({
+            id: noteId,
+            notebooks
+          });
+          this.topicReferences.add(topicId, noteId);
+        }
+      } else {
+        await this._db.relations.add(
+          { id: notebookId, type: "notebook" },
+          note.data
+        );
       }
     }
   }
@@ -332,10 +336,7 @@ export default class Notes extends Collection {
    */
   async removeFromNotebook(to, ...noteIds) {
     if (!to) throw new Error("The destination notebook cannot be undefined.");
-    if (!to.id || !to.topic)
-      throw new Error(
-        "The destination notebook must contain notebookId and topic."
-      );
+    if (!to.id) throw new Error("The destination notebook must contain id.");
 
     const { id: notebookId, topic: topicId, rebuildCache = true } = to;
 
@@ -345,20 +346,27 @@ export default class Notes extends Collection {
         continue;
       }
 
-      const { notebooks } = note;
+      if (topicId) {
+        const { notebooks } = note;
 
-      const notebook = findById(notebooks, notebookId);
-      if (!notebook) continue;
+        const notebook = findById(notebooks, notebookId);
+        if (!notebook) continue;
 
-      const { topics } = notebook;
-      if (!deleteItem(topics, topicId)) continue;
+        const { topics } = notebook;
+        if (!deleteItem(topics, topicId)) continue;
 
-      if (topics.length <= 0) deleteItem(notebooks, notebook);
+        if (topics.length <= 0) deleteItem(notebooks, notebook);
 
-      await this._db.notes.add({
-        id: noteId,
-        notebooks
-      });
+        await this._db.notes.add({
+          id: noteId,
+          notebooks
+        });
+      } else {
+        await this._db.relations.unlink(
+          { id: notebookId, type: "notebook" },
+          note.data
+        );
+      }
     }
     if (rebuildCache) this.topicReferences.rebuild();
   }

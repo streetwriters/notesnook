@@ -117,6 +117,21 @@ export default class Relations extends Collection {
   }
 
   /**
+   *
+   * @param {ItemReference} from
+   * @param {ItemReference} to
+   */
+  async unlink(from, to) {
+    const relation = this.all.find(
+      (a) =>
+        compareItemReference(a.from, from) && compareItemReference(a.to, to)
+    );
+    if (!relation) return;
+
+    await this.remove(relation.id);
+  }
+
+  /**
    * @param {Relation[]} relations
    * @param {"from" | "to"} resolveType
    * @private
@@ -127,7 +142,6 @@ export default class Relations extends Collection {
     const items = [];
     for (const relation of relations) {
       const reference = resolveType === "from" ? relation.from : relation.to;
-
       let item = null;
       switch (reference.type) {
         case "reminder":
@@ -137,6 +151,12 @@ export default class Relations extends Collection {
           const note = this._db.notes.note(reference.id);
           if (!note) continue;
           item = note.data;
+          break;
+        }
+        case "notebook": {
+          const notebook = this._db.notebooks.notebook(reference.id);
+          if (!notebook) continue;
+          item = notebook.data;
           break;
         }
       }
@@ -158,6 +178,11 @@ export default class Relations extends Collection {
           case "note":
             exists =
               this._db.notes.exists(reference.id) ||
+              this._db.trash.exists(reference.id);
+            break;
+          case "notebook":
+            exists =
+              this._db.notebooks.exists(reference.id) ||
               this._db.trash.exists(reference.id);
             break;
         }
