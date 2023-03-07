@@ -60,10 +60,11 @@ export type ThemeScopes = {
   statusBar?: Partial<Variants>;
   list?: Partial<Variants>;
   editor?: Partial<Variants>;
-  popup?: Partial<Variants>;
+  dialog?: Partial<Variants>;
   navigationMenu?: Partial<Variants>;
   contextMenu?: Partial<Variants>;
   editorToolbar?: Partial<Variants>;
+  sheet?: Partial<Variants>;
 };
 
 export type ThemeDefinition = {

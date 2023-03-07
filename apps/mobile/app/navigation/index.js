@@ -26,10 +26,10 @@ const _ApplicationHolder = () => {
   return (
     <>
       <TabHolder />
-      <ScopedThemeProvider value="popup">
+      <ScopedThemeProvider value="dialog">
         <Toast />
-        <DialogProvider />
       </ScopedThemeProvider>
+      <DialogProvider />
     </>
   );
 };

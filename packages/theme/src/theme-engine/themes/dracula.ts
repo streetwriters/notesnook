@@ -151,7 +151,7 @@ export const ThemeDracula: ThemeDefinition = {
         hover: "#44475a"
       }
     },
-    popup: {
+    dialog: {
       primary: {
         background: "#282a36"
       },

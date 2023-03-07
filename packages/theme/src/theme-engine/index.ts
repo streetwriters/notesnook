@@ -25,6 +25,18 @@ import {
   VariantsWithStaticColors
 } from "./types";
 
+export const StaticColors = {
+  red: "#f44336",
+  orange: "#FF9800",
+  yellow: "#FFD600",
+  green: "#4CAF50",
+  blue: "#2196F3",
+  purple: "#673AB7",
+  gray: "#9E9E9E",
+  black: "#000000",
+  white: "#ffffff"
+};
+
 const ThemeContext = createContext<{
   theme: ThemeDefinition;
   setTheme: (theme: ThemeDefinition) => void;
@@ -75,17 +87,7 @@ export const useThemeColors = (
           ...theme.scopes.base.success,
           ...themeScope.success
         },
-        static: {
-          red: "#f44336",
-          orange: "#FF9800",
-          yellow: "#FFD600",
-          green: "#4CAF50",
-          blue: "#2196F3",
-          purple: "#673AB7",
-          gray: "#9E9E9E",
-          black: "#000000",
-          white: "#ffffff"
-        }
+        static: StaticColors
       },
       isDark: theme.colorScheme === "dark",
       scope: currentScope

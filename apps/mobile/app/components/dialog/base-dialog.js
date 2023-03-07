@@ -60,7 +60,7 @@ const BaseDialog = ({
   const Wrapper = useSafeArea ? SafeAreaView : View;
 
   return (
-    <ScopedThemeProvider value="popup">
+    <ScopedThemeProvider value="dialog">
       <Modal
         visible={visible}
         transparent={true}

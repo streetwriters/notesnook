@@ -19,10 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Appearance } from "react-native";
 import create, { State } from "zustand";
-import { useThemeColors, ThemeDefinition } from "@notesnook/theme";
+import {
+  useThemeColors,
+  ThemeDefinition,
+  VariantsWithStaticColors
+} from "@notesnook/theme";
 import SettingsService from "../services/settings";
 export interface ThemeStore extends State {
-  colors: Partial<ReturnType<typeof useThemeColors>>;
+  colors: VariantsWithStaticColors;
   lightTheme: ThemeDefinition;
   darkTheme: ThemeDefinition;
   colorScheme: "dark" | "light";
@@ -33,7 +37,7 @@ export interface ThemeStore extends State {
 }
 
 export const useThemeStore = create<ThemeStore>((set, get) => ({
-  colors: SettingsService.get().lighTheme.scopes["base"],
+  colors: SettingsService.get().lighTheme.scopes["base"] as any,
   lightTheme: SettingsService.get().lighTheme,
   darkTheme: SettingsService.get().darkTheme,
   colorScheme: SettingsService.get().useSystemTheme
