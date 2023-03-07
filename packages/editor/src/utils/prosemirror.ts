@@ -22,16 +22,18 @@ import {
   findParentNode,
   NodeWithPos,
   Predicate,
-  findParentNodeClosestToPos
+  findParentNodeClosestToPos,
+  getChangedRanges
 } from "@tiptap/core";
 import {
+  NodeRange,
   Node as ProsemirrorNode,
   Mark,
   NodeType,
   ResolvedPos,
   Attrs
 } from "prosemirror-model";
-import { EditorState, Selection } from "prosemirror-state";
+import { EditorState, Selection, Transaction } from "prosemirror-state";
 import { BulletList } from "../extensions/bullet-list";
 import { ListItem } from "../extensions/list-item";
 import { OrderedList } from "../extensions/ordered-list";
@@ -194,3 +196,87 @@ const equalNodeType = (
     node.type === nodeType
   );
 };
+
+export function getChangedNodeRanges(tr: Transaction): NodeRange[] {
+  // The container of the ranges to be returned from this function.
+  const nodeRanges: NodeRange[] = [];
+  const ranges = getChangedRanges(tr);
+
+  for (const range of ranges) {
+    try {
+      const $from = tr.doc.resolve(range.newRange.from);
+      const $to = tr.doc.resolve(range.newRange.to);
+
+      // Find the node range for this provided range.
+      const nodeRange = $from.blockRange($to);
+
+      // Make sure a valid node is available.
+      if (nodeRange) {
+        nodeRanges.push(nodeRange);
+      }
+    } catch {
+      // Changed ranged outside the document
+    }
+  }
+
+  return nodeRanges;
+}
+
+interface GetChangedNodesOptions {
+  /**
+   * Whether to descend into child nodes.
+   *
+   * @defaultValue false
+   */
+  descend?: boolean;
+
+  /**
+   * A predicate test for node which was found. Return `false` to skip the node.
+   *
+   * @param node - the node that was found
+   * @param pos - the pos of that node
+   * @param range - the `NodeRange` which contained this node.
+   */
+  predicate?: (node: ProsemirrorNode, pos: number, range: NodeRange) => boolean;
+}
+
+/**
+ * Get all the changed nodes from the provided transaction.
+ *
+ * The following example will give us all the text nodes in the provided
+ * transaction.
+ *
+ * ```ts
+ * import { getChangedNodes } from 'remirror/core';
+ *
+ * const changedTextNodes = getChangeNodes(tr, { descend: true, predicate: (node) => node.isText });
+ * ```
+ */
+export function getChangedNodes(
+  tr: Transaction,
+  options: GetChangedNodesOptions = {}
+): NodeWithPos[] {
+  const { descend = false, predicate } = options;
+  const nodeRange = getChangedNodeRanges(tr);
+
+  // The container for the nodes which have been added..
+  const nodes: NodeWithPos[] = [];
+
+  for (const range of nodeRange) {
+    const { start, end } = range;
+
+    // Find all the nodes between the provided node range.
+    tr.doc.nodesBetween(start, end, (node, pos) => {
+      // Check wether this is a node that should be added.
+      const shouldAdd = predicate?.(node, pos, range) ?? true;
+
+      if (shouldAdd) {
+        nodes.push({ node, pos });
+      }
+
+      return descend;
+    });
+  }
+
+  return nodes;
+}

@@ -22,15 +22,15 @@ import { Decoration, DecorationSet } from "prosemirror-view";
 import {
   findChildren,
   findParentNodeClosestToPos,
-  NodeWithPos,
+  NodeWithPos
 } from "@tiptap/core";
 import { Root, refractor } from "refractor/lib/core";
 import { RootContent } from "hast";
 import { ReplaceAroundStep, ReplaceStep } from "prosemirror-transform";
 import { toCaretPosition, toCodeLines } from "./code-block";
-import { getChangedNodes } from "@remirror/core-utils";
 import Languages from "./languages.json";
 import { loadLanguage } from "./loader";
+import { getChangedNodes } from "../../utils/prosemirror";
 
 export type ReplaceMergedStep = ReplaceAroundStep | ReplaceStep;
 
@@ -66,7 +66,7 @@ function getHighlightNodes(result: Root) {
 
 function getDecorations({
   block,
-  defaultLanguage,
+  defaultLanguage
 }: {
   block: NodeWithPos;
   defaultLanguage: string | null | undefined;
@@ -87,7 +87,7 @@ function getDecorations({
     const to = from + node.text.length;
     if (node.classes.length) {
       const decoration = Decoration.inline(from, to, {
-        class: node.classes.join(" "),
+        class: node.classes.join(" ")
       });
       decorations.push(decoration);
     }
@@ -104,7 +104,7 @@ type HighlighterState = {
 
 export function HighlighterPlugin({
   name,
-  defaultLanguage,
+  defaultLanguage
 }: {
   name: string;
   defaultLanguage: string | null | undefined;
@@ -168,7 +168,7 @@ export function HighlighterPlugin({
             });
             view.dispatch(tr);
           }
-        },
+        }
       };
     },
     state: {
@@ -189,7 +189,7 @@ export function HighlighterPlugin({
         if (tr.docChanged && !tr.getMeta("selectionUpdate")) {
           const changedBlocks = getChangedNodes(tr, {
             descend: true,
-            predicate: (n) => n.type.name === name,
+            predicate: (n) => n.type.name === name
           });
           if (changedBlocks.length > 0) {
             const updated: Set<number> = new Set();
@@ -201,7 +201,7 @@ export function HighlighterPlugin({
               if (languages[id]) {
                 const newDecorations = getDecorations({
                   block,
-                  defaultLanguage,
+                  defaultLanguage
                 });
                 if (!newDecorations) return;
 
@@ -234,20 +234,20 @@ export function HighlighterPlugin({
 
         return {
           decorations: decorations.map(tr.mapping, tr.doc),
-          languages,
+          languages
         };
-      },
+      }
     },
 
     props: {
       decorations(state) {
         return HIGHLIGHTER_PLUGIN_KEY.getState(state)?.decorations;
-      },
+      }
     },
     appendTransaction(transactions, oldState, newState) {
       const isDocChanged = transactions.some((tr) => tr.docChanged);
       return updateSelection(name, oldState, newState, isDocChanged);
-    },
+    }
   });
 }
 
