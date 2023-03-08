@@ -187,7 +187,8 @@ class EditorStore extends BaseStore {
 
       if (currentSession.context) {
         const { type, value } = currentSession.context;
-        if (type === "topic") await db.notes.addToNotebook(value, id);
+        if (type === "topic" || type === "notebook")
+          await db.notes.addToNotebook(value, id);
         else if (type === "color") await db.notes.note(id).color(value);
         else if (type === "tag") await db.notes.note(id).tag(value);
         // update the note.

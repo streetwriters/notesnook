@@ -28,6 +28,7 @@ import { db } from "../../common/db";
 import { getTotalNotes } from "../../common";
 import Reminder from "../reminder";
 import type { Reminder as ReminderType } from "@notesnook/core/collections/reminders";
+import { useMemo } from "react";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
@@ -60,19 +61,26 @@ type ItemWrapper<TItem = Item> = (
   props: ItemWrapperProps<TItem>
 ) => JSX.Element;
 
-const NotesProfile: ItemWrapper = ({ index, item, type, context, compact }) => (
-  <Note
-    compact={compact}
-    index={index}
-    pinnable={!context}
-    item={item}
-    tags={getTags(item)}
-    notebook={getNotebook(item.notebooks as Item[], context?.type)}
-    reminder={getReminder(item.id)}
-    date={getDate(item, type)}
-    context={context}
-  />
-);
+const NotesProfile: ItemWrapper = ({ index, item, type, context, compact }) => {
+  const references = useMemo(
+    () => getReferences(item.id, item.notebooks as Item[], context?.type),
+    [item, context]
+  );
+
+  return (
+    <Note
+      compact={compact}
+      index={index}
+      pinnable={!context}
+      item={item}
+      tags={getTags(item)}
+      references={references}
+      reminder={getReminder(item.id)}
+      date={getDate(item, type)}
+      context={context}
+    />
+  );
+};
 
 const NotebooksProfile: ItemWrapper = ({ index, item, type }) => (
   <Notebook
@@ -129,26 +137,36 @@ function getTags(item: Item) {
   return tags || [];
 }
 
-type NotebookResult =
-  | {
-      id: string;
-      title: string;
-      dateEdited: number;
-      topic: { id: string; title: string };
-    }
-  | undefined;
+type Reference = {
+  type: "topic" | "notebook";
+  url: string;
+  title: string;
+};
 
-function getNotebook(
+function getReferences(
+  noteId: string,
   notebooks: Item[],
   contextType?: string
-): NotebookResult | undefined {
-  if (contextType === "topic" || !notebooks?.length) return;
+): { dateEdited: number; references: Reference[] } | undefined {
+  if (["topic", "notebook"].includes(contextType || "")) return;
 
-  return notebooks.reduce<NotebookResult>(function (
-    prev: NotebookResult,
-    curr
-  ): NotebookResult {
-    if (prev) return prev;
+  const references: Reference[] = [];
+  let latestDateEdited = 0;
+
+  db.relations
+    ?.to({ id: noteId, type: "note" }, "notebook")
+    ?.forEach((notebook: any) => {
+      references.push({
+        type: "notebook",
+        url: `/notebooks/${notebook.id}`,
+        title: notebook.title
+      } as Reference);
+
+      if (latestDateEdited < notebook.dateEdited)
+        latestDateEdited = notebook.dateEdited;
+    });
+
+  notebooks?.forEach((curr) => {
     const topicId = (curr as NotebookReference).topics[0];
     const notebook = db.notebooks?.notebook(curr.id)?.data as NotebookType;
     if (!notebook) return;
@@ -156,14 +174,16 @@ function getNotebook(
     const topic = notebook.topics.find((t: Item) => t.id === topicId);
     if (!topic) return;
 
-    return {
-      id: notebook.id,
-      title: notebook.title,
-      dateEdited: notebook.dateEdited,
-      topic: { id: topicId, title: topic.title }
-    } as NotebookResult;
-  },
-  undefined as NotebookResult);
+    references.push({
+      url: `/notebooks/${curr.id}/${topicId}`,
+      title: topic.title,
+      type: "topic"
+    });
+    if (latestDateEdited < (topic.dateEdited as number))
+      latestDateEdited = topic.dateEdited as number;
+  });
+
+  return { dateEdited: latestDateEdited, references: references.slice(0, 3) };
 }
 
 function getReminder(noteId: string) {

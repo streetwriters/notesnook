@@ -27,7 +27,6 @@ import Config from "../utils/config";
 
 class NotebookStore extends BaseStore {
   notebooks = [];
-  selectedNotebookTopics = [];
   selectedNotebookId = 0;
   viewMode = Config.get("notebooks:viewMode", "detailed");
 
@@ -60,13 +59,7 @@ class NotebookStore extends BaseStore {
   };
 
   setSelectedNotebook = (id) => {
-    const topics = db.notebooks.notebook(id)?.topics?.all;
-    if (!topics) return;
     this.set((state) => {
-      state.selectedNotebookTopics = groupArray(
-        topics,
-        db.settings.getGroupOptions("topics")
-      );
       state.selectedNotebookId = id;
     });
   };

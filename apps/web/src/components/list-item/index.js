@@ -138,7 +138,7 @@ function ListItem(props) {
 
         backgroundColor: isSelected
           ? "shade"
-          : isMenuTarget
+          : isMenuTarget || isFocused
           ? "hover"
           : background,
 
@@ -167,9 +167,11 @@ function ListItem(props) {
       }}
       data-test-id={`list-item`}
     >
+      {!isCompact && props.header}
+
       <Text
         data-test-id={`title`}
-        variant={isSimple ? "body" : "subtitle"}
+        variant={isSimple || isCompact ? "body" : "subtitle"}
         sx={{
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -181,8 +183,6 @@ function ListItem(props) {
       >
         {props.title}
       </Text>
-
-      {!isCompact && props.header}
 
       {!isSimple && !isCompact && props.body && (
         <Text
