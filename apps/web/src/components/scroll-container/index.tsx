@@ -41,6 +41,7 @@ const ScrollContainer = ({
         position: "relative",
         height: "100%"
       }}
+      suppressScrollX
       minThumbSize={40}
     >
       {children}
