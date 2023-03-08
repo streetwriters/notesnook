@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import * as Icon from "../icons";
 import { Flex, Text } from "@theme-ui/components";
 import { useStore, store } from "../../stores/editor-store";
@@ -86,11 +86,24 @@ function Properties(props) {
   const attachments = useAttachmentStore((store) =>
     store.attachments.filter((a) => a.noteIds.includes(session.id))
   );
-  const { id: sessionId, color, notebooks, sessionType, dateCreated } = session;
+  const {
+    id: sessionId,
+    color,
+    notebooks = [],
+    sessionType,
+    dateCreated
+  } = session;
   const isPreviewMode = sessionType === "preview";
   const reminders = db.relations.from(
     { id: session.id, type: "note" },
     "reminder"
+  );
+  const allNotebooks = useMemo(
+    () => [
+      ...notebooks.map((ref) => db.notebooks.notebook(ref.id)?.data),
+      ...db.relations.to({ id: sessionId, type: "note" }, "notebook")
+    ],
+    [sessionId, notebooks]
   );
 
   const changeState = useCallback(
@@ -246,22 +259,17 @@ function Properties(props) {
               </>
             )}
           </Card>
-          {notebooks?.length > 0 && (
+          {allNotebooks?.length > 0 && (
             <Card title="Notebooks">
-              {notebooks.map((ref) => {
-                const notebook = db.notebooks.notebook(ref.id)?._notebook;
-                if (!notebook) return null;
-
-                return (
-                  <Notebook
-                    key={ref.id}
-                    item={notebook}
-                    date={notebook.dateCreated}
-                    totalNotes={getTotalNotes(notebook)}
-                    simplified
-                  />
-                );
-              })}
+              {allNotebooks.map((notebook) => (
+                <Notebook
+                  key={notebook.id}
+                  item={notebook}
+                  date={notebook.dateCreated}
+                  totalNotes={getTotalNotes(notebook)}
+                  simplified
+                />
+              ))}
             </Card>
           )}
           {reminders?.length > 0 && (

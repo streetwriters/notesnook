@@ -29,7 +29,6 @@ import { navigate } from "../navigation";
 import Trash from "../views/trash";
 import { store as notestore } from "../stores/note-store";
 import { store as nbstore } from "../stores/notebook-store";
-import { showToast } from "../utils/toast";
 import Reminders from "../views/reminders";
 
 const routes = {
@@ -59,9 +58,14 @@ const routes = {
     const notebook = db.notebooks.notebook(notebookId);
     if (!notebook) return false;
     nbstore.setSelectedNotebook(notebookId);
+    notestore.setContext({
+      type: "notebook",
+      value: { id: notebookId }
+    });
+
     return {
-      key: "topics",
-      type: "topics",
+      key: "notebook",
+      type: "notebook",
       component: <Topics />,
       buttons: {
         back: {
@@ -69,7 +73,7 @@ const routes = {
           action: () => navigate("/notebooks")
         },
         search: {
-          title: `Search ${notebook.title} topics`
+          title: `Search ${notebook.title} notes`
         }
       }
     };
@@ -83,16 +87,10 @@ const routes = {
       value: { id: notebookId, topic: topicId }
     });
     return {
-      key: "notes",
-      type: "notes",
+      key: "topic",
+      type: "notebook",
       title: topic.title,
-      subtitle: notebook.title,
-      isEditable: true,
-      onChange: (title) => {
-        db.notebooks.notebook(notebookId).topics.add({ ...topic, title });
-        showToast("success", "Topic title updated!");
-      },
-      component: <Notes />,
+      component: <Topics />,
       buttons: {
         back: {
           title: `Go back to ${notebook.title}`,

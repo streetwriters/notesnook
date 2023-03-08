@@ -61,7 +61,7 @@ type ListContainerProps = {
   context?: Context;
   refresh: () => void;
   header?: JSX.Element;
-  placeholder: () => JSX.Element;
+  placeholder: JSX.Element;
   isLoading?: boolean;
   button?: {
     onClick: () => void;
@@ -136,7 +136,7 @@ function ListContainer(props: ListContainerProps) {
               <ListLoader />
             ) : (
               <Flex variant="columnCenterFill" data-test-id="list-placeholder">
-                <props.placeholder />
+                {props.placeholder}
               </Flex>
             )}
           </>

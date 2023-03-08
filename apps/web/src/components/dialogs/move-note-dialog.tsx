@@ -35,7 +35,7 @@ import { usePersistentState } from "../../hooks/use-persistent-state";
 type MoveDialogProps = { onClose: Perform; noteIds: string[] };
 type NotebookReference = {
   id: string;
-  topic: string;
+  topic?: string;
   new: boolean;
   op: "add" | "remove";
 };
@@ -95,6 +95,19 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
         }
       }
     }
+
+    for (const notebook of noteIds
+      .map((id) => db.relations?.to({ id, type: "note" }, "notebook"))
+      .flat()) {
+      if (!notebook) continue;
+
+      selected.push({
+        id: notebook.id,
+        op: "add",
+        new: false
+      });
+    }
+
     setSelected(selected);
     setIsMultiselect(false);
   }, [noteIds, notebooks, setSelected, setIsMultiselect]);
@@ -128,19 +141,13 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
 
           notestore.refresh();
 
-          const addedTopics = selected.filter((a) => a.op === "add").length;
-          const removedTopics = selected.filter(
-            (a) => a.op === "remove"
-          ).length;
-
-          showToast(
-            "success",
-            `${pluralize(noteIds.length, "note", "notes")} added to ${pluralize(
-              addedTopics,
-              "topic",
-              "topics"
-            )} & removed from ${pluralize(removedTopics, "topic", "topics")}.`
-          );
+          const stringified = stringifySelected(selected);
+          if (stringified) {
+            showToast(
+              "success",
+              stringified.replace("Add", "Added").replace("remove", "removed")
+            );
+          }
 
           onClose(true);
         }
@@ -226,10 +233,12 @@ function NotebookItem(props: {
 }) {
   const { notebook, isSearching, onCreateItem } = props;
 
-  const { selected, setIsMultiselect, setSelected } = useSelectionStore();
+  const { selected, setIsMultiselect, setSelected, isMultiselect } =
+    useSelectionStore();
 
   const [isCreatingNew, setIsCreatingNew] = useState(false);
-  const isSelected = isNotebookSelected(notebook, selected);
+  const index = findSelectionIndex(notebook, selected);
+  const isSelected = index > -1;
 
   return (
     <Box as="li" data-test-id="notebook">
@@ -263,10 +272,14 @@ function NotebookItem(props: {
               e.preventDefault();
               e.stopPropagation();
 
-              setIsMultiselect(true);
-              setSelected(
-                selectNotebook(notebook, selected, isSelected || false)
-              );
+              const isCtrlPressed = e.ctrlKey || e.metaKey;
+              if (isCtrlPressed) setIsMultiselect(true);
+
+              if (isMultiselect || isCtrlPressed) {
+                setSelected(selectMultiple(notebook, selected));
+              } else {
+                setSelected(selectSingle(notebook, selected));
+              }
             }}
           >
             <SelectedCheck size={20} selected={isSelected} />
@@ -384,9 +397,9 @@ function TopicItem(props: { topic: Topic }) {
         if (isCtrlPressed) setIsMultiselect(true);
 
         if (isMultiselect || isCtrlPressed) {
-          setSelected(selectMultipleTopics(topic, selected));
+          setSelected(selectMultiple(topic, selected));
         } else {
-          setSelected(selectSingleTopic(topic, selected));
+          setSelected(selectSingle(topic, selected));
         }
       }}
     >
@@ -545,22 +558,24 @@ function SelectedCheck({
   );
 }
 
-function createSelection(topic: Topic): NotebookReference {
+function createSelection(topic: Topic | Notebook): NotebookReference {
   return {
-    id: topic.notebookId,
-    topic: topic.id,
+    id: "notebookId" in topic ? topic.notebookId : topic.id,
+    topic: "notebookId" in topic ? topic.id : undefined,
     op: "add",
     new: true
   };
 }
 
 function findSelectionIndex(
-  topic: Topic | NotebookReference,
+  topic: Topic | NotebookReference | Notebook,
   array: NotebookReference[]
 ) {
   return "op" in topic
     ? array.findIndex((a) => a.id === topic.id && a.topic === topic.topic)
-    : array.findIndex((a) => a.id === topic.notebookId && a.topic === topic.id);
+    : "notebookId" in topic
+    ? array.findIndex((a) => a.id === topic.notebookId && a.topic === topic.id)
+    : array.findIndex((a) => a.id === topic.id && !a.topic);
 }
 
 function topicHasNotes(topic: Item, noteIds: string[]) {
@@ -568,36 +583,10 @@ function topicHasNotes(topic: Item, noteIds: string[]) {
   return noteIds.some((id) => notes.indexOf(id) > -1);
 }
 
-// There are 3 cases:
-// 1. Click on a notebook to select/deselect all its topics
-// 2. Click on a topic to select/deselect it (and deselect all other topics)
-// 3. Ctrl+click on a topic to enter multi select
-
-function selectNotebook(
-  notebook: Notebook,
-  selected: NotebookReference[],
-  isNotebookSelected: boolean
+function selectMultiple(
+  topic: Topic | Notebook,
+  selected: NotebookReference[]
 ) {
-  for (const topic of notebook.topics) {
-    const index = findSelectionIndex(topic, selected);
-    const item = selected[index];
-
-    // 1. first reset the item's selection state
-    // 2. set the new state
-
-    if (item?.new) selected.splice(index, 1);
-    else if (item && !item.new) item.op = "remove";
-
-    if (!isNotebookSelected) {
-      if (!item || item.new) selected.push(createSelection(topic));
-      else if (item && !item.new) item.op = "add";
-    }
-  }
-
-  return selected;
-}
-
-function selectMultipleTopics(topic: Topic, selected: NotebookReference[]) {
   const index = findSelectionIndex(topic, selected);
   const isSelected = index > -1;
   const item = selected[index];
@@ -613,7 +602,7 @@ function selectMultipleTopics(topic: Topic, selected: NotebookReference[]) {
   return selected;
 }
 
-function selectSingleTopic(topic: Topic, array: NotebookReference[]) {
+function selectSingle(topic: Topic | Notebook, array: NotebookReference[]) {
   const selected: NotebookReference[] = array.filter((ref) => !ref.new);
 
   const index = findSelectionIndex(topic, array);
@@ -628,19 +617,6 @@ function selectSingleTopic(topic: Topic, array: NotebookReference[]) {
   }
 
   return selected;
-}
-
-function isNotebookSelected(notebook: Notebook, selected: NotebookReference[]) {
-  const selectedTopics = notebook.topics.filter((topic) => {
-    const index = findSelectionIndex(topic, selected);
-    return selected[index]?.op === "add";
-  });
-
-  return !selectedTopics.length
-    ? false
-    : selectedTopics.length === notebook.topics.length
-    ? true
-    : null;
 }
 
 function stringifySelected(suggestion: NotebookReference[]) {
@@ -660,7 +636,7 @@ function stringifySelected(suggestion: NotebookReference[]) {
 
   if (removed.length >= 1) {
     parts.push("remove from");
-    parts.push(added[0]);
+    parts.push(removed[0]);
   }
   if (removed.length > 1) parts.push(`and ${removed.length - 1} others`);
 
@@ -668,7 +644,12 @@ function stringifySelected(suggestion: NotebookReference[]) {
 }
 
 function resolve(ref: NotebookReference) {
-  const topic = db.notebooks?.notebook(ref.id)?.topics.topic(ref.topic);
-  if (!topic) return undefined;
-  return topic._topic.title;
+  const notebook = db.notebooks?.notebook(ref.id);
+  if (!notebook) return undefined;
+
+  if (ref.topic) {
+    return notebook.topics.topic(ref.topic)?._topic?.title;
+  } else {
+    return notebook.title;
+  }
 }

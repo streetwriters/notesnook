@@ -25,12 +25,16 @@ import { hashNavigate } from "../../navigation";
 import { Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import { Multiselect } from "../../common/multi-select";
-import { pluralize } from "../../utils/string";
 import { confirm } from "../../common/dialog-controller";
+import { useStore as useNotesStore } from "../../stores/note-store";
 
 function Topic({ item, index, onClick }) {
   const { id, notebookId } = item;
   const topic = item;
+  const isOpened = useNotesStore(
+    (store) => store.context?.value?.topic === item.id
+  );
+
   const totalNotes = useMemo(() => {
     return db.notebooks.notebook(notebookId)?.topics.topic(id).totalNotes;
   }, [id, notebookId]);
@@ -38,6 +42,8 @@ function Topic({ item, index, onClick }) {
   return (
     <ListItem
       selectable
+      isFocused={isOpened}
+      isCompact
       item={topic}
       onClick={onClick}
       title={topic.title}
@@ -49,9 +55,7 @@ function Topic({ item, index, onClick }) {
             alignItems: "center"
           }}
         >
-          <Text variant="subBody">
-            {pluralize(totalNotes || 0, "note", "notes")}
-          </Text>
+          <Text variant="subBody">{totalNotes}</Text>
         </Flex>
       }
       index={index}

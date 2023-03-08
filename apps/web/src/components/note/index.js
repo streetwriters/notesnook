@@ -49,7 +49,7 @@ import {
 function Note(props) {
   const {
     tags,
-    notebook,
+    references,
     item,
     index,
     context,
@@ -115,15 +115,16 @@ function Note(props) {
         <Flex
           sx={{ alignItems: "center", flexWrap: "wrap", gap: 1, mt: "small" }}
         >
-          {notebook && (
+          {references?.references?.map((reference) => (
             <IconTag
+              key={reference.url}
               onClick={() => {
-                navigate(`/notebooks/${notebook.id}/${notebook.topic.id}`);
+                navigate(reference.url);
               }}
-              text={`${notebook.title} › ${notebook.topic.title}`}
-              icon={Icon.Notebook}
+              text={reference.title}
+              icon={reference.type === "topic" ? Icon.Topic : Icon.Notebook}
             />
-          )}
+          ))}
           {reminder && isReminderActive(reminder) && (
             <IconTag
               icon={Icon.Reminder}
@@ -260,7 +261,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
     prevProps.compact === nextProps.compact &&
-    prevProps.notebook?.dateEdited === nextProps.notebook?.dateEdited &&
+    prevProps.references?.dateEdited === nextProps.references?.dateEdited &&
     prevProps.reminder?.dateModified === nextProps.reminder?.dateModified &&
     JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags) &&
     JSON.stringify(prevProps.context) === JSON.stringify(nextProps.context)
@@ -543,7 +544,9 @@ function notebooksMenuItems({ note }) {
     }
   });
 
-  if (note && note.notebooks?.length > 0) {
+  const notebooks = db.relations?.to(note, "notebook");
+
+  if (note && (note.notebooks?.length > 0 || notebooks?.length > 0)) {
     menuItems.push(
       {
         key: "remove-from-all-notebooks",
@@ -556,16 +559,28 @@ function notebooksMenuItems({ note }) {
       },
       { key: "sep", type: "separator" }
     );
-    note.notebooks.forEach((ref) => {
-      // if (prev) return prev;
-      // const topicId = (curr as NotebookReference).topics[0];
+
+    notebooks?.forEach((notebook) => {
+      menuItems.push({
+        key: notebook.id,
+        title: notebook.title,
+        icon: Icon.Notebook,
+        checked: true,
+        tooltip: "Click to remove from this notebook",
+        onClick: async () => {
+          await db.notes.removeFromNotebook({ id: notebook.id }, note.id);
+          store.refresh();
+        }
+      });
+    });
+
+    note.notebooks?.forEach((ref) => {
       const notebook = db.notebooks?.notebook(ref.id);
       if (!notebook) return;
-      const notebookMenuItems = [];
       for (const topicId of ref.topics) {
         if (!notebook.topics.topic(topicId)) continue;
         const topic = notebook.topics.topic(topicId)._topic;
-        notebookMenuItems.push({
+        menuItems.push({
           key: topicId,
           title: topic.title,
           icon: Icon.Topic,
@@ -580,13 +595,6 @@ function notebooksMenuItems({ note }) {
           }
         });
       }
-
-      menuItems.push({
-        key: ref.id,
-        title: notebook.title,
-        icon: Icon.Notebook2,
-        items: notebookMenuItems
-      });
     });
   }
 
