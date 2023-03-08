@@ -43,7 +43,8 @@ function ReminderBar() {
         cursor: "pointer",
         borderRadius: "default",
         ":hover": { bg: "hover" },
-        alignItems: "center"
+        alignItems: "center",
+        minWidth: 250
       }}
       p={1}
       onClick={reminder?.action}
