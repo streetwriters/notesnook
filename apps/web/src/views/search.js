@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ListContainer from "../components/list-container";
-import SearchPlaceholder from "../components/placeholders/search-placeholder";
 import { db } from "../common/db";
 import SearchBox from "../components/search";
 import ProgressBar from "../components/progress-bar";
@@ -28,6 +27,7 @@ import { Flex, Text } from "@theme-ui/components";
 import { showToast } from "../utils/toast";
 import { store as notebookstore } from "../stores/notebook-store";
 import { hardNavigate } from "../navigation";
+import Placeholder from "../components/placeholders";
 
 async function typeToItems(type, context) {
   switch (type) {
@@ -149,7 +149,8 @@ function Search({ type }) {
             justifyContent: "center"
           }}
         >
-          <SearchPlaceholder
+          <Placeholder
+            context="search"
             text={`Searching in ${searchState.totalItems} ${type}...`}
           />
           <ProgressBar
@@ -165,7 +166,8 @@ function Search({ type }) {
           type={type}
           items={results}
           placeholder={() => (
-            <SearchPlaceholder
+            <Placeholder
+              context="search"
               text={
                 cachedQuery.current
                   ? `Nothing found for "${cachedQuery.current}"`

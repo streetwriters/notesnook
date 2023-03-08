@@ -20,11 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect } from "react";
 import ListContainer from "../components/list-container";
 import { useStore as useNotesStore } from "../stores/note-store";
-import NotesPlaceholder from "../components/placeholders/notesplacholder";
 import { hashNavigate, navigate } from "../navigation";
-import FavoritesPlaceholder from "../components/placeholders/favorites-placeholder";
 import { groupArray } from "@notesnook/core/utils/grouping";
 import { db } from "../common/db";
+import Placeholder from "../components/placeholders";
 
 function Notes() {
   const context = useNotesStore((store) => store.context);
@@ -48,7 +47,15 @@ function Notes() {
       context={{ ...context, notes: undefined }}
       items={groupArray(context.notes, db.settings.getGroupOptions(type))}
       placeholder={
-        context.type === "favorite" ? FavoritesPlaceholder : NotesPlaceholder
+        <Placeholder
+          context={
+            context.type === "favorite"
+              ? "favorites"
+              : context.type === "monographs"
+              ? "monographs"
+              : "notes"
+          }
+        />
       }
       button={{
         content: "Make a new note",
