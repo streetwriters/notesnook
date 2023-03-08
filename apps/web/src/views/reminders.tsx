@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/reminder-store";
-import RemindersPlaceholder from "../components/placeholders/reminders-placeholder";
 import { hashNavigate } from "../navigation";
 import useNavigate from "../hooks/use-navigate";
+import Placeholder from "../components/placeholders";
 
 function Reminders() {
   useNavigate("reminders", () => store.refresh());
@@ -34,7 +34,7 @@ function Reminders() {
         type="reminders"
         refresh={refresh}
         items={reminders}
-        placeholder={RemindersPlaceholder}
+        placeholder={<Placeholder context="reminders" />}
         button={{
           onClick: () => hashNavigate("/reminders/create")
         }}

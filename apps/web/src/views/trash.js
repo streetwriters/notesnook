@@ -21,11 +21,11 @@ import * as Icon from "../components/icons";
 import ListContainer from "../components/list-container";
 import { confirm } from "../common/dialog-controller";
 import { useStore, store } from "../stores/trash-store";
-import TrashPlaceholder from "../components/placeholders/trash-placeholder";
 import { showToast } from "../utils/toast";
 import { Text } from "@theme-ui/components";
 import useNavigate from "../hooks/use-navigate";
 import { db } from "../common/db";
+import Placeholder from "../components/placeholders";
 
 function Trash() {
   useNavigate("trash", async () => {
@@ -41,7 +41,7 @@ function Trash() {
       type="trash"
       groupType="trash"
       refresh={refresh}
-      placeholder={TrashPlaceholder}
+      placeholder={<Placeholder context="trash" />}
       items={items}
       button={{
         show: !!items.length,

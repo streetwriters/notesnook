@@ -189,12 +189,12 @@ import {
   mdiMinusCircleOutline,
   mdiLightbulbOnOutline,
   mdiNoteMultipleOutline,
-  mdiBookMultipleOutline
+  mdiBookMultipleOutline,
+  mdiArrowTopRight
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
-import { AnimatedFlex } from "../animated";
 import { Theme } from "@notesnook/theme";
-import { FlexProps } from "@theme-ui/components";
+import { Flex, FlexProps } from "@theme-ui/components";
 import { MotionProps } from "framer-motion";
 
 type MDIIconWrapperProps = {
@@ -237,7 +237,7 @@ function MDIIconWrapper({
   );
 }
 
-type IconProps = FlexProps &
+export type IconProps = FlexProps &
   MotionProps &
   Omit<MDIIconWrapperProps, "path"> & {
     hoverColor?: keyof Theme["colors"];
@@ -253,10 +253,8 @@ function createIcon(path: string, rotate = false) {
     const [isHovering, setIsHovering] = useState(false);
     const { sx, rotate: _rotate = rotate, size, ...restProps } = props;
     return (
-      <AnimatedFlex
+      <Flex
         {...restProps}
-        whileHover={{ scale: 1.1 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
         sx={{
           ...sx,
           justifyContent: "center",
@@ -275,7 +273,7 @@ function createIcon(path: string, rotate = false) {
             props.hoverColor && isHovering ? props.hoverColor : props.color
           }
         />
-      </AnimatedFlex>
+      </Flex>
     );
   };
   NNIcon.isReactComponent = true;
@@ -292,6 +290,7 @@ export const Notebook2 = createIcon(mdiNotebookOutline);
 export const ArrowLeft = createIcon(mdiArrowLeft);
 export const ArrowRight = createIcon(mdiArrowRight);
 export const ArrowDown = createIcon(mdiArrowDown);
+export const ArrowTopRight = createIcon(mdiArrowTopRight);
 export const Move = createIcon(mdiBookPlusMultipleOutline);
 export const Topic = createIcon(mdiBookmarkOutline);
 export const Alert = createIcon(mdiAlertOctagonOutline);
