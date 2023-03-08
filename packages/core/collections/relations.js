@@ -92,6 +92,17 @@ export default class Relations extends Collection {
     return this.resolve(relations, "from");
   }
 
+  /**
+   * Count number of from -> to relations
+   * @param {ItemReference} reference
+   * @param {string} type
+   */
+  count(reference, type) {
+    return this.all.filter(
+      (a) => compareItemReference(a.from, reference) && a.to.type === type
+    ).length;
+  }
+
   get raw() {
     return this._collection.getRaw();
   }
