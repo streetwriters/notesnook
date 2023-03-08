@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { createEditor, h } from "../../../../test-utils";
-import { getChangedNodes } from "@remirror/core-utils";
 import { expect, test, vi } from "vitest";
 import { CodeBlock, inferLanguage } from "../code-block";
 import { HighlighterPlugin } from "../highlighter";
+import { getChangedNodes } from "../../../utils/prosemirror";
 
 const CODEBLOCKS_HTML = h("div", [
   h("pre", [h("code", ["function hello() { }"])], {
