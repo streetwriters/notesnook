@@ -50,7 +50,6 @@ export default function useHashLocation() {
       const event = e as HashChangeEvent & { notify: boolean };
 
       const update = event.notify === undefined ? true : event.notify;
-      console.log(currentLocation());
       setLoc({
         location: currentLocation(),
         update
