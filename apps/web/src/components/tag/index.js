@@ -71,12 +71,13 @@ function Tag({ item, index }) {
   return (
     <ListItem
       item={item}
+      isCompact
       selectable={false}
       index={index}
       title={<TagNode title={alias} />}
       footer={
         <Text mt={1} variant="subBody">
-          {noteIds.length} notes
+          {noteIds.length}
         </Text>
       }
       menu={{ items: menuItems, extraData: { tag: item } }}
@@ -90,7 +91,7 @@ export default Tag;
 
 function TagNode({ title }) {
   return (
-    <Text as="span" variant="title">
+    <Text as="span">
       <Text as="span" sx={{ color: "primary" }}>
         {"#"}
       </Text>
