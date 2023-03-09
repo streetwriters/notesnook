@@ -120,7 +120,7 @@ export default class Note {
       case "html":
         templateData.content = rawHTML || content.toHTML();
         return template
-          ? HTMLBuilder.buildHTML(templateData)
+          ? await HTMLBuilder.buildHTML(templateData)
           : templateData.content;
       case "txt":
         templateData.content = rawHTML || content.toTXT();
