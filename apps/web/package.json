@@ -16,7 +16,7 @@
     "@emotion/react": "^11.10.0",
     "@mdi/js": "^6.9.96",
     "@mdi/react": "^1.6.0",
-    "@notesnook-importer/core": "^1.5.4",
+    "@notesnook-importer/core": "^1.6.0",
     "@notesnook/core": "*",
     "@notesnook/crypto": "*",
     "@notesnook/crypto-worker": "*",
