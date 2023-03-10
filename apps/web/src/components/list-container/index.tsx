@@ -154,7 +154,7 @@ function ListContainer(props: ListContainerProps) {
               transition={{ duration: 0.2, delay: 0.1, ease: "easeInOut" }}
               ref={listContainerRef}
               variant="columnFill"
-              data-test-id="note-list"
+              data-test-id={`${type}-list`}
             >
               <Virtuoso
                 ref={listRef}
@@ -187,6 +187,7 @@ function ListContainer(props: ListContainerProps) {
 
                   switch (item.type) {
                     case "header":
+                      if (!groupType) return null;
                       return (
                         <GroupHeader
                           type={groupType}

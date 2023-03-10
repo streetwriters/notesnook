@@ -96,9 +96,7 @@ test("add a note to notebook", async ({ page }) => {
   });
 
   expect(
-    await app.toasts.waitForToast(
-      "1 note added to 4 topics & removed from 0 topics."
-    )
+    await app.toasts.waitForToast("1 note added to Hello and 3 others.")
   ).toBe(true);
 });
 

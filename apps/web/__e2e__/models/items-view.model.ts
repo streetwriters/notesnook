@@ -28,7 +28,7 @@ export class ItemsViewModel extends BaseViewModel {
   private readonly createButton: Locator;
 
   constructor(page: Page, private readonly id: "topics" | "tags") {
-    super(page, id);
+    super(page, id, id);
     this.createButton = page.locator(getTestId(`${id}-action-button`));
   }
 
@@ -45,7 +45,11 @@ export class ItemsViewModel extends BaseViewModel {
   async findItem(item: Item) {
     const titleToCompare = this.id === "tags" ? `#${item.title}` : item.title;
     for await (const _item of this.iterateItems()) {
-      const itemModel = new ItemModel(_item);
+      const itemModel = new ItemModel(
+        _item,
+        // TODO:
+        this.id === "topics" ? "topic" : "tag"
+      );
       const title = await itemModel.getTitle();
       if (title === titleToCompare) return itemModel;
     }

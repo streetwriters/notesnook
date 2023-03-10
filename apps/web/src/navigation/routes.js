@@ -87,7 +87,7 @@ const routes = {
       value: { id: notebookId, topic: topicId }
     });
     return {
-      key: "topic",
+      key: "notebook",
       type: "notebook",
       title: topic.title,
       component: <Topics />,

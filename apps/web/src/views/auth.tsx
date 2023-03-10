@@ -755,6 +755,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
         (method, index) =>
           isValidMethod(method.type) && (
             <Button
+              key={method.type}
               type="submit"
               variant={"secondary"}
               mt={2}

@@ -28,7 +28,7 @@ export class NotebooksViewModel extends BaseViewModel {
   private readonly createButton: Locator;
 
   constructor(page: Page) {
-    super(page, "notebooks");
+    super(page, "notebooks", "notebooks");
     this.createButton = page
       .locator(getTestId("notebooks-action-button"))
       .first();

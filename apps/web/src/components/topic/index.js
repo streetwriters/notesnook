@@ -27,6 +27,7 @@ import * as Icon from "../icons";
 import { Multiselect } from "../../common/multi-select";
 import { confirm } from "../../common/dialog-controller";
 import { useStore as useNotesStore } from "../../stores/note-store";
+import { pluralize } from "../../utils/string";
 
 function Topic({ item, index, onClick }) {
   const { id, notebookId } = item;
@@ -36,7 +37,7 @@ function Topic({ item, index, onClick }) {
   );
 
   const totalNotes = useMemo(() => {
-    return db.notebooks.notebook(notebookId)?.topics.topic(id).totalNotes;
+    return db.notebooks.notebook(notebookId)?.topics.topic(id)?.totalNotes || 0;
   }, [id, notebookId]);
 
   return (
@@ -94,23 +95,30 @@ const menuItems = [
     color: "error",
     iconColor: "error",
     onClick: async ({ items, notebookId }) => {
-      const phrase = items.length > 1 ? "this topic" : "these topics";
-      const shouldDeleteNotes = await confirm({
-        title: `Delete notes in ${phrase}?`,
-        message: `These notes will be moved to trash and permanently deleted after 7 days.`,
-        yesText: `Yes`,
-        noText: "No"
+      const result = await confirm({
+        title: `Delete ${pluralize(items.length, "topic", "topics")}?`,
+        positiveButtonText: `Yes`,
+        negativeButtonText: "No",
+        checks: {
+          deleteContainingNotes: {
+            text: `Delete all containing notes`
+          }
+        }
       });
 
-      if (shouldDeleteNotes) {
-        const notes = [];
-        for (const item of items) {
-          const topic = db.notebooks.notebook(notebookId).topics.topic(item.id);
-          notes.push(...topic.all);
+      if (result) {
+        if (result.deleteContainingNotes) {
+          const notes = [];
+          for (const item of items) {
+            const topic = db.notebooks
+              .notebook(notebookId)
+              .topics.topic(item.id);
+            notes.push(...topic.all);
+          }
+          await Multiselect.moveNotesToTrash(notes, false);
         }
-        await Multiselect.moveNotesToTrash(notes, false);
+        await Multiselect.deleteTopics(notebookId, items);
       }
-      await Multiselect.deleteTopics(notebookId, items);
     },
     multiSelect: true
   }

@@ -145,7 +145,9 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
           if (stringified) {
             showToast(
               "success",
-              stringified.replace("Add", "Added").replace("remove", "removed")
+              `${pluralize(noteIds.length, "note", "notes")} ${stringified
+                .replace("Add", "added")
+                .replace("remove", "removed")}`
             );
           }
 
@@ -635,12 +637,12 @@ function stringifySelected(suggestion: NotebookReference[]) {
   if (added.length > 1) parts.push(`and ${added.length - 1} others`);
 
   if (removed.length >= 1) {
-    parts.push("remove from");
+    parts.push("& remove from");
     parts.push(removed[0]);
   }
   if (removed.length > 1) parts.push(`and ${removed.length - 1} others`);
 
-  return parts.join(" ");
+  return parts.join(" ") + ".";
 }
 
 function resolve(ref: NotebookReference) {

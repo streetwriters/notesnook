@@ -51,20 +51,9 @@ function Trash() {
           confirm({
             title: "Clear Trash",
             subtitle: "Are you sure you want to clear all the trash?",
-            yesText: "Clear trash",
-            noText: "Cancel",
-            message: (
-              <>
-                This action is{" "}
-                <Text as="span" sx={{ color: "error" }}>
-                  IRREVERSIBLE
-                </Text>
-                . You will{" "}
-                <Text as="span" sx={{ color: "primary" }}>
-                  not be able to recover any of these items.
-                </Text>
-              </>
-            )
+            positiveButtonText: "Clear trash",
+            negativeButtonText: "Cancel",
+            message: `Are you sure you want to proceed? **This action is IRREVERSIBLE**.`
           }).then(async (res) => {
             if (res) {
               try {

@@ -29,14 +29,17 @@ export class BaseViewModel {
   private readonly listPlaceholder: Locator;
   private readonly sortByButton: Locator;
 
-  constructor(page: Page, pageId: string) {
+  constructor(page: Page, pageId: string, listType: string) {
     this.page = page;
-    this.list = page.locator(`#${pageId} >> ${getTestId("note-list")}`);
+    this.list = page.locator(`#${pageId} >> ${getTestId(`${listType}-list`)}`);
     this.listPlaceholder = page.locator(
       `#${pageId} >> ${getTestId("list-placeholder")}`
     );
 
-    this.sortByButton = this.list.locator(getTestId("sort-icon-button"));
+    this.sortByButton = this.page.locator(
+      // TODO:
+      getTestId(`${pageId === "notebook" ? "notes" : pageId}-sort-button`)
+    );
   }
 
   async findGroup(groupName: string) {
@@ -103,13 +106,15 @@ export class BaseViewModel {
   async sort(sort: SortOptions) {
     const contextMenu: ContextMenuModel = new ContextMenuModel(this.page);
 
-    await contextMenu.open(this.sortByButton, "left");
-    await contextMenu.clickOnItem("groupBy");
-    if (!(await contextMenu.hasItem(sort.groupBy))) {
-      await contextMenu.close();
-      return false;
+    if (sort.groupBy) {
+      await contextMenu.open(this.sortByButton, "left");
+      await contextMenu.clickOnItem("groupBy");
+      if (!(await contextMenu.hasItem(sort.groupBy))) {
+        await contextMenu.close();
+        return false;
+      }
+      await contextMenu.clickOnItem(sort.groupBy);
     }
-    await contextMenu.clickOnItem(sort.groupBy);
 
     await contextMenu.open(this.sortByButton, "left");
     await contextMenu.clickOnItem("sortDirection");
@@ -131,7 +136,10 @@ export class BaseViewModel {
   }
 
   async isEmpty() {
-    const totalItems = await this.list.locator(getTestId("list-item")).count();
+    const items = this.list.locator(
+      `${getTestId(`virtuoso-item-list`)} >> ${getTestId("list-item")}`
+    );
+    const totalItems = await items.count();
     return totalItems <= 0;
   }
 }

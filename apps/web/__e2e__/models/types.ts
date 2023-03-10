@@ -45,7 +45,7 @@ export type GroupByOptions =
   | "week";
 
 export type SortOptions = {
-  groupBy: GroupByOptions;
+  groupBy?: GroupByOptions;
   sortBy: SortByOptions;
   orderBy: OrderByOptions;
 };

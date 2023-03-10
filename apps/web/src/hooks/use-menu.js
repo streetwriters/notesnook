@@ -62,6 +62,13 @@ export function useMenuTrigger() {
   };
 }
 
+export const Menu = {
+  openMenu: (items, data) => useMenuStore.getState().open(items, data),
+  closeMenu: () => useMenuStore.getState().close(),
+  isOpen: () => useMenuStore.getState().isOpen,
+  target: () => useMenuStore.getState().target
+};
+
 export function useMenu() {
   const [items, data] = useMenuStore((store) => [store.items, store.data]);
   return { items, data };

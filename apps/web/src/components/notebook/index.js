@@ -155,25 +155,31 @@ const menuItems = [
     iconColor: "error",
     icon: Icon.Trash,
     onClick: async ({ items }) => {
-      const phrase = items.length > 1 ? "this notebook" : "these notebooks";
-      const shouldDeleteNotes = await confirm({
-        title: `Delete notes in ${phrase}?`,
-        message: `These notes will be moved to trash and permanently deleted after 7 days.`,
-        yesText: `Yes`,
-        noText: "No"
-      });
-
-      if (shouldDeleteNotes) {
-        const notes = [];
-        for (const item of items) {
-          const topics = db.notebooks.notebook(item.id).topics;
-          for (const topic of topics.all) {
-            notes.push(...topics.topic(topic.id).all);
+      const result = await confirm({
+        title: `Delete ${pluralize(items.length, "notebook", "notebooks")}?`,
+        positiveButtonText: `Yes`,
+        negativeButtonText: "No",
+        checks: {
+          deleteContainingNotes: {
+            text: `Delete all containing notes`
           }
         }
-        await Multiselect.moveNotesToTrash(notes, false);
+      });
+
+      if (result) {
+        if (result.deleteContainingNotes) {
+          const notes = [];
+          for (const item of items) {
+            notes.push(...db.relations.from(item, "note"));
+            const topics = db.notebooks.notebook(item.id).topics;
+            for (const topic of topics.all) {
+              notes.push(...topics.topic(topic.id).all);
+            }
+          }
+          await Multiselect.moveNotesToTrash(notes, false);
+        }
+        await Multiselect.moveNotebooksToTrash(items);
       }
-      await Multiselect.moveNotebooksToTrash(items);
     },
     multiSelect: true
   }

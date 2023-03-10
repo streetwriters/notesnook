@@ -431,8 +431,8 @@ const menuItems = [
         await confirm({
           title: "Open duplicated note?",
           message: "Do you want to open the duplicated note?",
-          noText: "No",
-          yesText: "Yes"
+          negativeButtonText: "No",
+          positiveButtonText: "Yes"
         })
       ) {
         hashNavigate(`/notes/${id}/edit`, { replace: true });
@@ -455,8 +455,8 @@ const menuItems = [
           title: "Prevent this item from syncing?",
           message:
             "Turning sync off for this item will automatically delete it from all other devices & any future changes to this item won't get synced. Are you sure you want to continue?",
-          yesText: "Yes",
-          noText: "No"
+          positiveButtonText: "Yes",
+          negativeButtonText: "No"
         }))
       )
         await store.get().localOnly(note.id);
