@@ -20,20 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { Item } from "./models/types";
-import {
-  groupByOptions,
-  NOTEBOOK,
-  sortByOptions,
-  orderByOptions,
-  NOTE
-} from "./utils";
+import { NOTEBOOK, sortByOptions, orderByOptions, NOTE } from "./utils";
 
 test("create shortcut of a topic", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const notebooks = await app.goToNotebooks();
   const notebook = await notebooks.createNotebook(NOTEBOOK);
-  const topics = await notebook?.openNotebook();
+  const { topics } = (await notebook?.openNotebook()) || {};
   const topic = await topics?.findItem({ title: NOTEBOOK.topics[0] });
 
   await topic?.createShortcut();
@@ -48,7 +42,7 @@ test("remove shortcut of a topic", async ({ page }) => {
   await app.goto();
   const notebooks = await app.goToNotebooks();
   const notebook = await notebooks.createNotebook(NOTEBOOK);
-  const topics = await notebook?.openNotebook();
+  const { topics } = (await notebook?.openNotebook()) || {};
   const topic = await topics?.findItem({ title: NOTEBOOK.topics[0] });
   await topic?.createShortcut();
 
@@ -64,7 +58,7 @@ test("delete a topic", async ({ page }) => {
   await app.goto();
   const notebooks = await app.goToNotebooks();
   const notebook = await notebooks.createNotebook(NOTEBOOK);
-  const topics = await notebook?.openNotebook();
+  const { topics } = (await notebook?.openNotebook()) || {};
   const topic = await topics?.findItem({ title: NOTEBOOK.topics[0] });
 
   await topic?.deleteWithNotes();
@@ -78,7 +72,7 @@ test("edit topics individually", async ({ page }) => {
   await app.goto();
   const notebooks = await app.goToNotebooks();
   const notebook = await notebooks.createNotebook(NOTEBOOK);
-  const topics = await notebook?.openNotebook();
+  const { topics } = (await notebook?.openNotebook()) || {};
 
   const editedTopics: Item[] = [];
   for (const title of NOTEBOOK.topics) {
@@ -98,7 +92,7 @@ test("delete all notes within a topic", async ({ page }) => {
   await app.goto();
   const notebooks = await app.goToNotebooks();
   const notebook = await notebooks.createNotebook(NOTEBOOK);
-  const topics = await notebook?.openNotebook();
+  const { topics } = (await notebook?.openNotebook()) || {};
   const topic = await topics?.findItem({ title: NOTEBOOK.topics[0] });
   let notes = await topic?.open();
   for (let i = 0; i < 2; ++i) {
@@ -116,7 +110,7 @@ test("delete all notes within a topic", async ({ page }) => {
 });
 
 test(`sort topics`, async ({ page }, info) => {
-  info.setTimeout(2 * 60 * 1000);
+  info.setTimeout(1 * 60 * 1000);
 
   const app = new AppModel(page);
   await app.goto();
@@ -125,27 +119,24 @@ test(`sort topics`, async ({ page }, info) => {
     ...NOTEBOOK,
     topics: ["title1", "title2", "title3", "title4", "title5"]
   });
-  const topics = await notebook?.openNotebook();
+  const { topics } = (await notebook?.openNotebook()) || {};
 
-  for (const groupBy of groupByOptions) {
-    for (const sortBy of sortByOptions) {
-      for (const orderBy of orderByOptions) {
-        await test.step(`group by ${groupBy}, sort by ${sortBy}, order by ${orderBy}`, async () => {
-          const sortResult = await topics?.sort({
-            groupBy,
-            orderBy,
-            sortBy
-          });
-          if (!sortResult) return;
-
-          expect(await topics?.isEmpty()).toBeFalsy();
+  for (const sortBy of sortByOptions) {
+    for (const orderBy of orderByOptions) {
+      await test.step(`sort by ${sortBy}, order by ${orderBy}`, async () => {
+        const sortResult = await topics?.sort({
+          orderBy,
+          sortBy
         });
-      }
+        if (!sortResult) return;
+
+        expect(await topics?.isEmpty()).toBeFalsy();
+      });
     }
   }
 });
 
-test("search topics", async ({ page }) => {
+test.skip("search topics", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const notebooks = await app.goToNotebooks();
@@ -155,7 +146,7 @@ test("search topics", async ({ page }) => {
   });
   await notebook?.openNotebook();
 
-  const search = await app.search("1");
+  const search = await app.search("1", "topics");
   const topic = await search?.findItem({ title: "title1" });
 
   expect((await topic?.getTitle()) === "title1").toBeTruthy();

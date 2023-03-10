@@ -22,18 +22,21 @@ import { BaseItemModel } from "./base-item.model";
 import { ContextMenuModel } from "./context-menu.model";
 import { NotesViewModel } from "./notes-view.model";
 import { Item } from "./types";
-import { confirmDialog, denyDialog, fillItemDialog } from "./utils";
+import { confirmDialog, fillItemDialog } from "./utils";
 
 export class ItemModel extends BaseItemModel {
   private readonly contextMenu: ContextMenuModel;
-  constructor(locator: Locator) {
+  constructor(locator: Locator, private readonly id: "topic" | "tag") {
     super(locator);
     this.contextMenu = new ContextMenuModel(this.page);
   }
 
   async open() {
     await this.locator.click();
-    return new NotesViewModel(this.page, "notes");
+    return new NotesViewModel(
+      this.page,
+      this.id === "topic" ? "notebook" : "notes"
+    );
   }
 
   async delete() {
@@ -47,9 +50,10 @@ export class ItemModel extends BaseItemModel {
     await this.contextMenu.open(this.locator);
     await this.contextMenu.clickOnItem("delete");
 
-    if (deleteContainedNotes) await confirmDialog(this.page);
-    else await denyDialog(this.page);
+    if (deleteContainedNotes)
+      await this.page.locator("#deleteContainingNotes").check({ force: true });
 
+    await confirmDialog(this.page);
     await this.waitFor("detached");
   }
 

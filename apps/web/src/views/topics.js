@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import ListContainer from "../components/list-container";
 import { useStore as useNbStore } from "../stores/notebook-store";
 import { useStore as useAppStore } from "../stores/app-store";
@@ -28,37 +28,37 @@ import {
   ChevronRight,
   Edit,
   RemoveShortcutLink,
-  ShortcutLink
+  ShortcutLink,
+  SortAsc
 } from "../components/icons";
 import { getTotalNotes } from "../common";
 import { formatDate } from "@notesnook/core/utils/date";
-import { db } from "../common/db";
 import { pluralize } from "../utils/string";
 import { Allotment } from "allotment";
 import { Plus } from "../components/icons";
 import { useStore as useNotesStore } from "../stores/note-store";
 import Placeholder from "../components/placeholders";
+import { showSortMenu } from "../components/group-header";
 
 function Notebook() {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const selectedNotebookId = useNbStore((store) => store.selectedNotebookId);
+  const selectedNotebook = useNbStore((store) => store.selectedNotebook);
   const refresh = useNbStore((store) => store.setSelectedNotebook);
-  const notebooks = useNbStore((store) => store.notebooks);
 
   const context = useNotesStore((store) => store.context);
   const refreshContext = useNotesStore((store) => store.refreshContext);
   const isCompact = useNotesStore((store) => store.viewMode === "compact");
 
   useEffect(() => {
-    if (context && context.value && selectedNotebookId !== context.value.id)
+    if (
+      context &&
+      context.value &&
+      selectedNotebook &&
+      selectedNotebook.id !== context.value.id
+    )
       refresh(context.value.id);
-  }, [selectedNotebookId, context, refresh]);
-
-  const selectedNotebook = useMemo(
-    () => db.notebooks?.notebook(selectedNotebookId)?.data,
-    [selectedNotebookId, notebooks]
-  );
+  }, [selectedNotebook, context, refresh]);
 
   if (!context) return null;
   return (
@@ -69,7 +69,7 @@ function Notebook() {
             { title: "Notebooks", onClick: () => navigate(`/notebooks/`) },
             {
               title: selectedNotebook.title,
-              onClick: () => navigate(`/notebooks/${selectedNotebookId}`)
+              onClick: () => navigate(`/notebooks/${selectedNotebook.id}`)
             }
           ].map((crumb, index, array) => (
             <>
@@ -139,8 +139,11 @@ export default Notebook;
 
 function Topics({ selectedNotebook, isCollapsed, setIsCollapsed }) {
   const refresh = useNbStore((store) => store.setSelectedNotebook);
+  const topics = useNbStore((store) => store.selectedNotebookTopics);
+
+  if (!selectedNotebook) return null;
   return (
-    <Flex variant="columnFill" sx={{ height: "100%" }}>
+    <Flex id="topics" variant="columnFill" sx={{ height: "100%" }}>
       <Flex
         sx={{
           m: 1,
@@ -161,26 +164,42 @@ function Topics({ selectedNotebook, isCollapsed, setIsCollapsed }) {
             TOPICS
           </Text>
         </Flex>
-        <Button
-          variant="tool"
-          sx={{
-            p: "1px",
-            bg: "transparent",
-            visibility: isCollapsed ? "collapse" : "visible"
-          }}
-          onClick={(e) => {
-            hashNavigate(`/topics/create`);
-          }}
-        >
-          <Plus size={20} />
-        </Button>
+        <Flex sx={{ alignItems: "center" }}>
+          <Button
+            variant="tool"
+            data-test-id="topics-sort-button"
+            sx={{
+              p: "3.5px",
+              bg: "transparent",
+              visibility: isCollapsed ? "collapse" : "visible"
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              showSortMenu("topics", () => refresh(selectedNotebook.id));
+            }}
+          >
+            <SortAsc size={15} />
+          </Button>
+          <Button
+            variant="tool"
+            sx={{
+              p: "1px",
+              bg: "transparent",
+              visibility: isCollapsed ? "collapse" : "visible"
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              hashNavigate(`/topics/create`);
+            }}
+          >
+            <Plus size={20} />
+          </Button>
+        </Flex>
       </Flex>
 
       <ListContainer
         type="topics"
-        groupType="topics"
-        refresh={() => refresh(selectedNotebook.id)}
-        items={selectedNotebook.topics}
+        items={topics}
         context={{
           notebookId: selectedNotebook.id
         }}

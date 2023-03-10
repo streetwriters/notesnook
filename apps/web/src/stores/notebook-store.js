@@ -27,7 +27,8 @@ import Config from "../utils/config";
 
 class NotebookStore extends BaseStore {
   notebooks = [];
-  selectedNotebookId = 0;
+  selectedNotebook = undefined;
+  selectedNotebookTopics = [];
   viewMode = Config.get("notebooks:viewMode", "detailed");
 
   setViewMode = (viewMode) => {
@@ -42,7 +43,7 @@ class NotebookStore extends BaseStore {
         db.settings.getGroupOptions("notebooks")
       );
     });
-    this.setSelectedNotebook(this.get().selectedNotebookId);
+    this.setSelectedNotebook(this.get().selectedNotebook?.id);
   };
 
   delete = async (...ids) => {
@@ -59,8 +60,16 @@ class NotebookStore extends BaseStore {
   };
 
   setSelectedNotebook = (id) => {
+    if (!id) return;
+    const notebook = db.notebooks?.notebook(id)?.data;
+    if (!notebook) return;
+
     this.set((state) => {
-      state.selectedNotebookId = id;
+      state.selectedNotebook = notebook;
+      state.selectedNotebookTopics = groupArray(
+        notebook.topics,
+        db.settings.getGroupOptions("topics")
+      );
     });
   };
 }
