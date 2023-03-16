@@ -29,7 +29,7 @@ import {
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
 import { db } from "../../../common/database";
-import ImagePreview from "../../../components/image-preview";
+import ManageTagsSheet from "../../../components/sheets/manage-tags";
 import { RelationsList } from "../../../components/sheets/relations-list";
 import ReminderSheet from "../../../components/sheets/reminder";
 import useKeyboard from "../../../hooks/use-keyboard";
@@ -52,8 +52,7 @@ import {
   eOpenFullscreenEditor,
   eOpenLoginDialog,
   eOpenPremiumDialog,
-  eOpenPublishNoteDialog,
-  eOpenTagsDialog
+  eOpenPublishNoteDialog
 } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { tabBarRef } from "../../../utils/global-refs";
@@ -327,7 +326,7 @@ export const useEditorEvents = (
             });
             return;
           }
-          eSendEvent(eOpenTagsDialog, editor.note.current);
+          ManageTagsSheet.present(editor.note.current);
           break;
         case EventTypes.tag:
           if (editorMessage.value) {

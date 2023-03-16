@@ -230,6 +230,7 @@ export const useEditor = (
           id = await db.notes?.add(noteData);
           if (!note && id) {
             currentNote.current = db.notes?.note(id).data as NoteType;
+            console.log("on Note Created", state.current?.onNoteCreated);
             state.current?.onNoteCreated && state.current.onNoteCreated(id);
             if (!noteData.title) {
               postMessage(

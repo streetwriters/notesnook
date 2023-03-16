@@ -59,14 +59,12 @@ export class AddTopicDialog extends React.Component {
 
   addNewTopic = async () => {
     try {
-      this.setState({ loading: true });
       if (!this.title || this.title?.trim() === "") {
         ToastEvent.show({
           heading: "Topic title is required",
           type: "error",
           context: "local"
         });
-        this.setState({ loading: false });
         return;
       }
 
@@ -78,10 +76,11 @@ export class AddTopicDialog extends React.Component {
 
         await db.notebooks.notebook(topic.notebookId).topics.add(topic);
       }
-      this.setState({ loading: false });
       this.close();
-      Navigation.queueRoutesForUpdate("Notebooks", "Notebook", "TopicNotes");
-      useMenuStore.getState().setMenuPins();
+      setTimeout(() => {
+        Navigation.queueRoutesForUpdate("Notebooks", "Notebook", "TopicNotes");
+        useMenuStore.getState().setMenuPins();
+      });
     } catch (e) {
       console.error(e);
     }
@@ -177,7 +176,6 @@ export class AddTopicDialog extends React.Component {
             positiveTitle={this.toEdit ? "Save" : "Add"}
             onPressNegative={() => this.close()}
             onPressPositive={() => this.addNewTopic()}
-            loading={this.state.loading}
           />
         </DialogContainer>
         <Toast context="local" />

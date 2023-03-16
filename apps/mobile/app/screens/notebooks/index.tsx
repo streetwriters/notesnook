@@ -18,11 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
+import { Config } from "react-native-config";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
-import { AddNotebookEvent } from "../../components/dialog-provider/recievers";
 import List from "../../components/list";
+import { AddNotebookSheet } from "../../components/sheets/add-notebook";
 import { Walkthrough } from "../../components/walkthroughs";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
@@ -30,10 +31,9 @@ import SearchService from "../../services/search";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotebookStore } from "../../stores/use-notebook-store";
-import { Config } from "react-native-config";
 
 const onPressFloatingButton = () => {
-  AddNotebookEvent();
+  AddNotebookSheet.present();
 };
 
 const prepareSearch = () => {
@@ -83,7 +83,7 @@ export const Notebooks = ({
   });
 
   return (
-    <DelayLayout>
+    <DelayLayout delay={1}>
       <List
         listData={notebooks}
         type="notebooks"

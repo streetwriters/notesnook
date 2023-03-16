@@ -78,7 +78,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
           setTimeout(() => {
             translateValue.value = 6000;
           }, 500);
-        }, 100);
+        }, 0);
       }
     },
     [opacity, translateValue]

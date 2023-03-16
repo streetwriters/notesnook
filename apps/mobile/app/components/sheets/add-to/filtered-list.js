@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList } from "react-native-actions-sheet";
 import { db } from "../../../common/database";
 import { ListHeaderInputItem } from "./list-header-item.js";
 
@@ -27,6 +27,7 @@ export const FilteredList = ({
   itemType,
   onAddItem,
   hasHeaderSearch,
+  listRef,
   ...restProps
 }) => {
   const [filtered, setFiltered] = useState(data);
@@ -56,6 +57,7 @@ export const FilteredList = ({
     <FlatList
       {...restProps}
       data={filtered}
+      ref={listRef}
       ListHeaderComponent={
         hasHeaderSearch ? (
           <ListHeaderInputItem

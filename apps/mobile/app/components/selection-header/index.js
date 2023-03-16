@@ -201,7 +201,7 @@ export const SelectionHeader = React.memo(() => {
           }}
         >
           <Heading size={SIZE.md} color={colors.accent}>
-            {selectedItemsList.length + " Selected"}
+            {selectedItemsList.length}
           </Heading>
         </View>
       </View>
