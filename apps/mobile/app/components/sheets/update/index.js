@@ -19,10 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from "react";
 import { Linking, View } from "react-native";
+import { ScrollView } from "react-native-actions-sheet";
 import { checkVersion } from "react-native-check-version";
 import Config from "react-native-config";
 import deviceInfoModule from "react-native-device-info";
-import { ScrollView } from "react-native-gesture-handler";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { STORE_LINK } from "../../../utils/constants";
 import { SIZE } from "../../../utils/size";
@@ -148,9 +148,6 @@ export const Update = ({ version: appVersion, fwdRef }) => {
           <Seperator />
           <ScrollView
             nestedScrollEnabled={true}
-            onMomentumScrollEnd={() => {
-              fwdRef?.current?.handleChildScrollEnd();
-            }}
             style={{
               width: "100%"
             }}

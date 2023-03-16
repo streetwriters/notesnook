@@ -16,10 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 import React from "react";
 import { Platform, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { FlatList } from "react-native-actions-sheet";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { presentSheet } from "../../services/event-manager";
@@ -37,7 +36,6 @@ import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { Tags, TagStrip } from "./tags";
-
 const Line = ({ top = 6, bottom = 6 }) => {
   const colors = useThemeStore((state) => state.colors);
   return (
@@ -53,19 +51,10 @@ const Line = ({ top = 6, bottom = 6 }) => {
   );
 };
 
-export const Properties = ({
-  close = () => {},
-  item,
-  buttons = [],
-  getRef
-}) => {
+export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   const colors = useThemeStore((state) => state.colors);
   const alias = item.alias || item.title;
   const isColor = !!COLORS_NOTE[item.title];
-
-  const onScrollEnd = () => {
-    getRef().current?.handleChildScrollEnd();
-  };
 
   if (!item || !item.id) {
     return (
@@ -75,89 +64,92 @@ export const Properties = ({
     );
   }
   return (
-    <ScrollView
-      nestedScrollEnabled
-      onMomentumScrollEnd={onScrollEnd}
+    <FlatList
       keyboardShouldPersistTaps="always"
       keyboardDismissMode="none"
       style={{
         backgroundColor: colors.bg,
-        paddingHorizontal: 0,
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
         maxHeight: "100%"
       }}
-    >
-      <View
-        style={{
-          paddingHorizontal: 12,
-          marginTop: 5,
-          zIndex: 10
-        }}
-      >
-        <Heading size={SIZE.lg}>
-          {item.type === "tag" && !isColor ? (
-            <Heading size={SIZE.xl} color={colors.accent}>
-              #
+      data={[0]}
+      keyExtractor={() => "properties-scroll-item"}
+      renderItem={() => (
+        <View>
+          <View
+            style={{
+              paddingHorizontal: 12,
+              marginTop: 5,
+              zIndex: 10
+            }}
+          >
+            <Heading size={SIZE.lg}>
+              {item.type === "tag" && !isColor ? (
+                <Heading size={SIZE.xl} color={colors.accent}>
+                  #
+                </Heading>
+              ) : null}
+              {alias}
             </Heading>
 
-          ) : null}
-          {alias}
-        </Heading>
+            {item.type === "note" ? (
+              <TagStrip close={close} item={item} />
+            ) : null}
 
-        {item.type === "note" ? <TagStrip close={close} item={item} /> : null}
+            {item.type === "reminder" ? (
+              <ReminderTime
+                reminder={item}
+                style={{
+                  justifyContent: "flex-start",
+                  borderWidth: 0,
+                  height: 30,
+                  alignSelf: "flex-start",
+                  backgroundColor: "transparent",
+                  paddingHorizontal: 0
+                }}
+                fontSize={SIZE.xs + 1}
+              />
+            ) : null}
+          </View>
+          <Line top={12} />
 
-        {item.type === "reminder" ? (
-          <ReminderTime
-            reminder={item}
+          <DateMeta item={item} />
+          <Line bottom={0} />
+          {item.type === "note" ? <Tags close={close} item={item} /> : null}
+
+          <View
             style={{
-              justifyContent: "flex-start",
-              borderWidth: 0,
-              height: 30,
-              alignSelf: "flex-start",
-              backgroundColor: "transparent",
-              paddingHorizontal: 0
+              paddingHorizontal: 12
             }}
-            fontSize={SIZE.xs + 1}
+          >
+            {item.notebooks ? <Notebooks note={item} close={close} /> : null}
+          </View>
+
+          <Items
+            item={item}
+            buttons={buttons}
+            close={() => {
+              close();
+              setTimeout(() => {
+                SearchService.updateAndSearch();
+              }, 1000);
+            }}
           />
-        ) : null}
-      </View>
-      <Line top={12} />
+          <Synced item={item} close={close} />
+          <DevMode item={item} />
 
-      <DateMeta item={item} />
-      <Line bottom={0} />
-      {item.type === "note" ? <Tags close={close} item={item} /> : null}
-
-      <View
-        style={{
-          paddingHorizontal: 12
-        }}
-      >
-        {item.notebooks ? <Notebooks note={item} close={close} /> : null}
-      </View>
-
-      <Items
-        item={item}
-        buttons={buttons}
-        close={() => {
-          close();
-          setTimeout(() => {
-            SearchService.updateAndSearch();
-          }, 1000);
-        }}
-      />
-      <Synced item={item} close={close} />
-      <DevMode item={item} />
-
-      {DDS.isTab ? (
-        <View
-          style={{
-            height: 20
-          }}
-        />
-      ) : null}
-      <SheetProvider context="properties" />
-    </ScrollView>
+          {DDS.isTab ? (
+            <View
+              style={{
+                height: 20
+              }}
+            />
+          ) : null}
+          <SheetProvider context="properties" />
+        </View>
+      )}
+    />
   );
 };
 
@@ -219,12 +211,13 @@ Properties.present = (item, buttons = [], isSheet) => {
   if (!props[0]) return;
   presentSheet({
     context: isSheet ? "local" : undefined,
+    enableGesturesInScrollView: true,
     component: (ref, close) => (
       <Properties
         close={() => {
           close();
         }}
-        getRef={() => ref}
+        actionSheetRef={ref}
         item={props[0]}
         buttons={props[1]}
       />

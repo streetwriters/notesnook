@@ -36,7 +36,7 @@ import Paragraph from "../ui/typography/paragraph";
 const SheetProvider = ({ context = "global" }) => {
   const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);
-  const [dialogData, setDialogData] = useState(null);
+  const [data, setData] = useState(null);
   const actionSheetRef = useRef();
   const editor = useRef({
     refocus: false
@@ -52,42 +52,35 @@ const SheetProvider = ({ context = "global" }) => {
   }, [close, open, visible]);
 
   const open = useCallback(
-    async (data) => {
-      if (!data.context) data.context = "global";
-      if (data.context !== context) return;
-      if (visible || dialogData) {
-        setDialogData(null);
-        setVisible(false);
-        await sleep(0);
-      }
-      setDialogData(data);
+    async (payload) => {
+      if (!payload.context) payload.context = "global";
+      if (payload.context !== context) return;
+      setData(payload);
       setVisible(true);
-      if (data.editor) {
+      if (payload.editor) {
         editor.current.refocus = false;
         if (editorState().keyboardState) {
-          // tiny.call(EditorWebView, tiny.cacheRange + tiny.blur);
           editor.current.refocus = true;
         }
       }
     },
-    [context, dialogData, visible]
+    [context]
   );
 
   useEffect(() => {
     (async () => {
-      if (visible && dialogData) {
-        if (dialogData.editor) await sleep(100);
+      if (visible && data) {
+        if (data.editor) await sleep(100);
         actionSheetRef.current?.setModalVisible(true);
         return;
       } else {
         if (editor.current?.refocus) {
           editorState().isFocused = true;
-          //  tiny.call(EditorWebView, tiny.restoreRange + tiny.clearRange);
           editor.current.refocus = false;
         }
       }
     })();
-  }, [visible, dialogData]);
+  }, [visible, data]);
 
   const close = useCallback(
     (ctx) => {
@@ -98,34 +91,30 @@ const SheetProvider = ({ context = "global" }) => {
     [context]
   );
 
-  return !visible || !dialogData ? null : (
+  return !visible || !data ? null : (
     <SheetWrapper
       fwdRef={actionSheetRef}
-      gestureEnabled={!dialogData?.progress && !dialogData?.disableClosing}
-      closeOnTouchBackdrop={
-        !dialogData?.progress && !dialogData?.disableClosing
-      }
+      gestureEnabled={!data?.progress && !data?.disableClosing}
+      closeOnTouchBackdrop={!data?.progress && !data?.disableClosing}
       onClose={() => {
-        dialogData.onClose && dialogData.onClose();
+        data.onClose && data.onClose();
         setVisible(false);
-        setDialogData(null);
+        setData(null);
       }}
+      enableGesturesInScrollView={data.enableGesturesInScrollView}
     >
       <View
         style={{
           justifyContent: "center",
           alignItems: "center",
           marginBottom:
-            !dialogData.progress &&
-            !dialogData.icon &&
-            !dialogData.title &&
-            !dialogData.paragraph
+            !data.progress && !data.icon && !data.title && !data.paragraph
               ? 0
               : 10,
           paddingHorizontal: 12
         }}
       >
-        {dialogData?.progress ? (
+        {data?.progress ? (
           <ActivityIndicator
             style={{
               marginTop: 15
@@ -135,47 +124,48 @@ const SheetProvider = ({ context = "global" }) => {
           />
         ) : null}
 
-        {dialogData?.icon ? (
+        {data?.icon ? (
           <Icon
-            color={colors[dialogData.iconColor] || colors.accent}
-            name={dialogData.icon}
+            color={colors[data.iconColor] || colors.accent}
+            name={data.icon}
             size={50}
           />
         ) : null}
 
-        {dialogData?.title ? <Heading> {dialogData?.title}</Heading> : null}
+        {data?.title ? <Heading> {data?.title}</Heading> : null}
 
-        {dialogData?.paragraph ? (
+        {data?.paragraph ? (
           <Paragraph style={{ textAlign: "center" }}>
-            {dialogData?.paragraph}
+            {data?.paragraph}
           </Paragraph>
         ) : null}
       </View>
 
-      {typeof dialogData.component === "function"
-        ? dialogData.component(
+      {typeof data.component === "function"
+        ? data.component(
             actionSheetRef,
             () => close(context),
             (data) => {
               if (!data) return;
-              setDialogData((prevData) => {
+              setData((prevData) => {
                 return {
                   ...prevData,
                   ...data
                 };
               });
-            }
+            },
+            colors
           )
-        : dialogData.component}
+        : data.component}
 
       <View
         style={{
           paddingHorizontal: 12,
-          marginBottom: dialogData.valueArray ? 12 : 0
+          marginBottom: data.valueArray ? 12 : 0
         }}
       >
-        {dialogData.valueArray &&
-          dialogData.valueArray.map((v) => (
+        {data.valueArray &&
+          data.valueArray.map((v) => (
             <Button
               title={v}
               type="gray"
@@ -197,12 +187,12 @@ const SheetProvider = ({ context = "global" }) => {
           paddingHorizontal: 12
         }}
       >
-        {dialogData?.action ? (
+        {data?.action ? (
           <Button
-            onPress={dialogData.action}
-            key={dialogData.actionText}
-            title={dialogData.actionText}
-            accentColor={dialogData.iconColor || "accent"}
+            onPress={data.action}
+            key={data.actionText}
+            title={data.actionText}
+            accentColor={data.iconColor || "accent"}
             accentText="light"
             type="accent"
             height={45}
@@ -214,8 +204,8 @@ const SheetProvider = ({ context = "global" }) => {
           />
         ) : null}
 
-        {dialogData?.actionsArray &&
-          dialogData?.actionsArray.map((item) => (
+        {data?.actionsArray &&
+          data?.actionsArray.map((item) => (
             <Button
               onPress={item.action}
               key={item.accentText}
@@ -231,7 +221,7 @@ const SheetProvider = ({ context = "global" }) => {
             />
           ))}
 
-        {dialogData?.learnMore ? (
+        {data?.learnMore ? (
           <Paragraph
             style={{
               alignSelf: "center",
@@ -239,7 +229,7 @@ const SheetProvider = ({ context = "global" }) => {
               textDecorationLine: "underline"
             }}
             size={SIZE.xs}
-            onPress={dialogData.learnMorePress}
+            onPress={data.learnMorePress}
             color={colors.icon}
           >
             <Icon
@@ -247,7 +237,7 @@ const SheetProvider = ({ context = "global" }) => {
               name="information-outline"
               size={SIZE.xs}
             />{" "}
-            {dialogData.learnMore}
+            {data.learnMore}
           </Paragraph>
         ) : null}
       </View>

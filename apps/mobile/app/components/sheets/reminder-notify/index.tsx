@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import dayjs from "dayjs";
 import React, { RefObject } from "react";
-import { ScrollView, View } from "react-native";
-import ActionSheet from "react-native-actions-sheet";
+import { View } from "react-native";
+import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
 import {
@@ -36,7 +36,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
 type ReminderSheetProps = {
-  actionSheetRef: RefObject<ActionSheet>;
+  actionSheetRef: RefObject<ActionSheetRef>;
   close?: () => void;
   update?: (options: PresentSheetOptions) => void;
   reminder?: Reminder;

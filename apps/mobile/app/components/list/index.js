@@ -71,6 +71,7 @@ const RenderItem = ({ item, index, type, ...restArgs }) => {
         };
       })
       .filter((t) => t !== null) || [];
+
   return (
     <Item
       item={item}
@@ -103,7 +104,9 @@ const List = ({
   ListHeader,
   warning,
   isSheet = false,
-  onMomentumScrollEnd
+  onMomentumScrollEnd,
+  handlers,
+  ScrollComponent
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const scrollRef = useRef();
@@ -158,7 +161,7 @@ const List = ({
   };
 
   const _keyExtractor = (item) => item.id || item.title;
-
+  const ListView = ScrollComponent ? ScrollComponent : FlashList;
   return (
     <>
       <Animated.View
@@ -167,7 +170,8 @@ const List = ({
         }}
         entering={type === "search" ? undefined : FadeInDown}
       >
-        <FlashList
+        <ListView
+          {...handlers}
           style={styles}
           ref={scrollRef}
           testID={notesnook.list.id}

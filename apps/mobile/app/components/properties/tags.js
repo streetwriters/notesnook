@@ -21,11 +21,10 @@ import React from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import { TaggedNotes } from "../../screens/notes/tagged";
-import { eSendEvent } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { eOpenTagsDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
+import ManageTagsSheet from "../sheets/manage-tags";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
 export const Tags = ({ item, close }) => {
@@ -46,9 +45,7 @@ export const Tags = ({ item, close }) => {
     >
       <Button
         onPress={async () => {
-          close();
-          await sleep(300);
-          eSendEvent(eOpenTagsDialog, item);
+          ManageTagsSheet.present(item);
         }}
         buttonType={{
           text: colors.accent

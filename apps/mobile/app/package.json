@@ -4,6 +4,8 @@
   "main": "./App.js",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "react": "18.0.0",
+    "react-native": "0.69.7",
     "@flyerhq/react-native-link-preview": "^1.6.0",
     "@mdi/js": "^6.7.96",
     "absolutify": "^0.1.0",
@@ -13,7 +15,7 @@
     "html-to-text": "8.1.0",
     "phone": "^3.1.14",
     "qclone": "^1.2.0",
-    "react-native-actions-sheet": "^0.7.2",
+    "react-native-actions-sheet": "^0.9.0-alpha.6",
     "react-native-check-version": "https://github.com/flexible-agency/react-native-check-version",
     "react-native-drax": "^0.10.2",
     "react-native-image-zoom-viewer": "^3.0.1",
@@ -28,7 +30,6 @@
     "zustand": "^3.6.0",
     "fflate": "^0.7.3",
     "timeago.js": "4.0.2"
-
   },
   "sideEffects": false
 }

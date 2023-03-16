@@ -24,6 +24,7 @@ import { SafeAreaView } from "react-native";
 import Container from "../components/container";
 import DelayLayout from "../components/delay-layout";
 import Intro from "../components/intro";
+import { TopicsSheet } from "../components/sheets/topic-sheet";
 import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import Favorites from "../screens/favorites";
@@ -198,6 +199,7 @@ const _NavigationStack = () => {
       <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
         <Tabs />
       </NavigationContainer>
+      <TopicsSheet />
     </Container>
   );
 };

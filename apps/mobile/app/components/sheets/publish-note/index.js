@@ -18,22 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from "../../../services/event-manager";
+import { presentSheet, ToastEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useAttachmentStore } from "../../../stores/use-attachment-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import {
-  eClosePublishNoteDialog,
-  eOpenPublishNoteDialog
-} from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { SIZE } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
@@ -41,59 +33,27 @@ import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
-import SheetWrapper from "../../ui/sheet";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
-let passwordValue = null;
-const PublishNoteSheet = () => {
+const PublishNoteSheet = ({ note: item, update }) => {
   const colors = useThemeStore((state) => state.colors);
-  const [visible, setVisible] = useState(false);
   const actionSheetRef = useRef();
   const loading = useAttachmentStore((state) => state.loading);
   const [selfDestruct, setSelfDestruct] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
-  const [note, setNote] = useState(null);
+  const [note, setNote] = useState(item);
   const [publishing, setPublishing] = useState(false);
   const publishUrl =
     note &&
     `https://monograph.notesnook.com/${db?.monographs.monograph(note?.id)}`;
   const isPublished = note && db?.monographs.isPublished(note?.id);
   const pwdInput = useRef();
-
-  useEffect(() => {
-    eSubscribeEvent(eOpenPublishNoteDialog, open);
-    eSubscribeEvent(eClosePublishNoteDialog, close);
-    return () => {
-      eUnSubscribeEvent(eOpenPublishNoteDialog, open);
-      eUnSubscribeEvent(eClosePublishNoteDialog, close);
-    };
-  }, []);
-
-  const open = (item) => {
-    if (!item) return;
-    setNote(item);
-    setPublishing(false);
-    setSelfDestruct(false);
-    setIsLocked(false);
-    setVisible(true);
-    passwordValue = null;
-  };
-
-  useEffect(() => {
-    if (visible) {
-      actionSheetRef.current?.show();
-    }
-  }, [visible]);
-
-  const close = () => {
-    passwordValue = null;
-    actionSheetRef.current?.hide();
-  };
+  const passwordValue = useRef();
 
   const publishNote = async () => {
     if (publishing) return;
-    setPublishing(true);
+    setPublishLoading(true);
 
     try {
       if (note?.id) {
@@ -110,6 +70,7 @@ const PublishNoteSheet = () => {
           "TaggedNotes",
           "TopicNotes"
         );
+        setPublishLoading(false);
       }
     } catch (e) {
       ToastEvent.show({
@@ -120,12 +81,19 @@ const PublishNoteSheet = () => {
       });
     }
 
-    setPublishing(false);
+    setPublishLoading(false);
+  };
+
+  const setPublishLoading = (value) => {
+    setPublishing(value);
+    update({
+      progress: value
+    });
   };
 
   const deletePublishedNote = async () => {
     if (publishing) return;
-    setPublishing(true);
+    setPublishLoading(true);
     try {
       if (note?.id) {
         await db.monographs.unpublish(note.id);
@@ -137,6 +105,7 @@ const PublishNoteSheet = () => {
           "TaggedNotes",
           "TopicNotes"
         );
+        setPublishLoading(false);
       }
     } catch (e) {
       ToastEvent.show({
@@ -147,267 +116,268 @@ const PublishNoteSheet = () => {
       });
     }
     actionSheetRef.current?.hide();
-    setPublishing(false);
+    setPublishLoading(false);
   };
 
-  return !visible ? null : (
-    <SheetWrapper
-      centered={false}
-      fwdRef={actionSheetRef}
-      closeOnTouchBackdrop={!publishing}
-      gestureEnabled={!publishing}
-      onClose={async () => {
-        passwordValue = null;
-        setVisible(false);
+  return (
+    <View
+      style={{
+        width: "100%",
+        alignSelf: "center",
+        paddingHorizontal: 12
       }}
     >
-      <View
-        style={{
-          width: "100%",
-          alignSelf: "center",
-          paddingHorizontal: 12
-        }}
-      >
-        <DialogHeader
-          title={note?.title}
-          paragraph={`Anyone with the link${
-            isLocked ? " and password" : ""
-          } of the published note can view it.`}
-        />
+      <DialogHeader
+        title={note?.title}
+        paragraph={`Anyone with the link${
+          isLocked ? " and password" : ""
+        } of the published note can view it.`}
+      />
 
-        {publishing ? (
-          <View
+      {publishing ? (
+        <View
+          style={{
+            justifyContent: "center",
+            alignContent: "center",
+            height: 150,
+            width: "100%"
+          }}
+        >
+          <ActivityIndicator size={25} color={colors.accent} />
+          <Paragraph
             style={{
-              justifyContent: "center",
-              alignContent: "center",
-              height: 150,
-              width: "100%"
+              textAlign: "center"
             }}
           >
-            <ActivityIndicator size={25} color={colors.accent} />
-            <Paragraph
+            Please wait...
+            {loading && loading.current && loading.total
+              ? `\nDownloading attachments (${
+                  loading?.current / loading?.total
+                })`
+              : ""}
+          </Paragraph>
+        </View>
+      ) : (
+        <>
+          {isPublished && (
+            <View
               style={{
-                textAlign: "center"
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 15,
+                backgroundColor: colors.nav,
+                padding: 12,
+                borderRadius: 5
               }}
             >
-              Please wait...
-              {loading && loading.current && loading.total
-                ? `\nDownloading attachments (${
-                    loading?.current / loading?.total
-                  })`
-                : ""}
-            </Paragraph>
-          </View>
-        ) : (
-          <>
-            {isPublished && (
               <View
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginTop: 15,
-                  backgroundColor: colors.nav,
-                  padding: 12,
-                  borderRadius: 5
+                  width: "100%",
+                  flexShrink: 1
                 }}
               >
-                <View
+                <Heading size={SIZE.sm}>Published at:</Heading>
+                <Paragraph size={SIZE.xs} numberOfLines={1}>
+                  {publishUrl}
+                </Paragraph>
+                <Paragraph
+                  onPress={async () => {
+                    try {
+                      await openLinkInBrowser(publishUrl, colors.accent);
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }}
+                  size={SIZE.xs}
                   style={{
-                    width: "100%",
-                    flexShrink: 1
+                    marginTop: 5,
+                    color: colors.pri
                   }}
                 >
-                  <Heading size={SIZE.sm}>Published at:</Heading>
-                  <Paragraph size={SIZE.xs} numberOfLines={1}>
-                    {publishUrl}
-                  </Paragraph>
-                  <Paragraph
-                    onPress={async () => {
-                      try {
-                        await openLinkInBrowser(publishUrl, colors.accent);
-                      } catch (e) {
-                        console.error(e);
-                      }
-                    }}
-                    size={SIZE.xs}
-                    style={{
-                      marginTop: 5,
-                      color: colors.pri
-                    }}
-                  >
-                    <Icon color={colors.accent} name="open-in-new" /> Open in
-                    browser
-                  </Paragraph>
-                </View>
-
-                <IconButton
-                  onPress={() => {
-                    Clipboard.setString(publishUrl);
-                    ToastEvent.show({
-                      heading: "Note publish url copied",
-                      type: "success",
-                      context: "local"
-                    });
-                  }}
-                  color={colors.accent}
-                  size={SIZE.lg}
-                  name="content-copy"
-                />
+                  <Icon color={colors.accent} name="open-in-new" /> Open in
+                  browser
+                </Paragraph>
               </View>
-            )}
-            <Seperator />
 
-            <TouchableOpacity
+              <IconButton
+                onPress={() => {
+                  Clipboard.setString(publishUrl);
+                  ToastEvent.show({
+                    heading: "Note publish url copied",
+                    type: "success",
+                    context: "local"
+                  });
+                }}
+                color={colors.accent}
+                size={SIZE.lg}
+                name="content-copy"
+              />
+            </View>
+          )}
+          <Seperator />
+
+          <TouchableOpacity
+            onPress={() => {
+              if (publishing) return;
+              setIsLocked(!isLocked);
+            }}
+            activeOpacity={0.9}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 10
+            }}
+          >
+            <IconButton
               onPress={() => {
                 if (publishing) return;
                 setIsLocked(!isLocked);
               }}
-              activeOpacity={0.9}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 10
-              }}
-            >
-              <IconButton
-                onPress={() => {
-                  if (publishing) return;
-                  setIsLocked(!isLocked);
-                }}
-                color={isLocked ? colors.accent : colors.icon}
-                size={SIZE.lg}
-                name={
-                  isLocked
-                    ? "check-circle-outline"
-                    : "checkbox-blank-circle-outline"
-                }
-              />
-
-              <View
-                style={{
-                  width: "100%",
-                  flexShrink: 1
-                }}
-              >
-                <Heading size={SIZE.md}>Password protection</Heading>
-                <Paragraph>
-                  Published note can only be viewed by someone with the
-                  password.
-                </Paragraph>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                setSelfDestruct(!selfDestruct);
-              }}
-              activeOpacity={0.9}
-              style={{
-                flexDirection: "row",
-                alignItems: "center"
-              }}
-            >
-              <IconButton
-                onPress={() => {
-                  setSelfDestruct(!selfDestruct);
-                }}
-                color={selfDestruct ? colors.accent : colors.icon}
-                size={SIZE.lg}
-                name={
-                  selfDestruct
-                    ? "check-circle-outline"
-                    : "checkbox-blank-circle-outline"
-                }
-              />
-
-              <View
-                style={{
-                  width: "100%",
-                  flexShrink: 1
-                }}
-              >
-                <Heading size={SIZE.md}>Self destruct</Heading>
-                <Paragraph>
-                  Published note link will be automatically deleted once it is
-                  viewed by someone.
-                </Paragraph>
-              </View>
-            </TouchableOpacity>
+              color={isLocked ? colors.accent : colors.icon}
+              size={SIZE.lg}
+              name={
+                isLocked
+                  ? "check-circle-outline"
+                  : "checkbox-blank-circle-outline"
+              }
+            />
 
             <View
               style={{
                 width: "100%",
-                alignSelf: "center",
-                marginTop: 10
+                flexShrink: 1
               }}
             >
-              {isLocked ? (
-                <>
-                  <Input
-                    fwdRef={pwdInput}
-                    onChangeText={(value) => (passwordValue = value)}
-                    blurOnSubmit
-                    secureTextEntry
-                    defaultValue={passwordValue}
-                    placeholder="Enter Password"
-                  />
-                  <Seperator half />
-                </>
-              ) : null}
-
-              <Button
-                onPress={publishNote}
-                fontSize={SIZE.md}
-                width="100%"
-                style={{
-                  marginTop: 10
-                }}
-                height={50}
-                type="accent"
-                title={isPublished ? "Update published note" : "Publish note"}
-              />
-
-              {isPublished && (
-                <>
-                  <Seperator half />
-                  <Button
-                    onPress={deletePublishedNote}
-                    fontSize={SIZE.md}
-                    width="100%"
-                    height={50}
-                    type="error"
-                    title="Unpublish note"
-                  />
-                </>
-              )}
+              <Heading size={SIZE.md}>Password protection</Heading>
+              <Paragraph>
+                Published note can only be viewed by someone with the password.
+              </Paragraph>
             </View>
-          </>
-        )}
+          </TouchableOpacity>
 
-        <Paragraph
-          color={colors.icon}
-          size={SIZE.xs}
-          style={{
-            textAlign: "center",
-            marginTop: 5,
-            textDecorationLine: "underline"
-          }}
-          onPress={async () => {
-            try {
-              await openLinkInBrowser(
-                "https://docs.notesnook.com/monographs/",
-                colors.accent
-              );
-            } catch (e) {
-              console.error(e);
-            }
-          }}
-        >
-          Learn more about Notesnook Monograph
-        </Paragraph>
-      </View>
-    </SheetWrapper>
+          <TouchableOpacity
+            onPress={() => {
+              setSelfDestruct(!selfDestruct);
+            }}
+            activeOpacity={0.9}
+            style={{
+              flexDirection: "row",
+              alignItems: "center"
+            }}
+          >
+            <IconButton
+              onPress={() => {
+                setSelfDestruct(!selfDestruct);
+              }}
+              color={selfDestruct ? colors.accent : colors.icon}
+              size={SIZE.lg}
+              name={
+                selfDestruct
+                  ? "check-circle-outline"
+                  : "checkbox-blank-circle-outline"
+              }
+            />
+
+            <View
+              style={{
+                width: "100%",
+                flexShrink: 1
+              }}
+            >
+              <Heading size={SIZE.md}>Self destruct</Heading>
+              <Paragraph>
+                Published note link will be automatically deleted once it is
+                viewed by someone.
+              </Paragraph>
+            </View>
+          </TouchableOpacity>
+
+          <View
+            style={{
+              width: "100%",
+              alignSelf: "center",
+              marginTop: 10
+            }}
+          >
+            {isLocked ? (
+              <>
+                <Input
+                  fwdRef={pwdInput}
+                  onChangeText={(value) => (passwordValue.current = value)}
+                  blurOnSubmit
+                  secureTextEntry
+                  defaultValue={passwordValue.current}
+                  placeholder="Enter Password"
+                />
+                <Seperator half />
+              </>
+            ) : null}
+
+            <Button
+              onPress={publishNote}
+              fontSize={SIZE.md}
+              width="100%"
+              style={{
+                marginTop: 10
+              }}
+              height={50}
+              type="accent"
+              title={isPublished ? "Update published note" : "Publish note"}
+            />
+
+            {isPublished && (
+              <>
+                <Seperator half />
+                <Button
+                  onPress={deletePublishedNote}
+                  fontSize={SIZE.md}
+                  width="100%"
+                  height={50}
+                  type="error"
+                  title="Unpublish note"
+                />
+              </>
+            )}
+          </View>
+        </>
+      )}
+
+      <Paragraph
+        color={colors.icon}
+        size={SIZE.xs}
+        style={{
+          textAlign: "center",
+          marginTop: 5,
+          textDecorationLine: "underline"
+        }}
+        onPress={async () => {
+          try {
+            await openLinkInBrowser(
+              "https://docs.notesnook.com/monographs/",
+              colors.accent
+            );
+          } catch (e) {
+            console.error(e);
+          }
+        }}
+      >
+        Learn more about Notesnook Monograph
+      </Paragraph>
+    </View>
   );
+};
+
+PublishNoteSheet.present = (note) => {
+  presentSheet({
+    component: (ref, close, update) => (
+      <PublishNoteSheet
+        actionSheetRef={ref}
+        close={close}
+        update={update}
+        note={note}
+      />
+    )
+  });
 };
 
 export default PublishNoteSheet;

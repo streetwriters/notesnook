@@ -37,7 +37,8 @@ const SheetWrapper = ({
   onHasReachedTop,
   keyboardMode,
   overlay,
-  overlayOpacity = 0.3
+  overlayOpacity = 0.3,
+  enableGesturesInScrollView = false
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const deviceMode = useSettingStore((state) => state.deviceMode);
@@ -59,8 +60,8 @@ const SheetWrapper = ({
       zIndex: 10,
       paddingTop: 5,
       paddingBottom: 0,
-      borderTopRightRadius: 20,
-      borderTopLeftRadius: 20,
+      borderTopRightRadius: 15,
+      borderTopLeftRadius: 15,
       alignSelf: "center",
       borderBottomRightRadius: 0,
       borderBottomLeftRadius: 0
@@ -84,7 +85,8 @@ const SheetWrapper = ({
         backdrop: "sheet-backdrop"
       }}
       indicatorStyle={{
-        width: 100
+        width: 100,
+        backgroundColor: colors.nav
       }}
       drawUnderStatusBar={false}
       containerStyle={style}
@@ -98,8 +100,9 @@ const SheetWrapper = ({
       indicatorColor={colors.nav}
       onOpen={_onOpen}
       keyboardDismissMode="none"
+      enableGesturesInScrollView={enableGesturesInScrollView}
       defaultOverlayOpacity={overlayOpacity}
-      overlayColor={pitchBlack ? "#585858" : "#000000"}
+      overlayColor={pitchBlack ? "#585858" : "#2b2b2b"}
       keyboardShouldPersistTaps="always"
       ExtraOverlayComponent={
         <>

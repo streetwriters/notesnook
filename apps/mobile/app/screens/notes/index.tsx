@@ -42,6 +42,13 @@ import {
   setOnFirstSave,
   toCamelCase
 } from "./common";
+import { View } from "react-native";
+import { db } from "../../common/database";
+import Paragraph from "../../components/ui/typography/paragraph";
+import { IconButton } from "../../components/ui/icon-button";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { SIZE } from "../../utils/size";
+import Notebook from "../notebook/index";
 export const WARNING_DATA = {
   title: "Some notes in this topic are not synced"
 };
@@ -92,13 +99,18 @@ const NotesPage = ({
 }: RouteProps<
   "NotesPage" | "TaggedNotes" | "Monographs" | "ColoredNotes" | "TopicNotes"
 >) => {
+  const colors = useThemeStore((state) => state.colors);
   const params = useRef<NotesScreenParams>(route?.params);
   const [notes, setNotes] = useState<NoteType[]>(get(route.params, true));
   const loading = useNoteStore((state) => state.loading);
   const [loadingNotes, setLoadingNotes] = useState(false);
   const alias = getAlias(params.current);
   const isMonograph = route.name === "Monographs";
-
+  const notebook =
+    route.name === "TopicNotes" && (params.current.item as TopicType).notebookId
+      ? db.notebooks?.notebook((params.current.item as TopicType).notebookId)
+          ?.data
+      : null;
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
       Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
@@ -176,6 +188,7 @@ const NotesPage = ({
         ) {
           return Navigation.goBack();
         }
+        if (notes.length === 0) setLoadingNotes(false);
         setNotes(notes);
         syncWithNavigation();
       } catch (e) {
@@ -187,7 +200,7 @@ const NotesPage = ({
 
   useEffect(() => {
     if (loadingNotes) {
-      setTimeout(() => setLoadingNotes(false), 300);
+      setTimeout(() => setLoadingNotes(false), 50);
     }
   }, [loadingNotes, notes]);
 
@@ -208,6 +221,45 @@ const NotesPage = ({
       }
       wait={loading || loadingNotes}
     >
+      {route.name === "TopicNotes" ? (
+        <View
+          style={{
+            width: "100%",
+            paddingHorizontal: 12,
+            flexDirection: "row",
+            alignItems: "center"
+            // borderBottomWidth: 1,
+            // borderBottomColor: colors.nav
+          }}
+        >
+          <Paragraph
+            onPress={() => {
+              Navigation.navigate(
+                {
+                  name: "Notebooks"
+                },
+                {}
+              );
+            }}
+            size={SIZE.xs}
+          >
+            Notebooks
+          </Paragraph>
+          <IconButton
+            name="chevron-right"
+            size={14}
+            customStyle={{ width: 25, height: 25 }}
+          />
+          <Paragraph
+            onPress={() => {
+              Notebook.navigate(notebook, true);
+            }}
+            size={SIZE.xs}
+          >
+            {notebook.title}
+          </Paragraph>
+        </View>
+      ) : null}
       <List
         listData={notes}
         type="notes"

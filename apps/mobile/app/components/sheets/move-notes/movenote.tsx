@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { FlashList } from "@shopify/flash-list";
 import { NotebookType, NoteType, TopicType } from "app/utils/types";
 import React, { RefObject, useState } from "react";
 import { Platform, useWindowDimensions, View } from "react-native";
-import ActionSheet from "react-native-actions-sheet";
+import { ActionSheetRef } from "react-native-actions-sheet";
+import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import { db } from "../../../common/database";
 import {
   eSendEvent,
@@ -58,7 +58,7 @@ export const MoveNotes = ({
 }: {
   notebook: NotebookType;
   selectedTopic?: TopicType;
-  fwdRef: RefObject<ActionSheet>;
+  fwdRef: RefObject<ActionSheetRef>;
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const [currentNotebook, setCurrentNotebook] = useState(notebook);
@@ -277,10 +277,6 @@ export const MoveNotes = ({
       )}
 
       <FlashList
-        nestedScrollEnabled
-        onMomentumScrollEnd={() => {
-          fwdRef.current?.handleChildScrollEnd();
-        }}
         ListEmptyComponent={
           <View
             style={{
@@ -345,7 +341,7 @@ export const MoveNotes = ({
 
 MoveNotes.present = (notebook: NotebookType, topic: TopicType) => {
   presentSheet({
-    component: (ref: RefObject<ActionSheet>) => (
+    component: (ref: RefObject<ActionSheetRef>) => (
       <MoveNotes fwdRef={ref} notebook={notebook} selectedTopic={topic} />
     )
   });

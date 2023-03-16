@@ -17,91 +17,37 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, {
-  createRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Keyboard, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from "../../../services/event-manager";
+import { presentSheet, ToastEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SearchService from "../../../services/search";
 import { useNotebookStore } from "../../../stores/use-notebook-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { eOpenMoveNoteDialog } from "../../../utils/events";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
 import { Button } from "../../ui/button";
-import SheetWrapper from "../../ui/sheet";
 import Paragraph from "../../ui/typography/paragraph";
 import { SelectionProvider } from "./context";
 import { FilteredList } from "./filtered-list";
 import { ListItem } from "./list-item";
 
-const actionSheetRef = createRef();
-const AddToNotebookSheet = () => {
-  const [visible, setVisible] = useState(false);
-  const [note, setNote] = useState(null);
-
-  function open(note) {
-    setNote(note);
-    setVisible(true);
-    actionSheetRef.current?.setModalVisible(true);
-  }
-
-  useEffect(() => {
-    eSubscribeEvent(eOpenMoveNoteDialog, open);
-    return () => {
-      eUnSubscribeEvent(eOpenMoveNoteDialog, open);
-    };
-  }, []);
-
-  const _onClose = () => {
-    setVisible(false);
-    setNote(null);
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes",
-      "Notebooks",
-      "Notebook"
-    );
-  };
-
-  return !visible ? null : (
-    <SheetWrapper fwdRef={actionSheetRef} onClose={_onClose}>
-      <MoveNoteComponent note={note} />
-    </SheetWrapper>
-  );
-};
-
-export default AddToNotebookSheet;
-
-const MoveNoteComponent = ({ note }) => {
+const MoveNoteSheet = ({ note, actionSheetRef }) => {
   const colors = useThemeStore((state) => state.colors);
   const [multiSelect, setMultiSelect] = useState(false);
   const notebooks = useNotebookStore((state) =>
     state.notebooks.filter((n) => n?.type === "notebook")
   );
-  const [edited, setEdited] = useState(false);
+
   const selectedItemsList = useSelectionStore(
     (state) => state.selectedItemsList
   );
   const setNotebooks = useNotebookStore((state) => state.setNotebooks);
   const [itemState, setItemState] = useState({});
-
   const onAddNotebook = async (title) => {
     if (!title || title.trim().length === 0) {
       ToastEvent.show({
@@ -159,13 +105,13 @@ const MoveNoteComponent = ({ note }) => {
     (item) => {
       switch (item.type) {
         case "notebook": {
-          const noteIds = [];
-          for (let topic of item.topics) {
-            noteIds.push(...(db.notes?.topicReferences.get(topic.id) || []));
-          }
+          const notes = db.relations.from(item, "note");
+          if (notes.length === 0) return 0;
           let count = 0;
           selectedItemsList.forEach((item) =>
-            noteIds.indexOf(item.id) > -1 ? count++ : undefined
+            notes.findIndex((note) => note.id === item.id) > -1
+              ? count++
+              : undefined
           );
           return count;
         }
@@ -195,8 +141,7 @@ const MoveNoteComponent = ({ note }) => {
         for (let notebook of notebooks) {
           itemState[notebook.id] = state
             ? state
-            : areAllSelectedItemsInAllTopics(notebook, selectedItemsList) &&
-              getSelectedNotesCountInItem(notebook, selectedItemsList) > 0
+            : areAllSelectedItemsInNotebook(notebook, selectedItemsList)
             ? "selected"
             : getSelectedNotesCountInItem(notebook, selectedItemsList) > 0
             ? "intermediate"
@@ -231,11 +176,11 @@ const MoveNoteComponent = ({ note }) => {
     }
   };
 
-  function areAllSelectedItemsInAllTopics(notebook, items) {
+  function areAllSelectedItemsInNotebook(notebook, items) {
+    const notes = db.relations.from(notebook, "note");
+    if (notes.length === 0) return false;
     return items.every((item) => {
-      return notebook.topics.every((topic) => {
-        return db.notes.topicReferences.get(topic.id).indexOf(item.id) > -1;
-      });
+      return notes.find((note) => note.id === item.id);
     });
   }
 
@@ -250,25 +195,6 @@ const MoveNoteComponent = ({ note }) => {
       const mergeState = {
         [item.id]: state
       };
-      const notebooks = db.notebooks.all;
-      const notebook =
-        item.type === "notebook"
-          ? item
-          : notebooks.find((n) => n.id === item.notebookId);
-      const intermediate = notebook.topics.some((topic) => {
-        return topic.id === item.id
-          ? state === "selected"
-          : itemState[topic.id] === "selected";
-      });
-      if (intermediate) mergeState[notebook.id] = "intermediate";
-      const selected = notebook.topics.every((topic) => {
-        return topic.id === item.id
-          ? state === "selected"
-          : itemState[topic.id] === "selected";
-      });
-      if (selected) mergeState[notebook.id] = "selected";
-      if (!selected && !intermediate) mergeState[notebook.id] = "deselected";
-
       return {
         ...itemState,
         ...mergeState
@@ -314,28 +240,39 @@ const MoveNoteComponent = ({ note }) => {
   };
 
   const onSave = async () => {
+    const noteIds = note ? [note.id] : selectedItemsList.map((n) => n.id);
     for (const id in itemState) {
       const item = getItemFromId(id);
-      if (item.type === "notebook") continue;
-      const noteIds = selectedItemsList.map((n) => n.id);
       if (itemState[id] === "selected") {
-        await db.notes.addToNotebook(
-          {
-            topic: item.id,
-            id: item.notebookId,
-            rebuildCache: true
-          },
-          ...noteIds
-        );
+        if (item.type === "notebook") {
+          for (let noteId of noteIds) {
+            db.relations.add(item, { id: noteId, type: "note" });
+          }
+        } else {
+          await db.notes.addToNotebook(
+            {
+              topic: item.id,
+              id: item.notebookId,
+              rebuildCache: true
+            },
+            ...noteIds
+          );
+        }
       } else if (itemState[id] === "deselected") {
-        await db.notes.removeFromNotebook(
-          {
-            id: item.notebookId,
-            topic: item.id,
-            rebuildCache: true
-          },
-          ...noteIds
-        );
+        if (item.type === "notebook") {
+          for (let noteId of noteIds) {
+            db.relations.unlink(item, { id: noteId, type: "note" });
+          }
+        } else {
+          await db.notes.removeFromNotebook(
+            {
+              id: item.notebookId,
+              topic: item.id,
+              rebuildCache: true
+            },
+            ...noteIds
+          );
+        }
       }
     }
     Navigation.queueRoutesForUpdate(
@@ -343,7 +280,8 @@ const MoveNoteComponent = ({ note }) => {
       "Favorites",
       "ColoredNotes",
       "TaggedNotes",
-      "TopicNotes"
+      "TopicNotes",
+      "Notebook"
     );
     setNotebooks();
     SearchService.updateAndSearch();
@@ -420,9 +358,6 @@ const MoveNoteComponent = ({ note }) => {
 
         <SelectionProvider value={contextValue}>
           <FilteredList
-            onMomentumScrollEnd={() => {
-              actionSheetRef.current?.handleChildScrollEnd();
-            }}
             style={{
               paddingHorizontal: 12
             }}
@@ -455,6 +390,7 @@ const MoveNoteComponent = ({ note }) => {
                   itemState[item.id] === "deselected" &&
                   getSelectedNotesCountInItem(item) > 0
                 }
+                sheetRef={actionSheetRef}
                 isSelected={itemState[item.id] === "selected"}
                 infoText={
                   <>
@@ -480,10 +416,6 @@ const MoveNoteComponent = ({ note }) => {
                     if (currentState !== "selected") {
                       resetItemState("deselected");
                       contextValue.select(item);
-                      updateItemState(
-                        notebooks.find((n) => n.id === item.notebookId),
-                        "intermediate"
-                      );
                     } else {
                       contextValue.deselect(item);
                     }
@@ -514,16 +446,24 @@ const MoveNoteComponent = ({ note }) => {
             onAddItem={async (title) => {
               return await onAddNotebook(title);
             }}
-            ListFooterComponent={
-              <View
-                style={{
-                  height: 200
-                }}
-              />
-            }
+            // ListFooterComponent={
+            //   <View
+            //     style={{
+            //       height: 200
+            //     }}
+            //   />
+            // }
           />
         </SelectionProvider>
       </View>
     </>
   );
 };
+
+MoveNoteSheet.present = (note) => {
+  presentSheet({
+    component: (ref) => <MoveNoteSheet actionSheetRef={ref} note={note} />,
+    enableGesturesInScrollView: false
+  });
+};
+export default MoveNoteSheet;
