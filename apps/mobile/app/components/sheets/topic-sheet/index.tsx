@@ -238,6 +238,7 @@ export const TopicsSheet = () => {
       <View
         style={{
           maxHeight: 600,
+          height: 600,
           width: "100%"
         }}
       >
@@ -294,6 +295,7 @@ export const TopicsSheet = () => {
               <IconButton
                 name="plus"
                 onPress={PLACEHOLDER_DATA.action}
+                testID="add-topic-button"
                 color={colors.pri}
                 size={22}
                 customStyle={{
@@ -355,7 +357,7 @@ const SelectionContext = createContext<{
 });
 const useSelection = () => useContext(SelectionContext);
 
-const TopicItem = ({ item }: { item: TopicType; index: number }) => {
+const TopicItem = ({ item, index }: { item: TopicType; index: number }) => {
   const screen = useNavigationStore((state) => state.currentScreen);
   const colors = useThemeStore((state) => state.colors);
   const selection = useSelection();
@@ -372,6 +374,7 @@ const TopicItem = ({ item }: { item: TopicType; index: number }) => {
         selection.setEnabled(true);
         selection.toggleSelection(item);
       }}
+      testID={`topic-sheet-item-${index}`}
       onPress={() => {
         if (selection.enabled) {
           selection.toggleSelection(item);
