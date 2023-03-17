@@ -143,6 +143,19 @@ export default class Relations extends Collection {
   }
 
   /**
+   *
+   * @param {ItemReference} from
+   * @param {string} type
+   */
+  async unlinkAll(to, type) {
+    for (const relation of this.all.filter(
+      (a) => compareItemReference(a.to, to) && a.from.type === type
+    )) {
+      await this.remove(relation.id);
+    }
+  }
+
+  /**
    * @param {Relation[]} relations
    * @param {"from" | "to"} resolveType
    * @private
