@@ -22,6 +22,7 @@ import http from "../utils/http";
 import constants from "../utils/constants";
 import TokenManager from "./token-manager";
 import { EV, EVENTS } from "../common";
+import { HealthCheck } from "./healthcheck";
 
 const ENDPOINTS = {
   signup: "/users",
@@ -48,14 +49,20 @@ class UserManager {
     this.tokenManager = new TokenManager(storage);
 
     EV.subscribe(EVENTS.userUnauthorized, async (url) => {
-      if (url.includes("/connect/token")) return;
+      if (
+        url.includes("/connect/token") ||
+        !(await HealthCheck.isAuthServerHealthy())
+      )
+        return;
       try {
         await this.tokenManager._refreshToken(true);
       } catch (e) {
-        await this.logout(
-          false,
-          `Your token has been revoked. Error: ${e.message}.`
-        );
+        if (e.message === "invalid_grant" || e.message === "invalid_client") {
+          await this.logout(
+            false,
+            `Your token has been revoked. Error: ${e.message}.`
+          );
+        }
       }
     });
   }
