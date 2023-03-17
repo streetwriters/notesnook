@@ -29,7 +29,7 @@ const defaultVariant: ThemeUIStyleObject = {
   color: "text",
   ":-webkit-autofill": {
     WebkitTextFillColor: "var(--text)",
-    caretColor: "red",
+    caretColor: "var(--text)",
     fontSize: "inherit"
   },
   ":focus": {
