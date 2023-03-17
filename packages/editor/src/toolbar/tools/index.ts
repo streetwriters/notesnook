@@ -71,6 +71,7 @@ import {
 import {
   AttachmentSettings,
   DownloadAttachment,
+  PreviewAttachment,
   RemoveAttachment
 } from "./attachment";
 import {
@@ -133,6 +134,7 @@ const tools = {
   webclipOpenSource: WebClipOpenSource,
   webclipSettings: WebClipSettings,
 
+  previewAttachment: PreviewAttachment,
   attachmentSettings: AttachmentSettings,
   downloadAttachment: DownloadAttachment,
   removeAttachment: RemoveAttachment,

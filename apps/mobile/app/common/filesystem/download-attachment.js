@@ -29,19 +29,29 @@ import { db } from "../database";
 import Storage from "../database/storage";
 import { cacheDir } from "./utils";
 
-export default async function downloadAttachment(hash, global = true) {
+export default async function downloadAttachment(
+  hash,
+  global = true,
+  options = {
+    silent: false,
+    cache: false
+  }
+) {
   let attachment = db.attachments.attachment(hash);
+  console.log(attachment);
   if (!attachment) {
     console.log("attachment not found");
     return;
   }
 
   let folder = {};
-  if (Platform.OS === "android") {
-    folder = await ScopedStorage.openDocumentTree();
-    if (!folder) return;
-  } else {
-    folder.uri = await Storage.checkAndCreateDir("/downloads/");
+  if (!options.cache) {
+    if (Platform.OS === "android") {
+      folder = await ScopedStorage.openDocumentTree();
+      if (!folder) return;
+    } else {
+      folder.uri = await Storage.checkAndCreateDir("/downloads/");
+    }
   }
 
   try {
@@ -63,19 +73,29 @@ export default async function downloadAttachment(hash, global = true) {
       hash: attachment.metadata.hash,
       hashType: attachment.metadata.hashType,
       mime: attachment.metadata.type,
-      fileName: attachment.metadata.filename,
-      uri: folder.uri,
+      fileName: options.cache ? undefined : attachment.metadata.filename,
+      uri: options.cache ? undefined : folder.uri,
       chunkSize: attachment.chunkSize
     };
 
-    let fileUri = await Sodium.decryptFile(key, info, "file");
-    ToastEvent.show({
-      heading: "Download successful",
-      message: attachment.metadata.filename + " downloaded",
-      type: "success"
-    });
+    let fileUri = await Sodium.decryptFile(
+      key,
+      info,
+      options.cache ? "cache" : "file"
+    );
 
-    if (attachment.dateUploaded) {
+    if (!options.silent) {
+      ToastEvent.show({
+        heading: "Download successful",
+        message: attachment.metadata.filename + " downloaded",
+        type: "success"
+      });
+    }
+
+    if (
+      attachment.dateUploaded &&
+      !attachment.metadata?.type?.startsWith("image")
+    ) {
       RNFetchBlob.fs
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
         .catch(console.log);
@@ -85,24 +105,26 @@ export default async function downloadAttachment(hash, global = true) {
       fileUri = folder.uri + `/${attachment.metadata.filename}`;
     }
     console.log("saved file uri: ", fileUri);
+    if (!options.silent) {
+      presentSheet({
+        title: "File downloaded",
+        paragraph: `${attachment.metadata.filename} saved to ${
+          Platform.OS === "android"
+            ? "selected path"
+            : "File Manager/Notesnook/downloads"
+        }`,
+        icon: "download",
+        context: global ? null : attachment.metadata.hash,
+        component: (
+          <ShareComponent
+            uri={fileUri}
+            name={attachment.metadata.filename}
+            padding={12}
+          />
+        )
+      });
+    }
 
-    presentSheet({
-      title: "File downloaded",
-      paragraph: `${attachment.metadata.filename} saved to ${
-        Platform.OS === "android"
-          ? "selected path"
-          : "File Manager/Notesnook/downloads"
-      }`,
-      icon: "download",
-      context: global ? null : attachment.metadata.hash,
-      component: (
-        <ShareComponent
-          uri={fileUri}
-          name={attachment.metadata.filename}
-          padding={12}
-        />
-      )
-    });
     return fileUri;
   } catch (e) {
     console.log("download attachment error: ", e);

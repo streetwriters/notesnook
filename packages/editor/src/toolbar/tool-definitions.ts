@@ -237,7 +237,6 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: "Cell border width",
     conditional: true
   },
-
   imageSettings: {
     icon: "imageSettings",
     title: "Image settings",
@@ -261,6 +260,11 @@ const tools: Record<ToolId, ToolDefinition> = {
   imageProperties: {
     icon: "more",
     title: "Image properties",
+    conditional: true
+  },
+  previewAttachment: {
+    icon: "previewAttachment",
+    title: "Preview attachment",
     conditional: true
   },
   attachmentSettings: {
@@ -354,6 +358,7 @@ export const STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
     "cellProperties",
     "imageSettings",
     "embedSettings",
+    "previewAttachment",
     "attachmentSettings",
     "linkSettings",
     "codeRemove",

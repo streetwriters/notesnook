@@ -27,7 +27,11 @@ import { Attachment } from "../../extensions/attachment";
 export function AttachmentSettings(props: ToolProps) {
   const { editor } = props;
   const isBottom = useToolbarLocation() === "bottom";
-  if (!editor.isActive("attachment") || !isBottom) return null;
+  if (
+    (!editor.isActive("attachment") && !editor.isActive("image")) ||
+    !isBottom
+  )
+    return null;
 
   return (
     <MoreTools
@@ -53,6 +57,28 @@ export function DownloadAttachment(props: ToolProps) {
 
         const attachment = (attachmentNode?.attrs || {}) as Attachment;
         editor.current?.chain().focus().downloadAttachment(attachment).run();
+      }}
+    />
+  );
+}
+
+export function PreviewAttachment(props: ToolProps) {
+  const { editor } = props;
+  const isBottom = useToolbarLocation() === "bottom";
+
+  if (!editor.isActive("image") || !isBottom) return null;
+
+  return (
+    <ToolButton
+      {...props}
+      toggled={false}
+      onClick={() => {
+        const attachmentNode =
+          findSelectedNode(editor, "attachment") ||
+          findSelectedNode(editor, "image");
+
+        const attachment = (attachmentNode?.attrs || {}) as Attachment;
+        editor.current?.chain().focus().previewAttachment(attachment).run();
       }}
     />
   );

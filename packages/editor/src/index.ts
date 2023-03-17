@@ -17,64 +17,64 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import "./extensions";
-import CharacterCount from "@tiptap/extension-character-count";
-import Placeholder from "@tiptap/extension-placeholder";
-import Underline from "@tiptap/extension-underline";
-import StarterKit from "@tiptap/starter-kit";
-import { useEffect, useMemo } from "react";
-import Toolbar from "./toolbar";
-import TextAlign from "@tiptap/extension-text-align";
-import Subscript from "@tiptap/extension-subscript";
-import Superscript from "@tiptap/extension-superscript";
-import FontSize from "./extensions/font-size";
-import TextDirection from "./extensions/text-direction";
-import TextStyle from "@tiptap/extension-text-style";
-import FontFamily from "./extensions/font-family";
-import BulletList from "./extensions/bullet-list";
-import OrderedList from "./extensions/ordered-list";
-import Color from "@tiptap/extension-color";
-import TableRow from "@tiptap/extension-table-row";
-import TableCell from "./extensions/table-cell";
-import TableHeader from "@tiptap/extension-table-header";
-import { ImageNode } from "./extensions/image";
 import { Theme } from "@notesnook/theme";
-import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
-import { TaskListNode } from "./extensions/task-list";
-import { TaskItemNode } from "./extensions/task-item";
-import { SearchReplace } from "./extensions/search-replace";
-import { EmbedNode } from "./extensions/embed";
-import { CodeBlock } from "./extensions/code-block";
-import { ListItem } from "./extensions/list-item";
-import { Link } from "@tiptap/extension-link";
-import { Codemark } from "./extensions/code-mark";
-import { MathInline, MathBlock } from "./extensions/math";
-import {
-  NodeViewSelectionNotifier,
-  usePortalProvider
-} from "./extensions/react";
-import { OutlineList } from "./extensions/outline-list";
-import { OutlineListItem } from "./extensions/outline-list-item";
-import { KeepInView } from "./extensions/keep-in-view";
-import { SelectionPersist } from "./extensions/selection-persist";
-import { Table } from "./extensions/table";
-import { useToolbarStore } from "./toolbar/stores/toolbar-store";
-import { useEditor } from "./hooks/use-editor";
 import {
   EditorOptions,
   extensions as TiptapCoreExtensions,
   getHTMLFromFragment
 } from "@tiptap/core";
-import { usePermissionHandler } from "./hooks/use-permission-handler";
-import { Highlight } from "./extensions/highlight";
-import { Paragraph } from "./extensions/paragraph";
-import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer";
+import CharacterCount from "@tiptap/extension-character-count";
 import { Code } from "@tiptap/extension-code";
-import { DateTime } from "./extensions/date-time";
-import { OpenLink, OpenLinkOptions } from "./extensions/open-link";
+import Color from "@tiptap/extension-color";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
+import { Link } from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
+import TextAlign from "@tiptap/extension-text-align";
+import TextStyle from "@tiptap/extension-text-style";
+import Underline from "@tiptap/extension-underline";
+import StarterKit from "@tiptap/starter-kit";
+import { useEffect, useMemo } from "react";
+import "./extensions";
+import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
+import BulletList from "./extensions/bullet-list";
+import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer";
+import { CodeBlock } from "./extensions/code-block";
+import { Codemark } from "./extensions/code-mark";
+import { DateTime } from "./extensions/date-time";
+import { EmbedNode } from "./extensions/embed";
+import FontFamily from "./extensions/font-family";
+import FontSize from "./extensions/font-size";
+import { Highlight } from "./extensions/highlight";
+import { ImageNode, ImageOptions } from "./extensions/image";
+import { KeepInView } from "./extensions/keep-in-view";
 import { KeyMap } from "./extensions/key-map";
+import { ListItem } from "./extensions/list-item";
+import { MathBlock, MathInline } from "./extensions/math";
+import { OpenLink, OpenLinkOptions } from "./extensions/open-link";
+import OrderedList from "./extensions/ordered-list";
+import { OutlineList } from "./extensions/outline-list";
+import { OutlineListItem } from "./extensions/outline-list-item";
+import { Paragraph } from "./extensions/paragraph";
+import {
+  NodeViewSelectionNotifier,
+  usePortalProvider
+} from "./extensions/react";
+import { SearchReplace } from "./extensions/search-replace";
+import { SelectionPersist } from "./extensions/selection-persist";
+import { Table } from "./extensions/table";
+import TableCell from "./extensions/table-cell";
+import { TaskItemNode } from "./extensions/task-item";
+import { TaskListNode } from "./extensions/task-list";
+import TextDirection from "./extensions/text-direction";
 import { WebClipNode, WebClipOptions } from "./extensions/web-clip";
+import { useEditor } from "./hooks/use-editor";
+import { usePermissionHandler } from "./hooks/use-permission-handler";
+import Toolbar from "./toolbar";
+import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { DownloadOptions } from "./utils/downloader";
 
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
@@ -85,6 +85,7 @@ const CoreExtensions = Object.entries(TiptapCoreExtensions)
 type TiptapOptions = EditorOptions &
   Omit<AttachmentOptions, "HTMLAttributes"> &
   Omit<WebClipOptions, "HTMLAttributes"> &
+  Omit<ImageOptions, "HTMLAttributes"> &
   OpenLinkOptions & {
     downloadOptions?: DownloadOptions;
     theme: Theme;
@@ -104,6 +105,7 @@ const useTiptap = (
     isKeyboardOpen,
     onDownloadAttachment,
     onOpenAttachmentPicker,
+    onPreviewAttachment,
     onOpenLink,
     onBeforeCreate,
     downloadOptions,
@@ -219,7 +221,8 @@ const useTiptap = (
         EmbedNode,
         AttachmentNode.configure({
           onDownloadAttachment,
-          onOpenAttachmentPicker
+          onOpenAttachmentPicker,
+          onPreviewAttachment
         }),
         OutlineListItem,
         OutlineList,
@@ -241,6 +244,7 @@ const useTiptap = (
       injectCSS: false
     }),
     [
+      onPreviewAttachment,
       onDownloadAttachment,
       onOpenAttachmentPicker,
       PortalProviderAPI,
@@ -260,6 +264,12 @@ const useTiptap = (
   return editor;
 };
 
+export { type Fragment } from "prosemirror-model";
+export { type Attachment, type AttachmentType } from "./extensions/attachment";
+export * from "./extensions/react";
+export * from "./toolbar";
+export * from "./types";
+export * from "./utils/word-counter";
 export {
   useTiptap,
   Toolbar,
@@ -267,9 +277,3 @@ export {
   getHTMLFromFragment,
   type DownloadOptions
 };
-export * from "./types";
-export * from "./extensions/react";
-export * from "./toolbar";
-export { type AttachmentType, type Attachment } from "./extensions/attachment";
-export { type Fragment } from "prosemirror-model";
-export * from "./utils/word-counter";

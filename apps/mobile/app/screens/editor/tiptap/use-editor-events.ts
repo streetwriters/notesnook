@@ -29,6 +29,7 @@ import {
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
 import { db } from "../../../common/database";
+import ImagePreview from "../../../components/image-preview";
 import { RelationsList } from "../../../components/sheets/relations-list";
 import ReminderSheet from "../../../components/sheets/reminder";
 import useKeyboard from "../../../hooks/use-keyboard";
@@ -379,6 +380,10 @@ export const useEditorEvents = (
           break;
         case EventTypes.link:
           openLinkInBrowser(editorMessage.value as string);
+          break;
+
+        case EventTypes.previewAttachment:
+          eSendEvent("ImagePreview", editorMessage.value);
           break;
         default:
           break;
