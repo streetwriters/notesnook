@@ -35,6 +35,7 @@ import BaseDialog from "./base-dialog";
 import DialogButtons from "./dialog-buttons";
 import DialogHeader from "./dialog-header";
 import { useCallback } from "react";
+import { Button } from "../ui/button";
 
 export const Dialog = ({ context = "global" }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -54,7 +55,11 @@ export const Dialog = ({ context = "global" }) => {
     input: false,
     inputPlaceholder: "Enter some text",
     defaultValue: "",
-    disableBackdropClosing: false
+    disableBackdropClosing: false,
+    check: {
+      info: "Check",
+      type: "transparent"
+    }
   });
 
   useEffect(() => {
@@ -87,6 +92,7 @@ export const Dialog = ({ context = "global" }) => {
       if (data.context !== context) return;
       setDialogInfo(data);
       setVisible(true);
+      setInputValue(data.defaultValue);
     },
     [context]
   );
@@ -137,6 +143,9 @@ export const Dialog = ({ context = "global" }) => {
           paragraph={dialogInfo.paragraph}
           paragraphColor={dialogInfo.paragraphColor}
           padding={12}
+          style={{
+            minHeight: 0
+          }}
         />
         <Seperator half />
 
@@ -161,6 +170,28 @@ export const Dialog = ({ context = "global" }) => {
               placeholder={dialogInfo.inputPlaceholder}
             />
           </View>
+        ) : null}
+
+        {dialogInfo.check ? (
+          <>
+            <Button
+              onPress={() => {
+                setInputValue(!inputValue);
+              }}
+              icon={
+                inputValue
+                  ? "check-circle-outline"
+                  : "checkbox-blank-circle-outline"
+              }
+              style={{
+                justifyContent: "flex-start"
+              }}
+              height={35}
+              width="100%"
+              title={dialogInfo.check.info}
+              type={inputValue ? dialogInfo.check.type : "gray"}
+            />
+          </>
         ) : null}
 
         <DialogButtons
