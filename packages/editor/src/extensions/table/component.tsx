@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex } from "@theme-ui/components";
 import {
-  SelectionBasedNodeView,
-  SelectionBasedReactNodeViewProps
+  ReactNodeView,
+  ReactNodeViewProps,
 } from "../react";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "../../types";
@@ -43,11 +43,10 @@ import {
 import { DesktopOnly } from "../../components/responsive";
 import { TextDirections } from "../text-direction";
 
-export function TableComponent(props: SelectionBasedReactNodeViewProps) {
+export function TableComponent(props: ReactNodeViewProps) {
   const { editor, node, forwardRef } = props;
   const colgroupRef = useRef<HTMLTableColElement>(null);
   const tableRef = useRef<HTMLTableElement>();
-  const selected = editor.isActive("table");
   const { textDirection } = node.attrs;
 
   useEffect(() => {
@@ -59,20 +58,16 @@ export function TableComponent(props: SelectionBasedReactNodeViewProps) {
   return (
     <>
       <DesktopOnly>
-        {selected && (
-          <>
-            <TableRowToolbar
-              editor={editor}
-              table={tableRef}
-              textDirection={textDirection}
-            />
-            <TableColumnToolbar
-              editor={editor}
-              table={tableRef}
-              textDirection={textDirection}
-            />
-          </>
-        )}
+        <TableRowToolbar
+          editor={editor}
+          table={tableRef}
+          textDirection={textDirection}
+        />
+        <TableColumnToolbar
+          editor={editor}
+          table={tableRef}
+          textDirection={textDirection}
+        />
       </DesktopOnly>
       <div className="tableWrapper" dir={textDirection}>
         <table
@@ -91,7 +86,7 @@ export function TableComponent(props: SelectionBasedReactNodeViewProps) {
 
 export function TableNodeView(editor: TiptapEditor) {
   class TableNode
-    extends SelectionBasedNodeView<SelectionBasedReactNodeViewProps<unknown>>
+    extends ReactNodeView<ReactNodeViewProps<unknown>>
     implements NodeView
   {
     constructor(node: ProsemirrorNode) {
