@@ -464,32 +464,6 @@ const menuItems = [
   },
   { key: "sep3", type: "separator" },
   {
-    key: "removefromtopic",
-    title: "Remove from topic",
-    icon: Icon.TopicRemove,
-    hidden: ({ context }) => context?.type !== "topic",
-    onClick: async ({ items, context }) => {
-      try {
-        if (!context.value?.topic || !context.value?.id)
-          throw new Error("context is missing");
-
-        const ids = items.map((i) => i.id);
-
-        await db.notes.removeFromNotebook(
-          { id: context.value.id, topic: context.value.topic },
-          ...ids
-        );
-
-        store.refresh();
-
-        showToast("success", "Note removed from topic.");
-      } catch (e) {
-        showToast("error", `Failed to remove note from topic: ${e.message}.`);
-      }
-    },
-    multiSelect: true
-  },
-  {
     key: "movetotrash",
     title: "Move to trash",
     color: "error",
