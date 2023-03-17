@@ -374,7 +374,7 @@ export default class Notes extends Collection {
   async removeFromAllNotebooks(...noteIds) {
     for (const noteId of noteIds) {
       const note = this.note(noteId);
-      if (!note || note.deleted || !note.notebooks) {
+      if (!note || note.deleted) {
         continue;
       }
 
@@ -382,6 +382,7 @@ export default class Notes extends Collection {
         id: noteId,
         notebooks: []
       });
+      await this._db.relations.unlinkAll(note.data, "notebook");
     }
     this.topicReferences.rebuild();
   }
