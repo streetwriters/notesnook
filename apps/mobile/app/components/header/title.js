@@ -112,7 +112,7 @@ export const Title = () => {
         <Heading
           onPress={navigateToNotebook}
           numberOfLines={isTopic ? 2 : 1}
-          size={isTopic ? SIZE.md + 2 : SIZE.xl}
+          size={SIZE.xl}
           style={{
             flexWrap: "wrap",
             marginTop: Platform.OS === "ios" ? -1 : 0
@@ -120,10 +120,7 @@ export const Title = () => {
           color={currentScreen.color || colors.heading}
         >
           {isTag ? (
-            <Heading
-              size={isTopic ? SIZE.md + 2 : SIZE.xl}
-              color={colors.accent}
-            >
+            <Heading size={SIZE.xl} color={colors.accent}>
               #
             </Heading>
           ) : null}
