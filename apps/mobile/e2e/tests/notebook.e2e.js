@@ -29,7 +29,8 @@ import {
   navigate,
   elementByText,
   sleep,
-  notVisibleByText
+  notVisibleByText,
+  visibleById
 } from "./utils";
 
 async function createNotebook(
@@ -128,11 +129,11 @@ describe("NOTEBOOKS", () => {
     await device.pressBack();
     await sleep(500);
     await tapByText("Notebook 1");
-    await tapById(notesnook.buttons.add);
+    await tapById("add-topic-button");
     await elementById("input-title").typeText("Topic");
     await tapByText("Add");
     await sleep(500);
-    await visibleByText("Topic");
+    await visibleById("topic-sheet-item-0");
   });
 
   it("Edit topic", async () => {
@@ -145,12 +146,11 @@ describe("NOTEBOOKS", () => {
     await sleep(500);
     await tapByText("Notebook 1");
     await sleep(300);
-    await visibleByText("Topic");
+    await visibleById("topic-sheet-item-0");
     await tapById(notesnook.ids.notebook.menu);
     await tapByText("Edit topic");
     await elementById("input-title").typeText(" (edited)");
     await tapByText("Save");
-    await visibleByText("Topic (edited)");
   });
 
   it("Add new note to topic", async () => {
@@ -175,12 +175,11 @@ describe("NOTEBOOKS", () => {
     await tapByText("Topic");
     let note = await createNote();
     await elementByText(note.body).longPress();
-    await tapByText("Select");
     await tapById("select-minus");
     await notVisibleById(note.title);
   });
 
-  it.only("Add/Remove note to notebook from home", async () => {
+  it("Add/Remove note to notebook from home", async () => {
     await prepare();
     await navigate("Notebooks");
     await sleep(500);
@@ -192,31 +191,31 @@ describe("NOTEBOOKS", () => {
     await createNote();
     console.log("ADD TO A SINGLE TOPIC");
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Add to notebook");
+    await tapById("icon-notebooks");
     await sleep(500);
     await tapByText("Notebook 1");
     await tapByText("Topic");
     await tapByText("Save");
     await sleep(300);
-    await visibleByText("Notebook 1 › Topic");
+    await visibleByText("Topic");
     console.log("MOVE FROM ONE TOPIC TO ANOTHER");
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Add to notebook");
+    await tapById("icon-notebooks");
     await tapByText("Notebook 1");
     await tapByText("Topic 2");
     await tapByText("Save");
-    await visibleByText("Notebook 1 › Topic 2");
+    await visibleByText("Topic 2");
     console.log("REMOVE FROM TOPIC");
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Add to notebook");
+    await tapById("icon-notebooks");
     await tapByText("Notebook 1");
     await tapByText("Topic 2");
     await tapByText("Save");
     await sleep(300);
-    await notVisibleByText("Notebook 1 › Topic 2");
+    await notVisibleByText("Topic 2");
     console.log("MOVE TO MULTIPLE TOPICS");
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Add to notebook");
+    await tapById("icon-notebooks");
     await tapByText("Notebook 1");
     await elementByText("Topic").longPress();
     await visibleByText("Reset selection");

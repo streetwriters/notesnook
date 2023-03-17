@@ -53,6 +53,9 @@ import { getTotalNotes, history } from "../../../utils";
 import { Properties } from "../../properties";
 import { deleteItems } from "../../../utils/functions";
 import { presentDialog } from "../../dialog/functions";
+import Config from "react-native-config";
+import { notesnook } from "../../../../e2e/test.ids";
+
 export const TopicsSheet = () => {
   const currentScreen = useNavigationStore((state) => state.currentScreen);
   const canShow =
@@ -179,7 +182,7 @@ export const TopicsSheet = () => {
         backgroundColor: colors.nav
       }}
       keyboardHandlerEnabled={false}
-      snapPoints={[15, 60, 100]}
+      snapPoints={Config.isTesting === "true" ? [60, 100] : [15, 60, 100]}
       initialSnapIndex={0}
       backgroundInteractionEnabled
       onChange={(position, height) => {
@@ -212,6 +215,7 @@ export const TopicsSheet = () => {
           }}
         >
           <PressableButton
+            testID={notesnook.buttons.add}
             type="accent"
             accentColor={"accent"}
             accentText="light"
@@ -423,6 +427,7 @@ const TopicItem = ({ item, index }: { item: TopicType; index: number }) => {
           width: 40,
           height: 40
         }}
+        testID={notesnook.ids.notebook.menu}
         onPress={() => {
           Properties.present(item);
         }}

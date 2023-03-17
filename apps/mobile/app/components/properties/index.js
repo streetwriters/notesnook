@@ -123,7 +123,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
               paddingHorizontal: 12
             }}
           >
-            {item.notebooks ? <Notebooks note={item} close={close} /> : null}
+            <Notebooks note={item} close={close} />
           </View>
 
           <Items
