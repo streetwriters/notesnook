@@ -108,7 +108,8 @@ export const Items = ({ item, buttons, close }) => {
     />
   );
 
-  const renderTopBarItem = (item) => {
+  const renderTopBarItem = (item, index) => {
+    const isLast = index === topBarItems.length;
     return (
       <PressableButton
         onPress={item.func}
@@ -118,7 +119,7 @@ export const Items = ({ item, buttons, close }) => {
           alignItems: "center",
           width: topBarItemWidth,
           marginBottom: 10,
-          marginRight: 10,
+          marginRight: isLast ? 0 : 10,
           backgroundColor: "transparent"
         }}
       >
@@ -200,10 +201,8 @@ export const Items = ({ item, buttons, close }) => {
         disableVirtualization={true}
         style={{
           marginTop: item.type !== "note" ? 10 : 0,
-          paddingTop: 10
-        }}
-        columnWrapperStyle={{
-          justifyContent: "flex-start"
+          paddingTop: 10,
+          marginLeft: 6
         }}
         contentContainerStyle={{
           alignSelf: "center",

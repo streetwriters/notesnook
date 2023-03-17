@@ -15,7 +15,7 @@
     "html-to-text": "8.1.0",
     "phone": "^3.1.14",
     "qclone": "^1.2.0",
-    "react-native-actions-sheet": "^0.9.0-alpha.6",
+    "react-native-actions-sheet": "^0.9.0-alpha.8",
     "react-native-check-version": "https://github.com/flexible-agency/react-native-check-version",
     "react-native-drax": "^0.10.2",
     "react-native-image-zoom-viewer": "^3.0.1",

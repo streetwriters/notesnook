@@ -89,6 +89,7 @@ export const ColorTags = ({ item }) => {
         flexWrap: "wrap",
         flexGrow: isTablet ? undefined : 1,
         paddingHorizontal: 12,
+        paddingRight: 0,
         alignItems: "center",
         justifyContent: isTablet ? "center" : "space-between"
       }}

@@ -40,7 +40,9 @@ export const Tags = ({ item, close }) => {
         flexWrap: "wrap",
         alignItems: "center",
         paddingHorizontal: 12,
-        alignSelf: "center"
+        alignSelf: "center",
+        justifyContent: "space-between",
+        width: "100%"
       }}
     >
       <Button
@@ -76,8 +78,8 @@ export const TagStrip = ({ item, close }) => {
         alignItems: "center"
       }}
     >
-      {item.tags.map((item) =>
-        item ? <TagItem key={item} tag={item} close={close} /> : null
+      {item.tags.map((tag) =>
+        tag ? <TagItem key={tag} tag={item} close={close} /> : null
       )}
     </View>
   ) : null;

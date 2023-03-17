@@ -217,7 +217,7 @@ export class AddNotebookSheet extends React.Component {
         topics: prevTopics
       });
       setTimeout(() => {
-        this.listRef.scrollToEnd({ animated: true });
+        this.listRef.current?.scrollToEnd?.({ animated: true });
       }, 30);
       this.currentInputValue = null;
     } else {
@@ -241,7 +241,7 @@ export class AddNotebookSheet extends React.Component {
 
       if (forward) {
         setTimeout(() => {
-          this.listRef.scrollToEnd({ animated: true });
+          this.listRef.current?.scrollToEnd?.({ animated: true });
         }, 30);
       }
     }

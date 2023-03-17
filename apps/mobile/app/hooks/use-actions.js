@@ -102,6 +102,15 @@ export const useActions = ({ close = () => null, item }) => {
     );
   };
 
+  const isNoteInNotebook = () => {
+    const currentScreen = useNavigationStore.getState().currentScreen;
+    if (item.type !== "note" || currentScreen.name !== "Notebook") return;
+
+    return !!db.relations
+      .to(item, "notebook")
+      .find((notebook) => notebook.id === currentScreen.id);
+  };
+
   const onUpdate = useCallback(
     async (type) => {
       if (type === "unpin") {
@@ -506,6 +515,22 @@ export const useActions = ({ close = () => null, item }) => {
     close();
   }
 
+  async function removeNoteFromNotebook() {
+    const currentScreen = useNavigationStore.getState().currentScreen;
+    if (currentScreen.name !== "Notebook") return;
+    await db.relations.unlink({ type: "notebook", id: currentScreen.id }, item);
+    Navigation.queueRoutesForUpdate(
+      "TaggedNotes",
+      "ColoredNotes",
+      "TopicNotes",
+      "Favorites",
+      "Notes",
+      "Notebook",
+      "Notebooks"
+    );
+    close();
+  }
+
   async function deleteTrashItem() {
     if (!checkNoteSynced()) return;
     close();
@@ -827,6 +852,13 @@ export const useActions = ({ close = () => null, item }) => {
       hidden: !isNoteInTopic(),
       icon: "minus-circle-outline",
       func: removeNoteFromTopic
+    },
+    {
+      id: "remove-from-notebook",
+      title: "Remove from notebook",
+      hidden: !isNoteInNotebook(),
+      icon: "minus-circle-outline",
+      func: removeNoteFromNotebook
     },
     {
       id: "trash",

@@ -179,6 +179,7 @@ Properties.present = (item, buttons = [], isSheet) => {
         "lock-unlock",
         "trash",
         "remove-from-topic",
+        "remove-from-notebook",
         "history",
         "read-only",
         "reminders",
