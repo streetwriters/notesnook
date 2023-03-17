@@ -190,7 +190,8 @@ import {
   mdiLightbulbOnOutline,
   mdiNoteMultipleOutline,
   mdiBookMultipleOutline,
-  mdiArrowTopRight
+  mdiArrowTopRight,
+  mdiBookmarkRemoveOutline
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -306,7 +307,8 @@ export const Check = createIcon(mdiCheck);
 export const Cross = createIcon(mdiClose);
 export const MoreVertical = createIcon(mdiDotsVertical);
 export const Trash = createIcon(mdiTrashCanOutline);
-export const TopicRemove = createIcon(mdiBookRemoveOutline);
+export const TopicRemove = createIcon(mdiBookmarkRemoveOutline);
+export const NotebookRemove = createIcon(mdiBookRemoveOutline);
 export const Search = createIcon(mdiMagnify);
 export const Menu = createIcon(mdiMenu);
 export const Login = createIcon(mdiLoginVariant);
