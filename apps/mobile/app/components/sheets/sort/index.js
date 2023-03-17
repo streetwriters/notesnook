@@ -100,7 +100,7 @@ const Sort = ({ type, screen }) => {
           height={25}
           iconPosition="right"
           fontSize={SIZE.sm - 1}
-          type="grayBg"
+          type="transparent"
           buttonType={{
             text: colors.accent
           }}
