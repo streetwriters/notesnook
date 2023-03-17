@@ -533,27 +533,32 @@ function colorsToMenuItems() {
   });
 }
 
-function notebooksMenuItems({ note }) {
+function notebooksMenuItems({ items }) {
+  const noteIds = items.map((i) => i.id);
+
   const menuItems = [];
   menuItems.push({
     key: "link-notebooks",
     title: "Link to...",
     icon: Icon.AddToNotebook,
-    onClick: async ({ items }) => {
-      await showMoveNoteDialog(items.map((i) => i.id));
+    onClick: async () => {
+      await showMoveNoteDialog(noteIds);
     }
   });
 
-  const notebooks = db.relations?.to(note, "notebook");
+  const notebooks = items
+    .map((note) => db.relations?.to(note, "notebook"))
+    .flat();
+  const topics = items.map((note) => note.notebooks || []).flat();
 
-  if (note && (note.notebooks?.length > 0 || notebooks?.length > 0)) {
+  if (topics?.length > 0 || notebooks?.length > 0) {
     menuItems.push(
       {
         key: "remove-from-all-notebooks",
         title: "Unlink from all",
         icon: Icon.RemoveShortcutLink,
         onClick: async () => {
-          await db.notes.removeFromAllNotebooks(note.id);
+          await db.notes.removeFromAllNotebooks(...noteIds);
           store.refresh();
         }
       },
@@ -561,6 +566,8 @@ function notebooksMenuItems({ note }) {
     );
 
     notebooks?.forEach((notebook) => {
+      if (menuItems.find((item) => item.key === notebook.id)) return;
+
       menuItems.push({
         key: notebook.id,
         title: notebook.title,
@@ -568,17 +575,19 @@ function notebooksMenuItems({ note }) {
         checked: true,
         tooltip: "Click to remove from this notebook",
         onClick: async () => {
-          await db.notes.removeFromNotebook({ id: notebook.id }, note.id);
+          await db.notes.removeFromNotebook({ id: notebook.id }, ...noteIds);
           store.refresh();
         }
       });
     });
 
-    note.notebooks?.forEach((ref) => {
+    topics?.forEach((ref) => {
       const notebook = db.notebooks?.notebook(ref.id);
       if (!notebook) return;
       for (const topicId of ref.topics) {
         if (!notebook.topics.topic(topicId)) continue;
+        if (menuItems.find((item) => item.key === topicId)) continue;
+
         const topic = notebook.topics.topic(topicId)._topic;
         menuItems.push({
           key: topicId,
@@ -589,7 +598,7 @@ function notebooksMenuItems({ note }) {
           onClick: async () => {
             await db.notes.removeFromNotebook(
               { id: ref.id, topic: topic.id },
-              note.id
+              ...noteIds
             );
             store.refresh();
           }
