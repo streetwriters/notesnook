@@ -182,7 +182,6 @@ export const TopicsSheet = () => {
       snapPoints={[15, 60, 100]}
       initialSnapIndex={0}
       backgroundInteractionEnabled
-      enableGesturesInScrollView
       onChange={(position, height) => {
         animations.translate.setValue(position);
         const h = Dimensions.get("window").height;
@@ -317,6 +316,8 @@ export const TopicsSheet = () => {
                 onRefresh={() => {
                   onRequestUpdate();
                 }}
+                colors={[colors.accent]}
+                progressBackgroundColor={colors.bg}
               />
             }
             keyExtractor={(item) => item.id}
