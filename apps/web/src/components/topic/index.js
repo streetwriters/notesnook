@@ -101,7 +101,9 @@ const menuItems = [
         negativeButtonText: "No",
         checks: {
           deleteContainingNotes: {
-            text: `Delete all containing notes`
+            text: `Move all notes in ${
+              items.length > 1 ? "these topics" : "this topic"
+            } to trash`
           }
         }
       });
