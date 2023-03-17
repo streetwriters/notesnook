@@ -29,22 +29,28 @@ import { eClearEditor } from "./events";
 import { useRelationStore } from "../stores/use-relation-store";
 import { presentDialog } from "../components/dialog/functions";
 
-function deleteNotesConfirmDialog(items, type, context) {
+function deleteConfirmDialog(items, type, context) {
   return new Promise((resolve) => {
     presentDialog({
-      title: "Delete Contained Notes?",
-      paragraph: `Do you want to delete notes within ${
-        items.length > 1 ? `these ${type}s` : `this ${type}`
+      title: `Delete ${
+        items.length > 1 ? `${items.length} ${type}s` : `${type}`
       }?`,
-      positiveText: "Yes",
-      negativeText: "No",
-      positivePress: () => {
-        resolve(true);
+      positiveText: "Delete",
+      negativeText: "Cancel",
+      positivePress: (value) => {
+        console.log(value);
+        resolve({ delete: true, deleteNotes: value });
       },
       onClose: () => {
-        resolve(false);
+        resolve({ delete: false });
       },
-      context: context
+      context: context,
+      check: {
+        info: `Move all notes in ${
+          items.length > 1 ? `these ${type}s` : `this ${type}`
+        } to trash`,
+        type: "transparent"
+      }
     });
   });
 }
@@ -107,50 +113,49 @@ export const deleteItems = async (item, context) => {
   }
 
   if (topics?.length > 0) {
-    const deleteNotes = await deleteNotesConfirmDialog(
-      topics,
-      "topic",
-      context
-    );
-    for (const topic of topics) {
-      if (deleteNotes) {
-        const notes = db.notebooks
-          .notebook(topic.notebookId)
-          .topics.topic(topic.id).all;
-        await db.notes.delete(...notes.map((note) => note.id));
-      }
-      await db.notebooks.notebook(topic.notebookId).topics.delete(topic.id);
-    }
-    routesForUpdate.push("Notebook", "Notebooks");
-    useMenuStore.getState().setMenuPins();
-    ToastEvent.show({
-      heading: `${topics.length > 1 ? "Topics" : "Topic"} deleted`,
-      type: "success"
-    });
-  }
-
-  if (notebooks?.length > 0) {
-    const deleteNotes = await deleteNotesConfirmDialog(
-      notebooks,
-      "notebook",
-      context
-    );
-
-    let ids = notebooks.map((i) => i.id);
-    if (deleteNotes) {
-      for (let id of ids) {
-        const topics = db.notebooks.notebook(id).topics.all;
-        for (let topic of topics) {
+    const result = await deleteConfirmDialog(topics, "topic", context);
+    if (result.delete) {
+      for (const topic of topics) {
+        if (result.deleteNotes) {
           const notes = db.notebooks
             .notebook(topic.notebookId)
             .topics.topic(topic.id).all;
           await db.notes.delete(...notes.map((note) => note.id));
         }
+        await db.notebooks.notebook(topic.notebookId).topics.delete(topic.id);
       }
+      routesForUpdate.push("Notebook", "Notebooks");
+      useMenuStore.getState().setMenuPins();
+      ToastEvent.show({
+        heading: `${topics.length > 1 ? "Topics" : "Topic"} deleted`,
+        type: "success"
+      });
     }
-    await db.notebooks.delete(...ids);
-    routesForUpdate.push("Notebook", "Notebooks");
-    useMenuStore.getState().setMenuPins();
+  }
+
+  if (notebooks?.length > 0) {
+    const result = await deleteConfirmDialog(notebooks, "notebook", context);
+
+    if (result.delete) {
+      let ids = notebooks.map((i) => i.id);
+      if (result.deleteNotes) {
+        for (let id of ids) {
+          const notebook = db.notebooks.notebook(id);
+          const topics = notebook.topics.all;
+          for (let topic of topics) {
+            const notes = db.notebooks
+              .notebook(topic.notebookId)
+              .topics.topic(topic.id).all;
+            await db.notes.delete(...notes.map((note) => note.id));
+          }
+          const notes = db.relations.from(notebook.data, "note");
+          await db.notes.delete(...notes.map((note) => note.id));
+        }
+      }
+      await db.notebooks.delete(...ids);
+      routesForUpdate.push("Notebook", "Notebooks");
+      useMenuStore.getState().setMenuPins();
+    }
   }
 
   Navigation.queueRoutesForUpdate(...routesForUpdate);
