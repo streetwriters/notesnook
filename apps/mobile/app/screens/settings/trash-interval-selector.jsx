@@ -24,6 +24,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { PressableButton } from "../../components/ui/pressable";
 import Paragraph from "../../components/ui/typography/paragraph";
+import PremiumService from "../../services/premium";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 
@@ -34,6 +35,13 @@ export const TrashIntervalSelector = () => {
   );
   const menuRef = useRef();
   const [width, setWidth] = useState(0);
+
+  const onChange = (item) => {
+    menuRef.current?.hide();
+    setTrashInterval(item);
+    db.settings.setTrashCleanupInterval(item);
+  };
+
   return (
     <View
       onLayout={(event) => {
@@ -77,31 +85,32 @@ export const TrashIntervalSelector = () => {
           </PressableButton>
         }
       >
-        {[-1, 7, 30, 365].map(
-          (item) =>
-            item.name !== "Monographs" && (
-              <MenuItem
-                key={item.name}
-                onPress={async () => {
-                  menuRef.current?.hide();
-                  setTrashInterval(item);
-                  db.settings.setTrashCleanupInterval(item);
-                }}
-                style={{
-                  backgroundColor:
-                    trashInterval === item ? colors.nav : "transparent",
-                  width: "100%",
-                  maxWidth: width
-                }}
-                textStyle={{
-                  fontSize: SIZE.md,
-                  color: trashInterval === item ? colors.accent : colors.pri
-                }}
-              >
-                {item === -1 ? "Never" : item + " days"}
-              </MenuItem>
-            )
-        )}
+        {[-1, 7, 30, 365].map((item) => (
+          <MenuItem
+            key={item.name}
+            onPress={async () => {
+              if (item === -1) {
+                await PremiumService.verify(() => {
+                  onChange(item);
+                });
+                return;
+              }
+              onChange(item);
+            }}
+            style={{
+              backgroundColor:
+                trashInterval === item ? colors.nav : "transparent",
+              width: "100%",
+              maxWidth: width
+            }}
+            textStyle={{
+              fontSize: SIZE.md,
+              color: trashInterval === item ? colors.accent : colors.pri
+            }}
+          >
+            {item === -1 ? "Never" : item + " days"}
+          </MenuItem>
+        ))}
       </Menu>
     </View>
   );
