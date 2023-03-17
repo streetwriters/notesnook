@@ -32,6 +32,7 @@ function Reminders() {
     <>
       <ListContainer
         type="reminders"
+        groupType="reminders"
         refresh={refresh}
         items={reminders}
         placeholder={<Placeholder context="reminders" />}
