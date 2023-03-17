@@ -116,17 +116,11 @@ async function importNotebook(notebook: Notebook) {
   if (!nb) {
     const nbId = await db.notebooks?.add({
       title: notebook.notebook,
-      topics: [notebook.topic]
+      topics: notebook.topic ? [notebook.topic] : []
     });
     nb = db.notebooks?.notebook(nbId).data;
   }
-
-  let topic = nb?.topics.find((t: any) => t.title === notebook.topic);
-  if (!topic) {
-    const topics = db.notebooks?.notebook(nb).topics;
-    await topics?.add(notebook.topic);
-    topic = topics?.all.find((t) => t.title === notebook.topic);
-  }
+  const topic = nb?.topics.find((t: any) => t.title === notebook.topic);
 
   return { id: nb.id, topic: topic.id };
 }
