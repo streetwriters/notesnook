@@ -93,7 +93,13 @@ NewFeature.present = () => {
     });
     return;
   }
-  if (version && version === getVersion()) return false;
+  if (!version || version === getVersion()) {
+    SettingsService.set({
+      version: getVersion()
+    });
+    return false;
+  }
+
   SettingsService.set({
     version: getVersion()
   });
