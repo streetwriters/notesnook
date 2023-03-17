@@ -126,7 +126,7 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const PLACEHOLDER_DATA = {
     heading: params.current.item?.title,
     paragraph: "You have not added any notes yet.",
-    button: "Add first note",
+    button: "Add your first note",
     action: openEditor,
     loading: "Loading notebook notes"
   };

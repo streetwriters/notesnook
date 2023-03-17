@@ -164,8 +164,7 @@ export const TopicsSheet = () => {
       ref={ref}
       isModal={false}
       containerStyle={{
-        height: 530,
-        maxHeight: 800,
+        maxHeight: 600,
         borderTopRightRadius: 15,
         borderTopLeftRadius: 15,
         backgroundColor: colors.bg,
@@ -239,7 +238,7 @@ export const TopicsSheet = () => {
     >
       <View
         style={{
-          height: 530,
+          maxHeight: 600,
           width: "100%"
         }}
       >
@@ -322,6 +321,18 @@ export const TopicsSheet = () => {
             }
             keyExtractor={(item) => item.id}
             renderItem={renderTopic}
+            ListEmptyComponent={
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: 300
+                }}
+              >
+                <Paragraph color={colors.icon}>No topics</Paragraph>
+              </View>
+            }
             ListFooterComponent={<View style={{ height: 50 }} />}
           />
         </SelectionContext.Provider>
