@@ -34,5 +34,6 @@ export const EventTypes = {
   fullscreen: "editor-event:fullscreen",
   link: "editor-event:link",
   contentchange: "editor-event:content-change",
-  reminders: "editor-event:reminders"
+  reminders: "editor-event:reminders",
+  previewAttachment: "editor-event:preview-attachment"
 };
