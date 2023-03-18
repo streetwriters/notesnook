@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Node, mergeAttributes, findChildren, Editor } from "@tiptap/core";
+import {
+  Node,
+  mergeAttributes,
+  findChildren,
+  Editor,
+  findParentNode
+} from "@tiptap/core";
 import { NodeType } from "prosemirror-model";
 import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { onArrowUpPressed, onBackspacePressed } from "../list-item/commands";
@@ -145,9 +151,34 @@ export const OutlineListItem = Node.create<ListItemOptions>({
         const clientY =
           e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
 
-        const { x, y } = li.getBoundingClientRect();
+        const { x, y,left,right, } = li.getBoundingClientRect();
 
         const hitArea = { width: 26, height: 24 };
+
+        const selection = editor.state.selection;
+        const parent = findParentNode((node) => !!node.attrs.textDirection)(
+          selection
+        );
+        console.log("addNodeView", left,right,clientX);
+        if (parent) {
+          if (parent.node.attrs.textDirection === "rtl") {
+            //x = clientX / 2 + x;
+          }
+        }
+        console.log(
+          "clientX<=x",
+          clientX <= x,
+          "clientX >= x - hitArea.width",
+          clientX >= x - hitArea.width,
+          "clientY >= y",
+          clientY >= y,
+          "clientY <= y + hitArea.height",
+          clientY <= y + hitArea.height,
+          " x",
+          x,
+          "clientX",
+          clientX
+        );
         if (
           clientX >= x - hitArea.width &&
           clientX <= x &&

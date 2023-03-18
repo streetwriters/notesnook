@@ -134,9 +134,10 @@ export const OutlineList = Node.create<OutlineListOptions>({
   },
 
   addNodeView() {
-    return () => {
+    return ({ HTMLAttributes }) => {
       const ul = document.createElement("ul");
       ul.classList.add("outline-list");
+      if (HTMLAttributes.dir) ul.dir = HTMLAttributes.dir;
       return {
         dom: ul,
         contentDOM: ul
