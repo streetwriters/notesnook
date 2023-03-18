@@ -141,7 +141,7 @@ const otherItems = [
     description: `version ${appVersion.formatted}`,
     onClick: async () => {
       await writeText(`version ${appVersion.formatted}`);
-      showToast("info", "copied to Clipboard");
+      showToast("info", "Copied to clipboard!");
     }
   }
 ];
