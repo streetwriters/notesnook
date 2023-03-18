@@ -28,7 +28,7 @@ import { EV, EVENTS } from "@notesnook/core/common";
 import { hashNavigate } from "../navigation";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
-import { updateWebTitle } from "../utils/updateWebTitle";
+import { setDocumentTitle } from "../utils/dom";
 
 const SESSION_STATES = {
   stale: "stale",
@@ -131,7 +131,8 @@ class EditorStore extends BaseStore {
     if (!note) return;
 
     noteStore.setSelectedNote(note.id);
-    updateWebTitle(note.title);
+
+    setDocumentTitle(note.title);
 
     if (note.locked)
       return hashNavigate(`/notes/${noteId}/unlock`, { replace: true });
