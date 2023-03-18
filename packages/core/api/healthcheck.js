@@ -16,24 +16,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-export const EventTypes = {
-  selection: "editor-event:selection",
-  content: "editor-event:content",
-  title: "editor-event:title",
-  scroll: "editor-event:scroll",
-  history: "editor-event:history",
-  newtag: "editor-event:newtag",
-  tag: "editor-event:tag",
-  filepicker: "editor-event:picker",
-  download: "editor-event:download-attachment",
-  logger: "native:logger",
-  back: "editor-event:back",
-  pro: "editor-event:pro",
-  monograph: "editor-event:monograph",
-  properties: "editor-event:properties",
-  fullscreen: "editor-event:fullscreen",
-  link: "editor-event:link",
-  contentchange: "editor-event:content-change",
-  reminders: "editor-event:reminders",
-  previewAttachment: "editor-event:preview-attachment"
-};
+import hosts from "../utils/constants";
+import http from "../utils/http";
+
+export class HealthCheck {
+  static async isAuthServerHealthy() {
+    try {
+      const response = await http.get(`${hosts.AUTH_HOST}/health`);
+      return response.trim() === "Healthy";
+    } catch {
+      return false;
+    }
+  }
+}

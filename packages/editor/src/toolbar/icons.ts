@@ -113,7 +113,8 @@ import {
   mdiWeb,
   mdiPageNextOutline,
   mdiSortBoolAscendingVariant,
-  mdiApplicationCogOutline
+  mdiApplicationCogOutline,
+  mdiArrowExpand
 } from "@mdi/js";
 
 export const Icons = {
@@ -156,6 +157,7 @@ export const Icons = {
   fullscreen: mdiFullscreen,
   url: mdiLink,
   image: mdiImageOutline,
+  previewAttachment: mdiArrowExpand,
   imageDownload: mdiProgressDownload,
   imageFailed: mdiProgressAlert,
   imageSettings: mdiImageEditOutline,

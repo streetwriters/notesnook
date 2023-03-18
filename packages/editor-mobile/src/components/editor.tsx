@@ -92,6 +92,10 @@ const Tiptap = ({
         global.editorController.downloadAttachment(attachment);
         return true;
       },
+      onPreviewAttachment(editor, attachment) {
+        global.editorController.previewAttachment(attachment);
+        return true;
+      },
       theme: editorTheme,
       element: !layout ? undefined : contentRef.current || undefined,
       editable: !settings.readonly,

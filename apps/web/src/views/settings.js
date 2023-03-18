@@ -149,6 +149,7 @@ function Settings() {
     developer: false,
     notifications: false,
     desktop: false,
+    trash: false,
     other: true
   });
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
@@ -187,6 +188,7 @@ function Settings() {
     "backupReminderOffset",
     0
   );
+  const [trashCleanupInterval, setTrashCleanupInterval] = useState(7);
   const [debugMode, setDebugMode] = usePersistentState("debugMode", false);
   const [homepage, setHomepage] = usePersistentState("homepage", 0);
   const [backupStorageLocation, setBackupStorageLocation] = usePersistentState(
@@ -512,7 +514,12 @@ function Settings() {
             <OptionsItem
               title={"Homepage"}
               tip={"Default screen to open on app startup."}
-              options={["Notes", "Notebooks", "Favorites", "Tags"]}
+              options={[
+                { value: 0, title: "Notes" },
+                { value: 1, title: "Notebooks" },
+                { value: 2, title: "Favorites" },
+                { value: 3, title: "Tags" }
+              ]}
               premium
               selectedOption={homepage}
               onSelectionChanged={(_option, index) => setHomepage(index)}
@@ -700,18 +707,15 @@ function Settings() {
               tip={
                 "Create a zip file containing all your notes as TXT, MD or HTML files"
               }
-              options={["Text", "Markdown", "HTML"]}
-              selectedOption={-1}
+              options={[
+                { value: "txt", title: "Text" },
+                { value: "md", title: "Markdown", premium: true },
+                { value: "html", title: "HTML", premium: true }
+              ]}
               onSelectionChanged={async (option) => {
                 await db.notes.init();
-                const format =
-                  option === "Text"
-                    ? "txt"
-                    : option === "Markdown"
-                    ? "md"
-                    : "html";
                 await exportNotes(
-                  format,
+                  option.value,
                   db.notes.all.map((n) => n.id)
                 );
               }}
@@ -748,11 +752,16 @@ function Settings() {
                       ? "Automatically backup my data"
                       : "Remind me to backup my data"
                   }
-                  options={["Never", "Daily", "Weekly", "Monthly"]}
+                  options={[
+                    { value: 0, title: "Never" },
+                    { value: 1, title: "Daily" },
+                    { value: 2, title: "Weekly" },
+                    { value: 3, title: "Monthly" }
+                  ]}
                   premium="backups"
                   selectedOption={backupReminderOffset}
-                  onSelectionChanged={async (_option, index) =>
-                    setBackupReminderOffset(index)
+                  onSelectionChanged={(option) =>
+                    setBackupReminderOffset(option.value)
                   }
                 />
                 {isDesktop() ? (
@@ -779,7 +788,31 @@ function Settings() {
             )}
           </>
         )}
-
+        <Header
+          title="Trash settings"
+          isOpen={groups.trash}
+          testId="trash-settings"
+          onClick={() => {
+            setGroups((g) => ({ ...g, trash: !g.trash }));
+          }}
+        />
+        {groups.trash && (
+          <OptionsItem
+            title="Clear trash interval"
+            tip={"Permanently delete all items in the trash"}
+            options={[
+              { value: 7, title: "Weekly" },
+              { value: 30, title: "Monthly" },
+              { value: 365, title: "Yearly" },
+              { value: -1, title: "Never", premium: true }
+            ]}
+            selectedOption={trashCleanupInterval}
+            onSelectionChanged={async (option) => {
+              setTrashCleanupInterval(option.value);
+              await db.settings.setTrashCleanupInterval(option.value);
+            }}
+          />
+        )}
         <Header
           title="Notesnook Importer"
           isOpen={groups.importer}
@@ -1100,27 +1133,31 @@ function OptionsItem(props) {
       >
         {options.map((option, index) => (
           <Text
-            key={option}
-            bg={selectedOption === index ? "primary" : "transparent"}
+            key={option.value}
+            bg={selectedOption === option.value ? "primary" : "transparent"}
             variant="subBody"
             p={2}
             py={1}
             onClick={async () => {
-              if (isUserPremium() || !premium)
+              const isPremium = premium || option.premium;
+              if (isUserPremium() || !isPremium)
                 onSelectionChanged(option, index);
               else {
                 await showBuyDialog();
               }
             }}
             sx={{
-              ":hover": { color: selectedOption === index ? "static" : "text" },
+              ":hover": {
+                color: selectedOption === option.value ? "static" : "text"
+              },
               flex: 1,
               textAlign: "center",
-              color: selectedOption === index ? "static" : "bgSecondaryText",
-              minWidth: 100
+              color:
+                selectedOption === option.value ? "static" : "bgSecondaryText",
+              minWidth: 70
             }}
           >
-            {option}
+            {option.title}
           </Text>
         ))}
       </Flex>

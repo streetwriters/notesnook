@@ -58,6 +58,7 @@ export type EditorController = {
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   openFilePicker: (type: "image" | "file" | "camera") => void;
   downloadAttachment: (attachment: Attachment) => void;
+  previewAttachment: (attachment: Attachment) => void;
   content: MutableRefObject<string | null>;
   onUpdate: () => void;
   titlePlaceholder: string;
@@ -170,7 +171,9 @@ export function useEditorController(update: () => void): EditorController {
   const downloadAttachment = useCallback((attachment: Attachment) => {
     post(EventTypes.download, attachment);
   }, []);
-
+  const previewAttachment = useCallback((attachment: Attachment) => {
+    post(EventTypes.previewAttachment, attachment);
+  }, []);
   const openLink = useCallback((url: string) => {
     post(EventTypes.link, url);
     return true;
@@ -187,6 +190,7 @@ export function useEditorController(update: () => void): EditorController {
     setTitlePlaceholder,
     openFilePicker,
     downloadAttachment,
+    previewAttachment,
     content: htmlContentRef,
     openLink,
     onUpdate: onUpdate

@@ -38,8 +38,10 @@ export default class Trash {
 
   async cleanup() {
     const now = dayjs().unix();
+    const duration = this._db.settings.getTrashCleanupInterval();
+    if (duration === -1 || !duration) return;
     for (const item of this.all) {
-      if (dayjs(item.dateDeleted).add(7, "days").unix() > now) continue;
+      if (dayjs(item.dateDeleted).add(duration, "days").unix() > now) continue;
       await this.delete(item.id);
     }
   }
