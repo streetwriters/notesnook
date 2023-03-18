@@ -226,6 +226,8 @@ class EditorStore extends BaseStore {
       });
 
       this.setSaveState(1);
+      setDocumentTitle(note.title);
+
     } catch (err) {
       this.setSaveState(-1);
       logger.error(err);
