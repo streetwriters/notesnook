@@ -19,7 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { UnionCommands, Editor as TiptapEditor } from "@tiptap/core";
 
-export type PermissionRequestEvent = CustomEvent<{ id: keyof UnionCommands }>;
+export type Commands = keyof UnionCommands | "exportToCSV";
+export type PermissionRequestEvent = CustomEvent<{ id: Commands }>;
 
 export class Editor extends TiptapEditor {
   /**
@@ -35,7 +36,7 @@ export class Editor extends TiptapEditor {
    * @param id the command id to get permission for
    * @returns latest editor instance
    */
-  requestPermission(id: keyof UnionCommands): TiptapEditor | undefined {
+  requestPermission(id: Commands): TiptapEditor | undefined {
     const event = new CustomEvent("permissionrequest", {
       detail: { id },
       cancelable: true

@@ -21,13 +21,17 @@ import { Editor } from "@tiptap/core";
 import { selectedRect, TableRect } from "@tiptap/pm/tables";
 import { Transaction } from "prosemirror-state";
 import { Node } from "prosemirror-model";
+import { unparse } from "papaparse";
+import { saveAs } from "file-saver";
 
 type TableCell = {
   cell: Node;
   pos: number;
 };
 
-function moveColumnRight(editor: Editor) {
+function moveColumnRight(editor?: Editor) {
+  if (!editor) return;
+
   const { tr } = editor.state;
   const rect = selectedRect(editor.state);
   if (rect.right === rect.map.width) return;
@@ -38,7 +42,9 @@ function moveColumnRight(editor: Editor) {
   editor.view.dispatch(transaction);
 }
 
-function moveColumnLeft(editor: Editor) {
+function moveColumnLeft(editor?: Editor) {
+  if (!editor) return;
+
   const { tr } = editor.state;
   const rect = selectedRect(editor.state);
   if (rect.left === 0) return;
@@ -49,7 +55,9 @@ function moveColumnLeft(editor: Editor) {
   editor.view.dispatch(transaction);
 }
 
-function moveRowDown(editor: Editor) {
+function moveRowDown(editor?: Editor) {
+  if (!editor) return;
+
   const { tr } = editor.state;
   const rect = selectedRect(editor.state);
   if (rect.top + 1 === rect.map.height) return;
@@ -60,7 +68,9 @@ function moveRowDown(editor: Editor) {
   editor.view.dispatch(transaction);
 }
 
-function moveRowUp(editor: Editor) {
+function moveRowUp(editor?: Editor) {
+  if (!editor) return;
+
   const { tr } = editor.state;
   const rect = selectedRect(editor.state);
   if (rect.top === 0) return;
@@ -159,4 +169,19 @@ function moveCells(
   return tr;
 }
 
-export { moveColumnLeft, moveColumnRight, moveRowDown, moveRowUp };
+function exportToCSV(editor?: Editor) {
+  if (!editor) return;
+
+  const rect = selectedRect(editor.state);
+
+  const rows: string[][] = [];
+  rect.table.forEach((node) => {
+    const row: string[] = [];
+    node.forEach((cell) => row.push(cell.textContent));
+    rows.push(row);
+  });
+
+  saveAs(new Blob([new TextEncoder().encode(unparse(rows))]), "table.csv");
+}
+
+export { moveColumnLeft, moveColumnRight, moveRowDown, moveRowUp, exportToCSV };

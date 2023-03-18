@@ -217,6 +217,11 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: "Delete table",
     conditional: true
   },
+  exportToCSV: {
+    icon: "csv",
+    title: "Export to CSV",
+    conditional: true
+  },
   cellBackgroundColor: {
     icon: "backgroundColor",
     title: "Cell background color",

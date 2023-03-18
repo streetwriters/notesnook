@@ -27,7 +27,8 @@ import {
   moveColumnLeft as moveColumnLeftAction,
   moveColumnRight as moveColumnRightAction,
   moveRowDown as moveRowDownAction,
-  moveRowUp as moveRowUpAction
+  moveRowUp as moveRowUpAction,
+  exportToCSV as exportToCSVAction
 } from "../../extensions/table/actions";
 import { MoreTools } from "../components/more-tools";
 import { menuButtonToTool } from "./utils";
@@ -166,6 +167,7 @@ export function TableProperties(props: ToolProps) {
       splitCells(editor),
       cellProperties(editor),
       { type: "separator", key: "tableSeperator" },
+      exportToCSV(editor),
       deleteTable(editor)
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -334,14 +336,14 @@ const moveColumnLeft = (editor: Editor): MenuButton => ({
   ...getToolDefinition("moveColumnLeft"),
   key: "moveColumnLeft",
   type: "button",
-  onClick: () => moveColumnLeftAction(editor)
+  onClick: () => moveColumnLeftAction(editor.current)
 });
 
 const moveColumnRight = (editor: Editor): MenuButton => ({
   ...getToolDefinition("moveColumnRight"),
   key: "moveColumnRight",
   type: "button",
-  onClick: () => moveColumnRightAction(editor)
+  onClick: () => moveColumnRightAction(editor.current)
 });
 
 const deleteColumn = (editor: Editor): MenuButton => ({
@@ -383,13 +385,13 @@ const moveRowUp = (editor: Editor): MenuButton => ({
   ...getToolDefinition("moveRowUp"),
   key: "moveRowUp",
   type: "button",
-  onClick: () => moveRowUpAction(editor)
+  onClick: () => moveRowUpAction(editor.current)
 });
 const moveRowDown = (editor: Editor): MenuButton => ({
   ...getToolDefinition("moveRowDown"),
   key: "moveRowDown",
   type: "button",
-  onClick: () => moveRowDownAction(editor)
+  onClick: () => moveRowDownAction(editor.current)
 });
 
 const deleteRow = (editor: Editor): MenuButton => ({
@@ -404,6 +406,13 @@ const deleteTable = (editor: Editor): MenuButton => ({
   key: "deleteTable",
   type: "button",
   onClick: () => editor.current?.chain().focus().deleteTable().run()
+});
+
+const exportToCSV = (editor: Editor): MenuButton => ({
+  ...getToolDefinition("exportToCSV"),
+  key: "exportToCSV",
+  type: "button",
+  onClick: () => exportToCSVAction(editor.requestPermission("exportToCSV"))
 });
 
 const cellProperties = (editor: Editor): MenuButton => ({
@@ -430,3 +439,4 @@ export const MoveRowUp = menuButtonToTool(moveRowUp);
 export const MoveRowDown = menuButtonToTool(moveRowDown);
 export const DeleteRow = menuButtonToTool(deleteRow);
 export const DeleteTable = menuButtonToTool(deleteTable);
+export const ExportToCSV = menuButtonToTool(exportToCSV);

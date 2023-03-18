@@ -17,18 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { UnionCommands } from "@tiptap/core";
 import { useEffect } from "react";
-import { PermissionRequestEvent } from "../types";
+import { PermissionRequestEvent, Commands } from "../types";
 
 export type Claims = "premium";
 export type PermissionHandlerOptions = {
   claims: Record<Claims, boolean>;
-  onPermissionDenied: (claim: Claims, id: keyof UnionCommands) => void;
+  onPermissionDenied: (claim: Claims, id: Commands) => void;
 };
 
-const ClaimsMap: Record<Claims, (keyof UnionCommands)[]> = {
-  premium: ["insertImage"]
+const ClaimsMap: Record<Claims, Commands[]> = {
+  premium: ["insertImage", "exportToCSV"]
 };
 
 export function usePermissionHandler(options: PermissionHandlerOptions) {

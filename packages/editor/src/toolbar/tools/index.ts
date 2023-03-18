@@ -59,7 +59,8 @@ import {
   CellBackgroundColor,
   CellBorderColor,
   CellTextColor,
-  CellBorderWidth
+  CellBorderWidth,
+  ExportToCSV
 } from "./table";
 import {
   ImageSettings,
@@ -160,6 +161,7 @@ const tools = {
   moveRowDown: MoveRowDown,
   deleteRow: DeleteRow,
   deleteTable: DeleteTable,
+  exportToCSV: ExportToCSV,
 
   outdent: Outdent,
   indent: Indent,
