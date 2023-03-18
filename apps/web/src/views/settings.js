@@ -78,6 +78,7 @@ import usePrivacyMode from "../hooks/use-privacy-mode";
 import { useTelemetry } from "../hooks/use-telemetry";
 import useSpellChecker from "../hooks/use-spell-checker";
 import useDesktopIntegration from "../hooks/use-desktop-integration";
+import { writeText } from "clipboard-polyfill";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -134,6 +135,14 @@ const otherItems = [
     title: "Roadmap",
     description: "See what the future of Notesnook is going to be like!",
     link: "https://notesnook.com/roadmap"
+  },
+  {
+    title: "About",
+    description: `version ${appVersion.formatted}`,
+    onClick: async () => {
+      await writeText(`version ${appVersion.formatted}`);
+      showToast("info", "copied to Clipboard");
+    }
   }
 ];
 
@@ -1000,11 +1009,6 @@ function Settings() {
                 <Tip text={item.title} tip={item.description} />
               </Button>
             ))}
-            <Tip
-              sx={{ mt: 2 }}
-              text="About"
-              tip={`version ${appVersion.formatted}`}
-            />
           </>
         )}
         {isLoggedIn && (
