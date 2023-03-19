@@ -28,6 +28,7 @@ import { EV, EVENTS } from "@notesnook/core/common";
 import { hashNavigate } from "../navigation";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
+import { setDocumentTitle } from "../utils/dom";
 
 const SESSION_STATES = {
   stale: "stale",
@@ -131,6 +132,8 @@ class EditorStore extends BaseStore {
 
     noteStore.setSelectedNote(note.id);
 
+    setDocumentTitle(note.title);
+
     if (note.locked)
       return hashNavigate(`/notes/${noteId}/unlock`, { replace: true });
     if (note.conflicted)
@@ -224,6 +227,8 @@ class EditorStore extends BaseStore {
       });
 
       this.setSaveState(1);
+      setDocumentTitle(note.title);
+
     } catch (err) {
       this.setSaveState(-1);
       logger.error(err);
