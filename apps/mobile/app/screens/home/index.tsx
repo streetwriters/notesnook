@@ -65,7 +65,6 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
     onBlur: () => false,
     delay: SettingsService.get().homepage === route.name ? 1 : -1
   });
-
   return (
     <DelayLayout wait={loading} delay={500}>
       <List

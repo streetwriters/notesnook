@@ -23,8 +23,8 @@ import { ItemModel } from "./item.model";
 import { Item } from "./types";
 
 export class SearchViewModel extends BaseViewModel {
-  constructor(page: Page) {
-    super(page, "general");
+  constructor(page: Page, type: string) {
+    super(page, "general", type);
   }
 
   async findItem(item: Item) {

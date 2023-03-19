@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import ListItem from "../list-item";
-import { Flex, Text } from "@theme-ui/components";
+import { Flex } from "@theme-ui/components";
 import * as Icon from "../icons";
 import IconTag from "../icon-tag";
 import {
@@ -164,15 +164,11 @@ const menuItems: MenuItem[] = [
     onClick: async ({ items }) => {
       confirm({
         title: `Delete ${pluralize(items.length, "reminder", "reminders")}`,
-        message: (
-          <Text>
-            Are you sure you want to proceed?
-            <Text sx={{ color: "error" }}> This action is IRREVERSIBLE.</Text>
-          </Text>
-        ),
-        yesText: "Yes",
-        noText: "No",
-        yesAction: () => Multiselect.moveRemindersToTrash(items)
+        message: `Are you sure you want to proceed? **This action is IRREVERSIBLE**.`,
+        positiveButtonText: "Yes",
+        negativeButtonText: "No"
+      }).then((result) => {
+        result && Multiselect.moveRemindersToTrash(items);
       });
     },
     multiSelect: true

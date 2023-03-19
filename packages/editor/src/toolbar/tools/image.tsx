@@ -43,8 +43,14 @@ export function ImageSettings(props: ToolProps) {
       popupId="imageSettings"
       tools={
         findSelectedNode(editor, "image")?.attrs?.float
-          ? ["imageAlignLeft", "imageAlignRight", "imageProperties"]
+          ? [
+              "downloadAttachment",
+              "imageAlignLeft",
+              "imageAlignRight",
+              "imageProperties"
+            ]
           : [
+              "downloadAttachment",
               "imageAlignLeft",
               "imageAlignCenter",
               "imageAlignRight",

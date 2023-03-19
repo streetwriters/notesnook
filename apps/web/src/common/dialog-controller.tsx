@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ReactDOM from "react-dom";
 import { Dialogs } from "../components/dialogs";
-import { hardNavigate } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import qclone from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
@@ -29,7 +28,7 @@ import { store as editorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
-import { Flex, Text } from "@theme-ui/components";
+import { Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
 import { formatDate } from "@notesnook/core/utils/date";
@@ -41,10 +40,11 @@ import { FeatureKeys } from "../components/dialogs/feature-dialog";
 import { AuthenticatorType } from "../components/dialogs/mfa/types";
 import { Suspense } from "react";
 import { Reminder } from "@notesnook/core/collections/reminders";
+import { ConfirmDialogProps } from "../components/dialogs/confirm";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
-export type Perform = (result: boolean) => void;
+export type Perform<T = boolean> = (result: T) => void;
 type RenderDialog<TId extends DialogIds, TReturnType> = (
   dialog: DialogTypes[TId],
   perform: (result: TReturnType) => void
@@ -154,26 +154,15 @@ export function showBuyDialog(plan?: Period, couponCode?: string) {
   ));
 }
 
-type ConfirmDialogProps = {
-  title?: string;
-  subtitle?: string;
-  message?: string | JSX.Element;
-  yesText?: string;
-  noText?: string;
-  yesAction?: () => void;
-  width?: string;
-};
-export function confirm(props: ConfirmDialogProps) {
-  return showDialog("Confirm", (Dialog, perform) => (
-    <Dialog
-      {...props}
-      onNo={() => perform(false)}
-      onYes={() => {
-        if (props.yesAction) props.yesAction();
-        perform(true);
-      }}
-    />
-  ));
+export function confirm<TCheckId extends string>(
+  props: Omit<ConfirmDialogProps<TCheckId>, "onClose">
+) {
+  return showDialog<"Confirm", false | Record<TCheckId, boolean>>(
+    "Confirm",
+    (Dialog, perform) => (
+      <Dialog {...props} onClose={(result) => perform(result)} />
+    )
+  );
 }
 
 export function showPromptDialog(props: {
@@ -214,41 +203,26 @@ export function showToolbarConfigDialog() {
 }
 
 export function showError(title: string, message: string) {
-  return confirm({ title, message, yesText: "Okay" });
+  return confirm({ title, message, positiveButtonText: "Okay" });
 }
 
 export function showMultiDeleteConfirmation(length: number) {
   return confirm({
     title: `Delete ${length} items?`,
-    message: (
-      <Text as="span">
-        These items will be{" "}
-        <Text as="span" sx={{ color: "primary" }}>
-          kept in your Trash for 7 days
-        </Text>{" "}
-        after which they will be permanently removed.
-      </Text>
-    ),
-    yesText: `Delete selected`,
-    noText: "Cancel"
+    message:
+      "These items will be **kept in your Trash for 7 days** after which they will be permanently deleted.",
+    positiveButtonText: "Yes",
+    negativeButtonText: "No"
   });
 }
 
 export function showMultiPermanentDeleteConfirmation(length: number) {
   return confirm({
     title: `Permanently delete ${length} items?`,
-    message: (
-      <Text as="span">
-        These items will be{" "}
-        <Text as="span" sx={{ color: "primary" }}>
-          permanently deleted
-        </Text>
-        {". "}
-        This action is IRREVERSIBLE.
-      </Text>
-    ),
-    yesText: `Permanently delete selected`,
-    noText: "Cancel"
+    message:
+      "These items will be **permanently deleted**. This is IRREVERSIBLE.",
+    positiveButtonText: "Yes",
+    negativeButtonText: "No"
   });
 }
 
@@ -257,8 +231,8 @@ export function showLogoutConfirmation() {
     title: `Logout?`,
     message:
       "Logging out will delete all local data and reset the app. Make sure you have synced your data before logging out.",
-    yesText: `Yes`,
-    noText: "No"
+    positiveButtonText: "Yes",
+    negativeButtonText: "No"
   });
 }
 
@@ -267,8 +241,8 @@ export function showClearSessionsConfirmation() {
     title: `Logout from other devices?`,
     message:
       "All other logged-in devices will be forced to logout stopping sync. Use with care lest you lose important notes.",
-    yesText: `Yes`,
-    noText: "No"
+    positiveButtonText: "Yes",
+    negativeButtonText: "No"
   });
 }
 
@@ -276,9 +250,7 @@ export function showAccountLoggedOutNotice(reason?: string) {
   return confirm({
     title: "You were logged out",
     message: reason,
-    noText: "Okay",
-    yesText: `Relogin`,
-    yesAction: () => hardNavigate("/login")
+    negativeButtonText: "Okay"
   });
 }
 
@@ -287,24 +259,13 @@ export function showAppUpdatedNotice(
 ) {
   return confirm({
     title: `Welcome to v${version.formatted}`,
-    message: (
-      <Flex
-        bg="bgSecondary"
-        p={1}
-        sx={{ borderRadius: "default", flexDirection: "column" }}
-      >
-        <Text variant="title">Changelog:</Text>
-        <Text
-          as="pre"
-          variant="body"
-          mt={1}
-          sx={{ fontFamily: "monospace", overflow: "auto" }}
-        >
-          {version.changelog || "No change log."}
-        </Text>
-      </Flex>
-    ),
-    yesText: `Yay!`
+    message: `## Changelog:
+    
+\`\`\`
+${version.changelog || "No change log."}
+\`\`\`
+`,
+    positiveButtonText: `Continue`
   });
 }
 
@@ -706,32 +667,29 @@ export function showOnboardingDialog(type: string) {
   ));
 }
 
-export function showInvalidSystemTimeDialog({
+export async function showInvalidSystemTimeDialog({
   serverTime,
   localTime
 }: {
   serverTime: number;
   localTime: number;
 }) {
-  return confirm({
+  const result = await confirm({
     title: "Your system clock is out of sync",
     subtitle:
       "Please correct your system date & time and reload the app to avoid syncing issues.",
-    message: (
-      <>
-        Server time:{" "}
-        {formatDate(serverTime, { dateStyle: "medium", timeStyle: "medium" })}
-        <br />
-        Local time:{" "}
-        {formatDate(localTime, { dateStyle: "medium", timeStyle: "medium" })}
-        <br />
-        Please sync your system time with{" "}
-        <a href="https://time.is">https://time.is/</a>.
-      </>
-    ),
-    yesText: "Reload app",
-    yesAction: () => window.location.reload()
+    message: `Server time: ${formatDate(serverTime, {
+      dateStyle: "medium",
+      timeStyle: "medium"
+    })}
+Local time: ${formatDate(localTime, {
+      dateStyle: "medium",
+      timeStyle: "medium"
+    })}
+Please sync your system time with [https://time.is](https://time.is).`,
+    positiveButtonText: "Reload app"
   });
+  if (result) window.location.reload();
 }
 
 export async function showUpdateAvailableNotice({
@@ -771,37 +729,18 @@ type UpdateDialogProps = {
     onClick: () => void;
   };
 };
-function showUpdateDialog({
+async function showUpdateDialog({
   title,
   subtitle,
   changelog,
   action
 }: UpdateDialogProps) {
-  return confirm({
+  const result = await confirm({
     title,
     subtitle,
-    message: changelog && (
-      <Flex sx={{ borderRadius: "default", flexDirection: "column" }}>
-        <Text
-          as="div"
-          variant="body"
-          sx={{ overflow: "auto", fontFamily: "body" }}
-          css={`
-            h2 {
-              font-size: 1.2em;
-              font-weight: 600;
-            }
-            h3 {
-              font-size: 1em;
-              font-weight: 600;
-            }
-          `}
-          dangerouslySetInnerHTML={{ __html: changelog }}
-        ></Text>
-      </Flex>
-    ),
-    width: "500px",
-    yesText: action.text,
-    yesAction: action.onClick
+    message: changelog,
+    width: 500,
+    positiveButtonText: action.text
   });
+  if (result && action.onClick) action.onClick();
 }

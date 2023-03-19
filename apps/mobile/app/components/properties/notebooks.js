@@ -35,8 +35,16 @@ export default function Notebooks({ note, close, full }) {
   const colors = useThemeStore((state) => state.colors);
   const notebooks = useNotebookStore((state) => state.notebooks);
   function getNotebooks(item) {
-    if (!item.notebooks || item.notebooks.length < 1) return [];
     let filteredNotebooks = [];
+    const relations = db.relations.to(note, "notebook");
+    filteredNotebooks.push(
+      ...relations.map((notebook) => ({
+        ...notebook,
+        topics: []
+      }))
+    );
+    if (!item.notebooks || item.notebooks.length < 1) return filteredNotebooks;
+
     for (let notebookReference of item.notebooks) {
       let notebook = {
         ...(notebooks.find((item) => item.id === notebookReference.id) || {})
@@ -45,7 +53,14 @@ export default function Notebooks({ note, close, full }) {
         notebook.topics = notebook.topics.filter((topic) => {
           return notebookReference.topics.findIndex((t) => t === topic.id) > -1;
         });
-        filteredNotebooks.push(notebook);
+        const index = filteredNotebooks.findIndex(
+          (item) => item.id === notebook.id
+        );
+        if (index > -1) {
+          filteredNotebooks[index].topics = notebook.topics;
+        } else {
+          filteredNotebooks.push(notebook);
+        }
       }
     }
     return filteredNotebooks;
@@ -63,7 +78,6 @@ export default function Notebooks({ note, close, full }) {
     if (!item) return;
     TopicNotes.navigate(item, true);
   };
-
   const renderItem = (item) => (
     <View
       key={item.id}
@@ -78,7 +92,8 @@ export default function Notebooks({ note, close, full }) {
         borderWidth: full ? 0 : 1,
         borderColor: colors.nav,
         borderRadius: 10,
-        backgroundColor: full ? "transparent" : colors.nav
+        backgroundColor: full ? "transparent" : colors.nav,
+        minHeight: 42
       }}
     >
       <Icon
@@ -160,7 +175,7 @@ export default function Notebooks({ note, close, full }) {
     </View>
   );
 
-  return !note.notebooks || note.notebooks.length === 0 ? null : (
+  return noteNotebooks.length === 0 ? null : (
     <View
       style={{
         width: "100%",

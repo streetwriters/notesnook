@@ -18,8 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList, ScrollView, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useActions } from "../../hooks/use-actions";
 import { DDS } from "../../services/device-detection";
@@ -85,8 +84,9 @@ export const Items = ({ item, buttons, close }) => {
     </View>
   );
 
-  const renderColumnItem = ({ item }) => (
+  const renderColumnItem = (item) => (
     <Button
+      key={item.name + item.title}
       buttonType={{
         text: item.on
           ? colors.accent
@@ -108,7 +108,8 @@ export const Items = ({ item, buttons, close }) => {
     />
   );
 
-  const renderTopBarItem = ({ item }) => {
+  const renderTopBarItem = (item, index) => {
+    const isLast = index === topBarItems.length;
     return (
       <PressableButton
         onPress={item.func}
@@ -118,7 +119,7 @@ export const Items = ({ item, buttons, close }) => {
           alignItems: "center",
           width: topBarItemWidth,
           marginBottom: 10,
-          marginRight: 10,
+          marginRight: isLast ? 0 : 10,
           backgroundColor: "transparent"
         }}
       >
@@ -169,7 +170,7 @@ export const Items = ({ item, buttons, close }) => {
     "lock-unlock",
     "publish"
   ];
-  const bottomBarItems = data.filter(
+  const topBarItems = data.filter(
     (item) => topBarItemsList.indexOf(item.id) > -1
   );
 
@@ -178,21 +179,19 @@ export const Items = ({ item, buttons, close }) => {
   );
 
   const topBarItemWidth =
-    (width - (bottomBarItems.length * 10 + 14)) / bottomBarItems.length;
+    (width - (topBarItems.length * 10 + 14)) / topBarItems.length;
 
   return item.type === "note" ? (
     <>
-      <FlatList
-        data={bottomBarItems}
-        keyExtractor={(item) => item.title}
+      <ScrollView
         horizontal
-        disableVirtualization={true}
         style={{
           paddingHorizontal: 12,
           paddingTop: 12
         }}
-        renderItem={renderTopBarItem}
-      />
+      >
+        {topBarItems.map(renderTopBarItem)}
+      </ScrollView>
 
       <FlatList
         data={bottomGridItems}
@@ -202,10 +201,8 @@ export const Items = ({ item, buttons, close }) => {
         disableVirtualization={true}
         style={{
           marginTop: item.type !== "note" ? 10 : 0,
-          paddingTop: 10
-        }}
-        columnWrapperStyle={{
-          justifyContent: "flex-start"
+          paddingTop: 10,
+          marginLeft: 6
         }}
         contentContainerStyle={{
           alignSelf: "center",
@@ -216,11 +213,6 @@ export const Items = ({ item, buttons, close }) => {
       />
     </>
   ) : (
-    <FlatList
-      data={data}
-      keyExtractor={(item) => item.title}
-      renderItem={renderColumnItem}
-      disableVirtualization={true}
-    />
+    <View data={data}>{data.map(renderColumnItem)}</View>
   );
 };

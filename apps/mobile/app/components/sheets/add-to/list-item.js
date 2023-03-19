@@ -46,25 +46,15 @@ const _ListItem = ({
   removed,
   isSelected,
   hasHeaderSearch,
-  onAddSublistItem
+  onAddSublistItem,
+  sheetRef
 }) => {
-  const { enabled, toggleSelection, setMultiSelect, select, deselect } =
-    useSelectionContext();
+  const { enabled, toggleSelection, setMultiSelect } = useSelectionContext();
   const colors = useThemeStore((state) => state.colors);
   const [expanded, setExpanded] = useState(false);
 
   function selectItem() {
-    const currentState = isSelected;
     toggleSelection(item);
-    if (item.type === "notebook") {
-      item.topics.forEach((item) => {
-        if (currentState) {
-          deselect(item);
-        } else {
-          select(item);
-        }
-      });
-    }
   }
   return (
     <View
@@ -122,9 +112,6 @@ const _ListItem = ({
                   : colors.icon
               }
               onPress={() => {
-                if (item.type === "notebook") {
-                  setMultiSelect(true);
-                }
                 selectItem();
                 if (enabled) return;
                 onPress?.(item);
@@ -205,7 +192,7 @@ const _ListItem = ({
           style={{
             width: "95%",
             alignSelf: "flex-end",
-            maxHeight: 500
+            maxHeight: 250
           }}
           itemType={sublistItemType}
           hasHeaderSearch={hasHeaderSearch}

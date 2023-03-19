@@ -54,7 +54,6 @@ import Config from "react-native-config";
 import { getGithubVersion } from "../../utils/github-version";
 import notifee from "@notifee/react-native";
 
-
 const Launcher = React.memo(
   function Launcher() {
     const colors = useThemeStore((state) => state.colors);
@@ -151,7 +150,7 @@ const Launcher = React.memo(
     }, [introCompleted]);
 
     const checkAppUpdateAvailable = async () => {
-      if (__DEV__) return;
+      if (__DEV__ || Config.isTesting === "true") return;
       try {
         const version =
           Config.GITHUB_RELEASE === "true"

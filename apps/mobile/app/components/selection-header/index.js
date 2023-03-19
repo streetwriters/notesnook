@@ -201,7 +201,7 @@ export const SelectionHeader = React.memo(() => {
           }}
         >
           <Heading size={SIZE.md} color={colors.accent}>
-            {selectedItemsList.length + " Selected"}
+            {selectedItemsList.length}
           </Heading>
         </View>
       </View>
@@ -264,19 +264,29 @@ export const SelectionHeader = React.memo(() => {
           </>
         )}
 
-        {screen === "TopicNotes" ? (
+        {screen === "TopicNotes" || screen === "Notebook" ? (
           <IconButton
             onPress={async () => {
               if (selectedItemsList.length > 0) {
-                const currentTopic =
+                const currentScreen =
                   useNavigationStore.getState().currentScreen;
-                await db.notes.removeFromNotebook(
-                  {
-                    id: currentTopic.notebookId,
-                    topic: currentTopic.id
-                  },
-                  ...selectedItemsList.map((item) => item.id)
-                );
+
+                if (screen === "Notebook") {
+                  for (const item of selectedItemsList) {
+                    await db.relations.unlink(
+                      { type: "notebook", id: currentScreen.id },
+                      item
+                    );
+                  }
+                } else {
+                  await db.notes.removeFromNotebook(
+                    {
+                      id: currentScreen.notebookId,
+                      topic: currentScreen.id
+                    },
+                    ...selectedItemsList.map((item) => item.id)
+                  );
+                }
 
                 Navigation.queueRoutesForUpdate(
                   "Notes",
@@ -293,7 +303,9 @@ export const SelectionHeader = React.memo(() => {
             customStyle={{
               marginLeft: 10
             }}
-            tooltipText="Remove from topic"
+            tooltipText={`Remove from ${
+              screen === "Notebook" ? "notebook" : "topic"
+            }`}
             tooltipPosition={4}
             testID="select-minus"
             color={colors.pri}

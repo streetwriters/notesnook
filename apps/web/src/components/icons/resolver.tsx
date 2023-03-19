@@ -17,15 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Placeholder from "./index";
+import { toTitleCase, toCamelCase, KebabCase } from "../../utils/string";
+import * as Icons from "./index";
 
-function MonographsPlaceholder() {
-  return (
-    <Placeholder
-      id="monographs"
-      title="Your monographs"
-      text="All your published notes will be shown here."
-    />
-  );
+export type IconAlias = KebabCase<keyof typeof Icons>;
+export function getIconFromAlias(alias: IconAlias) {
+  if (!alias) return;
+  const iconName = toTitleCase(toCamelCase(alias));
+  return Icons[iconName as keyof typeof Icons];
 }
-export default MonographsPlaceholder;
+export function AliasIcon(props: Icons.IconProps & { alias?: IconAlias }) {
+  if (!props.alias) return null;
+
+  const iconName = toTitleCase(toCamelCase(props.alias));
+  const Icon = Icons[iconName as keyof typeof Icons];
+  return <Icon {...props} />;
+}

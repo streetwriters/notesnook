@@ -24,7 +24,7 @@ import { TrashItemModel } from "./trash-item.model";
 
 export class TrashViewModel extends BaseViewModel {
   constructor(page: Page) {
-    super(page, "trash");
+    super(page, "trash", "trash");
   }
 
   async findItem(title: string) {

@@ -61,7 +61,7 @@ type ListContainerProps = {
   context?: Context;
   refresh: () => void;
   header?: JSX.Element;
-  placeholder: () => JSX.Element;
+  placeholder: JSX.Element;
   isLoading?: boolean;
   button?: {
     onClick: () => void;
@@ -136,7 +136,7 @@ function ListContainer(props: ListContainerProps) {
               <ListLoader />
             ) : (
               <Flex variant="columnCenterFill" data-test-id="list-placeholder">
-                <props.placeholder />
+                {props.placeholder}
               </Flex>
             )}
           </>
@@ -154,7 +154,7 @@ function ListContainer(props: ListContainerProps) {
               transition={{ duration: 0.2, delay: 0.1, ease: "easeInOut" }}
               ref={listContainerRef}
               variant="columnFill"
-              data-test-id="note-list"
+              data-test-id={`${type}-list`}
             >
               <Virtuoso
                 ref={listRef}
@@ -187,6 +187,7 @@ function ListContainer(props: ListContainerProps) {
 
                   switch (item.type) {
                     case "header":
+                      if (!groupType) return null;
                       return (
                         <GroupHeader
                           type={groupType}

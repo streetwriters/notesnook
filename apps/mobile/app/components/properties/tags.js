@@ -21,11 +21,10 @@ import React from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import { TaggedNotes } from "../../screens/notes/tagged";
-import { eSendEvent } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { eOpenTagsDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
+import ManageTagsSheet from "../sheets/manage-tags";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
 export const Tags = ({ item, close }) => {
@@ -41,14 +40,14 @@ export const Tags = ({ item, close }) => {
         flexWrap: "wrap",
         alignItems: "center",
         paddingHorizontal: 12,
-        alignSelf: "center"
+        alignSelf: "center",
+        justifyContent: "space-between",
+        width: "100%"
       }}
     >
       <Button
         onPress={async () => {
-          close();
-          await sleep(300);
-          eSendEvent(eOpenTagsDialog, item);
+          ManageTagsSheet.present(item);
         }}
         buttonType={{
           text: colors.accent
@@ -79,8 +78,8 @@ export const TagStrip = ({ item, close }) => {
         alignItems: "center"
       }}
     >
-      {item.tags.map((item) =>
-        item ? <TagItem key={item} tag={item} close={close} /> : null
+      {item.tags.map((tag) =>
+        tag ? <TagItem key={tag} tag={item} close={close} /> : null
       )}
     </View>
   ) : null;

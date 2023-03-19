@@ -58,16 +58,18 @@ export const TopicNotes = ({
   route
 }: NavigationProps<"TopicNotes">) => {
   return (
-    <NotesPage
-      navigation={navigation}
-      route={route}
-      get={TopicNotes.get}
-      placeholderData={PLACEHOLDER_DATA}
-      onPressFloatingButton={openEditor}
-      rightButtons={headerRightButtons}
-      canGoBack={route.params.canGoBack}
-      focusControl={true}
-    />
+    <>
+      <NotesPage
+        navigation={navigation}
+        route={route}
+        get={TopicNotes.get}
+        placeholderData={PLACEHOLDER_DATA}
+        onPressFloatingButton={openEditor}
+        rightButtons={headerRightButtons}
+        canGoBack={route.params.canGoBack}
+        focusControl={true}
+      />
+    </>
   );
 };
 

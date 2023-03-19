@@ -30,7 +30,6 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { eScrollEvent } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import Heading from "../ui/typography/heading";
-import Paragraph from "../ui/typography/paragraph";
 import { useCallback } from "react";
 import Tag from "../ui/tag";
 
@@ -113,24 +112,15 @@ export const Title = () => {
         <Heading
           onPress={navigateToNotebook}
           numberOfLines={isTopic ? 2 : 1}
-          size={isTopic ? SIZE.md + 2 : SIZE.xl}
+          size={SIZE.xl}
           style={{
             flexWrap: "wrap",
             marginTop: Platform.OS === "ios" ? -1 : 0
           }}
           color={currentScreen.color || colors.heading}
         >
-          {isTopic ? (
-            <Paragraph numberOfLines={1} size={SIZE.xs + 1}>
-              {notebook?.title}
-              {"\n"}
-            </Paragraph>
-          ) : null}
           {isTag ? (
-            <Heading
-              size={isTopic ? SIZE.md + 2 : SIZE.xl}
-              color={colors.accent}
-            >
+            <Heading size={SIZE.xl} color={colors.accent}>
               #
             </Heading>
           ) : null}

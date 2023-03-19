@@ -41,13 +41,17 @@ import { EVENTS } from "@notesnook/core/common";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
-    title: "Make a note",
+    title: "Add a note",
     onClick: () =>
       hashNavigate("/notes/create", { addNonce: true, replace: true })
   },
   notebooks: {
     title: "Create a notebook",
     onClick: () => hashNavigate("/notebooks/create", { replace: true })
+  },
+  notebook: {
+    title: "Add a note",
+    onClick: () => hashNavigate(`/notes/create`, { replace: true })
   },
   topics: {
     title: "Create a topic",

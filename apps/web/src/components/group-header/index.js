@@ -21,7 +21,7 @@ import * as Icon from "../icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { db } from "../../common/db";
-import { useMenuTrigger } from "../../hooks/use-menu";
+import { Menu, useMenuTrigger } from "../../hooks/use-menu";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import useMobile from "../../hooks/use-mobile";
@@ -36,84 +36,97 @@ const groupByToTitleMap = {
   month: "Month"
 };
 
-const menuItems = [
-  {
-    key: "sortDirection",
-    title: "Order by",
-    icon: ({ groupOptions }) =>
-      groupOptions.sortDirection === "asc"
-        ? groupOptions.sortBy === "title"
-          ? Icon.OrderAtoZ
-          : Icon.OrderOldestNewest
-        : groupOptions.sortBy === "title"
-        ? Icon.OrderZtoA
-        : Icon.OrderNewestOldest,
-    items: map([
-      {
-        key: "asc",
-        title: ({ groupOptions }) =>
-          groupOptions.sortBy === "title" ? "A - Z" : "Oldest - newest"
-      },
-      {
-        key: "desc",
-        title: ({ groupOptions }) =>
-          groupOptions.sortBy === "title" ? "Z - A" : "Newest - oldest"
+const groupByMenu = {
+  key: "groupBy",
+  title: "Group by",
+  icon: Icon.GroupBy,
+  items: map([
+    { key: "none", title: "None" },
+    { key: "default", title: "Default" },
+    { key: "year", title: "Year" },
+    { key: "month", title: "Month" },
+    { key: "week", title: "Week" },
+    { key: "abc", title: "A - Z" }
+  ])
+};
+
+const orderByMenu = {
+  key: "sortDirection",
+  title: "Order by",
+  icon: ({ groupOptions }) =>
+    groupOptions.sortDirection === "asc"
+      ? groupOptions.sortBy === "title"
+        ? Icon.OrderAtoZ
+        : Icon.OrderOldestNewest
+      : groupOptions.sortBy === "title"
+      ? Icon.OrderZtoA
+      : Icon.OrderNewestOldest,
+  items: map([
+    {
+      key: "asc",
+      title: ({ groupOptions }) =>
+        groupOptions.sortBy === "title" ? "A - Z" : "Oldest - newest"
+    },
+    {
+      key: "desc",
+      title: ({ groupOptions }) =>
+        groupOptions.sortBy === "title" ? "Z - A" : "Newest - oldest"
+    }
+  ])
+};
+
+const sortByMenu = {
+  key: "sortBy",
+  title: "Sort by",
+  icon: Icon.SortBy,
+  items: map([
+    {
+      key: "dateCreated",
+      title: "Date created",
+      hidden: ({ type }) => type === "trash"
+    },
+    {
+      key: "dateEdited",
+      title: "Date edited",
+      hidden: ({ type }) => type === "trash" || type === "tags"
+    },
+    {
+      key: "dateDeleted",
+      title: "Date deleted",
+      hidden: ({ type }) => type !== "trash"
+    },
+    {
+      key: "dateModified",
+      title: "Date modified",
+      hidden: ({ type }) => type !== "tags"
+    },
+    {
+      key: "title",
+      title: "Title",
+      hidden: ({ groupOptions, parent, isUngrouped }, item) => {
+        if (isUngrouped) return false;
+
+        return (
+          parent?.key === "sortBy" &&
+          item.key === "title" &&
+          groupOptions.groupBy !== "abc" &&
+          groupOptions.groupBy !== "none"
+        );
       }
-    ])
-  },
-  {
-    key: "sortBy",
-    title: "Sort by",
-    icon: Icon.SortBy,
-    items: map([
-      {
-        key: "dateCreated",
-        title: "Date created",
-        hidden: ({ type }) => type === "trash"
-      },
-      {
-        key: "dateEdited",
-        title: "Date edited",
-        hidden: ({ type }) => type === "trash" || type === "tags"
-      },
-      {
-        key: "dateDeleted",
-        title: "Date deleted",
-        hidden: ({ type }) => type !== "trash"
-      },
-      {
-        key: "dateModified",
-        title: "Date modified",
-        hidden: ({ type }) => type !== "tags"
-      },
-      {
-        key: "title",
-        title: "Title",
-        hidden: ({ groupOptions, parent }, item) => {
-          return (
-            parent?.key === "sortBy" &&
-            item.key === "title" &&
-            groupOptions.groupBy !== "abc" &&
-            groupOptions.groupBy !== "none"
-          );
-        }
-      }
-    ])
-  },
-  {
-    key: "groupBy",
-    title: "Group by",
-    icon: Icon.GroupBy,
-    items: map([
-      { key: "none", title: "None" },
-      { key: "default", title: "Default" },
-      { key: "year", title: "Year" },
-      { key: "month", title: "Month" },
-      { key: "week", title: "Week" },
-      { key: "abc", title: "A - Z" }
-    ])
-  }
-];
+    }
+  ])
+};
+
+export function showSortMenu(type, refresh) {
+  const groupOptions = db.settings.getGroupOptions(type);
+  Menu.openMenu([orderByMenu, sortByMenu], {
+    title: "Sort",
+    groupOptions,
+    refresh,
+    type,
+    isUngrouped: true
+  });
+}
 
 function changeGroupOptions({ groupOptions, type, refresh, parent }, item) {
   if (!parent) return false;
@@ -132,19 +145,10 @@ function isChecked({ groupOptions, parent }, item) {
   return groupOptions[parent.key] === item.key;
 }
 
-function isDisabled({ groupOptions, parent }, item) {
-  return (
-    parent?.key === "sortBy" &&
-    item.key === "title" &&
-    groupOptions.groupBy === "abc"
-  );
-}
-
 function map(items) {
   return items.map((item) => {
     item.checked = isChecked;
     item.onClick = changeGroupOptions;
-    item.disabled = isDisabled;
     return item;
   }, []);
 }
@@ -248,7 +252,7 @@ function GroupHeader(props) {
         <Flex mr={1}>
           {type && (
             <IconButton
-              testId="sort-icon-button"
+              testId={`${type}-sort-button`}
               icon={
                 groupOptions.sortDirection === "asc"
                   ? Icon.SortAsc
@@ -259,7 +263,7 @@ function GroupHeader(props) {
                 const groupOptions = db.settings.getGroupOptions(type);
                 setGroupOptions(groupOptions);
 
-                openMenu(menuItems, {
+                openMenu([orderByMenu, sortByMenu, groupByMenu], {
                   title: "Group & sort",
                   groupOptions,
                   refresh,

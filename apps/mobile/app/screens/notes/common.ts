@@ -81,12 +81,31 @@ export const setOnFirstSave = (
     editorState().onNoteCreated = null;
     return;
   }
-  editorState().onNoteCreated = (id) => onNoteCreated(id, data);
+  setTimeout(() => {
+    editorState().onNoteCreated = (id) => onNoteCreated(id, data);
+  }, 0);
 };
 
 async function onNoteCreated(id: string, params: FirstSaveData) {
   if (!params) return;
   switch (params.type) {
+    case "notebook": {
+      await db.relations?.add(
+        { type: "notebook", id: params.id },
+        { type: "note", id: id }
+      );
+      Navigation.queueRoutesForUpdate(
+        "TaggedNotes",
+        "ColoredNotes",
+        "TopicNotes",
+        "Favorites",
+        "Notes",
+        "Notebook",
+        "Notebooks"
+      );
+      editorState().onNoteCreated = null;
+      break;
+    }
     case "topic": {
       if (!params.notebook) break;
       await db.notes?.addToNotebook(

@@ -205,6 +205,12 @@ function notesFromContext(context) {
     case "color":
       notes = db.notes.colored(context.value);
       break;
+    case "notebook": {
+      const notebook = db.notebooks.notebook(context?.value?.id);
+      if (!notebook) break;
+      notes = db.relations.from(notebook.data, "note");
+      break;
+    }
     case "topic": {
       const notebook = db.notebooks.notebook(context?.value?.id);
       if (!notebook) break;

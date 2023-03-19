@@ -49,7 +49,7 @@ import {
 function Note(props) {
   const {
     tags,
-    notebook,
+    references,
     item,
     index,
     context,
@@ -115,15 +115,16 @@ function Note(props) {
         <Flex
           sx={{ alignItems: "center", flexWrap: "wrap", gap: 1, mt: "small" }}
         >
-          {notebook && (
+          {references?.references?.map((reference) => (
             <IconTag
+              key={reference.url}
               onClick={() => {
-                navigate(`/notebooks/${notebook.id}/${notebook.topic.id}`);
+                navigate(reference.url);
               }}
-              text={`${notebook.title} › ${notebook.topic.title}`}
-              icon={Icon.Notebook}
+              text={reference.title}
+              icon={reference.type === "topic" ? Icon.Topic : Icon.Notebook}
             />
-          )}
+          ))}
           {reminder && isReminderActive(reminder) && (
             <IconTag
               icon={Icon.Reminder}
@@ -260,7 +261,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
     prevProps.compact === nextProps.compact &&
-    prevProps.notebook?.dateEdited === nextProps.notebook?.dateEdited &&
+    prevProps.references?.dateEdited === nextProps.references?.dateEdited &&
     prevProps.reminder?.dateModified === nextProps.reminder?.dateModified &&
     JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags) &&
     JSON.stringify(prevProps.context) === JSON.stringify(nextProps.context)
@@ -430,8 +431,8 @@ const menuItems = [
         await confirm({
           title: "Open duplicated note?",
           message: "Do you want to open the duplicated note?",
-          noText: "No",
-          yesText: "Yes"
+          negativeButtonText: "No",
+          positiveButtonText: "Yes"
         })
       ) {
         hashNavigate(`/notes/${id}/edit`, { replace: true });
@@ -454,40 +455,14 @@ const menuItems = [
           title: "Prevent this item from syncing?",
           message:
             "Turning sync off for this item will automatically delete it from all other devices & any future changes to this item won't get synced. Are you sure you want to continue?",
-          yesText: "Yes",
-          noText: "No"
+          positiveButtonText: "Yes",
+          negativeButtonText: "No"
         }))
       )
         await store.get().localOnly(note.id);
     }
   },
   { key: "sep3", type: "separator" },
-  {
-    key: "removefromtopic",
-    title: "Remove from topic",
-    icon: Icon.TopicRemove,
-    hidden: ({ context }) => context?.type !== "topic",
-    onClick: async ({ items, context }) => {
-      try {
-        if (!context.value?.topic || !context.value?.id)
-          throw new Error("context is missing");
-
-        const ids = items.map((i) => i.id);
-
-        await db.notes.removeFromNotebook(
-          { id: context.value.id, topic: context.value.topic },
-          ...ids
-        );
-
-        store.refresh();
-
-        showToast("success", "Note removed from topic.");
-      } catch (e) {
-        showToast("error", `Failed to remove note from topic: ${e.message}.`);
-      }
-    },
-    multiSelect: true
-  },
   {
     key: "movetotrash",
     title: "Move to trash",
@@ -532,40 +507,63 @@ function colorsToMenuItems() {
   });
 }
 
-function notebooksMenuItems({ note }) {
+function notebooksMenuItems({ items }) {
+  const noteIds = items.map((i) => i.id);
+
   const menuItems = [];
   menuItems.push({
     key: "link-notebooks",
     title: "Link to...",
     icon: Icon.AddToNotebook,
-    onClick: async ({ items }) => {
-      await showMoveNoteDialog(items.map((i) => i.id));
+    onClick: async () => {
+      await showMoveNoteDialog(noteIds);
     }
   });
 
-  if (note && note.notebooks?.length > 0) {
+  const notebooks = items
+    .map((note) => db.relations?.to(note, "notebook"))
+    .flat();
+  const topics = items.map((note) => note.notebooks || []).flat();
+
+  if (topics?.length > 0 || notebooks?.length > 0) {
     menuItems.push(
       {
         key: "remove-from-all-notebooks",
         title: "Unlink from all",
         icon: Icon.RemoveShortcutLink,
         onClick: async () => {
-          await db.notes.removeFromAllNotebooks(note.id);
+          await db.notes.removeFromAllNotebooks(...noteIds);
           store.refresh();
         }
       },
       { key: "sep", type: "separator" }
     );
-    note.notebooks.forEach((ref) => {
-      // if (prev) return prev;
-      // const topicId = (curr as NotebookReference).topics[0];
+
+    notebooks?.forEach((notebook) => {
+      if (menuItems.find((item) => item.key === notebook.id)) return;
+
+      menuItems.push({
+        key: notebook.id,
+        title: notebook.title,
+        icon: Icon.Notebook,
+        checked: true,
+        tooltip: "Click to remove from this notebook",
+        onClick: async () => {
+          await db.notes.removeFromNotebook({ id: notebook.id }, ...noteIds);
+          store.refresh();
+        }
+      });
+    });
+
+    topics?.forEach((ref) => {
       const notebook = db.notebooks?.notebook(ref.id);
       if (!notebook) return;
-      const notebookMenuItems = [];
       for (const topicId of ref.topics) {
         if (!notebook.topics.topic(topicId)) continue;
+        if (menuItems.find((item) => item.key === topicId)) continue;
+
         const topic = notebook.topics.topic(topicId)._topic;
-        notebookMenuItems.push({
+        menuItems.push({
           key: topicId,
           title: topic.title,
           icon: Icon.Topic,
@@ -574,19 +572,12 @@ function notebooksMenuItems({ note }) {
           onClick: async () => {
             await db.notes.removeFromNotebook(
               { id: ref.id, topic: topic.id },
-              note.id
+              ...noteIds
             );
             store.refresh();
           }
         });
       }
-
-      menuItems.push({
-        key: ref.id,
-        title: notebook.title,
-        icon: Icon.Notebook2,
-        items: notebookMenuItems
-      });
     });
   }
 

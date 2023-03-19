@@ -22,10 +22,15 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import Share from "react-native-share";
 import { db } from "../common/database";
+import { AttachmentDialog } from "../components/attachments";
 import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
+import { AddNotebookSheet } from "../components/sheets/add-notebook";
+import MoveNoteSheet from "../components/sheets/add-to";
 import ExportNotesSheet from "../components/sheets/export-notes";
 import { MoveNotes } from "../components/sheets/move-notes/movenote";
+import PublishNoteSheet from "../components/sheets/publish-note";
+import { RelationsList } from "../components/sheets/relations-list/index";
 import ReminderSheet from "../components/sheets/reminder";
 import {
   eSendEvent,
@@ -40,24 +45,16 @@ import Notifications from "../services/notifications";
 import { useEditorStore } from "../stores/use-editor-store";
 import { useMenuStore } from "../stores/use-menu-store";
 import useNavigationStore from "../stores/use-navigation-store";
+import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useThemeStore } from "../stores/use-theme-store";
 import { useUserStore } from "../stores/use-user-store";
 import { toTXT } from "../utils";
 import { toggleDarkMode } from "../utils/color-scheme/utils";
-import {
-  eOpenAddNotebookDialog,
-  eOpenAddTopicDialog,
-  eOpenAttachmentsDialog,
-  eOpenLoginDialog,
-  eOpenMoveNoteDialog,
-  eOpenPublishNoteDialog
-} from "../utils/events";
+import { eOpenAddTopicDialog, eOpenLoginDialog } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { sleep } from "../utils/time";
-import { RelationsList } from "../components/sheets/relations-list/index";
-import { useRelationStore } from "../stores/use-relation-store";
 
 export const useActions = ({ close = () => null, item }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -105,6 +102,15 @@ export const useActions = ({ close = () => null, item }) => {
     );
   };
 
+  const isNoteInNotebook = () => {
+    const currentScreen = useNavigationStore.getState().currentScreen;
+    if (item.type !== "note" || currentScreen.name !== "Notebook") return;
+
+    return !!db.relations
+      .to(item, "notebook")
+      .find((notebook) => notebook.id === currentScreen.id);
+  };
+
   const onUpdate = useCallback(
     async (type) => {
       if (type === "unpin") {
@@ -129,12 +135,9 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   function addTo() {
-    close();
     clearSelection(true);
     setSelectedItem(item);
-    setTimeout(() => {
-      eSendEvent(eOpenMoveNoteDialog, item);
-    }, 300);
+    MoveNoteSheet.present(item);
   }
 
   async function addToFavorites() {
@@ -270,9 +273,7 @@ export const useActions = ({ close = () => null, item }) => {
       });
       return;
     }
-    close();
-    await sleep(300);
-    eSendEvent(eOpenPublishNoteDialog, item);
+    PublishNoteSheet.present(item);
   }
 
   const checkNoteSynced = () => {
@@ -514,6 +515,22 @@ export const useActions = ({ close = () => null, item }) => {
     close();
   }
 
+  async function removeNoteFromNotebook() {
+    const currentScreen = useNavigationStore.getState().currentScreen;
+    if (currentScreen.name !== "Notebook") return;
+    await db.relations.unlink({ type: "notebook", id: currentScreen.id }, item);
+    Navigation.queueRoutesForUpdate(
+      "TaggedNotes",
+      "ColoredNotes",
+      "TopicNotes",
+      "Favorites",
+      "Notes",
+      "Notebook",
+      "Notebooks"
+    );
+    close();
+  }
+
   async function deleteTrashItem() {
     if (!checkNoteSynced()) return;
     close();
@@ -538,22 +555,16 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   async function openHistory() {
-    close();
-    await sleep(300);
     presentSheet({
       component: (ref) => <NoteHistory fwdRef={ref} note={item} />
     });
   }
 
   async function showAttachments() {
-    close();
-    await sleep(300);
-    eSendEvent(eOpenAttachmentsDialog, item);
+    AttachmentDialog.present();
   }
 
   async function exportNote() {
-    close();
-    await sleep(300);
     ExportNotesSheet.present([item]);
   }
 
@@ -647,8 +658,6 @@ export const useActions = ({ close = () => null, item }) => {
       title: "Add notes",
       icon: "plus",
       func: async () => {
-        close();
-        await sleep(500);
         MoveNotes.present(db.notebooks.notebook(item.notebookId).data, item);
       }
     },
@@ -689,9 +698,7 @@ export const useActions = ({ close = () => null, item }) => {
       title: "Edit notebook",
       icon: "square-edit-outline",
       func: async () => {
-        close();
-        await sleep(300);
-        eSendEvent(eOpenAddNotebookDialog, item);
+        AddNotebookSheet.present(item);
       }
     },
     {
@@ -777,8 +784,6 @@ export const useActions = ({ close = () => null, item }) => {
       title: "Edit reminder",
       icon: "pencil",
       func: async () => {
-        close();
-        await sleep(300);
         ReminderSheet.present(item);
       },
       close: false
@@ -789,7 +794,6 @@ export const useActions = ({ close = () => null, item }) => {
       title: "Reminders",
       icon: "clock-outline",
       func: async () => {
-        close();
         RelationsList.present({
           reference: item,
           referenceType: "reminder",
@@ -848,6 +852,13 @@ export const useActions = ({ close = () => null, item }) => {
       hidden: !isNoteInTopic(),
       icon: "minus-circle-outline",
       func: removeNoteFromTopic
+    },
+    {
+      id: "remove-from-notebook",
+      title: "Remove from notebook",
+      hidden: !isNoteInNotebook(),
+      icon: "minus-circle-outline",
+      func: removeNoteFromNotebook
     },
     {
       id: "trash",
