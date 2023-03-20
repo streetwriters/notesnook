@@ -155,7 +155,7 @@ const Tiptap = ({
         const isFirstChildEmpty =
           !firstChild?.textContent || firstChild?.textContent?.length === 0;
         if (isParagraph && isFirstChildEmpty) {
-          globalThis.editor?.commands.focus();
+          globalThis.editor?.commands.focus("end");
           return;
         }
         globalThis.editor
@@ -163,10 +163,8 @@ const Tiptap = ({
           .insertContentAt(0, "<p></p>", {
             updateSelection: true
           })
+          .focus("end")
           .run();
-        setTimeout(() => {
-          globalThis.editor?.commands.focus();
-        }, 1);
       }
     },
     []
@@ -180,7 +178,7 @@ const Tiptap = ({
     const isLastChildEmpty =
       !lastChild?.textContent || lastChild?.textContent?.length === 0;
     if (isParagraph && isLastChildEmpty) {
-      globalThis.editor?.commands.focus();
+      globalThis.editor?.commands.focus("end");
       return;
     }
     globalThis.editor
@@ -188,10 +186,8 @@ const Tiptap = ({
       .insertContentAt(docSize - 1, "<p></p>", {
         updateSelection: true
       })
+      .focus("end")
       .run();
-    setTimeout(() => {
-      globalThis.editor?.commands.focus();
-    }, 1);
   }, []);
 
   return (
