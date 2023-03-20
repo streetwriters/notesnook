@@ -35,7 +35,7 @@ function DiffViewer(props) {
 
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
   const sync = useAppStore((store) => store.sync);
-  const clearSession = useEditorStore((store) => store.clearSession);
+  const openSession = useEditorStore((store) => store.openSession);
   const [conflictedNote, setConflictedNote] = useState();
   const [remoteContent, setRemoteContent] = useState();
   const [localContent, setLocalContent] = useState();
@@ -98,7 +98,10 @@ function DiffViewer(props) {
         hashNavigate(`/notes/create`, { replace: true });
         return;
       }
-      notesStore.setSelectedNote(noteId);
+
+      await openSession(noteId);
+      setIsEditorOpen(true);
+
       note = note.data;
 
       const content = await db.content.raw(note.contentId);
@@ -114,12 +117,7 @@ function DiffViewer(props) {
 
       setHtmlDiff({ before: content.data, after: content.conflicted.data });
     })();
-  }, [noteId, resolveConflict]);
-
-  useEffect(() => {
-    clearSession(false);
-    setIsEditorOpen(true);
-  }, [setIsEditorOpen, clearSession]);
+  }, [noteId, openSession, setIsEditorOpen, resolveConflict]);
 
   if (!conflictedNote || !localContent || !remoteContent) return null;
   return (
