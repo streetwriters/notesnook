@@ -1,16 +1,28 @@
 diff --git a/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js b/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js
-index 4536402..5ceaf65 100644
+index 4536402..2a100d9 100644
 --- a/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js
 +++ b/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js
-@@ -82,6 +82,7 @@ class KeyboardAvoidingView extends React.Component<Props, State> {
+@@ -64,7 +64,7 @@ class KeyboardAvoidingView extends React.Component<Props, State> {
+   _subscriptions: Array<EventSubscription> = [];
+   viewRef: {current: React.ElementRef<typeof View> | null, ...};
+   _initialFrameHeight: number = 0;
+-
++  keyboardShown = false;
+   constructor(props: Props) {
+     super(props);
+     this.state = {bottom: 0};
+@@ -80,7 +80,9 @@ class KeyboardAvoidingView extends React.Component<Props, State> {
+     const keyboardY =
+       keyboardFrame.screenY - (this.props.keyboardVerticalOffset ?? 0);
  
-     // Calculate the displacement needed for the view such that it
+-    // Calculate the displacement needed for the view such that it
++   
++    if (this._initialFrameHeight && frame.height < this._initialFrameHeight && this.keyboardShown) frame.height = this._initialFrameHeight;
++     // Calculate the displacement needed for the view such that it
      // no longer overlaps with the keyboard
-+    if (this._initialFrameHeight && frame.height < this._initialFrameHeight) frame.height = this._initialFrameHeight;
      return Math.max(frame.y + frame.height - keyboardY, 0);
    }
- 
-@@ -92,7 +93,9 @@ class KeyboardAvoidingView extends React.Component<Props, State> {
+@@ -92,7 +94,9 @@ class KeyboardAvoidingView extends React.Component<Props, State> {
  
    _onLayout = (event: ViewLayoutEvent) => {
      const wasFrameNull = this._frame == null;
@@ -20,6 +32,19 @@ index 4536402..5ceaf65 100644
      if (!this._initialFrameHeight) {
        // save the initial frame height, before the keyboard is visible
        this._initialFrameHeight = this._frame.height;
+@@ -142,6 +146,8 @@ class KeyboardAvoidingView extends React.Component<Props, State> {
+       this._subscriptions = [
+         Keyboard.addListener('keyboardDidHide', this._onKeyboardChange),
+         Keyboard.addListener('keyboardDidShow', this._onKeyboardChange),
++        Keyboard.addListener('keyboardDidHide', () => this.keyboardShown = true),
++        Keyboard.addListener('keyboardDidShow', () => this.keyboardShown = false),
+       ];
+     }
+   }
+diff --git a/node_modules/react-native/React/.DS_Store b/node_modules/react-native/React/.DS_Store
+new file mode 100644
+index 0000000..5155fbe
+Binary files /dev/null and b/node_modules/react-native/React/.DS_Store differ
 diff --git a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
 index f0f6402..d645d81 100644
 --- a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
@@ -44,6 +69,13 @@ index f0f6402..d645d81 100644
      CGFloat smallerOffset = 0.0;
      CGFloat largerOffset = maximumOffset;
  
+diff --git a/node_modules/react-native/scripts/.packager.env b/node_modules/react-native/scripts/.packager.env
+new file mode 100644
+index 0000000..361f5fb
+--- /dev/null
++++ b/node_modules/react-native/scripts/.packager.env
+@@ -0,0 +1 @@
++export RCT_METRO_PORT=8081
 diff --git a/node_modules/react-native/scripts/packager.sh b/node_modules/react-native/scripts/packager.sh
 index b9f9016..8859130 100755
 --- a/node_modules/react-native/scripts/packager.sh
