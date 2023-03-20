@@ -48,7 +48,11 @@ class AppStore extends BaseStore {
   isSyncEnabled = Config.get("syncEnabled", true);
   isRealtimeSyncEnabled = Config.get("isRealtimeSyncEnabled", true);
   syncStatus = {
-    key: navigator.onLine ? "synced" : "offline",
+    key: navigator.onLine
+      ? Config.get("syncEnabled", true)
+        ? "synced"
+        : "disabled"
+      : "offline",
     progress: null,
     type: null
   };
