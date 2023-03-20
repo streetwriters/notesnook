@@ -169,7 +169,7 @@ export const ImageNode = Node.create<ImageOptions>({
         },
       updateImage:
         (query, options) =>
-        ({ state, tr, dispatch }) => {
+        ({ state, tr }) => {
           const keyedQuery = query.hash
             ? { key: "hash", value: query.hash }
             : query.src
@@ -191,7 +191,6 @@ export const ImageNode = Node.create<ImageOptions>({
           }
           tr.setMeta("preventUpdate", options.preventUpdate || false);
           tr.setMeta("addToHistory", false);
-          if (dispatch) dispatch(tr);
           return true;
         }
     };
