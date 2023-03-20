@@ -17,21 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function hexToRGB(hex, alpha = 1) {
-  let parseString = hex;
-  if (hex.startsWith("#")) {
-    parseString = hex.slice(1, 7);
+function hexToRGB(hex:string, alpha = 1) {
+    let parseString = hex;
+    if (hex.startsWith("#")) {
+      parseString = hex.slice(1, 7);
+    }
+    if (parseString.length !== 6) {
+      return null;
+    }
+    const r = parseInt(parseString.slice(0, 2), 16);
+    const g = parseInt(parseString.slice(2, 4), 16);
+    const b = parseInt(parseString.slice(4, 6), 16);
+    if (isNaN(r) || isNaN(g) || isNaN(b)) {
+      return null;
+    }
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
-  if (parseString.length !== 6) {
-    return null;
-  }
-  const r = parseInt(parseString.slice(0, 2), 16);
-  const g = parseInt(parseString.slice(2, 4), 16);
-  const b = parseInt(parseString.slice(4, 6), 16);
-  if (isNaN(r) || isNaN(g) || isNaN(b)) {
-    return null;
-  }
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
-export { hexToRGB };
+  
+  export { hexToRGB };
+  
