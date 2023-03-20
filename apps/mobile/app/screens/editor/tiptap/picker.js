@@ -248,9 +248,13 @@ const handleImageResponse = async (response, options) => {
   const isPng = /(png)/g.test(image.type);
   const isJpeg = /(jpeg|jpg)/g.test(image.type);
   if (isPng || isJpeg) {
+    console.log(image.uri);
     b64 =
       `data:${image.type};base64, ` +
-      (await compressToBase64(image.uri, isPng ? "PNG" : "JPEG"));
+      (await compressToBase64(
+        Platform.OS === "ios" ? "file://" + image.uri : image.uri,
+        isPng ? "PNG" : "JPEG"
+      ));
   }
 
   if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
