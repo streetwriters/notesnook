@@ -26,6 +26,7 @@ import TaskItem from "@tiptap/extension-task-item";
 import { dropPoint } from "prosemirror-transform";
 import { findChildrenByType, hasSameAttributes } from "../../utils/prosemirror";
 import { countCheckedItems } from "./utils";
+import TextStyle from "@tiptap/extension-text-style";
 
 export type TaskListAttributes = {
   title: string;
@@ -81,9 +82,21 @@ export const TaskListNode = TaskList.extend({
     return {
       toggleTaskList:
         () =>
-        ({ editor, commands, state, tr }) => {
+        ({ editor, chain, state, tr }) => {
           const { $from, $to } = state.selection;
-          commands.toggleList(this.name, this.options.itemTypeName);
+
+          chain()
+            .toggleList(
+              this.name,
+              this.options.itemTypeName,
+              true // TODO
+            )
+            .updateAttributes(
+              this.options.itemTypeName,
+              this.editor.getAttributes(TextStyle.name)
+            )
+            .run();
+
           const position = {
             from: tr.mapping.map($from.pos),
             to: tr.mapping.map($to.pos)

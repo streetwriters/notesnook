@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node, mergeAttributes, wrappingInputRule } from "@tiptap/core";
+import TextStyle from "@tiptap/extension-text-style";
 
 export type OutlineListAttributes = {
   collapsed: boolean;
@@ -25,6 +26,8 @@ export type OutlineListAttributes = {
 
 export interface OutlineListOptions {
   HTMLAttributes: Record<string, unknown>;
+  keepMarks: boolean;
+  keepAttributes: boolean;
 }
 
 declare module "@tiptap/core" {
@@ -45,7 +48,9 @@ export const OutlineList = Node.create<OutlineListOptions>({
 
   addOptions() {
     return {
-      HTMLAttributes: {}
+      HTMLAttributes: {},
+      keepMarks: false,
+      keepAttributes: false
     };
   },
 
@@ -76,8 +81,26 @@ export const OutlineList = Node.create<OutlineListOptions>({
     return {
       toggleOutlineList:
         () =>
-        ({ commands }) => {
-          return commands.toggleList(this.name, outlineListItemName);
+        ({ commands, chain }) => {
+          if (this.options.keepAttributes) {
+            return chain()
+              .toggleList(
+                this.name,
+                outlineListItemName,
+                this.options.keepMarks
+              )
+              .updateAttributes(
+                outlineListItemName,
+                this.editor.getAttributes(TextStyle.name)
+              )
+              .run();
+          }
+
+          return commands.toggleList(
+            this.name,
+            outlineListItemName,
+            this.options.keepMarks
+          );
         }
     };
   },
@@ -89,12 +112,25 @@ export const OutlineList = Node.create<OutlineListOptions>({
   },
 
   addInputRules() {
-    return [
-      wrappingInputRule({
+    let inputRule = wrappingInputRule({
+      find: inputRegex,
+      type: this.type
+    });
+
+    if (this.options.keepMarks || this.options.keepAttributes) {
+      inputRule = wrappingInputRule({
         find: inputRegex,
-        type: this.type
-      })
-    ];
+        type: this.type,
+        keepMarks: this.options.keepMarks,
+        keepAttributes: this.options.keepAttributes,
+        getAttributes: () => {
+          return this.editor.getAttributes(TextStyle.name);
+        },
+        editor: this.editor
+      });
+    }
+
+    return [inputRule];
   },
 
   addNodeView() {
