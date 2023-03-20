@@ -49,6 +49,7 @@ import { logger } from "../logger";
 import Shortcuts from "../collections/shortcuts";
 import Reminders from "../collections/reminders";
 import Relations from "../collections/relations";
+import Subscriptions from "./subscriptions";
 
 /**
  * @type {EventSource}
@@ -128,6 +129,7 @@ class Database {
     this.offers = new Offers();
     this.debug = new Debug();
     this.pricing = new Pricing();
+    this.subscriptions = new Subscriptions(this.user.tokenManager);
 
     // collections
     /** @type {Notes} */

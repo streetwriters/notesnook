@@ -24,7 +24,7 @@ import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { NotesScreenParams } from "../../stores/use-navigation-store";
 import { useTagStore } from "../../stores/use-tag-store";
-import { eOnLoadNote } from "../../utils/events";
+import { eOnLoadNote, eOnTopicSheetUpdate } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
 import { tabBarRef } from "../../utils/global-refs";
 import { TopicType } from "../../utils/types";
@@ -125,6 +125,7 @@ async function onNoteCreated(id: string, params: FirstSaveData) {
         "Notebook",
         "Notebooks"
       );
+      eSendEvent(eOnTopicSheetUpdate);
       break;
     }
     case "tag": {

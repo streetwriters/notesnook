@@ -43,7 +43,11 @@ import useNavigationStore, {
   NotebookScreenParams
 } from "../../../stores/use-navigation-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { eOnNewTopicAdded, eOpenAddTopicDialog } from "../../../utils/events";
+import {
+  eOnNewTopicAdded,
+  eOnTopicSheetUpdate,
+  eOpenAddTopicDialog
+} from "../../../utils/events";
 import { normalize, SIZE } from "../../../utils/size";
 import { NotebookType, TopicType } from "../../../utils/types";
 
@@ -92,9 +96,14 @@ export const TopicsSheet = () => {
   );
 
   useEffect(() => {
+    const onTopicUpdate = () => {
+      onRequestUpdate();
+    };
+    eSubscribeEvent(eOnTopicSheetUpdate, onTopicUpdate);
     eSubscribeEvent(eOnNewTopicAdded, onRequestUpdate);
     return () => {
-      eUnSubscribeEvent(eOnNewTopicAdded, onRequestUpdate);
+      eUnSubscribeEvent(eOnTopicSheetUpdate, onRequestUpdate);
+      eUnSubscribeEvent(eOnNewTopicAdded, onTopicUpdate);
     };
   }, [onRequestUpdate]);
 
@@ -167,7 +176,7 @@ export const TopicsSheet = () => {
       ref={ref}
       isModal={false}
       containerStyle={{
-        maxHeight: 600,
+        maxHeight: 400,
         borderTopRightRadius: 15,
         borderTopLeftRadius: 15,
         backgroundColor: colors.bg,
@@ -186,7 +195,7 @@ export const TopicsSheet = () => {
       initialSnapIndex={0}
       backgroundInteractionEnabled
       onChange={(position, height) => {
-        animations.translate.setValue(position);
+        animations.translate.setValue(position - 60);
         const h = Dimensions.get("window").height;
         const minPos = h - height;
         if (position - 100 < minPos || !canShow) {
@@ -221,8 +230,7 @@ export const TopicsSheet = () => {
             accentText="light"
             onPress={openEditor}
             customStyle={{
-              borderRadius: 100,
-              bottom: 50
+              borderRadius: 100
             }}
           >
             <View
@@ -241,8 +249,8 @@ export const TopicsSheet = () => {
     >
       <View
         style={{
-          maxHeight: 600,
-          height: 600,
+          maxHeight: 400,
+          height: 400,
           width: "100%"
         }}
       >

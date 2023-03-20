@@ -70,13 +70,11 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
           <Icon
             sx={{
               width: 25,
-              height: 25,
-              borderTopLeftRadius: "default",
-              borderBottomRightRadius: "default"
+              height: 25
             }}
             path={Icons.resize}
             size={25}
-            color={handleColor || "icon"}
+            color={handleColor || "text"}
           />
         )
       }}

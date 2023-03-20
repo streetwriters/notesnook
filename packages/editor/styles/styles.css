@@ -553,7 +553,7 @@ p > *::selection {
   right: 0;
   bottom: 0;
   z-index: 1;
-  background-image: linear-gradient( -45deg, var(--bgTransparent) 5%, transparent 10%, transparent 90%, var(--bgTransparent) 99%);
+  background-image: linear-gradient(135deg, #ffffffaa 0%, #ffffff88 5%, transparent 12%, transparent 91%, #ffffff88 97%, #ffffffaa 100%);
   pointer-events: none;
 }
 

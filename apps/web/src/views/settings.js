@@ -43,8 +43,10 @@ import {
   showToolbarConfigDialog,
   showPromptDialog,
   showEmailChangeDialog,
-  showLanguageSelectorDialog
+  showLanguageSelectorDialog,
+  confirm
 } from "../common/dialog-controller";
+import { TaskManager } from "../common/task-manager";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { createBackup, importBackup, verifyAccount } from "../common";
 import { db } from "../common/db";
@@ -1288,40 +1290,64 @@ function AccountStatus(props) {
         </>
       ) : isPro ? (
         <>
-          <Button
-            variant="list"
-            onClick={async () => {
-              if (!user.subscription.updateURL)
-                return showToast(
-                  "error",
-                  "Failed to update. Please reach out to us at support@streetwriters.co so we can help you resolve the issue."
-                );
-              window.open(user.subscription.updateURL, "_blank");
-            }}
-          >
-            <Tip
-              text="Update payment method"
-              tip="Update the payment method you used to purchase this subscription."
-            />
-          </Button>
-          <Button
-            variant="list"
-            sx={{ ":hover": { borderColor: "error" } }}
-            onClick={async () => {
-              if (!user.subscription.cancelURL)
-                return showToast(
-                  "error",
-                  "Failed to cancel subscription. Please reach out to us at support@streetwriters.co so we can help you resolve the issue."
-                );
-              window.open(user.subscription.cancelURL, "_blank");
-            }}
-          >
-            <Tip
-              color="error"
-              text="Cancel subscription"
-              tip="You will be downgraded to the Basic plan at the end of your billing period."
-            />
-          </Button>
+          {provider === "Web" ? (
+            <>
+              <Button
+                variant="list"
+                onClick={async () => {
+                  try {
+                    window.open(await db.subscriptions.updateUrl(), "_blank");
+                  } catch (e) {
+                    showToast("error", e.message);
+                  }
+                }}
+              >
+                <Tip
+                  text="Update payment method"
+                  tip="Update the payment method you used to purchase this subscription."
+                />
+              </Button>
+              <Button
+                variant="list"
+                sx={{ ":hover": { borderColor: "error" } }}
+                onClick={async () => {
+                  try {
+                    const cancelSubscription = await confirm({
+                      title: "Cancel subscription?",
+                      message:
+                        "Cancelling your subscription will automatically downgrade you to the Basic plan at the end of your billing period. You will have to resubscribe to continue using the Pro features.",
+                      negativeButtonText: "No",
+                      positiveButtonText: "Yes"
+                    });
+                    if (cancelSubscription) {
+                      await TaskManager.startTask({
+                        id: "cancel-subscription",
+                        type: "modal",
+                        title: "Cancelling your subscription",
+                        subtitle: "Please wait...",
+                        action: () => db.subscriptions.cancel()
+                      });
+                      showToast(
+                        "success",
+                        "Your subscription has been cancelled."
+                      );
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 5000);
+                    }
+                  } catch (e) {
+                    showToast("error", e.message);
+                  }
+                }}
+              >
+                <Tip
+                  color="error"
+                  text="Cancel subscription"
+                  tip="You will be downgraded to the Basic plan at the end of your billing period."
+                />
+              </Button>
+            </>
+          ) : null}
           <Text
             variant="subBody"
             mt={1}

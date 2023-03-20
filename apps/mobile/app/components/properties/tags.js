@@ -79,7 +79,7 @@ export const TagStrip = ({ item, close }) => {
       }}
     >
       {item.tags.map((tag) =>
-        tag ? <TagItem key={tag} tag={item} close={close} /> : null
+        tag ? <TagItem key={tag} tag={tag} close={close} /> : null
       )}
     </View>
   ) : null;
@@ -101,7 +101,6 @@ const TagItem = ({ tag, close }) => {
     marginTop: 0,
     backgroundColor: "transparent"
   };
-
   return (
     <Button
       onPress={onPress}

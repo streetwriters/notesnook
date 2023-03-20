@@ -46,6 +46,7 @@ export default function Tag({
         marginLeft: 2,
         marginTop: -10,
         height: 20,
+        justifyContent: "center",
         ...style
       }}
     >
