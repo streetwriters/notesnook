@@ -185,8 +185,8 @@ const useTiptap = (
         FontSize,
         TextDirection,
         FontFamily,
-        BulletList,
-        OrderedList,
+        BulletList.configure({ keepMarks: true, keepAttributes: true }),
+        OrderedList.configure({ keepMarks: true, keepAttributes: true }),
         TaskItemNode.configure({ nested: true }),
         TaskListNode,
         Link.extend({
@@ -225,7 +225,7 @@ const useTiptap = (
           onPreviewAttachment
         }),
         OutlineListItem,
-        OutlineList,
+        OutlineList.configure({ keepAttributes: true, keepMarks: true }),
         ListItem,
         Code.extend({ excludes: "" }),
         Codemark,
