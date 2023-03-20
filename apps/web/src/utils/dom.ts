@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export const setDocumentTitle = (title:string) => {
-    document.title = `${title} - Notesnook`;
+export const setDocumentTitle = (title?: string) => {
+  if (!title) document.title = "Notesnook";
+  else document.title = `${title} - Notesnook`;
 };

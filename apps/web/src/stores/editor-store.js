@@ -131,7 +131,6 @@ class EditorStore extends BaseStore {
     if (!note) return;
 
     noteStore.setSelectedNote(note.id);
-
     setDocumentTitle(note.title);
 
     if (note.locked)
@@ -225,10 +224,9 @@ class EditorStore extends BaseStore {
         state.session.dateEdited = note.dateEdited;
         state.session.attachmentsLength = attachments.length;
       });
-
-      this.setSaveState(1);
       setDocumentTitle(note.title);
 
+      this.setSaveState(1);
     } catch (err) {
       this.setSaveState(-1);
       logger.error(err);
@@ -253,6 +251,7 @@ class EditorStore extends BaseStore {
     });
     noteStore.setSelectedNote(0);
     appStore.setIsEditorOpen(true);
+    setDocumentTitle();
   };
 
   clearSession = async (shouldNavigate = true) => {
@@ -270,6 +269,7 @@ class EditorStore extends BaseStore {
     if (shouldNavigate)
       hashNavigate(`/notes/create`, { replace: true, addNonce: true });
     appStore.setIsEditorOpen(false);
+    setDocumentTitle();
   };
 
   setTitle = (noteId, title) => {
