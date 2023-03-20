@@ -17,22 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function isMobile() {
-  var match = window.matchMedia || window.msMatchMedia;
-  if (match) {
-    var mq = match("(max-width: 480px)");
-    return mq.matches;
+function isMobile():boolean {
+    const match = window.matchMedia;
+    if (match) {
+      const mq = match("(max-width: 480px)");
+      return mq.matches;
+    }
+    return false;
   }
-  return false;
-}
-
-function isTablet() {
-  var match = window.matchMedia || window.msMatchMedia;
-  if (match) {
-    var mq = match("(min-width: 480px) and (max-width: 1000px)");
-    return mq.matches;
+  
+  function isTablet():boolean {
+    const match = window.matchMedia;
+    if (match) {
+      const mq = match("(min-width: 480px) and (max-width: 1000px)");
+      return mq.matches;
+    }
+    return false;
   }
-  return false;
-}
-
-export { isMobile, isTablet };
+  
+  export { isMobile, isTablet };
+  
