@@ -248,7 +248,6 @@ const handleImageResponse = async (response, options) => {
   const isPng = /(png)/g.test(image.type);
   const isJpeg = /(jpeg|jpg)/g.test(image.type);
   if (isPng || isJpeg) {
-    console.log(image.uri);
     b64 =
       `data:${image.type};base64, ` +
       (await compressToBase64(

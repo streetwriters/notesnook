@@ -158,3 +158,5 @@ export const eCloseAnnouncementDialog = "604";
 
 export const eOpenLoading = "605";
 export const eCloseLoading = "606";
+
+export const eOnTopicSheetUpdate = "607";
