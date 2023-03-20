@@ -191,7 +191,7 @@ export const TopicsSheet = () => {
         backgroundColor: colors.nav
       }}
       keyboardHandlerEnabled={false}
-      snapPoints={Config.isTesting === "true" ? [60, 100] : [15, 60, 100]}
+      snapPoints={Config.isTesting === "true" ? [100] : [15, 100]}
       initialSnapIndex={0}
       backgroundInteractionEnabled
       onChange={(position, height) => {

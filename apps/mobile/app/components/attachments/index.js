@@ -116,6 +116,9 @@ export const AttachmentDialog = ({ data }) => {
       <FlatList
         keyboardDismissMode="none"
         keyboardShouldPersistTaps="always"
+        maxToRenderPerBatch={10}
+        initialNumToRender={10}
+        windowSize={5}
         ListEmptyComponent={
           <View
             style={{
