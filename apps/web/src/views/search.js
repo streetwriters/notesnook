@@ -47,6 +47,8 @@ async function typeToItems(type, context) {
     }
     case "tags":
       return ["tags", db.tags.all];
+    case "reminders":
+      return ["reminders", db.reminders.all];
     case "trash":
       return ["trash", db.trash.all];
     default:
@@ -100,6 +102,8 @@ function Search({ type }) {
           }
           case "favorite":
             return "favorite notes";
+          case "monographs":
+            return "all monographs";
           case "color": {
             const color = db.colors.all.find((tag) => tag.id === context.value);
             return `notes in color ${color.title}`;
@@ -117,6 +121,8 @@ function Search({ type }) {
       }
       case "tags":
         return "all tags";
+      case "reminders":
+        return "all reminders";
       case "trash":
         return "all trash";
       default:
