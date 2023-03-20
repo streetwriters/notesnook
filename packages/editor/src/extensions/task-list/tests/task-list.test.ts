@@ -76,7 +76,7 @@ test(`count items in a task list`, async () => {
     builder: { taskItem, taskList }
   } = createEditor({
     extensions: {
-      taskItem: TaskItemNode,
+      taskItem: TaskItemNode.configure({ nested: true }),
       taskList: TaskListNode
     }
   });
@@ -103,7 +103,7 @@ test(`delete checked items in a task list`, async () => {
       taskItem("Task item 2")
     ).outerHTML,
     extensions: {
-      taskItem: TaskItemNode,
+      taskItem: TaskItemNode.configure({ nested: true }),
       taskList: TaskListNode
     }
   });
@@ -117,7 +117,7 @@ test(`delete checked items in a nested task list`, async () => {
   const { editor } = createEditor({
     initialContent: NESTED_TASK_LIST,
     extensions: {
-      taskItem: TaskItemNode,
+      taskItem: TaskItemNode.configure({ nested: true }),
       taskList: TaskListNode
     }
   });
@@ -145,7 +145,7 @@ test(`delete checked items in a task list with no checked items should do nothin
       )
     ).outerHTML,
     extensions: {
-      taskItem: TaskItemNode,
+      taskItem: TaskItemNode.configure({ nested: true }),
       taskList: TaskListNode
     }
   });
@@ -160,7 +160,7 @@ test(`sort checked items to the bottom of the task list`, async () => {
   const { editor } = createEditor({
     initialContent: NESTED_TASK_LIST,
     extensions: {
-      taskItem: TaskItemNode,
+      taskItem: TaskItemNode.configure({ nested: true }),
       taskList: TaskListNode
     }
   });
@@ -175,7 +175,7 @@ test(`sorting a task list with no checked items should do nothing`, async () => 
     initialContent: taskList(taskItem("Task item 1"), taskItem("Task item 2"))
       .outerHTML,
     extensions: {
-      taskItem: TaskItemNode,
+      taskItem: TaskItemNode.configure({ nested: true }),
       taskList: TaskListNode
     }
   });
