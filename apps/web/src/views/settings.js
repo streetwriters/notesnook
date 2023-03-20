@@ -43,8 +43,10 @@ import {
   showToolbarConfigDialog,
   showPromptDialog,
   showEmailChangeDialog,
-  showLanguageSelectorDialog
+  showLanguageSelectorDialog,
+  confirm
 } from "../common/dialog-controller";
+import { TaskManager } from "../common/task-manager";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { createBackup, importBackup, verifyAccount } from "../common";
 import { db } from "../common/db";
@@ -1310,14 +1312,29 @@ function AccountStatus(props) {
                 sx={{ ":hover": { borderColor: "error" } }}
                 onClick={async () => {
                   try {
-                    await db.subscriptions.cancel();
-                    showToast(
-                      "success",
-                      "Your subscription has been cancelled."
-                    );
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 5000);
+                    const cancelSubscription = await confirm({
+                      title: "Cancel subscription?",
+                      message:
+                        "Cancelling your subscription will automatically downgrade you to the Basic plan at the end of your billing period. You will have to resubscribe to continue using the Pro features.",
+                      negativeButtonText: "No",
+                      positiveButtonText: "Yes"
+                    });
+                    if (cancelSubscription) {
+                      await TaskManager.startTask({
+                        id: "cancel-subscription",
+                        type: "modal",
+                        title: "Cancelling your subscription",
+                        subtitle: "Please wait...",
+                        action: () => db.subscriptions.cancel()
+                      });
+                      showToast(
+                        "success",
+                        "Your subscription has been cancelled."
+                      );
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 5000);
+                    }
                   } catch (e) {
                     showToast("error", e.message);
                   }
