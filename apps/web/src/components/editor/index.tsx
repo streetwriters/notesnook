@@ -363,7 +363,7 @@ function EditorChrome(
       ) : null}
 
       <Toolbar />
-      <Flex sx={{ justifyContent: "center", overflow: "hidden" }}>
+      <Flex sx={{ justifyContent: "center", overflow: "hidden", flex: 1 }}>
         <FlexScrollContainer
           className="editorScroll"
           style={{ display: "flex", flexDirection: "column", flex: 1 }}
