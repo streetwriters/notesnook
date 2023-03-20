@@ -235,14 +235,17 @@ const _TabsHolder = () => {
     let needsUpdate = current !== deviceMode;
 
     if (fullscreen && current !== "mobile") {
-      editorRef.current?.setNativeProps({
-        style: {
-          width: size.width,
-          zIndex: 999,
-          paddingHorizontal:
-            current === "smallTablet" ? size.width * 0 : size.width * 0.15
-        }
-      });
+      // Runs after size is set via state.
+      setTimeout(() => {
+        editorRef.current?.setNativeProps({
+          style: {
+            width: size.width,
+            zIndex: 999,
+            paddingHorizontal:
+              current === "smallTablet" ? size.width * 0 : size.width * 0.15
+          }
+        });
+      }, 1);
     } else {
       if (fullscreen) eSendEvent(eCloseFullscreenEditor, current);
       editorRef.current?.setNativeProps({
@@ -281,10 +284,8 @@ const _TabsHolder = () => {
             !editorState().movedAway &&
             useEditorStore.getState().currentEditingNote
           ) {
-            console.log("editor");
             tabBarRef.current?.goToIndex(2, false);
           } else {
-            console.log("home");
             tabBarRef.current?.goToIndex(1, false);
           }
           break;
