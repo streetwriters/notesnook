@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import notifee from "@notifee/react-native";
 import dayjs from "dayjs";
 import React from "react";
 import { Linking, Platform } from "react-native";
@@ -25,6 +26,7 @@ import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
 import { db } from "../../common/database";
 import { MMKV } from "../../common/database/mmkv";
+import { AttachmentDialog } from "../../components/attachments";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
 import { ChangeEmail } from "../../components/sheets/change-email";
@@ -56,7 +58,6 @@ import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import {
   eCloseSheet,
   eCloseSimpleDialog,
-  eOpenAttachmentsDialog,
   eOpenLoginDialog,
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog
@@ -68,7 +69,6 @@ import { useDragState } from "./editor/state";
 import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import notifee from "@notifee/react-native";
 
 type User = any;
 
@@ -149,7 +149,7 @@ export const settingsGroups: SettingSection[] = [
             name: "Manage attachments",
             icon: "attachment",
             modifer: () => {
-              eSendEvent(eOpenAttachmentsDialog);
+              AttachmentDialog.present();
             },
             description: "Manage all attachments in one place."
           },

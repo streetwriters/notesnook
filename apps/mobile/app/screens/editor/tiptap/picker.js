@@ -17,13 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import Sodium from "@ammarahmed/react-native-sodium";
 import React from "react";
 import { Platform, View } from "react-native";
 import DocumentPicker from "react-native-document-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
-import Sodium from "@ammarahmed/react-native-sodium";
 import RNFetchBlob from "rn-fetch-blob";
 import { db } from "../../../common/database";
+import { compressToBase64 } from "../../../common/filesystem/compress";
 import { AttachmentItem } from "../../../components/attachments/attachment-item";
 import {
   eSendEvent,
@@ -32,9 +33,7 @@ import {
 } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { eCloseSheet } from "../../../utils/events";
-import { sleep } from "../../../utils/time";
 import { editorController, editorState } from "./utils";
-import { compressToBase64 } from "../../../common/filesystem/compress";
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
@@ -149,8 +148,6 @@ const file = async (fileOptions) => {
 const camera = async (options) => {
   try {
     await db.attachments.generateKey();
-    eSendEvent(eCloseSheet);
-    await sleep(400);
     launchCamera(
       {
         includeBase64: true,
@@ -172,8 +169,6 @@ const camera = async (options) => {
 const gallery = async (options) => {
   try {
     await db.attachments.generateKey();
-    eSendEvent(eCloseSheet);
-    await sleep(400);
     launchImageLibrary(
       {
         includeBase64: true,
@@ -207,7 +202,7 @@ const pick = async (options) => {
     return;
   }
   if (options?.type.startsWith("image") || options?.type === "camera") {
-    if (options.type === "image") {
+    if (options.type.startsWith("image")) {
       gallery(options);
     } else {
       camera(options);

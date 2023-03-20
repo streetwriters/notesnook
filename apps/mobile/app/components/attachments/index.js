@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
@@ -31,11 +30,11 @@ import Input from "../ui/input";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import { AttachmentItem } from "./attachment-item";
+import { FlatList } from "react-native-actions-sheet";
 
 export const AttachmentDialog = ({ data }) => {
   const colors = useThemeStore((state) => state.colors);
   const [note, setNote] = useState(data);
-  const actionSheetRef = useRef();
   const [attachments, setAttachments] = useState(
     data
       ? db.attachments.ofNote(data.id, "all")
@@ -115,14 +114,8 @@ export const AttachmentDialog = ({ data }) => {
       ) : null}
 
       <FlatList
-        nestedScrollEnabled
-        overScrollMode="never"
-        scrollToOverflowEnabled={false}
         keyboardDismissMode="none"
         keyboardShouldPersistTaps="always"
-        onMomentumScrollEnd={() => {
-          actionSheetRef.current?.handleChildScrollEnd();
-        }}
         ListEmptyComponent={
           <View
             style={{

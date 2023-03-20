@@ -46,7 +46,6 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
   const encryptionProgress = useAttachmentStore(
     (state) => state.encryptionProgress
   );
-
   const onPress = () => {
     Actions.present(attachment, setAttachments, attachment.metadata.hash);
   };
@@ -122,7 +121,9 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
         </View>
       </View>
 
-      {currentProgress || encryptionProgress || encryption ? (
+      {currentProgress ||
+      (encryptionProgress && encryptionProgress !== "0.00") ||
+      encryption ? (
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={() => {
