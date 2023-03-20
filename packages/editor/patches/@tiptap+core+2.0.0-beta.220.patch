@@ -1,8 +1,8 @@
 diff --git a/node_modules/@tiptap/core/dist/index.js b/node_modules/@tiptap/core/dist/index.js
-index 5f413ac..1ccdb49 100644
+index 163e352..8cd7ec6 100644
 --- a/node_modules/@tiptap/core/dist/index.js
 +++ b/node_modules/@tiptap/core/dist/index.js
-@@ -3093,8 +3093,7 @@ const Keymap = Extension.create({
+@@ -3129,8 +3129,7 @@ const Keymap = Extension.create({
              new Plugin({
                  key: new PluginKey('clearDocument'),
                  appendTransaction: (transactions, oldState, newState) => {
@@ -12,20 +12,18 @@ index 5f413ac..1ccdb49 100644
                      if (!docChanges) {
                          return;
                      }
-@@ -3102,10 +3101,14 @@ const Keymap = Extension.create({
+@@ -3138,10 +3137,12 @@ const Keymap = Extension.create({
                      const allFrom = Selection.atStart(oldState.doc).from;
                      const allEnd = Selection.atEnd(oldState.doc).to;
                      const allWasSelected = from === allFrom && to === allEnd;
 -                    const isEmpty = newState.doc.textBetween(0, newState.doc.content.size, ' ', ' ').length === 0;
 -                    if (empty || !allWasSelected || !isEmpty) {
-+
 +                    if (empty || !allWasSelected) {
                          return;
                      }
-+
 +                    const isEmpty = newState.doc.textBetween(0, newState.doc.content.size, ' ', ' ').length === 0;
 +                    if (!isEmpty) return;
-+                    
++
                      const tr = newState.tr;
                      const state = createChainableState({
                          state: newState,

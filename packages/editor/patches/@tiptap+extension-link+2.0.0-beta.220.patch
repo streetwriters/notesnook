@@ -1,5 +1,5 @@
 diff --git a/node_modules/@tiptap/extension-link/dist/index.cjs b/node_modules/@tiptap/extension-link/dist/index.cjs
-index c5a8ab7..fa6e342 100644
+index a79f326..a5f8fdd 100644
 --- a/node_modules/@tiptap/extension-link/dist/index.cjs
 +++ b/node_modules/@tiptap/extension-link/dist/index.cjs
 @@ -101,6 +101,8 @@ function clickHandler(options) {
@@ -12,7 +12,7 @@ index c5a8ab7..fa6e342 100644
                  const attrs = core.getAttributes(view.state, options.type.name);
                  const link = (_a = event.target) === null || _a === void 0 ? void 0 : _a.closest('a');
 diff --git a/node_modules/@tiptap/extension-link/dist/index.js b/node_modules/@tiptap/extension-link/dist/index.js
-index 3dfe757..dd6d3b5 100644
+index d579117..3f6d893 100644
 --- a/node_modules/@tiptap/extension-link/dist/index.js
 +++ b/node_modules/@tiptap/extension-link/dist/index.js
 @@ -97,6 +97,8 @@ function clickHandler(options) {
@@ -25,7 +25,7 @@ index 3dfe757..dd6d3b5 100644
                  const attrs = getAttributes(view.state, options.type.name);
                  const link = (_a = event.target) === null || _a === void 0 ? void 0 : _a.closest('a');
 diff --git a/node_modules/@tiptap/extension-link/dist/index.umd.js b/node_modules/@tiptap/extension-link/dist/index.umd.js
-index c75d4ed..d1d7f33 100644
+index 743ae18..643089d 100644
 --- a/node_modules/@tiptap/extension-link/dist/index.umd.js
 +++ b/node_modules/@tiptap/extension-link/dist/index.umd.js
 @@ -99,6 +99,8 @@
