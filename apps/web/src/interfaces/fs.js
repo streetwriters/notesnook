@@ -29,6 +29,7 @@ import { sendAttachmentsProgressEvent } from "@notesnook/core/common";
 import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
 import { db } from "../common/db";
+import { getFileNameWithExtension } from "@notesnook/core/utils/filename";
 
 const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
@@ -413,7 +414,8 @@ async function saveFile(filename, fileMetadata) {
     },
     filename
   );
-  saveAs(new Blob(blobParts, { type }), name);
+
+  saveAs(new Blob(blobParts, { type }), getFileNameWithExtension(name, type));
 
   if (isUploaded) await streamablefs.deleteFile(filename);
 }
