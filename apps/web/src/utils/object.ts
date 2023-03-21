@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export function objectMap(obj, fn) {
+export function objectMap<T, U>(
+  obj: Record<string, T>,
+  fn: (k: string, v: T, i: number) => U
+) {
   return Object.entries(obj).map(([k, v], i) => fn(k, v, i));
 }
