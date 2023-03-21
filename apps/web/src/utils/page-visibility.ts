@@ -17,36 +17,38 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var hidden, visibilityChange;
+let hidden: string, visibilityChange: string;
 if (typeof document.hidden !== "undefined") {
   // Opera 12.10 and Firefox 18 and later support
   hidden = "hidden";
   visibilityChange = "visibilitychange";
-} else if (typeof document.msHidden !== "undefined") {
+} else if (typeof (document as any).msHidden !== "undefined") {
   hidden = "msHidden";
   visibilityChange = "msvisibilitychange";
-} else if (typeof document.webkitHidden !== "undefined") {
+} else if (typeof (document as any).webkitHidden !== "undefined") {
   hidden = "webkitHidden";
   visibilityChange = "webkitvisibilitychange";
 }
 
-export function onPageVisibilityChanged(handler) {
+export function onPageVisibilityChanged(
+  handler: (status: string, current: boolean) => void
+) {
   onDeviceOnline(() => handler("online", false));
   onDeviceOffline(() => handler("offline", false));
 
   // Handle page visibility change
   document.addEventListener(visibilityChange, () =>
-    handler("visibilitychange", document[hidden])
+    handler("visibilitychange", (document as any)[hidden])
   );
 }
 
-function onDeviceOnline(handler) {
+function onDeviceOnline(handler: () => void | undefined) {
   window.addEventListener("online", function () {
     handler && handler();
   });
 }
 
-function onDeviceOffline(handler) {
+function onDeviceOffline(handler: () => void | undefined) {
   window.addEventListener("offline", function () {
     handler && handler();
   });
