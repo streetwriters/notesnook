@@ -39,85 +39,96 @@ exports[`delete checked items in a nested task list 1`] = `
             "type": "paragraph",
           },
           {
+            "attrs": {
+              "title": null,
+            },
             "content": [
               {
-                "text": "Task item 4",
-                "type": "text",
+                "attrs": {
+                  "checked": false,
+                },
+                "content": [
+                  {
+                    "content": [
+                      {
+                        "text": "Task item 5",
+                        "type": "text",
+                      },
+                    ],
+                    "type": "paragraph",
+                  },
+                ],
+                "type": "taskItem",
               },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
               {
-                "text": "Task item 5",
-                "type": "text",
+                "attrs": {
+                  "checked": false,
+                },
+                "content": [
+                  {
+                    "content": [
+                      {
+                        "text": "Task item 6",
+                        "type": "text",
+                      },
+                    ],
+                    "type": "paragraph",
+                  },
+                  {
+                    "attrs": {
+                      "title": null,
+                    },
+                    "content": [
+                      {
+                        "attrs": {
+                          "checked": false,
+                        },
+                        "content": [
+                          {
+                            "content": [
+                              {
+                                "text": "Task item 9",
+                                "type": "text",
+                              },
+                            ],
+                            "type": "paragraph",
+                          },
+                          {
+                            "attrs": {
+                              "title": null,
+                            },
+                            "content": [
+                              {
+                                "attrs": {
+                                  "checked": false,
+                                },
+                                "content": [
+                                  {
+                                    "content": [
+                                      {
+                                        "text": "Task item 12",
+                                        "type": "text",
+                                      },
+                                    ],
+                                    "type": "paragraph",
+                                  },
+                                ],
+                                "type": "taskItem",
+                              },
+                            ],
+                            "type": "taskList",
+                          },
+                        ],
+                        "type": "taskItem",
+                      },
+                    ],
+                    "type": "taskList",
+                  },
+                ],
+                "type": "taskItem",
               },
             ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 6",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 7",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 8",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 9",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 10",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 11",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 12",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
+            "type": "taskList",
           },
         ],
         "type": "taskItem",
@@ -197,85 +208,181 @@ exports[`sort checked items to the bottom of the task list 1`] = `
             "type": "paragraph",
           },
           {
+            "attrs": {
+              "title": null,
+            },
             "content": [
               {
-                "text": "Task item 4",
-                "type": "text",
+                "attrs": {
+                  "checked": false,
+                },
+                "content": [
+                  {
+                    "content": [
+                      {
+                        "text": "Task item 5",
+                        "type": "text",
+                      },
+                    ],
+                    "type": "paragraph",
+                  },
+                ],
+                "type": "taskItem",
               },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
               {
-                "text": "Task item 5",
-                "type": "text",
+                "attrs": {
+                  "checked": false,
+                },
+                "content": [
+                  {
+                    "content": [
+                      {
+                        "text": "Task item 6",
+                        "type": "text",
+                      },
+                    ],
+                    "type": "paragraph",
+                  },
+                  {
+                    "attrs": {
+                      "title": null,
+                    },
+                    "content": [
+                      {
+                        "attrs": {
+                          "checked": false,
+                        },
+                        "content": [
+                          {
+                            "content": [
+                              {
+                                "text": "Task item 9",
+                                "type": "text",
+                              },
+                            ],
+                            "type": "paragraph",
+                          },
+                          {
+                            "attrs": {
+                              "title": null,
+                            },
+                            "content": [
+                              {
+                                "attrs": {
+                                  "checked": false,
+                                },
+                                "content": [
+                                  {
+                                    "content": [
+                                      {
+                                        "text": "Task item 12",
+                                        "type": "text",
+                                      },
+                                    ],
+                                    "type": "paragraph",
+                                  },
+                                ],
+                                "type": "taskItem",
+                              },
+                              {
+                                "attrs": {
+                                  "checked": true,
+                                },
+                                "content": [
+                                  {
+                                    "content": [
+                                      {
+                                        "text": "Task item 10",
+                                        "type": "text",
+                                      },
+                                    ],
+                                    "type": "paragraph",
+                                  },
+                                ],
+                                "type": "taskItem",
+                              },
+                              {
+                                "attrs": {
+                                  "checked": true,
+                                },
+                                "content": [
+                                  {
+                                    "content": [
+                                      {
+                                        "text": "Task item 11",
+                                        "type": "text",
+                                      },
+                                    ],
+                                    "type": "paragraph",
+                                  },
+                                ],
+                                "type": "taskItem",
+                              },
+                            ],
+                            "type": "taskList",
+                          },
+                        ],
+                        "type": "taskItem",
+                      },
+                      {
+                        "attrs": {
+                          "checked": true,
+                        },
+                        "content": [
+                          {
+                            "content": [
+                              {
+                                "text": "Task item 7",
+                                "type": "text",
+                              },
+                            ],
+                            "type": "paragraph",
+                          },
+                        ],
+                        "type": "taskItem",
+                      },
+                      {
+                        "attrs": {
+                          "checked": true,
+                        },
+                        "content": [
+                          {
+                            "content": [
+                              {
+                                "text": "Task item 8",
+                                "type": "text",
+                              },
+                            ],
+                            "type": "paragraph",
+                          },
+                        ],
+                        "type": "taskItem",
+                      },
+                    ],
+                    "type": "taskList",
+                  },
+                ],
+                "type": "taskItem",
               },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
               {
-                "text": "Task item 6",
-                "type": "text",
+                "attrs": {
+                  "checked": true,
+                },
+                "content": [
+                  {
+                    "content": [
+                      {
+                        "text": "Task item 4",
+                        "type": "text",
+                      },
+                    ],
+                    "type": "paragraph",
+                  },
+                ],
+                "type": "taskItem",
               },
             ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 7",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 8",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 9",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 10",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 11",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
-          },
-          {
-            "content": [
-              {
-                "text": "Task item 12",
-                "type": "text",
-              },
-            ],
-            "type": "paragraph",
+            "type": "taskList",
           },
         ],
         "type": "taskItem",

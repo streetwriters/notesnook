@@ -133,6 +133,9 @@ class Settings {
     await this._saveSettings();
   }
 
+  /**
+   * @returns {7 | 30 | 365 | -1}
+   */
   getTrashCleanupInterval() {
     return this._settings.trashCleanupInterval || 7;
   }

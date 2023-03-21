@@ -24,6 +24,7 @@ import { EV, EVENTS, sendAttachmentsProgressEvent } from "../common";
 import dataurl from "../utils/dataurl";
 import dayjs from "dayjs";
 import setManipulator from "../utils/set";
+import { getFileNameWithExtension } from "../utils/filename";
 
 export default class Attachments extends Collection {
   constructor(db, name, cached) {
@@ -131,7 +132,7 @@ export default class Attachments extends Collection {
       metadata: {
         hash,
         hashType,
-        filename,
+        filename: getFileNameWithExtension(filename, type),
         type: type || "application/octet-stream"
       },
       dateCreated: attachment.dateCreated || Date.now(),

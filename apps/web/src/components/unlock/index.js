@@ -23,20 +23,25 @@ import * as Icon from "../icons";
 import { db } from "../../common/db";
 import { useStore as useEditorStore } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { useStore as useNoteStore } from "../../stores/note-store";
 import Field from "../field";
 import { showToast } from "../../utils/toast";
 
 function Unlock(props) {
   const { noteId } = props;
-  const note = useMemo(() => db.notes.note(noteId)?.data, [noteId]);
-  const passwordRef = useRef();
+
   const [isWrong, setIsWrong] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const passwordRef = useRef();
+
+  const note = useMemo(
+    () => !isLoading && db.notes.note(noteId)?.data,
+    [noteId, isLoading]
+  );
   const openLockedSession = useEditorStore((store) => store.openLockedSession);
-  const clearSession = useEditorStore((store) => store.clearSession);
+  const openSession = useEditorStore((store) => store.openSession);
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
-  const setSelectedNote = useNoteStore((store) => store.setSelectedNote);
 
   const submit = useCallback(async () => {
     setIsUnlocking(true);
@@ -58,10 +63,15 @@ function Unlock(props) {
   }, [setIsWrong, noteId, openLockedSession]);
 
   useEffect(() => {
-    clearSession(false);
-    setIsEditorOpen(true);
-    setTimeout(() => setSelectedNote(noteId));
-  }, [clearSession, setIsEditorOpen, setSelectedNote, noteId]);
+    (async () => {
+      setIsLoading(true);
+
+      await openSession(noteId);
+      setIsEditorOpen(true);
+
+      setIsLoading(false);
+    })();
+  }, [openSession, setIsEditorOpen, noteId]);
 
   return (
     <Flex

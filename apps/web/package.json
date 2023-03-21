@@ -1,7 +1,7 @@
 {
   "name": "@notesnook/web",
   "description": "Your private note taking space",
-  "version": "2.4.4",
+  "version": "2.4.5",
   "private": true,
   "main": "./src/app.js",
   "homepage": "https://notesnook.com/",
@@ -16,7 +16,7 @@
     "@emotion/react": "^11.10.0",
     "@mdi/js": "^6.9.96",
     "@mdi/react": "^1.6.0",
-    "@notesnook-importer/core": "^1.6.0",
+    "@notesnook-importer/core": "^1.7.1",
     "@notesnook/core": "*",
     "@notesnook/crypto": "*",
     "@notesnook/crypto-worker": "*",

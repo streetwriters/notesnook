@@ -86,12 +86,15 @@ export function sortList(tr: Transaction, pos: number) {
   sublists.push(parent);
 
   for (const list of sublists) {
+    const listNode = tr.doc.nodeAt(tr.mapping.map(list.pos));
+    if (!listNode) continue;
+
     const children: {
       checked: number;
       index: number;
     }[] = [];
 
-    list.node.forEach((node, _, index) => {
+    listNode.forEach((node, _, index) => {
       children.push({
         index,
         checked: node.attrs.checked ? 1 : 0
@@ -106,11 +109,11 @@ export function sortList(tr: Transaction, pos: number) {
 
     tr.replaceWith(
       tr.mapping.map(list.pos + 1),
-      tr.mapping.map(list.pos + list.node.nodeSize - 1),
+      tr.mapping.map(list.pos + listNode.nodeSize - 1),
       Fragment.from(
         children
           .sort((a, b) => a.checked - b.checked)
-          .map((c) => list.node.child(c.index))
+          .map((c) => listNode.child(c.index))
       )
     );
   }

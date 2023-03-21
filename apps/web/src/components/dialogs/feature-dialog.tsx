@@ -92,22 +92,14 @@ const features: Record<FeatureKeys, Feature> = {
       : isDesktop()
       ? [
           {
-            title: "Smoother app loading animation",
+            title: "Topics are now optional",
             subtitle:
-              "Starting the app will now feel much, much smoother and less janky."
+              "You can now move notes directly into a notebook without ever needing a topic (but topics are still there...just optional)."
           },
           {
-            title: "Faster & less buggy outline list"
-          },
-          {
-            title: "Sortable task lists",
+            title: "Adjustable trash cleanup interval",
             subtitle:
-              "Task lists can now be sorted by their status. This'll move all completed tasks to the bottom."
-          },
-          {
-            title: "Faster editor",
-            subtitle:
-              "Editor performance has been vastly improved in this version especially when you have a lot of images, task list etc."
+              "You can now customize after how long you want your trash to be automatically cleared. Just go into Settings -> Trash settings."
           }
         ]
       : [],
