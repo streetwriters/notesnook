@@ -18,8 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import EventManager from "@notesnook/core/utils/event-manager";
-
-const GlobalKeyboard = {};
+interface GlobalKeyboard {
+  addEventListener(
+    name: string,
+    handler: EventListenerOrEventListenerObject
+  ): void;
+  removeEventListener(
+    name: string,
+    handler: EventListenerOrEventListenerObject
+  ): void;
+}
+const GlobalKeyboard = {} as GlobalKeyboard;
 
 const KeyboardEventManager = new EventManager();
 
