@@ -51,7 +51,7 @@ const windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
 const windowsTrailingRe = /[. ]+$/;
 const whitespace = /\s+/g;
 
-function sanitize(input:string, replacement:string) {
+function sanitize(input: string, replacement: string) {
   if (typeof input !== "string") {
     throw new Error("Input must be string");
   }
@@ -66,12 +66,12 @@ function sanitize(input:string, replacement:string) {
   return sanitized.slice(0, 254).toLowerCase();
 }
 
-export function sanitizeFilename(input:string) {
+export function sanitizeFilename(input: string) {
   const replacement = "-";
   return sanitize(input, replacement);
 }
 
-export function formatBytes(bytes:number, decimals = 2) {
+export function formatBytes(bytes: number, decimals = 2) {
   if (bytes === 0) return "0 B";
 
   const k = 1024;
@@ -83,7 +83,7 @@ export function formatBytes(bytes:number, decimals = 2) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
 
-export function truncateFilename(filename:string) {
+export function truncateFilename(filename: string) {
   const MAX_LENGTH = 38;
   if (filename.length > MAX_LENGTH) {
     return (
