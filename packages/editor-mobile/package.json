@@ -32,7 +32,8 @@
     "start": "env-cmd -e all react-scripts start",
     "build": "env-cmd -e all react-scripts build && rm -rf build.bundle && mv build build.bundle",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "postinstall": "patch-package"
   },
   "homepage": ".",
   "browserslist": {
