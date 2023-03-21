@@ -215,17 +215,17 @@ jobs:
       - name: Build snap
         if: inputs.publish-snap
         run: |
-          npx electron-builder --linux snap -p never
+          npx electron-builder --linux snap:x64 snap:arm64 -p never
         working-directory: ./apps/web/desktop
 
-      - name: Build AppImage deb and rpm
+      - name: Build AppImage
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ ${{ inputs.publish-github }} == true ]; then
-            npx electron-builder --linux AppImage deb rpm -p always
+            npx electron-builder --linux AppImage:x64 AppImage:arm64 -p always
           else
-            npx electron-builder --linux AppImage deb rpm -p never
+            npx electron-builder --linux AppImage:x64 AppImage:arm64 -p never
           fi
         working-directory: ./apps/web/desktop
 
