@@ -17,23 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function isMobile():boolean {
-    const match = window.matchMedia;
-    if (match) {
-      const mq = match("(max-width: 480px)");
-      return mq.matches;
-    }
-    return false;
-  }
-  
-  function isTablet():boolean {
-    const match = window.matchMedia;
-    if (match) {
-      const mq = match("(min-width: 480px) and (max-width: 1000px)");
-      return mq.matches;
-    }
-    return false;
-  }
-  
-  export { isMobile, isTablet };
-  
+function isMobile(): boolean {
+  const match = window.matchMedia;
+  const mq = match("(max-width: 480px)");
+  return mq.matches;
+}
+
+function isTablet(): boolean {
+  const match = window.matchMedia;
+  const mq = match("(min-width: 480px) and (max-width: 1000px)");
+  return mq.matches;
+}
+
+export { isMobile, isTablet };
