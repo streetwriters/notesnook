@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function getRandom(min, max) {
+function getRandom(min: number, max: number) {
   return Math.round(Math.random() * (max - min) + min);
 }
 
-function getRandomArbitrary(min, max) {
+function getRandomArbitrary(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
 export { getRandom, getRandomArbitrary };
