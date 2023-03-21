@@ -215,7 +215,7 @@ jobs:
       - name: Build snap
         if: inputs.publish-snap
         run: |
-          npx electron-builder --linux snap:x64 snap:arm64 -p never
+          npx electron-builder --linux snap:x64 -p never
         working-directory: ./apps/web/desktop
 
       - name: Build AppImage

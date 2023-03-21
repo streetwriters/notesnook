@@ -27,7 +27,7 @@
   "scripts": {
     "build": "esbuild ./electron.js ./preload.js --external:electron --external:fsevents --minify --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=false --define:RELEASE=true",
     "build:mas": "esbuild ./electron.js ./preload.js --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=true --define:RELEASE=true",
-    "pack": "rm -rf ./build && cp -r ../build ./ && npm run build && yarn electron-builder --linux deb",
+    "pack": "rm -rf ./build && cp -r ../build ./ && npm run build && yarn electron-builder --linux AppImage:x64 AppImage:arm64",
     "postinstall": "patch-package"
   },
   "author": {
