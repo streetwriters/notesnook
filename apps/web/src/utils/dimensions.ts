@@ -18,15 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 function isMobile(): boolean {
-  const match = window.matchMedia;
-  const mq = match("(max-width: 480px)");
-  return mq.matches;
+  return window.matchMedia("(max-width: 480px)").matches;
 }
 
 function isTablet(): boolean {
-  const match = window.matchMedia;
-  const mq = match("(min-width: 480px) and (max-width: 1000px)");
-  return mq.matches;
+  return window.matchMedia("(min-width: 480px) and (max-width: 1000px)")
+    .matches;
 }
 
 export { isMobile, isTablet };
