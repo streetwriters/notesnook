@@ -17,15 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-type MimeTypeInfo = {
-  source: string;
-  extensions?: string[];
-  charset?: string;
-  compressible?: boolean;
-};
+// type MimeTypeInfo = {
+//   source: string;
+//   extensions?: string[];
+//   charset?: string;
+//   compressible?: boolean;
+// };
 
-let db: Record<string, MimeTypeInfo>;
-export function getFileNameWithExtension(filename: string, mime?: string) {
+let db; // : Record<string, MimeTypeInfo>;
+
+/**
+ *
+ * @param {string} filename
+ * @param {string | undefined} mime
+ * @returns {string}
+ */
+export function getFileNameWithExtension(filename, mime) {
   if (!mime || mime === "application/octet-stream") return filename;
   if (!db) db = require("mime-db");
   const mimeData = db[mime];
