@@ -18,20 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 let hidden: string, visibilityChange: string;
-if (typeof document.hidden !== "undefined") {
+if ("hidden" in document) {
   // Opera 12.10 and Firefox 18 and later support
   hidden = "hidden";
   visibilityChange = "visibilitychange";
-} else if (typeof (document as any).msHidden !== "undefined") {
+} else if ("msHidden" in document) {
   hidden = "msHidden";
   visibilityChange = "msvisibilitychange";
-} else if (typeof (document as any).webkitHidden !== "undefined") {
+} else if ("webkitHidden" in document) {
   hidden = "webkitHidden";
   visibilityChange = "webkitvisibilitychange";
 }
 
 export function onPageVisibilityChanged(
-  handler: (status: string, current: boolean) => void
+  handler: (status: string, bool: boolean) => void
 ) {
   onDeviceOnline(() => handler("online", false));
   onDeviceOffline(() => handler("offline", false));
