@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import ImageViewer from "react-native-image-zoom-viewer";
 import downloadAttachment from "../../common/filesystem/download-attachment";
 import { cacheDir } from "../../common/filesystem/utils";
@@ -30,6 +30,8 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import BaseDialog from "../dialog/base-dialog";
 import { IconButton } from "../ui/icon-button";
 import { ProgressBarComponent } from "../ui/svg/lazy";
+import Sodium from "@ammarahmed/react-native-sodium";
+import dataurl from "@notesnook/core/utils/dataurl";
 
 const ImagePreview = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -49,13 +51,22 @@ const ImagePreview = () => {
     setVisible(true);
     setLoading(true);
     setTimeout(async () => {
-      const hash = image.hash;
+      let hash = image.hash;
+      if (!hash && dataurl.toObject(image.src)) {
+        const data = dataurl.toObject(image.src);
+        if (!data) return;
+        hash = await Sodium.hashFile({
+          data: data.data,
+          type: "base64",
+          uri: ""
+        });
+      }
+      if (!hash) return;
       const uri = await downloadAttachment(hash, false, {
         silent: true,
         cache: true
       });
       const path = `${cacheDir}/${uri}`;
-      console.log(path);
       setImage("file://" + path);
       setLoading(false);
     }, 100);
@@ -111,7 +122,7 @@ const ImagePreview = () => {
                     position: "absolute",
                     zIndex: 999,
                     backgroundColor: "rgba(0,0,0,0.3)",
-                    paddingTop: 30
+                    paddingTop: Platform.OS === "android" ? 30 : 0
                   }}
                 >
                   <IconButton
