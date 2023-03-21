@@ -28,6 +28,7 @@ import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import Storage from "../database/storage";
 import { cacheDir } from "./utils";
+import { getFileNameWithExtension } from "@notesnook/core/utils/filename";
 
 export default async function downloadAttachment(
   hash,
@@ -38,7 +39,6 @@ export default async function downloadAttachment(
   }
 ) {
   let attachment = db.attachments.attachment(hash);
-  console.log(attachment);
   if (!attachment) {
     console.log("attachment not found");
     return;
@@ -64,6 +64,11 @@ export default async function downloadAttachment(
     )
       return;
 
+    let filename = getFileNameWithExtension(
+      attachment.metadata.filename,
+      attachment.metadata.type
+    );
+
     let key = await db.attachments.decryptKey(attachment.key);
     let info = {
       iv: attachment.iv,
@@ -73,7 +78,7 @@ export default async function downloadAttachment(
       hash: attachment.metadata.hash,
       hashType: attachment.metadata.hashType,
       mime: attachment.metadata.type,
-      fileName: options.cache ? undefined : attachment.metadata.filename,
+      fileName: options.cache ? undefined : filename,
       uri: options.cache ? undefined : folder.uri,
       chunkSize: attachment.chunkSize
     };
@@ -87,7 +92,7 @@ export default async function downloadAttachment(
     if (!options.silent) {
       ToastEvent.show({
         heading: "Download successful",
-        message: attachment.metadata.filename + " downloaded",
+        message: filename + " downloaded",
         type: "success"
       });
     }
@@ -100,28 +105,20 @@ export default async function downloadAttachment(
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
         .catch(console.log);
     }
-
-    if (Platform.OS === "ios") {
-      fileUri = folder.uri + `/${attachment.metadata.filename}`;
+    if (Platform.OS === "ios" && !options.cache) {
+      fileUri = folder.uri + `/${filename}`;
     }
-    console.log("saved file uri: ", fileUri);
     if (!options.silent) {
       presentSheet({
         title: "File downloaded",
-        paragraph: `${attachment.metadata.filename} saved to ${
+        paragraph: `${filename} saved to ${
           Platform.OS === "android"
             ? "selected path"
             : "File Manager/Notesnook/downloads"
         }`,
         icon: "download",
         context: global ? null : attachment.metadata.hash,
-        component: (
-          <ShareComponent
-            uri={fileUri}
-            name={attachment.metadata.filename}
-            padding={12}
-          />
-        )
+        component: <ShareComponent uri={fileUri} name={filename} padding={12} />
       });
     }
 
