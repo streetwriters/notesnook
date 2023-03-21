@@ -72,7 +72,11 @@ export async function downloadImage(url: string, options?: DownloadOptions) {
     throw new Error("not an image");
 
   const size = parseInt(contentLength);
-  const blob = await response.blob();
+  let blob = await response.blob();
+  if (UTITypes[blob.type])
+    blob = new Blob([blob], {
+      type: contentType
+    });
   return {
     blob,
     url: URL.createObjectURL(blob),
