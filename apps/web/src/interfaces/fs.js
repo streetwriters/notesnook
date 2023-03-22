@@ -124,6 +124,15 @@ async function writeEncryptedBase64(metadata) {
 
 /**
  *
+ * @param {string} data the base64 data
+ * @returns
+ */
+function hashBase64(data) {
+  return hashBuffer(Buffer.from(data, "base64"));
+}
+
+/**
+ *
  * @param {import("hash-wasm/dist/lib/util").IDataType} data
  * @returns
  */
@@ -469,11 +478,13 @@ const FS = {
   deleteFile,
   saveFile,
   exists,
-  hashBuffer,
-  hashStream,
   writeEncryptedFile,
   clearFileStorage,
-  getUploadedFileSize
+  getUploadedFileSize,
+
+  hashBase64,
+  hashBuffer,
+  hashStream
 };
 export default FS;
 
