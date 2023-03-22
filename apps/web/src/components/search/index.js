@@ -32,7 +32,7 @@ function SearchBox({ onSearch }) {
       type="text"
       sx={{ m: 0, mx: 1, mt: 1 }}
       placeholder="Type your query here"
-      onKeyDown={(e) =>
+      onChange={(e) =>
         inlineDebounce("search", () => onSearch(e.target.value), 250)
       }
       action={{
