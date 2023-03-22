@@ -233,7 +233,7 @@ export function ImageComponent(
                     data-drag-handle
                     draggable
                     path={Icons.dragHandle}
-                    color="text"
+                    color="black"
                     sx={{
                       cursor: "grab",
                       position: "absolute",
