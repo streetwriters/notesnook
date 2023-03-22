@@ -61,6 +61,7 @@ export type ImageAttributes = Partial<ImageSizeOptions> &
     alt?: string;
     title?: string;
     textDirection?: TextDirections;
+    aspectRatio?: number;
   };
 
 export type ImageAlignmentOptions = {
@@ -135,6 +136,19 @@ export const ImageNode = Node.create<ImageOptions>({
       filename: getDataAttribute("filename"),
       type: getDataAttribute("mime"),
       size: getDataAttribute("size"),
+      aspectRatio: {
+        default: undefined,
+        parseHTML: (element) => element.dataset.aspectRatio,
+        renderHTML: (attributes) => {
+          if (!attributes.aspectRatio) {
+            return {};
+          }
+
+          return {
+            [`data-aspect-ratio`]: attributes.aspectRatio
+          };
+        }
+      },
 
       dataurl: {
         ...getDataAttribute("dataurl"),
