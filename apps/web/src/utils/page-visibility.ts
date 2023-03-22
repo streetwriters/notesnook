@@ -18,23 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 const getVisibilityChangeParams = () => {
-  let hidden: "hidden" | "msHidden" | "webkitHidden" = "hidden";
-  let visibilityChange:
-    | "visibilitychange"
-    | "msvisibilitychange"
-    | "webkitvisibilitychange" = "visibilitychange";
   if ("hidden" in document) {
     // Opera 12.10 and Firefox 18 and later support
-    hidden = "hidden";
-    visibilityChange = "visibilitychange";
+    return ["hidden", "visibilityChange"] as const;
   } else if ("msHidden" in document) {
-    hidden = "msHidden";
-    visibilityChange = "msvisibilitychange";
+    return ["msHidden", "msvisibilityChange"] as const;
   } else if ("webkitHidden" in document) {
-    hidden = "webkitHidden";
-    visibilityChange = "webkitvisibilitychange";
+    return ["webkitHidden", "webkitvisibilityChange"] as const;
   }
-  return { hidden, visibilityChange };
+  return ["hidden", "visibilityChange"] as const;
 };
 
 export function onPageVisibilityChanged(
