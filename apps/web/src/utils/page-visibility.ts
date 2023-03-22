@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const getVisibilityChange = () => {
+const getVisibilityChangeParams = () => {
   let hidden: "hidden" | "msHidden" | "webkitHidden" = "hidden";
   let visibilityChange:
     | "visibilitychange"
@@ -47,7 +47,7 @@ export function onPageVisibilityChanged(
   onDeviceOffline(() => handler("offline", false));
 
   // Handle page visibility change
-  const { hidden, visibilityChange } = getVisibilityChange();
+  const { hidden, visibilityChange } = getVisibilityChangeParams();
   document.addEventListener(visibilityChange, () =>
     handler("visibilitychange", (document as any)[hidden])
   );
