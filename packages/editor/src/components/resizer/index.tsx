@@ -30,15 +30,25 @@ type ResizerProps = {
   height?: number;
   handleColor?: keyof SchemeColors;
   onResize: (width: number, height: number) => void;
+  style?: React.CSSProperties;
 };
 export function Resizer(props: PropsWithChildren<ResizerProps>) {
-  const { editor, selected, onResize, width, height, children, handleColor } =
-    props;
+  const {
+    editor,
+    selected,
+    onResize,
+    width,
+    height,
+    children,
+    handleColor,
+    style
+  } = props;
 
   if (!editor.isEditable) return <>{children}</>;
 
   return (
     <Resizable
+      style={style}
       enable={{
         bottom: false,
         left: false,
