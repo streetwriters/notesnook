@@ -226,20 +226,20 @@ export function ImageComponent(
               alt={alt}
               src={source}
               title={title}
-              width={editor.isEditable ? "100%" : width}
-              height={editor.isEditable ? "100%" : height}
               sx={{
+                width: editor.isEditable ? "100%" : width,
+                height: editor.isEditable ? "100%" : height,
                 border: selected
                   ? "2px solid var(--primary)"
                   : "2px solid transparent",
                 borderRadius: "default"
               }}
               onLoad={(e) => {
-                const { clientWidth, clientHeight } = e.currentTarget;
-                if (!width && !height) {
+                const { clientHeight } = e.currentTarget;
+                if (height !== clientHeight) {
                   editor.current?.commands.updateImage(
                     { src },
-                    { width: clientWidth, height: clientHeight }
+                    { height: clientHeight }
                   );
                 }
               }}
