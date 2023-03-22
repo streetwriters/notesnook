@@ -82,6 +82,7 @@ const routes = {
     const notebook = db.notebooks.notebook(notebookId);
     const topic = notebook?.topics?.topic(topicId)?._topic;
     if (!topic) return false;
+    nbstore.setSelectedNotebook(notebookId);
     notestore.setContext({
       type: "topic",
       value: { id: notebookId, topic: topicId }
