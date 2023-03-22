@@ -16,10 +16,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 export type DownloadOptions = {
   corsHost: string;
 };
 
+/**
+ * macOS uses its own Uniform Type Identifier format instead of mime-types.
+ * This is an incomplete map of UTI->mime-type for image types taken from
+ * https://gist.github.com/RhetTbull/7221ef3cfd9d746f34b2550d4419a8c2
+ */
 const UTITypes: Record<string, string> = {
   "com.microsoft.bmp": "image/bmp",
   "com.canon.crw-raw-image": "image/x-canon-crw",
@@ -77,6 +83,7 @@ export async function downloadImage(url: string, options?: DownloadOptions) {
     blob = new Blob([blob], {
       type: contentType
     });
+
   return {
     blob,
     url: URL.createObjectURL(blob),
