@@ -76,8 +76,7 @@ export const useEditor = (
   const saveCount = useRef(0);
   const lastContentChangeTime = useRef<number>(0);
   const lock = useRef(false);
-  const attachedImages = useRef<{ [name: string]: any }>({});
-  const loadedImages = useRef<{ [name: string]: any }>({});
+  const loadedImages = useRef<{ [name: string]: boolean }>({});
 
   const postMessage = useCallback(
     async <T>(type: string, data: T) =>
@@ -156,8 +155,7 @@ export const useEditor = (
     async (resetState = true) => {
       currentNote.current?.id && db.fs.cancel(currentNote.current.id);
       currentNote.current = null;
-      attachedImages.current = [];
-      loadedImages.current = [];
+      loadedImages.current = {};
       currentContent.current = null;
       clearTimeout(timers.current["loading-images"]);
       sessionHistoryId.current = undefined;
