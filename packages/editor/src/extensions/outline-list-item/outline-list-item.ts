@@ -146,12 +146,13 @@ export const OutlineListItem = Node.create<ListItemOptions>({
         if (!(e.target instanceof HTMLParagraphElement)) return;
         if (!li.classList.contains("nested")) return;
 
+        const { x, y, right } = li.getBoundingClientRect();
+
         const clientX =
           e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+
         const clientY =
           e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
-
-        const { x, y,left,right, } = li.getBoundingClientRect();
 
         const hitArea = { width: 26, height: 24 };
 
@@ -159,29 +160,20 @@ export const OutlineListItem = Node.create<ListItemOptions>({
         const parent = findParentNode((node) => !!node.attrs.textDirection)(
           selection
         );
-        console.log("addNodeView", left,right,clientX);
+
+        let xlowerLimit = clientX >= x - hitArea.width;
+        let xHigherLimit = clientX <= x;
+
         if (parent) {
           if (parent.node.attrs.textDirection === "rtl") {
-            //x = clientX / 2 + x;
+            xHigherLimit = clientX <= right + hitArea.width;
+            xlowerLimit = clientX >= right;
           }
         }
-        console.log(
-          "clientX<=x",
-          clientX <= x,
-          "clientX >= x - hitArea.width",
-          clientX >= x - hitArea.width,
-          "clientY >= y",
-          clientY >= y,
-          "clientY <= y + hitArea.height",
-          clientY <= y + hitArea.height,
-          " x",
-          x,
-          "clientX",
-          clientX
-        );
+
         if (
-          clientX >= x - hitArea.width &&
-          clientX <= x &&
+          xlowerLimit &&
+          xHigherLimit &&
           clientY >= y &&
           clientY <= y + hitArea.height
         ) {
