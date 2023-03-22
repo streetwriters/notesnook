@@ -44,7 +44,8 @@ export function ImageComponent(
 ) {
   const { editor, node, selected } = props;
   const isMobile = useIsMobile();
-  const { src, alt, title, width, height, textDirection, hash } = node.attrs;
+  const { dataurl, src, alt, title, width, height, textDirection, hash } =
+    node.attrs;
   const float = isMobile ? false : node.attrs.float;
 
   let align = node.attrs.align;
@@ -58,9 +59,10 @@ export function ImageComponent(
   useEffect(
     () => {
       (async () => {
-        if (!src) return;
+        if (!src && !dataurl) return;
         try {
-          if (isDataUrl(src)) setSource(await toBlobURL(src));
+          if (dataurl) setSource(await toBlobURL(dataurl));
+          else if (isDataUrl(src)) setSource(await toBlobURL(src));
           else {
             const { url, size, blob, type } = await downloadImage(
               src,
@@ -79,7 +81,7 @@ export function ImageComponent(
       })();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [src, imageRef, downloadOptions]
+    [src, dataurl, imageRef, downloadOptions]
   );
 
   return (

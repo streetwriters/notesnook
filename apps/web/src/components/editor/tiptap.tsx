@@ -398,7 +398,7 @@ function toIEditor(editor: Editor): IEditor {
     loadImage: (hash, src) =>
       editor.current?.commands.updateImage(
         { hash },
-        { hash, src, preventUpdate: true }
+        { hash, dataurl: src, preventUpdate: true }
       ),
     sendAttachmentProgress: (hash, type, progress) =>
       editor.current?.commands.setAttachmentProgress({
