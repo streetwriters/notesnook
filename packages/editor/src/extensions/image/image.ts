@@ -23,11 +23,15 @@ import {
   mergeAttributes,
   findChildren
 } from "@tiptap/core";
+import { Attrs } from "@tiptap/pm/model";
+import { Plugin } from "@tiptap/pm/state";
 import { hasSameAttributes } from "../../utils/prosemirror";
 import { Attachment, getDataAttribute } from "../attachment";
 import { createSelectionBasedNodeView } from "../react";
 import { TextDirections } from "../text-direction";
 import { ImageComponent } from "./component";
+
+type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 export interface ImageOptions {
   inline: boolean;
@@ -176,6 +180,28 @@ export const ImageNode = Node.create<ImageOptions>({
     return createSelectionBasedNodeView(ImageComponent, {
       shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs)
     });
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        props: {
+          transformCopied: (content) => {
+            content.content.descendants((node) => {
+              if (
+                node.type.name === this.name &&
+                typeof node.attrs.dataurl === "string"
+              ) {
+                const attrs = node.attrs as Writeable<Attrs>;
+                attrs.src = attrs.dataurl;
+                delete attrs.dataurl;
+              }
+            });
+            return content;
+          }
+        }
+      })
+    ];
   },
 
   addCommands() {

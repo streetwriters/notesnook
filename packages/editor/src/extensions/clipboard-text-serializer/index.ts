@@ -30,10 +30,7 @@ export const ClipboardTextSerializer = Extension.create({
         key: new PluginKey("clipboardTextSerializer"),
         props: {
           clipboardTextSerializer: (content) => {
-            const {
-              editor: { schema }
-            } = this;
-            return getTextBetween(content, schema);
+            return getTextBetween(content, this.editor.schema);
           }
         }
       })
