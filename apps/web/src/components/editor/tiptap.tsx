@@ -373,6 +373,14 @@ function toIEditor(editor: Editor): IEditor {
     focus: () => editor.current?.commands.focus("start"),
     undo: () => editor.current?.commands.undo(),
     redo: () => editor.current?.commands.redo(),
+    getMediaHashes: () => {
+      if (!editor.current) return [];
+      const hashes: string[] = [];
+      editor.current.state.doc.descendants((n) => {
+        if (typeof n.attrs.hash === "string") hashes.push(n.attrs.hash);
+      });
+      return hashes;
+    },
     updateContent: (content) => {
       const { from, to } = editor.state.selection;
       editor.current

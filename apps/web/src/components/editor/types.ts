@@ -30,6 +30,7 @@ export interface IEditor {
   focus: () => void;
   undo: () => void;
   redo: () => void;
+  getMediaHashes: () => string[];
   updateContent: (content: string) => void;
   attachFile: (file: Attachment) => void;
   loadWebClip: (hash: string, html: string) => void;
