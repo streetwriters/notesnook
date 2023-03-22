@@ -18,9 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export function tryParse(val: string) {
-  if (!val || val == "null" || val == "undefined") {
-    return;
-  }
+  if (val == "null" || val == "undefined") return;
   try {
     return JSON.parse(val);
   } catch (error) {
