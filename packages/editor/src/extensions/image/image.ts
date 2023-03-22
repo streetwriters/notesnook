@@ -35,9 +35,29 @@ export interface ImageOptions {
   HTMLAttributes: Record<string, unknown>;
 }
 
+/**
+ * We have two attributes that store the source of an image:
+ *
+ * 1. `src`
+ * 2. `dataurl`
+ *
+ * `src` is the image's inherent source. This can contain a URL, a base64-dataurl,
+ * a blob...etc. We should never touch this attribute. This is also where we store
+ * the data that we want to upload so after we download a pasted image, its base64
+ * dataurl goes in this attribute.
+ *
+ * `dataurl` should never get added to the final HTML. This attribute is where we
+ * restore an image's data after loading a note.
+ *
+ * The reason we have 2 instead of a single attribute is to avoid unnecessary processing.
+ * Keeping everything in the `src` attribute requires us to always send the rendered image
+ * along with everything else. This is pointless because we already have the image's rendered
+ * data.
+ */
 export type ImageAttributes = Partial<ImageSizeOptions> &
   Partial<Attachment> & {
     src: string;
+    dataurl?: string;
     alt?: string;
     title?: string;
     textDirection?: TextDirections;
@@ -114,7 +134,12 @@ export const ImageNode = Node.create<ImageOptions>({
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),
       type: getDataAttribute("mime"),
-      size: getDataAttribute("size")
+      size: getDataAttribute("size"),
+
+      dataurl: {
+        ...getDataAttribute("dataurl"),
+        rendered: false
+      }
     };
   },
 
