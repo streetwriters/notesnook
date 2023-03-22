@@ -302,12 +302,13 @@ export default class Attachments extends Collection {
     return { key, metadata };
   }
 
-  async downloadMedia(noteId, attachments) {
-    if (!attachments) {
-      attachments = this.media.filter((attachment) =>
-        hasItem(attachment.noteIds, noteId)
-      );
-    }
+  async downloadMedia(noteId, hashesToLoad) {
+    const attachments = this.media.filter(
+      (attachment) =>
+        hasItem(attachment.noteIds, noteId) &&
+        (!hashesToLoad || hasItem(hashesToLoad, attachment.metadata.hash))
+    );
+
     try {
       for (let i = 0; i < attachments.length; i++) {
         const attachment = attachments[i];
