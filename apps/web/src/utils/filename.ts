@@ -44,18 +44,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @param  {Object} options {replacement: String | Function }
  * @return {String}         Sanitized filename
  */
-var illegalRe = /[/?<>\\:*|"]/g;
+const illegalRe = /[/?<>\\:*|"]/g;
 // var controlRe = /[x00-x1f\x80-\x9f]/g;
-var reservedRe = /^\.+$/;
-var windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
-var windowsTrailingRe = /[. ]+$/;
-var whitespace = /\s+/g;
+const reservedRe = /^\.+$/;
+const windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+const windowsTrailingRe = /[. ]+$/;
+const whitespace = /\s+/g;
 
-function sanitize(input, replacement) {
+function sanitize(input: string, replacement: string) {
   if (typeof input !== "string") {
     throw new Error("Input must be string");
   }
-  var sanitized = input
+  const sanitized = input
     .replace(whitespace, replacement)
     //.replace(controlRe, replacement)
     .replace(illegalRe, replacement)
@@ -66,12 +66,12 @@ function sanitize(input, replacement) {
   return sanitized.slice(0, 254).toLowerCase();
 }
 
-export function sanitizeFilename(input) {
-  var replacement = "-";
+export function sanitizeFilename(input: string) {
+  const replacement = "-";
   return sanitize(input, replacement);
 }
 
-export function formatBytes(bytes, decimals = 2) {
+export function formatBytes(bytes: number, decimals = 2) {
   if (bytes === 0) return "0 B";
 
   const k = 1024;
@@ -83,7 +83,7 @@ export function formatBytes(bytes, decimals = 2) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
 
-export function truncateFilename(filename) {
+export function truncateFilename(filename: string) {
   const MAX_LENGTH = 38;
   if (filename.length > MAX_LENGTH) {
     return (
