@@ -21,15 +21,15 @@ import { ToolProps } from "../types";
 import { Editor } from "../../types";
 import { Dropdown } from "../components/dropdown";
 import { MenuItem } from "../../components/menu/types";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Counter } from "../components/counter";
 import { useRefValue } from "../../hooks/use-ref-value";
-import { config } from "../../utils/config";
+import { useToolbarStore } from "../stores/toolbar-store";
 
 export function FontSize(props: ToolProps) {
   const { editor } = props;
+  const defaultFontSize = useToolbarStore((store) => store.fontSize);
   const { fontSize: _fontSize } = editor.getAttributes("textStyle");
-  const defaultFontSize = `${config.get("fontSize", 16)}px`;
   const fontSize = _fontSize || defaultFontSize;
   const fontSizeAsNumber = useRefValue(parseInt(fontSize.replace("px", "")));
 
@@ -66,23 +66,39 @@ export function FontSize(props: ToolProps) {
   );
 }
 
-const fontFamilies = {
-  "Sans-serif": "Open Sans",
-  Serif: "serif",
-  Monospace: "monospace"
-};
+interface CustomFonts {
+  [key: string]: string;
+}
+function fontFamilies(defaultFontFamily: string) {
+  const fonts: { [key: string]: string } = {
+    "Sans-serif": "Open Sans",
+    Serif: "serif",
+    Monospace: "monospace"
+  };
+
+  const customFonts: CustomFonts = {};
+  customFonts[defaultFontFamily] = fonts[defaultFontFamily];
+
+  Object.entries(fonts).map(([key, value]) => {
+    if (key !== defaultFontFamily) customFonts[key] = value;
+  });
+  return customFonts;
+}
+
 export function FontFamily(props: ToolProps) {
   const { editor } = props;
-
+  const defaultFontFamily = useToolbarStore((store) => store.fontFamily);
+  const customFonts = fontFamilies(defaultFontFamily);
   const currentFontFamily =
-    Object.entries(fontFamilies)
+    Object.entries(customFonts)
       .find(([_key, value]) =>
         editor.isActive("textStyle", { fontFamily: value })
       )
       ?.map((a) => a)
-      ?.at(0) || "Sans-serif";
+      ?.at(0) || defaultFontFamily;
+
   const items = useMemo(
-    () => toMenuItems(editor, currentFontFamily),
+    () => toMenuItems(editor, currentFontFamily, customFonts),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentFontFamily]
   );
@@ -98,10 +114,14 @@ export function FontFamily(props: ToolProps) {
   );
 }
 
-function toMenuItems(editor: Editor, currentFontFamily: string): MenuItem[] {
+function toMenuItems(
+  editor: Editor,
+  currentFontFamily: string,
+  customFonts: CustomFonts
+): MenuItem[] {
   const menuItems: MenuItem[] = [];
-  for (const key in fontFamilies) {
-    const value = fontFamilies[key as keyof typeof fontFamilies];
+  for (const key in customFonts) {
+    const value = customFonts[key as keyof typeof customFonts];
     menuItems.push({
       key,
       type: "button",

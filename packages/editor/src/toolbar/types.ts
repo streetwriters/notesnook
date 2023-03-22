@@ -28,6 +28,8 @@ export type ToolProps = ToolDefinition & {
   variant?: ToolButtonVariant;
   force?: boolean;
   selectedNode?: NodeWithOffset;
+  defaultFontFamily?: string;
+  defaultFontSize?: string;
 };
 
 export type ToolDefinition = {

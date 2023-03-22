@@ -19,14 +19,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex, Slider, Text } from "@theme-ui/components";
 import { useEffect, useState } from "react";
+import { useStore as useEditorStore } from "../../stores/editor-store";
 import Config from "../../utils/config";
 import DropdownButton from "../dropdown-button";
 
 export function DefaultFont() {
-  const fonts = ["sans-serif", "serif", "monoSpace"];
+  const { setFontSize, setFontFamily } = useEditorStore((store) => store);
+  const fontSize = useEditorStore((store) => store.session.fontSize);
+  //const fontFamily = useEditorStore((store) => store.session.fontFamily);
+
+  const fonts = ["Sans-serif", "Serif", "Monospace"];
   const getOptions = () =>
-    Config.get("fontFamily", fonts).map((font) => ({
-      title: () => capitalizeFirstLetter(font),
+    getFonts(Config.get("fontFamily", "Sans-serif")).map((font) => ({
+      title: () => font,
       onClick: () => {
         const newFonts = [font];
         for (const item of fonts) {
@@ -34,14 +39,16 @@ export function DefaultFont() {
             newFonts.push(item);
           }
         }
-        Config.set("fontFamily", newFonts);
+        Config.set("fontFamily", font);
+        setFontFamily(font);
         setOptions(getOptions());
       },
       key: font
     }));
-  const [fontSize, setFontSize] = useState(Config.get("fontSize", 16));
   const [options, setOptions] = useState(getOptions());
+
   useEffect(() => {
+    //setFontFamily(options.at(0));
     console.log("options changed");
   }, [options]);
 
@@ -51,11 +58,11 @@ export function DefaultFont() {
         <Slider
           min={8}
           max={120}
-          defaultValue={fontSize}
+          defaultValue={parseInt(fontSize.replace("px", ""))}
           step={1}
           onChange={(e) => {
-            setFontSize(parseInt(e.target.value));
-            Config.set("fontSize", parseInt(e.target.value));
+            setFontSize(`${parseInt(e.target.value)}px`);
+            Config.set("fontSize", `${e.target.value}px`);
           }}
           sx={{ width: "75%" }}
         />
@@ -66,7 +73,7 @@ export function DefaultFont() {
             textAlign: "center"
           }}
         >
-          {`${fontSize}px`}
+          {fontSize}
         </Text>
       </Flex>
       <DropdownButton
@@ -87,6 +94,13 @@ export function DefaultFont() {
   );
 }
 
-function capitalizeFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+function getFonts(font: string) {
+  const fonts = [font];
+  const deafultFonts = ["Sans-serif", "Serif", "Monospace"];
+  for (const _font of deafultFonts) {
+    if (_font !== font) {
+      fonts.push(_font);
+    }
+  }
+  return fonts;
 }

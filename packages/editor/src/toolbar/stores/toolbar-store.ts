@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Theme } from "@notesnook/theme";
 import create from "zustand";
 import { DownloadOptions } from "../../utils/downloader";
+import { FontFamily } from "../tools/font";
 
 export type ToolbarLocation = "top" | "bottom";
 
@@ -41,6 +42,10 @@ interface ToolbarState {
   closePopup: (popupId: string) => void;
   closePopupGroup: (groupId: string, excluded: string[]) => void;
   closeAllPopups: () => void;
+  fontFamily: string;
+  setFontFamily: (fontFamily: string) => void;
+  fontSize: string;
+  setFontSize: (fontSize: string) => void;
 }
 
 export const useToolbarStore = create<ToolbarState>((set, get) => ({
@@ -99,6 +104,16 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
       for (const key in state.openedPopups) {
         state.openedPopups[key] = false;
       }
+    }),
+  fontFamily: "",
+  setFontFamily: (fontFamily) =>
+    set((state) => {
+      state.fontFamily = fontFamily;
+    }),
+  fontSize: "",
+  setFontSize: (fontSize) =>
+    set((state) => {
+      state.fontSize = fontSize;
     })
 }));
 

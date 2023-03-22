@@ -33,7 +33,8 @@ import {
   usePermissionHandler,
   getHTMLFromFragment,
   Fragment,
-  type DownloadOptions
+  type DownloadOptions,
+  ToolProps
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
@@ -70,6 +71,8 @@ type TipTapProps = {
   theme: Theme;
   isMobile?: boolean;
   downloadOptions?: DownloadOptions;
+  fontSize: string;
+  fontFamily: string;
 };
 
 const SAVE_INTERVAL = process.env.REACT_APP_TEST ? 100 : 300;
@@ -114,7 +117,9 @@ function TipTap(props: TipTapProps) {
     nonce,
     theme,
     isMobile,
-    downloadOptions
+    downloadOptions,
+    fontSize,
+    fontFamily
   } = props;
 
   const isUserPremium = useIsUserPremium();
@@ -281,11 +286,10 @@ function TipTap(props: TipTapProps) {
   }, [editor, editorContainer]);
 
   useEffect(() => {
-    editorContainer.style.fontSize = `${Config.get("fontSize", 16)}px`;
+    editorContainer.style.fontSize = fontSize;
   });
 
   if (!toolbarContainerId) return null;
-
   return (
     <>
       <Portal containerId={toolbarContainerId}>
@@ -294,6 +298,8 @@ function TipTap(props: TipTapProps) {
           theme={theme}
           location={isMobile ? "bottom" : "top"}
           tools={toolbarConfig}
+          defaultFontFamily={fontFamily}
+          defaultFontSize={fontSize}
         />
       </Portal>
     </>

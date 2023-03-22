@@ -41,6 +41,8 @@ type ToolbarProps = FlexProps & {
   editor: Editor | null;
   location: ToolbarLocation;
   tools?: ToolbarDefinition;
+  defaultFontFamily: string;
+  defaultFontSize: string;
 };
 
 export function Toolbar(props: ToolbarProps) {
@@ -49,10 +51,11 @@ export function Toolbar(props: ToolbarProps) {
     theme,
     location,
     tools = getDefaultPresets().default,
+    defaultFontFamily,
+    defaultFontSize,
     sx,
     ...flexProps
   } = props;
-
   const toolbarTools = useMemo(
     () => [...STATIC_TOOLBAR_GROUPS, ...tools],
     [tools]
@@ -63,10 +66,22 @@ export function Toolbar(props: ToolbarProps) {
   const setToolbarLocation = useToolbarStore(
     (store) => store.setToolbarLocation
   );
+  const setDefaultFontFamily = useToolbarStore((store) => store.setFontFamily);
+  const setDefaultFontSize = useToolbarStore((store) => store.setFontSize);
 
   useEffect(() => {
     setToolbarLocation(location);
   }, [location, setToolbarLocation]);
+
+  useEffect(() => {
+    setDefaultFontFamily(defaultFontFamily);
+    setDefaultFontSize(defaultFontSize);
+  }, [
+    defaultFontFamily,
+    defaultFontSize,
+    setDefaultFontFamily,
+    setDefaultFontSize
+  ]);
 
   if (!editor) return null;
   return (

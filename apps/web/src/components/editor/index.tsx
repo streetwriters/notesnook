@@ -47,6 +47,10 @@ import useMobile from "../../hooks/use-mobile";
 import Titlebox from "./title-box";
 import useTablet from "../../hooks/use-tablet";
 import Config from "../../utils/config";
+import {
+  FontFamily,
+  FontSize
+} from "@notesnook/editor/dist/toolbar/tools/font";
 
 type PreviewSession = {
   content: { data: string; type: string };
@@ -241,6 +245,8 @@ export function Editor(props: EditorProps) {
     focusMode: false,
     isMobile: false
   };
+  const fontSize = useStore((store) => store.session.fontSize);
+  const fontFamily = useStore((store) => store.session.fontFamily);
 
   const editor = useEditorInstance();
 
@@ -287,6 +293,8 @@ export function Editor(props: EditorProps) {
   return (
     <EditorChrome {...props}>
       <Tiptap
+        fontSize={fontSize}
+        fontFamily={fontFamily}
         isMobile={isMobile}
         nonce={nonce}
         readonly={readonly}
