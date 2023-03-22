@@ -63,13 +63,15 @@ export const Title = () => {
       }
       if (data.y > 150) {
         if (!hide) return;
+        titleState[currentScreen.id] = false;
         setHide(false);
       } else {
         if (hide) return;
+        titleState[currentScreen.id] = true;
         setHide(true);
       }
     },
-    [currentScreen.name, hide]
+    [currentScreen.id, currentScreen.name, hide]
   );
 
   useEffect(() => {
@@ -83,10 +85,6 @@ export const Title = () => {
       setHide(titleState[currentScreen.id]);
     }
   }, [currentScreen.id, currentScreen.name]);
-
-  useEffect(() => {
-    titleState[currentScreen.id] = hide;
-  }, [currentScreen.id, hide]);
 
   useEffect(() => {
     eSubscribeEvent(eScrollEvent, onScroll);
