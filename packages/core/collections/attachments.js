@@ -288,7 +288,10 @@ export default class Attachments extends Collection {
   async save(data, mimeType) {
     const { hash } = await this._db.fs.hashBase64(data);
     const attachment = this.attachment(hash);
-    if (attachment) return attachment;
+    if (attachment)
+      return {
+        metadata: attachment.metadata
+      };
 
     const key = await this._db.attachments.generateKey();
     const metadata = await this._db.fs.writeEncryptedBase64(
