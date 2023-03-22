@@ -64,19 +64,19 @@ export async function readEncrypted(filename, key, cipherData) {
 }
 
 export async function hashBase64(data) {
+  const hash = await Sodium.hashFile({
+    type: "base64",
+    data,
+    uri: ""
+  });
   return {
-    hash: await Sodium.hashFile({
-      type: "base64",
-      data,
-      uri: ""
-    }),
+    hash: hash,
     type: "xxh64"
   };
 }
 
 export async function writeEncryptedBase64({ data, key }) {
   let filepath = cacheDir + `/${getRandomId("imagecache_")}`;
-  console.log(filepath);
   await RNFetchBlob.fs.writeFile(filepath, data, "base64");
   let output = await Sodium.encryptFile(key, {
     uri: Platform.OS === "ios" ? filepath : "file://" + filepath,
