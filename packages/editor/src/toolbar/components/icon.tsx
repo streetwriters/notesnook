@@ -23,11 +23,18 @@ import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
 import { Flex, FlexProps } from "@theme-ui/components";
 import { useTheme } from "@emotion/react";
 
+function isSchemeColor(
+  color: string,
+  theme: Theme
+): color is keyof SchemeColors {
+  return color in theme.colors;
+}
+
 type IconProps = {
   title?: string;
   path: string;
   size?: keyof Theme["iconSizes"] | number;
-  color?: keyof SchemeColors;
+  color?: keyof SchemeColors | string;
   stroke?: string;
   rotate?: boolean;
 };
@@ -41,9 +48,10 @@ function MDIIconWrapper({
 }: IconProps) {
   const theme = useTheme() as Theme;
 
-  const themedColor: string = theme?.colors
-    ? (theme.colors[color] as string)
-    : color;
+  const themedColor: string =
+    theme && isSchemeColor(color, theme)
+      ? (theme.colors[color] as string)
+      : color;
 
   return (
     <MDIIcon

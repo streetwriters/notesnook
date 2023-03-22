@@ -74,7 +74,7 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
             }}
             path={Icons.resize}
             size={25}
-            color={handleColor || "text"}
+            color={handleColor || "black"}
           />
         )
       }}
