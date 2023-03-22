@@ -20,8 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import * as Icon from "../icons";
 import "./search.css";
 import Field from "../field";
-import { inlineDebounce } from "../../utils/debounce";
-
+import { debounce } from "../../utils/debounce";
 function SearchBox({ onSearch }) {
   return (
     <Field
@@ -32,9 +31,7 @@ function SearchBox({ onSearch }) {
       type="text"
       sx={{ m: 0, mx: 1, mt: 1 }}
       placeholder="Type your query here"
-      onChange={(e) =>
-        inlineDebounce("search", () => onSearch(e.target.value), 250)
-      }
+      onChange={debounce((e) => onSearch(e.target.value), 250)}
       action={{
         icon: Icon.Search,
         testId: "search-button",
