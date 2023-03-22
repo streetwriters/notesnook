@@ -295,32 +295,38 @@ export const useEditor = (
     }
   }, []);
 
-  const getImagesToLoad = () => {
+  const getMediaToLoad = (previousContent?: string) => {
     if (!currentNote.current?.id) return [];
-    const currentImages = [
-      ...(db.attachments?.ofNote(currentNote.current?.id, "images") || []),
-      ...(db.attachments?.ofNote(currentNote.current?.id, "webclips") || [])
-    ];
-    if (!currentImages || currentImages?.length === 0) return [];
-    const imagesToLoad: any[] = [];
-    for (const image of currentImages) {
-      if (!loadedImages.current[image.metadata.hash]) {
-        loadedImages.current[image.metadata.hash] = false;
-        imagesToLoad.push(image);
+
+    const previousAttachments =
+      previousContent?.matchAll(/data-hash="(.+?)"/gm) || [];
+    const attachments =
+      currentContent.current?.data?.matchAll(/data-hash="(.+?)"/gm) || [];
+
+    const media: string[] = [];
+
+    const oldMatches = Array.from(previousAttachments).map((match) => match[1]);
+    const matches = Array.from(attachments).map((match) => match[1]);
+
+    for (let i = 0; i < matches.length; i++) {
+      const currentHash = matches[i];
+      const oldHash = oldMatches[i];
+      if (currentHash !== oldHash) {
+        media.push(currentHash);
+        loadedImages.current[currentHash] = false;
       }
-      attachedImages.current[image.metadata.hash] = image;
     }
-    return imagesToLoad;
+    return media;
   };
 
   const markImageLoaded = (hash: string) => {
-    const attachment = attachedImages.current[hash];
-    if (attachment) {
+    const attachment = loadedImages.current[hash];
+    if (typeof attachment === "boolean") {
       loadedImages.current[hash] = true;
     }
   };
 
-  const loadImages = useCallback(() => {
+  const loadImages = useCallback((previousContent?: string) => {
     if (!currentNote.current?.id) return;
     const timerId = "loading-images";
     clearTimeout(timers.current[timerId]);
@@ -333,12 +339,12 @@ export const useEditor = (
           true
         );
       } else {
-        const images = getImagesToLoad();
-        if (images.length > 0) {
-          db.attachments?.downloadMedia(currentNote.current?.id, images);
+        const media = getMediaToLoad(previousContent);
+        if (media.length > 0) {
+          db.attachments?.downloadMedia(currentNote.current?.id, media);
         }
       }
-    }, 100);
+    }, 1000);
   }, []);
 
   const loadNote = useCallback(
@@ -422,6 +428,8 @@ export const useEditor = (
 
       lock.current = true;
 
+      const previousContent = currentContent.current?.data;
+
       if (data.type === "tiptap") {
         if (!currentNote.current.locked && isContentEncrypted) {
           lockNoteWithVault(note);
@@ -452,13 +460,14 @@ export const useEditor = (
         }
         await commands.setStatus(timeConverter(note.dateEdited), "Saved");
       }
+
       lock.current = false;
       if (data.type === "tiptap") {
-        loadImages();
+        loadImages(previousContent);
         db.eventManager.subscribe(
           EVENTS.syncCompleted,
           () => {
-            loadImages();
+            loadImages(previousContent);
           },
           true
         );
