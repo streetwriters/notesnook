@@ -57,6 +57,7 @@ import { Attachment as AttachmentType } from "@notesnook/core";
 import { useEditorStore } from "../../stores/editor-store";
 import { PromptDialog } from "../../dialogs/prompt";
 import { DialogManager } from "../../common/dialog-manager";
+import { useStore as useSelectionStore } from "../../stores/selection-store";
 
 const FILE_ICONS: Record<string, Icon> = {
   "image/": FileImage,
@@ -135,6 +136,13 @@ export function Attachment({
         Menu.openMenu(AttachmentMenuItems(item, status));
       }}
       onClick={onSelected}
+      onKeyPress={async (e) => {
+        if (e.key === "Delete") {
+          await Multiselect.deleteAttachments(
+            useSelectionStore.getState().selectedItems
+          );
+        }
+      }}
       style={style}
       ref={rowRef}
     >

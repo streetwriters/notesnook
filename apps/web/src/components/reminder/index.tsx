@@ -43,6 +43,7 @@ import { MenuItem } from "@notesnook/ui";
 import { Reminder as ReminderType } from "@notesnook/core/dist/types";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { EditReminderDialog } from "../../dialogs/add-reminder-dialog";
+import { useStore as useSelectionStore } from "../../stores/selection-store";
 
 const RECURRING_MODE_MAP = {
   week: "Weekly",
@@ -74,6 +75,13 @@ function Reminder(props: ReminderProps) {
       isDisabled={reminder.disabled}
       isCompact={compact}
       onClick={() => EditReminderDialog.show({ reminderId: reminder.id })}
+      onKeyPress={async (e) => {
+        if (e.key === "Delete") {
+          await Multiselect.moveRemindersToTrash(
+            useSelectionStore.getState().selectedItems
+          );
+        }
+      }}
       footer={
         <Flex
           sx={{

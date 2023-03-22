@@ -21,6 +21,8 @@ import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as attachmentStore } from "../stores/attachment-store";
 import { store as reminderStore } from "../stores/reminder-store";
+import { store as tagStore } from "../stores/tag-store";
+import { store as appStore } from "../stores/app-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
 import Vault from "./vault";
@@ -134,9 +136,42 @@ async function moveRemindersToTrash(ids: string[]) {
   showToast("success", `${pluralize(ids.length, "reminder")} deleted.`);
 }
 
+async function deleteTags(ids: string[]) {
+  if (
+    !(await ConfirmDialog.show({
+      title: "Are you sure?",
+      message:
+        "Are you sure you want to permanently delete these tags? This action is IRREVERSIBLE.",
+      negativeButtonText: "No",
+      positiveButtonText: "Yes"
+    }))
+  )
+    return;
+
+  await TaskManager.startTask({
+    type: "status",
+    id: "deleteTags",
+    title: "Deleting tags",
+    action: async (report) => {
+      report({
+        text: `Deleting ${pluralize(ids.length, "tag")}...`
+      });
+      for (const id of ids) {
+        await db.tags.remove(id);
+      }
+      await appStore.refreshNavItems();
+      await tagStore.refresh();
+      await noteStore.refresh();
+    }
+  });
+
+  showToast("success", `${pluralize(ids.length, "tag")} deleted.`);
+}
+
 export const Multiselect = {
   moveRemindersToTrash,
   moveNotebooksToTrash,
   moveNotesToTrash,
-  deleteAttachments
+  deleteAttachments,
+  deleteTags
 };
