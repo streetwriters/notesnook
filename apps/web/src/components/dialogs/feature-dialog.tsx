@@ -100,6 +100,9 @@ const features: Record<FeatureKeys, Feature> = {
             title: "Adjustable trash cleanup interval",
             subtitle:
               "You can now customize after how long you want your trash to be automatically cleared. Just go into Settings -> Trash settings."
+          },
+          {
+            title: "Images are now much more stable"
           }
         ]
       : [],
