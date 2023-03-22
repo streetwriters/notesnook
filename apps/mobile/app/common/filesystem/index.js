@@ -23,14 +23,16 @@ import {
   deleteFile,
   exists,
   readEncrypted,
-  writeEncrypted
+  writeEncryptedBase64,
+  hashBase64
 } from "./io";
 import { uploadFile } from "./upload";
 import { cancelable } from "./utils";
 
 export default {
   readEncrypted,
-  writeEncrypted,
+  writeEncryptedBase64,
+  hashBase64,
   uploadFile: cancelable(uploadFile),
   downloadFile: cancelable(downloadFile),
   deleteFile,

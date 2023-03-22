@@ -63,8 +63,18 @@ export async function readEncrypted(filename, key, cipherData) {
   }
 }
 
-export async function writeEncrypted(filename, { data, type, key }) {
-  console.log("file input: ", { type, key });
+export async function hashBase64(data) {
+  return {
+    hash: await Sodium.hashFile({
+      type: "base64",
+      data,
+      uri: ""
+    }),
+    type: "xxh64"
+  };
+}
+
+export async function writeEncryptedBase64({ data, key }) {
   let filepath = cacheDir + `/${getRandomId("imagecache_")}`;
   console.log(filepath);
   await RNFetchBlob.fs.writeFile(filepath, data, "base64");
@@ -73,7 +83,6 @@ export async function writeEncrypted(filename, { data, type, key }) {
     type: "url"
   });
   RNFetchBlob.fs.unlink(filepath).catch(console.log);
-
   console.log("encrypted file output: ", output);
   return {
     ...output,
