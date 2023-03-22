@@ -136,7 +136,8 @@ export function ImageComponent(
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                mt: 1
+                mt: 1,
+                py: 50
               }}
             >
               <Icon
