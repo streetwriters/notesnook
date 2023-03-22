@@ -548,7 +548,7 @@ p > *::selection {
   transition: border 200ms ease-in-out;
 }
 
-*:not([dir="rtl"]).outline-list li .outline-list::before {
+.outline-list:not([dir="rtl"]) li .outline-list::before {
   left: -14px;
   border-left: 1px solid var(--border);
 }
