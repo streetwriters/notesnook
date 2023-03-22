@@ -79,7 +79,7 @@ declare module "@tiptap/core" {
       /**
        * Add an image
        */
-      insertImage: (options: ImageAttributes) => ReturnType;
+      insertImage: (options: Partial<ImageAttributes>) => ReturnType;
       updateImage: (
         query: { src?: string; hash?: string },
         options: Partial<ImageAttributes> & { preventUpdate?: boolean }

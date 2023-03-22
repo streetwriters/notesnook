@@ -390,15 +390,18 @@ function toIEditor(editor: Editor): IEditor {
     },
     attachFile: (file: Attachment) => {
       if (file.dataurl) {
-        editor.current?.commands.insertImage({ ...file, src: file.dataurl });
+        editor.current?.commands.insertImage({
+          ...file,
+          dataurl: file.dataurl
+        });
       } else editor.current?.commands.insertAttachment(file);
     },
     loadWebClip: (hash, src) =>
       editor.current?.commands.updateWebClip({ hash }, { src }),
-    loadImage: (hash, src) =>
+    loadImage: (hash, dataurl) =>
       editor.current?.commands.updateImage(
         { hash },
-        { hash, dataurl: src, preventUpdate: true }
+        { hash, dataurl, preventUpdate: true }
       ),
     sendAttachmentProgress: (hash, type, progress) =>
       editor.current?.commands.setAttachmentProgress({
