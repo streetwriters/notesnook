@@ -17,39 +17,50 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-let hidden: string, visibilityChange: string;
-if ("hidden" in document) {
-  // Opera 12.10 and Firefox 18 and later support
-  hidden = "hidden";
-  visibilityChange = "visibilitychange";
-} else if ("msHidden" in document) {
-  hidden = "msHidden";
-  visibilityChange = "msvisibilitychange";
-} else if ("webkitHidden" in document) {
-  hidden = "webkitHidden";
-  visibilityChange = "webkitvisibilitychange";
-}
+const getVisibilityChange = () => {
+  let hidden: "hidden" | "msHidden" | "webkitHidden" = "hidden";
+  let visibilityChange:
+    | "visibilitychange"
+    | "msvisibilitychange"
+    | "webkitvisibilitychange" = "visibilitychange";
+  if ("hidden" in document) {
+    // Opera 12.10 and Firefox 18 and later support
+    hidden = "hidden";
+    visibilityChange = "visibilitychange";
+  } else if ("msHidden" in document) {
+    hidden = "msHidden";
+    visibilityChange = "msvisibilitychange";
+  } else if ("webkitHidden" in document) {
+    hidden = "webkitHidden";
+    visibilityChange = "webkitvisibilitychange";
+  }
+  return { hidden, visibilityChange };
+};
 
 export function onPageVisibilityChanged(
-  handler: (status: string, bool: boolean) => void
+  handler: (
+    status: "online" | "offline" | "visibilitychange",
+    bool: boolean
+  ) => void
 ) {
   onDeviceOnline(() => handler("online", false));
   onDeviceOffline(() => handler("offline", false));
 
   // Handle page visibility change
+  const { hidden, visibilityChange } = getVisibilityChange();
   document.addEventListener(visibilityChange, () =>
     handler("visibilitychange", (document as any)[hidden])
   );
 }
 
-function onDeviceOnline(handler: () => void | undefined) {
+function onDeviceOnline(handler: () => void) {
   window.addEventListener("online", function () {
-    handler && handler();
+    handler();
   });
 }
 
-function onDeviceOffline(handler: () => void | undefined) {
+function onDeviceOffline(handler: () => void) {
   window.addEventListener("offline", function () {
-    handler && handler();
+    handler();
   });
 }
