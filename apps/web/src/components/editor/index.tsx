@@ -110,25 +110,31 @@ export default function EditorManager({
         const isContent = item.type === "tiptap" && item.id === contentId;
         const isNote = item.type === "note" && item.id === id;
 
-        if (isContent) {
+        if (isContent && editorInstance.current) {
           if (locked) {
             const result = await db.vault?.decryptContent(item).catch(() => {});
             if (result) item.data = result.data;
             else EV.publish(EVENTS.vaultLocked);
           }
+          const oldHashes = editorInstance.current.getMediaHashes();
 
-          editorInstance.current?.updateContent(item.data as string);
+          editorInstance.current.updateContent(item.data as string);
+
+          const newHashes = editorInstance.current.getMediaHashes();
+          const hashesToLoad = newHashes.filter(
+            (hash, index) => hash !== oldHashes[index]
+          );
 
           if (appstore.get().isSyncing()) {
             db.eventManager.subscribe(
               EVENTS.syncCompleted,
               async () => {
-                await db.attachments?.downloadMedia(id);
+                await db.attachments?.downloadMedia(id, hashesToLoad);
               },
               true
             );
           } else {
-            await db.attachments?.downloadMedia(id);
+            await db.attachments?.downloadMedia(id, hashesToLoad);
           }
         } else if (isNote) {
           if (!locked && item.locked) return EV.publish(EVENTS.vaultLocked);
