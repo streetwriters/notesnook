@@ -192,7 +192,6 @@ export function ImageComponent(
                 editor={editor}
                 selected={selected}
                 width={width}
-                height={height}
                 onResize={(width, height) => {
                   editor.commands.setImageSize({ width, height });
                 }}
