@@ -257,7 +257,7 @@ const handleImageResponse = async (response, options) => {
     hash: hash,
     type: image.type,
     title: fileName,
-    src: b64,
+    dataurl: b64,
     size: image.fileSize,
     filename: fileName
   });

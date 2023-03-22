@@ -229,7 +229,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     await this.doAsync(
       `editor && editor.commands.updateImage(${JSON.stringify({
         hash
-      })},${JSON.stringify({ src, hash, preventUpdate: true })})`
+      })},${JSON.stringify({ dataurl: src, hash, preventUpdate: true })})`
     );
   };
 
