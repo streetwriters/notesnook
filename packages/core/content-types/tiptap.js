@@ -161,7 +161,7 @@ export class Tiptap {
       try {
         const { data, mime } = dataurl.toObject(image.src);
         if (!data) continue;
-        const storeResult = await store(data, "base64", mime);
+        const storeResult = await store(data, mime);
         if (!storeResult) continue;
 
         images[image.id] = { ...storeResult, mime };

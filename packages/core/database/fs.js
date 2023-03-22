@@ -108,4 +108,12 @@ export default class FileStorage {
   clear() {
     return this.fs.clearFileStorage();
   }
+
+  /**
+   * @param {string} data
+   * @returns {Promise<{hash: string, type: string}>}
+   */
+  hashBase64(data) {
+    return this.fs.hashBase64(data);
+  }
 }
