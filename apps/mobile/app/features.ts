@@ -21,15 +21,11 @@ import { FeatureType } from "./components/sheets/new-feature";
 
 export const features: FeatureType[] = [
   {
-    title: "Improved editor performance",
-    body: "The editor perfomance is now much better especially with images"
+    title: "Top level notes in notebooks",
+    body: "Now you can add notes to Notesnooks directly without creating any topics."
   },
   {
-    title: "Sortable task lists",
-    body: "Now you can sort tasks by checked/unchecked in editor"
-  },
-  {
-    title: "Improved outline lists",
-    body: "Rewritten outline lists to be more performant and less buggy"
+    title: "Image preview & download",
+    body: "Now you can preview images in fullscreen & download them from editor"
   }
 ];

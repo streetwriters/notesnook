@@ -1,3 +1,9 @@
-- Fixed reminders notifications on android
+- Top level notes in notebooks
+- Image fullscreen preview & download from editor
+- Change auto clear trash interval from settings
+- Fixed image upload not working since last update
+- Fixed adding images to notes via copy/paste from other apps
+- Focus cursor on end when tapping bottom empty area in editor.
+- Fixed iPad orientation change editor resizing 
 
 Thank you for using Notesnook!
