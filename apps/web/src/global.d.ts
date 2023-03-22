@@ -32,7 +32,7 @@ type DesktopIntegrationSettings = {
 };
 
 declare interface Window {
-  os: string | undefined;
+  os: typeof process.platform & "mas";
   config: {
     static spellChecker(): Promise<SpellCheckerOptions>;
     static desktopIntegration(): Promise<DesktopIntegrationSettings>;
