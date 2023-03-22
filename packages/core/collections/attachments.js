@@ -250,6 +250,8 @@ export default class Attachments extends Collection {
         outputType
       }
     );
+    if (!data) return;
+
     return outputType === "base64"
       ? dataurl.fromObject({ type: attachment.metadata.type, data })
       : data;
