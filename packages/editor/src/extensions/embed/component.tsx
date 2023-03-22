@@ -52,7 +52,6 @@ export function EmbedComponent(
         editor={editor}
         selected={selected}
         width={width}
-        height={height}
         onResize={(width, height) => {
           updateAttributes(
             {
