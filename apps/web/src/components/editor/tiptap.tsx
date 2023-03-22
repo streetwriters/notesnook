@@ -400,7 +400,7 @@ function toIEditor(editor: Editor): IEditor {
       if (file.dataurl) {
         editor.current?.commands.insertImage({
           ...file,
-          dataurl: file.dataurl
+          src: file.dataurl
         });
       } else editor.current?.commands.insertAttachment(file);
     },
@@ -409,7 +409,7 @@ function toIEditor(editor: Editor): IEditor {
     loadImage: (hash, dataurl) =>
       editor.current?.commands.updateImage(
         { hash },
-        { hash, dataurl, preventUpdate: true }
+        { hash, src: dataurl, preventUpdate: true }
       ),
     sendAttachmentProgress: (hash, type, progress) =>
       editor.current?.commands.setAttachmentProgress({
