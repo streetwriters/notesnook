@@ -461,7 +461,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
             onAddItem={async (title) => {
               return await onAddNotebook(title);
             }}
-            ListFooterComponent={<View style={{ height: 50 }} />}
+            ListFooterComponent={<View style={{ height: 20 }} />}
           />
         </SelectionProvider>
       </View>
