@@ -1,6 +1,4 @@
-- Top level notes in notebooks
-- Image fullscreen preview & download from editor
-- Change auto clear trash interval from settings
-- Focus cursor on end when tapping bottom empty area in editor.
+- Fix note publishing not working with password protection
+- Some fixes and improvements in notebook/topic linking
 
 Thank you for using Notesnook!
