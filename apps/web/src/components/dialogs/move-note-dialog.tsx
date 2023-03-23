@@ -241,7 +241,9 @@ function NotebookItem(props: {
 
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const index = findSelectionIndex(notebook, selected);
-  const isSelected = index > -1;
+  const selectedNotebook = selected[index];
+  const hasSelectedTopics =
+    selected.filter((nb) => nb.id === notebook.id && !!nb.topic).length > 0;
 
   return (
     <Box as="li" data-test-id="notebook">
@@ -285,7 +287,14 @@ function NotebookItem(props: {
               }
             }}
           >
-            <SelectedCheck size={20} selected={isSelected} />
+            <SelectedCheck
+              size={20}
+              selected={
+                selectedNotebook?.op === "remove"
+                  ? "remove"
+                  : selectedNotebook?.op === "add"
+              }
+            />
             <Text
               className="title"
               data-test-id="notebook-title"
@@ -300,11 +309,14 @@ function NotebookItem(props: {
             </Text>
           </Flex>
           <Flex data-test-id="notebook-tools" sx={{ alignItems: "center" }}>
+            {hasSelectedTopics && (
+              <Icon.Circle size={8} color="primary" sx={{ mr: 1 }} />
+            )}
             <Button
               variant="tool"
               className="create-topic"
               data-test-id="create-topic"
-              sx={{ display: "none", p: 1, mr: 1 }}
+              sx={{ display: "none", p: 1 }}
             >
               <Icon.Plus
                 size={18}
