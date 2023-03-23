@@ -71,7 +71,6 @@ export const FilteredList = ({
       }
       keyboardShouldPersistTaps="always"
       keyboardDismissMode="none"
-      nestedScrollEnabled
     />
   );
 };

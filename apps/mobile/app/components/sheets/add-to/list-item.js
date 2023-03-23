@@ -57,6 +57,10 @@ const SelectionIndicator = ({ item, hasNotes, selectItem, onPress }) => {
         if (multiSelect) return selectItem();
         onPress?.(item);
       }}
+      onLongPress={() => {
+        useItemSelectionStore.getState().setMultiSelect(true);
+        selectItem();
+      }}
       testID={
         isRemoved
           ? "close-circle-outline"
@@ -102,7 +106,7 @@ export const ListItem = ({
   const multiSelect = useItemSelectionStore((state) => state.multiSelect);
 
   const colors = useThemeStore((state) => state.colors);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   function selectItem() {
     toggleSelection(item);

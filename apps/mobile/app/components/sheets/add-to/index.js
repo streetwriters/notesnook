@@ -26,6 +26,7 @@ import Navigation from "../../../services/navigation";
 import SearchService from "../../../services/search";
 import { useNotebookStore } from "../../../stores/use-notebook-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
@@ -42,7 +43,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
   const notebooks = useNotebookStore((state) =>
     state.notebooks.filter((n) => n?.type === "notebook")
   );
-
+  const dimensions = useSettingStore((state) => state.dimensions);
   const selectedItemsList = useSelectionStore(
     (state) => state.selectedItemsList
   );
@@ -132,6 +133,10 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
 
   useEffect(() => {
     resetItemState();
+    return () => {
+      useItemSelectionStore.getState().setMultiSelect(false);
+      useItemSelectionStore.getState().setItemState({});
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -139,6 +144,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
     (state) => {
       const itemState = {};
       const notebooks = db.notebooks.all;
+      let count = 0;
       for (let notebook of notebooks) {
         itemState[notebook.id] = state
           ? state
@@ -148,6 +154,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
           ? "intermediate"
           : "deselected";
         if (itemState[notebook.id] === "selected") {
+          count++;
           contextValue.select(notebook);
         } else {
           contextValue.deselect(notebook);
@@ -162,13 +169,18 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
             ? "intermediate"
             : "deselected";
           if (itemState[topic.id] === "selected") {
+            count++;
             contextValue.select(topic);
           } else {
             contextValue.deselect(topic);
           }
         }
       }
-
+      if (count > 1) {
+        useItemSelectionStore.getState().setMultiSelect(true);
+      } else {
+        useItemSelectionStore.getState().setMultiSelect(false);
+      }
       useItemSelectionStore.getState().setItemState(itemState);
     },
     [contextValue, getSelectedNotesCountInItem, selectedItemsList]
@@ -335,31 +347,32 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
           />
         </View>
 
-        {multiSelect ? (
-          <View
+        <View
+          style={{
+            paddingHorizontal: 12
+          }}
+        >
+          <Button
+            title="Reset selection"
+            height={30}
             style={{
-              paddingHorizontal: 12
+              alignSelf: "flex-start",
+              paddingHorizontal: 0,
+              width: "100%",
+              marginTop: 6
             }}
-          >
-            <Button
-              title="Reset selection"
-              height={30}
-              style={{
-                alignSelf: "flex-start",
-                paddingHorizontal: 0
-              }}
-              onPress={() => {
-                resetItemState();
-                useItemSelectionStore.getState().setMultiSelect(false);
-              }}
-            />
-          </View>
-        ) : null}
+            type="grayAccent"
+            onPress={() => {
+              resetItemState();
+            }}
+          />
+        </View>
 
         <SelectionProvider value={contextValue}>
           <FilteredList
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: 12,
+              maxHeight: dimensions.height * 0.85
             }}
             ListEmptyComponent={
               notebooks.length > 0 ? null : (
@@ -448,6 +461,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
             onAddItem={async (title) => {
               return await onAddNotebook(title);
             }}
+            ListFooterComponent={<View style={{ height: 50 }} />}
           />
         </SelectionProvider>
       </View>
