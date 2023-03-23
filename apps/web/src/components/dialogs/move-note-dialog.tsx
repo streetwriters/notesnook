@@ -30,7 +30,6 @@ import { showToast } from "../../utils/toast";
 import { pluralize } from "../../utils/string";
 import { isMac } from "../../utils/platform";
 import create from "zustand";
-import { usePersistentState } from "../../hooks/use-persistent-state";
 
 type MoveDialogProps = { onClose: Perform; noteIds: string[] };
 type NotebookReference = {
@@ -45,7 +44,11 @@ type Item = {
   title: string;
 };
 type Topic = Item & { notebookId: string };
-type Notebook = Item & { topics: Topic[]; dateCreated: number };
+type Notebook = Item & {
+  topics: Topic[];
+  dateCreated: number;
+  dateModified: number;
+};
 
 interface ISelectionStore {
   selected: NotebookReference[];
@@ -61,13 +64,9 @@ export const useSelectionStore = create<ISelectionStore>((set) => ({
 }));
 
 function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
-  const { selected, setIsMultiselect, isMultiselect, setSelected } =
-    useSelectionStore();
-
-  const [suggestion, setSuggestion] = usePersistentState<NotebookReference[]>(
-    "link-notebooks:suggestion",
-    []
-  );
+  const setSelected = useSelectionStore((store) => store.setSelected);
+  const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
+  const isMultiselect = useSelectionStore((store) => store.isMultiselect);
 
   const refreshNotebooks = useStore((store) => store.refresh);
   const notebooks = useStore((store) => store.notebooks);
@@ -123,9 +122,8 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
       width={450}
       positiveButton={{
         text: "Done",
-        disabled: !selected.length,
         onClick: async () => {
-          setSuggestion(selected);
+          const { selected } = useSelectionStore.getState();
           for (const item of selected) {
             try {
               if (item.op === "remove") {
@@ -145,9 +143,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
           if (stringified) {
             showToast(
               "success",
-              `${pluralize(noteIds.length, "note", "notes")} ${stringified
-                .replace("Add", "added")
-                .replace("remove", "removed")}`
+              `${pluralize(noteIds.length, "note", "notes")} ${stringified}`
             );
           }
 
@@ -163,8 +159,9 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
         <Button
           variant="anchor"
           onClick={() => {
-            const originalSelection: NotebookReference[] = selected
-              .filter((a) => !a.new)
+            const originalSelection: NotebookReference[] = useSelectionStore
+              .getState()
+              .selected.filter((a) => !a.new)
               .map((s) => ({ ...s, op: "add" }));
             setSelected(originalSelection);
             setIsMultiselect(originalSelection.length > 1);
@@ -179,26 +176,6 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
         sx={{ overflowY: "hidden", flexDirection: "column" }}
         data-test-id="notebook-list"
       >
-        {suggestion.length > 0 && selected.length <= 0 && (
-          <Flex
-            sx={{
-              bg: "shade",
-              borderRadius: "default",
-              p: 1,
-              alignItems: "center",
-              cursor: "pointer",
-              ":hover": {
-                filter: "brightness(70%)"
-              }
-            }}
-            onClick={() => setSelected(suggestion.slice())}
-          >
-            <Icon.Suggestion color="primary" size={16} sx={{ mr: 1 }} />
-            <Text variant="body" sx={{ color: "primary" }}>
-              {stringifySelected(suggestion)}
-            </Text>
-          </Flex>
-        )}
         <FilteredTree
           placeholders={{
             empty: "Add a new notebook",
@@ -215,6 +192,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
           }
           renderItem={(notebook, _index, refresh, isSearching) => (
             <NotebookItem
+              key={notebook.id}
               notebook={notebook}
               isSearching={isSearching}
               onCreateItem={async (title) => {
@@ -236,14 +214,11 @@ function NotebookItem(props: {
 }) {
   const { notebook, isSearching, onCreateItem } = props;
 
-  const { selected, setIsMultiselect, setSelected, isMultiselect } =
-    useSelectionStore();
-
   const [isCreatingNew, setIsCreatingNew] = useState(false);
-  const index = findSelectionIndex(notebook, selected);
-  const selectedNotebook = selected[index];
-  const hasSelectedTopics =
-    selected.filter((nb) => nb.id === notebook.id && !!nb.topic).length > 0;
+
+  const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
+  const setSelected = useSelectionStore((store) => store.setSelected);
+  const isMultiselect = useSelectionStore((store) => store.isMultiselect);
 
   return (
     <Box as="li" data-test-id="notebook">
@@ -276,6 +251,7 @@ function NotebookItem(props: {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              const { selected } = useSelectionStore.getState();
 
               const isCtrlPressed = e.ctrlKey || e.metaKey;
               if (isCtrlPressed) setIsMultiselect(true);
@@ -287,14 +263,7 @@ function NotebookItem(props: {
               }
             }}
           >
-            <SelectedCheck
-              size={20}
-              selected={
-                selectedNotebook?.op === "remove"
-                  ? "remove"
-                  : selectedNotebook?.op === "add"
-              }
-            />
+            <SelectedCheck size={20} item={notebook} />
             <Text
               className="title"
               data-test-id="notebook-title"
@@ -309,9 +278,7 @@ function NotebookItem(props: {
             </Text>
           </Flex>
           <Flex data-test-id="notebook-tools" sx={{ alignItems: "center" }}>
-            {hasSelectedTopics && (
-              <Icon.Circle size={8} color="primary" sx={{ mr: 1 }} />
-            )}
+            <TopicSelectionIndicator notebook={notebook} />
             <Button
               variant="tool"
               className="create-topic"
@@ -355,7 +322,7 @@ function NotebookItem(props: {
                 p: "small"
               }}
             >
-              <SelectedCheck selected={false} />
+              <SelectedCheck />
               <Input
                 variant="clean"
                 data-test-id={`new-topic-input`}
@@ -386,14 +353,23 @@ function NotebookItem(props: {
   );
 }
 
+function TopicSelectionIndicator({ notebook }: { notebook: Notebook }) {
+  const hasSelectedTopics = useSelectionStore(
+    (store) =>
+      store.selected.filter((nb) => nb.id === notebook.id && !!nb.topic)
+        .length > 0
+  );
+
+  if (!hasSelectedTopics) return null;
+  return <Icon.Circle size={8} color="primary" sx={{ mr: 1 }} />;
+}
+
 function TopicItem(props: { topic: Topic }) {
   const { topic } = props;
 
-  const { selected, setIsMultiselect, setSelected, isMultiselect } =
-    useSelectionStore();
-
-  const index = findSelectionIndex(topic, selected);
-  const selectedTopic = selected[index];
+  const setSelected = useSelectionStore((store) => store.setSelected);
+  const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
+  const isMultiselect = useSelectionStore((store) => store.isMultiselect);
 
   return (
     <Flex
@@ -408,6 +384,8 @@ function TopicItem(props: { topic: Topic }) {
         ":hover": { bg: "hover" }
       }}
       onClick={(e) => {
+        const { selected } = useSelectionStore.getState();
+
         const isCtrlPressed = e.ctrlKey || e.metaKey;
         if (isCtrlPressed) setIsMultiselect(true);
 
@@ -418,13 +396,7 @@ function TopicItem(props: { topic: Topic }) {
         }
       }}
     >
-      <SelectedCheck
-        selected={
-          selectedTopic?.op === "remove"
-            ? "remove"
-            : selectedTopic?.op === "add"
-        }
-      />
+      <SelectedCheck item={topic} />
       <Text variant="body" sx={{ fontSize: "subtitle" }}>
         {topic.title}
       </Text>
@@ -556,12 +528,18 @@ function FilteredTree<T extends Item>(props: FilteredTreeProps<T>) {
 }
 
 function SelectedCheck({
-  selected,
+  item,
   size = 20
 }: {
-  selected: boolean | null | "remove";
+  item?: Topic | Notebook;
   size?: number;
 }) {
+  const selectedItem = useSelectionStore(
+    (store) => item && store.selected[findSelectionIndex(item, store.selected)]
+  );
+  const selected =
+    selectedItem?.op === "remove" ? "remove" : selectedItem?.op === "add";
+
   return selected === true ? (
     <Icon.CheckCircleOutline size={size} sx={{ mr: 1 }} color="primary" />
   ) : selected === null ? (
@@ -636,21 +614,23 @@ function selectSingle(topic: Topic | Notebook, array: NotebookReference[]) {
 
 function stringifySelected(suggestion: NotebookReference[]) {
   const added = suggestion
-    .filter((a) => a.op === "add")
-    .map(resolve)
+    .filter((a) => a.new && a.op === "add")
+    .map(resolveReference)
     .filter(Boolean);
   const removed = suggestion
     .filter((a) => a.op === "remove")
-    .map(resolve)
+    .map(resolveReference)
     .filter(Boolean);
   if (!added.length && !removed.length) return;
 
-  const parts = ["Add to"];
+  const parts = [];
+  if (added.length > 0) parts.push("added to");
   if (added.length >= 1) parts.push(added[0]);
   if (added.length > 1) parts.push(`and ${added.length - 1} others`);
 
   if (removed.length >= 1) {
-    parts.push("& remove from");
+    if (parts.length > 0) parts.push("&");
+    parts.push("removed from");
     parts.push(removed[0]);
   }
   if (removed.length > 1) parts.push(`and ${removed.length - 1} others`);
@@ -658,7 +638,7 @@ function stringifySelected(suggestion: NotebookReference[]) {
   return parts.join(" ") + ".";
 }
 
-function resolve(ref: NotebookReference) {
+function resolveReference(ref: NotebookReference): string | undefined {
   const notebook = db.notebooks?.notebook(ref.id);
   if (!notebook) return undefined;
 
