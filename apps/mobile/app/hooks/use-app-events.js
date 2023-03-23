@@ -402,11 +402,9 @@ export const useAppEvents = () => {
 
   const checkAutoBackup = useCallback(async () => {
     if (verify || syncing) {
-      console.log("backup is waiting");
       refValues.current.backupDidWait = true;
       return;
     }
-    console.log("backup running immediate");
     const user = await db.user.getUser();
     if (PremiumService.get() && user) {
       if (SettingsService.get().reminder === "off") {
@@ -427,7 +425,6 @@ export const useAppEvents = () => {
 
   useEffect(() => {
     if (!verify && !syncing && refValues.current.backupDidWait) {
-      console.log("backup run after wait");
       refValues.current.backupDidWait = false;
       checkAutoBackup();
     }
