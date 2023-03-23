@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ListContainer from "../components/list-container";
 import { useStore as useNbStore } from "../stores/notebook-store";
 import { useStore as useAppStore } from "../stores/app-store";
@@ -42,6 +42,14 @@ import { showSortMenu } from "../components/group-header";
 
 function Notebook() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  /**
+   * @type {React.RefObject<import("allotment").AllotmentHandle>}
+   */
+  const paneRef = useRef(null);
+  /**
+   * @type {React.RefObject<[number, number]>}
+   */
+  const sizes = useRef([]);
 
   const selectedNotebook = useNbStore((store) => store.selectedNotebook);
   const refresh = useNbStore((store) => store.setSelectedNotebook);
@@ -59,6 +67,22 @@ function Notebook() {
     )
       refresh(context.value.id);
   }, [selectedNotebook, context, refresh]);
+
+  useEffect(() => {
+    toggleCollapse(isCollapsed);
+  }, [isCollapsed, toggleCollapse]);
+
+  const toggleCollapse = useCallback((isCollapsed) => {
+    if (!paneRef.current || !sizes.current) return;
+
+    if (!isCollapsed) {
+      if (sizes.current[1] < 60) {
+        paneRef.current.reset();
+      } else {
+        paneRef.current.resize(sizes.current);
+      }
+    }
+  }, []);
 
   if (!context) return null;
   return (
@@ -91,7 +115,19 @@ function Notebook() {
           ))}
         </Flex>
       ) : null}
-      <Allotment vertical>
+      <Allotment
+        ref={paneRef}
+        vertical
+        onChange={(paneSizes) => {
+          const [_, topicsPane] = paneSizes;
+          if (topicsPane > 30 && !isCollapsed) sizes.current = paneSizes;
+        }}
+        onDragEnd={([_, topicsPane]) => {
+          if (topicsPane < 35 && !isCollapsed) {
+            setIsCollapsed(true);
+          }
+        }}
+      >
         <Allotment.Pane>
           <Flex variant="columnFill" sx={{ height: "100%" }}>
             <ListContainer
@@ -128,7 +164,9 @@ function Notebook() {
           <Topics
             selectedNotebook={selectedNotebook}
             isCollapsed={isCollapsed}
-            setIsCollapsed={setIsCollapsed}
+            onClick={() => {
+              setIsCollapsed((isCollapsed) => !isCollapsed);
+            }}
           />
         </Allotment.Pane>
       </Allotment>
@@ -137,9 +175,14 @@ function Notebook() {
 }
 export default Notebook;
 
-function Topics({ selectedNotebook, isCollapsed, setIsCollapsed }) {
+function Topics({ selectedNotebook, isCollapsed, onClick }) {
   const refresh = useNbStore((store) => store.setSelectedNotebook);
   const topics = useNbStore((store) => store.selectedNotebookTopics);
+
+  // sometimes the onClick event is triggered on dragEnd
+  // which shouldn't happen. To prevent that we make sure
+  // that onMouseDown & onMouseUp events got called.
+  const mouseEventCounter = useRef(0);
 
   if (!selectedNotebook) return null;
   return (
@@ -152,7 +195,16 @@ function Topics({ selectedNotebook, isCollapsed, setIsCollapsed }) {
           justifyContent: "space-between",
           cursor: "pointer"
         }}
-        onClick={() => setIsCollapsed((s) => !s)}
+        onMouseDown={() => {
+          mouseEventCounter.current = 1;
+        }}
+        onMouseUp={() => {
+          mouseEventCounter.current++;
+        }}
+        onClick={() => {
+          if (mouseEventCounter.current === 2) onClick();
+          mouseEventCounter.current = 0;
+        }}
       >
         <Flex sx={{ alignItems: "center" }}>
           {isCollapsed ? (
