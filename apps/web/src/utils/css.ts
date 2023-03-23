@@ -19,7 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export function removeCss(id: string) {
   const link = document.getElementById(id);
-  link ? link.remove() : undefined;
+  if(link){
+    link.remove();
+  }
 }
 
 export function injectCssSrc(id: string, src: string) {
