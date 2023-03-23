@@ -199,7 +199,9 @@ function Settings() {
     "backupReminderOffset",
     0
   );
-  const [trashCleanupInterval, setTrashCleanupInterval] = useState(7);
+  const [trashCleanupInterval, setTrashCleanupInterval] = useState(
+    db.settings.getTrashCleanupInterval()
+  );
   const [debugMode, setDebugMode] = usePersistentState("debugMode", false);
   const [homepage, setHomepage] = usePersistentState("homepage", 0);
   const [backupStorageLocation, setBackupStorageLocation] = usePersistentState(
