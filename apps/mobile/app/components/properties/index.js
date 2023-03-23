@@ -212,7 +212,6 @@ Properties.present = (item, buttons = [], isSheet) => {
   if (!props[0]) return;
   presentSheet({
     context: isSheet ? "local" : undefined,
-    enableGesturesInScrollView: true,
     component: (ref, close) => (
       <Properties
         close={() => {

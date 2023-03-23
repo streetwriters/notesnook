@@ -114,7 +114,8 @@ export type PresentSheetOptions = {
   actionsArray: SheetAction[];
   learnMore: string;
   learnMorePress: () => void;
-  enableGesturesInScrollView: boolean;
+  enableGesturesInScrollView?: boolean;
+  noBottomPadding?: boolean;
 };
 
 export function presentSheet(data: Partial<PresentSheetOptions>) {
