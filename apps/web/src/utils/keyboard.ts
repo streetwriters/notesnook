@@ -19,16 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import EventManager from "@notesnook/core/utils/event-manager";
 
-const GlobalKeyboard = {};
-
 const KeyboardEventManager = new EventManager();
 
-GlobalKeyboard.addEventListener = (name, handler) => {
-  KeyboardEventManager.subscribe(name, handler);
+const GlobalKeyboard = {
+  addEventListener: (name: string, handler: (...args: any[]) => void) => {
+    KeyboardEventManager.subscribe(name, handler);
+  },
+  removeEventListener: (name: string, handler: (...args: any[]) => void) =>
+    KeyboardEventManager.unsubscribe(name, handler)
 };
-
-GlobalKeyboard.removeEventListener = (name, handler) =>
-  KeyboardEventManager.unsubscribe(name, handler);
 
 // window.addEventListener("keydown", (e) => {
 //   // KeyboardEventManager.publish("keydown", e);
