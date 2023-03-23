@@ -472,7 +472,8 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
 MoveNoteSheet.present = (note) => {
   presentSheet({
     component: (ref) => <MoveNoteSheet actionSheetRef={ref} note={note} />,
-    enableGesturesInScrollView: false
+    enableGesturesInScrollView: false,
+    noBottomPadding: true
   });
 };
 export default MoveNoteSheet;

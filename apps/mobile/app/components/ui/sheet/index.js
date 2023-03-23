@@ -38,7 +38,8 @@ const SheetWrapper = ({
   keyboardMode,
   overlay,
   overlayOpacity = 0.3,
-  enableGesturesInScrollView = false
+  enableGesturesInScrollView = false,
+  bottomPadding = true
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const deviceMode = useSettingStore((state) => state.deviceMode);
@@ -119,14 +120,16 @@ const SheetWrapper = ({
     >
       <BouncingView>
         {children}
-        <View
-          style={{
-            height:
-              Platform.OS === "ios" && insets.bottom !== 0
-                ? insets.bottom + 5
-                : 20
-          }}
-        />
+        {bottomPadding ? (
+          <View
+            style={{
+              height:
+                Platform.OS === "ios" && insets.bottom !== 0
+                  ? insets.bottom + 5
+                  : 20
+            }}
+          />
+        ) : null}
       </BouncingView>
     </ActionSheet>
   );

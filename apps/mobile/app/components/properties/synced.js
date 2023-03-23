@@ -94,7 +94,7 @@ export const Synced = ({ item, close }) => {
         fontSize={SIZE.xs + 1}
         title="Learn more"
         height={30}
-        type="transparent"
+        type="grayAccent"
       />
     </View>
   ) : null;
