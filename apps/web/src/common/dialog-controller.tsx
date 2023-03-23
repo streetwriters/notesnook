@@ -471,9 +471,9 @@ export function showCreateTopicDialog() {
       }}
       onAction={async (topic: Record<string, unknown>) => {
         if (!topic) return;
-        const notebookId = notebookStore.get().selectedNotebookId;
-        await db.notebooks?.notebook(notebookId).topics.add(topic);
-        notebookStore.setSelectedNotebook(notebookId);
+        const notebook = notebookStore.get().selectedNotebook;
+        await db.notebooks?.notebook(notebook.id).topics.add(topic);
+        notebookStore.setSelectedNotebook(notebook.id);
         showToast("success", "Topic created!");
         perform(true);
       }}
