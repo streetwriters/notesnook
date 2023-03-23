@@ -148,6 +148,8 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
             : "deselected";
           if (itemState[notebook.id] === "selected") {
             contextValue.select(notebook);
+          } else {
+            contextValue.deselect(notebook);
           }
           for (let topic of notebook.topics) {
             itemState[topic.id] = state
@@ -160,6 +162,8 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
               : "deselected";
             if (itemState[topic.id] === "selected") {
               contextValue.select(topic);
+            } else {
+              contextValue.deselect(topic);
             }
           }
         }
