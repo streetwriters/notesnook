@@ -96,7 +96,6 @@ const RateAppSheet = () => {
           onPress={rateApp}
           fontSize={SIZE.md}
           width="100%"
-          height={50}
           type="accent"
           title="Rate now (It takes only a second)"
         />
@@ -121,14 +120,12 @@ const RateAppSheet = () => {
             fontSize={SIZE.md}
             type="error"
             width="48%"
-            height={50}
             title="Never"
           />
           <Button
             onPress={onClose}
             fontSize={SIZE.md}
             width="48%"
-            height={50}
             type="grayBg"
             title="Later"
           />

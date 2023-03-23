@@ -142,7 +142,6 @@ const ManageTagsSheet = (props) => {
           setFocus(false);
         }}
         onSubmit={onSubmit}
-        height={50}
         placeholder="Search or add a tag"
       />
 

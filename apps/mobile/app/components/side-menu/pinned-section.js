@@ -164,7 +164,6 @@ export const PinItem = React.memo(
               }}
               fontSize={SIZE.md}
               width="95%"
-              height={50}
               customStyle={{
                 marginBottom: 30
               }}

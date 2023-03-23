@@ -135,7 +135,6 @@ const ResultDialog = () => {
               paddingHorizontal: 12
             }}
             onPress={close}
-            height={50}
             fontSize={SIZE.md + 2}
           />
         </View>

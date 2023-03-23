@@ -104,7 +104,7 @@ export const COLOR_SCHEME_PITCH_BLACK = {
   light: "#ffffff",
   transGray: "#ffffff10",
   border: "#383838",
-  placeholder: "#404040"
+  placeholder: "#606060"
 };
 
 export const COLOR_SCHEME_DARK = {
