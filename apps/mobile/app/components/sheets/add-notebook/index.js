@@ -375,7 +375,6 @@ export class AddNotebookSheet extends React.Component {
         <Seperator />
         <Button
           width="100%"
-          height={50}
           fontSize={SIZE.md}
           title={
             notebook && notebook.dateCreated

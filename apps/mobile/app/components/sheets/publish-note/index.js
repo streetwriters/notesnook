@@ -86,9 +86,6 @@ const PublishNoteSheet = ({ note: item, update }) => {
 
   const setPublishLoading = (value) => {
     setPublishing(value);
-    update({
-      progress: value
-    });
   };
 
   const deletePublishedNote = async () => {
@@ -313,31 +310,37 @@ const PublishNoteSheet = ({ note: item, update }) => {
               </>
             ) : null}
 
-            <Button
-              onPress={publishNote}
-              fontSize={SIZE.md}
-              width="100%"
+            <View
               style={{
-                marginTop: 10
+                flexDirection: "row",
+                width: "100%",
+                justifyContent: "space-between"
               }}
-              height={50}
-              type="accent"
-              title={isPublished ? "Update published note" : "Publish note"}
-            />
+            >
+              {isPublished && (
+                <>
+                  <Button
+                    onPress={deletePublishedNote}
+                    fontSize={SIZE.md}
+                    type="error"
+                    title="Unpublish"
+                    style={{
+                      width: "49%"
+                    }}
+                  />
+                </>
+              )}
 
-            {isPublished && (
-              <>
-                <Seperator half />
-                <Button
-                  onPress={deletePublishedNote}
-                  fontSize={SIZE.md}
-                  width="100%"
-                  height={50}
-                  type="error"
-                  title="Unpublish note"
-                />
-              </>
-            )}
+              <Button
+                onPress={publishNote}
+                fontSize={SIZE.md}
+                style={{
+                  width: isPublished ? "49%" : "100%"
+                }}
+                type="accent"
+                title={isPublished ? "Update" : "Publish"}
+              />
+            </View>
           </View>
         </>
       )}

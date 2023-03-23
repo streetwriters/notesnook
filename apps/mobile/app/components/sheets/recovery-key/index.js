@@ -298,7 +298,6 @@ class RecoveryKeySheet extends React.Component {
             width="100%"
             type="grayAccent"
             fontSize={SIZE.md}
-            height={50}
           />
           <Seperator />
           <Button
@@ -308,7 +307,6 @@ class RecoveryKeySheet extends React.Component {
             type="grayAccent"
             fontSize={SIZE.md}
             icon="qrcode"
-            height={50}
           />
           <Seperator />
           <Button
@@ -318,7 +316,6 @@ class RecoveryKeySheet extends React.Component {
             type="grayAccent"
             icon="text"
             fontSize={SIZE.md}
-            height={50}
           />
           <Seperator />
 
@@ -329,7 +326,6 @@ class RecoveryKeySheet extends React.Component {
             type="grayAccent"
             icon="cloud"
             fontSize={SIZE.md}
-            height={50}
           />
           <Seperator />
 
@@ -349,7 +345,6 @@ class RecoveryKeySheet extends React.Component {
           <Button
             title="I have saved the key."
             width="100%"
-            height={50}
             type="error"
             fontSize={SIZE.md}
             onPress={this.close}
