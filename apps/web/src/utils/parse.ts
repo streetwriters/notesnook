@@ -17,12 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export function tryParse(val) {
-  if (val === "undefined" || val === "null") return;
-
+export function tryParse(val: string) {
+  if (val == "null" || val == "undefined") return;
   try {
     return JSON.parse(val);
-  } catch (e) {
+  } catch (error) {
     return val;
   }
 }

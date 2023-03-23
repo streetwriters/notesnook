@@ -26,8 +26,7 @@ function set<T>(key: string, value: T) {
 function get<T>(key: string, def?: T): T {
   const value = window.localStorage.getItem(key);
   if (!value && def !== undefined) return def;
-
-  return tryParse(value);
+  return value ? tryParse(value) : def;
 }
 
 function clear() {
