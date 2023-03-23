@@ -87,7 +87,8 @@ function Notebook() {
   }, []);
 
   const notes = useMemo(
-    () => groupArray(context?.notes, db.settings.getGroupOptions("notes")),
+    () =>
+      groupArray(context?.notes || [], db.settings.getGroupOptions("notes")),
     [context?.notes]
   );
 
