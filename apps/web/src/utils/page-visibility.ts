@@ -17,37 +17,41 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var hidden, visibilityChange;
-if (typeof document.hidden !== "undefined") {
-  // Opera 12.10 and Firefox 18 and later support
-  hidden = "hidden";
-  visibilityChange = "visibilitychange";
-} else if (typeof document.msHidden !== "undefined") {
-  hidden = "msHidden";
-  visibilityChange = "msvisibilitychange";
-} else if (typeof document.webkitHidden !== "undefined") {
-  hidden = "webkitHidden";
-  visibilityChange = "webkitvisibilitychange";
+function getVisibilityChangeParams() {
+  if ("msHidden" in document) {
+    return ["msHidden", "msvisibilityChange"] as const;
+  } else if ("webkitHidden" in document) {
+    return ["webkitHidden", "webkitvisibilityChange"] as const;
+  } else {
+    // Opera 12.10 and Firefox 18 and later support
+    return ["hidden", "visibilityChange"] as const;
+  }
 }
 
-export function onPageVisibilityChanged(handler) {
+export function onPageVisibilityChanged(
+  handler: (
+    status: "online" | "offline" | "visibilitychange",
+    bool: boolean
+  ) => void
+) {
   onDeviceOnline(() => handler("online", false));
   onDeviceOffline(() => handler("offline", false));
 
   // Handle page visibility change
+  const [hidden, visibilityChange] = getVisibilityChangeParams();
   document.addEventListener(visibilityChange, () =>
-    handler("visibilitychange", document[hidden])
+    handler("visibilitychange", (document as any)[hidden])
   );
 }
 
-function onDeviceOnline(handler) {
+function onDeviceOnline(handler: () => void) {
   window.addEventListener("online", function () {
-    handler && handler();
+    handler();
   });
 }
 
-function onDeviceOffline(handler) {
+function onDeviceOffline(handler: () => void) {
   window.addEventListener("offline", function () {
-    handler && handler();
+    handler();
   });
 }
