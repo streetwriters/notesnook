@@ -161,7 +161,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: 15,
+                marginTop: 10,
                 backgroundColor: colors.nav,
                 padding: 12,
                 borderRadius: 5
@@ -173,8 +173,8 @@ const PublishNoteSheet = ({ note: item, update }) => {
                   flexShrink: 1
                 }}
               >
-                <Heading size={SIZE.sm}>Published at:</Heading>
-                <Paragraph size={SIZE.xs} numberOfLines={1}>
+                <Heading size={SIZE.md}>Published at:</Heading>
+                <Paragraph size={SIZE.sm} numberOfLines={1}>
                   {publishUrl}
                 </Paragraph>
                 <Paragraph
@@ -211,7 +211,6 @@ const PublishNoteSheet = ({ note: item, update }) => {
               />
             </View>
           )}
-          <Seperator />
 
           <TouchableOpacity
             onPress={() => {
@@ -222,7 +221,11 @@ const PublishNoteSheet = ({ note: item, update }) => {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginBottom: 10
+              marginBottom: 10,
+              backgroundColor: colors.nav,
+              paddingVertical: 12,
+              borderRadius: 5,
+              marginTop: 10
             }}
           >
             <IconButton
@@ -231,7 +234,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
                 setIsLocked(!isLocked);
               }}
               color={isLocked ? colors.accent : colors.icon}
-              size={SIZE.lg}
+              size={SIZE.xl}
               name={
                 isLocked
                   ? "check-circle-outline"
@@ -259,7 +262,10 @@ const PublishNoteSheet = ({ note: item, update }) => {
             activeOpacity={0.9}
             style={{
               flexDirection: "row",
-              alignItems: "center"
+              alignItems: "center",
+              backgroundColor: colors.nav,
+              paddingVertical: 12,
+              borderRadius: 5
             }}
           >
             <IconButton
@@ -267,7 +273,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
                 setSelfDestruct(!selfDestruct);
               }}
               color={selfDestruct ? colors.accent : colors.icon}
-              size={SIZE.lg}
+              size={SIZE.xl}
               name={
                 selfDestruct
                   ? "check-circle-outline"
@@ -314,7 +320,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
               style={{
                 flexDirection: "row",
                 width: "100%",
-                justifyContent: "space-between"
+                justifyContent: "center"
               }}
             >
               {isPublished && (
@@ -330,12 +336,13 @@ const PublishNoteSheet = ({ note: item, update }) => {
                   />
                 </>
               )}
-
+              <Seperator half />
               <Button
                 onPress={publishNote}
                 fontSize={SIZE.md}
                 style={{
-                  width: isPublished ? "49%" : "100%"
+                  width: isPublished ? "49%" : 250,
+                  borderRadius: isPublished ? 5 : 100
                 }}
                 type="accent"
                 title={isPublished ? "Update" : "Publish"}
@@ -350,7 +357,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
         size={SIZE.xs}
         style={{
           textAlign: "center",
-          marginTop: 5,
+          marginTop: 10,
           textDecorationLine: "underline"
         }}
         onPress={async () => {
