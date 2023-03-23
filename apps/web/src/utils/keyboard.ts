@@ -22,16 +22,11 @@ import EventManager from "@notesnook/core/utils/event-manager";
 const KeyboardEventManager = new EventManager();
 
 const GlobalKeyboard = {
-  addEventListener: (
-    name: string,
-    handler: EventListenerOrEventListenerObject
-  ) => {
+  addEventListener: (name: string, handler: (...args: any[]) => void) => {
     KeyboardEventManager.subscribe(name, handler);
   },
-  removeEventListener: (
-    name: string,
-    handler: EventListenerOrEventListenerObject
-  ) => KeyboardEventManager.unsubscribe(name, handler)
+  removeEventListener: (name: string, handler: (...args: any[]) => void) =>
+    KeyboardEventManager.unsubscribe(name, handler)
 };
 
 // window.addEventListener("keydown", (e) => {
