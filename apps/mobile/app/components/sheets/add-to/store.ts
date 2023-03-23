@@ -16,14 +16,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import create, { State } from "zustand";
 
-import { createContext, useContext } from "react";
+type SelectionItemState = Record<
+  string,
+  "intermediate" | "selected" | "deselected"
+>;
 
-export const SelectionContext = createContext({
-  toggleSelection: (item) => null,
-  deselect: (item) => null,
-  select: (item) => null,
-  deselectAll: () => null
-});
-export const SelectionProvider = SelectionContext.Provider;
-export const useSelectionContext = () => useContext(SelectionContext);
+export interface SelectionStore extends State {
+  itemState: SelectionItemState;
+  setItemState: (state: SelectionItemState) => void;
+  multiSelect: boolean;
+  setMultiSelect: (multiSelect: boolean) => void;
+}
+
+export const useItemSelectionStore = create<SelectionStore>((set) => ({
+  itemState: {},
+  setItemState: (itemState) => {
+    set({
+      itemState
+    });
+  },
+  multiSelect: false,
+  setMultiSelect: (multiSelect) => set({ multiSelect })
+}));

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Keyboard, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
@@ -35,10 +35,10 @@ import Paragraph from "../../ui/typography/paragraph";
 import { SelectionProvider } from "./context";
 import { FilteredList } from "./filtered-list";
 import { ListItem } from "./list-item";
+import { useItemSelectionStore } from "./store";
 
 const MoveNoteSheet = ({ note, actionSheetRef }) => {
   const colors = useThemeStore((state) => state.colors);
-  const [multiSelect, setMultiSelect] = useState(false);
   const notebooks = useNotebookStore((state) =>
     state.notebooks.filter((n) => n?.type === "notebook")
   );
@@ -47,7 +47,9 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
     (state) => state.selectedItemsList
   );
   const setNotebooks = useNotebookStore((state) => state.setNotebooks);
-  const [itemState, setItemState] = useState({});
+
+  const multiSelect = useItemSelectionStore((state) => state.multiSelect);
+
   const onAddNotebook = async (title) => {
     if (!title || title.trim().length === 0) {
       ToastEvent.show({
@@ -135,40 +137,39 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
 
   const resetItemState = useCallback(
     (state) => {
-      setItemState(() => {
-        const itemState = {};
-        const notebooks = db.notebooks.all;
-        for (let notebook of notebooks) {
-          itemState[notebook.id] = state
+      const itemState = {};
+      const notebooks = db.notebooks.all;
+      for (let notebook of notebooks) {
+        itemState[notebook.id] = state
+          ? state
+          : areAllSelectedItemsInNotebook(notebook, selectedItemsList)
+          ? "selected"
+          : getSelectedNotesCountInItem(notebook, selectedItemsList) > 0
+          ? "intermediate"
+          : "deselected";
+        if (itemState[notebook.id] === "selected") {
+          contextValue.select(notebook);
+        } else {
+          contextValue.deselect(notebook);
+        }
+        for (let topic of notebook.topics) {
+          itemState[topic.id] = state
             ? state
-            : areAllSelectedItemsInNotebook(notebook, selectedItemsList)
+            : areAllSelectedItemsInTopic(topic, selectedItemsList) &&
+              getSelectedNotesCountInItem(topic, selectedItemsList)
             ? "selected"
-            : getSelectedNotesCountInItem(notebook, selectedItemsList) > 0
+            : getSelectedNotesCountInItem(topic, selectedItemsList) > 0
             ? "intermediate"
             : "deselected";
-          if (itemState[notebook.id] === "selected") {
-            contextValue.select(notebook);
+          if (itemState[topic.id] === "selected") {
+            contextValue.select(topic);
           } else {
-            contextValue.deselect(notebook);
-          }
-          for (let topic of notebook.topics) {
-            itemState[topic.id] = state
-              ? state
-              : areAllSelectedItemsInTopic(topic, selectedItemsList) &&
-                getSelectedNotesCountInItem(topic, selectedItemsList)
-              ? "selected"
-              : getSelectedNotesCountInItem(topic, selectedItemsList) > 0
-              ? "intermediate"
-              : "deselected";
-            if (itemState[topic.id] === "selected") {
-              contextValue.select(topic);
-            } else {
-              contextValue.deselect(topic);
-            }
+            contextValue.deselect(topic);
           }
         }
-        return itemState;
-      });
+      }
+
+      useItemSelectionStore.getState().setItemState(itemState);
     },
     [contextValue, getSelectedNotesCountInItem, selectedItemsList]
   );
@@ -195,32 +196,26 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
   }
 
   const updateItemState = useCallback(function (item, state) {
-    setItemState((itemState) => {
-      const mergeState = {
-        [item.id]: state
-      };
-      return {
-        ...itemState,
-        ...mergeState
-      };
+    const itemState = useItemSelectionStore.getState().itemState;
+    const mergeState = {
+      [item.id]: state
+    };
+    useItemSelectionStore.getState().setItemState({
+      ...itemState,
+      ...mergeState
     });
   }, []);
 
   const contextValue = useMemo(
     () => ({
-      enabled: multiSelect,
       toggleSelection: (item) => {
-        setItemState((itemState) => {
-          if (itemState[item.id] === "selected") {
-            updateItemState(item, "deselected");
-          } else {
-            updateItemState(item, "selected");
-          }
-
-          return itemState;
-        });
+        const itemState = useItemSelectionStore.getState().itemState;
+        if (itemState[item.id] === "selected") {
+          updateItemState(item, "deselected");
+        } else {
+          updateItemState(item, "selected");
+        }
       },
-      setMultiSelect: setMultiSelect,
       deselect: (item) => {
         updateItemState(item, "deselected");
       },
@@ -231,7 +226,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
         resetItemState(state);
       }
     }),
-    [multiSelect, resetItemState, updateItemState]
+    [resetItemState, updateItemState]
   );
 
   const getItemFromId = (id) => {
@@ -245,6 +240,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
 
   const onSave = async () => {
     const noteIds = note ? [note.id] : selectedItemsList.map((n) => n.id);
+    const itemState = useItemSelectionStore.getState().itemState;
     for (const id in itemState) {
       const item = getItemFromId(id);
       if (itemState[id] === "selected") {
@@ -354,7 +350,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
               }}
               onPress={() => {
                 resetItemState();
-                setMultiSelect(false);
+                useItemSelectionStore.getState().setMultiSelect(false);
               }}
             />
           </View>
@@ -389,13 +385,8 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
                 item={item}
                 key={item.id}
                 index={index}
-                intermediate={itemState[item.id] === "intermediate"}
-                removed={
-                  itemState[item.id] === "deselected" &&
-                  getSelectedNotesCountInItem(item) > 0
-                }
+                hasNotes={getSelectedNotesCountInItem(item) > 0}
                 sheetRef={actionSheetRef}
-                isSelected={itemState[item.id] === "selected"}
                 infoText={
                   <>
                     {item.topics.length === 1
@@ -405,17 +396,14 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
                 }
                 getListItems={getItemsForItem}
                 getSublistItemProps={(topic) => ({
-                  selected: itemState[topic.id] === "selected",
-                  intermediate: itemState[topic.id] === "intermediate",
-                  isSelected: itemState[topic.id] === "selected",
-                  removed:
-                    itemState[topic.id] === "deselected" &&
-                    getSelectedNotesCountInItem(topic) > 0,
+                  hasNotes: getSelectedNotesCountInItem(topic) > 0,
                   style: {
                     marginBottom: 0,
                     height: 40
                   },
                   onPress: (item) => {
+                    const itemState =
+                      useItemSelectionStore.getState().itemState;
                     const currentState = itemState[item.id];
                     if (currentState !== "selected") {
                       resetItemState("deselected");
@@ -444,19 +432,22 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
                 onAddSublistItem={(item) => {
                   openAddTopicDialog(item);
                 }}
+                onPress={(item) => {
+                  const itemState = useItemSelectionStore.getState().itemState;
+                  const currentState = itemState[item.id];
+                  if (currentState !== "selected") {
+                    resetItemState("deselected");
+                    contextValue.select(item);
+                  } else {
+                    contextValue.deselect(item);
+                  }
+                }}
               />
             )}
             itemType="notebook"
             onAddItem={async (title) => {
               return await onAddNotebook(title);
             }}
-            // ListFooterComponent={
-            //   <View
-            //     style={{
-            //       height: 200
-            //     }}
-            //   />
-            // }
           />
         </SelectionProvider>
       </View>
