@@ -43,10 +43,7 @@ export function injectCss(rule: string) {
   const css = document.createElement("style");
   css.type = "text/css";
   css.id = "variables";
-  // Support for IE
-  if ((css as any).styleSheet) (css as any).styleSheet.cssText = rule;
-  // Support for the rest
-  else css.appendChild(document.createTextNode(rule));
+  css.appendChild(document.createTextNode(rule));
   head.insertBefore(css, getRootStylesheet());
 }
 
