@@ -17,8 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
+import { db } from "../../../common/database";
+import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
 import { IconButton } from "../../ui/icon-button";
@@ -29,7 +31,13 @@ import { useSelectionContext } from "./context";
 import { FilteredList } from "./filtered-list";
 import { useItemSelectionStore } from "./store";
 
-const SelectionIndicator = ({ item, hasNotes, selectItem, onPress }) => {
+const SelectionIndicator = ({
+  item,
+  hasNotes,
+  selectItem,
+  onPress,
+  onChange
+}) => {
   const itemState = useItemSelectionStore((state) => state.itemState[item.id]);
   const multiSelect = useItemSelectionStore((state) => state.multiSelect);
 
@@ -37,6 +45,11 @@ const SelectionIndicator = ({ item, hasNotes, selectItem, onPress }) => {
   const isIntermediate = itemState === "intermediate";
   const isRemoved = !isSelected && hasNotes;
   const colors = useThemeStore((state) => state.colors);
+
+  useEffect(() => {
+    onChange?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itemState]);
 
   return (
     <IconButton
@@ -100,17 +113,45 @@ export const ListItem = ({
   hasHeaderSearch,
   onAddSublistItem,
   hasNotes,
+  onChange,
   sheetRef
 }) => {
   const { toggleSelection } = useSelectionContext();
   const multiSelect = useItemSelectionStore((state) => state.multiSelect);
-
+  const [showSelectedIndicator, setShowSelectedIndicator] = useState(false);
   const colors = useThemeStore((state) => state.colors);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   function selectItem() {
     toggleSelection(item);
   }
+
+  const getSelectedNotesCountInNotebookTopics = (item) => {
+    if (item.type === "topic") return;
+
+    let count = 0;
+    const noteIds = [];
+    for (let topic of item.topics) {
+      noteIds.push(...(db.notes?.topicReferences.get(topic.id) || []));
+      if (useItemSelectionStore.getState().itemState[topic.id] === "selected") {
+        count++;
+      }
+    }
+    useSelectionStore.getState().selectedItemsList.forEach((item) => {
+      if (noteIds.indexOf(item.id) > -1) {
+        count++;
+      }
+    });
+    return count;
+  };
+
+  useEffect(() => {
+    setShowSelectedIndicator(getSelectedNotesCountInNotebookTopics(item) > 0);
+  }, [item]);
+
+  const onChangeSubItem = () => {
+    setShowSelectedIndicator(getSelectedNotesCountInNotebookTopics(item) > 0);
+  };
 
   return (
     <View
@@ -157,6 +198,7 @@ export const ListItem = ({
               hasNotes={hasNotes}
               onPress={onPress}
               item={item}
+              onChange={onChange}
               selectItem={selectItem}
             />
             <View>
@@ -176,9 +218,22 @@ export const ListItem = ({
 
           <View
             style={{
-              flexDirection: "row"
+              flexDirection: "row",
+              alignItems: "center"
             }}
           >
+            {showSelectedIndicator ? (
+              <View
+                style={{
+                  backgroundColor: colors.accent,
+                  width: 7,
+                  height: 7,
+                  borderRadius: 100,
+                  marginRight: 12
+                }}
+              />
+            ) : null}
+
             {onAddSublistItem ? (
               <IconButton
                 name={"plus"}
@@ -225,6 +280,7 @@ export const ListItem = ({
               item={item}
               {...getSublistItemProps(item)}
               index={index}
+              onChange={onChangeSubItem}
               onScrollEnd={onScrollEnd}
             />
           )}
