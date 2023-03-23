@@ -40,9 +40,9 @@ async function typeToItems(type, context) {
     case "notebooks":
       return ["notebooks", db.notebooks.all];
     case "topics": {
-      const notebookId = notebookstore.get().selectedNotebookId;
-      if (!notebookId) return ["topics", []];
-      const topics = db.notebooks.notebook(notebookId).topics.all;
+      const selectedNotebook = notebookstore.get().selectedNotebook;
+      if (!selectedNotebook) return ["topics", []];
+      const topics = db.notebooks.notebook(selectedNotebook.id).topics.all;
       return ["topics", topics];
     }
     case "tags":
@@ -114,9 +114,9 @@ function Search({ type }) {
       case "notebooks":
         return "all notebooks";
       case "topics": {
-        const notebookId = notebookstore.get().selectedNotebookId;
-        if (!notebookId) return "";
-        const notebook = db.notebooks.notebook(notebookId);
+        const selectedNotebook = notebookstore.get().selectedNotebook;
+        if (!selectedNotebook) return "";
+        const notebook = db.notebooks.notebook(selectedNotebook.id);
         return `topics in ${notebook.title} notebook`;
       }
       case "tags":
