@@ -118,7 +118,7 @@ const NoteItem = ({
             {notebooks?.map((item) => (
               <Button
                 title={item.title}
-                key={item}
+                key={item.id}
                 height={25}
                 icon={item.type === "topic" ? "bookmark" : "book-outline"}
                 type="grayBg"
