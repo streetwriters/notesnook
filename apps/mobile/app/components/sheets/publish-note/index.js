@@ -60,7 +60,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
         if (isLocked && !passwordValue) return;
         await db.monographs.publish(note.id, {
           selfDestruct: selfDestruct,
-          password: isLocked && passwordValue
+          password: isLocked && passwordValue.current
         });
         setNote(db.notes.note(note.id)?.data);
         Navigation.queueRoutesForUpdate(
