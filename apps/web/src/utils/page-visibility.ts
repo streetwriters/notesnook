@@ -17,15 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function getVisibilityChangeParams() {
-  if ("msHidden" in document) {
-    return ["msHidden", "msvisibilityChange"] as const;
-  } else if ("webkitHidden" in document) {
-    return ["webkitHidden", "webkitvisibilityChange"] as const;
-  } else {
-    // Opera 12.10 and Firefox 18 and later support
-    return ["hidden", "visibilityChange"] as const;
-  }
+function visibilityChange() {
+  return "msHidden" in document
+    ? "msvisibilityChange"
+    : "webkitHidden" in document
+    ? "webkitvisibilityChange"
+    : "visibilityChange";
+}
+
+function isDocumentHidden() {
+  return "msHidden" in document && typeof document.msHidden === "boolean"
+    ? document.msHidden
+    : "webkitHidden" in document && typeof document.webkitHidden === "boolean"
+    ? document.webkitHidden
+    : document.hidden;
 }
 
 export function onPageVisibilityChanged(
@@ -38,9 +43,8 @@ export function onPageVisibilityChanged(
   onDeviceOffline(() => handler("offline", false));
 
   // Handle page visibility change
-  const [hidden, visibilityChange] = getVisibilityChangeParams();
-  document.addEventListener(visibilityChange, () =>
-    handler("visibilitychange", (document as any)[hidden])
+  document.addEventListener(visibilityChange(), () =>
+    handler("visibilitychange", isDocumentHidden())
   );
 }
 
