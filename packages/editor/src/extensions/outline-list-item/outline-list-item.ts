@@ -161,22 +161,17 @@ export const OutlineListItem = Node.create<ListItemOptions>({
           selection
         );
 
-        let xlowerLimit = clientX >= x - hitArea.width;
-        let xHigherLimit = clientX <= x;
+        let xStart = clientX >= x - hitArea.width;
+        let xEnd = clientX <= x;
+        const yStart = clientY >= y;
+        const yEnd = clientY <= y + hitArea.height;
 
-        if (parent) {
-          if (parent.node.attrs.textDirection === "rtl") {
-            xHigherLimit = clientX <= right + hitArea.width;
-            xlowerLimit = clientX >= right;
-          }
+        if (parent && parent.node.attrs.textDirection === "rtl") {
+          xEnd = clientX <= right + hitArea.width;
+          xStart = clientX >= right;
         }
 
-        if (
-          xlowerLimit &&
-          xHigherLimit &&
-          clientY >= y &&
-          clientY <= y + hitArea.height
-        ) {
+        if (xStart && xEnd && yStart && yEnd) {
           const pos = typeof getPos === "function" ? getPos() : 0;
           if (!pos) return;
 

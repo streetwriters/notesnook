@@ -517,14 +517,12 @@ p > *::selection {
 
   transform: rotate(0);
   transition: transform 250ms ease;
-}
-
-*:not([dir="rtl"]).outline-list li > p::before {
   left: -22px;
 }
 
 [dir="rtl"].outline-list li > p::before {
   right: -22px;
+  left: unset;
 }
 
 .outline-list li:not(.nested) > p::before {
@@ -546,24 +544,24 @@ p > *::selection {
   position: absolute;
   height: 100%;
   transition: border 200ms ease-in-out;
-}
-
-.outline-list:not([dir="rtl"]) li .outline-list::before {
   left: -14px;
   border-left: 1px solid var(--border);
 }
 
 [dir="rtl"].outline-list li .outline-list::before {
+  left: unset;
+  border-left: unset;
   right: -14px;
   border-right: 1px solid var(--border);
 }
 
-*:not([dir="rtl"]).outline-list li .outline-list:hover:before {
+.outline-list li .outline-list:hover:before {
   border-left: 1px solid var(--bgSecondaryHover);
 }
 
 [dir="rtl"].outline-list li .outline-list:hover:before {
   border-right: 1px solid var(--bgSecondaryHover);
+  border-left: unset;
 }
 
 /* IMAGE */
