@@ -109,7 +109,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
     }
 
     setSelected(selected);
-    setIsMultiselect(false);
+    setIsMultiselect(selected.length > 1);
   }, [noteIds, notebooks, setSelected, setIsMultiselect]);
 
   return (
@@ -159,6 +159,21 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
         onClick: () => onClose(false)
       }}
     >
+      {isMultiselect && (
+        <Button
+          variant="anchor"
+          onClick={() => {
+            const originalSelection: NotebookReference[] = selected
+              .filter((a) => !a.new)
+              .map((s) => ({ ...s, op: "add" }));
+            setSelected(originalSelection);
+            setIsMultiselect(originalSelection.length > 1);
+          }}
+          sx={{ textDecoration: "none", mt: 1 }}
+        >
+          Reset selection
+        </Button>
+      )}
       <Flex
         mt={1}
         sx={{ overflowY: "hidden", flexDirection: "column" }}
@@ -210,20 +225,6 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
           )}
         />
       </Flex>
-      {isMultiselect && (
-        <Button
-          variant="anchor"
-          onClick={() => {
-            setIsMultiselect(false);
-            setSelected(
-              selected.filter((a) => !a.new).map((s) => ({ ...s, op: "add" }))
-            );
-          }}
-          sx={{ textDecoration: "none", mt: 1 }}
-        >
-          Reset selection
-        </Button>
-      )}
     </Dialog>
   );
 }
