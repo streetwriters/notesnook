@@ -238,7 +238,7 @@ export const ListItem = ({
               <IconButton
                 name={"plus"}
                 testID="add-item-icon"
-                color={colors}
+                color={colors.pri}
                 size={SIZE.xl}
                 onPress={() => {
                   onAddSublistItem(item);
