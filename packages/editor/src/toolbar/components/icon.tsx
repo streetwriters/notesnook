@@ -27,6 +27,7 @@ function isSchemeColor(
   color: string,
   theme: Theme
 ): color is keyof SchemeColors {
+  if (!theme || !theme.colors) return false;
   return color in theme.colors;
 }
 
