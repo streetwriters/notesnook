@@ -27,8 +27,8 @@
   padding-bottom: 10px;
   cursor: pointer;
   position: relative;
-  margin-top: 4px; 
-  margin-bottom:-10px;
+  margin-top: 4px;
+  margin-bottom: -10px;
 }
 
 .ProseMirror hr::after {
@@ -503,7 +503,6 @@ p > *::selection {
 .outline-list li > p::before {
   position: absolute;
   top: 4px;
-  left: -22px;
   cursor: pointer;
   content: "";
   background-size: 18px;
@@ -518,6 +517,7 @@ p > *::selection {
 
   transform: rotate(0);
   transition: transform 250ms ease;
+  left: -22px;
 }
 
 .outline-list li:not(.nested) > p::before {
@@ -530,23 +530,25 @@ p > *::selection {
   transform: rotate(-90deg);
 }
 
+
 .outline-list li .outline-list::before {
   content: " ";
   position: absolute;
   height: 100%;
+  transition: border 200ms ease-in-out;
   left: -14px;
   border-left: 1px solid var(--border);
-  transition: border 200ms ease-in-out;
 }
 
 .outline-list li .outline-list:hover:before {
   border-left: 1px solid var(--bgSecondaryHover);
 }
 
+
 /* IMAGE */
 
 .image-view-content-wrap.ProseMirror-selectednode .resizer::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -574,14 +576,24 @@ blockquote[dir="rtl"] {
   padding-right: 15px;
 }
 
-.outline-list-item-toggle.rtl {
-  display: none;
+
+.outline-list[dir="rtl"] li > p::before {
+  right: -22px;
+  left: unset;
 }
 
-[dir="rtl"] .outline-list-item-toggle.rtl {
-  display: block;
+.outline-list[dir="rtl"] li .outline-list::before {
+  border-left: unset;
+  border-right: 1px solid var(--border);
+  left: unset;
+  right: -14px;
 }
 
-[dir="rtl"] .outline-list-item-toggle:not(.rtl) {
-  display: none;
+.outline-list[dir="rtl"] li .outline-list:hover:before {
+  border-right: 1px solid var(--bgSecondaryHover);
+  border-left: unset;
+}
+
+.outline-list[dir="rtl"] li.collapsed > p::before {
+  transform: rotate(90deg);
 }
