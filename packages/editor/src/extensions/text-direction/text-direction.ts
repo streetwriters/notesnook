@@ -17,8 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { isListActive } from "../../utils/prosemirror";
 import { Extension, Editor, findParentNode } from "@tiptap/core";
 import "@tiptap/extension-text-style";
+import { Paragraph } from "../paragraph";
+import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 
 export type TextDirections = undefined | "rtl";
 const TEXT_DIRECTION_TYPES = [
@@ -52,17 +55,19 @@ declare module "@tiptap/core" {
 
 export function getTextDirection(editor: Editor): TextDirections {
   const selection = editor.state.selection;
-  const { $anchor } = selection;
-  const selectedNode = editor.state.doc.nodeAt($anchor.pos);
 
-  if (!!selectedNode && !!selectedNode.attrs.textDirection)
-    return selectedNode.attrs.textDirection;
-
-  const parent = findParentNode((node) => !!node.attrs.textDirection)(
-    selection
-  );
+  const parent = findParentNode(
+    (node) =>
+      !!node.attrs.textDirection && !isTextDirectionIgnored(editor, node)
+  )(selection);
   if (!parent) return;
   return parent.node.attrs.textDirection;
+}
+
+function isTextDirectionIgnored(editor: Editor, node: ProsemirrorNode) {
+  const isInsideList = isListActive(editor);
+  const isParagraph = node.type.name === Paragraph.name;
+  return isInsideList && isParagraph;
 }
 
 export const TextDirection = Extension.create<TextDirectionOptions>({
