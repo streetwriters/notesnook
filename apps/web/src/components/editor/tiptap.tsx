@@ -52,7 +52,7 @@ import { getCurrentPreset } from "../../common/toolbar-config";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
-import { debounceWithId, inlineDebounce } from "../../utils/debounce";
+import { debounce, debounceWithId } from "../../utils/debounce";
 import { store as editorstore } from "../../stores/editor-store";
 
 type TipTapProps = {
@@ -214,38 +214,32 @@ function TipTap(props: TipTapProps) {
           canUndo: editor.can().undo()
         });
       },
-      onSelectionUpdate: ({ editor, transaction }) => {
-        inlineDebounce(
-          "tiptap:onSelectionUpdate",
-          () => {
-            const isEmptySelection = transaction.selection.empty;
-            configure((old) => {
-              const oldSelected = old.statistics?.words?.selected;
-              const oldWords = old.statistics?.words.total || 0;
-              if (isEmptySelection)
-                return oldSelected
-                  ? {
-                    statistics: { words: { total: oldWords, selected: 0 } }
-                  }
-                  : old;
-
-              const selectedWords = getSelectedWords(
-                editor as Editor,
-                transaction.selection
-              );
-              return {
-                statistics: {
-                  words: {
-                    total: oldWords,
-                    selected: selectedWords
-                  }
+      onSelectionUpdate: debounce(({ editor, transaction }) => {
+        const isEmptySelection = transaction.selection.empty;
+        configure((old) => {
+          const oldSelected = old.statistics?.words?.selected;
+          const oldWords = old.statistics?.words.total || 0;
+          if (isEmptySelection)
+            return oldSelected
+              ? {
+                  statistics: { words: { total: oldWords, selected: 0 } }
                 }
-              };
-            });
-          },
-          500
-        );
-      },
+              : old;
+
+          const selectedWords = getSelectedWords(
+            editor as Editor,
+            transaction.selection
+          );
+          return {
+            statistics: {
+              words: {
+                total: oldWords,
+                selected: selectedWords
+              }
+            }
+          };
+        });
+      }, 500),
       theme,
       onOpenAttachmentPicker: (_editor, type) => {
         onInsertAttachment?.(type);

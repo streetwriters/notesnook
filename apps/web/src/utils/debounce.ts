@@ -16,37 +16,46 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+interface DebouncedFunction<
+  Args extends any[],
+  F extends (...args: Args) => any
+> {
+  (this: ThisParameterType<F>, ...args: Args & Parameters<F>): void;
+}
 
-export function debounce<F extends (...args: never[]) => void>(
+interface DebouncedFunctionWithId<
+  Args extends any[],
+  F extends (...args: Args) => any
+> {
+  (this: ThisParameterType<F>, id: string, ...args: Args & Parameters<F>): void;
+}
+
+export function debounce<Args extends any[], F extends (...args: Args) => void>(
   func: F,
   waitFor: number
-) {
+): DebouncedFunction<Args, F> {
   let timeout: number | null;
 
-  const debounced = (...args: Parameters<F>) => {
+  return (...args: Args) => {
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), waitFor) as unknown as number;
   };
-
-  return debounced;
 }
 
-export function debounceWithId<F extends (...args: never[]) => void>(
-  func: F,
-  waitFor: number
-) {
+export function debounceWithId<
+  Args extends any[],
+  F extends (...args: Args) => void
+>(func: F, waitFor: number): DebouncedFunctionWithId<Args, F> {
   let timeout: number | null;
   let debounceId: string | null = null;
 
-  const debounced = (id: string, ...args: Parameters<F>) => {
+  return (id: string, ...args: Parameters<F>) => {
     if (timeout && id === debounceId) clearTimeout(timeout);
     debounceId = id;
     timeout = setTimeout(() => {
       func(...args);
     }, waitFor) as unknown as number;
   };
-
-  return debounced;
 }
 
 const DEBOUNCE_TIMEOUTS: Record<string, NodeJS.Timeout> = {};

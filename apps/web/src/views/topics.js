@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ListContainer from "../components/list-container";
 import { useStore as useNbStore } from "../stores/notebook-store";
 import { useStore as useAppStore } from "../stores/app-store";
@@ -39,6 +39,8 @@ import { Plus } from "../components/icons";
 import { useStore as useNotesStore } from "../stores/note-store";
 import Placeholder from "../components/placeholders";
 import { showSortMenu } from "../components/group-header";
+import { db } from "../common/db";
+import { groupArray } from "@notesnook/core/utils/grouping";
 
 function Notebook() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -83,6 +85,12 @@ function Notebook() {
       }
     }
   }, []);
+
+  const notes = useMemo(
+    () =>
+      groupArray(context?.notes || [], db.settings.getGroupOptions("notes")),
+    [context?.notes]
+  );
 
   if (!context) return null;
   return (
@@ -136,7 +144,7 @@ function Notebook() {
               refresh={refreshContext}
               compact={isCompact}
               context={{ ...context, notes: undefined }}
-              items={context.notes}
+              items={notes}
               placeholder={<Placeholder context="notes" />}
               header={
                 context?.type === "topic" ? (

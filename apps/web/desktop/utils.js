@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { app } from "electron";
 import { join } from "path";
-import { statSync } from "fs";
+import { statSync, existsSync } from "fs";
 
 const APP_ICON_PATH = join(
   __dirname,
@@ -52,4 +52,8 @@ function getPath(filePath) {
   }
 }
 
-export { getPath, isDevelopment, APP_ICON_PATH };
+function isFlatpak() {
+  return existsSync("/.flatpak-info");
+}
+
+export { getPath, isDevelopment, isFlatpak, APP_ICON_PATH };

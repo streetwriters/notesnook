@@ -16,26 +16,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import create, { State } from "zustand";
 
-import EventManager from "@notesnook/core/utils/event-manager";
+type SelectionItemState = Record<
+  string,
+  "intermediate" | "selected" | "deselected"
+>;
 
-const GlobalKeyboard = {};
+export interface SelectionStore extends State {
+  itemState: SelectionItemState;
+  setItemState: (state: SelectionItemState) => void;
+  multiSelect: boolean;
+  setMultiSelect: (multiSelect: boolean) => void;
+}
 
-const KeyboardEventManager = new EventManager();
-
-GlobalKeyboard.addEventListener = (name, handler) => {
-  KeyboardEventManager.subscribe(name, handler);
-};
-
-GlobalKeyboard.removeEventListener = (name, handler) =>
-  KeyboardEventManager.unsubscribe(name, handler);
-
-// window.addEventListener("keydown", (e) => {
-//   // KeyboardEventManager.publish("keydown", e);
-// });
-
-window.addEventListener("keyup", (e) => {
-  KeyboardEventManager.publish("keyup", e);
-});
-
-export { GlobalKeyboard, KeyboardEventManager };
+export const useItemSelectionStore = create<SelectionStore>((set) => ({
+  itemState: {},
+  setItemState: (itemState) => {
+    set({
+      itemState
+    });
+  },
+  multiSelect: false,
+  setMultiSelect: (multiSelect) => set({ multiSelect })
+}));

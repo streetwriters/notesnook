@@ -17,13 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createContext, useContext } from "react";
+import EventManager from "@notesnook/core/utils/event-manager";
 
-export const SelectionContext = createContext({
-  toggleSelection: (item) => null,
-  deselect: (item) => null,
-  select: (item) => null,
-  deselectAll: () => null
+const KeyboardEventManager = new EventManager();
+
+const GlobalKeyboard = {
+  addEventListener: (name: string, handler: (...args: any[]) => void) => {
+    KeyboardEventManager.subscribe(name, handler);
+  },
+  removeEventListener: (name: string, handler: (...args: any[]) => void) =>
+    KeyboardEventManager.unsubscribe(name, handler)
+};
+
+// window.addEventListener("keydown", (e) => {
+//   // KeyboardEventManager.publish("keydown", e);
+// });
+
+window.addEventListener("keyup", (e) => {
+  KeyboardEventManager.publish("keyup", e);
 });
-export const SelectionProvider = SelectionContext.Provider;
-export const useSelectionContext = () => useContext(SelectionContext);
+
+export { GlobalKeyboard, KeyboardEventManager };

@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Node, mergeAttributes, findChildren, Editor } from "@tiptap/core";
+import {
+  Node,
+  mergeAttributes,
+  findChildren,
+  Editor,
+  findParentNode
+} from "@tiptap/core";
 import { NodeType } from "prosemirror-model";
 import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { onArrowUpPressed, onBackspacePressed } from "../list-item/commands";
@@ -140,20 +146,32 @@ export const OutlineListItem = Node.create<ListItemOptions>({
         if (!(e.target instanceof HTMLParagraphElement)) return;
         if (!li.classList.contains("nested")) return;
 
+        const { x, y, right } = li.getBoundingClientRect();
+
         const clientX =
           e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+
         const clientY =
           e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
 
-        const { x, y } = li.getBoundingClientRect();
-
         const hitArea = { width: 26, height: 24 };
-        if (
-          clientX >= x - hitArea.width &&
-          clientX <= x &&
-          clientY >= y &&
-          clientY <= y + hitArea.height
-        ) {
+
+        const selection = editor.state.selection;
+        const parent = findParentNode((node) => !!node.attrs.textDirection)(
+          selection
+        );
+
+        let xStart = clientX >= x - hitArea.width;
+        let xEnd = clientX <= x;
+        const yStart = clientY >= y;
+        const yEnd = clientY <= y + hitArea.height;
+
+        if (parent && parent.node.attrs.textDirection === "rtl") {
+          xEnd = clientX <= right + hitArea.width;
+          xStart = clientX >= right;
+        }
+
+        if (xStart && xEnd && yStart && yEnd) {
           const pos = typeof getPos === "function" ? getPos() : 0;
           if (!pos) return;
 

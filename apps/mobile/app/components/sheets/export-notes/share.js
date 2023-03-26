@@ -48,7 +48,6 @@ export const ShareComponent = ({ uri, name, padding }) => {
             });
           });
         }}
-        height={50}
       />
       <Button
         title="Share"
@@ -65,7 +64,6 @@ export const ShareComponent = ({ uri, name, padding }) => {
             shareFile: true
           }).catch(console.log);
         }}
-        height={50}
       />
     </View>
   );

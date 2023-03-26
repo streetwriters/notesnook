@@ -101,8 +101,13 @@ async function importNote(note: Note) {
   note.notebooks = [];
   const noteId = await db.notes?.add(note);
 
-  for (const notebook of notebooks) {
-    await db.notes?.addToNotebook(await importNotebook(notebook), noteId);
+  for (const nb of notebooks) {
+    const notebook = await importNotebook(nb);
+    if (!notebook.id) continue;
+    await db.notes?.addToNotebook(
+      { id: notebook.id, topic: notebook.topic },
+      noteId
+    );
   }
 }
 
@@ -111,7 +116,9 @@ async function fileToJson<T>(file: Entry) {
   return JSON.parse(text) as T;
 }
 
-async function importNotebook(notebook: Notebook) {
+async function importNotebook(
+  notebook: Notebook
+): Promise<{ id?: string; topic?: string }> {
   let nb = db.notebooks?.all.find((nb) => nb.title === notebook.notebook);
   if (!nb) {
     const nbId = await db.notebooks?.add({
@@ -122,5 +129,5 @@ async function importNotebook(notebook: Notebook) {
   }
   const topic = nb?.topics.find((t: any) => t.title === notebook.topic);
 
-  return { id: nb.id, topic: topic.id };
+  return { id: nb?.id, topic: topic?.id };
 }

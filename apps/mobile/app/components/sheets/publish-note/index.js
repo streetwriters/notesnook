@@ -60,7 +60,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
         if (isLocked && !passwordValue) return;
         await db.monographs.publish(note.id, {
           selfDestruct: selfDestruct,
-          password: isLocked && passwordValue
+          password: isLocked && passwordValue.current
         });
         setNote(db.notes.note(note.id)?.data);
         Navigation.queueRoutesForUpdate(
@@ -86,9 +86,6 @@ const PublishNoteSheet = ({ note: item, update }) => {
 
   const setPublishLoading = (value) => {
     setPublishing(value);
-    update({
-      progress: value
-    });
   };
 
   const deletePublishedNote = async () => {
@@ -164,7 +161,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: 15,
+                marginTop: 10,
                 backgroundColor: colors.nav,
                 padding: 12,
                 borderRadius: 5
@@ -176,8 +173,8 @@ const PublishNoteSheet = ({ note: item, update }) => {
                   flexShrink: 1
                 }}
               >
-                <Heading size={SIZE.sm}>Published at:</Heading>
-                <Paragraph size={SIZE.xs} numberOfLines={1}>
+                <Heading size={SIZE.md}>Published at:</Heading>
+                <Paragraph size={SIZE.sm} numberOfLines={1}>
                   {publishUrl}
                 </Paragraph>
                 <Paragraph
@@ -214,7 +211,6 @@ const PublishNoteSheet = ({ note: item, update }) => {
               />
             </View>
           )}
-          <Seperator />
 
           <TouchableOpacity
             onPress={() => {
@@ -225,7 +221,11 @@ const PublishNoteSheet = ({ note: item, update }) => {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginBottom: 10
+              marginBottom: 10,
+              backgroundColor: colors.nav,
+              paddingVertical: 12,
+              borderRadius: 5,
+              marginTop: 10
             }}
           >
             <IconButton
@@ -234,7 +234,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
                 setIsLocked(!isLocked);
               }}
               color={isLocked ? colors.accent : colors.icon}
-              size={SIZE.lg}
+              size={SIZE.xl}
               name={
                 isLocked
                   ? "check-circle-outline"
@@ -262,7 +262,10 @@ const PublishNoteSheet = ({ note: item, update }) => {
             activeOpacity={0.9}
             style={{
               flexDirection: "row",
-              alignItems: "center"
+              alignItems: "center",
+              backgroundColor: colors.nav,
+              paddingVertical: 12,
+              borderRadius: 5
             }}
           >
             <IconButton
@@ -270,7 +273,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
                 setSelfDestruct(!selfDestruct);
               }}
               color={selfDestruct ? colors.accent : colors.icon}
-              size={SIZE.lg}
+              size={SIZE.xl}
               name={
                 selfDestruct
                   ? "check-circle-outline"
@@ -313,31 +316,38 @@ const PublishNoteSheet = ({ note: item, update }) => {
               </>
             ) : null}
 
-            <Button
-              onPress={publishNote}
-              fontSize={SIZE.md}
-              width="100%"
+            <View
               style={{
-                marginTop: 10
+                flexDirection: "row",
+                width: "100%",
+                justifyContent: "center"
               }}
-              height={50}
-              type="accent"
-              title={isPublished ? "Update published note" : "Publish note"}
-            />
-
-            {isPublished && (
-              <>
-                <Seperator half />
-                <Button
-                  onPress={deletePublishedNote}
-                  fontSize={SIZE.md}
-                  width="100%"
-                  height={50}
-                  type="error"
-                  title="Unpublish note"
-                />
-              </>
-            )}
+            >
+              {isPublished && (
+                <>
+                  <Button
+                    onPress={deletePublishedNote}
+                    fontSize={SIZE.md}
+                    type="error"
+                    title="Unpublish"
+                    style={{
+                      width: "49%"
+                    }}
+                  />
+                </>
+              )}
+              <Seperator half />
+              <Button
+                onPress={publishNote}
+                fontSize={SIZE.md}
+                style={{
+                  width: isPublished ? "49%" : 250,
+                  borderRadius: isPublished ? 5 : 100
+                }}
+                type="accent"
+                title={isPublished ? "Update" : "Publish"}
+              />
+            </View>
           </View>
         </>
       )}
@@ -347,7 +357,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
         size={SIZE.xs}
         style={{
           textAlign: "center",
-          marginTop: 5,
+          marginTop: 10,
           textDecorationLine: "underline"
         }}
         onPress={async () => {

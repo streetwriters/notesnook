@@ -129,7 +129,6 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
   };
 
   setInsets = async (insets: EdgeInsets) => {
-    logger.info("setInsets", insets);
     await this.doAsync(`
       if (typeof safeAreaController !== "undefined") {
         safeAreaController.update(${JSON.stringify(insets)}) 

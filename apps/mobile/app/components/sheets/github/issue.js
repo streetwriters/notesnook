@@ -196,7 +196,6 @@ For example:
         onPress={onPress}
         title={loading ? null : "Submit"}
         loading={loading}
-        height={50}
         width="100%"
         type="accent"
       />

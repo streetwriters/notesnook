@@ -101,6 +101,7 @@ const SheetProvider = ({ context = "global" }) => {
         setVisible(false);
         setData(null);
       }}
+      bottomPadding={!data.noBottomPadding}
       enableGesturesInScrollView={data.enableGesturesInScrollView}
     >
       <View
@@ -212,7 +213,6 @@ const SheetProvider = ({ context = "global" }) => {
               title={item.actionText}
               icon={item.icon && item.icon}
               type={item.type || "accent"}
-              height={50}
               style={{
                 marginBottom: 10
               }}

@@ -106,12 +106,6 @@ export const useDragState = create<DragState>(
           return;
         }
         const preset = toolbarConfig?.preset as DragState["preset"];
-        logger.info(
-          "DragState",
-          "Init user toolbar config",
-          preset,
-          toolbarConfig?.config
-        );
         set({
           preset: preset,
           data:

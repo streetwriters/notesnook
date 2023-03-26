@@ -19,13 +19,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FeatureType } from "./components/sheets/new-feature";
 
-export const features: FeatureType[] = [
-  {
-    title: "Top level notes in notebooks",
-    body: "Now you can add notes to Notesnooks directly without creating any topics."
-  },
-  {
-    title: "Image preview & download",
-    body: "Now you can preview images in fullscreen & download them from editor"
-  }
-];
+export const features: FeatureType[] = [];

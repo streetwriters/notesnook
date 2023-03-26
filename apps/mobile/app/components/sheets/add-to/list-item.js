@@ -17,8 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
+import { db } from "../../../common/database";
+import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
 import { IconButton } from "../../ui/icon-button";
@@ -27,13 +29,78 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { useSelectionContext } from "./context";
 import { FilteredList } from "./filtered-list";
+import { useItemSelectionStore } from "./store";
 
-const _ListItem = ({
+const SelectionIndicator = ({
+  item,
+  hasNotes,
+  selectItem,
+  onPress,
+  onChange
+}) => {
+  const itemState = useItemSelectionStore((state) => state.itemState[item.id]);
+  const multiSelect = useItemSelectionStore((state) => state.multiSelect);
+
+  const isSelected = itemState === "selected";
+  const isIntermediate = itemState === "intermediate";
+  const isRemoved = !isSelected && hasNotes;
+  const colors = useThemeStore((state) => state.colors);
+
+  useEffect(() => {
+    onChange?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itemState]);
+
+  return (
+    <IconButton
+      size={22}
+      customStyle={{
+        marginRight: 5,
+        width: 23,
+        height: 23
+      }}
+      color={
+        isRemoved
+          ? colors.red
+          : isIntermediate || isSelected
+          ? colors.accent
+          : colors.icon
+      }
+      onPress={() => {
+        if (multiSelect) return selectItem();
+        onPress?.(item);
+      }}
+      onLongPress={() => {
+        useItemSelectionStore.getState().setMultiSelect(true);
+        selectItem();
+      }}
+      testID={
+        isRemoved
+          ? "close-circle-outline"
+          : isSelected
+          ? "check-circle-outline"
+          : isIntermediate
+          ? "minus-circle-outline"
+          : "checkbox-blank-circle-outline"
+      }
+      name={
+        isRemoved
+          ? "close-circle-outline"
+          : isSelected
+          ? "check-circle-outline"
+          : isIntermediate
+          ? "minus-circle-outline"
+          : "checkbox-blank-circle-outline"
+      }
+    />
+  );
+};
+
+export const ListItem = ({
   item,
   index,
   icon,
   infoText,
-  intermediate,
   hasSubList,
   onPress,
   onScrollEnd,
@@ -43,19 +110,49 @@ const _ListItem = ({
   sublistItemType,
   onAddItem,
   getSublistItemProps,
-  removed,
-  isSelected,
   hasHeaderSearch,
   onAddSublistItem,
+  hasNotes,
+  onChange,
   sheetRef
 }) => {
-  const { enabled, toggleSelection, setMultiSelect } = useSelectionContext();
+  const { toggleSelection } = useSelectionContext();
+  const multiSelect = useItemSelectionStore((state) => state.multiSelect);
+  const [showSelectedIndicator, setShowSelectedIndicator] = useState(false);
   const colors = useThemeStore((state) => state.colors);
   const [expanded, setExpanded] = useState(false);
 
   function selectItem() {
     toggleSelection(item);
   }
+
+  const getSelectedNotesCountInNotebookTopics = (item) => {
+    if (item.type === "topic") return;
+
+    let count = 0;
+    const noteIds = [];
+    for (let topic of item.topics) {
+      noteIds.push(...(db.notes?.topicReferences.get(topic.id) || []));
+      if (useItemSelectionStore.getState().itemState[topic.id] === "selected") {
+        count++;
+      }
+    }
+    useSelectionStore.getState().selectedItemsList.forEach((item) => {
+      if (noteIds.indexOf(item.id) > -1) {
+        count++;
+      }
+    });
+    return count;
+  };
+
+  useEffect(() => {
+    setShowSelectedIndicator(getSelectedNotesCountInNotebookTopics(item) > 0);
+  }, [item]);
+
+  const onChangeSubItem = () => {
+    setShowSelectedIndicator(getSelectedNotesCountInNotebookTopics(item) > 0);
+  };
+
   return (
     <View
       style={{
@@ -67,12 +164,12 @@ const _ListItem = ({
       <PressableButton
         onPress={() => {
           if (hasSubList) return setExpanded(!expanded);
-          if (enabled) return selectItem();
+          if (multiSelect) return selectItem();
           onPress?.(item);
         }}
         type={type}
         onLongPress={() => {
-          setMultiSelect(true);
+          useItemSelectionStore.getState().setMultiSelect(true);
           selectItem();
         }}
         customStyle={{
@@ -97,43 +194,12 @@ const _ListItem = ({
               alignItems: "center"
             }}
           >
-            <IconButton
-              size={22}
-              customStyle={{
-                marginRight: 5,
-                width: 23,
-                height: 23
-              }}
-              color={
-                removed
-                  ? colors.red
-                  : intermediate || isSelected
-                  ? colors.accent
-                  : colors.icon
-              }
-              onPress={() => {
-                selectItem();
-                if (enabled) return;
-                onPress?.(item);
-              }}
-              testID={
-                removed
-                  ? "close-circle-outline"
-                  : isSelected
-                  ? "check-circle-outline"
-                  : intermediate
-                  ? "minus-circle-outline"
-                  : "checkbox-blank-circle-outline"
-              }
-              name={
-                removed
-                  ? "close-circle-outline"
-                  : isSelected
-                  ? "check-circle-outline"
-                  : intermediate
-                  ? "minus-circle-outline"
-                  : "checkbox-blank-circle-outline"
-              }
+            <SelectionIndicator
+              hasNotes={hasNotes}
+              onPress={onPress}
+              item={item}
+              onChange={onChange}
+              selectItem={selectItem}
             />
             <View>
               {hasSubList && expanded ? (
@@ -152,14 +218,27 @@ const _ListItem = ({
 
           <View
             style={{
-              flexDirection: "row"
+              flexDirection: "row",
+              alignItems: "center"
             }}
           >
+            {showSelectedIndicator ? (
+              <View
+                style={{
+                  backgroundColor: colors.accent,
+                  width: 7,
+                  height: 7,
+                  borderRadius: 100,
+                  marginRight: 12
+                }}
+              />
+            ) : null}
+
             {onAddSublistItem ? (
               <IconButton
                 name={"plus"}
                 testID="add-item-icon"
-                color={colors}
+                color={colors.pri}
                 size={SIZE.xl}
                 onPress={() => {
                   onAddSublistItem(item);
@@ -201,6 +280,7 @@ const _ListItem = ({
               item={item}
               {...getSublistItemProps(item)}
               index={index}
+              onChange={onChangeSubItem}
               onScrollEnd={onScrollEnd}
             />
           )}
@@ -210,11 +290,3 @@ const _ListItem = ({
     </View>
   );
 };
-
-export const ListItem = React.memo(_ListItem, (prev, next) => {
-  if (prev.selected === undefined) return false;
-  if (prev.isSelected !== next.isSelected) return false;
-  if (prev.selected !== next.selected) return false;
-  if (prev.intermediate !== next.intermediate) return false;
-  return true;
-});

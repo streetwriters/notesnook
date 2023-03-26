@@ -277,7 +277,6 @@ const ExportNotesSheet = ({ notes, update }) => {
                       });
                     });
                   }}
-                  height={50}
                 />
                 <Button
                   title="Share"
@@ -301,7 +300,6 @@ const ExportNotesSheet = ({ notes, update }) => {
                       }).catch(console.log);
                     }
                   }}
-                  height={50}
                 />
                 <Button
                   title="Export in another format"
@@ -317,7 +315,6 @@ const ExportNotesSheet = ({ notes, update }) => {
                     setResult(null);
                     setExporting(false);
                   }}
-                  height={50}
                 />
               </>
             )}

@@ -22,12 +22,14 @@ import { AssetManager } from "./asset-manager";
 import { EVENTS } from "./events";
 import bringToFront from "./ipc/actions/bringToFront";
 import { sendMessageToRenderer } from "./ipc/utils";
+import { isFlatpak } from "./utils";
 
 let tray: Tray | undefined = undefined;
 export function setupTray() {
   if (tray) tray.destroy();
 
-  const trayIconSize = process.platform === "win32" || process.platform === "darwin" ? 16 : 32;
+  const trayIconSize =
+    process.platform === "win32" || process.platform === "darwin" ? 16 : 32;
 
   tray = new Tray(
     AssetManager.icon("tray-icon", {
@@ -39,14 +41,18 @@ export function setupTray() {
     {
       label: "Show app",
       type: "normal",
-      icon: AssetManager.icon("tray-icon", { size: trayIconSize }),
+      icon: isFlatpak()
+        ? undefined
+        : AssetManager.icon("tray-icon", { size: trayIconSize }),
       click: bringToFront
     },
     { type: "separator" },
     {
       label: "New note",
       type: "normal",
-      icon: AssetManager.icon("note-add", { size: trayIconSize }),
+      icon: isFlatpak()
+        ? undefined
+        : AssetManager.icon("note-add", { size: trayIconSize }),
       click: () => {
         bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "note" });
@@ -55,7 +61,9 @@ export function setupTray() {
     {
       label: "New notebook",
       type: "normal",
-      icon: AssetManager.icon("notebook-add", { size: trayIconSize }),
+      icon: isFlatpak()
+        ? undefined
+        : AssetManager.icon("notebook-add", { size: trayIconSize }),
       click: () => {
         bringToFront();
         sendMessageToRenderer(EVENTS.createItem, { itemType: "notebook" });
@@ -64,7 +72,9 @@ export function setupTray() {
     { type: "separator" },
     {
       label: "Quit",
-      icon: AssetManager.icon("quit", { size: trayIconSize }),
+      icon: isFlatpak()
+        ? undefined
+        : AssetManager.icon("quit", { size: trayIconSize }),
       type: "normal",
       click: () => {
         app.exit(0);
