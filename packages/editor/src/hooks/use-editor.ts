@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EditorOptions } from "@tiptap/core";
+import { Content, EditorOptions } from "@tiptap/core";
 import { DependencyList, useEffect, useRef, useState } from "react";
 import { Editor } from "../types";
 
@@ -36,12 +36,25 @@ export const useEditor = (
   const editorRef = useRef<Editor | null>(editor);
   const updateTimeout = useRef<number>();
 
+  const [readonly, nonce, doubleSpacedLines] = deps;
+  const [prevNonce, setPrevNonce] = useState<number>(nonce);
+
+  function getContent(optionContent: Content | undefined) {
+    if (prevNonce !== nonce) {
+      return optionContent;
+    }
+    return editor?.getJSON();
+  }
+
   useEffect(
     () => {
       let isMounted = true;
 
-      const instance = new Editor(options);
-
+      const instance = new Editor({
+        ...options,
+        content: getContent(options.content)
+      });
+      setPrevNonce(nonce);
       setEditor(instance);
 
       instance.on("transaction", () => {

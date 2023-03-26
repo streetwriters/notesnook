@@ -630,7 +630,7 @@ function Settings() {
                 toggleDoubleSpacedLines();
                 showToast(
                   "success",
-                  "Re-open the editor for changes to take effect."
+                  "New settings are applied!"
                 );
               }}
               isToggled={doubleSpacedLines}

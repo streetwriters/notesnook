@@ -107,7 +107,7 @@ function TipTap(props: TipTapProps) {
     onDownloadAttachment,
     onAttachFile,
     onContentChange,
-    onFocus = () => {},
+    onFocus = () => { },
     content,
     toolbarContainerId,
     editorContainer,
@@ -225,8 +225,8 @@ function TipTap(props: TipTapProps) {
               if (isEmptySelection)
                 return oldSelected
                   ? {
-                      statistics: { words: { total: oldWords, selected: 0 } }
-                    }
+                    statistics: { words: { total: oldWords, selected: 0 } }
+                  }
                   : old;
 
               const selectedWords = getSelectedWords(
@@ -261,7 +261,7 @@ function TipTap(props: TipTapProps) {
       }
     },
     // IMPORTANT: only put stuff here that the editor depends on.
-    [readonly, nonce]
+    [readonly, nonce, doubleSpacedLines]
   );
 
   useEffect(
