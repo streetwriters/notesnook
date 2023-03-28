@@ -42,7 +42,15 @@ export class Tiptap {
   }
 
   toHTML() {
-    return this.data;
+    let data = this.data.replaceAll(
+      'data-spacing="single"',
+      'style = "margin:0px"'
+    );
+    data = data.replaceAll(
+      'data-spacing="double"',
+      'style = "margin-bottom:0px"'
+    );
+    return data;
   }
 
   toTXT() {
@@ -59,16 +67,17 @@ export class Tiptap {
             return elem.attribs.class.includes("checked") ? " ✅ " : " ☐ ";
           });
         },
-        paragraph: (elem, walk, builder, formatOptions) => {
+        paragraph: (elem, walk, builder) => {
+          const { "data-spacing": dataSpacing } = elem.attribs;
           if (elem.parent && elem.parent.name === "li") {
             walk(elem.children, builder);
           } else {
             builder.openBlock({
-              leadingLineBreaks: formatOptions.leadingLineBreaks || 2
+              leadingLineBreaks: dataSpacing == "single" ? 1 : 2
             });
             walk(elem.children, builder);
             builder.closeBlock({
-              trailingLineBreaks: formatOptions.trailingLineBreaks || 2
+              trailingLineBreaks: 1
             });
           }
         }

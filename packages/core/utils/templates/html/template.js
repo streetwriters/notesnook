@@ -52,6 +52,10 @@ const template = (data) => `<!DOCTYPE html>
     h6 {
       color: #212121;
     }
+
+    p[data-spacing="single"] {
+      margin:0px;
+    }
     
     pre.codeblock {
       overflow-x: auto;
