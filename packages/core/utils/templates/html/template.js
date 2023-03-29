@@ -56,6 +56,10 @@ const template = (data) => `<!DOCTYPE html>
     p[data-spacing="single"] {
       margin:0px;
     }
+
+    p[data-spacing="double"]{
+      margin-bottom:0px;
+    }
     
     pre.codeblock {
       overflow-x: auto;
