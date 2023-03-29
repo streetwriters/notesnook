@@ -32,6 +32,7 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 const Sort = ({ type, screen }) => {
   const colors = useThemeStore((state) => state.colors);
+  const isTopicSheet = screen === "TopicSheet";
   const [groupOptions, setGroupOptions] = useState(
     db.settings.getGroupOptions(type)
   );
@@ -41,7 +42,7 @@ const Sort = ({ type, screen }) => {
     layoutmanager.withSpringAnimation(600);
     setGroupOptions(_groupOptions);
     setTimeout(() => {
-      Navigation.queueRoutesForUpdate(screen);
+      if (screen !== "TopicSheet") Navigation.queueRoutesForUpdate(screen);
       eSendEvent("groupOptionsUpdate");
       eSendEvent(refreshNotesPage);
     }, 1);
@@ -52,6 +53,9 @@ const Sort = ({ type, screen }) => {
       ...groupOptions,
       sortDirection: groupOptions.sortDirection === "asc" ? "desc" : "asc"
     };
+    if (type === "topics") {
+      _groupOptions.groupBy = "none";
+    }
     await updateGroupOptions(_groupOptions);
   };
 
@@ -119,7 +123,7 @@ const Sort = ({ type, screen }) => {
           flexDirection: "row",
           justifyContent: "flex-start",
           flexWrap: "wrap",
-          borderBottomWidth: 1,
+          borderBottomWidth: isTopicSheet ? 0 : 1,
           borderBottomColor: colors.nav,
           marginBottom: 12,
           paddingHorizontal: 12,
@@ -166,6 +170,9 @@ const Sort = ({ type, screen }) => {
                     ...groupOptions,
                     sortBy: type === "trash" ? "dateDeleted" : item
                   };
+                  if (type === "topics") {
+                    _groupOptions.groupBy = "none";
+                  }
                   await updateGroupOptions(_groupOptions);
                 }}
                 iconSize={SIZE.md}
@@ -175,64 +182,70 @@ const Sort = ({ type, screen }) => {
         )}
       </View>
 
-      <Heading
-        style={{
-          marginLeft: 12
-        }}
-        size={SIZE.lg}
-      >
-        Group by
-      </Heading>
-
-      <Seperator />
-
-      <View
-        style={{
-          borderRadius: 0,
-          flexDirection: "row",
-          flexWrap: "wrap",
-          paddingHorizontal: 12
-        }}
-      >
-        {Object.keys(GROUP).map((item) => (
-          <Button
-            key={item}
-            testID={"btn-" + item}
-            type={groupOptions.groupBy === GROUP[item] ? "grayBg" : "gray"}
-            buttonType={{
-              text:
-                groupOptions.groupBy === GROUP[item]
-                  ? colors.accent
-                  : colors.icon
-            }}
-            onPress={async () => {
-              let _groupOptions = {
-                ...groupOptions,
-                groupBy: GROUP[item]
-              };
-
-              if (item === "abc") {
-                _groupOptions.sortBy = "title";
-                _groupOptions.sortDirection = "asc";
-              } else {
-                if (groupOptions.sortBy === "title") {
-                  _groupOptions.sortBy = "dateEdited";
-                  _groupOptions.sortDirection = "desc";
-                }
-              }
-              updateGroupOptions(_groupOptions);
-            }}
-            height={40}
-            icon={groupOptions.groupBy === GROUP[item] ? "check" : null}
-            title={item.slice(0, 1).toUpperCase() + item.slice(1, item.length)}
+      {isTopicSheet ? null : (
+        <>
+          <Heading
             style={{
-              paddingHorizontal: 8,
-              marginBottom: 10,
-              marginRight: 10
+              marginLeft: 12
             }}
-          />
-        ))}
-      </View>
+            size={SIZE.lg}
+          >
+            Group by
+          </Heading>
+
+          <Seperator />
+
+          <View
+            style={{
+              borderRadius: 0,
+              flexDirection: "row",
+              flexWrap: "wrap",
+              paddingHorizontal: 12
+            }}
+          >
+            {Object.keys(GROUP).map((item) => (
+              <Button
+                key={item}
+                testID={"btn-" + item}
+                type={groupOptions.groupBy === GROUP[item] ? "grayBg" : "gray"}
+                buttonType={{
+                  text:
+                    groupOptions.groupBy === GROUP[item]
+                      ? colors.accent
+                      : colors.icon
+                }}
+                onPress={async () => {
+                  let _groupOptions = {
+                    ...groupOptions,
+                    groupBy: GROUP[item]
+                  };
+
+                  if (item === "abc") {
+                    _groupOptions.sortBy = "title";
+                    _groupOptions.sortDirection = "asc";
+                  } else {
+                    if (groupOptions.sortBy === "title") {
+                      _groupOptions.sortBy = "dateEdited";
+                      _groupOptions.sortDirection = "desc";
+                    }
+                  }
+                  updateGroupOptions(_groupOptions);
+                }}
+                height={40}
+                icon={groupOptions.groupBy === GROUP[item] ? "check" : null}
+                title={
+                  item.slice(0, 1).toUpperCase() + item.slice(1, item.length)
+                }
+                style={{
+                  paddingHorizontal: 8,
+                  marginBottom: 10,
+                  marginRight: 10
+                }}
+              />
+            ))}
+          </View>
+        </>
+      )}
     </View>
   );
 };
