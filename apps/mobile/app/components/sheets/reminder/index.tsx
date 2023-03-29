@@ -434,11 +434,6 @@ export default function ReminderSheet({
 
             <DatePicker
               date={date}
-              minimumDate={
-                dayjs(date).subtract(3, "months").isBefore(dayjs())
-                  ? dayjs().toDate()
-                  : dayjs(date).subtract(3, "months").toDate()
-              }
               maximumDate={dayjs(date).add(3, "months").toDate()}
               onDateChange={handleConfirm}
               textColor={colors.night ? "#ffffff" : "#000000"}
