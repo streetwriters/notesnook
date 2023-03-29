@@ -367,7 +367,8 @@ async function scheduleNotification(
 
 function loadNote(id: string, jump: boolean) {
   if (!id || id === "notesnook_note_input") return;
-  const note = db.notes?.note(id).data;
+  const note = db.notes?.note(id)?.data;
+  if (!note) return;
   if (!DDS.isTab && jump) {
     tabBarRef.current?.goToPage(1);
   }

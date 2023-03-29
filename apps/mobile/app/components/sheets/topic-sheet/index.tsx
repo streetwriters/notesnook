@@ -154,7 +154,7 @@ export const TopicsSheet = () => {
       }
       if (id) {
         onRequestUpdate({
-          item: db.notebooks?.notebook(id).data
+          item: db.notebooks?.notebook(id)?.data
         } as any);
       }
       ref.current?.show();
