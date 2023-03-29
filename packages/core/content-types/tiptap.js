@@ -42,15 +42,7 @@ export class Tiptap {
   }
 
   toHTML() {
-    let data = this.data.replaceAll(
-      'data-spacing="single"',
-      'style = "margin:0px"'
-    );
-    data = data.replaceAll(
-      'data-spacing="double"',
-      'style = "margin-bottom:0px"'
-    );
-    return data;
+    return this.data;
   }
 
   toTXT() {
