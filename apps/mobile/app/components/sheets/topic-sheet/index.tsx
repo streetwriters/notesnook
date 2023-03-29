@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import qclone from "qclone";
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -37,7 +38,8 @@ import { TopicNotes } from "../../../screens/notes/topic-notes";
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
+  presentSheet
 } from "../../../services/event-manager";
 import useNavigationStore, {
   NotebookScreenParams
@@ -49,7 +51,7 @@ import {
   eOpenAddTopicDialog
 } from "../../../utils/events";
 import { normalize, SIZE } from "../../../utils/size";
-import { NotebookType, TopicType } from "../../../utils/types";
+import { GroupHeader, NotebookType, TopicType } from "../../../utils/types";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { openEditor } from "../../../screens/notes/common";
@@ -59,6 +61,8 @@ import { deleteItems } from "../../../utils/functions";
 import { presentDialog } from "../../dialog/functions";
 import Config from "react-native-config";
 import { notesnook } from "../../../../e2e/test.ids";
+import Sort from "../sort";
+import { groupArray } from "@notesnook/core/utils/grouping";
 
 export const TopicsSheet = () => {
   const currentScreen = useNavigationStore((state) => state.currentScreen);
@@ -75,12 +79,33 @@ export const TopicsSheet = () => {
   const [enabled, setEnabled] = useState(false);
   const colors = useThemeStore((state) => state.colors);
   const ref = useRef<ActionSheetRef>(null);
-  const [topics, setTopics] = useState(notebook ? qclone(notebook.topics) : []);
+  const [topics, setTopics] = useState(
+    notebook
+      ? qclone(
+          groupArray(notebook.topics, db.settings?.getGroupOptions("topics"))
+        )
+      : []
+  );
   const [animations] = useState({
     translate: new Animated.Value(0),
     display: new Animated.Value(-5000),
     opacity: new Animated.Value(0)
   });
+  const [groupOptions, setGroupOptions] = useState(
+    db.settings?.getGroupOptions("topics")
+  );
+
+  const onUpdate = useCallback(() => {
+    setGroupOptions({ ...(db.settings?.getGroupOptions("topics") as any) });
+  }, []);
+
+  useEffect(() => {
+    eSubscribeEvent("groupOptionsUpdate", onUpdate);
+    return () => {
+      eUnSubscribeEvent("groupOptionsUpdate", onUpdate);
+    };
+  }, [onUpdate]);
+
   const onRequestUpdate = React.useCallback(
     (data?: NotebookScreenParams) => {
       if (!canShow) return;
@@ -89,10 +114,11 @@ export const TopicsSheet = () => {
         ?.data as NotebookType;
       if (_notebook) {
         setNotebook(_notebook);
-        setTopics(qclone(_notebook.topics));
+
+        setTopics(qclone(groupArray(_notebook.topics, groupOptions)));
       }
     },
-    [notebook, canShow]
+    [canShow, notebook, groupOptions]
   );
 
   useEffect(() => {
@@ -117,9 +143,16 @@ export const TopicsSheet = () => {
     loading: "Loading notebook topics"
   };
 
-  const renderTopic = ({ item, index }: { item: TopicType; index: number }) => (
-    <TopicItem item={item} index={index} />
-  );
+  const renderTopic = ({
+    item,
+    index
+  }: {
+    item: TopicType | GroupHeader;
+    index: number;
+  }) =>
+    (item as GroupHeader).type === "header" ? null : (
+      <TopicItem item={item as TopicType} index={index} />
+    );
 
   const selectionContext = {
     selection: selection,
@@ -191,7 +224,7 @@ export const TopicsSheet = () => {
         backgroundColor: colors.nav
       }}
       keyboardHandlerEnabled={false}
-      snapPoints={Config.isTesting === "true" ? [100] : [15, 100]}
+      snapPoints={Config.isTesting === "true" ? [100] : [25, 100]}
       initialSnapIndex={0}
       backgroundInteractionEnabled
       onChange={(position, height) => {
@@ -304,17 +337,38 @@ export const TopicsSheet = () => {
                 size={22}
               />
             ) : (
-              <IconButton
-                name="plus"
-                onPress={PLACEHOLDER_DATA.action}
-                testID="add-topic-button"
-                color={colors.pri}
-                size={22}
-                customStyle={{
-                  width: 40,
-                  height: 40
-                }}
-              />
+              <>
+                <IconButton
+                  name={
+                    groupOptions?.sortDirection === "asc"
+                      ? "sort-ascending"
+                      : "sort-descending"
+                  }
+                  onPress={() => {
+                    presentSheet({
+                      component: <Sort screen="TopicSheet" type="topics" />
+                    });
+                  }}
+                  testID="group-topic-button"
+                  color={colors.pri}
+                  size={22}
+                  customStyle={{
+                    width: 40,
+                    height: 40
+                  }}
+                />
+                <IconButton
+                  name="plus"
+                  onPress={PLACEHOLDER_DATA.action}
+                  testID="add-topic-button"
+                  color={colors.pri}
+                  size={22}
+                  customStyle={{
+                    width: 40,
+                    height: 40
+                  }}
+                />
+              </>
             )}
           </View>
         </View>
@@ -334,7 +388,7 @@ export const TopicsSheet = () => {
                 progressBackgroundColor={colors.bg}
               />
             }
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => (item as TopicType).id}
             renderItem={renderTopic}
             ListEmptyComponent={
               <View
