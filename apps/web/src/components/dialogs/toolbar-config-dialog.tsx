@@ -714,8 +714,9 @@ export function getDisabledTools(tools: TreeNode[]) {
   for (const key in allTools) {
     const tool = allTools[key as ToolId];
     if (tool.conditional) continue;
-    if (items.findIndex((t) => t.toolId === key) <= -1)
-      disabled.push(key as ToolId);
+
+    const isDisabled = items.findIndex((t) => t.toolId === key);
+    if (isDisabled === -1 && key !== "none") disabled.push(key as ToolId);
   }
   return disabled;
 }
