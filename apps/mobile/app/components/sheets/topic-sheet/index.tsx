@@ -86,11 +86,7 @@ export const TopicsSheet = () => {
         )
       : []
   );
-  const [animations] = useState({
-    translate: new Animated.Value(0),
-    display: new Animated.Value(0),
-    opacity: new Animated.Value(1)
-  });
+
   const [groupOptions, setGroupOptions] = useState(
     db.settings?.getGroupOptions("topics")
   );
@@ -180,21 +176,19 @@ export const TopicsSheet = () => {
   useEffect(() => {
     if (canShow) {
       const isTopic = currentScreen.name === "TopicNotes";
-      const id = isTopic ? currentScreen?.notebookId : currentScreen?.id;
-      if (id) {
-        onRequestUpdate({
-          item: db.notebooks?.notebook(id)?.data
-        } as any);
-      }
+      ref.current?.show();
       setTimeout(() => {
-        ref.current?.show();
-      }, 1);
+        const id = isTopic ? currentScreen?.notebookId : currentScreen?.id;
+        if (id) {
+          onRequestUpdate({
+            item: db.notebooks?.notebook(id)?.data
+          } as any);
+        }
+      }, 300);
     } else {
       ref.current?.hide();
     }
   }, [
-    animations.display,
-    animations.opacity,
     canShow,
     currentScreen?.id,
     currentScreen.name,
@@ -212,8 +206,11 @@ export const TopicsSheet = () => {
         borderTopLeftRadius: 15,
         backgroundColor: colors.bg,
         borderWidth: 1,
-        borderColor: colors.border,
+        borderColor: colors.nav,
         borderBottomWidth: 0
+      }}
+      openAnimationConfig={{
+        friction: 10
       }}
       closable={!canShow}
       elevation={10}
@@ -229,48 +226,37 @@ export const TopicsSheet = () => {
       }
       initialSnapIndex={Config.isTesting === "true" ? 0 : 1}
       backgroundInteractionEnabled
-      onChange={(position) => {
-        if (position === 0) return;
-        animations.translate.setValue(position - 60);
-      }}
       gestureEnabled
-      ExtraOverlayComponent={
-        <Animated.View
-          style={{
-            top: animations.translate,
-            position: "absolute",
-            right: 12,
-            transform: [
-              {
-                translateY: animations.display
-              }
-            ]
+    >
+      <View
+        style={{
+          position: "absolute",
+          right: 12,
+          marginTop: -80
+        }}
+      >
+        <PressableButton
+          testID={notesnook.buttons.add}
+          type="accent"
+          accentColor={"accent"}
+          accentText="light"
+          onPress={openEditor}
+          customStyle={{
+            borderRadius: 100
           }}
         >
-          <PressableButton
-            testID={notesnook.buttons.add}
-            type="accent"
-            accentColor={"accent"}
-            accentText="light"
-            onPress={openEditor}
-            customStyle={{
-              borderRadius: 100
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              height: normalize(60),
+              width: normalize(60)
             }}
           >
-            <View
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                height: normalize(60),
-                width: normalize(60)
-              }}
-            >
-              <Icon name="plus" color="white" size={SIZE.xxl} />
-            </View>
-          </PressableButton>
-        </Animated.View>
-      }
-    >
+            <Icon name="plus" color="white" size={SIZE.xxl} />
+          </View>
+        </PressableButton>
+      </View>
       <View
         style={{
           maxHeight: 300,
