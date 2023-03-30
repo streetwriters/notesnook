@@ -25,7 +25,13 @@ import React, {
   useRef,
   useState
 } from "react";
-import { Animated, Dimensions, View, RefreshControl } from "react-native";
+import {
+  Animated,
+  Dimensions,
+  View,
+  RefreshControl,
+  Platform
+} from "react-native";
 import ActionSheet, {
   ActionSheetRef,
   FlatList
@@ -224,7 +230,11 @@ export const TopicsSheet = () => {
         backgroundColor: colors.nav
       }}
       keyboardHandlerEnabled={false}
-      snapPoints={Config.isTesting === "true" ? [100] : [25, 100]}
+      snapPoints={
+        Config.isTesting === "true"
+          ? [100]
+          : [Platform.OS === "ios" ? 25 : 20, 100]
+      }
       initialSnapIndex={0}
       backgroundInteractionEnabled
       onChange={(position, height) => {
