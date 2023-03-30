@@ -28,13 +28,14 @@ import {
   to_base64,
   from_base64,
   base64_variants
-} from "libsodium-wrappers";
+} from "@notesnook/sodium";
 import KeyUtils from "./keyutils";
 import { Chunk, Cipher, OutputFormat, Plaintext, SerializedKey } from "./types";
 
 const encoder = new TextEncoder();
 export default class Encryption {
   private static transformInput(plaintext: Plaintext): Uint8Array {
+    console.log(base64_variants);
     let data: Uint8Array | null = null;
     if (typeof plaintext.data === "string" && plaintext.format === "base64") {
       data = from_base64(plaintext.data, base64_variants.ORIGINAL);

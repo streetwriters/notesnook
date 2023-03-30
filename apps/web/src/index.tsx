@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import "@notesnook/core/types";
-import { EVENTS } from "@notesnook/desktop/events";
+import { EVENTS } from "@notesnook/desktop";
 import { AppEventManager } from "./common/app-events";
 import { render } from "react-dom";
 import { getCurrentHash, getCurrentPath, makeURL } from "./navigation";

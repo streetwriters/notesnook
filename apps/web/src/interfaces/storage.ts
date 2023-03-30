@@ -207,3 +207,23 @@ async function aesDecrypt(
   );
   return dec.decode(plainText);
 }
+
+// async function main() {
+//   const nncrypto = await getNNCrypto();
+//   const electronNNCrypto = new NNCryptoElectron();
+
+//   console.time("nncrypto");
+//   for (let i = 0; i < 100; ++i) {
+//     await nncrypto.hash("mypassword", APP_SALT);
+//   }
+//   console.timeEnd("nncrypto");
+
+//   console.time("electron");
+//   for (let i = 0; i < 100; ++i) {
+//     await electronNNCrypto.hash("mypassword", APP_SALT);
+//   }
+//   console.timeEnd("electron");
+// }
+
+// main();
+// setTimeout(main, 10000);

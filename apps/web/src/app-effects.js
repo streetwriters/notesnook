@@ -30,7 +30,7 @@ import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
 import { EV, EVENTS } from "@notesnook/core/common";
-import { EVENTS as DESKTOP_APP_EVENTS } from "@notesnook/desktop/events";
+import { EVENTS as DESKTOP_APP_EVENTS } from "@notesnook/desktop";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 import {

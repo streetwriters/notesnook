@@ -12,12 +12,9 @@
   "author": "",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "libsodium-wrappers": "0.7.9"
+    "@notesnook/sodium": "*"
   },
-  "devDependencies": {
-    "@types/libsodium-wrappers": "0.7.9",
-    "typescript": "^4.8.2"
-  },
+  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/streetwriters/notesnook.git",

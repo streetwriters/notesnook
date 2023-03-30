@@ -1,0 +1,22 @@
+{
+  "name": "notesnook-api",
+  "version": "0.0.0",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20230321.0",
+    "@types/libsodium-wrappers": "^0.7.10",
+    "vitest": "^0.29.7",
+    "wrangler": "2.9.1"
+  },
+  "private": true,
+  "scripts": {
+    "start": "wrangler dev",
+    "deploy": "wrangler publish",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@notesnook/crypto": "*",
+    "hono": "^3.1.2",
+    "libsodium-wrappers": "^0.7.11",
+    "sodium-plus": "^0.9.0"
+  }
+}

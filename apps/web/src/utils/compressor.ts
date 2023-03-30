@@ -23,6 +23,7 @@ import Worker from "worker-loader?filename=static/workers/compressor.worker.[con
 import type { Compressor as CompressorWorker } from "./compressor.worker";
 import { wrap, Remote } from "comlink";
 import { isDesktop } from "./platform";
+import { desktop } from "../common/desktop-client";
 
 export class Compressor {
   private worker!: globalThis.Worker;
@@ -36,13 +37,14 @@ export class Compressor {
   }
 
   async compress(data: string) {
-    if (isDesktop()) return await window.native.gzip({ data, level: 6 });
+    if (isDesktop())
+      return await desktop.compress.gzip.query({ data, level: 6 });
 
     return await this.compressor.gzip({ data, level: 6 });
   }
 
   async decompress(data: string) {
-    if (isDesktop()) return await window.native.gunzip({ data });
+    if (isDesktop()) return await desktop.compress.gunzip.query(data);
 
     return await this.compressor.gunzip({ data });
   }

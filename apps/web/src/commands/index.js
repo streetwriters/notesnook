@@ -23,16 +23,16 @@ import { isDesktop } from "../utils/platform";
 export function invokeCommand(type, payload = {}) {
   if (!isDesktop()) return;
 
-  window.api.send("fromRenderer", {
-    type,
-    ...payload
-  });
+  // window.api.send("fromRenderer", {
+  //   type,
+  //   ...payload
+  // });
 }
 
-if (isDesktop()) {
-  window.api.receive("fromMain", (args) => {
-    console.log(args);
-    const { type, ...other } = args;
-    AppEventManager.publish(type, other);
-  });
-}
+// if (isDesktop()) {
+//   window.api.receive("fromMain", (args) => {
+//     console.log(args);
+//     const { type, ...other } = args;
+//     AppEventManager.publish(type, other);
+//   });
+// }

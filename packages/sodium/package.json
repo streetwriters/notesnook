@@ -1,0 +1,31 @@
+{
+  "name": "@notesnook/sodium",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/node.js",
+  "types": "./dist/node.d.ts",
+  "scripts": {
+    "test": "vitest run",
+    "bench": "ts-node benches/bench.ts",
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/streetwriters/notesnook.git",
+    "directory": "packages/sodium"
+  },
+  "dependencies": {
+    "libsodium-wrappers-sumo": "^0.7.11",
+    "sodium-native": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/libsodium-wrappers-sumo": "0.7.5",
+    "benny": "^3.7.1",
+    "ts-node": "^10.9.1",
+    "vitest": "^0.29.7"
+  },
+  "browser": "./dist/browser.js"
+}

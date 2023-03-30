@@ -123,7 +123,7 @@ export function getDownloadLink(platform: string) {
 }
 
 export function isDesktop() {
-  return "api" in window;
+  return "os" in window;
 }
 
 export function isMac() {

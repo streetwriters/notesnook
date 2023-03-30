@@ -18,19 +18,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useState } from "react";
-import setDesktopIntegration from "../commands/set-desktop-integration";
+import { desktop } from "../common/desktop-client";
+
+export type DesktopIntegrationSettings = {
+  autoStart: boolean;
+  startMinimized: boolean;
+  minimizeToSystemTray: boolean;
+  closeToSystemTray: boolean;
+};
 
 export default function useDesktopIntegration() {
   const [settings, changeSettings] = useState<DesktopIntegrationSettings>();
 
   const setupDesktopIntegration = useCallback(async () => {
-    const settings = await window.config.desktopIntegration();
+    const settings = await desktop.integration.desktopIntegration.query();
     changeSettings(settings);
     return settings;
   }, []);
 
   useEffect(() => {
-    if (!window.config) return;
     (async function () {
       await setupDesktopIntegration();
     })();
@@ -40,7 +46,10 @@ export default function useDesktopIntegration() {
     async (_settings: Partial<DesktopIntegrationSettings>) => {
       if (!settings) return;
 
-      setDesktopIntegration({ ...settings, ..._settings });
+      await desktop.integration.setDesktopIntegration.mutate({
+        ...settings,
+        ..._settings
+      });
       await setupDesktopIntegration();
     },
     [settings, setupDesktopIntegration]

@@ -25,9 +25,9 @@ import {
   from_base64,
   base64_variants,
   to_string,
-  from_hex,
-  crypto_secretstream_xchacha20poly1305_TAG_FINAL
-} from "libsodium-wrappers";
+  crypto_secretstream_xchacha20poly1305_TAG_FINAL,
+  from_hex
+} from "@notesnook/sodium";
 import KeyUtils from "./keyutils";
 import { Cipher, OutputFormat, Plaintext, SerializedKey } from "./types";
 
