@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import BaseStore from "./index";
 import Config from "../utils/config";
-import changeAppTheme from "../commands/change-app-theme";
 import { getDefaultAccentColor } from "@notesnook/theme";
 
 class ThemeStore extends BaseStore {

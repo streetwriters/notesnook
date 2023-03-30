@@ -25,7 +25,7 @@ import {
   crypto_pwhash_SALTBYTES,
   crypto_pwhash_ALG_ARGON2I13,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES
-} from "libsodium-wrappers";
+} from "@notesnook/sodium";
 import { EncryptionKey, SerializedKey } from "./types";
 
 export default class KeyUtils {

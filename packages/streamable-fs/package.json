@@ -14,7 +14,6 @@
     "localforage": "^1.10.0"
   },
   "devDependencies": {
-    "@types/localforage": "^0.0.34",
-    "typescript": "^4.8.2"
+    "@types/localforage": "^0.0.34"
   }
 }

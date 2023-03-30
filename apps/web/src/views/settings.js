@@ -73,8 +73,7 @@ import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { Slider } from "@theme-ui/components";
 import useZoomFactor from "../hooks/use-zoom-factor";
-import { PATHS } from "@notesnook/desktop/paths";
-import { openPath } from "../commands/open";
+import { PATHS } from "@notesnook/desktop";
 import { getAllAccents } from "@notesnook/theme";
 import { debounce } from "../utils/debounce";
 import { clearLogs, downloadLogs } from "../utils/logger";
@@ -88,6 +87,7 @@ import { writeText } from "clipboard-polyfill";
 import { useEditorConfig } from "../components/editor/context";
 import { getFonts } from "@notesnook/editor";
 import { formatDate } from "@notesnook/core/utils/date";
+import { desktop } from "../common/desktop-client";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -937,11 +937,12 @@ function Settings() {
                     key={"backupLocation"}
                     variant="list"
                     onClick={async () => {
-                      const location = await window.native.selectDirectory({
-                        title: "Select where Notesnook should save backups",
-                        defaultPath:
-                          backupStorageLocation || PATHS.backupsDirectory
-                      });
+                      const location =
+                        await desktop.integration.selectDirectory.query({
+                          title: "Select where Notesnook should save backups",
+                          defaultPath:
+                            backupStorageLocation || PATHS.backupsDirectory
+                        });
                       if (!location) return;
                       setBackupStorageLocation(location);
                     }}
@@ -1154,8 +1155,11 @@ function Settings() {
             {isDesktop() && (
               <Button
                 variant="list"
-                onClick={() => {
-                  openPath(PATHS.logsDirectory);
+                onClick={async () => {
+                  await desktop.integration.openPath.query({
+                    type: "path",
+                    link: PATHS.logsDirectory
+                  });
                 }}
               >
                 <Tip

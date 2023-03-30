@@ -22,7 +22,7 @@ import {
   crypto_pwhash,
   crypto_pwhash_ALG_ARGON2ID13,
   crypto_pwhash_SALTBYTES
-} from "libsodium-wrappers";
+} from "@notesnook/sodium";
 
 export default class Password {
   static hash(password: string, salt: string): string {

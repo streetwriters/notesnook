@@ -31,8 +31,6 @@ import { showToast } from "../utils/toast";
 import { Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
-import downloadUpdate from "../commands/download-update";
-import installUpdate from "../commands/install-update";
 import { AppVersion, getChangelog } from "../utils/version";
 import { Period } from "../components/dialogs/buy-dialog/types";
 import { FeatureKeys } from "../components/dialogs/feature-dialog";
@@ -41,6 +39,7 @@ import { Suspense } from "react";
 import { Reminder } from "@notesnook/core/collections/reminders";
 import { ConfirmDialogProps } from "../components/dialogs/confirm";
 import { getFormattedDate } from "../utils/time";
+import { downloadUpdate, installUpdate } from "../utils/updater";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;

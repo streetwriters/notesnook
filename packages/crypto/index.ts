@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ready } from "libsodium-wrappers";
+import { initialize } from "@notesnook/sodium";
 import Decryption from "./src/decryption";
 import Encryption from "./src/encryption";
 import { INNCrypto } from "./src/interfaces";
@@ -36,7 +36,7 @@ export class NNCrypto implements INNCrypto {
 
   private async init() {
     if (this.isReady) return;
-    await ready;
+    await initialize();
     this.isReady = true;
   }
 

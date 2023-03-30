@@ -34,15 +34,14 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import TimeAgo from "../time-ago";
 import { hardNavigate, hashNavigate, navigate } from "../../navigation";
-import useAutoUpdater from "../../hooks/use-auto-updater";
-import installUpdate from "../../commands/install-update";
-import checkForUpdate from "../../commands/check-for-update";
+import { useAutoUpdater } from "../../hooks/use-auto-updater";
 import {
   showIssueDialog,
   showUpdateAvailableNotice
 } from "../../common/dialog-controller";
 import useStatus from "../../hooks/use-status";
 import { getIconFromAlias } from "../icons/resolver";
+import { checkForUpdate, installUpdate } from "../../utils/updater";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);

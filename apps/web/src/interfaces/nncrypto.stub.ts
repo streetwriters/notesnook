@@ -19,12 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { INNCrypto } from "@notesnook/crypto/dist/src/interfaces";
 import "worker-loader?filename=static/workers/nncrypto.worker.js!@notesnook/crypto-worker/dist/src/worker.js";
+import { isDesktop } from "../utils/platform";
 
 const WORKER_PATH = "/static/workers/nncrypto.worker.js";
 
 async function loadNNCrypto() {
   const hasWorker = "Worker" in window || "Worker" in global;
-  if (hasWorker) {
+  if (isDesktop() && window.NativeNNCrypto) {
+    return window.NativeNNCrypto;
+  } else if (hasWorker) {
     const { NNCryptoWorker } = await import("@notesnook/crypto-worker");
     return NNCryptoWorker;
   } else {

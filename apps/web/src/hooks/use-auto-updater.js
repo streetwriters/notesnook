@@ -19,16 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useState } from "react";
 import { AppEventManager } from "../common/app-events";
-import { EVENTS } from "@notesnook/desktop/events";
+import { EVENTS } from "@notesnook/desktop";
 import {
   showUpdateAvailableNotice,
   showUpdateReadyNotice
 } from "../common/dialog-controller";
-import checkForUpdate from "../commands/check-for-update";
 import { isDesktop } from "../utils/platform";
+import { checkForUpdate } from "../utils/updater";
 
 var checkingForUpdateTimeout = 0;
-export default function useAutoUpdater() {
+export function useAutoUpdater() {
   const [status, setStatus] = useState();
 
   useEffect(() => {

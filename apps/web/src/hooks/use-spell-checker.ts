@@ -18,20 +18,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useState } from "react";
-import setSpellCheckerLanguages from "../commands/set-spell-checker-languages";
-import toggleSpellChecker from "../commands/toggle-spell-checker";
+import { desktop } from "../common/desktop-client";
+
+export type Language = { code: string; name: string };
+export type SpellCheckerOptions = {
+  languages: Language[];
+  enabledLanguages: Language[];
+  enabled: boolean;
+};
 
 export default function useSpellChecker() {
   const [spellChecker, setSpellChecker] = useState<SpellCheckerOptions>();
 
   const loadSpellChecker = useCallback(async () => {
-    const options = await window.config.spellChecker();
-    setSpellChecker(options);
-    return options;
+    setSpellChecker({
+      enabledLanguages: await desktop.spellChecker.enabledLanguages.query(),
+      languages: await desktop.spellChecker.languages.query(),
+      enabled: await desktop.spellChecker.isEnabled.query()
+    });
   }, []);
 
   useEffect(() => {
-    if (!window.config) return;
     (async function () {
       await loadSpellChecker();
     })();
@@ -39,7 +46,7 @@ export default function useSpellChecker() {
 
   const toggle = useCallback(
     async (enabled: boolean) => {
-      toggleSpellChecker(enabled);
+      await desktop.spellChecker.toggle.mutate(enabled);
       await loadSpellChecker();
     },
     [loadSpellChecker]
@@ -47,7 +54,7 @@ export default function useSpellChecker() {
 
   const setLanguages = useCallback(
     async (languages: string[]) => {
-      setSpellCheckerLanguages(languages);
+      await desktop.spellChecker.setLanguages.mutate(languages);
       await loadSpellChecker();
     },
     [loadSpellChecker]

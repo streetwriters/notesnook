@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EVENTS } from "@notesnook/desktop/events";
+import { EVENTS } from "@notesnook/desktop";
 import { useEffect, useState } from "react";
 import { AppEventManager } from "../common/app-events";
 import useMediaQuery from "./use-media-query";

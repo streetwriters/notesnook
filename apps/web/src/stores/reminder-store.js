@@ -27,8 +27,7 @@ import dayjs from "dayjs";
 import Config from "../utils/config";
 import { store as notestore } from "./note-store";
 import { isDesktop, isTesting } from "../utils/platform";
-import showNotification from "../commands/show-notification";
-import bringToFront from "../commands/bring-to-front";
+import { desktop } from "../common/desktop-client";
 
 class ReminderStore extends BaseStore {
   reminders = [];
@@ -91,7 +90,7 @@ async function resetReminders(reminders) {
  * @returns
  */
 function scheduleReminder(id, reminder, cron) {
-  return TaskScheduler.register(`reminder:${id}`, cron, () => {
+  return TaskScheduler.register(`reminder:${id}`, cron, async () => {
     if (!Config.get("reminderNotifications", true)) return;
 
     if (isTesting()) {
@@ -100,7 +99,7 @@ function scheduleReminder(id, reminder, cron) {
     }
 
     if (isDesktop()) {
-      showNotification(
+      await desktop.integration.showNotification.query(
         {
           title: reminder.title,
           body: reminder.description,
@@ -115,8 +114,8 @@ function scheduleReminder(id, reminder, cron) {
           focusOnClick: true,
           tag: id
         },
-        () => {
-          bringToFront();
+        async () => {
+          await desktop.integration.bringToFront.query();
           showReminderPreviewDialog(reminder);
         }
       );
