@@ -69,6 +69,7 @@ import {
 import { editorRef, tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
+import changeNavigationBarColor from "react-native-navigation-bar-color";
 
 const _TabsHolder = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -385,6 +386,10 @@ const _TabsHolder = () => {
       ]
     };
   }, []);
+
+  useEffect(() => {
+    changeNavigationBarColor(colors.bg, !colors.night, true);
+  }, [colors.night, colors.bg]);
 
   return (
     <View
