@@ -25,7 +25,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import { Animated, Platform, RefreshControl, View } from "react-native";
+import { Platform, RefreshControl, View } from "react-native";
 import ActionSheet, {
   ActionSheetRef,
   FlatList
