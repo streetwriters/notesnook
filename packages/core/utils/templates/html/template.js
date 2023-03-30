@@ -53,12 +53,20 @@ const template = (data) => `<!DOCTYPE html>
       color: #212121;
     }
 
+    p {
+      margin-bottom: 0px;
+    }
+    
+    p[data-spacing="double"] {
+      margin-top: 1em;
+    }
+    
     p[data-spacing="single"] {
-      margin:0px;
+      margin-top: 0px;
     }
 
-    p[data-spacing="double"]{
-      margin-bottom:0px;
+    p[data-spacing="single"]:empty {
+      margin-top: 1em;
     }
     
     pre.codeblock {
