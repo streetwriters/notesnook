@@ -17,10 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Chunk } from "@notesnook/crypto/dist/src/types";
 import FileStreamSource from "./filestreamsource";
 import { File } from "./types";
 
-export default class FileHandle extends ReadableStream {
+export default class FileHandle extends ReadableStream<Chunk> {
   private storage: LocalForage;
   private file: File;
 

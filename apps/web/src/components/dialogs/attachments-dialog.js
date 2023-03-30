@@ -26,6 +26,9 @@ import Field from "../field";
 import ListContainer from "../list-container";
 import Dialog from "./dialog";
 import Placeholder from "../placeholders";
+import { AttachmentStream } from "../../common/attachments/attachment-stream";
+import { ZipStream } from "../../common/attachments/zip-stream";
+import { createWriteStream } from "../../common/attachments/stream-saver";
 
 function AttachmentsDialog({ onClose }) {
   const attachments = useStore((store) => store.attachments);
@@ -34,7 +37,6 @@ function AttachmentsDialog({ onClose }) {
   useEffect(() => {
     refresh();
   }, [refresh]);
-
   return (
     <Dialog
       isOpen={true}
@@ -46,6 +48,20 @@ function AttachmentsDialog({ onClose }) {
       onClose={onClose}
       noScroll
       negativeButton={{ text: "Close", onClick: onClose }}
+      positiveButton={{
+        text: "Download All Attachments",
+        onClick: async () => {
+          if (navigator.serviceWorker) {
+            console.log(
+              "attachment-dialog",
+              await new AttachmentStream(attachments)
+                .pipeThrough(new ZipStream())
+                .pipeTo(createWriteStream("notesnook-importer.zip"))
+            );
+          }
+        }
+      }}
+      show
     >
       <Flex px={2} sx={{ flexDirection: "column", height: 500 }}>
         <Field
