@@ -122,7 +122,7 @@ export const Title = () => {
               #
             </Heading>
           ) : null}
-          {title} adn this is how it is going to be.
+          {title}
         </Heading>
       ) : null}
       <Tag visible={currentScreen.beta} text="BETA" />

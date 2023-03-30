@@ -1027,9 +1027,19 @@ export const settingsGroups: SettingSection[] = [
         id: "join-telegram",
         name: "Join our Telegram group",
         description: "We are on telegram, let's talk",
-        // icon: 'telegram',
         modifer: () => {
           Linking.openURL("https://t.me/notesnook").catch(console.log);
+        }
+      },
+      {
+        id: "join-mastodom",
+        name: "Follow us on Mastodon",
+        description: "We are on mastodom",
+        icon: "mastodon",
+        modifer: () => {
+          Linking.openURL("https://fosstodon.org/@notesnook").catch(
+            console.log
+          );
         }
       },
       {
