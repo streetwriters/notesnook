@@ -394,6 +394,59 @@ async function downloadFile(filename, requestOptions) {
   }
 }
 
+async function downloadAttachment(filename, requestOptions) {
+  const { url, headers, chunkSize, cancellationToken } = requestOptions;
+  if (await streamablefs.exists(filename)) return true;
+
+  try {
+    const signedUrlResponse = await axios.get(url, {
+      headers,
+      responseType: "text"
+    });
+
+    const signedUrl = signedUrlResponse.data;
+    const response = await axios.get(signedUrl, {
+      responseType: "arraybuffer",
+      cancelToken: cancellationToken
+    });
+
+    const contentType = response.headers["content-type"];
+    if (contentType === "application/xml") {
+      const error = parseS3Error(response.data);
+      if (error.Code !== "Unknown") {
+        throw new Error(`[${error.Code}] ${error.Message}`);
+      }
+    }
+
+    const contentLength = response.headers["content-length"];
+    if (contentLength === "0") {
+      const error = `File length is 0. Please upload this file again from the attachment manager. (File hash: ${filename})`;
+      await db.attachments.markAsFailed(filename, error);
+      throw new Error(error);
+    }
+
+    const distributor = new ChunkDistributor(chunkSize + ABYTES);
+    distributor.fill(new Uint8Array(response.data));
+    distributor.close();
+
+    const fileHandle = await streamablefs.createFile(
+      filename,
+      response.data.byteLength,
+      "application/octet-stream"
+    );
+
+    for (let chunk of distributor.chunks) {
+      await fileHandle.write(chunk.data);
+    }
+
+    return true;
+  } catch (e) {
+    handleS3Error(e, "Could not download file");
+    reportProgress(undefined, { type: "download", hash: filename });
+    return false;
+  }
+}
+
 function exists(filename) {
   return streamablefs.exists(filename);
 }
@@ -475,6 +528,7 @@ const FS = {
   readEncrypted,
   uploadFile: cancellable(uploadFile),
   downloadFile: cancellable(downloadFile),
+  downloadAttachment: cancellable(downloadAttachment),
   deleteFile,
   saveFile,
   exists,
