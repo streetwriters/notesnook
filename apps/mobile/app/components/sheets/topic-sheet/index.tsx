@@ -25,13 +25,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import {
-  Animated,
-  Dimensions,
-  View,
-  RefreshControl,
-  Platform
-} from "react-native";
+import { Animated, Platform, RefreshControl, View } from "react-native";
 import ActionSheet, {
   ActionSheetRef,
   FlatList
@@ -59,16 +53,16 @@ import {
 import { normalize, SIZE } from "../../../utils/size";
 import { GroupHeader, NotebookType, TopicType } from "../../../utils/types";
 
+import { groupArray } from "@notesnook/core/utils/grouping";
+import Config from "react-native-config";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { notesnook } from "../../../../e2e/test.ids";
 import { openEditor } from "../../../screens/notes/common";
 import { getTotalNotes, history } from "../../../utils";
-import { Properties } from "../../properties";
 import { deleteItems } from "../../../utils/functions";
 import { presentDialog } from "../../dialog/functions";
-import Config from "react-native-config";
-import { notesnook } from "../../../../e2e/test.ids";
+import { Properties } from "../../properties";
 import Sort from "../sort";
-import { groupArray } from "@notesnook/core/utils/grouping";
 
 export const TopicsSheet = () => {
   const currentScreen = useNavigationStore((state) => state.currentScreen);
@@ -94,8 +88,8 @@ export const TopicsSheet = () => {
   );
   const [animations] = useState({
     translate: new Animated.Value(0),
-    display: new Animated.Value(-5000),
-    opacity: new Animated.Value(0)
+    display: new Animated.Value(0),
+    opacity: new Animated.Value(1)
   });
   const [groupOptions, setGroupOptions] = useState(
     db.settings?.getGroupOptions("topics")
@@ -187,16 +181,14 @@ export const TopicsSheet = () => {
     if (canShow) {
       const isTopic = currentScreen.name === "TopicNotes";
       const id = isTopic ? currentScreen?.notebookId : currentScreen?.id;
-      if (!ref.current?.isOpen()) {
-        animations.display.setValue(5000);
-        animations.opacity.setValue(0);
-      }
       if (id) {
         onRequestUpdate({
           item: db.notebooks?.notebook(id)?.data
         } as any);
       }
-      ref.current?.show();
+      setTimeout(() => {
+        ref.current?.show();
+      }, 1);
     } else {
       ref.current?.hide();
     }
@@ -215,7 +207,7 @@ export const TopicsSheet = () => {
       ref={ref}
       isModal={false}
       containerStyle={{
-        maxHeight: 400,
+        maxHeight: 300,
         borderTopRightRadius: 15,
         borderTopLeftRadius: 15,
         backgroundColor: colors.bg,
@@ -235,21 +227,11 @@ export const TopicsSheet = () => {
           ? [100]
           : [Platform.OS === "ios" ? 25 : 20, 100]
       }
-      initialSnapIndex={0}
+      initialSnapIndex={Config.isTesting === "true" ? 0 : 1}
       backgroundInteractionEnabled
-      onChange={(position, height) => {
+      onChange={(position) => {
+        if (position === 0) return;
         animations.translate.setValue(position - 60);
-        const h = Dimensions.get("window").height;
-        const minPos = h - height;
-        if (position - 100 < minPos || !canShow) {
-          animations.display.setValue(5000);
-          animations.opacity.setValue(0);
-        } else {
-          animations.display.setValue(0);
-          setTimeout(() => {
-            animations.opacity.setValue(1);
-          }, 300);
-        }
       }}
       gestureEnabled
       ExtraOverlayComponent={
@@ -258,7 +240,6 @@ export const TopicsSheet = () => {
             top: animations.translate,
             position: "absolute",
             right: 12,
-            opacity: animations.opacity,
             transform: [
               {
                 translateY: animations.display
@@ -292,8 +273,8 @@ export const TopicsSheet = () => {
     >
       <View
         style={{
-          maxHeight: 400,
-          height: 400,
+          maxHeight: 300,
+          height: 300,
           width: "100%"
         }}
       >
