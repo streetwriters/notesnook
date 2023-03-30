@@ -109,7 +109,7 @@ export const Title = () => {
       {!hide && !isHidden ? (
         <Heading
           onPress={navigateToNotebook}
-          numberOfLines={isTopic ? 2 : 1}
+          numberOfLines={1}
           size={SIZE.xl}
           style={{
             flexWrap: "wrap",
@@ -122,7 +122,7 @@ export const Title = () => {
               #
             </Heading>
           ) : null}
-          {title}
+          {title} adn this is how it is going to be.
         </Heading>
       ) : null}
       <Tag visible={currentScreen.beta} text="BETA" />
