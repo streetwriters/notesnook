@@ -280,7 +280,8 @@ const NotesPage = ({
         placeholderData={placeholderData}
       />
 
-      {notes?.length > 0 || (isFocused && !isMonograph) ? (
+      {notes?.length > 0 ||
+      (isFocused && !isMonograph && route.name !== "TopicNotes") ? (
         <FloatingButton title="Create a note" onPress={onPressFloatingButton} />
       ) : null}
     </DelayLayout>
