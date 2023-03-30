@@ -1,4 +1,7 @@
-- Fix note publishing not working with password protection
-- Some fixes and improvements in notebook/topic linking
+- Added support for sorting topics in topics sheet
+- Navigation Bar in app now follows app theme
+- Splashscreen logo quality in dark mode has been improved
+- Fix topic title goes into multiple lines if long
+- Fix reminder date picker not allowing to pick a date from past
 
 Thank you for using Notesnook!

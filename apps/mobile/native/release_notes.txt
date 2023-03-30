@@ -1,4 +1,6 @@
-- Fix note publishing not working with password protection
-- Some fixes and improvements in notebook/topic linking
+- Added support for sorting topics in topics sheet
+- Fixed topics sheet is hard to swipe up from bottom
+- Fix topic title goes into multiple lines if long
+- Fix reminder date picker not allowing to pick a date from past
 
 Thank you for using Notesnook!
