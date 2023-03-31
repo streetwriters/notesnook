@@ -25,7 +25,7 @@ import SearchService from "../services/search";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useMenuStore } from "../stores/use-menu-store";
 import { db } from "../common/database";
-import { eClearEditor } from "./events";
+import { eClearEditor, eOnTopicSheetUpdate } from "./events";
 import { useRelationStore } from "../stores/use-relation-store";
 import { presentDialog } from "../components/dialog/functions";
 
@@ -38,11 +38,14 @@ function deleteConfirmDialog(items, type, context) {
       positiveText: "Delete",
       negativeText: "Cancel",
       positivePress: (value) => {
-        console.log(value);
-        resolve({ delete: true, deleteNotes: value });
+        setTimeout(() => {
+          resolve({ delete: true, deleteNotes: value });
+        });
       },
       onClose: () => {
-        resolve({ delete: false });
+        setTimeout(() => {
+          resolve({ delete: false });
+        });
       },
       context: context,
       check: {
@@ -196,6 +199,7 @@ export const deleteItems = async (item, context) => {
   useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();
   SearchService.updateAndSearch();
+  eSendEvent(eOnTopicSheetUpdate);
 };
 
 export const openLinkInBrowser = async (link) => {

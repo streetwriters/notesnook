@@ -66,16 +66,19 @@ import { Properties } from "../../properties";
 import Sort from "../sort";
 import { MMKV } from "../../../common/database/mmkv";
 
+type ConfigItem = { id: string; type: string };
 class TopicSheetConfig {
   static storageKey: "$$sp";
-  static makeId(item: any) {
+
+  static makeId(item: ConfigItem) {
     return `${TopicSheetConfig.storageKey}:${item.type}:${item.id}`;
   }
-  static get(item: any) {
+
+  static get(item: ConfigItem) {
     return MMKV.getInt(TopicSheetConfig.makeId(item)) || 0;
   }
 
-  static set(item: any, index = 0) {
+  static set(item: ConfigItem, index = 0) {
     MMKV.setInt(TopicSheetConfig.makeId(item), index);
   }
 }
@@ -109,17 +112,6 @@ export const TopicsSheet = () => {
     db.settings?.getGroupOptions("topics")
   );
 
-  const onUpdate = useCallback(() => {
-    setGroupOptions({ ...(db.settings?.getGroupOptions("topics") as any) });
-  }, []);
-
-  useEffect(() => {
-    eSubscribeEvent("groupOptionsUpdate", onUpdate);
-    return () => {
-      eUnSubscribeEvent("groupOptionsUpdate", onUpdate);
-    };
-  }, [onUpdate]);
-
   const onRequestUpdate = React.useCallback(
     (data?: NotebookScreenParams) => {
       if (!canShow) return;
@@ -139,9 +131,23 @@ export const TopicsSheet = () => {
     [canShow, notebook]
   );
 
+  const onUpdate = useCallback(() => {
+    setGroupOptions({ ...(db.settings?.getGroupOptions("topics") as any) });
+    onRequestUpdate();
+  }, [onRequestUpdate]);
+
+  useEffect(() => {
+    eSubscribeEvent("groupOptionsUpdate", onUpdate);
+    return () => {
+      eUnSubscribeEvent("groupOptionsUpdate", onUpdate);
+    };
+  }, [onUpdate]);
+
   useEffect(() => {
     const onTopicUpdate = () => {
-      onRequestUpdate();
+      setTimeout(() => {
+        onRequestUpdate();
+      }, 1);
     };
     eSubscribeEvent(eOnTopicSheetUpdate, onTopicUpdate);
     eSubscribeEvent(eOnNewTopicAdded, onRequestUpdate);
@@ -199,12 +205,20 @@ export const TopicsSheet = () => {
     if (canShow) {
       const id = isTopic ? currentScreen?.notebookId : currentScreen?.id;
       const notebook = db.notebooks?.notebook(id as string)?.data;
-      ref.current?.show(
-        TopicSheetConfig.get({
-          type: isTopic ? "topic" : "notebook",
-          id: currentScreen.id
-        })
-      );
+      const snapPoint = TopicSheetConfig.get({
+        type: isTopic ? "topic" : "notebook",
+        id: currentScreen.id as string
+      });
+      if (ref.current?.isOpen()) {
+        if (!isTopic) {
+          ref.current?.snapToIndex(snapPoint);
+        } else {
+          ref.current?.snapToIndex(0);
+        }
+      } else {
+        ref.current?.show(snapPoint);
+      }
+
       setTimeout(() => {
         if (notebook) {
           onRequestUpdate({
@@ -245,7 +259,7 @@ export const TopicsSheet = () => {
         TopicSheetConfig.set(
           {
             type: isTopic ? "topic" : "notebook",
-            id: currentScreen.id
+            id: currentScreen.id as string
           },
           index
         );
@@ -331,7 +345,7 @@ export const TopicsSheet = () => {
                       selection.length > 1 ? "topics" : "topics"
                     }`,
                     paragraph: `Are you sure you want to delete ${
-                      selection.length > 1 ? "these topicss?" : "this topics?"
+                      selection.length > 1 ? "these topics?" : "this topic?"
                     }`,
                     positiveText: "Delete",
                     negativeText: "Cancel",
@@ -452,8 +466,8 @@ const SelectionContext = createContext<{
 }>({
   selection: [],
   enabled: false,
-  setEnabled: (value: boolean) => {},
-  toggleSelection: (item: TopicType) => {}
+  setEnabled: (_value: boolean) => {},
+  toggleSelection: (_item: TopicType) => {}
 });
 const useSelection = () => useContext(SelectionContext);
 
@@ -489,7 +503,6 @@ const TopicItem = ({
           return;
         }
         TopicNotes.navigate(item, true);
-        sheetRef.current?.snapToIndex(0);
       }}
       customStyle={{
         justifyContent: "space-between",

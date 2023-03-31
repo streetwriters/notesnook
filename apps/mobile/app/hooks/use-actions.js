@@ -52,7 +52,11 @@ import { useThemeStore } from "../stores/use-theme-store";
 import { useUserStore } from "../stores/use-user-store";
 import { toTXT } from "../utils";
 import { toggleDarkMode } from "../utils/color-scheme/utils";
-import { eOpenAddTopicDialog, eOpenLoginDialog } from "../utils/events";
+import {
+  eOnTopicSheetUpdate,
+  eOpenAddTopicDialog,
+  eOpenLoginDialog
+} from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { sleep } from "../utils/time";
 
@@ -512,6 +516,7 @@ export const useActions = ({ close = () => null, item }) => {
       "Notebook",
       "Notebooks"
     );
+    eSendEvent(eOnTopicSheetUpdate);
     close();
   }
 
