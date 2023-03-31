@@ -23,7 +23,8 @@ import React, {
   useContext,
   useEffect,
   useRef,
-  useState
+  useState,
+  RefObject
 } from "react";
 import { Platform, RefreshControl, View } from "react-native";
 import ActionSheet, {
@@ -63,8 +64,24 @@ import { deleteItems } from "../../../utils/functions";
 import { presentDialog } from "../../dialog/functions";
 import { Properties } from "../../properties";
 import Sort from "../sort";
+import { MMKV } from "../../../common/database/mmkv";
+
+class TopicSheetConfig {
+  static storageKey: "$$sp";
+  static makeId(item: any) {
+    return `${TopicSheetConfig.storageKey}:${item.type}:${item.id}`;
+  }
+  static get(item: any) {
+    return MMKV.getInt(TopicSheetConfig.makeId(item)) || 0;
+  }
+
+  static set(item: any, index = 0) {
+    MMKV.setInt(TopicSheetConfig.makeId(item), index);
+  }
+}
 
 export const TopicsSheet = () => {
+  const [collapsed, setCollapsed] = useState(false);
   const currentScreen = useNavigationStore((state) => state.currentScreen);
   const canShow =
     currentScreen.name === "Notebook" || currentScreen.name === "TopicNotes";
@@ -79,6 +96,7 @@ export const TopicsSheet = () => {
   const [enabled, setEnabled] = useState(false);
   const colors = useThemeStore((state) => state.colors);
   const ref = useRef<ActionSheetRef>(null);
+  const isTopic = currentScreen.name === "TopicNotes";
   const [topics, setTopics] = useState(
     notebook
       ? qclone(
@@ -111,10 +129,14 @@ export const TopicsSheet = () => {
       if (_notebook) {
         setNotebook(_notebook);
 
-        setTopics(qclone(groupArray(_notebook.topics, groupOptions)));
+        setTopics(
+          qclone(
+            groupArray(_notebook.topics, db.settings?.getGroupOptions("topics"))
+          )
+        );
       }
     },
-    [canShow, notebook, groupOptions]
+    [canShow, notebook]
   );
 
   useEffect(() => {
@@ -147,7 +169,7 @@ export const TopicsSheet = () => {
     index: number;
   }) =>
     (item as GroupHeader).type === "header" ? null : (
-      <TopicItem item={item as TopicType} index={index} />
+      <TopicItem sheetRef={ref} item={item as TopicType} index={index} />
     );
 
   const selectionContext = {
@@ -175,16 +197,21 @@ export const TopicsSheet = () => {
 
   useEffect(() => {
     if (canShow) {
-      const isTopic = currentScreen.name === "TopicNotes";
-      ref.current?.show();
+      const id = isTopic ? currentScreen?.notebookId : currentScreen?.id;
+      const notebook = db.notebooks?.notebook(id as string)?.data;
+      ref.current?.show(
+        TopicSheetConfig.get({
+          type: isTopic ? "topic" : "notebook",
+          id: currentScreen.id
+        })
+      );
       setTimeout(() => {
-        const id = isTopic ? currentScreen?.notebookId : currentScreen?.id;
-        if (id) {
+        if (notebook) {
           onRequestUpdate({
-            item: db.notebooks?.notebook(id)?.data
+            item: notebook
           } as any);
         }
-      }, 300);
+      }, 1);
     } else {
       ref.current?.hide();
     }
@@ -193,7 +220,8 @@ export const TopicsSheet = () => {
     currentScreen?.id,
     currentScreen.name,
     currentScreen?.notebookId,
-    onRequestUpdate
+    onRequestUpdate,
+    isTopic
   ]);
 
   return (
@@ -212,6 +240,16 @@ export const TopicsSheet = () => {
       openAnimationConfig={{
         friction: 10
       }}
+      onSnapIndexChange={(index) => {
+        setCollapsed(index === 0);
+        TopicSheetConfig.set(
+          {
+            type: isTopic ? "topic" : "notebook",
+            id: currentScreen.id
+          },
+          index
+        );
+      }}
       closable={!canShow}
       elevation={10}
       indicatorStyle={{
@@ -224,7 +262,7 @@ export const TopicsSheet = () => {
           ? [100]
           : [Platform.OS === "ios" ? 25 : 20, 100]
       }
-      initialSnapIndex={Config.isTesting === "true" ? 0 : 1}
+      initialSnapIndex={1}
       backgroundInteractionEnabled
       gestureEnabled
     >
@@ -345,6 +383,25 @@ export const TopicsSheet = () => {
                     height: 40
                   }}
                 />
+
+                <IconButton
+                  name={collapsed ? "chevron-up" : "chevron-down"}
+                  onPress={() => {
+                    if (ref.current?.currentSnapIndex() !== 0) {
+                      setCollapsed(true);
+                      ref.current?.snapToIndex(0);
+                    } else {
+                      setCollapsed(false);
+                      ref.current?.snapToIndex(1);
+                    }
+                  }}
+                  color={colors.pri}
+                  size={22}
+                  customStyle={{
+                    width: 40,
+                    height: 40
+                  }}
+                />
               </>
             )}
           </View>
@@ -373,7 +430,7 @@ export const TopicsSheet = () => {
                   flex: 1,
                   justifyContent: "center",
                   alignItems: "center",
-                  height: 300
+                  height: 200
                 }}
               >
                 <Paragraph color={colors.icon}>No topics</Paragraph>
@@ -400,7 +457,15 @@ const SelectionContext = createContext<{
 });
 const useSelection = () => useContext(SelectionContext);
 
-const TopicItem = ({ item, index }: { item: TopicType; index: number }) => {
+const TopicItem = ({
+  item,
+  index,
+  sheetRef
+}: {
+  item: TopicType;
+  index: number;
+  sheetRef: RefObject<ActionSheetRef>;
+}) => {
   const screen = useNavigationStore((state) => state.currentScreen);
   const colors = useThemeStore((state) => state.colors);
   const selection = useSelection();
@@ -424,6 +489,7 @@ const TopicItem = ({ item, index }: { item: TopicType; index: number }) => {
           return;
         }
         TopicNotes.navigate(item, true);
+        sheetRef.current?.snapToIndex(0);
       }}
       customStyle={{
         justifyContent: "space-between",
