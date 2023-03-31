@@ -22,6 +22,7 @@ import { View } from "react-native";
 
 import { useMenuStore } from "../../../stores/use-menu-store";
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
@@ -30,6 +31,7 @@ import Navigation from "../../../services/navigation";
 import { db } from "../../../common/database";
 import {
   eCloseAddTopicDialog,
+  eOnTopicSheetUpdate,
   eOpenAddTopicDialog
 } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
@@ -40,6 +42,7 @@ import DialogHeader from "../../dialog/dialog-header";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import { Toast } from "../../toast";
+import { useRelationStore } from "../../../stores/use-relation-store";
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -81,6 +84,8 @@ export class AddTopicDialog extends React.Component {
         Navigation.queueRoutesForUpdate("Notebooks", "Notebook", "TopicNotes");
         useMenuStore.getState().setMenuPins();
       });
+      eSendEvent(eOnTopicSheetUpdate);
+      useRelationStore.getState().update();
     } catch (e) {
       console.error(e);
     }

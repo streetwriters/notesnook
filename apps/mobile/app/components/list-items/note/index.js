@@ -27,6 +27,7 @@ import { db } from "../../../common/database";
 import Notebook from "../../../screens/notebook";
 import { TaggedNotes } from "../../../screens/notes/tagged";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
+import useNavigationStore from "../../../stores/use-navigation-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
@@ -52,12 +53,14 @@ const showActionSheet = (item) => {
 
 function getNotebook(item) {
   const isTrash = item.type === "trash";
+  const currentId = useNavigationStore.getState().currentScreen.id;
   if (isTrash) return [];
   const items = [];
   const notebooks = db.relations.to(item, "notebook") || [];
 
   for (let notebook of notebooks) {
     if (items.length > 1) break;
+    if (notebook.id === currentId) continue;
     items.push(notebook);
   }
 
@@ -68,6 +71,7 @@ function getNotebook(item) {
       if (!notebook) continue;
       for (let topicId of nb.topics) {
         if (items.length > 1) break;
+        if (topicId === currentId) continue;
         const topic = notebook.topics.find((t) => t.id === topicId);
         if (!topic) continue;
         items.push(topic);
@@ -117,7 +121,12 @@ const NoteItem = ({
           >
             {notebooks?.map((item) => (
               <Button
-                title={item.title}
+                title={
+                  item.title.length > 25
+                    ? item.title.slice(0, 25) + "..."
+                    : item.title
+                }
+                tooltipText={item.title}
                 key={item.id}
                 height={25}
                 icon={item.type === "topic" ? "bookmark" : "book-outline"}

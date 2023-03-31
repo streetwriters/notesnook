@@ -21,13 +21,18 @@ import React, { useCallback, useEffect, useMemo } from "react";
 import { Keyboard, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
-import { presentSheet, ToastEvent } from "../../../services/event-manager";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastEvent
+} from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SearchService from "../../../services/search";
 import { useNotebookStore } from "../../../stores/use-notebook-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
+import { eOnTopicSheetUpdate } from "../../../utils/events";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
@@ -296,6 +301,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
       "Notebook"
     );
     setNotebooks();
+    eSendEvent(eOnTopicSheetUpdate);
     SearchService.updateAndSearch();
     actionSheetRef.current?.hide();
   };
