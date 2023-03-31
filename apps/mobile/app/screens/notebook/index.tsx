@@ -22,9 +22,9 @@ import { db } from "../../common/database";
 import DelayLayout from "../../components/delay-layout";
 import List from "../../components/list";
 import { NotebookHeader } from "../../components/list-items/headers/notebook-header";
+import { AddNotebookSheet } from "../../components/sheets/add-notebook";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import {
-  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
@@ -33,7 +33,7 @@ import SearchService from "../../services/search";
 import useNavigationStore, {
   NotebookScreenParams
 } from "../../stores/use-navigation-store";
-import { eOnNewTopicAdded, eOpenAddNotebookDialog } from "../../utils/events";
+import { eOnNewTopicAdded } from "../../utils/events";
 import { NotebookType } from "../../utils/types";
 import { openEditor, setOnFirstSave } from "../notes/common";
 const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
@@ -148,7 +148,7 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
           ListHeader={
             <NotebookHeader
               onEditNotebook={() => {
-                eSendEvent(eOpenAddNotebookDialog, params.current.item);
+                AddNotebookSheet.present(params.current.item);
               }}
               notebook={params.current.item}
             />
