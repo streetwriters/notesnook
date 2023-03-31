@@ -16,25 +16,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { toAsyncIterator } from "@notesnook-importer/core/dist/src/utils/stream";
 
-type Message<T> = {
-  type: string;
-  data?: T;
-};
-
-export function sendEventWithResult<T>(type: string): Promise<T> {
-  return new Promise<T>((resolve) => {
-    // eslint-disable-next-line no-restricted-globals
-    addEventListener(
-      "message",
-      (ev: MessageEvent<Message<T>>) => {
-        const { type: messageType, data } = ev.data;
-        if (messageType === type && data) {
-          resolve(data);
-        }
-      },
-      { once: true }
-    );
-    postMessage({ type });
-  });
+export async function consumeReadableStream<T>(
+  stream: ReadableStream<T>
+): Promise<T[]> {
+  const chunks: T[] = [];
+  for await (const chunk of toAsyncIterator(stream)) {
+    chunks.push(chunk);
+  }
+  return chunks;
 }

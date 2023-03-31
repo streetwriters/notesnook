@@ -26,9 +26,10 @@ import Field from "../field";
 import ListContainer from "../list-container";
 import Dialog from "./dialog";
 import Placeholder from "../placeholders";
-import { AttachmentStream } from "../../common/attachments/attachment-stream";
-import { ZipStream } from "../../common/attachments/zip-stream";
-import { createWriteStream } from "../../common/attachments/stream-saver";
+import { AttachmentStream } from "../../common/attachment-stream";
+import { ZipStream } from "../../utils/zip-stream";
+import { createWriteStream } from "../../utils/stream-saver";
+import { register } from "../../utils/mitm";
 
 function AttachmentsDialog({ onClose }) {
   const attachments = useStore((store) => store.attachments);
@@ -51,14 +52,10 @@ function AttachmentsDialog({ onClose }) {
       positiveButton={{
         text: "Download All Attachments",
         onClick: async () => {
-          if (navigator.serviceWorker) {
-            console.log(
-              "attachment-dialog",
-              await new AttachmentStream(attachments)
-                .pipeThrough(new ZipStream())
-                .pipeTo(createWriteStream("notesnook-importer.zip"))
-            );
-          }
+          await register();
+          await new AttachmentStream(attachments)
+            .pipeThrough(new ZipStream())
+            .pipeTo(createWriteStream("attachments.zip"));
         }
       }}
       show

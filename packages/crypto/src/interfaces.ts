@@ -50,16 +50,12 @@ export interface INNCrypto {
 
   exportKey(password: string, salt?: string): Promise<SerializedKey>;
 
-  encryptStream(
-    key: SerializedKey,
-    stream: IStreamable,
-    streamId?: string
-  ): Promise<string>;
+  createEncryptionStream(
+    key: SerializedKey
+  ): Promise<{ iv: string; stream: TransformStream<Chunk, Uint8Array> }>;
 
-  decryptStream(
+  createDecryptionStream(
     key: SerializedKey,
-    iv: string,
-    stream: IStreamable,
-    streamId?: string
-  ): Promise<void>;
+    iv: string
+  ): Promise<TransformStream<Uint8Array, Uint8Array>>;
 }

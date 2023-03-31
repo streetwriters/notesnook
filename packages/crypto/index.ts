@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ready } from "libsodium-wrappers";
 import Decryption from "./src/decryption";
 import Encryption from "./src/encryption";
-import { INNCrypto, IStreamable } from "./src/interfaces";
+import { INNCrypto } from "./src/interfaces";
 import KeyUtils from "./src/keyutils";
 import Password from "./src/password";
 import {
@@ -28,8 +28,7 @@ import {
   EncryptionKey,
   OutputFormat,
   Plaintext,
-  SerializedKey,
-  Chunk
+  SerializedKey
 } from "./src/types";
 
 export class NNCrypto implements INNCrypto {
@@ -74,73 +73,69 @@ export class NNCrypto implements INNCrypto {
     return KeyUtils.exportKey(password, salt);
   }
 
-  async createEncryptionStream(
-    key: SerializedKey,
-    stream: IStreamable
-  ): Promise<string> {
+  async createEncryptionStream(key: SerializedKey) {
     await this.init();
-    const encryptionStream = Encryption.createStream(key);
+    return Encryption.createStream(key);
 
+    // // eslint-disable-next-line no-constant-condition
+    // while (true) {
+    //   const chunk = await stream.read();
+    //   if (!chunk) break;
+
+    //   const { data, final } = chunk;
+    //   if (!data) break;
+
+    //   const encryptedChunk: Chunk = {
+    //     data: encryptionStream.write(data, final),
+    //     final
+    //   };
+    //   await stream.write(encryptedChunk);
+
+    //   if (final) break;
+    // }
+    // return encryptionStream.header;
+  }
+
+  async createDecryptionStream(key: SerializedKey, iv: string) {
+    await this.init();
+    return Decryption.createStream(iv, key);
     // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const chunk = await stream.read();
-      if (!chunk) break;
+    // while (true) {
+    //   const chunk = await stream.read();
+    //   if (!chunk) break;
 
-      const { data, final } = chunk;
-      if (!data) break;
+    //   const { data, final } = chunk;
+    //   if (!data) break;
 
-      const encryptedChunk: Chunk = {
-        data: encryptionStream.write(data, final),
-        final
-      };
-      await stream.write(encryptedChunk);
+    //   const decryptedChunk: Chunk = {
+    //     data: decryptionStream.read(data),
+    //     final
+    //   };
+    //   await stream.write(decryptedChunk);
 
-      if (final) break;
-    }
-    return encryptionStream.header;
+    //   if (final) break;
+    // }
   }
 
-  async createDecryptionStream(
-    iv: string,
-    key: SerializedKey,
-    stream: IStreamable
-  ) {
-    await this.init();
-    const decryptionStream = Decryption.createStream(iv, key);
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const chunk = await stream.read();
-      if (!chunk) break;
+  // async encryptStream(
+  //   key: SerializedKey,
+  //   stream: IStreamable,
+  //   _streamId?: string
+  // ): Promise<string> {
+  //   await this.init();
+  //   return await this.createEncryptionStream(key, stream);
+  // }
 
-      const { data, final } = chunk;
-      if (!data) break;
-
-      const decryptedChunk: Chunk = {
-        data: decryptionStream.read(data),
-        final
-      };
-      await stream.write(decryptedChunk);
-
-      if (final) break;
-    }
-  }
-
-  async encryptStream(
-    key: SerializedKey,
-    stream: IStreamable,
-    _streamId?: string
-  ): Promise<string> {
-    await this.init();
-    return await this.createEncryptionStream(key, stream);
-  }
-
-  async decryptStream(
-    key: SerializedKey,
-    iv: string,
-    stream: IStreamable,
-    _streamId?: string
-  ): Promise<void> {
-    await this.init();
-    await this.createDecryptionStream(iv, key, stream);
-  }
+  // async decryptStream(
+  //   key: SerializedKey,
+  //   iv: string,
+  //   stream: IStreamable,
+  //   _streamId?: string
+  // ): Promise<void> {
+  //   await this.init();
+  //   await this.createDecryptionStream(iv, key, stream);
+  // }
 }
+
+export * from "./src/types";
+export * from "./src/interfaces";

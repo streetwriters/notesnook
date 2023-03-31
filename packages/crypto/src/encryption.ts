@@ -27,17 +27,10 @@ import {
   crypto_secretstream_xchacha20poly1305_TAG_MESSAGE,
   to_base64,
   from_base64,
-  base64_variants,
-  StateAddress
+  base64_variants
 } from "libsodium-wrappers";
 import KeyUtils from "./keyutils";
-import {
-  Cipher,
-  EncryptionKey,
-  OutputFormat,
-  Plaintext,
-  SerializedKey
-} from "./types";
+import { Chunk, Cipher, OutputFormat, Plaintext, SerializedKey } from "./types";
 
 const encoder = new TextEncoder();
 export default class Encryption {
@@ -89,34 +82,61 @@ export default class Encryption {
     };
   }
 
-  static createStream(key: SerializedKey): EncryptionStream {
-    return new EncryptionStream(KeyUtils.transform(key));
-  }
-}
-
-class EncryptionStream {
-  state: StateAddress;
-  header: string;
-  constructor(key: EncryptionKey) {
+  static createStream(key: SerializedKey): {
+    iv: string;
+    stream: TransformStream<Chunk, Uint8Array>;
+  } {
+    const { key: _key } = KeyUtils.transform(key);
     const { state, header } = crypto_secretstream_xchacha20poly1305_init_push(
-      key.key,
+      _key,
       "base64"
     );
-    this.state = state;
-    this.header = header;
-  }
 
-  write(chunk: Uint8Array, final?: boolean): Uint8Array {
-    return crypto_secretstream_xchacha20poly1305_push(
-      this.state,
-      chunk,
-      null,
-      final
-        ? crypto_secretstream_xchacha20poly1305_TAG_FINAL
-        : crypto_secretstream_xchacha20poly1305_TAG_MESSAGE
-    );
+    return {
+      iv: header,
+      stream: new TransformStream<Chunk, Uint8Array>({
+        start() {},
+        transform(chunk, controller) {
+          controller.enqueue(
+            crypto_secretstream_xchacha20poly1305_push(
+              state,
+              chunk.data,
+              null,
+              chunk.final
+                ? crypto_secretstream_xchacha20poly1305_TAG_FINAL
+                : crypto_secretstream_xchacha20poly1305_TAG_MESSAGE
+            )
+          );
+          if (chunk.final) controller.terminate();
+        }
+      })
+    };
   }
 }
+
+// class EncryptionStream {
+//   state: StateAddress;
+//   header: string;
+//   constructor(key: EncryptionKey) {
+//     const { state, header } = crypto_secretstream_xchacha20poly1305_init_push(
+//       key.key,
+//       "base64"
+//     );
+//     this.state = state;
+//     this.header = header;
+//   }
+
+//   write(chunk: Uint8Array, final?: boolean): Uint8Array {
+//     return crypto_secretstream_xchacha20poly1305_push(
+//       this.state,
+//       chunk,
+//       null,
+//       final
+//         ? crypto_secretstream_xchacha20poly1305_TAG_FINAL
+//         : crypto_secretstream_xchacha20poly1305_TAG_MESSAGE
+//     );
+//   }
+// }
 
 function getAlgorithm(base64Variant: base64_variants) {
   //Template: encryptionAlgorithm-kdfAlgorithm-base64variant

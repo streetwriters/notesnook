@@ -26,7 +26,8 @@ function registerWorker() {
     .getRegistration("./")
     .then((swReg) => {
       return (
-        swReg || navigator.serviceWorker.register("sw.js", { scope: "./" })
+        swReg ||
+        navigator.serviceWorker.register("stream-saver-sw.js", { scope: "./" })
       );
     })
     .then((swReg) => {
@@ -90,7 +91,7 @@ export function postMessage(
   data.pathname = data.pathname.replace(/^\/+/g, "");
 
   // remove protocol
-  let org = origin.replace(/(^\w+:|^)\/\//, "");
+  const org = origin.replace(/(^\w+:|^)\/\//, "");
 
   // set the absolute pathname to the download url.
   data.url = new URL(`${scope + org}/${data.pathname}`).toString();
