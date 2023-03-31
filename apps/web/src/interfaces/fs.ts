@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "web-streams-polyfill/dist/ponyfill";
 import localforage from "localforage";
 import { xxhash64, createXXHash64 } from "hash-wasm";
-import axios from "axios";
+import axios, { AxiosProgressEvent } from "axios";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import { StreamableFS } from "@notesnook/streamable-fs";
 import { getNNCrypto } from "./nncrypto.stub";
@@ -30,6 +30,13 @@ import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
 import { db } from "../common/db";
 import { getFileNameWithExtension } from "@notesnook/core/utils/filename";
+import { ChunkedStream, IntoChunks } from "./chunked-stream";
+import { ProgressStream } from "./progress-stream";
+import { consumeReadableStream } from "./stream-utils";
+import { Base64DecoderStream } from "./base64-decoder-stream";
+import { toBlob } from "@notesnook-importer/core/dist/src/utils/stream";
+import { Cipher, OutputFormat, SerializedKey } from "@notesnook/crypto";
+import { IDataType } from "hash-wasm/dist/lib/util";
 
 const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
@@ -39,12 +46,11 @@ const UPLOAD_PART_REQUIRED_CHUNKS = Math.ceil(
 );
 const streamablefs = new StreamableFS("streamable-fs");
 
-/**
- * @param {File} file
- * @param {import("nncrypto/dist/src/types").SerializedKey} key
- * @param {string} hash
- */
-async function writeEncryptedFile(file, key, hash) {
+async function writeEncryptedFile(
+  file: File,
+  key: SerializedKey,
+  hash: string
+) {
   const crypto = await getNNCrypto();
 
   if (!localforage.supports(localforage.INDEXEDDB))
@@ -52,38 +58,29 @@ async function writeEncryptedFile(file, key, hash) {
 
   if (await streamablefs.exists(hash)) await streamablefs.deleteFile(hash);
 
-  let offset = 0;
-  let encrypted = 0;
+  // let offset = 0;
+  // let encrypted = 0;
   const fileHandle = await streamablefs.createFile(hash, file.size, file.type);
   sendAttachmentsProgressEvent("encrypt", hash, 1, 0);
 
-  const iv = await crypto.encryptStream(
-    key,
-    {
-      read: async () => {
-        let end = Math.min(offset + CHUNK_SIZE, file.size);
-        if (offset === end) return;
-        const chunk = new Uint8Array(
-          await file.slice(offset, end).arrayBuffer()
-        );
-        offset = end;
-        const isFinal = offset === file.size;
-        return {
-          final: isFinal,
-          data: chunk
-        };
-      },
-      write: async (chunk) => {
-        encrypted += chunk.data.length - ABYTES;
+  const { iv, stream } = await crypto.createEncryptionStream(key);
+  await file
+    .stream()
+    .pipeThrough(new ChunkedStream(CHUNK_SIZE))
+    .pipeThrough(new IntoChunks(file.size))
+    .pipeThrough(stream)
+    .pipeThrough(
+      new ProgressStream((totalRead, done) =>
         reportProgress(
-          { total: file.size, loaded: encrypted },
+          {
+            total: file.size,
+            loaded: done ? file.size : totalRead
+          },
           { type: "encrypt", hash }
-        );
-        await fileHandle.write(chunk.data);
-      }
-    },
-    file.name
-  );
+        )
+      )
+    )
+    .pipeTo(fileHandle.writeable);
 
   sendAttachmentsProgressEvent("encrypt", hash, 1);
 
@@ -91,7 +88,7 @@ async function writeEncryptedFile(file, key, hash) {
     chunkSize: CHUNK_SIZE,
     iv: iv,
     length: file.size,
-    salt: key.salt,
+    salt: key.salt!,
     alg: "xcha-stream"
   };
 }
@@ -103,7 +100,11 @@ async function writeEncryptedFile(file, key, hash) {
  * 3. We encrypt the Uint8Array
  * 4. We save the encrypted Uint8Array
  */
-async function writeEncryptedBase64(metadata) {
+async function writeEncryptedBase64(metadata: {
+  data: string;
+  key: SerializedKey;
+  mimeType?: string;
+}) {
   const { data, key, mimeType } = metadata;
 
   const bytes = new Uint8Array(Buffer.from(data, "base64"));
@@ -122,33 +123,18 @@ async function writeEncryptedBase64(metadata) {
   };
 }
 
-/**
- *
- * @param {string} data the base64 data
- * @returns
- */
-function hashBase64(data) {
+function hashBase64(data: string) {
   return hashBuffer(Buffer.from(data, "base64"));
 }
 
-/**
- *
- * @param {import("hash-wasm/dist/lib/util").IDataType} data
- * @returns
- */
-async function hashBuffer(data) {
+async function hashBuffer(data: IDataType) {
   return {
     hash: await xxhash64(data),
     type: "xxh64"
   };
 }
 
-/**
- *
- * @param {ReadableStreamReader<Uint8Array>} reader
- * @returns
- */
-async function hashStream(reader) {
+async function hashStream(reader: ReadableStreamDefaultReader<Uint8Array>) {
   const hasher = await createXXHash64();
   hasher.init();
 
@@ -162,42 +148,51 @@ async function hashStream(reader) {
   return { type: "xxh64", hash: hasher.digest("hex") };
 }
 
-async function readEncrypted(filename, key, cipherData) {
+async function readEncrypted(
+  filename: string,
+  key: SerializedKey,
+  cipherData: Cipher & { outputType: OutputFormat }
+) {
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle) {
     console.error(`File not found. (File hash: ${filename})`);
     return null;
   }
-
-  const reader = fileHandle.getReader();
-  const plainText = new Uint8Array(fileHandle.file.size);
-  let offset = 0;
-
   const crypto = await getNNCrypto();
-  await crypto.decryptStream(
+  const decryptionStream = await crypto.createDecryptionStream(
     key,
-    cipherData.iv,
-    {
-      read: async () => {
-        const { value } = await reader.read();
-        return value;
-      },
-      write: async (chunk) => {
-        plainText.set(chunk.data, offset);
-        offset += chunk.data.length;
-      }
-    },
-    filename
+    cipherData.iv
   );
 
-  return cipherData.outputType === "base64"
-    ? Buffer.from(plainText).toString("base64")
-    : cipherData.outputType === "text"
-    ? new TextDecoder().decode(plainText)
-    : plainText;
+  return cipherData.outputType === "base64" || cipherData.outputType === "text"
+    ? (
+        await consumeReadableStream(
+          fileHandle.readable
+            .pipeThrough(decryptionStream)
+            .pipeThrough(
+              cipherData.outputType === "text"
+                ? new globalThis.TextDecoderStream()
+                : new Base64DecoderStream()
+            )
+        )
+      ).join()
+    : new Uint8Array(
+        Buffer.concat(
+          await consumeReadableStream(
+            fileHandle.readable.pipeThrough(decryptionStream)
+          )
+        )
+      );
 }
 
-async function uploadFile(filename, requestOptions) {
+type RequestOptions = {
+  headers: Record<string, string>;
+  signal: AbortSignal;
+  url: string;
+  chunkSize: number;
+};
+
+async function uploadFile(filename: string, requestOptions: RequestOptions) {
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle)
     throw new Error(`File stream not found. (File hash: ${filename})`);
@@ -205,12 +200,15 @@ async function uploadFile(filename, requestOptions) {
     fileHandle.file.chunks / UPLOAD_PART_REQUIRED_CHUNKS
   );
 
-  let {
-    uploadedChunks = [],
-    uploadedBytes = 0,
-    uploaded = false,
-    uploadId = ""
-  } = fileHandle.file.additionalData || {};
+  const additionalData = (fileHandle.file.additionalData || {}) as {
+    uploadedBytes?: number;
+    uploadId?: string;
+    uploaded?: boolean;
+    uploadedChunks?: { PartNumber: number; ETag: string }[];
+  };
+
+  const { uploadedChunks = [], uploaded = false } = additionalData;
+  let { uploadedBytes = 0, uploadId = "" } = additionalData;
 
   try {
     if (uploaded) {
@@ -218,14 +216,14 @@ async function uploadFile(filename, requestOptions) {
       return true;
     }
 
-    const { headers, cancellationToken } = requestOptions;
+    const { headers, signal } = requestOptions;
 
     const initiateMultiPartUpload = await axios
       .get(
         `${hosts.API_HOST}/s3/multipart?name=${filename}&parts=${TOTAL_PARTS}&uploadId=${uploadId}`,
         {
           headers,
-          cancelToken: cancellationToken
+          signal
         }
       )
       .catch((e) => {
@@ -237,7 +235,7 @@ async function uploadFile(filename, requestOptions) {
 
     await fileHandle.addAdditionalData("uploadId", uploadId);
 
-    const onUploadProgress = (ev) => {
+    const onUploadProgress = (ev: AxiosProgressEvent) => {
       reportProgress(
         {
           total: fileHandle.file.size + ABYTES,
@@ -262,7 +260,7 @@ async function uploadFile(filename, requestOptions) {
           url,
           method: "PUT",
           headers: { "Content-Type": "" },
-          cancelToken: cancellationToken,
+          signal,
           data,
           onUploadProgress
         })
@@ -294,7 +292,7 @@ async function uploadFile(filename, requestOptions) {
         },
         {
           headers,
-          cancelToken: cancellationToken
+          signal
         }
       )
       .catch((e) => {
@@ -311,21 +309,24 @@ async function uploadFile(filename, requestOptions) {
     return true;
   } catch (e) {
     reportProgress(undefined, { type: "upload", hash: filename });
-    if (e.handle) e.handle();
+    if (e instanceof S3Error) e.handle();
     else handleS3Error(e);
 
     return false;
   }
 }
 
-async function checkUpload(filename) {
+async function checkUpload(filename: string) {
   if ((await getUploadedFileSize(filename)) <= 0) {
     const error = `Upload verification failed: file size is 0. Please upload this file again. (File hash: ${filename})`;
     throw new Error(error);
   }
 }
 
-function reportProgress(ev, { type, hash }) {
+function reportProgress(
+  ev: { total?: number; loaded?: number } | undefined,
+  { type, hash }: { type: string; hash: string }
+) {
   AppEventManager.publish(AppEvents.UPDATE_ATTACHMENT_PROGRESS, {
     type,
     hash,
@@ -334,8 +335,8 @@ function reportProgress(ev, { type, hash }) {
   });
 }
 
-async function downloadFile(filename, requestOptions) {
-  const { url, headers, chunkSize, cancellationToken } = requestOptions;
+async function downloadFile(filename: string, requestOptions: RequestOptions) {
+  const { url, headers, chunkSize, signal } = requestOptions;
   if (await streamablefs.exists(filename)) return true;
 
   try {
@@ -344,47 +345,59 @@ async function downloadFile(filename, requestOptions) {
       { type: "download", hash: filename }
     );
 
-    const signedUrlResponse = await axios.get(url, {
-      headers,
-      responseType: "text"
+    const signedUrl = (
+      await axios.get(url, {
+        headers,
+        responseType: "text"
+      })
+    ).data;
+
+    const response = await fetch(signedUrl, {
+      signal
     });
 
-    const signedUrl = signedUrlResponse.data;
-    const response = await axios.get(signedUrl, {
-      responseType: "arraybuffer",
-      cancelToken: cancellationToken,
-      onDownloadProgress: (ev) =>
-        reportProgress(ev, { type: "download", hash: filename })
-    });
-
-    const contentType = response.headers["content-type"];
+    const contentType = response.headers.get("content-type");
     if (contentType === "application/xml") {
-      const error = parseS3Error(response.data);
+      const error = parseS3Error(await response.text());
       if (error.Code !== "Unknown") {
         throw new Error(`[${error.Code}] ${error.Message}`);
       }
     }
-
-    const contentLength = response.headers["content-length"];
-    if (contentLength === "0") {
+    const contentLength = parseInt(
+      response.headers.get("content-length") || "0"
+    );
+    if (contentLength === 0 || isNaN(contentLength)) {
       const error = `File length is 0. Please upload this file again from the attachment manager. (File hash: ${filename})`;
-      await db.attachments.markAsFailed(filename, error);
+      await db.attachments?.markAsFailed(filename, error);
       throw new Error(error);
     }
 
-    const distributor = new ChunkDistributor(chunkSize + ABYTES);
-    distributor.fill(new Uint8Array(response.data));
-    distributor.close();
+    if (!response.body) {
+      const error = `The download response does not contain a body. Please upload this file again from the attachment manager. (File hash: ${filename})`;
+      await db.attachments?.markAsFailed(filename, error);
+      throw new Error(error);
+    }
 
     const fileHandle = await streamablefs.createFile(
       filename,
-      response.data.byteLength,
+      contentLength,
       "application/octet-stream"
     );
 
-    for (let chunk of distributor.chunks) {
-      await fileHandle.write(chunk.data);
-    }
+    await response.body
+      .pipeThrough(
+        new ProgressStream((totalRead, done) => {
+          reportProgress(
+            {
+              total: contentLength,
+              loaded: done ? contentLength : totalRead
+            },
+            { type: "download", hash: filename }
+          );
+        })
+      )
+      .pipeThrough(new ChunkedStream(chunkSize + ABYTES))
+      .pipeTo(fileHandle.writeable);
 
     return true;
   } catch (e) {
@@ -394,96 +407,45 @@ async function downloadFile(filename, requestOptions) {
   }
 }
 
-async function downloadAttachment(filename, requestOptions) {
-  const { url, headers, chunkSize, cancellationToken } = requestOptions;
-  if (await streamablefs.exists(filename)) return true;
-
-  try {
-    const signedUrlResponse = await axios.get(url, {
-      headers,
-      responseType: "text"
-    });
-
-    const signedUrl = signedUrlResponse.data;
-    const response = await axios.get(signedUrl, {
-      responseType: "arraybuffer",
-      cancelToken: cancellationToken
-    });
-
-    const contentType = response.headers["content-type"];
-    if (contentType === "application/xml") {
-      const error = parseS3Error(response.data);
-      if (error.Code !== "Unknown") {
-        throw new Error(`[${error.Code}] ${error.Message}`);
-      }
-    }
-
-    const contentLength = response.headers["content-length"];
-    if (contentLength === "0") {
-      const error = `File length is 0. Please upload this file again from the attachment manager. (File hash: ${filename})`;
-      await db.attachments.markAsFailed(filename, error);
-      throw new Error(error);
-    }
-
-    const distributor = new ChunkDistributor(chunkSize + ABYTES);
-    distributor.fill(new Uint8Array(response.data));
-    distributor.close();
-
-    const fileHandle = await streamablefs.createFile(
-      filename,
-      response.data.byteLength,
-      "application/octet-stream"
-    );
-
-    for (let chunk of distributor.chunks) {
-      await fileHandle.write(chunk.data);
-    }
-
-    return true;
-  } catch (e) {
-    handleS3Error(e, "Could not download file");
-    reportProgress(undefined, { type: "download", hash: filename });
-    return false;
-  }
-}
-
-function exists(filename) {
+function exists(filename: string) {
   return streamablefs.exists(filename);
 }
 
-async function saveFile(filename, fileMetadata) {
+type FileMetadata = {
+  key: SerializedKey;
+  iv: string;
+  name: string;
+  type: string;
+  isUploaded: boolean;
+};
+export async function decryptFile(
+  filename: string,
+  fileMetadata: FileMetadata
+) {
   if (!fileMetadata) return false;
 
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle) return false;
 
-  const { key, iv, name, type, isUploaded } = fileMetadata;
-
-  const blobParts = [];
-  const reader = fileHandle.getReader();
+  const { key, iv } = fileMetadata;
 
   const crypto = await getNNCrypto();
-  await crypto.decryptStream(
-    key,
-    iv,
-    {
-      read: async () => {
-        const { value } = await reader.read();
-        return value;
-      },
-      write: async (chunk) => {
-        blobParts.push(chunk.data);
-      }
-    },
-    filename
-  );
+  const decryptionStream = await crypto.createDecryptionStream(key, iv);
+  return await toBlob(fileHandle.readable.pipeThrough(decryptionStream));
+}
 
-  saveAs(new Blob(blobParts, { type }), getFileNameWithExtension(name, type));
+async function saveFile(filename: string, fileMetadata: FileMetadata) {
+  if (!fileMetadata) return false;
+
+  const { name, type, isUploaded } = fileMetadata;
+
+  const decrypted = await decryptFile(filename, fileMetadata);
+  if (decrypted) saveAs(decrypted, getFileNameWithExtension(name, type));
 
   if (isUploaded) await streamablefs.deleteFile(filename);
 }
 
-async function deleteFile(filename, requestOptions) {
+async function deleteFile(filename: string, requestOptions: RequestOptions) {
   if (!requestOptions) return await streamablefs.deleteFile(filename);
   if (!requestOptions && !(await streamablefs.exists(filename))) return true;
 
@@ -502,10 +464,10 @@ async function deleteFile(filename, requestOptions) {
   }
 }
 
-async function getUploadedFileSize(filename) {
+async function getUploadedFileSize(filename: string) {
   try {
     const url = `${hosts.API_HOST}/s3?name=${filename}`;
-    const token = await db.user.tokenManager.getAccessToken();
+    const token = await db.user?.tokenManager.getAccessToken();
 
     const attachmentInfo = await axios.head(url, {
       headers: { Authorization: `Bearer ${token}` }
@@ -528,13 +490,13 @@ const FS = {
   readEncrypted,
   uploadFile: cancellable(uploadFile),
   downloadFile: cancellable(downloadFile),
-  downloadAttachment: cancellable(downloadAttachment),
   deleteFile,
   saveFile,
   exists,
   writeEncryptedFile,
   clearFileStorage,
   getUploadedFileSize,
+  decryptFile,
 
   hashBase64,
   hashBuffer,
@@ -542,106 +504,25 @@ const FS = {
 };
 export default FS;
 
-function isSuccessStatusCode(statusCode) {
+function isSuccessStatusCode(statusCode: number) {
   return statusCode >= 200 && statusCode <= 299;
 }
 
-function cancellable(operation) {
-  return function (filename, requestOptions) {
-    const source = axios.CancelToken.source();
-    requestOptions.cancellationToken = source.token;
+function cancellable(
+  operation: (filename: string, requestOptions: RequestOptions) => any
+) {
+  return function (filename: string, requestOptions: RequestOptions) {
+    const abortController = new AbortController();
+    requestOptions.signal = abortController.signal;
     return {
       execute: () => operation(filename, requestOptions),
-      cancel: (message) => {
-        source.cancel(message);
+      cancel: (message: string) => {
+        abortController.abort(message);
       }
     };
   };
 }
-
-class ChunkDistributor {
-  /**
-   * @typedef {{length: number, data: Uint8Array, final: boolean}} Chunk
-   */
-  constructor(chunkSize) {
-    this.chunkSize = chunkSize;
-    this.chunks = [];
-    this.filledCount = 0;
-    this.done = false;
-  }
-
-  /**
-   * @returns {Chunk}
-   */
-  get lastChunk() {
-    return this.chunks[this.chunks.length - 1];
-  }
-
-  /**
-   * @returns {boolean}
-   */
-  get isLastChunkFilled() {
-    return this.lastChunk.length === this.chunkSize;
-  }
-
-  /**
-   * @returns {Chunk}
-   */
-  get firstChunk() {
-    const chunk = this.chunks.shift();
-    if (chunk.data.length === this.chunkSize) this.filledCount--;
-    return chunk;
-  }
-
-  close() {
-    if (!this.lastChunk)
-      throw new Error("No data available in this distributor.");
-    this.lastChunk.data = this.lastChunk.data.slice(0, this.lastChunk.length);
-    this.lastChunk.final = true;
-    this.done = true;
-  }
-
-  /**
-   * @param {Uint8Array} data
-   */
-  fill(data) {
-    if (this.done || !data || !data.length) return;
-
-    const dataLength = data.length;
-    const totalBlocks = Math.ceil(dataLength / this.chunkSize);
-
-    for (let i = 0; i < totalBlocks; ++i) {
-      const start = i * this.chunkSize;
-
-      if (this.lastChunk && !this.isLastChunkFilled) {
-        const needed = this.chunkSize - this.lastChunk.length;
-        const end = Math.min(start + needed, dataLength);
-        const chunk = data.slice(start, end);
-
-        this.lastChunk.data.set(chunk, this.lastChunk.length);
-        this.lastChunk.length += chunk.length;
-
-        if (this.lastChunk.length === this.chunkSize) this.filledCount++;
-
-        if (end !== dataLength) {
-          this.fill(data.slice(end));
-          break;
-        }
-      } else {
-        const end = Math.min(start + this.chunkSize, dataLength);
-        let chunk = data.slice(start, end);
-
-        const buffer = new Uint8Array(this.chunkSize);
-        buffer.set(chunk, 0);
-
-        this.chunks.push({ data: buffer, final: false, length: chunk.length });
-        if (chunk.length === this.chunkSize) this.filledCount++;
-      }
-    }
-  }
-}
-
-function parseS3Error(data) {
+function parseS3Error(data: ArrayBuffer | unknown) {
   if (!(data instanceof ArrayBuffer)) {
     return {
       Code: "UNKNOWN",
@@ -655,28 +536,29 @@ function parseS3Error(data) {
   if (!ErrorElement)
     return { Code: "Unknown", Message: "An unknown error occured." };
 
-  const error = {};
+  const error: Record<string, string> = {};
   for (const child of ErrorElement.children) {
-    error[child.tagName] = child.textContent;
+    if (child.textContent) error[child.tagName] = child.textContent;
   }
   return error;
 }
 
-function handleS3Error(e, message) {
+function handleS3Error(e: unknown, message?: unknown) {
   if (axios.isAxiosError(e) && e.response?.data) {
     const error = parseS3Error(e.response.data);
     showToast("error", `${message}: [${error.Code}] ${error.Message}`);
-  } else if (message) {
+  } else if (message && e instanceof Error) {
     showToast("error", `${message}: ${e.message}`);
-  } else {
+  } else if (e instanceof Error) {
     showToast("error", e.message);
+  } else {
+    showToast("error", JSON.stringify(e));
   }
 }
 
 class S3Error extends Error {
-  constructor(message, error) {
+  constructor(message: string, readonly error: Error) {
     super(message);
-    this.error = error;
   }
 
   handle() {

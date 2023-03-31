@@ -26,8 +26,9 @@ export class ZipStream extends TransformStream<ZipFile, Uint8Array> {
     super({
       start(controller) {
         zipper.ondata = (err, data) => {
-          if (err) controller.error(err);
-          else controller.enqueue(data);
+          if (err) {
+            controller.error(err);
+          } else controller.enqueue(data);
         };
       },
       transform(chunk) {
