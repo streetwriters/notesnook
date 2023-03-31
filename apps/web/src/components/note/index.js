@@ -480,6 +480,9 @@ const menuItems = [
 
       if (db.monographs.isPublished(items[0].id))
         return "Please unpublish this note to move it to trash";
+
+      if (items[0].locked)
+        return "Please unlock this note to move it to trash.";
     },
     onClick: async ({ items }) => {
       await Multiselect.moveNotesToTrash(items, items.length > 1);
