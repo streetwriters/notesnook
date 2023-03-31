@@ -40,7 +40,7 @@ class AttachmentStore extends BaseStore {
           const percent = Math.round((loaded / total) * 100);
           const status =
             percent < 100 ? { type, loaded, total, progress: percent } : null;
-          if (!status) return this.refresh();
+          if (!status) this.refresh();
           state.attachments[index] = {
             ...state.attachments[index],
             status

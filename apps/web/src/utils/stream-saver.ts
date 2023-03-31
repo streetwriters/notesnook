@@ -27,48 +27,17 @@ let useBlobFallback =
   "safari" in globalThis ||
   "WebKitPoint" in globalThis;
 
-type IFrameContainer = HTMLIFrameElement & {
-  loaded: boolean;
-  isIFrame: boolean;
-  remove: () => void;
-  addEventListener: HTMLIFrameElement["addEventListener"];
-  dispatchEvent: HTMLIFrameElement["dispatchEvent"];
-  removeEventListener: HTMLIFrameElement["removeEventListener"];
-  postMessage(
-    message: any,
-    targetOrigin: string,
-    transfer?: Transferable[] | undefined
-  ): void;
-};
-
 /**
  * create a hidden iframe and append it to the DOM (body)
- *
- * @param  {string} src page to load
- * @return {HTMLIFrameElement} page to load
  */
-function makeIframe(src: string, doc = true): IFrameContainer {
+function makeIframe(src: string, doc = true) {
   if (!src) throw new Error("meh");
 
-  const iframe = document.createElement("iframe") as IFrameContainer;
+  const iframe = document.createElement("iframe");
   iframe.hidden = true;
   if (doc) iframe.srcdoc = src;
   else iframe.src = src;
-  iframe.name = "iframe";
-  iframe.loaded = false;
-  iframe.isIFrame = true;
-  iframe.postMessage = (message, targetOrigin, transfer) =>
-    iframe.contentWindow?.postMessage(message, targetOrigin, transfer);
-
-  iframe.addEventListener(
-    "load",
-    () => {
-      iframe.loaded = true;
-    },
-    { once: true }
-  );
   document.body.appendChild(iframe);
-  return iframe;
 }
 
 try {
@@ -85,7 +54,6 @@ function checkSupportsTransferable() {
   // Transferable stream was first enabled in chrome v73 behind a flag
   const { readable } = new TransformStream();
   const mc = new MessageChannel();
-  // @ts-ignore
   mc.port1.postMessage(readable, [readable]);
   mc.port1.close();
   mc.port2.close();
@@ -139,7 +107,6 @@ export function createWriteStream(
       ts = new TransformStream();
       const readableStream = ts.readable;
 
-      // @ts-ignore
       channel.port1.postMessage({ readableStream }, [readableStream]);
     }
     channel.port1.onmessage = async (evt) => {

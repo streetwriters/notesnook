@@ -23,8 +23,7 @@ import {
   Plaintext,
   SerializedKey
 } from "@notesnook/crypto/dist/src/types";
-import { expose } from "comlink";
-import WorkerStream from "./workerstream";
+import { expose, transfer } from "comlink";
 import { NNCrypto } from "@notesnook/crypto";
 
 let crypto: NNCrypto | null = null;
@@ -63,17 +62,19 @@ const module = {
     const crypto = await loadNNCrypto();
     return crypto.decrypt(key, cipherData, outputFormat);
   },
-  createEncryptionStream: async function (id: string, key: SerializedKey) {
+  createEncryptionStream: async function (key: SerializedKey) {
     const crypto = await loadNNCrypto();
-    return crypto.createEncryptionStream(key, new WorkerStream(id));
+    const stream = await crypto.createEncryptionStream(key);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return transfer(stream, [stream.stream]);
   },
-  createDecryptionStream: async function (
-    id: string,
-    iv: string,
-    key: SerializedKey
-  ) {
+  createDecryptionStream: async function (key: SerializedKey, iv: string) {
     const crypto = await loadNNCrypto();
-    return crypto.createDecryptionStream(iv, key, new WorkerStream(id));
+    const obj = { stream: await crypto.createDecryptionStream(key, iv) };
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return transfer(obj, [obj.stream]);
   }
 };
 

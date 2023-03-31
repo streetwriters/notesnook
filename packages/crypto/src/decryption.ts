@@ -24,18 +24,12 @@ import {
   to_base64,
   from_base64,
   base64_variants,
-  StateAddress,
   to_string,
-  from_hex
+  from_hex,
+  crypto_secretstream_xchacha20poly1305_TAG_FINAL
 } from "libsodium-wrappers";
 import KeyUtils from "./keyutils";
-import {
-  Cipher,
-  EncryptionKey,
-  OutputFormat,
-  Plaintext,
-  SerializedKey
-} from "./types";
+import { Cipher, OutputFormat, Plaintext, SerializedKey } from "./types";
 
 export default class Decryption {
   private static transformInput(cipherData: Cipher): Uint8Array {
@@ -88,26 +82,47 @@ export default class Decryption {
     };
   }
 
-  static createStream(header: string, key: SerializedKey): DecryptionStream {
-    return new DecryptionStream(header, KeyUtils.transform(key));
-  }
-}
-
-class DecryptionStream {
-  state: StateAddress;
-  constructor(header: string, key: EncryptionKey) {
-    this.state = crypto_secretstream_xchacha20poly1305_init_pull(
+  static createStream(
+    header: string,
+    key: SerializedKey
+  ): TransformStream<Uint8Array, Uint8Array> {
+    const { key: _key } = KeyUtils.transform(key);
+    const state = crypto_secretstream_xchacha20poly1305_init_pull(
       from_base64(header),
-      key.key
+      _key
     );
-  }
 
-  read(chunk: Uint8Array): Uint8Array {
-    const { message } = crypto_secretstream_xchacha20poly1305_pull(
-      this.state,
-      chunk,
-      null
-    );
-    return message;
+    return new TransformStream<Uint8Array, Uint8Array>({
+      start() {},
+      transform(chunk, controller) {
+        const { message, tag } = crypto_secretstream_xchacha20poly1305_pull(
+          state,
+          chunk,
+          null
+        );
+        controller.enqueue(message);
+        if (tag === crypto_secretstream_xchacha20poly1305_TAG_FINAL)
+          controller.terminate();
+      }
+    });
   }
 }
+
+// class DecryptionStream {
+//   state: StateAddress;
+//   constructor(header: string, key: EncryptionKey) {
+//     this.state = crypto_secretstream_xchacha20poly1305_init_pull(
+//       from_base64(header),
+//       key.key
+//     );
+//   }
+
+//   read(chunk: Uint8Array): Uint8Array {
+//     const { message } = crypto_secretstream_xchacha20poly1305_pull(
+//       this.state,
+//       chunk,
+//       null
+//     );
+//     return message;
+//   }
+// }

@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { File } from "./types";
-import { Chunk } from "@notesnook/crypto/dist/src/types";
 
 export default class FileStreamSource {
   private storage: LocalForage;
@@ -32,16 +31,12 @@ export default class FileStreamSource {
 
   start() {}
 
-  async pull(controller: ReadableStreamDefaultController<Chunk>) {
+  async pull(controller: ReadableStreamDefaultController<Uint8Array>) {
     const data = await this.readChunk(this.offset++);
+
+    if (data) controller.enqueue(data);
+
     const isFinalChunk = this.offset === this.file.chunks;
-
-    if (data)
-      controller.enqueue({
-        data,
-        final: isFinalChunk
-      });
-
     if (isFinalChunk || !data) controller.close();
   }
 
