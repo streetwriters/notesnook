@@ -92,7 +92,7 @@ export class AddNotebookSheet extends React.Component {
 
   close = () => {
     refs = [];
-    this.props.close();
+    this.props.close(true);
   };
 
   onDelete = (index) => {
@@ -182,6 +182,7 @@ export class AddNotebookSheet extends React.Component {
       });
 
       await db.notebooks.notebook(toEdit.id).topics.add(...nextTopics);
+      this.close();
     } else {
       newNotebookId = await db.notebooks.add({
         title: this.title,
