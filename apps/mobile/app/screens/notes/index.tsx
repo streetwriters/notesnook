@@ -245,19 +245,23 @@ const NotesPage = ({
           >
             Notebooks
           </Paragraph>
-          <IconButton
-            name="chevron-right"
-            size={14}
-            customStyle={{ width: 25, height: 25 }}
-          />
-          <Paragraph
-            onPress={() => {
-              Notebook.navigate(notebook, true);
-            }}
-            size={SIZE.xs}
-          >
-            {notebook.title}
-          </Paragraph>
+          {notebook ? (
+            <>
+              <IconButton
+                name="chevron-right"
+                size={14}
+                customStyle={{ width: 25, height: 25 }}
+              />
+              <Paragraph
+                onPress={() => {
+                  Notebook.navigate(notebook, true);
+                }}
+                size={SIZE.xs}
+              >
+                {notebook.title}
+              </Paragraph>
+            </>
+          ) : null}
         </View>
       ) : null}
       <List
