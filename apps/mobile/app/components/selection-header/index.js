@@ -21,18 +21,18 @@ import React, { useCallback, useEffect } from "react";
 import { BackHandler, Platform, View } from "react-native";
 import { db } from "../../common/database";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import { eSendEvent, ToastEvent } from "../../services/event-manager";
+import { ToastEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import SearchService from "../../services/search";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { eOpenMoveNoteDialog } from "../../utils/events";
 import { deleteItems } from "../../utils/functions";
 import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { presentDialog } from "../dialog/functions";
+import MoveNoteSheet from "../sheets/add-to";
 import ExportNotesSheet from "../sheets/export-notes";
 import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
@@ -237,7 +237,7 @@ export const SelectionHeader = React.memo(() => {
               onPress={async () => {
                 //setSelectionMode(false);
                 await sleep(100);
-                eSendEvent(eOpenMoveNoteDialog);
+                MoveNoteSheet.present();
               }}
               customStyle={{
                 marginLeft: 10
