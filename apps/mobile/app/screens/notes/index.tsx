@@ -181,8 +181,9 @@ const NotesPage = ({
         if (isNew) setLoadingNotes(true);
         const notes = get(params.current, true) as NoteType[];
         if (
-          (item.type === "tag" || item.type === "color") &&
-          (!notes || notes.length === 0)
+          ((item.type === "tag" || item.type === "color") &&
+            (!notes || notes.length === 0)) ||
+          (item.type === "topic" && !notes)
         ) {
           return Navigation.goBack();
         }

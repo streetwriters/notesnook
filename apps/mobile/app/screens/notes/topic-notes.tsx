@@ -75,7 +75,11 @@ export const TopicNotes = ({
 
 TopicNotes.get = (params: NotesScreenParams, grouped = true) => {
   const { id, notebookId } = params.item as TopicType;
-  const notes = db.notebooks?.notebook(notebookId)?.topics.topic(id)?.all || [];
+  const topic = db.notebooks?.notebook(notebookId)?.topics.topic(id);
+  if (!topic) {
+    return null;
+  }
+  const notes = topic?.all || [];
   return grouped
     ? groupArray(notes, db.settings?.getGroupOptions("notes"))
     : notes;
