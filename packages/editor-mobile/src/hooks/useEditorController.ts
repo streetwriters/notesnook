@@ -123,12 +123,13 @@ export function useEditorController(update: () => void): EditorController {
             from,
             to
           });
-
+          statusBar.current?.updateWords();
           break;
         }
         case "native:html":
           htmlContentRef.current = value;
           update();
+          statusBar.current?.updateWords();
           break;
         case "native:theme":
           useEditorThemeStore.getState().setColors(message.value);
@@ -156,7 +157,6 @@ export function useEditorController(update: () => void): EditorController {
     if (isSafari) {
       root = window;
     }
-    console.log("recreating messaging");
     root.addEventListener("message", onMessage);
 
     return () => {

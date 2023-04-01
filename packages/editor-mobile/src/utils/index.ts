@@ -51,6 +51,7 @@ declare global {
         saved: string;
       }>
     >;
+    updateWords: () => void;
   }>;
   var __PLATFORM__: "ios" | "android";
   var readonly: boolean;

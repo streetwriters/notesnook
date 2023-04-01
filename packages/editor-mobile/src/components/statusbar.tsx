@@ -33,7 +33,12 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   const currentWords = useRef(words);
   const interval = useRef(0);
   const statusBar = useRef({
-    set: setStatus
+    set: setStatus,
+    updateWords: () => {
+      const words = getTotalWords(editor as Editor) + " words";
+      if (currentWords.current === words) return;
+      setWords(words);
+    }
   });
   globalThis.statusBar = statusBar;
 
@@ -66,11 +71,10 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
 
   useEffect(() => {
     clearInterval(interval.current);
-    interval.current = setInterval(() => {
-      const words = getTotalWords(editor as Editor) + " words";
-      if (currentWords.current === words) return;
-      setWords(words);
-    }, 3000) as unknown as number;
+    interval.current = setInterval(
+      statusBar.current.updateWords,
+      3000
+    ) as unknown as number;
     return () => {
       clearInterval(interval.current);
     };
