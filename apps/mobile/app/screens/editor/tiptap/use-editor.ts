@@ -368,6 +368,8 @@ export const useEditor = (
         useEditorStore.getState().setReadonly(false);
       } else {
         if (!item.forced && currentNote.current?.id === item.id) return;
+        state.current.movedAway = false;
+        state.current.currentlyEditing = true;
         isDefaultEditor && editorState.setCurrentlyEditingNote(item.id);
         currentNote.current && (await reset(false, false));
         await loadContent(item as NoteType);
