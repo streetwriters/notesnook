@@ -18,9 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
+import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import List from "../../components/list";
+import { IconButton } from "../../components/ui/icon-button";
+import Paragraph from "../../components/ui/typography/paragraph";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import {
   eSubscribeEvent,
@@ -34,7 +38,9 @@ import useNavigationStore, {
   RouteName
 } from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
+import { SIZE } from "../../utils/size";
 import { NoteType, TopicType } from "../../utils/types";
+import Notebook from "../notebook/index";
 import {
   getAlias,
   openEditor,
@@ -42,13 +48,6 @@ import {
   setOnFirstSave,
   toCamelCase
 } from "./common";
-import { View } from "react-native";
-import { db } from "../../common/database";
-import Paragraph from "../../components/ui/typography/paragraph";
-import { IconButton } from "../../components/ui/icon-button";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { SIZE } from "../../utils/size";
-import Notebook from "../notebook/index";
 export const WARNING_DATA = {
   title: "Some notes in this topic are not synced"
 };
@@ -99,7 +98,6 @@ const NotesPage = ({
 }: RouteProps<
   "NotesPage" | "TaggedNotes" | "Monographs" | "ColoredNotes" | "TopicNotes"
 >) => {
-  const colors = useThemeStore((state) => state.colors);
   const params = useRef<NotesScreenParams>(route?.params);
   const [notes, setNotes] = useState<NoteType[]>(get(route.params, true));
   const loading = useNoteStore((state) => state.loading);
