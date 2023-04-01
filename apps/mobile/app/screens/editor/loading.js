@@ -42,7 +42,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
   const colors = useThemeStore((state) => state.colors);
   const [error, setError] = useState(false);
   const opacity = useSharedValue(1);
-  const translateValue = useSharedValue(6000);
+  const translateValue = useSharedValue(0);
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const isTablet = deviceMode !== "mobile";
   const insets = useGlobalSafeAreaInsets();
@@ -83,16 +83,14 @@ const EditorOverlay = ({ editorId = "", editor }) => {
           opacity.value = 0;
           translateValue.value = 6000;
         } else {
+          setError(false);
+          editorState().overlay = false;
+          opacity.value = withTiming(0, {
+            duration: 500
+          });
           setTimeout(() => {
-            setError(false);
-            editorState().overlay = false;
-            opacity.value = withTiming(0, {
-              duration: timeDiffSinceLoadStarted
-            });
-            setTimeout(() => {
-              translateValue.value = 6000;
-            }, timeDiffSinceLoadStarted);
-          }, 0);
+            translateValue.value = 6000;
+          }, 500);
         }
       }
     },
@@ -100,12 +98,17 @@ const EditorOverlay = ({ editorId = "", editor }) => {
   );
 
   useEffect(() => {
+    setTimeout(() => {
+      if (!loadingState.current.startTime) {
+        translateValue.value = 6000;
+      }
+    }, 1000);
     eSubscribeEvent("loadingNote" + editorId, load);
     return () => {
       clearTimers();
       eUnSubscribeEvent("loadingNote" + editorId, load);
     };
-  }, [editorId, load]);
+  }, [editorId, load, translateValue]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
