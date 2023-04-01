@@ -203,28 +203,27 @@ export const TopicsSheet = () => {
 
   useEffect(() => {
     if (canShow) {
-      const id = isTopic ? currentScreen?.notebookId : currentScreen?.id;
-      const notebook = db.notebooks?.notebook(id as string)?.data;
-      const snapPoint = isTopic
-        ? 0
-        : TopicSheetConfig.get({
-            type: isTopic ? "topic" : "notebook",
-            id: currentScreen.id as string
-          });
-
-      if (ref.current?.isOpen()) {
-        ref.current?.snapToIndex(snapPoint);
-      } else {
-        ref.current?.show(snapPoint);
-      }
-
       setTimeout(() => {
+        const id = isTopic ? currentScreen?.notebookId : currentScreen?.id;
+        const notebook = db.notebooks?.notebook(id as string)?.data;
+        const snapPoint = isTopic
+          ? 0
+          : TopicSheetConfig.get({
+              type: isTopic ? "topic" : "notebook",
+              id: currentScreen.id as string
+            });
+
+        if (ref.current?.isOpen()) {
+          ref.current?.snapToIndex(snapPoint);
+        } else {
+          ref.current?.show(snapPoint);
+        }
         if (notebook) {
           onRequestUpdate({
             item: notebook
           } as any);
         }
-      }, 1);
+      }, 300);
     } else {
       ref.current?.hide();
     }
