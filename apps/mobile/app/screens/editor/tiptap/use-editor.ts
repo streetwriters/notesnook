@@ -239,7 +239,8 @@ export const useEditor = (
 
           if (
             useEditorStore.getState().currentEditingNote !== id &&
-            isDefaultEditor
+            isDefaultEditor &&
+            state.current.currentlyEditing
           ) {
             setTimeout(() => {
               id && useEditorStore.getState().setCurrentlyEditingNote(id);
@@ -505,17 +506,22 @@ export const useEditor = (
           noteId: currentNote.current?.id as string
         };
       }
+      const noteIdFromSessionId =
+        !sessionIdRef.current || sessionIdRef.current.startsWith("session")
+          ? null
+          : sessionIdRef.current.split("_")[0];
+
+      const noteId = currentNote.current?.id || noteIdFromSessionId;
       const params = {
         title,
         data: content,
         type: "tiptap",
         sessionId,
-        id: currentNote.current?.id,
+        id: noteId,
         sessionHistoryId: sessionHistoryId.current
       };
-
       withTimer(
-        currentNote.current?.id || "newnote",
+        noteId || "newnote",
         () => {
           if (
             currentNote.current &&
@@ -530,7 +536,7 @@ export const useEditor = (
           }
           saveNote(params);
         },
-        500
+        150
       );
     },
     [sessionId, withTimer, onChange, saveNote]
