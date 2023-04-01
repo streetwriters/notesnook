@@ -85,13 +85,7 @@ const MergeConflicts = () => {
         }
       });
     }
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes"
-    );
+    Navigation.queueRoutesForUpdate();
     if (editorController.current?.note?.id === note.id) {
       // reload the note in editor
       eSendEvent(eOnLoadNote, {

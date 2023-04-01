@@ -122,15 +122,7 @@ export const MoveNotes = ({
       db.notebooks?.notebook(currentNotebook.id).data as NotebookType
     );
 
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes",
-      "Notebook",
-      "Notebooks"
-    );
+    Navigation.queueRoutesForUpdate();
     return true;
   };
 
@@ -318,15 +310,7 @@ export const MoveNotes = ({
               },
               ...selectedNoteIds
             );
-            Navigation.queueRoutesForUpdate(
-              "Notes",
-              "Favorites",
-              "ColoredNotes",
-              "TaggedNotes",
-              "TopicNotes",
-              "Notebook",
-              "Notebooks"
-            );
+            Navigation.queueRoutesForUpdate();
             SearchService.updateAndSearch();
             eSendEvent(eCloseSheet);
           }}

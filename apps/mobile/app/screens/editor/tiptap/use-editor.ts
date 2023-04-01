@@ -262,12 +262,7 @@ export const useEditor = (
             currentNote.current?.headline?.slice(0, 200) !==
               note.headline?.slice(0, 200)
           ) {
-            Navigation.queueRoutesForUpdate(
-              "ColoredNotes",
-              "Notes",
-              "TaggedNotes",
-              "TopicNotes"
-            );
+            Navigation.queueRoutesForUpdate();
           }
         }
 

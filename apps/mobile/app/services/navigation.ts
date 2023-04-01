@@ -106,7 +106,11 @@ function routeNeedsUpdate(routeName: RouteName, callback: () => void) {
   }
 }
 
-function queueRoutesForUpdate(...routes: RouteName[]) {
+function queueRoutesForUpdate(...routesToUpdate: RouteName[]) {
+  const routes =
+    routesToUpdate?.length > 0
+      ? routesToUpdate
+      : (Object.keys(routeNames) as (keyof RouteParams)[]);
   const currentScreen = useNavigationStore.getState().currentScreen;
   if (routes.indexOf(currentScreen.name) > -1) {
     routeUpdateFunctions[currentScreen.name]();

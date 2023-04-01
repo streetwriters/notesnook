@@ -64,13 +64,7 @@ export const SelectionHeader = React.memo(() => {
       selectedItemsList.forEach((item) => {
         db.notes.note(item.id).favorite();
       });
-      Navigation.queueRoutesForUpdate(
-        "Notes",
-        "Favorites",
-        "ColoredNotes",
-        "TaggedNotes",
-        "TopicNotes"
-      );
+      Navigation.queueRoutesForUpdate();
       clearSelection();
     }
   };
@@ -82,16 +76,7 @@ export const SelectionHeader = React.memo(() => {
         noteIds.push(item.id);
       });
       await db.trash.restore(...noteIds);
-      Navigation.queueRoutesForUpdate(
-        "Notes",
-        "Favorites",
-        "ColoredNotes",
-        "TaggedNotes",
-        "TopicNotes",
-        "Trash",
-        "Notebooks",
-        "Tags"
-      );
+      Navigation.queueRoutesForUpdate();
 
       clearSelection();
       ToastEvent.show({
@@ -118,16 +103,7 @@ export const SelectionHeader = React.memo(() => {
             noteIds.push(item.id);
           });
           await db.trash.delete(...noteIds);
-          Navigation.queueRoutesForUpdate(
-            "Notes",
-            "Favorites",
-            "ColoredNotes",
-            "TaggedNotes",
-            "TopicNotes",
-            "Trash",
-            "Notebooks",
-            "Tags"
-          );
+          Navigation.queueRoutesForUpdate();
           clearSelection();
         }
       },
@@ -288,15 +264,7 @@ export const SelectionHeader = React.memo(() => {
                   );
                 }
 
-                Navigation.queueRoutesForUpdate(
-                  "Notes",
-                  "Favorites",
-                  "ColoredNotes",
-                  "TaggedNotes",
-                  "TopicNotes",
-                  "Notebooks",
-                  "Notebook"
-                );
+                Navigation.queueRoutesForUpdate();
                 clearSelection();
               }
             }}

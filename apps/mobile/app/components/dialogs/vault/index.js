@@ -207,13 +207,7 @@ export class VaultDialog extends Component {
       return;
     }
 
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "TopicNotes",
-      "TaggedNotes",
-      "ColoredNotes"
-    );
+    Navigation.queueRoutesForUpdate();
 
     this.password = null;
     this.confirmPassword = null;

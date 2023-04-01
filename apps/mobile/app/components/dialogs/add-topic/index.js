@@ -81,7 +81,7 @@ export class AddTopicDialog extends React.Component {
       }
       this.close();
       setTimeout(() => {
-        Navigation.queueRoutesForUpdate("Notebooks", "Notebook", "TopicNotes");
+        Navigation.queueRoutesForUpdate();
         useMenuStore.getState().setMenuPins();
       });
       eSendEvent(eOnTopicSheetUpdate);

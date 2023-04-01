@@ -208,15 +208,7 @@ export default function ReminderSheet({
         });
       }
       Notifications.scheduleNotification(_reminder as Reminder);
-      Navigation.queueRoutesForUpdate(
-        "TaggedNotes",
-        "ColoredNotes",
-        "Notes",
-        "NotesPage",
-        "Reminders",
-        "Favorites",
-        "TopicNotes"
-      );
+      Navigation.queueRoutesForUpdate();
       useRelationStore.getState().update();
       close?.();
     } catch (e) {

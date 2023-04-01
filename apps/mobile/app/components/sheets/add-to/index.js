@@ -292,14 +292,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
         }
       }
     }
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes",
-      "Notebook"
-    );
+    Navigation.queueRoutesForUpdate();
     setNotebooks();
     eSendEvent(eOnTopicSheetUpdate);
     SearchService.updateAndSearch();

@@ -43,13 +43,7 @@ export const ColorTags = ({ item }) => {
     let _note = db.notes.note(note.id).data;
     setNote({ ..._note });
     setColorNotes();
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes"
-    );
+    Navigation.queueRoutesForUpdate();
     eSendEvent(refreshNotesPage);
   };
 
