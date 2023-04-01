@@ -192,14 +192,7 @@ export class AddNotebookSheet extends React.Component {
       });
     }
     useMenuStore.getState().setMenuPins();
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes",
-      "Notebooks",
-      "Notebook"
-    );
+    Navigation.queueRoutesForUpdate();
     useRelationStore.getState().update();
     MoveNotes.present(db.notebooks.notebook(newNotebookId).data);
   };

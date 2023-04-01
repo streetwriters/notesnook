@@ -161,7 +161,7 @@ export const deleteItems = async (item, context) => {
     }
   }
 
-  Navigation.queueRoutesForUpdate(...routesForUpdate);
+  Navigation.queueRoutesForUpdate();
 
   let msgPart = history.selectedItemsList.length === 1 ? " item" : " items";
   let message = history.selectedItemsList.length + msgPart + " moved to trash.";
@@ -185,7 +185,7 @@ export const deleteItems = async (item, context) => {
         }
         await db.trash.restore(...ids);
 
-        Navigation.queueRoutesForUpdate(routesForUpdate);
+        Navigation.queueRoutesForUpdate();
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
         ToastEvent.hide();
@@ -194,7 +194,7 @@ export const deleteItems = async (item, context) => {
     });
   }
   history.selectedItemsList = [];
-  Navigation.queueRoutesForUpdate("Trash");
+  Navigation.queueRoutesForUpdate();
   useSelectionStore.getState().clearSelection(true);
   useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();

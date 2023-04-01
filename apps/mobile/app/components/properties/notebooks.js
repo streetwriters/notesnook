@@ -145,13 +145,7 @@ export default function Notebooks({ note, close, full }) {
                 note
               );
               useNotebookStore.getState().setNotebooks();
-              Navigation.queueRoutesForUpdate(
-                "Notes",
-                "Favorites",
-                "ColoredNotes",
-                "TaggedNotes",
-                "TopicNotes"
-              );
+              Navigation.queueRoutesForUpdate();
               ToastEvent.show({
                 heading: "Note removed from topic",
                 context: "local",

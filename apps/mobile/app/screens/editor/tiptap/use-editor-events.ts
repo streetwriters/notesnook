@@ -189,12 +189,7 @@ export const useEditorEvents = (
       setImmediate(() => {
         useEditorStore.getState().setCurrentlyEditingNote(null);
         setTimeout(() => {
-          Navigation.queueRoutesForUpdate(
-            "ColoredNotes",
-            "Notes",
-            "TaggedNotes",
-            "TopicNotes"
-          );
+          Navigation.queueRoutesForUpdate();
         }, 500);
       });
       editorState().currentlyEditing = false;
@@ -337,13 +332,7 @@ export const useEditorEvents = (
               .then(async () => {
                 useTagStore.getState().setTags();
                 await editor.commands.setTags(editor.note.current);
-                Navigation.queueRoutesForUpdate(
-                  "ColoredNotes",
-                  "Notes",
-                  "TaggedNotes",
-                  "TopicNotes",
-                  "Tags"
-                );
+                Navigation.queueRoutesForUpdate();
               });
           }
           break;

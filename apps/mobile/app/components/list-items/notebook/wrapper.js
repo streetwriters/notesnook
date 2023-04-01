@@ -64,16 +64,7 @@ export const openNotebookTopic = (item) => {
       negativeText: "Delete",
       positivePress: async () => {
         await db.trash.restore(item.id);
-        Navigation.queueRoutesForUpdate(
-          "Tags",
-          "Notes",
-          "Notebooks",
-          "Favorites",
-          "Trash",
-          "TaggedNotes",
-          "ColoredNotes",
-          "TopicNotes"
-        );
+        Navigation.queueRoutesForUpdate();
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
           heading: "Restore successful",

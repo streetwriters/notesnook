@@ -44,16 +44,7 @@ export default function NotePreview({ session, content, note }) {
   async function restore() {
     if (note && note.type === "trash") {
       await db.trash.restore(note.id);
-      Navigation.queueRoutesForUpdate(
-        "Tags",
-        "Notes",
-        "Notebooks",
-        "Favorites",
-        "Trash",
-        "TaggedNotes",
-        "ColoredNotes",
-        "TopicNotes"
-      );
+      Navigation.queueRoutesForUpdate();
       useSelectionStore.getState().setSelectionMode(false);
       ToastEvent.show({
         heading: "Restore successful",
@@ -73,13 +64,7 @@ export default function NotePreview({ session, content, note }) {
     }
     eSendEvent(eCloseSheet, "note_history");
     eSendEvent(eCloseSheet);
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes"
-    );
+    Navigation.queueRoutesForUpdate();
 
     ToastEvent.show({
       heading: "Note restored successfully",

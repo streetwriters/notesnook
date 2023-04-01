@@ -63,13 +63,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
           password: isLocked && passwordValue.current
         });
         setNote(db.notes.note(note.id)?.data);
-        Navigation.queueRoutesForUpdate(
-          "Notes",
-          "Favorites",
-          "ColoredNotes",
-          "TaggedNotes",
-          "TopicNotes"
-        );
+        Navigation.queueRoutesForUpdate();
         setPublishLoading(false);
       }
     } catch (e) {
@@ -95,13 +89,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
       if (note?.id) {
         await db.monographs.unpublish(note.id);
         setNote(db.notes.note(note.id)?.data);
-        Navigation.queueRoutesForUpdate(
-          "Notes",
-          "Favorites",
-          "ColoredNotes",
-          "TaggedNotes",
-          "TopicNotes"
-        );
+        Navigation.queueRoutesForUpdate();
         setPublishLoading(false);
       }
     } catch (e) {

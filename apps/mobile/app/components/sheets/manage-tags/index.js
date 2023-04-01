@@ -103,15 +103,7 @@ const ManageTagsSheet = (props) => {
       });
     }
 
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes",
-      "Notebooks",
-      "Notebook"
-    );
+    Navigation.queueRoutesForUpdate();
   };
 
   return (
@@ -224,13 +216,7 @@ const TagItem = ({ tag, note, setNote }) => {
       console.error(e);
     }
     setTimeout(() => {
-      Navigation.queueRoutesForUpdate(
-        "Notes",
-        "Favorites",
-        "ColoredNotes",
-        "TaggedNotes",
-        "TopicNotes"
-      );
+      Navigation.queueRoutesForUpdate();
     }, 1);
   };
 

@@ -148,13 +148,7 @@ export const useActions = ({ close = () => null, item }) => {
     if (!item.id) return;
     close();
     await db.notes.note(item.id).favorite();
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes"
-    );
+    Navigation.queueRoutesForUpdate();
   }
 
   async function pinItem() {
@@ -162,14 +156,7 @@ export const useActions = ({ close = () => null, item }) => {
     close();
     let type = item.type;
     await db[`${type}s`][type](item.id).pin();
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes",
-      "Notebooks"
-    );
+    Navigation.queueRoutesForUpdate();
   }
 
   async function pinToNotifications() {
@@ -204,15 +191,7 @@ export const useActions = ({ close = () => null, item }) => {
     if (!checkNoteSynced()) return;
     close();
     await db.trash.restore(item.id);
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes",
-      "Notebooks",
-      "Trash"
-    );
+    Navigation.queueRoutesForUpdate();
     let type = item.type === "trash" ? item.itemType : item.type;
     ToastEvent.show({
       heading:
@@ -328,13 +307,7 @@ export const useActions = ({ close = () => null, item }) => {
       let note = db.notes.note(item.id).data;
       if (note.locked) {
         close();
-        Navigation.queueRoutesForUpdate(
-          "TaggedNotes",
-          "ColoredNotes",
-          "TopicNotes",
-          "Favorites",
-          "Notes"
-        );
+        Navigation.queueRoutesForUpdate();
       }
     } catch (e) {
       close();
@@ -402,14 +375,7 @@ export const useActions = ({ close = () => null, item }) => {
         await db.tags.rename(item.id, db.tags.sanitize(value));
         useTagStore.getState().setTags();
         useMenuStore.getState().setMenuPins();
-        Navigation.queueRoutesForUpdate(
-          "TaggedNotes",
-          "ColoredNotes",
-          "TopicNotes",
-          "Favorites",
-          "Notes",
-          "Tags"
-        );
+        Navigation.queueRoutesForUpdate();
       },
       input: true,
       defaultValue: alias,
@@ -468,7 +434,7 @@ export const useActions = ({ close = () => null, item }) => {
             useTagStore.getState().setTags();
             routes.push("Tags");
           }
-          Navigation.queueRoutesForUpdate(...routes);
+          Navigation.queueRoutesForUpdate();
           useRelationStore.getState().update();
         },
         positiveText: "Delete",
@@ -507,15 +473,7 @@ export const useActions = ({ close = () => null, item }) => {
       },
       item.id
     );
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes",
-      "Notebook",
-      "Notebooks"
-    );
+    Navigation.queueRoutesForUpdate();
     eSendEvent(eOnTopicSheetUpdate);
     close();
   }
@@ -524,15 +482,7 @@ export const useActions = ({ close = () => null, item }) => {
     const currentScreen = useNavigationStore.getState().currentScreen;
     if (currentScreen.name !== "Notebook") return;
     await db.relations.unlink({ type: "notebook", id: currentScreen.id }, item);
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes",
-      "Notebook",
-      "Notebooks"
-    );
+    Navigation.queueRoutesForUpdate();
     close();
   }
 
@@ -547,7 +497,7 @@ export const useActions = ({ close = () => null, item }) => {
       negativeText: "Cancel",
       positivePress: async () => {
         await db.trash.delete(item.id);
-        Navigation.queueRoutesForUpdate("Trash");
+        Navigation.queueRoutesForUpdate();
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
           heading: "Permanantly deleted items",
@@ -576,13 +526,7 @@ export const useActions = ({ close = () => null, item }) => {
   async function toggleLocalOnly() {
     if (!checkNoteSynced() || !user) return;
     db.notes.note(item.id).localOnly();
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes"
-    );
+    Navigation.queueRoutesForUpdate();
     close();
   }
 
@@ -593,26 +537,14 @@ export const useActions = ({ close = () => null, item }) => {
       useEditorStore.getState().setReadonly(current);
       //  tiny.call(EditorWebView, tiny.toogleReadMode(current ? 'readonly' : 'design'));
     }
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes"
-    );
+    Navigation.queueRoutesForUpdate();
     close();
   };
 
   const duplicateNote = async () => {
     if (!checkNoteSynced()) return;
     await db.notes.note(item.id).duplicate();
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes"
-    );
+    Navigation.queueRoutesForUpdate();
     close();
   };
   const actions = [
@@ -840,15 +772,7 @@ export const useActions = ({ close = () => null, item }) => {
         });
         Notifications.scheduleNotification(item);
         useRelationStore.getState().update();
-        Navigation.queueRoutesForUpdate(
-          "TaggedNotes",
-          "ColoredNotes",
-          "TopicNotes",
-          "Favorites",
-          "Notes",
-          "NotesPage",
-          "Reminders"
-        );
+        Navigation.queueRoutesForUpdate();
       }
     },
     {

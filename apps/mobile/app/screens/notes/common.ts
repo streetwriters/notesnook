@@ -94,15 +94,6 @@ async function onNoteCreated(id: string, params: FirstSaveData) {
         { type: "notebook", id: params.id },
         { type: "note", id: id }
       );
-      Navigation.queueRoutesForUpdate(
-        "TaggedNotes",
-        "ColoredNotes",
-        "TopicNotes",
-        "Favorites",
-        "Notes",
-        "Notebook",
-        "Notebooks"
-      );
       editorState().onNoteCreated = null;
       break;
     }
@@ -116,41 +107,18 @@ async function onNoteCreated(id: string, params: FirstSaveData) {
         id
       );
       editorState().onNoteCreated = null;
-      Navigation.queueRoutesForUpdate(
-        "TaggedNotes",
-        "ColoredNotes",
-        "TopicNotes",
-        "Favorites",
-        "Notes",
-        "Notebook",
-        "Notebooks"
-      );
       eSendEvent(eOnTopicSheetUpdate);
       break;
     }
     case "tag": {
       await db.notes?.note(id).tag(params.id);
       editorState().onNoteCreated = null;
-      Navigation.queueRoutesForUpdate(
-        "TaggedNotes",
-        "ColoredNotes",
-        "TopicNotes",
-        "Favorites",
-        "Notes"
-      );
       useTagStore.getState().setTags();
       break;
     }
     case "color": {
       await db.notes?.note(id).color(params.color);
       editorState().onNoteCreated = null;
-      Navigation.queueRoutesForUpdate(
-        "TaggedNotes",
-        "ColoredNotes",
-        "TopicNotes",
-        "Favorites",
-        "Notes"
-      );
       useMenuStore.getState().setColorNotes();
       break;
     }
@@ -158,4 +126,5 @@ async function onNoteCreated(id: string, params: FirstSaveData) {
       break;
     }
   }
+  Navigation.queueRoutesForUpdate();
 }
