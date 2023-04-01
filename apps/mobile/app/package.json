@@ -4,8 +4,6 @@
   "main": "./App.js",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "react": "18.0.0",
-    "react-native": "0.69.7",
     "@flyerhq/react-native-link-preview": "^1.6.0",
     "@mdi/js": "^6.7.96",
     "absolutify": "^0.1.0",
