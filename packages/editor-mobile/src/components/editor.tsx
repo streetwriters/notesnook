@@ -119,6 +119,10 @@ const Tiptap = ({
 
   const update = useCallback(() => {
     setTick((tick) => tick + 1);
+    containerRef.current?.scrollTo?.({
+      left: 0,
+      top: 0
+    });
     globalThis.editorController.setTitlePlaceholder("Note title");
   }, []);
 
