@@ -177,6 +177,8 @@ class AppStore extends BaseStore {
 
     if (isSyncEnabled) {
       this.abortSync("disabled");
+    } else {
+      this.sync();
     }
   };
 
