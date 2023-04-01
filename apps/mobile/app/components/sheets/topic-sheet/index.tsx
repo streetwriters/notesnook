@@ -205,16 +205,15 @@ export const TopicsSheet = () => {
     if (canShow) {
       const id = isTopic ? currentScreen?.notebookId : currentScreen?.id;
       const notebook = db.notebooks?.notebook(id as string)?.data;
-      const snapPoint = TopicSheetConfig.get({
-        type: isTopic ? "topic" : "notebook",
-        id: currentScreen.id as string
-      });
+      const snapPoint = isTopic
+        ? 0
+        : TopicSheetConfig.get({
+            type: isTopic ? "topic" : "notebook",
+            id: currentScreen.id as string
+          });
+
       if (ref.current?.isOpen()) {
-        if (!isTopic) {
-          ref.current?.snapToIndex(snapPoint);
-        } else {
-          ref.current?.snapToIndex(0);
-        }
+        ref.current?.snapToIndex(snapPoint);
       } else {
         ref.current?.show(snapPoint);
       }
