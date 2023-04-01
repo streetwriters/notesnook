@@ -152,7 +152,7 @@ export const useEditor = (
   );
 
   const reset = useCallback(
-    async (resetState = true) => {
+    async (resetState = true, resetContent = true) => {
       currentNote.current?.id && db.fs.cancel(currentNote.current.id);
       currentNote.current = null;
       loadedImages.current = {};
@@ -161,10 +161,10 @@ export const useEditor = (
       sessionHistoryId.current = undefined;
       saveCount.current = 0;
       useEditorStore.getState().setReadonly(false);
-      postMessage(EditorEvents.title, "");
+      resetContent && postMessage(EditorEvents.title, "");
       lastContentChangeTime.current = 0;
-      await commands.clearContent();
-      await commands.clearTags();
+      resetContent && (await commands.clearContent());
+      resetContent && (await commands.clearTags());
       if (resetState) {
         isDefaultEditor &&
           useEditorStore.getState().setCurrentlyEditingNote(null);
@@ -369,9 +369,16 @@ export const useEditor = (
       } else {
         if (!item.forced && currentNote.current?.id === item.id) return;
         isDefaultEditor && editorState.setCurrentlyEditingNote(item.id);
-        overlay(true, item);
-        currentNote.current && (await reset(false));
+        currentNote.current && (await reset(false, false));
         await loadContent(item as NoteType);
+        if (
+          !currentContent.current?.data ||
+          currentContent.current?.data.length < 50000
+        ) {
+          overlay(false);
+        } else {
+          overlay(true);
+        }
         lastContentChangeTime.current = item.dateEdited;
         const nextSessionId = makeSessionId(item as NoteType);
         sessionHistoryId.current = Date.now();

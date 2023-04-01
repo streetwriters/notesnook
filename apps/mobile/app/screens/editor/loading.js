@@ -28,12 +28,12 @@ import { Button } from "../../components/ui/button";
 import { IconButton } from "../../components/ui/icon-button";
 import Paragraph from "../../components/ui/typography/paragraph";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import { DDS } from "../../services/device-detection";
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { eClearEditor } from "../../utils/events";
 import { SIZE } from "../../utils/size";
@@ -43,6 +43,8 @@ const EditorOverlay = ({ editorId = "", editor }) => {
   const [error, setError] = useState(false);
   const opacity = useSharedValue(1);
   const translateValue = useSharedValue(6000);
+  const deviceMode = useSettingStore((state) => state.deviceMode);
+  const isTablet = deviceMode !== "mobile";
   const insets = useGlobalSafeAreaInsets();
   const isDefaultEditor = editorId === "";
   const timers = useRef({
@@ -153,7 +155,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               paddingRight: 12
             }}
           >
-            {DDS.isTablet() ? (
+            {isTablet ? (
               <View />
             ) : (
               <IconButton
@@ -197,7 +199,9 @@ const EditorOverlay = ({ editorId = "", editor }) => {
                 alignItems: "center",
                 flexDirection: "row",
                 paddingHorizontal: 10,
-                marginTop: 10
+                marginTop: 5,
+                borderWidth: 1,
+                borderColor: colors.border
               }}
             >
               <Paragraph color={colors.icon} size={13}>
