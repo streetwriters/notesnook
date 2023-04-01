@@ -27,12 +27,19 @@ import {
 import checkForUpdate from "../commands/check-for-update";
 import { isDesktop } from "../utils/platform";
 
-var checkingForUpdateTimeout = 0;
+type ofStatus = {
+  type: "checking" | "updated" | "available" | "completed" | "downloading";
+  version?: string;
+  progress?: number;
+};
+
+let checkingForUpdateTimeout: NodeJS.Timeout;
+
 export default function useAutoUpdater() {
-  const [status, setStatus] = useState();
+  const [status, setStatus] = useState({} as ofStatus);
 
   useEffect(() => {
-    function changeStatus(status) {
+    function changeStatus(status: ofStatus) {
       clearTimeout(checkingForUpdateTimeout);
       setStatus(status);
     }
@@ -44,7 +51,7 @@ export default function useAutoUpdater() {
       }, 10000);
     }
 
-    function updateAvailable(info) {
+    function updateAvailable(info: { version: "string" }) {
       changeStatus({
         type: "available",
         version: info.version
@@ -56,15 +63,15 @@ export default function useAutoUpdater() {
 
     function updateNotAvailable() {
       if (isDesktop()) changeStatus({ type: "updated" });
-      else changeStatus();
+      else return;
     }
 
-    function updateDownloadCompleted(info) {
+    function updateDownloadCompleted(info: { version: string }) {
       changeStatus({ type: "completed", version: info.version });
       showUpdateReadyNotice({ version: info.version });
     }
 
-    function updateDownloadProgress(progressInfo) {
+    function updateDownloadProgress(progressInfo: { percent: number }) {
       changeStatus({ type: "downloading", progress: progressInfo.percent });
     }
 
