@@ -50,6 +50,9 @@ const EditorOverlay = ({ editorId = "", editor }) => {
     error: 0,
     closing: 0
   });
+  const loadingState = useRef({
+    startTime: 0
+  });
 
   const clearTimers = () => {
     clearTimeout(timers.current.loading);
@@ -62,6 +65,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
       editorState().overlay = true;
       clearTimers();
       if (_loading) {
+        loadingState.current.startTime = Date.now();
         opacity.value = 1;
         translateValue.value = 0;
         timers.current.error = setTimeout(() => {
@@ -69,16 +73,25 @@ const EditorOverlay = ({ editorId = "", editor }) => {
         }, 15 * 1000);
       } else {
         clearTimers();
-        setTimeout(() => {
+        const timeDiffSinceLoadStarted =
+          Date.now() - loadingState.current.startTime > 300 ? 300 : 0;
+        if (!timeDiffSinceLoadStarted) {
           setError(false);
           editorState().overlay = false;
-          opacity.value = withTiming(0, {
-            duration: 500
-          });
+          opacity.value = 0;
+          translateValue.value = 6000;
+        } else {
           setTimeout(() => {
-            translateValue.value = 6000;
-          }, 500);
-        }, 0);
+            setError(false);
+            editorState().overlay = false;
+            opacity.value = withTiming(0, {
+              duration: timeDiffSinceLoadStarted
+            });
+            setTimeout(() => {
+              translateValue.value = 6000;
+            }, timeDiffSinceLoadStarted);
+          }, 0);
+        }
       }
     },
     [opacity, translateValue]
