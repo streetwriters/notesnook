@@ -26,6 +26,13 @@ import {
 } from "../app/utils/color-scheme";
 import { MMKV } from "../app/common/database/mmkv";
 
+const StorageKeys = {
+  appendNote: "shareMenuAppendNote",
+  selectedNotebooks: "shareMenuSelectedNotebooks",
+  selectedTag: "shareMenuSelectedTag",
+  appSettings: "appSettings"
+};
+
 export const useShareStore = create((set) => ({
   colors:
     Appearance.getColorScheme() === "dark"
@@ -33,7 +40,7 @@ export const useShareStore = create((set) => ({
       : COLOR_SCHEME_LIGHT,
   accent: ACCENT,
   setAccent: async () => {
-    let appSettings = MMKV.getString("appSettings");
+    let appSettings = MMKV.getString(StorageKeys.appSettings);
 
     if (appSettings) {
       appSettings = JSON.parse(appSettings);
@@ -56,14 +63,31 @@ export const useShareStore = create((set) => ({
   },
   appendNote: null,
   setAppendNote: (note) => {
-    MMKV.setItem("shareMenuAppendNote", JSON.stringify(note));
+    MMKV.setItem(StorageKeys.appendNote, JSON.stringify(note));
     set({ appendNote: note });
   },
-  restoreAppendNote: async () => {
-    let note = MMKV.getString("shareMenuAppendNote");
-    if (note) {
-      note = JSON.parse(note);
-      set({ appendNote: note });
-    }
+  restore: () => {
+    let appendNote = MMKV.getString(StorageKeys.appendNote);
+    let selectedNotebooks = MMKV.getString(StorageKeys.selectedNotebooks);
+    let selectedTags = MMKV.getString(StorageKeys.selectedTag);
+    appendNote = JSON.parse(appendNote);
+    set({
+      appendNote: appendNote ? JSON.parse(appendNote) : null,
+      selectedNotebooks: selectedNotebooks ? JSON.parse(selectedNotebooks) : [],
+      selectedTag: selectedTags ? JSON.parse(selectedTags) : []
+    });
+  },
+  selectedTags: [],
+  selectedNotebooks: [],
+  setSelectedNotebooks: (selectedNotebooks) => {
+    MMKV.setItem(
+      StorageKeys.selectedNotebooks,
+      JSON.stringify(selectedNotebooks)
+    );
+    set({ selectedNotebooks });
+  },
+  setSelectedTags: (selectedTags) => {
+    MMKV.setItem(StorageKeys.selectedTag, JSON.stringify(selectedTags));
+    set({ selectedTags });
   }
 }));
