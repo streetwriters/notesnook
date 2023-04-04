@@ -48,16 +48,14 @@ export default class Lookup {
       (n) =>
         `${n.title} ${n.description} ${n.topics.map((t) => t.title).join(" ")}`
     );
-    let i = 0;
-    while (i < array.length) {
-      const notebook = this._db.notebooks.notebook(array[i].id);
+    array.forEach((n) => {
+      const notebook = this._db.notebooks.notebook(n.id);
       const notes = this._db.relations.from(notebook.data, "note");
       const searchInNotes = this._byTitle(notes, query);
       if (searchInNotes.length > 0 && !result.includes(notebook._notebook)) {
         result.push(notebook._notebook);
       }
-      i++;
-    }
+    });
     return result;
   }
 
