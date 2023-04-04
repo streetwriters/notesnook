@@ -124,7 +124,6 @@ export function HighlighterPlugin({
           if (!pluginState) return;
 
           const changedBlocks: Set<string> = new Set();
-
           for (const blockKey in pluginState.languages) {
             const language = pluginState.languages[blockKey];
             if (
@@ -139,6 +138,14 @@ export function HighlighterPlugin({
                 l.filename === language || l.alias?.some((a) => a === language)
             );
             if (!languageDefinition) continue;
+
+            if (refractor.registered(language)) {
+              if (!HIGHLIGHTED_BLOCKS.has(blockKey)) {
+                HIGHLIGHTED_BLOCKS.add(blockKey);
+                changedBlocks.add(blockKey);
+              }
+              continue;
+            }
 
             changedBlocks.add(blockKey);
             HIGHLIGHTED_BLOCKS.add(blockKey);
@@ -197,15 +204,15 @@ export function HighlighterPlugin({
 
               const { id, language } = block.node.attrs;
 
-              const isRegistered = () => {
-                if (language) {
-                  return refractor.registered(language) ? true : false;
-                }
-                return "No need to register";
-                // If I return false It will uselessly calls the update method until the language in null(plaintext).
-              };
+              const isRegistered =
+                language ? refractor.registered(language) ? true : false : "No need to register"
 
-              if (isRegistered()) {
+              if (!isRegistered) {
+                languages[id] = language;
+                return { decorations, languages };
+              }
+
+              if (languages[id]) {
                 const newDecorations = getDecorations({
                   block,
                   defaultLanguage
