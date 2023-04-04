@@ -30,7 +30,8 @@ import {
   Text,
   TouchableOpacity,
   useWindowDimensions,
-  View
+  View,
+  ScrollView
 } from "react-native";
 import {
   SafeAreaProvider,
@@ -507,13 +508,13 @@ const ShareView = ({ quicknote = false }) => {
         />
       ) : null}
 
-      <View
+      <ScrollView
         style={{
           paddingVertical: 12,
           backgroundColor: colors.bg,
           display: searchMode ? "none" : "flex",
-          borderTopRightRadius: 15,
-          borderTopLeftRadius: 15
+          borderTopRightRadius: Platform.OS === "ios" ? 10 : 15,
+          borderTopLeftRadius: Platform.OS === "ios" ? 10 : 15
         }}
       >
         <View
@@ -547,7 +548,7 @@ const ShareView = ({ quicknote = false }) => {
               >
                 <Text
                   style={{
-                    fontSize: 20,
+                    fontSize: 18,
                     fontFamily: "OpenSans-SemiBold"
                   }}
                 >
@@ -558,14 +559,14 @@ const ShareView = ({ quicknote = false }) => {
                   title="Done"
                   style={{
                     backgroundColor: colors.accent,
-                    height: 40,
+                    height: Platform.OS === "ios" ? 35 : 40,
                     paddingHorizontal: 15,
                     marginBottom: 0
                   }}
                   loading={loading}
                   onPress={onPress}
                   textStyle={{
-                    fontSize: 16,
+                    fontSize: 15,
                     marginLeft: 0
                   }}
                 />
@@ -754,7 +755,7 @@ const ShareView = ({ quicknote = false }) => {
             }}
           />
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
