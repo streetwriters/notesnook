@@ -268,12 +268,28 @@ export const useEditorEvents = (
     (event: WebViewMessageEvent) => {
       const data = event.nativeEvent.data;
       const editorMessage = JSON.parse(data) as EditorMessage;
+
+      if (editorMessage.type === EventTypes.content) {
+        editor.saveContent({
+          type: editorMessage.type,
+          content: editorMessage.value as string,
+          forSessionId: editorMessage.sessionId
+        });
+      } else if (editorMessage.type === EventTypes.title) {
+        editor.saveContent({
+          type: editorMessage.type,
+          title: editorMessage.value as string,
+          forSessionId: editorMessage.sessionId
+        });
+      }
+
       if (
         editorMessage.sessionId !== editor.sessionId &&
         editorMessage.type !== EditorEvents.status
       ) {
         return;
       }
+
       switch (editorMessage.type) {
         case EventTypes.logger:
           logger.info("[WEBVIEW LOG]", editorMessage.value);
@@ -281,21 +297,8 @@ export const useEditorEvents = (
         case EventTypes.contentchange:
           editor.onContentChanged();
           break;
-        case EventTypes.content:
-          editor.saveContent({
-            type: editorMessage.type,
-            content: editorMessage.value as string
-          });
-          break;
         case EventTypes.selection:
           break;
-        case EventTypes.title:
-          editor.saveContent({
-            type: editorMessage.type,
-            title: editorMessage.value as string
-          });
-          break;
-
         case EventTypes.reminders:
           if (!editor.note.current) {
             ToastEvent.show({

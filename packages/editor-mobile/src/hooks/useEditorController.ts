@@ -83,6 +83,7 @@ export function useEditorController(update: () => void): EditorController {
   }, []);
 
   const contentChange = useCallback((editor: Editor) => {
+    const currentSessionId = globalThis.sessionId;
     post(EventTypes.contentchange);
     if (!editor) return;
     if (typeof timers.current.change === "number") {
@@ -90,7 +91,7 @@ export function useEditorController(update: () => void): EditorController {
     }
     timers.current.change = setTimeout(() => {
       htmlContentRef.current = editor.getHTML();
-      post(EventTypes.content, htmlContentRef.current);
+      post(EventTypes.content, htmlContentRef.current, currentSessionId);
     }, 300);
   }, []);
 

@@ -77,6 +77,7 @@ export const useEditor = (
   const lastContentChangeTime = useRef<number>(0);
   const lock = useRef(false);
   const loadedImages = useRef<{ [name: string]: boolean }>({});
+  const lockedSessionId = useRef<string>();
 
   const postMessage = useCallback(
     async <T>(type: string, data: T) =>
@@ -243,6 +244,11 @@ export const useEditor = (
             state.current.currentlyEditing
           ) {
             setTimeout(() => {
+              if (
+                (currentNote.current?.id && currentNote.current?.id !== id) ||
+                !state.current.currentlyEditing
+              )
+                return;
               id && useEditorStore.getState().setCurrentlyEditingNote(id);
             });
           }
@@ -378,10 +384,11 @@ export const useEditor = (
         }
         lastContentChangeTime.current = item.dateEdited;
         const nextSessionId = makeSessionId(item as NoteType);
+        lockedSessionId.current = nextSessionId;
         sessionHistoryId.current = Date.now();
         setSessionId(nextSessionId);
+        commands.setSessionId(nextSessionId);
         sessionIdRef.current = nextSessionId;
-        await commands.setSessionId(nextSessionId);
         currentNote.current = item as NoteType;
         await commands.setStatus(timeConverter(item.dateEdited), "Saved");
         await postMessage(EditorEvents.title, item.title);
@@ -389,6 +396,11 @@ export const useEditor = (
         useEditorStore.getState().setReadonly(item.readonly);
         await commands.setTags(currentNote.current);
         commands.setSettings();
+        setTimeout(() => {
+          if (lockedSessionId.current === nextSessionId) {
+            lockedSessionId.current = undefined;
+          }
+        }, 300);
         overlay(false);
         loadImages();
       }
@@ -495,14 +507,16 @@ export const useEditor = (
     ({
       title,
       content,
-      type
+      type,
+      forSessionId
     }: {
       title?: string;
       content?: string;
       type: string;
+      forSessionId: string;
     }) => {
+      if (lock.current || lockedSessionId.current === forSessionId) return;
       lastContentChangeTime.current = Date.now();
-      if (lock.current) return;
       if (type === EditorEvents.content) {
         currentContent.current = {
           data: content,
@@ -511,16 +525,16 @@ export const useEditor = (
         };
       }
       const noteIdFromSessionId =
-        !sessionIdRef.current || sessionIdRef.current.startsWith("session")
+        !forSessionId || forSessionId.startsWith("session")
           ? null
-          : sessionIdRef.current.split("_")[0];
+          : forSessionId.split("_")[0];
 
-      const noteId = currentNote.current?.id || noteIdFromSessionId;
+      const noteId = noteIdFromSessionId || currentNote.current?.id;
       const params = {
         title,
         data: content,
         type: "tiptap",
-        sessionId,
+        sessionId: forSessionId,
         id: noteId,
         sessionHistoryId: sessionHistoryId.current
       };
@@ -530,7 +544,7 @@ export const useEditor = (
           if (
             currentNote.current &&
             !params.id &&
-            params.sessionId === sessionId
+            params.sessionId === forSessionId
           ) {
             params.id = currentNote.current?.id;
           }
@@ -543,7 +557,7 @@ export const useEditor = (
         150
       );
     },
-    [sessionId, withTimer, onChange, saveNote]
+    [withTimer, onChange, saveNote]
   );
 
   const restoreEditorState = useCallback(async () => {
