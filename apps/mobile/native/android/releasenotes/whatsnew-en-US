@@ -1,7 +1,7 @@
-- Added support for sorting topics in topics sheet
-- Navigation Bar in app now follows app theme
-- Splashscreen logo quality in dark mode has been improved
-- Fix topic title goes into multiple lines if long
-- Fix reminder date picker not allowing to pick a date from past
+- New and improved share extension with support for organizing notes
+with tags & notebooks!
+- Improved UX for topics sheet in Notebooks
+- Improved editor performance
+- Many bug fixes and minor improvements
 
 Thank you for using Notesnook!

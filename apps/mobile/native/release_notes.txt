@@ -1,6 +1,7 @@
-- Added support for sorting topics in topics sheet
-- Fixed topics sheet is hard to swipe up from bottom
-- Fix topic title goes into multiple lines if long
-- Fix reminder date picker not allowing to pick a date from past
+- New and improved share extension with support for organizing notes
+with tags & notebooks!
+- Improved UX for Topics sheet in Notebooks
+- Improved editor performance
+- Many bug fixes and minor improvements
 
 Thank you for using Notesnook!
