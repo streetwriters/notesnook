@@ -182,9 +182,9 @@ const template = (data) => `<!DOCTYPE html>
       font-family: PT Mono, Consolas, Monaco, "Andale Mono", "Ubuntu Mono",
         monospace;
       text-align: left;
-      white-space: pre;
+      white-space: pre-wrap;
       word-spacing: normal;
-      word-break: normal;
+      word-break: break-word;
       word-wrap: normal;
       line-height: 1.5;
 
