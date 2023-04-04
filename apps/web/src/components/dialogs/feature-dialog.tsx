@@ -90,21 +90,7 @@ const features: Record<FeatureKeys, Feature> = {
           }
         ]
       : isDesktop()
-      ? [
-          {
-            title: "Topics are now optional",
-            subtitle:
-              "You can now move notes directly into a notebook without ever needing a topic (but topics are still there...just optional)."
-          },
-          {
-            title: "Adjustable trash cleanup interval",
-            subtitle:
-              "You can now customize after how long you want your trash to be automatically cleared. Just go into Settings -> Trash settings."
-          },
-          {
-            title: "Images are now much more stable"
-          }
-        ]
+      ? []
       : [],
     cta: {
       title: "Got it",
