@@ -204,10 +204,7 @@ export function HighlighterPlugin({
 
               const { id, language } = block.node.attrs;
 
-              const isRegistered =
-                language && refractor.registered(language) ? true : false;
-
-              if (!isRegistered) {
+              if (language && !refractor.registered(language)) {
                 languages[id] = language;
                 return { decorations, languages };
               }
