@@ -121,18 +121,18 @@ export function HighlighterPlugin({
         },
         async update(view) {
           const pluginState = HIGHLIGHTER_PLUGIN_KEY.getState(view.state);
-          const pluginLanguages = pluginState?.languages;
-          const registeredLanguage = refractor.listLanguages();
           if (!pluginState) return;
 
           const changedBlocks: Set<string> = new Set();
+
           for (const blockKey in pluginState.languages) {
-            if (pluginLanguages) {
-              if (!registeredLanguage.includes(pluginLanguages[blockKey])) {
-                HIGHLIGHTED_BLOCKS.delete(blockKey);
-              }
+            const blockLanguage = pluginState.languages[blockKey];
+            if (
+              HIGHLIGHTED_BLOCKS.has(blockKey) &&
+              refractor.registered(blockLanguage)
+            ) {
+              continue;
             }
-            if (HIGHLIGHTED_BLOCKS.has(blockKey)) continue;
 
             const language = pluginState.languages[blockKey];
             const languageDefinition = Languages.find(
@@ -140,14 +140,6 @@ export function HighlighterPlugin({
                 l.filename === language || l.alias?.some((a) => a === language)
             );
             if (!languageDefinition) continue;
-
-            if (refractor.registered(language)) {
-              if (!HIGHLIGHTED_BLOCKS.has(blockKey)) {
-                HIGHLIGHTED_BLOCKS.add(blockKey);
-                changedBlocks.add(blockKey);
-              }
-              continue;
-            }
 
             changedBlocks.add(blockKey);
             HIGHLIGHTED_BLOCKS.add(blockKey);
@@ -206,19 +198,15 @@ export function HighlighterPlugin({
 
               const { id, language } = block.node.attrs;
 
-              const registeredLanguage = refractor.listLanguages();
               const isRegistered = () => {
-                for (const key in registeredLanguage) {
-                  const currentLang = registeredLanguage[key];
-                  if (currentLang == language) {
-                    return true;
-                  }
+                if (language) {
+                  return refractor.registered(language) ? true : false;
                 }
+                return "No need to register";
+                // If I return false It will uselessly calls the update method until the language in null(plaintext).
               };
 
-              if (!isRegistered()) {
-                languages[id] = language;
-              } else {
+              if (isRegistered()) {
                 const newDecorations = getDecorations({
                   block,
                   defaultLanguage
@@ -241,6 +229,8 @@ export function HighlighterPlugin({
                   decorations = decorations.remove(toRemove);
                 if (toAdd.length > 0)
                   decorations = decorations.add(tr.doc, toAdd);
+              } else {
+                languages[id] = language;
               }
             });
 
