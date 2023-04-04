@@ -19,14 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import qclone from "qclone";
 import React, {
   createContext,
+  RefObject,
   useCallback,
   useContext,
   useEffect,
   useRef,
-  useState,
-  RefObject
+  useState
 } from "react";
-import { Platform, RefreshControl, View } from "react-native";
+import { RefreshControl, View } from "react-native";
 import ActionSheet, {
   ActionSheetRef,
   FlatList
@@ -58,13 +58,13 @@ import { groupArray } from "@notesnook/core/utils/grouping";
 import Config from "react-native-config";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
+import { MMKV } from "../../../common/database/mmkv";
 import { openEditor } from "../../../screens/notes/common";
 import { getTotalNotes, history } from "../../../utils";
 import { deleteItems } from "../../../utils/functions";
 import { presentDialog } from "../../dialog/functions";
 import { Properties } from "../../properties";
 import Sort from "../sort";
-import { MMKV } from "../../../common/database/mmkv";
 
 type ConfigItem = { id: string; type: string };
 class TopicSheetConfig {
@@ -269,11 +269,7 @@ export const TopicsSheet = () => {
         backgroundColor: colors.nav
       }}
       keyboardHandlerEnabled={false}
-      snapPoints={
-        Config.isTesting === "true"
-          ? [100]
-          : [Platform.OS === "ios" ? 25 : 20, 100]
-      }
+      snapPoints={Config.isTesting === "true" ? [100] : [25, 100]}
       initialSnapIndex={1}
       backgroundInteractionEnabled
       gestureEnabled
