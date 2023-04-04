@@ -1,7 +1,8 @@
 {
   "name": "@notesnook/core",
   "version": "7.3.6",
-  "main": "./api/index.js",
+  "main": "./dist/api/index.js",
+  "types": "./dist/api/index.d.ts",
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
@@ -14,7 +15,9 @@
     "@babel/runtime": "^7.18.9",
     "@notesnook/crypto": "^1.0.1",
     "@types/jest": "^28.1.6",
+    "@types/mime-db": "^1.43.1",
     "@types/showdown": "^2.0.0",
+    "@types/spark-md5": "^3.0.2",
     "abortcontroller-polyfill": "^1.7.3",
     "analyze-es6-modules": "^0.6.2",
     "babel-jest": "^28.1.3",
@@ -28,9 +31,11 @@
     "jest-fetch-mock": "^3.0.3",
     "jsdom": "^20.0.0",
     "mockdate": "^3.0.5",
-    "otplib": "^12.0.1"
+    "otplib": "^12.0.1",
+    "vitest": "^0.29.8"
   },
   "scripts": {
+    "build": "tsc",
     "test:e2e": "env-cmd -e e2e jest --forceExit",
     "test": "jest --forceExit"
   },
@@ -46,9 +51,10 @@
     "htmlparser2": "^8.0.1",
     "linkedom": "^0.14.17",
     "liqe": "^1.13.0",
+    "mime-db": "1.52.0",
     "qclone": "^1.2.0",
-    "spark-md5": "^3.0.2",
-    "mime-db": "1.52.0"
+    "rfdc": "^1.3.0",
+    "spark-md5": "^3.0.2"
   },
   "overrides": {
     "htmlparser2": "^8.0.1"

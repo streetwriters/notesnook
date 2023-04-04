@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "allowJs": true
+  },
+  "exclude": ["**/__tests__"],
+  "include": ["src/", "index.ts"]
+}
