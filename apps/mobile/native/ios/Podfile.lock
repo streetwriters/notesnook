@@ -418,8 +418,6 @@ PODS:
     - pop (~> 1.0)
     - React
     - SexyTooltip
-  - RNVectorIcons (9.2.0):
-    - React-Core
   - SexyTooltip (1.2.5):
     - pop (~> 1.0)
   - toolbar-android (0.2.1):
@@ -504,7 +502,6 @@ DEPENDENCIES:
   - RNShare (from `../../node_modules/react-native-share`)
   - RNSVG (from `../../node_modules/react-native-svg`)
   - RNTooltips (from `../../node_modules/react-native-tooltips`)
-  - RNVectorIcons (from `../../node_modules/react-native-vector-icons`)
   - SexyTooltip (from `https://github.com/ammarahm-ed/SexyTooltip.git`)
   - "toolbar-android (from `../../node_modules/@react-native-community/toolbar-android`)"
   - Yoga (from `../../node_modules/react-native/ReactCommon/yoga`)
@@ -667,8 +664,6 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native-svg"
   RNTooltips:
     :path: "../../node_modules/react-native-tooltips"
-  RNVectorIcons:
-    :path: "../../node_modules/react-native-vector-icons"
   SexyTooltip:
     :git: https://github.com/ammarahm-ed/SexyTooltip.git
   toolbar-android:
@@ -762,7 +757,6 @@ SPEC CHECKSUMS:
   RNShare: a5dc3b9c53ddc73e155b8cd9a94c70c91913c43c
   RNSVG: ecd661f380a07ba690c9c5929c475a44f432d674
   RNTooltips: 5424d4bf0b3d441104127943b1115cc7f0616b1f
-  RNVectorIcons: fcc2f6cb32f5735b586e66d14103a74ce6ad61f8
   SexyTooltip: 5c9b4dec52bfb317938cb0488efd9da3717bb6fd
   toolbar-android: 2a73856e98b750d7e71ce4644d3f41cc98211719
   Yoga: 0b84a956f7393ef1f37f3bb213c516184e4a689d
