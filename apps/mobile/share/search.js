@@ -178,7 +178,25 @@ const ListItem = ({ item, mode, close }) => {
 const SearchGetters = {
   appendNote: () => db.notes.all,
   selectNotebooks: () => db.notebooks.all,
-  selectTags: () => db.tags.all
+  selectTags: () => {
+    const selected = useShareStore.getState().selectedTags;
+    const tags = [];
+    if (selected)
+      tags.push(
+        ...selected.map((t) => ({
+          alias: t,
+          type: "tag"
+        }))
+      );
+
+    for (let tag of db.tags.all) {
+      const index = tags.findIndex((t) => t.alias === tag.alias);
+      // Skip selected tags as they are already in the list.
+      if (index > -1) continue;
+      tags.push(tag);
+    }
+    return tags;
+  }
 };
 
 const SearchLookup = {
@@ -196,7 +214,6 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
 
   const [searchResults, setSearchResults] = useState([]);
   const searchableItems = useRef(null);
-  const [searching, setSearching] = useState(false);
   const searchKeyword = useRef(null);
 
   const insets =
@@ -224,12 +241,10 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
         setSearchResults(get());
         return;
       }
-      setSearching(true);
       setSearchResults(
         await lookup(searchableItems.current, searchKeyword.current)
       );
-      setSearching(false);
-    }, 500);
+    }, 150);
   };
 
   useEffect(() => {
@@ -306,16 +321,8 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
           }}
           onSubmitEditing={onSearch}
         />
-        {searching ? (
-          <ActivityIndicator size={25} color={colors.icon} />
-        ) : (
-          <Icon
-            name="magnify"
-            color={colors.pri}
-            size={25}
-            onPress={onSearch}
-          />
-        )}
+
+        <Icon name="magnify" color={colors.pri} size={25} onPress={onSearch} />
       </View>
 
       <View
@@ -328,7 +335,6 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
           data={searchResults}
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="none"
-          keyExtractor={(item) => item.id}
           renderItem={renderItem}
           estimatedItemSize={50}
           ListHeaderComponent={

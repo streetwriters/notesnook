@@ -404,6 +404,8 @@ const ShareView = ({ quicknote = false }) => {
     loadData();
   }, [loadData]);
 
+  const WrapperView = Platform.OS === "android" ? View : ScrollView;
+
   return loadingExtension ? null : (
     <SafeAreaView
       style={{
@@ -508,13 +510,14 @@ const ShareView = ({ quicknote = false }) => {
         />
       ) : null}
 
-      <ScrollView
+      <WrapperView
         style={{
           paddingVertical: 12,
           backgroundColor: colors.bg,
           display: searchMode ? "none" : "flex",
           borderTopRightRadius: Platform.OS === "ios" ? 10 : 15,
-          borderTopLeftRadius: Platform.OS === "ios" ? 10 : 15
+          borderTopLeftRadius: Platform.OS === "ios" ? 10 : 15,
+          maxHeight: Platform.OS === "android" ? undefined : "100%"
         }}
       >
         <View
@@ -756,7 +759,7 @@ const ShareView = ({ quicknote = false }) => {
             }}
           />
         </View>
-      </ScrollView>
+      </WrapperView>
     </SafeAreaView>
   );
 };
