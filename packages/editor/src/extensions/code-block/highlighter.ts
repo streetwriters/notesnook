@@ -205,7 +205,7 @@ export function HighlighterPlugin({
               const { id, language } = block.node.attrs;
 
               const isRegistered =
-                language ? refractor.registered(language) ? true : false : "No need to register"
+                language && refractor.registered(language) ? true : false;
 
               if (!isRegistered) {
                 languages[id] = language;
