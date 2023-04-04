@@ -121,10 +121,17 @@ export function HighlighterPlugin({
         },
         async update(view) {
           const pluginState = HIGHLIGHTER_PLUGIN_KEY.getState(view.state);
+          const pluginLanguages = pluginState?.languages;
+          const registeredLanguage = refractor.listLanguages();
           if (!pluginState) return;
 
           const changedBlocks: Set<string> = new Set();
           for (const blockKey in pluginState.languages) {
+            if (pluginLanguages) {
+              if (!registeredLanguage.includes(pluginLanguages[blockKey])) {
+                HIGHLIGHTED_BLOCKS.delete(blockKey);
+              }
+            }
             if (HIGHLIGHTED_BLOCKS.has(blockKey)) continue;
 
             const language = pluginState.languages[blockKey];
@@ -198,7 +205,20 @@ export function HighlighterPlugin({
               updated.add(block.pos);
 
               const { id, language } = block.node.attrs;
-              if (languages[id]) {
+
+              const registeredLanguage = refractor.listLanguages();
+              const isRegistered = () => {
+                for (const key in registeredLanguage) {
+                  const currentLang = registeredLanguage[key];
+                  if (currentLang == language) {
+                    return true;
+                  }
+                }
+              };
+
+              if (!isRegistered()) {
+                languages[id] = language;
+              } else {
                 const newDecorations = getDecorations({
                   block,
                   defaultLanguage
@@ -221,8 +241,6 @@ export function HighlighterPlugin({
                   decorations = decorations.remove(toRemove);
                 if (toAdd.length > 0)
                   decorations = decorations.add(tr.doc, toAdd);
-              } else {
-                languages[id] = language;
               }
             });
 

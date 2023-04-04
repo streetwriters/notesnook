@@ -125,7 +125,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
   addAttributes() {
     return {
       id: {
-        default: undefined,
+        default: `codeblock-${nanoid(12)}`,
         rendered: false,
         parseHTML: () => `codeblock-${nanoid(12)}`
       },
