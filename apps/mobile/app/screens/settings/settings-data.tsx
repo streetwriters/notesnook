@@ -959,9 +959,7 @@ export const settingsGroups: SettingSection[] = [
         onChange: () => {
           ToastEvent.show({
             heading: "Line spacing changed",
-            type: "success",
-            message:
-              "Close and reopen the current opened note or restart the app for changes to take affect."
+            type: "success"
           });
         }
       }
