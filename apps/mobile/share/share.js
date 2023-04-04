@@ -564,6 +564,7 @@ const ShareView = ({ quicknote = false }) => {
                     marginBottom: 0
                   }}
                   loading={loading}
+                  iconColor={colors.light}
                   onPress={onPress}
                   textStyle={{
                     fontSize: 16,
