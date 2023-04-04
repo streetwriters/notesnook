@@ -114,7 +114,7 @@ const Tiptap = ({
         corsHost: settings.corsProxy
       }
     },
-    [layout, settings.readonly, tick]
+    [layout, settings.readonly, tick, settings.doubleSpacedLines]
   );
 
   const update = useCallback(() => {
