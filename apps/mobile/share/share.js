@@ -566,7 +566,7 @@ const ShareView = ({ quicknote = false }) => {
                   loading={loading}
                   onPress={onPress}
                   textStyle={{
-                    fontSize: 15,
+                    fontSize: 16,
                     marginLeft: 0
                   }}
                 />
