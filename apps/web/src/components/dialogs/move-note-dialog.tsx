@@ -80,11 +80,17 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
   useEffect(() => {
     if (!notebooks) return;
 
-    const selected: NotebookReference[] = [];
+    const selected: NotebookReference[] = useSelectionStore
+      .getState()
+      .selected.slice();
     for (const notebook of notebooks as Notebook[]) {
       if (notebook.type === "header") continue;
       for (const topic of notebook.topics) {
-        if (topicHasNotes(topic, noteIds)) {
+        const isSelected =
+          selected.findIndex(
+            (item) => item.id === notebook.id && item.topic === topic.id
+          ) > -1;
+        if (!isSelected && topicHasNotes(topic, noteIds)) {
           selected.push({
             id: notebook.id,
             topic: topic.id,
@@ -98,7 +104,9 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
     for (const notebook of noteIds
       .map((id) => db.relations?.to({ id, type: "note" }, "notebook"))
       .flat()) {
-      if (!notebook) continue;
+      const isSelected =
+        notebook && selected.findIndex((item) => item.id === notebook.id) > -1;
+      if (!notebook || isSelected) continue;
 
       selected.push({
         id: notebook.id,
@@ -111,6 +119,15 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
     setIsMultiselect(selected.length > 1);
   }, [noteIds, notebooks, setSelected, setIsMultiselect]);
 
+  const _onClose = useCallback(
+    (result: boolean) => {
+      setSelected([]);
+      setIsMultiselect(false);
+      onClose(result);
+    },
+    [setSelected, setIsMultiselect, onClose]
+  );
+
   return (
     <Dialog
       isOpen={true}
@@ -118,7 +135,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
       description={`Use ${
         isMac() ? "cmd" : "ctrl"
       }+click to select multiple topics`}
-      onClose={() => onClose(false)}
+      onClose={() => _onClose(false)}
       width={450}
       positiveButton={{
         text: "Done",
@@ -147,12 +164,12 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
             );
           }
 
-          onClose(true);
+          _onClose(true);
         }
       }}
       negativeButton={{
         text: "Cancel",
-        onClick: () => onClose(false)
+        onClick: () => _onClose(false)
       }}
     >
       {isMultiselect && (
@@ -534,9 +551,10 @@ function SelectedCheck({
   item?: Topic | Notebook;
   size?: number;
 }) {
-  const selectedItem = useSelectionStore(
-    (store) => item && store.selected[findSelectionIndex(item, store.selected)]
-  );
+  const selectedItems = useSelectionStore((store) => store.selected);
+
+  const selectedItem =
+    item && selectedItems[findSelectionIndex(item, selectedItems)];
   const selected =
     selectedItem?.op === "remove" ? "remove" : selectedItem?.op === "add";
 
