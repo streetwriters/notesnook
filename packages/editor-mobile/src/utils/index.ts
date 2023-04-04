@@ -169,14 +169,15 @@ export function logger(
 
 export function post<T extends keyof typeof EventTypes>(
   type: (typeof EventTypes)[T],
-  value?: unknown
+  value?: unknown,
+  sessionId?: string
 ): void {
   if (isReactNative()) {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type,
         value: value,
-        sessionId: globalThis.sessionId
+        sessionId: sessionId || globalThis.sessionId
       })
     );
   } else {
