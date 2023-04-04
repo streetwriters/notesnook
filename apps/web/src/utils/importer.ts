@@ -117,8 +117,10 @@ async function fileToJson<T>(file: Entry) {
 }
 
 async function importNotebook(
-  notebook: Notebook
+  notebook: Notebook | undefined
 ): Promise<{ id?: string; topic?: string }> {
+  if (!notebook) return {};
+
   let nb = db.notebooks?.all.find((nb) => nb.title === notebook.notebook);
   if (!nb) {
     const nbId = await db.notebooks?.add({
@@ -129,5 +131,5 @@ async function importNotebook(
   }
   const topic = nb?.topics.find((t: any) => t.title === notebook.topic);
 
-  return { id: nb?.id, topic: topic?.id };
+  return { id: nb ? nb.id : undefined, topic: topic ? topic.id : undefined };
 }
