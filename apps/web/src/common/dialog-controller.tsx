@@ -209,9 +209,8 @@ export function showError(title: string, message: string) {
 export function showMultiDeleteConfirmation(length: number) {
   return confirm({
     title: `Delete ${length} items?`,
-    message: `These items will be **kept in your Trash for ${
-      db.settings?.getTrashCleanupInterval() || 7
-    } days** after which they will be permanently deleted.`,
+    message: `These items will be **kept in your Trash for ${db.settings?.getTrashCleanupInterval() || 7
+      } days** after which they will be permanently deleted.`,
     positiveButtonText: "Yes",
     negativeButtonText: "No"
   });
@@ -565,7 +564,7 @@ export function showRenameColorDialog(colorId: string) {
       onClose={() => perform(false)}
       onAction={async (title: string) => {
         if (!title) return;
-        await db.colors?.rename(colorId, title);
+        await db.colors?.rename(colorId, title, true);
         showToast("success", "Color renamed!");
         appStore.refreshNavItems();
         perform(true);
