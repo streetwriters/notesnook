@@ -57,7 +57,7 @@ test("codeblocks should get highlighted after pasting", async () => {
   });
 
   editor.commands.setContent(CODEBLOCKS_HTML, true, {
-    preserveWhitespace: "full"
+    preserveWhitespace: true
   });
 
   await new Promise((resolve) => setTimeout(resolve, 100));

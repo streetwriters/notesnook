@@ -241,7 +241,8 @@ const useTiptap = (
         editor.storage.portalProviderAPI = PortalProviderAPI;
         if (onBeforeCreate) onBeforeCreate({ editor });
       },
-      injectCSS: false
+      injectCSS: false,
+      parseOptions: { preserveWhitespace: true }
     }),
     [
       onPreviewAttachment,

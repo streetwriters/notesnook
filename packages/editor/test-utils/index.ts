@@ -39,7 +39,6 @@ export function createEditor<TNodes extends string>(
   const editor = new Editor({
     element,
     content: initialContent,
-    parseOptions: { preserveWhitespace: "full" },
     extensions: [
       StarterKit.configure({
         bulletList: false,
