@@ -24,85 +24,107 @@ import { getContentFromData } from "../content-types";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { addItem, deleteItem } from "../utils/array";
 import { formatDate } from "../utils/date";
+import { Note, NotebookReference } from "../entities";
 
-export default class Note {
-  /**
-   *
-   * @param {import('../api').default} db
-   * @param {Object} note
-   */
-  constructor(note, db) {
-    this._note = note;
-    this._db = db;
-  }
+interface INoteModel extends Readonly<Note> {
+  export(
+    to?: "html" | "md" | "txt",
+    rawContent?: string
+  ): Promise<string | false | undefined>;
 
-  get data() {
-    return this._note;
-  }
+  readonly data: Note;
+}
 
-  get headline() {
-    return this._note.headline;
-  }
+export class NoteModel implements INoteModel {
+  constructor(private readonly note: Note) {}
 
   get title() {
-    return this._note.title;
+    return this.note.title;
   }
-
-  get tags() {
-    return this._note.tags;
-  }
-
-  get colors() {
-    return this._note.colors;
-  }
-
-  get id() {
-    return this._note.id;
-  }
-
   get notebooks() {
-    return this._note.notebooks;
+    return this.note.notebooks;
   }
-
-  get deleted() {
-    return this._note.deleted;
+  get tags() {
+    return this.note.tags;
   }
-
   get dateEdited() {
-    return this._note.dateEdited;
+    return this.note.dateEdited;
   }
-
+  get pinned() {
+    return this.note.pinned;
+  }
+  get locked() {
+    return this.note.locked;
+  }
+  get favorite() {
+    return this.note.favorite;
+  }
+  get localOnly() {
+    return this.note.localOnly;
+  }
+  get conflicted() {
+    return this.note.conflicted;
+  }
+  get readonly() {
+    return this.note.readonly;
+  }
+  get contentId() {
+    return this.note.contentId;
+  }
+  get sessionId() {
+    return this.note.sessionId;
+  }
+  get headline() {
+    return this.note.headline;
+  }
+  get color() {
+    return this.note.color;
+  }
+  get id() {
+    return this.note.id;
+  }
+  get type() {
+    return this.note.type;
+  }
   get dateModified() {
-    return this._note.dateModified;
+    return this.note.dateModified;
+  }
+  get dateCreated() {
+    return this.note.dateCreated;
+  }
+  get migrated() {
+    return this.note.migrated;
+  }
+  get remote() {
+    return this.note.remote;
   }
 
   /**
-   *
-   * @param {"html"|"md"|"txt"} format - Format to export into
-   * @param {string?} rawContent - Use this raw content instead of generating itself
-   * @returns {Promise<string | false | undefined>}
+   * @deprecated use the model directly
    */
-  async export(to = "html", rawContent) {
+  get data() {
+    return this.note;
+  }
+
+  async export(to = "html", rawContent?: string) {
     if (to !== "txt" && !(await checkIsUserPremium(CHECK_IDS.noteExport)))
       return false;
-
     const templateData = {
-      metadata: this.data,
+      metadata: this,
       title: this.title,
       editedOn: formatDate(this.dateEdited),
       headline: this.headline,
-      createdOn: formatDate(this.data.dateCreated),
+      createdOn: formatDate(this.dateCreated),
       tags: this.tags.join(", ")
     };
-    const contentItem = await this._db.content.raw(this._note.contentId);
+    const contentItem = await this._db.content.raw(this.contentId);
     if (!contentItem) return false;
     const { data, type } = await this._db.content.downloadMedia(
       `export-${this.id}`,
       contentItem,
       false
     );
-    let content = getContentFromData(type, data);
-
+    const content = getContentFromData(type, data);
     switch (to) {
       case "html":
         templateData.content = rawContent || content.toHTML();
@@ -119,14 +141,14 @@ export default class Note {
   }
 
   async content() {
-    const content = await this._db.content.raw(this._note.contentId);
+    const content = await this._db.content.raw(this.contentId);
     return content ? content.data : null;
   }
 
   async duplicate() {
-    const content = await this._db.content.raw(this._note.contentId);
+    const content = await this._db.content.raw(this.contentId);
     return await this._db.notes.add({
-      ...this._note,
+      ...this.note,
       id: undefined,
       content: {
         type: content.type,
@@ -136,17 +158,16 @@ export default class Note {
       favorite: false,
       pinned: false,
       contentId: null,
-      title: this._note.title + " (Copy)",
+      title: this.title + " (Copy)",
       dateEdited: null,
       dateCreated: null,
       dateModified: null
     });
   }
 
-  async color(color) {
+  async color(color: string) {
     if (!(await checkIsUserPremium(CHECK_IDS.noteColor))) return;
-    if (this._note.color)
-      await this._db.colors.untag(this._note.color, this._note.id);
+    if (this.color) await this._db.colors.untag(this.color, this.id);
     await this._db.notes.add({
       id: this.id,
       color: this._db.colors.sanitize(color)
@@ -154,8 +175,8 @@ export default class Note {
   }
 
   async uncolor() {
-    if (!this._note.color) return;
-    await this._db.colors.untag(this._note.color, this._note.id);
+    if (!this.color) return;
+    await this._db.colors.untag(this.color, this.id);
     await this._db.notes.add({
       id: this.id,
       color: undefined
@@ -169,40 +190,38 @@ export default class Note {
       !(await checkIsUserPremium(CHECK_IDS.noteTag))
     )
       return;
-
-    let tagItem = await this._db.tags.add(tag, this._note.id);
-    if (addItem(this._note.tags, tagItem.title))
-      await this._db.notes.add(this._note);
+    let tagItem = await this._db.tags.add(tag, this.id);
+    if (addItem(this.tags, tagItem.title)) await this._db.notes.add(this);
   }
 
   async untag(tag) {
-    if (deleteItem(this._note.tags, tag)) {
-      await this._db.notes.add(this._note);
+    if (deleteItem(this.tags, tag)) {
+      await this._db.notes.add(this);
     } else console.error("This note is not tagged by the specified tag.", tag);
-    await this._db.tags.untag(tag, this._note.id);
-  }
-
-  _toggle(prop) {
-    return this._db.notes.add({ id: this._note.id, [prop]: !this._note[prop] });
+    await this._db.tags.untag(tag, this.id);
   }
 
   localOnly() {
-    return this._toggle("localOnly");
+    return this.toggle("localOnly");
   }
 
   favorite() {
-    return this._toggle("favorite");
+    return this.toggle("favorite");
   }
 
   pin() {
-    return this._toggle("pinned");
+    return this.toggle("pinned");
   }
 
   readonly() {
-    return this._toggle("readonly");
+    return this.toggle("readonly");
   }
 
-  synced() {
-    return !this.data.contentId || this._db.content.exists(this.data.contentId);
+  get synced() {
+    return !this.contentId || this._db.content.exists(this.contentId);
+  }
+
+  private toggle(prop: "localOnly" | "readonly" | "pinned" | "favorite") {
+    return this._db.notes.add({ id: this.id, [prop]: !this[prop] });
   }
 }

@@ -28,6 +28,7 @@ import { IStorage } from "../interfaces";
 
 export class Tags implements ICollection<"tags", Tag> {
   private readonly collection: CachedCollection<"tags", Tag>;
+  private readonly mutex: Mutex;
   constructor(storage: IStorage) {
     this.collection = new CachedCollection(storage, "tags");
     this.mutex = new Mutex();
@@ -64,7 +65,7 @@ export class Tags implements ICollection<"tags", Tag> {
         type: "tag",
         id,
         title: tag.title,
-        noteIds: setManipulator.union(notes, noteIds),
+        noteIds: set.union(notes, noteIds),
         localOnly: true
       };
 
