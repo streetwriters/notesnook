@@ -145,19 +145,12 @@ export function getTotalNotes(item) {
   return db.notebooks.notebook(item.id)?.totalNotes || 0;
 }
 
-export async function toTXT(note, notitle) {
+export async function toTXT(note, template = true) {
   let text;
   if (note.locked) {
-    text = note.content.data;
+    text = await db.notes.note(note.id).export("txt", note.content, template);
   } else {
-    text = await db.notes.note(note.id).content();
-  }
-  htmlToText = htmlToText || require("html-to-text");
-  text = htmlToText.convert(text, {
-    selectors: [{ selector: "img", format: "skip" }]
-  });
-  if (!notitle) {
-    text = `${note.title}\n \n ${text}`;
+    text = await db.notes.note(note.id).export("txt", undefined, template);
   }
   return text;
 }
