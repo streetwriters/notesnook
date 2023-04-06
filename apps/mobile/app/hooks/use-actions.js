@@ -171,8 +171,8 @@ export const useActions = ({ close = () => null, item }) => {
       return;
     }
     if (item.locked) return;
-    let html = await db.notes.note(item.id).content();
-    let text = await toTXT(item);
+    let text = await toTXT(item, false);
+    let html = text.replace(/\n/g, "<br />");
     Notifications.displayNotification({
       title: item.title,
       message: item.headline || text,
@@ -520,6 +520,7 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   async function exportNote() {
+    if (item.locked) return;
     ExportNotesSheet.present([item]);
   }
 
