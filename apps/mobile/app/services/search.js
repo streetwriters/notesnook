@@ -26,7 +26,7 @@ let searchInformation = {
   placeholder: "Search in all notes",
   data: [],
   type: "notes",
-  get: () => null
+  get: () => []
 };
 
 let keyword = null;
