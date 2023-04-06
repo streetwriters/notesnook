@@ -55,12 +55,13 @@ describe("NOTE TESTS", () => {
     await prepare();
     let note = await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Favorite");
+    await tapById("icon-favorite");
     await visibleById("icon-star");
     await navigate("Favorites");
     await visibleByText(note.body);
+    await sleep(500);
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Favorite");
+    await tapById("icon-favorite");
     await expect(element(by.text(note.body))).not.toBeVisible();
     await navigate("Notes");
   });
@@ -69,11 +70,11 @@ describe("NOTE TESTS", () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Pin");
+    await tapById("icon-pin");
     await visibleByText("Pinned");
     await visibleById("icon-pinned");
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Pin");
+    await tapById("icon-pin");
     expect(element(by.id("icon-pinned"))).not.toBeVisible();
   });
 
@@ -81,11 +82,12 @@ describe("NOTE TESTS", () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-PinToNotif");
-    await visibleByText("Unpin from Notifications");
+    await tapById("icon-pin-to-notifications");
+    await visibleByText("Unpin from notifications");
     await sleep(500);
-    await tapById("icon-PinToNotif");
-    await visibleByText("Pin to Notifications");
+    await tapById("icon-pin-to-notifications");
+    await sleep(500);
+    await visibleByText("Pin to notifications");
   });
 
   // it("Copy note", async () => {
@@ -100,7 +102,7 @@ describe("NOTE TESTS", () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Export");
+    await tapById("icon-export");
     await visibleByText("PDF");
   });
 
@@ -122,7 +124,7 @@ describe("NOTE TESTS", () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Delete");
+    await tapById("icon-delete");
     await navigate("Trash");
     await tapById(notesnook.listitem.menu);
     await tapByText("Restore note");

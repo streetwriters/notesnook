@@ -623,7 +623,7 @@ export const useActions = ({ close = () => null, item }) => {
       id: "pin-to-notifications",
       title:
         notifPinned !== null
-          ? "Unpin from Notifications"
+          ? "Unpin from notifications"
           : "Pin to notifications",
       icon: "message-badge-outline",
       on: notifPinned !== null,
