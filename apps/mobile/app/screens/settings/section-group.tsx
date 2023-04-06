@@ -42,12 +42,12 @@ export const SectionGroup = ({ item }: { item: SettingSection }) => {
           color={colors.accent}
           size={SIZE.xs}
         >
-          {item.name.toUpperCase()}
+          {(item.name as string).toUpperCase()}
         </Heading>
       ) : null}
 
       {item.sections?.map((item) => (
-        <SectionItem key={item.name} item={item} />
+        <SectionItem key={item.name as string} item={item} />
       ))}
     </View>
   );

@@ -17,13 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { notesnook } from "../test.ids";
 import {
   tapById,
   visibleByText,
   createNote,
   prepare,
   elementById,
-  sleep
+  sleep,
+  tapByText
 } from "./utils";
 
 describe("Search", () => {
@@ -34,6 +36,10 @@ describe("Search", () => {
     await sleep(300);
     await elementById("search-input").typeText("n");
     await sleep(1000);
+    await tapByText(note.body);
+    await sleep(1000);
+    await device.pressBack();
+    await device.pressBack();
     await visibleByText(note.body);
   });
 });
