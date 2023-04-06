@@ -22,6 +22,7 @@ import { expect, test, vi } from "vitest";
 import { CodeBlock, inferLanguage } from "../code-block";
 import { HighlighterPlugin } from "../highlighter";
 import { getChangedNodes } from "../../../utils/prosemirror";
+import { refractor } from "refractor/lib/core";
 
 const CODEBLOCKS_HTML = h("div", [
   h("pre", [h("code", ["function hello() { }"])], {
@@ -190,4 +191,29 @@ test("editing code in a highlighted code block should not be too slow", async ()
 
   expect(timings.reduce((a, b) => a + b) / timings.length).toBeLessThan(16);
   expect(editorElement.outerHTML).toMatchSnapshot();
+});
+
+test("Switching codeblock language should register the new language", async () => {
+  const editorElement = h("div");
+  const { editor } = createEditor({
+    element: editorElement,
+    initialContent: CODEBLOCKS_HTML,
+    extensions: {
+      codeblock: CodeBlock
+    }
+  });
+
+  const plugin = HighlighterPlugin({
+    name: CodeBlock.name,
+    defaultLanguage: "plaintext"
+  });
+  editor.commands.updateAttributes(CodeBlock.name, { language: "java" });
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  const highlighterState = plugin.spec.state?.init(editor.state, editor.state);
+  const highlighterLanguages = highlighterState?.languages;
+  for (const key in highlighterLanguages) {
+    const isTrue = refractor.registered(highlighterLanguages[key]);
+    expect(isTrue).toBe(true);
+  }
 });
