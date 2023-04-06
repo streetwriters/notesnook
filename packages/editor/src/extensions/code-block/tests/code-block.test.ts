@@ -202,18 +202,7 @@ test("Switching codeblock language should register the new language", async () =
       codeblock: CodeBlock
     }
   });
-
-  const plugin = HighlighterPlugin({
-    name: CodeBlock.name,
-    defaultLanguage: "plaintext"
-  });
   editor.commands.updateAttributes(CodeBlock.name, { language: "java" });
   await new Promise((resolve) => setTimeout(resolve, 100));
-
-  const highlighterState = plugin.spec.state?.init(editor.state, editor.state);
-  const highlighterLanguages = highlighterState?.languages;
-  for (const key in highlighterLanguages) {
-    const isTrue = refractor.registered(highlighterLanguages[key]);
-    expect(isTrue).toBe(true);
-  }
+  expect(refractor.registered("java")).toBe(true);
 });
