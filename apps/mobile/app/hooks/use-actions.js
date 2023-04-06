@@ -170,7 +170,15 @@ export const useActions = ({ close = () => null, item }) => {
       checkNotifPinned();
       return;
     }
-    if (item.locked) return;
+    if (item.locked) {
+      ToastEvent.show({
+        heading: "Note is locked",
+        type: "error",
+        message: "Locked notes cannot be pinned to notifications",
+        context: "local"
+      });
+      return;
+    }
     let text = await toTXT(item, false);
     let html = text.replace(/\n/g, "<br />");
     Notifications.displayNotification({
@@ -520,7 +528,15 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   async function exportNote() {
-    if (item.locked) return;
+    if (item.locked) {
+      ToastEvent.show({
+        heading: "Note is locked",
+        type: "error",
+        message: "Locked notes cannot be exported",
+        context: "local"
+      });
+      return;
+    }
     ExportNotesSheet.present([item]);
   }
 
