@@ -87,7 +87,7 @@ export const TrashIntervalSelector = () => {
       >
         {[-1, 7, 30, 365].map((item) => (
           <MenuItem
-            key={item.name}
+            key={item.toString()}
             onPress={async () => {
               if (item === -1) {
                 await PremiumService.verify(() => {
