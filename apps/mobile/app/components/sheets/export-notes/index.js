@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -277,7 +277,6 @@ const ExportNotesSheet = ({ notes, update }) => {
                       });
                     });
                   }}
-                  height={50}
                 />
                 <Button
                   title="Share"
@@ -301,7 +300,6 @@ const ExportNotesSheet = ({ notes, update }) => {
                       }).catch(console.log);
                     }
                   }}
-                  height={50}
                 />
                 <Button
                   title="Export in another format"
@@ -317,7 +315,6 @@ const ExportNotesSheet = ({ notes, update }) => {
                     setResult(null);
                     setExporting(false);
                   }}
-                  height={50}
                 />
               </>
             )}

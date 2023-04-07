@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import { ItemsViewModel } from "./items-view.model";
 import { NavigationMenuModel } from "./navigation-menu.model";
 import { NotebooksViewModel } from "./notebooks-view.model";
 import { NotesViewModel } from "./notes-view.model";
+import { RemindersViewModel } from "./reminders-view.model";
 import { SearchViewModel } from "./search-view-model";
 import { SettingsViewModel } from "./settings-view.model";
 import { ToastsModel } from "./toasts.model";
@@ -47,9 +48,10 @@ export class AppModel {
     this.routeHeader = this.page.locator(getTestId("routeHeader"));
   }
 
-  async goto() {
+  async goto(isLoggedIn = false) {
     await this.page.goto("/");
     await this.routeHeader.waitFor({ state: "visible" });
+    if (!isLoggedIn) await this.navigation.waitForItem("Login");
   }
 
   goBack() {
@@ -70,6 +72,11 @@ export class AppModel {
   async goToFavorites() {
     await this.navigateTo("Favorites");
     return new NotesViewModel(this.page, "notes");
+  }
+
+  async goToReminders() {
+    await this.navigateTo("Reminders");
+    return new RemindersViewModel(this.page);
   }
 
   async goToTags() {
@@ -95,7 +102,9 @@ export class AppModel {
   async navigateTo(title: string) {
     if ((await this.getRouteHeader()) === title) return;
     const item = await this.navigation.findItem(title);
-    await item?.click();
+    if (!item) throw new Error(`Could not find item to navigate to: ${title}`);
+
+    await item.click();
     await this.page.waitForTimeout(1000);
   }
 
@@ -123,7 +132,7 @@ export class AppModel {
       .waitFor({ state: "visible" });
   }
 
-  async search(query: string) {
+  async search(query: string, type: string) {
     const searchinput = this.page.locator(getTestId("search-input"));
     const searchButton = this.page.locator(getTestId("search-button"));
     const openSearch = this.page.locator(getTestId("open-search"));
@@ -131,6 +140,6 @@ export class AppModel {
     await openSearch.click();
     await searchinput.fill(query);
     await searchButton.click();
-    return new SearchViewModel(this.page);
+    return new SearchViewModel(this.page, type);
   }
 }

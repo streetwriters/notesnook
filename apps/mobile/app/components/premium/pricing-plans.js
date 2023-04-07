@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Platform, Text, View } from "react-native";
 import * as RNIap from "react-native-iap";
-import umami from "../../common/analytics";
 import { db } from "../../common/database";
 import { usePricing } from "../../hooks/use-pricing";
 import {
@@ -48,7 +47,6 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import { PricingItem } from "./pricing-item";
-import { useCallback } from "react";
 
 const promoCyclesMonthly = {
   1: "first month",
@@ -141,10 +139,6 @@ export const PricingPlans = ({
         setBuying(false);
         return;
       }
-      umami.pageView(
-        "/iap-native",
-        `${compact ? "pro-sheet" : "pro-screen"}/pro-plans`
-      );
       await RNIap.requestSubscription(
         product?.productId,
         false,

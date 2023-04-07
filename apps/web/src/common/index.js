@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -41,25 +41,29 @@ import { EVENTS } from "@notesnook/core/common";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
-    title: "Make a note",
+    title: "Add a note",
     onClick: () =>
       hashNavigate("/notes/create", { addNonce: true, replace: true })
   },
   notebooks: {
     title: "Create a notebook",
-    onClick: () => hashNavigate("/notebooks/create")
+    onClick: () => hashNavigate("/notebooks/create", { replace: true })
+  },
+  notebook: {
+    title: "Add a note",
+    onClick: () => hashNavigate(`/notes/create`, { replace: true })
   },
   topics: {
     title: "Create a topic",
-    onClick: () => hashNavigate(`/topics/create`)
+    onClick: () => hashNavigate(`/topics/create`, { replace: true })
   },
   tags: {
     title: "Create a tag",
-    onClick: () => hashNavigate(`/tags/create`)
+    onClick: () => hashNavigate(`/tags/create`, { replace: true })
   },
   reminders: {
     title: "Add a reminder",
-    onClick: () => hashNavigate(`/reminders/create`)
+    onClick: () => hashNavigate(`/reminders/create`, { replace: true })
   }
 };
 

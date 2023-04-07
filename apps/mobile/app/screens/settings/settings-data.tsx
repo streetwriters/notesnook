@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import notifee from "@notifee/react-native";
 import dayjs from "dayjs";
 import React from "react";
 import { Linking, Platform } from "react-native";
@@ -25,6 +26,7 @@ import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
 import { db } from "../../common/database";
 import { MMKV } from "../../common/database/mmkv";
+import { AttachmentDialog } from "../../components/attachments";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
 import { ChangeEmail } from "../../components/sheets/change-email";
@@ -56,7 +58,6 @@ import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import {
   eCloseSheet,
   eCloseSimpleDialog,
-  eOpenAttachmentsDialog,
   eOpenLoginDialog,
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog
@@ -68,7 +69,6 @@ import { useDragState } from "./editor/state";
 import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import notifee from "@notifee/react-native";
 
 type User = any;
 
@@ -149,7 +149,7 @@ export const settingsGroups: SettingSection[] = [
             name: "Manage attachments",
             icon: "attachment",
             modifer: () => {
-              eSendEvent(eOpenAttachmentsDialog);
+              AttachmentDialog.present();
             },
             description: "Manage all attachments in one place."
           },
@@ -474,7 +474,14 @@ export const settingsGroups: SettingSection[] = [
             description:
               "Automatically switch to dark mode when system theme changes",
             property: "useSystemTheme",
-            icon: "circle-half"
+            icon: "circle-half",
+            modifer: () => {
+              const current = SettingsService.get().useSystemTheme;
+              SettingsService.set({
+                useSystemTheme: !current
+              });
+              getColorScheme();
+            }
           },
           {
             id: "enable-dark-mode",
@@ -516,6 +523,14 @@ export const settingsGroups: SettingSection[] = [
             name: "Homepage",
             description: "Default screen to open on app startup",
             component: "homeselector"
+          },
+          {
+            id: "clear-trash-interval",
+            type: "component",
+            name: "Clear trash interval",
+            description:
+              "Select the duration after which trash items will be cleared",
+            component: "trash-interval-selector"
           }
         ]
       }
@@ -821,7 +836,6 @@ export const settingsGroups: SettingSection[] = [
   {
     id: "productivity",
     name: "Productivity",
-    hidden: () => Platform.OS !== "android",
     sections: [
       {
         id: "notification-notes",
@@ -841,7 +855,8 @@ export const settingsGroups: SettingSection[] = [
           SettingsService.set({
             notifNotes: !settings.notifNotes
           });
-        }
+        },
+        hidden: () => Platform.OS !== "android"
       },
       {
         id: "reminders",
@@ -890,7 +905,9 @@ export const settingsGroups: SettingSection[] = [
               "Set the notification sound for reminder notifications",
             component: "sound-picker",
             icon: "bell-ring",
-            hidden: () => Platform.OS === "android" && Platform.Version > 25
+            hidden: () =>
+              Platform.OS === "ios" ||
+              (Platform.OS === "android" && Platform.Version > 25)
           },
           {
             id: "reminder-sound",
@@ -942,9 +959,7 @@ export const settingsGroups: SettingSection[] = [
         onChange: () => {
           ToastEvent.show({
             heading: "Line spacing changed",
-            type: "success",
-            message:
-              "Close and reopen the current opened note or restart the app for changes to take affect."
+            type: "success"
           });
         }
       }
@@ -1010,9 +1025,19 @@ export const settingsGroups: SettingSection[] = [
         id: "join-telegram",
         name: "Join our Telegram group",
         description: "We are on telegram, let's talk",
-        // icon: 'telegram',
         modifer: () => {
           Linking.openURL("https://t.me/notesnook").catch(console.log);
+        }
+      },
+      {
+        id: "join-mastodom",
+        name: "Follow us on Mastodon",
+        description: "We are on mastodom",
+        icon: "mastodon",
+        modifer: () => {
+          Linking.openURL("https://fosstodon.org/@notesnook").catch(
+            console.log
+          );
         }
       },
       {
@@ -1086,6 +1111,14 @@ export const settingsGroups: SettingSection[] = [
           }
         },
         description: "Read our privacy policy"
+      },
+      {
+        id: "licenses",
+        name: "Open source Licenses",
+        type: "screen",
+        component: "licenses",
+        description: "Open source libraries used in Notesnook",
+        icon: "open-source-initiative"
       }
     ]
   },

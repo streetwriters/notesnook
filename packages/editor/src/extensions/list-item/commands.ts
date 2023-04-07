@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ export function onBackspacePressed(
 ) {
   const { selection } = editor.state;
   const { empty, $from } = selection;
+
   if (
     !empty ||
     !isInside(name, type, editor.state) ||
@@ -52,19 +53,22 @@ export function onBackspacePressed(
       if (parentList.childCount > 1) {
         return editor.commands.liftListItem(type);
       }
-      return editor.commands.deleteNode(parentList.type);
     }
 
-    return editor.commands.deleteNode(type);
-  } else if (isFirstOfType(type, editor.state)) {
-    return false;
-  } else {
-    // we have to run join backward twice because on the first join
-    // the two list items are joined i.e., the editor just puts their
-    // paragraphs next to each other. The next join merges the paragraphs
-    // like it should be.
     return editor.chain().joinBackward().joinBackward().run();
+  } else if (isFirstOfType(type, editor.state)) {
+    return editor.commands.liftListItem(type);
+  } else {
+    const block = findParentNodeOfType(type)(selection);
+    if (block && block.start === $from.pos - 1) {
+      // we have to run join backward twice because on the first join
+      // the two list items are joined i.e., the editor just puts their
+      // paragraphs next to each other. The next join merges the paragraphs
+      // like it should be.
+      return editor.chain().joinBackward().joinBackward().run();
+    }
   }
+  return false;
 }
 
 export function onArrowUpPressed(editor: Editor, name: string, type: NodeType) {

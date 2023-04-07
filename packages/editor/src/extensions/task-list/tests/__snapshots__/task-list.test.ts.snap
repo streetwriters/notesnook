@@ -1,0 +1,411 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`delete checked items in a nested task list 1`] = `
+[
+  {
+    "attrs": {
+      "title": null,
+    },
+    "content": [
+      {
+        "attrs": {
+          "checked": false,
+        },
+        "content": [
+          {
+            "content": [
+              {
+                "text": "Task item 2",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "taskItem",
+      },
+      {
+        "attrs": {
+          "checked": false,
+        },
+        "content": [
+          {
+            "content": [
+              {
+                "text": "Task item 3",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          {
+            "attrs": {
+              "title": null,
+            },
+            "content": [
+              {
+                "attrs": {
+                  "checked": false,
+                },
+                "content": [
+                  {
+                    "content": [
+                      {
+                        "text": "Task item 5",
+                        "type": "text",
+                      },
+                    ],
+                    "type": "paragraph",
+                  },
+                ],
+                "type": "taskItem",
+              },
+              {
+                "attrs": {
+                  "checked": false,
+                },
+                "content": [
+                  {
+                    "content": [
+                      {
+                        "text": "Task item 6",
+                        "type": "text",
+                      },
+                    ],
+                    "type": "paragraph",
+                  },
+                  {
+                    "attrs": {
+                      "title": null,
+                    },
+                    "content": [
+                      {
+                        "attrs": {
+                          "checked": false,
+                        },
+                        "content": [
+                          {
+                            "content": [
+                              {
+                                "text": "Task item 9",
+                                "type": "text",
+                              },
+                            ],
+                            "type": "paragraph",
+                          },
+                          {
+                            "attrs": {
+                              "title": null,
+                            },
+                            "content": [
+                              {
+                                "attrs": {
+                                  "checked": false,
+                                },
+                                "content": [
+                                  {
+                                    "content": [
+                                      {
+                                        "text": "Task item 12",
+                                        "type": "text",
+                                      },
+                                    ],
+                                    "type": "paragraph",
+                                  },
+                                ],
+                                "type": "taskItem",
+                              },
+                            ],
+                            "type": "taskList",
+                          },
+                        ],
+                        "type": "taskItem",
+                      },
+                    ],
+                    "type": "taskList",
+                  },
+                ],
+                "type": "taskItem",
+              },
+            ],
+            "type": "taskList",
+          },
+        ],
+        "type": "taskItem",
+      },
+    ],
+    "type": "taskList",
+  },
+]
+`;
+
+exports[`delete checked items in a task list 1`] = `
+[
+  {
+    "attrs": {
+      "title": null,
+    },
+    "content": [
+      {
+        "attrs": {
+          "checked": false,
+        },
+        "content": [
+          {
+            "content": [
+              {
+                "text": "Task item 2",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "taskItem",
+      },
+    ],
+    "type": "taskList",
+  },
+]
+`;
+
+exports[`sort checked items to the bottom of the task list 1`] = `
+[
+  {
+    "attrs": {
+      "title": null,
+    },
+    "content": [
+      {
+        "attrs": {
+          "checked": false,
+        },
+        "content": [
+          {
+            "content": [
+              {
+                "text": "Task item 2",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "taskItem",
+      },
+      {
+        "attrs": {
+          "checked": false,
+        },
+        "content": [
+          {
+            "content": [
+              {
+                "text": "Task item 3",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+          {
+            "attrs": {
+              "title": null,
+            },
+            "content": [
+              {
+                "attrs": {
+                  "checked": false,
+                },
+                "content": [
+                  {
+                    "content": [
+                      {
+                        "text": "Task item 5",
+                        "type": "text",
+                      },
+                    ],
+                    "type": "paragraph",
+                  },
+                ],
+                "type": "taskItem",
+              },
+              {
+                "attrs": {
+                  "checked": false,
+                },
+                "content": [
+                  {
+                    "content": [
+                      {
+                        "text": "Task item 6",
+                        "type": "text",
+                      },
+                    ],
+                    "type": "paragraph",
+                  },
+                  {
+                    "attrs": {
+                      "title": null,
+                    },
+                    "content": [
+                      {
+                        "attrs": {
+                          "checked": false,
+                        },
+                        "content": [
+                          {
+                            "content": [
+                              {
+                                "text": "Task item 9",
+                                "type": "text",
+                              },
+                            ],
+                            "type": "paragraph",
+                          },
+                          {
+                            "attrs": {
+                              "title": null,
+                            },
+                            "content": [
+                              {
+                                "attrs": {
+                                  "checked": false,
+                                },
+                                "content": [
+                                  {
+                                    "content": [
+                                      {
+                                        "text": "Task item 12",
+                                        "type": "text",
+                                      },
+                                    ],
+                                    "type": "paragraph",
+                                  },
+                                ],
+                                "type": "taskItem",
+                              },
+                              {
+                                "attrs": {
+                                  "checked": true,
+                                },
+                                "content": [
+                                  {
+                                    "content": [
+                                      {
+                                        "text": "Task item 10",
+                                        "type": "text",
+                                      },
+                                    ],
+                                    "type": "paragraph",
+                                  },
+                                ],
+                                "type": "taskItem",
+                              },
+                              {
+                                "attrs": {
+                                  "checked": true,
+                                },
+                                "content": [
+                                  {
+                                    "content": [
+                                      {
+                                        "text": "Task item 11",
+                                        "type": "text",
+                                      },
+                                    ],
+                                    "type": "paragraph",
+                                  },
+                                ],
+                                "type": "taskItem",
+                              },
+                            ],
+                            "type": "taskList",
+                          },
+                        ],
+                        "type": "taskItem",
+                      },
+                      {
+                        "attrs": {
+                          "checked": true,
+                        },
+                        "content": [
+                          {
+                            "content": [
+                              {
+                                "text": "Task item 7",
+                                "type": "text",
+                              },
+                            ],
+                            "type": "paragraph",
+                          },
+                        ],
+                        "type": "taskItem",
+                      },
+                      {
+                        "attrs": {
+                          "checked": true,
+                        },
+                        "content": [
+                          {
+                            "content": [
+                              {
+                                "text": "Task item 8",
+                                "type": "text",
+                              },
+                            ],
+                            "type": "paragraph",
+                          },
+                        ],
+                        "type": "taskItem",
+                      },
+                    ],
+                    "type": "taskList",
+                  },
+                ],
+                "type": "taskItem",
+              },
+              {
+                "attrs": {
+                  "checked": true,
+                },
+                "content": [
+                  {
+                    "content": [
+                      {
+                        "text": "Task item 4",
+                        "type": "text",
+                      },
+                    ],
+                    "type": "paragraph",
+                  },
+                ],
+                "type": "taskItem",
+              },
+            ],
+            "type": "taskList",
+          },
+        ],
+        "type": "taskItem",
+      },
+      {
+        "attrs": {
+          "checked": true,
+        },
+        "content": [
+          {
+            "content": [
+              {
+                "text": "Task item 1",
+                "type": "text",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "taskItem",
+      },
+    ],
+    "type": "taskList",
+  },
+]
+`;

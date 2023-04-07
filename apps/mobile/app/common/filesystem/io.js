@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ import { Platform } from "react-native";
 import Sodium from "@ammarahmed/react-native-sodium";
 import RNFetchBlob from "rn-fetch-blob";
 import { cacheDir, getRandomId } from "./utils";
+import { db } from "../database";
+import { compressToBase64 } from "./compress";
 
 export async function readEncrypted(filename, key, cipherData) {
   let path = `${cacheDir}/${filename}`;
@@ -29,6 +31,9 @@ export async function readEncrypted(filename, key, cipherData) {
     if (!exists) {
       return false;
     }
+    const attachment = db.attachments.attachment(filename);
+    const isPng = /(png)/g.test(attachment?.metadata.type);
+    const isJpeg = /(jpeg|jpg)/g.test(attachment?.metadata.type);
 
     let output = await Sodium.decryptFile(
       key,
@@ -36,8 +41,20 @@ export async function readEncrypted(filename, key, cipherData) {
         ...cipherData,
         hash: filename
       },
-      cipherData.outputType === "base64" ? "base64" : "text"
+      cipherData.outputType === "base64"
+        ? isPng || isJpeg
+          ? "cache"
+          : "base64"
+        : "text"
     );
+    if (cipherData.outputType === "base64" && (isPng || isJpeg)) {
+      const dCachePath = `${cacheDir}/${output}`;
+      output = await compressToBase64(
+        `file://${dCachePath}`,
+        isPng ? "PNG" : "JPEG"
+      );
+    }
+
     return output;
   } catch (e) {
     RNFetchBlob.fs.unlink(path).catch(console.log);
@@ -46,17 +63,26 @@ export async function readEncrypted(filename, key, cipherData) {
   }
 }
 
-export async function writeEncrypted(filename, { data, type, key }) {
-  console.log("file input: ", { type, key });
+export async function hashBase64(data) {
+  const hash = await Sodium.hashFile({
+    type: "base64",
+    data,
+    uri: ""
+  });
+  return {
+    hash: hash,
+    type: "xxh64"
+  };
+}
+
+export async function writeEncryptedBase64({ data, key }) {
   let filepath = cacheDir + `/${getRandomId("imagecache_")}`;
-  console.log(filepath);
   await RNFetchBlob.fs.writeFile(filepath, data, "base64");
   let output = await Sodium.encryptFile(key, {
     uri: Platform.OS === "ios" ? filepath : "file://" + filepath,
     type: "url"
   });
   RNFetchBlob.fs.unlink(filepath).catch(console.log);
-
   console.log("encrypted file output: ", output);
   return {
     ...output,

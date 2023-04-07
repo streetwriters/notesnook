@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,12 +37,12 @@ export default function Prompt(props: PromptDialogProps) {
       isOpen={true}
       title={props.title}
       description={props.description}
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
         text: "Done",
         onClick: () => props.onSave(inputRef.current?.value || "")
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
       <Field inputRef={inputRef} defaultValue={props.defaultValue} autoFocus />
     </Dialog>

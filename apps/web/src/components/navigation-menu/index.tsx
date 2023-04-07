@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ type Route = {
   title: string;
   path: string;
   icon: Icon;
-  isNew?: boolean;
+  tag?: string;
 };
 
 const navigationHistory = new Map();
@@ -92,7 +92,8 @@ const routes: Route[] = [
   {
     title: "Reminders",
     path: "/reminders",
-    icon: Reminders
+    icon: Reminders,
+    tag: "Beta"
   },
   { title: "Trash", path: "/trash", icon: Trash }
 ];
@@ -143,108 +144,117 @@ function NavigationMenu(props: NavigationMenuProps) {
       id="navigation-menu"
       data-test-id="navigation-menu"
       initial={{
-        opacity: 1
+        opacity: 0
       }}
       animate={{
         opacity: isFocusMode ? 0 : 1,
         visibility: isFocusMode ? "collapse" : "visible"
       }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      transition={{ duration: 0.2, ease: "easeInOut" }}
       sx={{
         zIndex: 1,
-        height: "auto",
         position: "relative",
         flex: 1,
+        height: "100%",
+        overflow: "hidden",
         flexDirection: "column",
         justifyContent: "space-between"
       }}
       bg={"bgSecondary"}
       px={0}
     >
-      <FlexScrollContainer>
-        <Flex sx={{ flexDirection: "column" }}>
-          {routes.map((item) => (
-            <NavigationItem
-              isTablet={isTablet}
-              key={item.path}
-              title={item.title}
-              icon={item.icon}
-              isNew={item.isNew}
-              selected={
-                item.path === "/"
-                  ? location === item.path
-                  : location.startsWith(item.path)
-              }
-              onClick={() => {
-                if (!isMobile && location === item.path)
-                  return toggleNavigationContainer();
-                _navigate(item.path);
-              }}
-            />
-          ))}
-          {colors.map((color) => (
-            <NavigationItem
-              isTablet={isTablet}
-              key={color.id}
-              title={db.colors?.alias(color.id)}
-              icon={Circle}
-              selected={location === `/colors/${color.id}`}
-              color={color.title.toLowerCase()}
-              onClick={() => {
-                _navigate(`/colors/${color.id}`);
-              }}
-              menuItems={[
-                {
-                  key: "rename",
-                  title: () => "Rename color",
-                  onClick: async () => {
-                    await showRenameColorDialog(color.id);
-                  }
-                }
-              ]}
-            />
-          ))}
-          <Box
-            bg="border"
-            my={1}
-            sx={{ width: "85%", height: "0.8px", alignSelf: "center" }}
+      <FlexScrollContainer
+        style={{
+          flexDirection: "column",
+          display: "flex"
+        }}
+        suppressScrollX={true}
+      >
+        {routes.map((item) => (
+          <NavigationItem
+            isTablet={isTablet}
+            key={item.path}
+            title={item.title}
+            icon={item.icon}
+            tag={item.tag}
+            selected={
+              item.path === "/"
+                ? location === item.path
+                : location.startsWith(item.path)
+            }
+            onClick={() => {
+              if (!isMobile && location === item.path)
+                return toggleNavigationContainer();
+              _navigate(item.path);
+            }}
           />
-          {shortcuts.map((item) => (
-            <NavigationItem
-              isTablet={isTablet}
-              key={item.id}
-              title={item.type === "tag" ? db.tags?.alias(item.id) : item.title}
-              menuItems={[
-                {
-                  key: "removeshortcut",
-                  title: () => "Remove shortcut",
-                  onClick: async () => {
-                    await db.shortcuts?.remove(item.id);
-                    refreshNavItems();
-                  }
+        ))}
+        {colors.map((color, index) => (
+          <NavigationItem
+            animate
+            index={index}
+            isTablet={isTablet}
+            key={color.id}
+            title={db.colors?.alias(color.id)}
+            icon={Circle}
+            selected={location === `/colors/${color.id}`}
+            color={color.title.toLowerCase()}
+            onClick={() => {
+              _navigate(`/colors/${color.id}`);
+            }}
+            menuItems={[
+              {
+                key: "rename",
+                title: () => "Rename color",
+                onClick: async () => {
+                  await showRenameColorDialog(color.id);
                 }
-              ]}
-              icon={
-                item.type === "notebook"
-                  ? Notebook2
-                  : item.type === "tag"
-                  ? Tag2
-                  : Topic
               }
-              isShortcut
-              selected={shouldSelectNavItem(location, item)}
-              onClick={() => {
-                if (item.type === "notebook") {
-                  _navigate(`/notebooks/${item.id}`);
-                } else if (item.type === "topic") {
-                  _navigate(`/notebooks/${item.notebookId}/${item.id}`);
-                } else if (item.type === "tag") {
-                  _navigate(`/tags/${item.id}`);
+            ]}
+          />
+        ))}
+        <Box
+          bg="border"
+          my={1}
+          sx={{ width: "85%", height: "0.8px", alignSelf: "center" }}
+        />
+        {shortcuts.map((item, index) => (
+          <NavigationItem
+            animate
+            index={colors.length - 1 + index}
+            isTablet={isTablet}
+            key={item.id}
+            title={item.type === "tag" ? db.tags?.alias(item.id) : item.title}
+            menuItems={[
+              {
+                key: "removeshortcut",
+                title: () => "Remove shortcut",
+                onClick: async () => {
+                  await db.shortcuts?.remove(item.id);
+                  refreshNavItems();
                 }
-              }}
-            />
-          ))}
-        </Flex>
+              }
+            ]}
+            icon={
+              item.type === "notebook"
+                ? Notebook2
+                : item.type === "tag"
+                ? Tag2
+                : Topic
+            }
+            isShortcut
+            selected={shouldSelectNavItem(location, item)}
+            onClick={() => {
+              if (item.type === "notebook") {
+                _navigate(`/notebooks/${item.id}`);
+              } else if (item.type === "topic") {
+                _navigate(`/notebooks/${item.notebookId}/${item.id}`);
+              } else if (item.type === "tag") {
+                _navigate(`/tags/${item.id}`);
+              }
+            }}
+          />
+        ))}
       </FlexScrollContainer>
       <Flex sx={{ flexDirection: "column" }}>
         {isLoggedIn === false && (
@@ -272,6 +282,8 @@ function NavigationMenu(props: NavigationMenuProps) {
           title={settings.title}
           icon={settings.icon}
           onClick={() => {
+            if (!isMobile && location === settings.path)
+              return toggleNavigationContainer();
             _navigate(settings.path);
           }}
           selected={location.startsWith(settings.path)}

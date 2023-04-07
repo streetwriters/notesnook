@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ function EmailVerificationDialog(props) {
       description={
         "Check your spam folder if you haven't received an email yet."
       }
-      onClose={props.onCancel}
+      onClose={() => props.onCancel(false)}
       positiveButton={{
         text: canSendAgain || isSending ? "Resend" : `Resend (${resetTimer})`,
         onClick: async () => {
@@ -82,7 +82,7 @@ function EmailVerificationDialog(props) {
       }}
       negativeButton={{
         text: "Cancel",
-        onClick: props.onCancel,
+        onClick: () => props.onCancel(true),
         disabled: isSending
       }}
     >

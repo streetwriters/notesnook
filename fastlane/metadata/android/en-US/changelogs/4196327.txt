@@ -1,0 +1,13 @@
+- Cross platform Reminders 🔔
+- Multi-factor auth is enabled by default for all users to improve login security
+- Now you can change account email from Settings -> Account Settings -> Change email
+- Added options to disable sync, auto-sync & real-time sync from settings.
+- Improved PDF exports styling- Added background sync support
+- Fix new features sheet showing on every launch
+- Fix permanent reminders removed on rebooting device
+- Fixed unable to unpin/disable reminders from notifications
+
+Thank you for using Notesnook!
+- Many bug fixes and improvements
+
+Thank you for using Notesnook!

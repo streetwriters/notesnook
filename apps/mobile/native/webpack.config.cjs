@@ -164,6 +164,7 @@ module.exports = (env) => {
             /node_modules(.*[/\\])+readable-stream/,
             /node_modules(.*[/\\])+react-native-fingerprint-scanner/,
             /node_modules(.*[/\\])+@notesnook[/\\]logger/,
+            /node_modules(.*[/\\])+@ammarahmed[/\\]notifee-react-native/,
           ],
           use: {
             loader: "babel-loader",

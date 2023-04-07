@@ -341,7 +341,6 @@ putIntoContainer(squareContainer, circle); // Error: Argument of type 'Circle' i
 A lot more code, I know, and if you don't know how generics work that blob of
 code is utter nonsense. One of the main reasons I avoided Typescript for a long
 time. But look at the benefits:
-
  1. You have 100% compile-time type safety.
  2. You can't put a round item in a square container (you will get compiler
     error).
@@ -385,7 +384,6 @@ right? Well, let's get into that.
 
 exports[`convert HTML to text with outlinelists: html-to-txt-outlinelists.txt 1`] = `
 "Testing outline list:
-
  * My outline list
  * works
  * but sometimes
@@ -410,7 +408,6 @@ EMAILS
 FEATURE INTRO
 
 Features:
-
  1.  Web clipper on mobile
  2.  Pin any note to notification
  3.  Take notes from notifications
@@ -453,7 +450,6 @@ daskvbkdsa   kdsajvbsajkd   kjdsavbdsa"
 
 exports[`convert HTML to text with tasklists: html-to-txt-tasklists.txt 1`] = `
 "Hello
-
  ✅ Task item 1
  ✅ Task item 2
  ✅ Task item 3
@@ -463,7 +459,6 @@ exports[`convert HTML to text with tasklists: html-to-txt-tasklists.txt 1`] = `
  ☐ Task Item 5
 
 Nene
-
  * dasvsadv
  * adsva\`sd
  * vasd

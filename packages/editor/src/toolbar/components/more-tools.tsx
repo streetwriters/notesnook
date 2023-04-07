@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,13 +31,15 @@ type MoreToolsProps = ToolProps & {
   popupId: string;
   tools: ToolId[];
   autoCloseOnUnmount?: boolean;
+  autoOpen?: boolean;
+  group?: string;
 };
 export function MoreTools(props: MoreToolsProps) {
-  const { popupId, editor, tools, autoCloseOnUnmount } = props;
+  const { popupId, editor, tools, autoCloseOnUnmount, autoOpen, group } = props;
   const toolbarLocation = useToolbarLocation();
   const isBottom = toolbarLocation === "bottom";
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(autoOpen || false);
   const onClosed = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   return (
@@ -50,7 +52,7 @@ export function MoreTools(props: MoreToolsProps) {
       />
       <PopupWrapper
         isOpen={isOpen}
-        group={"toolbarGroup"}
+        group={group || "toolbarGroup"}
         id={popupId}
         onClosed={onClosed}
         position={{

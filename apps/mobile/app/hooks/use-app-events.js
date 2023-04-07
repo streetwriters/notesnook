@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,12 +26,13 @@ import {
   Linking,
   NativeEventEmitter,
   NativeModules,
-  Platform
+  Platform,
+  Keyboard
 } from "react-native";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
 import { Walkthrough } from "../components/walkthroughs";
-import { editorState } from "../screens/editor/tiptap/utils";
+import { editorController, editorState } from "../screens/editor/tiptap/utils";
 import {
   clearMessage,
   setEmailVerifyMessage,
@@ -69,6 +70,7 @@ import { clearAppState } from "../screens/editor/tiptap/utils";
 import { tabBarRef } from "../utils/global-refs";
 import BackupService from "../services/backup";
 import { sleep } from "../utils/time";
+import notifee from "@notifee/react-native";
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
@@ -142,9 +144,9 @@ export const useAppEvents = () => {
     }
   }, []);
 
-  const onSyncAborted = useCallback((error) => {
+  const onSyncAborted = useCallback(() => {
     useUserStore.getState().setSyncing(false, SyncStatus.Failed);
-    if (error) ToastEvent.error(new Error(error));
+    //if (error) ToastEvent.error(new Error(error));
   }, []);
 
   useEffect(() => {
@@ -316,6 +318,10 @@ export const useAppEvents = () => {
 
   const onLogout = async (reason) => {
     console.log("Logged out", reason);
+    DatabaseLogger.log("User Logged Out" + reason);
+    SettingsService.set({
+      introCompleted: true
+    });
   };
 
   const unsubIAP = () => {
@@ -396,11 +402,9 @@ export const useAppEvents = () => {
 
   const checkAutoBackup = useCallback(async () => {
     if (verify || syncing) {
-      console.log("backup is waiting");
       refValues.current.backupDidWait = true;
       return;
     }
-    console.log("backup running immediate");
     const user = await db.user.getUser();
     if (PremiumService.get() && user) {
       if (SettingsService.get().reminder === "off") {
@@ -421,7 +425,6 @@ export const useAppEvents = () => {
 
   useEffect(() => {
     if (!verify && !syncing && refValues.current.backupDidWait) {
-      console.log("backup run after wait");
       refValues.current.backupDidWait = false;
       checkAutoBackup();
     }
@@ -444,6 +447,7 @@ export const useAppEvents = () => {
   const onAppStateChanged = useCallback(
     async (state) => {
       if (state === "active") {
+        notifee.setBadgeCount(0);
         updateStatusBarColor();
         if (
           SettingsService.get().appLockMode !== "background" &&
@@ -488,6 +492,10 @@ export const useAppEvents = () => {
           !useUserStore.getState().verifyUser
         ) {
           useUserStore.getState().setVerifyUser(true);
+          if (Platform.OS === "ios") {
+            editorController.current?.commands.blur();
+            Keyboard.dismiss();
+          }
         }
         if (
           SettingsService.get().privacyScreen ||

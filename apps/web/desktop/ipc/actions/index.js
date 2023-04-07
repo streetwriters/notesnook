@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,6 +25,11 @@ import open from "./open";
 import saveFile from "./saveFile";
 import setZoomFactor from "./setZoomFactor";
 import setPrivacyMode from "./setPrivacyMode";
+import showNotification from "./showNotification";
+import bringToFront from "./bringToFront";
+import setSpellCheckerLanguages from "./setSpellCheckerLanguages";
+import toggleSpellChecker from "./toggleSpellChecker";
+import setDesktopIntegration from "./setDesktopIntegration";
 
 const actions = {
   changeAppTheme,
@@ -34,7 +39,12 @@ const actions = {
   open,
   saveFile,
   setZoomFactor,
-  setPrivacyMode
+  setPrivacyMode,
+  showNotification,
+  bringToFront,
+  setSpellCheckerLanguages,
+  toggleSpellChecker,
+  setDesktopIntegration,
 };
 
 export function getAction(actionName) {

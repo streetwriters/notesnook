@@ -1,0 +1,9 @@
+- Improved UX for linking Notebooks
+- Redesign properties sheet to be simple & handy
+- Added support for RTL languages in editor
+- Telemetery is now opt-in
+- Get default reminder title/description from note
+- Fix unable to input recovery code on 2FA sheet
+- Bug fixes & small improvements
+
+Thank you for using Notesnook!

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,41 +25,34 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
 import { notesnook } from "../../../../e2e/test.ids";
-import { useMenuStore } from "../../../stores/use-menu-store";
-import { DDS } from "../../../services/device-detection";
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from "../../../services/event-manager";
-import Navigation from "../../../services/navigation";
 import { db } from "../../../common/database";
-import {
-  eCloseAddNotebookDialog,
-  eOpenAddNotebookDialog
-} from "../../../utils/events";
+import { DDS } from "../../../services/device-detection";
+import { presentSheet, ToastEvent } from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
+import { useMenuStore } from "../../../stores/use-menu-store";
+import { useRelationStore } from "../../../stores/use-relation-store";
 import { ph, pv, SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
-import { IconButton } from "../../ui/icon-button";
-import { Button } from "../../ui/button";
 import DialogHeader from "../../dialog/dialog-header";
+import { Button } from "../../ui/button";
+import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
-import { MoveNotes } from "../move-notes/movenote";
 import Seperator from "../../ui/seperator";
-import SheetWrapper from "../../ui/sheet";
-import { Toast } from "../../toast";
+import { MoveNotes } from "../move-notes/movenote";
+import { FlatList } from "react-native-actions-sheet";
 
 let refs = [];
-
 export class AddNotebookSheet extends React.Component {
   constructor(props) {
     super(props);
+    refs = [];
     this.state = {
-      notebook: null,
-      visible: false,
-      topics: [],
+      notebook: props.notebook,
+      topics:
+        props.notebook?.topics?.map((item) => {
+          return item.title;
+        }) || [],
       description: null,
       titleFocused: false,
       descFocused: false,
@@ -68,13 +61,14 @@ export class AddNotebookSheet extends React.Component {
       editTopic: false,
       loading: false
     };
-    this.title = null;
-    this.description = null;
+
+    this.title = props.notebook?.title;
+    this.description = props.notebook?.description;
     this.listRef;
     this.prevItem = null;
     this.prevIndex = null;
     this.currentSelectedInput = null;
-    this.id = null;
+    this.id = props.notebook?.id;
     this.backPressCount = 0;
     this.currentInputValue = null;
     this.titleRef;
@@ -83,57 +77,22 @@ export class AddNotebookSheet extends React.Component {
     this.hiddenInput = createRef();
     this.topicInputRef = createRef();
     this.addingTopic = false;
-    this.actionSheetRef = createRef();
-  }
-
-  componentDidMount() {
-    eSubscribeEvent(eOpenAddNotebookDialog, this.open);
-    eSubscribeEvent(eCloseAddNotebookDialog, this.close);
+    this.actionSheetRef = props.actionSheetRef;
   }
 
   componentWillUnmount() {
-    eUnSubscribeEvent(eOpenAddNotebookDialog, this.open);
-    eUnSubscribeEvent(eCloseAddNotebookDialog, this.close);
+    refs = [];
   }
 
-  open = (notebook) => {
-    refs = [];
-
-    if (notebook) {
-      let topicsList = [];
-      notebook.topics.forEach((item) => {
-        topicsList.push(item.title);
-      });
-      this.id = notebook.id;
-      this.title = notebook.title;
-      this.description = notebook.description;
-
-      this.setState({
-        topics: [...topicsList],
-        visible: true,
-        notebook: notebook
-      });
-    } else {
-      this.setState({
-        visible: true,
-        notebook: null
-      });
-    }
-    sleep(100).then(() => {
-      this.actionSheetRef.current?.show();
+  componentDidMount() {
+    sleep(300).then(() => {
+      !this.state.notebook && this.titleRef?.focus();
     });
-  };
+  }
 
   close = () => {
-    this.actionSheetRef.current?.hide();
     refs = [];
-    this.prevIndex = null;
-    this.prevItem = null;
-    this.currentSelectedInput = null;
-    this.title = null;
-    this.description = null;
-    this.currentInputValue = null;
-    this.id = null;
+    this.props.close(true);
   };
 
   onDelete = (index) => {
@@ -223,6 +182,7 @@ export class AddNotebookSheet extends React.Component {
       });
 
       await db.notebooks.notebook(toEdit.id).topics.add(...nextTopics);
+      this.close();
     } else {
       newNotebookId = await db.notebooks.add({
         title: this.title,
@@ -232,23 +192,9 @@ export class AddNotebookSheet extends React.Component {
       });
     }
     useMenuStore.getState().setMenuPins();
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes",
-      "Notebooks",
-      "Notebook"
-    );
-
-    this.setState({
-      loading: false
-    });
-    this.close();
-    await sleep(300);
-    if (!notebook) {
-      MoveNotes.present(db.notebooks.notebook(newNotebookId).data);
-    }
+    Navigation.queueRoutesForUpdate();
+    useRelationStore.getState().update();
+    MoveNotes.present(db.notebooks.notebook(newNotebookId).data);
   };
 
   onSubmit = (forward = true) => {
@@ -265,7 +211,7 @@ export class AddNotebookSheet extends React.Component {
         topics: prevTopics
       });
       setTimeout(() => {
-        this.listRef.scrollToEnd({ animated: true });
+        this.listRef.current?.scrollToEnd?.({ animated: true });
       }, 30);
       this.currentInputValue = null;
     } else {
@@ -289,7 +235,7 @@ export class AddNotebookSheet extends React.Component {
 
       if (forward) {
         setTimeout(() => {
-          this.listRef.scrollToEnd({ animated: true });
+          this.listRef.current?.scrollToEnd?.({ animated: true });
         }, 30);
       }
     }
@@ -301,166 +247,138 @@ export class AddNotebookSheet extends React.Component {
 
   render() {
     const { colors } = this.props;
-    const { topics, visible, topicInputFocused, notebook } = this.state;
-    if (!visible) return null;
+    const { topics, topicInputFocused, notebook } = this.state;
     return (
-      <SheetWrapper
-        onOpen={async () => {
-          this.topicsToDelete = [];
-          await sleep(300);
-          !this.state.notebook && this.titleRef?.focus();
+      <View
+        style={{
+          maxHeight: DDS.isTab ? "90%" : "96%",
+          borderRadius: DDS.isTab ? 5 : 0,
+          paddingHorizontal: 12
         }}
-        fwdRef={this.actionSheetRef}
-        onClose={() => {
-          this.close();
-          this.setState({
-            visible: false,
-            topics: [],
-            descFocused: false,
-            titleFocused: false,
-            editTopic: false,
-            notebook: null
-          });
-        }}
-        statusBarTranslucent={false}
-        onRequestClose={this.close}
       >
-        <View
+        <TextInput
+          ref={this.hiddenInput}
           style={{
-            maxHeight: DDS.isTab ? "90%" : "96%",
-            borderRadius: DDS.isTab ? 5 : 0,
-            paddingHorizontal: 12
+            width: 1,
+            height: 1,
+            opacity: 0,
+            position: "absolute"
           }}
-        >
-          <TextInput
-            ref={this.hiddenInput}
-            style={{
-              width: 1,
-              height: 1,
-              opacity: 0,
-              position: "absolute"
-            }}
-            blurOnSubmit={false}
-          />
-          <DialogHeader
-            title={
-              notebook && notebook.dateCreated
-                ? "Edit Notebook"
-                : "New Notebook"
+          blurOnSubmit={false}
+        />
+        <DialogHeader
+          title={
+            notebook && notebook.dateCreated ? "Edit Notebook" : "New Notebook"
+          }
+          paragraph={
+            notebook && notebook.dateCreated
+              ? "You are editing " + this.title + " notebook."
+              : "Notebooks are the best way to organize your notes."
+          }
+        />
+        <Seperator half />
+
+        <Input
+          fwdRef={(ref) => (this.titleRef = ref)}
+          testID={notesnook.ids.dialogs.notebook.inputs.title}
+          onChangeText={(value) => {
+            this.title = value;
+          }}
+          placeholder="Enter a title"
+          onSubmit={() => {
+            this.descriptionRef.focus();
+          }}
+          returnKeyLabel="Next"
+          returnKeyType="next"
+          defaultValue={notebook ? notebook.title : null}
+        />
+
+        <Input
+          fwdRef={(ref) => (this.descriptionRef = ref)}
+          testID={notesnook.ids.dialogs.notebook.inputs.description}
+          onChangeText={(value) => {
+            this.description = value;
+          }}
+          placeholder="Describe your notebook."
+          onSubmit={() => {
+            this.topicInputRef.current?.focus();
+          }}
+          returnKeyLabel="Next"
+          returnKeyType="next"
+          defaultValue={notebook ? notebook.description : null}
+        />
+
+        <Input
+          fwdRef={this.topicInputRef}
+          testID={notesnook.ids.dialogs.notebook.inputs.topic}
+          onChangeText={(value) => {
+            this.currentInputValue = value;
+            if (this.prevItem !== null) {
+              refs[this.prevIndex].setNativeProps({
+                text: value,
+                style: {
+                  borderBottomColor: colors.accent
+                }
+              });
             }
-            paragraph={
-              notebook && notebook.dateCreated
-                ? "You are editing " + this.title + " notebook."
-                : "Notebooks are the best way to organize your notes."
-            }
-          />
-          <Seperator half />
+          }}
+          returnKeyLabel="Done"
+          returnKeyType="done"
+          onSubmit={() => {
+            this.onSubmit();
+          }}
+          blurOnSubmit={false}
+          button={{
+            testID: "topic-add-button",
+            icon: this.state.editTopic ? "check" : "plus",
+            onPress: this.onSubmit,
+            color: topicInputFocused ? colors.accent : colors.icon
+          }}
+          placeholder="Add a topic"
+        />
 
-          <Input
-            fwdRef={(ref) => (this.titleRef = ref)}
-            testID={notesnook.ids.dialogs.notebook.inputs.title}
-            onChangeText={(value) => {
-              this.title = value;
-            }}
-            placeholder="Enter a title"
-            onSubmit={() => {
-              this.descriptionRef.focus();
-            }}
-            returnKeyLabel="Next"
-            returnKeyType="next"
-            defaultValue={notebook ? notebook.title : null}
-          />
-
-          <Input
-            fwdRef={(ref) => (this.descriptionRef = ref)}
-            testID={notesnook.ids.dialogs.notebook.inputs.description}
-            onChangeText={(value) => {
-              this.description = value;
-            }}
-            placeholder="Describe your notebook."
-            onSubmit={() => {
-              this.topicInputRef.current?.focus();
-            }}
-            returnKeyLabel="Next"
-            returnKeyType="next"
-            defaultValue={notebook ? notebook.description : null}
-          />
-
-          <Input
-            fwdRef={this.topicInputRef}
-            testID={notesnook.ids.dialogs.notebook.inputs.topic}
-            onChangeText={(value) => {
-              this.currentInputValue = value;
-              if (this.prevItem !== null) {
-                refs[this.prevIndex].setNativeProps({
-                  text: value,
-                  style: {
-                    borderBottomColor: colors.accent
-                  }
+        <FlatList
+          data={topics}
+          ref={(ref) => (this.listRef = ref)}
+          nestedScrollEnabled
+          keyExtractor={(item, index) => item + index.toString()}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="interactive"
+          ListFooterComponent={<View style={{ height: 50 }} />}
+          renderItem={({ item, index }) => (
+            <TopicItem
+              item={item}
+              onPress={(item, index) => {
+                this.prevIndex = index;
+                this.prevItem = item;
+                this.topicInputRef.current?.setNativeProps({
+                  text: item
                 });
-              }
-            }}
-            returnKeyLabel="Done"
-            returnKeyType="done"
-            onSubmit={() => {
-              this.onSubmit();
-            }}
-            blurOnSubmit={false}
-            button={{
-              testID: "topic-add-button",
-              icon: this.state.editTopic ? "check" : "plus",
-              onPress: this.onSubmit,
-              color: topicInputFocused ? colors.accent : colors.icon
-            }}
-            placeholder="Add a topic"
-          />
-
-          <FlatList
-            data={topics}
-            ref={(ref) => (this.listRef = ref)}
-            nestedScrollEnabled
-            keyExtractor={(item, index) => item + index.toString()}
-            onMomentumScrollEnd={() => {
-              this.actionSheetRef.current?.handleChildScrollEnd();
-            }}
-            keyboardShouldPersistTaps="always"
-            keyboardDismissMode="interactive"
-            ListFooterComponent={<View style={{ height: 50 }} />}
-            renderItem={({ item, index }) => (
-              <TopicItem
-                item={item}
-                onPress={(item, index) => {
-                  this.prevIndex = index;
-                  this.prevItem = item;
-                  this.topicInputRef.current?.setNativeProps({
-                    text: item
-                  });
-                  this.topicInputRef.current?.focus();
-                  this.currentInputValue = item;
-                  this.setState({
-                    editTopic: true
-                  });
-                }}
-                onDelete={this.onDelete}
-                index={index}
-                colors={colors}
-              />
-            )}
-          />
-          <Seperator />
-          <Button
-            width="100%"
-            height={50}
-            fontSize={SIZE.md}
-            title={
-              notebook && notebook.dateCreated
-                ? "Save changes"
-                : "Create notebook"
-            }
-            type="accent"
-            onPress={this.addNewNotebook}
-          />
-          {/* 
+                this.topicInputRef.current?.focus();
+                this.currentInputValue = item;
+                this.setState({
+                  editTopic: true
+                });
+              }}
+              onDelete={this.onDelete}
+              index={index}
+              colors={colors}
+            />
+          )}
+        />
+        <Seperator />
+        <Button
+          width="100%"
+          fontSize={SIZE.md}
+          title={
+            notebook && notebook.dateCreated
+              ? "Save changes"
+              : "Create notebook"
+          }
+          type="accent"
+          onPress={this.addNewNotebook}
+        />
+        {/* 
           {Platform.OS === 'ios'  && (
             <View
               style={{
@@ -468,13 +386,23 @@ export class AddNotebookSheet extends React.Component {
               }}
             />
           )} */}
-        </View>
-
-        <Toast context="local" />
-      </SheetWrapper>
+      </View>
     );
   }
 }
+
+AddNotebookSheet.present = (notebook) => {
+  presentSheet({
+    component: (ref, close, _update, colors) => (
+      <AddNotebookSheet
+        actionSheetRef={ref}
+        notebook={notebook}
+        close={close}
+        colors={colors}
+      />
+    )
+  });
+};
 
 const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
   const topicRef = (ref) => (refs[index] = ref);

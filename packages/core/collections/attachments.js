@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import { EV, EVENTS, sendAttachmentsProgressEvent } from "../common";
 import dataurl from "../utils/dataurl";
 import dayjs from "dayjs";
 import setManipulator from "../utils/set";
+import { getFileNameWithExtension } from "../utils/filename";
 
 export default class Attachments extends Collection {
   constructor(db, name, cached) {
@@ -131,7 +132,7 @@ export default class Attachments extends Collection {
       metadata: {
         hash,
         hashType,
-        filename,
+        filename: getFileNameWithExtension(filename, type),
         type: type || "application/octet-stream"
       },
       dateCreated: attachment.dateCreated || Date.now(),
@@ -183,7 +184,7 @@ export default class Attachments extends Collection {
 
   async detach(attachment) {
     await this._db.notes.init();
-    for (let noteId of attachment.noteIds) {
+    for (const noteId of attachment.noteIds) {
       const note = this._db.notes.note(noteId);
       if (!note) continue;
       const contentId = note.data.contentId;
@@ -195,9 +196,9 @@ export default class Attachments extends Collection {
 
   async _canDetach(attachment) {
     await this._db.notes.init();
-    for (let noteId of attachment.noteIds) {
-      const note = this._db.notes.note(noteId).data;
-      if (note.locked) return false;
+    for (const noteId of attachment.noteIds) {
+      const note = this._db.notes.note(noteId);
+      if (note && note.data.locked) return false;
     }
 
     return true;
@@ -249,6 +250,8 @@ export default class Attachments extends Collection {
         outputType
       }
     );
+    if (!data) return;
+
     return outputType === "base64"
       ? dataurl.fromObject({ type: attachment.metadata.type, data })
       : data;
@@ -282,22 +285,30 @@ export default class Attachments extends Collection {
     return this._collection.updateItem(attachment);
   }
 
-  async save(data, type, mimeType) {
+  async save(data, mimeType) {
+    const { hash } = await this._db.fs.hashBase64(data);
+    const attachment = this.attachment(hash);
+    if (attachment)
+      return {
+        metadata: attachment.metadata
+      };
+
     const key = await this._db.attachments.generateKey();
-    const metadata = await this._db.fs.writeEncrypted(
-      null,
+    const metadata = await this._db.fs.writeEncryptedBase64(
       data,
-      type,
       key,
       mimeType
     );
     return { key, metadata };
   }
 
-  async downloadMedia(noteId) {
-    const attachments = this.media.filter((attachment) =>
-      hasItem(attachment.noteIds, noteId)
+  async downloadMedia(noteId, hashesToLoad) {
+    const attachments = this.media.filter(
+      (attachment) =>
+        hasItem(attachment.noteIds, noteId) &&
+        (!hashesToLoad || hasItem(hashesToLoad, attachment.metadata.hash))
     );
+
     try {
       for (let i = 0; i < attachments.length; i++) {
         const attachment = attachments[i];

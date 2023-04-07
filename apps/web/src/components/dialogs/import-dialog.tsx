@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -68,13 +68,13 @@ function ImportDialog(props: ImportDialogProps) {
           ? undefined
           : {
               text: "Cancel",
-              onClick: props.onClose
+              onClick: () => props.onClose(false)
             }
       }
       positiveButton={
         isDone
           ? {
-              onClick: props.onClose,
+              onClick: () => props.onClose(true),
               text: "Close"
             }
           : {

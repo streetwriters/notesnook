@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -51,7 +51,9 @@ declare global {
         saved: string;
       }>
     >;
+    updateWords: () => void;
   }>;
+  var __PLATFORM__: "ios" | "android";
   var readonly: boolean;
   var noToolbar: boolean;
   var noHeader: boolean;
@@ -95,7 +97,6 @@ declare global {
   };
 
   var editorTitle: RefObject<HTMLInputElement>;
-
   /**
    * Global ref to manage tags in editor.
    */
@@ -113,7 +114,7 @@ declare global {
    */
 
   function post<T extends keyof typeof EventTypes>(
-    type: typeof EventTypes[T],
+    type: (typeof EventTypes)[T],
     value?: unknown
   ): void;
   interface Window {
@@ -145,7 +146,8 @@ export const EventTypes = {
   fullscreen: "editor-event:fullscreen",
   link: "editor-event:link",
   contentchange: "editor-event:content-change",
-  reminders: "editor-event:reminders"
+  reminders: "editor-event:reminders",
+  previewAttachment: "editor-event:preview-attachment"
 } as const;
 
 export function isReactNative(): boolean {
@@ -166,15 +168,16 @@ export function logger(
 }
 
 export function post<T extends keyof typeof EventTypes>(
-  type: typeof EventTypes[T],
-  value?: unknown
+  type: (typeof EventTypes)[T],
+  value?: unknown,
+  sessionId?: string
 ): void {
   if (isReactNative()) {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type,
         value: value,
-        sessionId: globalThis.sessionId
+        sessionId: sessionId || globalThis.sessionId
       })
     );
   } else {

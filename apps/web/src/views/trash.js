@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,11 +21,11 @@ import * as Icon from "../components/icons";
 import ListContainer from "../components/list-container";
 import { confirm } from "../common/dialog-controller";
 import { useStore, store } from "../stores/trash-store";
-import TrashPlaceholder from "../components/placeholders/trash-placeholder";
 import { showToast } from "../utils/toast";
 import { Text } from "@theme-ui/components";
 import useNavigate from "../hooks/use-navigate";
 import { db } from "../common/db";
+import Placeholder from "../components/placeholders";
 
 function Trash() {
   useNavigate("trash", async () => {
@@ -41,7 +41,7 @@ function Trash() {
       type="trash"
       groupType="trash"
       refresh={refresh}
-      placeholder={TrashPlaceholder}
+      placeholder={<Placeholder context="trash" />}
       items={items}
       button={{
         show: !!items.length,
@@ -51,20 +51,9 @@ function Trash() {
           confirm({
             title: "Clear Trash",
             subtitle: "Are you sure you want to clear all the trash?",
-            yesText: "Clear trash",
-            noText: "Cancel",
-            message: (
-              <>
-                This action is{" "}
-                <Text as="span" sx={{ color: "error" }}>
-                  IRREVERSIBLE
-                </Text>
-                . You will{" "}
-                <Text as="span" sx={{ color: "primary" }}>
-                  not be able to recover any of these items.
-                </Text>
-              </>
-            )
+            positiveButtonText: "Clear trash",
+            negativeButtonText: "Cancel",
+            message: `Are you sure you want to proceed? **This action is IRREVERSIBLE**.`
           }).then(async (res) => {
             if (res) {
               try {

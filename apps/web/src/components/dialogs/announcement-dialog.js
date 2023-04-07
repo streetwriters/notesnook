@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,10 +21,17 @@ import Modal from "react-modal";
 import { useTheme } from "@emotion/react";
 import { Flex } from "@theme-ui/components";
 import AnnouncementBody from "../announcements/body";
+import { store as announcementStore } from "../../stores/announcement-store";
+import { useCallback } from "react";
 
 function AnnouncementDialog(props) {
-  const { announcement, removeAnnouncement } = props;
+  const { announcement, onClose } = props;
   const theme = useTheme();
+
+  const dismiss = useCallback(() => {
+    announcementStore.get().dismiss(announcement.id);
+    onClose(true);
+  }, [announcement, onClose]);
 
   return (
     <Modal
@@ -48,7 +55,6 @@ function AnnouncementDialog(props) {
             props.onClose();
           }
         };
-        if (props.onOpen) props.onOpen();
       }}
       style={{
         content: {
@@ -85,8 +91,8 @@ function AnnouncementDialog(props) {
         }}
       >
         <AnnouncementBody
+          dismiss={dismiss}
           components={announcement.body}
-          removeAnnouncement={removeAnnouncement}
           type="dialog"
         />
       </Flex>

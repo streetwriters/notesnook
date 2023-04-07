@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ import { ToolProps } from "../types";
 import { Editor } from "../../types";
 import { ToolButton } from "../components/tool-button";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Flex, Text } from "@theme-ui/components";
 import { ResponsivePresenter } from "../../components/responsive";
 import { MenuButton, MenuItem } from "../../components/menu/types";
 import {
@@ -38,11 +37,13 @@ import { ColorTool } from "./colors";
 import { Counter } from "../components/counter";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { showPopup } from "../../components/popup-presenter";
+import { useRefValue } from "../../hooks/use-ref-value";
 
 export function TableSettings(props: ToolProps) {
   const { editor } = props;
   const isBottom = useToolbarLocation() === "bottom";
   if (!editor.isActive("table") || !isBottom) return null;
+
   return (
     <MoreTools
       {...props}
@@ -53,7 +54,6 @@ export function TableSettings(props: ToolProps) {
         "insertColumnRight",
         "insertRowAbove",
         "insertRowBelow",
-        "cellProperties",
         "columnProperties",
         "rowProperties",
         "deleteRow",
@@ -199,6 +199,10 @@ export function TableProperties(props: ToolProps) {
 }
 
 export function CellProperties(props: ToolProps) {
+  const { editor } = props;
+  const isBottom = useToolbarLocation() === "bottom";
+  if (!editor.isActive("table") || !isBottom) return null;
+
   return (
     <>
       <MoreTools
@@ -272,41 +276,41 @@ export function CellBorderColor(props: ToolProps) {
 export function CellBorderWidth(props: ToolProps) {
   const { editor } = props;
   const { borderWidth: _borderWidth } = editor.getAttributes("tableCell");
-  const borderWidth: number = _borderWidth ? _borderWidth : 1;
+  const borderWidth: number = _borderWidth
+    ? typeof _borderWidth === "string"
+      ? parseInt(_borderWidth)
+      : _borderWidth
+    : 1;
+  const borderWidthAsNumber = useRefValue(borderWidth);
 
   const decreaseBorderWidth = useCallback(() => {
-    return Math.max(1, borderWidth - 1);
-  }, [borderWidth]);
+    return Math.max(1, borderWidthAsNumber.current - 1);
+  }, [borderWidthAsNumber]);
 
   const increaseBorderWidth = useCallback(() => {
-    return Math.min(10, borderWidth + 1);
-  }, [borderWidth]);
+    return Math.min(10, borderWidthAsNumber.current + 1);
+  }, [borderWidthAsNumber]);
 
   return (
-    <Flex sx={{ justifyContent: "center", alignItems: "center" }}>
-      <Text variant={"subBody"} sx={{ mx: 1 }}>
-        Border width:
-      </Text>
-      <Counter
-        title="cell border width"
-        onDecrease={() =>
-          editor.current?.commands.setCellAttribute(
-            "borderWidth",
-            decreaseBorderWidth()
-          )
-        }
-        onIncrease={() =>
-          editor.current?.commands.setCellAttribute(
-            "borderWidth",
-            increaseBorderWidth()
-          )
-        }
-        onReset={() =>
-          editor.current?.commands.setCellAttribute("borderWidth", 1)
-        }
-        value={borderWidth + "px"}
-      />
-    </Flex>
+    <Counter
+      title="cell border width"
+      onDecrease={() =>
+        editor.current?.commands.setCellAttribute(
+          "borderWidth",
+          decreaseBorderWidth()
+        )
+      }
+      onIncrease={() =>
+        editor.current?.commands.setCellAttribute(
+          "borderWidth",
+          increaseBorderWidth()
+        )
+      }
+      onReset={() =>
+        editor.current?.commands.setCellAttribute("borderWidth", 1)
+      }
+      value={borderWidth + "px"}
+    />
   );
 }
 

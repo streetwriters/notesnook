@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,26 +25,35 @@ import SearchService from "../services/search";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useMenuStore } from "../stores/use-menu-store";
 import { db } from "../common/database";
-import { eClearEditor } from "./events";
+import { eClearEditor, eOnTopicSheetUpdate } from "./events";
 import { useRelationStore } from "../stores/use-relation-store";
 import { presentDialog } from "../components/dialog/functions";
 
-function deleteNotesConfirmDialog(items, type, context) {
+function deleteConfirmDialog(items, type, context) {
   return new Promise((resolve) => {
     presentDialog({
-      title: "Delete Contained Notes?",
-      paragraph: `Do you want to delete notes within ${
-        items.length > 1 ? `these ${type}s` : `this ${type}`
+      title: `Delete ${
+        items.length > 1 ? `${items.length} ${type}s` : `${type}`
       }?`,
-      positiveText: "Yes",
-      negativeText: "No",
-      positivePress: () => {
-        resolve(true);
+      positiveText: "Delete",
+      negativeText: "Cancel",
+      positivePress: (value) => {
+        setTimeout(() => {
+          resolve({ delete: true, deleteNotes: value });
+        });
       },
       onClose: () => {
-        resolve(false);
+        setTimeout(() => {
+          resolve({ delete: false });
+        });
       },
-      context: context
+      context: context,
+      check: {
+        info: `Move all notes in ${
+          items.length > 1 ? `these ${type}s` : `this ${type}`
+        } to trash`,
+        type: "transparent"
+      }
     });
   });
 }
@@ -107,53 +116,52 @@ export const deleteItems = async (item, context) => {
   }
 
   if (topics?.length > 0) {
-    const deleteNotes = await deleteNotesConfirmDialog(
-      topics,
-      "topic",
-      context
-    );
-    for (const topic of topics) {
-      if (deleteNotes) {
-        const notes = db.notebooks
-          .notebook(topic.notebookId)
-          .topics.topic(topic.id).all;
-        await db.notes.delete(...notes.map((note) => note.id));
-      }
-      await db.notebooks.notebook(topic.notebookId).topics.delete(topic.id);
-    }
-    routesForUpdate.push("Notebook", "Notebooks");
-    useMenuStore.getState().setMenuPins();
-    ToastEvent.show({
-      heading: `${topics.length > 1 ? "Topics" : "Topic"} deleted`,
-      type: "success"
-    });
-  }
-
-  if (notebooks?.length > 0) {
-    const deleteNotes = await deleteNotesConfirmDialog(
-      notebooks,
-      "notebook",
-      context
-    );
-
-    let ids = notebooks.map((i) => i.id);
-    if (deleteNotes) {
-      for (let id of ids) {
-        const topics = db.notebooks.notebook(id).topics.all;
-        for (let topic of topics) {
+    const result = await deleteConfirmDialog(topics, "topic", context);
+    if (result.delete) {
+      for (const topic of topics) {
+        if (result.deleteNotes) {
           const notes = db.notebooks
             .notebook(topic.notebookId)
             .topics.topic(topic.id).all;
           await db.notes.delete(...notes.map((note) => note.id));
         }
+        await db.notebooks.notebook(topic.notebookId).topics.delete(topic.id);
       }
+      routesForUpdate.push("Notebook", "Notebooks");
+      useMenuStore.getState().setMenuPins();
+      ToastEvent.show({
+        heading: `${topics.length > 1 ? "Topics" : "Topic"} deleted`,
+        type: "success"
+      });
     }
-    await db.notebooks.delete(...ids);
-    routesForUpdate.push("Notebook", "Notebooks");
-    useMenuStore.getState().setMenuPins();
   }
 
-  Navigation.queueRoutesForUpdate(...routesForUpdate);
+  if (notebooks?.length > 0) {
+    const result = await deleteConfirmDialog(notebooks, "notebook", context);
+
+    if (result.delete) {
+      let ids = notebooks.map((i) => i.id);
+      if (result.deleteNotes) {
+        for (let id of ids) {
+          const notebook = db.notebooks.notebook(id);
+          const topics = notebook.topics.all;
+          for (let topic of topics) {
+            const notes = db.notebooks
+              .notebook(topic.notebookId)
+              .topics.topic(topic.id).all;
+            await db.notes.delete(...notes.map((note) => note.id));
+          }
+          const notes = db.relations.from(notebook.data, "note");
+          await db.notes.delete(...notes.map((note) => note.id));
+        }
+      }
+      await db.notebooks.delete(...ids);
+      routesForUpdate.push("Notebook", "Notebooks");
+      useMenuStore.getState().setMenuPins();
+    }
+  }
+
+  Navigation.queueRoutesForUpdate();
 
   let msgPart = history.selectedItemsList.length === 1 ? " item" : " items";
   let message = history.selectedItemsList.length + msgPart + " moved to trash.";
@@ -177,7 +185,7 @@ export const deleteItems = async (item, context) => {
         }
         await db.trash.restore(...ids);
 
-        Navigation.queueRoutesForUpdate(routesForUpdate);
+        Navigation.queueRoutesForUpdate();
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
         ToastEvent.hide();
@@ -186,11 +194,12 @@ export const deleteItems = async (item, context) => {
     });
   }
   history.selectedItemsList = [];
-  Navigation.queueRoutesForUpdate("Trash");
+  Navigation.queueRoutesForUpdate();
   useSelectionStore.getState().clearSelection(true);
   useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();
   SearchService.updateAndSearch();
+  eSendEvent(eOnTopicSheetUpdate);
 };
 
 export const openLinkInBrowser = async (link) => {

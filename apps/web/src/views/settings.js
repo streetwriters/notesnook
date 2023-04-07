@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,8 +42,11 @@ import {
   show2FARecoveryCodesDialog,
   showToolbarConfigDialog,
   showPromptDialog,
-  showEmailChangeDialog
+  showEmailChangeDialog,
+  showLanguageSelectorDialog,
+  confirm
 } from "../common/dialog-controller";
+import { TaskManager } from "../common/task-manager";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { createBackup, importBackup, verifyAccount } from "../common";
 import { db } from "../common/db";
@@ -75,6 +78,11 @@ import { exportNotes } from "../common/export";
 import { scheduleBackups } from "../common/reminders";
 import usePrivacyMode from "../hooks/use-privacy-mode";
 import { DefaultFont } from "../components/default-font";
+import { useTelemetry } from "../hooks/use-telemetry";
+import useSpellChecker from "../hooks/use-spell-checker";
+import useDesktopIntegration from "../hooks/use-desktop-integration";
+import { writeText } from "clipboard-polyfill";
+
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -131,6 +139,14 @@ const otherItems = [
     title: "Roadmap",
     description: "See what the future of Notesnook is going to be like!",
     link: "https://notesnook.com/roadmap"
+  },
+  {
+    title: "About",
+    description: `version ${appVersion.formatted}`,
+    onClick: async () => {
+      await writeText(`version ${appVersion.formatted}`);
+      showToast("info", "Copied to clipboard!");
+    }
   }
 ];
 
@@ -145,6 +161,8 @@ function Settings() {
     privacy: false,
     developer: false,
     notifications: false,
+    desktop: false,
+    trash: false,
     other: true
   });
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
@@ -183,19 +201,22 @@ function Settings() {
     "backupReminderOffset",
     0
   );
+  const [trashCleanupInterval, setTrashCleanupInterval] = useState(
+    db.settings.getTrashCleanupInterval()
+  );
   const [debugMode, setDebugMode] = usePersistentState("debugMode", false);
   const [homepage, setHomepage] = usePersistentState("homepage", 0);
   const [backupStorageLocation, setBackupStorageLocation] = usePersistentState(
     "backupStorageLocation",
     PATHS.backupsDirectory
   );
-  const [enableTelemetry, setEnableTelemetry] = usePersistentState(
-    "telemetry",
-    true
-  );
+  const [enableTelemetry, setEnableTelemetry] = useTelemetry();
+  const spellChecker = useSpellChecker();
   const [privacyMode, setPrivacyMode] = usePrivacyMode();
   const [showReminderNotifications, setShowReminderNotifications] =
     usePersistentState("reminderNotifications", true);
+  const [desktopIntegration, changeDesktopIntegration] =
+    useDesktopIntegration();
   const [corsProxy, setCorsProxy] = usePersistentState(
     "corsProxy",
     "https://cors.notesnook.com"
@@ -431,25 +452,25 @@ function Settings() {
             {groups.sync && (
               <>
                 <Toggle
-                  title="Disable realtime sync in editor"
-                  onTip="You will have to manually open/close a note to see new changes."
-                  offTip="All changes in the editor will be synced & updated in realtime."
-                  onToggled={toggleRealtimeSync}
-                  isToggled={!isRealtimeSyncEnabled}
-                />
-                <Toggle
-                  title="Disable sync"
-                  onTip="All changes to or from this device won't be synced."
-                  offTip="All changes to or from this device will be synced."
+                  title="Enable sync"
+                  onTip="All changes to or from this device will be synced."
+                  offTip="All changes to or from this device won't be synced."
                   onToggled={toggleSync}
-                  isToggled={!isSyncEnabled}
+                  isToggled={isSyncEnabled}
                 />
                 <Toggle
-                  title="Disable auto sync"
-                  onTip="You will have to manually run the sync to transfer your changes to other devices."
-                  offTip="All changes will automatically sync to your other device."
+                  title="Enable auto sync"
+                  onTip="All changes will automatically sync to your other device."
+                  offTip="You will have to manually run the sync to transfer your changes to other devices."
                   onToggled={toggleAutoSync}
-                  isToggled={!isAutoSyncEnabled}
+                  isToggled={isAutoSyncEnabled}
+                />
+                <Toggle
+                  title="Enable realtime sync in editor"
+                  onTip="All changes in the editor will be synced & updated in realtime."
+                  offTip="You will have to manually open/close a note to see new changes."
+                  onToggled={toggleRealtimeSync}
+                  isToggled={isRealtimeSyncEnabled}
                 />
                 <Button variant="list" onClick={() => sync(true, true)}>
                   <Tip
@@ -508,7 +529,12 @@ function Settings() {
             <OptionsItem
               title={"Homepage"}
               tip={"Default screen to open on app startup."}
-              options={["Notes", "Notebooks", "Favorites", "Tags"]}
+              options={[
+                { value: 0, title: "Notes" },
+                { value: 1, title: "Notebooks" },
+                { value: 2, title: "Favorites" },
+                { value: 3, title: "Tags" }
+              ]}
               premium
               selectedOption={homepage}
               onSelectionChanged={(_option, index) => setHomepage(index)}
@@ -528,6 +554,61 @@ function Settings() {
                   onChange={debounce((e) => {
                     setZoomFactor(e.target.valueAsNumber);
                   }, 500)}
+                />
+              </>
+            )}
+          </>
+        )}
+
+        {isDesktop() && (
+          <>
+            <Header
+              title="Desktop integration"
+              isOpen={groups.desktop}
+              onClick={() => {
+                setGroups((g) => ({ ...g, desktop: !g.desktop }));
+              }}
+            />
+            {groups.desktop && (
+              <>
+                <Toggle
+                  title="Auto start on system startup"
+                  onToggled={() => {
+                    changeDesktopIntegration({
+                      autoStart: !desktopIntegration.autoStart
+                    });
+                  }}
+                  isToggled={desktopIntegration.autoStart}
+                />
+                {desktopIntegration.autoStart && (
+                  <Toggle
+                    title="Start minimized"
+                    onToggled={() => {
+                      changeDesktopIntegration({
+                        startMinimized: !desktopIntegration.startMinimized
+                      });
+                    }}
+                    isToggled={desktopIntegration.startMinimized}
+                  />
+                )}
+                <Toggle
+                  title="Minimize to system tray"
+                  onToggled={() => {
+                    changeDesktopIntegration({
+                      minimizeToSystemTray:
+                        !desktopIntegration.minimizeToSystemTray
+                    });
+                  }}
+                  isToggled={desktopIntegration.minimizeToSystemTray}
+                />
+                <Toggle
+                  title="Close to system tray"
+                  onToggled={() => {
+                    changeDesktopIntegration({
+                      closeToSystemTray: !desktopIntegration.closeToSystemTray
+                    });
+                  }}
+                  isToggled={desktopIntegration.closeToSystemTray}
                 />
               </>
             )}
@@ -573,6 +654,30 @@ function Settings() {
                 tip="Customize the editor toolbar to fit your needs."
               />
             </Button>
+
+            {isDesktop() && (
+              <>
+                <Toggle
+                  title="Enable spellchecker"
+                  onToggled={() => spellChecker.toggle(!spellChecker.enabled)}
+                  isToggled={spellChecker.enabled}
+                />
+                {getPlatform() !== "darwin" && (
+                  <Button
+                    variant="list"
+                    onClick={async () => {
+                      await showLanguageSelectorDialog();
+                    }}
+                  >
+                    <Tip
+                      text="Spellchecker languages"
+                      tip="Choose languages for the spellchecker"
+                      sx={{ py: 2 }}
+                    />
+                  </Button>
+                )}
+              </>
+            )}
           </>
         )}
 
@@ -623,18 +728,15 @@ function Settings() {
               tip={
                 "Create a zip file containing all your notes as TXT, MD or HTML files"
               }
-              options={["Text", "Markdown", "HTML"]}
-              selectedOption={-1}
+              options={[
+                { value: "txt", title: "Text" },
+                { value: "md", title: "Markdown", premium: true },
+                { value: "html", title: "HTML", premium: true }
+              ]}
               onSelectionChanged={async (option) => {
                 await db.notes.init();
-                const format =
-                  option === "Text"
-                    ? "txt"
-                    : option === "Markdown"
-                    ? "md"
-                    : "html";
                 await exportNotes(
-                  format,
+                  option.value,
                   db.notes.all.map((n) => n.id)
                 );
               }}
@@ -671,11 +773,16 @@ function Settings() {
                       ? "Automatically backup my data"
                       : "Remind me to backup my data"
                   }
-                  options={["Never", "Daily", "Weekly", "Monthly"]}
+                  options={[
+                    { value: 0, title: "Never" },
+                    { value: 1, title: "Daily" },
+                    { value: 2, title: "Weekly" },
+                    { value: 3, title: "Monthly" }
+                  ]}
                   premium="backups"
                   selectedOption={backupReminderOffset}
-                  onSelectionChanged={async (_option, index) =>
-                    setBackupReminderOffset(index)
+                  onSelectionChanged={(option) =>
+                    setBackupReminderOffset(option.value)
                   }
                 />
                 {isDesktop() ? (
@@ -702,7 +809,31 @@ function Settings() {
             )}
           </>
         )}
-
+        <Header
+          title="Trash settings"
+          isOpen={groups.trash}
+          testId="trash-settings"
+          onClick={() => {
+            setGroups((g) => ({ ...g, trash: !g.trash }));
+          }}
+        />
+        {groups.trash && (
+          <OptionsItem
+            title="Clear trash interval"
+            tip={"Permanently delete all items in the trash"}
+            options={[
+              { value: 7, title: "Weekly" },
+              { value: 30, title: "Monthly" },
+              { value: 365, title: "Yearly" },
+              { value: -1, title: "Never", premium: true }
+            ]}
+            selectedOption={trashCleanupInterval}
+            onSelectionChanged={async (option) => {
+              setTrashCleanupInterval(option.value);
+              await db.settings.setTrashCleanupInterval(option.value);
+            }}
+          />
+        )}
         <Header
           title="Notesnook Importer"
           isOpen={groups.importer}
@@ -831,7 +962,7 @@ function Settings() {
             <Toggle
               title="Enable telemetry"
               onTip="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
-              offTip="Do not collect any data or crash reports"
+              offTip={"Do not collect any data or crash reports"}
               onToggled={() => {
                 setEnableTelemetry(!enableTelemetry);
               }}
@@ -923,11 +1054,6 @@ function Settings() {
                 <Tip text={item.title} tip={item.description} />
               </Button>
             ))}
-            <Tip
-              sx={{ mt: 2 }}
-              text="About"
-              tip={`version ${appVersion.formatted}`}
-            />
           </>
         )}
         {isLoggedIn && (
@@ -1023,27 +1149,31 @@ function OptionsItem(props) {
       >
         {options.map((option, index) => (
           <Text
-            key={option}
-            bg={selectedOption === index ? "primary" : "transparent"}
+            key={option.value}
+            bg={selectedOption === option.value ? "primary" : "transparent"}
             variant="subBody"
             p={2}
             py={1}
             onClick={async () => {
-              if (isUserPremium() || !premium)
+              const isPremium = premium || option.premium;
+              if (isUserPremium() || !isPremium)
                 onSelectionChanged(option, index);
               else {
                 await showBuyDialog();
               }
             }}
             sx={{
-              ":hover": { color: selectedOption === index ? "static" : "text" },
+              ":hover": {
+                color: selectedOption === option.value ? "static" : "text"
+              },
               flex: 1,
               textAlign: "center",
-              color: selectedOption === index ? "static" : "bgSecondaryText",
-              minWidth: 100
+              color:
+                selectedOption === option.value ? "static" : "bgSecondaryText",
+              minWidth: 70
             }}
           >
-            {option}
+            {option.title}
           </Text>
         ))}
       </Flex>
@@ -1170,40 +1300,64 @@ function AccountStatus(props) {
         </>
       ) : isPro ? (
         <>
-          <Button
-            variant="list"
-            onClick={async () => {
-              if (!user.subscription.updateURL)
-                return showToast(
-                  "error",
-                  "Failed to update. Please reach out to us at support@streetwriters.co so we can help you resolve the issue."
-                );
-              window.open(user.subscription.updateURL, "_blank");
-            }}
-          >
-            <Tip
-              text="Update payment method"
-              tip="Update the payment method you used to purchase this subscription."
-            />
-          </Button>
-          <Button
-            variant="list"
-            sx={{ ":hover": { borderColor: "error" } }}
-            onClick={async () => {
-              if (!user.subscription.cancelURL)
-                return showToast(
-                  "error",
-                  "Failed to cancel subscription. Please reach out to us at support@streetwriters.co so we can help you resolve the issue."
-                );
-              window.open(user.subscription.cancelURL, "_blank");
-            }}
-          >
-            <Tip
-              color="error"
-              text="Cancel subscription"
-              tip="You will be downgraded to the Basic plan at the end of your billing period."
-            />
-          </Button>
+          {provider === "Web" ? (
+            <>
+              <Button
+                variant="list"
+                onClick={async () => {
+                  try {
+                    window.open(await db.subscriptions.updateUrl(), "_blank");
+                  } catch (e) {
+                    showToast("error", e.message);
+                  }
+                }}
+              >
+                <Tip
+                  text="Update payment method"
+                  tip="Update the payment method you used to purchase this subscription."
+                />
+              </Button>
+              <Button
+                variant="list"
+                sx={{ ":hover": { borderColor: "error" } }}
+                onClick={async () => {
+                  try {
+                    const cancelSubscription = await confirm({
+                      title: "Cancel subscription?",
+                      message:
+                        "Cancelling your subscription will automatically downgrade you to the Basic plan at the end of your billing period. You will have to resubscribe to continue using the Pro features.",
+                      negativeButtonText: "No",
+                      positiveButtonText: "Yes"
+                    });
+                    if (cancelSubscription) {
+                      await TaskManager.startTask({
+                        id: "cancel-subscription",
+                        type: "modal",
+                        title: "Cancelling your subscription",
+                        subtitle: "Please wait...",
+                        action: () => db.subscriptions.cancel()
+                      });
+                      showToast(
+                        "success",
+                        "Your subscription has been cancelled."
+                      );
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 5000);
+                    }
+                  } catch (e) {
+                    showToast("error", e.message);
+                  }
+                }}
+              >
+                <Tip
+                  color="error"
+                  text="Cancel subscription"
+                  tip="You will be downgraded to the Basic plan at the end of your billing period."
+                />
+              </Button>
+            </>
+          ) : null}
           <Text
             variant="subBody"
             mt={1}

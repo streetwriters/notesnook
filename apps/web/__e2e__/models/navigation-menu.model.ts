@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -38,6 +38,12 @@ export class NavigationMenuModel {
     }
   }
 
+  waitForItem(title: string) {
+    return this.menu
+      .locator(getTestId(`navigation-item`), { hasText: title })
+      .waitFor();
+  }
+
   async getShortcuts() {
     const shortcuts: string[] = [];
     for await (const item of this.iterateList()) {
@@ -57,13 +63,12 @@ export class NavigationMenuModel {
 }
 
 class NavigationItemModel {
-  private readonly title: Locator;
+  // private readonly title: Locator;
   private readonly shortcut: Locator;
   private readonly menu: ContextMenuModel;
   private readonly page: Page;
   constructor(private readonly locator: Locator) {
     this.page = locator.page();
-    this.title = locator.locator(getTestId("title"));
     this.shortcut = locator.locator(getTestId("shortcut"));
     this.menu = new ContextMenuModel(this.page);
   }
@@ -77,7 +82,7 @@ class NavigationItemModel {
   }
 
   async getTitle() {
-    return await this.title.textContent();
+    return await this.locator.getAttribute("title");
   }
 
   async renameColor(alias: string) {

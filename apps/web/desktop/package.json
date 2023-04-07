@@ -2,7 +2,7 @@
   "name": "@notesnook/desktop",
   "productName": "Notesnook",
   "description": "Your private note taking space",
-  "version": "2.3.0",
+  "version": "2.4.7",
   "appAppleId": "1544027013",
   "private": true,
   "main": "./build/electron.js",
@@ -11,7 +11,9 @@
   "dependencies": {
     "diary": "^0.3.1",
     "electron-updater": "^5.3.0",
-    "isomorphic-fetch": "^3.0.0"
+    "icojs": "^0.17.1",
+    "isomorphic-fetch": "^3.0.0",
+    "yargs": "^17.6.2"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.6.2",
@@ -19,22 +21,24 @@
     "electron-builder": "^23.6.0",
     "electron-builder-notarize": "^1.5.0",
     "electron-reloader": "^1.2.3",
-    "esbuild": "^0.15.11"
+    "esbuild": "^0.15.11",
+    "patch-package": "^6.5.1"
   },
   "scripts": {
     "build": "esbuild ./electron.js ./preload.js --external:electron --external:fsevents --minify --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=false --define:RELEASE=true",
     "build:mas": "esbuild ./electron.js ./preload.js --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=true --define:RELEASE=true",
-    "pack": "rm -rf ./build && cp -r ../build ./ && npm run build && yarn electron-builder --linux AppImage && ./dist/notesnook_linux_x86_64.AppImage"
+    "pack": "rm -rf ./build && cp -r ../build ./ && npm run build && yarn electron-builder --linux AppImage:x64 AppImage:arm64",
+    "postinstall": "patch-package"
   },
   "author": {
-    "name": "Streetwriters (Private) Ltd.",
+    "name": "Streetwriters (Private) Limited",
     "email": "support@streetwriters.co",
     "url": "https://streetwriters.co"
   },
   "build": {
     "appId": "org.streetwriters.notesnook",
     "productName": "Notesnook",
-    "copyright": "Copyright © 2022 Streetwriters (Private) Ltd.",
+    "copyright": "Copyright © 2023 Streetwriters (Private) Limited",
     "artifactName": "notesnook_${os}_${arch}.${ext}",
     "files": [
       "!*.chunk.js.map",
@@ -46,7 +50,7 @@
     "afterSign": "electron-builder-notarize",
     "afterPack": "./scripts/removeLocales.js",
     "mac": {
-      "bundleVersion": "222",
+      "bundleVersion": "240",
       "minimumSystemVersion": "10.12.0",
       "target": [
         {
@@ -97,8 +101,20 @@
     },
     "win": {
       "target": [
-        "nsis",
-        "portable"
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
       "icon": "assets/icons/app.ico"
     },
@@ -111,15 +127,44 @@
     },
     "linux": {
       "target": [
-        "AppImage",
-        "deb",
-        "rpm",
-        "snap"
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "snap",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
       "category": "Office",
       "icon": "assets/icons/app.icns",
       "description": "Your private note taking space",
-      "executableName": "notesnook"
+      "executableName": "notesnook",
+      "desktop": {
+        "actions": [
+          {
+            "id": "new-note",
+            "name": "New note",
+            "args": "new note"
+          },
+          {
+            "id": "new-notebook",
+            "name": "New notebook",
+            "args": "new notebook"
+          },
+          {
+            "id": "new-reminder",
+            "name": "New reminder",
+            "args": "new reminder"
+          }
+        ]
+      }
     },
     "snap": {
       "autoStart": false,

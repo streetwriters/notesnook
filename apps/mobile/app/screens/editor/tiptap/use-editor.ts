@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { EVENTS } from "@notesnook/core/common";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import WebView from "react-native-webview";
 import { db } from "../../../common/database";
@@ -29,6 +30,7 @@ import {
   openVault
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
+import SettingsService from "../../../services/settings";
 import { TipManager } from "../../../services/tip-manager";
 import { useEditorStore } from "../../../stores/use-editor-store";
 import { useNoteStore } from "../../../stores/use-notes-store";
@@ -50,8 +52,6 @@ import {
   makeSessionId,
   post
 } from "./utils";
-import { EVENTS } from "@notesnook/core/common";
-import SettingsService from "../../../services/settings";
 
 export const useEditor = (
   editorId = "",
@@ -76,6 +76,8 @@ export const useEditor = (
   const saveCount = useRef(0);
   const lastContentChangeTime = useRef<number>(0);
   const lock = useRef(false);
+  const loadedImages = useRef<{ [name: string]: boolean }>({});
+  const lockedSessionId = useRef<string>();
 
   const postMessage = useCallback(
     async <T>(type: string, data: T) =>
@@ -112,7 +114,7 @@ export const useEditor = (
     (show: boolean, data = { type: "new" }) => {
       eSendEvent(
         "loadingNote" + editorId,
-        show ? currentNote.current || data : false
+        show ? data || currentNote.current : false
       );
     },
     [editorId]
@@ -151,17 +153,19 @@ export const useEditor = (
   );
 
   const reset = useCallback(
-    async (resetState = true) => {
+    async (resetState = true, resetContent = true) => {
       currentNote.current?.id && db.fs.cancel(currentNote.current.id);
       currentNote.current = null;
+      loadedImages.current = {};
       currentContent.current = null;
+      clearTimeout(timers.current["loading-images"]);
       sessionHistoryId.current = undefined;
       saveCount.current = 0;
       useEditorStore.getState().setReadonly(false);
-      postMessage(EditorEvents.title, "");
+      resetContent && postMessage(EditorEvents.title, "");
       lastContentChangeTime.current = 0;
-      await commands.clearContent();
-      await commands.clearTags();
+      resetContent && (await commands.clearContent());
+      resetContent && (await commands.clearTags());
       if (resetState) {
         isDefaultEditor &&
           useEditorStore.getState().setCurrentlyEditingNote(null);
@@ -236,9 +240,15 @@ export const useEditor = (
 
           if (
             useEditorStore.getState().currentEditingNote !== id &&
-            isDefaultEditor
+            isDefaultEditor &&
+            state.current.currentlyEditing
           ) {
             setTimeout(() => {
+              if (
+                (currentNote.current?.id && currentNote.current?.id !== id) ||
+                !state.current.currentlyEditing
+              )
+                return;
               id && useEditorStore.getState().setCurrentlyEditingNote(id);
             });
           }
@@ -259,12 +269,7 @@ export const useEditor = (
             currentNote.current?.headline?.slice(0, 200) !==
               note.headline?.slice(0, 200)
           ) {
-            Navigation.queueRoutesForUpdate(
-              "ColoredNotes",
-              "Notes",
-              "TaggedNotes",
-              "TopicNotes"
-            );
+            Navigation.queueRoutesForUpdate();
           }
         }
 
@@ -290,6 +295,58 @@ export const useEditor = (
     }
   }, []);
 
+  const getMediaToLoad = (previousContent?: string) => {
+    if (!currentNote.current?.id) return [];
+
+    const previousAttachments =
+      previousContent?.matchAll(/data-hash="(.+?)"/gm) || [];
+    const attachments =
+      currentContent.current?.data?.matchAll(/data-hash="(.+?)"/gm) || [];
+
+    const media: string[] = [];
+
+    const oldMatches = Array.from(previousAttachments).map((match) => match[1]);
+    const matches = Array.from(attachments).map((match) => match[1]);
+
+    for (let i = 0; i < matches.length; i++) {
+      const currentHash = matches[i];
+      const oldHash = oldMatches[i];
+      if (currentHash !== oldHash) {
+        media.push(currentHash);
+        loadedImages.current[currentHash] = false;
+      }
+    }
+    return media;
+  };
+
+  const markImageLoaded = (hash: string) => {
+    const attachment = loadedImages.current[hash];
+    if (typeof attachment === "boolean") {
+      loadedImages.current[hash] = true;
+    }
+  };
+
+  const loadImages = useCallback((previousContent?: string) => {
+    if (!currentNote.current?.id) return;
+    const timerId = "loading-images";
+    clearTimeout(timers.current[timerId]);
+    timers.current[timerId] = setTimeout(() => {
+      if (!currentNote.current?.id) return;
+      if (currentNote.current?.content?.isPreview) {
+        db.content?.downloadMedia(
+          currentNote.current?.id,
+          currentNote.current.content,
+          true
+        );
+      } else {
+        const media = getMediaToLoad(previousContent);
+        if (media.length > 0) {
+          db.attachments?.downloadMedia(currentNote.current?.id, media);
+        }
+      }
+    }, 1000);
+  }, []);
+
   const loadNote = useCallback(
     async (
       item: Omit<NoteType, "type"> & {
@@ -312,16 +369,26 @@ export const useEditor = (
         useEditorStore.getState().setReadonly(false);
       } else {
         if (!item.forced && currentNote.current?.id === item.id) return;
+        state.current.movedAway = false;
+        state.current.currentlyEditing = true;
         isDefaultEditor && editorState.setCurrentlyEditingNote(item.id);
-        overlay(true, item);
-        currentNote.current && (await reset(false));
+        currentNote.current && (await reset(false, false));
         await loadContent(item as NoteType);
+        if (
+          !currentContent.current?.data ||
+          currentContent.current?.data.length < 50000
+        ) {
+          overlay(false);
+        } else {
+          overlay(true);
+        }
         lastContentChangeTime.current = item.dateEdited;
         const nextSessionId = makeSessionId(item as NoteType);
+        lockedSessionId.current = nextSessionId;
         sessionHistoryId.current = Date.now();
         setSessionId(nextSessionId);
+        commands.setSessionId(nextSessionId);
         sessionIdRef.current = nextSessionId;
-        await commands.setSessionId(nextSessionId);
         currentNote.current = item as NoteType;
         await commands.setStatus(timeConverter(item.dateEdited), "Saved");
         await postMessage(EditorEvents.title, item.title);
@@ -329,28 +396,25 @@ export const useEditor = (
         useEditorStore.getState().setReadonly(item.readonly);
         await commands.setTags(currentNote.current);
         commands.setSettings();
+        setTimeout(() => {
+          if (lockedSessionId.current === nextSessionId) {
+            lockedSessionId.current = undefined;
+          }
+        }, 300);
         overlay(false);
         loadImages();
       }
     },
-    [commands, isDefaultEditor, loadContent, overlay, postMessage, reset]
+    [
+      commands,
+      isDefaultEditor,
+      loadContent,
+      loadImages,
+      overlay,
+      postMessage,
+      reset
+    ]
   );
-
-  const loadImages = () => {
-    if (!currentNote.current?.id) return;
-    setTimeout(() => {
-      if (!currentNote.current?.id) return;
-      if (currentNote.current?.content?.isPreview) {
-        db.content?.downloadMedia(
-          currentNote.current?.id,
-          currentNote.current.content,
-          true
-        );
-      } else {
-        db.attachments?.downloadMedia(currentNote.current?.id);
-      }
-    }, 300);
-  };
 
   const lockNoteWithVault = useCallback((note: NoteType) => {
     eSendEvent(eClearEditor);
@@ -378,6 +442,9 @@ export const useEditor = (
         return;
 
       lock.current = true;
+
+      const previousContent = currentContent.current?.data;
+
       if (data.type === "tiptap") {
         if (!currentNote.current.locked && isContentEncrypted) {
           lockNoteWithVault(note);
@@ -408,16 +475,20 @@ export const useEditor = (
         }
         await commands.setStatus(timeConverter(note.dateEdited), "Saved");
       }
-      db.eventManager.subscribe(
-        EVENTS.syncCompleted,
-        async () => {
-          loadImages();
-        },
-        true
-      );
+
       lock.current = false;
+      if (data.type === "tiptap") {
+        loadImages(previousContent);
+        db.eventManager.subscribe(
+          EVENTS.syncCompleted,
+          () => {
+            loadImages(previousContent);
+          },
+          true
+        );
+      }
     },
-    [commands, postMessage, lockNoteWithVault]
+    [loadImages, lockNoteWithVault, postMessage, commands]
   );
 
   useEffect(() => {
@@ -436,14 +507,16 @@ export const useEditor = (
     ({
       title,
       content,
-      type
+      type,
+      forSessionId
     }: {
       title?: string;
       content?: string;
       type: string;
+      forSessionId: string;
     }) => {
+      if (lock.current || lockedSessionId.current === forSessionId) return;
       lastContentChangeTime.current = Date.now();
-      if (lock.current) return;
       if (type === EditorEvents.content) {
         currentContent.current = {
           data: content,
@@ -451,22 +524,27 @@ export const useEditor = (
           noteId: currentNote.current?.id as string
         };
       }
+      const noteIdFromSessionId =
+        !forSessionId || forSessionId.startsWith("session")
+          ? null
+          : forSessionId.split("_")[0];
+
+      const noteId = noteIdFromSessionId || currentNote.current?.id;
       const params = {
         title,
         data: content,
         type: "tiptap",
-        sessionId,
-        id: currentNote.current?.id,
+        sessionId: forSessionId,
+        id: noteId,
         sessionHistoryId: sessionHistoryId.current
       };
-
       withTimer(
-        currentNote.current?.id || "newnote",
+        noteId || "newnote",
         () => {
           if (
             currentNote.current &&
             !params.id &&
-            params.sessionId === sessionId
+            params.sessionId === forSessionId
           ) {
             params.id = currentNote.current?.id;
           }
@@ -476,10 +554,10 @@ export const useEditor = (
           }
           saveNote(params);
         },
-        500
+        150
       );
     },
-    [sessionId, withTimer, onChange, saveNote]
+    [withTimer, onChange, saveNote]
   );
 
   const restoreEditorState = useCallback(async () => {
@@ -560,6 +638,7 @@ export const useEditor = (
     onReady,
     saveContent,
     onContentChanged,
-    editorId: editorId
+    editorId: editorId,
+    markImageLoaded
   };
 };

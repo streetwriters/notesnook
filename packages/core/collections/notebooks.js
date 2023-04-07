@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -142,6 +142,10 @@ export default class Notebooks extends Collection {
     let notebook = id.type ? id : this._collection.getItem(id);
     if (!notebook || notebook.deleted) return;
     return new Notebook(notebook, this._db);
+  }
+
+  exists(id) {
+    return this._collection.exists(id);
   }
 
   async delete(...ids) {

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,11 +23,19 @@ import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
 import { Flex, FlexProps } from "@theme-ui/components";
 import { useTheme } from "@emotion/react";
 
+function isSchemeColor(
+  color: string,
+  theme: Theme
+): color is keyof SchemeColors {
+  if (!theme || !theme.colors) return false;
+  return color in theme.colors;
+}
+
 type IconProps = {
   title?: string;
   path: string;
   size?: keyof Theme["iconSizes"] | number;
-  color?: keyof SchemeColors;
+  color?: keyof SchemeColors | string;
   stroke?: string;
   rotate?: boolean;
 };
@@ -41,9 +49,10 @@ function MDIIconWrapper({
 }: IconProps) {
   const theme = useTheme() as Theme;
 
-  const themedColor: string = theme?.colors
-    ? (theme.colors[color] as string)
-    : color;
+  const themedColor: string =
+    theme && isSchemeColor(color, theme)
+      ? (theme.colors[color] as string)
+      : color;
 
   return (
     <MDIIcon

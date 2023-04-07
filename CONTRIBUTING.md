@@ -28,12 +28,6 @@ If you've thought of a way that Notesnook could be better, we want to hear about
 
 Before you open a new feature request, please make sure it's not a duplicate. **Duplicate feature requests & bug reports are closed immediately.**
 
-### Improving documentation
-
-All app related documentation can be found in the `docs/` directory. All the files in this directory are simple markdown files which you can edit either directly on GitHub, or in your favorite text editor.
-
-If you find a mistake in the documentation or would like to contribute something new to the documentation, feel free to open a pull request; creating an issue for this is not required.
-
 ### Helping out in the issue tracker
 
 There are always new issues getting opened that need to be triaged, sorted & organized, so the developers can easily find the most critical and/or relevant bugs to fix. Any help in this regard is appreciated.
@@ -91,7 +85,11 @@ The DCO is a declaration attached to every contribution made by every developer 
 Signed-off-by: Jane Smith <jane.smith@email.com>
 ```
 
-You may type this line on your own when writing your commit messages. However, if your [user.name](http://user.name) and [user.email](http://user.email) are set in your git configs, you can use `-s` or `--signoff` to add the `Signed-off-by` line to the end of the commit message.
+On VSCode, it looks like this:
+
+![](resources/vscode-signed-off-commit.png)
+
+You may type this line on your own when writing your commit messages. However, if your [user.name](http://user.name) and [user.email](http://user.email) are set in your git configs, you can use `-s` or `--signoff` to add the `Signed-off-by` line to the end of the commit message automatically.
 
 #### Include `<scope>:` in your commit message
 

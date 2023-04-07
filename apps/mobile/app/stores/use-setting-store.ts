@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Dimensions,PlatformOSType } from "react-native";
+import { Dimensions, PlatformOSType } from "react-native";
 import Config from "react-native-config";
+import { Sound } from "react-native-notification-sounds";
+import { initialWindowMetrics } from "react-native-safe-area-context";
 import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
-import { ACCENT } from "../utils/color-scheme";
-import { initialWindowMetrics } from "react-native-safe-area-context";
 import { Reminder } from "../services/notifications";
-import { Sound } from "react-native-notification-sounds";
+import { ACCENT } from "../utils/color-scheme";
 
 export type Settings = {
   showToolbarOnTop?: boolean;
@@ -123,7 +123,7 @@ export const useSettingStore = create<SettingStore>((set) => ({
     screenshotMode: true,
     privacyScreen: false,
     appLockMode: "none",
-    telemetry: true,
+    telemetry: false,
     notebooksListMode: "normal",
     notesListMode: "normal",
     devMode: false,

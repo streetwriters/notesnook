@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,14 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React, { RefObject, useRef, useState } from "react";
-import {
-  Platform,
-  ScrollView,
-  TextInput,
-  useWindowDimensions,
-  View
-} from "react-native";
-import ActionSheet from "react-native-actions-sheet";
+import { Platform, TextInput, View } from "react-native";
+import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {
   presentSheet,
@@ -44,11 +38,13 @@ import Notifications, { Reminder } from "../../../services/notifications";
 import PremiumService from "../../../services/premium";
 import SettingsService from "../../../services/settings";
 import { useRelationStore } from "../../../stores/use-relation-store";
+import { NoteType } from "../../../utils/types";
+import { Dialog } from "../../dialog";
 import { ReminderTime } from "../../ui/reminder-time";
 import Paragraph from "../../ui/typography/paragraph";
 
 type ReminderSheetProps = {
-  actionSheetRef: RefObject<ActionSheet>;
+  actionSheetRef: RefObject<ActionSheetRef>;
   close?: (ctx?: string) => void;
   update?: (options: PresentSheetOptions) => void;
   reminder?: Reminder;
@@ -115,10 +111,16 @@ export default function ReminderSheet({
   >(reminder?.priority || SettingsService.get().reminderNotificationMode);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [repeatFrequency, setRepeatFrequency] = useState(1);
-  const title = useRef<string | undefined>(reminder?.title);
+  const referencedItem = reference
+    ? (db.notes?.note(reference.id)?.data as NoteType)
+    : null;
+  const title = useRef<string | undefined>(
+    reminder?.title || referencedItem?.title
+  );
   const details = useRef<string | undefined>(reminder?.description);
   const titleRef = useRef<TextInput>(null);
-  const { height } = useWindowDimensions();
+  const timer = useRef<NodeJS.Timeout>();
+
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -128,9 +130,10 @@ export default function ReminderSheet({
   };
 
   const handleConfirm = (date: Date) => {
-    hideDatePicker();
-    setDate(date);
-    console.log(date);
+    timer.current = setTimeout(() => {
+      hideDatePicker();
+      setDate(date);
+    }, 50);
   };
   function nth(n: number) {
     return (
@@ -156,7 +159,7 @@ export default function ReminderSheet({
 
   async function saveReminder() {
     try {
-      if (!(await Notifications.checkAndRequestPermissions()))
+      if (!(await Notifications.checkAndRequestPermissions(true)))
         throw new Error(
           "App does not have permission to schedule notifications"
         );
@@ -205,15 +208,7 @@ export default function ReminderSheet({
         });
       }
       Notifications.scheduleNotification(_reminder as Reminder);
-      Navigation.queueRoutesForUpdate(
-        "TaggedNotes",
-        "ColoredNotes",
-        "Notes",
-        "NotesPage",
-        "Reminders",
-        "Favorites",
-        "TopicNotes"
-      );
+      Navigation.queueRoutesForUpdate();
       useRelationStore.getState().update();
       close?.();
     } catch (e) {
@@ -227,25 +222,37 @@ export default function ReminderSheet({
         paddingHorizontal: 12
       }}
     >
-      <ScrollView
-        onScrollEndDrag={() => actionSheetRef.current?.handleChildScrollEnd()}
-        style={{
-          maxHeight: height * 0.85
-        }}
-      >
+      <Dialog context="local" />
+      <ScrollView keyboardShouldPersistTaps="always">
         <Input
           fwdRef={titleRef}
-          defaultValue={reminder?.title}
+          defaultValue={reminder?.title || referencedItem?.title}
           placeholder="Remind me of..."
           onChangeText={(text) => (title.current = text)}
           containerStyle={{ borderWidth: 0, borderBottomWidth: 1 }}
         />
 
         <Input
-          defaultValue={reminder?.description}
+          defaultValue={
+            reminder ? reminder?.description : referencedItem?.headline
+          }
           placeholder="Add a quick note"
           onChangeText={(text) => (details.current = text)}
-          containerStyle={{ borderWidth: 0, borderBottomWidth: 1 }}
+          containerStyle={{
+            borderWidth: 0,
+            borderBottomWidth: 1,
+            maxHeight: 80,
+            marginTop: 10
+          }}
+          multiline
+          textAlignVertical="top"
+          inputStyle={{
+            height: 80
+          }}
+          height={80}
+          wrapperStyle={{
+            marginBottom: 20
+          }}
         />
 
         <View
@@ -419,6 +426,7 @@ export default function ReminderSheet({
 
             <DatePicker
               date={date}
+              maximumDate={dayjs(date).add(3, "months").toDate()}
               onDateChange={handleConfirm}
               textColor={colors.night ? "#ffffff" : "#000000"}
               fadeToColor={colors.bg}
@@ -540,16 +548,16 @@ export default function ReminderSheet({
             alignSelf: "flex-start"
           }}
         />
+        <Button
+          style={{
+            width: "100%"
+          }}
+          title="Save"
+          type="accent"
+          fontSize={SIZE.md}
+          onPress={saveReminder}
+        />
       </ScrollView>
-      <Button
-        style={{
-          width: "100%"
-        }}
-        title="Save"
-        type="accent"
-        fontSize={SIZE.md}
-        onPress={saveReminder}
-      />
     </View>
   );
 }
@@ -561,6 +569,7 @@ ReminderSheet.present = (
 ) => {
   presentSheet({
     context: isSheet ? "local" : undefined,
+    enableGesturesInScrollView: true,
     component: (ref, close, update) => (
       <ReminderSheet
         actionSheetRef={ref}

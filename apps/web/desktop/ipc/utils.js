@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,8 @@ import { isAbsolute, join } from "path";
 function sendMessageToRenderer(type, payload = {}) {
   const message = { type, ...payload };
   logger.info("Sending message to renderer", message);
-  if (global.win) global.win.webContents.send("fromMain", message);
+  if (globalThis.window)
+    globalThis.window.webContents.send("fromMain", message);
 }
 
 function resolvePath(_path) {

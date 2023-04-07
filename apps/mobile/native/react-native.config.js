@@ -1,5 +1,5 @@
 
-const isGithubRelease =  process.env.GITHUB_RELEASE;
+const isGithubRelease = false;
 const config = {
   commands: require('@callstack/repack/commands'),
   project: {
@@ -9,15 +9,19 @@ const config = {
   }
 };
 
-if (isGithubRelease) {
-  config.dependencies = {
-    "react-native-iap": {
-      platforms: {
-        android:null
-      }
-    },
-  }
+if (!config.dependencies) config.dependencies = {};
+config.dependencies['react-native-vector-icons'] = {
+  platforms: {
+    ios: null,
+  },
 }
 
+if (isGithubRelease) {
+  config.dependencies["react-native-iap"] = {
+    platforms: {
+      android:null
+    }
+  }
+}
 
 module.exports = config;

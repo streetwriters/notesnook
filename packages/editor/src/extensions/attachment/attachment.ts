@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ export interface AttachmentOptions {
   HTMLAttributes: Record<string, unknown>;
   onDownloadAttachment: (editor: Editor, attachment: Attachment) => boolean;
   onOpenAttachmentPicker: (editor: Editor, type: AttachmentType) => boolean;
+  onPreviewAttachment: (editor: Editor, attachment: Attachment) => boolean;
 }
 
 export type AttachmentWithProgress = AttachmentProgress & Attachment;
@@ -52,6 +53,7 @@ declare module "@tiptap/core" {
       removeAttachment: () => ReturnType;
       downloadAttachment: (attachment: Attachment) => ReturnType;
       setAttachmentProgress: (progress: AttachmentProgress) => ReturnType;
+      previewAttachment: (options: Attachment) => ReturnType;
     };
   }
 }
@@ -67,7 +69,8 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return {
       HTMLAttributes: {},
       onDownloadAttachment: () => false,
-      onOpenAttachmentPicker: () => false
+      onOpenAttachmentPicker: () => false,
+      onPreviewAttachment: () => false
     };
   },
 
@@ -158,6 +161,12 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
           tr.setMeta("addToHistory", false);
           if (dispatch) dispatch(tr);
           return true;
+        },
+
+      previewAttachment:
+        (attachment) =>
+        ({ editor }) => {
+          return this.options.onPreviewAttachment(editor, attachment);
         }
     };
   }

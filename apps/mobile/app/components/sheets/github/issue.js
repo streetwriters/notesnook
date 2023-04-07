@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -196,7 +196,6 @@ For example:
         onPress={onPress}
         title={loading ? null : "Submit"}
         loading={loading}
-        height={50}
         width="100%"
         type="accent"
       />

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,6 +21,10 @@ import { ToolbarDefinition, ToolDefinition } from "./types";
 import { ToolId } from "./tools";
 
 const tools: Record<ToolId, ToolDefinition> = {
+  none: {
+    icon: "none",
+    title: ""
+  },
   bold: {
     icon: "bold",
     title: "Bold"
@@ -233,7 +237,6 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: "Cell border width",
     conditional: true
   },
-
   imageSettings: {
     icon: "imageSettings",
     title: "Image settings",
@@ -257,6 +260,11 @@ const tools: Record<ToolId, ToolDefinition> = {
   imageProperties: {
     icon: "more",
     title: "Image properties",
+    conditional: true
+  },
+  previewAttachment: {
+    icon: "previewAttachment",
+    title: "Preview attachment",
     conditional: true
   },
   attachmentSettings: {
@@ -347,8 +355,10 @@ export const STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
   [
     "insertBlock",
     "tableSettings",
+    "cellProperties",
     "imageSettings",
     "embedSettings",
+    "previewAttachment",
     "attachmentSettings",
     "linkSettings",
     "codeRemove",

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ test.afterAll(async () => {
 });
 
 test.afterEach(async () => {
-  await app.goto();
+  await app.goto(true);
 });
 
 function roundOffPrices(prices: PriceItem[]) {
@@ -142,7 +142,7 @@ test("apply coupon through url", async () => {
 
     planPrices[plan] = roundOffPrices(await pricing.getPrices());
 
-    await app.goto();
+    await app.goto(true);
   }
 
   for (const key in planPrices) {

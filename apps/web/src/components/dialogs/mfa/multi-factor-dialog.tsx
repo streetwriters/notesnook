@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ export default function MultifactorDialog(props: MultifactorDialogProps) {
         step.next
           ? {
               text: "Continue",
-              props: { form: "2faForm" }
+              form: "2faForm"
             }
           : null
       }
@@ -64,7 +64,7 @@ export default function MultifactorDialog(props: MultifactorDialogProps) {
         step.cancellable
           ? {
               text: "Cancel",
-              onClick: onClose
+              onClick: () => props.onClose(false)
             }
           : null
       }

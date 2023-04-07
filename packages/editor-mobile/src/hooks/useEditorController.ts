@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@ export type EditorController = {
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   openFilePicker: (type: "image" | "file" | "camera") => void;
   downloadAttachment: (attachment: Attachment) => void;
+  previewAttachment: (attachment: Attachment) => void;
   content: MutableRefObject<string | null>;
   onUpdate: () => void;
   titlePlaceholder: string;
@@ -82,6 +83,7 @@ export function useEditorController(update: () => void): EditorController {
   }, []);
 
   const contentChange = useCallback((editor: Editor) => {
+    const currentSessionId = globalThis.sessionId;
     post(EventTypes.contentchange);
     if (!editor) return;
     if (typeof timers.current.change === "number") {
@@ -89,7 +91,7 @@ export function useEditorController(update: () => void): EditorController {
     }
     timers.current.change = setTimeout(() => {
       htmlContentRef.current = editor.getHTML();
-      post(EventTypes.content, htmlContentRef.current);
+      post(EventTypes.content, htmlContentRef.current, currentSessionId);
     }, 300);
   }, []);
 
@@ -115,17 +117,20 @@ export function useEditorController(update: () => void): EditorController {
           htmlContentRef.current = value;
           if (!editor) break;
           const { from, to } = editor.state.selection;
-          editor?.commands.setContent(htmlContentRef.current, false);
+          editor?.commands.setContent(htmlContentRef.current, false, {
+            preserveWhitespace: true
+          });
           editor.commands.setTextSelection({
             from,
             to
           });
-
+          statusBar.current?.updateWords();
           break;
         }
         case "native:html":
           htmlContentRef.current = value;
           update();
+          statusBar.current?.updateWords();
           break;
         case "native:theme":
           useEditorThemeStore.getState().setColors(message.value);
@@ -153,7 +158,6 @@ export function useEditorController(update: () => void): EditorController {
     if (isSafari) {
       root = window;
     }
-    console.log("recreating messaging");
     root.addEventListener("message", onMessage);
 
     return () => {
@@ -168,7 +172,9 @@ export function useEditorController(update: () => void): EditorController {
   const downloadAttachment = useCallback((attachment: Attachment) => {
     post(EventTypes.download, attachment);
   }, []);
-
+  const previewAttachment = useCallback((attachment: Attachment) => {
+    post(EventTypes.previewAttachment, attachment);
+  }, []);
   const openLink = useCallback((url: string) => {
     post(EventTypes.link, url);
     return true;
@@ -185,6 +191,7 @@ export function useEditorController(update: () => void): EditorController {
     setTitlePlaceholder,
     openFilePicker,
     downloadAttachment,
+    previewAttachment,
     content: htmlContentRef,
     openLink,
     onUpdate: onUpdate

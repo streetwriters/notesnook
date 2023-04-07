@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,7 +31,11 @@ import { hashNavigate } from "../../navigation";
 import { Multiselect } from "../../common/multi-select";
 import { store } from "../../stores/reminder-store";
 import { db } from "../../common/db";
-import { showEditReminderDialog } from "../../common/dialog-controller";
+import {
+  confirm,
+  showEditReminderDialog
+} from "../../common/dialog-controller";
+import { pluralize } from "../../utils/string";
 
 const RECURRING_MODE_MAP = {
   week: "Weekly",
@@ -68,7 +72,8 @@ function Reminder({
       footer={
         <Flex
           sx={{
-            alignItems: "center"
+            alignItems: "center",
+            gap: 1
           }}
         >
           {reminder.disabled ? (
@@ -76,21 +81,24 @@ function Reminder({
               icon={Icon.ReminderOff}
               text={"Disabled"}
               styles={{ icon: { color: "error" } }}
+              testId={"disabled"}
             />
           ) : (
             <IconTag
               icon={Icon.Clock}
               text={formatReminderTime(reminder)}
               highlight={isReminderToday(reminder)}
+              testId={"reminder-time"}
             />
           )}
           {reminder.disabled ? null : (
-            <PriorityIcon size={14} color="fontTertiary" sx={{ ml: 1 }} />
+            <PriorityIcon size={14} color="fontTertiary" />
           )}
           {reminder.mode === "repeat" && reminder.recurringMode && (
             <IconTag
               icon={Icon.Refresh}
               text={RECURRING_MODE_MAP[reminder.recurringMode]}
+              testId={`recurring-mode`}
             />
           )}
         </Flex>
@@ -114,16 +122,19 @@ type MenuActionParams = {
 };
 
 type MenuItemValue<T> = T | ((options: MenuActionParams) => T);
-
-const menuItems: {
+type MenuItem = {
+  type?: "separator";
   key: string;
-  title: MenuItemValue<string>;
-  icon: MenuItemValue<Icon.Icon>;
-  onClick: (options: MenuActionParams) => void;
+  title?: MenuItemValue<string>;
+  icon?: MenuItemValue<Icon.Icon>;
+  onClick?: (options: MenuActionParams) => void;
   color?: MenuItemValue<string>;
   iconColor?: MenuItemValue<string>;
   multiSelect?: boolean;
-}[] = [
+  items?: MenuItemValue<MenuItem[]>;
+};
+
+const menuItems: MenuItem[] = [
   {
     key: "edit",
     title: "Edit",
@@ -132,7 +143,7 @@ const menuItems: {
   },
   {
     key: "toggle",
-    title: ({ reminder }) => (reminder.disabled ? "Turn on" : "Turn off"),
+    title: ({ reminder }) => (reminder.disabled ? "Activate" : "Deactivate"),
     icon: ({ reminder }: MenuActionParams) =>
       reminder.disabled ? Icon.Reminders : Icon.ReminderOff,
     onClick: async ({ reminder }) => {
@@ -143,6 +154,7 @@ const menuItems: {
       store.refresh();
     }
   },
+  { key: "sep", type: "separator" },
   {
     key: "delete",
     title: "Delete",
@@ -150,7 +162,14 @@ const menuItems: {
     iconColor: "error",
     icon: Icon.Trash,
     onClick: async ({ items }) => {
-      await Multiselect.moveRemindersToTrash(items);
+      confirm({
+        title: `Delete ${pluralize(items.length, "reminder", "reminders")}`,
+        message: `Are you sure you want to proceed? **This action is IRREVERSIBLE**.`,
+        positiveButtonText: "Yes",
+        negativeButtonText: "No"
+      }).then((result) => {
+        result && Multiselect.moveRemindersToTrash(items);
+      });
     },
     multiSelect: true
   }

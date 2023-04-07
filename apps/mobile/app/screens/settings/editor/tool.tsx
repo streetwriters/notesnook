@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ import ToolSheet from "./tool-sheet";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ToolId } from "@notesnook/editor/dist/toolbar/tools";
+import PremiumService from "../../../services/premium";
 
 export const Tool = ({
   item,
@@ -72,6 +73,10 @@ export const Tool = ({
           {
             name: "minus",
             onPress: () => {
+              if (!PremiumService.get()) {
+                PremiumService.sheet("global");
+                return;
+              }
               presentDialog({
                 context: "global",
                 title: "Delete collapsed section?",
@@ -90,6 +95,10 @@ export const Tool = ({
           {
             name: "plus",
             onPress: () => {
+              if (!PremiumService.get()) {
+                PremiumService.sheet("global");
+                return;
+              }
               ToolSheet.present({
                 item,
                 index,
@@ -103,13 +112,16 @@ export const Tool = ({
           {
             name: "minus",
             onPress: () => {
+              if (!PremiumService.get()) {
+                PremiumService.sheet("global");
+                return;
+              }
               if (typeof groupIndex !== "number") return;
               const _data = useDragState.getState().data.slice();
               if (typeof parentIndex !== "number") {
-                const index =
-                  _data[groupIndex]?.findIndex(
-                    (tool: ToolId) => tool === item
-                  );
+                const index = _data[groupIndex]?.findIndex(
+                  (tool: ToolId) => tool === item
+                );
                 _data[groupIndex]?.splice(index, 1);
               } else {
                 const index = (
@@ -258,6 +270,10 @@ export const Tool = ({
   );
 
   const onDrop = (data: DraxDragWithReceiverEventData) => {
+    if (!PremiumService.get()) {
+      PremiumService.sheet("global");
+      return;
+    }
     const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;
     const dragged = data.dragged.payload;
     const reciever = data.receiver.payload;
@@ -294,7 +310,6 @@ export const Tool = ({
           : _data.splice(dragged.groupIndex, 1);
       }
     }
-
     setData(_data);
     setRecieving(false);
     return data.dragAbsolutePosition;

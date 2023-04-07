@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -59,16 +59,17 @@ export class Tiptap {
             return elem.attribs.class.includes("checked") ? " ✅ " : " ☐ ";
           });
         },
-        paragraph: (elem, walk, builder, formatOptions) => {
+        paragraph: (elem, walk, builder) => {
+          const { "data-spacing": dataSpacing } = elem.attribs;
           if (elem.parent && elem.parent.name === "li") {
             walk(elem.children, builder);
           } else {
             builder.openBlock({
-              leadingLineBreaks: formatOptions.leadingLineBreaks || 2
+              leadingLineBreaks: dataSpacing == "single" ? 1 : 2
             });
             walk(elem.children, builder);
             builder.closeBlock({
-              trailingLineBreaks: formatOptions.trailingLineBreaks || 2
+              trailingLineBreaks: 1
             });
           }
         }
@@ -161,7 +162,7 @@ export class Tiptap {
       try {
         const { data, mime } = dataurl.toObject(image.src);
         if (!data) continue;
-        const storeResult = await store(data, "base64", mime);
+        const storeResult = await store(data, mime);
         if (!storeResult) continue;
 
         images[image.id] = { ...storeResult, mime };

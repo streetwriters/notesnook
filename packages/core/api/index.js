@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ import { logger } from "../logger";
 import Shortcuts from "../collections/shortcuts";
 import Reminders from "../collections/reminders";
 import Relations from "../collections/relations";
+import Subscriptions from "./subscriptions";
 
 /**
  * @type {EventSource}
@@ -128,6 +129,7 @@ class Database {
     this.offers = new Offers();
     this.debug = new Debug();
     this.pricing = new Pricing();
+    this.subscriptions = new Subscriptions(this.user.tokenManager);
 
     // collections
     /** @type {Notes} */
@@ -191,7 +193,9 @@ class Database {
         return;
       this.disconnectSSE();
 
-      let token = await this.user.tokenManager.getAccessToken();
+      const token = await this.user.tokenManager.getAccessToken();
+      if (!token) return;
+
       this.evtSource = new NNEventSource(`${Constants.SSE_HOST}/sse`, {
         headers: { Authorization: `Bearer ${token}` }
       });

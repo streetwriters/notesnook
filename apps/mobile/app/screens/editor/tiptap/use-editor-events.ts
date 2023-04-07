@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,8 +28,10 @@ import {
   NativeEventSubscription
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
-import umami from "../../../common/analytics/index";
 import { db } from "../../../common/database";
+import ManageTagsSheet from "../../../components/sheets/manage-tags";
+import { RelationsList } from "../../../components/sheets/relations-list";
+import ReminderSheet from "../../../components/sheets/reminder";
 import useKeyboard from "../../../hooks/use-keyboard";
 import { DDS } from "../../../services/device-detection";
 import {
@@ -50,18 +52,15 @@ import {
   eOpenFullscreenEditor,
   eOpenLoginDialog,
   eOpenPremiumDialog,
-  eOpenPublishNoteDialog,
-  eOpenTagsDialog
+  eOpenPublishNoteDialog
 } from "../../../utils/events";
+import { openLinkInBrowser } from "../../../utils/functions";
 import { tabBarRef } from "../../../utils/global-refs";
 import { NoteType } from "../../../utils/types";
 import { useDragState } from "../../settings/editor/state";
+import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { EditorEvents, editorState } from "./utils";
-import { openLinkInBrowser } from "../../../utils/functions";
-import { EventTypes } from "./editor-events";
-import { RelationsList } from "../../../components/sheets/relations-list";
-import ReminderSheet from "../../../components/sheets/reminder";
 
 const publishNote = async (editor: useEditorType) => {
   const user = useUserStore.getState().user;
@@ -129,7 +128,7 @@ export const useEditorEvents = (
 ) => {
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
-  const  corsProxy = useSettingStore(state => state.settings.corsProxy);
+  const corsProxy = useSettingStore((state) => state.settings.corsProxy);
   const handleBack = useRef<NativeEventSubscription>();
   const readonly = useEditorStore((state) => state.readonly);
   const isPremium = useUserStore((state) => state.premium);
@@ -150,7 +149,7 @@ export const useEditorEvents = (
       noToolbar: readonly || editorPropReadonly || noToolbar,
       keyboardShown: keyboardShown || false,
       doubleSpacedLines: doubleSpacedLines,
-      corsProxy:corsProxy
+      corsProxy: corsProxy
     });
   }, [
     fullscreen,
@@ -190,12 +189,7 @@ export const useEditorEvents = (
       setImmediate(() => {
         useEditorStore.getState().setCurrentlyEditingNote(null);
         setTimeout(() => {
-          Navigation.queueRoutesForUpdate(
-            "ColoredNotes",
-            "Notes",
-            "TaggedNotes",
-            "TopicNotes"
-          );
+          Navigation.queueRoutesForUpdate();
         }, 500);
       });
       editorState().currentlyEditing = false;
@@ -274,12 +268,28 @@ export const useEditorEvents = (
     (event: WebViewMessageEvent) => {
       const data = event.nativeEvent.data;
       const editorMessage = JSON.parse(data) as EditorMessage;
+
+      if (editorMessage.type === EventTypes.content) {
+        editor.saveContent({
+          type: editorMessage.type,
+          content: editorMessage.value as string,
+          forSessionId: editorMessage.sessionId
+        });
+      } else if (editorMessage.type === EventTypes.title) {
+        editor.saveContent({
+          type: editorMessage.type,
+          title: editorMessage.value as string,
+          forSessionId: editorMessage.sessionId
+        });
+      }
+
       if (
         editorMessage.sessionId !== editor.sessionId &&
         editorMessage.type !== EditorEvents.status
       ) {
         return;
       }
+
       switch (editorMessage.type) {
         case EventTypes.logger:
           logger.info("[WEBVIEW LOG]", editorMessage.value);
@@ -287,21 +297,8 @@ export const useEditorEvents = (
         case EventTypes.contentchange:
           editor.onContentChanged();
           break;
-        case EventTypes.content:
-          editor.saveContent({
-            type: editorMessage.type,
-            content: editorMessage.value as string
-          });
-          break;
         case EventTypes.selection:
           break;
-        case EventTypes.title:
-          editor.saveContent({
-            type: editorMessage.type,
-            title: editorMessage.value as string
-          });
-          break;
-
         case EventTypes.reminders:
           if (!editor.note.current) {
             ToastEvent.show({
@@ -327,7 +324,7 @@ export const useEditorEvents = (
             });
             return;
           }
-          eSendEvent(eOpenTagsDialog, editor.note.current);
+          ManageTagsSheet.present(editor.note.current);
           break;
         case EventTypes.tag:
           if (editorMessage.value) {
@@ -338,13 +335,7 @@ export const useEditorEvents = (
               .then(async () => {
                 useTagStore.getState().setTags();
                 await editor.commands.setTags(editor.note.current);
-                Navigation.queueRoutesForUpdate(
-                  "ColoredNotes",
-                  "Notes",
-                  "TaggedNotes",
-                  "TopicNotes",
-                  "Tags"
-                );
+                Navigation.queueRoutesForUpdate();
               });
           }
           break;
@@ -363,7 +354,6 @@ export const useEditorEvents = (
           if (editor.state.current?.isFocused) {
             editor.state.current.isFocused = true;
           }
-          umami.pageView("/pro-screen", "/editor");
           eSendEvent(eOpenPremiumDialog);
           break;
         case EventTypes.monograph:
@@ -381,6 +371,10 @@ export const useEditorEvents = (
           break;
         case EventTypes.link:
           openLinkInBrowser(editorMessage.value as string);
+          break;
+
+        case EventTypes.previewAttachment:
+          eSendEvent("ImagePreview", editorMessage.value);
           break;
         default:
           break;

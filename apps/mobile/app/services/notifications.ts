@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -41,10 +41,10 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import SettingsService from "./settings";
 import { useSettingStore } from "../stores/use-setting-store";
-import ReminderNotify from "../components/sheets/reminder-notify";
 import { sleep } from "../utils/time";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useReminderStore } from "../stores/use-reminder-store";
+import { presentDialog } from "../components/dialog/functions";
 
 export type Reminder = {
   id: string;
@@ -97,17 +97,20 @@ const onEvent = async ({ type, detail }: Event) => {
     return;
   }
   if (type === EventType.PRESS) {
+    notifee.decrementBadgeCount();
     if (notification?.data?.type === "quickNote") return;
-    editorState().movedAway = false;
     MMKV.removeItem("appState");
     await db.init();
     await db.notes?.init();
     if (notification?.data?.type === "reminder") {
       const reminder = db.reminders?.reminder(notification.id?.split("_")[0]);
       await sleep(1000);
+      const ReminderNotify =
+        require("../components/sheets/reminder-notify").default;
       ReminderNotify.present(reminder);
+      return;
     }
-
+    editorState().movedAway = false;
     const noteId = notification?.id;
     if (useNoteStore?.getState()?.loading === false) {
       loadNote(noteId as string, false);
@@ -125,8 +128,11 @@ const onEvent = async ({ type, detail }: Event) => {
   }
 
   if (type === EventType.ACTION_PRESS) {
+    notifee.decrementBadgeCount();
     switch (pressAction?.id) {
       case "REMINDER_SNOOZE": {
+        await db.init();
+        await db.notes?.init();
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
         );
@@ -145,6 +151,8 @@ const onEvent = async ({ type, detail }: Event) => {
         break;
       }
       case "REMINDER_DISABLE": {
+        await db.init();
+        await db.notes?.init();
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
         );
@@ -160,6 +168,8 @@ const onEvent = async ({ type, detail }: Event) => {
         break;
       }
       case "UNPIN": {
+        await db.init();
+        await db.notes?.init();
         remove(notification?.id as string);
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
@@ -254,21 +264,25 @@ async function scheduleNotification(
 
   try {
     const { title, description, priority } = reminder;
-
     await clearAllPendingTriggersForId(reminder.id);
-    await remove(reminder.id);
-    if (reminder.disabled) return;
+    if (reminder.disabled) {
+      remove(reminder.id);
+      return;
+    }
     const triggers = await getTriggers(reminder);
-    console.log(triggers);
-    if (!triggers && reminder.mode === "permanent") {
-      displayNotification({
-        id: reminder.id,
-        title: title,
-        message: description || "",
-        ongoing: true,
-        subtitle: description || "",
-        actions: ["UNPIN"]
-      });
+    if (reminder.mode === "permanent") {
+      const notifications = await get();
+      const pinned = notifications.findIndex((i) => i.id === reminder.id) > -1;
+      if (!pinned) {
+        displayNotification({
+          id: reminder.id,
+          title: title,
+          message: description || "",
+          ongoing: true,
+          subtitle: description || "",
+          actions: ["UNPIN"]
+        });
+      }
       return;
     }
     await setupIOSCategories();
@@ -320,6 +334,7 @@ async function scheduleNotification(
               id: "default",
               mainComponent: "notesnook"
             },
+            badgeCount: 1,
             actions: androidActions,
             sound: notificationSound?.url,
             style: !description
@@ -332,6 +347,7 @@ async function scheduleNotification(
           ios: {
             interruptionLevel: "active",
             criticalVolume: 1.0,
+            badgeCount: 1,
             critical:
               reminder.priority === "silent" || reminder.priority === "urgent"
                 ? false
@@ -351,7 +367,8 @@ async function scheduleNotification(
 
 function loadNote(id: string, jump: boolean) {
   if (!id || id === "notesnook_note_input") return;
-  const note = db.notes?.note(id).data;
+  const note = db.notes?.note(id)?.data;
+  if (!note) return;
   if (!DDS.isTab && jump) {
     tabBarRef.current?.goToPage(1);
   }
@@ -370,7 +387,8 @@ async function getChannelId(id: "silent" | "vibrate" | "urgent" | "default") {
     case "default":
       return await notifee.createChannel({
         id: "com.streetwriters.notesnook",
-        name: "Default"
+        name: "Default",
+        vibration: false
       });
     case "silent":
       return await notifee.createChannel({
@@ -419,6 +437,7 @@ async function displayNotification({
   id?: string;
 }) {
   if (!(await checkAndRequestPermissions())) return;
+
   try {
     await notifee.displayNotification({
       id: id,
@@ -430,9 +449,14 @@ async function displayNotification({
       },
       android: {
         ongoing: ongoing,
+        smallIcon: "ic_stat_name",
         localOnly: true,
         channelId: await getChannelId("default"),
         autoCancel: false,
+        pressAction: {
+          id: "default",
+          mainComponent: "notesnook"
+        },
         actions: actions?.map((action) => ({
           pressAction: {
             id: action
@@ -460,7 +484,30 @@ async function displayNotification({
   }
 }
 
-async function checkAndRequestPermissions() {
+function openSettingsDialog(context: any) {
+  return new Promise((resolve) => {
+    presentDialog({
+      title: "Notifications disabled",
+      paragraph: `Reminders cannot be set because notifications have been disabled from app settings. If you want to keep receiving reminder notifications, enable notifications for Notesnook from app settings.`,
+      positiveText: Platform.OS === "ios" ? undefined : "Open settings",
+      negativeText: Platform.OS === "ios" ? "Close" : "Cancel",
+      positivePress:
+        Platform.OS === "ios"
+          ? undefined
+          : () => {
+              resolve(true);
+            },
+      onClose: () => {
+        resolve(false);
+      },
+      context: context
+    });
+  });
+}
+
+async function checkAndRequestPermissions(
+  promptUser?: boolean
+): Promise<boolean> {
   let permissionStatus = await notifee.getNotificationSettings();
   if (Platform.OS === "android") {
     if (
@@ -475,16 +522,28 @@ async function checkAndRequestPermissions() {
       await notifee.openAlarmPermissionSettings();
     }
     permissionStatus = await notifee.getNotificationSettings();
+
     if (
       permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED &&
       permissionStatus.android.alarm === 1
     )
       return true;
+
+    if (promptUser) {
+      if (await openSettingsDialog("local")) {
+        await notifee.openNotificationSettings();
+        return false;
+      }
+    }
+
     return false;
   } else {
     permissionStatus = await notifee.requestPermission();
     if (permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED)
       return true;
+    if (promptUser) {
+      await openSettingsDialog("local");
+    }
     return false;
   }
 }
@@ -733,6 +792,9 @@ async function setupReminders(checkNeedsScheduling = false) {
   const triggers = await notifee.getTriggerNotifications();
 
   for (const reminder of reminders) {
+    if (reminder.mode === "permanent") {
+      await scheduleNotification(reminder);
+    }
     const pending = triggers.filter((t) =>
       t.notification.id?.startsWith(reminder.id)
     );

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,6 +35,9 @@ import {
   Fragment,
   type DownloadOptions,
   ToolProps
+  getTotalWords,
+  countWords,
+  type DownloadOptions
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
@@ -51,7 +54,7 @@ import { getCurrentPreset } from "../../common/toolbar-config";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
-import { debounceWithId } from "../../utils/debounce";
+import { debounce, debounceWithId } from "../../utils/debounce";
 import { store as editorstore } from "../../stores/editor-store";
 import Config from "../../utils/config";
 
@@ -143,7 +146,14 @@ function TipTap(props: TipTapProps) {
     {
       editorProps: {
         handlePaste: (view, event) => {
-          if (event.clipboardData?.files?.length && onAttachFile) {
+          const hasText = event.clipboardData?.types?.some((type) =>
+            type.startsWith("text/")
+          );
+          // we always give preference to text over files & skip any attached
+          // files if there is text.
+          // TODO: give user an actionable hint to allow them to select what they
+          // want to do in such cases.
+          if (!hasText && event.clipboardData?.files?.length && onAttachFile) {
             event.preventDefault();
             event.stopPropagation();
             for (const file of event.clipboardData.files) {
@@ -176,6 +186,7 @@ function TipTap(props: TipTapProps) {
           }
         });
         if (onLoad) onLoad();
+        editor.commands.refreshSearch();
       },
       onUpdate: ({ editor, transaction }) => {
         onContentChange?.();
@@ -209,22 +220,32 @@ function TipTap(props: TipTapProps) {
           canUndo: editor.can().undo()
         });
       },
-      onSelectionUpdate: ({ editor, transaction }) => {
-        const content = editor.state.doc.content;
-        configure((old) => ({
-          statistics: {
-            words: {
-              total:
-                old.statistics?.words.total ||
-                countWords(content.textBetween(0, content.size, "\n", " ")),
-              selected: getSelectedWords(
-                editor as Editor,
-                transaction.selection
-              )
+      onSelectionUpdate: debounce(({ editor, transaction }) => {
+        const isEmptySelection = transaction.selection.empty;
+        configure((old) => {
+          const oldSelected = old.statistics?.words?.selected;
+          const oldWords = old.statistics?.words.total || 0;
+          if (isEmptySelection)
+            return oldSelected
+              ? {
+                  statistics: { words: { total: oldWords, selected: 0 } }
+                }
+              : old;
+
+          const selectedWords = getSelectedWords(
+            editor as Editor,
+            transaction.selection
+          );
+          return {
+            statistics: {
+              words: {
+                total: oldWords,
+                selected: selectedWords
+              }
             }
-          }
-        }));
-      },
+          };
+        });
+      }, 500),
       theme,
       onOpenAttachmentPicker: (_editor, type) => {
         onInsertAttachment?.(type);
@@ -266,7 +287,9 @@ function TipTap(props: TipTapProps) {
     if (!editorContainer) return;
     const currentEditor = editor;
     function onClick(e: MouseEvent) {
-      if (e.target !== editorContainer) return;
+      if (e.target !== editorContainer || !currentEditor?.state.selection.empty)
+        return;
+
       const lastNode = currentEditor?.state.doc.lastChild;
       const isLastNodeParagraph = lastNode?.type.name === "paragraph";
       const isEmpty = lastNode?.nodeSize === 2;
@@ -355,6 +378,14 @@ function toIEditor(editor: Editor): IEditor {
     focus: () => editor.current?.commands.focus("start"),
     undo: () => editor.current?.commands.undo(),
     redo: () => editor.current?.commands.redo(),
+    getMediaHashes: () => {
+      if (!editor.current) return [];
+      const hashes: string[] = [];
+      editor.current.state.doc.descendants((n) => {
+        if (typeof n.attrs.hash === "string") hashes.push(n.attrs.hash);
+      });
+      return hashes;
+    },
     updateContent: (content) => {
       const { from, to } = editor.state.selection;
       editor.current
@@ -363,7 +394,7 @@ function toIEditor(editor: Editor): IEditor {
           tr.setMeta("preventSave", true);
           return true;
         })
-        .setContent(content, true)
+        .setContent(content, true, { preserveWhitespace: true })
         .setTextSelection({
           from,
           to
@@ -372,15 +403,18 @@ function toIEditor(editor: Editor): IEditor {
     },
     attachFile: (file: Attachment) => {
       if (file.dataurl) {
-        editor.current?.commands.insertImage({ ...file, src: file.dataurl });
+        editor.current?.commands.insertImage({
+          ...file,
+          dataurl: file.dataurl
+        });
       } else editor.current?.commands.insertAttachment(file);
     },
     loadWebClip: (hash, src) =>
       editor.current?.commands.updateWebClip({ hash }, { src }),
-    loadImage: (hash, src) =>
+    loadImage: (hash, dataurl) =>
       editor.current?.commands.updateImage(
         { hash },
-        { hash, src, preventUpdate: true }
+        { hash, dataurl, preventUpdate: true }
       ),
     sendAttachmentProgress: (hash, type, progress) =>
       editor.current?.commands.setAttachmentProgress({
@@ -391,16 +425,6 @@ function toIEditor(editor: Editor): IEditor {
   };
 }
 
-function getTotalWords(editor: Editor): number {
-  const documentText = editor.state.doc.textBetween(
-    0,
-    editor.state.doc.content.size,
-    "\n",
-    " "
-  );
-  return countWords(documentText);
-}
-
 function getSelectedWords(
   editor: Editor,
   selection: { from: number; to: number; empty: boolean }
@@ -409,32 +433,4 @@ function getSelectedWords(
     ? ""
     : editor.state.doc.textBetween(selection.from, selection.to, "\n", " ");
   return countWords(selectedText);
-}
-
-function countWords(str: string) {
-  let count = 0;
-  let shouldCount = false;
-
-  for (let i = 0; i < str.length; ++i) {
-    const s = str[i];
-
-    if (
-      s === " " ||
-      s === "\r" ||
-      s === "\n" ||
-      s === "*" ||
-      s === "/" ||
-      s === "&"
-    ) {
-      if (!shouldCount) continue;
-      ++count;
-      shouldCount = false;
-    } else {
-      shouldCount = true;
-    }
-  }
-
-  if (shouldCount) ++count;
-
-  return count;
 }

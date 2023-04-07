@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ListContainer from "../components/list-container";
-import SearchPlaceholder from "../components/placeholders/search-placeholder";
 import { db } from "../common/db";
 import SearchBox from "../components/search";
 import ProgressBar from "../components/progress-bar";
@@ -28,6 +27,7 @@ import { Flex, Text } from "@theme-ui/components";
 import { showToast } from "../utils/toast";
 import { store as notebookstore } from "../stores/notebook-store";
 import { hardNavigate } from "../navigation";
+import Placeholder from "../components/placeholders";
 
 async function typeToItems(type, context) {
   switch (type) {
@@ -40,13 +40,15 @@ async function typeToItems(type, context) {
     case "notebooks":
       return ["notebooks", db.notebooks.all];
     case "topics": {
-      const notebookId = notebookstore.get().selectedNotebookId;
-      if (!notebookId) return ["topics", []];
-      const topics = db.notebooks.notebook(notebookId).topics.all;
+      const selectedNotebook = notebookstore.get().selectedNotebook;
+      if (!selectedNotebook) return ["topics", []];
+      const topics = db.notebooks.notebook(selectedNotebook.id).topics.all;
       return ["topics", topics];
     }
     case "tags":
       return ["tags", db.tags.all];
+    case "reminders":
+      return ["reminders", db.reminders.all];
     case "trash":
       return ["trash", db.trash.all];
     default:
@@ -100,6 +102,8 @@ function Search({ type }) {
           }
           case "favorite":
             return "favorite notes";
+          case "monographs":
+            return "all monographs";
           case "color": {
             const color = db.colors.all.find((tag) => tag.id === context.value);
             return `notes in color ${color.title}`;
@@ -110,13 +114,15 @@ function Search({ type }) {
       case "notebooks":
         return "all notebooks";
       case "topics": {
-        const notebookId = notebookstore.get().selectedNotebookId;
-        if (!notebookId) return "";
-        const notebook = db.notebooks.notebook(notebookId);
+        const selectedNotebook = notebookstore.get().selectedNotebook;
+        if (!selectedNotebook) return "";
+        const notebook = db.notebooks.notebook(selectedNotebook.id);
         return `topics in ${notebook.title} notebook`;
       }
       case "tags":
         return "all tags";
+      case "reminders":
+        return "all reminders";
       case "trash":
         return "all trash";
       default:
@@ -149,7 +155,8 @@ function Search({ type }) {
             justifyContent: "center"
           }}
         >
-          <SearchPlaceholder
+          <Placeholder
+            context="search"
             text={`Searching in ${searchState.totalItems} ${type}...`}
           />
           <ProgressBar
@@ -165,7 +172,8 @@ function Search({ type }) {
           type={type}
           items={results}
           placeholder={() => (
-            <SearchPlaceholder
+            <Placeholder
+              context="search"
               text={
                 cachedQuery.current
                   ? `Nothing found for "${cachedQuery.current}"`

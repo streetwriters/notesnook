@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { RefreshControl, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -57,24 +57,10 @@ const RenderItem = ({ item, index, type, ...restArgs }) => {
   const dateBy =
     groupOptions.sortBy !== "title" ? groupOptions.sortBy : "dateEdited";
   const totalNotes = getTotalNotes(item);
-  const tags =
-    item.tags
-      ?.slice(0, 3)
-      ?.map((item) => {
-        let tag = db.tags.tag(item);
 
-        if (!tag) return null;
-        return {
-          title: tag.title,
-          id: tag.id,
-          alias: tag.alias
-        };
-      })
-      .filter((t) => t !== null) || [];
   return (
     <Item
       item={item}
-      tags={tags}
       dateBy={dateBy}
       index={index}
       type={type}
@@ -85,9 +71,9 @@ const RenderItem = ({ item, index, type, ...restArgs }) => {
 };
 
 /**
- * 
- * @param {any} param0 
- * @returns 
+ *
+ * @param {any} param0
+ * @returns
  */
 const List = ({
   listData,
@@ -103,7 +89,9 @@ const List = ({
   ListHeader,
   warning,
   isSheet = false,
-  onMomentumScrollEnd
+  onMomentumScrollEnd,
+  handlers,
+  ScrollComponent
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const scrollRef = useRef();
@@ -151,14 +139,21 @@ const List = ({
     [screen]
   );
 
+  useEffect(() => {
+    eSendEvent(eScrollEvent, {
+      y: 0,
+      screen
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   let styles = {
     width: "100%",
     minHeight: 1,
     minWidth: 1
   };
 
-  const _keyExtractor = (item) => item.id || item.title;
-
+  const ListView = ScrollComponent ? ScrollComponent : FlashList;
   return (
     <>
       <Animated.View
@@ -167,7 +162,8 @@ const List = ({
         }}
         entering={type === "search" ? undefined : FadeInDown}
       >
-        <FlashList
+        <ListView
+          {...handlers}
           style={styles}
           ref={scrollRef}
           testID={notesnook.list.id}

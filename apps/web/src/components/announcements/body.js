@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ import {
   Image as RebassImage,
   Text as RebassText
 } from "@theme-ui/components";
-import { allowedPlatforms } from "../../hooks/use-announcements";
 import {
   closeOpenedDialog,
   showBuyDialog
@@ -33,6 +32,7 @@ import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import * as Icon from "../icons";
 import { store as appStore } from "../../stores/app-store";
 import { createBackup } from "../../common";
+import { allowedPlatforms } from "../../stores/announcement-store";
 
 var margins = [0, 2];
 var HORIZONTAL_MARGIN = 3;
@@ -48,11 +48,7 @@ const features = [
   { icon: Icon.Edit, title: "Rich text editor" }
 ];
 
-export default function AnnouncementBody({
-  removeAnnouncement,
-  components,
-  type
-}) {
+export default function AnnouncementBody({ components, type, dismiss }) {
   return components
     .filter((item) =>
       item.platforms.some((platform) => allowedPlatforms.indexOf(platform) > -1)
@@ -85,10 +81,7 @@ export default function AnnouncementBody({
             );
           case "callToActions":
             return (
-              <InlineCalltoActions
-                item={item}
-                removeAnnouncement={removeAnnouncement}
-              />
+              <InlineCalltoActions item={item} dismissAnnouncement={dismiss} />
             );
           case "text":
             return (
@@ -117,12 +110,7 @@ export default function AnnouncementBody({
           case "description":
             return <Description item={item} fontSize="subtitle" />;
           case "callToActions":
-            return (
-              <CalltoActions
-                item={item}
-                removeAnnouncement={removeAnnouncement}
-              />
-            );
+            return <CalltoActions item={item} dismissAnnouncement={dismiss} />;
           case "features":
             return <Features item={item} />;
           case "text":
@@ -212,7 +200,7 @@ function Text({ value, ...restProps }) {
   );
 }
 
-function CalltoActions({ item, removeAnnouncement }) {
+function CalltoActions({ item, dismissAnnouncement }) {
   const { actions, style } = item;
   return (
     <Flex
@@ -250,14 +238,14 @@ function CalltoActions({ item, removeAnnouncement }) {
                 mr: 1
               }
             }}
-            removeAnnouncement={removeAnnouncement}
+            dismissAnnouncement={dismissAnnouncement}
           />
         ))}
     </Flex>
   );
 }
 
-function InlineCalltoActions({ item, removeAnnouncement }) {
+function InlineCalltoActions({ item, dismissAnnouncement }) {
   const { actions, style } = item;
   return (
     <Flex px={2} sx={mapStyle(style)}>
@@ -283,22 +271,22 @@ function InlineCalltoActions({ item, removeAnnouncement }) {
                 mr: 1
               }
             }}
-            removeAnnouncement={removeAnnouncement}
+            dismissAnnouncement={dismissAnnouncement}
           />
         ))}
     </Flex>
   );
 }
 
-function CalltoAction({ action, variant, sx, removeAnnouncement }) {
+function CalltoAction({ action, variant, sx, dismissAnnouncement }) {
   return (
     <Button
       variant={variant}
       sx={sx}
       onClick={async () => {
-        if (removeAnnouncement) removeAnnouncement();
+        if (dismissAnnouncement) dismissAnnouncement();
         closeOpenedDialog();
-        trackEvent(ANALYTICS_EVENTS.announcementCta, action.data);
+        trackEvent(ANALYTICS_EVENTS.announcementCta, action);
         switch (action.type) {
           case "link": {
             const url = new URL(action.data);

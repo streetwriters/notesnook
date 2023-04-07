@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,12 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React, { RefObject, useEffect, useState } from "react";
 import { View } from "react-native";
-import ActionSheet from "react-native-actions-sheet";
+import { ActionSheetRef } from "react-native-actions-sheet";
+import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
 import {
-  PresentSheetOptions,
-  presentSheet
+  presentSheet,
+  PresentSheetOptions
 } from "../../../services/event-manager";
 import { Reminder } from "../../../services/notifications";
 import { useRelationStore } from "../../../stores/use-relation-store";
@@ -37,7 +38,7 @@ import { PressableButtonProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 
 type RelationsListProps = {
-  actionSheetRef: RefObject<ActionSheet>;
+  actionSheetRef: RefObject<ActionSheetRef>;
   close?: () => void;
   update?: (options: PresentSheetOptions) => void;
   item: { id: string; type: string };
@@ -62,8 +63,6 @@ const IconsByType = {
 
 export const RelationsList = ({
   actionSheetRef,
-  close,
-  update,
   item,
   referenceType,
   relationType,
@@ -75,7 +74,6 @@ export const RelationsList = ({
   const [items, setItems] = useState<Reminder[]>([]);
   const colors = useThemeStore((state) => state.colors);
   const hasNoRelations = !items || items.length === 0;
-
   useEffect(() => {
     setItems(
       db.relations?.[relationType]?.(
@@ -123,6 +121,7 @@ export const RelationsList = ({
       ) : (
         <List
           listData={items}
+          ScrollComponent={FlashList}
           loading={false}
           type={referenceType}
           headerProps={null}

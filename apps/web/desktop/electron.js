@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "isomorphic-fetch";
 import { app, BrowserWindow, nativeTheme, shell } from "electron";
-import { join } from "path";
-import { platform } from "os";
 import { isDevelopment } from "./utils";
 import { registerProtocol, PROTOCOL_URL } from "./protocol";
 import { configureAutoUpdater } from "./autoupdate";
@@ -29,11 +27,19 @@ import { getBackgroundColor, getTheme, setTheme } from "./config/theme";
 import getZoomFactor from "./ipc/calls/getZoomFactor";
 import { logger } from "./logger";
 import { setupMenu } from "./menu";
-import { WindowState } from "./config/windowstate";
+import { WindowState } from "./config/window-state";
 import { sendMessageToRenderer } from "./ipc/utils";
 import { EVENTS } from "./events";
 import "./ipc/index.js";
 import getPrivacyMode from "./ipc/calls/getPrivacyMode";
+import setPrivacyMode from "./ipc/actions/setPrivacyMode";
+import { getIsSpellCheckerEnabled } from "./config/spellChecker";
+import { getDesktopIntegration } from "./config/desktopIntegration";
+import { AutoLaunch } from "./autolaunch";
+import { setupJumplist } from "./jumplist";
+import { setupTray } from "./tray";
+import { parseArguments } from "./cli";
+import { AssetManager } from "./asset-manager";
 
 if (!RELEASE) {
   require("electron-reloader")(module);
@@ -45,58 +51,67 @@ if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
   app.exit();
 }
 
-/**
- * @type {BrowserWindow}
- */
-let mainWindow;
+if (process.platform === "win32") {
+  app.setAppUserModelId(app.name);
+}
 
+var mainWindowState;
 async function createWindow() {
-  const mainWindowState = new WindowState({});
+  await AssetManager.loadIcons();
+  const cliOptions = await parseArguments();
+
+  mainWindowState = new WindowState({});
   setTheme(getTheme());
-  mainWindow = new BrowserWindow({
+
+  const mainWindow = new BrowserWindow({
     x: mainWindowState.x,
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
+    darkTheme: getTheme() === "dark",
     backgroundColor: getBackgroundColor(),
+
     autoHideMenuBar: true,
-    icon: join(
-      __dirname,
-      platform() === "win32" ? "app.ico" : "favicon-72x72.png"
-    ),
+    icon: AssetManager.appIcon({
+      size: 512,
+      format: process.platform === "win32" ? "ico" : "png"
+    }),
     webPreferences: {
       zoomFactor: getZoomFactor(),
       devTools: true, // isDev,
       nodeIntegration: false, //true,
-      enableRemoteModule: false,
       contextIsolation: true,
       nativeWindowOpen: true,
-      spellcheck: false,
+      spellcheck: getIsSpellCheckerEnabled(),
       preload: __dirname + "/preload.js"
     }
   });
+
   mainWindowState.manage(mainWindow);
-  global.win = mainWindow;
-  setupMenu(mainWindow);
+  globalThis.window = mainWindow;
+  setupMenu();
+  setupJumplist();
+  setupDesktopIntegration();
+
+  mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
+    "http://dictionaries.notesnook.com/"
+  );
 
   if (isDevelopment())
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });
 
   if (getPrivacyMode()) {
-    global.win.setContentProtection(true);
+    setPrivacyMode({ privacyMode: getPrivacyMode() });
   }
 
   try {
-    await mainWindow.loadURL(
-      isDevelopment() ? "http://localhost:3000" : PROTOCOL_URL
-    );
+    await mainWindow.loadURL(`${createURL(cliOptions)}`);
   } catch (e) {
     logger.error(e);
   }
 
   mainWindow.on("closed", () => {
-    mainWindow = null;
-    global.win = null;
+    globalThis.window = null;
   });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -105,6 +120,9 @@ async function createWindow() {
   });
 
   nativeTheme.on("updated", () => {
+    setupTray();
+    setupJumplist();
+
     if (getTheme() === "system") {
       sendMessageToRenderer(EVENTS.themeChanged, {
         theme: nativeTheme.shouldUseDarkColors ? "dark" : "light"
@@ -129,7 +147,74 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
-  if (mainWindow === null) {
+  if (globalThis.window === null) {
     createWindow();
   }
 });
+
+/**
+ * @param {import("./cli").CLIOptions} options
+ */
+function createURL(options) {
+  const url = new URL(isDevelopment() ? "http://localhost:3000" : PROTOCOL_URL);
+
+  if (options.note === true) url.hash = "/notes/create/1";
+  else if (options.notebook === true) url.hash = "/notebooks/create";
+  else if (options.reminder === true) url.hash = "/reminders/create";
+  else if (typeof options.note === "string")
+    url.hash = `/notes/${options.note}/edit`;
+  else if (typeof options.notebook === "string")
+    url.hash = `/notebooks/${options.notebook}`;
+
+  return url;
+}
+
+function setupDesktopIntegration() {
+  const desktopIntegration = getDesktopIntegration();
+
+  if (
+    desktopIntegration.closeToSystemTray ||
+    desktopIntegration.minimizeToSystemTray
+  ) {
+    setupTray();
+  }
+
+  // when close to system tray is enabled, it becomes nigh impossible
+  // to "quit" the app. This is necessary in order to fix that.
+  if (desktopIntegration.closeToSystemTray) {
+    app.on("before-quit", () => app.exit(0));
+  }
+
+  globalThis.window.on("close", (e) => {
+    if (getDesktopIntegration().closeToSystemTray) {
+      e.preventDefault();
+      if (process.platform == "darwin") {
+        // on macOS window cannot be minimized/hidden if it is already fullscreen
+        // so we just close it.
+        if (globalThis.window.isFullScreen()) app.exit(0);
+        else app.hide();
+      } else {
+        globalThis.window.minimize();
+        globalThis.window.hide();
+      }
+    }
+  });
+
+  globalThis.window.on("minimize", () => {
+    if (getDesktopIntegration().minimizeToSystemTray) {
+      if (process.platform == "darwin") {
+        app.hide();
+      } else {
+        globalThis.window.hide();
+      }
+    }
+  });
+
+  if (desktopIntegration.autoStart) {
+    AutoLaunch.enable(desktopIntegration.startMinimized);
+
+    if (process.platform === "win32" && desktopIntegration.startMinimized) {
+      globalThis.window.minimize();
+    }
+  }
+}

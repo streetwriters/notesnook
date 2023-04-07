@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@ import {
   Keyboard,
   Platform,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
   useWindowDimensions,
-  View
+  View,
+  ScrollView
 } from "react-native";
 import {
   SafeAreaProvider,
@@ -195,7 +195,6 @@ const ShareView = ({ quicknote = false }) => {
   const appendNote = useShareStore((state) => state.appendNote);
   const [note, setNote] = useState({ ...defaultNote });
   const noteContent = useRef();
-  const [loadingIntent, setLoadingIntent] = useState(true);
   const [loading, setLoading] = useState(false);
   const [loadingExtension, setLoadingExtension] = useState(true);
   const [rawData, setRawData] = useState({
@@ -210,9 +209,9 @@ const ShareView = ({ quicknote = false }) => {
       ? { top: StatusBar.currentHeight }
       : // eslint-disable-next-line react-hooks/rules-of-hooks
         useSafeAreaInsets();
-  const [showSearch, setShowSearch] = useState(false);
+  const [searchMode, setSearchMode] = useState(null);
+
   const [kh, setKh] = useState(0);
-  const editorRef = useRef();
 
   const onKeyboardDidShow = (event) => {
     let kHeight = event.endCoordinates.height;
@@ -262,7 +261,6 @@ const ShareView = ({ quicknote = false }) => {
         setRawData({
           value: ""
         });
-        setLoadingIntent(false);
         return;
       }
       let note = { ...defaultNote };
@@ -282,7 +280,6 @@ const ShareView = ({ quicknote = false }) => {
     } catch (e) {
       console.error(e);
     }
-    setLoadingIntent(false);
   }, [onLoad]);
 
   const onLoad = useCallback(() => {
@@ -301,13 +298,12 @@ const ShareView = ({ quicknote = false }) => {
       //await loadDatabase();
       setLoadingExtension(false);
       loadData();
-      useShareStore.getState().restoreAppendNote();
+      useShareStore.getState().restore();
     })();
   }, [loadData]);
 
   const close = async () => {
     setNote({ ...defaultNote });
-    setLoadingIntent(true);
     setLoadingExtension(true);
     if (quicknote) {
       ShareExtension.openURL("ShareMedia://MainApp");
@@ -333,7 +329,7 @@ const ShareView = ({ quicknote = false }) => {
       let raw = await db.content.raw(appendNote.contentId);
       _note = {
         content: {
-          data: raw.data + "\n" + noteContent.current,
+          data: raw.data + noteContent.current,
           type: "tiptap"
         },
         id: appendNote.id,
@@ -341,10 +337,28 @@ const ShareView = ({ quicknote = false }) => {
       };
     } else {
       _note = { ...note };
+      _note.tags = useShareStore.getState().selectedTags || [];
+
       _note.content.data = noteContent.current;
       _note.sessionId = Date.now();
     }
-    await db.notes.add(_note);
+
+    let id = await db.notes.add(_note);
+    if (!appendNote) {
+      for (const item of useShareStore.getState().selectedNotebooks) {
+        if (item.type === "notebook") {
+          db.relations.add(item, { id, type: "note" });
+        } else {
+          db.notes.addToNotebook(
+            {
+              id: item.notebookId,
+              topic: item.id
+            },
+            id
+          );
+        }
+      }
+    }
     await Storage.write("notesAddedFromIntent", "added");
     close();
     setLoading(false);
@@ -390,6 +404,8 @@ const ShareView = ({ quicknote = false }) => {
     loadData();
   }, [loadData]);
 
+  const WrapperView = Platform.OS === "android" ? View : ScrollView;
+
   return loadingExtension ? null : (
     <SafeAreaView
       style={{
@@ -399,7 +415,7 @@ const ShareView = ({ quicknote = false }) => {
         justifyContent: quicknote ? "flex-start" : "flex-end"
       }}
     >
-      {quicknote && !showSearch ? (
+      {quicknote && !searchMode ? (
         <View
           style={{
             width: "100%",
@@ -418,8 +434,8 @@ const ShareView = ({ quicknote = false }) => {
             icon="close"
             iconColor={colors.pri}
             onPress={() => {
-              if (showSearch) {
-                setShowSearch(false);
+              if (searchMode) {
+                setSearchMode(null);
               } else {
                 close();
               }
@@ -459,8 +475,8 @@ const ShareView = ({ quicknote = false }) => {
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
-            if (showSearch) {
-              setShowSearch(false);
+            if (searchMode) {
+              setSearchMode(null);
             } else {
               close();
             }
@@ -483,28 +499,31 @@ const ShareView = ({ quicknote = false }) => {
         </TouchableOpacity>
       )}
 
-      {showSearch ? (
+      {searchMode ? (
         <Search
           quicknote={quicknote}
           getKeyboardHeight={() => keyboardHeight.current}
+          mode={searchMode}
           close={() => {
-            setShowSearch(false);
+            setSearchMode(null);
           }}
         />
       ) : null}
 
-      <View
+      <WrapperView
         style={{
-          paddingVertical: 25,
-          backgroundColor: "transparent",
-          marginBottom: insets.top,
-          display: showSearch ? "none" : "flex"
+          paddingVertical: 12,
+          backgroundColor: colors.bg,
+          display: searchMode ? "none" : "flex",
+          borderTopRightRadius: Platform.OS === "ios" ? 10 : 15,
+          borderTopLeftRadius: Platform.OS === "ios" ? 10 : 15,
+          maxHeight: Platform.OS === "android" ? undefined : "100%"
         }}
       >
         <View
           style={{
-            maxHeight: "100%",
-            paddingHorizontal: 12
+            maxHeight: "100%"
+            //paddingHorizontal: 12
           }}
         >
           <View
@@ -514,20 +533,56 @@ const ShareView = ({ quicknote = false }) => {
           >
             <View
               style={{
-                marginTop: 10,
                 minHeight: 100,
-                borderRadius: 10,
-                ...getElevation(quicknote ? 1 : 5),
                 backgroundColor: colors.bg,
                 overflow: "hidden"
               }}
             >
               <View
                 style={{
+                  justifyContent: "space-between",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  borderBottomWidth: 1,
+                  paddingBottom: 12,
+                  borderBottomColor: colors.nav,
+                  paddingHorizontal: 12
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontFamily: "OpenSans-SemiBold"
+                  }}
+                >
+                  Save to Notesnook
+                </Text>
+
+                <Button
+                  title="Done"
+                  style={{
+                    backgroundColor: colors.accent,
+                    height: Platform.OS === "ios" ? 35 : 40,
+                    paddingHorizontal: 15,
+                    marginBottom: 0
+                  }}
+                  loading={loading}
+                  iconColor={colors.light}
+                  onPress={onPress}
+                  textStyle={{
+                    fontSize: 16,
+                    marginLeft: 0
+                  }}
+                />
+              </View>
+              <View
+                style={{
                   width: "100%",
-                  height: height * 0.3,
+                  height: 200,
                   paddingBottom: 15,
-                  borderRadius: 10
+                  marginBottom: 10,
+                  borderBottomColor: colors.nav,
+                  borderBottomWidth: 1
                 }}
               >
                 <SafeAreaProvider
@@ -575,61 +630,127 @@ const ShareView = ({ quicknote = false }) => {
                 style={{
                   flexDirection: "row",
                   paddingHorizontal: 12,
-                  alignItems: "flex-end",
-                  justifyContent: "space-between",
-                  width: "100%"
+                  width: "100%",
+                  alignItems: "center"
                 }}
               >
-                <View
+                <Text
                   style={{
-                    flexDirection: "row"
+                    color: colors.pri,
+                    marginRight: 10
                   }}
                 >
-                  {rawData.value && isURL(rawData.value) ? (
-                    <Button
-                      color={mode == 2 ? colors.shade : colors.nav}
-                      icon={modes[2].icon}
-                      onPress={() => changeMode(2)}
-                      title={modes[2].title}
-                      iconSize={18}
-                      iconColor={mode == 2 ? accent.color : colors.icon}
-                      textColor={mode == 2 ? accent.color : colors.icon}
-                      type="rounded"
-                      style={{ paddingHorizontal: 12 }}
-                    />
-                  ) : null}
+                  Clip Mode:
+                </Text>
+                {rawData.value && isURL(rawData.value) ? (
                   <Button
-                    color={mode == 1 ? colors.shade : colors.nav}
-                    icon={modes[1].icon}
-                    onPress={() => changeMode(1)}
-                    title={modes[1].title}
-                    iconSize={18}
-                    iconColor={mode == 1 ? accent.color : colors.icon}
-                    textColor={mode == 1 ? accent.color : colors.icon}
-                    type="rounded"
-                    style={{ paddingHorizontal: 12 }}
-                  />
-                </View>
-
-                {!quicknote ? (
-                  <Button
-                    color={accent.color}
-                    onPress={onPress}
-                    loading={loading || loadingIntent}
-                    icon="check"
-                    iconSize={20}
-                    iconColor={colors.light}
+                    color="transparent"
+                    icon={mode === 2 ? "radiobox-marked" : "radiobox-blank"}
+                    onPress={() => changeMode(2)}
+                    title={modes[2].title}
+                    iconSize={16}
+                    fontSize={14}
+                    iconColor={mode == 2 ? accent.color : colors.icon}
+                    textColor={mode == 2 ? accent.color : colors.icon}
                     style={{
                       paddingHorizontal: 0,
-                      height: 40,
-                      width: 40,
-                      borderRadius: 100,
-                      minWidth: 0
+                      height: 30,
+                      marginRight: 12,
+                      marginBottom: 0
                     }}
                   />
                 ) : null}
+                <Button
+                  color="transparent"
+                  icon={mode === 1 ? "radiobox-marked" : "radiobox-blank"}
+                  onPress={() => changeMode(1)}
+                  title={modes[1].title}
+                  iconSize={16}
+                  fontSize={14}
+                  iconColor={mode == 1 ? accent.color : colors.icon}
+                  textColor={mode == 1 ? accent.color : colors.icon}
+                  style={{ paddingHorizontal: 0, height: 30, marginBottom: 0 }}
+                />
               </View>
             </View>
+          </View>
+
+          <View
+            style={{
+              width: "100%",
+              borderRadius: 10,
+              flexDirection: "column",
+              marginTop: 10,
+              alignSelf: "center",
+              alignItems: "center",
+              paddingHorizontal: 12
+            }}
+          >
+            <Button
+              color={colors.bg}
+              onPress={() => {
+                useShareStore.getState().setAppendNote(null);
+              }}
+              icon="plus"
+              iconSize={18}
+              iconColor={!appendNote ? accent.color : colors.icon}
+              title="New note"
+              textColor={!appendNote ? accent.color : colors.icon}
+              type="button"
+              textStyle={{
+                fontSize: 15
+              }}
+              style={{
+                paddingHorizontal: 12,
+                height: 45,
+                width: "100%",
+                marginRight: 0,
+                borderWidth: 1,
+                borderColor: colors.nav,
+                justifyContent: "flex-start"
+              }}
+            />
+
+            <Button
+              color={colors.bg}
+              onPress={() => {
+                setSearchMode("appendNote");
+              }}
+              icon="text-short"
+              iconSize={18}
+              iconColor={appendNote ? accent.color : colors.icon}
+              title={`Append to a note`}
+              textColor={colors.icon}
+              type="button"
+              textStyle={{
+                fontSize: 15
+              }}
+              style={{
+                paddingHorizontal: 12,
+                height: 45,
+                width: "100%",
+                marginRight: 0,
+                borderWidth: 1,
+                borderColor: colors.nav,
+                justifyContent: "flex-start"
+              }}
+            />
+
+            {!appendNote ? (
+              <AddTags
+                onPress={() => {
+                  setSearchMode("selectTags");
+                }}
+              />
+            ) : null}
+
+            {!appendNote ? (
+              <AddNotebooks
+                onPress={() => {
+                  setSearchMode("selectNotebooks");
+                }}
+              />
+            ) : null}
           </View>
 
           <View
@@ -638,67 +759,219 @@ const ShareView = ({ quicknote = false }) => {
             }}
           />
         </View>
+      </WrapperView>
+    </SafeAreaView>
+  );
+};
+
+const AddNotebooks = ({ onPress }) => {
+  const colors = useShareStore((state) => state.colors);
+  const notebooks = useShareStore((state) => state.selectedNotebooks);
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      style={{
+        paddingHorizontal: 12,
+        width: "100%",
+        marginRight: 0,
+        borderWidth: 1,
+        borderColor: colors.nav,
+        justifyContent: "center",
+        borderRadius: 5,
+        marginBottom: 10,
+        paddingVertical: 10,
+        paddingTop: 5
+      }}
+    >
+      {!notebooks || !notebooks.length ? (
+        <>
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              marginTop: 5
+            }}
+          >
+            <Icon
+              name="notebook-outline"
+              size={20}
+              style={{
+                marginRight: 10
+              }}
+              color={colors.icon}
+            />
+            <Text
+              style={{
+                color: colors.icon,
+                fontSize: 15
+              }}
+            >
+              Add to notebook
+            </Text>
+          </View>
+        </>
+      ) : (
         <View
           style={{
+            flexWrap: "wrap",
             width: "100%",
-            borderRadius: 10,
-            flexDirection: "column",
-            marginTop: 10,
-            alignSelf: "center",
-            alignItems: "center",
-            paddingHorizontal: 12
+            flexDirection: "row"
           }}
         >
-          <Button
-            color={colors.bg}
-            onPress={() => {
-              useShareStore.getState().setAppendNote(null);
-            }}
-            icon="plus"
-            iconSize={18}
-            iconColor={!appendNote ? accent.color : colors.icon}
-            title="New note"
-            textColor={!appendNote ? accent.color : colors.icon}
-            type="button"
-            textStyle={{
-              fontSize: 15
-            }}
-            style={{
-              paddingHorizontal: 0,
-              ...getElevation(1),
-              height: 45,
-              width: "100%",
-              marginRight: 0
-            }}
-          />
+          {notebooks.map((item) => (
+            <Text
+              style={{
+                color: colors.icon,
+                marginRight: 5,
+                fontSize: 14,
+                borderRadius: 4,
+                paddingHorizontal: 8,
+                backgroundColor: colors.nav,
+                paddingVertical: 5,
+                marginTop: 5
+              }}
+              onPress={() => {
+                const index = notebooks.findIndex(
+                  (nb) => nb.id === item.id && nb.type === item.type
+                );
+                const selectedNotebooks = [...notebooks];
+                selectedNotebooks.splice(index, 1);
+                useShareStore
+                  .getState()
+                  .setSelectedNotebooks(selectedNotebooks);
+              }}
+              key={item.id}
+            >
+              <Icon
+                name={item.type === "topic" ? "bookmark" : "notebook-outline"}
+                size={15}
+              />{" "}
+              {item.title}
+            </Text>
+          ))}
 
-          <Button
-            color={colors.bg}
-            onPress={() => {
-              setShowSearch(true);
-            }}
-            icon="text-short"
-            iconSize={18}
-            iconColor={appendNote ? accent.color : colors.icon}
-            title={`${
-              appendNote ? appendNote.title.slice(0, 25) : "Append to note"
-            }`}
-            textColor={appendNote ? accent.color : colors.icon}
-            type="button"
-            textStyle={{
-              fontSize: 15
-            }}
+          <Text
             style={{
-              paddingHorizontal: 0,
-              ...getElevation(1),
-              height: 45,
-              width: "100%",
-              marginRight: 0
+              color: colors.accent,
+              marginRight: 5,
+              fontSize: 14,
+              borderRadius: 4,
+              paddingHorizontal: 8,
+              backgroundColor: colors.nav,
+              paddingVertical: 5,
+              marginTop: 5
             }}
-          />
+            onPress={() => {
+              onPress();
+            }}
+            key="$add-more"
+          >
+            <Icon name="plus" size={16} /> Add more
+          </Text>
         </View>
-      </View>
-    </SafeAreaView>
+      )}
+    </TouchableOpacity>
+  );
+};
+
+const AddTags = ({ onPress }) => {
+  const colors = useShareStore((state) => state.colors);
+  const tags = useShareStore((state) => state.selectedTags);
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      style={{
+        paddingHorizontal: 12,
+        height: 45,
+        width: "100%",
+        marginRight: 0,
+        borderWidth: 1,
+        borderColor: colors.nav,
+        justifyContent: "center",
+        borderRadius: 5,
+        marginBottom: 10
+      }}
+    >
+      {!tags || !tags.length ? (
+        <>
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row"
+            }}
+          >
+            <Icon
+              name="pound"
+              size={20}
+              style={{
+                marginRight: 10
+              }}
+              color={colors.icon}
+            />
+            <Text
+              style={{
+                color: colors.icon,
+                fontSize: 15
+              }}
+            >
+              Add tags
+            </Text>
+          </View>
+        </>
+      ) : (
+        <View
+          style={{
+            flexWrap: "wrap",
+            width: "100%",
+            flexDirection: "row"
+          }}
+        >
+          {tags.map((tag) => (
+            <Text
+              style={{
+                color: colors.icon,
+                marginRight: 5,
+                fontSize: 14,
+                borderRadius: 4,
+                paddingHorizontal: 8,
+                backgroundColor: colors.nav,
+                paddingVertical: 5
+              }}
+              onPress={() => {
+                const index = tags.indexOf(tag);
+                const selectedTags = [...tags];
+                selectedTags.splice(index, 1);
+                useShareStore.getState().setSelectedTags(selectedTags);
+              }}
+              key={tag}
+            >
+              #{tag}
+            </Text>
+          ))}
+
+          <Text
+            style={{
+              color: colors.accent,
+              marginRight: 5,
+              fontSize: 14,
+              borderRadius: 4,
+              paddingHorizontal: 8,
+              backgroundColor: colors.nav,
+              paddingVertical: 5
+            }}
+            onPress={() => {
+              onPress();
+            }}
+            key="$add-tag"
+          >
+            <Icon name="plus" size={17} />
+            Add tag
+          </Text>
+        </View>
+      )}
+    </TouchableOpacity>
   );
 };
 
@@ -735,7 +1008,6 @@ const Button = ({
         alignItems: "center",
         flexDirection: "row",
         marginBottom: 10,
-        minWidth: 80,
         paddingHorizontal: 20
       },
       textStyle: {}
@@ -768,11 +1040,9 @@ const Button = ({
           alignItems: "center",
           flexDirection: "row",
           marginBottom: 10,
-          minWidth: 80,
           paddingHorizontal: 20
         },
-        types[type].style,
-        style
+        { ...types[type].style, ...style }
       ]}
     >
       {loading ? <ActivityIndicator color={iconColor} /> : null}

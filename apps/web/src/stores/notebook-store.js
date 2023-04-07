@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@ import Config from "../utils/config";
 
 class NotebookStore extends BaseStore {
   notebooks = [];
+  selectedNotebook = undefined;
   selectedNotebookTopics = [];
-  selectedNotebookId = 0;
   viewMode = Config.get("notebooks:viewMode", "detailed");
 
   setViewMode = (viewMode) => {
@@ -43,7 +43,7 @@ class NotebookStore extends BaseStore {
         db.settings.getGroupOptions("notebooks")
       );
     });
-    this.setSelectedNotebook(this.get().selectedNotebookId);
+    this.setSelectedNotebook(this.get().selectedNotebook?.id);
   };
 
   delete = async (...ids) => {
@@ -60,14 +60,16 @@ class NotebookStore extends BaseStore {
   };
 
   setSelectedNotebook = (id) => {
-    const topics = db.notebooks.notebook(id)?.topics?.all;
-    if (!topics) return;
+    if (!id) return;
+    const notebook = db.notebooks?.notebook(id)?.data;
+    if (!notebook) return;
+
     this.set((state) => {
+      state.selectedNotebook = notebook;
       state.selectedNotebookTopics = groupArray(
-        topics,
+        notebook.topics,
         db.settings.getGroupOptions("topics")
       );
-      state.selectedNotebookId = id;
     });
   };
 }

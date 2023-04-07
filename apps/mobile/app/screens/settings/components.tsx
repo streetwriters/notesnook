@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,8 +22,10 @@ import { AccentColorPicker, HomagePageSelector } from "./appearance";
 import { AutomaticBackupsSelector } from "./backup-restore";
 import DebugLogs from "./debug";
 import { ConfigureToolbar } from "./editor/configure-toolbar";
+import { Licenses } from "./licenses";
 import SoundPicker from "./sound-picker";
 import { Subscription } from "./subscription";
+import { TrashIntervalSelector } from "./trash-interval-selector";
 export const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker />,
   homeselector: <HomagePageSelector />,
@@ -31,5 +33,7 @@ export const components: { [name: string]: ReactElement } = {
   subscription: <Subscription />,
   configuretoolbar: <ConfigureToolbar />,
   "debug-logs": <DebugLogs />,
-  "sound-picker": <SoundPicker />
+  "sound-picker": <SoundPicker />,
+  licenses: <Licenses />,
+  "trash-interval-selector": <TrashIntervalSelector />
 };

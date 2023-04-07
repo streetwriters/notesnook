@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,8 +32,7 @@ import {
   ForwardRef
 } from "./types";
 import { ReactNodeView } from "./react-node-view";
-import { NodeViewRendererProps } from "@tiptap/core";
-import { Editor } from "../../types";
+import { Editor, NodeViewRendererProps } from "@tiptap/core";
 import { ThemeProvider } from "../../components/theme-provider";
 
 /**
@@ -93,7 +92,7 @@ export class SelectionBasedNodeView<
     if (!this.options.component) return null;
     const isSelected =
       this.editor.isEditable &&
-      (this.insideSelection() || this.nodeInsideSelection());
+      this.isSelectedNode(this.editor.view.state.selection);
 
     return (
       <ThemeProvider>

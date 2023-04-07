@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -85,7 +85,6 @@ export default class NoteHistory extends Collection {
     if (!noteId || !dateEdited || !content) return;
     let sessionId = `${noteId}_${dateEdited}`;
     let oldSession = await this._collection.getItem(sessionId);
-    let locked = this._db.notes.note(noteId)?.data?.locked;
 
     let session = {
       type: "session",
@@ -96,7 +95,8 @@ export default class NoteHistory extends Collection {
       localOnly: true
     };
 
-    if (locked) {
+    const note = this._db.notes.note(noteId);
+    if (note && note.data.locked) {
       session.locked = true;
     }
 
@@ -178,12 +178,14 @@ export default class NoteHistory extends Collection {
     /**
      * @type {Session}
      */
-    let session = await this._collection.getItem(sessionId);
-    let content = await this.sessionContent.get(session.sessionContentId);
-    let note = this._db.notes.note(session.noteId).data;
+    const session = await this._collection.getItem(sessionId);
+    const content = await this.sessionContent.get(session.sessionContentId);
+    const note = this._db.notes.note(session.noteId);
+    if (!note) return;
+
     if (session.locked) {
       await this._db.content.add({
-        id: note.contentId,
+        id: note.data.contentId,
         data: content.data,
         type: content.type
       });

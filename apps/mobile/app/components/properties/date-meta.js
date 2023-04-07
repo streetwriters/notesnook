@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -43,36 +43,41 @@ export const DateMeta = ({ item }) => {
     }
   };
 
-  const renderItem = (key) =>
-    key.startsWith("date") && key !== "date" ? (
-      <View
-        key={key}
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingVertical: 3
-        }}
-      >
-        <Paragraph size={SIZE.xs} color={colors.icon}>
-          {getNameFromKey(key)}
-        </Paragraph>
-        <Paragraph size={SIZE.xs} color={colors.icon}>
-          {timeConverter(item[key])}
-        </Paragraph>
-      </View>
-    ) : null;
+  function getDateMeta() {
+    let keys = Object.keys(item);
+    if (keys.includes("dateEdited"))
+      keys.splice(
+        keys.findIndex((k) => k === "dateModified"),
+        1
+      );
+    return keys.filter((key) => key.startsWith("date") && key !== "date");
+  }
+
+  const renderItem = (key) => (
+    <View
+      key={key}
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingVertical: 3
+      }}
+    >
+      <Paragraph size={SIZE.xs + 1} color={colors.icon}>
+        {getNameFromKey(key)}
+      </Paragraph>
+      <Paragraph size={SIZE.xs + 1} color={colors.icon}>
+        {timeConverter(item[key])}
+      </Paragraph>
+    </View>
+  );
 
   return (
     <View
       style={{
-        paddingVertical: 5,
-        marginTop: 5,
-        borderTopWidth: 1,
-        borderTopColor: colors.nav,
         paddingHorizontal: 12
       }}
     >
-      {Object.keys(item).map(renderItem)}
+      {getDateMeta().map(renderItem)}
     </View>
   );
 };

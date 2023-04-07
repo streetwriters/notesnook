@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { app } from "electron";
 import { join } from "path";
-import { statSync } from "fs";
+import { statSync, existsSync } from "fs";
+
+const APP_ICON_PATH = join(
+  __dirname,
+  process.platform === "win32" ? "app.ico" : "favicon-72x72.png"
+);
 
 function isDevelopment() {
   if (typeof electron === "string") {
@@ -47,4 +52,8 @@ function getPath(filePath) {
   }
 }
 
-export { getPath, isDevelopment };
+function isFlatpak() {
+  return existsSync("/.flatpak-info");
+}
+
+export { getPath, isDevelopment, isFlatpak, APP_ICON_PATH };

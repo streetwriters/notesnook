@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,51 +17,32 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
-import { ScrollView, View } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { View } from "react-native";
+import { ScrollView } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from "../../../services/event-manager";
+import { presentSheet, ToastEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useTagStore } from "../../../stores/use-tag-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { eCloseTagsDialog, eOpenTagsDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
-import { sleep } from "../../../utils/time";
 import Input from "../../ui/input";
 import { PressableButton } from "../../ui/pressable";
-import SheetWrapper from "../../ui/sheet";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { useCallback } from "react";
-const ManageTagsSheet = () => {
+const ManageTagsSheet = (props) => {
   const colors = useThemeStore((state) => state.colors);
-  const [visible, setVisible] = useState(false);
-  const [note, setNote] = useState(null);
+  const [note, setNote] = useState(props.note);
   const allTags = useTagStore((state) => state.tags);
   const [tags, setTags] = useState([]);
   const [query, setQuery] = useState(null);
   const inputRef = useRef();
-  const actionSheetRef = useRef();
+  const [focus, setFocus] = useState(false);
 
   useEffect(() => {
-    eSubscribeEvent(eOpenTagsDialog, open);
-    eSubscribeEvent(eCloseTagsDialog, close);
-    return () => {
-      eUnSubscribeEvent(eOpenTagsDialog, open);
-      eUnSubscribeEvent(eCloseTagsDialog, close);
-    };
-  }, [open]);
-
-  useEffect(() => {
-    if (visible) {
-      sortTags();
-    }
-  }, [allTags, note, query, sortTags, visible]);
+    sortTags();
+  }, [allTags, note, query, sortTags]);
 
   const sortTags = useCallback(() => {
     let _tags = [...allTags];
@@ -88,26 +69,9 @@ const ManageTagsSheet = () => {
     setTags(combinedTags);
   }, [allTags, note, query]);
 
-  const open = useCallback(
-    (item) => {
-      setNote(item);
-      useTagStore.getState().setTags();
-      sortTags();
-      setVisible(true);
-    },
-    [sortTags]
-  );
-
   useEffect(() => {
-    if (visible) {
-      actionSheetRef.current?.show();
-    }
-  }, [visible]);
-
-  const close = () => {
-    setQuery(null);
-    actionSheetRef.current?.hide();
-  };
+    useTagStore.getState().setTags();
+  }, []);
 
   const onSubmit = async () => {
     let _query = query;
@@ -139,113 +103,96 @@ const ManageTagsSheet = () => {
       });
     }
 
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes",
-      "Notebooks",
-      "Notebook"
-    );
+    Navigation.queueRoutesForUpdate();
   };
 
-  return !visible ? null : (
-    <SheetWrapper
-      centered={false}
-      fwdRef={actionSheetRef}
-      onOpen={async () => {
-        await sleep(300);
-        inputRef.current?.focus();
-      }}
-      onClose={async () => {
-        setQuery(null);
-        setVisible(false);
+  return (
+    <View
+      style={{
+        width: "100%",
+        alignSelf: "center",
+        paddingHorizontal: 12,
+        minHeight: focus ? "100%" : "60%"
       }}
     >
-      <View
-        style={{
-          width: "100%",
-          alignSelf: "center",
-          paddingHorizontal: 12,
-          minHeight: "60%"
+      <Input
+        button={{
+          icon: "magnify",
+          color: colors.accent,
+          size: SIZE.lg
         }}
+        testID="tag-input"
+        fwdRef={inputRef}
+        autoCapitalize="none"
+        onChangeText={(v) => {
+          setQuery(db.tags.sanitize(v));
+        }}
+        onFocusInput={() => {
+          setFocus(true);
+        }}
+        onBlurInput={() => {
+          setFocus(false);
+        }}
+        onSubmit={onSubmit}
+        placeholder="Search or add a tag"
+      />
+
+      <ScrollView
+        overScrollMode="never"
+        scrollToOverflowEnabled={false}
+        keyboardDismissMode="none"
+        keyboardShouldPersistTaps="always"
       >
-        <Input
-          button={{
-            icon: "magnify",
-            color: colors.accent,
-            size: SIZE.lg
-          }}
-          testID="tag-input"
-          fwdRef={inputRef}
-          autoCapitalize="none"
-          onChangeText={(v) => {
-            setQuery(db.tags.sanitize(v));
-          }}
-          onSubmit={onSubmit}
-          height={50}
-          placeholder="Search or add a tag"
-        />
+        {query && query !== tags[0]?.title ? (
+          <PressableButton
+            key={"query_item"}
+            customStyle={{
+              flexDirection: "row",
+              marginVertical: 5,
+              justifyContent: "space-between",
+              padding: 12
+            }}
+            onPress={onSubmit}
+            type="accent"
+          >
+            <Heading size={SIZE.sm} color={colors.light}>
+              Add {'"' + "#" + query + '"'}
+            </Heading>
+            <Icon name="plus" color={colors.light} size={SIZE.lg} />
+          </PressableButton>
+        ) : null}
+        {!allTags || allTags.length === 0 ? (
+          <View
+            style={{
+              width: "100%",
+              height: 200,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Heading size={50} color={colors.icon}>
+              #
+            </Heading>
+            <Paragraph textBreakStrategy="balanced" color={colors.icon}>
+              You do not have any tags.
+            </Paragraph>
+          </View>
+        ) : null}
 
-        <ScrollView
-          nestedScrollEnabled
-          overScrollMode="never"
-          scrollToOverflowEnabled={false}
-          keyboardDismissMode="none"
-          keyboardShouldPersistTaps="always"
-          onMomentumScrollEnd={() => {
-            actionSheetRef.current?.handleChildScrollEnd();
-          }}
-        >
-          {query && query !== tags[0]?.title ? (
-            <PressableButton
-              key={"query_item"}
-              customStyle={{
-                flexDirection: "row",
-                marginVertical: 5,
-                justifyContent: "space-between",
-                padding: 12
-              }}
-              onPress={onSubmit}
-              type="accent"
-            >
-              <Heading size={SIZE.sm} color={colors.light}>
-                Add {'"' + "#" + query + '"'}
-              </Heading>
-              <Icon name="plus" color={colors.light} size={SIZE.lg} />
-            </PressableButton>
-          ) : null}
-          {!allTags || allTags.length === 0 ? (
-            <View
-              style={{
-                width: "100%",
-                height: 200,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Heading size={50} color={colors.icon}>
-                #
-              </Heading>
-              <Paragraph textBreakStrategy="balanced" color={colors.icon}>
-                You do not have any tags.
-              </Paragraph>
-            </View>
-          ) : null}
-
-          {tags.map((item) => (
-            <TagItem
-              key={item.title}
-              tag={item}
-              note={note}
-              setNote={setNote}
-            />
-          ))}
-        </ScrollView>
-      </View>
-    </SheetWrapper>
+        {tags.map((item) => (
+          <TagItem key={item.title} tag={item} note={note} setNote={setNote} />
+        ))}
+      </ScrollView>
+    </View>
   );
+};
+
+ManageTagsSheet.present = (note) => {
+  presentSheet({
+    component: (ref) => {
+      return <ManageTagsSheet actionSheetRef={ref} note={note} />;
+    }
+  });
 };
 
 export default ManageTagsSheet;
@@ -269,13 +216,7 @@ const TagItem = ({ tag, note, setNote }) => {
       console.error(e);
     }
     setTimeout(() => {
-      Navigation.queueRoutesForUpdate(
-        "Notes",
-        "Favorites",
-        "ColoredNotes",
-        "TaggedNotes",
-        "TopicNotes"
-      );
+      Navigation.queueRoutesForUpdate();
     }, 1);
   };
 

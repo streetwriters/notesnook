@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -69,6 +69,7 @@ import {
 import { editorRef, tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
+import changeNavigationBarColor from "react-native-navigation-bar-color";
 
 const _TabsHolder = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -235,14 +236,17 @@ const _TabsHolder = () => {
     let needsUpdate = current !== deviceMode;
 
     if (fullscreen && current !== "mobile") {
-      editorRef.current?.setNativeProps({
-        style: {
-          width: size.width,
-          zIndex: 999,
-          paddingHorizontal:
-            current === "smallTablet" ? size.width * 0 : size.width * 0.15
-        }
-      });
+      // Runs after size is set via state.
+      setTimeout(() => {
+        editorRef.current?.setNativeProps({
+          style: {
+            width: size.width,
+            zIndex: 999,
+            paddingHorizontal:
+              current === "smallTablet" ? size.width * 0 : size.width * 0.15
+          }
+        });
+      }, 1);
     } else {
       if (fullscreen) eSendEvent(eCloseFullscreenEditor, current);
       editorRef.current?.setNativeProps({
@@ -281,10 +285,8 @@ const _TabsHolder = () => {
             !editorState().movedAway &&
             useEditorStore.getState().currentEditingNote
           ) {
-            console.log("editor");
             tabBarRef.current?.goToIndex(2, false);
           } else {
-            console.log("home");
             tabBarRef.current?.goToIndex(1, false);
           }
           break;
@@ -384,6 +386,10 @@ const _TabsHolder = () => {
       ]
     };
   }, []);
+
+  useEffect(() => {
+    changeNavigationBarColor(colors.bg, !colors.night, true);
+  }, [colors.night, colors.bg]);
 
   return (
     <View

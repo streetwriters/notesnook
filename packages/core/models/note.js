@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import TextBuilder from "../utils/templates/text/builder";
 import { getContentFromData } from "../content-types";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { addItem, deleteItem } from "../utils/array";
-import { formatDate } from "../utils/date"
+import { formatDate } from "../utils/date";
 
 export default class Note {
   /**
@@ -79,9 +79,12 @@ export default class Note {
   /**
    *
    * @param {"html"|"md"|"txt"} format - Format to export into
-   * @param {string?} rawContent - Use this raw content instead of generating itself
+   * @param {string} [contentItem=undefined]
+   * @param {boolean} [template=true]
+   * @param {string} [rawHTML=undefined] rawHTML - Use this raw content instead of generating itself
+   * @returns {Promise<string | false | undefined>}
    */
-  async export(to = "html", rawContent) {
+  async export(to = "html", contentItem, template = true, rawHTML) {
     if (to !== "txt" && !(await checkIsUserPremium(CHECK_IDS.noteExport)))
       return false;
 
@@ -93,7 +96,8 @@ export default class Note {
       createdOn: formatDate(this.data.dateCreated),
       tags: this.tags.join(", ")
     };
-    const contentItem = await this._db.content.raw(this._note.contentId);
+    contentItem =
+      contentItem || (await this._db.content.raw(this._note.contentId));
     if (!contentItem) return false;
     const { data, type } = await this._db.content.downloadMedia(
       `export-${this.id}`,
@@ -104,14 +108,20 @@ export default class Note {
 
     switch (to) {
       case "html":
-        templateData.content = rawContent || content.toHTML();
-        return HTMLBuilder.buildHTML(templateData);
+        templateData.content = rawHTML || content.toHTML();
+        return template
+          ? HTMLBuilder.buildHTML(templateData)
+          : templateData.content;
       case "txt":
-        templateData.content = rawContent || content.toTXT();
-        return TextBuilder.buildText(templateData);
+        templateData.content = rawHTML || content.toTXT();
+        return template
+          ? TextBuilder.buildText(templateData)
+          : templateData.content;
       case "md":
-        templateData.content = rawContent || content.toMD();
-        return MarkdownBuilder.buildMarkdown(templateData);
+        templateData.content = rawHTML || content.toMD();
+        return template
+          ? MarkdownBuilder.buildMarkdown(templateData)
+          : templateData.content;
       default:
         throw new Error("Export format not supported.");
     }

@@ -18,6 +18,10 @@ apps/web/public/an.js
 
 # editor
 packages/editor/styles/
+packages/editor/languages/
 
 # editor mobile
 packages/editor-mobile/build.bundle
+
+# snapshots
+tap-snapshots

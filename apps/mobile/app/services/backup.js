@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -116,7 +116,7 @@ async function presentBackupCompleteSheet(backupFilePath) {
           if (Platform.OS === "ios") {
             Share.open({
               url: backupFilePath,
-              failOnCancel: false,
+              failOnCancel: false
             }).catch(console.log);
           } else {
             FileViewer.open(backupFilePath, {
@@ -165,7 +165,6 @@ async function run(progress, context) {
   }
 
   try {
-
     backup = await db.backup.export(
       "mobile",
       PremiumService.get() ? SettingsService.get().encryptedBackup : false

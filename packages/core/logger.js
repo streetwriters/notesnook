@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -136,10 +136,11 @@ class DatabaseLogManager {
   }
 }
 
-function initalize(storage,disableConsoleLogs) {
+function initalize(storage, disableConsoleLogs) {
   if (storage) {
     let reporters = [new DatabaseLogReporter(storage)];
-    if (process.env.NODE_ENV !== "production" && !disableConsoleLogs) reporters.push(consoleReporter);
+    if (process.env.NODE_ENV !== "production" && !disableConsoleLogs)
+      reporters.push(consoleReporter);
     logger = new Logger({
       reporter: combineReporters(reporters),
       lastTime: Date.now()

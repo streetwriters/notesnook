@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -56,15 +56,7 @@ const RecurringModes = {
   DAY: "day"
 } as const;
 
-const WEEK_DAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday"
-];
+const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const modes = [
   {
     id: Modes.ONCE,
@@ -99,7 +91,7 @@ const recurringModes = [
   {
     id: RecurringModes.WEEK,
     title: "Weekly",
-    options: WEEK_DAYS
+    options: new Array(7).fill(0).map((_, i) => i)
   },
   {
     id: RecurringModes.MONTH,
@@ -127,14 +119,6 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
   const isUserPremium = useIsUserPremium();
 
   useEffect(() => {
-    setSelectedDays([]);
-  }, [recurringMode, mode]);
-
-  useEffect(() => {
-    setRecurringMode(RecurringModes.DAY);
-  }, [mode]);
-
-  useEffect(() => {
     if (!reminderId) return;
     const reminder = db.reminders?.reminder(reminderId);
     if (!reminder) return;
@@ -149,6 +133,15 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
     setDescription(reminder.description);
   }, [reminderId]);
 
+  useEffect(() => {
+    if (!noteId) return;
+    const note = db.notes?.note(noteId);
+    if (!note) return;
+
+    setTitle(note.title);
+    setDescription(note.headline);
+  }, [noteId]);
+
   const repeatsDaily =
     (selectedDays.length === 7 && recurringMode === RecurringModes.WEEK) ||
     (selectedDays.length === 31 && recurringMode === RecurringModes.MONTH) ||
@@ -159,7 +152,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
       isOpen={true}
       title={reminderId ? "Edit reminder" : "Add a reminder"}
       description={""}
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
         text: reminderId ? "Save" : "Add",
         disabled:
@@ -185,7 +178,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
 
           const dateTime = dayjs(getDateTime(date, time));
 
-          if (dateTime.isBefore(dayjs())) {
+          if (mode !== Modes.REPEAT && dateTime.isBefore(dayjs())) {
             showToast(
               "error",
               "Reminder time cannot be earlier than the current time."
@@ -217,22 +210,30 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
           props.onClose(true);
         }
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
       <Field
         id="title"
         label="Title"
         required
         value={title}
+        data-test-id="title-input"
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setTitle(e.target.value)
         }
       />
       <Field
+        as="textarea"
         id="description"
         label="Description"
+        data-test-id="description-input"
         helpText="Optional"
         value={description}
+        styles={{
+          input: {
+            height: 100
+          }
+        }}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setDescription(e.target.value)
         }
@@ -242,6 +243,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
           <Label
             key={m.id}
             variant="text.body"
+            data-test-id={`mode-${m.id}`}
             sx={{
               width: "auto",
               justifyContent: "center",
@@ -257,6 +259,8 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
               onChange={() => {
                 if (m.premium && !isUserPremium) return;
                 setMode(m.id);
+                setRecurringMode(RecurringModes.DAY);
+                setSelectedDays([]);
               }}
             />
             {m.title}
@@ -281,7 +285,11 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
               <Button
                 key={mode.id}
                 variant="tool"
-                onClick={() => setRecurringMode(mode.id)}
+                data-test-id={`recurring-mode-${mode.id}`}
+                onClick={() => {
+                  setRecurringMode(mode.id);
+                  setSelectedDays([]);
+                }}
                 sx={{
                   borderRadius: 100,
                   py: 1,
@@ -301,8 +309,8 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                   display: "grid",
                   gridTemplateColumns:
                     mode.id === RecurringModes.WEEK
-                      ? "1fr 1fr 1fr"
-                      : "1fr 1fr 1fr 1fr 1fr",
+                      ? "1fr 1fr 1fr 1fr 1fr 1fr 1fr"
+                      : "1fr 1fr 1fr 1fr 1fr 1fr 1fr",
                   mt: mode.options.length > 0 ? 1 : 0,
                   maxHeight: 150,
                   overflowY: "auto",
@@ -313,12 +321,13 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                   <Button
                     key={day}
                     variant="tool"
+                    data-test-id={`day-${day}`}
                     onClick={() => {
                       setSelectedDays((days) => {
                         const clone = days.slice();
-                        if (clone.indexOf(i) > -1)
-                          clone.splice(clone.indexOf(i), 1);
-                        else clone.push(i);
+                        if (clone.indexOf(day) > -1)
+                          clone.splice(clone.indexOf(day), 1);
+                        else clone.push(day);
                         return clone;
                       });
                     }}
@@ -328,11 +337,11 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                       px: 2,
                       flexShrink: 0,
                       textAlign: "left",
-                      bg: selectedDays.includes(i) ? "shade" : "bgSecondary",
-                      color: selectedDays.includes(i) ? "primary" : "text"
+                      bg: selectedDays.includes(day) ? "shade" : "bgSecondary",
+                      color: selectedDays.includes(day) ? "primary" : "text"
                     }}
                   >
-                    {day}
+                    {mode.id === "week" ? WEEK_DAYS[i] : day}
                   </Button>
                 ))}
               </Box>
@@ -348,6 +357,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             label="Date"
             required
             type="date"
+            data-test-id="date-input"
             min={dayjs().format("YYYY-MM-DD")}
             defaultValue={date}
             value={date}
@@ -362,6 +372,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
           label="Time"
           required
           type="time"
+          data-test-id="time-input"
           defaultValue={time}
           value={time}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -374,6 +385,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
           <Label
             key={p.id}
             variant="text.body"
+            data-test-id={`priority-${p.id}`}
             sx={{
               width: "auto",
               justifyContent: "center",
@@ -434,7 +446,7 @@ function getSelectedDaysText(
       const joinWith = isSecondLast ? " & " : isLast ? "" : ", ";
       return recurringMode === RecurringModes.WEEK
         ? WEEK_DAYS[day] + joinWith
-        : `${day + 1}${nth(day + 1)} ${joinWith}`;
+        : `${day}${nth(day)} ${joinWith}`;
     })
     .join("");
   return text;

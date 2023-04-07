@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useRef, useState } from "react";
 import { Dimensions, View } from "react-native";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
-import umami from "../../common/analytics";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { ToastEvent } from "../../services/event-manager";
@@ -31,7 +30,6 @@ import { useUserStore } from "../../stores/use-user-store";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import BaseDialog from "../dialog/base-dialog";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
 import { SvgView } from "../ui/svg";
@@ -79,7 +77,6 @@ export const Signup = ({ changeMode, trial }) => {
       clearMessage();
       setEmailVerifyMessage();
       hideAuth();
-      umami.pageView("/account-created", "/welcome/signup");
       await sleep(300);
       if (trial) {
         PremiumService.sheet(null, null, true);
@@ -99,9 +96,6 @@ export const Signup = ({ changeMode, trial }) => {
 
   return (
     <>
-      {loading ? (
-        <BaseDialog transparent={true} visible={true} animation="fade" />
-      ) : null}
       <Animated.View
         entering={FadeInDown}
         exiting={FadeOutUp}
@@ -150,6 +144,7 @@ export const Signup = ({ changeMode, trial }) => {
               textAlign: "center"
             }}
             onPress={() => {
+              if (loading) return;
               changeMode(0);
             }}
             size={SIZE.md}
@@ -237,7 +232,10 @@ export const Signup = ({ changeMode, trial }) => {
                 borderRadius: 100
               }}
               loading={loading}
-              onPress={signup}
+              onPress={() => {
+                if (loading) return;
+                signup();
+              }}
               type="accent"
               title={loading ? null : "Agree and continue"}
             />

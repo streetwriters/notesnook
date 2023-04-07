@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,7 +37,9 @@ const SheetWrapper = ({
   onHasReachedTop,
   keyboardMode,
   overlay,
-  overlayOpacity = 0.3
+  overlayOpacity = 0.3,
+  enableGesturesInScrollView = false,
+  bottomPadding = true
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const deviceMode = useSettingStore((state) => state.deviceMode);
@@ -59,8 +61,8 @@ const SheetWrapper = ({
       zIndex: 10,
       paddingTop: 5,
       paddingBottom: 0,
-      borderTopRightRadius: 10,
-      borderTopLeftRadius: 10,
+      borderTopRightRadius: 15,
+      borderTopLeftRadius: 15,
       alignSelf: "center",
       borderBottomRightRadius: 0,
       borderBottomLeftRadius: 0
@@ -84,7 +86,8 @@ const SheetWrapper = ({
         backdrop: "sheet-backdrop"
       }}
       indicatorStyle={{
-        width: 100
+        width: 100,
+        backgroundColor: colors.nav
       }}
       drawUnderStatusBar={false}
       containerStyle={style}
@@ -98,32 +101,35 @@ const SheetWrapper = ({
       indicatorColor={colors.nav}
       onOpen={_onOpen}
       keyboardDismissMode="none"
+      enableGesturesInScrollView={enableGesturesInScrollView}
       defaultOverlayOpacity={overlayOpacity}
-      overlayColor={pitchBlack ? "#585858" : "#000000"}
+      overlayColor={pitchBlack ? "#585858" : "#2b2b2b"}
       keyboardShouldPersistTaps="always"
       ExtraOverlayComponent={
         <>
           {overlay}
-          <Toast context="local" />
           <PremiumToast
             context="sheet"
             close={() => fwdRef?.current?.hide()}
             offset={50}
           />
+          <Toast context="local" />
         </>
       }
       onClose={_onClose}
     >
       <BouncingView>
         {children}
-        <View
-          style={{
-            height:
-              Platform.OS === "ios" && insets.bottom !== 0
-                ? insets.bottom + 5
-                : 20
-          }}
-        />
+        {bottomPadding ? (
+          <View
+            style={{
+              height:
+                Platform.OS === "ios" && insets.bottom !== 0
+                  ? insets.bottom + 5
+                  : 20
+            }}
+          />
+        ) : null}
       </BouncingView>
     </ActionSheet>
   );

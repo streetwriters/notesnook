@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, View, ViewStyle } from "react-native";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
@@ -35,12 +35,13 @@ type DialogHeaderProps = {
     loading?: boolean;
     title?: string;
     type?: PressableButtonProps["type"];
-    icon?: string
+    icon?: string;
   };
   paragraphColor?: string;
   padding?: number;
   centered?: boolean;
   titlePart?: string;
+  style?: ViewStyle;
 };
 
 const DialogHeader = ({
@@ -50,7 +51,8 @@ const DialogHeader = ({
   paragraphColor,
   padding,
   centered,
-  titlePart
+  titlePart,
+  style
 }: DialogHeaderProps) => {
   const colors = useThemeStore((state) => state.colors);
 
@@ -62,7 +64,8 @@ const DialogHeader = ({
           alignItems: "center",
           justifyContent: "space-between",
           minHeight: 50,
-          paddingHorizontal: padding
+          paddingHorizontal: padding,
+          ...style
         }}
       >
         <View

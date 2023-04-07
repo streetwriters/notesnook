@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -183,12 +183,19 @@ import {
   mdiVibrate,
   mdiBellCancelOutline,
   mdiBellPlusOutline,
-  mdiBellOutline
+  mdiBellOutline,
+  mdiGestureTapButton,
+  mdiCloseCircleOutline,
+  mdiMinusCircleOutline,
+  mdiLightbulbOnOutline,
+  mdiNoteMultipleOutline,
+  mdiBookMultipleOutline,
+  mdiArrowTopRight,
+  mdiBookmarkRemoveOutline
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
-import { AnimatedFlex } from "../animated";
 import { Theme } from "@notesnook/theme";
-import { FlexProps } from "@theme-ui/components";
+import { Flex, FlexProps } from "@theme-ui/components";
 import { MotionProps } from "framer-motion";
 
 type MDIIconWrapperProps = {
@@ -231,7 +238,7 @@ function MDIIconWrapper({
   );
 }
 
-type IconProps = FlexProps &
+export type IconProps = FlexProps &
   MotionProps &
   Omit<MDIIconWrapperProps, "path"> & {
     hoverColor?: keyof Theme["colors"];
@@ -247,10 +254,8 @@ function createIcon(path: string, rotate = false) {
     const [isHovering, setIsHovering] = useState(false);
     const { sx, rotate: _rotate = rotate, size, ...restProps } = props;
     return (
-      <AnimatedFlex
+      <Flex
         {...restProps}
-        whileHover={{ scale: 1.1 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
         sx={{
           ...sx,
           justifyContent: "center",
@@ -269,7 +274,7 @@ function createIcon(path: string, rotate = false) {
             props.hoverColor && isHovering ? props.hoverColor : props.color
           }
         />
-      </AnimatedFlex>
+      </Flex>
     );
   };
   NNIcon.isReactComponent = true;
@@ -278,12 +283,15 @@ function createIcon(path: string, rotate = false) {
 
 export const Plus = createIcon(mdiPlus);
 export const Note = createIcon(mdiNoteOutline);
+export const Notes = createIcon(mdiNoteMultipleOutline);
 export const Minus = createIcon(mdiMinus);
 export const Notebook = createIcon(mdiBookOutline);
+export const Notebooks = createIcon(mdiBookMultipleOutline);
 export const Notebook2 = createIcon(mdiNotebookOutline);
 export const ArrowLeft = createIcon(mdiArrowLeft);
 export const ArrowRight = createIcon(mdiArrowRight);
 export const ArrowDown = createIcon(mdiArrowDown);
+export const ArrowTopRight = createIcon(mdiArrowTopRight);
 export const Move = createIcon(mdiBookPlusMultipleOutline);
 export const Topic = createIcon(mdiBookmarkOutline);
 export const Alert = createIcon(mdiAlertOctagonOutline);
@@ -299,7 +307,8 @@ export const Check = createIcon(mdiCheck);
 export const Cross = createIcon(mdiClose);
 export const MoreVertical = createIcon(mdiDotsVertical);
 export const Trash = createIcon(mdiTrashCanOutline);
-export const TopicRemove = createIcon(mdiBookRemoveOutline);
+export const TopicRemove = createIcon(mdiBookmarkRemoveOutline);
+export const NotebookRemove = createIcon(mdiBookRemoveOutline);
 export const Search = createIcon(mdiMagnify);
 export const Menu = createIcon(mdiMenu);
 export const Login = createIcon(mdiLoginVariant);
@@ -333,6 +342,8 @@ export const ThemeIcon = createIcon(mdiThemeLightDark);
 export const Checkmark = createIcon(mdiCheck);
 export const DoubleCheckmark = createIcon(mdiCheckAll);
 export const CheckCircle = createIcon(mdiCheckCircle);
+export const CheckIntermediate = createIcon(mdiMinusCircleOutline);
+export const CheckRemove = createIcon(mdiCloseCircleOutline);
 export const CheckCircleOutline = createIcon(mdiCheckCircleOutline);
 export const Properties = createIcon(mdiDotsVertical);
 export const Markdown = createIcon(mdiLanguageMarkdownOutline);
@@ -459,3 +470,12 @@ export const AddReminder = createIcon(mdiBellPlusOutline);
 export const Silent = createIcon(mdiBellOffOutline);
 export const Vibrate = createIcon(mdiVibrate);
 export const Loud = createIcon(mdiBellRingOutline);
+export const CustomToolbar = createIcon(mdiGestureTapButton);
+
+export const EditorNormalWidth = createIcon(
+  `M4 20q-.825 0-1.412-.587Q2 18.825 2 18V6q0-.825.588-1.412Q3.175 4 4 4h16q.825 0 1.413.588Q22 5.175 22 6v12q0 .825-.587 1.413Q20.825 20 20 20Zm0-2h2V6H4v12Zm4 0h8V6H8Zm10 0h2V6h-2ZM8 6v12Z`
+);
+export const EditorFullWidth = createIcon(
+  `M4 20q-.825 0-1.412-.587Q2 18.825 2 18V6q0-.825.588-1.412Q3.175 4 4 4h16q.825 0 1.413.588Q22 5.175 22 6v12q0 .825-.587 1.413Q20.825 20 20 20Zm0-2h1V6H4v12Zm3 0h10V6H7Zm12 0h1V6h-1ZM7 6v12Z`
+);
+export const Suggestion = createIcon(mdiLightbulbOnOutline);

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import { store as editorstore } from "./editor-store";
 import { store as attachmentStore } from "./attachment-store";
 import { store as monographStore } from "./monograph-store";
 import { store as reminderStore } from "./reminder-store";
+import { store as announcementStore } from "./announcement-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
@@ -47,7 +48,11 @@ class AppStore extends BaseStore {
   isSyncEnabled = Config.get("syncEnabled", true);
   isRealtimeSyncEnabled = Config.get("isRealtimeSyncEnabled", true);
   syncStatus = {
-    key: navigator.onLine ? "synced" : "offline",
+    key: navigator.onLine
+      ? Config.get("syncEnabled", true)
+        ? "synced"
+        : "disabled"
+      : "offline",
     progress: null,
     type: null
   };
@@ -60,6 +65,7 @@ class AppStore extends BaseStore {
   init = () => {
     // this needs to happen here so reminders can be set on app load.
     reminderStore.refresh();
+    announcementStore.refresh();
 
     let count = 0;
     EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
@@ -104,8 +110,7 @@ class AppStore extends BaseStore {
       }
     );
 
-    db.eventManager.subscribe(EVENTS.syncAborted, (error) => {
-      if (error) showToast("error", error);
+    db.eventManager.subscribe(EVENTS.syncAborted, () => {
       this.updateSyncStatus("failed");
     });
 

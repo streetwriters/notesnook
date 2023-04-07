@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -82,18 +82,17 @@ function ListItem(props) {
       id={`id_${props.item.id}`}
       className={isSelected ? "selected" : ""}
       ref={listItemRef}
-      bg={isSelected ? "shade" : background}
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();
 
         let items = props.menu?.items?.slice() || [];
-        let title = props.item.title;
+        let title = undefined;
         let selectedItems = selectionStore
           .get()
           .selectedItems.filter((i) => i.type === props.item.type);
 
-        if (selectedItems.indexOf(props.item) === -1) {
+        if (selectedItems.findIndex((i) => i.id === props.item.id) === -1) {
           selectedItems = [];
           selectedItems.push(props.item);
         }
@@ -114,33 +113,47 @@ function ListItem(props) {
           ...props.menu?.extraData
         });
       }}
-      pr={2}
-      py={isCompact ? 1 : 2}
       pl={1}
+      pr={2}
+      py={1}
+      mb={isCompact ? 0 : 1}
       tabIndex={-1}
       sx={{
-        opacity: isDisabled ? 0.7 : 1,
         height: "inherit",
         cursor: "pointer",
         position: "relative",
-        borderLeft: "5px solid",
-        borderLeftColor: isFocused ? primary : "transparent",
-        transition: "box-shadow 200ms ease-in",
-        outline: isMenuTarget ? `1px solid var(--${primary})` : "none",
-        // borderBottom: isMenuTarget ? `1px solid var(--${primary})` : "none",
-        ":hover": {
-          backgroundColor: isSelected ? "shade" : "hover"
-        },
-        ":focus,:focus-visible": {
-          // outline: "none",
-          outline: `1px solid var(--${primary})`
-          // outline: `1px solid var(--${primary})`,
-        },
         overflow: "hidden",
         maxWidth: "100%",
+
         flexDirection: isCompact ? "row" : "column",
         justifyContent: isCompact ? "space-between" : "center",
-        alignItems: isCompact ? "center" : undefined
+        alignItems: isCompact ? "center" : undefined,
+
+        opacity: isDisabled ? 0.7 : 1,
+
+        borderLeft: "5px solid",
+        borderLeftColor: isFocused ? primary : "transparent",
+        ml: "2px",
+        mr: "1px",
+
+        backgroundColor: isSelected
+          ? "shade"
+          : isMenuTarget || isFocused
+          ? "hover"
+          : background,
+
+        ":hover": {
+          backgroundColor: isSelected ? "textSelection" : "hover"
+        },
+        ":focus": {
+          backgroundColor: isSelected ? "textSelection" : "hover"
+        },
+        ":focus-visible": {
+          outline: `1px solid var(--${
+            primary === "primary" ? "dimPrimary" : primary
+          })`,
+          backgroundColor: isSelected ? "textSelection" : background
+        }
       }}
       onKeyPress={(e) => {
         if (e.key !== "Enter") {
@@ -154,9 +167,11 @@ function ListItem(props) {
       }}
       data-test-id={`list-item`}
     >
+      {!isCompact && props.header}
+
       <Text
         data-test-id={`title`}
-        variant={isSimple ? "body" : "subtitle"}
+        variant={isSimple || isCompact ? "body" : "subtitle"}
         sx={{
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -169,8 +184,6 @@ function ListItem(props) {
         {props.title}
       </Text>
 
-      {!isCompact && props.header}
-
       {!isSimple && !isCompact && props.body && (
         <Text
           as="p"
@@ -180,6 +193,7 @@ function ListItem(props) {
             lineHeight: `1.2rem`,
             overflow: "hidden",
             textOverflow: "ellipsis",
+            whiteSpace: "pre-wrap",
             position: "relative",
             display: "-webkit-box",
             WebkitLineClamp: 4,

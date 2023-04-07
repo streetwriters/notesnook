@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ async function save(path, data, fileName, extension) {
     uri = await ScopedStorage.writeFile(
       path,
       data,
-      fileName + `.${extension}`,
+      `${fileName}.${extension}`,
       MIMETypes[extension],
       extension === "pdf" ? "base64" : "utf8",
       false
@@ -124,7 +124,6 @@ async function exportAs(type, note, bulk) {
     case "pdf":
       {
         let html = await makeHtml(note);
-        console.log(html);
         let fileName = sanitizeFilename(note.title + Date.now(), {
           replacement: "_"
         });
@@ -197,6 +196,19 @@ function zipsync(results) {
   return Buffer.from(data.buffer).toString("base64");
 }
 
+function getUniqueFileName(fileName, results) {
+  const chunks = fileName.split(".");
+  const ext = chunks.pop();
+  const name = chunks.join(".");
+  let resolvedName = fileName;
+  let count = 0;
+  while (results[resolvedName]) {
+    resolvedName = `${name}${++count}.${ext}`;
+  }
+
+  return resolvedName;
+}
+
 /**
  *
  * @param {"txt" | "pdf" | "md" | "html"} type
@@ -212,14 +224,12 @@ async function bulkExport(notes, type, callback) {
       let note = notes[i];
       if (note.locked) continue;
       let result = await exportAs(type, note);
-      let fileName = sanitizeFilename(note.title + Date.now(), {
+      let fileName = sanitizeFilename(note.title, {
         replacement: "_"
       });
       if (result) {
-        results[fileName + `.${type}`] = Buffer.from(
-          result,
-          type === "pdf" ? "base64" : "utf-8"
-        );
+        results[getUniqueFileName(fileName + `.${type}`, results)] =
+          Buffer.from(result, type === "pdf" ? "base64" : "utf-8");
       }
       callback(`${i + 1}/${notes.length}`);
     } catch (e) {

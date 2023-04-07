@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,6 +24,9 @@ import { FlexScrollContainer } from "../scroll-container";
 import MenuItem from "./menu-item";
 import { store as selectionStore } from "../../stores/selection-store";
 
+function getMenuItemId(item) {
+  return `menuitem-${item.key}`;
+}
 function useMenuFocus(items, onAction, onClose) {
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
@@ -32,7 +35,7 @@ function useMenuFocus(items, onAction, onClose) {
     (index) => {
       const item = items[index];
       if (!item) return;
-      const element = document.getElementById(item.key);
+      const element = document.getElementById(getMenuItemId(item));
       if (!element) return;
       element.scrollIntoView({
         behavior: "auto"
@@ -44,7 +47,7 @@ function useMenuFocus(items, onAction, onClose) {
   const onKeyDown = useCallback(
     (e) => {
       const isSeperator = (i) =>
-        items && (items[i]?.type === "seperator" || items[i]?.isDisabled);
+        items && (items[i]?.type === "separator" || items[i]?.isDisabled);
       const moveDown = (i) => (i < items.length - 1 ? ++i : 0);
       const moveUp = (i) => (i > 0 ? --i : items.length - 1);
       const hasSubmenu = (i) => items && items[i]?.hasSubmenu;
@@ -145,8 +148,8 @@ function Menu({ items, data, title, closeMenu }) {
     }
 
     const { top, left } = getPosition(subMenuRef.current, {
-      yOffset: document.getElementById(item.key).offsetHeight,
-      relativeTo: document.getElementById(item.key),
+      yOffset: 0,
+      relativeTo: document.getElementById(getMenuItemId(item)),
       location: "right"
     });
 
@@ -175,15 +178,18 @@ function Menu({ items, data, title, closeMenu }) {
                 setFocusIndex(-1);
                 return;
               }
+              if (!isSubmenuOpen) setFocusIndex(index);
 
               clearTimeout(hoverTimeout.current);
-              setFocusIndex(index);
-              setIsSubmenuOpen(false);
-              if (item.items?.length) {
-                hoverTimeout.current = setTimeout(() => {
+              hoverTimeout.current = setTimeout(() => {
+                if (isSubmenuOpen) {
+                  setFocusIndex(index);
+                  setIsSubmenuOpen(false);
+                }
+                if (item.items?.length) {
                   setIsSubmenuOpen(true);
-                }, 500);
-              }
+                }
+              }, 200);
             }}
             onMouseLeave={() => {
               clearTimeout(hoverTimeout.current);
@@ -215,10 +221,11 @@ function MenuContainer({ title, children }) {
   return (
     <Flex
       className="menuContainer"
+      data-test-id="menu-container"
       tabIndex={-1}
-      bg="background"
       py={1}
       sx={{
+        bg: "bgSecondary",
         padding: 0,
         margin: 0,
         borderRadius: "default",

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,8 +24,10 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { db } from "../../../common/database";
+import Notebook from "../../../screens/notebook";
 import { TaggedNotes } from "../../../screens/notes/tagged";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
+import useNavigationStore from "../../../stores/use-navigation-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
@@ -39,10 +41,6 @@ import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
-const navigateToTopic = (topic) => {
-  TopicNotes.navigate(topic, true);
-};
-
 function navigateToTag(item) {
   const tag = db.tags.tag(item.id);
   if (!tag) return;
@@ -55,30 +53,48 @@ const showActionSheet = (item) => {
 
 function getNotebook(item) {
   const isTrash = item.type === "trash";
-  if (isTrash || !item.notebooks || item.notebooks.length < 1) return [];
+  const currentId = useNavigationStore.getState().currentScreen.id;
+  if (isTrash) return [];
+  const items = [];
+  const notebooks = db.relations.to(item, "notebook") || [];
 
-  return item.notebooks.reduce(function (prev, curr) {
-    if (prev && prev.length > 0) return prev;
-    const topicId = curr.topics[0];
-    const notebook = db.notebooks?.notebook(curr.id)?.data;
-    if (!notebook) return [];
-    const topic = notebook.topics.find((t) => t.id === topicId);
-    if (!topic) return [];
+  for (let notebook of notebooks) {
+    if (items.length > 1) break;
+    if (notebook.id === currentId) continue;
+    items.push(notebook);
+  }
 
-    return [
-      {
-        title: `${notebook?.title} › ${topic?.title}`,
-        notebook: notebook,
-        topic: topic
+  if (item.notebooks) {
+    for (let nb of item.notebooks) {
+      if (items.length > 1) break;
+      const notebook = db.notebooks?.notebook(nb.id)?.data;
+      if (!notebook) continue;
+      for (let topicId of nb.topics) {
+        if (items.length > 1) break;
+        if (topicId === currentId) continue;
+        const topic = notebook.topics.find((t) => t.id === topicId);
+        if (!topic) continue;
+        items.push(topic);
       }
-    ];
-  }, []);
+    }
+  }
+  return items;
+}
+
+function getTags(item) {
+  const noteTags = item.tags?.slice(0, 3) || [];
+  const tags = [];
+  for (const tagName of noteTags) {
+    const tag = db.tags.tag(tagName);
+    if (!tag) continue;
+    tags.push(tag);
+  }
+  return tags;
 }
 
 const NoteItem = ({
   item,
   isTrash,
-  tags,
   dateBy = "dateCreated",
   noOpen = false
 }) => {
@@ -88,11 +104,13 @@ const NoteItem = ({
   );
   const compactMode = notesListMode === "compact";
   const attachmentCount = db.attachments?.ofNote(item.id, "all")?.length || 0;
-  const notebooks = React.useMemo(() => getNotebook(item), [item]);
+  const _update = useRelationStore((state) => state.updater);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const notebooks = React.useMemo(() => getNotebook(item), [item, _update]);
   const reminders = db.relations.from(item, "reminder");
   const reminder = getUpcomingReminder(reminders);
-  const _update = useRelationStore((state) => state.updater);
   const noteColor = COLORS_NOTE[item.color?.toLowerCase()];
+  const tags = getTags(item);
   return (
     <>
       <View
@@ -112,12 +130,17 @@ const NoteItem = ({
               flexWrap: "wrap"
             }}
           >
-            {notebooks?.map((_item) => (
+            {notebooks?.map((item) => (
               <Button
-                title={_item.title}
-                key={_item}
+                title={
+                  item.title.length > 25
+                    ? item.title.slice(0, 25) + "..."
+                    : item.title
+                }
+                tooltipText={item.title}
+                key={item.id}
                 height={25}
-                icon="book-outline"
+                icon={item.type === "topic" ? "bookmark" : "book-outline"}
                 type="grayBg"
                 fontSize={SIZE.xs}
                 iconSize={SIZE.sm}
@@ -132,7 +155,13 @@ const NoteItem = ({
                   paddingHorizontal: 6,
                   marginBottom: 5
                 }}
-                onPress={() => navigateToTopic(_item.topic)}
+                onPress={() => {
+                  if (item.type === "topic") {
+                    TopicNotes.navigate(item, true);
+                  } else {
+                    Notebook.navigate(item);
+                  }
+                }}
               />
             ))}
 

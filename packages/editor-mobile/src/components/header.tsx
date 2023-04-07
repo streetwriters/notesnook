@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,14 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ArrowBackIcon from "mdi-react/ArrowBackIcon";
-import CloudUploadOutlineIcon from "mdi-react/CloudUploadOutlineIcon";
 import CrownIcon from "mdi-react/CrownIcon";
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import ArrowULeftTopIcon from "mdi-react/ArrowULeftTopIcon";
 import ArrowURightTopIcon from "mdi-react/ArrowURightTopIcon";
 import FullscreenIcon from "mdi-react/FullscreenIcon";
 import MagnifyIcon from "mdi-react/MagnifyIcon";
-import BellIcon from "mdi-react/BellIcon";
 import React from "react";
 import { useSafeArea } from "../hooks/useSafeArea";
 import { EventTypes, Settings } from "../utils";
@@ -213,32 +211,6 @@ export default function Header({
 
             <Button
               onPress={() => {
-                post(EventTypes.reminders);
-              }}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_icon)",
-                marginRight: 10,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
-              }}
-            >
-              <BellIcon
-                size={25}
-                style={{
-                  position: "absolute"
-                }}
-                color="var(--nn_pri)"
-              />
-            </Button>
-
-            <Button
-              onPress={() => {
                 editor?.commands.startSearch();
               }}
               style={{
@@ -255,32 +227,6 @@ export default function Header({
               }}
             >
               <MagnifyIcon
-                size={25}
-                style={{
-                  position: "absolute"
-                }}
-                color="var(--nn_pri)"
-              />
-            </Button>
-            <Button
-              onPress={() => {
-                post(EventTypes.monograph);
-              }}
-              preventDefault={false}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_icon)",
-                marginRight: 10,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
-              }}
-            >
-              <CloudUploadOutlineIcon
                 size={25}
                 style={{
                   position: "absolute"

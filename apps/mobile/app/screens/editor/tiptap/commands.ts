@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ const fn = (fn: string) => {
   const id = randId("fn_");
   return {
     job: `(async () => {
+      if (typeof __PLATFORM__ === "undefined") __PLATFORM__ = "${Platform.OS}";
       try {
         let response = true;
         ${fn}
@@ -57,7 +58,7 @@ const fn = (fn: string) => {
         if (DEV_MODE && typeof logger !== "undefined") logger('error', "webview: ", e.message, e.stack);
       }
       return true;
-    })();`,
+    })();true;`,
     id: id
   };
 };
@@ -128,7 +129,6 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
   };
 
   setInsets = async (insets: EdgeInsets) => {
-    logger.info("setInsets", insets);
     await this.doAsync(`
       if (typeof safeAreaController !== "undefined") {
         safeAreaController.update(${JSON.stringify(insets)}) 
@@ -228,7 +228,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     await this.doAsync(
       `editor && editor.commands.updateImage(${JSON.stringify({
         hash
-      })},${JSON.stringify({ src, hash, preventUpdate: true })})`
+      })},${JSON.stringify({ dataurl: src, hash, preventUpdate: true })})`
     );
   };
 

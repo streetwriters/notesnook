@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -61,6 +61,13 @@ export function useMenuTrigger() {
     target
   };
 }
+
+export const Menu = {
+  openMenu: (items, data) => useMenuStore.getState().open(items, data),
+  closeMenu: () => useMenuStore.getState().close(),
+  isOpen: () => useMenuStore.getState().isOpen,
+  target: () => useMenuStore.getState().target
+};
 
 export function useMenu() {
   const [items, data] = useMenuStore((store) => [store.items, store.data]);
@@ -193,9 +200,9 @@ function mapMenuItems(items, data) {
     const isHidden = hidden && hidden(data, item);
     if (isHidden) return prev;
 
-    const isSeperator = type === "seperator";
+    const isSeperator = type === "separator";
     if (isSeperator) {
-      prev.push({ isSeperator: true });
+      prev.push({ type });
       return prev;
     }
 

@@ -1,0 +1,72 @@
+{
+  "folders": [
+    {
+      "name": "✨ notesnook",
+      "path": ".."
+    },
+    {
+      "name": "🚀 @notesnook/mobile",
+      "path": "../apps/mobile"
+    },
+    {
+      "name": "🚀 @notesnook/web",
+      "path": "../apps/web"
+    },
+    {
+      "name": "🚀 @notesnook/desktop",
+      "path": "../apps/web/desktop"
+    },
+    {
+      "name": "🚀 @notesnook/web-clipper",
+      "path": "../extensions/web-clipper"
+    },
+    {
+      "name": "📦 @notesnook/clipper",
+      "path": "../packages/clipper"
+    },
+    {
+      "name": "📦 @notesnook/core",
+      "path": "../packages/core"
+    },
+    {
+      "name": "📦 @notesnook/crypto",
+      "path": "../packages/crypto"
+    },
+    {
+      "name": "📦 @notesnook/crypto-worker",
+      "path": "../packages/crypto-worker"
+    },
+    {
+      "name": "📦 @notesnook/editor",
+      "path": "../packages/editor"
+    },
+    {
+      "name": "📦 @notesnook/editor-mobile",
+      "path": "../packages/editor-mobile"
+    },
+    {
+      "name": "📦 @notesnook/logger",
+      "path": "../packages/logger"
+    },
+    {
+      "name": "📦 @notesnook/streamable-fs",
+      "path": "../packages/streamable-fs"
+    },
+    {
+      "name": "📦 @notesnook/theme",
+      "path": "../packages/theme"
+    }
+  ],
+  "settings": {
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "javascript.format.enable": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "modificationsIfAvailable",
+    "eslint.packageManager": "npm",
+    "eslint.run": "onSave",
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "eslint.execArgv": ["--cache"]
+  }
+}

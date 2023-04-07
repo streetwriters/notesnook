@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import { View } from "react-native";
 
 import { useMenuStore } from "../../../stores/use-menu-store";
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
@@ -30,6 +31,7 @@ import Navigation from "../../../services/navigation";
 import { db } from "../../../common/database";
 import {
   eCloseAddTopicDialog,
+  eOnTopicSheetUpdate,
   eOpenAddTopicDialog
 } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
@@ -40,6 +42,7 @@ import DialogHeader from "../../dialog/dialog-header";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import { Toast } from "../../toast";
+import { useRelationStore } from "../../../stores/use-relation-store";
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -59,14 +62,12 @@ export class AddTopicDialog extends React.Component {
 
   addNewTopic = async () => {
     try {
-      this.setState({ loading: true });
       if (!this.title || this.title?.trim() === "") {
         ToastEvent.show({
           heading: "Topic title is required",
           type: "error",
           context: "local"
         });
-        this.setState({ loading: false });
         return;
       }
 
@@ -78,10 +79,13 @@ export class AddTopicDialog extends React.Component {
 
         await db.notebooks.notebook(topic.notebookId).topics.add(topic);
       }
-      this.setState({ loading: false });
       this.close();
-      Navigation.queueRoutesForUpdate("Notebooks", "Notebook", "TopicNotes");
-      useMenuStore.getState().setMenuPins();
+      setTimeout(() => {
+        Navigation.queueRoutesForUpdate();
+        useMenuStore.getState().setMenuPins();
+      });
+      eSendEvent(eOnTopicSheetUpdate);
+      useRelationStore.getState().update();
     } catch (e) {
       console.error(e);
     }
@@ -177,7 +181,6 @@ export class AddTopicDialog extends React.Component {
             positiveTitle={this.toEdit ? "Save" : "Add"}
             onPressNegative={() => this.close()}
             onPressPositive={() => this.addNewTopic()}
-            loading={this.state.loading}
           />
         </DialogContainer>
         <Toast context="local" />

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ export const Synced = ({ item, close }) => {
         fontSize={SIZE.xs + 1}
         title="Learn more"
         height={30}
-        type="transparent"
+        type="grayAccent"
       />
     </View>
   ) : null;

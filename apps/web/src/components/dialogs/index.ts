@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -54,6 +54,9 @@ const Prompt = React.lazy(() => import("./prompt"));
 const ToolbarConfigDialog = React.lazy(() => import("./toolbar-config-dialog"));
 const MigrationDialog = React.lazy(() => import("./migration-dialog"));
 const EmailChangeDialog = React.lazy(() => import("./email-change-dialog"));
+const LanguageSelectorDialog = React.lazy(
+  () => import("./language-selector-dialog")
+);
 
 export const Dialogs = {
   AddNotebookDialog,
@@ -81,5 +84,6 @@ export const Dialogs = {
   MigrationDialog,
   AddReminderDialog,
   ReminderPreviewDialog,
-  EmailChangeDialog
+  EmailChangeDialog,
+  LanguageSelectorDialog
 };

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,15 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useMemo } from "react";
 import { Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import AnnouncementBody from "./body";
+import { useStore as useAnnouncementStore } from "../../stores/announcement-store";
+import ReminderBar from "../reminder-bar";
 
-function Announcements({ announcements, removeAnnouncement }) {
-  const announcement = useMemo(() => announcements[0], [announcements]);
+function Announcements() {
+  const announcements = useAnnouncementStore(
+    (store) => store.inlineAnnouncements
+  );
+  const dismiss = useAnnouncementStore((store) => store.dismiss);
+  const announcement = announcements[0];
 
+  if (!announcement) return <ReminderBar />;
   return (
     <Flex
       mx={1}
@@ -51,11 +57,8 @@ function Announcements({ announcements, removeAnnouncement }) {
         }}
         title="Dismiss announcement"
         onClick={() => {
-          trackEvent(
-            ANALYTICS_EVENTS.announcementDismissed,
-            announcement.title
-          );
-          removeAnnouncement && removeAnnouncement(announcement.id);
+          trackEvent(ANALYTICS_EVENTS.announcementDismissed, announcement);
+          dismiss(announcement.id);
         }}
       >
         <Icon.Cross color="error" size={16} />

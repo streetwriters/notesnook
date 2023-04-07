@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -75,6 +75,7 @@ export const useLogin = (onFinishLogin) => {
                   mfa.code,
                   mfa.method
                 );
+
                 if (success) {
                   setStep(LoginSteps.passwordAuth);
                   setLoading(false);
@@ -93,6 +94,8 @@ export const useLogin = (onFinishLogin) => {
                 }
               }
             }, mfaInfo);
+          } else {
+            finishWithError(new Error("Unable to send 2FA code"));
           }
           break;
         }

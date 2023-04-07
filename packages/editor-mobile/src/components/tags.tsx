@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -39,26 +39,23 @@ export default function Tags(): JSX.Element {
 
   return (
     <div
+      className={styles.container}
       style={{
         padding: "0px 12px",
         display: "flex",
         alignItems: "center",
-        marginTop: 10
+        overflowX: "scroll",
+        minHeight: "40px"
       }}
     >
       <button
         className={styles.btn}
-        onMouseUp={(e) => {
-          e.preventDefault();
-          openManageTagsSheet();
-        }}
-        onMouseDown={(e) => e.preventDefault()}
-        onTouchEnd={(e) => {
+        onClick={(e) => {
           e.preventDefault();
           openManageTagsSheet();
         }}
         style={{
-          borderWidth: 0,
+          border: "1px solid var(--nn_border)",
           backgroundColor: "var(--nn_nav)",
           marginRight: 5,
           borderRadius: 100,
@@ -66,7 +63,9 @@ export default function Tags(): JSX.Element {
           fontFamily: "Open Sans",
           display: "flex",
           alignItems: "center",
-          height: "30px"
+          height: "30px",
+          userSelect: "none",
+          WebkitUserSelect: "none"
         }}
       >
         {tags.length === 0 ? (
@@ -100,7 +99,7 @@ export default function Tags(): JSX.Element {
           key={tag.title}
           className={styles.btn}
           style={{
-            borderWidth: 0,
+            border: "1px solid var(--nn_border)",
             backgroundColor: "var(--nn_nav)",
             marginRight: 5,
             borderRadius: 100,
@@ -108,14 +107,11 @@ export default function Tags(): JSX.Element {
             height: "30px",
             fontFamily: "Open Sans",
             fontSize: 13,
-            color: "var(--nn_icon)"
+            color: "var(--nn_icon)",
+            userSelect: "none",
+            WebkitUserSelect: "none"
           }}
-          onMouseUp={(e) => {
-            e.preventDefault();
-            post(EventTypes.tag, tag.title);
-          }}
-          onMouseDown={(e) => e.preventDefault()}
-          onTouchEnd={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             post(EventTypes.tag, tag.title);
           }}

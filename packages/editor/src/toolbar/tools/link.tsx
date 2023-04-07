@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import { ToolButton } from "../components/tool-button";
 import { useCallback, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
 import { LinkPopup } from "../popups/link-popup";
-import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
+import { useToolbarLocation } from "../stores/toolbar-store";
 import { MoreTools } from "../components/more-tools";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { findMark, selectionToOffset } from "../../utils/prosemirror";
@@ -38,6 +38,7 @@ export function LinkSettings(props: ToolProps) {
   return (
     <MoreTools
       {...props}
+      autoOpen
       autoCloseOnUnmount
       popupId="linkSettings"
       tools={["openLink", "editLink", "removeLink"]}
@@ -153,7 +154,7 @@ export function EditLink(props: ToolProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-
+  if (!editor.current?.isEditable) return null;
   return (
     <LinkTool
       {...props}
@@ -179,6 +180,7 @@ export function EditLink(props: ToolProps) {
 
 export function RemoveLink(props: ToolProps) {
   const { editor, selectedNode } = props;
+  if (!editor.current?.isEditable) return null;
   return (
     <ToolButton
       {...props}
@@ -215,7 +217,16 @@ export function OpenLink(props: ToolProps) {
         }}
         target="_blank"
         variant="body"
-        sx={{ mr: 1 }}
+        sx={{
+          fontSize: "subBody",
+          mr: 1,
+          maxWidth: [150, 250],
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          ":visited": { color: "primary" },
+          ":hover": { color: "primary", opacity: 0.8 }
+        }}
       >
         {href}
       </Link>

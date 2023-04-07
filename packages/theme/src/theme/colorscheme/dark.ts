@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,13 +26,13 @@ export function getDarkScheme(accent: string): SchemeColors {
     primary: accent,
     placeholder: tinycolor("#ffffff").setAlpha(0.6).toRgbString(),
     background: "#1b1b1b",
-    bgTransparent: "#1f1f1f99",
+    bgTransparent: "#2b2b2b99",
     accent: "#000",
     bgSecondary: "#2b2b2b",
     bgSecondaryText: "#A1A1A1",
     bgSecondaryHover: "#3d3d3d",
     border: "#353535",
-    hover: "#2f2f2f",
+    hover: "#404040",
     fontSecondary: "#000",
     fontTertiary: "#A1A1A1",
     text: "#d3d3d3",

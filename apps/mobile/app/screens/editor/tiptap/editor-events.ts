@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,5 +34,6 @@ export const EventTypes = {
   fullscreen: "editor-event:fullscreen",
   link: "editor-event:link",
   contentchange: "editor-event:content-change",
-  reminders: "editor-event:reminders"
+  reminders: "editor-event:reminders",
+  previewAttachment: "editor-event:preview-attachment"
 };

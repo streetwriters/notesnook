@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -142,7 +142,6 @@ class Sync {
         }
       })
       .withHubProtocol(new MessagePackHubProtocol({ ignoreUndefined: true }))
-      .withAutomaticReconnect()
       .build();
 
     EV.subscribe(EVENTS.userLoggedOut, async () => {
@@ -182,6 +181,7 @@ class Sync {
       await this.connection.stop();
       return;
     }
+    if (!(await this.db.user.getUser())) return;
 
     this.logger.info("Starting sync", { full, force, serverLastSynced });
 

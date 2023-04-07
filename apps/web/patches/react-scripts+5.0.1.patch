@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-scripts/config/webpack.config.js b/node_modules/react-scripts/config/webpack.config.js
-index e465d8e..0fbcf67 100644
+index e465d8e..5236a94 100644
 --- a/node_modules/react-scripts/config/webpack.config.js
 +++ b/node_modules/react-scripts/config/webpack.config.js
 @@ -106,6 +106,9 @@ module.exports = function (webpackEnv) {
@@ -35,12 +35,14 @@ index e465d8e..0fbcf67 100644
        // We placed these paths second because we want `node_modules` to "win"
        // if there are any conflicts. This matches Node resolution mechanism.
        // https://github.com/facebook/create-react-app/issues/253
-@@ -320,13 +330,15 @@ module.exports = function (webpackEnv) {
+@@ -320,13 +330,17 @@ module.exports = function (webpackEnv) {
          .map(ext => `.${ext}`)
          .filter(ext => useTypeScript || !ext.includes('ts')),
        alias: {
 +        "react": path.resolve(path.join(__dirname,'../../react')),
 +        "react-dom": path.resolve(path.join(__dirname,'../../react-dom')),
++        "@mdi/js": path.resolve(path.join(__dirname,'../../@mdi/js')),
++        "@mdi/react": path.resolve(path.join(__dirname,'../../@mdi/react')),
          // Support React Native Web
          // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
          'react-native': 'react-native-web',
@@ -52,7 +54,7 @@ index e465d8e..0fbcf67 100644
          }),
          ...(modules.webpackAliases || {}),
        },
-@@ -336,14 +348,14 @@ module.exports = function (webpackEnv) {
+@@ -336,14 +350,14 @@ module.exports = function (webpackEnv) {
          // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
          // please link the files into your node_modules/ and let module-resolution kick in.
          // Make sure your source files are compiled, as they will not be processed in any way.
@@ -75,7 +77,7 @@ index e465d8e..0fbcf67 100644
        ],
      },
      module: {
-@@ -353,7 +365,7 @@ module.exports = function (webpackEnv) {
+@@ -353,7 +367,7 @@ module.exports = function (webpackEnv) {
          shouldUseSourceMap && {
            enforce: 'pre',
            exclude: /@babel(?:\/|\\{1,2})runtime/,
@@ -84,7 +86,7 @@ index e465d8e..0fbcf67 100644
            loader: require.resolve('source-map-loader'),
          },
          {
-@@ -408,13 +420,13 @@ module.exports = function (webpackEnv) {
+@@ -408,13 +422,13 @@ module.exports = function (webpackEnv) {
                  },
                ],
                issuer: {
@@ -100,7 +102,24 @@ index e465d8e..0fbcf67 100644
                include: paths.appSrc,
                loader: require.resolve('babel-loader'),
                options: {
-@@ -466,7 +478,7 @@ module.exports = function (webpackEnv) {
+@@ -453,6 +467,9 @@ module.exports = function (webpackEnv) {
+                   isEnvDevelopment &&
+                     shouldUseReactRefresh &&
+                     require.resolve('react-refresh/babel'),
++                  isEnvProduction &&
++                    !isEnvProductionTest &&
++                    require.resolve("babel-plugin-jsx-remove-data-test-id")
+                 ].filter(Boolean),
+                 // This is a feature of `babel-loader` for webpack (not Babel itself).
+                 // It enables caching results in ./node_modules/.cache/babel-loader/
+@@ -460,13 +477,13 @@ module.exports = function (webpackEnv) {
+                 cacheDirectory: true,
+                 // See #6846 for context on why cacheCompression is disabled
+                 cacheCompression: false,
+-                compact: isEnvProduction,
++                compact: isEnvProduction && !isEnvProductionTest,
+               },
+             },
              // Process any JS outside of the app with Babel.
              // Unlike the application JS, we only compile the standard ES features.
              {
@@ -109,7 +128,7 @@ index e465d8e..0fbcf67 100644
                exclude: /@babel(?:\/|\\{1,2})runtime/,
                loader: require.resolve('babel-loader'),
                options: {
-@@ -594,7 +606,7 @@ module.exports = function (webpackEnv) {
+@@ -594,7 +611,7 @@ module.exports = function (webpackEnv) {
                // its runtime that would otherwise be processed through "file" loader.
                // Also exclude `html` and `json` extensions so they get processed
                // by webpacks internal loaders.

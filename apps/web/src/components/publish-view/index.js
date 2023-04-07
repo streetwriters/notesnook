@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { Flex, Text, Button } from "@theme-ui/components";
 import * as Icon from "../icons";
@@ -29,7 +29,6 @@ import ThemeProvider from "../theme-provider";
 import { showToast } from "../../utils/toast";
 import { EV, EVENTS } from "@notesnook/core/common";
 import { useStore } from "../../stores/monograph-store";
-import { closeOpenedDialog } from "../../common/dialog-controller";
 
 function PublishView(props) {
   const { noteId, position, onClose } = props;
@@ -47,6 +46,15 @@ function PublishView(props) {
     setPublishId(db.monographs.monograph(noteId));
   }, [noteId]);
 
+  const onKeyDown = useCallback(
+    (event) => {
+      if (event.keyCode === 27) onClose(false);
+    },
+    [onClose]
+  );
+
+  const onWindowClick = useCallback(() => onClose(false), [onClose]);
+
   useEffect(() => {
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("click", onWindowClick);
@@ -57,7 +65,7 @@ function PublishView(props) {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("blur", onWindowClick);
     };
-  }, []);
+  }, [onKeyDown, onWindowClick]);
 
   useEffect(() => {
     const attachmentsLoadingEvent = EV.subscribe(
@@ -304,6 +312,7 @@ export function showPublishView(noteId, location = "top") {
     return new Promise((resolve) => {
       const perform = (result) => {
         ReactDOM.unmountComponentAtNode(root);
+        closePublishView();
         resolve(result);
       };
       ReactDOM.render(
@@ -326,10 +335,9 @@ export function showPublishView(noteId, location = "top") {
   return Promise.reject("No element with id 'dialogContainer'");
 }
 
-function onKeyDown(event) {
-  if (event.keyCode === 27) closeOpenedDialog();
-}
-
-function onWindowClick() {
-  closeOpenedDialog();
+function closePublishView() {
+  const root = document.getElementById("dialogContainer");
+  if (root) {
+    root.innerHTML = "";
+  }
 }

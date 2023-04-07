@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,21 +33,27 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { eClearEditor, eOnLoadNote } from "../../utils/events";
+import { eClearEditor } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { editorState } from "./tiptap/utils";
 const EditorOverlay = ({ editorId = "", editor }) => {
   const colors = useThemeStore((state) => state.colors);
   const [error, setError] = useState(false);
   const opacity = useSharedValue(1);
-  const translateValue = useSharedValue(6000);
+  const translateValue = useSharedValue(0);
+  const deviceMode = useSettingStore((state) => state.deviceMode);
+  const isTablet = deviceMode !== "mobile";
   const insets = useGlobalSafeAreaInsets();
   const isDefaultEditor = editorId === "";
   const timers = useRef({
     loading: 0,
     error: 0,
     closing: 0
+  });
+  const loadingState = useRef({
+    startTime: 0
   });
 
   const clearTimers = () => {
@@ -61,19 +67,22 @@ const EditorOverlay = ({ editorId = "", editor }) => {
       editorState().overlay = true;
       clearTimers();
       if (_loading) {
+        loadingState.current.startTime = Date.now();
         opacity.value = 1;
         translateValue.value = 0;
         timers.current.error = setTimeout(() => {
-          if (_loading) {
-            let note = _loading;
-            note.forced = true;
-            eSendEvent(eOnLoadNote + editorId, note);
-          }
           setError(true);
-        }, 4000);
+        }, 15 * 1000);
       } else {
         clearTimers();
-        setTimeout(() => {
+        const timeDiffSinceLoadStarted =
+          Date.now() - loadingState.current.startTime > 300 ? 300 : 0;
+        if (!timeDiffSinceLoadStarted) {
+          setError(false);
+          editorState().overlay = false;
+          opacity.value = 0;
+          translateValue.value = 6000;
+        } else {
           setError(false);
           editorState().overlay = false;
           opacity.value = withTiming(0, {
@@ -82,19 +91,24 @@ const EditorOverlay = ({ editorId = "", editor }) => {
           setTimeout(() => {
             translateValue.value = 6000;
           }, 500);
-        }, 100);
+        }
       }
     },
-    [editorId, opacity, translateValue]
+    [opacity, translateValue]
   );
 
   useEffect(() => {
+    setTimeout(() => {
+      if (!loadingState.current.startTime) {
+        translateValue.value = 6000;
+      }
+    }, 1000);
     eSubscribeEvent("loadingNote" + editorId, load);
     return () => {
       clearTimers();
       eUnSubscribeEvent("loadingNote" + editorId, load);
     };
-  }, [editorId, load]);
+  }, [editorId, load, translateValue]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -144,15 +158,19 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               paddingRight: 12
             }}
           >
-            <IconButton
-              onPress={() => {
-                eSendEvent(eClearEditor);
-                opacity.value = 0;
-                translateValue.value = 6000;
-              }}
-              name="arrow-left"
-              color={colors.pri}
-            />
+            {isTablet ? (
+              <View />
+            ) : (
+              <IconButton
+                onPress={() => {
+                  eSendEvent(eClearEditor);
+                  opacity.value = 0;
+                  translateValue.value = 6000;
+                }}
+                name="arrow-left"
+                color={colors.pri}
+              />
+            )}
 
             <View
               style={{
@@ -184,7 +202,9 @@ const EditorOverlay = ({ editorId = "", editor }) => {
                 alignItems: "center",
                 flexDirection: "row",
                 paddingHorizontal: 10,
-                marginTop: 10
+                marginTop: 5,
+                borderWidth: 1,
+                borderColor: colors.border
               }}
             >
               <Paragraph color={colors.icon} size={13}>

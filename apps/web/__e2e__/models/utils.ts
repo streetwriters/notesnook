@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Reminder } from "@notesnook/core/collections/reminders";
 import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { Item, Notebook } from "./types";
@@ -52,6 +53,62 @@ export async function fillNotebookDialog(
     }
     await topicInput.fill(notebook.topics[i]);
     await topicInputAction.click();
+  }
+
+  await confirmDialog(page);
+}
+
+export async function fillReminderDialog(
+  page: Page,
+  reminder: Partial<Reminder>
+) {
+  const titleInput = page.locator(getTestId("title-input"));
+  const descriptionInput = page.locator(getTestId("description-input"));
+  const dateInput = page.locator(getTestId("date-input"));
+  const timeInput = page.locator(getTestId("time-input"));
+
+  if (reminder.title) {
+    await titleInput.waitFor({ state: "visible" });
+    await titleInput.fill(reminder.title);
+  }
+  if (reminder.description) await descriptionInput.fill(reminder.description);
+  if (reminder.mode)
+    await page.locator(getTestId(`mode-${reminder.mode}`)).click();
+
+  if (reminder.priority)
+    await page.locator(getTestId(`priority-${reminder.priority}`)).click();
+
+  if (reminder.recurringMode && reminder.mode === "repeat") {
+    await page
+      .locator(getTestId(`recurring-mode-${reminder.recurringMode}`))
+      .click();
+
+    if (
+      reminder.selectedDays &&
+      reminder.selectedDays.length > 0 &&
+      reminder.recurringMode !== "day"
+    ) {
+      for (const day of reminder.selectedDays) {
+        await page.locator(getTestId(`day-${day}`)).click();
+      }
+    }
+  }
+
+  if (reminder.date) {
+    const date = new Date(Date.now() + reminder.date);
+    if (reminder.mode === "once") {
+      await dateInput.fill(
+        `${date.getFullYear()}-${(date.getMonth() + 1)
+          .toString()
+          .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`
+      );
+    }
+
+    const time = `${date.getHours().toString().padStart(2, "0")}:${date
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}`;
+    await timeInput.fill(time);
   }
 
   await confirmDialog(page);

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Link, Text } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import { appVersion } from "../../utils/version";
 import Field from "../field";
 import Dialog from "./dialog";
@@ -52,16 +52,14 @@ function IssueDialog(props: IssueDialogProps) {
     <Dialog
       isOpen={true}
       title={"Report an issue"}
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
         text: "Submit",
-        props: {
-          form: "issueForm"
-        },
+        form: "issueForm",
         loading: isSubmitting,
         disabled: isSubmitting
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
       <Flex
         id="issueForm"
@@ -154,33 +152,14 @@ export default IssueDialog;
 function showIssueReportedDialog({ url }: { url: string }) {
   return confirm({
     title: "Thank you for reporting!",
-    yesAction: () => clipboard.writeText(url),
-    yesText: "Copy link",
-    message: (
-      <>
-        <p>
-          You can track your bug report at{" "}
-          <Link target="_blank" href={url} sx={{ lineBreak: "anywhere" }}>
-            {url}
-          </Link>
-          .
-        </p>
-        <p>
-          Please note that we will respond to your bug report on the link above.{" "}
-          <b>
-            We recommended that you save the above link for later reference.
-          </b>
-        </p>
-        <p>
-          If your issue is critical (e.g. notes not syncing, crashes etc.),
-          please{" "}
-          <a href="https://discord.com/invite/zQBK97EE22">
-            join our Discord community
-          </a>{" "}
-          for one-to-one support.
-        </p>
-      </>
-    )
+    positiveButtonText: "Copy link",
+    message: `You can track your bug report at [${url}](${url}).
+    
+    Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**
+    
+    If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support.`
+  }).then((result) => {
+    result && clipboard.writeText(url);
   });
 }
 

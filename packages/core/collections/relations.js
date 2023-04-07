@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -92,6 +92,17 @@ export default class Relations extends Collection {
     return this.resolve(relations, "from");
   }
 
+  /**
+   * Count number of from -> to relations
+   * @param {ItemReference} reference
+   * @param {string} type
+   */
+  count(reference, type) {
+    return this.all.filter(
+      (a) => compareItemReference(a.from, reference) && a.to.type === type
+    ).length;
+  }
+
   get raw() {
     return this._collection.getRaw();
   }
@@ -117,6 +128,34 @@ export default class Relations extends Collection {
   }
 
   /**
+   *
+   * @param {ItemReference} from
+   * @param {ItemReference} to
+   */
+  async unlink(from, to) {
+    const relation = this.all.find(
+      (a) =>
+        compareItemReference(a.from, from) && compareItemReference(a.to, to)
+    );
+    if (!relation) return;
+
+    await this.remove(relation.id);
+  }
+
+  /**
+   *
+   * @param {ItemReference} from
+   * @param {string} type
+   */
+  async unlinkAll(to, type) {
+    for (const relation of this.all.filter(
+      (a) => compareItemReference(a.to, to) && a.from.type === type
+    )) {
+      await this.remove(relation.id);
+    }
+  }
+
+  /**
    * @param {Relation[]} relations
    * @param {"from" | "to"} resolveType
    * @private
@@ -127,15 +166,23 @@ export default class Relations extends Collection {
     const items = [];
     for (const relation of relations) {
       const reference = resolveType === "from" ? relation.from : relation.to;
-
       let item = null;
       switch (reference.type) {
         case "reminder":
           item = this._db.reminders.reminder(reference.id);
           break;
-        case "note":
-          item = this._db.notes.note(reference.id)?.data;
+        case "note": {
+          const note = this._db.notes.note(reference.id);
+          if (!note) continue;
+          item = note.data;
           break;
+        }
+        case "notebook": {
+          const notebook = this._db.notebooks.notebook(reference.id);
+          if (!notebook) continue;
+          item = notebook.data;
+          break;
+        }
       }
       if (item) items.push(item);
     }
@@ -155,6 +202,11 @@ export default class Relations extends Collection {
           case "note":
             exists =
               this._db.notes.exists(reference.id) ||
+              this._db.trash.exists(reference.id);
+            break;
+          case "notebook":
+            exists =
+              this._db.notebooks.exists(reference.id) ||
               this._db.trash.exists(reference.id);
             break;
         }

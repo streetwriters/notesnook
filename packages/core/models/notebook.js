@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import Topics from "../collections/topics";
 export default class Notebook {
   /**
    *
-   * @param {Object} notebook
+   * @param {any} notebook
    * @param {import ('../api').default} db
    */
   constructor(notebook, db) {
@@ -31,9 +31,11 @@ export default class Notebook {
   }
 
   get totalNotes() {
-    return this._notebook.topics.reduce((sum, topic) => {
-      return sum + this._db.notes.topicReferences.count(topic.id);
-    }, 0);
+    let count = 0;
+    for (const topic of this._notebook.topics) {
+      count += this._db.notes.topicReferences.count(topic.id);
+    }
+    return count + this._db.relations.count(this._notebook, "note");
   }
 
   get title() {

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ async function inlineImage(element: HTMLImageElement, options?: FetchOptions) {
     return element;
   }
 
-  return new Promise<HTMLImageElement | null>(function (resolve, reject) {
+  return new Promise<HTMLImageElement | null>(function(resolve, reject) {
     if (element.parentElement?.tagName === "PICTURE") {
       element.parentElement?.replaceWith(element);
     }

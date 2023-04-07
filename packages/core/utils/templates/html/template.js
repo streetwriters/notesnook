@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -51,6 +51,22 @@ const template = (data) => `<!DOCTYPE html>
     h5,
     h6 {
       color: #212121;
+    }
+
+    p {
+      margin-bottom: 0px;
+    }
+    
+    p[data-spacing="double"] {
+      margin-top: 1em;
+    }
+    
+    p[data-spacing="single"] {
+      margin-top: 0px;
+    }
+
+    p[data-spacing="single"]:empty {
+      margin-top: 1em;
     }
     
     pre.codeblock {
@@ -166,9 +182,9 @@ const template = (data) => `<!DOCTYPE html>
       font-family: PT Mono, Consolas, Monaco, "Andale Mono", "Ubuntu Mono",
         monospace;
       text-align: left;
-      white-space: pre;
+      white-space: pre-wrap;
       word-spacing: normal;
-      word-break: normal;
+      word-break: break-word;
       word-wrap: normal;
       line-height: 1.5;
 

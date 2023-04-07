@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import Dialog from "./dialog";
 import { getHomeRoute, hardNavigate } from "../../navigation";
 import { appVersion } from "../../utils/version";
 import Config from "../../utils/config";
-import { isTesting } from "../../utils/platform";
+import { isDesktop, isTesting } from "../../utils/platform";
 import { useEffect } from "react";
 import { ArrowRight, Checkmark, Icon, Warn } from "../icons";
 
@@ -89,26 +89,9 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [
-
-          {
-            title: "Web clipper",
-            subtitle:
-              <>
-              You can manually download &amp; install the web clipper from <Code text="here" href="https://github.com/streetwriters/notesnook/releases/tag/v2.3.0"/> until it gets released on Firefox Addons & Chrome Web Store.
-              </>
-          },
-          {
-            title: "Delete individual task items",
-            subtitle:
-              "You can now delete individual task items with a click of a button."
-          },
-          {
-            title: "Diacritics & extended glyphs support",
-            subtitle:
-              "Notesnook now fully supports all glyphs & diacritics everywhere. No more broken fonts when writing in Polish."
-          },
-        ],
+      : isDesktop()
+      ? []
+      : [],
     cta: {
       title: "Got it",
       icon: Checkmark,
@@ -150,7 +133,7 @@ function FeatureDialog(props: FeatureDialogProps) {
       isOpen={true}
       title={feature.title}
       description={feature.subtitle}
-      alignment="center"
+      textAlignment="center"
       positiveButton={{
         text: (
           <Flex>

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -43,7 +43,19 @@ test("create a note inside a notebook", async ({ page }) => {
   await app.goto();
   const notebooks = await app.goToNotebooks();
   const notebook = await notebooks.createNotebook(NOTEBOOK);
-  const topics = await notebook?.openNotebook();
+  const { notes } = (await notebook?.openNotebook()) || {};
+
+  const note = await notes?.createNote(NOTE);
+
+  expect(note).toBeDefined();
+});
+
+test("create a note inside a topic", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notebooks = await app.goToNotebooks();
+  const notebook = await notebooks.createNotebook(NOTEBOOK);
+  const { topics } = (await notebook?.openNotebook()) || {};
   const topic = await topics?.findItem({ title: NOTEBOOK.topics[0] });
   const notes = await topic?.open();
 
@@ -170,7 +182,27 @@ test("delete all notes within a notebook", async ({ page }) => {
   await app.goto();
   const notebooks = await app.goToNotebooks();
   const notebook = await notebooks.createNotebook(NOTEBOOK);
-  const topics = await notebook?.openNotebook();
+  let { notes } = (await notebook?.openNotebook()) || {};
+  for (let i = 0; i < 2; ++i) {
+    await notes?.createNote({
+      title: `Note ${i}`,
+      content: NOTE.content
+    });
+  }
+  await app.goBack();
+
+  await notebook?.moveToTrash(true);
+
+  notes = await app.goToNotes();
+  expect(await notes.isEmpty()).toBe(true);
+});
+
+test("delete all notes within a topic", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notebooks = await app.goToNotebooks();
+  const notebook = await notebooks.createNotebook(NOTEBOOK);
+  const { topics } = (await notebook?.openNotebook()) || {};
   const topic = await topics?.findItem({ title: NOTEBOOK.topics[0] });
   let notes = await topic?.open();
   for (let i = 0; i < 2; ++i) {

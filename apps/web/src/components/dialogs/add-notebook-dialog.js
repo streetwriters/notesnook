@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -137,8 +137,8 @@ class AddNotebookDialog extends React.Component {
             this.createNotebook();
           }
         }}
-        onClose={props.onClose}
-        negativeButton={{ text: "Cancel", onClick: props.onClose }}
+        onClose={() => props.onClose(false)}
+        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
       >
         <Flex sx={{ overflowY: "auto", flexDirection: "column" }}>
           <Field

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import { EV, EVENTS } from "@notesnook/core/common";
 import { hashNavigate } from "../navigation";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
+import { setDocumentTitle } from "../utils/dom";
 
 const SESSION_STATES = {
   stale: "stale",
@@ -66,6 +67,7 @@ export const getDefaultSession = (sessionId = Date.now()) => {
 class EditorStore extends BaseStore {
   session = getDefaultSession();
   arePropertiesVisible = false;
+  editorMargins = Config.get("editor:margins", true);
 
   init = () => {
     EV.subscribe(EVENTS.userLoggedOut, () => {
@@ -131,6 +133,7 @@ class EditorStore extends BaseStore {
     if (!note) return;
 
     noteStore.setSelectedNote(note.id);
+    setDocumentTitle(note.title);
 
     if (note.locked)
       return hashNavigate(`/notes/${noteId}/unlock`, { replace: true });
@@ -188,7 +191,8 @@ class EditorStore extends BaseStore {
 
       if (currentSession.context) {
         const { type, value } = currentSession.context;
-        if (type === "topic") await db.notes.addToNotebook(value, id);
+        if (type === "topic" || type === "notebook")
+          await db.notes.addToNotebook(value, id);
         else if (type === "color") await db.notes.note(id).color(value);
         else if (type === "tag") await db.notes.note(id).tag(value);
         // update the note.
@@ -222,6 +226,7 @@ class EditorStore extends BaseStore {
         state.session.dateEdited = note.dateEdited;
         state.session.attachmentsLength = attachments.length;
       });
+      setDocumentTitle(note.title);
 
       this.setSaveState(1);
     } catch (err) {
@@ -248,6 +253,7 @@ class EditorStore extends BaseStore {
     });
     noteStore.setSelectedNote(0);
     appStore.setIsEditorOpen(true);
+    setDocumentTitle();
   };
 
   clearSession = async (shouldNavigate = true) => {
@@ -265,6 +271,7 @@ class EditorStore extends BaseStore {
     if (shouldNavigate)
       hashNavigate(`/notes/create`, { replace: true, addNonce: true });
     appStore.setIsEditorOpen(false);
+    setDocumentTitle();
   };
 
   setTitle = (noteId, title) => {
@@ -307,6 +314,14 @@ class EditorStore extends BaseStore {
         (state.arePropertiesVisible =
           toggleState !== undefined ? toggleState : !state.arePropertiesVisible)
     );
+  };
+
+  toggleEditorMargins = (toggleState) => {
+    this.set((state) => {
+      state.editorMargins =
+        toggleState !== undefined ? toggleState : !state.editorMargins;
+      Config.set("editor:margins", state.editorMargins);
+    });
   };
 
   /**

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import { TrashItemModel } from "./trash-item.model";
 
 export class TrashViewModel extends BaseViewModel {
   constructor(page: Page) {
-    super(page, "trash");
+    super(page, "trash", "trash");
   }
 
   async findItem(title: string) {

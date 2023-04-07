@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -168,6 +168,14 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                   });
                 }
                 item.inputProperties?.onSubmitEditing?.(e);
+              }}
+              onChangeText={(text) => {
+                if (text) {
+                  SettingsService.set({
+                    [item.property as string]: text
+                  });
+                }
+                item.inputProperties?.onSubmitEditing?.(text as any);
               }}
               containerStyle={{ marginTop: 12 }}
               fwdRef={inputRef}

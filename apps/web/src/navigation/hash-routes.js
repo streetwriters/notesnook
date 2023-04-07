@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -44,12 +44,11 @@ import {
   showCreateTopicDialog
 } from "../common/dialog-controller";
 import { hashNavigate } from ".";
-import EditorPlaceholder from "../components/editor/-placeholder";
 import Editor from "../components/editor";
 
 const hashroutes = {
   "/": () => {
-    return !editorStore.get().session.state && <EditorPlaceholder />;
+    return !editorStore.get().session.state && <Editor noteId={0} nonce={-1} />;
   },
   "/email/verify": () => {
     showEmailVerificationDialog().then(afterAction);

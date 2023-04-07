@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,10 +23,7 @@ import { Linking, View } from "react-native";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
-import {
-  eCloseAnnouncementDialog,
-  eCloseSheet
-} from "../../utils/events";
+import { eCloseAnnouncementDialog, eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { PricingPlans } from "../premium/pricing-plans";

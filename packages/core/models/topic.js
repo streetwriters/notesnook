@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export default class Topic {
   /**
-   * @param {Object} topic
+   * @param {any} topic
    * @param {string} notebookId
    * @param {import('../api').default} db
    */
@@ -56,9 +56,12 @@ export default class Topic {
     const noteIds = this._db.notes.topicReferences.get(this.id);
     if (!noteIds.length) return;
 
-    return this._db.notes.deleteFromNotebook(
-      this._notebookId,
-      this.id,
+    return this._db.notes.removeFromNotebook(
+      {
+        topic: this.id,
+        id: this._notebookId,
+        rebuildCache: true
+      },
       ...noteIds
     );
   }

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ import { sendAttachmentsProgressEvent } from "@notesnook/core/common";
 import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
 import { db } from "../common/db";
+import { getFileNameWithExtension } from "@notesnook/core/utils/filename";
 
 const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
@@ -97,18 +98,19 @@ async function writeEncryptedFile(file, key, hash) {
 
 /**
  * We perform 4 steps here:
- * 1. We convert base64 to Uint8Array (if we get base64, that is)
+ * 1. We convert base64 to Uint8Array
  * 2. We hash the Uint8Array.
  * 3. We encrypt the Uint8Array
  * 4. We save the encrypted Uint8Array
  */
-async function writeEncrypted(filename, { data, type, key, mimeType }) {
-  if (type === "base64") data = new Uint8Array(Buffer.from(data, "base64"));
+async function writeEncryptedBase64(metadata) {
+  const { data, key, mimeType } = metadata;
 
-  const { hash, type: hashType } = await hashBuffer(data);
-  if (!filename) filename = hash;
+  const bytes = new Uint8Array(Buffer.from(data, "base64"));
 
-  const file = new File([data.buffer], filename, {
+  const { hash, type: hashType } = await hashBuffer(bytes);
+
+  const file = new File([bytes.buffer], hash, {
     type: mimeType || "application/octet-stream"
   });
 
@@ -118,6 +120,15 @@ async function writeEncrypted(filename, { data, type, key, mimeType }) {
     hash,
     hashType
   };
+}
+
+/**
+ *
+ * @param {string} data the base64 data
+ * @returns
+ */
+function hashBase64(data) {
+  return hashBuffer(Buffer.from(data, "base64"));
 }
 
 /**
@@ -259,8 +270,10 @@ async function uploadFile(filename, requestOptions) {
           throw new S3Error(`Failed to upload part at offset ${i}`, e);
         });
 
-      if (!response.headers.etag)
-        throw new Error(`Failed to upload part at offset ${i}: no etag found.`);
+      if (!response.headers.etag || typeof response.headers.etag !== "string")
+        throw new Error(
+          `Failed to upload part at offset ${i}: invalid etag. ETag: ${response.headers.etag}`
+        );
 
       uploadedBytes += blob.size;
       uploadedChunks.push({
@@ -411,7 +424,8 @@ async function saveFile(filename, fileMetadata) {
     },
     filename
   );
-  saveAs(new Blob(blobParts, { type }), name);
+
+  saveAs(new Blob(blobParts, { type }), getFileNameWithExtension(name, type));
 
   if (isUploaded) await streamablefs.deleteFile(filename);
 }
@@ -457,18 +471,20 @@ function clearFileStorage() {
 }
 
 const FS = {
-  writeEncrypted,
+  writeEncryptedBase64,
   readEncrypted,
   uploadFile: cancellable(uploadFile),
   downloadFile: cancellable(downloadFile),
   deleteFile,
   saveFile,
   exists,
-  hashBuffer,
-  hashStream,
   writeEncryptedFile,
   clearFileStorage,
-  getUploadedFileSize
+  getUploadedFileSize,
+
+  hashBase64,
+  hashBuffer,
+  hashStream
 };
 export default FS;
 

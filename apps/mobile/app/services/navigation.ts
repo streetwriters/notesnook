@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ import { eOnNewTopicAdded } from "../utils/events";
 import { rootNavigatorRef, tabBarRef } from "../utils/global-refs";
 import { eSendEvent } from "./event-manager";
 import SettingsService from "./settings";
+import SearchService from "./search";
 
 /**
  * Routes that should be updated on focus
@@ -86,7 +87,8 @@ const routeUpdateFunctions: {
   ColoredNotes: (params) => eSendEvent("ColoredNotes", params),
   TopicNotes: (params) => eSendEvent("TopicNotes", params),
   Monographs: (params) => eSendEvent("Monographs", params),
-  Reminders: () => useReminderStore.getState().setReminders()
+  Reminders: () => useReminderStore.getState().setReminders(),
+  Search: () => SearchService.updateAndSearch()
 };
 
 function clearRouteFromQueue(routeName: RouteName) {
@@ -106,10 +108,14 @@ function routeNeedsUpdate(routeName: RouteName, callback: () => void) {
   }
 }
 
-function queueRoutesForUpdate(...routes: RouteName[]) {
+function queueRoutesForUpdate(...routesToUpdate: RouteName[]) {
+  const routes =
+    routesToUpdate?.length > 0
+      ? routesToUpdate
+      : (Object.keys(routeNames) as (keyof RouteParams)[]);
   const currentScreen = useNavigationStore.getState().currentScreen;
   if (routes.indexOf(currentScreen.name) > -1) {
-    routeUpdateFunctions[currentScreen.name]();
+    routeUpdateFunctions[currentScreen.name]?.();
     clearRouteFromQueue(currentScreen.name);
     // Remove focused screen from queue
     routes.splice(routes.indexOf(currentScreen.name), 1);
@@ -125,7 +131,7 @@ function navigate<T extends RouteName>(
   useNavigationStore.getState().update(screen, !!params?.canGoBack);
   if (screen.name === "Notebook") routeUpdateFunctions["Notebook"](params);
   if (screen.name.endsWith("Notes") && screen.name !== "Notes")
-    routeUpdateFunctions[screen.name](params);
+    routeUpdateFunctions[screen.name]?.(params);
   //@ts-ignore Not sure how to fix this for now ignore it.
   rootNavigatorRef.current?.navigate<RouteName>(screen.name, params);
 }

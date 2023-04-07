@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -73,7 +73,8 @@ interface InputProps extends TextInputProps {
   buttonLeft?: React.ReactNode;
   inputStyle?: TextInputProps["style"];
   containerStyle?: ViewStyle;
-  flexGrow?: number
+  wrapperStyle?: ViewStyle;
+  flexGrow?: number;
 }
 
 const Input = ({
@@ -91,7 +92,7 @@ const Input = ({
   button,
   onBlurInput,
   onPress,
-  height = 50,
+  height = 45,
   fontSize = SIZE.md,
   onFocusInput,
   buttons,
@@ -100,6 +101,7 @@ const Input = ({
   flexGrow = 1,
   inputStyle = {},
   containerStyle = {},
+  wrapperStyle = {},
   ...restProps
 }: InputProps) => {
   const colors = useThemeStore((state) => state.colors);
@@ -236,7 +238,8 @@ const Input = ({
           marginBottom: marginBottom,
           flexGrow: flexGrow,
           maxHeight: height,
-          marginRight: marginRight
+          marginRight: marginRight,
+          ...wrapperStyle
         }}
       >
         <TouchableOpacity

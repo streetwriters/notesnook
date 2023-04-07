@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Platform } from "react-native";
+import { verifyUser } from "../screens/settings/functions";
 import { useMessageStore } from "../stores/use-message-store";
 import {
   eOpenLoginDialog,
@@ -25,9 +27,6 @@ import {
 } from "../utils/events";
 import { eSendEvent } from "./event-manager";
 import PremiumService from "./premium";
-import { verifyUser } from "../screens/settings/functions";
-import { Platform } from "react-native";
-import umami from "../common/analytics";
 import SettingsService from "./settings";
 
 const rateAppMessage = {
@@ -82,7 +81,6 @@ const loginMessage = {
   message: "You are not logged in",
   actionText: "Login to encrypt and sync notes",
   onPress: () => {
-    umami.pageView("/signup", "/welcome/home");
     eSendEvent(eOpenLoginDialog);
   },
   data: {},

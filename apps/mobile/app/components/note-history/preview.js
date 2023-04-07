@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -44,16 +44,7 @@ export default function NotePreview({ session, content, note }) {
   async function restore() {
     if (note && note.type === "trash") {
       await db.trash.restore(note.id);
-      Navigation.queueRoutesForUpdate(
-        "Tags",
-        "Notes",
-        "Notebooks",
-        "Favorites",
-        "Trash",
-        "TaggedNotes",
-        "ColoredNotes",
-        "TopicNotes"
-      );
+      Navigation.queueRoutesForUpdate();
       useSelectionStore.getState().setSelectionMode(false);
       ToastEvent.show({
         heading: "Restore successful",
@@ -73,13 +64,7 @@ export default function NotePreview({ session, content, note }) {
     }
     eSendEvent(eCloseSheet, "note_history");
     eSendEvent(eCloseSheet);
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes"
-    );
+    Navigation.queueRoutesForUpdate();
 
     ToastEvent.show({
       heading: "Note restored successfully",
@@ -93,7 +78,7 @@ export default function NotePreview({ session, content, note }) {
       paragraph: `Are you sure you want to delete this note from trash permanentaly`,
       positiveText: "Delete",
       negativeText: "Cancel",
-      context:"local",
+      context: "local",
       positivePress: async () => {
         await db.trash.delete(note.id);
         useTrashStore.getState().setTrash();
@@ -105,7 +90,7 @@ export default function NotePreview({ session, content, note }) {
         });
         eSendEvent(eCloseSheet);
       },
-      positiveType:"error"
+      positiveType: "error"
     });
   };
 

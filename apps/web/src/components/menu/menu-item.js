@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,26 +37,25 @@ function MenuItem({ item, isFocused, onMouseEnter, onMouseLeave, onClick }) {
     modifier
   } = item;
   const itemRef = useRef();
-  if (type === "seperator")
+  if (type === "separator")
     return (
       <Box
-        as="li"
         key={key}
         bg="border"
-        my={2}
-        sx={{ width: "95%", height: "0.5px", alignSelf: "center" }}
+        my={1}
+        sx={{ width: "90%", height: "1px", ml: "5%" }}
       />
     );
 
   return (
     <Flex
       as="li"
+      id={`menuitem-${key}`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       sx={{ flex: 1, flexDirection: "column" }}
     >
       <Button
-        id={key}
         data-test-id={`menuitem-${key}`}
         key={key}
         ref={itemRef}
@@ -66,22 +65,27 @@ function MenuItem({ item, isFocused, onMouseEnter, onMouseLeave, onClick }) {
         disabled={isDisabled}
         onClick={onClick}
         sx={{
-          bg: isFocused ? "hover" : "transparent",
+          bg: isFocused ? "border" : "transparent",
           alignItems: "center",
           justifyContent: "space-between",
-          display: "flex"
+          display: "flex",
+          py: "7px",
+          px: 2,
+          mx: 1,
+          borderRadius: "default"
         }}
       >
-        <Flex>
+        <Flex sx={{ mr: 1 }}>
           {Icon && (
-            <Icon color={iconColor || "text"} size={15} sx={{ mr: 2 }} />
+            <Icon color={iconColor || "icon"} size={15} sx={{ mr: 2 }} />
           )}
           <Text
             as="span"
             sx={{
               fontSize: "menu",
               fontFamily: "body",
-              color: color || "text"
+              color: color || "text",
+              textAlign: "left"
             }}
           >
             {title}

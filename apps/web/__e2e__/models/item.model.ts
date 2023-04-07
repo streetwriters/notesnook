@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,27 +22,38 @@ import { BaseItemModel } from "./base-item.model";
 import { ContextMenuModel } from "./context-menu.model";
 import { NotesViewModel } from "./notes-view.model";
 import { Item } from "./types";
-import { confirmDialog, denyDialog, fillItemDialog } from "./utils";
+import { confirmDialog, fillItemDialog } from "./utils";
 
 export class ItemModel extends BaseItemModel {
   private readonly contextMenu: ContextMenuModel;
-  constructor(locator: Locator) {
+  constructor(locator: Locator, private readonly id: "topic" | "tag") {
     super(locator);
     this.contextMenu = new ContextMenuModel(this.page);
   }
 
   async open() {
     await this.locator.click();
-    return new NotesViewModel(this.page, "notes");
+    return new NotesViewModel(
+      this.page,
+      this.id === "topic" ? "notebook" : "notes"
+    );
   }
 
-  async delete(deleteContainedNotes = false) {
+  async delete() {
     await this.contextMenu.open(this.locator);
     await this.contextMenu.clickOnItem("delete");
 
-    if (deleteContainedNotes) await confirmDialog(this.page);
-    else await denyDialog(this.page);
+    await this.waitFor("detached");
+  }
 
+  async deleteWithNotes(deleteContainedNotes = false) {
+    await this.contextMenu.open(this.locator);
+    await this.contextMenu.clickOnItem("delete");
+
+    if (deleteContainedNotes)
+      await this.page.locator("#deleteContainingNotes").check({ force: true });
+
+    await confirmDialog(this.page);
     await this.waitFor("detached");
   }
 

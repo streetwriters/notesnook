@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import { TaskManager } from "./task-manager";
 import { zip } from "../utils/zip";
 import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
+import { sanitizeFilename } from "../utils/filename";
 
 export async function exportToPDF(
   title: string,
@@ -56,7 +57,7 @@ export async function exportNotes(
       if (format === "pdf") {
         const note = db.notes?.note(noteIds[0]);
         if (!note) return false;
-        const html = await note.export("html", null);
+        const html = await note.export("html");
         if (!html) return false;
         return await exportToPDF(note.title, html);
       }
@@ -71,8 +72,8 @@ export async function exportNotes(
           total: noteIds.length,
           text: `Exporting "${note.title}"...`
         });
-        console.log("Exporting", note.title);
-        const content = await note.export(format, null).catch((e) => {
+
+        const content = await note.export(format).catch((e: Error) => {
           showToast("error", e.message);
         });
         if (!content) continue;
@@ -83,7 +84,7 @@ export async function exportNotes(
       if (files.length === 1) {
         saveAs(
           new Blob([Buffer.from(files[0].content, "utf-8")]),
-          `${files[0].filename}.${format}`
+          `${sanitizeFilename(files[0].filename)}.${format}`
         );
       } else {
         const zipped = await zip(files, format);

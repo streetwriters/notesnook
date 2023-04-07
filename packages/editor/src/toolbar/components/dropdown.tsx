@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ export function Dropdown(props: DropdownProps) {
   const isMobile = useIsMobile();
   const isBottom = toolbarLocation === "bottom";
 
-  const { closePopup, isPopupOpen } = usePopupHandler({
+  const { isPopupOpen } = usePopupHandler({
     group,
     id,
     isOpen,
@@ -82,7 +82,15 @@ export function Dropdown(props: DropdownProps) {
           selectedItem
         )}
         <Icon
-          path={isBottom ? Icons.chevronUp : Icons.chevronDown}
+          path={
+            isBottom
+              ? isPopupOpen
+                ? Icons.chevronDown
+                : Icons.chevronUp
+              : isPopupOpen
+              ? Icons.chevronUp
+              : Icons.chevronDown
+          }
           size={"small"}
           color={"text"}
         />
@@ -91,7 +99,7 @@ export function Dropdown(props: DropdownProps) {
       <MenuPresenter
         isOpen={isPopupOpen}
         items={items}
-        onClose={() => closePopup(id)}
+        onClose={() => setIsOpen(false)}
         position={{
           target: isBottom
             ? getToolbarElement()

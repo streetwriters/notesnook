@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -51,6 +51,9 @@ import {
   FontFamily,
   FontSize
 } from "@notesnook/editor/dist/toolbar/tools/font";
+import { AnimatedFlex } from "../animated";
+import { EditorLoader } from "../loaders/editor-loader";
+
 
 type PreviewSession = {
   content: { data: string; type: string };
@@ -112,22 +115,32 @@ export default function EditorManager({
         const isContent = item.type === "tiptap" && item.id === contentId;
         const isNote = item.type === "note" && item.id === id;
 
-        if (isContent) {
+        if (isContent && editorInstance.current) {
           if (locked) {
             const result = await db.vault?.decryptContent(item).catch(() => {});
             if (result) item.data = result.data;
             else EV.publish(EVENTS.vaultLocked);
           }
+          const oldHashes = editorInstance.current.getMediaHashes();
 
-          editorInstance.current?.updateContent(item.data as string);
+          editorInstance.current.updateContent(item.data as string);
 
-          db.eventManager.subscribe(
-            EVENTS.syncCompleted,
-            async () => {
-              await db.attachments?.downloadMedia(id);
-            },
-            true
+          const newHashes = editorInstance.current.getMediaHashes();
+          const hashesToLoad = newHashes.filter(
+            (hash, index) => hash !== oldHashes[index]
           );
+
+          if (appstore.get().isSyncing()) {
+            db.eventManager.subscribe(
+              EVENTS.syncCompleted,
+              async () => {
+                await db.attachments?.downloadMedia(id, hashesToLoad);
+              },
+              true
+            );
+          } else {
+            await db.attachments?.downloadMedia(id, hashesToLoad);
+          }
         } else if (isNote) {
           if (!locked && item.locked) return EV.publish(EVENTS.vaultLocked);
 
@@ -247,6 +260,8 @@ export function Editor(props: EditorProps) {
   };
   const fontSize = useStore((store) => store.session.fontSize);
   const fontFamily = useStore((store) => store.session.fontFamily);
+  const [isLoading, setIsLoading] = useState(true);
+
 
   const editor = useEditorInstance();
 
@@ -291,7 +306,7 @@ export function Editor(props: EditorProps) {
   }, [editor]);
 
   return (
-    <EditorChrome {...props}>
+    <EditorChrome isLoading={isLoading} {...props}>
       <Tiptap
         fontSize={fontSize}
         fontFamily={fontFamily}
@@ -305,6 +320,7 @@ export function Editor(props: EditorProps) {
         }}
         onLoad={() => {
           if (onLoadMedia) onLoadMedia();
+          if (nonce && nonce > 0) setIsLoading(false);
         }}
         onContentChange={onContentChange}
         onChange={onEditorChange}
@@ -328,8 +344,10 @@ export function Editor(props: EditorProps) {
   );
 }
 
-function EditorChrome(props: PropsWithChildren<EditorProps>) {
-  const { options, children } = props;
+function EditorChrome(
+  props: PropsWithChildren<EditorProps & { isLoading: boolean }>
+) {
+  const { options, children, isLoading } = props;
   const { readonly, focusMode, headless, onRequestFocus, isMobile } =
     options || {
       headless: false,
@@ -337,11 +355,29 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       focusMode: false,
       isMobile: false
     };
+  const editorMargins = useStore((store) => store.editorMargins);
 
   if (headless) return <>{children}</>;
 
   return (
     <>
+      {isLoading ? (
+        <AnimatedFlex
+          sx={{
+            position: "absolute",
+            overflow: "hidden",
+            flex: 1,
+            flexDirection: "column",
+            width: "100%",
+            height: "100%",
+            zIndex: 999,
+            bg: "background"
+          }}
+        >
+          <EditorLoader />
+        </AnimatedFlex>
+      ) : null}
+
       <Toolbar />
       <FlexScrollContainer
         className="editorScroll"
@@ -352,7 +388,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
           className="editor"
           sx={{
             alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
-            maxWidth: "min(100%, 850px)",
+            maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
             width: "100%"
           }}
           px={6}
@@ -373,7 +409,13 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
           )}
           <Titlebox readonly={readonly || false} />
           <Header readonly={readonly} />
-          {children}
+          <AnimatedFlex
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isLoading ? 0 : 1 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            {children}
+          </AnimatedFlex>
         </Flex>
       </FlexScrollContainer>
 

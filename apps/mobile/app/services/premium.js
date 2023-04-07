@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -309,7 +309,6 @@ const subscriptions = {
       subscription = _subscriptions.length > 0 ? _subscriptions[0] : null;
     }
     if (subscription) {
-
       await RNIap.finishTransaction(subscription.transactionId);
       await RNIap.clearTransactionIOS();
       await subscriptions.remove(subscription.transactionId);

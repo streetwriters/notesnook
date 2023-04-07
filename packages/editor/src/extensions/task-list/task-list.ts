@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,9 @@ import { TaskListComponent } from "./component";
 import { Plugin, PluginKey, NodeSelection } from "prosemirror-state";
 import TaskItem from "@tiptap/extension-task-item";
 import { dropPoint } from "prosemirror-transform";
-import { findChildrenByType } from "../../utils/prosemirror";
+import { findChildrenByType, hasSameAttributes } from "../../utils/prosemirror";
+import { countCheckedItems } from "./utils";
+import TextStyle from "@tiptap/extension-text-style";
 
 export type TaskListAttributes = {
   title: string;
@@ -80,9 +82,21 @@ export const TaskListNode = TaskList.extend({
     return {
       toggleTaskList:
         () =>
-        ({ editor, commands, state, tr }) => {
+        ({ editor, chain, state, tr }) => {
           const { $from, $to } = state.selection;
-          commands.toggleList(this.name, this.options.itemTypeName);
+
+          chain()
+            .toggleList(
+              this.name,
+              this.options.itemTypeName,
+              true // TODO
+            )
+            .updateAttributes(
+              this.options.itemTypeName,
+              this.editor.getAttributes(TextStyle.name)
+            )
+            .run();
+
           const position = {
             from: tr.mapping.map($from.pos),
             to: tr.mapping.map($to.pos)
@@ -106,6 +120,13 @@ export const TaskListNode = TaskList.extend({
         content.classList.add(`${this.name.toLowerCase()}-content-wrapper`);
         content.style.whiteSpace = "inherit";
         return { dom: content };
+      },
+      shouldUpdate: (prev, next) => {
+        return (
+          !hasSameAttributes(prev.attrs, next.attrs) ||
+          prev.childCount !== next.childCount ||
+          countCheckedItems(prev).checked !== countCheckedItems(next).checked
+        );
       }
     });
   },

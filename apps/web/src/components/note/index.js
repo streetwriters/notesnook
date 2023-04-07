@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ import {
 function Note(props) {
   const {
     tags,
-    notebook,
+    references,
     item,
     index,
     context,
@@ -99,7 +99,7 @@ function Note(props) {
         background: isOpened ? "bgSecondary" : "background"
       }}
       menu={{
-        items: context?.type === "topic" ? topicNoteMenuItems : menuItems,
+        items: menuItems,
         extraData: { note, context }
       }}
       onClick={() => {
@@ -115,15 +115,16 @@ function Note(props) {
         <Flex
           sx={{ alignItems: "center", flexWrap: "wrap", gap: 1, mt: "small" }}
         >
-          {notebook && (
+          {references?.references?.map((reference) => (
             <IconTag
+              key={reference.url}
               onClick={() => {
-                navigate(`/notebooks/${notebook.id}/${notebook.topic.id}`);
+                navigate(reference.url);
               }}
-              text={`${notebook.title} › ${notebook.topic.title}`}
-              icon={Icon.Notebook}
+              text={reference.title}
+              icon={reference.type === "topic" ? Icon.Topic : Icon.Notebook}
             />
-          )}
+          ))}
           {reminder && isReminderActive(reminder) && (
             <IconTag
               icon={Icon.Reminder}
@@ -260,7 +261,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
     prevProps.compact === nextProps.compact &&
-    prevProps.notebook?.dateEdited === nextProps.notebook?.dateEdited &&
+    prevProps.references?.dateEdited === nextProps.references?.dateEdited &&
     prevProps.reminder?.dateModified === nextProps.reminder?.dateModified &&
     JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags) &&
     JSON.stringify(prevProps.context) === JSON.stringify(nextProps.context)
@@ -317,6 +318,13 @@ const menuItems = [
     }
   },
   {
+    key: "readonly",
+    title: "Readonly",
+    checked: ({ note }) => note.readonly,
+    icon: Icon.Readonly,
+    onClick: ({ note }) => store.readonly(note.id)
+  },
+  {
     key: "favorite",
     title: "Favorite",
     checked: ({ note }) => note.favorite,
@@ -324,21 +332,39 @@ const menuItems = [
     onClick: ({ note }) => store.favorite(note.id)
   },
   {
-    key: "addtonotebook",
-    title: "Add to notebook(s)",
-    icon: Icon.AddToNotebook,
-    onClick: async ({ items }) => {
-      await showMoveNoteDialog(items.map((i) => i.id));
+    key: "lock",
+    disabled: ({ note }) =>
+      !db.notes.note(note.id).synced() ? notFullySyncedText : false,
+    title: "Lock",
+    checked: ({ note }) => note.locked,
+    icon: Icon.Lock,
+    onClick: async ({ note }) => {
+      const { unlock, lock } = store.get();
+      if (!note.locked) {
+        if (await lock(note.id))
+          showToast("success", "Note locked successfully!");
+      } else {
+        if (await unlock(note.id))
+          showToast("success", "Note unlocked successfully!");
+      }
     },
-    multiSelect: true
+    isPro: true
   },
   {
-    key: "addreminder",
-    title: "Add reminder",
+    key: "remind-me",
+    title: "Remind me",
     icon: Icon.AddReminder,
     onClick: async ({ note }) => {
       await showAddReminderDialog(note.id);
     }
+  },
+  { key: "sep1", type: "separator" },
+  {
+    key: "notebooks",
+    title: "Notebooks",
+    icon: Icon.Notebook,
+    items: notebooksMenuItems,
+    multiSelect: true
   },
   {
     key: "colors",
@@ -346,6 +372,7 @@ const menuItems = [
     icon: Icon.Colors,
     items: colorsToMenuItems()
   },
+  { key: "sep2", type: "separator" },
   {
     key: "publish",
     disabled: ({ note }) => {
@@ -379,6 +406,7 @@ const menuItems = [
         format.type === "pdf" && items.length > 1
           ? "Multiple notes cannot be exported as PDF."
           : false,
+      isPro: format.type !== "txt",
       onClick: async ({ items }) => {
         await exportNotes(
           format.type,
@@ -403,55 +431,38 @@ const menuItems = [
         await confirm({
           title: "Open duplicated note?",
           message: "Do you want to open the duplicated note?",
-          noText: "No",
-          yesText: "Yes"
+          negativeButtonText: "No",
+          positiveButtonText: "Yes"
         })
       ) {
         hashNavigate(`/notes/${id}/edit`, { replace: true });
       }
     }
   },
+  { key: "sep3", type: "separator" },
   {
-    key: "lock",
-    disabled: ({ note }) =>
-      !db.notes.note(note.id).synced() ? notFullySyncedText : false,
-    title: "Lock",
-    checked: ({ note }) => note.locked,
-    icon: Icon.Lock,
-    onClick: async ({ note }) => {
-      const { unlock, lock } = store.get();
-      if (!note.locked) {
-        if (await lock(note.id))
-          showToast("success", "Note locked successfully!");
-      } else {
-        if (await unlock(note.id))
-          showToast("success", "Note unlocked successfully!");
-      }
-    },
-    isPro: true
-  },
-  {
-    key: "sync-disable",
+    key: "local-only",
     hidden: () => !userstore.get().isLoggedIn,
     disabled: ({ note }) =>
       !db.notes.note(note.id).synced() ? notFullySyncedText : false,
-    title: "Disable sync",
+    title: "Local only",
     checked: ({ note }) => note.localOnly,
     icon: ({ note }) => (note.localOnly ? Icon.Sync : Icon.SyncOff),
     onClick: async ({ note }) => {
       if (
         note.localOnly ||
         (await confirm({
-          title: "Disable sync for this item?",
+          title: "Prevent this item from syncing?",
           message:
-            "Turning sync off for this item will automatically delete it from all other devices. Are you sure you want to continue?",
-          yesText: "Yes",
-          noText: "No"
+            "Turning sync off for this item will automatically delete it from all other devices & any future changes to this item won't get synced. Are you sure you want to continue?",
+          positiveButtonText: "Yes",
+          negativeButtonText: "No"
         }))
       )
         await store.get().localOnly(note.id);
     }
   },
+  { key: "sep3", type: "separator" },
   {
     key: "movetotrash",
     title: "Move to trash",
@@ -469,40 +480,12 @@ const menuItems = [
 
       if (db.monographs.isPublished(items[0].id))
         return "Please unpublish this note to move it to trash";
+
+      if (items[0].locked)
+        return "Please unlock this note to move it to trash.";
     },
     onClick: async ({ items }) => {
       await Multiselect.moveNotesToTrash(items, items.length > 1);
-    },
-    multiSelect: true
-  }
-];
-
-const topicNoteMenuItems = [
-  ...menuItems,
-  {
-    key: "removefromtopic",
-    title: "Remove from topic",
-    icon: Icon.TopicRemove,
-    color: "error",
-    iconColor: "error",
-    onClick: async ({ items, context }) => {
-      try {
-        if (!context.value?.topic || !context.value?.id)
-          throw new Error("context is missing");
-
-        const ids = items.map((i) => i.id);
-
-        await db.notes.removeFromNotebook(
-          { id: context.value.id, topic: context.value.topic },
-          ...ids
-        );
-
-        store.refresh();
-
-        showToast("success", "Note removed from topic.");
-      } catch (e) {
-        showToast("error", `Failed to remove note from topic: ${e.message}.`);
-      }
     },
     multiSelect: true
   }
@@ -525,4 +508,81 @@ function colorsToMenuItems() {
       }
     };
   });
+}
+
+function notebooksMenuItems({ items }) {
+  const noteIds = items.map((i) => i.id);
+
+  const menuItems = [];
+  menuItems.push({
+    key: "link-notebooks",
+    title: "Link to...",
+    icon: Icon.AddToNotebook,
+    onClick: async () => {
+      await showMoveNoteDialog(noteIds);
+    }
+  });
+
+  const notebooks = items
+    .map((note) => db.relations?.to(note, "notebook"))
+    .flat();
+  const topics = items.map((note) => note.notebooks || []).flat();
+
+  if (topics?.length > 0 || notebooks?.length > 0) {
+    menuItems.push(
+      {
+        key: "remove-from-all-notebooks",
+        title: "Unlink from all",
+        icon: Icon.RemoveShortcutLink,
+        onClick: async () => {
+          await db.notes.removeFromAllNotebooks(...noteIds);
+          store.refresh();
+        }
+      },
+      { key: "sep", type: "separator" }
+    );
+
+    notebooks?.forEach((notebook) => {
+      if (menuItems.find((item) => item.key === notebook.id)) return;
+
+      menuItems.push({
+        key: notebook.id,
+        title: notebook.title,
+        icon: Icon.Notebook,
+        checked: true,
+        tooltip: "Click to remove from this notebook",
+        onClick: async () => {
+          await db.notes.removeFromNotebook({ id: notebook.id }, ...noteIds);
+          store.refresh();
+        }
+      });
+    });
+
+    topics?.forEach((ref) => {
+      const notebook = db.notebooks?.notebook(ref.id);
+      if (!notebook) return;
+      for (const topicId of ref.topics) {
+        if (!notebook.topics.topic(topicId)) continue;
+        if (menuItems.find((item) => item.key === topicId)) continue;
+
+        const topic = notebook.topics.topic(topicId)._topic;
+        menuItems.push({
+          key: topicId,
+          title: topic.title,
+          icon: Icon.Topic,
+          checked: true,
+          tooltip: "Click to remove from this topic",
+          onClick: async () => {
+            await db.notes.removeFromNotebook(
+              { id: ref.id, topic: topic.id },
+              ...noteIds
+            );
+            store.refresh();
+          }
+        });
+      }
+    });
+  }
+
+  return menuItems;
 }

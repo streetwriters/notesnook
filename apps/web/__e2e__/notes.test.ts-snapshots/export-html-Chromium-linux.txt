@@ -33,6 +33,22 @@
     h6 {
       color: #212121;
     }
+
+    p {
+      margin-bottom: 0px;
+    }
+    
+    p[data-spacing="double"] {
+      margin-top: 1em;
+    }
+    
+    p[data-spacing="single"] {
+      margin-top: 0px;
+    }
+
+    p[data-spacing="single"]:empty {
+      margin-top: 1em;
+    }
     
     pre.codeblock {
       overflow-x: auto;
@@ -147,9 +163,9 @@
       font-family: PT Mono, Consolas, Monaco, "Andale Mono", "Ubuntu Mono",
         monospace;
       text-align: left;
-      white-space: pre;
+      white-space: pre-wrap;
       word-spacing: normal;
-      word-break: normal;
+      word-break: break-word;
       word-wrap: normal;
       line-height: 1.5;
 
@@ -182,6 +198,6 @@
   </head>
   <body>
     <h1>Test 1</h1>
-    <p dir="ltr" data-spacing="double">This is Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1</p>
+    <p data-spacing="double">This is Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1</p>
   </body>
 </html>

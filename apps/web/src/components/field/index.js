@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -79,7 +79,13 @@ function Field(props) {
 
   return (
     <Flex
-      sx={{ ...sx, ...styles.container, flexDirection: "column", m: "1.5px" }}
+      sx={{
+        m: "2px",
+        mr: "2px",
+        ...sx,
+        ...styles.container,
+        flexDirection: "column"
+      }}
     >
       <Label
         htmlFor={id}

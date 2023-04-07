@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Dimensions,
   Image,
@@ -26,7 +26,6 @@ import {
   View
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import umami from "../../common/analytics";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { DDS } from "../../services/device-detection";
@@ -50,9 +49,6 @@ export const SVG_Z =
 
 const Intro = ({ navigation }) => {
   const colors = useThemeStore((state) => state.colors);
-  const introCompleted = useSettingStore(
-    (state) => state.settings.introCompleted
-  );
   const isTelemetryEnabled = useSettingStore(
     (state) => state.settings.telemetry
   );
@@ -63,12 +59,6 @@ const Intro = ({ navigation }) => {
       tabBarRef.current.lock();
     }
   });
-
-  useEffect(() => {
-    if (!introCompleted) {
-      umami.pageView("/welcome", "", []);
-    }
-  }, [introCompleted]);
 
   return (
     <View
@@ -171,8 +161,6 @@ const Intro = ({ navigation }) => {
             navigation.navigate("AppLock", {
               welcome: true
             });
-
-            umami.pageView("/home", "/welcome");
           }}
           style={{
             paddingHorizontal: 24,

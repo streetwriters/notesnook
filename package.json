@@ -44,8 +44,8 @@
     "eslint-plugin-react-native": "^4.0.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "husky": "^8.0.1",
-    "lerna": "^5.4.0",
-    "nx": "^14.5.4",
+    "lerna": "^6.5.1",
+    "nx": "^15.7.2",
     "patch-package": "^6.5.0",
     "prettier": "^2.7.1",
     "serve": "^14.0.1"

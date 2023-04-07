@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,115 +34,113 @@ export function EmbedComponent(
   const { editor, updateAttributes, selected, node } = props;
   const [isLoading, setIsLoading] = useState(true);
   const embedRef = useRef<HTMLIFrameElement>(null);
-  const { src, width, height, align } = node.attrs;
+  const { src, width, height, textDirection } = node.attrs;
+
+  let align = node.attrs.align;
+  if (!align) align = textDirection ? "right" : "left";
 
   return (
-    <>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent:
-            align === "center" ? "center" : align === "left" ? "start" : "end",
-          position: "relative"
+    <Flex
+      sx={{
+        justifyContent:
+          align === "center" ? "center" : align === "left" ? "start" : "end",
+        position: "relative"
+      }}
+    >
+      <Resizer
+        handleColor="primary"
+        editor={editor}
+        selected={selected}
+        width={width}
+        onResize={(width, height) => {
+          updateAttributes(
+            {
+              width,
+              height
+            },
+            { addToHistory: true, preventUpdate: false }
+          );
         }}
       >
-        <Resizer
-          handleColor="primary"
-          editor={editor}
-          selected={selected}
-          width={width}
-          height={height}
-          onResize={(width, height) => {
-            updateAttributes(
-              {
-                width,
-                height
-              },
-              { addToHistory: true, preventUpdate: false }
-            );
+        <Box
+          sx={{
+            width: "100%",
+            display: editor.isEditable ? "flex" : "none",
+            position: "absolute",
+            top: -24,
+            justifyContent: "end",
+            p: "small",
+            bg: editor.isEditable ? "bgSecondary" : "transparent",
+            borderTopLeftRadius: "default",
+            borderTopRightRadius: "default",
+            borderColor: selected ? "border" : "bgSecondary",
+            cursor: "pointer",
+            ":hover": {
+              borderColor: "border"
+            }
           }}
         >
-          <Box
+          <Icon path={Icons.dragHandle} size={"big"} />
+          <DesktopOnly>
+            {selected && (
+              <Flex sx={{ position: "relative", justifyContent: "end" }}>
+                <Flex
+                  sx={{
+                    position: "absolute",
+                    top: -10,
+                    mb: 2,
+                    alignItems: "end"
+                  }}
+                >
+                  <ToolbarGroup
+                    editor={editor}
+                    tools={[
+                      "embedAlignLeft",
+                      "embedAlignCenter",
+                      "embedAlignRight",
+                      "embedProperties"
+                    ]}
+                    sx={{
+                      boxShadow: "menu",
+                      borderRadius: "default",
+                      bg: "background"
+                    }}
+                  />
+                </Flex>
+              </Flex>
+            )}
+          </DesktopOnly>
+        </Box>
+        <Embed
+          ref={embedRef}
+          src={src}
+          width={"100%"}
+          height={"100%"}
+          sx={{
+            bg: "bgSecondary",
+            border: selected
+              ? "2px solid var(--primary)"
+              : "2px solid transparent",
+            borderRadius: "default"
+          }}
+          onLoad={() => setIsLoading(false)}
+          {...props}
+        />
+        {isLoading && (
+          <Flex
             sx={{
-              width: "100%",
-              display: editor.isEditable ? "flex" : "none",
               position: "absolute",
-              top: -24,
-              justifyContent: "end",
-              p: "small",
-              bg: editor.isEditable ? "bgSecondary" : "transparent",
-              borderTopLeftRadius: "default",
-              borderTopRightRadius: "default",
-              borderColor: selected ? "border" : "bgSecondary",
-              cursor: "pointer",
-              ":hover": {
-                borderColor: "border"
-              }
+              bottom: 0,
+              width: "100%",
+              height: "calc(100% - 20px)",
+              alignItems: "center",
+              justifyContent: "center"
             }}
           >
-            <Icon path={Icons.dragHandle} size={"big"} />
-            <DesktopOnly>
-              {selected && (
-                <Flex sx={{ position: "relative", justifyContent: "end" }}>
-                  <Flex
-                    sx={{
-                      position: "absolute",
-                      top: -10,
-                      mb: 2,
-                      alignItems: "end"
-                    }}
-                  >
-                    <ToolbarGroup
-                      editor={editor}
-                      tools={[
-                        "embedAlignLeft",
-                        "embedAlignCenter",
-                        "embedAlignRight",
-                        "embedProperties"
-                      ]}
-                      sx={{
-                        boxShadow: "menu",
-                        borderRadius: "default",
-                        bg: "background"
-                      }}
-                    />
-                  </Flex>
-                </Flex>
-              )}
-            </DesktopOnly>
-          </Box>
-          <Embed
-            ref={embedRef}
-            src={src}
-            width={"100%"}
-            height={"100%"}
-            sx={{
-              bg: "bgSecondary",
-              border: selected
-                ? "2px solid var(--primary)"
-                : "2px solid transparent",
-              borderRadius: "default"
-            }}
-            onLoad={() => setIsLoading(false)}
-            {...props}
-          />
-          {isLoading && (
-            <Flex
-              sx={{
-                position: "absolute",
-                bottom: 0,
-                width: "100%",
-                height: "calc(100% - 20px)",
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Icon path={Icons.loading} rotate size={32} color="disabled" />
-            </Flex>
-          )}
-        </Resizer>
-      </Box>
-    </>
+            <Icon path={Icons.loading} rotate size={32} color="disabled" />
+          </Flex>
+        )}
+      </Resizer>
+    </Flex>
   );
 }

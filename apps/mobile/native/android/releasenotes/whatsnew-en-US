@@ -1,6 +1,6 @@
-- Added support for displaying webclips in editor
-- Fixed pdf export saves corrupted files
-- Fixed multi-window support
-- Fixed a bug in sync causing sync to get stuck on some devices
+- Fixed text exports not following line spacing settings
+- Fixed tags are not updated in list after renaming
+- Fixed a sync issue where notes marked as local only would get deleted sometimes
+- Fixed a bug where opening a note from search then closing it would cause a crash
 
 Thank you for using Notesnook!

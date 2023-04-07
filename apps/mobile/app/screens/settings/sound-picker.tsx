@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,7 +48,6 @@ const SoundItem = ({
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const isPlaying = playingSoundId === item.soundID;
-
   return (
     <PressableButton
       customStyle={{
@@ -128,17 +127,6 @@ export default function SoundPicker() {
   );
 
   useEffect(() => {
-    NotificationSounds.getNotifications("notification").then((results) =>
-      setSounds([
-        {
-          soundID: "defaultSound",
-          title: "Default sound",
-          url: ""
-        },
-        ...results
-      ])
-    );
-
     NotificationSounds.getNotifications("ringtone").then((results) =>
       setRingtones([
         {
@@ -148,6 +136,9 @@ export default function SoundPicker() {
         },
         ...results
       ])
+    );
+    NotificationSounds.getNotifications("notification").then((results) =>
+      setSounds([...results])
     );
   }, []);
 

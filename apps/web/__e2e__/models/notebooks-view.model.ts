@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,12 +28,14 @@ export class NotebooksViewModel extends BaseViewModel {
   private readonly createButton: Locator;
 
   constructor(page: Page) {
-    super(page, "notebooks");
-    this.createButton = page.locator(getTestId("notebooks-action-button"));
+    super(page, "notebooks", "notebooks");
+    this.createButton = page
+      .locator(getTestId("notebooks-action-button"))
+      .first();
   }
 
   async createNotebook(notebook: Notebook) {
-    await this.createButton.first().click();
+    await this.createButton.click();
 
     await fillNotebookDialog(this.page, notebook);
 

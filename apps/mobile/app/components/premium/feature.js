@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -71,8 +71,7 @@ export const FeatureBlock = ({
       <Icon color={colors.icon} name={icon} size={SIZE.xl} />
       <Paragraph size={SIZE.md}>
         <Text style={{ color: colors.accent }}>{highlight}</Text>
-        {"\n"}
-        {content}
+        {content ? "\n" + content : null}
       </Paragraph>
 
       {pro ? (

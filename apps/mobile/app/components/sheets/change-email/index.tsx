@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React, { RefObject, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
-import ActionSheet from "react-native-actions-sheet";
+import { ActionSheetRef } from "react-native-actions-sheet";
 import { db } from "../../../common/database";
 import {
   eSendEvent,
@@ -31,7 +31,7 @@ import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 
 type ChangeEmailProps = {
-  actionSheetRef: RefObject<ActionSheet>;
+  actionSheetRef: RefObject<ActionSheetRef>;
   close?: () => void;
   update?: (options: PresentSheetOptions) => void;
 };

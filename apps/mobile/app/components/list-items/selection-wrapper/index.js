@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,19 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from "../../../services/event-manager";
+import React, { useRef } from "react";
+import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { history } from "../../../utils";
 import { PressableButton } from "../../ui/pressable";
-import { ActionStrip } from "./action-strip";
 import { Filler } from "./back-fill";
 import { SelectionIcon } from "./selection";
-import { useRef } from "react";
 
 const SelectionWrapper = ({
   children,
@@ -42,7 +36,6 @@ const SelectionWrapper = ({
 }) => {
   const itemId = useRef(item.id);
   const colors = useThemeStore((state) => state.colors);
-  const [actionStrip, setActionStrip] = useState(false);
   const notebooksListMode = useSettingStore(
     (state) => state.settings.notebooksListMode
   );
@@ -56,35 +49,18 @@ const SelectionWrapper = ({
 
   if (item.id !== itemId.current) {
     itemId.current = item.id;
-    if (actionStrip) {
-      setActionStrip(false);
-    }
   }
 
   const _onLongPress = () => {
-    if (history.selectedItemsList.length > 0) return;
-    setActionStrip(!actionStrip);
+    if (!useSelectionStore.getState().selectionMode) {
+      useSelectionStore.getState().setSelectionMode(true);
+    }
+    useSelectionStore.getState().setSelectedItem(item);
   };
 
   const _onPress = async () => {
-    if (actionStrip) {
-      setActionStrip(false);
-      return;
-    }
     await onPress();
   };
-
-  const closeStrip = () => {
-    setActionStrip(false);
-  };
-
-  useEffect(() => {
-    eSubscribeEvent("navigate", closeStrip);
-
-    return () => {
-      eUnSubscribeEvent("navigate", closeStrip);
-    };
-  }, []);
   return (
     <PressableButton
       customColor={isSheet ? colors.transGray : "transparent"}
@@ -103,7 +79,7 @@ const SelectionWrapper = ({
         paddingHorizontal: 12,
         paddingVertical: compactMode ? 8 : 12,
         borderRadius: isSheet ? 10 : 0,
-        marginBottom: isSheet ? 12 : undefined,
+        marginBottom: isSheet ? 12 : undefined
       }}
     >
       {item.type === "note" ? (
@@ -111,15 +87,10 @@ const SelectionWrapper = ({
       ) : null}
       <SelectionIcon
         compactMode={compactMode}
-        setActionStrip={setActionStrip}
         item={item}
         onLongPress={onLongPress}
       />
       {children}
-
-      {actionStrip ? (
-        <ActionStrip note={item} setActionStrip={setActionStrip} />
-      ) : null}
     </PressableButton>
   );
 };

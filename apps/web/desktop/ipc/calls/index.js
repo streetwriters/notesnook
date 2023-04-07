@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,13 +21,17 @@ import getZoomFactor from "./getZoomFactor";
 import getPrivacyMode from "./getPrivacyMode";
 import selectDirectory from "./selectDirectory";
 import { gunzip, gzip } from "./gzip";
+import getSpellChecker from "./getSpellChecker";
+import getDesktopIntegration from "./getDesktopIntegration";
 
 const calls = {
   getZoomFactor,
   getPrivacyMode,
   selectDirectory,
   gunzip,
-  gzip
+  gzip,
+  getSpellChecker,
+  getDesktopIntegration,
 };
 
 export const getCall = function getAction(callName) {

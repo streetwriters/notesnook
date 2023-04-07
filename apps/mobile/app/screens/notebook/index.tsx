@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,18 +16,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 import { groupArray } from "@notesnook/core/utils/grouping";
-import qclone from "qclone";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
-import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import List from "../../components/list";
 import { NotebookHeader } from "../../components/list-items/headers/notebook-header";
+import { AddNotebookSheet } from "../../components/sheets/add-notebook";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import {
-  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
@@ -36,28 +33,29 @@ import SearchService from "../../services/search";
 import useNavigationStore, {
   NotebookScreenParams
 } from "../../stores/use-navigation-store";
-import {
-  eOnNewTopicAdded,
-  eOpenAddNotebookDialog,
-  eOpenAddTopicDialog
-} from "../../utils/events";
+import { eOnNewTopicAdded } from "../../utils/events";
 import { NotebookType } from "../../utils/types";
+import { openEditor, setOnFirstSave } from "../notes/common";
 const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
-  const [topics, setTopics] = useState(
+  const [notes, setNotes] = useState(
     groupArray(
-      qclone(route?.params.item?.topics) || [],
-      db.settings?.getGroupOptions("topics")
+      db.relations?.from(route.params.item, "note") || [],
+      db.settings?.getGroupOptions("notes")
     )
   );
   const params = useRef<NotebookScreenParams>(route?.params);
+
   useNavigationFocus(navigation, {
     onFocus: () => {
       Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
       syncWithNavigation();
-      useNavigationStore.getState().setButtonAction(onPressFloatingButton);
+      useNavigationStore.getState().setButtonAction(openEditor);
       return false;
     },
-    onBlur: () => false
+    onBlur: () => {
+      setOnFirstSave(null);
+      return false;
+    }
   });
 
   const syncWithNavigation = React.useCallback(() => {
@@ -70,6 +68,10 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
       },
       params.current?.canGoBack
     );
+    setOnFirstSave({
+      type: "notebook",
+      id: params.current.item.id
+    });
     SearchService.prepareSearch = prepareSearch;
   }, [route.name]);
 
@@ -82,11 +84,9 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
           ?.data as NotebookType;
         if (notebook) {
           params.current.item = notebook;
-          setTopics(
-            groupArray(
-              qclone(notebook.topics),
-              db.settings?.getGroupOptions("topics")
-            )
+          const notes = db.relations?.from(notebook, "note");
+          setNotes(
+            groupArray(notes || [], db.settings?.getGroupOptions("notes"))
           );
           syncWithNavigation();
         }
@@ -102,60 +102,61 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
     return () => {
       eUnSubscribeEvent(eOnNewTopicAdded, onRequestUpdate);
     };
-  }, [onRequestUpdate, topics]);
+  }, [onRequestUpdate]);
+
+  useEffect(() => {
+    return () => {
+      setOnFirstSave(null);
+    };
+  }, []);
 
   const prepareSearch = () => {
     SearchService.update({
       placeholder: `Search in "${params.current.title}"`,
-      type: "topics",
+      type: "notes",
       title: params.current.title,
       get: () => {
         const notebook = db.notebooks?.notebook(params?.current?.item?.id)
           ?.data as NotebookType;
-        return notebook?.topics;
+        return db.relations?.from(notebook, "note");
       }
     });
   };
 
-  const onPressFloatingButton = () => {
-    const n = params.current.item;
-    eSendEvent(eOpenAddTopicDialog, { notebookId: n.id });
-  };
-
   const PLACEHOLDER_DATA = {
     heading: params.current.item?.title,
-    paragraph: "You have not added any topics yet.",
-    button: "Add first topic",
-    action: onPressFloatingButton,
-    loading: "Loading notebook topics"
+    paragraph: "You have not added any notes yet.",
+    button: "Add your first note",
+    action: openEditor,
+    loading: "Loading notebook notes"
   };
 
   return (
-    <DelayLayout>
-      <List
-        listData={topics}
-        type="topics"
-        refreshCallback={() => {
-          onRequestUpdate();
-        }}
-        screen="Notebook"
-        headerProps={{
-          heading: params.current.title
-        }}
-        loading={false}
-        ListHeader={
-          <NotebookHeader
-            onEditNotebook={() => {
-              eSendEvent(eOpenAddNotebookDialog, params.current.item);
-            }}
-            notebook={params.current.item}
-          />
-        }
-        placeholderData={PLACEHOLDER_DATA}
-      />
-
-      <FloatingButton title="Add new topic" onPress={onPressFloatingButton} />
-    </DelayLayout>
+    <>
+      <DelayLayout>
+        <List
+          listData={notes}
+          type="notes"
+          refreshCallback={() => {
+            onRequestUpdate();
+          }}
+          screen="Notebook"
+          headerProps={{
+            heading: params.current.title
+          }}
+          loading={false}
+          ListHeader={
+            <NotebookHeader
+              onEditNotebook={() => {
+                AddNotebookSheet.present(params.current.item);
+              }}
+              notebook={params.current.item}
+            />
+          }
+          placeholderData={PLACEHOLDER_DATA}
+        />
+      </DelayLayout>
+    </>
   );
 };
 

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Box, Flex, Input, Text } from "@theme-ui/components";
 import { findChildren, getNodeType } from "@tiptap/core";
-import TaskItem from "@tiptap/extension-task-item";
 import { Node } from "prosemirror-model";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToolButton } from "../../toolbar/components/tool-button";
@@ -27,6 +26,7 @@ import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
+import { countCheckedItems, deleteCheckedItems, sortList } from "./utils";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
@@ -34,7 +34,7 @@ export function TaskListComponent(
   // const isMobile = useIsMobile();
   const { editor, getPos, node, updateAttributes, forwardRef } = props;
   const taskItemType = getNodeType(TaskItemNode.name, editor.schema);
-  const { title } = node.attrs;
+  const { title, textDirection } = node.attrs;
   const [stats, setStats] = useState({ checked: 0, total: 0, percentage: 0 });
 
   const getParent = useCallback(() => {
@@ -64,129 +64,145 @@ export function TaskListComponent(
   }, [editor.commands, editor.state.doc, getParent, node, node.childCount]);
 
   useEffect(() => {
-    let checked = 0;
-    let total = 0;
-    node.forEach((node) => {
-      if (node.type.name === TaskItemNode.name) {
-        if (node.attrs.checked) checked++;
-        total++;
-      }
-    });
+    const { checked, total } = countCheckedItems(node);
     const percentage = Math.round((checked / total) * 100);
     setStats({ checked, total, percentage });
   }, [isNested, node]);
 
   return (
     <>
-      <Flex
-        sx={{
-          flexDirection: "column"
-        }}
-        className="task-list-tools"
-      >
-        {!isNested && (
-          <Flex
+      {!isNested && (
+        <Flex
+          sx={{
+            position: "relative",
+            bg: "bgSecondary",
+            py: 1,
+            borderRadius: "default",
+            mb: 2,
+            alignItems: "center",
+            justifyContent: "end",
+            overflow: "hidden"
+          }}
+          className="task-list-tools"
+          dir={textDirection}
+          contentEditable={false}
+        >
+          <Box
             sx={{
-              position: "relative",
-              bg: "bgSecondary",
-              py: "5px",
-              borderRadius: "default",
-              mb: 2,
-              alignItems: "center",
-              justifyContent: "end",
-              overflow: "hidden"
+              height: "100%",
+              width: `${stats.percentage}%`,
+              position: "absolute",
+              bg: "border",
+
+              zIndex: 0,
+              left: 0,
+              transition: "width 250ms ease-out"
             }}
-            contentEditable={false}
+          />
+          <Input
+            readOnly={!editor.isEditable}
+            value={title || ""}
+            variant={"clean"}
+            sx={{
+              p: 0,
+              px: 2,
+              zIndex: 1,
+              color: "fontTertiary",
+              fontSize: "title"
+            }}
+            placeholder="Untitled"
+            onChange={(e) => {
+              updateAttributes(
+                { title: e.target.value },
+                { addToHistory: true, preventUpdate: false }
+              );
+            }}
+          />
+          {editor.isEditable && (
+            <>
+              <ToolButton
+                toggled={false}
+                title="Move all checked tasks to bottom"
+                icon="sortTaskList"
+                variant="small"
+                sx={{
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  const pos = getPos();
+                  editor.current
+                    ?.chain()
+                    .focus()
+                    .command(({ tr }) => {
+                      return !!sortList(tr, pos);
+                    })
+                    .run();
+                }}
+              />
+              <ToolButton
+                toggled={false}
+                title="Clear completed tasks"
+                icon="clear"
+                variant="small"
+                sx={{
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  const pos = getPos();
+
+                  editor.current
+                    ?.chain()
+                    .focus()
+                    .command(({ tr }) => {
+                      return !!deleteCheckedItems(tr, pos);
+                    })
+                    .run();
+                }}
+              />
+            </>
+          )}
+          <Text
+            variant={"body"}
+            sx={{
+              ml: 1,
+              mr: 2,
+              color: "fontTertiary",
+              flexShrink: 0,
+              zIndex: 1
+            }}
           >
-            <Box
-              sx={{
-                height: "100%",
-                width: `${stats.percentage}%`,
-                position: "absolute",
-                bg: "border",
-
-                zIndex: 0,
-                left: 0,
-                transition: "width 250ms ease-out"
-              }}
-            />
-            <Input
-              readOnly={!editor.isEditable}
-              value={title || ""}
-              variant={"clean"}
-              sx={{
-                p: 0,
-                px: 2,
-                zIndex: 1,
-                color: "fontTertiary",
-                fontSize: "title"
-              }}
-              placeholder="Untitled"
-              onChange={(e) => {
-                updateAttributes(
-                  { title: e.target.value },
-                  { addToHistory: true, preventUpdate: false }
-                );
-              }}
-            />
-            <Flex
-              sx={{ flexShrink: 0, pr: 2, zIndex: 1, alignItems: "center" }}
-            >
-              {editor.isEditable && (
-                <ToolButton
-                  toggled={false}
-                  title="Clear completed tasks"
-                  icon="clear"
-                  variant="small"
-                  onClick={() => {
-                    if (!editor.isEditable) return;
-                    if (!editor.current) return;
-                    const pos = getPos();
-                    // we need to get a fresh instance of the task list instead
-                    // of using the one we got via props.
-                    const node = editor.current.state.doc.nodeAt(pos);
-                    if (!node) return;
-
-                    editor.current?.commands.command(({ tr }) => {
-                      const taskItems = findChildren(
-                        node,
-                        (n) => n.type.name === TaskItem.name && n.attrs.checked
-                      );
-                      const mapping = tr.mapping;
-                      for (const item of taskItems) {
-                        const childPos = pos + item.pos + 1;
-                        tr.deleteRange(
-                          mapping.map(childPos),
-                          mapping.map(childPos + item.node.nodeSize)
-                        );
-                      }
-                      return true;
-                    });
-                  }}
-                />
-              )}
-              <Text variant={"body"} sx={{ ml: 1, color: "fontTertiary" }}>
-                {stats.checked}/{stats.total}
-              </Text>
-            </Flex>
-          </Flex>
-        )}
-      </Flex>
+            {stats.checked}/{stats.total}
+          </Text>
+        </Flex>
+      )}
       <Text
         as={"div"}
         ref={forwardRef}
+        dir={textDirection}
         sx={{
           ul: {
             display: "block",
             paddingInlineStart: 0,
             marginBlockStart: isNested ? 10 : 0,
             marginBlockEnd: 0,
-            marginLeft: isNested ? (editor.isEditable ? -35 : -10) : 0
+            marginLeft: isNested ? (editor.isEditable ? -35 : -10) : 0,
+            padding: 0
           },
           li: {
             listStyleType: "none",
             position: "relative",
-            marginBottom: isNested ? 1 : [2, 1]
+            marginTop: 2,
+            marginBottom: 0,
+
+            display: "flex",
+            bg: "background",
+            borderRadius: "default",
+            ":hover > .dragHandle": {
+              opacity: editor.isEditable ? 1 : 0
+            },
+            ":hover > .taskItemTools": {
+              opacity: 1
+            }
           }
         }}
       />

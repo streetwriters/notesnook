@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ import { useStore } from "../../stores/attachment-store";
 import { formatBytes } from "../../utils/filename";
 import Field from "../field";
 import ListContainer from "../list-container";
-import AttachmentsPlaceholder from "../placeholders/attachments-placeholder";
 import Dialog from "./dialog";
+import Placeholder from "../placeholders";
 
 function AttachmentsDialog({ onClose }) {
   const attachments = useStore((store) => store.attachments);
@@ -57,7 +57,7 @@ function AttachmentsDialog({ onClose }) {
           header={<div />}
           type="attachments"
           groupType="attachments"
-          placeholder={AttachmentsPlaceholder}
+          placeholder={<Placeholder context="attachments" />}
           items={attachments}
         />
       </Flex>

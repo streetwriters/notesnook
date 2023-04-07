@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,12 +32,12 @@ import {
   Item,
   ListProfiles
 } from "./list-profiles";
-import ReminderBar from "../reminder-bar";
 import Announcements from "../announcements";
-import useAnnouncements from "../../hooks/use-announcements";
 import { ListLoader } from "../loaders/list-loader";
 import ScrollContainer from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
+import { AnimatedFlex } from "../animated";
+import { domAnimation, LazyMotion } from "framer-motion";
 
 const CustomScrollbarsVirtualList = forwardRef<HTMLDivElement, ScrollerProps>(
   function CustomScrollbarsVirtualList(props, ref) {
@@ -61,7 +61,7 @@ type ListContainerProps = {
   context?: Context;
   refresh: () => void;
   header?: JSX.Element;
-  placeholder: () => JSX.Element;
+  placeholder: JSX.Element;
   isLoading?: boolean;
   button?: {
     onClick: () => void;
@@ -74,7 +74,6 @@ function ListContainer(props: ListContainerProps) {
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
-  const [announcements, removeAnnouncement] = useAnnouncements();
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
   const isSelected = useSelectionStore((store) => store.isSelected);
   const selectItem = useSelectionStore((store) => store.selectItem);
@@ -108,164 +107,204 @@ function ListContainer(props: ListContainerProps) {
     bulkSelect: (indices) => setSelectedItems(indices.map((i) => items[i])),
     focusItemAt: (index) => {
       const item = items[index];
-      if (!item) return;
+      if (!item || !listRef.current) return;
 
-      const element = document.getElementById(`id_${item.id}`);
-      if (!element) return;
-      element.focus();
+      waitForElement(listRef.current, index, `id_${item.id}`, (element) =>
+        element.focus()
+      );
     },
     skip: (index) => items[index].type === "header",
     open: (index) => {
       const item = items[index];
-      if (!item) return;
+      if (!item || !listRef.current) return;
 
-      const element = document.getElementById(`id_${item.id}`);
-      if (!element) return;
-      element.click();
+      waitForElement(listRef.current, index, `id_${item.id}`, (element) =>
+        element.click()
+      );
     }
   });
 
   const Component = ListProfiles[type];
 
   return (
-    <Flex variant="columnFill">
-      {!props.items.length && props.placeholder ? (
-        <>
-          {props.isLoading ? (
-            <ListLoader />
-          ) : (
-            <>
-              {header || <ReminderBar />}
+    <LazyMotion features={domAnimation} strict>
+      <Flex variant="columnFill">
+        {!props.items.length && props.placeholder ? (
+          <>
+            {header}
+            {props.isLoading ? (
+              <ListLoader />
+            ) : (
               <Flex variant="columnCenterFill" data-test-id="list-placeholder">
-                <props.placeholder />
+                {props.placeholder}
               </Flex>
-            </>
-          )}
-        </>
-      ) : (
-        <>
-          <Flex
-            ref={listContainerRef}
-            variant="columnFill"
-            data-test-id="note-list"
-          >
-            <Virtuoso
-              ref={listRef}
-              data={items}
-              computeItemKey={(index) => items[index].id || items[index].title}
-              defaultItemHeight={DEFAULT_ITEM_HEIGHT}
-              totalCount={items.length}
-              onBlur={() => setFocusedGroupIndex(-1)}
-              onKeyDown={(e) => onKeyDown(e.nativeEvent)}
-              overscan={5}
-              components={{
-                Scroller: CustomScrollbarsVirtualList,
-                Item: (props) => (
-                  <div
-                    {...props}
-                    style={{ paddingBottom: 1 }}
-                    onFocus={() => onFocus(props["data-item-index"])}
-                    onMouseDown={(e) =>
-                      onMouseDown(e.nativeEvent, props["data-item-index"])
-                    }
-                  >
-                    {props.children}
-                  </div>
-                ),
-                Header: () =>
-                  header ? (
-                    header
-                  ) : announcements.length ? (
-                    <Announcements
-                      announcements={announcements}
-                      removeAnnouncement={removeAnnouncement}
-                    />
-                  ) : (
-                    <ReminderBar />
-                  )
+            )}
+          </>
+        ) : (
+          <>
+            <AnimatedFlex
+              initial={{
+                opacity: 0,
+                scale: 0.98
               }}
-              itemContent={(index, item) => {
-                if (!item) return null;
-
-                switch (item.type) {
-                  case "header":
-                    return (
-                      <GroupHeader
-                        type={groupType}
-                        refresh={refresh}
-                        title={item.title}
-                        isFocused={index === focusedGroupIndex}
-                        index={index}
-                        onSelectGroup={() => {
-                          let endIndex;
-                          for (let i = index + 1; i < props.items.length; ++i) {
-                            if (props.items[i].type === "header") {
-                              endIndex = i;
-                              break;
-                            }
-                          }
-                          setSelectedItems([
-                            ...selectionStore.get().selectedItems,
-                            ...props.items.slice(
-                              index,
-                              endIndex || props.items.length
-                            )
-                          ]);
-                        }}
-                        groups={groups}
-                        onJump={(title: string) => {
-                          const index = props.items.findIndex(
-                            (v) => v.title === title
-                          );
-                          if (index < 0) return;
-                          listRef.current?.scrollToIndex({
-                            index,
-                            align: "center",
-                            behavior: "auto"
-                          });
-                          setFocusedGroupIndex(index);
-                        }}
-                      />
-                    );
-                  default:
-                    return (
-                      <Component
-                        item={item}
-                        context={context}
-                        index={index}
-                        type={type}
-                        compact={compact}
-                      />
-                    );
+              animate={{
+                opacity: 1,
+                scale: 1
+              }}
+              transition={{ duration: 0.2, delay: 0.1, ease: "easeInOut" }}
+              ref={listContainerRef}
+              variant="columnFill"
+              data-test-id={`${type}-list`}
+            >
+              <Virtuoso
+                ref={listRef}
+                data={items}
+                computeItemKey={(index) =>
+                  items[index].id || items[index].title
                 }
-              }}
-            />
-          </Flex>
-        </>
-      )}
-      {button && (
-        <Button
-          variant="primary"
-          data-test-id={`${props.type}-action-button`}
-          onClick={button.onClick}
-          sx={{
-            position: "absolute",
-            bottom: 0,
-            display: ["block", "block", "none"],
-            alignSelf: "end",
-            borderRadius: 100,
-            p: 0,
-            m: 0,
-            mb: 2,
-            mr: 2,
-            width: 45,
-            height: 45
-          }}
-        >
-          <Icon.Plus color="static" />
-        </Button>
-      )}
-    </Flex>
+                defaultItemHeight={DEFAULT_ITEM_HEIGHT}
+                totalCount={items.length}
+                onBlur={() => setFocusedGroupIndex(-1)}
+                onKeyDown={(e) => onKeyDown(e.nativeEvent)}
+                components={{
+                  Scroller: CustomScrollbarsVirtualList,
+                  Item: (props) => (
+                    <div
+                      {...props}
+                      style={{ paddingBottom: 1 }}
+                      onFocus={() => onFocus(props["data-item-index"])}
+                      onMouseDown={(e) =>
+                        onMouseDown(e.nativeEvent, props["data-item-index"])
+                      }
+                    >
+                      {props.children}
+                    </div>
+                  ),
+                  Header: () => (header ? header : <Announcements />)
+                }}
+                itemContent={(index, item) => {
+                  if (!item) return null;
+
+                  switch (item.type) {
+                    case "header":
+                      if (!groupType) return null;
+                      return (
+                        <GroupHeader
+                          type={groupType}
+                          refresh={refresh}
+                          title={item.title}
+                          isFocused={index === focusedGroupIndex}
+                          index={index}
+                          onSelectGroup={() => {
+                            let endIndex;
+                            for (
+                              let i = index + 1;
+                              i < props.items.length;
+                              ++i
+                            ) {
+                              if (props.items[i].type === "header") {
+                                endIndex = i;
+                                break;
+                              }
+                            }
+                            setSelectedItems([
+                              ...selectionStore.get().selectedItems,
+                              ...props.items.slice(
+                                index,
+                                endIndex || props.items.length
+                              )
+                            ]);
+                          }}
+                          groups={groups}
+                          onJump={(title: string) => {
+                            const index = props.items.findIndex(
+                              (v) => v.title === title
+                            );
+                            if (index < 0) return;
+                            listRef.current?.scrollToIndex({
+                              index,
+                              align: "center",
+                              behavior: "auto"
+                            });
+                            setFocusedGroupIndex(index);
+                          }}
+                        />
+                      );
+                    default:
+                      return (
+                        <Component
+                          item={item}
+                          context={context}
+                          index={index}
+                          type={type}
+                          compact={compact}
+                        />
+                      );
+                  }
+                }}
+              />
+            </AnimatedFlex>
+          </>
+        )}
+        {button && (
+          <Button
+            variant="primary"
+            data-test-id={`${props.type}-action-button`}
+            onClick={button.onClick}
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              display: ["block", "block", "none"],
+              alignSelf: "end",
+              borderRadius: 100,
+              p: 0,
+              m: 0,
+              mb: 2,
+              mr: 2,
+              width: 45,
+              height: 45
+            }}
+          >
+            <Icon.Plus color="static" />
+          </Button>
+        )}
+      </Flex>
+    </LazyMotion>
   );
 }
 export default ListContainer;
+
+/**
+ * Scroll the element at the specified index into view and
+ * wait until it renders into the DOM. This function keeps
+ * running until the element is found or the max number of
+ * attempts have been made. Each attempt is separated by a
+ * 50ms interval.
+ */
+function waitForElement(
+  list: VirtuosoHandle,
+  index: number,
+  elementId: string,
+  callback: (element: HTMLElement) => void
+) {
+  let waitInterval = 0;
+  let maxAttempts = 3;
+  list.scrollIntoView({
+    index,
+    done: function scrollDone() {
+      if (!maxAttempts) return;
+      clearTimeout(waitInterval);
+
+      const element = document.getElementById(elementId);
+      if (!element) {
+        --maxAttempts;
+        waitInterval = setTimeout(() => {
+          scrollDone();
+        }, 50) as unknown as number;
+        return;
+      }
+
+      callback(element);
+    }
+  });
+}

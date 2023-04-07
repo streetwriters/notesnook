@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper from "../selection-wrapper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ReminderSheet from "../../sheets/reminder";
-import { formatReminderTime } from "@notesnook/core/collections/reminders";
 import { ReminderTime } from "../../ui/reminder-time";
 
 const ReminderItem = React.memo(
@@ -57,7 +56,6 @@ const ReminderItem = React.memo(
       >
         <View
           style={{
-            flexWrap: "wrap",
             flexShrink: 1,
             opacity: item.disabled ? 0.5 : 1
           }}
@@ -95,13 +93,13 @@ const ReminderItem = React.memo(
                   backgroundColor: colors.nav,
                   borderRadius: 5,
                   flexDirection: "row",
-                  paddingHorizontal: 5,
-                  paddingVertical: 3,
+                  paddingHorizontal: 6,
                   alignItems: "center",
                   marginTop: 5,
                   justifyContent: "flex-start",
                   alignSelf: "flex-start",
-                  marginRight: 10
+                  marginRight: 10,
+                  height: 30
                 }}
               >
                 <Icon
@@ -124,13 +122,13 @@ const ReminderItem = React.memo(
                   backgroundColor: colors.nav,
                   borderRadius: 5,
                   flexDirection: "row",
-                  paddingHorizontal: 5,
-                  paddingVertical: 3,
+                  paddingHorizontal: 6,
                   alignItems: "center",
                   marginTop: 5,
                   justifyContent: "flex-start",
                   alignSelf: "flex-start",
-                  marginRight: 10
+                  marginRight: 10,
+                  height: 30
                 }}
               >
                 <Icon name="reload" size={SIZE.md} color={colors.accent} />

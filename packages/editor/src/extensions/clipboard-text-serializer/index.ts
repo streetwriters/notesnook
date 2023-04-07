@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Extension, TextSerializer } from "@tiptap/core";
 import { Plugin, PluginKey } from "prosemirror-state";
-import { Node as ProseMirrorNode, Schema, Slice } from "prosemirror-model";
+import { Schema, Slice } from "prosemirror-model";
 
 export const ClipboardTextSerializer = Extension.create({
   name: "clipboardTextSerializer",
@@ -30,10 +30,7 @@ export const ClipboardTextSerializer = Extension.create({
         key: new PluginKey("clipboardTextSerializer"),
         props: {
           clipboardTextSerializer: (content) => {
-            const {
-              editor: { schema }
-            } = this;
-            return getTextBetween(content, schema);
+            return getTextBetween(content, this.editor.schema);
           }
         }
       })

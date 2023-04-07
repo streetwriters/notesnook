@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+import "react-native-gesture-handler";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -32,7 +32,6 @@ import { useUserStore } from "./stores/use-user-store";
 import { View } from "react-native";
 import { useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
-
 NetInfo.configure({
   reachabilityUrl: "https://notesnook.com",
   reachabilityTest: (response) => {
@@ -51,6 +50,7 @@ const App = () => {
     if (appLockMode && appLockMode !== "none") {
       useUserStore.getState().setVerifyUser(true);
     }
+    //BackgroundSync.start();
     setInit(true);
     setTimeout(async () => {
       SettingsService.onFirstLaunch();

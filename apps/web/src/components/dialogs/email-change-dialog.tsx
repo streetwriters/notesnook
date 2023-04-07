@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -69,14 +69,14 @@ export default function EmailChangeDialog(props: EmailChangeDialogProps) {
       description={
         "Your account email will be changed without affecting your subscription or any other settings."
       }
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
         text: "Next",
         disabled: isLoading,
         loading: isLoading,
-        props: { form: "changeEmailForm" }
+        form: "changeEmailForm"
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
       <Flex
         id="changeEmailForm"

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useEffect, useState } from "react";
 import { useStore, store } from "../stores/note-store";
 import ListContainer from "../components/list-container";
-import NotesPlaceholder from "../components/placeholders/notesplacholder";
 import { db } from "../common/db";
 import { hashNavigate } from "../navigation";
 import useNavigate from "../hooks/use-navigate";
+import Placeholder from "../components/placeholders";
 
 function Home() {
   useStore((store) => store.nonce);
@@ -66,7 +66,7 @@ function Home() {
       refresh={refresh}
       isLoading={isLoading}
       items={notes}
-      placeholder={NotesPlaceholder}
+      placeholder={<Placeholder context="notes" />}
       button={{
         content: "Make a new note",
         onClick: () =>

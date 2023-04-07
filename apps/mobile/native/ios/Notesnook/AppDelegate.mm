@@ -7,6 +7,7 @@
 #import <React/RCTAppSetupUtils.h>
 #import <React/RCTLinkingManager.h>
 #import "RNShortcuts.h"
+//#import <TSBackgroundFetch/TSBackgroundFetch.h>
 
 #if RCT_NEW_ARCH_ENABLED
 #import <React/CoreModulesPlugins.h>
@@ -62,6 +63,7 @@ RCTBridge *bridge;
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  //[[TSBackgroundFetch sharedInstance] didFinishLaunching];
   return YES;
 }
 

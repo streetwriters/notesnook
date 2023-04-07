@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
     app: "Enter the 6 digit code from your authenticator app to continue logging in",
     sms: "Enter the 6 digit code sent to your phone number to continue logging in",
     email: "Enter the 6 digit code sent to your email to continue logging in",
-    recoveryCode: "Enter the 8 digit recovery code to continue logging in"
+    recoveryCode: "Enter the recovery code to continue logging in"
   };
 
   const secondaryMethodsText = {
@@ -65,9 +65,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   };
 
   const onNext = async () => {
-    const length = currentMethod.method === "recoveryCode" ? 8 : 6;
-
-    if (!code.current || code.current.length !== length) return;
+    if (!code.current || code.current.length < 6) return;
     setLoading(true);
     inputRef.current?.blur();
     await onMfaLogin(
@@ -202,22 +200,26 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
           <>
             <Input
               placeholder={
-                currentMethod.method === "recoveryCode" ? "xxxxxxxx" : "xxxxxx"
+                currentMethod.method === "recoveryCode"
+                  ? "xxxxx-xxxxx"
+                  : "xxxxxx"
               }
               testID={"input.totp"}
-              maxLength={currentMethod.method === "recoveryCode" ? 8 : 6}
+              maxLength={
+                currentMethod.method === "recoveryCode" ? undefined : 6
+              }
               fwdRef={inputRef}
               textAlign="center"
               onChangeText={(value) => {
                 code.current = value;
-                onNext();
+                //onNext();
               }}
               inputStyle={{
                 fontSize: SIZE.lg,
                 height: 60,
                 textAlign: "center",
                 letterSpacing: 10,
-                width: null
+                width: 250
               }}
               keyboardType={
                 currentMethod.method === "recoveryCode" ? "default" : "numeric"
@@ -300,7 +302,9 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
 
 TwoFactorVerification.present = (onMfaLogin, data, context) => {
   presentSheet({
-    component: <TwoFactorVerification onMfaLogin={onMfaLogin} mfaInfo={data} />,
+    component: () => (
+      <TwoFactorVerification onMfaLogin={onMfaLogin} mfaInfo={data} />
+    ),
     context: context || "two_factor_verify",
     onClose: () => {
       onMfaLogin();

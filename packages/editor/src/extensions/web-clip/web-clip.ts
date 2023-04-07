@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node, mergeAttributes, findChildren } from "@tiptap/core";
+import { hasSameAttributes } from "../../utils/prosemirror";
 import { getDataAttribute } from "../attachment";
 import { createSelectionBasedNodeView } from "../react";
 import { WebClipComponent } from "./component";
@@ -108,7 +109,9 @@ export const WebClipNode = Node.create<WebClipOptions>({
   },
 
   addNodeView() {
-    return createSelectionBasedNodeView(WebClipComponent);
+    return createSelectionBasedNodeView(WebClipComponent, {
+      shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs)
+    });
   },
 
   addCommands() {

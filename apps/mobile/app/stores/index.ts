@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,22 +19,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { db } from "../common/database";
 import Navigation from "../services/navigation";
+import Notifications from "../services/notifications";
 import { useFavoriteStore } from "./use-favorite-store";
 import { useMenuStore } from "./use-menu-store";
-import { RouteName } from "./use-navigation-store";
 import { useNotebookStore } from "./use-notebook-store";
 import { useNoteStore } from "./use-notes-store";
+import { useRelationStore } from "./use-relation-store";
+import { useReminderStore } from "./use-reminder-store";
 import { useTagStore } from "./use-tag-store";
 import { useTrashStore } from "./use-trash-store";
-import { useReminderStore } from "./use-reminder-store";
-import Notifications from "../services/notifications";
-import { useRelationStore } from "./use-relation-store";
 export function initAfterSync() {
   useMenuStore.getState().setColorNotes();
   useMenuStore.getState().setMenuPins();
-  Navigation.queueRoutesForUpdate(
-    ...(Object.keys(Navigation.routeUpdateFunctions) as unknown as RouteName[])
-  );
+  Navigation.queueRoutesForUpdate();
   // Whenever sync completes, try to reschedule
   // any new/updated reminders.
   Notifications.setupReminders(true);

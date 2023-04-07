@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -41,6 +41,11 @@ import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
+import { keepLastLineInView } from "@notesnook/editor/dist/extensions/keep-in-view/keep-in-view";
+
+function isIOSBrowser() {
+  return __PLATFORM__ !== "android";
+}
 
 const Tiptap = ({
   editorTheme,
@@ -69,7 +74,15 @@ const Tiptap = ({
         global.editorController.contentChange(editor as Editor);
       },
       onSelectionUpdate: (props) => {
-        props.transaction.scrollIntoView();
+        if (props.transaction.docChanged) {
+          if (isIOSBrowser()) {
+            setTimeout(() => {
+              keepLastLineInView(props.editor, 80, 1);
+            }, 1);
+          } else {
+            props.transaction.scrollIntoView();
+          }
+        }
       },
       onOpenAttachmentPicker: (editor, type) => {
         global.editorController.openFilePicker(type);
@@ -77,6 +90,10 @@ const Tiptap = ({
       },
       onDownloadAttachment: (editor, attachment) => {
         global.editorController.downloadAttachment(attachment);
+        return true;
+      },
+      onPreviewAttachment(editor, attachment) {
+        global.editorController.previewAttachment(attachment);
         return true;
       },
       theme: editorTheme,
@@ -96,11 +113,15 @@ const Tiptap = ({
         corsHost: settings.corsProxy
       }
     },
-    [layout, settings.readonly, tick]
+    [layout, settings.readonly, tick, settings.doubleSpacedLines]
   );
 
   const update = useCallback(() => {
     setTick((tick) => tick + 1);
+    containerRef.current?.scrollTo?.({
+      left: 0,
+      top: 0
+    });
     globalThis.editorController.setTitlePlaceholder("Note title");
   }, []);
 
@@ -137,7 +158,7 @@ const Tiptap = ({
         const isFirstChildEmpty =
           !firstChild?.textContent || firstChild?.textContent?.length === 0;
         if (isParagraph && isFirstChildEmpty) {
-          globalThis.editor?.commands.focus();
+          globalThis.editor?.commands.focus("end");
           return;
         }
         globalThis.editor
@@ -145,10 +166,8 @@ const Tiptap = ({
           .insertContentAt(0, "<p></p>", {
             updateSelection: true
           })
+          .focus("end")
           .run();
-        setTimeout(() => {
-          globalThis.editor?.commands.focus();
-        }, 1);
       }
     },
     []
@@ -162,7 +181,7 @@ const Tiptap = ({
     const isLastChildEmpty =
       !lastChild?.textContent || lastChild?.textContent?.length === 0;
     if (isParagraph && isLastChildEmpty) {
-      globalThis.editor?.commands.focus();
+      globalThis.editor?.commands.focus("end");
       return;
     }
     globalThis.editor
@@ -170,10 +189,8 @@ const Tiptap = ({
       .insertContentAt(docSize - 1, "<p></p>", {
         updateSelection: true
       })
+      .focus("end")
       .run();
-    setTimeout(() => {
-      globalThis.editor?.commands.focus();
-    }, 1);
   }, []);
 
   return (

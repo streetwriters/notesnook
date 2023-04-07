@@ -27,6 +27,8 @@
   padding-bottom: 10px;
   cursor: pointer;
   position: relative;
+  margin-top: 4px;
+  margin-bottom: -10px;
 }
 
 .ProseMirror hr::after {
@@ -41,7 +43,7 @@
   border: 2px solid var(--primary);
 }
 
-.ProseMirror code:not(pre code){
+.ProseMirror code:not(pre code) {
   background-color: var(--bgSecondary);
   border: 1px solid var(--border);
   border-radius: 5px;
@@ -51,7 +53,7 @@
   font-size: 10pt !important;
 }
 
-.ProseMirror code > span  {
+.ProseMirror code > span {
   font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
     Menlo, monospace !important;
 }
@@ -62,6 +64,16 @@
 
 .ProseMirror li {
   margin-bottom: 5px;
+}
+
+.ProseMirror ul.tasklist-content-wrapper {
+  padding-left: 0px;
+}
+
+.ProseMirror ul ul,
+.ProseMirror ol ol {
+  margin-top: 5px;
+  padding-left: 15px;
 }
 
 .ProseMirror a {
@@ -86,8 +98,7 @@
 }
 
 .ProseMirror > div.codeblock-view-content-wrap,
-.ProseMirror > div.taskList-view-content-wrap,
-.ProseMirror > div.outlineList-view-content-wrap {
+.ProseMirror > div.taskList-view-content-wrap {
   margin-top: 1em;
   margin-bottom: 1em;
 }
@@ -194,6 +205,10 @@ img.ProseMirror-separator {
   vertical-align: top;
 }
 
+.ProseMirror table .selectedCell {
+  border-color: var(--primary);
+}
+
 .ProseMirror table td > *,
 .ProseMirror table th > * {
   margin-bottom: 0;
@@ -222,7 +237,7 @@ img.ProseMirror-separator {
   background-color: var(--primary);
   bottom: -2px;
   position: absolute;
-  right: -2px;
+  right: 0px;
   pointer-events: none;
   top: 0;
   width: 5px;
@@ -466,3 +481,119 @@ p > *::selection {
 .math-inline.math-select .math-render {
   padding-top: 2px;
 } */
+
+/* Outline lists */
+
+.outline-list {
+  list-style-type: none;
+  position: relative;
+}
+
+.outline-list li ul {
+  padding-left: 25px;
+}
+
+.outline-list li.collapsed .outline-list {
+  display: none;
+}
+.outline-list li > p {
+  position: relative;
+}
+
+.outline-list li > p::before {
+  position: absolute;
+  top: 4px;
+  cursor: pointer;
+  content: "";
+  background-size: 18px;
+  width: 18px;
+  height: 18px;
+
+  background-color: var(--icon);
+  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik03LjQxIDguNThMMTIgMTMuMTdsNC41OS00LjU5TDE4IDEwbC02IDZsLTYtNmwxLjQxLTEuNDJaIi8+PC9zdmc+)
+    no-repeat 50% 50%;
+  mask-size: cover;
+  border: 1px solid var(--background);
+
+  transform: rotate(0);
+  transition: transform 250ms ease;
+  left: -22px;
+}
+
+.outline-list li:not(.nested) > p::before {
+  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik0xMiAyQTEwIDEwIDAgMCAwIDIgMTJhMTAgMTAgMCAwIDAgMTAgMTBhMTAgMTAgMCAwIDAgMTAtMTBBMTAgMTAgMCAwIDAgMTIgMloiLz48L3N2Zz4=)
+    no-repeat 50% 50%;
+  scale: 0.4;
+}
+
+.outline-list li.collapsed > p::before {
+  transform: rotate(-90deg);
+}
+
+
+.outline-list li .outline-list::before {
+  content: " ";
+  position: absolute;
+  height: 100%;
+  transition: border 200ms ease-in-out;
+  left: -14px;
+  border-left: 1px solid var(--border);
+}
+
+.outline-list li .outline-list:hover:before {
+  border-left: 1px solid var(--bgSecondaryHover);
+}
+
+
+/* IMAGE */
+
+.image-view-content-wrap.ProseMirror-selectednode .resizer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  background-image: linear-gradient(135deg, #ffffffaa 0%, #ffffff88 5%, transparent 12%, transparent 91%, #ffffff88 97%, #ffffffaa 100%);
+  pointer-events: none;
+}
+
+/* RTL */
+
+[dir="rtl"] * {
+  direction: rtl;
+}
+
+[dir="rtl"] ul {
+  margin-left: 0px !important;
+}
+
+blockquote[dir="rtl"] {
+  border-left: none;
+  padding-left: 0px;
+  border-right: 5px solid var(--border);
+  padding-right: 15px;
+}
+
+
+.outline-list[dir="rtl"] li > p::before {
+  right: -22px;
+  left: unset;
+}
+
+.outline-list[dir="rtl"] li .outline-list::before {
+  border-left: unset;
+  border-right: 1px solid var(--border);
+  left: unset;
+  right: -14px;
+}
+
+.outline-list[dir="rtl"] li .outline-list:hover:before {
+  border-right: 1px solid var(--bgSecondaryHover);
+  border-left: unset;
+}
+
+.outline-list[dir="rtl"] li.collapsed > p::before {
+  transform: rotate(90deg);
+}

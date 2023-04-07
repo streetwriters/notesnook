@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,15 +17,31 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Extension } from "@tiptap/core";
+import { isListActive } from "../../utils/prosemirror";
+import { Extension, Editor, findParentNode } from "@tiptap/core";
 import "@tiptap/extension-text-style";
+import { Paragraph } from "../paragraph";
+import { Node as ProsemirrorNode } from "@tiptap/pm/model";
+
+export type TextDirections = undefined | "rtl";
+const TEXT_DIRECTION_TYPES = [
+  "paragraph",
+  "heading",
+  "orderedList",
+  "bulletList",
+  "outlineList",
+  "taskList",
+  "table",
+  "blockquote",
+  "embed",
+  "image"
+];
 
 type TextDirectionOptions = {
   types: string[];
   defaultDirection: TextDirections;
 };
 
-type TextDirections = "ltr" | "rtl";
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     textDirection: {
@@ -37,12 +53,31 @@ declare module "@tiptap/core" {
   }
 }
 
+export function getTextDirection(editor: Editor): TextDirections {
+  const selection = editor.state.selection;
+
+  const parent = findParentNode(
+    (node) =>
+      !!node.attrs.textDirection && !isTextDirectionIgnored(editor, node)
+  )(selection);
+  if (!parent) return;
+  return parent.node.attrs.textDirection;
+}
+
+function isTextDirectionIgnored(editor: Editor, node: ProsemirrorNode) {
+  const isInsideList = isListActive(editor);
+  const isParagraph = node.type.name === Paragraph.name;
+  return isInsideList && isParagraph;
+}
+
 export const TextDirection = Extension.create<TextDirectionOptions>({
   name: "textDirection",
 
-  defaultOptions: {
-    types: ["paragraph", "heading"],
-    defaultDirection: "ltr"
+  addOptions() {
+    return {
+      types: TEXT_DIRECTION_TYPES,
+      defaultDirection: undefined
+    };
   },
 
   addGlobalAttributes() {
@@ -51,7 +86,9 @@ export const TextDirection = Extension.create<TextDirectionOptions>({
         types: this.options.types,
         attributes: {
           textDirection: {
-            default: this.options.defaultDirection,
+            // NOTE: for some reason setting this to undefined breaks enter behaviour
+            // on Android for some keyboards (GBoard etc.). Empty string works fine.
+            default: this.options.defaultDirection || "",
             parseHTML: (element) => element.dir,
             renderHTML: (attributes) => {
               if (!attributes.textDirection) {

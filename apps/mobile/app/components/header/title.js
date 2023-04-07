@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { eScrollEvent } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import Heading from "../ui/typography/heading";
-import Paragraph from "../ui/typography/paragraph";
 import { useCallback } from "react";
 import Tag from "../ui/tag";
 
@@ -64,13 +63,15 @@ export const Title = () => {
       }
       if (data.y > 150) {
         if (!hide) return;
+        titleState[currentScreen.id] = false;
         setHide(false);
       } else {
         if (hide) return;
+        titleState[currentScreen.id] = true;
         setHide(true);
       }
     },
-    [currentScreen.name, hide]
+    [currentScreen.id, currentScreen.name, hide]
   );
 
   useEffect(() => {
@@ -84,10 +85,6 @@ export const Title = () => {
       setHide(titleState[currentScreen.id]);
     }
   }, [currentScreen.id, currentScreen.name]);
-
-  useEffect(() => {
-    titleState[currentScreen.id] = hide;
-  }, [currentScreen.id, hide]);
 
   useEffect(() => {
     eSubscribeEvent(eScrollEvent, onScroll);
@@ -112,25 +109,16 @@ export const Title = () => {
       {!hide && !isHidden ? (
         <Heading
           onPress={navigateToNotebook}
-          numberOfLines={isTopic ? 2 : 1}
-          size={isTopic ? SIZE.md + 2 : SIZE.xl}
+          numberOfLines={1}
+          size={SIZE.xl}
           style={{
             flexWrap: "wrap",
             marginTop: Platform.OS === "ios" ? -1 : 0
           }}
           color={currentScreen.color || colors.heading}
         >
-          {isTopic ? (
-            <Paragraph numberOfLines={1} size={SIZE.xs + 1}>
-              {notebook?.title}
-              {"\n"}
-            </Paragraph>
-          ) : null}
           {isTag ? (
-            <Heading
-              size={isTopic ? SIZE.md + 2 : SIZE.xl}
-              color={colors.accent}
-            >
+            <Heading size={SIZE.xl} color={colors.accent}>
               #
             </Heading>
           ) : null}

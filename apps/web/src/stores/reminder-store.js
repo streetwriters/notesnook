@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,6 +26,9 @@ import { showReminderPreviewDialog } from "../common/dialog-controller";
 import dayjs from "dayjs";
 import Config from "../utils/config";
 import { store as notestore } from "./note-store";
+import { isDesktop, isTesting } from "../utils/platform";
+import showNotification from "../commands/show-notification";
+import bringToFront from "../commands/bring-to-front";
 
 class ReminderStore extends BaseStore {
   reminders = [];
@@ -54,7 +57,10 @@ export { useStore, store };
 async function resetReminders(reminders) {
   await TaskScheduler.stopAllWithPrefix("reminder:");
 
-  if (!("Notification" in window) || Notification.permission !== "granted")
+  if (
+    !isTesting() &&
+    (!("Notification" in window) || Notification.permission !== "granted")
+  )
     return;
 
   for (const reminder of reminders) {
@@ -77,22 +83,58 @@ async function resetReminders(reminders) {
   }
 }
 
+/**
+ *
+ * @param {string} id
+ * @param {import("@notesnook/core/collections/reminders").Reminder} reminder
+ * @param {string} cron
+ * @returns
+ */
 function scheduleReminder(id, reminder, cron) {
   return TaskScheduler.register(`reminder:${id}`, cron, () => {
     if (!Config.get("reminderNotifications", true)) return;
 
-    const notification = new Notification(reminder.title, {
-      body: reminder.description,
-      vibrate: reminder.priority === "vibrate",
-      silent: reminder.priority === "silent",
-      tag: id,
-      renotify: true,
-      requireInteraction: true
-    });
+    if (isTesting()) {
+      window.confirm("Reminder activated!");
+      return;
+    }
 
-    notification.onclick = function () {
-      showReminderPreviewDialog(reminder);
-    };
+    if (isDesktop()) {
+      showNotification(
+        {
+          title: reminder.title,
+          body: reminder.description,
+          silent: reminder.priority === "silent",
+          timeoutType: reminder.priority === "urgent" ? "never" : "default",
+          urgency:
+            reminder.priority === "urgent"
+              ? "critical"
+              : reminder.priority === "vibrate"
+              ? "normal"
+              : "low",
+          focusOnClick: true,
+          tag: id
+        },
+        () => {
+          bringToFront();
+          showReminderPreviewDialog(reminder);
+        }
+      );
+    } else {
+      const notification = new Notification(reminder.title, {
+        body: reminder.description,
+        vibrate: reminder.priority === "vibrate",
+        silent: reminder.priority === "silent",
+        tag: id,
+        renotify: true,
+        requireInteraction: true
+      });
+
+      notification.onclick = function () {
+        window.focus();
+        showReminderPreviewDialog(reminder);
+      };
+    }
 
     store.refresh(false);
   });

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,8 +20,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { setPrivacyMode } from "../../config/privacyMode";
 
 export default (args) => {
-  if (!global.win) return;
+  if (!globalThis.window || !["win32", "darwin"].includes(process.platform))
+    return;
+
   const { privacyMode } = args;
-  global.win.setContentProtection(privacyMode);
+  globalThis.window.setContentProtection(privacyMode);
+
+  if (process.platform === "win32") {
+    globalThis.window.setThumbnailClip(
+      privacyMode
+        ? { x: 0, y: 0, width: 1, height: 1 }
+        : { x: 0, y: 0, width: 0, height: 0 }
+    );
+  }
+
   setPrivacyMode(privacyMode);
 };

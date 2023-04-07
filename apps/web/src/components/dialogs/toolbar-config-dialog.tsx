@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -62,6 +62,8 @@ import {
   PresetId
 } from "../../common/toolbar-config";
 import { showToast } from "../../utils/toast";
+import { isUserPremium } from "../../hooks/use-is-user-premium";
+import { Pro } from "../icons";
 export type ToolbarConfigDialogProps = {
   onClose: Perform;
 };
@@ -93,7 +95,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
       title={"Configure toolbar"}
       description={"Customize the editor toolbar to fit your needs."}
       width={500}
-      onClose={props.onClose}
+      onClose={() => props.onClose(false)}
       positiveButton={{
         text: "Save",
         onClick: async () => {
@@ -108,7 +110,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
           props.onClose(true);
         }
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
       <Flex sx={{ flexDirection: "column" }}>
         <Flex
@@ -126,12 +128,24 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
                   name="preset"
                   value={preset.id}
                   checked={preset.id === currentPreset.id}
+                  disabled={preset.id === "custom" && !isUserPremium()}
                   onChange={(e) => {
                     const { value } = e.target;
+                    if (preset.id === "custom" && !isUserPremium()) {
+                      showToast(
+                        "info",
+                        "You need to be Pro to use the custom preset."
+                      );
+                      return;
+                    }
+
                     setCurrentPreset(getPreset(value as PresetId));
                   }}
                 />
                 {preset.title}
+                {preset.id === "custom" && !isUserPremium() ? (
+                  <Pro color="primary" size={18} sx={{ ml: 1 }} />
+                ) : null}
               </Label>
             ))}
           </Flex>
@@ -159,6 +173,11 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragStart={(event) => {
+            if (!isUserPremium()) {
+              showToast("info", "You need to be Pro to customize the toolbar.");
+              return;
+            }
+
             if (currentPreset.id !== "custom") {
               setCurrentPreset((c) => ({
                 ...getPreset("custom"),
@@ -695,8 +714,9 @@ export function getDisabledTools(tools: TreeNode[]) {
   for (const key in allTools) {
     const tool = allTools[key as ToolId];
     if (tool.conditional) continue;
-    if (items.findIndex((t) => t.toolId === key) <= -1)
-      disabled.push(key as ToolId);
+
+    const isDisabled = items.findIndex((t) => t.toolId === key);
+    if (isDisabled === -1 && key !== "none") disabled.push(key as ToolId);
   }
   return disabled;
 }

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ import {
   useToolbarStore
 } from "../../toolbar/stores/toolbar-store";
 import React from "react";
-import { usePopupRenderer } from "./popuprenderer";
 import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive";
 import { ThemeProvider } from "../theme-provider";
 
@@ -241,15 +240,14 @@ export type PopupWrapperProps = UsePopupHandlerOptions & {
 export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
   const { id, position, children, autoCloseOnUnmount, ...presenterProps } =
     props;
-  const PopupRenderer = usePopupRenderer();
   const { closePopup, isPopupOpen } = usePopupHandler(props);
 
   useEffect(() => {
     if (!autoCloseOnUnmount) return;
     return () => {
-      PopupRenderer?.closePopup(id);
+      closePopup(id);
     };
-  }, [autoCloseOnUnmount, id, PopupRenderer]);
+  }, [autoCloseOnUnmount, id, closePopup]);
 
   return (
     <PopupPresenter
@@ -282,29 +280,30 @@ type UsePopupHandlerOptions = {
 };
 export function usePopupHandler(options: UsePopupHandlerOptions) {
   const { isOpen, id, onClosed, group } = options;
-  const isPopupOpen = useToolbarStore((store) => !!store.openedPopups[id]);
+  const openedPopups = useToolbarStore((store) => store.openedPopups);
   const openPopup = useToolbarStore((store) => store.openPopup);
   const closePopup = useToolbarStore((store) => store.closePopup);
   const closePopupGroup = useToolbarStore((store) => store.closePopupGroup);
 
+  const isPopupOpen = typeof openedPopups[id] === "object";
+  const isPopupDefined = typeof openedPopups[id] !== "undefined";
+
   useEffect(() => {
     if (isOpen) openPopup({ id, group });
     else closePopup(id);
-  }, [isOpen, id, group, openPopup, closePopup]);
+  }, [isOpen, closePopup, openPopup, id, group]);
 
   useEffect(() => {
-    if (!isPopupOpen) onClosed?.();
-  }, [isPopupOpen]);
+    // we don't want to close the popup just when it is about to open.
+    if (!isPopupOpen && isPopupDefined) onClosed?.();
+  }, [isPopupOpen, isPopupDefined]);
 
   useEffect(() => {
+    // if another popup in the same group is open, close it.
     if (isPopupOpen) {
       closePopupGroup(group, [id]);
     }
   }, [onClosed, isPopupOpen, closePopupGroup, id, group]);
-
-  useEffect(() => {
-    if (!isOpen) closePopup(id);
-  }, [isOpen, id, group, closePopup]);
 
   return { isPopupOpen, closePopup };
 }

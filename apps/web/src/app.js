@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState, Suspense, useMemo, useRef, useEffect } from "react";
+import React, { useState, Suspense, useMemo, useRef } from "react";
 import { Box, Flex } from "@theme-ui/components";
 import ThemeProvider from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
@@ -34,13 +34,13 @@ import NavigationMenu from "./components/navigation-menu";
 import StatusBar from "./components/status-bar";
 import { EditorLoader } from "./components/loaders/editor-loader";
 import { FlexScrollContainer } from "./components/scroll-container";
+import CachedRouter from "./components/cached-router";
 
 const GlobalMenuWrapper = React.lazy(() =>
   import("./components/global-menu-wrapper")
 );
 const AppEffects = React.lazy(() => import("./app-effects"));
 const MobileAppEffects = React.lazy(() => import("./app-effects.mobile"));
-const CachedRouter = React.lazy(() => import("./components/cached-router"));
 const HashRouter = React.lazy(() => import("./components/hash-router"));
 
 function App() {
@@ -136,14 +136,12 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             visible={!isFocusMode}
             priority={LayoutPriority.Low}
           >
-            <Flex sx={{ overflow: "hidden", flex: 1 }}>
-              <NavigationMenu
-                toggleNavigationContainer={(state) => {
-                  setShow(state || !show);
-                }}
-                isTablet={isNarrow}
-              />
-            </Flex>
+            <NavigationMenu
+              toggleNavigationContainer={(state) => {
+                setShow(state || !show);
+              }}
+              isTablet={isNarrow}
+            />
           </Allotment.Pane>
           <Allotment.Pane
             className="pane middle-pane"
@@ -153,11 +151,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             priority={LayoutPriority.Normal}
           >
             <Flex className="listMenu" variant="columnFill">
-              <SuspenseLoader
-                condition={isAppLoaded}
-                component={CachedRouter}
-                fallback={<ViewLoader />}
-              />
+              {isAppLoaded && <CachedRouter />}
             </Flex>
           </Allotment.Pane>
           <Allotment.Pane
@@ -171,11 +165,13 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
                 flexDirection: "column"
               }}
             >
-              <SuspenseLoader
-                fallback={<EditorLoader />}
-                component={HashRouter}
-                condition={isAppLoaded}
-              />
+              {isAppLoaded && (
+                <SuspenseLoader
+                  fallback={<EditorLoader />}
+                  component={HashRouter}
+                  condition={isAppLoaded}
+                />
+              )}
             </Flex>
           </Allotment.Pane>
         </Allotment>

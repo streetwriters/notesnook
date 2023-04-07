@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { EVENTS } from "@notesnook/core/common";
-import React, { createRef, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
+import { FlatList } from "react-native-actions-sheet";
 import DocumentPicker from "react-native-document-picker";
-import { FlatList } from "react-native-gesture-handler";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { db } from "../../../common/database";
 import storage from "../../../common/database/storage";
@@ -35,7 +35,7 @@ import { initialize } from "../../../stores";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { eCloseRestoreDialog, eOpenRestoreDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
-import { sleep, timeConverter } from "../../../utils/time";
+import { timeConverter } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
@@ -44,12 +44,18 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Paragraph from "../../ui/typography/paragraph";
-const actionSheetRef = createRef();
 let RNFetchBlob;
 const RestoreDataSheet = () => {
   const [visible, setVisible] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const sheet = useRef();
   useEffect(() => {
+    const open = async () => {
+      setVisible(true);
+      setTimeout(() => {
+        sheet.current?.show();
+      }, 1);
+    };
     eSubscribeEvent(eOpenRestoreDialog, open);
     eSubscribeEvent(eCloseRestoreDialog, close);
     return () => {
@@ -58,21 +64,15 @@ const RestoreDataSheet = () => {
     };
   }, [close]);
 
-  const open = async () => {
-    setVisible(true);
-    await sleep(30);
-    actionSheetRef.current?.setModalVisible(true);
-  };
-
   const close = useCallback(() => {
     if (restoring) {
       showIsWorking();
       return;
     }
-    actionSheetRef.current?.setModalVisible(false);
+    sheet.current?.hide();
     setTimeout(() => {
       setVisible(false);
-    }, 300);
+    }, 150);
   }, [restoring]);
 
   const showIsWorking = () => {
@@ -86,15 +86,19 @@ const RestoreDataSheet = () => {
 
   return !visible ? null : (
     <SheetWrapper
-      fwdRef={actionSheetRef}
+      fwdRef={sheet}
       gestureEnabled={!restoring}
       closeOnTouchBackdrop={!restoring}
-      onClose={close}
+      onClose={() => {
+        setVisible(false);
+        close();
+      }}
     >
       <RestoreDataComponent
         close={close}
         restoring={restoring}
         setRestoring={setRestoring}
+        actionSheetRef={sheet}
       />
       <Toast context="local" />
     </SheetWrapper>
@@ -109,7 +113,6 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   const [loading, setLoading] = useState(true);
   const [backupDirectoryAndroid, setBackupDirectoryAndroid] = useState(false);
   const [progress, setProgress] = useState();
-
   useEffect(() => {
     const subscription = db.eventManager.subscribe(
       EVENTS.migrationProgress,
@@ -123,7 +126,9 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   }, []);
 
   useEffect(() => {
-    checkBackups();
+    setTimeout(() => {
+      checkBackups();
+    }, 300);
   }, []);
 
   const restore = async (item) => {
@@ -362,10 +367,6 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         </View>
         <Seperator half />
         <FlatList
-          nestedScrollEnabled
-          onMomentumScrollEnd={() => {
-            actionSheetRef.current?.handleChildScrollEnd();
-          }}
           ListEmptyComponent={
             !restoring ? (
               loading ? (

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -64,16 +64,7 @@ export const openNotebookTopic = (item) => {
       negativeText: "Delete",
       positivePress: async () => {
         await db.trash.restore(item.id);
-        Navigation.queueRoutesForUpdate(
-          "Tags",
-          "Notes",
-          "Notebooks",
-          "Favorites",
-          "Trash",
-          "TaggedNotes",
-          "ColoredNotes",
-          "TopicNotes"
-        );
+        Navigation.queueRoutesForUpdate();
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
           heading: "Restore successful",
