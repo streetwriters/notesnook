@@ -85,7 +85,8 @@ class Collector {
         result.items.push({
           id: item.id,
           deleted: true,
-          dateModified: Date.now()
+          dateModified: item.dateModified,
+          deleteReason: "localOnly"
         });
         result.types.push(itemType);
       } else if (isUnsynced && isSyncable) {
