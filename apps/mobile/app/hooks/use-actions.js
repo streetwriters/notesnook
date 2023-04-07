@@ -381,9 +381,11 @@ export const useActions = ({ close = () => null, item }) => {
       positivePress: async (value) => {
         if (!value || value === "" || value.trimStart().length == 0) return;
         await db.tags.rename(item.id, db.tags.sanitize(value));
-        useTagStore.getState().setTags();
-        useMenuStore.getState().setMenuPins();
-        Navigation.queueRoutesForUpdate();
+        setImmediate(() => {
+          useTagStore.getState().setTags();
+          useMenuStore.getState().setMenuPins();
+          Navigation.queueRoutesForUpdate();
+        });
       },
       input: true,
       defaultValue: alias,
@@ -426,24 +428,16 @@ export const useActions = ({ close = () => null, item }) => {
             ? "This reminder will be removed"
             : "This tag will be removed from all notes.",
         positivePress: async () => {
-          const routes = [];
-          routes.push(
-            "TaggedNotes",
-            "ColoredNotes",
-            "Notes",
-            "NotesPage",
-            "Reminders",
-            "Favorites"
-          );
           if (item.type === "reminder") {
             await db.reminders.remove(item.id);
           } else {
             await db.tags.remove(item.id);
-            useTagStore.getState().setTags();
-            routes.push("Tags");
           }
-          Navigation.queueRoutesForUpdate();
-          useRelationStore.getState().update();
+          setImmediate(() => {
+            useTagStore.getState().setTags();
+            Navigation.queueRoutesForUpdate();
+            useRelationStore.getState().update();
+          });
         },
         positiveText: "Delete",
         positiveType: "errorShade"
@@ -505,12 +499,14 @@ export const useActions = ({ close = () => null, item }) => {
       negativeText: "Cancel",
       positivePress: async () => {
         await db.trash.delete(item.id);
-        Navigation.queueRoutesForUpdate();
-        useSelectionStore.getState().setSelectionMode(false);
-        ToastEvent.show({
-          heading: "Permanantly deleted items",
-          type: "success",
-          context: "local"
+        setImmediate(() => {
+          Navigation.queueRoutesForUpdate();
+          useSelectionStore.getState().setSelectionMode(false);
+          ToastEvent.show({
+            heading: "Permanantly deleted items",
+            type: "success",
+            context: "local"
+          });
         });
       },
       positiveType: "errorShade"
