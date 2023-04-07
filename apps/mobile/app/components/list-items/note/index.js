@@ -81,10 +81,20 @@ function getNotebook(item) {
   return items;
 }
 
+function getTags(item) {
+  const noteTags = item.tags?.slice(0, 3) || [];
+  const tags = [];
+  for (const tagName of noteTags) {
+    const tag = db.tags.tag(tagName);
+    if (!tag) continue;
+    tags.push(tag);
+  }
+  return tags;
+}
+
 const NoteItem = ({
   item,
   isTrash,
-  tags,
   dateBy = "dateCreated",
   noOpen = false
 }) => {
@@ -100,6 +110,7 @@ const NoteItem = ({
   const reminders = db.relations.from(item, "reminder");
   const reminder = getUpcomingReminder(reminders);
   const noteColor = COLORS_NOTE[item.color?.toLowerCase()];
+  const tags = getTags(item);
   return (
     <>
       <View

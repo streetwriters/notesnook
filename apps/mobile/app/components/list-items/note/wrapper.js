@@ -100,7 +100,7 @@ export const openNote = async (item, isTrash, setSelectedItem, isSheet) => {
 };
 
 export const NoteWrapper = React.memo(
-  function NoteWrapper({ item, index, tags, dateBy, isSheet }) {
+  function NoteWrapper({ item, index, dateBy, isSheet }) {
     const isTrash = item.type === "trash";
     const setSelectedItem = useSelectionStore((state) => state.setSelectedItem);
 
@@ -113,7 +113,7 @@ export const NoteWrapper = React.memo(
         isSheet={isSheet}
         item={item}
       >
-        <NoteItem item={item} dateBy={dateBy} tags={tags} isTrash={isTrash} />
+        <NoteItem item={item} dateBy={dateBy} isTrash={isTrash} />
       </SelectionWrapper>
     );
   },
@@ -122,10 +122,6 @@ export const NoteWrapper = React.memo(
       return false;
     }
     if (prev.item?.dateEdited !== next.item?.dateEdited) {
-      return false;
-    }
-
-    if (JSON.stringify(prev.tags) !== JSON.stringify(next.tags)) {
       return false;
     }
 

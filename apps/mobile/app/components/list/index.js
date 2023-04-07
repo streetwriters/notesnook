@@ -57,25 +57,10 @@ const RenderItem = ({ item, index, type, ...restArgs }) => {
   const dateBy =
     groupOptions.sortBy !== "title" ? groupOptions.sortBy : "dateEdited";
   const totalNotes = getTotalNotes(item);
-  const tags =
-    item.tags
-      ?.slice(0, 3)
-      ?.map((item) => {
-        let tag = db.tags.tag(item);
-
-        if (!tag) return null;
-        return {
-          title: tag.title,
-          id: tag.id,
-          alias: tag.alias
-        };
-      })
-      .filter((t) => t !== null) || [];
 
   return (
     <Item
       item={item}
-      tags={tags}
       dateBy={dateBy}
       index={index}
       type={type}
@@ -168,7 +153,6 @@ const List = ({
     minWidth: 1
   };
 
-  const _keyExtractor = (item) => item.id || item.title;
   const ListView = ScrollComponent ? ScrollComponent : FlashList;
   return (
     <>
