@@ -1,7 +1,6 @@
-- New and improved share extension with support for organizing notes
-with tags & notebooks!
-- Improved UX for topics sheet in Notebooks
-- Improved editor performance
-- Many bug fixes and minor improvements
+- Fixed text exports not following line spacing settings
+- Fixed tags are not updated in list after renaming
+- Fixed a sync issue where notes marked as local only would get deleted sometimes
+- Fixed a bug where opening a note from search then closing it would cause a crash
 
 Thank you for using Notesnook!
