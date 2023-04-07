@@ -26,6 +26,7 @@ import { Licenses } from "./licenses";
 import SoundPicker from "./sound-picker";
 import { Subscription } from "./subscription";
 import { TrashIntervalSelector } from "./trash-interval-selector";
+import { FontSelector } from "./font-selector";
 export const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker />,
   homeselector: <HomagePageSelector />,
@@ -35,5 +36,6 @@ export const components: { [name: string]: ReactElement } = {
   "debug-logs": <DebugLogs />,
   "sound-picker": <SoundPicker />,
   licenses: <Licenses />,
-  "trash-interval-selector": <TrashIntervalSelector />
+  "trash-interval-selector": <TrashIntervalSelector />,
+  "font-selector": <FontSelector />
 };

@@ -30,7 +30,9 @@ const initialState = {
   noToolbar: globalThis.noToolbar,
   noHeader: globalThis.noHeader,
   readonly: globalThis.readonly,
-  doubleSpacedLines: true
+  doubleSpacedLines: true,
+  fontFamily: "sans-serif",
+  fontSize: "16px"
 };
 
 global.settingsController = {

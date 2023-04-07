@@ -37,6 +37,7 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
+import { IconButton } from "../../components/ui/icon-button";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -64,6 +65,12 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           backgroundColor: colors.errorBg
         }
       : {};
+
+  const updateInput = (value: any) => {
+    inputRef?.current?.setNativeProps({
+      text: value + ""
+    });
+  };
   return isHidden ? null : (
     <PressableButton
       disabled={item.type === "component"}
@@ -189,6 +196,93 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               }}
               defaultValue={item.inputProperties?.defaultValue}
             />
+          )}
+
+          {item.type === "input-selector" && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 12
+              }}
+            >
+              <IconButton
+                name="minus"
+                onPress={() => {
+                  const rawValue = SettingsService.get()[
+                    item.property as keyof SettingStore["settings"]
+                  ] as string;
+                  if (rawValue) {
+                    const currentValue = parseInt(rawValue);
+                    if (currentValue <= 0) return;
+                    const nextValue = currentValue - 1;
+                    SettingsService.set({
+                      [item.property as string]: nextValue
+                    });
+                    updateInput(nextValue);
+                  }
+                }}
+                size={SIZE.xl}
+              />
+              <Input
+                {...item.inputProperties}
+                onSubmit={(e) => {
+                  if (e.nativeEvent.text) {
+                    SettingsService.set({
+                      [item.property as string]: e.nativeEvent.text
+                    });
+                  }
+                  item.inputProperties?.onSubmitEditing?.(e);
+                }}
+                onChangeText={(text) => {
+                  if (text) {
+                    if (item.minInputValue) {
+                      text =
+                        parseInt(text) < item.minInputValue
+                          ? item.minInputValue + ""
+                          : text;
+                    }
+                    SettingsService.set({
+                      [item.property as string]: text
+                    });
+                  }
+                  item.inputProperties?.onSubmitEditing?.(text as any);
+                }}
+                keyboardType="decimal-pad"
+                containerStyle={{
+                  width: 45
+                }}
+                wrapperStyle={{
+                  maxWidth: 45,
+                  marginBottom: 0,
+                  marginHorizontal: 6
+                }}
+                fwdRef={inputRef}
+                onLayout={() => {
+                  if (item.property) {
+                    updateInput(SettingsService.get()[item.property]);
+                  }
+                }}
+                defaultValue={item.inputProperties?.defaultValue}
+              />
+              <IconButton
+                name="plus"
+                onPress={() => {
+                  const rawValue = SettingsService.get()[
+                    item.property as keyof SettingStore["settings"]
+                  ] as string;
+                  if (rawValue) {
+                    const currentValue = parseInt(rawValue);
+                    const nextValue = currentValue + 1;
+                    SettingsService.set({
+                      [item.property as string]: nextValue
+                    });
+                    updateInput(nextValue);
+                  }
+                }}
+                size={SIZE.xl}
+              />
+            </View>
           )}
         </View>
       </View>

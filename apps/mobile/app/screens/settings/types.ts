@@ -22,7 +22,14 @@ import { Settings } from "../../stores/use-setting-store";
 
 export type SettingSection = {
   id: string;
-  type?: "screen" | "switch" | "component" | "danger" | "input";
+  type?:
+    | "screen"
+    | "switch"
+    | "component"
+    | "danger"
+    | "input"
+    | "input-selector"
+    | "dropdown-selector";
   name?: string | ((current?: unknown) => string);
   description?: string | ((current: unknown) => string);
   icon?: string;
@@ -35,6 +42,8 @@ export type SettingSection = {
   hidden?: (current: unknown) => boolean;
   onChange?: (property: boolean) => void;
   inputProperties?: TextInput["props"];
+  options?: any[];
+  minInputValue?: number;
 };
 
 export type SettingsGroup = {

@@ -135,6 +135,13 @@ export const useEditorEvents = (
   const doubleSpacedLines = useSettingStore(
     (state) => state.settings?.doubleSpacedLines
   );
+  const defaultFontSize = useSettingStore(
+    (state) => state.settings.defaultFontSize
+  );
+  const defaultFontFamily = useSettingStore(
+    (state) => state.settings.defaultFontFamily
+  );
+
   const tools = useDragState((state) => state.data);
   const { keyboardShown } = useKeyboard();
 
@@ -149,7 +156,9 @@ export const useEditorEvents = (
       noToolbar: readonly || editorPropReadonly || noToolbar,
       keyboardShown: keyboardShown || false,
       doubleSpacedLines: doubleSpacedLines,
-      corsProxy: corsProxy
+      corsProxy: corsProxy,
+      fontSize: defaultFontSize + "px",
+      fontFamily: defaultFontFamily
     });
   }, [
     fullscreen,
@@ -165,7 +174,9 @@ export const useEditorEvents = (
     editorPropReadonly,
     noHeader,
     noToolbar,
-    corsProxy
+    corsProxy,
+    defaultFontSize,
+    defaultFontFamily
   ]);
 
   const onBackPress = useCallback(async () => {

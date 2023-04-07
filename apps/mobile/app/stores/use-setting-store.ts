@@ -73,6 +73,8 @@ export type Settings = {
   corsProxy: string;
   disableRealtimeSync?: boolean;
   notificationSound?: Sound & { platform: PlatformOSType };
+  defaultFontSize: string;
+  defaultFontFamily: string;
 };
 
 type DimensionsType = {
@@ -149,7 +151,9 @@ export const useSettingStore = create<SettingStore>((set) => ({
     defaultSnoozeTime: "5",
     corsProxy: "https://cors.notesnook.com",
     reminderNotificationMode: "urgent",
-    notificationSound: undefined
+    notificationSound: undefined,
+    defaultFontFamily: "sans-serif",
+    defaultFontSize: "16"
   },
   sheetKeyboardHandler: true,
   fullscreen: false,

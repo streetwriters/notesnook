@@ -40,6 +40,8 @@ export type Settings = {
   keyboardShown?: boolean;
   doubleSpacedLines?: boolean;
   corsProxy: string;
+  fontSize: string;
+  fontFamily: string;
 };
 
 /* eslint-disable no-var */

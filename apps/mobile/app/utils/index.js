@@ -27,7 +27,6 @@ import { db } from "../common/database";
 import { tabBarRef } from "./global-refs";
 
 let prevTarget = null;
-let htmlToText;
 
 export const TOOLTIP_POSITIONS = {
   LEFT: 1,
@@ -170,4 +169,9 @@ export function showTooltip(event, text, position = 2) {
     autoHide: true,
     clickToHide: true
   });
+}
+
+export function toTitleCase(value) {
+  if (!value) return;
+  return value.slice(0, 1).toUpperCase() + value.slice(1);
 }
