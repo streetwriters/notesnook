@@ -72,15 +72,12 @@ export default class Tags extends Collection {
     });
   }
 
-  async rename(tagId, newName, isColorTag) {
+  async rename(tagId, newName) {
     let tag = this.tag(tagId);
     if (!tag) {
       console.error(`No tag found. Tag id:`, tagId);
       return;
     }
-
-    if (!isColorTag) newName = this.sanitize(newName);
-    if (!newName) throw new Error(`Tag title cannot be empty.`);
 
     await this._db.settings.setAlias(tagId, newName);
     await this._collection.addItem({ ...tag, alias: newName });
