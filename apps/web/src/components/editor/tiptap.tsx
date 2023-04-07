@@ -34,10 +34,9 @@ import {
   getHTMLFromFragment,
   Fragment,
   type DownloadOptions,
-  ToolProps
   getTotalWords,
   countWords,
-  type DownloadOptions
+  FONTS
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
@@ -56,7 +55,6 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce, debounceWithId } from "../../utils/debounce";
 import { store as editorstore } from "../../stores/editor-store";
-import Config from "../../utils/config";
 
 type TipTapProps = {
   editorContainer: HTMLElement;
@@ -308,10 +306,6 @@ function TipTap(props: TipTapProps) {
     };
   }, [editor, editorContainer]);
 
-  useEffect(() => {
-    editorContainer.style.fontSize = fontSize;
-  });
-
   if (!toolbarContainerId) return null;
   return (
     <>
@@ -336,7 +330,6 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
   useEffect(() => {
     setIsReady(true);
   }, []);
-
   return (
     <PortalProvider>
       <Flex sx={{ flex: 1, flexDirection: "column" }}>
@@ -354,7 +347,9 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
             flex: 1,
             cursor: "text",
             color: theme.colors.text, // TODO!
-            paddingBottom: 150
+            paddingBottom: 150,
+            fontSize: props.fontSize,
+            fontFamily: FONTS[props.fontFamily]
           }}
         />
       </Flex>

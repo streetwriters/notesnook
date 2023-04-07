@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, Slider, Text } from "@theme-ui/components";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useStore as useEditorStore } from "../../stores/editor-store";
 import Config from "../../utils/config";
+import { toTitleCase } from "../../utils/string";
 import DropdownButton from "../dropdown-button";
 
 export function DefaultFont() {
@@ -28,10 +29,10 @@ export function DefaultFont() {
   const fontSize = useEditorStore((store) => store.session.fontSize);
   //const fontFamily = useEditorStore((store) => store.session.fontFamily);
 
-  const fonts = ["Sans-serif", "Serif", "Monospace"];
+  const fonts = ["sans-serif", "serif", "monospace"];
   const getOptions = () =>
-    getFonts(Config.get("fontFamily", "Sans-serif")).map((font) => ({
-      title: () => font,
+    getFonts(Config.get("fontFamily", "sans-serif")).map((font) => ({
+      title: () => toTitleCase(font),
       onClick: () => {
         const newFonts = [font];
         for (const item of fonts) {
@@ -45,12 +46,8 @@ export function DefaultFont() {
       },
       key: font
     }));
-  const [options, setOptions] = useState(getOptions());
 
-  useEffect(() => {
-    //setFontFamily(options.at(0));
-    console.log("options changed");
-  }, [options]);
+  const [options, setOptions] = useState(getOptions());
 
   return (
     <Flex sx={{ justifyContent: "space-evenly", flexWrap: "wrap" }}>
@@ -96,8 +93,8 @@ export function DefaultFont() {
 
 function getFonts(font: string) {
   const fonts = [font];
-  const deafultFonts = ["Sans-serif", "Serif", "Monospace"];
-  for (const _font of deafultFonts) {
+  const defaultFonts = ["sans-serif", "serif", "monospace"];
+  for (const _font of defaultFonts) {
     if (_font !== font) {
       fonts.push(_font);
     }

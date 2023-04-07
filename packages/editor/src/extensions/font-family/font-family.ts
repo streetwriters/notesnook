@@ -39,7 +39,7 @@ declare module "@tiptap/core" {
   }
 }
 
-const FONTS: Record<string, string> = {
+export const FONTS: Record<string, string> = {
   monospace: getFontConfig().fonts.monospace,
   "sans-serif": getFontConfig().fonts.body,
   serif: `Noto Serif, Times New Roman, serif`

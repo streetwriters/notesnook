@@ -47,13 +47,8 @@ import useMobile from "../../hooks/use-mobile";
 import Titlebox from "./title-box";
 import useTablet from "../../hooks/use-tablet";
 import Config from "../../utils/config";
-import {
-  FontFamily,
-  FontSize
-} from "@notesnook/editor/dist/toolbar/tools/font";
 import { AnimatedFlex } from "../animated";
 import { EditorLoader } from "../loaders/editor-loader";
-
 
 type PreviewSession = {
   content: { data: string; type: string };
@@ -261,7 +256,6 @@ export function Editor(props: EditorProps) {
   const fontSize = useStore((store) => store.session.fontSize);
   const fontFamily = useStore((store) => store.session.fontFamily);
   const [isLoading, setIsLoading] = useState(true);
-
 
   const editor = useEditorInstance();
 
