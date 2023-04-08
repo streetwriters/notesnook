@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import tinycolor from "tinycolor2";
 import { PopupWrapper } from "../../components/popup-presenter";
 import { config } from "../../utils/config";
@@ -26,6 +26,7 @@ import { ColorPicker, DEFAULT_COLORS } from "../popups/color-picker";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { ToolProps } from "../types";
 import { getToolbarElement } from "../utils/dom";
+import { PositionOptions } from "../../utils/position";
 
 type ColorToolProps = ToolProps & {
   onColorChange: (color?: string) => void;
@@ -49,6 +50,16 @@ export function ColorTool(props: ColorToolProps) {
   const [colors, setColors] = useState(
     config.get<string[]>(`custom_${cacheKey}`, []) || []
   );
+  const position = useMemo(() => {
+    const pos: PositionOptions = {
+      isTargetAbsolute: true,
+      target: getToolbarElement(),
+      align: isBottom ? "center" : "end",
+      location: isBottom ? "top" : "below",
+      yOffset: 10
+    };
+    return pos;
+  }, [isBottom]);
 
   useEffect(() => {
     config.set(`custom_${cacheKey}`, colors);
@@ -73,13 +84,7 @@ export function ColorTool(props: ColorToolProps) {
         isOpen={isOpen}
         id={props.icon}
         group={"color"}
-        position={{
-          isTargetAbsolute: true,
-          target: getToolbarElement(),
-          align: isBottom ? "center" : "end",
-          location: isBottom ? "top" : "below",
-          yOffset: 10
-        }}
+        position={position}
         focusOnRender={false}
         blocking={false}
       >
