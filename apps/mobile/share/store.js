@@ -25,6 +25,15 @@ import {
   COLOR_SCHEME_LIGHT
 } from "../app/utils/color-scheme";
 import { MMKV } from "../app/common/database/mmkv";
+import { db } from "../app/common/database";
+
+export async function initDatabase() {
+  if (!db.isInitialized) {
+    // Only load collections in database.
+    await db.initCollections();
+    await db.notes.init();
+  }
+}
 
 const StorageKeys = {
   appendNote: "shareMenuAppendNote",

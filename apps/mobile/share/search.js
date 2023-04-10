@@ -17,23 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { FlashList } from "@shopify/flash-list";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Platform,
   StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
-  useWindowDimensions,
-  View
+  View,
+  useWindowDimensions
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../app/common/database";
 import { getElevation } from "../app/utils";
-import { useShareStore } from "./store";
-import { FlashList } from "@shopify/flash-list";
+import { initDatabase, useShareStore } from "./store";
 
 const ListItem = ({ item, mode, close }) => {
   const colors = useShareStore((state) => state.colors);
@@ -227,8 +226,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
 
   const onSearch = async () => {
     if (!searchableItems.current) {
-      await db.init();
-      await db.notes.init();
+      await initDatabase();
       searchableItems.current = get();
     }
     if (timer.current) {
@@ -249,8 +247,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
 
   useEffect(() => {
     (async () => {
-      await db.init();
-      await db.notes.init();
+      await initDatabase();
       searchableItems.current = get();
       setSearchResults(searchableItems.current);
     })();

@@ -69,7 +69,7 @@ const Launcher = React.memo(
     const introCompleted = useSettingStore(
       (state) => state.settings.introCompleted
     );
-    const dbInitCompleted = useRef(false);
+
     const loadNotes = useCallback(async () => {
       if (verifyUser) {
         return;
@@ -80,28 +80,25 @@ const Launcher = React.memo(
           initialize();
           setImmediate(() => {
             setLoading(false);
-            if (!dbInitCompleted.current) {
-              setImmediate(() => doAppLoadActions());
-            }
           });
         });
       });
-    }, [doAppLoadActions, setLoading, verifyUser]);
+    }, [setLoading, verifyUser]);
 
     const init = useCallback(async () => {
-      if (!dbInitCompleted.current) {
+      if (!db.isInitialized) {
         await RNBootSplash.hide({ fade: true });
-        await loadDatabase();
         DatabaseLogger.info("Initializing database");
         await db.init();
-        dbInitCompleted.current = true;
       }
 
       if (db.migrations.required() && !verifyUser) {
         presentSheet({
           component: <Migrate />,
           onClose: async () => {
-            await db.init();
+            if (!db.isInitialized) {
+              await db.init();
+            }
             loadNotes();
           },
           disableClosing: true
@@ -120,9 +117,6 @@ const Launcher = React.memo(
       if (!loading) {
         doAppLoadActions();
       }
-      return () => {
-        dbInitCompleted.current = false;
-      };
     }, [doAppLoadActions, loading]);
 
     const doAppLoadActions = useCallback(async () => {

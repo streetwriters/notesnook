@@ -68,14 +68,3 @@ db.host(
         ISSUES_HOST: "https://issues.streetwriters.co"
       }
 );
-
-export async function loadDatabase() {
-  // if (!DB) {
-  //   let module = await import(/* webpackChunkName: "notes-core" */ 'notes-core/api/index');
-  //   DB = module.default;
-  // }
-  // db = new DB(Storage, Platform.OS === 'ios' ? EventSource : AndroidEventSource, filesystem);
-  // if (DOMParser) {
-  //   await DOMParser.prepare();
-  // }
-}
