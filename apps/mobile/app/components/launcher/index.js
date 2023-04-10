@@ -17,12 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import notifee from "@notifee/react-native";
 import React, { useCallback, useEffect, useRef } from "react";
 import { Platform, View } from "react-native";
 import RNBootSplash from "react-native-bootsplash";
 import { checkVersion } from "react-native-check-version";
+import Config from "react-native-config";
 import { enabled } from "react-native-privacy-snapshot";
-import { DatabaseLogger, db, loadDatabase } from "../../common/database";
+import { DatabaseLogger, db } from "../../common/database";
 import { useAppState } from "../../hooks/use-app-state";
 import BiometricService from "../../services/biometrics";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
@@ -36,6 +38,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { eOpenAnnouncementDialog } from "../../utils/events";
+import { getGithubVersion } from "../../utils/github-version";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { SVG } from "../auth/background";
@@ -50,9 +53,6 @@ import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
-import Config from "react-native-config";
-import { getGithubVersion } from "../../utils/github-version";
-import notifee from "@notifee/react-native";
 
 const Launcher = React.memo(
   function Launcher() {
