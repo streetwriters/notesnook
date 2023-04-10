@@ -85,13 +85,20 @@ async function getNextMonthlyReminderDate(
   return await getNextMonthlyReminderDate(reminder, dayjs().year() + 1);
 }
 
+async function initDatabase(notes = true) {
+  if (db.isInitialized) return;
+  await db.initCollections();
+  if (notes) {
+    await db.notes?.init();
+  }
+}
+
 const onEvent = async ({ type, detail }: Event) => {
   const { notification, pressAction, input } = detail;
   if (type === EventType.DELIVERED && Platform.OS === "android") {
     const reminder = db.reminders?.reminder(notification?.id?.split("_")[0]);
     if (reminder && reminder.recurringMode === "month") {
-      await db.init();
-      await db.notes?.init();
+      await initDatabase();
       await scheduleNotification(reminder);
     }
     return;
@@ -100,8 +107,7 @@ const onEvent = async ({ type, detail }: Event) => {
     notifee.decrementBadgeCount();
     if (notification?.data?.type === "quickNote") return;
     MMKV.removeItem("appState");
-    await db.init();
-    await db.notes?.init();
+    await initDatabase();
     if (notification?.data?.type === "reminder") {
       const reminder = db.reminders?.reminder(notification.id?.split("_")[0]);
       await sleep(1000);
@@ -131,8 +137,7 @@ const onEvent = async ({ type, detail }: Event) => {
     notifee.decrementBadgeCount();
     switch (pressAction?.id) {
       case "REMINDER_SNOOZE": {
-        await db.init();
-        await db.notes?.init();
+        await initDatabase();
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
         );
@@ -151,8 +156,7 @@ const onEvent = async ({ type, detail }: Event) => {
         break;
       }
       case "REMINDER_DISABLE": {
-        await db.init();
-        await db.notes?.init();
+        await initDatabase();
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
         );
@@ -168,8 +172,7 @@ const onEvent = async ({ type, detail }: Event) => {
         break;
       }
       case "UNPIN": {
-        await db.init();
-        await db.notes?.init();
+        await initDatabase();
         remove(notification?.id as string);
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
@@ -198,7 +201,7 @@ const onEvent = async ({ type, detail }: Event) => {
           reply_button_text: "Take note",
           reply_placeholder_text: "Write something..."
         });
-        await db.init();
+        await initDatabase(false);
         await db.notes?.add({
           content: {
             type: "tiptap",

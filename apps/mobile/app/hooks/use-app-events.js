@@ -558,7 +558,7 @@ export const useAppEvents = () => {
       let shareExtensionOpened = MMKV.getString("shareExtensionOpened");
       if (notesAddedFromIntent) {
         if (Platform.OS === "ios") {
-          await db.init();
+          await db.initCollections();
           await db.notes.init();
         }
         useNoteStore.getState().setNotes();
