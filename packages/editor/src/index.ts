@@ -77,6 +77,12 @@ import Toolbar from "./toolbar";
 import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { DownloadOptions } from "./utils/downloader";
 
+declare global {
+  // eslint-disable-next-line no-var
+  var keyboardShown: boolean;
+}
+
+globalThis["keyboardShown"] = true;
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
   .filter(([name]) => name !== "ClipboardTextSerializer")
@@ -90,7 +96,6 @@ type TiptapOptions = EditorOptions &
     downloadOptions?: DownloadOptions;
     theme: Theme;
     isMobile?: boolean;
-    isKeyboardOpen?: boolean;
     doubleSpacedLines?: boolean;
   };
 
@@ -102,7 +107,6 @@ const useTiptap = (
     theme,
     doubleSpacedLines = true,
     isMobile,
-    isKeyboardOpen,
     onDownloadAttachment,
     onOpenAttachmentPicker,
     onPreviewAttachment,
@@ -115,7 +119,6 @@ const useTiptap = (
   const setIsMobile = useToolbarStore((store) => store.setIsMobile);
   const setTheme = useToolbarStore((store) => store.setTheme);
   const closeAllPopups = useToolbarStore((store) => store.closeAllPopups);
-  const setIsKeyboardOpen = useToolbarStore((store) => store.setIsKeyboardOpen);
   const setDownloadOptions = useToolbarStore(
     (store) => store.setDownloadOptions
   );
@@ -123,9 +126,8 @@ const useTiptap = (
   useEffect(() => {
     setIsMobile(isMobile || false);
     setTheme(theme);
-    setIsKeyboardOpen(isKeyboardOpen || false);
     setDownloadOptions(downloadOptions);
-  }, [isMobile, theme, isKeyboardOpen, downloadOptions]);
+  }, [isMobile, theme, downloadOptions]);
 
   useEffect(() => {
     closeAllPopups();

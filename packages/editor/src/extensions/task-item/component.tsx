@@ -26,10 +26,7 @@ import { Transaction } from "prosemirror-state";
 import { findChildren, findChildrenInRange } from "@tiptap/core";
 import { useCallback } from "react";
 import { TaskItemNode, TaskItemAttributes } from "./task-item";
-import {
-  useIsKeyboardOpen,
-  useIsMobile
-} from "../../toolbar/stores/toolbar-store";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 import { isiOS } from "../../utils/platform";
 import { DesktopOnly } from "../../components/responsive";
 
@@ -120,13 +117,13 @@ export function TaskItemComponent(
           }
         }}
         onMouseDown={(e) => {
-          if (useIsKeyboardOpen.current) {
+          if (globalThis["keyboardShown"]) {
             e.preventDefault();
           }
           toggle();
         }}
         onTouchEnd={(e) => {
-          if (useIsKeyboardOpen.current || isiOS()) {
+          if (globalThis["keyboardShown"] || isiOS()) {
             e.preventDefault();
             toggle();
           }
