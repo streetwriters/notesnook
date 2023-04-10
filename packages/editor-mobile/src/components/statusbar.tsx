@@ -31,7 +31,6 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   const lastStickyChangeTime = useRef(0);
   const [words, setWords] = useState("0 words");
   const currentWords = useRef(words);
-  const interval = useRef(0);
   const statusBar = useRef({
     set: setStatus,
     updateWords: () => {
@@ -68,17 +67,6 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   useEffect(() => {
     currentWords.current = words;
   }, [words]);
-
-  useEffect(() => {
-    clearInterval(interval.current);
-    interval.current = setInterval(
-      statusBar.current.updateWords,
-      3000
-    ) as unknown as number;
-    return () => {
-      clearInterval(interval.current);
-    };
-  }, []);
 
   useEffect(() => {
     const node = container.current;

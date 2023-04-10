@@ -158,7 +158,6 @@ function TipTap(props: TipTapProps) {
       },
       downloadOptions,
       doubleSpacedLines,
-      isKeyboardOpen: true,
       isMobile: isMobile || false,
       element: editorContainer,
       editable: !readonly,

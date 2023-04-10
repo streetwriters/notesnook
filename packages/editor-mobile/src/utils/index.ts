@@ -37,7 +37,6 @@ export type Settings = {
   tools: ToolbarGroupDefinition[];
   noToolbar?: boolean;
   noHeader?: boolean;
-  keyboardShown?: boolean;
   doubleSpacedLines?: boolean;
   corsProxy: string;
 };

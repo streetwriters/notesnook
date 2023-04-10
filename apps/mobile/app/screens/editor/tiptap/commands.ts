@@ -237,6 +237,10 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
       'response = window.dispatchEvent(new Event("handleBackPress",{cancelable:true}));'
     );
   };
+
+  keyboardShown = async (keyboardShown: boolean) => {
+    return this.doAsync(`globalThis['keyboardShown']=${keyboardShown};`);
+  };
   //todo add replace image function
 }
 

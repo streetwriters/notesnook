@@ -47,6 +47,7 @@ export type Selection = {
 type Timers = {
   selectionChange: NodeJS.Timeout | null;
   change: NodeJS.Timeout | null;
+  wordCounter: NodeJS.Timeout | null;
 };
 
 export type EditorController = {
@@ -72,7 +73,8 @@ export function useEditorController(update: () => void): EditorController {
   const htmlContentRef = useRef<string | null>(null);
   const timers = useRef<Timers>({
     selectionChange: null,
-    change: null
+    change: null,
+    wordCounter: null
   });
 
   const selectionChange = useCallback((_editor: Editor) => {}, []);
@@ -93,6 +95,8 @@ export function useEditorController(update: () => void): EditorController {
       htmlContentRef.current = editor.getHTML();
       post(EventTypes.content, htmlContentRef.current, currentSessionId);
     }, 300);
+
+    countWords(5000);
   }, []);
 
   const scroll = useCallback(
@@ -124,13 +128,13 @@ export function useEditorController(update: () => void): EditorController {
             from,
             to
           });
-          statusBar.current?.updateWords();
+          countWords();
           break;
         }
         case "native:html":
           htmlContentRef.current = value;
           update();
-          statusBar.current?.updateWords();
+          countWords();
           break;
         case "native:theme":
           useEditorThemeStore.getState().setColors(message.value);
@@ -150,6 +154,16 @@ export function useEditorController(update: () => void): EditorController {
     },
     [update]
   );
+
+  function countWords(ms = 300) {
+    if (typeof timers.current.wordCounter === "number")
+      clearTimeout(timers.current.wordCounter);
+    timers.current.wordCounter = setTimeout(() => {
+      console.time("wordCounter");
+      statusBar?.current?.updateWords();
+      console.timeEnd("wordCounter");
+    }, ms);
+  }
 
   useEffect(() => {
     if (!isReactNative()) return; // Subscribe only in react native webview.

@@ -25,6 +25,8 @@ import { useCallback, useEffect, useRef } from "react";
 import {
   BackHandler,
   InteractionManager,
+  Keyboard,
+  KeyboardEventListener,
   NativeEventSubscription
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
@@ -32,13 +34,12 @@ import { db } from "../../../common/database";
 import ManageTagsSheet from "../../../components/sheets/manage-tags";
 import { RelationsList } from "../../../components/sheets/relations-list";
 import ReminderSheet from "../../../components/sheets/reminder";
-import useKeyboard from "../../../hooks/use-keyboard";
 import { DDS } from "../../../services/device-detection";
 import {
+  ToastEvent,
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
+  eUnSubscribeEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useEditorStore } from "../../../stores/use-editor-store";
@@ -136,7 +137,22 @@ export const useEditorEvents = (
     (state) => state.settings?.doubleSpacedLines
   );
   const tools = useDragState((state) => state.data);
-  const { keyboardShown } = useKeyboard();
+
+  useEffect(() => {
+    const handleKeyboardDidShow: KeyboardEventListener = () => {
+      editor.commands.keyboardShown(true);
+    };
+    const handleKeyboardDidHide: KeyboardEventListener = () => {
+      editor.commands.keyboardShown(false);
+    };
+    const subscriptions = [
+      Keyboard.addListener("keyboardDidShow", handleKeyboardDidShow),
+      Keyboard.addListener("keyboardDidHide", handleKeyboardDidHide)
+    ];
+    return () => {
+      subscriptions.forEach((subscription) => subscription.remove());
+    };
+  }, [editor.commands]);
 
   useEffect(() => {
     editor.commands.setSettings({
@@ -147,7 +163,6 @@ export const useEditorEvents = (
       tools: tools || getDefaultPresets().default,
       noHeader: noHeader,
       noToolbar: readonly || editorPropReadonly || noToolbar,
-      keyboardShown: keyboardShown || false,
       doubleSpacedLines: doubleSpacedLines,
       corsProxy: corsProxy
     });
@@ -160,7 +175,6 @@ export const useEditorEvents = (
     deviceMode,
     tools,
     editor.commands,
-    keyboardShown,
     doubleSpacedLines,
     editorPropReadonly,
     noHeader,
