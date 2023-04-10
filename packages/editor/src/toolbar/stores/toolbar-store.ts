@@ -29,8 +29,6 @@ interface ToolbarState {
   setTheme: (theme?: Theme) => void;
   downloadOptions?: DownloadOptions;
   setDownloadOptions: (options?: DownloadOptions) => void;
-  isKeyboardOpen: boolean;
-  setIsKeyboardOpen: (isKeyboardOpen: boolean) => void;
   isMobile: boolean;
   openedPopups: Record<string, PopupRef | false | undefined>;
   setIsMobile: (isMobile: boolean) => void;
@@ -47,15 +45,10 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
   theme: undefined,
   downloadOptions: undefined,
   isMobile: false,
-  isKeyboardOpen: true,
   openedPopups: {},
   setDownloadOptions: (options) =>
     set((state) => {
       state.downloadOptions = options;
-    }),
-  setIsKeyboardOpen: (isKeyboardOpen) =>
-    set((state) => {
-      state.isKeyboardOpen = isKeyboardOpen;
     }),
   setIsMobile: (isMobile) =>
     set((state) => {
@@ -119,13 +112,3 @@ export const useTheme = Object.defineProperty(
     get: () => useToolbarStore.getState().theme
   }
 ) as (() => Theme | undefined) & { current: Theme | undefined };
-
-export const useIsKeyboardOpen = Object.defineProperty(
-  () => {
-    return useToolbarStore((store) => store.isKeyboardOpen);
-  },
-  "current",
-  {
-    get: () => useToolbarStore.getState().isKeyboardOpen
-  }
-) as (() => boolean) & { current: boolean };
