@@ -54,7 +54,7 @@ const Button = ({
   );
 };
 
-export default function Header({
+function Header({
   noHeader,
   settings,
   hasUndo,
@@ -296,3 +296,17 @@ export default function Header({
     </div>
   );
 }
+
+export default React.memo(Header, (prev, next) => {
+  if (
+    prev.settings.deviceMode !== next.settings.deviceMode ||
+    prev.settings.fullscreen !== next.settings.fullscreen ||
+    prev.settings.premium !== next.settings.premium ||
+    prev.noHeader !== next.noHeader ||
+    prev.hasRedo !== next.hasRedo ||
+    prev.hasUndo !== next.hasUndo
+  )
+    return false;
+
+  return true;
+});

@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { EventTypes } from "../utils";
 import styles from "./styles.module.css";
 
-export default function Tags(): JSX.Element {
+function Tags(): JSX.Element {
   const [tags, setTags] = useState<{ title: string; alias: string }[]>([]);
   const editorTags = useRef({
     setTags: setTags
@@ -122,3 +122,5 @@ export default function Tags(): JSX.Element {
     </div>
   );
 }
+
+export default React.memo(Tags, () => true);

@@ -24,6 +24,7 @@ import {
   usePermissionHandler,
   useTiptap
 } from "@notesnook/editor";
+import { keepLastLineInView } from "@notesnook/editor/dist/extensions/keep-in-view/keep-in-view";
 import { Theme, useTheme } from "@notesnook/theme";
 import {
   forwardRef,
@@ -41,12 +42,10 @@ import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
-import { keepLastLineInView } from "@notesnook/editor/dist/extensions/keep-in-view/keep-in-view";
 
 function isIOSBrowser() {
   return __PLATFORM__ !== "android";
 }
-
 const Tiptap = ({
   editorTheme,
   toolbarTheme,
@@ -104,7 +103,6 @@ const Tiptap = ({
       },
       content: global.editorController?.content?.current,
       isMobile: true,
-      isKeyboardOpen: settings.keyboardShown,
       doubleSpacedLines: settings.doubleSpacedLines,
       onOpenLink: (url) => {
         return global.editorController.openLink(url);
@@ -192,7 +190,6 @@ const Tiptap = ({
       .focus("end")
       .run();
   }, []);
-
   return (
     <>
       <div

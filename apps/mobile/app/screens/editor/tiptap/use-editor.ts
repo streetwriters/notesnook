@@ -43,9 +43,9 @@ import { NoteType } from "../../../utils/types";
 import Commands from "./commands";
 import { Content, EditorState, Note, SavePayload } from "./types";
 import {
+  EditorEvents,
   clearAppState,
   defaultState,
-  EditorEvents,
   getAppState,
   isContentInvalid,
   isEditorLoaded,
@@ -120,29 +120,9 @@ export const useEditor = (
     [editorId]
   );
 
-  const onReady = useCallback(async () => {
-    if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
-      overlay(true);
-      setLoading(true);
-    }
-  }, [overlay]);
-
-  useEffect(() => {
-    state.current.saveCount = 0;
-    async () => {
-      await commands.setSessionId(sessionIdRef.current);
-      if (sessionIdRef.current) {
-        if (!state.current?.ready) return;
-        await onReady();
-      }
-    };
-  }, [sessionId, loading, commands, onReady]);
-
-  useEffect(() => {
-    if (loading) {
-      setLoading(false);
-    }
-  }, [loading]);
+  if (loading) {
+    setLoading(false);
+  }
 
   const withTimer = useCallback(
     (id: string, fn: () => void, duration: number) => {
@@ -567,6 +547,7 @@ export const useEditor = (
     state.current.isRestoringState = true;
     state.current.currentlyEditing = true;
     state.current.movedAway = false;
+
     if (!DDS.isTab) {
       tabBarRef.current?.goToPage(1, false);
     }
@@ -587,15 +568,35 @@ export const useEditor = (
   }, [loadNote, overlay]);
 
   useEffect(() => {
-    isDefaultEditor && restoreEditorState();
-  }, [isDefaultEditor, restoreEditorState]);
-
-  useEffect(() => {
     eSubscribeEvent(eOnLoadNote + editorId, loadNote);
     return () => {
       eUnSubscribeEvent(eOnLoadNote + editorId, loadNote);
     };
   }, [editorId, loadNote, restoreEditorState, isDefaultEditor]);
+
+  const onContentChanged = () => {
+    lastContentChangeTime.current = Date.now();
+  };
+
+  const onReady = useCallback(async () => {
+    if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
+      overlay(true);
+      setLoading(true);
+    } else {
+      isDefaultEditor && restoreEditorState();
+    }
+  }, [overlay, isDefaultEditor, restoreEditorState]);
+
+  useEffect(() => {
+    state.current.saveCount = 0;
+    async () => {
+      await commands.setSessionId(sessionIdRef.current);
+      if (sessionIdRef.current) {
+        if (!state.current?.ready) return;
+        await onReady();
+      }
+    };
+  }, [sessionId, loading, commands, onReady]);
 
   const onLoad = useCallback(async () => {
     state.current.ready = true;
@@ -619,10 +620,6 @@ export const useEditor = (
     insets,
     loadNote
   ]);
-
-  const onContentChanged = () => {
-    lastContentChangeTime.current = Date.now();
-  };
 
   return {
     ref: editorRef,
