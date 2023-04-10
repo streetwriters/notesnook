@@ -58,6 +58,7 @@ var NNEventSource;
 // const DIFFERENCE_THRESHOLD = 20 * 1000;
 // const MAX_TIME_ERROR_FAILURES = 5;
 class Database {
+  isInitialized = false;
   /**
    *
    * @param {any} storage
@@ -131,6 +132,19 @@ class Database {
     this.pricing = new Pricing();
     this.subscriptions = new Subscriptions(this.user.tokenManager);
 
+    await this.initCollections();
+
+    await this.settings.init();
+    await this.outbox.init();
+    await this.user.init();
+    await this.migrations.init();
+    this.isInitialized = true;
+    if (this.migrations.required()) {
+      logger.warn("Database migration is required.");
+    }
+  }
+
+  async initCollections() {
     // collections
     /** @type {Notes} */
     this.notes = await Notes.new(this, "notes", true, true);
@@ -154,15 +168,6 @@ class Database {
     this.relations = await Relations.new(this, "relations");
 
     this.trash = new Trash(this);
-
-    await this.settings.init();
-    await this.outbox.init();
-    await this.user.init();
-    await this.migrations.init();
-
-    if (this.migrations.required()) {
-      logger.warn("Database migration is required.");
-    }
   }
 
   disconnectSSE() {
