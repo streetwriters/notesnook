@@ -60,7 +60,8 @@
     "@bam.tech/react-native-image-resizer": "3.0.5",
     "react-native-navigation-bar-color": "2.0.2",
     "react-native-actions-shortcuts": "^1.0.1",
-    "react-native-in-app-review": "4.3.3"
+    "react-native-in-app-review": "4.3.3",
+    "react-native-zip-archive": "6.0.9"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
