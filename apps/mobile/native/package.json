@@ -57,7 +57,8 @@
     "@react-native-community/datetimepicker":"6.6.0",
     "react-native-date-picker": "4.2.6",
     "react-native-notification-sounds": "0.5.5",
-    "@bam.tech/react-native-image-resizer": "3.0.5"
+    "@bam.tech/react-native-image-resizer": "3.0.5",
+    "react-native-zip-archive": "6.0.9"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
