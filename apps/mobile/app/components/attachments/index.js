@@ -113,6 +113,7 @@ export const AttachmentDialog = ({ note }) => {
               width: 40,
               marginRight: 10
             }}
+            color={colors.pri}
             size={SIZE.lg}
             onPress={onCheck}
           />
@@ -123,6 +124,7 @@ export const AttachmentDialog = ({ note }) => {
               height: 40,
               width: 40
             }}
+            color={colors.pri}
             onPress={() => {
               DownloadAttachments.present(
                 "attachments-list",
