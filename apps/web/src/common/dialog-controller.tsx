@@ -41,6 +41,7 @@ import { AuthenticatorType } from "../components/dialogs/mfa/types";
 import { Suspense } from "react";
 import { Reminder } from "@notesnook/core/collections/reminders";
 import { ConfirmDialogProps } from "../components/dialogs/confirm";
+import { Note } from "../components/dialogs/add-tags-dialog";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -86,6 +87,21 @@ export function closeOpenedDialog() {
     ".ReactModalPortal,[data-react-modal-body-trap]"
   );
   dialogs.forEach((elem) => elem.remove());
+}
+
+export function showAddTagsDialog(items: Array<Note>) {
+  return showDialog("AddTagsDialog", (Dialog, perform) => (
+    <Dialog
+      title="Add Tags"
+      subtitle="Add tags to multiple notes at once"
+      width={400}
+      positiveButtonText="Done"
+      onClose={() => {
+        perform(false);
+      }}
+      items={items}
+    />
+  ));
 }
 
 export function showAddNotebookDialog() {

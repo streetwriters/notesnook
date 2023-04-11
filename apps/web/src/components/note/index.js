@@ -25,6 +25,7 @@ import ListItem from "../list-item";
 import {
   confirm,
   showAddReminderDialog,
+  showAddTagsDialog,
   showMoveNoteDialog
 } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
@@ -371,6 +372,15 @@ const menuItems = [
     title: "Assign color",
     icon: Icon.Colors,
     items: colorsToMenuItems()
+  },
+  {
+    key: "add-tags",
+    title: "Add Tags",
+    icon: Icon.Tag2,
+    multiSelect: true,
+    onClick: async ({ items }) => {
+      await showAddTagsDialog(items);
+    }
   },
   { key: "sep2", type: "separator" },
   {
