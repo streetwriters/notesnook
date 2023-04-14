@@ -59,7 +59,7 @@ export default class Notes extends Collection {
     if (
       remoteNote.deleted &&
       remoteNote.deleteReason !== "localOnly" &&
-      !localNote.localOnly
+      (!localNote || !localNote.localOnly)
     )
       return await this._collection.addItem(remoteNote);
 
