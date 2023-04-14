@@ -218,12 +218,14 @@ const List = ({
           }
         />
       </Animated.View>
-      <JumpToSectionDialog
-        screen={screen}
-        data={listData}
-        type={screen === "Notes" ? "home" : type}
-        scrollRef={scrollRef}
-      />
+      {listData ? (
+        <JumpToSectionDialog
+          screen={screen}
+          data={listData}
+          type={screen === "Notes" ? "home" : type}
+          scrollRef={scrollRef}
+        />
+      ) : null}
     </>
   );
 };
