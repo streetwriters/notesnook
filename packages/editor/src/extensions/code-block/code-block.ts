@@ -127,7 +127,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
       id: {
         default: undefined,
         rendered: false,
-        parseHTML: () => `codeblock-${nanoid(12)}`
+        parseHTML: () => createCodeblockId()
       },
       caretPosition: {
         default: undefined,
@@ -227,13 +227,18 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
       setCodeBlock:
         (attributes) =>
         ({ commands }) => {
-          return commands.setNode(this.name, attributes);
+          return commands.setNode(this.name, {
+            ...attributes,
+            id: createCodeblockId()
+          });
         },
       toggleCodeBlock:
         (attributes) =>
         ({ commands }) => {
-          console.log("TOGGLING!");
-          return commands.toggleNode(this.name, "paragraph", attributes);
+          return commands.toggleNode(this.name, "paragraph", {
+            ...attributes,
+            id: createCodeblockId()
+          });
         },
       changeCodeBlockIndentation:
         (options) =>
@@ -477,14 +482,16 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         find: backtickInputRegex,
         type: this.type,
         getAttributes: (match) => ({
-          language: match[1]
+          language: match[1],
+          id: createCodeblockId()
         })
       }),
       textblockTypeInputRule({
         find: tildeInputRegex,
         type: this.type,
         getAttributes: (match) => ({
-          language: match[1]
+          language: match[1],
+          id: createCodeblockId()
         })
       })
     ];
@@ -520,7 +527,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             if (isCode && !isInsideCodeBlock) {
               tr.replaceSelectionWith(
                 this.type.create({
-                  id: `codeblock-${nanoid(12)}`,
+                  id: createCodeblockId(),
                   language,
                   indentType: indent.type,
                   indentLength: indent.amount
@@ -630,7 +637,7 @@ function indentOnEnter(editor: Editor, $from: ResolvedPos, options: Indent) {
   return editor
     .chain()
     .insertContent(`${newline}${indentation}`, {
-      parseOptions: { preserveWhitespace: "full" }
+      parseOptions: { preserveWhitespace: true }
     })
     .focus()
     .run();
@@ -804,4 +811,8 @@ export function inferLanguage(node: Element) {
     (l) => l.filename === lang || l.alias?.some((a) => a === lang)
   );
   return language?.filename;
+}
+
+function createCodeblockId() {
+  return `codeblock-${nanoid(12)}`;
 }
