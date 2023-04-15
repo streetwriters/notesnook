@@ -19,11 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import MarkdownBuilder from "../utils/templates/markdown/builder";
 import HTMLBuilder from "../utils/templates/html/builder";
-import TextBuilder from "../utils/templates/text/builder";
 import { getContentFromData } from "../content-types";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { addItem, deleteItem } from "../utils/array";
 import { formatDate } from "../utils/date";
+import { modifyContent } from "../utils/contentMiddleware";
 
 export default class Note {
   /**
@@ -82,7 +82,7 @@ export default class Note {
    * @param {string?} rawContent - Use this raw content instead of generating itself
    * @returns {Promise<string | false | undefined>}
    */
-  async export(to = "html", rawContent) {
+  async export(to = "html", title, rawContent) {
     if (to !== "txt" && !(await checkIsUserPremium(CHECK_IDS.noteExport)))
       return false;
 
@@ -104,15 +104,42 @@ export default class Note {
     let content = getContentFromData(type, data);
 
     switch (to) {
-      case "html":
+      case "pdf": // No need for extracting attachments for the pdf export
         templateData.content = rawContent || content.toHTML();
         return HTMLBuilder.buildHTML(templateData);
+      case "html":
+        const renewdHtml = await modifyContent(content.data, "html");
+        content.data = renewdHtml.data;
+        templateData.content = rawContent || content.toHTML();
+        let htmlFiles = [...renewdHtml.files];
+        const htmlNote = {
+          path: `${title}.${to}`,
+          noteContent: MarkdownBuilder.buildMarkdown(templateData)
+        };
+        htmlFiles.unshift(htmlNote);
+        return htmlFiles;
       case "txt":
+        const renewdTxt = await modifyContent(content.data, "txt");
+        content.data = renewdTxt.data;
         templateData.content = rawContent || content.toTXT();
-        return TextBuilder.buildText(templateData);
+        let txtFiles = [...renewdTxt.files];
+        const txtNote = {
+          path: `${title}.${to}`,
+          noteContent: MarkdownBuilder.buildMarkdown(templateData)
+        };
+        txtFiles.unshift(txtNote);
+        return txtFiles;
       case "md":
+        const renewdMd = await modifyContent(content.data, "md");
+        content.data = renewdMd.data;
         templateData.content = rawContent || content.toMD();
-        return MarkdownBuilder.buildMarkdown(templateData);
+        let mdFiles = [...renewdMd.files];
+        const mdNote = {
+          path: `${title}.${to}`,
+          noteContent: MarkdownBuilder.buildMarkdown(templateData)
+        };
+        mdFiles.unshift(mdNote);
+        return mdFiles;
       default:
         throw new Error("Export format not supported.");
     }
