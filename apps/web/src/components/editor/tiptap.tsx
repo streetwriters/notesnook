@@ -64,6 +64,7 @@ type TipTapProps = {
   onContentChange?: () => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
+  onPreviewAttachment?: (attachment: Attachment) => void;
   onAttachFile?: (file: File) => void;
   onFocus?: () => void;
   content?: string;
@@ -109,6 +110,7 @@ function TipTap(props: TipTapProps) {
     onChange,
     onInsertAttachment,
     onDownloadAttachment,
+    onPreviewAttachment,
     onAttachFile,
     onContentChange,
     onFocus = () => {},
@@ -251,6 +253,10 @@ function TipTap(props: TipTapProps) {
       },
       onDownloadAttachment: (_editor, attachment) => {
         onDownloadAttachment?.(attachment);
+        return true;
+      },
+      onPreviewAttachment(_editor, attachment) {
+        onPreviewAttachment?.(attachment);
         return true;
       },
       onOpenLink: (url) => {

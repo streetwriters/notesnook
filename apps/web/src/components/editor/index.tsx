@@ -24,6 +24,7 @@ import {
   useRef,
   PropsWithChildren
 } from "react";
+import ReactDOM from "react-dom";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
 import Properties from "../properties";
 import { useStore, store as editorstore } from "../../stores/editor-store";
@@ -49,6 +50,9 @@ import useTablet from "../../hooks/use-tablet";
 import Config from "../../utils/config";
 import { AnimatedFlex } from "../animated";
 import { EditorLoader } from "../loaders/editor-loader";
+import { Lightbox } from "../lightbox";
+import ThemeProviderWrapper from "../theme-provider";
+import { Document, Page } from "react-pdf";
 
 type PreviewSession = {
   content: { data: string; type: string };
@@ -317,6 +321,24 @@ export function Editor(props: EditorProps) {
         onDownloadAttachment={(attachment) =>
           downloadAttachment(attachment.hash)
         }
+        onPreviewAttachment={({ hash, dataurl }) => {
+          const attachment = db.attachments?.attachment(hash);
+          if (attachment && attachment.metadata.type.startsWith("image/")) {
+            const container = document.getElementById("dialogContainer");
+            if (!(container instanceof HTMLElement)) return;
+            ReactDOM.render(
+              <ThemeProviderWrapper>
+                <Lightbox
+                  image={dataurl}
+                  onClose={() => {
+                    ReactDOM.unmountComponentAtNode(container);
+                  }}
+                />
+              </ThemeProviderWrapper>,
+              container
+            );
+          }
+        }}
         onInsertAttachment={(type) => {
           const mime = type === "file" ? "*/*" : "image/*";
           insertAttachment(mime).then((file) => {
@@ -369,46 +391,67 @@ function EditorChrome(
       ) : null}
 
       <Toolbar />
-      <FlexScrollContainer
-        className="editorScroll"
-        style={{ display: "flex", flexDirection: "column", flex: 1 }}
-      >
-        <Flex
-          variant="columnFill"
-          className="editor"
-          sx={{
-            alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
-            maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
-            width: "100%"
-          }}
-          px={6}
-          onClick={onRequestFocus}
+      <Flex sx={{ justifyContent: "center", overflow: "hidden", flex: 1 }}>
+        <FlexScrollContainer
+          className="editorScroll"
+          style={{ display: "flex", flexDirection: "column", flex: 1 }}
         >
-          {!isMobile && (
-            <Box
-              id="editorToolbar"
-              sx={{
-                display: readonly ? "none" : "flex",
-                bg: "background",
-                position: "sticky",
-                top: 0,
-                mb: 1,
-                zIndex: 2
-              }}
-            />
-          )}
-          <Titlebox readonly={readonly || false} />
-          <Header readonly={readonly} />
-          <AnimatedFlex
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isLoading ? 0 : 1 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+          <Flex
+            variant="columnFill"
+            className="editor"
+            sx={{
+              alignSelf: [
+                "stretch",
+                focusMode ? "center" : "stretch",
+                "center"
+              ],
+              maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
+              width: "100%"
+            }}
+            px={6}
+            onClick={onRequestFocus}
           >
-            {children}
-          </AnimatedFlex>
+            {!isMobile && (
+              <Box
+                id="editorToolbar"
+                sx={{
+                  display: readonly ? "none" : "flex",
+                  bg: "background",
+                  position: "sticky",
+                  top: 0,
+                  mb: 1,
+                  zIndex: 2
+                }}
+              />
+            )}
+            <Titlebox readonly={readonly || false} />
+            <Header readonly={readonly} />
+            <AnimatedFlex
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isLoading ? 0 : 1 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              {children}
+            </AnimatedFlex>
+          </Flex>
+        </FlexScrollContainer>
+        <Flex
+          id="editorSidebar"
+          sx={{
+            flexDirection: "column",
+            overflow: "hidden",
+            borderLeft: "1px solid var(--border)"
+          }}
+        >
+          <Document
+            file="/sample.pdf"
+            onLoadSuccess={() => {}}
+            onLoadError={console.error}
+          >
+            <Page pageNumber={1} />
+          </Document>
         </Flex>
-      </FlexScrollContainer>
-
+      </Flex>
       {isMobile && (
         <Box
           id="editorToolbar"
