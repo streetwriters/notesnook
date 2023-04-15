@@ -222,7 +222,7 @@ export default function ReminderSheet({
     <View
       style={{
         paddingHorizontal: 12,
-        maxHeight: DDS.isTab ? "90%" : "97%"
+        maxHeight: DDS.isTab ? "90%" : "99.99%"
       }}
     >
       <View
