@@ -50,15 +50,14 @@ export function ColorTool(props: ColorToolProps) {
   const [colors, setColors] = useState(
     config.get<string[]>(`custom_${cacheKey}`, []) || []
   );
-  const position = useMemo(() => {
-    const pos: PositionOptions = {
+  const position: PositionOptions = useMemo(() => {
+    return {
       isTargetAbsolute: true,
       target: getToolbarElement(),
       align: isBottom ? "center" : "end",
       location: isBottom ? "top" : "below",
       yOffset: 10
     };
-    return pos;
   }, [isBottom]);
 
   useEffect(() => {
