@@ -206,6 +206,7 @@ export function ImageComponent(
                       <ToolbarGroup
                         editor={editor}
                         tools={[
+                          hash ? "previewAttachment" : "none",
                           hash ? "downloadAttachment" : "none",
                           "imageAlignLeft",
                           float ? "none" : "imageAlignCenter",

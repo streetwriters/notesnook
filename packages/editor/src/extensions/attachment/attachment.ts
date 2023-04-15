@@ -166,6 +166,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
       previewAttachment:
         (attachment) =>
         ({ editor }) => {
+          if (!this.options.onPreviewAttachment) return false;
           return this.options.onPreviewAttachment(editor, attachment);
         }
     };

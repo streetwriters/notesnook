@@ -64,9 +64,7 @@ export function DownloadAttachment(props: ToolProps) {
 
 export function PreviewAttachment(props: ToolProps) {
   const { editor } = props;
-  const isBottom = useToolbarLocation() === "bottom";
-
-  if (!editor.isActive("image") || !isBottom) return null;
+  if (!editor.isActive("image")) return null;
 
   return (
     <ToolButton
@@ -78,7 +76,7 @@ export function PreviewAttachment(props: ToolProps) {
           findSelectedNode(editor, "image");
 
         const attachment = (attachmentNode?.attrs || {}) as Attachment;
-        editor.current?.chain().focus().previewAttachment(attachment).run();
+        editor.current?.commands.previewAttachment(attachment);
       }}
     />
   );
