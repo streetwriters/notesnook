@@ -34,23 +34,25 @@ import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-let toastMessages = [];
 export const Toast = ({ context = "global" }) => {
   const colors = useThemeStore((state) => state.colors);
   const [data, setData] = useState({});
   const insets = useGlobalSafeAreaInsets();
   const hideTimeout = useRef();
   const [visible, setVisible] = useState(false);
+  const toastMessages = useRef([]);
 
   const show = useCallback(
     async (data) => {
       if (!data) return;
       if (data.context !== context) return;
-      if (toastMessages.findIndex((m) => m.message === data.message) >= 0) {
+      if (
+        toastMessages.current.findIndex((m) => m.message === data.message) >= 0
+      ) {
         return;
       }
-      toastMessages.push(data);
-      if (toastMessages?.length > 1) return;
+      toastMessages.current.push(data);
+      if (toastMessages.current?.length > 1) return;
       setData(data);
 
       setVisible(true);
@@ -85,7 +87,8 @@ export const Toast = ({ context = "global" }) => {
     if (hideTimeout.current) {
       clearTimeout(hideTimeout.current);
     }
-    let msg = toastMessages.length > 1 ? toastMessages.shift() : null;
+    let msg =
+      toastMessages.current.length > 1 ? toastMessages.current.shift() : null;
 
     if (msg) {
       setVisible(false);
@@ -95,7 +98,7 @@ export const Toast = ({ context = "global" }) => {
       }, 300);
     } else {
       setVisible(false);
-      toastMessages.shift();
+      toastMessages.current.shift();
       setTimeout(() => {
         setData({});
         if (hideTimeout.current) {
@@ -106,11 +109,10 @@ export const Toast = ({ context = "global" }) => {
   }, [next]);
 
   useEffect(() => {
-    toastMessages = [];
     eSubscribeEvent(eShowToast, show);
     eSubscribeEvent(eHideToast, hide);
     return () => {
-      toastMessages = [];
+      toastMessages.current = [];
       eUnSubscribeEvent(eShowToast, show);
       eUnSubscribeEvent(eHideToast, hide);
     };
@@ -119,12 +121,7 @@ export const Toast = ({ context = "global" }) => {
   return (
     visible && (
       <TouchableOpacity
-        onPress={() => {
-          if (hideTimeout.current) {
-            clearTimeout(hideTimeout.current);
-          }
-          hide();
-        }}
+        onPress={hide}
         activeOpacity={1}
         style={{
           width: DDS.isTab ? 400 : "100%",
