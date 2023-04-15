@@ -110,6 +110,7 @@ const onEvent = async ({ type, detail }: Event) => {
     await initDatabase();
     if (notification?.data?.type === "reminder") {
       const reminder = db.reminders?.reminder(notification.id?.split("_")[0]);
+      if (!reminder) return;
       await sleep(1000);
       const ReminderNotify =
         require("../components/sheets/reminder-notify").default;
