@@ -312,6 +312,7 @@ export default function ReminderSheet({
                 );
                 if (mode === "Repeat") {
                   setSelectedDays((days) => {
+                    if (days.length > 0) return days;
                     if (days.indexOf(date.getDay()) > -1) {
                       return days;
                     }
