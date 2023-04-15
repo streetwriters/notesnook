@@ -56,6 +56,7 @@
     "react-hot-toast": "^2.2.0",
     "react-loading-skeleton": "^3.1.0",
     "react-modal": "^3.12.1",
+    "react-pdf": "^6.2.2",
     "react-qrcode-logo": "^2.2.1",
     "react-scripts": "^5.0.1",
     "react-scroll-sync": "^0.9.0",

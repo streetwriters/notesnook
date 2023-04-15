@@ -197,7 +197,11 @@ import {
   mdiFileVideoOutline,
   mdiWeb,
   mdiUploadOutline,
-  mdiLinkOff
+  mdiLinkOff,
+  mdiMagnifyPlusOutline,
+  mdiMagnifyMinusOutline,
+  mdiRotateRight,
+  mdiRotateLeft
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -490,3 +494,8 @@ export const FileVideo = createIcon(mdiFileVideoOutline);
 export const FileGeneral = createIcon(mdiFileOutline);
 export const FileWebClip = createIcon(mdiWeb);
 export const Unlink = createIcon(mdiLinkOff);
+export const ZoomIn = createIcon(mdiMagnifyPlusOutline);
+export const ZoomOut = createIcon(mdiMagnifyMinusOutline);
+export const RotateCW = createIcon(mdiRotateRight);
+export const RotateACW = createIcon(mdiRotateLeft);
+export const Reset = createIcon(mdiRestore);
