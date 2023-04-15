@@ -317,7 +317,6 @@ export const settingsGroups: SettingSection[] = [
                       await PremiumService.setPremiumStatus();
                       await BiometicService.resetCredentials();
                       MMKV.clearStore();
-                      await db.init();
                       await clearAllStores();
                       SettingsService.init();
                       setTimeout(() => {

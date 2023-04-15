@@ -47,7 +47,7 @@ import { getElevation } from "../app/utils";
 import { eOnLoadNote } from "../app/utils/events";
 import { sleep } from "../app/utils/time";
 import { Search } from "./search";
-import { useShareStore } from "./store";
+import { initDatabase, useShareStore } from "./store";
 import { Editor } from "./editor";
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
@@ -314,8 +314,7 @@ const ShareView = ({ quicknote = false }) => {
 
   const onPress = async () => {
     setLoading(true);
-    await db.init();
-    await db.notes.init();
+    await initDatabase();
     await sleep(1500);
     if (!noteContent.current) return;
     if (appendNote && !db.notes.note(appendNote.id)) {

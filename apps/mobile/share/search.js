@@ -32,7 +32,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../app/common/database";
 import { getElevation } from "../app/utils";
-import { useShareStore } from "./store";
+import { initDatabase, useShareStore } from "./store";
 
 const ListItem = ({ item, mode, close }) => {
   const colors = useShareStore((state) => state.colors);
@@ -226,8 +226,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
 
   const onSearch = async () => {
     if (!searchableItems.current) {
-      await db.init();
-      await db.notes.init();
+      await initDatabase();
       searchableItems.current = get();
     }
     if (timer.current) {
@@ -248,8 +247,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
 
   useEffect(() => {
     (async () => {
-      await db.init();
-      await db.notes.init();
+      await initDatabase();
       searchableItems.current = get();
       setSearchResults(searchableItems.current);
     })();
