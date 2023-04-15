@@ -46,9 +46,10 @@ export function WebClipFullScreen(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() => {
-        const dom = editor.current?.view.nodeDOM(
-          selectionToOffset(editor.state).from
-        );
+        const offset = selectionToOffset(editor.state);
+        if (!offset) return;
+
+        const dom = editor.current?.view.nodeDOM(offset.from);
         if (!dom || !(dom instanceof HTMLElement)) return;
 
         const iframe = dom.querySelector("iframe");
@@ -70,9 +71,10 @@ export function WebClipOpenExternal(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={async () => {
-        const dom = editor.current?.view.nodeDOM(
-          selectionToOffset(editor.state).from
-        );
+        const offset = selectionToOffset(editor.state);
+        if (!offset) return;
+
+        const dom = editor.current?.view.nodeDOM(offset.from);
         if (!dom || !(dom instanceof HTMLElement)) return;
 
         const iframe = dom.querySelector("iframe");
