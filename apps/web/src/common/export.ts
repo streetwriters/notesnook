@@ -19,10 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { db } from "./db";
 import { TaskManager } from "./task-manager";
-import { zip } from "../utils/zip";
 import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
 import { sanitizeFilename } from "../utils/filename";
+import { NoteFile, exportStream } from "../utils/export-stream";
 
 export async function exportToPDF(
   title: string,
@@ -57,12 +57,12 @@ export async function exportNotes(
       if (format === "pdf") {
         const note = db.notes?.note(noteIds[0]);
         if (!note) return false;
-        const html = await note.export("html", null);
+        const html = await note.export("pdf", note.title, null);
         if (!html) return false;
         return await exportToPDF(note.title, html);
       }
 
-      const files = [];
+      let files: NoteFile[] = [];
       let index = 0;
       for (const noteId of noteIds) {
         const note = db.notes?.note(noteId);
@@ -73,22 +73,21 @@ export async function exportNotes(
           text: `Exporting "${note.title}"...`
         });
 
-        const content = await note.export(format, null).catch((e: Error) => {
-          showToast("error", e.message);
-        });
-        if (!content) continue;
-        files.push({ filename: note.title, content });
+        const content = await note
+          .export(format, note.title, null)
+          .catch((e: Error) => {
+            showToast("error", e.message);
+          });
+        files = [...files, ...(content as any)]; //added any to solve some type glitch
       }
-
-      if (!files.length) return false;
-      if (files.length === 1) {
-        saveAs(
-          new Blob([Buffer.from(files[0].content, "utf-8")]),
-          `${sanitizeFilename(files[0].filename)}.${format}`
-        );
+      if (files.length == 1) {
+        files[0].noteContent &&
+          saveAs(
+            new Blob([Buffer.from(files[0].noteContent, "utf-8")]),
+            `${sanitizeFilename(files[0].path)}`
+          );
       } else {
-        const zipped = await zip(files, format);
-        saveAs(new Blob([zipped.buffer]), "notes.zip");
+        await exportStream(files);
       }
       return true;
     }
