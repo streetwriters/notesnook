@@ -105,6 +105,8 @@ export function EditLink(props: ToolProps) {
 
   const onDone = useCallback(
     (link: LinkDefinition) => {
+      if (!selectedNode.current) return;
+
       const { href, text, isImage } = link;
       const { from, node, to } = selectedNode.current;
       if (!href || !editor.current || !node) return;
@@ -117,6 +119,7 @@ export function EditLink(props: ToolProps) {
       let commandChain = editor.current.chain();
 
       if (!isImage) {
+        console.log(from, to);
         commandChain = commandChain.command(({ tr }) => {
           tr.removeMark(from, to, mark.type);
           tr.insertText(
@@ -161,6 +164,8 @@ export function EditLink(props: ToolProps) {
       isEditing
       onDone={onDone}
       onClick={() => {
+        if (!selectedNode.current) return;
+
         const { node } = selectedNode.current;
         if (!node) return;
 
@@ -202,7 +207,7 @@ export function OpenLink(props: ToolProps) {
   const selectedNode = useRefValue(
     _selectedNode || selectionToOffset(editor.state)
   );
-  const { node } = selectedNode.current;
+  const { node } = selectedNode.current || {};
   const link = node ? findMark(node, "link") : null;
   if (!link) return null;
   const href = link?.attrs.href;
