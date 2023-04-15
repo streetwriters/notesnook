@@ -637,7 +637,7 @@ function indentOnEnter(editor: Editor, $from: ResolvedPos, options: Indent) {
   return editor
     .chain()
     .insertContent(`${newline}${indentation}`, {
-      parseOptions: { preserveWhitespace: true }
+      parseOptions: { preserveWhitespace: "full" }
     })
     .focus()
     .run();
