@@ -19,25 +19,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
+import { FlatList } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
 import { presentSheet } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
-import DialogHeader from "../dialog/dialog-header";
+import SheetProvider from "../sheet-provider";
+import { IconButton } from "../ui/icon-button";
 import Input from "../ui/input";
 import Seperator from "../ui/seperator";
+import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { AttachmentItem } from "./attachment-item";
-import { FlatList } from "react-native-actions-sheet";
+import DownloadAttachments from "./download-attachments";
 
-export const AttachmentDialog = ({ data }) => {
+export const AttachmentDialog = ({ note }) => {
   const colors = useThemeStore((state) => state.colors);
-  const [note, setNote] = useState(data);
   const [attachments, setAttachments] = useState(
-    data
-      ? db.attachments.ofNote(data.id, "all")
+    note
+      ? db.attachments.ofNote(note.id, "all")
       : [...(db.attachments.all || [])]
   );
   const attachmentSearchValue = useRef();
@@ -67,6 +69,20 @@ export const AttachmentDialog = ({ data }) => {
     <AttachmentItem setAttachments={setAttachments} attachment={item} />
   );
 
+  const onCheck = async () => {
+    setLoading(true);
+    for (let attachment of attachments) {
+      let result = await filesystem.checkAttachment(attachment.metadata.hash);
+      if (result.failed) {
+        db.attachments.markAsFailed(attachment.metadata.hash, result.failed);
+      } else {
+        db.attachments.markAsFailed(attachment.id, null);
+      }
+      setAttachments([...db.attachments.all]);
+    }
+    setLoading(false);
+  };
+
   return (
     <View
       style={{
@@ -75,33 +91,52 @@ export const AttachmentDialog = ({ data }) => {
         paddingHorizontal: 12
       }}
     >
-      <DialogHeader
-        title={note ? "Attachments" : "Manage attachments"}
-        paragraph="Tap on an attachment to view properties"
-        button={{
-          title: "Check all",
-          type: "grayAccent",
-          loading: loading,
-          onPress: async () => {
-            setLoading(true);
-            for (let attachment of attachments) {
-              let result = await filesystem.checkAttachment(
-                attachment.metadata.hash
-              );
-              if (result.failed) {
-                db.attachments.markAsFailed(
-                  attachment.metadata.hash,
-                  result.failed
-                );
-              } else {
-                db.attachments.markAsFailed(attachment.id, null);
-              }
-              setAttachments([...db.attachments.all]);
-            }
-            setLoading(false);
-          }
+      <SheetProvider context="attachments-list" />
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center"
         }}
-      />
+      >
+        <Heading>Attachments</Heading>
+
+        <View
+          style={{
+            flexDirection: "row"
+          }}
+        >
+          <IconButton
+            name="check-all"
+            customStyle={{
+              height: 40,
+              width: 40,
+              marginRight: 10
+            }}
+            color={colors.pri}
+            size={SIZE.lg}
+            onPress={onCheck}
+          />
+
+          <IconButton
+            name="download"
+            customStyle={{
+              height: 40,
+              width: 40
+            }}
+            color={colors.pri}
+            onPress={() => {
+              DownloadAttachments.present(
+                "attachments-list",
+                attachments,
+                !!note
+              );
+            }}
+            size={SIZE.lg}
+          />
+        </View>
+      </View>
+
       <Seperator />
       {!note ? (
         <Input
@@ -162,6 +197,6 @@ export const AttachmentDialog = ({ data }) => {
 
 AttachmentDialog.present = (note) => {
   presentSheet({
-    component: () => <AttachmentDialog data={note} />
+    component: () => <AttachmentDialog note={note} />
   });
 };
