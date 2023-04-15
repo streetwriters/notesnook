@@ -17,23 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { FlashList } from "@shopify/flash-list";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Platform,
   StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
-  useWindowDimensions,
-  View
+  View,
+  useWindowDimensions
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../app/common/database";
 import { getElevation } from "../app/utils";
 import { useShareStore } from "./store";
-import { FlashList } from "@shopify/flash-list";
 
 const ListItem = ({ item, mode, close }) => {
   const colors = useShareStore((state) => state.colors);
