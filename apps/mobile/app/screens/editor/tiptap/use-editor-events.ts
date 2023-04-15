@@ -157,7 +157,7 @@ export const useEditorEvents = (
       keyboardShown: keyboardShown || false,
       doubleSpacedLines: doubleSpacedLines,
       corsProxy: corsProxy,
-      fontSize: defaultFontSize + "px",
+      fontSize: defaultFontSize,
       fontFamily: defaultFontFamily
     });
   }, [

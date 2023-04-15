@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import notifee from "@notifee/react-native";
+
 import dayjs from "dayjs";
 import React from "react";
 import { Linking, Platform } from "react-native";
@@ -584,7 +585,6 @@ export const settingsGroups: SettingSection[] = [
             id: "default-font-family",
             name: "Default font family",
             description: "Set the default font family in editor",
-            options: ["serif", "sans-serif", "monospace"],
             type: "component",
             icon: "format-font",
             property: "defaultFontFamily",

@@ -26,8 +26,8 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { toTitleCase } from "../../utils";
 import { SIZE } from "../../utils/size";
+import { getFontById, getFonts } from "@notesnook/editor/dist/utils/font";
 
 export const FontSelector = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -79,29 +79,29 @@ export const FontSelector = () => {
               padding: 12
             }}
           >
-            <Paragraph>{toTitleCase(defaultFontFamily)}</Paragraph>
+            <Paragraph>{getFontById(defaultFontFamily).title}</Paragraph>
             <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
           </PressableButton>
         }
       >
-        {["sans-serif", "serif", "monospace"].map((item) => (
+        {getFonts().map((item) => (
           <MenuItem
-            key={item.toString()}
+            key={item.id}
             onPress={async () => {
-              onChange(item);
+              onChange(item.id);
             }}
             style={{
               backgroundColor:
-                defaultFontFamily === item ? colors.nav : "transparent",
+                defaultFontFamily === item.id ? colors.nav : "transparent",
               width: "100%",
               maxWidth: width
             }}
             textStyle={{
               fontSize: SIZE.md,
-              color: defaultFontFamily === item ? colors.accent : colors.pri
+              color: defaultFontFamily === item.id ? colors.accent : colors.pri
             }}
           >
-            {toTitleCase(item)}
+            {item.title}
           </MenuItem>
         ))}
       </Menu>

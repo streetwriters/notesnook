@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   Editor,
-  FONTS,
+  getFontById,
   PortalProvider,
   Toolbar,
   usePermissionHandler,
@@ -273,7 +273,7 @@ const Tiptap = ({
 const ContentDiv = memo(
   forwardRef<
     HTMLDivElement,
-    { padding: number; fontSize: string; fontFamily: string }
+    { padding: number; fontSize: number; fontFamily: string }
   >((props, ref) => {
     const theme = useEditorThemeStore((state) => state.colors);
     return (
@@ -286,7 +286,7 @@ const ContentDiv = memo(
           marginTop: -12,
           caretColor: theme.accent,
           fontSize: props.fontSize,
-          fontFamily: FONTS[props.fontFamily]
+          fontFamily: getFontById(props.fontFamily)?.font
         }}
       />
     );

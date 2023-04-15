@@ -17,11 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { RefObject, useEffect, useRef } from "react";
+import { getFontById } from "@notesnook/editor";
+import React, { RefObject, useEffect, useRef } from "react";
 import { EditorController } from "../hooks/useEditorController";
 import styles from "./styles.module.css";
-import { FONTS } from "@notesnook/editor";
 function Title({
   controller,
   title,
@@ -62,7 +61,7 @@ function Title({
         paddingRight: 12,
         paddingLeft: 12,
         fontWeight: 600,
-        fontFamily: FONTS[fontFamily] || "Open Sans",
+        fontFamily: getFontById(fontFamily)?.font || "Open Sans",
         backgroundColor: "transparent",
         color: "var(--nn_heading)",
         caretColor: "var(--nn_accent)",
