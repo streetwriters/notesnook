@@ -32,7 +32,7 @@ const errorMessage =
  * Returns the validity state of the given media query.
  *
  */
-const useMediaQuery = (mediaQuery) => {
+const useMediaQuery = (mediaQuery: string) => {
   if (!window.matchMedia) {
     // eslint-disable-next-line no-console
     console.warn(errorMessage);

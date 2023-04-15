@@ -94,7 +94,9 @@ export function showAddNotebookDialog() {
       isOpen={true}
       onDone={async (nb: Record<string, unknown>) => {
         // add the notebook to db
-        await db.notebooks?.add({ ...nb });
+        const notebook = await db.notebooks?.add({ ...nb });
+        if (!notebook) return perform(false);
+
         notebookStore.refresh();
 
         showToast("success", "Notebook added successfully!");
@@ -209,9 +211,8 @@ export function showError(title: string, message: string) {
 export function showMultiDeleteConfirmation(length: number) {
   return confirm({
     title: `Delete ${length} items?`,
-    message: `These items will be **kept in your Trash for ${
-      db.settings?.getTrashCleanupInterval() || 7
-    } days** after which they will be permanently deleted.`,
+    message: `These items will be **kept in your Trash for ${db.settings?.getTrashCleanupInterval() || 7
+      } days** after which they will be permanently deleted.`,
     positiveButtonText: "Yes",
     negativeButtonText: "No"
   });

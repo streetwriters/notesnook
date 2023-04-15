@@ -65,6 +65,7 @@ import { deleteItems } from "../../../utils/functions";
 import { presentDialog } from "../../dialog/functions";
 import { Properties } from "../../properties";
 import Sort from "../sort";
+import Heading from "../../ui/typography/heading";
 
 type ConfigItem = { id: string; type: string };
 class TopicSheetConfig {
