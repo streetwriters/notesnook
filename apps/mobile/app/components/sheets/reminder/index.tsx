@@ -21,9 +21,9 @@ import { Platform, TextInput, View } from "react-native";
 import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {
-  presentSheet,
   PresentSheetOptions,
-  ToastEvent
+  ToastEvent,
+  presentSheet
 } from "../../../services/event-manager";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
@@ -33,6 +33,7 @@ import Input from "../../ui/input";
 import dayjs from "dayjs";
 import DatePicker from "react-native-date-picker";
 import { db } from "../../../common/database";
+import { DDS } from "../../../services/device-detection";
 import Navigation from "../../../services/navigation";
 import Notifications, { Reminder } from "../../../services/notifications";
 import PremiumService from "../../../services/premium";
@@ -41,6 +42,7 @@ import { useRelationStore } from "../../../stores/use-relation-store";
 import { NoteType } from "../../../utils/types";
 import { Dialog } from "../../dialog";
 import { ReminderTime } from "../../ui/reminder-time";
+import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
 type ReminderSheetProps = {
@@ -219,35 +221,57 @@ export default function ReminderSheet({
   return (
     <View
       style={{
-        paddingHorizontal: 12
+        paddingHorizontal: 12,
+        maxHeight: DDS.isTab ? "90%" : "99.99%"
       }}
     >
+      <View
+        style={{
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
+      >
+        <Heading size={SIZE.lg}>Set reminder</Heading>
+        <Button
+          title="Save"
+          type="accent"
+          height={40}
+          style={{
+            borderRadius: 100,
+            paddingHorizontal: 24
+          }}
+          fontSize={SIZE.md}
+          onPress={saveReminder}
+        />
+      </View>
       <Dialog context="local" />
-      <ScrollView keyboardShouldPersistTaps="always">
+      <ScrollView>
         <Input
           fwdRef={titleRef}
           defaultValue={reminder?.title || referencedItem?.title}
           placeholder="Remind me of..."
           onChangeText={(text) => (title.current = text)}
-          containerStyle={{ borderWidth: 0, borderBottomWidth: 1 }}
+          wrapperStyle={{
+            marginTop: 10
+          }}
         />
 
         <Input
           defaultValue={
             reminder ? reminder?.description : referencedItem?.headline
           }
-          placeholder="Add a quick note"
+          placeholder="Add a short note"
           onChangeText={(text) => (details.current = text)}
           containerStyle={{
-            borderWidth: 0,
-            borderBottomWidth: 1,
-            maxHeight: 80,
-            marginTop: 10
+            maxHeight: 80
           }}
           multiline
           textAlignVertical="top"
           inputStyle={{
-            height: 80
+            minHeight: 80,
+            paddingVertical: 12
           }}
           height={80}
           wrapperStyle={{
@@ -432,6 +456,7 @@ export default function ReminderSheet({
               fadeToColor={colors.bg}
               theme={colors.night ? "dark" : "light"}
               is24hourSource="locale"
+              androidVariant="nativeAndroid"
               mode={reminderMode === ReminderModes.Repeat ? "time" : "datetime"}
             />
 
@@ -548,15 +573,6 @@ export default function ReminderSheet({
             alignSelf: "flex-start"
           }}
         />
-        <Button
-          style={{
-            width: "100%"
-          }}
-          title="Save"
-          type="accent"
-          fontSize={SIZE.md}
-          onPress={saveReminder}
-        />
       </ScrollView>
     </View>
   );
@@ -570,6 +586,7 @@ ReminderSheet.present = (
   presentSheet({
     context: isSheet ? "local" : undefined,
     enableGesturesInScrollView: true,
+    noBottomPadding: true,
     component: (ref, close, update) => (
       <ReminderSheet
         actionSheetRef={ref}

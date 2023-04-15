@@ -25,22 +25,22 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { FlatList } from "react-native-actions-sheet";
 import { notesnook } from "../../../../e2e/test.ids";
 import { db } from "../../../common/database";
 import { DDS } from "../../../services/device-detection";
-import { presentSheet, ToastEvent } from "../../../services/event-manager";
+import { ToastEvent, presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useMenuStore } from "../../../stores/use-menu-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
-import { ph, pv, SIZE } from "../../../utils/size";
+import { SIZE, ph, pv } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
-import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
+import Heading from "../../ui/typography/heading";
 import { MoveNotes } from "../move-notes/movenote";
-import { FlatList } from "react-native-actions-sheet";
 
 let refs = [];
 export class AddNotebookSheet extends React.Component {
@@ -245,13 +245,34 @@ export class AddNotebookSheet extends React.Component {
     willFocus && this.topicInputRef.current?.focus();
   };
 
+  renderTopicItem = ({ item, index }) => (
+    <TopicItem
+      item={item}
+      onPress={(item, index) => {
+        this.prevIndex = index;
+        this.prevItem = item;
+        this.topicInputRef.current?.setNativeProps({
+          text: item
+        });
+        this.topicInputRef.current?.focus();
+        this.currentInputValue = item;
+        this.setState({
+          editTopic: true
+        });
+      }}
+      onDelete={this.onDelete}
+      index={index}
+      colors={this.props.colors}
+    />
+  );
+
   render() {
     const { colors } = this.props;
     const { topics, topicInputFocused, notebook } = this.state;
     return (
       <View
         style={{
-          maxHeight: DDS.isTab ? "90%" : "96%",
+          maxHeight: DDS.isTab ? "90%" : "97%",
           borderRadius: DDS.isTab ? 5 : 0,
           paddingHorizontal: 12
         }}
@@ -266,17 +287,34 @@ export class AddNotebookSheet extends React.Component {
           }}
           blurOnSubmit={false}
         />
-        <DialogHeader
-          title={
-            notebook && notebook.dateCreated ? "Edit Notebook" : "New Notebook"
-          }
-          paragraph={
-            notebook && notebook.dateCreated
-              ? "You are editing " + this.title + " notebook."
-              : "Notebooks are the best way to organize your notes."
-          }
-        />
-        <Seperator half />
+
+        <View
+          style={{
+            flexDirection: "row",
+            width: "100%",
+            justifyContent: "space-between",
+            alignItems: "center"
+          }}
+        >
+          <Heading size={SIZE.lg}>
+            {notebook && notebook.dateCreated
+              ? "Edit Notebook"
+              : "New Notebook"}
+          </Heading>
+          <Button
+            title="Save"
+            type="accent"
+            height={40}
+            style={{
+              borderRadius: 100,
+              paddingHorizontal: 24
+            }}
+            fontSize={SIZE.md}
+            onPress={this.addNewNotebook}
+          />
+        </View>
+
+        <Seperator />
 
         <Input
           fwdRef={(ref) => (this.titleRef = ref)}
@@ -344,48 +382,11 @@ export class AddNotebookSheet extends React.Component {
           keyExtractor={(item, index) => item + index.toString()}
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="interactive"
-          ListFooterComponent={<View style={{ height: 50 }} />}
-          renderItem={({ item, index }) => (
-            <TopicItem
-              item={item}
-              onPress={(item, index) => {
-                this.prevIndex = index;
-                this.prevItem = item;
-                this.topicInputRef.current?.setNativeProps({
-                  text: item
-                });
-                this.topicInputRef.current?.focus();
-                this.currentInputValue = item;
-                this.setState({
-                  editTopic: true
-                });
-              }}
-              onDelete={this.onDelete}
-              index={index}
-              colors={colors}
-            />
-          )}
-        />
-        <Seperator />
-        <Button
-          width="100%"
-          fontSize={SIZE.md}
-          title={
-            notebook && notebook.dateCreated
-              ? "Save changes"
-              : "Create notebook"
+          ListFooterComponent={
+            topics.length === 0 ? null : <View style={{ height: 50 }} />
           }
-          type="accent"
-          onPress={this.addNewNotebook}
+          renderItem={this.renderTopicItem}
         />
-        {/* 
-          {Platform.OS === 'ios'  && (
-            <View
-              style={{
-                height: 40
-              }}
-            />
-          )} */}
       </View>
     );
   }
