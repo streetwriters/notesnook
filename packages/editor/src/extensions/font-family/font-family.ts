@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import "@tiptap/extension-text-style";
-import { getFontConfig } from "@notesnook/theme/dist/theme/font";
 import { Extension } from "@tiptap/core";
+import { getFontById } from "../../utils/font";
 
 export type FontFamilyOptions = {
   types: string[];
@@ -38,12 +38,6 @@ declare module "@tiptap/core" {
     };
   }
 }
-
-export const FONTS: Record<string, string> = {
-  monospace: getFontConfig().fonts.monospace,
-  "sans-serif": getFontConfig().fonts.body,
-  serif: `Noto Serif, Times New Roman, serif`
-};
 
 export const FontFamily = Extension.create<FontFamilyOptions>({
   name: "fontFamily",
@@ -70,7 +64,8 @@ export const FontFamily = Extension.create<FontFamilyOptions>({
 
               const realFontFamily =
                 attributes["data-font-family"] || attributes.fontFamily;
-              const font = FONTS[realFontFamily] || attributes.fontFamily;
+              const font =
+                getFontById(realFontFamily)?.font || attributes.fontFamily;
               return {
                 "data-font-family": realFontFamily,
                 style: `font-family: ${font}`

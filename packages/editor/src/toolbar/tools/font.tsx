@@ -21,17 +21,19 @@ import { ToolProps } from "../types";
 import { Editor } from "../../types";
 import { Dropdown } from "../components/dropdown";
 import { MenuItem } from "../../components/menu/types";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { Counter } from "../components/counter";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { useToolbarStore } from "../stores/toolbar-store";
+import { getFontById, getFontIds, getFonts } from "../../utils/font";
 
 export function FontSize(props: ToolProps) {
   const { editor } = props;
   const defaultFontSize = useToolbarStore((store) => store.fontSize);
-  const { fontSize: _fontSize } = editor.getAttributes("textStyle");
-  const fontSize = _fontSize || defaultFontSize;
-  const fontSizeAsNumber = useRefValue(parseInt(fontSize.replace("px", "")));
+  const { fontSize } = editor.getAttributes("textStyle");
+  const fontSizeAsNumber = useRefValue(
+    fontSize ? parseInt(fontSize.replace("px", "")) : defaultFontSize
+  );
 
   const decreaseFontSize = useCallback(() => {
     return Math.max(8, fontSizeAsNumber.current - 1);
@@ -59,46 +61,27 @@ export function FontSize(props: ToolProps) {
           .run();
       }}
       onReset={() =>
-        editor.current?.chain().focus().setFontSize(defaultFontSize).run()
+        editor.current
+          ?.chain()
+          .focus()
+          .setFontSize(`${defaultFontSize}px`)
+          .run()
       }
       value={fontSize}
     />
   );
 }
 
-interface CustomFonts {
-  [key: string]: string;
-}
-function fontFamilies(defaultFontFamily: string) {
-  const fonts: { [key: string]: string } = {
-    "Sans-serif": "Open Sans",
-    Serif: "serif",
-    Monospace: "monospace"
-  };
-
-  const customFonts: CustomFonts = {};
-  customFonts[defaultFontFamily] = fonts[defaultFontFamily];
-
-  Object.entries(fonts).map(([key, value]) => {
-    if (key !== defaultFontFamily) customFonts[key] = value;
-  });
-  return customFonts;
-}
-
 export function FontFamily(props: ToolProps) {
   const { editor } = props;
   const defaultFontFamily = useToolbarStore((store) => store.fontFamily);
-  const customFonts = fontFamilies(defaultFontFamily);
   const currentFontFamily =
-    Object.entries(customFonts)
-      .find(([_key, value]) =>
-        editor.isActive("textStyle", { fontFamily: value })
-      )
-      ?.map((a) => a)
-      ?.at(0) || defaultFontFamily;
+    getFontIds().find((id) =>
+      editor.isActive("textStyle", { fontFamily: id })
+    ) || defaultFontFamily;
 
   const items = useMemo(
-    () => toMenuItems(editor, currentFontFamily, customFonts),
+    () => toMenuItems(editor, currentFontFamily),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentFontFamily]
   );
@@ -107,29 +90,25 @@ export function FontFamily(props: ToolProps) {
     <Dropdown
       id="fontFamily"
       group="font"
-      selectedItem={currentFontFamily}
+      selectedItem={getFontById(currentFontFamily)?.title || defaultFontFamily}
       items={items}
       menuWidth={130}
     />
   );
 }
 
-function toMenuItems(
-  editor: Editor,
-  currentFontFamily: string,
-  customFonts: CustomFonts
-): MenuItem[] {
+function toMenuItems(editor: Editor, currentFontFamily: string): MenuItem[] {
   const menuItems: MenuItem[] = [];
-  for (const key in customFonts) {
-    const value = customFonts[key as keyof typeof customFonts];
+  for (const font of getFonts()) {
     menuItems.push({
-      key,
+      key: font.id,
       type: "button",
-      title: key,
-      isChecked: key === currentFontFamily,
-      onClick: () => editor.current?.chain().focus().setFontFamily(value).run(),
+      title: font.title,
+      isChecked: font.id === currentFontFamily,
+      onClick: () =>
+        editor.current?.chain().focus().setFontFamily(font.id).run(),
       styles: {
-        fontFamily: value
+        fontFamily: font.font
       }
     });
   }

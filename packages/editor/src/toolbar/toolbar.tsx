@@ -42,7 +42,7 @@ type ToolbarProps = FlexProps & {
   location: ToolbarLocation;
   tools?: ToolbarDefinition;
   defaultFontFamily: string;
-  defaultFontSize: string;
+  defaultFontSize: number;
 };
 
 export function Toolbar(props: ToolbarProps) {
