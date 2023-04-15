@@ -58,7 +58,7 @@ test("codeblocks should get highlighted after pasting", async () => {
   });
 
   editor.commands.setContent(CODEBLOCKS_HTML, true, {
-    preserveWhitespace: "full"
+    preserveWhitespace: true
   });
 
   await new Promise((resolve) => setTimeout(resolve, 100));
@@ -191,6 +191,26 @@ test("editing code in a highlighted code block should not be too slow", async ()
 
   expect(timings.reduce((a, b) => a + b) / timings.length).toBeLessThan(16);
   expect(editorElement.outerHTML).toMatchSnapshot();
+});
+
+test("Adding a new codeblock & changing the language should apply the new highlighting", async () => {
+  const editorElement = h("div");
+  const { editor } = createEditor({
+    element: editorElement,
+    extensions: {
+      codeblock: CodeBlock
+    }
+  });
+
+  editor.commands.setCodeBlock();
+  editor.commands.insertContent("function hello() { }");
+
+  editor.commands.updateAttributes(CodeBlock.name, { language: "javascript" });
+
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  expect(editorElement.outerHTML).toMatchSnapshot();
+  expect(refractor.registered("javascript")).toBe(true);
 });
 
 test("Switching codeblock language should register the new language", async () => {
