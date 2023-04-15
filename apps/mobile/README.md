@@ -19,9 +19,9 @@
 
 ## Build instructions
 
-> **Before you start it is recommended that you read [the contributing guidelines](/CONTRIBUTING.md).**
+> **Before you start, it is recommended that you read [the contributing guidelines](/CONTRIBUTING.md).**
 
-### Setting up development environment
+### Setting up the development environment
 
 Requirements:
 
@@ -57,7 +57,7 @@ npm install
 
 ### Running the app on Android
 
-[Setup an Android emulator from Android Studio](https://developer.android.com/studio/run/managing-avds) if you haven't already and then run the following command to start the app in the Emulator:
+[Setup an Android emulator from Android Studio](https://developer.android.com/studio/run/managing-avds) if you haven't already, and then run the following command to start the app in the Emulator:
 
 ```bash
 npm run start:android
@@ -78,11 +78,11 @@ npm run start:ios
 
 ## Developer guide
 
-> This project is in a transition state between Javascript & Typescript. We are gradually porting everything over to Typescript so if you can help with that, it'd be great!
+> This project is in a transition state between Javascript & Typescript. We are gradually porting everything over to Typescript, so if you can help with that, it'd be great!
 
 ### The tech stack
 
-We try to keep the stack as lean as possible
+We try to keep the stack as lean as possible:
 
 1. React Native
 2. Typescript/Javascript
@@ -95,17 +95,17 @@ We try to keep the stack as lean as possible
 
 The app codebase is distributed over two primary directories. `native/` and `app/`.
 
-- `native/`: Includes `android/` and `ios/` folders and everything related to react native core functionality like bundling, development and packaging. Any react-native dependency that has native code i.e android & ios folders, is installed here.
+- `native/`: Includes `android/` and `ios/` folders and everything related to react native core functionality like bundling, development, and packaging. Any react-native dependency with native code, i.e., android & ios folders, is installed here.
 
-- `app/`: Includes all the app code other than the native part. All JS only dependencies are installed here.
-  - `components/`: Each component serves a specific purpose in the app UI, for example the `Paragraph` component is used to render paragraphs in the app and a `Header` component is used to render a `header` on all screens.
-  - `common/`: Features that have integral role in app functionality, for example, notesnook core is initialized here.
+- `app/`: Includes all the app code other than the native part. All JS-only dependencies are installed here.
+  - `components/`: Each component serves a specific purpose in the app UI. For example, the `Paragraph` component is used to render paragraphs in the app, and a `Header` component is used to render a `header` on all screens.
+  - `common/`: Features that are integral to the app's functionality. For example, the notesnook core is initialized here.
   - `hooks/`: Hooks for different app logic
-  - `navigation/`: Includes app navigation specific code. Here the app navigation, editor & side menu are rendered side by side in fluid tabs.
+  - `navigation/`: Includes app navigation-specific code. Here the app navigation, editor & side menu are rendered side by side in fluid tabs.
   - `screens`: Navigator screens.
-  - `services`: Parts of code that do a specific function, for example, the `sync` service is responsibe for running Sync from anywhere in the app.
-  - `stores`: We use `zustand` for global state management in the app. There are multiple stores that provide the state for different parts of the app.
-  - `utils`: General purpose stuff such as constant values, utility functions etc.
+  - `services`: Parts of code that do a specific function. For example, the `sync` service runs Sync from anywhere in the app.
+  - `stores`: We use `zustand` for global state management in the app. Multiple stores provide the state for different parts of the app.
+  - `utils`: General purpose stuff such as constant values, utility functions, etc.
 
 There are several other folders at the root:
 
@@ -115,11 +115,11 @@ There are several other folders at the root:
 
 ### Running the tests
 
-When you are done making the required changes, you will need to run the tests to make sure you didn't break anything. We use Detox as the testing framework & the tests can be started as follows:
+When you are done making the required changes, you must run the tests to ensure you didn't break anything. We use Detox as the testing framework & the tests can be started as follows:
 
 ### Android
 
-To run the tests on android, you will need to create an emulator device on your system:
+To run the tests on Android, you will need to create an emulator device on your system:
 
 ```
 $ANDROID_HOME/tools/bin/avdmanager create avd -n Pixel_5_API_31 -d pixel --package "system-images;android-31;default;x86_64"
@@ -127,13 +127,13 @@ $ANDROID_HOME/tools/bin/avdmanager create avd -n Pixel_5_API_31 -d pixel --packa
 
 If you face problems, follow the detailed guide in [Detox documentation](https://wix.github.io/Detox/docs/introduction/android-dev-env). Keep the emulator name set to `Pixel_5_API_31`.
 
-Once you have created an emulator device, build the android apks
+Once you have created an emulator device, build the Android apks:
 
 ```
 npm run build:android
 ```
 
-Finally run the tests
+Finally, run the tests:
 
 ```
 npm run test:android
@@ -141,9 +141,9 @@ npm run test:android
 
 ### iOS
 
-To run e2e tests on iOS simulator, you must be on a Mac with XCode installed.
+To run e2e tests on the iOS simulator, you must be on a Mac with XCode installed.
 
-First install [AppleSimulatorUtils](https://github.com/wix/AppleSimulatorUtils)
+First, install [AppleSimulatorUtils](https://github.com/wix/AppleSimulatorUtils):
 
 ```
 brew tap wix/brew
@@ -156,7 +156,7 @@ Now build the iOS app for testing:
 npm run build:ios
 ```
 
-Finally run the tests:
+Finally, run the tests:
 
 ```
 npm run test:ios
