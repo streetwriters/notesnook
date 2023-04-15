@@ -200,7 +200,8 @@ export default function ReminderSheet({
 
       if (!_reminder) {
         ToastEvent.show({
-          heading: "Failed to add a new reminder"
+          heading: "Failed to add a new reminder",
+          context: "local"
         });
       }
       if (reference) {
@@ -214,7 +215,7 @@ export default function ReminderSheet({
       useRelationStore.getState().update();
       close?.();
     } catch (e) {
-      ToastEvent.error(e as Error);
+      ToastEvent.error(e as Error, undefined, "local");
     }
   }
 
@@ -309,6 +310,15 @@ export default function ReminderSheet({
                     mode as keyof typeof ReminderModes
                   ] as Reminder["mode"]
                 );
+                if (mode === "Repeat") {
+                  setSelectedDays((days) => {
+                    if (days.indexOf(date.getDay()) > -1) {
+                      return days;
+                    }
+                    days.push(date.getDay());
+                    return [...days];
+                  });
+                }
               }}
             />
           ))}
