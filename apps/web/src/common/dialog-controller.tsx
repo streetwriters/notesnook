@@ -94,7 +94,9 @@ export function showAddNotebookDialog() {
       isOpen={true}
       onDone={async (nb: Record<string, unknown>) => {
         // add the notebook to db
-        await db.notebooks?.add({ ...nb });
+        const notebook = await db.notebooks?.add({ ...nb });
+        if (!notebook) return perform(false);
+
         notebookStore.refresh();
 
         showToast("success", "Notebook added successfully!");
