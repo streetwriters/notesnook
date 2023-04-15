@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useState } from "react";
 import { initializeDatabase } from "../common/db";
 import "../utils/analytics";
+import "../app.css";
 
 if (process.env.NODE_ENV === "production") {
   console.log = () => {};
@@ -35,7 +36,6 @@ export default function useDatabase(persistence?: "db" | "memory") {
     if (memory.isAppLoaded) return;
 
     (async () => {
-      await import("../app.css" as string);
       await initializeDatabase(persistence);
       setIsAppLoaded(true);
       memory.isAppLoaded = true;
