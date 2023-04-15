@@ -23,7 +23,8 @@ import { useStore, store } from "../../stores/editor-store";
 import { debounceWithId } from "../../utils/debounce";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
-import { FONTS } from "@notesnook/editor";
+import { useEditorConfig } from "./context";
+import { getFontById } from "@notesnook/editor";
 
 type TitleBoxProps = {
   readonly: boolean;
@@ -36,7 +37,7 @@ function TitleBox(props: TitleBoxProps) {
   const id = useStore((store) => store.session.id);
   const isMobile = useMobile();
   const isTablet = useTablet();
-  const fontFamily = useStore((store) => store.session.fontFamily);
+  const { editorConfig } = useEditorConfig();
 
   const MAX_FONT_SIZE = useMemo(() => {
     return isMobile || isTablet ? 1.625 : 2.625;
@@ -68,7 +69,7 @@ function TitleBox(props: TitleBoxProps) {
       readOnly={readonly}
       sx={{
         p: 0,
-        fontFamily: FONTS[fontFamily] || "heading",
+        fontFamily: getFontById(editorConfig.fontFamily)?.font || "heading",
         fontSize: ["1.625em", "1.625em", "2.625em"],
         fontWeight: "heading",
         width: "100%"

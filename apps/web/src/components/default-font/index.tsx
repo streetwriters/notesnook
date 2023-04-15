@@ -25,70 +25,70 @@ import { toTitleCase } from "../../utils/string";
 import DropdownButton from "../dropdown-button";
 
 export function DefaultFont() {
-  const { setFontSize, setFontFamily } = useEditorStore((store) => store);
-  const fontSize = useEditorStore((store) => store.session.fontSize);
+  return null;
+  // const fontSize = useEditorStore((store) => store.session.fontSize);
   //const fontFamily = useEditorStore((store) => store.session.fontFamily);
 
-  const fonts = ["sans-serif", "serif", "monospace"];
-  const getOptions = () =>
-    getFonts(Config.get("fontFamily", "sans-serif")).map((font) => ({
-      title: () => toTitleCase(font),
-      onClick: () => {
-        const newFonts = [font];
-        for (const item of fonts) {
-          if (item !== font) {
-            newFonts.push(item);
-          }
-        }
-        Config.set("fontFamily", font);
-        setFontFamily(font);
-        setOptions(getOptions());
-      },
-      key: font
-    }));
+  // const fonts = ["sans-serif", "serif", "monospace"];
+  // const getOptions = () =>
+  //   getFonts(Config.get("fontFamily", "sans-serif")).map((font) => ({
+  //     title: () => toTitleCase(font),
+  //     onClick: () => {
+  //       const newFonts = [font];
+  //       for (const item of fonts) {
+  //         if (item !== font) {
+  //           newFonts.push(item);
+  //         }
+  //       }
+  //       Config.set("fontFamily", font);
+  //       setFontFamily(font);
+  //       setOptions(getOptions());
+  //     },
+  //     key: font
+  //   }));
 
-  const [options, setOptions] = useState(getOptions());
+  // const [options, setOptions] = useState(getOptions());
 
-  return (
-    <Flex sx={{ justifyContent: "space-evenly", flexWrap: "wrap" }}>
-      <Flex sx={{ flex: 3, minWidth: 100 }}>
-        <Slider
-          min={8}
-          max={120}
-          defaultValue={parseInt(fontSize.replace("px", ""))}
-          step={1}
-          onChange={(e) => {
-            setFontSize(`${parseInt(e.target.value)}px`);
-            Config.set("fontSize", `${e.target.value}px`);
-          }}
-          sx={{ width: "75%" }}
-        />
-        <Text
-          sx={{
-            width: "25%",
-            fontSize: "12px",
-            textAlign: "center"
-          }}
-        >
-          {fontSize}
-        </Text>
-      </Flex>
-      <DropdownButton
-        options={options}
-        title="Font Family"
-        sx={{
-          flex: 1,
-          minWidth: 100
-        }}
-        buttonStyle={{
-          width: "80%"
-        }}
-        chevronStyle={{
-          width: "20%"
-        }}
-      />
-    </Flex>
-  );
+  // return (
+  //   <Flex sx={{ justifyContent: "space-evenly", flexWrap: "wrap" }}>
+  //     <Flex sx={{ flex: 3, minWidth: 100 }}>
+  //       <Slider
+  //         min={8}
+  //         max={120}
+  //         defaultValue={parseInt(fontSize.replace("px", ""))}
+  //         step={1}
+  //         onChange={(e) => {
+  //           setFontSize(`${parseInt(e.target.value)}px`);
+  //           Config.set("fontSize", `${e.target.value}px`);
+  //         }}
+  //         sx={{ width: "75%" }}
+  //       />
+  //       <Text
+  //         sx={{
+  //           width: "25%",
+  //           fontSize: "12px",
+  //           textAlign: "center"
+  //         }}
+  //       >
+  //         {fontSize}
+  //       </Text>
+  //     </Flex>
+  //     <DropdownButton
+  //       options={options}
+  //       title="Font Family"
+  //       sx={{
+  //         flex: 1,
+  //         minWidth: 100
+  //       }}
+  //       buttonStyle={{
+  //         width: "80%"
+  //       }}
+  //       chevronStyle={{
+  //         width: "20%"
+  //       }}
+  //     />
+  //   </Flex>
+  // );
 }
 
 function getFonts(font: string) {

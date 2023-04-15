@@ -253,8 +253,6 @@ export function Editor(props: EditorProps) {
     focusMode: false,
     isMobile: false
   };
-  const fontSize = useStore((store) => store.session.fontSize);
-  const fontFamily = useStore((store) => store.session.fontFamily);
   const [isLoading, setIsLoading] = useState(true);
 
   const editor = useEditorInstance();
@@ -302,8 +300,6 @@ export function Editor(props: EditorProps) {
   return (
     <EditorChrome isLoading={isLoading} {...props}>
       <Tiptap
-        fontSize={fontSize}
-        fontFamily={fontFamily}
         isMobile={isMobile}
         nonce={nonce}
         readonly={readonly}

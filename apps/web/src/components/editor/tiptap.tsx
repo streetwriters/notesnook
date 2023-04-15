@@ -36,7 +36,7 @@ import {
   type DownloadOptions,
   getTotalWords,
   countWords,
-  FONTS
+  getFontById
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
@@ -46,7 +46,8 @@ import {
   useConfigureEditor,
   useSearch,
   useToolbarConfig,
-  configureEditor
+  configureEditor,
+  useEditorConfig
 } from "./context";
 import { createPortal } from "react-dom";
 import { getCurrentPreset } from "../../common/toolbar-config";
@@ -72,7 +73,7 @@ type TipTapProps = {
   theme: Theme;
   isMobile?: boolean;
   downloadOptions?: DownloadOptions;
-  fontSize: string;
+  fontSize: number;
   fontFamily: string;
 };
 
@@ -323,13 +324,20 @@ function TipTap(props: TipTapProps) {
   );
 }
 
-function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
+function TiptapWrapper(
+  props: Omit<
+    TipTapProps,
+    "editorContainer" | "theme" | "fontSize" | "fontFamily"
+  >
+) {
   const theme = useTheme() as Theme;
   const [isReady, setIsReady] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>(null);
+  const { editorConfig } = useEditorConfig();
   useEffect(() => {
     setIsReady(true);
   }, []);
+
   return (
     <PortalProvider>
       <Flex sx={{ flex: 1, flexDirection: "column" }}>
@@ -338,6 +346,8 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
             {...props}
             editorContainer={editorContainerRef.current}
             theme={theme}
+            fontFamily={editorConfig.fontFamily}
+            fontSize={editorConfig.fontSize}
           />
         ) : null}
         <Box
@@ -348,8 +358,8 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
             cursor: "text",
             color: theme.colors.text, // TODO!
             paddingBottom: 150,
-            fontSize: props.fontSize,
-            fontFamily: FONTS[props.fontFamily]
+            fontSize: editorConfig.fontSize,
+            fontFamily: getFontById(editorConfig.fontFamily)?.font
           }}
         />
       </Flex>

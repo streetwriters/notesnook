@@ -58,9 +58,7 @@ export const getDefaultSession = (sessionId = Date.now()) => {
     color: undefined,
     dateEdited: 0,
     attachmentsLength: 0,
-    isDeleted: false,
-    fontFamily: Config.get("fontFamily", "Sans-serif"),
-    fontSize: Config.get("fontSize", "16px")
+    isDeleted: false
   };
 };
 
@@ -288,18 +286,6 @@ class EditorStore extends BaseStore {
 
   setTag = (tag) => {
     return this._setTag(tag);
-  };
-
-  setFontSize = (fontSize) => {
-    this.set((state) => {
-      state.session.fontSize = fontSize;
-    });
-  };
-
-  setFontFamily = (fontFamily) => {
-    this.set((state) => {
-      state.session.fontFamily = fontFamily;
-    });
   };
 
   setSaveState = (saveState) => {
