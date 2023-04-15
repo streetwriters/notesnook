@@ -22,7 +22,6 @@ import { TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
-import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { formatBytes } from "../../utils";
 import { SIZE } from "../../utils/size";
@@ -43,9 +42,7 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
     attachment,
     encryption
   );
-  const encryptionProgress = useAttachmentStore(
-    (state) => state.encryptionProgress
-  );
+
   const onPress = () => {
     Actions.present(attachment, setAttachments, attachment.metadata.hash);
   };
@@ -121,9 +118,7 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
         </View>
       </View>
 
-      {currentProgress ||
-      (encryptionProgress && encryptionProgress !== "0.00") ||
-      encryption ? (
+      {currentProgress || encryption ? (
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={() => {
@@ -140,13 +135,7 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
         >
           <ProgressCircleComponent
             size={SIZE.xxl}
-            progress={
-              encryptionProgress
-                ? encryptionProgress
-                : currentProgress?.value
-                ? currentProgress?.value / 100
-                : 0
-            }
+            progress={currentProgress?.value ? currentProgress?.value / 100 : 0}
             showsText
             textStyle={{
               fontSize: 10
