@@ -28,7 +28,7 @@ Notesnook is built using the following technologies:
 4. NPM — listed here because we **don't** use Yarn or PNPM or XYZ across any of our projects.
 5. Lerna & Nx — maintaining monorepos is hard but Nx makes it easier.
 
-> **Note: Each project in the monorepo contains its own architecture details which you can refer to.**
+> **Note: Each project in the monorepo contains its own architecture details, which you can refer to.**
 
 ### Monorepo structure
 
@@ -47,7 +47,7 @@ Notesnook is built using the following technologies:
 
 ### Contributing guidelines
 
-If you are interested in contributing to Notesnook, I highly recommend checking out the [contributing guidelines](/CONTRIBUTING.md). You'll find all the relevant information such as [style guideline](/CONTRIBUTING.md#style-guidelines), [how to make a PR](/CONTRIBUTING.md#opening--submitting-a-pull-request), [how to commit](/CONTRIBUTING.md#commit-guidelines) etc., there.
+If you are interested in contributing to Notesnook, we highly recommend that you read the [contributing guidelines](/CONTRIBUTING.md). You'll find all the relevant information there, such as the [style guidelines](/CONTRIBUTING.md#style-guidelines), [how to make a PR](/CONTRIBUTING.md#opening--submitting-a-pull-request), [how to commit](/CONTRIBUTING.md#commit-guidelines) etc.
 
 ### Support & help
 
