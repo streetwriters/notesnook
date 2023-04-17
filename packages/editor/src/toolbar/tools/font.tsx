@@ -67,7 +67,7 @@ export function FontSize(props: ToolProps) {
           .setFontSize(`${defaultFontSize}px`)
           .run()
       }
-      value={fontSize}
+      value={fontSize || `${defaultFontSize}px`}
     />
   );
 }

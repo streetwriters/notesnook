@@ -108,7 +108,8 @@ export function TaskListComponent(
               px: 2,
               zIndex: 1,
               color: "fontTertiary",
-              fontSize: "title"
+              fontSize: "inherit",
+              fontFamily: "inherit"
             }}
             placeholder="Untitled"
             onChange={(e) => {
@@ -168,15 +169,15 @@ export function TaskListComponent(
               mr: 2,
               color: "fontTertiary",
               flexShrink: 0,
-              zIndex: 1
+              zIndex: 1,
+              fontFamily: "inherit"
             }}
           >
             {stats.checked}/{stats.total}
           </Text>
         </Flex>
       )}
-      <Text
-        as={"div"}
+      <Box
         ref={forwardRef}
         dir={textDirection}
         sx={{

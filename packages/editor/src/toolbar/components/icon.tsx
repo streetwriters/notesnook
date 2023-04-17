@@ -34,7 +34,7 @@ function isSchemeColor(
 type IconProps = {
   title?: string;
   path: string;
-  size?: keyof Theme["iconSizes"] | number;
+  size?: keyof Theme["iconSizes"] | number | string;
   color?: keyof SchemeColors | string;
   stroke?: string;
   rotate?: boolean;
@@ -60,8 +60,10 @@ function MDIIconWrapper({
       title={title}
       path={path}
       size={
-        typeof size === "string"
-          ? `${theme?.iconSizes[size] || 24}px`
+        theme && typeof size === "string" && size in theme.iconSizes
+          ? `${(theme?.iconSizes as any)[size] || 24}px`
+          : typeof size === "string"
+          ? size
           : `${size}px`
       }
       style={{

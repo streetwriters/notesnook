@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@theme-ui/components";
+import { Box, Flex } from "@theme-ui/components";
 import { ReactNodeViewProps } from "../react";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
@@ -106,7 +106,6 @@ export function TaskItemComponent(
           borderRadius: "default",
           alignSelf: "start",
           p: "1px",
-          mt: "2px",
           mr: 1,
           cursor: editor.isEditable ? "pointer" : "unset",
           ":hover": {
@@ -114,7 +113,8 @@ export function TaskItemComponent(
           },
           ":hover .icon path": {
             fill: "var(--checked) !important"
-          }
+          },
+          fontFamily: "inherit"
         }}
         onMouseDown={(e) => {
           if (globalThis["keyboardShown"]) {
@@ -129,11 +129,10 @@ export function TaskItemComponent(
           }
         }}
         color={checked ? "checked" : "icon"}
-        size={isMobile ? 16 : 14}
+        size={isMobile ? "1.66ch" : "1.46ch"}
       />
 
-      <Text
-        as="div"
+      <Box
         ref={forwardRef}
         sx={{
           "> .taskitem-content-wrapper > p": {
