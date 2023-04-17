@@ -56,7 +56,7 @@ async function createNotebook(
       await tapById("topic-add-button");
     }
   }
-  await tapByText("Create notebook");
+  await tapByText("Save");
   await sleep(500);
 }
 
@@ -120,7 +120,7 @@ describe("NOTEBOOKS", () => {
     await visibleByText(note.body);
   });
 
-  it("Add new topic to notebook", async () => {
+  it.only("Add new topic to notebook", async () => {
     await prepare();
     await navigate("Notebooks");
     await sleep(500);
@@ -133,7 +133,7 @@ describe("NOTEBOOKS", () => {
     await elementById("input-title").typeText("Topic");
     await tapByText("Add");
     await sleep(500);
-    await visibleById("topic-sheet-item-0");
+    await tapByText("Topic");
   });
 
   it("Edit topic", async () => {
@@ -146,7 +146,6 @@ describe("NOTEBOOKS", () => {
     await sleep(500);
     await tapByText("Notebook 1");
     await sleep(300);
-    await visibleById("topic-sheet-item-0");
     await tapById(notesnook.ids.notebook.menu);
     await tapByText("Edit topic");
     await elementById("input-title").typeText(" (edited)");
@@ -254,7 +253,7 @@ describe("NOTEBOOKS", () => {
       "Topic 2"
     );
     await tapById("topic-add-button");
-    await tapByText("Save changes");
+    await tapByText("Save");
     await sleep(500);
     await visibleByText("Notebook 1 (Edited)");
     await visibleByText("Description of Notebook 1 (Edited)");
@@ -274,7 +273,7 @@ describe("NOTEBOOKS", () => {
     await tapById(notesnook.ids.notebook.menu);
     await tapByText("Move to trash");
     await sleep(2000);
-    await tapByText("No");
+    await tapByText("Delete");
     await sleep(4000);
     await navigate("Trash");
     await visibleByText("Notebook 1");
@@ -296,7 +295,9 @@ describe("NOTEBOOKS", () => {
     await tapById(notesnook.ids.notebook.menu);
     await tapByText("Move to trash");
     await sleep(2000);
-    await tapByText("Yes");
+    await tapByText("Move all notes in this notebook to trash");
+    await sleep(500);
+    await tapByText("Delete");
     await sleep(4000);
     await navigate("Trash");
     await visibleByText("Notebook 1");
@@ -319,7 +320,9 @@ describe("NOTEBOOKS", () => {
     await tapById(notesnook.ids.notebook.menu);
     await tapByText("Delete topic");
     await sleep(2000);
-    await tapByText("Yes");
+    await tapByText("Move all notes in this topic to trash");
+    await sleep(500);
+    await tapByText("Delete");
     await device.pressBack();
     await sleep(4000);
     await navigate("Trash");

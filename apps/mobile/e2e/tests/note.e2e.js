@@ -48,7 +48,7 @@ describe("NOTE TESTS", () => {
     await prepare();
     let note = await createNote();
     await tapById(notesnook.listitem.menu);
-    await visibleByText(note.body);
+    await visibleByText("Created at:");
   });
 
   it("Favorite and unfavorite a note", async () => {
@@ -124,8 +124,9 @@ describe("NOTE TESTS", () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-delete");
+    await tapById("icon-trash");
     await navigate("Trash");
+    await sleep(500);
     await tapById(notesnook.listitem.menu);
     await tapByText("Restore note");
     await device.pressBack();
