@@ -22,7 +22,6 @@ import dataurl from "../utils/dataurl";
 import { extractFirstParagraph, getDummyDocument } from "../utils/html-parser";
 import { HTMLParser, HTMLRewriter } from "../utils/html-rewriter";
 import { convert } from "html-to-text";
-import { list } from "html-to-text/lib/formatter";
 
 const ATTRIBUTES = {
   hash: "data-hash",
@@ -55,7 +54,7 @@ export class Tiptap {
       ],
       formatters: {
         taskList: (elem, walk, builder, formatOptions) => {
-          return list(elem, walk, builder, formatOptions, (elem) => {
+          return formatList(elem, walk, builder, formatOptions, (elem) => {
             return elem.attribs.class.includes("checked") ? " ✅ " : " ☐ ";
           });
         },
@@ -224,4 +223,54 @@ export class Tiptap {
       attachments
     };
   }
+}
+
+/**
+ * @param { import("html-to-text").DomNode }           elem               List items with their prefixes.
+ * @param { import("html-to-text").RecursiveCallback } walk               Recursive callback to process child nodes.
+ * @param { import("html-to-text/lib/block-text-builder").BlockTextBuilder }  builder            Passed around to accumulate output text.
+ * @param { import("html-to-text").FormatOptions }     formatOptions      Options specific to a formatter.
+ * @param { (elem: import("html-to-text").DomNode) => string }      nextPrefixCallback Function that returns increasing index each time it is called.
+ */
+function formatList(elem, walk, builder, formatOptions, nextPrefixCallback) {
+  const isNestedList = elem?.parent?.name === "li";
+
+  // With Roman numbers, index length is not as straightforward as with Arabic numbers or letters,
+  // so the dumb length comparison is the most robust way to get the correct value.
+  let maxPrefixLength = 0;
+  const listItems = (elem.children || [])
+    // it might be more accurate to check only for html spaces here, but no significant benefit
+    .filter((child) => child.type !== "text" || !/^\s*$/.test(child.data))
+    .map(function (child) {
+      if (child.name !== "li") {
+        return { node: child, prefix: "" };
+      }
+      const prefix = isNestedList
+        ? nextPrefixCallback(child).trimStart()
+        : nextPrefixCallback(child);
+      if (prefix.length > maxPrefixLength) {
+        maxPrefixLength = prefix.length;
+      }
+      return { node: child, prefix: prefix };
+    });
+  if (!listItems.length) {
+    return;
+  }
+
+  builder.openList({
+    interRowLineBreaks: 1,
+    leadingLineBreaks: isNestedList ? 1 : formatOptions.leadingLineBreaks || 2,
+    maxPrefixLength: maxPrefixLength,
+    prefixAlign: "left"
+  });
+
+  for (const { node, prefix } of listItems) {
+    builder.openListItem({ prefix: prefix });
+    walk([node], builder);
+    builder.closeListItem();
+  }
+
+  builder.closeList({
+    trailingLineBreaks: isNestedList ? 1 : formatOptions.trailingLineBreaks || 2
+  });
 }
