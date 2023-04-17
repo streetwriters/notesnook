@@ -90,7 +90,13 @@ const features: Record<FeatureKeys, Feature> = {
           }
         ]
       : isDesktop()
-      ? []
+      ? [
+          {
+            title: "Default font size & font family",
+            subtitle:
+              "You can now change the default font family and size used by the editor across all your older & newer notes. Go into Settings > Editor settings to change these settings."
+          }
+        ]
       : [],
     cta: {
       title: "Got it",
