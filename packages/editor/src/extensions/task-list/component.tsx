@@ -76,7 +76,7 @@ export function TaskListComponent(
           sx={{
             position: "relative",
             bg: "bgSecondary",
-            py: 1,
+            py: "5px",
             borderRadius: "default",
             mb: 2,
             alignItems: "center",
