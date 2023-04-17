@@ -208,6 +208,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             >
               <IconButton
                 name="minus"
+                color={colors.pri}
                 onPress={() => {
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]
@@ -267,6 +268,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               />
               <IconButton
                 name="plus"
+                color={colors.pri}
                 onPress={() => {
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]
