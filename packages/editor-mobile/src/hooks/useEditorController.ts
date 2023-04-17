@@ -65,6 +65,7 @@ export type EditorController = {
   titlePlaceholder: string;
   openLink: (url: string) => boolean;
   setTitlePlaceholder: React.Dispatch<React.SetStateAction<string>>;
+  countWords: (ms: number) => void;
 };
 
 export function useEditorController(update: () => void): EditorController {
@@ -84,20 +85,33 @@ export function useEditorController(update: () => void): EditorController {
     post(EventTypes.title, title);
   }, []);
 
-  const contentChange = useCallback((editor: Editor) => {
-    const currentSessionId = globalThis.sessionId;
-    post(EventTypes.contentchange);
-    if (!editor) return;
-    if (typeof timers.current.change === "number") {
-      clearTimeout(timers.current?.change);
-    }
-    timers.current.change = setTimeout(() => {
-      htmlContentRef.current = editor.getHTML();
-      post(EventTypes.content, htmlContentRef.current, currentSessionId);
-    }, 300);
-
-    countWords(5000);
+  const countWords = useCallback((ms = 300) => {
+    if (typeof timers.current.wordCounter === "number")
+      clearTimeout(timers.current.wordCounter);
+    timers.current.wordCounter = setTimeout(() => {
+      console.time("wordCounter");
+      statusBar?.current?.updateWords();
+      console.timeEnd("wordCounter");
+    }, ms);
   }, []);
+
+  const contentChange = useCallback(
+    (editor: Editor) => {
+      const currentSessionId = globalThis.sessionId;
+      post(EventTypes.contentchange);
+      if (!editor) return;
+      if (typeof timers.current.change === "number") {
+        clearTimeout(timers.current?.change);
+      }
+      timers.current.change = setTimeout(() => {
+        htmlContentRef.current = editor.getHTML();
+        post(EventTypes.content, htmlContentRef.current, currentSessionId);
+      }, 300);
+
+      countWords(5000);
+    },
+    [countWords]
+  );
 
   const scroll = useCallback(
     (_event: React.UIEvent<HTMLDivElement, UIEvent>) => {},
@@ -152,18 +166,8 @@ export function useEditorController(update: () => void): EditorController {
       }
       post(type); // Notify that message was delivered successfully.
     },
-    [update]
+    [update, countWords]
   );
-
-  function countWords(ms = 300) {
-    if (typeof timers.current.wordCounter === "number")
-      clearTimeout(timers.current.wordCounter);
-    timers.current.wordCounter = setTimeout(() => {
-      console.time("wordCounter");
-      statusBar?.current?.updateWords();
-      console.timeEnd("wordCounter");
-    }, ms);
-  }
 
   useEffect(() => {
     if (!isReactNative()) return; // Subscribe only in react native webview.
@@ -208,6 +212,7 @@ export function useEditorController(update: () => void): EditorController {
     previewAttachment,
     content: htmlContentRef,
     openLink,
-    onUpdate: onUpdate
+    onUpdate: onUpdate,
+    countWords
   };
 }

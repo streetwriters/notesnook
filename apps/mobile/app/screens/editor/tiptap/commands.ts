@@ -106,6 +106,7 @@ typeof globalThis.editorTitle !== "undefined" && editorTitle.current && editorTi
 if (editorController.content) editorController.content.current = null;
 editorController.onUpdate();
 editorController.setTitle(null);
+editorController.countWords(0);
 typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",saved:""});
         `
     );
