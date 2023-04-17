@@ -24,6 +24,7 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useRef,
   useState
 } from "react";
 import { Platform, ViewStyle } from "react-native";
@@ -89,7 +90,7 @@ const Editor = React.memo(
         noToolbar,
         noHeader
       });
-
+      const renderKey = useRef(`editor-0`);
       useImperativeHandle(ref, () => ({
         get: () => editor
       }));
@@ -124,6 +125,8 @@ const Editor = React.memo(
       );
 
       const onError = useCallback(() => {
+        renderKey.current =
+          renderKey.current === `editor-0` ? `editor-1` : `editor-0`;
         editor.setLoading(true);
         setTimeout(() => editor.setLoading(false), 10);
       }, [editor]);
@@ -152,6 +155,7 @@ const Editor = React.memo(
             testID={notesnook.editor.id}
             ref={editor.ref}
             onLoad={editor.onLoad}
+            key={renderKey.current}
             onRenderProcessGone={onError}
             nestedScrollEnabled
             onError={onError}
