@@ -50,7 +50,8 @@ export class Tiptap {
       preserveNewlines: true,
       selectors: [
         { selector: "table", format: "dataTable" },
-        { selector: "ul.checklist", format: "taskList" }
+        { selector: "ul.checklist", format: "taskList" },
+        { selector: "p", format: "paragraph" }
       ],
       formatters: {
         taskList: (elem, walk, builder, formatOptions) => {

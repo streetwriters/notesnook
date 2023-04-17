@@ -86,7 +86,17 @@ module.exports = (env) => {
         "@notesnook": path.join(__dirname, "../../../packages"),
         "@streetwriters/showdown": path.join(__dirname, "../node_modules/@streetwriters/showdown"),
         "qclone": path.join(__dirname, "../node_modules/qclone"),
-        "@notifee/react-native": path.join(__dirname, "../node_modules/@ammarahmed/notifee-react-native")
+        "@notifee/react-native": path.join(__dirname, "../node_modules/@ammarahmed/notifee-react-native"),
+        "html-to-text": path.join(__dirname, "../node_modules/html-to-text"),
+        "leac": path.join(__dirname, "../node_modules/leac"),
+        "parseley": path.join(__dirname, "../node_modules/parseley"),
+        "htmlparser2": path.join(__dirname, "../node_modules/htmlparser2"),
+        "selderee": path.join(__dirname, "../node_modules/selderee"),
+        "minimist": path.join(__dirname, "../node_modules/minimist"),
+        "entities": path.join(__dirname, "../node_modules/entities"),
+        "deepmerge": path.join(__dirname, "../node_modules/deepmerge"),
+        "@selderee/plugin-htmlparser2": path.join(__dirname, "../node_modules/@selderee/plugin-htmlparser2"),
+        "peberminta": path.join(__dirname, "../node_modules/peberminta"),
       },
     },
     /**
