@@ -39,7 +39,8 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
       <Flex
         ref={ref}
         sx={{
-          borderRadius: "default"
+          borderRadius: "default",
+          flexShrink: 0
         }}
       >
         <ToolButton
