@@ -1,3 +1,4 @@
+- Added default font size & font family settings
 - Redesign reminder/notebook sheets to improve UX
 - Fixed an issue causing sync to fail
 - Fix tag suggestions in share extension
