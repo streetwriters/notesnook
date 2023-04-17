@@ -17,20 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { RefObject, useEffect, useRef } from "react";
+import { getFontById } from "@notesnook/editor";
+import React, { RefObject, useEffect, useRef } from "react";
 import { EditorController } from "../hooks/useEditorController";
 import styles from "./styles.module.css";
 function Title({
   controller,
   title,
   titlePlaceholder,
-  readonly
+  readonly,
+  fontFamily
 }: {
   controller: RefObject<EditorController>;
   title: string;
   titlePlaceholder: string;
   readonly: boolean;
+  fontFamily: string;
 }) {
   const titleRef = useRef<HTMLInputElement>(null);
   const emitUpdate = useRef(true);
@@ -59,7 +61,7 @@ function Title({
         paddingRight: 12,
         paddingLeft: 12,
         fontWeight: 600,
-        fontFamily: "Open Sans",
+        fontFamily: getFontById(fontFamily)?.font || "Open Sans",
         backgroundColor: "transparent",
         color: "var(--nn_heading)",
         caretColor: "var(--nn_accent)",
@@ -76,8 +78,13 @@ function Title({
 }
 
 export default React.memo(Title, (prev, next) => {
-  if (prev.title !== next.title) return false;
-  if (prev.titlePlaceholder !== next.titlePlaceholder) return false;
-  if (prev.readonly !== next.readonly) return false;
+  if (
+    prev.title !== next.title ||
+    prev.titlePlaceholder !== next.titlePlaceholder ||
+    prev.readonly !== next.readonly ||
+    prev.fontFamily !== next.fontFamily
+  )
+    return false;
+
   return true;
 });

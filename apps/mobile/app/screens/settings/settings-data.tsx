@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import notifee from "@notifee/react-native";
+
 import dayjs from "dayjs";
 import React from "react";
 import { Linking, Platform } from "react-native";
@@ -450,13 +451,13 @@ export const settingsGroups: SettingSection[] = [
   },
   {
     id: "customize",
-    name: "Customize",
+    name: "Customization",
     sections: [
       {
         id: "personalization",
         type: "screen",
         name: "Theme",
-        description: "Change app look and feel",
+        description: "Change app look and feel with color themes",
         icon: "shape",
         sections: [
           {
@@ -514,7 +515,7 @@ export const settingsGroups: SettingSection[] = [
         id: "behaviour",
         type: "screen",
         name: "Behaviour",
-        description: "Change app homepage",
+        description: "Change how the app behaves in different situations",
         sections: [
           {
             id: "default-home",
@@ -530,6 +531,63 @@ export const settingsGroups: SettingSection[] = [
             description:
               "Select the duration after which trash items will be cleared",
             component: "trash-interval-selector"
+          }
+        ]
+      },
+      {
+        id: "editor",
+        name: "Editor",
+        type: "screen",
+        icon: "note-edit-outline",
+        description: "Customize the editor to fit your needs",
+        sections: [
+          {
+            id: "configure-toolbar",
+            type: "screen",
+            name: "Configure toolbar",
+            description: "Make the toolbar adaptable to your needs.",
+            component: "configuretoolbar"
+          },
+          {
+            id: "reset-toolbar",
+            name: "Reset toolbar",
+            description: "Reset toolbar configuration to default",
+            modifer: () => {
+              useDragState.getState().setPreset("default");
+            }
+          },
+          {
+            id: "double-spaced-lines",
+            name: "Use double spaced lines",
+            description:
+              "New lines will be double spaced (old ones won't be affected).",
+            type: "switch",
+            property: "doubleSpacedLines",
+            icon: "format-line-spacing",
+            onChange: () => {
+              ToastEvent.show({
+                heading: "Line spacing changed",
+                type: "success"
+              });
+            }
+          },
+          {
+            id: "default-font-size",
+            name: "Default font size",
+            description: "Set the default font size in editor",
+            type: "input-selector",
+            minInputValue: 8,
+            icon: "format-size",
+            property: "defaultFontSize"
+          },
+          {
+            id: "default-font-family",
+            name: "Default font family",
+            description: "Set the default font family in editor",
+            type: "component",
+            icon: "format-font",
+            property: "defaultFontFamily",
+            component: "font-selector"
           }
         ]
       }
@@ -925,42 +983,6 @@ export const settingsGroups: SettingSection[] = [
             }
           }
         ]
-      }
-    ]
-  },
-  {
-    id: "editor",
-    name: "Editor",
-    sections: [
-      {
-        id: "configure-toolbar",
-        type: "screen",
-        name: "Configure toolbar",
-        description: "Make the toolbar adaptable to your needs.",
-        component: "configuretoolbar"
-      },
-      {
-        id: "reset-toolbar",
-        name: "Reset toolbar",
-        description: "Reset toolbar configuration to default",
-        modifer: () => {
-          useDragState.getState().setPreset("default");
-        }
-      },
-      {
-        id: "double-spaced-lines",
-        name: "Use double spaced lines",
-        description:
-          "New lines will be double spaced (old ones won't be affected).",
-        type: "switch",
-        property: "doubleSpacedLines",
-        icon: "format-line-spacing",
-        onChange: () => {
-          ToastEvent.show({
-            heading: "Line spacing changed",
-            type: "success"
-          });
-        }
       }
     ]
   },

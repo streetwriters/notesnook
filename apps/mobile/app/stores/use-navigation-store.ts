@@ -69,6 +69,7 @@ export type RouteParams = {
   AppLock: AppLockRouteParams;
   Auth: AuthParams;
   Reminders: GenericRouteParam;
+  SettingsGroup: GenericRouteParam;
 };
 
 export type RouteName = keyof RouteParams;

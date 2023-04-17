@@ -39,6 +39,8 @@ export type Settings = {
   noHeader?: boolean;
   doubleSpacedLines?: boolean;
   corsProxy: string;
+  fontSize: number;
+  fontFamily: string;
 };
 
 /* eslint-disable no-var */

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useMemo, useState } from "react";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Button, Flex, Input, Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useNoteStore } from "../stores/note-store";
@@ -81,6 +81,8 @@ import { useTelemetry } from "../hooks/use-telemetry";
 import useSpellChecker from "../hooks/use-spell-checker";
 import useDesktopIntegration from "../hooks/use-desktop-integration";
 import { writeText } from "clipboard-polyfill";
+import { useEditorConfig } from "../components/editor/context";
+import { getFonts } from "@notesnook/editor";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -219,6 +221,7 @@ function Settings() {
     "corsProxy",
     "https://cors.notesnook.com"
   );
+  const { editorConfig, setEditorConfig } = useEditorConfig();
 
   useEffect(() => {
     (async () => {
@@ -622,6 +625,51 @@ function Settings() {
         />
         {groups.editor && (
           <>
+            <OptionsItem
+              title={"Default font family"}
+              tip={"Set default font family"}
+              selectedOption={editorConfig.fontFamily}
+              options={getFonts().map((font) => ({
+                value: font.id,
+                title: font.title
+              }))}
+              onSelectionChanged={(option) => {
+                setEditorConfig({ fontFamily: option.value });
+              }}
+            />
+            <Flex
+              py={2}
+              sx={{
+                cursor: "pointer",
+                borderBottom: "1px solid",
+                borderBottomColor: "border",
+                ":hover": { borderBottomColor: "primary" },
+                alignItems: "center"
+              }}
+            >
+              <Tip
+                text="Default font size"
+                tip="Set default font size"
+                sx={{ flex: 1 }}
+              />
+              <Input
+                type="number"
+                min={8}
+                sx={{ width: 70 }}
+                defaultValue={editorConfig.fontSize}
+                onChange={(e) => {
+                  setEditorConfig({ fontSize: e.currentTarget.valueAsNumber });
+                }}
+              />
+            </Flex>
+            {/* <Counter
+              value={editorConfig.fontSize}
+              onDecrease={() => {}}
+              onIncrease={() => {}}
+              title="Set default font size"
+              onReset={() => setEditorConfig({ fontFamily: "16px" })}
+            /> */}
+            {/* <DefaultFont />  */}
             <Toggle
               title="Use double spaced lines"
               onTip="New lines will be double spaced (old ones won't be affected)."

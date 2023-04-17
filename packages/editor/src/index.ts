@@ -273,6 +273,7 @@ export * from "./extensions/react";
 export * from "./toolbar";
 export * from "./types";
 export * from "./utils/word-counter";
+export * from "./utils/font";
 export {
   useTiptap,
   Toolbar,

@@ -24,17 +24,26 @@ import BaseStore from "../../stores";
 import { UseBoundStore } from "zustand";
 import shallow from "zustand/shallow";
 import type { ToolbarDefinition } from "@notesnook/editor";
+import Config from "../../utils/config";
 
+type EditorConfig = { fontFamily: string; fontSize: number };
 type EditorSubState = {
   editor?: IEditor;
   canUndo?: boolean;
   canRedo?: boolean;
   searching?: boolean;
   toolbarConfig?: ToolbarDefinition;
+  editorConfig: EditorConfig;
   statistics?: NoteStatistics;
 };
+
 class EditorContext extends BaseStore {
-  subState: EditorSubState = {};
+  subState: EditorSubState = {
+    editorConfig: Config.get("editorConfig", {
+      fontFamily: "sans-serif",
+      fontSize: 16
+    })
+  };
 
   configure = (
     partial:
@@ -115,4 +124,28 @@ export function useNoteStatistics(): NoteStatistics {
         words: { total: 0 }
       }
   );
+}
+
+export function useEditorConfig() {
+  const editorConfig = useEditorContext((store) => store.subState.editorConfig);
+  const configure = useEditorContext((store) => store.configure);
+  const setEditorConfig = useCallback(
+    (config: Partial<EditorConfig>) => {
+      if (editorConfig)
+        Config.set("editorConfig", {
+          ...editorConfig,
+          ...config
+        });
+
+      configure({
+        editorConfig: {
+          ...editorConfig,
+          ...config
+        }
+      });
+    },
+    [editorConfig, configure]
+  );
+
+  return { editorConfig, setEditorConfig };
 }

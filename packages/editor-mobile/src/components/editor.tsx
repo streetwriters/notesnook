@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   Editor,
+  getFontById,
   PortalProvider,
   Toolbar,
   usePermissionHandler,
@@ -227,6 +228,7 @@ const Tiptap = ({
                 readonly={settings.readonly}
                 controller={controllerRef}
                 title={controller.title}
+                fontFamily={settings.fontFamily}
               />
               <StatusBar container={containerRef} />
             </>
@@ -234,6 +236,8 @@ const Tiptap = ({
 
           <ContentDiv
             padding={settings.doubleSpacedLines ? 0 : 6}
+            fontSize={settings.fontSize}
+            fontFamily={settings.fontFamily}
             ref={contentRef}
           />
 
@@ -254,6 +258,8 @@ const Tiptap = ({
             editor={_editor}
             location="bottom"
             tools={[...settings.tools]}
+            defaultFontFamily={settings.fontFamily}
+            defaultFontSize={settings.fontSize}
           />
         )}
       </div>
@@ -262,7 +268,10 @@ const Tiptap = ({
 };
 
 const ContentDiv = memo(
-  forwardRef<HTMLDivElement, { padding: number }>((props, ref) => {
+  forwardRef<
+    HTMLDivElement,
+    { padding: number; fontSize: number; fontFamily: string }
+  >((props, ref) => {
     const theme = useEditorThemeStore((state) => state.colors);
     return (
       <div
@@ -272,12 +281,18 @@ const ContentDiv = memo(
           paddingTop: props.padding,
           color: theme.pri,
           marginTop: -12,
-          caretColor: theme.accent
+          caretColor: theme.accent,
+          fontSize: props.fontSize,
+          fontFamily: getFontById(props.fontFamily)?.font
         }}
       />
     );
   }),
-  () => true
+  (prev, next) => {
+    if (prev.fontSize !== next.fontSize || prev.fontFamily !== next.fontFamily)
+      return false;
+    return true;
+  }
 );
 
 const modifyToolbarTheme = (toolbarTheme: Theme) => {

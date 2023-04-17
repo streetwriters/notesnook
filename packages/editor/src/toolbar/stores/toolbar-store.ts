@@ -39,6 +39,10 @@ interface ToolbarState {
   closePopup: (popupId: string) => void;
   closePopupGroup: (groupId: string, excluded: string[]) => void;
   closeAllPopups: () => void;
+  fontFamily: string;
+  setFontFamily: (fontFamily: string) => void;
+  fontSize: number;
+  setFontSize: (fontSize: number) => void;
 }
 
 export const useToolbarStore = create<ToolbarState>((set, get) => ({
@@ -92,6 +96,16 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
       for (const key in state.openedPopups) {
         state.openedPopups[key] = undefined;
       }
+    }),
+  fontFamily: "sans-serif",
+  setFontFamily: (fontFamily) =>
+    set((state) => {
+      state.fontFamily = fontFamily;
+    }),
+  fontSize: 16,
+  setFontSize: (fontSize) =>
+    set((state) => {
+      state.fontSize = fontSize;
     })
 }));
 

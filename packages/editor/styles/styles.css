@@ -1,4 +1,10 @@
+
+
 .ProseMirror span * {
+  font-family: inherit;
+}
+
+.ProseMirror {
   font-family: inherit;
 }
 
@@ -87,6 +93,7 @@
 
 .ProseMirror p {
   margin-bottom: 0px;
+  font-family: inherit;
 }
 
 .ProseMirror > p[data-spacing="double"] {

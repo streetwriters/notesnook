@@ -33,9 +33,10 @@ import {
   usePermissionHandler,
   getHTMLFromFragment,
   Fragment,
+  type DownloadOptions,
   getTotalWords,
   countWords,
-  type DownloadOptions
+  getFontById
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
@@ -45,7 +46,8 @@ import {
   useConfigureEditor,
   useSearch,
   useToolbarConfig,
-  configureEditor
+  configureEditor,
+  useEditorConfig
 } from "./context";
 import { createPortal } from "react-dom";
 import { getCurrentPreset } from "../../common/toolbar-config";
@@ -71,6 +73,8 @@ type TipTapProps = {
   theme: Theme;
   isMobile?: boolean;
   downloadOptions?: DownloadOptions;
+  fontSize: number;
+  fontFamily: string;
 };
 
 const SAVE_INTERVAL = process.env.REACT_APP_TEST ? 100 : 300;
@@ -115,7 +119,9 @@ function TipTap(props: TipTapProps) {
     nonce,
     theme,
     isMobile,
-    downloadOptions
+    downloadOptions,
+    fontSize,
+    fontFamily
   } = props;
 
   const isUserPremium = useIsUserPremium();
@@ -301,7 +307,6 @@ function TipTap(props: TipTapProps) {
   }, [editor, editorContainer]);
 
   if (!toolbarContainerId) return null;
-
   return (
     <>
       <Portal containerId={toolbarContainerId}>
@@ -310,16 +315,24 @@ function TipTap(props: TipTapProps) {
           theme={theme}
           location={isMobile ? "bottom" : "top"}
           tools={toolbarConfig}
+          defaultFontFamily={fontFamily}
+          defaultFontSize={fontSize}
         />
       </Portal>
     </>
   );
 }
 
-function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
+function TiptapWrapper(
+  props: Omit<
+    TipTapProps,
+    "editorContainer" | "theme" | "fontSize" | "fontFamily"
+  >
+) {
   const theme = useTheme() as Theme;
   const [isReady, setIsReady] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>(null);
+  const { editorConfig } = useEditorConfig();
   useEffect(() => {
     setIsReady(true);
   }, []);
@@ -332,6 +345,8 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
             {...props}
             editorContainer={editorContainerRef.current}
             theme={theme}
+            fontFamily={editorConfig.fontFamily}
+            fontSize={editorConfig.fontSize}
           />
         ) : null}
         <Box
@@ -341,7 +356,9 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
             flex: 1,
             cursor: "text",
             color: theme.colors.text, // TODO!
-            paddingBottom: 150
+            paddingBottom: 150,
+            fontSize: editorConfig.fontSize,
+            fontFamily: getFontById(editorConfig.fontFamily)?.font
           }}
         />
       </Flex>
