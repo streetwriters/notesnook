@@ -1,6 +1,9 @@
-- Fixed text exports not following line spacing settings
-- Fixed tags are not updated in list after renaming
-- Fixed a sync issue where notes marked as local only would get deleted sometimes
-- Fixed a bug where opening a note from search then closing it would cause a crash
+- Redesign reminder/notebook sheets to improve UX
+- Fixed an issue causing sync to fail
+- Fix tag suggestions in share extension
+- Fix app font sizes too small in some places
+- Improved mobile editor performance on low-end devices
+- Fix pin to notifications not working
+- Bug fixes and performance improvements
 
 Thank you for using Notesnook!
