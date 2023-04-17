@@ -117,7 +117,6 @@ export default class Reminders extends Collection {
   async remove(...reminderIds) {
     for (const id of reminderIds) {
       await this._collection.removeItem(id);
-      await this._db.relations.cleanup();
     }
   }
 }
