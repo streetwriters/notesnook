@@ -89,10 +89,10 @@ export function TaskItemComponent(
             ".icon:hover path": {
               fill: "var(--checked) !important"
             },
-            mt: "1px",
-            mx: 1
+            mx: 1,
+            fontFamily: "inherit"
           }}
-          size={isMobile ? 24 : 20}
+          size={isMobile ? "2.46ch" : "2.22ch"}
         />
       )}
       <Icon
