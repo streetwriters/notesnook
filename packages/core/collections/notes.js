@@ -37,6 +37,7 @@ export default class Notes extends Collection {
   async init() {
     await super.init();
     this.topicReferences.rebuild();
+    this.cleanup();
   }
 
   trashed(id) {
@@ -405,6 +406,17 @@ export default class Notes extends Collection {
       }
 
       await this._collection.updateItem(note);
+    }
+  }
+
+  cleanup() {
+    const notes = this._db.notes.all;
+    const today = Date.now();
+
+    for (const note of notes) {
+      if (note.expiryDate && today > note.expiryDate) {
+        this._db.notes.delete(note.id);
+      }
     }
   }
 }

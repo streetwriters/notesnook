@@ -25,6 +25,7 @@ import ListItem from "../list-item";
 import {
   confirm,
   showAddReminderDialog,
+  showCustomExpiryDateDialog,
   showMoveNoteDialog
 } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
@@ -358,6 +359,12 @@ const menuItems = [
       await showAddReminderDialog(note.id);
     }
   },
+  {
+    key: "set-expiry",
+    title: "Set expiry",
+    icon: Icon.expiryDate,
+    items: expiryDateMenuItems
+  },
   { key: "sep1", type: "separator" },
   {
     key: "notebooks",
@@ -585,4 +592,61 @@ function notebooksMenuItems({ items }) {
   }
 
   return menuItems;
+}
+
+function expiryDateMenuItems({ items }) {
+  const menuItems = [];
+  menuItems.push({
+    key: "one-day",
+    title: "A day",
+    icon: Icon.Clock,
+    onClick: async () => {
+      await db.notes.note(items[0].id).setExpiryDate(getXDayInUnix(1));
+      //db.notes.note(items[0].id).expiryDate
+    }
+  });
+
+  menuItems.push({
+    key: "one-week",
+    title: "A Week",
+    icon: Icon.Clock,
+    onClick: async () => {
+      await db.notes.note(items[0].id).setExpiryDate(getXDayInUnix(7));
+    }
+  });
+
+  menuItems.push({
+    key: "one-month",
+    title: "A Month",
+    icon: Icon.Clock,
+    onClick: async () => {
+      await db.notes.note(items[0].id).setExpiryDate(getXDayInUnix(30));
+    }
+  });
+
+  menuItems.push({
+    key: "one-year",
+    title: "A Year",
+    icon: Icon.Clock,
+    onClick: async () => {
+      await db.notes.note(items[0].id).setExpiryDate(getXDayInUnix(365));
+    }
+  });
+
+  menuItems.push({
+    key: "custom",
+    title: "Custom",
+    icon: Icon.Clock,
+    onClick: async () => {
+      await showCustomExpiryDateDialog(items[0]);
+    }
+  });
+
+  return menuItems;
+}
+
+function getXDayInUnix(days) {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.valueOf();
 }

@@ -154,6 +154,17 @@ export function showBuyDialog(plan?: Period, couponCode?: string) {
   ));
 }
 
+export function showCustomExpiryDateDialog(note: any) {
+  return showDialog("CustomExpiryDateDialog", (Dialog, perform) => (
+    <Dialog
+      note={note}
+      title="Custom Expiry Date"
+      positiveButtonText="Create"
+      onClose={() => perform(false)}
+    />
+  ));
+}
+
 export function confirm<TCheckId extends string>(
   props: Omit<ConfirmDialogProps<TCheckId>, "onClose">
 ) {
