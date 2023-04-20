@@ -81,7 +81,7 @@ The DCO is a declaration attached to every contribution made by every developer 
 
 **Each commit must include a DCO which looks like this:**
 
-"`txt
+```txt
 Signed-off-by: Jane Smith <jane.smith@email.com>
 ```
 
@@ -89,7 +89,7 @@ On VSCode, it looks like this:
 
 ![](resources/vscode-signed-off-commit.png)
 
-You may type this line on your own when writing your commit messages. However, if your [user.name](http://user.name) and [user.email](http://user.email) are set in your git configs, you can use `-s' or `--signoff` to add the `Signed-off-by` line to the end of the commit message automatically.
+You may type this line on your own when writing your commit messages. However, if your [user.name](http://user.name) and [user.email](http://user.email) are set in your git configs, you can use `-s` or `--signoff` to add the `Signed-off-by` line to the end of the commit message automatically.
 
 #### Include `<scope>:` in your commit message
 
@@ -119,7 +119,7 @@ All commits must include valid scopes in the commit message. **Valid commit scop
 
 **Some example commits would look like this:**
 
-"`txt
+```txt
 docs: list all valid scopes in commit guidelines
 web: impl xyz feature
 crypto: update libsodium version
