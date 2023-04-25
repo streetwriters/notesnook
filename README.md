@@ -28,7 +28,7 @@ Notesnook is built using the following technologies:
 4. NPM — listed here because we **don't** use Yarn or PNPM or XYZ across any of our projects.
 5. Lerna & Nx — maintaining monorepos is hard but Nx makes it easier.
 
-> **Note: Each project in the monorepo contains its own architecture details, which you can refer to.**
+> **Note: Each project in the monorepo contains its own architecture details.**
 
 ### Monorepo structure
 
