@@ -20,8 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ToolId } from "@notesnook/editor/dist/toolbar";
 import React, { RefObject } from "react";
 import { View } from "react-native";
-import ActionSheet from "react-native-actions-sheet";
-import { ScrollView } from "react-native-gesture-handler";
 import { PressableButton } from "../../../components/ui/pressable";
 import { SvgView } from "../../../components/ui/svg";
 import Paragraph from "../../../components/ui/typography/paragraph";
@@ -34,13 +32,14 @@ import {
   getToolIcon,
   getUngroupedTools
 } from "./toolbar-definition";
+import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 
 export default function ToolSheet({
   group,
   fwdRef
 }: {
   group: DraggableItem;
-  fwdRef: RefObject<ActionSheet>;
+  fwdRef: RefObject<ActionSheetRef>;
 }) {
   const colors = useThemeStore((state) => state.colors);
   const data = useDragState((state) => state.data);
@@ -50,6 +49,7 @@ export default function ToolSheet({
     (item: ToolId) => {
       const tool = findToolById(item);
       const iconSvgString = tool ? getToolIcon(tool.icon as ToolId) : null;
+      if (item === "none") return;
       return (
         <PressableButton
           key={item}
@@ -109,12 +109,7 @@ export default function ToolSheet({
         padding: 12
       }}
     >
-      <ScrollView
-        onMomentumScrollEnd={() => {
-          fwdRef.current?.handleChildScrollEnd();
-        }}
-        nestedScrollEnabled={true}
-      >
+      <ScrollView nestedScrollEnabled={true}>
         {!ungrouped || ungrouped.length === 0 ? (
           <Paragraph
             style={{
