@@ -27,14 +27,6 @@ import { DatabaseLogger } from "../common/database/index";
 import { ToastEvent } from "./event-manager";
 import SettingsService from "./settings";
 
-NetInfo.configure({
-  reachabilityUrl: "https://notesnook.com",
-  reachabilityTest: (response) => {
-    if (!response) return false;
-    return response?.status >= 200 && response?.status < 300;
-  }
-});
-
 export const ignoredMessages = [
   "Sync already running",
   "Not allowed to start service intent",

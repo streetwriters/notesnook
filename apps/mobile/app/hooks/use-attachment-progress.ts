@@ -17,35 +17,46 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 
-export const useAttachmentProgress = (attachment, encryption) => {
+type AttachmentProgress = {
+  type: string;
+  value?: number;
+  percent?: string;
+};
+
+export const useAttachmentProgress = (
+  attachment: any,
+  encryption?: boolean
+) => {
   const progress = useAttachmentStore((state) => state.progress);
-  const [currentProgress, setCurrentProgress] = useState(
+  const [currentProgress, setCurrentProgress] = useState<
+    AttachmentProgress | undefined
+  >(
     encryption
       ? {
           type: "encrypt"
         }
-      : null
+      : undefined
   );
 
-  useEffect(() => {
-    let prog = progress[attachment.metadata.hash];
-    if (prog) {
-      let type = prog.type;
-      let loaded = prog.type === "download" ? prog.recieved : prog.sent;
-      prog = loaded / prog.total;
-      prog = (prog * 100).toFixed(0);
-      setCurrentProgress({
-        value: prog,
-        percent: prog + "%",
-        type: type
-      });
-    } else {
-      setCurrentProgress(null);
-    }
-  }, [attachment.metadata.hash, progress]);
+  const attachmentProgress = progress?.[attachment.metadata.hash];
+  if (attachmentProgress) {
+    const type = attachmentProgress.type;
+    const loaded =
+      attachmentProgress.type === "download"
+        ? attachmentProgress.recieved
+        : attachmentProgress.sent;
+    const value = loaded / attachmentProgress.total;
+    setCurrentProgress({
+      value: value * 100,
+      percent: (value * 100).toFixed(0) + "%",
+      type: type
+    });
+  } else {
+    setCurrentProgress(undefined);
+  }
 
   return [currentProgress, setCurrentProgress];
 };

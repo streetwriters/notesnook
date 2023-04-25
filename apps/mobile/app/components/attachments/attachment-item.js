@@ -36,7 +36,11 @@ function getFileExtension(filename) {
   var ext = /^.+\.([^.]+)$/.exec(filename);
   return ext == null ? "" : ext[1];
 }
-
+/**
+ *
+ * @param {any} param0
+ * @returns
+ */
 export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
   const colors = useThemeStore((state) => state.colors);
   const [currentProgress, setCurrentProgress] = useAttachmentProgress(

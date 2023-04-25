@@ -46,18 +46,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @return {String}         Sanitized filename
  */
 
-var illegalRe = /[/?<>\\:*|"]/g;
+const illegalRe = /[/?<>\\:*|"]/g;
 //var controlRe = /[x00-x1f\x80-\x9f]/g;
-var reservedRe = /^\.+$/;
-var windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
-var windowsTrailingRe = /[. ]+$/;
-var whitespace = /\s+/g;
+const reservedRe = /^\.+$/;
+const windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+const windowsTrailingRe = /[. ]+$/;
+const whitespace = /\s+/g;
 
-function sanitize(input, replacement) {
+function sanitize(input: string, replacement: string) {
   if (typeof input !== "string") {
     throw new Error("Input must be string");
   }
-  var sanitized = input
+  const sanitized = input
     .replace(whitespace, replacement)
     .replace(illegalRe, replacement)
     .replace(reservedRe, replacement)
@@ -67,7 +67,10 @@ function sanitize(input, replacement) {
   return sanitized.slice(0, 254).toLowerCase();
 }
 
-export function sanitizeFilename(input, options) {
-  var replacement = (options && options.replacement) || "";
+export function sanitizeFilename(
+  input: string,
+  options: { replacement: string }
+) {
+  const replacement = (options && options.replacement) || "";
   return sanitize(input, replacement);
 }
