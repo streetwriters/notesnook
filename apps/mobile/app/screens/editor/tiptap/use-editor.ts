@@ -580,22 +580,21 @@ export const useEditor = (
 
   const onReady = useCallback(async () => {
     if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
-      overlay(true);
-      setLoading(true);
+      eSendEvent("webview_reset");
     } else {
       isDefaultEditor && restoreEditorState();
     }
-  }, [overlay, isDefaultEditor, restoreEditorState]);
+  }, [isDefaultEditor, restoreEditorState]);
 
   useEffect(() => {
     state.current.saveCount = 0;
-    async () => {
+    (async () => {
       await commands.setSessionId(sessionIdRef.current);
       if (sessionIdRef.current) {
         if (!state.current?.ready) return;
         await onReady();
       }
-    };
+    })();
   }, [sessionId, loading, commands, onReady]);
 
   const onLoad = useCallback(async () => {
