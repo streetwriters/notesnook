@@ -25,7 +25,6 @@ import Navigation from "../../../services/navigation";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { GROUP, SORT } from "../../../utils/constants";
 import { refreshNotesPage } from "../../../utils/events";
-import layoutmanager from "../../../utils/layout-manager";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
@@ -39,7 +38,6 @@ const Sort = ({ type, screen }) => {
   const updateGroupOptions = async (_groupOptions) => {
     await db.settings.setGroupOptions(type, _groupOptions);
 
-    layoutmanager.withSpringAnimation(600);
     setGroupOptions(_groupOptions);
     setTimeout(() => {
       if (screen !== "TopicSheet") Navigation.queueRoutesForUpdate(screen);
