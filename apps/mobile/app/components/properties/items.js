@@ -116,11 +116,11 @@ export const Items = ({ item, buttons, close }) => {
         key={item.id}
         testID={"icon-" + item.id}
         customStyle={{
-          alignItems: "center",
+          alignSelf: "flex-start",
           width: topBarItemWidth,
-          marginBottom: 10,
           marginRight: isLast ? 0 : 10,
-          backgroundColor: "transparent"
+          backgroundColor: "transparent",
+          paddingHorizontal: 0
         }}
       >
         <PressableButton
@@ -150,11 +150,7 @@ export const Items = ({ item, buttons, close }) => {
           />
         </PressableButton>
 
-        <Paragraph
-          size={SIZE.xxs + 1}
-          style={{ textAlign: "center" }}
-          textBreakStrategy="simple"
-        >
+        <Paragraph size={SIZE.xxs + 1} style={{ textAlign: "center" }}>
           {item.title}
         </Paragraph>
       </PressableButton>
