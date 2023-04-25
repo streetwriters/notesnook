@@ -92,6 +92,7 @@ function Field(props) {
         sx={{
           fontSize: "subtitle",
           fontWeight: "bold",
+          fontFamily: "body",
           color: "icon",
           flexDirection: "column",
           ...styles.label
