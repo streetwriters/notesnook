@@ -8,9 +8,9 @@ Thank you so much for considering to contribute to Notesnook! If you have no ide
 
 Ugh! Bugs!
 
-> A bug is when software behaves in a way that you didn't expect, and the developer didn't intend.
+> A bug is when software behaves in a way you didn't expect, which the developer didn't intend.
 
-To help us understand what's going on, we first want to **make sure you're using the latest version of Notesnook**.
+To help us understand what's happening, we first want to **make sure you're using the latest version of Notesnook**.
 
 Once you've **confirmed that the bug still exists in the latest version**, you'll want to check to make sure it's not something we already know about in the [opened GitHub issues](https://github.com/streetwriters/notesnook/issues).
 
@@ -30,7 +30,7 @@ Before you open a new feature request, please make sure it's not a duplicate. **
 
 ### Helping out in the issue tracker
 
-There are always new issues getting opened that need to be triaged, sorted & organized, so the developers can easily find the most critical and/or relevant bugs to fix. Any help in this regard is appreciated.
+New issues are always opened that need to be triaged, sorted & organized, so the developers can easily find the most critical and/or relevant bugs to fix. Any help in this regard is appreciated.
 
 In addition to this, you can help out in the following ways:
 
@@ -62,7 +62,7 @@ Once you are done, [open a new pull request](https://docs.github.com/en/pull-req
 
 1. Fork [the repository](https://github.com/streetwriters/notesnook) and create your branch from `master` (you can name your branch anything).
 2. Run `npm run bootstrap` in the repository root.
-3. If you’ve fixed a bug or added code that should be tested, add tests!
+3. If you've fixed a bug or added code that should be tested, add tests!
 4. Ensure the test suite passes (`npm run test`).
 5. Format your code with prettier (`npm run prettier`).
 6. Make sure your code lints (`npm run lint`). Tip: `npm run linc` to only check changed files.
@@ -131,11 +131,11 @@ We use an automatic code formatter called [Prettier](https://prettier.io/). Run 
 
 Then, our linter will catch most issues that may exist in your code. You can check the status of your code styling by simply running `npm run lint`.
 
-However, there are still some styles that the linter cannot pick up. If you are unsure about something, looking at [Airbnb’s Style Guide](https://github.com/airbnb/javascript) will guide you in the right direction.
+However, there are still some styles that the linter cannot pick up. If you are unsure about something, looking at [Airbnb's Style Guide](https://github.com/airbnb/javascript) will guide you in the right direction.
 
 ## Git Branch Organization
 
-Submit all changes directly to the [`master branch`](https://github.com/streetwriters/notesnook). We don’t use separate branches for development or for upcoming releases. This requires us to always keep the `master` branch in a deployable state which means:
+Submit all changes directly to the [`master branch`](https://github.com/streetwriters/notesnook). We don't use separate branches for development or for upcoming releases. This requires us to always keep the `master` branch in a deployable state which means:
 
 1. All tests must be passing at all times
 2. There should be as few breaking changes as possible
