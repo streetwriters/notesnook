@@ -4,7 +4,7 @@ Thank you so much for considering to contribute to Notesnook! If you have no ide
 
 ## Ways to Contribute
 
-### Reporting a bug  
+### Reporting a bug
 
 Ugh! Bugs!
 
