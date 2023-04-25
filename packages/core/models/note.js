@@ -137,10 +137,12 @@ export default class Note {
     return await this._db.notes.add({
       ...this._note,
       id: undefined,
-      content: {
-        type: content.type,
-        data: content.data
-      },
+      content: content
+        ? {
+            type: content.type,
+            data: content.data
+          }
+        : undefined,
       readonly: false,
       favorite: false,
       pinned: false,
