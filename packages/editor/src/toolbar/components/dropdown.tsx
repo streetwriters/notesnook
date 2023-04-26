@@ -64,6 +64,7 @@ export function Dropdown(props: DropdownProps) {
           m: 0,
           bg: isPopupOpen ? "hover" : "transparent",
           mr: 1,
+          flexShrink: 0,
           display: "flex",
           alignItems: "center",
           ":hover": { bg: "hover" },
@@ -75,7 +76,9 @@ export function Dropdown(props: DropdownProps) {
         onMouseDown={(e) => e.preventDefault()}
       >
         {typeof selectedItem === "string" ? (
-          <Text sx={{ fontSize: "subBody", mr: 1, color: "text" }}>
+          <Text
+            sx={{ fontSize: "subBody", mr: 1, color: "text", flexShrink: 0 }}
+          >
             {selectedItem}
           </Text>
         ) : (
