@@ -168,6 +168,7 @@ module.exports = (env) => {
             /node_modules(.*[/\\])+@microsoft/,
             /node_modules(.*[/\\])+@msgpack/,
             /node_modules(.*[/\\])+liqe/,
+            /node_modules(.*[/\\])+leac/,
             /node_modules(.*[/\\])+selderee/,
             /node_modules(.*[/\\])+html-to-text/,
             /node_modules(.*[/\\])+buffer/,
