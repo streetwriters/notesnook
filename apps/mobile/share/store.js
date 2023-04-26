@@ -31,8 +31,8 @@ export async function initDatabase() {
   if (!db.isInitialized) {
     // Only load collections in database.
     await db.initCollections();
-    await db.notes.init();
   }
+  await db.notes.init();
 }
 
 const StorageKeys = {
