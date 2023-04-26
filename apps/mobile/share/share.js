@@ -62,16 +62,15 @@ async function sanitizeHtml(site) {
 }
 
 function makeHtmlFromUrl(url) {
-  return `<a style="overflow-wrap:anywhere;white-space:pre-wrap" href='${url}' target='_blank'>${url}</a>`;
+  return `<a href='${url}' target='_blank'>${url}</a>`;
 }
 
 function makeHtmlFromPlainText(text) {
   if (!text) return "";
 
-  return `<p style="overflow-wrap:anywhere;white-space:pre-wrap" >${text.replace(
-    /(?:\r\n|\r|\n)/g,
-    "<br>"
-  )}</p>`;
+  return `<p>${text
+    .replace(/[\n]+/g, "\n")
+    .replace(/(?:\r\n|\r|\n)/g, "</p><p>")}</p>`;
 }
 
 function getBaseUrl(site) {
