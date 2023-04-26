@@ -203,14 +203,15 @@ const onEvent = async ({ type, detail }: Event) => {
           reply_button_text: "Take note",
           reply_placeholder_text: "Write something..."
         });
-        await initDatabase(false);
+        if (!db.isInitialized) await db.init();
+        await db.notes?.init();
         await db.notes?.add({
           content: {
             type: "tiptap",
             data: `<p>${input} </p>`
           }
         });
-        await db.notes?.init();
+        await db.sync(false, false);
         useNoteStore.getState().setNotes();
         break;
     }

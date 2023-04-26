@@ -26,12 +26,12 @@ import {
   Keyboard,
   Platform,
   SafeAreaView,
+  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
-  useWindowDimensions,
   View,
-  ScrollView
+  useWindowDimensions
 } from "react-native";
 import {
   SafeAreaProvider,
@@ -45,10 +45,9 @@ import Storage from "../app/common/database/storage";
 import { eSendEvent } from "../app/services/event-manager";
 import { getElevation } from "../app/utils";
 import { eOnLoadNote } from "../app/utils/events";
-import { sleep } from "../app/utils/time";
+import { Editor } from "./editor";
 import { Search } from "./search";
 import { initDatabase, useShareStore } from "./store";
-import { Editor } from "./editor";
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
 };
@@ -315,7 +314,6 @@ const ShareView = ({ quicknote = false }) => {
   const onPress = async () => {
     setLoading(true);
     await initDatabase();
-    await sleep(1500);
     if (!noteContent.current) return;
     if (appendNote && !db.notes.note(appendNote.id)) {
       useShareStore.getState().setAppendNote(null);
@@ -358,6 +356,7 @@ const ShareView = ({ quicknote = false }) => {
         }
       }
     }
+    await db.sync(false, false);
     await Storage.write("notesAddedFromIntent", "added");
     close();
     setLoading(false);

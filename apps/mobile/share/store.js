@@ -29,8 +29,7 @@ import { db } from "../app/common/database";
 
 export async function initDatabase() {
   if (!db.isInitialized) {
-    // Only load collections in database.
-    await db.initCollections();
+    await db.init();
   }
   await db.notes.init();
 }
