@@ -29,13 +29,13 @@ export default class Subscriptions {
   }
 
   async cancel() {
-    const token = this._tokenManager.getAccessToken();
+    const token = await this._tokenManager.getAccessToken();
     if (!token) return;
     await http.delete(`${hosts.SUBSCRIPTIONS_HOST}/subscriptions`, token);
   }
 
   async updateUrl() {
-    const token = this._tokenManager.getAccessToken();
+    const token = await this._tokenManager.getAccessToken();
     if (!token) return;
     return await http.get(
       `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/update_url`,
