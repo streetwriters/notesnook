@@ -209,8 +209,8 @@ const onEvent = async ({ type, detail }: Event) => {
             data: `<p>${input} </p>`
           }
         });
-        await db.notes?.init();
         if (!db.isInitialized) await db.init();
+        await db.notes?.init();
         await db.sync(false, false);
         useNoteStore.getState().setNotes();
         break;
