@@ -635,6 +635,7 @@ export const useEditor = (
     saveContent,
     onContentChanged,
     editorId: editorId,
-    markImageLoaded
+    markImageLoaded,
+    overlay
   };
 };
