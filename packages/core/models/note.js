@@ -24,6 +24,7 @@ import { getContentFromData } from "../content-types";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { addItem, deleteItem } from "../utils/array";
 import { formatDate } from "../utils/date";
+import qclone from "qclone";
 
 export default class Note {
   /**
@@ -135,12 +136,14 @@ export default class Note {
   async duplicate() {
     const content = await this._db.content.raw(this._note.contentId);
     return await this._db.notes.add({
-      ...this._note,
+      ...qclone(this._note),
       id: undefined,
-      content: {
-        type: content.type,
-        data: content.data
-      },
+      content: content
+        ? {
+            type: content.type,
+            data: content.data
+          }
+        : undefined,
       readonly: false,
       favorite: false,
       pinned: false,

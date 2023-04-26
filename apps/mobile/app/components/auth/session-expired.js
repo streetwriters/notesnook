@@ -44,8 +44,10 @@ import Paragraph from "../ui/typography/paragraph";
 import { LoginSteps, useLogin } from "./use-login";
 
 function getObfuscatedEmail(email) {
-  if (!email) return null;
-  return email.replace(/(.{2})(.*)(?=@)/, function (gp1, gp2, gp3) {
+  if (!email) return "";
+  const [username, provider] = email.split("@");
+  if (username.length === 1) return `****@${provider}`;
+  return email.replace(/(.{1})(.*)(?=@)/, function (gp1, gp2, gp3) {
     for (let i = 0; i < gp3.length; i++) {
       gp2 += "*";
     }

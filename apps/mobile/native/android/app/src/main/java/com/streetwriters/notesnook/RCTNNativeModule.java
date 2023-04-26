@@ -4,6 +4,7 @@ package com.streetwriters.notesnook;
 import android.graphics.Color;
 import android.view.WindowManager;
 
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -35,6 +36,16 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
 
         }
     }
+
+    @ReactMethod
+    public void getActivityName(Promise promise) {
+        try {
+            promise.resolve(getCurrentActivity().getClass().getSimpleName());
+        } catch (Exception e) {
+            promise.resolve(null);
+        }
+    }
+
 
 
     @ReactMethod

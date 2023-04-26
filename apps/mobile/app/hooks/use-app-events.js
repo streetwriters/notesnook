@@ -571,8 +571,8 @@ export const useAppEvents = () => {
       if (notesAddedFromIntent || shareExtensionOpened) {
         let id = useEditorStore.getState().currentEditingNote;
         let note = id && db.notes.note(id).data;
-        eSendEvent("loadingNote", note);
         eSendEvent("webview_reset");
+        setTimeout(() => eSendEvent("loadingNote", note), 1);
         MMKV.removeItem("shareExtensionOpened");
       }
     } catch (e) {

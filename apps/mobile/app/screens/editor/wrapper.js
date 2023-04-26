@@ -51,6 +51,7 @@ export const EditorWrapper = ({ width }) => {
     if (editorState().movedAway) return;
     if (state === "active") {
       editorController.current.onReady();
+      editorController.current.overlay(false);
     }
   };
 
