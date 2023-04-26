@@ -358,6 +358,8 @@ const ShareView = ({ quicknote = false }) => {
         }
       }
     }
+    if (!db.isInitialized) await db.init();
+    await db.sync(false, false);
     await Storage.write("notesAddedFromIntent", "added");
     close();
     setLoading(false);

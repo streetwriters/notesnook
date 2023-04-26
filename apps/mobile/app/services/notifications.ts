@@ -210,6 +210,8 @@ const onEvent = async ({ type, detail }: Event) => {
           }
         });
         await db.notes?.init();
+        if (!db.isInitialized) await db.init();
+        await db.sync(false, false);
         useNoteStore.getState().setNotes();
         break;
     }
