@@ -23,13 +23,18 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import Notebook from "../../screens/notebook";
 import { TopicNotes } from "../../screens/notes/topic-notes";
-import { presentSheet, ToastEvent } from "../../services/event-manager";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastEvent
+} from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useNotebookStore } from "../../stores/use-notebook-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
+import { eClearEditor } from "../../utils/events";
 
 export default function Notebooks({ note, close, full }) {
   const colors = useThemeStore((state) => state.colors);
@@ -112,6 +117,7 @@ export default function Notebooks({ note, close, full }) {
         size={SIZE.sm}
         onPress={() => {
           navigateNotebook(item.id);
+          eSendEvent(eClearEditor);
           close();
         }}
       >
@@ -134,6 +140,7 @@ export default function Notebooks({ note, close, full }) {
             key={topic.id}
             onPress={() => {
               navigateTopic(topic.id, item.id);
+              eSendEvent(eClearEditor);
               close();
             }}
             onLongPress={async () => {
