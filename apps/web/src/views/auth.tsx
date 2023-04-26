@@ -1019,13 +1019,14 @@ function openURL(url: string, force?: boolean) {
 
 function maskEmail(email: string) {
   if (!email) return "";
-  const [username, domain] = email.split("@");
-  const maskChars = "*".repeat(
-    username.substring(2, username.length - 2).length
-  );
-  return `${username.substring(0, 2)}${maskChars}${username.substring(
-    username.length - 2
-  )}@${domain}`;
+  const [username, provider] = email.split("@");
+  if (username.length === 1) return `****@${provider}`;
+  return email.replace(/(.{1})(.*)(?=@)/, function (gp1, gp2, gp3) {
+    for (let i = 0; i < gp3.length; i++) {
+      gp2 += "*";
+    }
+    return gp2;
+  });
 }
 
 function isSessionExpired() {
