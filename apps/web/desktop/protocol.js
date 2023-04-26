@@ -71,6 +71,11 @@ function registerProtocol() {
         var response;
         try {
           const body = await getBody(request);
+
+          if (request.referrer.includes("youtube")) {
+            protocol.uninterceptProtocol(PROTOCOL);
+            return;
+          }
           response = await fetch(request.url, {
             ...request,
             body,
