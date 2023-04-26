@@ -86,8 +86,9 @@ async function getNextMonthlyReminderDate(
 }
 
 async function initDatabase(notes = true) {
-  if (db.isInitialized) return;
-  await db.initCollections();
+  if (!db.isInitialized) {
+    await db.initCollections();
+  }
   if (notes) {
     await db.notes?.init();
   }
