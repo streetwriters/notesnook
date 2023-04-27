@@ -54,13 +54,12 @@ const clean: ThemeUIStyleObject = {
 
 const error: ThemeUIStyleObject = {
   variant: "forms.input",
-  boxShadow: "0px 0px 0px 1px var(--error) inset",
-  outline: "none",
+  outline: "1.5px solid var(--error)",
   ":focus": {
-    boxShadow: "0px 0px 0px 1.5px var(--error) inset"
+    outline: "2px solid var(--error)"
   },
   ":hover:not(:focus)": {
-    boxShadow: "0px 0px 0px 1px var(--error) inset"
+    outline: "1.5px solid var(--error)"
   }
 };
 
