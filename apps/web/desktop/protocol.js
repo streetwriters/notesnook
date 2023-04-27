@@ -67,9 +67,7 @@ function registerProtocol() {
           mimeType: extensionToMimeType[fileExtension]
         });
       } else {
-  
-            protocol.uninterceptProtocol(PROTOCOL);
-            return;
+        protocol.uninterceptProtocol(PROTOCOL);
       }
     }
   );
@@ -81,7 +79,7 @@ function registerProtocol() {
   );
 }
 
-const bypassedRoutes = ["/notes/index_v14.json", "/notes/welcome-web"];
+const bypassedRoutes = [];
 function shouldInterceptRequest(url) {
   let shouldIntercept = url.hostname === HOSTNAME;
   return shouldIntercept && !bypassedRoutes.includes(url.pathname);
