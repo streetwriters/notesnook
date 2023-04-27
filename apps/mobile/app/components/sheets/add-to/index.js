@@ -42,6 +42,7 @@ import { SelectionProvider } from "./context";
 import { FilteredList } from "./filtered-list";
 import { ListItem } from "./list-item";
 import { useItemSelectionStore } from "./store";
+import { useRelationStore } from "../../../stores/use-relation-store";
 
 const MoveNoteSheet = ({ note, actionSheetRef }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -263,7 +264,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
       if (itemState[id] === "selected") {
         if (item.type === "notebook") {
           for (let noteId of noteIds) {
-            db.relations.add(item, { id: noteId, type: "note" });
+            await db.relations.add(item, { id: noteId, type: "note" });
           }
         } else {
           await db.notes.addToNotebook(
@@ -278,7 +279,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
       } else if (itemState[id] === "deselected") {
         if (item.type === "notebook") {
           for (let noteId of noteIds) {
-            db.relations.unlink(item, { id: noteId, type: "note" });
+            await db.relations.unlink(item, { id: noteId, type: "note" });
           }
         } else {
           await db.notes.removeFromNotebook(
@@ -296,6 +297,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
     setNotebooks();
     eSendEvent(eOnTopicSheetUpdate);
     SearchService.updateAndSearch();
+    useRelationStore.getState().update();
     actionSheetRef.current?.hide();
   };
 
