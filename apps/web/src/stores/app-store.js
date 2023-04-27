@@ -35,7 +35,9 @@ import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/common";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
+import { NetworkCheck } from "../utils/network-check";
 
+const networkCheck = new NetworkCheck();
 var syncStatusTimeout = 0;
 const BATCH_SIZE = 50;
 class AppStore extends BaseStore {
@@ -128,7 +130,7 @@ class AppStore extends BaseStore {
         if (type === "online") {
           // a slight delay to make sure sockets are open and can be connected
           // to. Otherwise, this fails miserably.
-          await new Promise((resolve) => setTimeout(resolve, 2000));
+          await networkCheck.waitForInternet();
         }
         await db.connectSSE({ force: type === "online" }).catch(logger.error);
       } else if (type === "offline") {
