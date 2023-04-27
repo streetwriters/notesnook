@@ -18,10 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex } from "@theme-ui/components";
-import {
-  ReactNodeView,
-  ReactNodeViewProps,
-} from "../react";
+import { ReactNodeView, ReactNodeViewProps } from "../react";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "../../types";
 import { Editor as TiptapEditor } from "@tiptap/core";
@@ -263,7 +260,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
     >
       <TableProperties
         editor={editor}
-        title="tableProperties"
+        title="Table properties"
         icon="more"
         variant={"small"}
       />
