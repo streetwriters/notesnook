@@ -1,10 +1,6 @@
-- Added default font size & font family settings
-- Redesign reminder/notebook sheets to improve UX
-- Fixed an issue causing sync to fail
-- Fix tag suggestions in share extension
-- Fix app font sizes too small in some places
-- Improved mobile editor performance on low-end devices
-- Fix pin to notifications not working
-- Bug fixes and performance improvements
+- Sync notes created from share extension & notification quick notes in background
+- Fix formatting is lost when sharing notes to other apps
+- Fix editor would be blank after entering the app from background sometimes
+- Small bug fixes and UX improvements
 
 Thank you for using Notesnook!

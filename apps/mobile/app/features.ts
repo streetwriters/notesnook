@@ -19,9 +19,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FeatureType } from "./components/sheets/new-feature";
 
-export const features: FeatureType[] = [
-  {
-    title: "Default font size & font family",
-    body: "Now you can set default font size and font family in editor that will be used across all your new and old notes."
-  }
-];
+export const features: FeatureType[] = [];
