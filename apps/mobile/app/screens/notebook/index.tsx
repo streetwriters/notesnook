@@ -118,6 +118,7 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
       get: () => {
         const notebook = db.notebooks?.notebook(params?.current?.item?.id)
           ?.data as NotebookType;
+        if (!notebook) return [];
         return db.relations?.from(notebook, "note");
       }
     });
