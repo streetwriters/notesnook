@@ -44,7 +44,8 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Paragraph from "../../ui/typography/paragraph";
-let RNFetchBlob;
+import RNFetchBlob from "rn-fetch-blob";
+
 const RestoreDataSheet = () => {
   const [visible, setVisible] = useState(false);
   const [restoring, setRestoring] = useState(false);
@@ -213,7 +214,6 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
           return;
         }
       } else {
-        RNFetchBlob = (await import("rn-fetch-blob")).default;
         let path = await storage.checkAndCreateDir("/backups/");
         files = await RNFetchBlob.fs.lstat(path);
       }

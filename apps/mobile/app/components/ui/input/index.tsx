@@ -40,6 +40,8 @@ import { getElevation } from "../../../utils";
 import { SIZE } from "../../../utils/size";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
+import phone from "phone";
+
 interface InputProps extends TextInputProps {
   fwdRef?: RefObject<TextInput>;
   validationType?:
@@ -149,7 +151,6 @@ const Input = ({
         isError = customValidator && value === customValidator();
         break;
       case "phonenumber": {
-        const { default: phone } = await import("phone");
         const result = phone(value, {
           strictDetection: true,
           validateMobilePrefix: true

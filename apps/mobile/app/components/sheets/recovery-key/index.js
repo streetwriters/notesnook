@@ -43,8 +43,7 @@ import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import { QRCode } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
-
-let RNFetchBlob;
+import RNFetchBlob from "rn-fetch-blob";
 
 class RecoveryKeySheet extends React.Component {
   constructor(props) {
@@ -115,7 +114,6 @@ class RecoveryKeySheet extends React.Component {
     this.svg.current?.toDataURL(async (data) => {
       try {
         let path;
-        RNFetchBlob = (await import("rn-fetch-blob")).default;
         let fileName = "nn_" + this.user.email + "_recovery_key_qrcode";
         fileName = sanitizeFilename(fileName, { replacement: "_" });
         fileName = fileName + ".png";
@@ -151,7 +149,6 @@ class RecoveryKeySheet extends React.Component {
       fileName = sanitizeFilename(fileName, { replacement: "_" });
       fileName = fileName + ".txt";
 
-      RNFetchBlob = (await import("rn-fetch-blob")).default;
       if (Platform.OS === "android") {
         let file = await ScopedStorage.createDocument(
           fileName,
