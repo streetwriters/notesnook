@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import Worker from "worker-loader?filename=static/workers/network.worker.[contenthash].js!./network.worker";
+import Worker from "worker-loader?filename=static/workers/network-check.worker.[contenthash].js!./network-check.worker";
 import type { NetworkCheck as NetworkWorker } from "./network-check.worker";
 import { wrap, Remote } from "comlink";
 
