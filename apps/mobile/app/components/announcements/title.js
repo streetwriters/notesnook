@@ -67,7 +67,7 @@ export const Title = ({ text, style = {}, inline }) => {
           right: 0
         }}
         iconSize={24}
-        fontSize={SIZE.xs + 1}
+        fontSize={SIZE.xs}
         style={{
           borderRadius: 100,
           paddingVertical: 0,

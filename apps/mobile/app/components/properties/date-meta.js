@@ -62,10 +62,10 @@ export const DateMeta = ({ item }) => {
         paddingVertical: 3
       }}
     >
-      <Paragraph size={SIZE.xs + 1} color={colors.icon}>
+      <Paragraph size={SIZE.xs} color={colors.icon}>
         {getNameFromKey(key)}
       </Paragraph>
-      <Paragraph size={SIZE.xs + 1} color={colors.icon}>
+      <Paragraph size={SIZE.xs} color={colors.icon}>
         {timeConverter(item[key])}
       </Paragraph>
     </View>

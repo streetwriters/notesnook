@@ -119,7 +119,7 @@ export default function ReminderNotify({
           marginTop: 10
         }}
       >
-        <Paragraph size={SIZE.xs + 1}>Remind me in:</Paragraph>
+        <Paragraph size={SIZE.xs}>Remind me in:</Paragraph>
         {QuickActions.map((item) => {
           return (
             <Button
@@ -127,7 +127,7 @@ export default function ReminderNotify({
               key={item.title}
               title={item.title}
               height={30}
-              fontSize={SIZE.xs + 1}
+              fontSize={SIZE.xs}
               style={{ marginLeft: 10, borderRadius: 100 }}
               onPress={() => onSnooze(item.time)}
             />
@@ -150,7 +150,7 @@ export default function ReminderNotify({
           <Paragraph
             style={{
               color: colors.icon,
-              fontSize: SIZE.xs + 1,
+              fontSize: SIZE.xs,
               marginBottom: 10
             }}
           >

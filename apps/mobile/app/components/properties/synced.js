@@ -91,7 +91,7 @@ export const Synced = ({ item, close }) => {
             console.error(e);
           }
         }}
-        fontSize={SIZE.xs + 1}
+        fontSize={SIZE.xs}
         title="Learn more"
         height={30}
         type="grayAccent"

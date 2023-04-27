@@ -115,12 +115,12 @@ export const Items = ({ item, buttons, close }) => {
         onPress={item.func}
         key={item.id}
         testID={"icon-" + item.id}
+        activeOpacity={1}
         customStyle={{
           alignSelf: "flex-start",
-          width: topBarItemWidth,
           marginRight: isLast ? 0 : 10,
-          backgroundColor: "transparent",
-          paddingHorizontal: 0
+          paddingHorizontal: 0,
+          width: topBarItemWidth
         }}
       >
         <PressableButton
@@ -183,7 +183,7 @@ export const Items = ({ item, buttons, close }) => {
         horizontal
         style={{
           paddingHorizontal: 12,
-          paddingTop: 12
+          paddingVertical: 12
         }}
       >
         {topBarItems.map(renderTopBarItem)}

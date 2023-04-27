@@ -209,7 +209,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
           }}
         >
           <Paragraph
-            size={SIZE.xs + 1}
+            size={SIZE.xs}
             style={{
               marginRight: 10
             }}
@@ -221,7 +221,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
             style={{
               marginRight: 10
             }}
-            size={SIZE.xs + 1}
+            size={SIZE.xs}
             color={colors.icon}
           >
             {formatBytes(attachment.length)}
@@ -232,7 +232,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
               style={{
                 marginRight: 10
               }}
-              size={SIZE.xs + 1}
+              size={SIZE.xs}
               color={colors.icon}
             >
               {attachment.noteIds.length} note
@@ -248,7 +248,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
                 context: "local"
               });
             }}
-            size={SIZE.xs + 1}
+            size={SIZE.xs}
             color={colors.icon}
           >
             {attachment.metadata.hash}
@@ -304,7 +304,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
                 }}
                 key={item.id}
               >
-                <Paragraph size={SIZE.xs + 1}>{item.title}</Paragraph>
+                <Paragraph size={SIZE.xs}>{item.title}</Paragraph>
               </PressableButton>
             ))}
           </>

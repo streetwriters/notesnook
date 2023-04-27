@@ -108,7 +108,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                   backgroundColor: "transparent",
                   paddingHorizontal: 0
                 }}
-                fontSize={SIZE.xs + 1}
+                fontSize={SIZE.xs}
               />
             ) : null}
           </View>

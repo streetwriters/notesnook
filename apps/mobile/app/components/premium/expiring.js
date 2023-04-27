@@ -143,7 +143,7 @@ export const Expiring = () => {
                     await sleep(300);
                     eSendEvent(eOpenPremiumDialog, promo);
                   }}
-                  size={SIZE.xs + 1}
+                  size={SIZE.xs}
                   style={{
                     textDecorationLine: "underline",
                     color: colors.icon,

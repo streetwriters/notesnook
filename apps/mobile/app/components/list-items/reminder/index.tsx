@@ -108,7 +108,7 @@ const ReminderItem = React.memo(
                   color={colors.errorText}
                 />
                 <Paragraph
-                  size={SIZE.xs + 1}
+                  size={SIZE.xs}
                   color={colors.icon}
                   style={{ marginLeft: 5 }}
                 >
@@ -133,7 +133,7 @@ const ReminderItem = React.memo(
               >
                 <Icon name="reload" size={SIZE.md} color={colors.accent} />
                 <Paragraph
-                  size={SIZE.xs + 1}
+                  size={SIZE.xs}
                   color={colors.icon}
                   style={{ marginLeft: 5 }}
                 >
@@ -147,7 +147,7 @@ const ReminderItem = React.memo(
             <ReminderTime
               reminder={item}
               checkIsActive={false}
-              fontSize={SIZE.xs + 1}
+              fontSize={SIZE.xs}
               style={{
                 justifyContent: "flex-start",
                 borderWidth: 0,

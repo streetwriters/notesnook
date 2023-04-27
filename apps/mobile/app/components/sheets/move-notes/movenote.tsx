@@ -158,11 +158,7 @@ export const MoveNotes = ({
               {item.title}
             </Paragraph>
             {item.type == "note" && item.headline ? (
-              <Paragraph
-                numberOfLines={1}
-                color={colors.icon}
-                size={SIZE.xs + 1}
-              >
+              <Paragraph numberOfLines={1} color={colors.icon} size={SIZE.xs}>
                 {item.headline}
               </Paragraph>
             ) : null}

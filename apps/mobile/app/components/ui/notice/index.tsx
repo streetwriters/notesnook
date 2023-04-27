@@ -65,7 +65,7 @@ export const Notice = ({
           flexShrink: 1
         }}
         selectable={selectable}
-        size={isSmall ? SIZE.xs + 1 : SIZE.sm}
+        size={isSmall ? SIZE.xs : SIZE.sm}
       >
         {text}
       </Paragraph>

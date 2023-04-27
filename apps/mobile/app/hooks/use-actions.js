@@ -613,7 +613,7 @@ export const useActions = ({ close = () => null, item }) => {
     },
     {
       id: "pin",
-      title: "Pin",
+      title: item.pinned ? "Unpin" : "Pin",
       icon: item.pinned ? "pin-off-outline" : "pin-outline",
       func: pinItem,
       close: false,
@@ -623,7 +623,7 @@ export const useActions = ({ close = () => null, item }) => {
     },
     {
       id: "favorite",
-      title: "Favorite",
+      title: item.favorite ? "Unfavorite" : "Favorite",
       icon: item.favorite ? "star-off" : "star-outline",
       func: addToFavorites,
       close: false,
@@ -701,7 +701,7 @@ export const useActions = ({ close = () => null, item }) => {
     },
     {
       id: "read-only",
-      title: "Read only",
+      title: "Readonly",
       icon: "pencil-lock",
       func: toggleReadyOnlyMode,
       on: item.readonly

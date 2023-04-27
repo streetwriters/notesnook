@@ -162,7 +162,7 @@ export default function Notebooks({ note, close, full }) {
             title={topic.title}
             type="gray"
             height={30}
-            fontSize={SIZE.xs + 1}
+            fontSize={SIZE.xs}
             icon="bookmark-outline"
             style={{
               marginRight: 5,
@@ -191,7 +191,7 @@ export default function Notebooks({ note, close, full }) {
       {noteNotebooks.length > 1 && !full ? (
         <Button
           title={`See all linked notebooks`}
-          fontSize={SIZE.xs + 1}
+          fontSize={SIZE.xs}
           style={{
             alignSelf: "flex-end",
             marginRight: 12,

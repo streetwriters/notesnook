@@ -57,7 +57,7 @@ export const Tags = ({ item, close }) => {
         icon="plus"
         iconPosition="right"
         height={30}
-        fontSize={SIZE.xs + 1}
+        fontSize={SIZE.xs}
         style={{
           marginRight: 5,
           borderRadius: 100,
@@ -107,7 +107,7 @@ const TagItem = ({ tag, close }) => {
       title={"#" + tag}
       type="grayBg"
       height={20}
-      fontSize={SIZE.xs + 1}
+      fontSize={SIZE.xs}
       style={style}
       textStyle={{
         textDecorationLine: "underline"

@@ -39,7 +39,7 @@ export const Topics = ({ item, close }) => {
       height={30}
       onPress={() => open(topic)}
       icon="bookmark-outline"
-      fontSize={SIZE.xs + 1}
+      fontSize={SIZE.xs}
       style={{
         marginRight: 5,
         paddingHorizontal: 8,

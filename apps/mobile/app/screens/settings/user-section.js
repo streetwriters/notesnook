@@ -109,7 +109,7 @@ const SettingsUserSection = ({ item }) => {
                         flexGrow: 1
                       }}
                     >
-                      <Heading color={colors.accent} size={SIZE.xs + 1}>
+                      <Heading color={colors.accent} size={SIZE.xs}>
                         {SUBSCRIPTION_STATUS_STRINGS[
                           user.subscription?.type
                         ]?.toUpperCase() || "Basic"}

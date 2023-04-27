@@ -550,7 +550,7 @@ export default function ReminderSheet({
             }}
           >
             <>
-              <Paragraph size={SIZE.xs + 1} color={colors.icon}>
+              <Paragraph size={SIZE.xs} color={colors.icon}>
                 {recurringMode === RecurringModes.Daily
                   ? "Repeats daily " + `at ${dayjs(date).format("hh:mm A")}.`
                   : selectedDays.length === 7 &&

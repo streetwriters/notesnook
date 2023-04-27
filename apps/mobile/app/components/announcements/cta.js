@@ -148,7 +148,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.xs + 1}
+                fontSize={SIZE.xs}
                 type="gray"
                 onPress={() => onPress(item)}
                 width={null}
