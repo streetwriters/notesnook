@@ -22,7 +22,6 @@ import { isDevelopment, getPath } from "./utils";
 import { createReadStream } from "fs";
 import { extname, normalize } from "path";
 import { logger } from "./logger";
-import { Blob } from "buffer";
 import { URL } from "url";
 
 const FILE_NOT_FOUND = -6;
@@ -68,30 +67,7 @@ function registerProtocol() {
           mimeType: extensionToMimeType[fileExtension]
         });
       } else {
-        var response;
-        try {
-          const body = await getBody(request);
-          response = await fetch(request.url, {
-            ...request,
-            body,
-            headers: {
-              ...request.headers,
-              origin: `${PROTOCOL}://${HOSTNAME}/`
-            },
-            redirect: "manual"
-          });
-        } catch (e) {
-          console.error(e);
-          logger.error(`Error sending request to `, request.url, "Error: ", e);
-          callback({ statusCode: 400 });
-          return;
-        }
-        callback({
-          statusCode: response.status,
-          data: response.body,
-          headers: Object.fromEntries(response.headers.entries()),
-          mimeType: response.headers.get("Content-Type")
-        });
+        protocol.uninterceptProtocol(PROTOCOL);
       }
     }
   );
@@ -103,34 +79,10 @@ function registerProtocol() {
   );
 }
 
-const bypassedRoutes = ["/notes/index_v14.json", "/notes/welcome-web"];
+const bypassedRoutes = [];
 function shouldInterceptRequest(url) {
   let shouldIntercept = url.hostname === HOSTNAME;
   return shouldIntercept && !bypassedRoutes.includes(url.pathname);
-}
-
-/**
- *
- * @param {Electron.ProtocolRequest} request
- */
-async function getBody(request) {
-  /**
-   * @type {Electron.Session}
-   */
-  const session = globalThis.window.webContents.session;
-
-  const blobParts = [];
-  if (!request.uploadData || !request.uploadData.length) return null;
-  for (let data of request.uploadData) {
-    if (data.type === "rawData") {
-      blobParts.push(new Uint8Array(data.bytes));
-    } else if (data.type === "blob") {
-      const buffer = await session.getBlobData(data.blobUUID);
-      blobParts.push(new Uint8Array(buffer));
-    }
-  }
-  const blob = new Blob(blobParts);
-  return await blob.arrayBuffer();
 }
 
 const PROTOCOL_URL = `${PROTOCOL}://${HOSTNAME}/`;
