@@ -124,10 +124,10 @@ export function Highlight(props: ToolProps) {
       cacheKey="highlight"
       activeColor={editor.getAttributes("textStyle").backgroundColor}
       title={"Background color"}
-      onColorChange={(color) =>
+      onColorChange={(color) => 
         color
-          ? editor.current?.chain().focus().setHighlight(color).run()
-          : editor.current?.chain().focus().unsetHighlight().run()
+          ? editor.current?.chain().blur().setHighlight(color).run()
+          : editor.current?.chain().blur().unsetHighlight().run()
       }
     />
   );
@@ -141,10 +141,11 @@ export function TextColor(props: ToolProps) {
       cacheKey={"textColor"}
       activeColor={editor.getAttributes("textStyle").color}
       title="Text color"
-      onColorChange={(color) =>
+      onColorChange={(color) => 
         color
-          ? editor.current?.chain().focus().setColor(color).run()
-          : editor.current?.chain().focus().unsetColor().run()
+          ? editor.current?.chain().blur().setColor(color).run()
+          : editor.current?.chain().blur().unsetColor().run()
+          
       }
     />
   );
