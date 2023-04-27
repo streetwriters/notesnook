@@ -41,6 +41,8 @@ import { useCheckoutStore } from "./store";
 import { getCurrencySymbol } from "./helpers";
 import { Theme } from "@notesnook/theme";
 import { isMacStoreApp } from "../../../utils/platform";
+import { isUserSubscribed } from "../../../hooks/use-is-user-premium";
+import { SUBSCRIPTION_STATUS } from "../../../common/constants";
 
 type BuyDialogProps = {
   couponCode?: string;
@@ -156,7 +158,7 @@ type SideBarProps = {
 };
 function SideBar(props: SideBarProps) {
   const { initialPlan, onClose } = props;
-  const [showPlans, setShowPlans] = useState(!!initialPlan);
+  const [showPlans, setShowPlans] = useState(false);
   const onPlanSelected = useCheckoutStore((state) => state.selectPlan);
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
   const pricingInfo = useCheckoutStore((state) => state.pricingInfo);
@@ -176,7 +178,13 @@ function SideBar(props: SideBarProps) {
       />
     );
 
-  if (user && showPlans)
+  if (user && !showPlans && isUserSubscribed(user)) {
+    return (
+      <AlreadyPremium user={user} onShowPlans={() => setShowPlans(true)} />
+    );
+  }
+
+  if (user && (showPlans || !!initialPlan))
     return (
       <PlansList
         onPlansLoaded={(plans) => {
@@ -341,6 +349,47 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
             ? "Please select a plan to use your coupon:"
             : `Please sign up or login to use your coupon:`}{" "}
           <b>{couponCode}</b>
+        </Text>
+      )}
+    </>
+  );
+}
+
+type AlreadyPremiumProps = {
+  user: User | undefined;
+  onShowPlans: () => void;
+};
+function AlreadyPremium(props: AlreadyPremiumProps) {
+  const { user, onShowPlans } = props;
+
+  const isCanceled =
+    user?.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELED;
+
+  return (
+    <>
+      <Rocket width={200} />
+      <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
+        Notesnook Pro
+      </Text>
+      {isCanceled ? (
+        <>
+          <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
+            Resubscribing to Notesnook Pro will replace your existing
+            subscription.
+          </Text>
+          <Button
+            variant="primary"
+            mt={2}
+            sx={{ borderRadius: 100, px: 6 }}
+            onClick={onShowPlans}
+            data-test-id="see-all-plans"
+          >
+            Continue
+          </Button>
+        </>
+      ) : (
+        <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
+          You are already subscribed to Notesnook Pro.
         </Text>
       )}
     </>

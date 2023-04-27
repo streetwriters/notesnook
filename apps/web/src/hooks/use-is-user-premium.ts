@@ -41,3 +41,13 @@ export function isUserPremium(user?: User) {
     subStatus === SUBSCRIPTION_STATUS.TRIAL
   );
 }
+
+export function isUserSubscribed(user?: User) {
+  if (!user) user = userstore.get().user;
+
+  const subStatus = user?.subscription?.type;
+  return (
+    subStatus === SUBSCRIPTION_STATUS.PREMIUM ||
+    subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELED
+  );
+}
