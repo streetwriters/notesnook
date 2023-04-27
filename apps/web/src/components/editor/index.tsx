@@ -369,46 +369,59 @@ function EditorChrome(
       ) : null}
 
       <Toolbar />
-      <FlexScrollContainer
-        className="editorScroll"
-        style={{ display: "flex", flexDirection: "column", flex: 1 }}
-      >
-        <Flex
-          variant="columnFill"
-          className="editor"
-          sx={{
-            alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
-            maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
-            width: "100%"
-          }}
-          px={6}
-          onClick={onRequestFocus}
+      <Flex sx={{ justifyContent: "center", overflow: "hidden", flex: 1 }}>
+        <FlexScrollContainer
+          className="editorScroll"
+          style={{ display: "flex", flexDirection: "column", flex: 1 }}
         >
-          {!isMobile && (
-            <Box
-              id="editorToolbar"
-              sx={{
-                display: readonly ? "none" : "flex",
-                bg: "background",
-                position: "sticky",
-                top: 0,
-                mb: 1,
-                zIndex: 2
-              }}
-            />
-          )}
-          <Titlebox readonly={readonly || false} />
-          <Header readonly={readonly} />
-          <AnimatedFlex
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isLoading ? 0 : 1 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+          <Flex
+            variant="columnFill"
+            className="editor"
+            sx={{
+              alignSelf: [
+                "stretch",
+                focusMode ? "center" : "stretch",
+                "center"
+              ],
+              maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
+              width: "100%"
+            }}
+            px={6}
+            onClick={onRequestFocus}
           >
-            {children}
-          </AnimatedFlex>
-        </Flex>
-      </FlexScrollContainer>
-
+            {!isMobile && (
+              <Box
+                id="editorToolbar"
+                sx={{
+                  display: readonly ? "none" : "flex",
+                  bg: "background",
+                  position: "sticky",
+                  top: 0,
+                  mb: 1,
+                  zIndex: 2
+                }}
+              />
+            )}
+            <Titlebox readonly={readonly || false} />
+            <Header readonly={readonly} />
+            <AnimatedFlex
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isLoading ? 0 : 1 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              {children}
+            </AnimatedFlex>
+          </Flex>
+        </FlexScrollContainer>
+        <Flex
+          id="editorSidebar"
+          sx={{
+            flexDirection: "column",
+            overflow: "hidden",
+            borderLeft: "1px solid var(--border)"
+          }}
+        ></Flex>
+      </Flex>
       {isMobile && (
         <Box
           id="editorToolbar"

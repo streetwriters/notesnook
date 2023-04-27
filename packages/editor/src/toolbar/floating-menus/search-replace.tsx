@@ -20,31 +20,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SearchStorage } from "../../extensions/search-replace";
 import { FloatingMenuProps } from "./types";
 import { SearchReplacePopup } from "../popups/search-replace";
-import { ResponsivePresenter } from "../../components/responsive";
+import { SearchReplacePopupMobile } from "../popups/search-replace.mobile";
+import {
+  DesktopOnly,
+  MobileOnly,
+  ResponsivePresenter
+} from "../../components/responsive";
 import { getToolbarElement } from "../utils/dom";
+import ReactDOM from "react-dom";
 
 export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
   const { editor } = props;
   const { isSearching } = editor.storage.searchreplace as SearchStorage;
 
   return (
-    <ResponsivePresenter
-      mobile="sheet"
-      desktop="menu"
-      isOpen={isSearching}
-      onClose={() => editor.commands.endSearch()}
-      position={{
-        target: getToolbarElement(),
-        isTargetAbsolute: true,
-        location: "below",
-        align: "end",
-        yOffset: 5
-      }}
-      blocking={false}
-      focusOnRender={false}
-      draggable={false}
-    >
-      <SearchReplacePopup editor={editor} />
-    </ResponsivePresenter>
+    <>
+      <DesktopOnly>
+        {isSearching &&
+          ReactDOM.createPortal(
+            <SearchReplacePopup editor={editor} />,
+            document.getElementById("editorSidebar") || document.body
+          )}
+      </DesktopOnly>
+      <MobileOnly>
+        <ResponsivePresenter
+          mobile="sheet"
+          isOpen={isSearching}
+          onClose={() => editor.commands.endSearch()}
+          position={{
+            target: getToolbarElement(),
+            isTargetAbsolute: true,
+            location: "below",
+            align: "end",
+            yOffset: 5
+          }}
+          blocking={false}
+          focusOnRender={false}
+          draggable={false}
+        >
+          <SearchReplacePopupMobile editor={editor} />
+        </ResponsivePresenter>
+      </MobileOnly>
+    </>
   );
 }

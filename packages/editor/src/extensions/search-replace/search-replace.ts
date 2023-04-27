@@ -26,6 +26,7 @@ import {
   TextSelection,
   Transaction
 } from "prosemirror-state";
+import { Node } from "prosemirror-model";
 
 type DispatchFn = (tr: Transaction) => void;
 declare module "@tiptap/core" {
@@ -35,6 +36,7 @@ declare module "@tiptap/core" {
       endSearch: () => ReturnType;
       refreshSearch: () => ReturnType;
       search: (term: string, options?: SearchSettings) => ReturnType;
+      moveToResult: (index: number) => ReturnType;
       moveToNextResult: () => ReturnType;
       moveToPreviousResult: () => ReturnType;
       replace: (term: string) => ReturnType;
@@ -43,9 +45,13 @@ declare module "@tiptap/core" {
   }
 }
 
-interface Result {
+export interface SearchResult {
   from: number;
   to: number;
+  preview: {
+    text: string;
+    match: { from: number; to: number };
+  };
 }
 
 interface SearchOptions {
@@ -64,10 +70,10 @@ export type SearchStorage = SearchSettings & {
   isSearching: boolean;
   focusNonce: number;
   selectedText?: string;
-  results?: Result[];
+  results?: SearchResult[];
 };
 
-interface TextNodesWithPosition {
+interface TextNodeWithPosition {
   text: string;
   pos: number;
 }
@@ -82,7 +88,6 @@ const updateView = (state: EditorState, dispatch: DispatchFn) => {
 const regex = (s: string, settings: SearchSettings): RegExp => {
   const { enableRegex, matchCase, matchWholeWord } = settings;
   const boundary = matchWholeWord ? "\\b" : "";
-  console.log(boundary);
   return RegExp(
     boundary +
       (enableRegex ? s : s.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")) +
@@ -96,7 +101,11 @@ function searchDocument(
   searchResultClass: string,
   searchTerm?: RegExp,
   selectedIndex?: number
-): { decorationSet: DecorationSet; results: Result[]; startIndex: number } {
+): {
+  decorationSet: DecorationSet;
+  results: SearchResult[];
+  startIndex: number;
+} {
   if (!searchTerm)
     return {
       decorationSet: DecorationSet.empty,
@@ -106,45 +115,9 @@ function searchDocument(
 
   const doc = tr.doc;
   const decorations: Decoration[] = [];
-  const results: Result[] = [];
+  const results = searchInNode(searchTerm, doc);
 
-  let index = 0;
-  let textNodesWithPosition: TextNodesWithPosition[] = [];
-
-  doc?.descendants((node, pos) => {
-    if (node.isText) {
-      if (textNodesWithPosition[index]) {
-        textNodesWithPosition[index] = {
-          text: textNodesWithPosition[index].text + node.text,
-          pos: textNodesWithPosition[index].pos
-        };
-      } else {
-        textNodesWithPosition[index] = {
-          text: node.text || "",
-          pos
-        };
-      }
-    } else {
-      index += 1;
-    }
-  });
-  textNodesWithPosition = textNodesWithPosition.filter(Boolean);
-
-  for (const { text, pos } of textNodesWithPosition) {
-    const matches = text.matchAll(searchTerm);
-
-    for (const m of matches) {
-      if (m[0] === "") break;
-
-      if (m.index !== undefined) {
-        results.push({
-          from: pos + m.index,
-          to: pos + m.index + m[0].length
-        });
-      }
-    }
-  }
-
+  // find the match we want to highlight in all the search results
   const { from: selectedFrom, to: selectedTo } = tr.selection;
   for (let i = 0; i < results.length; i++) {
     const { from, to } = results[i];
@@ -159,10 +132,13 @@ function searchDocument(
     }
   }
 
+  // add decorations around all the matches
   for (let i = 0; i < results.length; i++) {
     const { from, to } = results[i];
-    const resultClass =
-      i === selectedIndex ? `${searchResultClass} selected` : searchResultClass;
+    const isSelected = i === selectedIndex;
+    const resultClass = isSelected
+      ? `${searchResultClass} selected`
+      : searchResultClass;
     decorations.push(Decoration.inline(from, to, { class: resultClass }));
   }
 
@@ -173,9 +149,59 @@ function searchDocument(
   };
 }
 
+function searchInNode(term: RegExp, node: Node) {
+  const results: SearchResult[] = [];
+
+  // search in all the extracted text nodes
+  for (const { text, pos } of extractTextWithPosition(node)) {
+    const matches = text.matchAll(term);
+
+    for (const m of matches) {
+      if (m[0] === "") break;
+
+      if (m.index !== undefined) {
+        results.push({
+          from: pos + m.index,
+          to: pos + m.index + m[0].length,
+          preview: {
+            text,
+            match: {
+              from: m.index,
+              to: m.index + m[0].length
+            }
+          }
+        });
+      }
+    }
+  }
+
+  return results;
+}
+
+function extractTextWithPosition(node: Node): TextNodeWithPosition[] {
+  let currentNode: TextNodeWithPosition | null = null;
+  const textNodesWithPosition: TextNodeWithPosition[] = [];
+  node.descendants((node, pos) => {
+    if (node.isText) {
+      if (currentNode) {
+        currentNode.text += node.text;
+      } else {
+        currentNode = {
+          text: node.text || "",
+          pos
+        };
+        textNodesWithPosition.push(currentNode);
+      }
+    } else {
+      currentNode = null;
+    }
+  });
+  return textNodesWithPosition;
+}
+
 const replaceAll = (
   replaceTerm: string,
-  results: Result[],
+  results: SearchResult[],
   tr: Transaction
 ) => {
   if (!results.length) return;
@@ -187,10 +213,11 @@ const replaceAll = (
     tr.insertText(replaceTerm, from, to);
 
     if (i + 1 < results.length) {
-      const { from, to } = results[i + 1];
+      const { from, to, preview } = results[i + 1];
       results[i + 1] = {
         from: map.map(from),
-        to: map.map(to)
+        to: map.map(to),
+        preview
       };
     }
   }
@@ -249,40 +276,41 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           if (dispatch) updateView(state, dispatch);
           return true;
         },
+      moveToResult:
+        (index: number) =>
+        ({ state, dispatch, commands }) => {
+          const { results } = this.storage;
+          if (!results || results.length <= 0) return false;
+
+          const { from, to } = results[index];
+          commands.setTextSelection({ from, to });
+          scrollIntoView();
+
+          this.storage.selectedIndex = index;
+          if (dispatch) updateView(state, dispatch);
+          return true;
+        },
       moveToNextResult:
         () =>
-        ({ state, dispatch, commands }) => {
+        ({ commands }) => {
           const { selectedIndex, results } = this.storage;
           if (!results || results.length <= 0) return false;
 
           let nextIndex = selectedIndex + 1;
           if (isNaN(nextIndex) || nextIndex >= results.length) nextIndex = 0;
 
-          const { from, to } = results[nextIndex];
-          commands.setTextSelection({ from, to });
-          scrollIntoView();
-
-          this.storage.selectedIndex = nextIndex;
-          if (dispatch) updateView(state, dispatch);
-          return true;
+          return commands.moveToResult(nextIndex);
         },
       moveToPreviousResult:
         () =>
-        ({ state, dispatch, commands }) => {
+        ({ commands }) => {
           const { selectedIndex, results } = this.storage;
           if (!results || results.length <= 0) return false;
 
           let prevIndex = selectedIndex - 1;
           if (isNaN(prevIndex) || prevIndex < 0) prevIndex = results.length - 1;
 
-          const { from, to } = results[prevIndex];
-          commands.setTextSelection({ from, to });
-          scrollIntoView();
-
-          this.storage.selectedIndex = prevIndex;
-          if (dispatch) updateView(state, dispatch);
-
-          return true;
+          return commands.moveToResult(prevIndex);
         },
       replace:
         (term) =>
@@ -297,10 +325,11 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           tr.insertText(term, from, to);
 
           if (index + 1 < results.length) {
-            const { from, to } = results[index + 1];
+            const { from, to, preview } = results[index + 1];
             const nextResult = (results[index + 1] = {
               from: tr.mapping.map(from),
-              to: tr.mapping.map(to)
+              to: tr.mapping.map(to),
+              preview
             });
 
             commands.focus();
