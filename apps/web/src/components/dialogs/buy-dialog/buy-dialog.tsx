@@ -52,7 +52,7 @@ export function BuyDialog(props: BuyDialogProps) {
   const { onClose, couponCode, plan } = props;
   const theme = useTheme() as Theme;
 
-  const onApplyCoupon = useCheckoutStore((store) => store.onApplyCoupon);
+  const onApplyCoupon = useCheckoutStore((store) => store.applyCoupon);
   useEffect(() => {
     return () => {
       useCheckoutStore.getState().reset();
@@ -157,12 +157,12 @@ type SideBarProps = {
 function SideBar(props: SideBarProps) {
   const { initialPlan, onClose } = props;
   const [showPlans, setShowPlans] = useState(!!initialPlan);
-  const onPlanSelected = useCheckoutStore((state) => state.onPlanSelected);
+  const onPlanSelected = useCheckoutStore((state) => state.selectPlan);
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
   const pricingInfo = useCheckoutStore((state) => state.pricingInfo);
   const user = useUserStore((store) => store.user);
   const couponCode = useCheckoutStore((store) => store.couponCode);
-  const onApplyCoupon = useCheckoutStore((store) => store.onApplyCoupon);
+  const onApplyCoupon = useCheckoutStore((store) => store.applyCoupon);
 
   if (user && selectedPlan)
     return (
@@ -221,7 +221,7 @@ function SideBar(props: SideBarProps) {
 function Details() {
   const user = useUserStore((store) => store.user);
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
-  const onPriceUpdated = useCheckoutStore((state) => state.onPriceUpdated);
+  const onPriceUpdated = useCheckoutStore((state) => state.updatePrice);
   const couponCode = useCheckoutStore((store) => store.couponCode);
   const setIsApplyingCoupon = useCheckoutStore(
     (store) => store.setIsApplyingCoupon
@@ -360,7 +360,7 @@ function SelectedPlan(props: SelectedPlanProps) {
     store.setIsApplyingCoupon
   ]);
 
-  const onApplyCoupon = useCheckoutStore((store) => store.onApplyCoupon);
+  const onApplyCoupon = useCheckoutStore((store) => store.applyCoupon);
   const couponInputRef = useRef<HTMLInputElement>(null);
 
   const applyCoupon = useCallback(() => {
