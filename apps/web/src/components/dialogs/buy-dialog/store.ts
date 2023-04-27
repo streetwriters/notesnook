@@ -23,13 +23,13 @@ import produce from "immer";
 
 interface ICheckoutStore {
   selectedPlan?: Plan;
-  onPlanSelected: (plan?: Plan) => void;
+  selectPlan: (plan?: Plan) => void;
   pricingInfo?: PricingInfo;
-  onPriceUpdated: (pricingInfo?: PricingInfo) => void;
+  updatePrice: (pricingInfo?: PricingInfo) => void;
   isApplyingCoupon: boolean;
   setIsApplyingCoupon: (isApplyingCoupon: boolean) => void;
   couponCode?: string;
-  onApplyCoupon: (couponCode?: string) => void;
+  applyCoupon: (couponCode?: string) => void;
   reset: () => void;
 }
 export const useCheckoutStore = create<ICheckoutStore>((set) => ({
@@ -37,20 +37,20 @@ export const useCheckoutStore = create<ICheckoutStore>((set) => ({
   pricingInfo: undefined,
   couponCode: undefined,
   isApplyingCoupon: false,
-  onPlanSelected: (plan) =>
+  selectPlan: (plan) =>
     set(
       produce((state: ICheckoutStore) => {
         state.selectedPlan = plan;
         state.pricingInfo = undefined;
       })
     ),
-  onPriceUpdated: (pricingInfo) =>
+  updatePrice: (pricingInfo) =>
     set(
       produce((state: ICheckoutStore) => {
         state.pricingInfo = pricingInfo;
       })
     ),
-  onApplyCoupon: (couponCode) =>
+  applyCoupon: (couponCode) =>
     set(
       produce((state: ICheckoutStore) => {
         state.couponCode = couponCode;
