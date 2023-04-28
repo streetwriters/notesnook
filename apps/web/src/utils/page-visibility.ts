@@ -35,7 +35,7 @@ function isDocumentHidden() {
 
 export function onPageVisibilityChanged(
   handler: (
-    status: "online" | "offline" | "visibilitychange",
+    status: "online" | "offline" | "visibilitychange" | "focus",
     bool: boolean
   ) => void
 ) {
@@ -46,6 +46,8 @@ export function onPageVisibilityChanged(
   document.addEventListener(visibilityChange(), () =>
     handler("visibilitychange", isDocumentHidden())
   );
+
+  window.addEventListener("focus", () => handler("focus", false));
 }
 
 function onDeviceOnline(handler: () => void) {
