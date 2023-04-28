@@ -154,7 +154,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
         const clientY =
           e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
 
-        const hitArea = { width: 26, height: 24 };
+        const hitArea = { width: 40, height: 40 };
 
         const selection = editor.state.selection;
         const parent = findParentNode((node) => !!node.attrs.textDirection)(
