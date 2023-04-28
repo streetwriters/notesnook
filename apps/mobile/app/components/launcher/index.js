@@ -70,6 +70,7 @@ const Launcher = React.memo(
     const introCompleted = useSettingStore(
       (state) => state.settings.introCompleted
     );
+    const verifying = useRef(false);
 
     const loadNotes = useCallback(async () => {
       if (verifyUser) {
@@ -206,6 +207,9 @@ const Launcher = React.memo(
         setVerifyUser(false);
         enabled(false);
         password.current = null;
+        setTimeout(() => {
+          verifying.current = false;
+        }, 1);
       }
     }, [setVerifyUser]);
 
@@ -214,7 +218,9 @@ const Launcher = React.memo(
     }, [init, verifyUser]);
 
     useEffect(() => {
+      if (verifying.current) return;
       if (verifyUser && appState === "active") {
+        verifying.current = true;
         onUnlockBiometrics();
       }
     }, [appState, onUnlockBiometrics, verifyUser]);
