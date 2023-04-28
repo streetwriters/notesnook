@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 
 type AttachmentProgress = {
@@ -41,22 +41,24 @@ export const useAttachmentProgress = (
       : undefined
   );
 
-  const attachmentProgress = progress?.[attachment.metadata.hash];
-  if (attachmentProgress) {
-    const type = attachmentProgress.type;
-    const loaded =
-      attachmentProgress.type === "download"
-        ? attachmentProgress.recieved
-        : attachmentProgress.sent;
-    const value = loaded / attachmentProgress.total;
-    setCurrentProgress({
-      value: value * 100,
-      percent: (value * 100).toFixed(0) + "%",
-      type: type
-    });
-  } else {
-    setCurrentProgress(undefined);
-  }
+  useEffect(() => {
+    const attachmentProgress = progress?.[attachment.metadata.hash];
+    if (attachmentProgress) {
+      const type = attachmentProgress.type;
+      const loaded =
+        attachmentProgress.type === "download"
+          ? attachmentProgress.recieved
+          : attachmentProgress.sent;
+      const value = loaded / attachmentProgress.total;
+      setCurrentProgress({
+        value: value * 100,
+        percent: (value * 100).toFixed(0) + "%",
+        type: type
+      });
+    } else {
+      setCurrentProgress(undefined);
+    }
+  }, [attachment.metadata.hash, progress]);
 
   return [currentProgress, setCurrentProgress];
 };
