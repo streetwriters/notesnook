@@ -520,7 +520,7 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   async function showAttachments() {
-    AttachmentDialog.present();
+    AttachmentDialog.present(item);
   }
 
   async function exportNote() {
