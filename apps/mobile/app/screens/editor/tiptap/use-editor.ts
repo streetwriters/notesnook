@@ -80,8 +80,8 @@ export const useEditor = (
   const lockedSessionId = useRef<string>();
 
   const postMessage = useCallback(
-    async <T>(type: string, data: T) =>
-      await post(editorRef, sessionIdRef.current, type, data),
+    async <T>(type: string, data: T, waitFor = 300) =>
+      await post(editorRef, sessionIdRef.current, type, data, waitFor),
     [sessionIdRef]
   );
 
@@ -120,9 +120,13 @@ export const useEditor = (
     [editorId]
   );
 
-  if (loading) {
-    setLoading(false);
-  }
+  useEffect(() => {
+    if (loading) {
+      setLoading(false);
+    } else {
+      state.current.ready = false;
+    }
+  }, [loading]);
 
   const withTimer = useCallback(
     (id: string, fn: () => void, duration: number) => {
@@ -372,7 +376,11 @@ export const useEditor = (
         currentNote.current = item as NoteType;
         await commands.setStatus(timeConverter(item.dateEdited), "Saved");
         await postMessage(EditorEvents.title, item.title);
-        await postMessage(EditorEvents.html, currentContent.current?.data);
+        await postMessage(
+          EditorEvents.html,
+          currentContent.current?.data,
+          10000
+        );
         useEditorStore.getState().setReadonly(item.readonly);
         await commands.setTags(currentNote.current);
         commands.setSettings();
@@ -578,6 +586,10 @@ export const useEditor = (
     lastContentChangeTime.current = Date.now();
   };
 
+  useEffect(() => {
+    state.current.saveCount = 0;
+  }, [sessionId, loading]);
+
   const onReady = useCallback(async () => {
     if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
       eSendEvent("webview_reset");
@@ -586,30 +598,24 @@ export const useEditor = (
     }
   }, [isDefaultEditor, restoreEditorState]);
 
-  useEffect(() => {
-    state.current.saveCount = 0;
-    (async () => {
-      await commands.setSessionId(sessionIdRef.current);
-      if (sessionIdRef.current) {
-        if (!state.current?.ready) return;
-        await onReady();
-      }
-    })();
-  }, [sessionId, loading, commands, onReady]);
-
   const onLoad = useCallback(async () => {
-    state.current.ready = true;
-    onReady();
-    postMessage(EditorEvents.theme, theme || useThemeStore.getState().colors);
-    commands.setInsets(
-      isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
-    );
-    if (currentNote.current) {
-      loadNote({ ...currentNote.current, forced: true });
-    } else {
-      await commands.setPlaceholder(placeholderTip.current);
-    }
-    commands.setSettings();
+    if (currentNote.current) overlay(true);
+    clearTimeout(timers.current["editor:loaded"]);
+    timers.current["editor:loaded"] = setTimeout(async () => {
+      postMessage(EditorEvents.theme, theme || useThemeStore.getState().colors);
+      commands.setInsets(
+        isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
+      );
+      await commands.setSessionId(sessionIdRef.current);
+      await onReady();
+      await commands.setSettings();
+      if (currentNote.current) {
+        loadNote({ ...currentNote.current, forced: true });
+      } else {
+        await commands.setPlaceholder(placeholderTip.current);
+      }
+      state.current.ready = true;
+    }, 300);
   }, [
     onReady,
     postMessage,
@@ -617,7 +623,8 @@ export const useEditor = (
     commands,
     isDefaultEditor,
     insets,
-    loadNote
+    loadNote,
+    overlay
   ]);
 
   return {
