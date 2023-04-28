@@ -128,7 +128,6 @@ const Editor = React.memo(
         renderKey.current =
           renderKey.current === `editor-0` ? `editor-1` : `editor-0`;
         editor.setLoading(true);
-        setTimeout(() => editor.setLoading(false), 10);
       }, [editor]);
 
       useEffect(() => {
@@ -167,6 +166,7 @@ const Editor = React.memo(
             injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
             javaScriptEnabled={true}
             focusable={true}
+            onContentProcessDidTerminate={onError}
             setSupportMultipleWindows={false}
             overScrollMode="never"
             scrollEnabled={false}
