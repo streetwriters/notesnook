@@ -83,7 +83,7 @@ export function TaskItemComponent(
           path={Icons.dragHandle}
           sx={{
             opacity: [1, 1, 0],
-            alignSelf: "start",
+            alignSelf: "center",
             bg: "transparent",
             cursor: "grab",
             ".icon:hover path": {
@@ -104,7 +104,7 @@ export function TaskItemComponent(
           border: "2px solid",
           borderColor: checked ? "checked" : "icon",
           borderRadius: "default",
-          alignSelf: "start",
+          alignSelf: "center",
           p: "1px",
           mr: 1,
           cursor: editor.isEditable ? "pointer" : "unset",
@@ -136,8 +136,12 @@ export function TaskItemComponent(
         ref={forwardRef}
         sx={{
           "> .taskitem-content-wrapper > p": {
-            textDecorationLine: checked ? "line-through" : "none",
+            // removed textDecoration from here
             opacity: checked ? 0.8 : 1
+          },
+          "> .taskitem-content-wrapper > p > span": {
+            // Added text decoration here
+            textDecorationLine: checked ? "line-through" : "none"
           },
           // FIXME: this is quite fragile and will break if the structure
           // changes. We should probably find a better & more robust

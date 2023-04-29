@@ -196,6 +196,7 @@ export function TaskListComponent(
             marginBottom: 0,
 
             display: "flex",
+            alignItems: "center",
             bg: "background",
             borderRadius: "default",
             ":hover > .dragHandle": {
