@@ -1,6 +1,5 @@
-- Sync notes created from share extension & notification quick notes in background
-- Fix formatting is lost when sharing notes to other apps
-- Fix editor would be blank after entering the app from background sometimes
-- Small bug fixes and UX improvements
+- Fix a crash when tryin to upload attachments
+- Fix editor not rendered when enter foreground after a long time on iOS
+- Increased hit area for outline list to make toggling outline list items easier
 
 Thank you for using Notesnook!
