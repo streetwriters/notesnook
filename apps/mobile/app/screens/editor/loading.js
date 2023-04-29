@@ -101,8 +101,9 @@ const EditorOverlay = ({ editorId = "", editor }) => {
     setTimeout(() => {
       if (!loadingState.current.startTime) {
         translateValue.value = 6000;
+        opacity.value = 0;
       }
-    }, 1000);
+    }, 3000);
     eSubscribeEvent("loadingNote" + editorId, load);
     return () => {
       clearTimers();
