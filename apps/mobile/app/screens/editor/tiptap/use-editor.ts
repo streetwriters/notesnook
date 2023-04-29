@@ -340,7 +340,6 @@ export const useEditor = (
     ) => {
       state.current.currentlyEditing = true;
       const editorState = useEditorStore.getState();
-
       if (item && item.type === "new") {
         currentNote.current && (await reset());
         const nextSessionId = makeSessionId(item as NoteType);
@@ -348,7 +347,7 @@ export const useEditor = (
         sessionIdRef.current = nextSessionId;
         sessionHistoryId.current = Date.now();
         await commands.setSessionId(nextSessionId);
-        await commands.focus();
+        if (state.current?.ready) await commands.focus();
         lastContentChangeTime.current = 0;
         useEditorStore.getState().setReadonly(false);
       } else {
@@ -362,7 +361,7 @@ export const useEditor = (
           !currentContent.current?.data ||
           currentContent.current?.data.length < 50000
         ) {
-          overlay(false);
+          if (state.current.ready) overlay(false);
         } else {
           overlay(true);
         }
