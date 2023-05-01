@@ -44,11 +44,20 @@ export default class Subscriptions {
     );
   }
 
+  async transactions() {
+    const token = await this._tokenManager.getAccessToken();
+    if (!token) return;
+    return await http.get(
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/transactions`,
+      token
+    );
+  }
+
   async updateUrl() {
     const token = await this._tokenManager.getAccessToken();
     if (!token) return;
     return await http.get(
-      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/update_url`,
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/update`,
       token
     );
   }

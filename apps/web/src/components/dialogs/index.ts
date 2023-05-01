@@ -57,6 +57,9 @@ const EmailChangeDialog = React.lazy(() => import("./email-change-dialog"));
 const LanguageSelectorDialog = React.lazy(
   () => import("./language-selector-dialog")
 );
+const BillingHistoryDialog = React.lazy(
+  () => import("./billing-history-dialog")
+);
 
 export const Dialogs = {
   AddNotebookDialog,
@@ -85,5 +88,6 @@ export const Dialogs = {
   AddReminderDialog,
   ReminderPreviewDialog,
   EmailChangeDialog,
-  LanguageSelectorDialog
+  LanguageSelectorDialog,
+  BillingHistoryDialog
 };
