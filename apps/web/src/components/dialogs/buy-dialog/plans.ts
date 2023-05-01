@@ -32,7 +32,7 @@ export const DEFAULT_PLANS: Plan[] = [
     country: "PK",
     currency: "USD",
     discount: 0,
-    id: "648884",
+    id: process.env.NODE_ENV === "development" ? "9822" : "648884",
     price: { gross: 4.49, net: 0, tax: 0 }
   },
   {
@@ -40,7 +40,7 @@ export const DEFAULT_PLANS: Plan[] = [
     country: "PK",
     currency: "USD",
     discount: 0,
-    id: "658759",
+    id: process.env.NODE_ENV === "development" ? "50305" : "658759",
     price: { gross: 49.99, net: 0, tax: 0 }
   }
 ];
@@ -52,7 +52,8 @@ export const PLAN_METADATA: Record<Period, PlanMetadata> = {
 
 let CACHED_PLANS: Plan[];
 export async function getPlans(): Promise<Plan[] | null> {
-  if (isTesting()) return DEFAULT_PLANS;
+  if (isTesting() || process.env.NODE_ENV === "development")
+    return DEFAULT_PLANS;
   if (CACHED_PLANS) return CACHED_PLANS;
 
   const url = `https://notesnook.com/api/v1/prices/products/web`;

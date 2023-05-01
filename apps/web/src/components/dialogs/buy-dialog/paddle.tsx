@@ -33,7 +33,18 @@ import {
 
 // const isDev = false; // process.env.NODE_ENV === "development";
 // const VENDOR_ID = isDev ? 1506 : 128190;
-const PADDLE_ORIGIN = "https://buy.paddle.com";
+const PADDLE_ORIGIN =
+  process.env.NODE_ENV === "development"
+    ? "https://sandbox-buy.paddle.com"
+    : "https://buy.paddle.com";
+const CHECKOUT_CREATE_ORIGIN =
+  process.env.NODE_ENV === "development"
+    ? "https://sandbox-create-checkout.paddle.com"
+    : "https://create-checkout.paddle.com";
+const CHECKOUT_SERVICE_ORIGIN =
+  process.env.NODE_ENV === "development"
+    ? "https://sandbox-checkout-service.paddle.com"
+    : "https://checkout-service.paddle.com";
 
 const SUBSCRIBED_EVENTS: PaddleEvents[] = [
   PaddleEvents["Checkout.Loaded"],
@@ -63,7 +74,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
   const reloadCheckout = useCallback(() => {
     if (!checkoutRef.current) return;
     setIsLoading(true);
-    checkoutRef.current.src = `https://buy.paddle.com/checkout/?checkout_id=${checkoutId}&display_mode=inline&apple_pay_enabled=false`;
+    checkoutRef.current.src = `${PADDLE_ORIGIN}/checkout/?checkout_id=${checkoutId}&display_mode=inline&apple_pay_enabled=false`;
   }, [checkoutId]);
 
   const updatePrice = useCallback(
@@ -179,7 +190,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
 
 async function getCheckoutURL(params: PaddleCheckoutProps) {
   const { plan, theme, user } = params;
-  const BASE_URL = `https://create-checkout.paddle.com/checkout/product/${plan.id}`;
+  const BASE_URL = `${CHECKOUT_CREATE_ORIGIN}/checkout/product/${plan.id}`;
   const queryParams = new URLSearchParams();
   queryParams.set("product", plan.id);
   queryParams.set("passthrough", JSON.stringify({ userId: user.id }));
@@ -233,7 +244,7 @@ async function applyCoupon(
   checkoutId: string,
   couponCode: string
 ): Promise<CheckoutData | false> {
-  const url = ` https://checkout-service.paddle.com/checkout/${checkoutId}/coupon`;
+  const url = ` ${CHECKOUT_SERVICE_ORIGIN}/checkout/${checkoutId}/coupon`;
   const body = { data: { coupon_code: couponCode } };
   const headers = new Headers();
   headers.set("content-type", "application/json");
@@ -252,7 +263,7 @@ async function applyCoupon(
 }
 
 async function removeCoupon(checkoutId: string): Promise<CheckoutData | false> {
-  const url = ` https://checkout-service.paddle.com/checkout/${checkoutId}/coupon`;
+  const url = ` ${CHECKOUT_SERVICE_ORIGIN}/checkout/${checkoutId}/coupon`;
 
   const response = await fetch(url, {
     method: "DELETE"
@@ -266,7 +277,7 @@ async function removeCoupon(checkoutId: string): Promise<CheckoutData | false> {
 }
 
 async function sendCheckoutEvent(checkoutId: string, eventName: PaddleEvents) {
-  const url = ` https://checkout-service.paddle.com/checkout/${checkoutId}/event`;
+  const url = ` ${CHECKOUT_SERVICE_ORIGIN}/checkout/${checkoutId}/event`;
   const body = { data: { event_name: eventName } };
   const headers = new Headers();
   headers.set("content-type", "application/json");
@@ -281,7 +292,7 @@ async function sendCheckoutEvent(checkoutId: string, eventName: PaddleEvents) {
 async function getCheckoutData(
   checkoutId: string
 ): Promise<CheckoutData | undefined> {
-  const url = `https://checkout-service.paddle.com/checkout/${checkoutId}`;
+  const url = `${CHECKOUT_SERVICE_ORIGIN}/checkout/${checkoutId}`;
   const response = await fetch(url);
   if (!response.ok) return undefined;
   const json = (await response.json()) as CheckoutDataResponse;
