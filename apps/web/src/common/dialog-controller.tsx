@@ -211,8 +211,9 @@ export function showError(title: string, message: string) {
 export function showMultiDeleteConfirmation(length: number) {
   return confirm({
     title: `Delete ${length} items?`,
-    message: `These items will be **kept in your Trash for ${db.settings?.getTrashCleanupInterval() || 7
-      } days** after which they will be permanently deleted.`,
+    message: `These items will be **kept in your Trash for ${
+      db.settings?.getTrashCleanupInterval() || 7
+    } days** after which they will be permanently deleted.`,
     positiveButtonText: "Yes",
     negativeButtonText: "No"
   });
@@ -328,6 +329,12 @@ export function showProgressDialog<T>(dialogData: ProgressDialogProps) {
 export function showMoveNoteDialog(noteIds: string[]) {
   return showDialog("MoveDialog", (Dialog, perform) => (
     <Dialog noteIds={noteIds} onClose={(res: boolean) => perform(res)} />
+  ));
+}
+
+export function showBillingHistoryDialog() {
+  return showDialog("BillingHistoryDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} />
   ));
 }
 

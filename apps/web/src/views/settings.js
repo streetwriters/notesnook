@@ -44,7 +44,8 @@ import {
   showPromptDialog,
   showEmailChangeDialog,
   showLanguageSelectorDialog,
-  confirm
+  confirm,
+  showBillingHistoryDialog
 } from "../common/dialog-controller";
 import { TaskManager } from "../common/task-manager";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
@@ -1391,6 +1392,12 @@ function AccountStatus(props) {
                   tip="If you are eligible for a refund, your account will be immediately downgraded to Basic and your funds will be transferred to your account within 24 hours."
                 />
               </Button>
+              <Button variant="list" onClick={() => showBillingHistoryDialog()}>
+                <Tip
+                  text="Billing history"
+                  tip="View all the transactions you have made with Notesnook."
+                />
+              </Button>
               <Button
                 variant="list"
                 sx={{ ":hover": { borderColor: "error" } }}
@@ -1413,11 +1420,8 @@ function AccountStatus(props) {
                       });
                       showToast(
                         "success",
-                        "Your subscription has been cancelled."
+                        "Your subscription has been canceled."
                       );
-                      setTimeout(() => {
-                        window.location.reload();
-                      }, 5000);
                     }
                   } catch (e) {
                     showToast("error", e.message);
