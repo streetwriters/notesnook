@@ -1359,6 +1359,40 @@ function AccountStatus(props) {
               </Button>
               <Button
                 variant="list"
+                onClick={async () => {
+                  const refundSubscription = await confirm({
+                    title: "Request refund?",
+                    message:
+                      "You will only be issued a refund if you are eligible as per our refund policy. Your account will be immediately downgraded to Basic and your funds will be transferred to your account within 24 hours.",
+                    negativeButtonText: "No",
+                    positiveButtonText: "Yes"
+                  });
+                  if (refundSubscription) {
+                    const error = await TaskManager.startTask({
+                      id: "refund-subscription",
+                      type: "modal",
+                      title: "Requesting refund for your subscription",
+                      subtitle: "Please wait...",
+                      action: () => db.subscriptions.refund()
+                    });
+                    if (error instanceof Error) {
+                      showToast("error", error.message);
+                    } else {
+                      showToast(
+                        "success",
+                        "Your refund has been issued. Please wait 24 hours before reaching out to us in case you do not receive your funds."
+                      );
+                    }
+                  }
+                }}
+              >
+                <Tip
+                  text="Request refund"
+                  tip="If you are eligible for a refund, your account will be immediately downgraded to Basic and your funds will be transferred to your account within 24 hours."
+                />
+              </Button>
+              <Button
+                variant="list"
                 sx={{ ":hover": { borderColor: "error" } }}
                 onClick={async () => {
                   try {

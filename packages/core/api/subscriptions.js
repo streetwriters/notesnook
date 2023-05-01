@@ -34,6 +34,16 @@ export default class Subscriptions {
     await http.delete(`${hosts.SUBSCRIPTIONS_HOST}/subscriptions`, token);
   }
 
+  async refund() {
+    const token = await this._tokenManager.getAccessToken();
+    if (!token) return;
+    await http.post(
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/refund`,
+      null,
+      token
+    );
+  }
+
   async updateUrl() {
     const token = await this._tokenManager.getAccessToken();
     if (!token) return;
