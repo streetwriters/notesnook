@@ -39,7 +39,8 @@ const SUBSCRIBED_EVENTS: PaddleEvents[] = [
   PaddleEvents["Checkout.Loaded"],
   PaddleEvents["Checkout.Coupon.Applied"],
   PaddleEvents["Checkout.Coupon.Remove"],
-  PaddleEvents["Checkout.Location.Submit"]
+  PaddleEvents["Checkout.Location.Submit"],
+  PaddleEvents["Checkout.Complete"]
 ];
 
 type PaddleCheckoutProps = {
@@ -48,10 +49,11 @@ type PaddleCheckoutProps = {
   plan: Plan;
   onPriceUpdated?: (pricingInfo: PricingInfo) => void;
   onCouponApplied?: () => void;
+  onCompleted?: () => void;
   coupon?: string;
 };
 export function PaddleCheckout(props: PaddleCheckoutProps) {
-  const { plan, onPriceUpdated, coupon, onCouponApplied } = props;
+  const { plan, onPriceUpdated, coupon, onCouponApplied, onCompleted } = props;
   const [sourceUrl, setSourceUrl] = useState<string>();
   const [isLoading, setIsLoading] = useState(true);
   const [checkoutId, setCheckoutId] = useState<string>();
@@ -96,6 +98,10 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
       )
         return;
 
+      if (event_name === PaddleEvents["Checkout.Complete"]) {
+        onCompleted && onCompleted();
+        return;
+      }
       if (event_name === PaddleEvents["Checkout.Loaded"]) setIsLoading(false);
 
       const pricingInfo = await updatePrice(checkout.id);
@@ -108,7 +114,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
     return () => {
       window.removeEventListener("message", onMessage);
     };
-  }, [onPriceUpdated, updatePrice, plan]);
+  }, [onPriceUpdated, updatePrice, plan, onCompleted]);
 
   useEffect(() => {
     if (

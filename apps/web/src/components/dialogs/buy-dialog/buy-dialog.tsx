@@ -55,6 +55,8 @@ export function BuyDialog(props: BuyDialogProps) {
   const theme = useTheme() as Theme;
 
   const onApplyCoupon = useCheckoutStore((store) => store.applyCoupon);
+  const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
+
   useEffect(() => {
     return () => {
       useCheckoutStore.getState().reset();
@@ -118,7 +120,7 @@ export function BuyDialog(props: BuyDialogProps) {
           boxShadow: "4px 5px 18px 2px #00000038",
           borderRadius: "dialog",
           flexDirection: ["column", "column", "row"],
-          width: ["95%", "80%", "60%"],
+          width: ["95%", "80%", isCheckoutCompleted ? "400px" : "60%"],
           maxHeight: ["95%", "80%", "80%"],
           alignSelf: "center",
           overflowY: ["scroll", "scroll", "hidden"]
@@ -139,7 +141,7 @@ export function BuyDialog(props: BuyDialogProps) {
             flexShrink: 0,
             alignItems: "center",
             justifyContent: "center",
-            width: ["100%", "100%", 350]
+            width: ["100%", "100%", isCheckoutCompleted ? "100%" : 350]
           }}
           p={4}
           py={50}
@@ -165,6 +167,9 @@ function SideBar(props: SideBarProps) {
   const user = useUserStore((store) => store.user);
   const couponCode = useCheckoutStore((store) => store.couponCode);
   const onApplyCoupon = useCheckoutStore((store) => store.applyCoupon);
+  const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
+
+  if (isCheckoutCompleted) return <CheckoutCompleted onClose={onClose} />;
 
   if (user && selectedPlan)
     return (
@@ -230,11 +235,15 @@ function Details() {
   const user = useUserStore((store) => store.user);
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
   const onPriceUpdated = useCheckoutStore((state) => state.updatePrice);
+  const completeCheckout = useCheckoutStore((state) => state.completeCheckout);
+  const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
   const couponCode = useCheckoutStore((store) => store.couponCode);
   const setIsApplyingCoupon = useCheckoutStore(
     (store) => store.setIsApplyingCoupon
   );
   const theme = useThemeStore((store) => store.theme);
+
+  if (isCheckoutCompleted) return null;
 
   if (selectedPlan && user)
     return (
@@ -243,6 +252,7 @@ function Details() {
         theme={theme}
         user={user}
         coupon={couponCode}
+        onCompleted={completeCheckout}
         onCouponApplied={() => setIsApplyingCoupon(true)}
         onPriceUpdated={(pricingInfo) => {
           onPriceUpdated(pricingInfo);
@@ -392,6 +402,31 @@ function AlreadyPremium(props: AlreadyPremiumProps) {
           You are already subscribed to Notesnook Pro.
         </Text>
       )}
+    </>
+  );
+}
+
+function CheckoutCompleted(props: { onClose: () => void }) {
+  const { onClose } = props;
+
+  return (
+    <>
+      <Rocket width={200} />
+      <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
+        Thank you!
+      </Text>
+      <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
+        You have successfully subscribed to Notesnook Pro.
+      </Text>
+      <Button
+        variant="primary"
+        mt={2}
+        sx={{ borderRadius: 100, px: 6 }}
+        onClick={onClose}
+        data-test-id="see-all-plans"
+      >
+        Continue
+      </Button>
     </>
   );
 }
