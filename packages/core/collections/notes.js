@@ -347,7 +347,6 @@ export default class Notes extends Collection {
 
     for (const noteId of noteIds) {
       const note = this.note(noteId);
-
       if (!note || note.deleted) {
         continue;
       }
