@@ -353,9 +353,7 @@ export default class Notes extends Collection {
       }
 
       if (topicId) {
-        if (!note.notebooks) {
-          continue;
-        }
+        if (!note.notebooks) continue;
         const { notebooks } = note;
 
         const notebook = findById(notebooks, notebookId);
