@@ -347,11 +347,12 @@ export default class Notes extends Collection {
 
     for (const noteId of noteIds) {
       const note = this.note(noteId);
-      if (!note || note.deleted || !note.notebooks) {
+      if (!note || note.deleted) {
         continue;
       }
 
       if (topicId) {
+        if (!note.notebooks) continue;
         const { notebooks } = note;
 
         const notebook = findById(notebooks, notebookId);
