@@ -98,7 +98,7 @@ async function getProducts() {
 }
 
 function get() {
-  if (__DEV__ || Config.isTesting) return true;
+  if (__DEV__ || Config.isTesting === "true") return true;
 
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
@@ -128,7 +128,7 @@ const onUserStatusCheck = async (type) => {
     userstore.setPremium(get());
   }
 
-  let status = get();
+  let status = false;
   let message = null;
   if (!status) {
     switch (type) {
