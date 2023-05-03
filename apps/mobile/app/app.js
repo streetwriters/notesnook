@@ -31,14 +31,6 @@ import { TipManager } from "./services/tip-manager";
 import { useUserStore } from "./stores/use-user-store";
 import { View } from "react-native";
 import { useState } from "react";
-import NetInfo from "@react-native-community/netinfo";
-NetInfo.configure({
-  reachabilityUrl: "https://notesnook.com",
-  reachabilityTest: (response) => {
-    if (!response) return false;
-    return response?.status >= 200 && response?.status < 300;
-  }
-});
 
 SettingsService.init();
 SettingsService.checkOrientation();

@@ -45,6 +45,7 @@ import { sleep } from "../utils/time";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useReminderStore } from "../stores/use-reminder-store";
 import { presentDialog } from "../components/dialog/functions";
+import NetInfo from "@react-native-community/netinfo";
 
 export type Reminder = {
   id: string;
@@ -193,7 +194,7 @@ const onEvent = async ({ type, detail }: Event) => {
       case "Hide":
         unpinQuickNote();
         break;
-      case "ReplyInput":
+      case "ReplyInput": {
         displayNotification({
           title: "Quick note",
           message: 'Tap on "Take note" to add a note.',
@@ -211,9 +212,17 @@ const onEvent = async ({ type, detail }: Event) => {
             data: `<p>${input} </p>`
           }
         });
-        await db.sync(false, false);
+        const status = await NetInfo.fetch();
+        if (status.isInternetReachable) {
+          try {
+            await db.sync(false, false);
+          } catch (e) {
+            console.log(e, (e as Error).stack);
+          }
+        }
         useNoteStore.getState().setNotes();
         break;
+      }
     }
   }
 };
