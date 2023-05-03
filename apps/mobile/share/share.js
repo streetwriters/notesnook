@@ -48,6 +48,7 @@ import { eOnLoadNote } from "../app/utils/events";
 import { Editor } from "./editor";
 import { Search } from "./search";
 import { initDatabase, useShareStore } from "./store";
+import NetInfo from "@react-native-community/netinfo";
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
 };
@@ -355,7 +356,14 @@ const ShareView = ({ quicknote = false }) => {
         }
       }
     }
-    await db.sync(false, false);
+    const status = await NetInfo.fetch();
+    if (status.isInternetReachable) {
+      try {
+        await db.sync(false, false);
+      } catch (e) {
+        console.log(e, e.stack);
+      }
+    }
     await Storage.write("notesAddedFromIntent", "added");
     close();
     setLoading(false);

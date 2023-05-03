@@ -7,6 +7,15 @@ import Config from 'react-native-config';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import appJson from './app.json';
 import Notifications from "../app/services/notifications";
+import NetInfo from "@react-native-community/netinfo";
+NetInfo.configure({
+  reachabilityUrl: "https://notesnook.com",
+  reachabilityTest: (response) => {
+    if (!response) return false;
+    return response?.status >= 200 && response?.status < 300;
+  }
+});
+
 Notifications.init();
 
 const appName = appJson.name;
