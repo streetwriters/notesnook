@@ -103,6 +103,10 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
           top: offset + keyboard.keyboardHeight,
           maxWidth: DDS.isLargeTablet() ? 400 : "98%"
         }}
+        onTouchEnd={() => {
+          setMsg(null);
+          clearTimeout(timer.current);
+        }}
       >
         <View
           style={{
