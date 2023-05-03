@@ -32,9 +32,6 @@ import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { eSendEvent } from "../../services/event-manager";
-import { eOpenLoginDialog } from "../../utils/events";
-import Navigation from "../../services/navigation";
 
 const Intro = ({ navigation }) => {
   const colors = useThemeStore((state) => state.colors);
