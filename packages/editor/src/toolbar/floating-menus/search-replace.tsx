@@ -21,7 +21,7 @@ import { SearchStorage } from "../../extensions/search-replace";
 import { FloatingMenuProps } from "./types";
 import { SearchReplacePopup } from "../popups/search-replace";
 import { ResponsivePresenter } from "../../components/responsive";
-import { getToolbarElement } from "../utils/dom";
+import { getEditorContainer, getToolbarElement } from "../utils/dom";
 
 export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
   const { editor } = props;
@@ -34,11 +34,11 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
       isOpen={isSearching}
       onClose={() => editor.commands.endSearch()}
       position={{
-        target: getToolbarElement(),
+        target: editor.isEditable ? getToolbarElement() : getEditorContainer(),
         isTargetAbsolute: true,
-        location: "below",
+        location: editor.isEditable ? "below" : "top",
         align: "end",
-        yOffset: 5
+        yOffset: editor.isEditable ? 5 : -50
       }}
       blocking={false}
       focusOnRender={false}
