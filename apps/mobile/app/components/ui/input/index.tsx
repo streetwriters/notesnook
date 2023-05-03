@@ -95,7 +95,7 @@ const Input = ({
   onBlurInput,
   onPress,
   height = 45,
-  fontSize = SIZE.md,
+  fontSize = SIZE.sm,
   onFocusInput,
   buttons,
   marginRight,
@@ -119,7 +119,7 @@ const Input = ({
     ? colors.red
     : focus
     ? customColor || colors.accent
-    : colors.nav;
+    : colors.border;
 
   const validate = async (value: string) => {
     if (!validationType) return;

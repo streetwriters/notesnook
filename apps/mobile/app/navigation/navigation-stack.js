@@ -50,6 +50,7 @@ import { useSettingStore } from "../stores/use-setting-store";
 import { useThemeStore } from "../stores/use-theme-store";
 import { history } from "../utils";
 import { rootNavigatorRef } from "../utils/global-refs";
+import Auth from "../components/auth";
 const NativeStack = createNativeStackNavigator();
 const IntroStack = createNativeStackNavigator();
 
@@ -64,6 +65,7 @@ const IntroStack = createNativeStackNavigator();
 
 const IntroStackNavigator = () => {
   const colors = useThemeStore((state) => state.colors);
+  const height = useSettingStore((state) => state.dimensions.height);
   return (
     <IntroStack.Navigator
       screenOptions={{
@@ -71,12 +73,14 @@ const IntroStackNavigator = () => {
         lazy: false,
         animation: "none",
         contentStyle: {
-          backgroundColor: colors.bg
+          backgroundColor: colors.bg,
+          minHeight: height
         }
       }}
       initialRouteName={"Intro"}
     >
       <NativeStack.Screen name="Intro" component={Intro} />
+      <NativeStack.Screen name="Auth" component={Auth} />
       <NativeStack.Screen name="AppLock" component={AppLock} />
     </IntroStack.Navigator>
   );
@@ -120,7 +124,7 @@ const _Tabs = () => {
         animation: "none",
         contentStyle: {
           backgroundColor: colors.bg,
-          height: !introCompleted ? undefined : screenHeight
+          minHeight: !introCompleted ? undefined : screenHeight
         }
       }}
     >

@@ -42,7 +42,6 @@ import { eOpenAnnouncementDialog } from "../../utils/events";
 import { getGithubVersion } from "../../utils/github-version";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import { SVG } from "../auth/background";
 import Migrate from "../sheets/migrate";
 import NewFeature from "../sheets/new-feature/index";
 import { Update } from "../sheets/update";
@@ -50,7 +49,6 @@ import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Input from "../ui/input";
 import Seperator from "../ui/seperator";
-import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
@@ -89,7 +87,7 @@ const Launcher = React.memo(
 
     const init = useCallback(async () => {
       if (!db.isInitialized) {
-        await RNBootSplash.hide({ fade: true });
+        RNBootSplash.hide({ fade: true });
         DatabaseLogger.info("Initializing database");
         await db.init();
       }
@@ -132,7 +130,6 @@ const Launcher = React.memo(
       if (NewFeature.present()) return;
       if (await checkAppUpdateAvailable()) return;
       if (await checkForRateAppRequest()) return;
-      if (await checkNeedsBackup()) return;
       if (await PremiumService.getRemainingTrialDaysStatus()) return;
 
       if (introCompleted) {
@@ -173,23 +170,6 @@ const Launcher = React.memo(
         return false;
       }
       return false;
-    };
-
-    const checkNeedsBackup = async () => {
-      return false;
-      // let { nextBackupRequestTime, reminder } = SettingsService.get();
-      // if (reminder === 'off' || !reminder) {
-      //   if (nextBackupRequestTime < Date.now()) {
-      //     presentSheet({
-      //       title: 'Backup & restore',
-      //       paragraph: 'Please enable automatic backups to keep your data safe',
-      //       component: <SettingsBackupAndRestore isSheet={true} />
-      //     });
-
-      //     return true;
-      //   }
-      // }
-      // return false;
     };
 
     const onUnlockBiometrics = useCallback(async () => {
@@ -247,18 +227,10 @@ const Launcher = React.memo(
           width: "100%",
           height: "100%",
           position: "absolute",
-          zIndex: 999
+          zIndex: 999,
+          justifyContent: "center"
         }}
       >
-        <View
-          style={{
-            height: 250,
-            overflow: "hidden"
-          }}
-        >
-          <SvgView src={SVG(colors.night ? "white" : "black")} height={700} />
-        </View>
-
         <View
           style={{
             flex: 1,
@@ -294,14 +266,13 @@ const Launcher = React.memo(
               textAlign: "center"
             }}
           >
-            Unlock to access your notes
+            Unlock your notes
           </Heading>
 
           <Paragraph
             style={{
               alignSelf: "center",
               textAlign: "center",
-              fontSize: SIZE.md,
               maxWidth: "90%"
             }}
           >
@@ -312,8 +283,7 @@ const Launcher = React.memo(
             style={{
               width: "100%",
               padding: 12,
-              backgroundColor: colors.bg,
-              flexGrow: 1
+              backgroundColor: colors.bg
             }}
           >
             {user ? (
@@ -353,14 +323,9 @@ const Launcher = React.memo(
               <Button
                 title="Unlock with Biometrics"
                 width={250}
-                height={45}
-                style={{
-                  borderRadius: 100
-                }}
                 onPress={onUnlockBiometrics}
                 icon={"fingerprint"}
                 type={user ? "grayAccent" : "accent"}
-                fontSize={SIZE.md}
               />
             </View>
           </View>

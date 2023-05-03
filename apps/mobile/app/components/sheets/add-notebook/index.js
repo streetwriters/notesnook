@@ -309,7 +309,6 @@ export class AddNotebookSheet extends React.Component {
               borderRadius: 100,
               paddingHorizontal: 24
             }}
-            fontSize={SIZE.md}
             onPress={this.addNewNotebook}
           />
         </View>
