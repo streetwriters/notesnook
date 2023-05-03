@@ -112,6 +112,7 @@ class EditorStore extends BaseStore {
   };
 
   openSession = async (noteId, force) => {
+    this.toggleProperties(false);
     await db.notes.init();
 
     const session = this.get().session;
