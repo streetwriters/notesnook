@@ -30,7 +30,7 @@ type IconProps = {
   title?: string;
   path: string;
   size?: keyof Theme["iconSizes"] | number | string;
-  color?: keyof SchemeColors | string;
+  color?: SchemeColors;
   stroke?: string;
   rotate?: boolean;
 };
@@ -44,7 +44,7 @@ function MDIIconWrapper({
 }: IconProps) {
   const theme = useTheme() as Theme;
 
-  const themedColor: string =
+  const themedColor =
     theme?.colors && isThemeColor(color, theme.colors)
       ? theme.colors[color]
       : color;

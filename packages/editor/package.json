@@ -47,8 +47,8 @@
     "zustand": "^4.3.3"
   },
   "devDependencies": {
-    "@mdi/js": "^6.9.96",
-    "@mdi/react": "^1.6.0",
+    "@mdi/js": "^7.2.96",
+    "@mdi/react": "^1.6.1",
     "@types/katex": "^0.14.0",
     "@types/prismjs": "^1.26.0",
     "@types/react": "17.0.2",
@@ -71,8 +71,8 @@
     "react-dom": "17.0.2"
   },
   "peerDependencies": {
-    "@mdi/js": ">=6.9.96",
-    "@mdi/react": ">=1.6.0",
+    "@mdi/js": ">=7.2.96",
+    "@mdi/react": ">=1.6.1",
     "@emotion/react": ">=11.0.0",
     "@theme-ui/components": ">=0.14.0",
     "@theme-ui/core": ">=0.14.0",

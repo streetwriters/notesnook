@@ -21,7 +21,6 @@ import { Colors } from "../../theme-engine/types";
 import * as CSS from "csstype";
 
 export type SchemeColors = keyof Colors | CSS.Property.Color;
-
 export function isThemeColor(
   color: string,
   colors: Colors
