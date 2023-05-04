@@ -95,7 +95,7 @@ const Input = ({
   onBlurInput,
   onPress,
   height = 45,
-  fontSize = SIZE.sm,
+  fontSize = SIZE.md,
   onFocusInput,
   buttons,
   marginRight,

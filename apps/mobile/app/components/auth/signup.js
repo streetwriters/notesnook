@@ -106,9 +106,13 @@ export const Signup = ({ changeMode, trial }) => {
       >
         <View
           style={{
-            flex: 0.4,
+            flex: 0.35,
             justifyContent: "flex-end",
-            paddingHorizontal: 20
+            paddingHorizontal: 20,
+            backgroundColor: colors.nav,
+            marginBottom: 20,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.border
           }}
         >
           <View
@@ -141,7 +145,7 @@ export const Signup = ({ changeMode, trial }) => {
               marginBottom: 25,
               marginTop: 10
             }}
-            size={SIZE.xxxl}
+            size={SIZE.xxl}
           >
             Create your {"\n"}account
           </Heading>
@@ -257,9 +261,11 @@ export const Signup = ({ changeMode, trial }) => {
             type="accent"
             loading={loading}
             onPress={signup}
+            fontSize={SIZE.md}
             style={{
               marginRight: 12,
-              width: 250
+              width: 250,
+              borderRadius: 100
             }}
           />
 
@@ -271,7 +277,8 @@ export const Signup = ({ changeMode, trial }) => {
             activeOpacity={0.8}
             style={{
               alignSelf: "center",
-              marginTop: 12
+              marginTop: 12,
+              paddingVertical: 12
             }}
           >
             <Paragraph size={SIZE.xs + 1} color={colors.icon}>

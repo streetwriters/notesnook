@@ -30,10 +30,10 @@ import { Progress } from "../sheets/progress";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
 import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import { useLogin } from "./use-login";
-import Paragraph from "../ui/typography/paragraph";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -91,10 +91,13 @@ export const Login = ({ changeMode }) => {
       >
         <View
           style={{
-            flex: 0.5,
-            //backgroundColor: colors.nav,
+            flex: 0.45,
             justifyContent: "flex-end",
-            paddingHorizontal: 20
+            paddingHorizontal: 20,
+            backgroundColor: colors.nav,
+            marginBottom: 20,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.border
           }}
         >
           <View
@@ -127,7 +130,7 @@ export const Login = ({ changeMode }) => {
               marginBottom: 25,
               marginTop: 10
             }}
-            size={SIZE.xxxl}
+            size={SIZE.xxl}
           >
             Login to your {"\n"}account
           </Heading>
@@ -221,8 +224,10 @@ export const Login = ({ changeMode }) => {
                 login();
               }}
               style={{
-                width: 250
+                width: 250,
+                borderRadius: 100
               }}
+              fontSize={SIZE.md}
               type="accent"
               title={"Continue"}
             />
@@ -257,7 +262,8 @@ export const Login = ({ changeMode }) => {
                 activeOpacity={0.8}
                 style={{
                   alignSelf: "center",
-                  marginTop: 12
+                  marginTop: 12,
+                  paddingVertical: 12
                 }}
               >
                 <Paragraph size={SIZE.xs + 1} color={colors.icon}>

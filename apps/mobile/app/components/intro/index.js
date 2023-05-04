@@ -112,21 +112,17 @@ const Intro = ({ navigation }) => {
       testID="notesnook.splashscreen"
       style={{
         width: "100%",
-        height: "100%",
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: insets.top,
-        paddingVertical: "10%"
+        height: "100%"
       }}
     >
       <View
         style={{
-          flex: 0.7,
-          //   backgroundColor: colors.nav,
-          width: "100%"
-          // borderRadius: 20,
-          // borderWidth: 1,
-          // borderColor: colors.border
+          flex: 0.65,
+          width: "100%",
+          backgroundColor: colors.nav,
+          marginBottom: 20,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.border
         }}
       >
         <SwiperFlatList
@@ -169,8 +165,10 @@ const Intro = ({ navigation }) => {
           style={{
             paddingHorizontal: 24,
             alignSelf: "center",
-            ...getElevation(5)
+            ...getElevation(5),
+            borderRadius: 100
           }}
+          fontSize={SIZE.md}
           type="accent"
           title="Get started"
         />
