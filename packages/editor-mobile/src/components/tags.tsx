@@ -55,8 +55,8 @@ function Tags(): JSX.Element {
           openManageTagsSheet();
         }}
         style={{
-          border: "1px solid var(--nn_border)",
-          backgroundColor: "var(--nn_nav)",
+          border: `1px solid var(--nn_primary_border)`,
+          backgroundColor: "var(--nn_secondary_background)",
           marginRight: 5,
           borderRadius: 100,
           padding: "0px 10px",
@@ -73,7 +73,7 @@ function Tags(): JSX.Element {
             style={{
               marginRight: 4,
               fontSize: 13,
-              color: "var(--nn_icon)",
+              color: "var(--nn_primary_icon)",
               userSelect: "none"
             }}
           >
@@ -88,7 +88,7 @@ function Tags(): JSX.Element {
           viewBox="0 0 24 24"
         >
           <path
-            fill="var(--nn_accent)"
+            fill="var(--nn_primary_accent)"
             d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
           />
         </svg>
@@ -99,15 +99,15 @@ function Tags(): JSX.Element {
           key={tag.title}
           className={styles.btn}
           style={{
-            border: "1px solid var(--nn_border)",
-            backgroundColor: "var(--nn_nav)",
+            border: "1px solid var(--nn_primary_border)",
+            backgroundColor: "var(--nn_secondary_background)",
             marginRight: 5,
             borderRadius: 100,
             padding: "0px 10px",
             height: "30px",
             fontFamily: "Open Sans",
             fontSize: 13,
-            color: "var(--nn_icon)",
+            color: "var(--nn_primary_icon)",
             userSelect: "none",
             WebkitUserSelect: "none"
           }}

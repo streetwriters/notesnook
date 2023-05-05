@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import "react-native-gesture-handler";
 import React, { useEffect, useState } from "react";
-import { ThemeDracula, ThemeProvider } from "@notesnook/theme";
+import { ThemeProvider } from "@notesnook/theme";
 import NetInfo from "@react-native-community/netinfo";
 import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -71,8 +71,8 @@ const App = () => {
   return (
     <ThemeProvider
       value={{
-        //theme: colorScheme === "dark" ? darkTheme : lightTheme,
-        theme: ThemeDracula,
+        theme: colorScheme === "dark" ? darkTheme : lightTheme,
+        //theme: ThemeDracula,
         setTheme: () => null
       }}
     >

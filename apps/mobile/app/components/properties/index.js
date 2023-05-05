@@ -37,7 +37,7 @@ import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { Tags, TagStrip } from "./tags";
 const Line = ({ top = 6, bottom = 6 }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   return (
     <View
       style={{

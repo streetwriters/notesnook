@@ -22,6 +22,7 @@ import { ThemeLight } from "./light";
 export const ThemeDark: ThemeDefinition = {
   ...ThemeLight,
   colorScheme: "dark",
+  id: "notesnook-default-theme-dark",
   scopes: {
     base: {
       primary: {

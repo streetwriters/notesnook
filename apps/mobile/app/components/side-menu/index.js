@@ -28,13 +28,13 @@ import { useNoteStore } from "../../stores/use-notes-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
-import { toggleDarkMode } from "../../utils/color-scheme/utils";
 import { MenuItemsList, SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
 import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
 import { TagsSection } from "./pinned-section";
 import { UserStatus } from "./user-status";
+import { useThemeStore } from "../../stores/use-theme-store";
 
 export const SideMenu = React.memo(
   function SideMenu() {
@@ -53,7 +53,9 @@ export const SideMenu = React.memo(
       {
         name: isDark ? "Day" : "Night",
         icon: "theme-light-dark",
-        func: toggleDarkMode,
+        func: () => {
+          useThemeStore.getState().setColorScheme();
+        },
         switch: true,
         on: !!isDark,
         close: false
@@ -109,7 +111,10 @@ export const SideMenu = React.memo(
           style={{
             height: "100%",
             width: "100%",
-            backgroundColor: deviceMode !== "mobile" ? colors.secondary.background : colors.primary.background,
+            backgroundColor:
+              deviceMode !== "mobile"
+                ? colors.secondary.background
+                : colors.primary.background,
             paddingTop: insets.top,
             borderRadius: 10,
             borderTopLeftRadius: 0,

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { EVENTS } from "@notesnook/core/common";
+import { useThemeProvider } from "@notesnook/theme";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import WebView from "react-native-webview";
 import { db } from "../../../common/database";
@@ -35,7 +36,7 @@ import { TipManager } from "../../../services/tip-manager";
 import { useEditorStore } from "../../../stores/use-editor-store";
 import { useNoteStore } from "../../../stores/use-notes-store";
 import { useTagStore } from "../../../stores/use-tag-store";
-import { ThemeStore, useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeStore } from "../../../stores/use-theme-store";
 import { eClearEditor, eOnLoadNote } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 import { timeConverter } from "../../../utils/time";
@@ -52,12 +53,14 @@ import {
   makeSessionId,
   post
 } from "./utils";
+
 export const useEditor = (
   editorId = "",
   readonly?: boolean,
-  onChange?: (html: string) => void,
-  theme?: ThemeStore["colors"]
+  onChange?: (html: string) => void
 ) => {
+  const { theme } = useThemeProvider();
+
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>(makeSessionId());
   const sessionIdRef = useRef(sessionId);
@@ -89,6 +92,10 @@ export const useEditor = (
       isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
     );
   }, [commands, insets, isDefaultEditor]);
+
+  useEffect(() => {
+    postMessage(EditorEvents.theme, theme);
+  }, [theme, postMessage]);
 
   useEffect(() => {
     sessionIdRef.current = sessionId;
@@ -600,7 +607,7 @@ export const useEditor = (
     if (currentNote.current) overlay(true);
     clearTimeout(timers.current["editor:loaded"]);
     timers.current["editor:loaded"] = setTimeout(async () => {
-      postMessage(EditorEvents.theme, theme || useThemeStore.getState().colors);
+      postMessage(EditorEvents.theme, theme);
       commands.setInsets(
         isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
       );

@@ -25,12 +25,12 @@ import { PressableButton } from "../../components/ui/pressable";
 import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { getFontById, getFonts } from "@notesnook/editor/dist/utils/font";
 
 export const FontSelector = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const defaultFontFamily = useSettingStore(
     (state) => state.settings.defaultFontFamily
   );
@@ -57,7 +57,7 @@ export const FontSelector = () => {
         animationDuration={200}
         style={{
           borderRadius: 5,
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           width: width,
           marginTop: 60
         }}
@@ -80,7 +80,7 @@ export const FontSelector = () => {
             }}
           >
             <Paragraph>{getFontById(defaultFontFamily).title}</Paragraph>
-            <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
+            <Icon color={colors.primary.icon} name="menu-down" size={SIZE.md} />
           </PressableButton>
         }
       >
@@ -92,13 +92,18 @@ export const FontSelector = () => {
             }}
             style={{
               backgroundColor:
-                defaultFontFamily === item.id ? colors.nav : "transparent",
+                defaultFontFamily === item.id
+                  ? colors.secondary.background
+                  : "transparent",
               width: "100%",
               maxWidth: width
             }}
             textStyle={{
               fontSize: SIZE.md,
-              color: defaultFontFamily === item.id ? colors.accent : colors.pri
+              color:
+                defaultFontFamily === item.id
+                  ? colors.primary.accent
+                  : colors.primary.paragraph
             }}
           >
             {item.title}

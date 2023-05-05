@@ -17,26 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Theme } from "@notesnook/theme";
-import { Editor } from "../types";
 import { Flex, FlexProps } from "@theme-ui/components";
-import { EditorFloatingMenus } from "./floating-menus";
-import { getDefaultPresets, STATIC_TOOLBAR_GROUPS } from "./tool-definitions";
 import { useEffect, useMemo } from "react";
+import {
+  EditorContext,
+  PopupRenderer
+} from "../components/popup-presenter/popuprenderer";
+import { Editor } from "../types";
+import { ToolbarGroup } from "./components/toolbar-group";
+import { EditorFloatingMenus } from "./floating-menus";
 import {
   ToolbarLocation,
   useIsMobile,
   useToolbarStore
 } from "./stores/toolbar-store";
+import { STATIC_TOOLBAR_GROUPS, getDefaultPresets } from "./tool-definitions";
 import { ToolbarDefinition } from "./types";
-import { ToolbarGroup } from "./components/toolbar-group";
-import {
-  EditorContext,
-  PopupRenderer
-} from "../components/popup-presenter/popuprenderer";
 
 type ToolbarProps = FlexProps & {
-  theme: Theme;
   editor: Editor | null;
   location: ToolbarLocation;
   tools?: ToolbarDefinition;
@@ -47,7 +45,6 @@ type ToolbarProps = FlexProps & {
 export function Toolbar(props: ToolbarProps) {
   const {
     editor,
-    theme,
     location,
     tools = getDefaultPresets().default,
     defaultFontFamily,

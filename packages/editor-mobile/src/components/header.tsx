@@ -72,7 +72,7 @@ function Header({
         display: "flex",
         alignItems: "center",
         height: noHeader ? `${insets.top}px` : `${50 + insets.top}px`,
-        backgroundColor: "var(--nn_bg)",
+        backgroundColor: "var(--nn_primary_background)",
         position: "sticky",
         width: "100vw"
       }}
@@ -101,7 +101,7 @@ function Header({
               style={{
                 borderWidth: 0,
                 borderRadius: 100,
-                color: "var(--nn_icon)",
+                color: "var(--nn_primary_icon)",
                 marginLeft: 6,
                 width: 40,
                 height: 40,
@@ -117,7 +117,7 @@ function Header({
                 style={{
                   position: "absolute"
                 }}
-                color="var(--nn_pri)"
+                color="var(--nn_primary_paragraph)"
               />
             </Button>
           )}
@@ -136,7 +136,7 @@ function Header({
               style={{
                 borderWidth: 0,
                 borderRadius: 100,
-                color: "var(--nn_icon)",
+                color: "var(--nn_primary_icon)",
                 marginRight: 10,
                 width: 39,
                 height: 39,
@@ -147,7 +147,11 @@ function Header({
               }}
             >
               <ArrowULeftTopIcon
-                color={!hasUndo ? "var(--nn_nav)" : "var(--nn_pri)"}
+                color={
+                  !hasUndo
+                    ? "var(--nn_secondary_background)"
+                    : "var(--nn_primary_paragraph)"
+                }
                 size={25}
                 style={{
                   position: "absolute"
@@ -162,7 +166,7 @@ function Header({
               style={{
                 borderWidth: 0,
                 borderRadius: 100,
-                color: "var(--nn_icon)",
+                color: "var(--nn_primary_icon)",
                 marginRight: 10,
                 width: 39,
                 height: 39,
@@ -173,7 +177,11 @@ function Header({
               }}
             >
               <ArrowURightTopIcon
-                color={!hasRedo ? "var(--nn_nav)" : "var(--nn_pri)"}
+                color={
+                  !hasRedo
+                    ? "var(--nn_secondary_background)"
+                    : "var(--nn_primary_paragraph)"
+                }
                 size={25}
                 style={{
                   position: "absolute"
@@ -189,7 +197,7 @@ function Header({
                 style={{
                   borderWidth: 0,
                   borderRadius: 100,
-                  color: "var(--nn_icon)",
+                  color: "var(--nn_primary_icon)",
                   marginRight: 10,
                   width: 39,
                   height: 39,
@@ -216,7 +224,7 @@ function Header({
               style={{
                 borderWidth: 0,
                 borderRadius: 100,
-                color: "var(--nn_icon)",
+                color: "var(--nn_primary_icon)",
                 marginRight: 10,
                 width: 39,
                 height: 39,
@@ -231,7 +239,7 @@ function Header({
                 style={{
                   position: "absolute"
                 }}
-                color="var(--nn_pri)"
+                color="var(--nn_primary_paragraph)"
               />
             </Button>
 
@@ -244,7 +252,7 @@ function Header({
                 style={{
                   borderWidth: 0,
                   borderRadius: 100,
-                  color: "var(--nn_icon)",
+                  color: "var(--nn_primary_icon)",
                   marginRight: 10,
                   width: 39,
                   height: 39,
@@ -259,7 +267,7 @@ function Header({
                   style={{
                     position: "absolute"
                   }}
-                  color="var(--nn_pri)"
+                  color="var(--nn_primary_paragraph)"
                 />
               </Button>
             ) : null}
@@ -272,7 +280,7 @@ function Header({
               style={{
                 borderWidth: 0,
                 borderRadius: 100,
-                color: "var(--nn_icon)",
+                color: "var(--nn_primary_icon)",
                 marginRight: 12,
                 width: 39,
                 height: 39,
@@ -287,7 +295,7 @@ function Header({
                 style={{
                   position: "absolute"
                 }}
-                color="var(--nn_pri)"
+                color="var(--nn_primary_paragraph)"
               />
             </Button>
           </div>

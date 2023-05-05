@@ -79,12 +79,11 @@ const Editor = React.memo(
         withController = true,
         editorId = "",
         onLoad,
-        onChange,
-        theme
+        onChange
       },
       ref
     ) => {
-      const editor = useEditor(editorId || "", readonly, onChange, theme);
+      const editor = useEditor(editorId || "", readonly, onChange);
       const onMessage = useEditorEvents(editor, {
         readonly,
         noToolbar,
@@ -147,8 +146,8 @@ const Editor = React.memo(
       if (withController) {
         editorController.current = editor;
       }
-
-      return editor.loading ? null : (
+      const loaded = false;
+      return !loaded ? null : (
         <>
           <WebView
             testID={notesnook.editor.id}

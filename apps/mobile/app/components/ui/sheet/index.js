@@ -88,7 +88,7 @@ const SheetWrapper = ({
         }}
         indicatorStyle={{
           width: 100,
-          backgroundColor: colors.nav
+          backgroundColor: colors.secondary.background
         }}
         drawUnderStatusBar={false}
         containerStyle={style}

@@ -99,7 +99,7 @@ const SoundItem = ({
           type={isPlaying ? "grayAccent" : "gray"}
           size={22}
           name={isPlaying ? "pause" : "play"}
-          color={isPlaying ? colors.primary.accent : colors.gray}
+          color={isPlaying ? colors.primary.accent : colors.primary.icon}
           onPress={() => {
             if (isPlaying) {
               stopSampleSound();

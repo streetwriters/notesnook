@@ -25,7 +25,7 @@ export const ThemeLight: ThemeDefinition = {
   compatibilityVersion: "1.0",
   description: "The default theme for Notesnook app",
   homepage: "https://notesnook.com",
-  id: "notesnook-default-theme",
+  id: "notesnook-default-theme-light",
   tags: ["theme"],
   version: "1.0",
   scopes: {
@@ -37,7 +37,7 @@ export const ThemeLight: ThemeDefinition = {
         placeholder: "#a9a9a9",
         heading: "#212121",
         paragraph: "#303030",
-        icon: "#808080",
+        icon: "#303030",
         separator: "#E8E8E8",
         backdrop: "#0000001a",
         hover: "#00000010",

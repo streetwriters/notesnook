@@ -122,13 +122,17 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             alignItems: "center",
             marginRight: 12,
             backgroundColor:
-              item.component === "colorpicker" ? colors.primary.accent : undefined,
+              item.component === "colorpicker"
+                ? colors.primary.accent
+                : undefined,
             borderRadius: 100
           }}
         >
           {!!item.icon && (
             <Icon
-              color={item.type === "danger" ? colors.error.icon : colors.primary.icon}
+              color={
+                item.type === "danger" ? colors.error.icon : colors.primary.icon
+              }
               name={item.icon}
               size={30}
             />
@@ -142,14 +146,22 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           }}
         >
           <Paragraph
-            color={item.type === "danger" ? colors.error.paragraph : colors.primary.heading}
+            color={
+              item.type === "danger"
+                ? colors.error.paragraph
+                : colors.primary.heading
+            }
             size={SIZE.md + 1}
           >
             {typeof item.name === "function" ? item.name(current) : item.name}
           </Paragraph>
           {!!item.description && (
             <Paragraph
-              color={item.type === "danger" ? colors.error.paragraph : colors.primary.paragraph}
+              color={
+                item.type === "danger"
+                  ? colors.error.paragraph
+                  : colors.primary.paragraph
+              }
               size={SIZE.sm}
             >
               {typeof item.description === "function"
@@ -208,7 +220,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             >
               <IconButton
                 name="minus"
-                color={colors.pri}
+                color={colors.primary.icon}
                 onPress={() => {
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]
@@ -268,7 +280,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               />
               <IconButton
                 name="plus"
-                color={colors.pri}
+                color={colors.primary.icon}
                 onPress={() => {
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]

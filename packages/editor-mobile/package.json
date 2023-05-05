@@ -6,12 +6,13 @@
     "@notesnook/editor": "*",
     "@notesnook/theme": "*",
     "framer-motion": "^6.5.1",
-    "@mdi/js": "^6.9.96",
+    "@mdi/js": "^7.2.96",
     "@mdi/react": "^1.6.0",
     "mdi-react": "9.1.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "zustand": "^3.6.8"
+    "zustand": "^3.6.8",
+    "@emotion/react": "^11.10.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.0",

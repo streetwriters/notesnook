@@ -25,11 +25,11 @@ import { db } from "../../common/database";
 import { PressableButton } from "../../components/ui/pressable";
 import Paragraph from "../../components/ui/typography/paragraph";
 import PremiumService from "../../services/premium";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 
 export const TrashIntervalSelector = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors("base");
   const [trashInterval, setTrashInterval] = useState(
     db.settings.getTrashCleanupInterval()
   );
@@ -56,7 +56,7 @@ export const TrashIntervalSelector = () => {
         animationDuration={200}
         style={{
           borderRadius: 5,
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           width: width,
           marginTop: 60
         }}
@@ -105,7 +105,10 @@ export const TrashIntervalSelector = () => {
             }}
             textStyle={{
               fontSize: SIZE.md,
-              color: trashInterval === item ? colors.accent : colors.pri
+              color:
+                trashInterval === item
+                  ? colors.primary.accent
+                  : colors.primary.paragraph
             }}
           >
             {item === -1 ? "Never" : item + " days"}

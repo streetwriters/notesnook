@@ -21,7 +21,7 @@ import { ThemeDark, ThemePitchBlack } from "@notesnook/theme";
 import notifee from "@notifee/react-native";
 import dayjs from "dayjs";
 import React from "react";
-import { Linking, Platform } from "react-native";
+import { Appearance, Linking, Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
@@ -458,12 +458,19 @@ export const settingsGroups: SettingSection[] = [
         description: "Change app look and feel with color themes",
         icon: "shape",
         sections: [
+          // {
+          //   id: "accent-color-picker",
+          //   type: "component",
+          //   name: "Accent color",
+          //   description: "Pick the color that matches your mood",
+          //   component: "colorpicker"
+          // },
           {
-            id: "accent-color-picker",
-            type: "component",
-            name: "Accent color",
-            description: "Pick the color that matches your mood",
-            component: "colorpicker"
+            id: "theme-picker",
+            type: "screen",
+            name: "Customize theme",
+            description: "Customize Notesnook to absolute infinity.",
+            component: "theme-selector"
           },
           {
             id: "use-system-theme",
@@ -478,7 +485,12 @@ export const settingsGroups: SettingSection[] = [
               SettingsService.set({
                 useSystemTheme: !current
               });
-              getColorScheme();
+              if (!current) {
+                useThemeStore
+                  .getState()
+                  .setColorScheme(Appearance.getColorScheme() as any);
+              }
+              //getColorScheme();
             }
           },
           {

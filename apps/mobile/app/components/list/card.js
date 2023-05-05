@@ -86,39 +86,6 @@ export const Card = ({ color, warning }) => {
               marginRight: 10
             }}
           >
-            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
-              {messageBoardState.message}
-            </Paragraph>
-            <Paragraph
-              style={{
-                width: 40,
-                backgroundColor:
-                  messageBoardState.type === "error"
-                    ? hexToRGBA(colors.red, 0.15)
-                    : hexToRGBA(color, 0.15),
-                height: 40,
-                borderRadius: 100,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-              color={colors.primary.heading}
-            />
-            <Icon
-              size={SIZE.lg}
-              color={
-                messageBoardState.type === "error" ? colors.errorText : color
-              }
-              name={messageBoardState.icon}
-            />
-          </View>
-
-          <View
-            style={{
-              marginLeft: 10,
-              flexShrink: 1,
-              marginRight: 10
-            }}
-          >
             <Paragraph color={colors.icon} size={SIZE.xs}>
               {messageBoardState.message}
             </Paragraph>

@@ -43,7 +43,6 @@ function MDIIconWrapper({
   rotate
 }: IconProps) {
   const theme = useTheme() as Theme;
-
   const themedColor =
     theme?.colors && isThemeColor(color, theme.colors)
       ? theme.colors[color]

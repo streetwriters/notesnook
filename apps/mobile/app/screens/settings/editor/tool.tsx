@@ -120,7 +120,7 @@ export const Tool = ({
               const _data = useDragState.getState().data.slice();
               if (typeof parentIndex !== "number") {
                 const index = _data[groupIndex]?.findIndex(
-                  (tool: ToolId) => tool === item
+                  (tool: any) => tool === item
                 );
                 _data[groupIndex]?.splice(index, 1);
               } else {
@@ -172,7 +172,9 @@ export const Tool = ({
             if (!isDragged) dimensions.current = event.nativeEvent.layout;
           }}
           style={{
-            backgroundColor: isSubgroup ? colors.primary.background : colors.secondary.background,
+            backgroundColor: isSubgroup
+              ? colors.primary.background
+              : colors.secondary.background,
             borderWidth: isSubgroup ? 0 : 1,
             borderColor: isSubgroup ? undefined : colors.secondary.background,
             marginBottom: 10,
@@ -210,7 +212,11 @@ export const Tool = ({
               style={{
                 marginLeft: iconSvgString ? 10 : 0
               }}
-              color={isSubgroup ? colors.secondary.paragraph : colors.primary.paragraph}
+              color={
+                isSubgroup
+                  ? colors.secondary.paragraph
+                  : colors.primary.paragraph
+              }
               size={isSubgroup ? SIZE.xs : SIZE.sm - 1}
             >
               {isSubgroup ? "COLLAPSED" : tool?.title}
@@ -259,6 +265,7 @@ export const Tool = ({
       colors.primary.icon,
       colors.secondary.background,
       colors.primary.paragraph,
+      colors.secondary.paragraph,
       groupIndex,
       iconSvgString,
       index,
@@ -356,7 +363,9 @@ export const Tool = ({
           paddingBottom: recievePosition === "below" ? 50 : 0,
           paddingTop: recievePosition === "above" ? 50 : 0,
           backgroundColor:
-            dragged?.type === "subgroup" ? colors.secondary.background : undefined,
+            dragged?.type === "subgroup"
+              ? colors.secondary.background
+              : undefined,
           marginTop: recievePosition === "above" ? 5 : 0,
           marginBottom: recievePosition === "below" ? 5 : 0,
           borderRadius: 10

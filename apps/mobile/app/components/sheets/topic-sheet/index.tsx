@@ -45,7 +45,7 @@ import {
 import useNavigationStore, {
   NotebookScreenParams
 } from "../../../stores/use-navigation-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import {
   eOnNewTopicAdded,
   eOnTopicSheetUpdate,
@@ -65,7 +65,6 @@ import { deleteItems } from "../../../utils/functions";
 import { presentDialog } from "../../dialog/functions";
 import { Properties } from "../../properties";
 import Sort from "../sort";
-import Heading from "../../ui/typography/heading";
 
 type ConfigItem = { id: string; type: string };
 class TopicSheetConfig {
@@ -98,7 +97,7 @@ export const TopicsSheet = () => {
   );
   const [selection, setSelection] = useState<TopicType[]>([]);
   const [enabled, setEnabled] = useState(false);
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors("sheet");
   const ref = useRef<ActionSheetRef>(null);
   const isTopic = currentScreen.name === "TopicNotes";
   const [topics, setTopics] = useState(
@@ -245,9 +244,9 @@ export const TopicsSheet = () => {
         maxHeight: 300,
         borderTopRightRadius: 15,
         borderTopLeftRadius: 15,
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         borderWidth: 1,
-        borderColor: colors.nav,
+        borderColor: colors.primary.border,
         borderBottomWidth: 0
       }}
       openAnimationConfig={{
@@ -267,7 +266,7 @@ export const TopicsSheet = () => {
       elevation={10}
       indicatorStyle={{
         width: 100,
-        backgroundColor: colors.nav
+        backgroundColor: colors.secondary.background
       }}
       keyboardHandlerEnabled={false}
       snapPoints={Config.isTesting === "true" ? [100] : [25, 100]}
@@ -319,7 +318,7 @@ export const TopicsSheet = () => {
             alignItems: "center"
           }}
         >
-          <Paragraph size={SIZE.xs} color={colors.icon}>
+          <Paragraph size={SIZE.xs} color={colors.primary.icon}>
             TOPICS
           </Paragraph>
           <View
@@ -354,7 +353,7 @@ export const TopicsSheet = () => {
                   });
                   return;
                 }}
-                color={colors.pri}
+                color={colors.primary.icon}
                 tooltipText="Move to trash"
                 tooltipPosition={1}
                 name="delete"
@@ -374,7 +373,7 @@ export const TopicsSheet = () => {
                     });
                   }}
                   testID="group-topic-button"
-                  color={colors.pri}
+                  color={colors.primary.icon}
                   size={22}
                   customStyle={{
                     width: 40,
@@ -385,7 +384,7 @@ export const TopicsSheet = () => {
                   name="plus"
                   onPress={PLACEHOLDER_DATA.action}
                   testID="add-topic-button"
-                  color={colors.pri}
+                  color={colors.primary.icon}
                   size={22}
                   customStyle={{
                     width: 40,
@@ -404,7 +403,7 @@ export const TopicsSheet = () => {
                       ref.current?.snapToIndex(1);
                     }
                   }}
-                  color={colors.pri}
+                  color={colors.primary.icon}
                   size={22}
                   customStyle={{
                     width: 40,
@@ -427,8 +426,8 @@ export const TopicsSheet = () => {
                 onRefresh={() => {
                   onRequestUpdate();
                 }}
-                colors={[colors.accent]}
-                progressBackgroundColor={colors.bg}
+                colors={[colors.primary.accent]}
+                progressBackgroundColor={colors.primary.background}
               />
             }
             keyExtractor={(item) => (item as TopicType).id}
@@ -442,7 +441,7 @@ export const TopicsSheet = () => {
                   height: 200
                 }}
               >
-                <Paragraph color={colors.icon}>No topics</Paragraph>
+                <Paragraph color={colors.primary.icon}>No topics</Paragraph>
               </View>
             }
             ListFooterComponent={<View style={{ height: 50 }} />}
@@ -476,7 +475,7 @@ const TopicItem = ({
   sheetRef: RefObject<ActionSheetRef>;
 }) => {
   const screen = useNavigationStore((state) => state.currentScreen);
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors("sheet");
   const selection = useSelection();
   const isSelected =
     selection.selection.findIndex((selected) => selected.id === item.id) > -1;
@@ -517,7 +516,7 @@ const TopicItem = ({
         {selection.enabled ? (
           <IconButton
             size={SIZE.lg}
-            color={isSelected ? colors.accent : colors.icon}
+            color={isSelected ? colors.primary.accent : colors.primary.icon}
             name={
               isSelected
                 ? "check-circle-outline"
@@ -528,7 +527,7 @@ const TopicItem = ({
         <Paragraph size={SIZE.sm}>
           {item.title}{" "}
           {notesCount ? (
-            <Paragraph size={SIZE.xs} color={colors.icon}>
+            <Paragraph size={SIZE.xs} color={colors.primary.icon}>
               {notesCount}
             </Paragraph>
           ) : null}
@@ -548,7 +547,7 @@ const TopicItem = ({
         right={0}
         bottom={0}
         top={0}
-        color={colors.pri}
+        color={colors.primary.icon}
         size={SIZE.xl}
       />
     </PressableButton>

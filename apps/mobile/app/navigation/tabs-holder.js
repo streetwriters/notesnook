@@ -388,8 +388,8 @@ const _TabsHolder = () => {
   }, []);
 
   useEffect(() => {
-    changeNavigationBarColor(colors.bg, !colors.night, true);
-  }, [colors.night, colors.bg]);
+    changeNavigationBarColor(colors.primary.background, isDark, true);
+  }, [colors.primary.background, isDark]);
 
   return (
     <View
