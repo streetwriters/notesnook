@@ -36,7 +36,7 @@ const defaultVariant: ThemeUIStyleObject = {
     outline: "2px solid var(--accent)"
   },
   ":hover:not(:focus)": {
-    outline: "1.5px solid var(--textSelection)"
+    outline: "1.5px solid var(--accent)"
   }
 };
 

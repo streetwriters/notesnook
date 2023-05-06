@@ -97,7 +97,7 @@ export function MenuButton(props: MenuButtonProps) {
                 sx={{
                   fontFamily: "body",
                   fontSize: "menu",
-                  color: "fontTertiary"
+                  color: "paragraph"
                 }}
               >
                 {modifier}

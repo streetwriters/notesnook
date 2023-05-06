@@ -138,7 +138,12 @@ export const ThemeDracula: ThemeDefinition = {
     },
     editor: {
       primary: {
-        textSelection: "#424450"
+        textSelection: "#424450",
+        border: "#44475a",
+        hover: "#c5c5c5"
+      },
+      secondary: {
+        textSelection: "#6272a4"
       }
     },
     editorToolbar: {

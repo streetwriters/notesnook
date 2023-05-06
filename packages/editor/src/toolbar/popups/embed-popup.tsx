@@ -25,6 +25,7 @@ import { Embed, EmbedSizeOptions } from "../../extensions/embed";
 import { convertUrlToEmbedUrl } from "@social-embed/lib";
 import { InlineInput } from "../../components/inline-input";
 import { Tabs, Tab } from "../../components/tabs";
+import { EmotionThemeVariant } from "@notesnook/theme";
 
 type EmbedSource = "url" | "code";
 export type EmbedPopupProps = {
@@ -110,17 +111,19 @@ export function EmbedPopup(props: EmbedPopupProps) {
     >
       <Flex sx={{ flexDirection: "column", width: ["auto", 300] }}>
         {error && (
-          <Text
-            variant={"error"}
-            sx={{
-              bg: "errorBg",
-              color: "error",
-              p: 1,
-              borderRadius: "default"
-            }}
-          >
-            Error: {error}
-          </Text>
+          <EmotionThemeVariant variant="error">
+            <Text
+              variant={"error"}
+              sx={{
+                bg: "background",
+                color: "paragraph",
+                p: 1,
+                borderRadius: "default"
+              }}
+            >
+              Error: {error}
+            </Text>
+          </EmotionThemeVariant>
         )}
 
         <Tabs

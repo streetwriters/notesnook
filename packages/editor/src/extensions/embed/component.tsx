@@ -25,6 +25,7 @@ import { DesktopOnly } from "../../components/responsive";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 import { Icon, Icons } from "../../toolbar";
 import { Resizer } from "../../components/resizer";
+import { EmotionThemeVariant } from "@notesnook/theme";
 
 export function EmbedComponent(
   props: SelectionBasedReactNodeViewProps<
@@ -48,7 +49,7 @@ export function EmbedComponent(
       }}
     >
       <Resizer
-        handleColor="primary"
+        handleColor="accent"
         editor={editor}
         selected={selected}
         width={width}
@@ -62,64 +63,66 @@ export function EmbedComponent(
           );
         }}
       >
-        <Box
-          sx={{
-            width: "100%",
-            display: editor.isEditable ? "flex" : "none",
-            position: "absolute",
-            top: -24,
-            justifyContent: "end",
-            p: "small",
-            bg: editor.isEditable ? "bgSecondary" : "transparent",
-            borderTopLeftRadius: "default",
-            borderTopRightRadius: "default",
-            borderColor: selected ? "border" : "bgSecondary",
-            cursor: "pointer",
-            ":hover": {
-              borderColor: "border"
-            }
-          }}
-        >
-          <Icon path={Icons.dragHandle} size={"big"} />
-          <DesktopOnly>
-            {selected && (
-              <Flex sx={{ position: "relative", justifyContent: "end" }}>
-                <Flex
-                  sx={{
-                    position: "absolute",
-                    top: -10,
-                    mb: 2,
-                    alignItems: "end"
-                  }}
-                >
-                  <ToolbarGroup
-                    editor={editor}
-                    tools={[
-                      "embedAlignLeft",
-                      "embedAlignCenter",
-                      "embedAlignRight",
-                      "embedProperties"
-                    ]}
+        <EmotionThemeVariant variant="secondary">
+          <Box
+            sx={{
+              width: "100%",
+              display: editor.isEditable ? "flex" : "none",
+              position: "absolute",
+              top: -24,
+              justifyContent: "end",
+              p: "small",
+              bg: editor.isEditable ? "background" : "transparent",
+              borderTopLeftRadius: "default",
+              borderTopRightRadius: "default",
+              borderColor: selected ? "border" : "background",
+              cursor: "pointer",
+              ":hover": {
+                borderColor: "border"
+              }
+            }}
+          >
+            <Icon path={Icons.dragHandle} size={"big"} />
+            <DesktopOnly>
+              {selected && (
+                <Flex sx={{ position: "relative", justifyContent: "end" }}>
+                  <Flex
                     sx={{
-                      boxShadow: "menu",
-                      borderRadius: "default",
-                      bg: "background"
+                      position: "absolute",
+                      top: -10,
+                      mb: 2,
+                      alignItems: "end"
                     }}
-                  />
+                  >
+                    <ToolbarGroup
+                      editor={editor}
+                      tools={[
+                        "embedAlignLeft",
+                        "embedAlignCenter",
+                        "embedAlignRight",
+                        "embedProperties"
+                      ]}
+                      sx={{
+                        boxShadow: "menu",
+                        borderRadius: "default",
+                        bg: "background"
+                      }}
+                    />
+                  </Flex>
                 </Flex>
-              </Flex>
-            )}
-          </DesktopOnly>
-        </Box>
+              )}
+            </DesktopOnly>
+          </Box>
+        </EmotionThemeVariant>
         <Embed
           ref={embedRef}
           src={src}
           width={"100%"}
           height={"100%"}
           sx={{
-            bg: "bgSecondary",
+            bg: "background",
             border: selected
-              ? "2px solid var(--primary)"
+              ? "2px solid var(--accent)"
               : "2px solid transparent",
             borderRadius: "default"
           }}
@@ -137,7 +140,7 @@ export function EmbedComponent(
               justifyContent: "center"
             }}
           >
-            <Icon path={Icons.loading} rotate size={32} color="disabled" />
+            <Icon path={Icons.loading} rotate size={32} color="icon" />
           </Flex>
         )}
       </Resizer>

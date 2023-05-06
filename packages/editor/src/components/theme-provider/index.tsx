@@ -17,16 +17,42 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
+// import { ThemeProvider  } from "@emotion/react";
 import { PropsWithChildren } from "react";
+import {
+  EmotionThemeProvider,
+  ThemeProvider as NNThemeProvider,
+  ThemeScopes,
+  Variants
+} from "@notesnook/theme";
+import { BoxProps } from "@theme-ui/components";
 import { useTheme } from "../../toolbar/stores/toolbar-store";
 
-export function ThemeProvider(props: PropsWithChildren<unknown>) {
+export function ThemeProvider(
+  props: PropsWithChildren<
+    {
+      injectCssVars?: boolean;
+      scope?: keyof ThemeScopes;
+      variant?: keyof Variants;
+    } & Omit<BoxProps, "variant">
+  >
+) {
+  const { children, scope, variant, ...restProps } = props;
   const theme = useTheme();
-  return null;
-  // return (
-  //   <EmotionThemeProvider theme={theme || {}}>
-  //     {props.children}
-  //   </EmotionThemeProvider>
-  // );
+  return (
+    <NNThemeProvider
+      value={{
+        theme: theme,
+        setTheme: () => {}
+      }}
+    >
+      <EmotionThemeProvider
+        scope={scope || "editor"}
+        variant={variant || "primary"}
+        {...restProps}
+      >
+        {children}
+      </EmotionThemeProvider>
+    </NNThemeProvider>
+  );
 }

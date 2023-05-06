@@ -117,10 +117,10 @@ export function TablePopup(props: TablePopupProps) {
                 data-index={index}
                 sx={{
                   height: cellSize || 15,
-                  border: "1px solid var(--disabled)",
+                  border: "1px solid var(--border)",
                   borderRadius: "small",
                   bg: isCellHighlighted(index, cellLocation, tableSize)
-                    ? "disabled"
+                    ? "border"
                     : "transparent"
                 }}
                 onTouchStart={() => {

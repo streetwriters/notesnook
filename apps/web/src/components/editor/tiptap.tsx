@@ -21,9 +21,7 @@ import "@notesnook/editor/styles/styles.css";
 import "@notesnook/editor/styles/katex.min.css";
 import "@notesnook/editor/styles/katex-fonts.css";
 import "@notesnook/editor/styles/fonts.css";
-import "@notesnook/editor/styles/prism-theme.css";
-import { Theme } from "@notesnook/theme";
-import { useTheme } from "@emotion/react";
+import { ThemeDefinition } from "@notesnook/theme";
 import {
   Toolbar,
   useTiptap,
@@ -57,6 +55,7 @@ import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce, debounceWithId } from "../../utils/debounce";
 import { store as editorstore } from "../../stores/editor-store";
 import { ScopedThemeProvider } from "../theme-provider";
+import { useTheme } from "../../hooks/use-theme";
 
 type TipTapProps = {
   editorContainer: HTMLElement;
@@ -71,7 +70,7 @@ type TipTapProps = {
   toolbarContainerId?: string;
   readonly?: boolean;
   nonce?: number;
-  theme: Theme;
+  theme: ThemeDefinition;
   isMobile?: boolean;
   downloadOptions?: DownloadOptions;
   fontSize: number;
@@ -314,7 +313,6 @@ function TipTap(props: TipTapProps) {
         <ScopedThemeProvider scope="editorToolbar">
           <Toolbar
             editor={editor}
-            theme={theme}
             location={isMobile ? "bottom" : "top"}
             tools={toolbarConfig}
             defaultFontFamily={fontFamily}
@@ -332,7 +330,7 @@ function TiptapWrapper(
     "editorContainer" | "theme" | "fontSize" | "fontFamily"
   >
 ) {
-  const theme = useTheme() as Theme;
+  const [theme] = useTheme();
   const [isReady, setIsReady] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const { editorConfig } = useEditorConfig();
@@ -358,7 +356,9 @@ function TiptapWrapper(
           style={{
             flex: 1,
             cursor: "text",
-            color: theme.colors.paragraph, // TODO!
+            color:
+              theme.scopes.editor?.primary?.paragraph ||
+              theme.scopes.base.primary.paragraph, // TODO!
             paddingBottom: 150,
             fontSize: editorConfig.fontSize,
             fontFamily: getFontById(editorConfig.fontFamily)?.font

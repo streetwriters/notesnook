@@ -46,11 +46,11 @@
 }
 
 .ProseMirror hr.ProseMirror-selectednode::after {
-  border: 2px solid var(--primary);
+  border: 2px solid var(--accent);
 }
 
 .ProseMirror code:not(pre code) {
-  background-color: var(--bgSecondary);
+  background-color: var(--background);
   border: 1px solid var(--border);
   border-radius: 5px;
   padding: 3px 5px 0px 5px;
@@ -83,7 +83,7 @@
 }
 
 .ProseMirror a {
-  color: var(--primary);
+  color: var(--accent);
   cursor: pointer;
 }
 
@@ -105,7 +105,8 @@
 }
 
 .ProseMirror > div.codeblock-view-content-wrap,
-.ProseMirror > div.taskList-view-content-wrap {
+.ProseMirror > div.taskList-view-content-wrap,
+.ProseMirror > div.math-block.math-node {
   margin-top: 1em;
   margin-bottom: 1em;
 }
@@ -213,7 +214,7 @@ img.ProseMirror-separator {
 }
 
 .ProseMirror table .selectedCell {
-  border-color: var(--primary);
+  border-color: var(--accent);
 }
 
 .ProseMirror table td > *,
@@ -222,13 +223,12 @@ img.ProseMirror-separator {
 }
 
 .ProseMirror table th {
-  background-color: var(--bgSecondary);
   font-weight: bold;
   text-align: left;
 }
 
 .ProseMirror table .selectedCell:after {
-  background: var(--primary);
+  background: var(--accent);
   content: "";
   left: 0;
   right: 0;
@@ -241,7 +241,7 @@ img.ProseMirror-separator {
 }
 
 .ProseMirror table .column-resize-handle {
-  background-color: var(--primary);
+  background-color: var(--accent);
   bottom: -2px;
   position: absolute;
   right: 0px;
@@ -302,12 +302,6 @@ img.ProseMirror-separator {
   left: 0;
   pointer-events: none;
   background-color: var(--overlay);
-}
-
-pre::selection,
-pre *::selection {
-  background-color: var(--codeSelection) !important;
-  color: currentColor;
 }
 
 .hide-scrollbar::-webkit-scrollbar {
@@ -548,7 +542,7 @@ p > *::selection {
 }
 
 .outline-list li .outline-list:hover:before {
-  border-left: 1px solid var(--bgSecondaryHover);
+  border-left: 1px solid var(--hover);
 }
 
 

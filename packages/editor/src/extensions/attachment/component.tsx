@@ -25,6 +25,7 @@ import { Icons } from "../../toolbar/icons";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 import { DesktopOnly } from "../../components/responsive";
+import { EmotionThemeVariant } from "@notesnook/theme";
 
 export function AttachmentComponent(
   props: SelectionBasedReactNodeViewProps<AttachmentWithProgress>
@@ -34,7 +35,7 @@ export function AttachmentComponent(
   const elementRef = useRef<HTMLSpanElement>();
 
   return (
-    <>
+    <EmotionThemeVariant variant="secondary">
       <Box
         ref={elementRef}
         as="span"
@@ -46,13 +47,13 @@ export function AttachmentComponent(
           justifyContent: "center",
           userSelect: "none",
           alignItems: "center",
-          backgroundColor: "bgSecondary",
+          backgroundColor: "background",
           px: 1,
           borderRadius: "default",
           border: "1px solid var(--border)",
           cursor: "pointer",
           maxWidth: 250,
-          borderColor: selected ? "primary" : "border",
+          borderColor: selected ? "accent" : "border",
           ":hover": {
             bg: "hover"
           }
@@ -77,7 +78,7 @@ export function AttachmentComponent(
           sx={{
             ml: 1,
             fontSize: "0.65rem",
-            color: "fontTertiary",
+            color: "paragraph",
             flexShrink: 0
           }}
         >
@@ -99,7 +100,7 @@ export function AttachmentComponent(
           )}
         </DesktopOnly>
       </Box>
-    </>
+    </EmotionThemeVariant>
   );
 }
 

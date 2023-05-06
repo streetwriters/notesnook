@@ -46,12 +46,12 @@ export type Theme = {
   typeof variants;
 
 export class ThemeFactory {
-  transform(type: Transformers, theme: Theme) {
+  static transform(type: Transformers, theme: Theme) {
     const factory = new TransformerFactory();
     return factory.construct(type, theme);
   }
 
-  construct(config: ThemeConfig): Theme {
+  static construct(config: ThemeConfig): Theme {
     const theme: Theme = {
       breakpoints: ["480px", "1000px", "1000px"],
       space: [0, 5, 10, 15, 20, 25, 30, 35],

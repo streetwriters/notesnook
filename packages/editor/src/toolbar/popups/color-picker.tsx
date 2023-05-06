@@ -28,6 +28,7 @@ import { Button } from "../../components/button";
 import { debounce } from "../../utils/debounce";
 import { Popup } from "../components/popup";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { EmotionThemeVariant } from "@notesnook/theme";
 
 export const DEFAULT_COLORS = [
   "#e91e63",
@@ -139,7 +140,7 @@ export function ColorPicker(props: ColorPickerProps) {
                   p: 0,
                   borderRadius: 0,
                   fontSize: ["title", "title", "body"],
-                  color: "fontTertiary",
+                  color: "paragraph",
                   width: [75, 75, 65],
                   letterSpacing: 1.5,
                   textAlign: "center"
@@ -190,18 +191,20 @@ export function ColorPicker(props: ColorPickerProps) {
                 iconSize={15}
               />
             )}
-            <PaletteButton
-              icon={Icons.delete}
-              iconColor={deleteMode ? "error" : "icon"}
-              bg={deleteMode ? "errorBg" : undefined}
-              onClick={() => setDeleteMode((s) => !s)}
-              title={
-                deleteMode
-                  ? "Disable delete mode"
-                  : "Enable delete mode for deleting custom colors"
-              }
-              iconSize={18}
-            />
+            <EmotionThemeVariant variant={deleteMode ? "error" : "primary"}>
+              <PaletteButton
+                icon={Icons.delete}
+                iconColor={"icon"}
+                bg={deleteMode ? "background" : "transparent"}
+                onClick={() => setDeleteMode((s) => !s)}
+                title={
+                  deleteMode
+                    ? "Disable delete mode"
+                    : "Enable delete mode for deleting custom colors"
+                }
+                iconSize={18}
+              />
+            </EmotionThemeVariant>
             {!deleteMode && (
               <PaletteButton
                 icon={Icons.palette}

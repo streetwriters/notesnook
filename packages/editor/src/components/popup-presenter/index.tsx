@@ -30,6 +30,7 @@ import {
 import React from "react";
 import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive";
 import { ThemeProvider } from "../theme-provider";
+import { EmotionThemeProvider } from "@notesnook/theme";
 
 export type PopupPresenterProps = {
   isOpen: boolean;
@@ -219,7 +220,9 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
         }
       }}
     >
-      {children}
+      <EmotionThemeProvider scope="editorToolbar">
+        {children}
+      </EmotionThemeProvider>
     </Modal>
   );
 }

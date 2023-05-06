@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Theme } from "@notesnook/theme";
+import { ThemeDefinition, ThemeLight } from "@notesnook/theme";
 import { create } from "zustand";
 import { DownloadOptions } from "../../utils/downloader";
 
@@ -25,8 +25,8 @@ export type ToolbarLocation = "top" | "bottom";
 
 export type PopupRef = { id: string; group: string };
 interface ToolbarState {
-  theme?: Theme;
-  setTheme: (theme?: Theme) => void;
+  theme: ThemeDefinition;
+  setTheme: (theme: ThemeDefinition) => void;
   downloadOptions?: DownloadOptions;
   setDownloadOptions: (options?: DownloadOptions) => void;
   isMobile: boolean;
@@ -46,7 +46,7 @@ interface ToolbarState {
 }
 
 export const useToolbarStore = create<ToolbarState>((set, get) => ({
-  theme: undefined,
+  theme: ThemeLight,
   downloadOptions: undefined,
   isMobile: false,
   openedPopups: {},
@@ -119,4 +119,6 @@ export const useTheme = Object.defineProperty(
   {
     get: () => useToolbarStore.getState().theme
   }
-) as (() => Theme | undefined) & { current: Theme | undefined };
+) as (() => ThemeDefinition) & {
+  current: ThemeDefinition;
+};

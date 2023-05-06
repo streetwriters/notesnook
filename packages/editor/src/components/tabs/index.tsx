@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Children, PropsWithChildren, useMemo, useState } from "react";
 import { Button, Flex, FlexProps } from "@theme-ui/components";
+import { EmotionThemeVariant } from "@notesnook/theme";
 
 export type TabProps = { title: string | React.ReactElement };
 export function Tab(props: PropsWithChildren<TabProps>) {
@@ -50,35 +51,37 @@ export function Tabs(props: PropsWithChildren<TabsProps>) {
           mb: 1
         }}
       >
-        {tabs?.map((tab, index) => (
-          <Button
-            key={index.toString()}
-            sx={{
-              flex: 1,
-              p: 0,
-              py: 1,
-              borderRadius: 0,
-              borderTopLeftRadius: "default",
-              borderTopRightRadius: "default",
-              bg: activeTab === index ? "bgSecondary" : "transparent",
-              fontWeight: activeTab === index ? "bold" : "normal",
-              color: "text",
-              ":last-of-type": { mr: 0 },
-              borderBottom: "2px solid",
-              borderBottomColor:
-                activeTab === index ? "primary" : "transparent",
-              ":hover": {
-                bg: "hover"
-              }
-            }}
-            onClick={() => {
-              setActiveTab(index);
-              onTabChanged?.(index);
-            }}
-          >
-            {tab.title}
-          </Button>
-        ))}
+        <EmotionThemeVariant variant="secondary">
+          {tabs?.map((tab, index) => (
+            <Button
+              key={index.toString()}
+              sx={{
+                flex: 1,
+                p: 0,
+                py: 1,
+                borderRadius: 0,
+                borderTopLeftRadius: "default",
+                borderTopRightRadius: "default",
+                bg: activeTab === index ? "background" : "transparent",
+                fontWeight: activeTab === index ? "bold" : "normal",
+                color: "text",
+                ":last-of-type": { mr: 0 },
+                borderBottom: "2px solid",
+                borderBottomColor:
+                  activeTab === index ? "accent" : "transparent",
+                ":hover": {
+                  bg: "hover"
+                }
+              }}
+              onClick={() => {
+                setActiveTab(index);
+                onTabChanged?.(index);
+              }}
+            >
+              {tab.title}
+            </Button>
+          ))}
+        </EmotionThemeVariant>
       </Flex>
       <Flex {...containerProps}>{tabs && tabs[activeTab].component}</Flex>
     </Flex>

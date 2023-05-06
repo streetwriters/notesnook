@@ -22,6 +22,7 @@ import { Icon } from "./icon";
 import { Icons } from "../icons";
 import { PropsWithChildren } from "react";
 import { DesktopOnly, MobileOnly } from "../../components/responsive";
+import { EmotionThemeVariant } from "@notesnook/theme";
 
 type Action = {
   title: string;
@@ -73,27 +74,31 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
           )}
           {children}
           {title && action && (
-            <Flex
-              sx={{ justifyContent: "end" }}
-              bg="bgSecondary"
-              p={1}
-              px={2}
-              mt={2}
-            >
-              <Button
-                variant="dialog"
-                onClick={
-                  action.disabled || action.loading ? undefined : action.onClick
-                }
-                disabled={action.disabled || action.loading}
+            <EmotionThemeVariant variant="secondary">
+              <Flex
+                sx={{ justifyContent: "end" }}
+                bg="secondary"
+                p={1}
+                px={2}
+                mt={2}
               >
-                {action.loading ? (
-                  <Icon path={Icons.loading} rotate size="medium" />
-                ) : (
-                  action.title
-                )}
-              </Button>
-            </Flex>
+                <Button
+                  variant="dialog"
+                  onClick={
+                    action.disabled || action.loading
+                      ? undefined
+                      : action.onClick
+                  }
+                  disabled={action.disabled || action.loading}
+                >
+                  {action.loading ? (
+                    <Icon path={Icons.loading} rotate size="medium" />
+                  ) : (
+                    action.title
+                  )}
+                </Button>
+              </Flex>
+            </EmotionThemeVariant>
           )}
         </Flex>
       </DesktopOnly>

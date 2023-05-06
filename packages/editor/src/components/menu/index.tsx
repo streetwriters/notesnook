@@ -180,7 +180,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
           sx={{
             fontFamily: "body",
             fontSize: "subtitle",
-            color: "primary",
+            color: "accent",
             py: "8px",
             px: 3,
             borderBottom: "1px solid",

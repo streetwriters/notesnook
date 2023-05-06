@@ -156,7 +156,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     if (!this.options.component) return null;
 
     return (
-      <ThemeProvider>
+      <ThemeProvider injectCssVars={false}>
         <this.options.component
           {...props}
           editor={this.editor}

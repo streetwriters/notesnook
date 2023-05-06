@@ -38,7 +38,8 @@ import {
   useTransform,
   useAnimation
 } from "framer-motion";
-import { useTheme } from "../../toolbar/stores/toolbar-store";
+import { useTheme } from "@emotion/react";
+import { Theme } from "@notesnook/theme";
 
 const AnimatedFlex = motion(
   Flex as React.FunctionComponent<Omit<FlexProps, "onDrag" | "onDragEnd">>
@@ -104,7 +105,7 @@ export function ActionSheetPresenter(
     draggable = true,
     children
   } = props;
-  const theme = useTheme();
+  const theme = useTheme() as Theme;
   const contentRef = useRef<HTMLDivElement>();
 
   const y = useMotionValue(0);

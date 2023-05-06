@@ -76,6 +76,7 @@ export type ThemeDefinition = {
   description: string;
   logo?: string;
   colorScheme: "light" | "dark";
+  codeBlockCSS: string;
   tags?: string[];
   compatibilityVersion: string;
   scopes: ThemeScopes;

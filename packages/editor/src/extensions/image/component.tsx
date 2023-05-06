@@ -128,9 +128,9 @@ export function ImageComponent(
                 height: height || relativeHeight || "100%",
                 maxWidth: "100%",
                 minWidth: 135,
-                bg: "bgSecondary",
+                bg: "background",
                 border: selected
-                  ? "2px solid var(--primary)"
+                  ? "2px solid var(--accent)"
                   : "2px solid transparent",
                 borderRadius: "default",
                 flexDirection: "column",
@@ -251,7 +251,7 @@ export function ImageComponent(
                   width: editor.isEditable ? "100%" : width,
                   height: editor.isEditable ? "100%" : height,
                   border: selected
-                    ? "2px solid var(--primary)"
+                    ? "2px solid var(--accent)"
                     : "2px solid transparent",
                   borderRadius: "default"
                 }}

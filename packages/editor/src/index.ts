@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Theme } from "@notesnook/theme";
+import { ThemeDefinition, ThemeLight } from "@notesnook/theme";
 import {
   EditorOptions,
   extensions as TiptapCoreExtensions,
@@ -94,13 +94,14 @@ type TiptapOptions = EditorOptions &
   Omit<ImageOptions, "HTMLAttributes"> &
   OpenLinkOptions & {
     downloadOptions?: DownloadOptions;
-    theme: Theme;
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
   };
 
 const useTiptap = (
-  options: Partial<TiptapOptions> = {},
+  options: Partial<TiptapOptions> & {
+    theme: ThemeDefinition;
+  } = { theme: ThemeLight },
   deps: React.DependencyList = []
 ) => {
   const {
@@ -117,8 +118,8 @@ const useTiptap = (
   } = options;
   const PortalProviderAPI = usePortalProvider();
   const setIsMobile = useToolbarStore((store) => store.setIsMobile);
-  const setTheme = useToolbarStore((store) => store.setTheme);
   const closeAllPopups = useToolbarStore((store) => store.closeAllPopups);
+  const setTheme = useToolbarStore((store) => store.setTheme);
   const setDownloadOptions = useToolbarStore(
     (store) => store.setDownloadOptions
   );

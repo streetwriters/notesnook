@@ -49,6 +49,7 @@ import useTablet from "../../hooks/use-tablet";
 import Config from "../../utils/config";
 import { AnimatedFlex } from "../animated";
 import { EditorLoader } from "../loaders/editor-loader";
+import { ScopedThemeProvider } from "../theme-provider";
 
 type PreviewSession = {
   content: { data: string; type: string };
@@ -299,37 +300,39 @@ export function Editor(props: EditorProps) {
 
   return (
     <EditorChrome isLoading={isLoading} {...props}>
-      <Tiptap
-        isMobile={isMobile}
-        nonce={nonce}
-        readonly={readonly}
-        toolbarContainerId={headless ? undefined : "editorToolbar"}
-        content={content}
-        downloadOptions={{
-          corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
-        }}
-        onLoad={() => {
-          if (onLoadMedia) onLoadMedia();
-          if (nonce && nonce > 0) setIsLoading(false);
-        }}
-        onContentChange={onContentChange}
-        onChange={onEditorChange}
-        onDownloadAttachment={(attachment) =>
-          downloadAttachment(attachment.hash)
-        }
-        onInsertAttachment={(type) => {
-          const mime = type === "file" ? "*/*" : "image/*";
-          insertAttachment(mime).then((file) => {
-            if (!file) return;
-            editor.current?.attachFile(file);
-          });
-        }}
-        onAttachFile={async (file) => {
-          const result = await attachFile(file);
-          if (!result) return;
-          editor.current?.attachFile(result);
-        }}
-      />
+      <ScopedThemeProvider scope="editor">
+        <Tiptap
+          isMobile={isMobile}
+          nonce={nonce}
+          readonly={readonly}
+          toolbarContainerId={headless ? undefined : "editorToolbar"}
+          content={content}
+          downloadOptions={{
+            corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
+          }}
+          onLoad={() => {
+            if (onLoadMedia) onLoadMedia();
+            if (nonce && nonce > 0) setIsLoading(false);
+          }}
+          onContentChange={onContentChange}
+          onChange={onEditorChange}
+          onDownloadAttachment={(attachment) =>
+            downloadAttachment(attachment.hash)
+          }
+          onInsertAttachment={(type) => {
+            const mime = type === "file" ? "*/*" : "image/*";
+            insertAttachment(mime).then((file) => {
+              if (!file) return;
+              editor.current?.attachFile(file);
+            });
+          }}
+          onAttachFile={async (file) => {
+            const result = await attachFile(file);
+            if (!result) return;
+            editor.current?.attachFile(result);
+          }}
+        />
+      </ScopedThemeProvider>
     </EditorChrome>
   );
 }
