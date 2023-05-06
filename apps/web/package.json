@@ -28,8 +28,8 @@
     "@notesnook/theme": "*",
     "@notesnook/web-clipper": "*",
     "@tanstack/react-virtual": "^3.0.0-beta.18",
-    "@theme-ui/components": "0.15.5",
-    "@theme-ui/core": "0.15.5",
+    "@theme-ui/components": "0.14.7",
+    "@theme-ui/core": "0.14.7",
     "allotment": "^1.12.1",
     "async-mutex": "^0.3.2",
     "axios": "^0.21.4",
@@ -103,8 +103,8 @@
     "@types/react@>17": "17.0.2",
     "@types/react-dom@>17": "17.0.2",
     "@emotion/react@>11": "11.10.5",
-    "@theme-ui/components@>0": "0.15.5",
-    "@theme-ui/core@>0": "0.15.5"
+    "@theme-ui/components@>0": "0.14.7",
+    "@theme-ui/core@>0": "0.14.7"
   },
   "scripts": {
     "start": "env-cmd -e all,dev,web react-scripts start",

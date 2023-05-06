@@ -17,12 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./theme/accents";
-export * from "./theme";
-export * from "./theme-engine";
-export * from "./theme-engine/themes/dark";
-export * from "./theme-engine/themes/light";
-export * from "./theme-engine/themes/pitch-black";
-export * from "./theme-engine/themes/dracula";
-export * from "./theme-engine/types";
-export * from "./emotion";
+import { ThemeDracula } from "@notesnook/theme";
+import { usePersistentState } from "./use-persistent-state";
+
+export function useTheme() {
+  const [theme, setTheme] = usePersistentState("settings:theme", ThemeDracula);
+  return [ThemeDracula, setTheme] as const;
+}

@@ -17,39 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  ThemeProvider,
-  ThemeDracula,
-  EmotionThemeProvider,
-  EmotionThemeVariant
-} from "@notesnook/theme";
+import { Variants, useCurrentThemeScope } from "../";
 import { PropsWithChildren } from "react";
-import { BoxProps } from "@theme-ui/components";
-import { useTheme } from "../../hooks/use-theme";
+import { EmotionThemeProvider } from "./theme-provider";
 
-export function BaseThemeProvider(
-  props: PropsWithChildren<
-    { injectCssVars?: boolean } & Omit<BoxProps, "variant">
-  >
+type ThemeVariantProps = { variant: keyof Variants; injectCssVars?: boolean };
+export function EmotionThemeVariant(
+  props: PropsWithChildren<ThemeVariantProps>
 ) {
-  const { children, ...restProps } = props;
-  const [theme, setTheme] = useTheme();
+  const { variant, injectCssVars = false, children } = props;
+  const scope = useCurrentThemeScope();
 
   return (
-    <ThemeProvider
-      value={{
-        theme: ThemeDracula,
-        setTheme
-      }}
+    <EmotionThemeProvider
+      scope={scope}
+      variant={variant}
+      injectCssVars={injectCssVars}
     >
-      <EmotionThemeProvider scope="base" {...restProps}>
-        {children}
-      </EmotionThemeProvider>
-    </ThemeProvider>
+      {children}
+    </EmotionThemeProvider>
   );
 }
-
-export {
-  EmotionThemeProvider as ScopedThemeProvider,
-  EmotionThemeVariant as ThemeVariant
-};
