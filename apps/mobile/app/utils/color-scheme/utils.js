@@ -17,17 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Appearance } from "react-native";
-import {
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  COLOR_SCHEME_PITCH_BLACK,
-  setAccentColor,
-  setColorScheme
-} from ".";
-import SettingsService from "../../services/settings";
-
 const isValidHex = (hex) => /^#([A-Fa-f0-9]{3,4}){1,2}$/.test(hex);
 const getChunksFromString = (st, chunkSize) =>
   st.match(new RegExp(`.{${chunkSize}}`, "g"));
@@ -84,50 +73,4 @@ export const RGB_Linear_Shade = (p, rgba) => {
     r(i(c) * P + t) +
     (d ? "," + d : ")")
   );
-};
-
-export function getColorScheme(overrideSystemTheme) {
-  let { pitchBlack, theme, useSystemTheme } = SettingsService.get();
-  const darkTheme = pitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK;
-
-  if (useSystemTheme && !overrideSystemTheme) {
-    setAccentColor(theme.accent);
-    Appearance.getColorScheme() === "dark"
-      ? setColorScheme(darkTheme)
-      : setColorScheme(COLOR_SCHEME_LIGHT);
-    SettingsService.set({
-      theme: {
-        ...theme,
-        dark: Appearance.getColorScheme() === "dark"
-      }
-    });
-    return COLOR_SCHEME;
-  }
-
-  setAccentColor(theme.accent);
-  setColorScheme(theme.dark ? darkTheme : COLOR_SCHEME_LIGHT);
-  return COLOR_SCHEME;
-}
-
-export const switchAccentColor = async (color) => {
-  setAccentColor(color);
-  let settings = SettingsService.get();
-  SettingsService.set({
-    theme: {
-      ...settings.theme,
-      accent: color
-    }
-  });
-  getColorScheme();
-};
-
-export const toggleDarkMode = async () => {
-  let settings = SettingsService.get();
-  SettingsService.set({
-    theme: {
-      ...settings.theme,
-      dark: !settings.theme?.dark
-    }
-  });
-  getColorScheme(true);
 };

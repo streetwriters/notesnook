@@ -23,7 +23,6 @@ import { enabled } from "react-native-privacy-snapshot";
 import { MMKV } from "../common/database/mmkv";
 import { SettingStore, useSettingStore } from "../stores/use-setting-store";
 import { AndroidModule } from "../utils";
-import { getColorScheme } from "../utils/color-scheme/utils";
 import { scale, updateSize } from "../utils/size";
 import { DDS } from "./device-detection";
 import { setAutobackOffMessage } from "./message";
@@ -57,7 +56,6 @@ function init() {
   setTimeout(() => setPrivacyScreen(settings), 1);
   updateSize();
   useSettingStore.getState().setSettings({ ...settings });
-  getColorScheme();
 }
 
 function setPrivacyScreen(settings: SettingStore["settings"]) {

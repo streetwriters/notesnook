@@ -39,7 +39,6 @@ import { useThemeStore } from "../../stores/use-theme-store";
 export const SideMenu = React.memo(
   function SideMenu() {
     const { colors, isDark } = useThemeColors();
-    const deviceMode = useSettingStore((state) => state.deviceMode);
     const insets = useGlobalSafeAreaInsets();
     const subscriptionType = useUserStore(
       (state) => state.user?.subscription?.type

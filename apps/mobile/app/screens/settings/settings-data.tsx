@@ -490,7 +490,6 @@ export const settingsGroups: SettingSection[] = [
                   .getState()
                   .setColorScheme(Appearance.getColorScheme() as any);
               }
-              //getColorScheme();
             }
           },
           {

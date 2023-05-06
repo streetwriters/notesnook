@@ -17,36 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ThemeDefinition } from "@notesnook/theme";
 import { Appearance } from "react-native";
 import create, { State } from "zustand";
-import {
-  useThemeColors,
-  ThemeDefinition,
-  VariantsWithStaticColors
-} from "@notesnook/theme";
 import SettingsService from "../services/settings";
 export interface ThemeStore extends State {
-  colors: VariantsWithStaticColors;
   lightTheme: ThemeDefinition;
   darkTheme: ThemeDefinition;
   colorScheme: "dark" | "light";
-  setColors: (colors: ReturnType<typeof useThemeColors>) => void;
   setDarkTheme: (theme: ThemeDefinition) => void;
   setLightTheme: (theme: ThemeDefinition) => void;
   setColorScheme: (colorScheme?: "dark" | "light") => void;
 }
 
 export const useThemeStore = create<ThemeStore>((set, get) => ({
-  colors: SettingsService.get().lighTheme.scopes["base"] as any,
   lightTheme: SettingsService.get().lighTheme,
   darkTheme: SettingsService.get().darkTheme,
   colorScheme: SettingsService.get().useSystemTheme
     ? (Appearance.getColorScheme() as "dark" | "light")
     : SettingsService.get().colorScheme,
-  setColors: () => {
-    // TODO
-    //set({ colors });
-  },
   setDarkTheme: (darkTheme) => {
     set({ darkTheme });
     SettingsService.setProperty("darkTheme", darkTheme);

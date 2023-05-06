@@ -48,7 +48,9 @@ export default function ToolSheet({
   const renderTool = React.useCallback(
     (item: ToolId) => {
       const tool = findToolById(item);
-      const iconSvgString = tool ? getToolIcon(tool.icon as ToolId) : null;
+      const iconSvgString = tool
+        ? getToolIcon(tool.icon as ToolId, colors.secondary.icon)
+        : null;
       if (item === "none") return;
       return (
         <PressableButton
@@ -99,7 +101,12 @@ export default function ToolSheet({
         </PressableButton>
       );
     },
-    [colors.primary.paragraph, group.groupIndex, group.index]
+    [
+      colors.primary.paragraph,
+      colors.secondary.icon,
+      group.groupIndex,
+      group.index
+    ]
   );
 
   return (

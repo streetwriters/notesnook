@@ -65,7 +65,9 @@ export const Tool = ({
   const tool =
     isSubgroup || item === "dummy" ? null : findToolById(item as ToolId);
   const iconSvgString =
-    isSubgroup || !tool ? null : getToolIcon(tool.icon as ToolId);
+    isSubgroup || !tool
+      ? null
+      : getToolIcon(tool.icon as ToolId, colors.secondary.icon);
 
   const buttons = React.useCallback(() => {
     const btns = isSubgroup
