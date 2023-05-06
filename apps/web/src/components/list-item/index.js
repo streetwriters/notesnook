@@ -143,10 +143,10 @@ function ListItem(props) {
           : background,
 
         ":hover": {
-          backgroundColor: isSelected ? "textSelection" : "hover"
+          backgroundColor: isSelected ? "shade" : "hover"
         },
         ":focus": {
-          backgroundColor: isSelected ? "textSelection" : "hover"
+          backgroundColor: isSelected ? "shade" : "hover"
         },
         ":focus-visible": {
           outline: `1px solid var(--${
