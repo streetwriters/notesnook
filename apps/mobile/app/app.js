@@ -45,11 +45,6 @@ NetInfo.configure({
 SettingsService.init();
 SettingsService.checkOrientation();
 const App = () => {
-  const [colorScheme, darkTheme, lightTheme] = useThemeStore((state) => [
-    state.colorScheme,
-    state.darkTheme,
-    state.lightTheme
-  ]);
   useAppEvents();
   const [init, setInit] = useState(false);
   useEffect(() => {
@@ -69,45 +64,59 @@ const App = () => {
     }, 100);
   }, []);
   return (
-    <ThemeProvider
-      value={{
-        theme: colorScheme === "dark" ? darkTheme : lightTheme,
-        //theme: ThemeDracula,
-        setTheme: () => null
+    <View
+      style={{
+        height: "100%",
+        width: "100%"
       }}
     >
       <View
+        style={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          zIndex: -1
+        }}
+        pointerEvents="none"
+      >
+        <SafeAreaProvider>
+          <GlobalSafeAreaProvider />
+        </SafeAreaProvider>
+      </View>
+
+      <GestureHandlerRootView
         style={{
           height: "100%",
           width: "100%"
         }}
       >
-        <View
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            zIndex: -1
-          }}
-          pointerEvents="none"
-        >
-          <SafeAreaProvider>
-            <GlobalSafeAreaProvider />
-          </SafeAreaProvider>
-        </View>
-
-        <GestureHandlerRootView
-          style={{
-            height: "100%",
-            width: "100%"
-          }}
-        >
-          <ApplicationHolder />
-          {init && <Launcher />}
-        </GestureHandlerRootView>
-      </View>
-    </ThemeProvider>
+        <ApplicationHolder />
+        {init && <Launcher />}
+      </GestureHandlerRootView>
+    </View>
   );
 };
 
-export default withErrorBoundry(App, "App");
+export const withThemeProvider = (Element) => {
+  return function AppWithThemeProvider() {
+    const [colorScheme, darkTheme, lightTheme] = useThemeStore((state) => [
+      state.colorScheme,
+      state.darkTheme,
+      state.lightTheme
+    ]);
+
+    return (
+      <ThemeProvider
+        value={{
+          theme: colorScheme === "dark" ? darkTheme : lightTheme,
+          //theme: ThemeDracula,
+          setTheme: () => null
+        }}
+      >
+        <Element />
+      </ThemeProvider>
+    );
+  };
+};
+
+export default withThemeProvider(withErrorBoundry(App, "App"));
