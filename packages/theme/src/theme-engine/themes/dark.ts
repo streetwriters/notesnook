@@ -27,7 +27,7 @@ export const ThemeDark: ThemeDefinition = {
     base: {
       primary: {
         accent: "#008837",
-        background: "#0d0d0d",
+        background: "#181818",
         border: "#202020",
         placeholder: "#404040",
         heading: "#e3e3e3",
@@ -41,7 +41,7 @@ export const ThemeDark: ThemeDefinition = {
       },
       secondary: {
         accent: "#008837",
-        background: "#151515",
+        background: "#202020",
         border: "#202020",
         placeholder: "#404040",
         heading: "#808080",

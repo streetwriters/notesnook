@@ -142,10 +142,10 @@ export const Items = ({ item, buttons, close }) => {
             size={DDS.isTab ? SIZE.xxl : SIZE.md + 4}
             color={
               item.on
-                ? colors.accent
+                ? colors.primary.accent
                 : item.name === "Delete" || item.name === "PermDelete"
-                ? colors.errorText
-                : colors.icon
+                ? colors.error.icon
+                : colors.secondary.icon
             }
           />
         </PressableButton>

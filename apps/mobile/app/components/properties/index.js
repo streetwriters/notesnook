@@ -81,7 +81,8 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
             style={{
               paddingHorizontal: 12,
               marginTop: 5,
-              zIndex: 10
+              zIndex: 10,
+              marginBottom: 6
             }}
           >
             <Heading size={SIZE.lg}>
@@ -112,7 +113,6 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
               />
             ) : null}
           </View>
-          <Line top={12} />
 
           <DateMeta item={item} />
           <Line bottom={0} />
