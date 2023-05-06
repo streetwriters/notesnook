@@ -71,6 +71,7 @@ import { tabBarRef } from "../utils/global-refs";
 import BackupService from "../services/backup";
 import { sleep } from "../utils/time";
 import notifee from "@notifee/react-native";
+import { useThemeColors } from "@notesnook/theme";
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
@@ -80,6 +81,7 @@ export const useAppEvents = () => {
   const syncedOnLaunch = useRef(false);
   const verify = useUserStore((state) => state.verifyUser);
   const syncing = useUserStore((state) => state.syncing);
+  const { isDark } = useThemeColors();
   const refValues = useRef({
     subsriptionSuccessListener: null,
     subsriptionErrorListener: null,
@@ -448,7 +450,7 @@ export const useAppEvents = () => {
     async (state) => {
       if (state === "active") {
         notifee.setBadgeCount(0);
-        updateStatusBarColor();
+        updateStatusBarColor(isDark);
         if (
           SettingsService.get().appLockMode !== "background" &&
           !SettingsService.get().privacyScreen
@@ -505,7 +507,7 @@ export const useAppEvents = () => {
         }
       }
     },
-    [onEmailVerified]
+    [onEmailVerified, isDark]
   );
 
   async function reconnectSSE(connection) {

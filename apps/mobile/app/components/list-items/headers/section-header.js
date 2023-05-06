@@ -168,7 +168,7 @@ export const SectionHeader = React.memo(
                     : "Switch to compact mode"
                 }
                 fwdRef={compactModeRef}
-                color={colors.primary.icon}
+                color={colors.secondary.icon}
                 name={listMode == "compact" ? "view-list" : "view-list-outline"}
                 onPress={() => {
                   let settings = {};

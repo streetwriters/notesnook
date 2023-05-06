@@ -153,11 +153,8 @@ export function setAccentColor(color) {
   return ACCENT;
 }
 
-export function updateStatusBarColor() {
-  StatusBar.setBarStyle(
-    COLOR_SCHEME.night ? "light-content" : "dark-content",
-    true
-  );
+export function updateStatusBarColor(isDark) {
+  StatusBar.setBarStyle(isDark ? "light-content" : "dark-content", true);
   if (Platform.OS === "android") {
     StatusBar.setBackgroundColor("transparent", true);
     StatusBar.setTranslucent(true, true);

@@ -161,7 +161,7 @@ export const PressableButton = ({
   fwdRef,
   hidden
 }: PressableButtonProps) => {
-  const { colors, isDark } = useThemeColors();
+  const { isDark } = useThemeColors();
   const { primary, selected, colorOpacity } = useButton({
     type,
     accent: accentColor,

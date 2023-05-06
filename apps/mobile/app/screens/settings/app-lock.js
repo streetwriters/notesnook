@@ -107,7 +107,8 @@ const AppLock = ({ route }) => {
                 style={{
                   position: "absolute",
                   right: 0,
-                  top: 6
+                  top: 6,
+                  opacity: 0.2
                 }}
               />
 

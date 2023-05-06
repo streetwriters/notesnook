@@ -36,7 +36,6 @@ import { TipManager } from "../../../services/tip-manager";
 import { useEditorStore } from "../../../stores/use-editor-store";
 import { useNoteStore } from "../../../stores/use-notes-store";
 import { useTagStore } from "../../../stores/use-tag-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
 import { eClearEditor, eOnLoadNote } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 import { timeConverter } from "../../../utils/time";
@@ -104,17 +103,6 @@ export const useEditor = (
   useEffect(() => {
     commands.setTags(currentNote.current);
   }, [commands, tags]);
-
-  useEffect(() => {
-    if (theme) return;
-    const unsub = useThemeStore.subscribe((state) => {
-      postMessage(EditorEvents.theme, state.colors);
-    });
-
-    return () => {
-      unsub();
-    };
-  }, [postMessage, theme]);
 
   const overlay = useCallback(
     (show: boolean, data = { type: "new" }) => {

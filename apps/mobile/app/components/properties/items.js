@@ -73,7 +73,7 @@ export const Items = ({ item, buttons, close }) => {
               ? colors.primary.accent
               : item.id.match(/(delete|trash)/g)
               ? colors.error.icon
-              : colors.primary.icon
+              : colors.secondary.icon
           }
         />
       </PressableButton>
