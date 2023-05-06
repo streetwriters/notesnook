@@ -29,10 +29,10 @@ export const ThemePitchBlack: ThemeDefinition = {
       primary: {
         accent: "#008837",
         background: "#000000",
-        border: "#383838",
+        border: "#202020",
         placeholder: "#404040",
-        heading: "#E8E8E8",
-        paragraph: "#C0C0C0",
+        heading: "#e3e3e3",
+        paragraph: "#D3D3D3",
         icon: "#808080",
         separator: "#383838",
         backdrop: "#35353580",
@@ -43,7 +43,7 @@ export const ThemePitchBlack: ThemeDefinition = {
       secondary: {
         accent: "#008837",
         background: "#2b2b2b",
-        border: "#383838",
+        border: "#202020",
         placeholder: "#404040",
         heading: "#808080",
         paragraph: "#818589",
@@ -57,7 +57,7 @@ export const ThemePitchBlack: ThemeDefinition = {
       disabled: {
         accent: "#008837",
         background: "#000000",
-        border: "#383838",
+        border: "#202020",
         placeholder: "#404040",
         heading: "#212121",
         paragraph: "#505050",
@@ -71,7 +71,7 @@ export const ThemePitchBlack: ThemeDefinition = {
       error: {
         accent: "#f54b42",
         background: "#f4433620",
-        border: "#383838",
+        border: "#202020",
         placeholder: "#404040",
         heading: "#f54b42",
         paragraph: "#f54b42",
@@ -85,7 +85,7 @@ export const ThemePitchBlack: ThemeDefinition = {
       warning: {
         accent: "#FFA500",
         background: "#FFA50020",
-        border: "#383838",
+        border: "#202020",
         placeholder: "#404040",
         heading: "#FFA500",
         paragraph: "#FFA500",
@@ -99,7 +99,7 @@ export const ThemePitchBlack: ThemeDefinition = {
       success: {
         accent: "#4F8A10",
         background: "#00FF0020",
-        border: "#383838",
+        border: "#202020",
         placeholder: "#404040",
         heading: "#4F8A10",
         paragraph: "#4F8A10",

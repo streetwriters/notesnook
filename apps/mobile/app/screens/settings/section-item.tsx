@@ -131,7 +131,9 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           {!!item.icon && (
             <Icon
               color={
-                item.type === "danger" ? colors.error.icon : colors.primary.icon
+                item.type === "danger"
+                  ? colors.error.icon
+                  : colors.secondary.icon
               }
               name={item.icon}
               size={30}
@@ -309,7 +311,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               : settings[item.property]
           }
           onColor={colors.primary.accent}
-          offColor={colors.primary.icon}
+          offColor={colors.secondary.icon}
           size="small"
           animationSpeed={150}
           onToggle={onChangeSettings}

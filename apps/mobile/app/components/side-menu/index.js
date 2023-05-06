@@ -104,17 +104,14 @@ export const SideMenu = React.memo(
         style={{
           height: "100%",
           width: "100%",
-          backgroundColor: colors.secondary.background
+          backgroundColor: colors.primary.background
         }}
       >
         <View
           style={{
             height: "100%",
             width: "100%",
-            backgroundColor:
-              deviceMode !== "mobile"
-                ? colors.secondary.background
-                : colors.primary.background,
+            backgroundColor: colors.primary.background,
             paddingTop: insets.top,
             borderRadius: 10,
             borderTopLeftRadius: 0,

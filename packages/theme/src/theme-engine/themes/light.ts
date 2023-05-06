@@ -126,6 +126,9 @@ export const ThemeLight: ThemeDefinition = {
         background: "#f7f7f7",
         paragraph: "#303030",
         icon: "#303030"
+      },
+      secondary: {
+        background: "#EEEEEE"
       }
     }
   }

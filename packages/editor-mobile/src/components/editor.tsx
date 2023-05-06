@@ -197,8 +197,7 @@ const Tiptap = ({
           display: "flex",
           flex: 1,
           flexDirection: "column",
-          maxWidth: "100vw",
-          marginBottom: "5px"
+          maxWidth: "100vw"
         }}
         id="editorroot"
         onDoubleClick={onClickEmptyArea}

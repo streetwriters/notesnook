@@ -146,8 +146,8 @@ const Editor = React.memo(
       if (withController) {
         editorController.current = editor;
       }
-      const loaded = false;
-      return !loaded ? null : (
+
+      return editor.loading ? null : (
         <>
           <WebView
             testID={notesnook.editor.id}
