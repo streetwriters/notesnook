@@ -156,6 +156,7 @@ class EditorStore extends BaseStore {
       }
     });
     appStore.setIsEditorOpen(true);
+    this.toggleProperties(false);
   };
 
   saveSession = async (sessionId, session) => {
