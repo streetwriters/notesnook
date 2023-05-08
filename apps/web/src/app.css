@@ -179,7 +179,7 @@ textarea,
 
 .ms-track:hover,
 .ms-track:active {
-  background: var(--bgSecondary) !important;
+  background: var(--border) !important;
   border-width: 0px !important;
 }
 
@@ -192,5 +192,5 @@ textarea,
 }
 
 .ms-thumb {
-  background: var(--bgSecondaryText) !important;
+  background: var(--hover) !important;
 }

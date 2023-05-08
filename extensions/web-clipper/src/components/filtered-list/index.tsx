@@ -85,12 +85,11 @@ export function FilteredList<T>({
     <>
       <Input
         sx={{
-          mt: 1,
-          mb: 1,
-          mr: 1,
+          m: 1,
           fontSize: "body",
           py: "7px",
-          color: "text"
+          color: "paragraph",
+          width: "auto"
         }}
         ref={inputRef}
         autoFocus

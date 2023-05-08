@@ -24,6 +24,7 @@ import { Icon } from "../icons/icon";
 import { Icons } from "../icons";
 import { useAppStore } from "../../stores/app-store";
 import { Picker } from "../picker";
+import { EmotionThemeVariant } from "@notesnook/theme";
 
 type TagPickerProps = {
   selectedTags: string[];
@@ -63,27 +64,29 @@ export const TagPicker = (props: TagPickerProps) => {
               />
             ))
           : null}
-        <Flex
-          onClick={open}
-          sx={{
-            bg: "bgSecondary",
-            border: "1px solid var(--border)",
-            borderRadius: "small",
-            mr: 1,
-            px: 1,
-            mb: 1,
-            cursor: "pointer",
-            ":hover": {
-              bg: "hover"
-            }
-          }}
-          title="Click to assign more tags"
-        >
-          <Icon path={Icons.plus} size={12} />
-          <Text variant="subBody" sx={{ ml: "2px", color: "icon" }}>
-            Assign a tag
-          </Text>
-        </Flex>
+        <EmotionThemeVariant variant="secondary">
+          <Flex
+            onClick={open}
+            sx={{
+              bg: "background",
+              border: "1px solid var(--border)",
+              borderRadius: "small",
+              mr: 1,
+              px: 1,
+              mb: 1,
+              cursor: "pointer",
+              ":hover": {
+                bg: "hover"
+              }
+            }}
+            title="Click to assign more tags"
+          >
+            <Icon path={Icons.plus} size={12} />
+            <Text variant="subBody" sx={{ ml: "2px", color: "icon" }}>
+              Assign a tag
+            </Text>
+          </Flex>
+        </EmotionThemeVariant>
       </Flex>
       <Picker onClose={close} isOpen={modalVisible}>
         <FilteredList
@@ -148,25 +151,27 @@ function InlineTag(props: { tag: string; onDeselected: () => void }) {
   const { tag, onDeselected } = props;
 
   return (
-    <Flex
-      onClick={onDeselected}
-      sx={{
-        bg: "bgSecondary",
-        border: "1px solid var(--border)",
-        borderRadius: "small",
-        mr: 1,
-        px: 1,
-        mb: 1,
-        cursor: "pointer",
-        ":hover": {
-          bg: "hover"
-        }
-      }}
-      title="Click to remove"
-    >
-      <Text variant="subBody" sx={{ color: "icon" }}>
-        #{tag}
-      </Text>
-    </Flex>
+    <EmotionThemeVariant variant="secondary">
+      <Flex
+        onClick={onDeselected}
+        sx={{
+          bg: "background",
+          border: "1px solid var(--border)",
+          borderRadius: "small",
+          mr: 1,
+          px: 1,
+          mb: 1,
+          cursor: "pointer",
+          ":hover": {
+            bg: "hover"
+          }
+        }}
+        title="Click to remove"
+      >
+        <Text variant="subBody" sx={{ color: "icon" }}>
+          #{tag}
+        </Text>
+      </Flex>
+    </EmotionThemeVariant>
   );
 }

@@ -35,8 +35,16 @@ export function App() {
     } else navigate("/");
   }, [isLoggedIn]);
 
+  useEffect(() => {
+    console.log(user);
+    if (user && user.theme) {
+      document.body.style.backgroundColor =
+        user.theme.scopes.base.primary.background;
+    }
+  }, [user]);
+
   return (
-    <ThemeProvider accent={user?.accent} theme={user?.theme}>
+    <ThemeProvider theme={user?.theme} injectCssVars>
       {(() => {
         switch (route) {
           case "/login":

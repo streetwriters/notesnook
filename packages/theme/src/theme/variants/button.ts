@@ -50,15 +50,18 @@ const defaultVariant: ThemeUIStyleObject = {
 const primary: ThemeUIStyleObject = {
   variant: "buttons.default",
   color: "white",
-  bg: "primary"
+  bg: "accent",
+  ":hover:not(:disabled)": {
+    filter: "brightness(90%)"
+  }
 };
 
 const dialog: ThemeUIStyleObject = {
   variant: "buttons.primary",
-  color: "primary",
+  color: "accent",
   fontWeight: "bold",
   bg: "transparent",
-  ":hover": { bg: "bgSecondary" },
+  ":hover": { bg: "hover" },
   ":focus:not(:active), :focus-within:not(:active), :focus-visible:not(:active)":
     {
       bg: "hover",
@@ -84,7 +87,7 @@ const tertiary: ThemeUIStyleObject = {
   border: "2px solid",
   borderColor: "border",
   ":hover": {
-    borderColor: "primary"
+    borderColor: "accent"
   }
 };
 
@@ -99,20 +102,20 @@ const list: ThemeUIStyleObject = {
   px: 0,
   cursor: "pointer",
   ":hover": {
-    borderBottomColor: "primary"
+    borderBottomColor: "accent"
   }
 };
 
 const anchor: ThemeUIStyleObject = {
   variant: "buttons.default",
-  color: "primary",
+  color: "accent",
   p: 0,
   m: 0,
   px: 0,
   py: 0,
   textDecoration: "underline",
   ":hover": {
-    color: "dimPrimary"
+    filter: "brightness(90%)"
   }
 };
 

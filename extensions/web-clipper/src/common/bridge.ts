@@ -17,15 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ThemeDefinition } from "@notesnook/theme";
+
 export type ClipArea = "full-page" | "visible" | "selection" | "article";
 
 export type ClipMode = "simplified" | "screenshot" | "complete";
 
 export type User = {
-  email: string;
+  email?: string;
   pro: boolean;
-  accent: string;
-  theme: "dark" | "light";
+  theme: ThemeDefinition;
 };
 export type ItemReference = {
   id: string;

@@ -18,31 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { PropsWithChildren } from "react";
 import Modal from "react-modal";
-import { Flex } from "@theme-ui/components";
 import { ThemeProvider } from "../theme-provider";
+import { useThemeProvider } from "@notesnook/theme";
 Modal.setAppElement("#root");
-
-const customStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-    boxShadow: "0px 1px 10px var(--info)",
-    border: "none",
-    borderRadius: 5,
-    backgroundColor: "var(--background)",
-    padding: "10px",
-
-    height: "80vh",
-    width: "85vw",
-    display: "flex",
-    flexDirection: "column",
-    overflow: "hidden"
-  } as const
-};
 
 type PickerProps = {
   isOpen: boolean;
@@ -50,27 +28,46 @@ type PickerProps = {
 };
 export const Picker = (props: PropsWithChildren<PickerProps>) => {
   const { children, isOpen, onClose } = props;
-
+  const { theme } = useThemeProvider();
   return (
     <Modal
       style={{
-        content: customStyles.content,
+        content: {
+          top: "50%",
+          left: "50%",
+          right: "auto",
+          bottom: "auto",
+          marginRight: "-50%",
+          transform: "translate(-50%, -50%)",
+          boxShadow: `0px 1px 10px ${theme.scopes.base.primary.border}`,
+          border: "none",
+          borderRadius: 5,
+          backgroundColor: theme.scopes.base.primary.background,
+          padding: "10px",
+
+          height: "80vh",
+          width: "85vw",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden"
+        },
         overlay: {
-          backgroundColor: "var(--overlay)"
+          backgroundColor: theme.scopes.base.primary.backdrop
         }
       }}
       onRequestClose={onClose}
       isOpen={isOpen}
     >
-      <ThemeProvider>
-        <Flex
-          sx={{
-            flexDirection: "column",
-            overflow: "hidden"
-          }}
-        >
-          {children}
-        </Flex>
+      <ThemeProvider
+        theme={theme}
+        injectCssVars
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden"
+        }}
+      >
+        {children}
       </ThemeProvider>
     </Modal>
   );

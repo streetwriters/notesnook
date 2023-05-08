@@ -29,12 +29,12 @@ import {
   WEB_EXTENSION_CHANNEL_EVENTS
 } from "@notesnook/web-clipper/dist/common/bridge";
 import { isUserPremium } from "../hooks/use-is-user-premium";
-import { store as themestore } from "../stores/theme-store";
 import { store as appstore } from "../stores/app-store";
 import { formatDate } from "@notesnook/core/utils/date";
 import { h } from "./html";
 import { sanitizeFilename } from "./filename";
 import { attachFile } from "../components/editor/picker";
+import { getTheme } from "../hooks/use-theme";
 
 export class WebExtensionRelay {
   private gateway?: Remote<Gateway>;
@@ -80,9 +80,9 @@ export class WebExtensionRelay {
 class WebExtensionServer implements Server {
   async login() {
     const user = await db.user?.getUser();
-    if (!user) return null;
-    const { theme, accent } = themestore.get();
-    return { email: user.email, pro: isUserPremium(user), accent, theme };
+    const theme = getTheme();
+    if (!user) return { pro: false, theme };
+    return { email: user.email, pro: isUserPremium(user), theme };
   }
 
   async getNotes(): Promise<ItemReference[] | undefined> {

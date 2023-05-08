@@ -38,6 +38,7 @@ import { connectApi } from "../api";
 import { FlexScrollContainer } from "../components/scroll-container";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./settings";
 import type { Config } from "@notesnook/clipper/dist/types";
+import { EmotionThemeVariant } from "@notesnook/theme";
 
 const clipAreas: { name: string; id: ClipArea; icon: string }[] = [
   {
@@ -191,7 +192,6 @@ export function Main() {
             {clipArea === item.id && (
               <Icon
                 path={isClipping ? Icons.loading : Icons.check}
-
                 size={16}
                 rotate={isClipping}
               />
@@ -234,7 +234,6 @@ export function Main() {
             {clipMode === item.id && (
               <Icon
                 path={isClipping ? Icons.loading : Icons.check}
-
                 size={16}
                 rotate={isClipping}
               />
@@ -248,9 +247,9 @@ export function Main() {
             sx={{
               mt: 1,
               bg: "shade",
-              color: "primary",
+              color: "accent",
               p: 1,
-              border: "1px solid var(--primary)",
+              border: "1px solid var(--accent)",
               borderRadius: "default",
               cursor: "pointer",
               ":hover": {
@@ -272,28 +271,31 @@ export function Main() {
         )}
 
         {error && (
-          <Text
-            variant="body"
-            sx={{
-              mt: 1,
-              bg: "errorBg",
-              color: "error",
-              p: 1,
-              border: "1px solid var(--error)",
-              borderRadius: "default",
-              cursor: "pointer",
-              ":hover": {
-                filter: "brightness(80%)"
-              }
-            }}
-            onClick={async () => {
-              setClipNonce((s) => ++s);
-            }}
-          >
-            {error}
-            <br />
-            Click here to retry.
-          </Text>
+          <EmotionThemeVariant variant="error">
+            <Text
+              variant="body"
+              sx={{
+                mt: 1,
+                bg: "background",
+                color: "paragraph",
+                p: 1,
+                border: "1px solid black",
+                borderColor: "accent",
+                borderRadius: "default",
+                cursor: "pointer",
+                ":hover": {
+                  filter: "brightness(80%)"
+                }
+              }}
+              onClick={async () => {
+                setClipNonce((s) => ++s);
+              }}
+            >
+              {error}
+              <br />
+              Click here to retry.
+            </Text>
+          </EmotionThemeVariant>
         )}
 
         <Text
@@ -343,6 +345,7 @@ export function Main() {
           </>
         )}
         <Button
+          variant="primary"
           sx={{ mt: 1 }}
           disabled={!clipData}
           onClick={async () => {
@@ -387,7 +390,7 @@ export function Main() {
               navigate("/settings");
             }}
           >
-            <Icon path={Icons.settings}  size={16} />
+            <Icon path={Icons.settings} size={16} />
           </Button>
         </Flex>
       </Flex>

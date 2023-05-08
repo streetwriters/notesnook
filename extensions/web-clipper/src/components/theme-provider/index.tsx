@@ -18,36 +18,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // import { useStore } from "../../stores/theme-store";
-import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
-import { getDefaultAccentColor, ThemeFactory } from "@notesnook/theme";
+// import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
+import {
+  ThemeProvider,
+  ThemeLight,
+  EmotionThemeProvider,
+  ThemeDefinition
+} from "@notesnook/theme";
+import { BoxProps } from "@theme-ui/components";
 import { ReactNode } from "react";
 
 type ThemeProviderProps = {
   children: ReactNode;
-  accent?: string;
-  theme?: "dark" | "light";
-};
+  theme?: ThemeDefinition;
+  injectCssVars?: boolean;
+} & Omit<BoxProps, "variant">;
 
-function ThemeProvider(props: ThemeProviderProps) {
-  const { accent, children, theme } = props;
-  const themeProperties = new ThemeFactory().construct({
-    colorScheme: "dark",
-
-    // TODO:
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    variants: {}
-  });
-
-  // useEffect(() => {
-  //   const root = document.querySelector("html");
-  //   if (root) root.setAttribute("data-theme", theme);
-  // }, [theme]);
+function BaseThemeProvider(props: ThemeProviderProps) {
+  const { children, theme = ThemeLight, ...restProps } = props;
 
   return (
-    <EmotionThemeProvider theme={themeProperties}>
-      {children}
-    </EmotionThemeProvider>
+    <ThemeProvider value={{ setTheme: () => {}, theme }}>
+      <EmotionThemeProvider scope="base" {...restProps}>
+        {children}
+      </EmotionThemeProvider>
+    </ThemeProvider>
   );
 }
-export { ThemeProvider };
+
+export { BaseThemeProvider as ThemeProvider };
