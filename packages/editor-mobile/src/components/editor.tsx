@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useTheme } from "@emotion/react";
 import {
   Editor,
   getFontById,
@@ -27,7 +26,11 @@ import {
   useTiptap
 } from "@notesnook/editor";
 import { keepLastLineInView } from "@notesnook/editor/dist/extensions/keep-in-view/keep-in-view";
-import { Theme, useThemeColors } from "@notesnook/theme";
+import {
+  ThemeDefinition,
+  useThemeColors,
+  useThemeProvider
+} from "@notesnook/theme";
 import {
   forwardRef,
   memo,
@@ -38,12 +41,12 @@ import {
 } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
+import { EmotionEditorToolbarTheme } from "../theme-factory";
 import { EventTypes, Settings } from "../utils";
 import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
-import { EmotionEditorToolbarTheme } from "../theme-factory";
 
 function isIOSBrowser() {
   return __PLATFORM__ !== "android";
@@ -52,7 +55,7 @@ const Tiptap = ({
   editorTheme,
   settings
 }: {
-  editorTheme: Theme;
+  editorTheme: ThemeDefinition;
   settings: Settings;
 }) => {
   const [tick, setTick] = useState(0);
@@ -296,11 +299,11 @@ const ContentDiv = memo(
 
 const TiptapProvider = (): JSX.Element => {
   const settings = useSettings();
-  const editorTheme = useTheme();
+  const { theme } = useThemeProvider();
 
   return (
     <PortalProvider>
-      <Tiptap editorTheme={editorTheme as Theme} settings={settings} />
+      <Tiptap editorTheme={theme} settings={settings} />
     </PortalProvider>
   );
 };

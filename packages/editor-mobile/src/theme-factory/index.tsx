@@ -53,13 +53,12 @@ const modifyToolbarTheme = (toolbarTheme: Theme) => {
     height: "45px"
   };
 };
-const factory = new ThemeFactory();
 
 export const EmotionEditorToolbarTheme = (props: PropsWithChildren<any>) => {
   const { colors, isDark } = useThemeColors("editorToolbar");
   const theme = useMemo(
     () =>
-      factory.construct({
+      ThemeFactory.construct({
         colors: colors["primary"],
         colorScheme: isDark ? "dark" : "light"
       }),
@@ -75,7 +74,7 @@ export const EmotionEditorTheme = (props: PropsWithChildren<any>) => {
   const { colors, isDark } = useThemeColors("editor");
   const theme = useMemo(
     () =>
-      factory.construct({
+      ThemeFactory.construct({
         colors: colors["primary"],
         colorScheme: isDark ? "dark" : "light"
       }),
