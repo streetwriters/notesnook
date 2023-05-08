@@ -58,7 +58,7 @@ export const ListHeaderInputItem = ({
         }}
         button={{
           icon: inputValue ? "plus" : "magnify",
-          color: focused ? colors.accent : colors.icon,
+          color: focused ? colors.primary.accent : colors.secondary.icon,
           onPress: async () => {
             const result = await onSubmit(inputValue);
             if (result) {
@@ -78,7 +78,7 @@ export const ListHeaderInputItem = ({
             marginBottom: 10
           }}
         >
-          <Paragraph color={colors.accent}>
+          <Paragraph color={colors.primary.accent}>
             Tap on + to add {`"${inputValue}"`}
           </Paragraph>
         </View>

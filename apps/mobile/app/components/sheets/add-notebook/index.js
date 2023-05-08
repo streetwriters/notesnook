@@ -355,7 +355,7 @@ export class AddNotebookSheet extends React.Component {
               refs[this.prevIndex].setNativeProps({
                 text: value,
                 style: {
-                  borderBottomColor: colors.accent
+                  borderBottomColor: colors.primary.accent
                 }
               });
             }
@@ -370,7 +370,9 @@ export class AddNotebookSheet extends React.Component {
             testID: "topic-add-button",
             icon: this.state.editTopic ? "check" : "plus",
             onPress: this.onSubmit,
-            color: topicInputFocused ? colors.accent : colors.icon
+            color: topicInputFocused
+              ? colors.primary.accent
+              : colors.secondary.icon
           }}
           placeholder="Add a topic"
         />
@@ -460,7 +462,7 @@ const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
           }}
           name="pencil"
           size={SIZE.lg - 5}
-          color={colors.primary.icon}
+          color={colors.secondary.icon}
         />
         <IconButton
           onPress={() => {
@@ -468,7 +470,7 @@ const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
           }}
           name="minus"
           size={SIZE.lg}
-          color={colors.primary.icon}
+          color={colors.secondary.icon}
         />
       </View>
     </View>

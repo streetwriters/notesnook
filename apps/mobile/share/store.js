@@ -17,16 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ThemeDark, ThemeLight } from "@notesnook/theme";
 import { Appearance } from "react-native";
 import create from "zustand";
-import {
-  ACCENT,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT
-} from "../app/utils/color-scheme";
-import { MMKV } from "../app/common/database/mmkv";
 import { db } from "../app/common/database";
-
+import { MMKV } from "../app/common/database/mmkv";
 export async function initDatabase() {
   if (!db.isInitialized) {
     await db.init();
@@ -41,34 +36,17 @@ const StorageKeys = {
   appSettings: "appSettings"
 };
 
+let appSettings = MMKV.getString(StorageKeys.appSettings);
+if (appSettings) {
+  appSettings = JSON.parse(appSettings);
+}
+const theme =
+  Appearance.getColorScheme() !== "dark"
+    ? appSettings?.darkTheme
+    : appSettings?.lightTheme;
 export const useShareStore = create((set) => ({
-  colors:
-    Appearance.getColorScheme() === "dark"
-      ? COLOR_SCHEME_DARK
-      : COLOR_SCHEME_LIGHT,
-  accent: ACCENT,
-  setAccent: async () => {
-    let appSettings = MMKV.getString(StorageKeys.appSettings);
-
-    if (appSettings) {
-      appSettings = JSON.parse(appSettings);
-      let accentColor = appSettings.theme?.accent || ACCENT.color;
-
-      let accent = {
-        color: accentColor,
-        shade: accentColor + "12"
-      };
-      set({ accent: accent });
-    }
-  },
-  setColors: () => {
-    set({
-      colors:
-        Appearance.getColorScheme() === "dark"
-          ? COLOR_SCHEME_DARK
-          : COLOR_SCHEME_LIGHT
-    });
-  },
+  theme:
+    theme || (Appearance.getColorScheme() === "dark" ? ThemeDark : ThemeLight),
   appendNote: null,
   setAppendNote: (note) => {
     MMKV.setItem(StorageKeys.appendNote, JSON.stringify(note));

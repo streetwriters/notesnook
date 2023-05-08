@@ -87,7 +87,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
           >
             <Heading size={SIZE.lg}>
               {item.type === "tag" && !isColor ? (
-                <Heading size={SIZE.xl} color={colors.accent}>
+                <Heading size={SIZE.xl} color={colors.primary.accent}>
                   #
                 </Heading>
               ) : null}

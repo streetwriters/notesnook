@@ -127,7 +127,7 @@ export const AttachmentDialog = ({ data }) => {
               alignItems: "center"
             }}
           >
-            <Icon name="attachment" size={60} color={colors.icon} />
+            <Icon name="attachment" size={60} color={colors.secondary.icon} />
             <Paragraph>
               {note ? "No attachments on this note" : "No attachments"}
             </Paragraph>
@@ -153,7 +153,11 @@ export const AttachmentDialog = ({ data }) => {
           marginTop: 10
         }}
       >
-        <Icon name="shield-key-outline" size={SIZE.xs} color={colors.primary.icon} />
+        <Icon
+          name="shield-key-outline"
+          size={SIZE.xs}
+          color={colors.primary.icon}
+        />
         {"  "}All attachments are end-to-end encrypted.
       </Paragraph>
     </View>

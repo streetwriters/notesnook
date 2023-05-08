@@ -81,7 +81,11 @@ export const TrashIntervalSelector = () => {
             <Paragraph>
               {trashInterval === -1 ? "Never" : trashInterval + " days"}
             </Paragraph>
-            <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
+            <Icon
+              color={colors.secondary.icon}
+              name="menu-down"
+              size={SIZE.md}
+            />
           </PressableButton>
         }
       >
@@ -99,7 +103,9 @@ export const TrashIntervalSelector = () => {
             }}
             style={{
               backgroundColor:
-                trashInterval === item ? colors.nav : "transparent",
+                trashInterval === item
+                  ? colors.secondary.background
+                  : "transparent",
               width: "100%",
               maxWidth: width
             }}

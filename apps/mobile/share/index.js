@@ -20,6 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { Fragment } from "react";
 import { Modal, Platform } from "react-native";
 import ShareView from "./share";
+import { ScopedThemeProvider, ThemeProvider } from "@notesnook/theme";
+import { useShareStore } from "./store";
 const Wrapper = Platform.OS === "android" ? Modal : Fragment;
 const outerProps =
   Platform.OS === "android"
@@ -31,9 +33,18 @@ const outerProps =
     : {};
 const NotesnookShare = ({ quicknote = false }) => {
   return (
-    <Wrapper {...outerProps}>
-      <ShareView quicknote={quicknote} />
-    </Wrapper>
+    <ThemeProvider
+      value={{
+        theme: useShareStore.getState().theme,
+        setTheme: () => {}
+      }}
+    >
+      <ScopedThemeProvider value="base">
+        <Wrapper {...outerProps}>
+          <ShareView quicknote={quicknote} />
+        </Wrapper>
+      </ScopedThemeProvider>
+    </ThemeProvider>
   );
 };
 

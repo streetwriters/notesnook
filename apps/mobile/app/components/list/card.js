@@ -86,7 +86,7 @@ export const Card = ({ color, warning }) => {
               marginRight: 10
             }}
           >
-            <Paragraph color={colors.icon} size={SIZE.xs}>
+            <Paragraph color={colors.secondary.icon} size={SIZE.xs}>
               {messageBoardState.message}
             </Paragraph>
             <Paragraph
@@ -94,7 +94,7 @@ export const Card = ({ color, warning }) => {
                 flexWrap: "wrap",
                 flexShrink: 1
               }}
-              color={colors.heading}
+              color={colors.primary.heading}
             >
               {messageBoardState.actionText}
             </Paragraph>

@@ -128,7 +128,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
             width: "100%"
           }}
         >
-          <ActivityIndicator size={25} color={colors.accent} />
+          <ActivityIndicator size={25} color={colors.primary.accent} />
           <Paragraph
             style={{
               textAlign: "center"
@@ -150,7 +150,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
                 flexDirection: "row",
                 alignItems: "center",
                 marginTop: 10,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 padding: 12,
                 borderRadius: 5
               }}
@@ -168,7 +168,10 @@ const PublishNoteSheet = ({ note: item, update }) => {
                 <Paragraph
                   onPress={async () => {
                     try {
-                      await openLinkInBrowser(publishUrl, colors.primary.accent);
+                      await openLinkInBrowser(
+                        publishUrl,
+                        colors.primary.accent
+                      );
                     } catch (e) {
                       console.error(e);
                     }
@@ -179,8 +182,8 @@ const PublishNoteSheet = ({ note: item, update }) => {
                     color: colors.primary.paragraph
                   }}
                 >
-                  <Icon color={colors.primary.accent} name="open-in-new" /> Open in
-                  browser
+                  <Icon color={colors.primary.accent} name="open-in-new" /> Open
+                  in browser
                 </Paragraph>
               </View>
 
@@ -210,7 +213,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
               flexDirection: "row",
               alignItems: "center",
               marginBottom: 10,
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               paddingVertical: 12,
               borderRadius: 5,
               marginTop: 10
@@ -251,7 +254,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               paddingVertical: 12,
               borderRadius: 5
             }}

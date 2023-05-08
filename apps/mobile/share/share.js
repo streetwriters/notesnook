@@ -48,6 +48,8 @@ import { eOnLoadNote } from "../app/utils/events";
 import { Editor } from "./editor";
 import { Search } from "./search";
 import { initDatabase, useShareStore } from "./store";
+import { useThemeColors } from "@notesnook/theme";
+
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
 };
@@ -188,8 +190,7 @@ const modes = {
 };
 
 const ShareView = ({ quicknote = false }) => {
-  const colors = useShareStore((state) => state.colors);
-  const accent = useShareStore((state) => state.accent);
+  const { colors } = useThemeColors();
   const appendNote = useShareStore((state) => state.appendNote);
   const [note, setNote] = useState({ ...defaultNote });
   const noteContent = useRef();
@@ -223,7 +224,6 @@ const ShareView = ({ quicknote = false }) => {
   };
 
   useEffect(() => {
-    useShareStore.getState().setAccent();
     let keyboardDidShow = Keyboard.addListener(
       "keyboardDidShow",
       onKeyboardDidShow
@@ -361,10 +361,6 @@ const ShareView = ({ quicknote = false }) => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    useShareStore.getState().setColors();
-  }, [note]);
-
   const changeMode = async (m) => {
     setMode(m);
 
@@ -416,7 +412,7 @@ const ShareView = ({ quicknote = false }) => {
         <View
           style={{
             width: "100%",
-            backgroundColor: colors.bg,
+            backgroundColor: colors.primary.background,
             height: 50 + insets.top,
             paddingTop: insets.top,
             ...getElevation(1),
@@ -429,7 +425,7 @@ const ShareView = ({ quicknote = false }) => {
           <Button
             type="action"
             icon="close"
-            iconColor={colors.pri}
+            iconColor={colors.secondary.icon}
             onPress={() => {
               if (searchMode) {
                 setSearchMode(null);
@@ -447,7 +443,7 @@ const ShareView = ({ quicknote = false }) => {
 
           <Text
             style={{
-              color: colors.pri,
+              color: colors.primary.paragraph,
               fontSize: 17,
               fontFamily: "OpenSans-Regular"
             }}
@@ -458,7 +454,7 @@ const ShareView = ({ quicknote = false }) => {
           <Button
             type="action"
             icon="check"
-            iconColor={accent.color}
+            iconColor={colors.primary.accent}
             onPress={onPress}
             style={{
               width: 50,
@@ -510,7 +506,7 @@ const ShareView = ({ quicknote = false }) => {
       <WrapperView
         style={{
           paddingVertical: 12,
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           display: searchMode ? "none" : "flex",
           borderTopRightRadius: Platform.OS === "ios" ? 10 : 15,
           borderTopLeftRadius: Platform.OS === "ios" ? 10 : 15,
@@ -531,7 +527,7 @@ const ShareView = ({ quicknote = false }) => {
             <View
               style={{
                 minHeight: 100,
-                backgroundColor: colors.bg,
+                backgroundColor: colors.primary.background,
                 overflow: "hidden"
               }}
             >
@@ -542,14 +538,15 @@ const ShareView = ({ quicknote = false }) => {
                   alignItems: "center",
                   borderBottomWidth: 1,
                   paddingBottom: 12,
-                  borderBottomColor: colors.nav,
+                  borderBottomColor: colors.secondary.background,
                   paddingHorizontal: 12
                 }}
               >
                 <Text
                   style={{
                     fontSize: 18,
-                    fontFamily: "OpenSans-SemiBold"
+                    fontFamily: "OpenSans-SemiBold",
+                    color: colors.primary.heading
                   }}
                 >
                   Save to Notesnook
@@ -558,13 +555,13 @@ const ShareView = ({ quicknote = false }) => {
                 <Button
                   title="Done"
                   style={{
-                    backgroundColor: colors.accent,
+                    backgroundColor: colors.primary.accent,
                     height: Platform.OS === "ios" ? 35 : 40,
                     paddingHorizontal: 15,
                     marginBottom: 0
                   }}
                   loading={loading}
-                  iconColor={colors.light}
+                  iconColor={colors.static.white}
                   onPress={onPress}
                   textStyle={{
                     fontSize: 16,
@@ -578,7 +575,7 @@ const ShareView = ({ quicknote = false }) => {
                   height: 200,
                   paddingBottom: 15,
                   marginBottom: 10,
-                  borderBottomColor: colors.nav,
+                  borderBottomColor: colors.secondary.background,
                   borderBottomWidth: 1
                 }}
               >
@@ -603,7 +600,7 @@ const ShareView = ({ quicknote = false }) => {
                 <Text
                   style={{
                     fontSize: 12,
-                    color: colors.icon,
+                    color: colors.secondary.paragraph,
                     fontFamily: "OpenSans-Regular",
                     paddingHorizontal: 12,
                     marginBottom: 10,
@@ -613,7 +610,7 @@ const ShareView = ({ quicknote = false }) => {
                   Above content will append to{" "}
                   <Text
                     style={{
-                      color: accent.color,
+                      color: colors.primary.accent,
                       fontFamily: "OpenSans-SemiBold"
                     }}
                   >
@@ -633,7 +630,7 @@ const ShareView = ({ quicknote = false }) => {
               >
                 <Text
                   style={{
-                    color: colors.pri,
+                    color: colors.primary.paragraph,
                     marginRight: 10
                   }}
                 >
@@ -647,8 +644,12 @@ const ShareView = ({ quicknote = false }) => {
                     title={modes[2].title}
                     iconSize={16}
                     fontSize={14}
-                    iconColor={mode == 2 ? accent.color : colors.icon}
-                    textColor={mode == 2 ? accent.color : colors.icon}
+                    iconColor={
+                      mode == 2 ? colors.primary.accent : colors.secondary.icon
+                    }
+                    textColor={
+                      mode == 2 ? colors.primary.accent : colors.secondary.icon
+                    }
                     style={{
                       paddingHorizontal: 0,
                       height: 30,
@@ -664,8 +665,12 @@ const ShareView = ({ quicknote = false }) => {
                   title={modes[1].title}
                   iconSize={16}
                   fontSize={14}
-                  iconColor={mode == 1 ? accent.color : colors.icon}
-                  textColor={mode == 1 ? accent.color : colors.icon}
+                  iconColor={
+                    mode == 1 ? colors.primary.accent : colors.secondary.icon
+                  }
+                  textColor={
+                    mode == 1 ? colors.primary.accent : colors.secondary.icon
+                  }
                   style={{ paddingHorizontal: 0, height: 30, marginBottom: 0 }}
                 />
               </View>
@@ -684,15 +689,19 @@ const ShareView = ({ quicknote = false }) => {
             }}
           >
             <Button
-              color={colors.bg}
+              color={colors.primary.background}
               onPress={() => {
                 useShareStore.getState().setAppendNote(null);
               }}
               icon="plus"
               iconSize={18}
-              iconColor={!appendNote ? accent.color : colors.icon}
+              iconColor={
+                !appendNote ? colors.primary.accent : colors.secondary.icon
+              }
               title="New note"
-              textColor={!appendNote ? accent.color : colors.icon}
+              textColor={
+                !appendNote ? colors.primary.accent : colors.secondary.icon
+              }
               type="button"
               textStyle={{
                 fontSize: 15
@@ -703,7 +712,7 @@ const ShareView = ({ quicknote = false }) => {
                 width: "100%",
                 marginRight: 0,
                 borderWidth: 1,
-                borderColor: colors.nav,
+                borderColor: colors.secondary.background,
                 justifyContent: "flex-start"
               }}
             />
@@ -715,9 +724,11 @@ const ShareView = ({ quicknote = false }) => {
               }}
               icon="text-short"
               iconSize={18}
-              iconColor={appendNote ? accent.color : colors.icon}
+              iconColor={
+                appendNote ? colors.primary.accent : colors.secondary.icon
+              }
               title={`Append to a note`}
-              textColor={colors.icon}
+              textColor={colors.secondary.paragraph}
               type="button"
               textStyle={{
                 fontSize: 15
@@ -728,7 +739,7 @@ const ShareView = ({ quicknote = false }) => {
                 width: "100%",
                 marginRight: 0,
                 borderWidth: 1,
-                borderColor: colors.nav,
+                borderColor: colors.secondary.background,
                 justifyContent: "flex-start"
               }}
             />
@@ -762,7 +773,7 @@ const ShareView = ({ quicknote = false }) => {
 };
 
 const AddNotebooks = ({ onPress }) => {
-  const colors = useShareStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const notebooks = useShareStore((state) => state.selectedNotebooks);
   return (
     <TouchableOpacity
@@ -773,7 +784,7 @@ const AddNotebooks = ({ onPress }) => {
         width: "100%",
         marginRight: 0,
         borderWidth: 1,
-        borderColor: colors.nav,
+        borderColor: colors.secondary.background,
         justifyContent: "center",
         borderRadius: 5,
         marginBottom: 10,
@@ -796,11 +807,11 @@ const AddNotebooks = ({ onPress }) => {
               style={{
                 marginRight: 10
               }}
-              color={colors.icon}
+              color={colors.secondary.icon}
             />
             <Text
               style={{
-                color: colors.icon,
+                color: colors.secondary.icon,
                 fontSize: 15
               }}
             >
@@ -819,12 +830,12 @@ const AddNotebooks = ({ onPress }) => {
           {notebooks.map((item) => (
             <Text
               style={{
-                color: colors.icon,
+                color: colors.secondary.icon,
                 marginRight: 5,
                 fontSize: 14,
                 borderRadius: 4,
                 paddingHorizontal: 8,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 paddingVertical: 5,
                 marginTop: 5
               }}
@@ -850,12 +861,12 @@ const AddNotebooks = ({ onPress }) => {
 
           <Text
             style={{
-              color: colors.accent,
+              color: colors.primary.accent,
               marginRight: 5,
               fontSize: 14,
               borderRadius: 4,
               paddingHorizontal: 8,
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               paddingVertical: 5,
               marginTop: 5
             }}
@@ -873,7 +884,7 @@ const AddNotebooks = ({ onPress }) => {
 };
 
 const AddTags = ({ onPress }) => {
-  const colors = useShareStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const tags = useShareStore((state) => state.selectedTags);
   return (
     <TouchableOpacity
@@ -885,7 +896,7 @@ const AddTags = ({ onPress }) => {
         width: "100%",
         marginRight: 0,
         borderWidth: 1,
-        borderColor: colors.nav,
+        borderColor: colors.secondary.background,
         justifyContent: "center",
         borderRadius: 5,
         marginBottom: 10
@@ -905,11 +916,11 @@ const AddTags = ({ onPress }) => {
               style={{
                 marginRight: 10
               }}
-              color={colors.icon}
+              color={colors.secondary.icon}
             />
             <Text
               style={{
-                color: colors.icon,
+                color: colors.secondary.icon,
                 fontSize: 15
               }}
             >
@@ -928,12 +939,12 @@ const AddTags = ({ onPress }) => {
           {tags.map((tag) => (
             <Text
               style={{
-                color: colors.icon,
+                color: colors.secondary.icon,
                 marginRight: 5,
                 fontSize: 14,
                 borderRadius: 4,
                 paddingHorizontal: 8,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 paddingVertical: 5
               }}
               onPress={() => {
@@ -950,12 +961,12 @@ const AddTags = ({ onPress }) => {
 
           <Text
             style={{
-              color: colors.accent,
+              color: colors.primary.accent,
               marginRight: 5,
               fontSize: 14,
               borderRadius: 4,
               paddingHorizontal: 8,
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               paddingVertical: 5
             }}
             onPress={() => {

@@ -37,7 +37,7 @@ import Heading from "../ui/typography/heading";
 import { eClearEditor } from "../../utils/events";
 
 export default function Notebooks({ note, close, full }) {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const notebooks = useNotebookStore((state) => state.notebooks);
   function getNotebooks(item) {
     let filteredNotebooks = [];
@@ -95,15 +95,15 @@ export default function Notebooks({ note, close, full }) {
         flexGrow: 1,
         padding: 6,
         borderWidth: full ? 0 : 1,
-        borderColor: colors.nav,
+        borderColor: colors.primary.background,
         borderRadius: 10,
-        backgroundColor: full ? "transparent" : colors.nav,
+        backgroundColor: full ? "transparent" : colors.secondary.background,
         minHeight: 42
       }}
     >
       <Icon
         name="book-outline"
-        color={colors.accent}
+        color={colors.primary.accent}
         size={SIZE.sm}
         style={{
           marginRight: 5
@@ -130,7 +130,7 @@ export default function Notebooks({ note, close, full }) {
         style={{
           flexDirection: "row",
           marginLeft: 8,
-          borderLeftColor: colors.nav,
+          borderLeftColor: colors.primary.hover,
           borderLeftWidth: 1,
           paddingLeft: 8
         }}

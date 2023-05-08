@@ -82,15 +82,15 @@ const Home = ({
             style={{
               width: "100%",
               height: "100%",
-              backgroundColor: colors.bg,
+              backgroundColor: colors.primary.background,
               justifyContent: "center",
               alignItems: "center"
             }}
           >
-            <Heading color={colors.pri} size={SIZE.lg}>
+            <Heading color={colors.primary.heading} size={SIZE.lg}>
               Logging out
             </Heading>
-            <Paragraph color={colors.icon}>
+            <Paragraph color={colors.secondary.icon}>
               Please wait while we log out and clear app data.
             </Paragraph>
             <View

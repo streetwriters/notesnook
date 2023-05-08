@@ -16,34 +16,33 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
+import { useThemeColors, useThemeProvider } from "@notesnook/theme";
 import React, {
-  useRef,
-  useState,
-  useMemo,
   useCallback,
   useEffect,
-  useLayoutEffect
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
 } from "react";
+import { Linking, Platform, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { EDITOR_URI } from "../app/screens/editor/source";
-import { Linking, Platform, View } from "react-native";
-import { EditorEvents, post } from "../app/screens/editor/tiptap/utils";
 import Commands from "../app/screens/editor/tiptap/commands";
-import { useShareStore } from "./store";
+import { EventTypes } from "../app/screens/editor/tiptap/editor-events";
+import { EditorEvents, post } from "../app/screens/editor/tiptap/utils";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../app/services/event-manager";
-import { eOnLoadNote } from "../app/utils/events";
-import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
 import { useSettingStore } from "../app/stores/use-setting-store";
-import { EventTypes } from "../app/screens/editor/tiptap/editor-events";
+import { eOnLoadNote } from "../app/utils/events";
 
 const useEditor = () => {
   const ref = useRef();
   const [sessionId] = useState("share-editor-session");
-  const colors = useShareStore((state) => state.colors);
-  const accent = useShareStore((state) => state.accent);
+  const { theme } = useThemeProvider();
   const commands = useMemo(() => new Commands(ref), [ref]);
   const currentNote = useRef();
   const doubleSpacedLines = useSettingStore(
@@ -70,7 +69,7 @@ const useEditor = () => {
   }, [loadNote]);
 
   const onLoad = () => {
-    postMessage(EditorEvents.theme, { ...colors, accent });
+    postMessage(EditorEvents.theme, theme);
     commands.setInsets({ top: 0, left: 0, right: 0, bottom: 0 });
     commands.setSettings({
       deviceMode: "mobile",
@@ -148,7 +147,7 @@ const style = {
 };
 
 export const Editor = ({ onChange, onLoad }) => {
-  const colors = useShareStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const editor = useEditor();
   const onMessage = useEditorEvents(editor, onChange);
   const [loading, setLoading] = useState(true);
@@ -212,7 +211,7 @@ export const Editor = ({ onChange, onLoad }) => {
             position: "absolute",
             width: "100%",
             height: "100%",
-            backgroundColor: colors.bg,
+            backgroundColor: colors.primary.background,
             alignItems: "flex-start",
             zIndex: 999,
             paddingHorizontal: 12
@@ -222,7 +221,7 @@ export const Editor = ({ onChange, onLoad }) => {
             style={{
               height: 16,
               width: "100%",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginTop: 10
             }}
@@ -232,7 +231,7 @@ export const Editor = ({ onChange, onLoad }) => {
             style={{
               height: 16,
               width: "100%",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginTop: 10
             }}
@@ -242,7 +241,7 @@ export const Editor = ({ onChange, onLoad }) => {
             style={{
               height: 16,
               width: "60%",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginTop: 10
             }}
