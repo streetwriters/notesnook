@@ -22,7 +22,7 @@ import { View } from "react-native";
 import { ScrollView } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
-import { presentSheet, ToastEvent } from "../../../services/event-manager";
+import { ToastEvent, presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useTagStore } from "../../../stores/use-tag-store";
 import { useThemeStore } from "../../../stores/use-theme-store";

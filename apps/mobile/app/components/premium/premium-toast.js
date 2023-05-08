@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
-import { editorState } from "../../screens/editor/tiptap/utils";
+import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
 import {
   eSendEvent,
@@ -31,6 +31,7 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { getElevation } from "../../utils";
 import {
   eCloseActionSheet,
+  eCloseSheet,
   eOpenPremiumDialog,
   eShowGetPremium
 } from "../../utils/events";
@@ -39,12 +40,12 @@ import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useCallback } from "react";
 
 export const PremiumToast = ({ context = "global", offset = 0 }) => {
   const colors = useThemeStore((state) => state.colors);
   const [msg, setMsg] = useState(null);
   const timer = useRef();
+  const keyboard = useKeyboard();
 
   const open = useCallback(
     (event) => {
@@ -72,7 +73,6 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
   useEffect(() => {
     eSubscribeEvent(eShowGetPremium, open);
     return () => {
-      clearTimeout(timer.current);
       eUnSubscribeEvent(eShowGetPremium, open);
     };
   }, [open]);
@@ -80,9 +80,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
   const onPress = async () => {
     open(null);
     eSendEvent(eCloseActionSheet);
-    if (editorState().isFocused) {
-      //tiny.call(EditorWebView, tiny.blur);
-    }
+    eSendEvent(eCloseSheet);
     await sleep(300);
     eSendEvent(eOpenPremiumDialog);
   };
@@ -102,8 +100,12 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
           flexDirection: "row",
           alignSelf: "center",
           justifyContent: "space-between",
-          top: offset,
+          top: offset + keyboard.keyboardHeight,
           maxWidth: DDS.isLargeTablet() ? 400 : "98%"
+        }}
+        onTouchEnd={() => {
+          setMsg(null);
+          clearTimeout(timer.current);
         }}
       >
         <View
