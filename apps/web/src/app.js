@@ -35,6 +35,9 @@ import StatusBar from "./components/status-bar";
 import { EditorLoader } from "./components/loaders/editor-loader";
 import { FlexScrollContainer } from "./components/scroll-container";
 import CachedRouter from "./components/cached-router";
+import { WebExtensionRelay } from "./utils/web-extension-relay";
+
+new WebExtensionRelay();
 
 const GlobalMenuWrapper = React.lazy(() =>
   import("./components/global-menu-wrapper")

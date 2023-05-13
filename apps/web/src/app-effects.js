@@ -45,10 +45,7 @@ import { isTesting } from "./utils/platform";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";
 import { interruptedOnboarding } from "./components/dialogs/onboarding-dialog";
-import { WebExtensionRelay } from "./utils/web-extension-relay";
 import { hashNavigate } from "./navigation";
-
-const relay = new WebExtensionRelay();
 
 export default function AppEffects({ setShow }) {
   const refreshNavItems = useStore((store) => store.refreshNavItems);
@@ -103,7 +100,6 @@ export default function AppEffects({ setShow }) {
         await showOnboardingDialog(interruptedOnboarding());
         await showFeatureDialog("highlights");
         await scheduleBackups();
-        relay.connect();
       })();
 
       return () => {
