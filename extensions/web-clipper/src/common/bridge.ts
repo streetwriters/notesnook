@@ -22,7 +22,7 @@ export type ClipArea = "full-page" | "visible" | "selection" | "article";
 export type ClipMode = "simplified" | "screenshot" | "complete";
 
 export type User = {
-  email: string;
+  email?: string;
   pro: boolean;
   accent: string;
   theme: "dark" | "light";
