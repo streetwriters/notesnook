@@ -46,24 +46,30 @@ const common = {
   content_scripts: [
     {
       js: ["nnContentScript.bundle.js"],
-      matches: ["*://app.notesnook.com/*", "*://localhost/*"]
+      matches:
+        process.env.NODE_ENV === "production"
+          ? ["*://app.notesnook.com/*"]
+          : ["*://localhost/*"]
     },
     {
       js: ["contentScript.bundle.js"],
       matches: ["http://*/*", "https://*/*"],
-      exclude_matches: ["*://app.notesnook.com/*", "*://localhost/*"]
+      exclude_matches:
+        process.env.NODE_ENV === "production"
+          ? ["*://app.notesnook.com/*"]
+          : ["*://localhost/*"]
     }
   ],
-  browser_specific_settings: {
-    gecko: {
-      strict_min_version: "105.0"
-    }
-  },
   icons: ICONS
 };
 
 const v2 = {
   ...common,
+  browser_specific_settings: {
+    gecko: {
+      strict_min_version: "105.0"
+    }
+  },
   manifest_version: 2,
   background: {
     scripts: [BACKGROUND_SCRIPT]
