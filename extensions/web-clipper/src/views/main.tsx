@@ -112,7 +112,11 @@ export function Main() {
 
   useEffect(() => {
     (async () => {
-      const [tab] = await browser.tabs.query({ active: true });
+      const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true,
+        windowType: "normal"
+      });
 
       setTitle(tab?.title ? tab.title : "Untitled");
       setUrl(tab?.url);
@@ -406,7 +410,11 @@ export async function clip(
     return { data: clipData };
   }
 
-  const [tab] = await browser.tabs.query({ active: true });
+  const [tab] = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+    windowType: "normal"
+  });
   if (!tab || !tab.id) return;
 
   if (area === "visible" && mode === "screenshot") {
