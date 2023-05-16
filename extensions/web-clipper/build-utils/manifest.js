@@ -36,14 +36,7 @@ const common = {
   version: "0.2",
   description:
     "Clip web pages & save interesting things you find on the web directly into Notesnook in a private & secure way.",
-  permissions: [
-    "activeTab",
-    "tabs",
-    "storage",
-    "contextMenus",
-    "notifications",
-    "<all_urls>"
-  ],
+  permissions: ["activeTab", "tabs", "storage", "notifications", "<all_urls>"],
   content_scripts: [
     {
       js: ["nnContentScript.bundle.js"],
