@@ -130,6 +130,13 @@ export function Main() {
   useEffect(() => {
     (async () => {
       if (!clipArea || !clipMode) return;
+      if (
+        !isPremium &&
+        (clipMode === "complete" || clipMode === "screenshot")
+      ) {
+        setClipMode("simplified");
+        return;
+      }
 
       try {
         setIsClipping(true);
@@ -141,7 +148,7 @@ export function Main() {
         setIsClipping(false);
       }
     })();
-  }, [clipArea, clipMode, clipNonce]);
+  }, [isPremium, clipArea, clipMode, clipNonce]);
 
   return (
     <FlexScrollContainer style={{ maxHeight: 560 }}>
