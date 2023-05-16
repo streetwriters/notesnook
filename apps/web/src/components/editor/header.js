@@ -200,6 +200,8 @@ function Autosuggest({
           if (e.key === "ArrowDown" && !text) onOpenMenu(defaultItems.slice());
 
           e.preventDefault();
+        } else if (e.key === "Tab") {
+          closeMenu();
         }
       }}
     />
