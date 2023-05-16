@@ -29,7 +29,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "playwright test"
+    "test": "playwright test",
+    "postinstall": "patch-package"
   },
   "bugs": {
     "url": "https://github.com/streetwriters/notesnook/issues"
