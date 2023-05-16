@@ -39,6 +39,10 @@ import { FlexScrollContainer } from "../components/scroll-container";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./settings";
 import type { Config } from "@notesnook/clipper/dist/types";
 
+const ERROR_MAP: Record<string, string> = {
+  "Could not establish connection. Receiving end does not exist.":
+    "Please refresh this web page and try again. If the error persists, it means you don't have the required permission."
+};
 const clipAreas: { name: string; id: ClipArea; icon: string }[] = [
   {
     name: "Full page",
@@ -293,9 +297,11 @@ export function Main() {
               setClipNonce((s) => ++s);
             }}
           >
-            {error}
+            {ERROR_MAP[error] || error}
             <br />
-            Click here to retry.
+            <Text sx={{ fontSize: 11, color: "error" }}>
+              Click here to try again.
+            </Text>
           </Text>
         )}
 
