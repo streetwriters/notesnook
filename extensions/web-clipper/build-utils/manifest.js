@@ -33,8 +33,9 @@ const ACTION = {
 
 const common = {
   name: "Notesnook Web Clipper",
-  version: "0.1",
-  description: "Clip web pages.",
+  version: "0.2",
+  description:
+    "Clip web pages & save interesting things you find on the web directly into Notesnook in a private & secure way.",
   permissions: [
     "activeTab",
     "tabs",
