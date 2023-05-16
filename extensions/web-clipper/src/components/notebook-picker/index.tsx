@@ -17,100 +17,120 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { useState } from "react";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Flex } from "@theme-ui/components";
 import { FilteredList } from "../filtered-list";
 import {
   NotebookReference,
   ItemReference,
-  SelectedNotebook
+  SelectedReference
 } from "../../common/bridge";
-import { Icon } from "../icons/icon";
 import { Icons } from "../icons";
 import { useAppStore } from "../../stores/app-store";
 import { Picker } from "../picker";
+import { InlineTag } from "../inline-tag";
+import { CheckListItem } from "../check-list-item";
 
 type NotebookPickerProps = {
-  selectedNotebook?: SelectedNotebook;
-  onSelected: (notebook?: SelectedNotebook) => void;
+  selectedItems: SelectedReference[];
+  onSelected: (items?: SelectedReference[]) => void;
 };
 export const NotebookPicker = (props: NotebookPickerProps) => {
-  const { selectedNotebook, onSelected } = props;
+  const { onSelected } = props;
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const notebooks = useAppStore((s) => s.notebooks);
+  const [selectedItems, setSelectedItems] = useState<SelectedReference[]>(
+    props.selectedItems
+  );
 
   const close = () => {
-    setExpanded(null);
     setModalVisible(false);
   };
-  const open = () => setModalVisible(true);
+  const open = () => {
+    setSelectedItems(props.selectedItems);
+    setModalVisible(true);
+  };
 
   return (
     <>
-      <Flex sx={{ alignItems: "center" }}>
-        <Button
-          variant="tool"
+      <Flex
+        sx={{
+          border: "1px solid var(--border)",
+          p: 1,
+          gap: 1,
+          borderRadius: "default",
+          flexWrap: "wrap"
+        }}
+      >
+        {props.selectedItems && props.selectedItems.length
+          ? props.selectedItems.map((item) => (
+              <InlineTag
+                key={item.id}
+                title={item.title}
+                icon={item.type === "topic" ? Icons.topic : Icons.notebook}
+                onClick={() =>
+                  setSelectedItems((items) => {
+                    const copy = items.slice();
+                    const index = copy.indexOf(item);
+                    if (index > -1) copy.splice(index, 1);
+                    onSelected(copy);
+                    return copy;
+                  })
+                }
+              />
+            ))
+          : null}
+        <InlineTag
+          title={selectedItems.length ? "Add more" : "Add to notebook"}
+          icon={Icons.plus}
+          iconColor="primary"
           onClick={open}
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flex: 1,
-            borderTopRightRadius: 0,
-            borderBottomRightRadius: 0,
-            height: 33
-          }}
-          title={
-            selectedNotebook
-              ? `${selectedNotebook.title} > ${selectedNotebook.topic.title}`
-              : `Select a notebook`
-          }
-        >
-          <Text variant="text">
-            {selectedNotebook
-              ? `${selectedNotebook.title} > ${selectedNotebook.topic.title}`
-              : `Select a notebook`}
-          </Text>
-          <Icon path={Icons.chevronDown} color="text" size={18} />
-        </Button>
-        {selectedNotebook && (
-          <Button
-            variant="tool"
-            onClick={() => onSelected(undefined)}
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexShrink: 0,
-              borderTopLeftRadius: 0,
-              borderBottomLeftRadius: 0,
-              height: 33
-            }}
-            title={"Clear selection"}
-          >
-            <Icon path={Icons.close} color="text" size={16} />
-          </Button>
-        )}
+        />
       </Flex>
-
-      <Picker onClose={close} isOpen={modalVisible}>
+      <Picker
+        onClose={close}
+        onDone={() => {
+          onSelected(selectedItems);
+          close();
+        }}
+        isOpen={modalVisible}
+      >
         <FilteredList
-          getAll={() => notebooks}
+          getAll={() => useAppStore.getState().notebooks}
           filter={(items, query) =>
             items.filter((item) => item.title.toLowerCase().indexOf(query) > -1)
           }
           itemName="notebook"
           placeholder={"Search for a notebook"}
-          refreshItems={() => notebooks}
+          refreshItems={() => useAppStore.getState().notebooks}
           renderItem={(item) => (
             <Notebook
               notebook={item}
-              isExpanded={expanded === item.id}
-              onExpand={(id) => setExpanded(id || null)}
-              onSelected={(notebook) => {
-                onSelected(notebook);
-                close();
+              isTopicSelected={(topic) =>
+                !!selectedItems.find(
+                  (n) =>
+                    n.id === topic.id &&
+                    n.type === "topic" &&
+                    n.parentId === item.id
+                )
+              }
+              isSelected={
+                !!selectedItems.find(
+                  (n) => n.id === item.id && n.type === "notebook"
+                )
+              }
+              onSelected={(ref) => {
+                setSelectedItems((items) => {
+                  const copy = items.slice();
+                  const index = copy.findIndex(
+                    (n) => n.id === ref.id && n.type === ref.type
+                  );
+                  if (index > -1) {
+                    copy.splice(index, 1);
+                  } else {
+                    copy.push(ref);
+                  }
+                  return copy;
+                });
               }}
             />
           )}
@@ -122,12 +142,12 @@ export const NotebookPicker = (props: NotebookPickerProps) => {
 
 type NotebookProps = {
   notebook: NotebookReference;
-  isExpanded: boolean;
-  onExpand: (notebookId?: string) => void;
-  onSelected: (notebook: SelectedNotebook) => void;
+  isSelected: boolean;
+  onSelected: (notebook: SelectedReference) => void;
+  isTopicSelected: (topic: ItemReference) => boolean;
 };
 function Notebook(props: NotebookProps) {
-  const { notebook, isExpanded, onExpand, onSelected } = props;
+  const { notebook, isSelected, onSelected, isTopicSelected } = props;
 
   return (
     <Flex
@@ -136,69 +156,39 @@ function Notebook(props: NotebookProps) {
         overflow: "hidden"
       }}
     >
-      <Button
-        variant="list"
-        onClick={() => {
-          if (isExpanded) return onExpand();
-          onExpand(notebook.id);
+      <CheckListItem
+        title={notebook.title}
+        isSelected={isSelected}
+        onSelected={() => {
+          onSelected({
+            id: notebook.id,
+            title: notebook.title,
+            type: "notebook"
+          });
         }}
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          backgroundColor: isExpanded ? "border" : "transparent",
-          py: "7px",
-          px: 1
-        }}
-      >
-        <Text
-          sx={{
-            fontSize: "13px",
-            fontWeight: 400,
-            color: "var(--paragraph)"
-          }}
-        >
-          {notebook.title}
-        </Text>
-        <Icon
-          path={isExpanded ? Icons.chevronUp : Icons.chevronDown}
-          color="text"
-          size={18}
-        />
-      </Button>
+      />
 
-      {isExpanded ? (
-        <FilteredList
-          getAll={() => notebook.topics}
-          filter={(items, query) =>
-            items.filter((item) => item.title.toLowerCase().indexOf(query) > -1)
-          }
-          itemName="topic"
-          placeholder={"Search for a topic"}
-          refreshItems={() => notebook.topics}
-          renderItem={(topic) => (
-            <Topic
-              topic={topic}
-              onSelected={() => {
-                onSelected({ id: notebook.id, title: notebook.title, topic });
-              }}
-            />
-          )}
-        />
-      ) : null}
+      <FilteredList
+        getAll={() => notebook.topics}
+        itemName="topic"
+        placeholder={"Search for a topic"}
+        refreshItems={() => notebook.topics}
+        renderItem={(topic) => (
+          <CheckListItem
+            title={topic.title}
+            isSelected={isTopicSelected(topic)}
+            indentLevel={1}
+            onSelected={() => {
+              onSelected({
+                id: topic.id,
+                title: topic.title,
+                type: "topic",
+                parentId: notebook.id
+              });
+            }}
+          />
+        )}
+      />
     </Flex>
-  );
-}
-
-type TopicProps = {
-  topic: ItemReference;
-  onSelected: () => void;
-};
-function Topic(props: TopicProps) {
-  const { topic, onSelected } = props;
-  return (
-    <Button variant="list" onClick={onSelected} sx={{ pl: 3, py: "7px" }}>
-      <Text variant="text">{topic.title}</Text>
-    </Button>
   );
 }

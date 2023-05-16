@@ -94,9 +94,8 @@ export class WebExtensionServer implements Server {
       }).outerHTML;
     }
 
-    const note =
-      (clip.note?.id && db.notes?.note(clip.note?.id)) ||
-      db.notes?.note(await db.notes?.add({ title: clip.title }));
+    const note = clip.note?.id ? db.notes?.note(clip.note?.id) : null;
+
     let content = (await note?.content()) || "";
     content += clipContent;
     content += h("div", [
@@ -105,20 +104,26 @@ export class WebExtensionServer implements Server {
       h("p", [`Date clipped: ${formatDate(Date.now())}`])
     ]).innerHTML;
 
-    await db.notes?.add({
+    const id = await db.notes?.add({
       id: note?.id,
-      content: { type: "tiptap", data: content }
+      title: note ? note.title : clip.title,
+      content: { type: "tiptap", data: content },
+      tags: note ? note.tags : clip.tags
     });
 
-    if (clip.notebook && note) {
-      await db.notes?.addToNotebook(
-        { id: clip.notebook.id, topic: clip.notebook.topic.id },
-        note.id
-      );
-    }
-    if (clip.tags && note) {
-      for (const tag of clip.tags) {
-        await db.tags?.add(tag, note.id);
+    if (clip.refs && id && !clip.note) {
+      for (const ref of clip.refs) {
+        switch (ref.type) {
+          case "notebook":
+            await db.notes?.addToNotebook({ id: ref.id }, id);
+            break;
+          case "topic":
+            await db.notes?.addToNotebook(
+              { id: ref.parentId, topic: ref.id },
+              id
+            );
+            break;
+        }
       }
     }
     await appstore.refresh();

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { PropsWithChildren } from "react";
 import Modal from "react-modal";
-import { Flex } from "@theme-ui/components";
+import { Button, Flex } from "@theme-ui/components";
 import { ThemeProvider } from "../theme-provider";
 Modal.setAppElement("#root");
 
@@ -30,26 +30,27 @@ const customStyles = {
     bottom: "auto",
     marginRight: "-50%",
     transform: "translate(-50%, -50%)",
-    boxShadow: "0px 1px 10px var(--info)",
+    boxShadow: "0px 1px 10px #00000055",
     border: "none",
     borderRadius: 5,
     backgroundColor: "var(--background)",
-    padding: "10px",
 
     height: "80vh",
     width: "85vw",
     display: "flex",
     flexDirection: "column",
-    overflow: "hidden"
+    overflow: "hidden",
+    padding: 0
   } as const
 };
 
 type PickerProps = {
   isOpen: boolean;
   onClose: () => void;
+  onDone: () => void;
 };
 export const Picker = (props: PropsWithChildren<PickerProps>) => {
-  const { children, isOpen, onClose } = props;
+  const { children, isOpen, onClose, onDone } = props;
 
   return (
     <Modal
@@ -66,10 +67,25 @@ export const Picker = (props: PropsWithChildren<PickerProps>) => {
         <Flex
           sx={{
             flexDirection: "column",
-            overflow: "hidden"
+            overflow: "hidden",
+            height: "100%"
           }}
         >
-          {children}
+          <Flex
+            sx={{
+              flexDirection: "column",
+              overflow: "hidden",
+              flex: 1,
+              padding: 2
+            }}
+          >
+            {children}
+          </Flex>
+          <Flex sx={{ bg: "bgSecondary", p: 1, justifyContent: "end" }}>
+            <Button variant="dialog" onClick={onDone}>
+              Done
+            </Button>
+          </Flex>
         </Flex>
       </ThemeProvider>
     </Modal>
