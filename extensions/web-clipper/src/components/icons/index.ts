@@ -38,7 +38,12 @@ import {
   mdiMagnify,
   mdiViewDayOutline,
   mdiViewDashboardOutline,
-  mdiArrowLeft
+  mdiArrowLeft,
+  mdiCheckCircleOutline,
+  mdiCircleOutline,
+  mdiBookOutline,
+  mdiBookmarkOutline,
+  mdiPound
 } from "@mdi/js";
 
 export const Icons = {
@@ -66,6 +71,12 @@ export const Icons = {
   chevronDown: mdiChevronDown,
   chevronUp: mdiChevronUp,
   chevronRight: mdiChevronRight,
+
+  checkCircle: mdiCheckCircleOutline,
+  circle: mdiCircleOutline,
+  notebook: mdiBookOutline,
+  topic: mdiBookmarkOutline,
+  tag: mdiPound,
 
   none: "",
   back: mdiArrowLeft

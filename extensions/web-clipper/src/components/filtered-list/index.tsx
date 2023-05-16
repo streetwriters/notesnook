@@ -25,7 +25,7 @@ import { FlexScrollContainer } from "../scroll-container";
 type FilteredListT<T> = {
   placeholder: string;
   getAll: () => Array<T>;
-  filter: (items: T[], query: string) => T[];
+  filter?: (items: T[], query: string) => T[];
   onCreateNewItem?: (title: string) => void;
   renderItem: (item: T, index: number) => JSX.Element;
   itemName: string;
@@ -57,6 +57,7 @@ export function FilteredList<T>({
 
   const _filter = useCallback(
     (query) => {
+      if (!filter) return;
       setItems(() => {
         const items = getAll();
         if (!query) {
@@ -83,27 +84,32 @@ export function FilteredList<T>({
 
   return (
     <>
-      <Input
-        sx={{
-          mt: 1,
-          mb: 1,
-          mr: 1,
-          fontSize: "body",
-          py: "7px",
-          color: "text"
-        }}
-        ref={inputRef}
-        autoFocus
-        placeholder={items.length <= 0 ? `Add a ${itemName}` : placeholder}
-        onChange={(e) => {
-          _filter(e.target.value);
-        }}
-        onKeyUp={async (e) => {
-          if (e.key === "Enter" && noItemsFound) {
-            _createNewItem(query);
+      {(onCreateNewItem || filter) && (
+        <Input
+          sx={{
+            m: 1,
+            width: "auto",
+            fontSize: "body",
+            py: "7px",
+            color: "text"
+          }}
+          ref={inputRef}
+          autoFocus
+          placeholder={
+            items.length <= 0 && onCreateNewItem
+              ? `Add a ${itemName}`
+              : placeholder
           }
-        }}
-      />
+          onChange={(e) => {
+            _filter(e.target.value);
+          }}
+          onKeyUp={async (e) => {
+            if (e.key === "Enter" && noItemsFound && onCreateNewItem) {
+              _createNewItem(query);
+            }
+          }}
+        />
+      )}
 
       <FlexScrollContainer>
         <Flex

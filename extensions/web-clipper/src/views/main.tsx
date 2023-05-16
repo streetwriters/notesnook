@@ -26,7 +26,7 @@ import { NotebookPicker } from "../components/notebook-picker";
 import { TagPicker } from "../components/tag-picker";
 import {
   ItemReference,
-  SelectedNotebook,
+  SelectedReference,
   ClipArea,
   ClipMode,
   ClipData
@@ -104,8 +104,7 @@ export function Main() {
   );
   const [isClipping, setIsClipping] = useState(false);
   const [note, setNote] = usePersistentState<ItemReference>("note");
-  const [notebook, setNotebook] =
-    usePersistentState<SelectedNotebook>("notebook");
+  const [refs, setRefs] = usePersistentState<SelectedReference[]>("refs", []);
   const [tags, setTags] = usePersistentState<string[]>("tags", []);
   const [clipData, setClipData] = useState<ClipData>();
   const pageTitle = useRef<string>();
@@ -307,7 +306,7 @@ export function Main() {
           Organization
         </Text>
 
-        {notebook || tags?.length ? null : (
+        {refs?.length || tags?.length ? null : (
           <NotePicker
             selectedNote={note}
             onSelected={(note) => setNote(note)}
@@ -315,34 +314,19 @@ export function Main() {
         )}
         {note ? null : (
           <>
-            {notebook || tags?.length ? null : (
+            {refs?.length || tags?.length ? null : (
               <Text variant="subBody" sx={{ my: 1, textAlign: "center" }}>
                 — or —
               </Text>
             )}
             <NotebookPicker
-              selectedNotebook={notebook}
-              onSelected={(notebook) => setNotebook(notebook)}
+              selectedItems={refs || []}
+              onSelected={(items) => setRefs(items)}
             />
             <Box sx={{ mt: 1 }} />
             <TagPicker
               selectedTags={tags || []}
-              onDeselected={(tag) => {
-                setTags((tags) => {
-                  const copy = tags?.slice() || [];
-                  copy.splice(copy.indexOf(tag), 1);
-                  return copy;
-                });
-              }}
-              onSelected={(tag) => {
-                setTags((tags) => {
-                  const copy = tags?.slice() || [];
-                  if (copy.indexOf(tag) > -1) {
-                    copy.splice(copy.indexOf(tag), 1);
-                  } else copy.push(tag);
-                  return copy;
-                });
-              }}
+              onSelected={(tags) => setTags(tags)}
             />
           </>
         )}
@@ -364,12 +348,21 @@ export function Main() {
               mode: clipMode,
               tags,
               note,
-              notebook,
+              refs,
               pageTitle: pageTitle.current,
               ...clipData
             });
 
             setClipData(undefined);
+
+            await browser.notifications?.create({
+              title: "Clip saved!",
+              message: "Open the Notesnook app to view the result.",
+              type: "basic",
+              iconUrl: browser.runtime.getURL("256x256.png"),
+              isClickable: false
+            });
+
             window.close();
           }}
         >
