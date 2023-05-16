@@ -61,7 +61,9 @@ export const useAppStore = create<AppStore>((set) => ({
 
     if (!notesnook) {
       set({ isLoggingIn: false });
-      return;
+      throw new Error(
+        "Please refresh the Notesnook web app to connect with the Web Clipper."
+      );
     }
 
     const user = await notesnook.login();
