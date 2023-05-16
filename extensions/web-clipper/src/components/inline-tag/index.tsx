@@ -46,7 +46,7 @@ export function InlineTag(props: {
         }
       }}
     >
-      <Icon path={icon} color={iconColor} size={16} />
+      <Icon path={icon} color={iconColor} size={14} />
       <Text variant="subBody" sx={{ color: "icon", ml: 1 }}>
         {title}
       </Text>
