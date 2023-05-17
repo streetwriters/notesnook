@@ -1,4 +1,4 @@
-- Fix note not saved from share widget when offline
-- Do not allow insecure http requests from app
+- Fix pro features locked accidentally for pro users
+- Added in app review
 
 Thank you for using Notesnook!
