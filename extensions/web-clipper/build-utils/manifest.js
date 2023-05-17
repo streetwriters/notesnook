@@ -36,7 +36,7 @@ const common = {
   version: "0.2",
   description:
     "Clip web pages & save interesting things you find on the web directly into Notesnook in a private & secure way.",
-  permissions: ["activeTab", "tabs", "storage", "notifications", "<all_urls>"],
+  permissions: ["activeTab", "tabs", "storage", "notifications"],
   content_scripts: [
     {
       js: ["nnContentScript.bundle.js"],
@@ -59,6 +59,7 @@ const common = {
 
 const v2 = {
   ...common,
+  optional_permissions: ["http://*/*", "https://*/*"],
   browser_specific_settings: {
     gecko: {
       strict_min_version: "105.0"
@@ -73,6 +74,7 @@ const v2 = {
 
 const v3 = {
   ...common,
+  optional_host_permissions: ["http://*/*", "https://*/*"],
   manifest_version: 3,
   background: {
     service_worker: BACKGROUND_SCRIPT

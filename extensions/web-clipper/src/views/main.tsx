@@ -96,6 +96,7 @@ export function Main() {
 
   const [settings] = usePersistentState<Config>(SETTINGS_KEY, DEFAULT_SETTINGS);
   const [title, setTitle] = useState<string>();
+  const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [url, setUrl] = useState<string>();
   const [clipNonce, setClipNonce] = useState(0);
   const [clipMode, setClipMode] = usePersistentState<ClipMode>(
@@ -149,6 +150,55 @@ export function Main() {
       }
     })();
   }, [isPremium, clipArea, clipMode, clipNonce]);
+
+  useEffect(() => {
+    (async () => {
+      if (!settings || !settings.corsProxy) return;
+      setHasPermission(
+        await browser.permissions.contains({
+          origins: [`${settings.corsProxy}/*`]
+        })
+      );
+    })();
+  }, [settings]);
+
+  if (!hasPermission) {
+    <FlexScrollContainer style={{ maxHeight: 560 }}>
+      <Flex
+        sx={{
+          flexDirection: "column",
+          p: 2,
+          width: 320,
+          backgroundColor: "background"
+        }}
+      >
+        <Text
+          variant="subtitle"
+          sx={{ mt: 2, mb: 1, color: "icon", fontSize: "body" }}
+        >
+          Permission required
+        </Text>
+        <Button
+          onClick={async () => {
+            if (settings?.corsProxy) {
+              if (
+                !(await browser.permissions.request({
+                  origins: [`${settings.corsProxy}/*`]
+                }))
+              )
+                throw new Error(
+                  "You must give the required permission in order to use the web clipper."
+                );
+
+              setHasPermission(true);
+            }
+          }}
+        >
+          Grant permission
+        </Button>
+      </Flex>
+    </FlexScrollContainer>;
+  }
 
   return (
     <FlexScrollContainer style={{ maxHeight: 560 }}>
