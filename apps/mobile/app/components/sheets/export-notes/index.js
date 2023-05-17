@@ -42,6 +42,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { eSendEvent } from "../../../services/event-manager";
 import { eCloseSheet } from "../../../utils/events";
+import { requestInAppReview } from "../../../services/app-review";
 
 const ExportNotesSheet = ({ notes, update }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -72,6 +73,7 @@ const ExportNotesSheet = ({ notes, update }) => {
     update({ disableClosing: false });
     setComplete(true);
     setExporting(false);
+    requestInAppReview();
   };
 
   const actions = [

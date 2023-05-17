@@ -22,6 +22,11 @@ if (isGithubRelease) {
       android:null
     }
   }
+  config.dependencies["react-native-in-app-review"] = {
+    platforms: {
+      android: null
+    }
+  }
 }
 
 module.exports = config;

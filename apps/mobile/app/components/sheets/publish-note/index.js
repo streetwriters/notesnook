@@ -35,6 +35,7 @@ import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { requestInAppReview } from "../../../services/app-review";
 
 const PublishNoteSheet = ({ note: item, update }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -66,6 +67,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
         Navigation.queueRoutesForUpdate();
         setPublishLoading(false);
       }
+      requestInAppReview();
     } catch (e) {
       ToastEvent.show({
         heading: "Could not publish note",

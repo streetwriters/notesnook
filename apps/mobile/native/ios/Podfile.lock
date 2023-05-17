@@ -256,6 +256,8 @@ PODS:
     - React-Core
   - react-native-image-resizer (3.0.5):
     - React-Core
+  - react-native-in-app-review (4.3.3):
+    - React-Core
   - react-native-keep-awake (1.1.0):
     - React-Core
   - react-native-mmkv-storage (0.8.0):
@@ -460,6 +462,7 @@ DEPENDENCIES:
   - react-native-html-to-pdf-lite (from `../../node_modules/react-native-html-to-pdf-lite`)
   - react-native-image-picker (from `../../node_modules/react-native-image-picker`)
   - "react-native-image-resizer (from `../../node_modules/@bam.tech/react-native-image-resizer`)"
+  - react-native-in-app-review (from `../../node_modules/react-native-in-app-review`)
   - "react-native-keep-awake (from `../../node_modules/@sayem314/react-native-keep-awake`)"
   - react-native-mmkv-storage (from `../../node_modules/react-native-mmkv-storage`)
   - "react-native-netinfo (from `../../node_modules/@react-native-community/netinfo`)"
@@ -580,6 +583,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native-image-picker"
   react-native-image-resizer:
     :path: "../../node_modules/@bam.tech/react-native-image-resizer"
+  react-native-in-app-review:
+    :path: "../../node_modules/react-native-in-app-review"
   react-native-keep-awake:
     :path: "../../node_modules/@sayem314/react-native-keep-awake"
   react-native-mmkv-storage:
@@ -715,6 +720,7 @@ SPEC CHECKSUMS:
   react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
   react-native-image-picker: 9c8a2687b69300ad9e95cec5d38f35ab9d32467d
   react-native-image-resizer: 00ceb0e05586c7aadf061eea676957a6c2ec60fa
+  react-native-in-app-review: db8bb167a5f238e7ceca5c242d6b36ce8c4404a4
   react-native-keep-awake: acbee258db16483744910f0da3ace39eb9ab47fd
   react-native-mmkv-storage: 8ba3c0216a6df283ece11205b442a3e435aec4e5
   react-native-netinfo: 2517ad504b3d303e90d7a431b0fcaef76d207983

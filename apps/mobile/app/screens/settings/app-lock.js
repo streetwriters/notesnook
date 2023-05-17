@@ -39,6 +39,7 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { getElevation } from "../../utils";
 import { SIZE } from "../../utils/size";
+import { requestInAppReview } from "../../services/app-review";
 const AppLock = ({ route }) => {
   const colors = useThemeStore((state) => state.colors);
   const appLockMode = useSettingStore((state) => state.settings.appLockMode);
@@ -151,6 +152,9 @@ const AppLock = ({ route }) => {
                       return;
                     }
                     SettingsService.set({ appLockMode: item.value });
+                    if (!welcome) {
+                      requestInAppReview();
+                    }
                   }}
                   customStyle={{
                     justifyContent: "flex-start",
