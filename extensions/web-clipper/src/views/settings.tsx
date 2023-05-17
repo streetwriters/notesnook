@@ -45,7 +45,7 @@ export function Settings() {
         backgroundColor: "background"
       }}
       as="form"
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
 
         const form = new FormData(e.target as HTMLFormElement);
@@ -55,6 +55,10 @@ export function Settings() {
           const url = new URL(corsProxy);
           corsProxy = `${url.protocol}//${url.hostname}`;
         }
+
+        await browser.permissions.request({
+          origins: [`${corsProxy}/*`]
+        });
 
         saveSettings({
           corsProxy

@@ -162,42 +162,44 @@ export function Main() {
     })();
   }, [settings]);
 
-  if (!hasPermission) {
-    <FlexScrollContainer style={{ maxHeight: 560 }}>
-      <Flex
-        sx={{
-          flexDirection: "column",
-          p: 2,
-          width: 320,
-          backgroundColor: "background"
-        }}
-      >
-        <Text
-          variant="subtitle"
-          sx={{ mt: 2, mb: 1, color: "icon", fontSize: "body" }}
-        >
-          Permission required
-        </Text>
-        <Button
-          onClick={async () => {
-            if (settings?.corsProxy) {
-              if (
-                !(await browser.permissions.request({
-                  origins: [`${settings.corsProxy}/*`]
-                }))
-              )
-                throw new Error(
-                  "You must give the required permission in order to use the web clipper."
-                );
-
-              setHasPermission(true);
-            }
+  if (!hasPermission && !!settings?.corsProxy) {
+    return (
+      <FlexScrollContainer style={{ maxHeight: 560 }}>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            p: 2,
+            width: 320,
+            backgroundColor: "background"
           }}
         >
-          Grant permission
-        </Button>
-      </Flex>
-    </FlexScrollContainer>;
+          <Text
+            variant="subtitle"
+            sx={{ mt: 2, mb: 1, color: "icon", fontSize: "body" }}
+          >
+            Permission required
+          </Text>
+          <Text
+            variant="body"
+            sx={{ mt: 2, mb: 1, color: "icon", fontSize: "body" }}
+          >
+            Permission is required to use the CORS proxy: {settings.corsProxy}
+          </Text>
+          <Button
+            onClick={async () => {
+              if (!settings.corsProxy) return;
+              setHasPermission(
+                await browser.permissions.request({
+                  origins: [`${settings.corsProxy}/*`]
+                })
+              );
+            }}
+          >
+            Grant permission
+          </Button>
+        </Flex>
+      </FlexScrollContainer>
+    );
   }
 
   return (
@@ -472,6 +474,17 @@ export async function clip(
     windowType: "normal"
   });
   if (!tab || !tab.id) return;
+
+  if (browser.scripting) {
+    await browser.scripting.executeScript({
+      files: ["contentScript.bundle.js"],
+      target: { tabId: tab.id }
+    });
+  } else {
+    await browser.tabs.executeScript(tab.id, {
+      file: "contentScript.bundle.js"
+    });
+  }
 
   if (area === "visible" && mode === "screenshot") {
     if (!tab.height || !tab.width) return;

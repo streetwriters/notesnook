@@ -49,16 +49,27 @@ function timeout(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms, false));
 }
 
-function connectToTab(tab: Tabs.Tab, onDisconnect?: () => void) {
-  return new Promise<Remote<Server> | false>(function connect(resolve) {
-    if (!tab.id) return resolve(false);
+async function connectToTab(tab: Tabs.Tab, onDisconnect?: () => void) {
+  if (!tab.id) return false;
 
-    const port = browser.tabs.connect(tab.id);
-    port.onDisconnect.addListener(() => {
-      api = undefined;
-      onDisconnect?.();
+  if (browser.scripting) {
+    await browser.scripting.executeScript({
+      files: ["nnContentScript.bundle.js"],
+      target: { tabId: tab.id }
     });
+  } else {
+    await browser.tabs.executeScript(tab.id, {
+      file: "nnContentScript.bundle.js"
+    });
+  }
 
+  const port = browser.tabs.connect(tab.id);
+  port.onDisconnect.addListener(() => {
+    api = undefined;
+    onDisconnect?.();
+  });
+
+  return new Promise<Remote<Server> | false>(function connect(resolve) {
     async function onMessage(
       message: WebExtensionChannelMessage,
       port: Runtime.Port
