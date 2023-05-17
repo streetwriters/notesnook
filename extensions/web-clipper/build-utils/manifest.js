@@ -38,7 +38,7 @@ const nnHost =
 const corsHost = "https://cors.notesnook.com/*";
 const common = {
   name: "Notesnook Web Clipper",
-  version: "0.2",
+  version: "0.2.0",
   description:
     "Clip web pages & save interesting things you find on the web directly into Notesnook in a private & secure way.",
   permissions: ["activeTab", "tabs", "storage", "notifications"],
