@@ -22,7 +22,7 @@ import Dialog from "./dialog";
 import { getHomeRoute, hardNavigate } from "../../navigation";
 import { appVersion } from "../../utils/version";
 import Config from "../../utils/config";
-import { isDesktop, isTesting } from "../../utils/platform";
+import { isTesting } from "../../utils/platform";
 import { useEffect } from "react";
 import { ArrowRight, Checkmark, Icon, Warn } from "../icons";
 
@@ -89,9 +89,18 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : isDesktop()
-      ? []
-      : [],
+      : [
+          {
+            title: "Billing history",
+            subtitle:
+              "You can now get a list of all the transactions you have made, their amount and when they were made."
+          },
+          {
+            title: "Request refund",
+            subtitle:
+              "You can now request refunds directly from inside the app. No need for emails etc. Go to Settings > Request refund to send your request for a refund."
+          }
+        ],
     cta: {
       title: "Got it",
       icon: Checkmark,
