@@ -128,7 +128,7 @@ const onUserStatusCheck = async (type) => {
     userstore.setPremium(get());
   }
 
-  let status = false;
+  let status = get();
   let message = null;
   if (!status) {
     switch (type) {
