@@ -61,10 +61,23 @@ export function DownloadAttachment(props: ToolProps) {
     />
   );
 }
+const previewableFileExtensions = ["pdf"];
 
+function canPreviewAttachment(attachment: Attachment) {
+  if (!attachment) return false;
+  const extension = attachment.filename?.split(".").pop();
+  if (!extension) return false;
+
+  return previewableFileExtensions.indexOf(extension) > -1;
+}
 export function PreviewAttachment(props: ToolProps) {
   const { editor } = props;
-  if (!editor.isActive("image")) return null;
+  const attachmentNode =
+    findSelectedNode(editor, "attachment") || findSelectedNode(editor, "image");
+  const attachment = (attachmentNode?.attrs || {}) as Attachment;
+
+  if (!editor.isActive("image") && !canPreviewAttachment(attachment))
+    return null;
 
   return (
     <ToolButton
