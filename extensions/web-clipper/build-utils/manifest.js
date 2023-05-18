@@ -64,6 +64,7 @@ const v2 = {
 
 const v3 = {
   ...common,
+  permissions: [...common.permissions, "scripting"],
   host_permissions: [corsHost, nnHost],
   optional_host_permissions: ["http://*/*", "https://*/*"],
   manifest_version: 3,
