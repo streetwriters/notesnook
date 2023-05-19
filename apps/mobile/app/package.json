@@ -27,7 +27,8 @@
     "validator": "^13.5.2",
     "zustand": "^3.6.0",
     "fflate": "^0.7.3",
-    "timeago.js": "4.0.2"
+    "timeago.js": "4.0.2",
+    "react-native-blob-util": "0.17.3"
   },
   "sideEffects": false
 }

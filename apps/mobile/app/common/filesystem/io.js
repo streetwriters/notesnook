@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Platform } from "react-native";
 import Sodium from "@ammarahmed/react-native-sodium";
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import { cacheDir, getRandomId } from "./utils";
 import { db } from "../database";
 import { compressToBase64 } from "./compress";

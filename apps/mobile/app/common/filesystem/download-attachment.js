@@ -26,7 +26,7 @@ import React from "react";
 import { Platform } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { subscribe, zip } from "react-native-zip-archive";
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import { ShareComponent } from "../../components/sheets/export-notes/share";
 import { ToastEvent, presentSheet } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";

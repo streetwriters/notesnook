@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import RNFetchBlob from "rn-fetch-blob";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { Platform } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 
 export const cacheDir = RNFetchBlob.fs.dirs.CacheDir;
 

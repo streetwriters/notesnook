@@ -398,9 +398,18 @@ export const useEditorEvents = (
           openLinkInBrowser(editorMessage.value as string);
           break;
 
-        case EventTypes.previewAttachment:
-          eSendEvent("ImagePreview", editorMessage.value);
+        case EventTypes.previewAttachment: {
+          const hash = (editorMessage.value as Attachment)?.hash;
+          const attachment = db.attachments?.attachment(hash);
+          if (attachment.metadata.type.startsWith("image/")) {
+            eSendEvent("ImagePreview", editorMessage.value);
+          } else {
+            eSendEvent("PDFPreview", attachment);
+          }
+
           break;
+        }
+
         default:
           break;
       }

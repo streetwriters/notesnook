@@ -21,7 +21,7 @@ import { Platform } from "react-native";
 import FileViewer from "react-native-file-viewer";
 import * as ScopedStorage from "react-native-scoped-storage";
 import Share from "react-native-share";
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import { presentDialog } from "../components/dialog/functions";
 import { DatabaseLogger, db } from "../common/database";
 import storage from "../common/database/storage";

@@ -22,7 +22,7 @@ import { zipSync } from "fflate";
 import { Platform } from "react-native";
 import RNHTMLtoPDF from "react-native-html-to-pdf-lite";
 import * as ScopedStorage from "react-native-scoped-storage";
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import { DatabaseLogger, db } from "../common/database/index";
 import Storage from "../common/database/storage";
 import { toTXT } from "../utils";

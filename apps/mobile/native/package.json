@@ -48,7 +48,6 @@
     "react-native-tooltips": "^1.0.3",
     "react-native-webview": "^11.14.1",
     "rn-extensions-share": "^2.4.0",
-    "rn-fetch-blob": "^0.12.0",
     "react-native-gzip":"1.0.0",
     "@shopify/flash-list":"1.4.0",
     "@ammarahmed/notifee-react-native": "7.4.4",
@@ -61,7 +60,9 @@
     "react-native-actions-shortcuts": "^1.0.1",
     "react-native-in-app-review": "4.3.3",
     "react-native-zip-archive": "6.0.9",
-    "react-native-vector-icons": "9.2.0"
+    "react-native-vector-icons": "9.2.0",
+    "react-native-pdf": "6.6.2",
+    "react-native-blob-util": "0.17.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
