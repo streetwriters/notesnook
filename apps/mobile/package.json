@@ -34,6 +34,7 @@
     "@notesnook/core": "*",
     "@notesnook/editor": "*",
     "@notesnook/editor-mobile": "*",
+    "react-native-swiper-flatlist": "3.2.2",
     "@notesnook/logger": "*"
   }
 }
