@@ -240,7 +240,8 @@ export const useAppEvents = () => {
     onEmailVerified,
     onInternetStateChanged,
     onUserUpdated,
-    verify
+    verify,
+    isDark
   ]);
 
   const onInternetStateChanged = useCallback(async (state) => {
