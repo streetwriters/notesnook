@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useRef, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, ScrollView, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
@@ -34,30 +34,40 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { AttachmentItem } from "./attachment-item";
 import DownloadAttachments from "./download-attachments";
+import { Button } from "../ui/button";
+
+const documentMimeTypes = ["application/pdf"];
 
 export const AttachmentDialog = ({ note }) => {
   const colors = useThemeStore((state) => state.colors);
+
   const [attachments, setAttachments] = useState(
     note
       ? db.attachments.ofNote(note.id, "all")
       : [...(db.attachments.all || [])]
   );
+
   const attachmentSearchValue = useRef();
   const searchTimer = useRef();
   const [loading, setLoading] = useState(false);
+  const [currentFilter, setCurrentFilter] = useState("all");
 
   const onChangeText = (text) => {
+    const attachments = note
+      ? db.attachments.ofNote(note.id, "all")
+      : [...(db.attachments.all || [])];
+
     attachmentSearchValue.current = text;
     if (
       !attachmentSearchValue.current ||
       attachmentSearchValue.current === ""
     ) {
-      setAttachments([...db.attachments.all]);
+      setAttachments([...attachments]);
     }
     clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(() => {
       let results = db.lookup.attachments(
-        db.attachments.all,
+        attachments,
         attachmentSearchValue.current
       );
       if (results.length === 0) return;
@@ -88,6 +98,57 @@ export const AttachmentDialog = ({ note }) => {
       setAttachments([...checkedAttachments]);
     }
     setLoading(false);
+  };
+
+  const attachmentTypes = [
+    {
+      title: "All",
+      filterBy: "all"
+    },
+    {
+      title: "Images",
+      filterBy: "images"
+    },
+    {
+      title: "Documents",
+      filterBy: "documents"
+    },
+    {
+      title: "Video",
+      filterBy: "video"
+    },
+    {
+      title: "Audio",
+      filterBy: "audio"
+    }
+  ];
+
+  const filterAttachments = (type) => {
+    const attachments = note
+      ? db.attachments.ofNote(note.id, "all")
+      : [...(db.attachments.all || [])];
+
+    switch (type) {
+      case "all":
+        return attachments;
+      case "images":
+        return attachments.filter((attachment) =>
+          attachment.metadata.type.startsWith("image/")
+        );
+      case "video":
+        return attachments.filter((attachment) =>
+          attachment.metadata.type.startsWith("video/")
+        );
+      case "audio":
+        return attachments.filter((attachment) =>
+          attachment.metadata.type.startsWith("audio/")
+        );
+      case "documents":
+        return attachments.filter(
+          (attachment) =>
+            documentMimeTypes.indexOf(attachment.metadata.type) > -1
+        );
+    }
   };
 
   return (
@@ -156,15 +217,13 @@ export const AttachmentDialog = ({ note }) => {
       </View>
 
       <Seperator />
-      {!note ? (
-        <Input
-          placeholder="Filter attachments by filename, type or hash"
-          onChangeText={onChangeText}
-          onSubmit={() => {
-            onChangeText(attachmentSearchValue.current);
-          }}
-        />
-      ) : null}
+      <Input
+        placeholder="Filter attachments by filename, type or hash"
+        onChangeText={onChangeText}
+        onSubmit={() => {
+          onChangeText(attachmentSearchValue.current);
+        }}
+      />
 
       <FlatList
         keyboardDismissMode="none"
@@ -172,6 +231,43 @@ export const AttachmentDialog = ({ note }) => {
         maxToRenderPerBatch={10}
         initialNumToRender={10}
         windowSize={5}
+        ListHeaderComponent={
+          <ScrollView
+            style={{
+              width: "100%",
+              height: 50,
+              flexDirection: "row"
+            }}
+            contentContainerStyle={{
+              minWidth: "100%"
+            }}
+            horizontal
+          >
+            {attachmentTypes.map((item) => (
+              <Button
+                type={currentFilter === item.filterBy ? "grayAccent" : "gray"}
+                key={item.title}
+                title={
+                  item.title +
+                  ` (${filterAttachments(item.filterBy)?.length || 0})`
+                }
+                style={{
+                  borderRadius: 0,
+                  borderBottomWidth: 1,
+                  flexGrow: 1,
+                  borderBottomColor:
+                    currentFilter !== item.filterBy
+                      ? "transparent"
+                      : colors.accent
+                }}
+                onPress={() => {
+                  setCurrentFilter(item.filterBy);
+                  setAttachments(filterAttachments(item.filterBy));
+                }}
+              />
+            ))}
+          </ScrollView>
+        }
         ListEmptyComponent={
           <View
             style={{
