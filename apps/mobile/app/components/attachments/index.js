@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useRef, useState } from "react";
-import { View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
@@ -71,14 +71,21 @@ export const AttachmentDialog = ({ note }) => {
 
   const onCheck = async () => {
     setLoading(true);
+    const checkedAttachments = [];
     for (let attachment of attachments) {
       let result = await filesystem.checkAttachment(attachment.metadata.hash);
       if (result.failed) {
-        db.attachments.markAsFailed(attachment.metadata.hash, result.failed);
+        await db.attachments.markAsFailed(
+          attachment.metadata.hash,
+          result.failed
+        );
       } else {
-        db.attachments.markAsFailed(attachment.id, null);
+        await db.attachments.markAsFailed(attachment.id, null);
       }
-      setAttachments([...db.attachments.all]);
+      checkedAttachments.push(
+        db.attachments.attachment(attachment.metadata.hash)
+      );
+      setAttachments([...checkedAttachments]);
     }
     setLoading(false);
   };
@@ -106,17 +113,28 @@ export const AttachmentDialog = ({ note }) => {
             flexDirection: "row"
           }}
         >
-          <IconButton
-            name="check-all"
-            customStyle={{
-              height: 40,
-              width: 40,
-              marginRight: 10
-            }}
-            color={colors.pri}
-            size={SIZE.lg}
-            onPress={onCheck}
-          />
+          {loading ? (
+            <ActivityIndicator
+              style={{
+                height: 40,
+                width: 40,
+                marginRight: 10
+              }}
+              size={SIZE.lg}
+            />
+          ) : (
+            <IconButton
+              name="check-all"
+              customStyle={{
+                height: 40,
+                width: 40,
+                marginRight: 10
+              }}
+              color={colors.pri}
+              size={SIZE.lg}
+              onPress={onCheck}
+            />
+          )}
 
           <IconButton
             name="download"
