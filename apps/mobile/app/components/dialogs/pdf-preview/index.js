@@ -60,7 +60,7 @@ const PDFPreview = () => {
   const pdfRef = useRef();
   const [attachment, setAttachment] = useState(null);
   const [password, setPassword] = useState("");
-  const progress = useAttachmentProgress(attachment);
+  const [progress] = useAttachmentProgress(attachment);
 
   useEffect(() => {
     eSubscribeEvent("PDFPreview", open);
@@ -152,9 +152,10 @@ const PDFPreview = () => {
               }}
             >
               <ProgressBarComponent
-                indeterminate
+                indeterminate={!progress}
                 color={colors.accent}
                 borderColor="transparent"
+                progress={parseInt(progress?.value || "100") / 100}
               />
               <Paragraph
                 style={{
@@ -162,7 +163,8 @@ const PDFPreview = () => {
                 }}
                 color={colors.light}
               >
-                Loading ({progress?.percent || "0%"})... Please wait
+                Loading {`${progress?.percent ? `(${progress?.percent})` : ""}`}
+                ... Please wait
               </Paragraph>
             </Animated.View>
           ) : (
