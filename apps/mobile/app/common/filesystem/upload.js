@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import { cacheDir } from "./utils";

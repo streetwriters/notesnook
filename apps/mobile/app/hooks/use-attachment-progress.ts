@@ -60,7 +60,7 @@ export const useAttachmentProgress = (
         setCurrentProgress(undefined);
       }, 300);
     }
-  }, [attachment.metadata.hash, progress]);
+  }, [attachment, progress]);
 
   return [currentProgress, setCurrentProgress];
 };

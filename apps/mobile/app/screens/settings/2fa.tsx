@@ -28,7 +28,7 @@ import React, {
 import { ActivityIndicator, Linking, Platform, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import * as ScopedStorage from "react-native-scoped-storage";
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import { db } from "../../common/database";
 import Storage from "../../common/database/storage";
 import DialogHeader from "../../components/dialog/dialog-header";

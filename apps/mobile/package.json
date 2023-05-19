@@ -32,6 +32,7 @@
     "react-native": "0.69.7",
     "@notesnook/core": "*",
     "@notesnook/editor": "*",
-    "@notesnook/editor-mobile": "*"
+    "@notesnook/editor-mobile": "*",
+    "@notesnook/logger": "*"
   }
 }

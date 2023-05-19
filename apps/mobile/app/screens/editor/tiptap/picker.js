@@ -22,7 +22,7 @@ import React from "react";
 import { Platform, View } from "react-native";
 import DocumentPicker from "react-native-document-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import { db } from "../../../common/database";
 import { compressToBase64 } from "../../../common/filesystem/compress";
 import { AttachmentItem } from "../../../components/attachments/attachment-item";
