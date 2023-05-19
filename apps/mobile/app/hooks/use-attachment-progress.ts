@@ -56,7 +56,9 @@ export const useAttachmentProgress = (
         type: type
       });
     } else {
-      setCurrentProgress(undefined);
+      setTimeout(() => {
+        setCurrentProgress(undefined);
+      }, 300);
     }
   }, [attachment.metadata.hash, progress]);
 

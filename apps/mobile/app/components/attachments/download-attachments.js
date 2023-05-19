@@ -27,6 +27,8 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { ProgressBarComponent } from "../ui/svg/lazy";
 import { useThemeStore } from "../../stores/use-theme-store";
+import { FlatList } from "react-native-actions-sheet";
+import { AttachmentItem } from "./attachment-item";
 
 const DownloadAttachments = ({ close, attachments, isNote, update }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -50,7 +52,7 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
       attachments,
       (progress, statusText) => setProgress({ value: progress, statusText }),
       canceled,
-      groupId
+      groupId.current
     );
     if (canceled.current) return;
     setResult(result);
@@ -65,6 +67,7 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
       disableClosing: false
     });
     canceled.current = true;
+    console.log(groupId.current, "canceling groupId downloads");
     await db.fs.cancel(groupId.current);
     setDownloading(false);
     groupId.current = null;
@@ -161,6 +164,38 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
           />
         </View>
       ) : null}
+
+      <FlatList
+        style={{
+          maxHeight: 300,
+          width: "100%",
+          minHeight: 60,
+          backgroundColor: colors.nav,
+          borderRadius: 5,
+          marginVertical: 12
+        }}
+        data={downloading ? attachments : []}
+        ListEmptyComponent={
+          <View
+            style={{
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              height: 60
+            }}
+          >
+            <Paragraph color={colors.icon}>No downloads in progress.</Paragraph>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <AttachmentItem
+            attachment={item}
+            setAttachments={() => {}}
+            pressable={false}
+            hideWhenNotDownloading={true}
+          />
+        )}
+      />
 
       {result.size ? (
         <Button

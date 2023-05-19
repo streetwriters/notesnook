@@ -195,7 +195,11 @@ export default async function downloadAttachment(
   }
 
   try {
-    console.log("starting download attachment", attachment.metadata.hash);
+    console.log(
+      "starting download attachment",
+      attachment.metadata.hash,
+      options.groupId
+    );
     await db.fs.downloadFile(
       options.groupId || attachment.metadata.hash,
       attachment.metadata.hash
