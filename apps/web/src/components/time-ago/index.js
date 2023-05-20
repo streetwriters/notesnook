@@ -90,6 +90,7 @@ function TimeAgo({ datetime, live, locale, opts, sx, ...restProps }) {
       as="time"
       data-test-id="time"
       dateTime={toDate(datetime).toISOString()}
+      variant="subBody"
     >
       {format(datetime, locale, opts)}
     </Text>
