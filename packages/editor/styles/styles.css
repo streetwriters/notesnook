@@ -509,7 +509,7 @@ p > *::selection {
 
 .outline-list li > p::before {
   position: absolute;
-  top: 15%;
+  top: 4px;
   cursor: pointer;
   content: "";
   background-size: 18px;
