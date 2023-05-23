@@ -154,14 +154,9 @@ export default class Note {
       dateModified: null
     });
 
-    this._db.relations
-      .to({ id: this._note.id, type: "note" }, "notebook")
-      .forEach(async (notebook) => {
-        await this._db.relations.add(
-          notebook,
-          this._db.notes.note(duplicateId).data
-        );
-      });
+    for (const notebook of this._db.relations.to(this._note, "notebook")) {
+      await this._db.relations.add(notebook, { id: duplicateId, type: "note" });
+    }
 
     return duplicateId;
   }
