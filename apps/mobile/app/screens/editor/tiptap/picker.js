@@ -34,6 +34,7 @@ import {
 import PremiumService from "../../../services/premium";
 import { eCloseSheet } from "../../../utils/events";
 import { editorController, editorState } from "./utils";
+import { isImage } from "@notesnook/core/utils/filename";
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
@@ -74,7 +75,7 @@ const file = async (fileOptions) => {
       mode: "import",
       allowMultiSelection: false
     };
-    if (Platform.OS == "ios") {
+    if (Platform.OS === "ios") {
       options.copyTo = "cachesDirectory";
     }
     await db.attachments.generateKey();
@@ -87,14 +88,9 @@ const file = async (fileOptions) => {
     }
 
     file = file[0];
-    if (file.type.startsWith("image")) {
-      ToastEvent.show({
-        title: "Type not supported",
-        message: "Please add images from gallery or camera picker.",
-        type: "error"
-      });
-      return;
-    }
+
+    let uri = Platform.OS === "ios" ? file.fileCopyUri : file.uri;
+
     if (file.size > FILE_SIZE_LIMIT) {
       ToastEvent.show({
         title: "File too large",
@@ -114,7 +110,6 @@ const file = async (fileOptions) => {
       return;
     }
 
-    let uri = Platform.OS === "ios" ? file.fileCopyUri : file.uri;
     console.log("file uri: ", uri);
     uri = Platform.OS === "ios" ? santizeUri(uri) : uri;
     showEncryptionSheet(file);
@@ -125,12 +120,24 @@ const file = async (fileOptions) => {
     if (!(await attachFile(uri, hash, file.type, file.name, fileOptions)))
       return;
     if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
-    editorController.current?.commands.insertAttachment({
-      hash: hash,
-      filename: file.name,
-      type: file.type,
-      size: file.size
-    });
+    if (isImage(file.type)) {
+      editorController.current?.commands.insertImage({
+        hash: hash,
+        filename: file.name,
+        type: file.type,
+        size: file.size,
+        dataurl: await db.attachments.read(hash, "base64"),
+        title: file.name
+      });
+    } else {
+      editorController.current?.commands.insertAttachment({
+        hash: hash,
+        filename: file.name,
+        type: file.type,
+        size: file.size
+      });
+    }
+
     setTimeout(() => {
       eSendEvent(eCloseSheet);
     }, 1000);
