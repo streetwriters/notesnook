@@ -20,6 +20,7 @@ import InAppReview from "react-native-in-app-review";
 import { DatabaseLogger } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import Config from "react-native-config";
+import { useUserStore } from "../stores/use-user-store";
 
 const day_ms = 86400000;
 export function requestInAppReview() {
@@ -32,6 +33,8 @@ export function requestInAppReview() {
   }
 
   if (InAppReview.isAvailable()) {
+    useUserStore.getState().setShouldBlockVerifyUser(true);
+
     InAppReview.RequestInAppReview()
       .then(() => {})
       .catch((error) => {

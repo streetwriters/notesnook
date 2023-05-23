@@ -37,6 +37,8 @@ export interface UserStore extends State {
   setLastSynced: (lastSynced: string) => void;
   verifyUser: boolean;
   setVerifyUser: (verified: boolean) => void;
+  shouldBlockVerifyUser: boolean;
+  setShouldBlockVerifyUser: (shouldBlockVerifyUser: boolean) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -52,5 +54,12 @@ export const useUserStore = create<UserStore>((set) => ({
   },
   setLastSynced: (lastSynced) => set({ lastSynced: lastSynced }),
   setVerifyUser: (verified) => set({ verifyUser: verified }),
-  lastSyncStatus: SyncStatus.Never
+  lastSyncStatus: SyncStatus.Never,
+  shouldBlockVerifyUser: false,
+  setShouldBlockVerifyUser: (shouldBlockVerifyUser) => {
+    set({ shouldBlockVerifyUser });
+    setTimeout(() => {
+      set({ shouldBlockVerifyUser: false });
+    }, 1000);
+  }
 }));
