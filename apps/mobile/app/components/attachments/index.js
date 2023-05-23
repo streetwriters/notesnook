@@ -35,8 +35,12 @@ import Paragraph from "../ui/typography/paragraph";
 import { AttachmentItem } from "./attachment-item";
 import DownloadAttachments from "./download-attachments";
 import { Button } from "../ui/button";
-
-const documentMimeTypes = ["application/pdf"];
+import {
+  isAudio,
+  isDocument,
+  isImage,
+  isVideo
+} from "@notesnook/core/utils/filename";
 
 export const AttachmentDialog = ({ note }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -127,26 +131,25 @@ export const AttachmentDialog = ({ note }) => {
     const attachments = note
       ? db.attachments.ofNote(note.id, "all")
       : [...(db.attachments.all || [])];
-
+    isDocument;
     switch (type) {
       case "all":
         return attachments;
       case "images":
         return attachments.filter((attachment) =>
-          attachment.metadata.type.startsWith("image/")
+          isImage(attachment.metadata.type)
         );
       case "video":
         return attachments.filter((attachment) =>
-          attachment.metadata.type.startsWith("video/")
+          isVideo(attachment.metadata.type)
         );
       case "audio":
         return attachments.filter((attachment) =>
-          attachment.metadata.type.startsWith("audio/")
+          isAudio(attachment.metadata.type)
         );
       case "documents":
-        return attachments.filter(
-          (attachment) =>
-            documentMimeTypes.indexOf(attachment.metadata.type) > -1
+        return attachments.filter((attachment) =>
+          isDocument(attachment.metadata.type)
         );
     }
   };
@@ -231,12 +234,14 @@ export const AttachmentDialog = ({ note }) => {
         maxToRenderPerBatch={10}
         initialNumToRender={10}
         windowSize={5}
+        stickyHeaderIndices={[0]}
         ListHeaderComponent={
           <ScrollView
             style={{
               width: "100%",
               height: 50,
-              flexDirection: "row"
+              flexDirection: "row",
+              backgroundColor: colors.bg
             }}
             contentContainerStyle={{
               minWidth: "100%"
