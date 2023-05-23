@@ -85,8 +85,8 @@ class EditorStore extends BaseStore {
   };
 
   async refresh() {
-    if (!this.get().session.id) return;
-    if (!db.notes.note(this.get().session.id)) await this.clearSession();
+    if (this.get().session.id && !db.notes.note(this.get().session.id))
+      await this.clearSession();
   }
 
   updateSession = async (item) => {
