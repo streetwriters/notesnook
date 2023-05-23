@@ -157,7 +157,7 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
             width={null}
             animated={true}
             useNativeDriver
-            progress={progress.value || 0}
+            progress={progress.value ? progress.value / 100 : 0}
             unfilledColor={colors.nav}
             color={colors.accent}
             borderWidth={0}
@@ -187,14 +187,17 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
             <Paragraph color={colors.icon}>No downloads in progress.</Paragraph>
           </View>
         }
-        renderItem={({ item }) => (
-          <AttachmentItem
-            attachment={item}
-            setAttachments={() => {}}
-            pressable={false}
-            hideWhenNotDownloading={true}
-          />
-        )}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => {
+          return (
+            <AttachmentItem
+              attachment={item}
+              setAttachments={() => {}}
+              pressable={false}
+              hideWhenNotDownloading={true}
+            />
+          );
+        }}
       />
 
       {result.size ? (
