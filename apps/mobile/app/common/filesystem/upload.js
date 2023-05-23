@@ -21,6 +21,7 @@ import RNFetchBlob from "rn-fetch-blob";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import { cacheDir } from "./utils";
+import { isImage } from "@notesnook/core/utils/filename";
 
 export async function uploadFile(filename, data, cancelToken) {
   if (!data) return false;
@@ -63,7 +64,7 @@ export async function uploadFile(filename, data, cancelToken) {
     if (result) {
       let attachment = db.attachments.attachment(filename);
       if (!attachment) return result;
-      if (!attachment.metadata.type.startsWith("image/")) {
+      if (!isImage(attachment.metadata.type)) {
         RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
       }
     }
