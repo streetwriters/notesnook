@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import TiptapTableCell from "@tiptap/extension-table-cell";
-import { Attribute } from "@tiptap/core";
+import { addStyleAttribute } from "./utils";
 
 export const TableCell = TiptapTableCell.extend({
   addAttributes() {
@@ -32,26 +32,3 @@ export const TableCell = TiptapTableCell.extend({
     };
   }
 });
-
-function addStyleAttribute(
-  name: keyof CSSStyleDeclaration,
-  cssName: string,
-  unit?: string
-): Partial<Attribute> {
-  return {
-    default: null,
-    parseHTML: (element) =>
-      unit
-        ? element.style[name]?.toString().replace(unit, "")
-        : element.style[name],
-    renderHTML: (attributes) => {
-      if (!attributes[name as string]) {
-        return {};
-      }
-
-      return {
-        style: `${cssName}: ${attributes[name as string]}${unit || ""}`
-      };
-    }
-  };
-}
