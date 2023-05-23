@@ -27,7 +27,7 @@ import CharacterCount from "@tiptap/extension-character-count";
 import { Code } from "@tiptap/extension-code";
 import Color from "@tiptap/extension-color";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
-import { Link } from "@tiptap/extension-link";
+import { Link } from "./extensions/link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
