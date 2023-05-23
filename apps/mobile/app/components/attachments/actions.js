@@ -102,15 +102,21 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
         if (res.failed) {
           db.attachments.markAsFailed(attachment.id, res.failed);
           setFailed(res.failed);
+          ToastEvent.show({
+            heading: "File check failed with error: " + res.failed,
+            type: "error",
+            context: "local"
+          });
         } else {
           setFailed(null);
           db.attachments.markAsFailed(attachment.id, null);
+          ToastEvent.show({
+            heading: "File check passed",
+            type: "success",
+            context: "local"
+          });
         }
-        ToastEvent.show({
-          heading: "File check passed",
-          type: "success",
-          context: "local"
-        });
+
         setAttachments([...db.attachments.all]);
         setLoading({
           name: null
