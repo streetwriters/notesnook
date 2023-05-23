@@ -35,7 +35,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { editorRef } from "../../utils/global-refs";
 import { ProgressBar } from "./progress";
-import { editorController, editorState, textInput } from "./tiptap/utils";
+import { editorController, textInput } from "./tiptap/utils";
 export const EditorWrapper = ({ width }) => {
   const colors = useThemeStore((state) => state.colors);
   const deviceMode = useSettingStore((state) => state.deviceMode);
@@ -48,7 +48,6 @@ export const EditorWrapper = ({ width }) => {
   const keyboard = useKeyboard();
 
   const onAppStateChanged = async (state) => {
-    if (editorState().movedAway) return;
     if (state === "active") {
       editorController.current.onReady();
       editorController.current.overlay(false);
