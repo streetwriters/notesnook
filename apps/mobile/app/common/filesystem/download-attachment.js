@@ -18,14 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Sodium from "@ammarahmed/react-native-sodium";
-import { getFileNameWithExtension } from "@notesnook/core/utils/filename";
+import {
+  getFileNameWithExtension,
+  isImage
+} from "@notesnook/core/utils/filename";
 import React from "react";
 import { Platform } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { subscribe, zip } from "react-native-zip-archive";
 import RNFetchBlob from "rn-fetch-blob";
 import { ShareComponent } from "../../components/sheets/export-notes/share";
-import { presentSheet, ToastEvent } from "../../services/event-manager";
+import { ToastEvent, presentSheet } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import Storage from "../database/storage";
@@ -242,10 +245,7 @@ export default async function downloadAttachment(
       });
     }
 
-    if (
-      attachment.dateUploaded &&
-      !attachment.metadata?.type?.startsWith("image")
-    ) {
+    if (attachment.dateUploaded && !isImage(attachment.metadata?.type)) {
       RNFetchBlob.fs
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
         .catch(console.log);
