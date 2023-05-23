@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { memo } from "react";
 import MDIIcon from "@mdi/react";
 import {
   mdiPlus,
@@ -191,7 +191,13 @@ import {
   mdiNoteMultipleOutline,
   mdiBookMultipleOutline,
   mdiArrowTopRight,
-  mdiBookmarkRemoveOutline
+  mdiBookmarkRemoveOutline,
+  mdiFileImageOutline,
+  mdiFileDocumentOutline,
+  mdiFileVideoOutline,
+  mdiWeb,
+  mdiUploadOutline,
+  mdiLinkOff
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -205,7 +211,7 @@ type MDIIconWrapperProps = {
   color?: keyof Theme["colors"];
   rotate?: boolean;
 };
-function MDIIconWrapper({
+function _MDIIconWrapper({
   title,
   path,
   size = 24,
@@ -237,12 +243,11 @@ function MDIIconWrapper({
     />
   );
 }
+const MDIIconWrapper = memo(_MDIIconWrapper, () => true);
 
 export type IconProps = FlexProps &
   MotionProps &
-  Omit<MDIIconWrapperProps, "path"> & {
-    hoverColor?: keyof Theme["colors"];
-  };
+  Omit<MDIIconWrapperProps, "path">;
 
 export type Icon = {
   (props: IconProps): JSX.Element;
@@ -251,7 +256,6 @@ export type Icon = {
 
 function createIcon(path: string, rotate = false) {
   const NNIcon: Icon = function Icon(props) {
-    const [isHovering, setIsHovering] = useState(false);
     const { sx, rotate: _rotate = rotate, size, ...restProps } = props;
     return (
       <Flex
@@ -262,17 +266,13 @@ function createIcon(path: string, rotate = false) {
           alignItems: "center",
           flexShrink: 0
         }}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
       >
         <MDIIconWrapper
           title={props.title}
           path={path}
           rotate={_rotate}
           size={size}
-          color={
-            props.hoverColor && isHovering ? props.hoverColor : props.color
-          }
+          color={props.color}
         />
       </Flex>
     );
@@ -455,6 +455,7 @@ export const Reupload = createIcon(mdiProgressUpload);
 export const Rename = createIcon(mdiFormTextbox);
 export const Upload = createIcon(mdiCloudOffOutline);
 export const Uploaded = createIcon(mdiCloudCheckOutline);
+export const Uploading = createIcon(mdiUploadOutline);
 export const References = createIcon(mdiVectorLink);
 export const Codeblock = createIcon(mdiCodeBraces);
 export const Resize = createIcon(mdiArrowCollapseHorizontal);
@@ -479,3 +480,13 @@ export const EditorFullWidth = createIcon(
   `M4 20q-.825 0-1.412-.587Q2 18.825 2 18V6q0-.825.588-1.412Q3.175 4 4 4h16q.825 0 1.413.588Q22 5.175 22 6v12q0 .825-.587 1.413Q20.825 20 20 20Zm0-2h1V6H4v12Zm3 0h10V6H7Zm12 0h1V6h-1ZM7 6v12Z`
 );
 export const Suggestion = createIcon(mdiLightbulbOnOutline);
+
+export const FileImage = createIcon(mdiFileImageOutline);
+export const FilePDF = createIcon(
+  `M14 2l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8m4 18V9h-5V4H6v16h12m-7.08-7.69c-.24-.77-.77-3.23.63-3.27c1.4-.04.48 3.12.48 3.12c.39 1.49 2.02 2.56 2.02 2.56c.5-.15 3.35-.48 2.95 1c-.43 1.48-3.5.09-3.5.09c-1.95.14-3.41.66-3.41.66c-1.13 2.11-2.45 3.03-2.99 2.14c-.67-1.11 2.13-2.54 2.13-2.54c1.45-2.35 1.67-3.72 1.69-3.76m.65.84c-.4 1.3-1.2 2.69-1.2 2.69c.85-.34 2.71-.73 2.71-.73c-1.14-1-1.49-1.95-1.51-1.96m3.14 2.17s1.75.65 1.79.39c.07-.27-1.33-.51-1.79-.39m-5.66 1.49c-.77.3-1.51 1.58-1.33 1.58c.18.01.91-.6 1.33-1.58m2.52-5.55c0-.05.43-1.68 0-1.73c-.3-.03-.01 1.69 0 1.73z`
+);
+export const FileDocument = createIcon(mdiFileDocumentOutline);
+export const FileVideo = createIcon(mdiFileVideoOutline);
+export const FileGeneral = createIcon(mdiFileOutline);
+export const FileWebClip = createIcon(mdiWeb);
+export const Unlink = createIcon(mdiLinkOff);

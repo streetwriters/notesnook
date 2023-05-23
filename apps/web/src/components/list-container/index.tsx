@@ -39,19 +39,20 @@ import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigat
 import { AnimatedFlex } from "../animated";
 import { domAnimation, LazyMotion } from "framer-motion";
 
-const CustomScrollbarsVirtualList = forwardRef<HTMLDivElement, ScrollerProps>(
-  function CustomScrollbarsVirtualList(props, ref) {
-    return (
-      <ScrollContainer
-        {...props}
-        forwardedRef={(sRef) => {
-          if (typeof ref === "function") ref(sRef);
-          else if (ref) ref.current = sRef;
-        }}
-      />
-    );
-  }
-);
+export const CustomScrollbarsVirtualList = forwardRef<
+  HTMLDivElement,
+  ScrollerProps
+>(function CustomScrollbarsVirtualList(props, ref) {
+  return (
+    <ScrollContainer
+      {...props}
+      forwardedRef={(sRef) => {
+        if (typeof ref === "function") ref(sRef);
+        else if (ref) ref.current = sRef;
+      }}
+    />
+  );
+});
 
 type ListContainerProps = {
   type: keyof typeof ListProfiles;

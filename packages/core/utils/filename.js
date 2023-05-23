@@ -45,3 +45,36 @@ export function getFileNameWithExtension(filename, mime) {
 
   return `${filename}.${extension}`;
 }
+
+export const PDFMimeType = "application/pdf";
+export const DocumentMimeTypes = [
+  PDFMimeType,
+  "application/msword",
+  "application/vnd.ms-word",
+  "application/vnd.oasis.opendocument.text",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml",
+  "application/vnd.oasis.opendocument.spreadsheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml",
+  "application/vnd.oasis.opendocument.presentation"
+];
+
+export const WebClipMimeType = "application/vnd.notesnook.web-clip";
+
+export function isDocument(mime) {
+  return DocumentMimeTypes.some((a) => a.startsWith(mime));
+}
+
+export function isWebClip(mime) {
+  return mime === WebClipMimeType;
+}
+
+export function isImage(mime) {
+  return mime.startsWith("image/");
+}
+
+export function isVideo(mime) {
+  return mime.startsWith("video/");
+}

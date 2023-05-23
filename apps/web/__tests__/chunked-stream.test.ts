@@ -19,25 +19,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "./bootstrap";
 import { test } from "vitest";
-import { ChunkedStream } from "../src/interfaces/chunked-stream";
-import { toAsyncIterator } from "@notesnook-importer/core/dist/src/utils/stream";
+import { ChunkedStream } from "../src/utils/streams/chunked-stream";
+import { Readable } from "stream";
+import { createReadStream } from "fs";
+import { consumeReadableStream } from "../src/utils/stream";
+import { xxhash64 } from "hash-wasm";
+import path from "path";
 
+const CHUNK_SIZE = 512 * 1024;
 test("chunked stream should create equal sized chunks", async (t) => {
-  const { readable, writable } = new ChunkedStream(512);
-  const lengths: number[] = [];
+  const chunks = await consumeReadableStream(
+    (
+      Readable.toWeb(
+        createReadStream(
+          path.join(__dirname, "..", "__e2e__", "data", "importer-data.zip")
+        )
+      ) as ReadableStream<Uint8Array>
+    ).pipeThrough(new ChunkedStream(CHUNK_SIZE))
+  );
 
-  setTimeout(async () => {
-    for await (const chunk of toAsyncIterator(readable)) {
-      lengths.push(chunk.length);
-    }
-  });
-  const writer = writable.getWriter();
-  await writer.write(Buffer.alloc(411));
-  await writer.write(Buffer.alloc(411));
-  await writer.write(Buffer.alloc(411));
-  await writer.write(Buffer.alloc(815));
-  await writer.write(Buffer.alloc(12));
-  await writer.close();
-
-  t.expect(lengths).toMatchObject([512, 512, 512, 512, 12]);
+  t.expect(await Promise.all(chunks.map((a) => xxhash64(a)))).toMatchObject([
+    "6234b76401d9eb97",
+    "338834da3f6500b2"
+  ]);
 });

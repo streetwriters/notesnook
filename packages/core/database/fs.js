@@ -55,13 +55,13 @@ export default class FileStorage {
     return result;
   }
 
-  async cancel(groupId, type = undefined) {
+  async cancel(groupId, type) {
     const [op] = this._deleteOp(groupId, type);
     if (!op) return;
     await op.cancel("Operation canceled.");
   }
 
-  _deleteOp(groupId, type = undefined) {
+  _deleteOp(groupId, type) {
     const opIndex = this._queue.findIndex(
       (item) => item.groupId === groupId && (!type || item.type === type)
     );

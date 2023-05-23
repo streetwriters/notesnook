@@ -22,6 +22,7 @@ import { Flex, Text, Button, ButtonProps } from "@theme-ui/components";
 import * as Icon from "../icons";
 import ReactModal from "react-modal";
 import { FlexScrollContainer } from "../scroll-container";
+import { SxProp } from "@theme-ui/core";
 
 ReactModal.setAppElement("#root");
 
@@ -32,7 +33,7 @@ type DialogButtonProps = ButtonProps & {
   loading?: boolean;
 };
 
-type DialogProps = {
+type DialogProps = SxProp & {
   isOpen?: boolean;
   onClose?: (
     event?: React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>
@@ -47,6 +48,7 @@ type DialogProps = {
   positiveButton?: DialogButtonProps | null;
   negativeButton?: DialogButtonProps | null;
   footer?: React.Component;
+  noScroll?: boolean;
 };
 
 function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
@@ -94,7 +96,9 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
           position: "relative",
           overflow: "hidden",
           boxShadow: "4px 5px 18px 2px #00000038",
-          borderRadius: "dialog"
+          borderRadius: "dialog",
+
+          ...props.sx
         }}
       >
         {props.showCloseButton && (
@@ -111,34 +115,42 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
             onClick={props.onClose}
           />
         )}
-        <Flex sx={{ flexDirection: "column" }} p={4} pb={0}>
-          <Text
-            variant="heading"
-            sx={{
-              fontSize: "subheading",
-              textAlign: props.textAlignment || "left",
-              color: "text"
-            }}
-          >
-            {props.title}
-          </Text>
-          {props.description && (
-            <Text
-              variant="body"
-              sx={{
-                textAlign: props.textAlignment || "left",
-                color: "fontTertiary"
-              }}
-            >
-              {props.description}
-            </Text>
-          )}
-        </Flex>
-        <Flex variant="columnFill" sx={{ overflowY: "hidden" }} my={1}>
-          <FlexScrollContainer style={{ paddingRight: 20, paddingLeft: 20 }}>
-            {props.children}
-          </FlexScrollContainer>
-        </Flex>
+        {props.title || props.description ? (
+          <Flex sx={{ flexDirection: "column" }} p={4} pb={0}>
+            {props.title && (
+              <Text
+                variant="heading"
+                sx={{
+                  fontSize: "subheading",
+                  textAlign: props.textAlignment || "left",
+                  color: "text"
+                }}
+              >
+                {props.title}
+              </Text>
+            )}
+            {props.description && (
+              <Text
+                variant="body"
+                sx={{
+                  textAlign: props.textAlignment || "left",
+                  color: "fontTertiary"
+                }}
+              >
+                {props.description}
+              </Text>
+            )}
+          </Flex>
+        ) : null}
+        {props.noScroll ? (
+          <>{props.children}</>
+        ) : (
+          <Flex variant="columnFill" sx={{ overflowY: "hidden" }} my={1}>
+            <FlexScrollContainer style={{ paddingRight: 20, paddingLeft: 20 }}>
+              {props.children}
+            </FlexScrollContainer>
+          </Flex>
+        )}
 
         {(props.positiveButton || props.negativeButton) && (
           <Flex
