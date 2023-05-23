@@ -135,7 +135,7 @@ export default class Note {
 
   async duplicate() {
     const content = await this._db.content.raw(this._note.contentId);
-    return await this._db.notes.add({
+    const duplicateId = await this._db.notes.add({
       ...qclone(this._note),
       id: undefined,
       content: content
@@ -153,6 +153,12 @@ export default class Note {
       dateCreated: null,
       dateModified: null
     });
+
+    for (const notebook of this._db.relations.to(this._note, "notebook")) {
+      await this._db.relations.add(notebook, { id: duplicateId, type: "note" });
+    }
+
+    return duplicateId;
   }
 
   async color(color) {
