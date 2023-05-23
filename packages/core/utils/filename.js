@@ -78,3 +78,7 @@ export function isImage(mime) {
 export function isVideo(mime) {
   return mime.startsWith("video/");
 }
+
+export function isAudio(mime) {
+  return mime.startsWith("audio/");
+}
