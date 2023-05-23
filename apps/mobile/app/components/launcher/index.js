@@ -218,7 +218,8 @@ const Launcher = React.memo(
     }, [init, verifyUser]);
 
     useEffect(() => {
-      if (verifying.current) return;
+      if (verifying.current || useUserStore.getState().shouldBlockVerifyUser)
+        return;
       if (verifyUser && appState === "active") {
         verifying.current = true;
         onUnlockBiometrics();

@@ -489,7 +489,8 @@ export const useAppEvents = () => {
         if (
           SettingsService.get().appLockMode === "background" &&
           !useSettingStore.getState().requestBiometrics &&
-          !useUserStore.getState().verifyUser
+          !useUserStore.getState().verifyUser &&
+          !useUserStore.getState().shouldBlockVerifyUser
         ) {
           useUserStore.getState().setVerifyUser(true);
           if (Platform.OS === "ios") {
