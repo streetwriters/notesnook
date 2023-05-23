@@ -30,10 +30,10 @@ import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
 import { db } from "../common/db";
 import { getFileNameWithExtension } from "@notesnook/core/utils/filename";
-import { ChunkedStream, IntoChunks } from "./chunked-stream";
-import { ProgressStream } from "./progress-stream";
-import { consumeReadableStream } from "./stream-utils";
-import { Base64DecoderStream } from "./base64-decoder-stream";
+import { ChunkedStream, IntoChunks } from "../utils/streams/chunked-stream";
+import { ProgressStream } from "../utils/streams/progress-stream";
+import { consumeReadableStream } from "../utils/stream";
+import { Base64DecoderStream } from "../utils/streams/base64-decoder-stream";
 import { toBlob } from "@notesnook-importer/core/dist/src/utils/stream";
 import { Cipher, OutputFormat, SerializedKey } from "@notesnook/crypto";
 import { IDataType } from "hash-wasm/dist/lib/util";
@@ -175,7 +175,7 @@ async function readEncrypted(
                 : new Base64DecoderStream()
             )
         )
-      ).join()
+      ).join("")
     : new Uint8Array(
         Buffer.concat(
           await consumeReadableStream(

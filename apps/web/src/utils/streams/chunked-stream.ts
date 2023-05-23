@@ -27,26 +27,24 @@ export class ChunkedStream extends TransformStream<Uint8Array, Uint8Array> {
       transform(chunk, controller) {
         backBuffer = backBuffer
           ? Buffer.concat(
-              [Buffer.from(backBuffer.buffer), Buffer.from(chunk.buffer)],
+              [Buffer.from(backBuffer), Buffer.from(chunk)],
               backBuffer.length + chunk.length
             )
-          : Buffer.from(chunk.buffer);
+          : Buffer.from(chunk);
 
         if (backBuffer.length >= chunkSize) {
           let remainingBytes = backBuffer.length;
-          while (remainingBytes > chunkSize) {
+          while (remainingBytes >= chunkSize) {
             const start = backBuffer.length - remainingBytes;
             const end = start + chunkSize;
+
             controller.enqueue(backBuffer.subarray(start, end));
             remainingBytes -= chunkSize;
           }
 
           backBuffer =
             remainingBytes > 0
-              ? backBuffer.subarray(
-                  backBuffer.length - remainingBytes,
-                  backBuffer.length
-                )
+              ? backBuffer.subarray(backBuffer.length - remainingBytes)
               : null;
         }
       },

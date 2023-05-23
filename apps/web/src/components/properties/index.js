@@ -32,7 +32,7 @@ import ScrollContainer from "../scroll-container";
 import { formatDate } from "@notesnook/core/utils/date";
 import Vault from "../../common/vault";
 import TimeAgo from "../time-ago";
-import Attachment from "../attachment";
+import { Attachment } from "../attachment";
 import { formatBytes } from "../../utils/filename";
 import { getTotalSize } from "../../common/attachments";
 import Notebook from "../notebook";
@@ -289,14 +289,17 @@ function Properties(props) {
                 getTotalSize(attachments)
               )} occupied`}
             >
-              {attachments.map((attachment, i) => (
-                <Attachment
-                  key={attachment.id}
-                  item={attachment}
-                  index={i}
-                  isCompact
-                />
-              ))}
+              <table style={{ borderSpacing: 0 }}>
+                <tbody>
+                  {attachments.map((attachment, i) => (
+                    <Attachment
+                      key={attachment.id}
+                      compact
+                      attachment={attachment}
+                    />
+                  ))}
+                </tbody>
+              </table>
             </Card>
           )}
           <Card

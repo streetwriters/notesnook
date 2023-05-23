@@ -17,22 +17,37 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { decryptFile } from "../interfaces/fs";
-import { db } from "./db";
-import { ZipFile } from "../utils/zip-stream";
+import { decryptFile } from "../../interfaces/fs";
+import { db } from "../../common/db";
+import { ZipFile } from "./zip-stream";
 
 export const METADATA_FILENAME = "metadata.json";
-
+const GROUP_ID = "all-attachments";
 export class AttachmentStream extends ReadableStream<ZipFile> {
-  constructor(attachments: Array<any>) {
+  constructor(
+    attachments: Array<any>,
+    signal?: AbortSignal,
+    onProgress?: (current: number) => void
+  ) {
+    if (signal)
+      signal.onabort = async () => {
+        await db.fs.cancel(GROUP_ID, "download");
+      };
+
     let index = 0;
     super({
       start() {},
       async pull(controller) {
+        if (signal?.aborted) {
+          controller.close();
+          return;
+        }
+
+        onProgress && onProgress(index);
         const attachment = attachments[index++];
 
         await db.fs.downloadFile(
-          "all-attachments",
+          GROUP_ID,
           attachment.metadata.hash,
           attachment.chunkSize,
           attachment.metadata

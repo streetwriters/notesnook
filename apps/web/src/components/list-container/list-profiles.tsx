@@ -23,7 +23,6 @@ import Notebook from "../notebook";
 import Tag from "../tag";
 import Topic from "../topic";
 import TrashItem from "../trash-item";
-import Attachment from "../attachment";
 import { db } from "../../common/db";
 import { getTotalNotes } from "../../common";
 import Reminder from "../reminder";
@@ -111,10 +110,6 @@ const TrashProfile: ItemWrapper = ({ index, item, type }) => (
   <TrashItem index={index} item={item} date={getDate(item, type)} />
 );
 
-const AttachmentProfile: ItemWrapper = ({ index, item }) => (
-  <Attachment index={index} item={item} isCompact={false} />
-);
-
 export const ListProfiles = {
   home: NotesProfile,
   notebooks: NotebooksProfile,
@@ -122,8 +117,7 @@ export const ListProfiles = {
   reminders: RemindersProfile,
   tags: TagsProfile,
   topics: TopicsProfile,
-  trash: TrashProfile,
-  attachments: AttachmentProfile
+  trash: TrashProfile
 } as const;
 
 function getTags(item: Item) {
@@ -191,8 +185,6 @@ function getReminder(noteId: string) {
 }
 
 function getDate(item: Item, groupType: keyof typeof ListProfiles) {
-  if (groupType === "attachments") return item.dateCreated;
-
   const sortBy = db.settings?.getGroupOptions(groupType).sortBy;
   switch (sortBy) {
     case "dateEdited":

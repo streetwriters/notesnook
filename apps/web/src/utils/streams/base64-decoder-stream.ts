@@ -25,14 +25,17 @@ export class Base64DecoderStream extends TransformStream<Uint8Array, string> {
       transform(chunk, controller) {
         let part = backBuffer
           ? Buffer.concat(
-              [Buffer.from(backBuffer.buffer), Buffer.from(chunk.buffer)],
+              [Buffer.from(backBuffer), Buffer.from(chunk)],
               backBuffer.length + chunk.length
             )
           : Buffer.from(chunk.buffer);
 
         const remaining = part.length % 3;
         if (remaining) {
-          backBuffer = part.subarray(part.length - remaining);
+          backBuffer = new Uint8Array(remaining);
+          for (let i = 0; i < remaining; ++i) {
+            backBuffer[i] = part[part.length - remaining + i];
+          }
           part = part.subarray(0, part.length - remaining);
         } else {
           backBuffer = null;

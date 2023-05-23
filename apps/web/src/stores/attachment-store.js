@@ -24,9 +24,22 @@ import { AppEventManager, AppEvents } from "../common/app-events";
 import { store as editorStore } from "./editor-store";
 import { checkAttachment } from "../common/attachments";
 import { showToast } from "../utils/toast";
+import { register } from "../utils/stream-saver/mitm";
+import { AttachmentStream } from "../utils/streams/attachment-stream";
+import { ZipStream } from "../utils/streams/zip-stream";
+import { createWriteStream } from "../utils/stream-saver";
 
+let abortController = undefined;
 class AttachmentStore extends BaseStore {
   attachments = [];
+  /**
+   * @type {{current: number, total: number}}
+   */
+  status = undefined;
+
+  refresh = () => {
+    this.set((state) => (state.attachments = db.attachments.all));
+  };
 
   init = () => {
     AppEventManager.subscribe(
@@ -51,17 +64,40 @@ class AttachmentStore extends BaseStore {
     this.refresh();
   };
 
-  refresh = () => {
-    this.set((state) => (state.attachments = db.attachments.all));
-  };
-
-  filter = (query) => {
-    if (!query || !query.trim().length) return this.refresh();
+  download = async (attachments) => {
+    if (this.get().status)
+      throw new Error(
+        "Please wait for the previous download to finish or cancel it."
+      );
 
     this.set(
-      (state) =>
-        (state.attachments = db.lookup.attachments(db.attachments.all, query))
+      (state) => (state.status = { current: 0, total: attachments.length })
     );
+
+    await register();
+    abortController = new AbortController();
+    const attachmentStream = new AttachmentStream(
+      attachments,
+      abortController.signal,
+      (current) => {
+        this.set(
+          (state) => (state.status = { current, total: attachments.length })
+        );
+      }
+    );
+    await attachmentStream
+      .pipeThrough(new ZipStream())
+      .pipeTo(createWriteStream("attachments.zip"));
+
+    this.set((state) => (state.status = undefined));
+  };
+
+  cancel = async () => {
+    if (abortController) {
+      await abortController.abort();
+      abortController = undefined;
+      this.set((state) => (state.status = undefined));
+    }
   };
 
   recheck = async (hashes) => {
