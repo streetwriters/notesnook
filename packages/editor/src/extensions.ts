@@ -33,7 +33,7 @@ import "./extensions/ordered-list";
 import "@tiptap/extension-color";
 import "@tiptap/extension-table-row";
 import "./extensions/table-cell";
-import "@tiptap/extension-table-header";
+import "./extensions/table-header";
 import "./extensions/image";
 import "./extensions/attachment";
 import "./extensions/task-list";

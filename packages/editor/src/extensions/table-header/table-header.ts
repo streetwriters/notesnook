@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import TiptapTableCell from "@tiptap/extension-table-cell";
-import { addStyleAttribute } from "./utils";
+import TipTapTableHeader from "@tiptap/extension-table-header";
+import { addStyleAttribute } from "../table-cell/utils";
 
-export const TableCell = TiptapTableCell.extend({
+export const TableHeader = TipTapTableHeader.extend({
   addAttributes() {
     return {
       ...this.parent?.(),

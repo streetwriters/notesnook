@@ -17,18 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import TiptapTableCell from "@tiptap/extension-table-cell";
-import { addStyleAttribute } from "./utils";
+import { Attribute } from "@tiptap/core";
 
-export const TableCell = TiptapTableCell.extend({
-  addAttributes() {
-    return {
-      ...this.parent?.(),
-      backgroundColor: addStyleAttribute("backgroundColor", "background-color"),
-      color: addStyleAttribute("color", "color"),
-      borderWidth: addStyleAttribute("borderWidth", "border-width", "px"),
-      borderStyle: addStyleAttribute("borderStyle", "border-style"),
-      borderColor: addStyleAttribute("borderColor", "border-color")
-    };
-  }
-});
+export function addStyleAttribute(
+  name: keyof CSSStyleDeclaration,
+  cssName: string,
+  unit?: string
+): Partial<Attribute> {
+  return {
+    default: null,
+    parseHTML: (element) =>
+      unit
+        ? element.style[name]?.toString().replace(unit, "")
+        : element.style[name],
+    renderHTML: (attributes) => {
+      if (!attributes[name as string]) {
+        return {};
+      }
+
+      return {
+        style: `${cssName}: ${attributes[name as string]}${unit || ""}`
+      };
+    }
+  };
+}
