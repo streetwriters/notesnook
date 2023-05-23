@@ -83,6 +83,7 @@ function TimeAgo({ datetime, live, locale, opts, sx, ...restProps }) {
       ref={timeRef}
       {...restProps}
       sx={{
+        fontFamily: "body",
         ...sx,
         color: sx?.color || "inherit"
       }}
