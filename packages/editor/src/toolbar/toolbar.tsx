@@ -22,7 +22,11 @@ import { Editor } from "../types";
 import { Flex, FlexProps } from "@theme-ui/components";
 import { ThemeProvider } from "@emotion/react";
 import { EditorFloatingMenus } from "./floating-menus";
-import { getDefaultPresets, STATIC_TOOLBAR_GROUPS } from "./tool-definitions";
+import {
+  getDefaultPresets,
+  STATIC_TOOLBAR_GROUPS,
+  MOBILE_ONLY_TOOLS
+} from "./tool-definitions";
 import { useEffect, useMemo } from "react";
 import {
   ToolbarLocation,
@@ -56,12 +60,14 @@ export function Toolbar(props: ToolbarProps) {
     sx,
     ...flexProps
   } = props;
-  const toolbarTools = useMemo(
-    () => [...STATIC_TOOLBAR_GROUPS, ...tools],
-    [tools]
-  );
-
   const isMobile = useIsMobile();
+  const toolbarTools = useMemo(
+    () =>
+      isMobile
+        ? [...STATIC_TOOLBAR_GROUPS, ...MOBILE_ONLY_TOOLS, ...tools]
+        : [...STATIC_TOOLBAR_GROUPS, ...tools],
+    [tools, isMobile]
+  );
 
   const setToolbarLocation = useToolbarStore(
     (store) => store.setToolbarLocation

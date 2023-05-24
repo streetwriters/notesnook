@@ -351,6 +351,7 @@ export function getDefaultPresets() {
   return defaultPresets;
 }
 
+export const MOBILE_ONLY_TOOLS: ToolbarDefinition = [["previewAttachment"]];
 export const STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
   [
     "insertBlock",
@@ -358,7 +359,6 @@ export const STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
     "cellProperties",
     "imageSettings",
     "embedSettings",
-    "previewAttachment",
     "attachmentSettings",
     "linkSettings",
     "codeRemove",

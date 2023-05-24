@@ -87,7 +87,11 @@ export function AttachmentComponent(
           {selected && (
             <ToolbarGroup
               editor={editor}
-              tools={["removeAttachment", "downloadAttachment"]}
+              tools={[
+                "removeAttachment",
+                "downloadAttachment",
+                "previewAttachment"
+              ]}
               sx={{
                 boxShadow: "menu",
                 borderRadius: "default",
