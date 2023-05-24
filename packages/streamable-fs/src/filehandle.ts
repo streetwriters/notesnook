@@ -92,4 +92,14 @@ export default class FileHandle {
     }
     return new Blob(blobParts, { type: this.file.type });
   }
+
+  async size() {
+    let size = 0;
+    for (let i = 0; i < this.file.chunks; ++i) {
+      const array = await this.readChunk(i);
+      if (!array) continue;
+      size += array.length;
+    }
+    return size;
+  }
 }
