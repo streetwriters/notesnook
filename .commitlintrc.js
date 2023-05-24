@@ -20,6 +20,7 @@ const SCOPES = [
   "logger",
   "theme",
   "core",
+  "fs",
   "clipper",
   "config",
   "ci",
