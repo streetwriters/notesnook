@@ -25,7 +25,7 @@ import {
   PropsWithChildren
 } from "react";
 import ReactDOM from "react-dom";
-import { Box, Button, Flex, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Progress, Text } from "@theme-ui/components";
 import Properties from "../properties";
 import { useStore, store as editorstore } from "../../stores/editor-store";
 import {
@@ -41,7 +41,10 @@ import Header from "./header";
 import { Attachment } from "../icons";
 import { useEditorInstance } from "./context";
 import { attachFile, AttachmentProgress, insertAttachment } from "./picker";
-import { downloadAttachment } from "../../common/attachments";
+import {
+  downloadAttachment,
+  downloadAttachmentForPreview
+} from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core/common";
 import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
@@ -52,12 +55,18 @@ import { AnimatedFlex } from "../animated";
 import { EditorLoader } from "../loaders/editor-loader";
 import { Lightbox } from "../lightbox";
 import ThemeProviderWrapper from "../theme-provider";
-import { Document, Page } from "react-pdf";
+import { Allotment } from "allotment";
+import { PdfPreview } from "../pdf-preview";
 
 type PreviewSession = {
   content: { data: string; type: string };
   dateCreated: number;
   dateEdited: number;
+};
+
+type DocumentPreview = {
+  url?: string;
+  hash: string;
 };
 
 function onEditorChange(noteId: string, sessionId: string, content: string) {
@@ -83,7 +92,9 @@ export default function EditorManager({
   // stored in refs. Update this value to trigger an
   // update.
   const [timestamp, setTimestamp] = useState<number>(0);
+
   const lastSavedTime = useRef<number>(0);
+  const [docPreview, setDocPreview] = useState<DocumentPreview>();
 
   const previewSession = useRef<PreviewSession>();
   const [dropRef, overlayRef] = useDragOverlay();
@@ -104,7 +115,7 @@ export default function EditorManager({
       async (item?: Record<string, string | number>) => {
         if (
           !item ||
-          lastSavedTime.current >= item.dateEdited ||
+          lastSavedTime.current >= (item.dateEdited as number) ||
           isPreviewSession ||
           !appstore.get().isRealtimeSyncEnabled
         )
@@ -190,47 +201,125 @@ export default function EditorManager({
   }, [noteId]);
 
   return (
+    <Allotment
+      proportionalLayout={true}
+      onDragEnd={(sizes) => {
+        Config.set("editor:panesize", sizes[1]);
+      }}
+    >
+      <Allotment.Pane className="editor-pane">
+        <Flex
+          ref={dropRef}
+          id="editorContainer"
+          sx={{
+            position: "relative",
+            alignSelf: "stretch",
+            overflow: "hidden",
+            flex: 1,
+            flexDirection: "column"
+          }}
+        >
+          {previewSession.current && (
+            <PreviewModeNotice
+              {...previewSession.current}
+              onDiscard={() => openSession(noteId)}
+            />
+          )}
+          <Editor
+            nonce={timestamp}
+            content={
+              previewSession.current?.content?.data ||
+              editorstore.get().session?.content?.data
+            }
+            onPreviewDocument={(url) => setDocPreview(url)}
+            onContentChange={() => (lastSavedTime.current = Date.now())}
+            options={{
+              readonly: isReadonly || isPreviewSession,
+              onRequestFocus: () => toggleProperties(false),
+              onLoadMedia: loadMedia,
+              focusMode: isFocusMode,
+              isMobile: isMobile || isTablet
+            }}
+          />
+
+          {arePropertiesVisible && (
+            <Properties
+              onOpenPreviewSession={async (session: PreviewSession) => {
+                previewSession.current = session;
+                setTimestamp(Date.now());
+              }}
+            />
+          )}
+          <DropZone overlayRef={overlayRef} />
+        </Flex>
+      </Allotment.Pane>
+      {docPreview && (
+        <Allotment.Pane
+          minSize={450}
+          preferredSize={Config.get("editor:panesize", 500)}
+        >
+          {docPreview.url ? (
+            <Flex
+              id="editorSidebar"
+              sx={{
+                flexDirection: "column",
+                overflow: "hidden",
+                borderLeft: "1px solid var(--border)",
+                height: "100%"
+              }}
+            >
+              <PdfPreview
+                fileUrl={docPreview.url}
+                hash={docPreview.hash}
+                onClose={() => setDocPreview(undefined)}
+              />
+            </Flex>
+          ) : (
+            <DownloadAttachmentProgress hash={docPreview.hash} />
+          )}
+        </Allotment.Pane>
+      )}
+    </Allotment>
+  );
+}
+
+type DownloadAttachmentProgressProps = {
+  hash: string;
+};
+function DownloadAttachmentProgress(props: DownloadAttachmentProgressProps) {
+  const { hash } = props;
+
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const event = AppEventManager.subscribe(
+      AppEvents.UPDATE_ATTACHMENT_PROGRESS,
+      (progress: AttachmentProgress) => {
+        if (progress.hash === hash) {
+          setProgress(Math.round((progress.loaded / progress.total) * 100));
+        }
+      }
+    );
+
+    return () => {
+      event.unsubscribe();
+    };
+  }, [hash]);
+
+  return (
     <Flex
-      ref={dropRef}
-      id="editorContainer"
       sx={{
-        position: "relative",
-        alignSelf: "stretch",
-        overflow: "hidden",
-        flex: 1,
+        height: "100%",
+        alignItems: "center",
+        justifyContent: "center",
         flexDirection: "column"
       }}
     >
-      {previewSession.current && (
-        <PreviewModeNotice
-          {...previewSession.current}
-          onDiscard={() => openSession(noteId)}
-        />
-      )}
-      <Editor
-        nonce={timestamp}
-        content={
-          previewSession.current?.content?.data ||
-          editorstore.get().session?.content?.data
-        }
-        onContentChange={() => (lastSavedTime.current = Date.now())}
-        options={{
-          readonly: isReadonly || isPreviewSession,
-          onRequestFocus: () => toggleProperties(false),
-          onLoadMedia: loadMedia,
-          focusMode: isFocusMode,
-          isMobile: isMobile || isTablet
-        }}
+      <Text variant="title">Downloading attachment ({progress}%)</Text>
+      <Progress
+        value={progress}
+        max={100}
+        sx={{ width: ["90%", "35%"], mt: 1 }}
       />
-      {arePropertiesVisible && (
-        <Properties
-          onOpenPreviewSession={async (session: PreviewSession) => {
-            previewSession.current = session;
-            setTimestamp(Date.now());
-          }}
-        />
-      )}
-      <DropZone overlayRef={overlayRef} />
     </Flex>
   );
 }
@@ -248,9 +337,10 @@ type EditorProps = {
   nonce?: number;
   options?: EditorOptions;
   onContentChange?: () => void;
+  onPreviewDocument?: (preview: DocumentPreview) => void;
 };
 export function Editor(props: EditorProps) {
-  const { content, nonce, options, onContentChange } = props;
+  const { content, nonce, options, onContentChange, onPreviewDocument } = props;
   const { readonly, headless, onLoadMedia, isMobile } = options || {
     headless: false,
     readonly: false,
@@ -321,7 +411,7 @@ export function Editor(props: EditorProps) {
         onDownloadAttachment={(attachment) =>
           downloadAttachment(attachment.hash)
         }
-        onPreviewAttachment={({ hash, dataurl }) => {
+        onPreviewAttachment={async ({ hash, dataurl }) => {
           const attachment = db.attachments?.attachment(hash);
           if (attachment && attachment.metadata.type.startsWith("image/")) {
             const container = document.getElementById("dialogContainer");
@@ -337,6 +427,11 @@ export function Editor(props: EditorProps) {
               </ThemeProviderWrapper>,
               container
             );
+          } else if (attachment && onPreviewDocument) {
+            onPreviewDocument({ hash });
+            const blob = await downloadAttachmentForPreview(hash);
+            if (!blob) return;
+            onPreviewDocument({ url: URL.createObjectURL(blob), hash });
           }
         }}
         onInsertAttachment={(type) => {
@@ -391,67 +486,45 @@ function EditorChrome(
       ) : null}
 
       <Toolbar />
-      <Flex sx={{ justifyContent: "center", overflow: "hidden", flex: 1 }}>
-        <FlexScrollContainer
-          className="editorScroll"
-          style={{ display: "flex", flexDirection: "column", flex: 1 }}
-        >
-          <Flex
-            variant="columnFill"
-            className="editor"
-            sx={{
-              alignSelf: [
-                "stretch",
-                focusMode ? "center" : "stretch",
-                "center"
-              ],
-              maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
-              width: "100%"
-            }}
-            px={6}
-            onClick={onRequestFocus}
-          >
-            {!isMobile && (
-              <Box
-                id="editorToolbar"
-                sx={{
-                  display: readonly ? "none" : "flex",
-                  bg: "background",
-                  position: "sticky",
-                  top: 0,
-                  mb: 1,
-                  zIndex: 2
-                }}
-              />
-            )}
-            <Titlebox readonly={readonly || false} />
-            <Header readonly={readonly} />
-            <AnimatedFlex
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isLoading ? 0 : 1 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-            >
-              {children}
-            </AnimatedFlex>
-          </Flex>
-        </FlexScrollContainer>
+      <FlexScrollContainer
+        className="editorScroll"
+        style={{ display: "flex", flexDirection: "column", flex: 1 }}
+      >
         <Flex
-          id="editorSidebar"
+          variant="columnFill"
+          className="editor"
           sx={{
-            flexDirection: "column",
-            overflow: "hidden",
-            borderLeft: "1px solid var(--border)"
+            alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
+            maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
+            width: "100%"
           }}
+          px={6}
+          onClick={onRequestFocus}
         >
-          <Document
-            file="/sample.pdf"
-            onLoadSuccess={() => {}}
-            onLoadError={console.error}
+          {!isMobile && (
+            <Box
+              id="editorToolbar"
+              sx={{
+                display: readonly ? "none" : "flex",
+                bg: "background",
+                position: "sticky",
+                top: 0,
+                mb: 1,
+                zIndex: 2
+              }}
+            />
+          )}
+          <Titlebox readonly={readonly || false} />
+          <Header readonly={readonly} />
+          <AnimatedFlex
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isLoading ? 0 : 1 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            <Page pageNumber={1} />
-          </Document>
+            {children}
+          </AnimatedFlex>
         </Flex>
-      </Flex>
+      </FlexScrollContainer>
       {isMobile && (
         <Box
           id="editorToolbar"

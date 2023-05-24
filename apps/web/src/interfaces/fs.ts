@@ -337,7 +337,9 @@ function reportProgress(
 
 async function downloadFile(filename: string, requestOptions: RequestOptions) {
   const { url, headers, chunkSize, signal } = requestOptions;
-  if (await streamablefs.exists(filename)) return true;
+  const handle = await streamablefs.readFile(filename);
+  if (handle && handle.file.size === (await handle.size())) return true;
+  else if (handle) await handle.delete();
 
   try {
     reportProgress(

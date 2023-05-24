@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { db } from "../common/db";
-import { showPasswordDialog } from "../common/dialog-controller";
+import { db } from "./db";
+import { showPasswordDialog } from "./dialog-controller";
 import { showToast } from "../utils/toast";
 
 class Vault {

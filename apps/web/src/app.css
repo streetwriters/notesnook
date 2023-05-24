@@ -95,6 +95,8 @@
       format("truetype");
 }
 
+.rpv-core__text-layer,
+.rpv-core__text-layer *,
 .selectable,
 .selectable *,
 input,
