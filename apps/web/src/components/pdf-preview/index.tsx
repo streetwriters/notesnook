@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Worker, Viewer, PasswordStatus } from "@react-pdf-viewer/core";
-import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { ToolbarSlot, toolbarPlugin } from "@react-pdf-viewer/toolbar";
 import { Button, Flex, Text } from "@theme-ui/components";
