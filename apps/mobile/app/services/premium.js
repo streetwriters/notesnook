@@ -98,6 +98,7 @@ async function getProducts() {
 }
 
 function get() {
+  return false;
   if (__DEV__ || Config.isTesting === "true") return true;
 
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
@@ -154,9 +155,11 @@ const onUserStatusCheck = async (type) => {
         };
         break;
       case CHECK_IDS.notebookAdd:
-        setTimeout(() => {
-          eSendEvent(eOpenPremiumDialog);
-        }, 500);
+        message = {
+          context: "sheet",
+          title: "Get Notesnook Pro",
+          desc: "With Notesnook Pro you can create unlimited notebooks and do so much more! Get it now."
+        };
         break;
       case CHECK_IDS.vaultAdd:
         message = {
