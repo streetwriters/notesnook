@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
-import { AppEventManager, AppEvents } from "../common/app-events";
 import { store as editorStore } from "./editor-store";
 import { checkAttachment } from "../common/attachments";
 import { showToast } from "../utils/toast";
@@ -42,25 +41,6 @@ class AttachmentStore extends BaseStore {
   };
 
   init = () => {
-    AppEventManager.subscribe(
-      AppEvents.UPDATE_ATTACHMENT_PROGRESS,
-      ({ hash, type, total, loaded }) => {
-        this.set((state) => {
-          const index = state.attachments.findIndex(
-            (a) => a.metadata.hash === hash
-          );
-          if (index <= -1) return;
-          const percent = Math.round((loaded / total) * 100);
-          const status =
-            percent < 100 ? { type, loaded, total, progress: percent } : null;
-          if (!status) this.refresh();
-          state.attachments[index] = {
-            ...state.attachments[index],
-            status
-          };
-        });
-      }
-    );
     this.refresh();
   };
 

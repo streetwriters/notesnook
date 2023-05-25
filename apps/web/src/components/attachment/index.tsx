@@ -56,6 +56,8 @@ import {
   WebClipMimeType,
   PDFMimeType
 } from "@notesnook/core/utils/filename";
+import { useEffect, useState } from "react";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 const FILE_ICONS: Record<string, Icon> = {
   "image/": FileImage,
@@ -75,6 +77,12 @@ function getFileIcon(type: string) {
   return FileGeneral;
 }
 
+type AttachmentProgressStatus = {
+  type: "download" | "upload";
+  loaded: number;
+  total: number;
+};
+
 type AttachmentProps = {
   attachment: any;
   isSelected?: boolean;
@@ -87,6 +95,31 @@ export function Attachment({
   onSelected,
   compact
 }: AttachmentProps) {
+  const [status, setStatus] = useState<AttachmentProgressStatus>();
+
+  useEffect(() => {
+    const event = AppEventManager.subscribe(
+      AppEvents.UPDATE_ATTACHMENT_PROGRESS,
+      (progress: any) => {
+        if (progress.hash === attachment.metadata.hash) {
+          const percent = Math.round((progress.loaded / progress.total) * 100);
+          setStatus(
+            percent < 100
+              ? {
+                  type: progress.type,
+                  loaded: progress.loaded,
+                  total: progress.total
+                }
+              : undefined
+          );
+        }
+      }
+    );
+    return () => {
+      event.unsubscribe();
+    };
+  }, [attachment.metadata.hash]);
+
   const Icon = getFileIcon(attachment.metadata.type);
   return (
     <Box
@@ -95,9 +128,11 @@ export function Attachment({
       onContextMenu={(e) => {
         e.preventDefault();
         Menu.openMenu(AttachmentMenuItems, {
-          attachment
+          attachment,
+          status
         });
       }}
+      onClick={onSelected}
     >
       {!compact && (
         <td>
@@ -111,12 +146,17 @@ export function Attachment({
         </td>
       )}
       <td>
-        <Flex sx={{ alignItems: "center" }}>
-          {attachment.status ? (
-            attachment.status.type === "download" ? (
-              <Download size={16} />
+        <Flex
+          sx={{
+            alignItems: "center",
+            maxWidth: compact ? 180 : "95%"
+          }}
+        >
+          {status ? (
+            status.type === "download" ? (
+              <Download size={16} color="primary" />
             ) : (
-              <Uploading size={16} />
+              <Uploading size={16} color="primary" />
             )
           ) : attachment.failed ? (
             <AttachmentError
@@ -134,7 +174,6 @@ export function Attachment({
             sx={{
               ml: 1,
               whiteSpace: "nowrap",
-              maxWidth: compact ? 180 : "80%",
               overflow: "hidden",
               textOverflow: "ellipsis"
             }}
@@ -162,11 +201,10 @@ export function Attachment({
           />
         )}
       </Text>
-      <Text as="td" variant="body">
-        {attachment.status ? (
+      <Text as="td" variant="body" sx={{ color: status ? "primary" : "text" }}>
+        {status ? (
           <>
-            {formatBytes(attachment.status.loaded, 1)}/
-            {formatBytes(attachment.status.total, 1)}
+            {formatBytes(status.loaded, 1)}/{formatBytes(status.total, 1)}
           </>
         ) : (
           formatBytes(attachment.length, compact ? 1 : 2)
@@ -188,6 +226,7 @@ export function Attachment({
 
 type MenuActionParams = {
   attachment: any;
+  status: AttachmentProgressStatus;
 };
 
 type MenuItemValue<T> = T | ((options: MenuActionParams) => T);
@@ -255,13 +294,13 @@ const AttachmentMenuItems: MenuItem[] = [
   },
   {
     key: "download",
-    title: ({ attachment }) =>
-      attachment.status?.type === "download" ? "Cancel download" : "Download",
+    title: ({ status }) =>
+      status?.type === "download" ? "Cancel download" : "Download",
     icon: Download,
     disabled: ({ attachment }) =>
       !attachment.dateUploaded ? "This attachment is not uploaded yet." : false,
-    onClick: async ({ attachment }) => {
-      const isDownloading = attachment.status?.type === "download";
+    onClick: async ({ attachment, status }) => {
+      const isDownloading = status?.type === "download";
       if (isDownloading) {
         await db.fs.cancel(attachment.metadata.hash, "download");
       } else await downloadAttachment(attachment.metadata.hash);
@@ -269,11 +308,11 @@ const AttachmentMenuItems: MenuItem[] = [
   },
   {
     key: "reupload",
-    title: ({ attachment }) =>
-      attachment.status?.type === "upload" ? "Cancel upload" : "Reupload",
+    title: ({ status }) =>
+      status?.type === "upload" ? "Cancel upload" : "Reupload",
     icon: Reupload,
-    onClick: async ({ attachment }) => {
-      const isDownloading = attachment.status?.type === "upload";
+    onClick: async ({ attachment, status }) => {
+      const isDownloading = status?.type === "upload";
       if (isDownloading) {
         await db.fs.cancel(attachment.metadata.hash, "upload");
       } else
