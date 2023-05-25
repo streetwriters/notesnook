@@ -157,7 +157,7 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
             width={null}
             animated={true}
             useNativeDriver
-            progress={progress.value ? progress.value / 100 : 0}
+            progress={progress.value ? progress.value / attachments.length : 0}
             unfilledColor={colors.nav}
             color={colors.accent}
             borderWidth={0}
