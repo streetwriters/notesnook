@@ -84,6 +84,11 @@ class EditorStore extends BaseStore {
     });
   };
 
+  async refresh() {
+    const sessionId = this.get().session.id;
+    if (sessionId && !db.notes.note(sessionId)) await this.clearSession();
+  }
+
   updateSession = async (item) => {
     this.set((state) => {
       state.session.title = item.title;

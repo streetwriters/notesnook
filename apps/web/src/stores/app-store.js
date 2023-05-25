@@ -151,6 +151,7 @@ class AppStore extends BaseStore {
     tagStore.refresh();
     attachmentStore.refresh();
     monographStore.refresh();
+    await editorstore.refresh();
     this.refreshNavItems();
 
     logger.measure("refreshing app");
