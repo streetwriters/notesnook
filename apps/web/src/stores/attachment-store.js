@@ -67,7 +67,9 @@ class AttachmentStore extends BaseStore {
     );
     await attachmentStream
       .pipeThrough(new ZipStream())
-      .pipeTo(createWriteStream("attachments.zip"));
+      .pipeTo(
+        createWriteStream("attachments.zip", { signal: abortController.signal })
+      );
 
     this.set((state) => (state.status = undefined));
   };

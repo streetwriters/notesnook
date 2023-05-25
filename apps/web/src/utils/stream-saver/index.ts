@@ -38,6 +38,7 @@ function makeIframe(src: string, doc = true) {
   if (doc) iframe.srcdoc = src;
   else iframe.src = src;
   document.body.appendChild(iframe);
+  return iframe;
 }
 
 try {
@@ -72,12 +73,14 @@ export function createWriteStream(
   opts: {
     size?: number;
     pathname?: string;
+    signal?: AbortSignal;
   } = {}
 ): WritableStream<Uint8Array> {
   // let bytesWritten = 0; // by StreamSaver.js (not the service worker)
   let downloadUrl: string | null = null;
   let channel: MessageChannel | null = null;
-  let ts = null;
+  let ts: TransformStream | null = null;
+  let frame: HTMLIFrameElement | null = null;
   if (!useBlobFallback) {
     channel = new MessageChannel();
 
@@ -106,14 +109,18 @@ export function createWriteStream(
     if (supportsTransferable) {
       ts = new TransformStream();
       const readableStream = ts.readable;
-
+      if (opts.signal) {
+        opts.signal.addEventListener("abort", () => frame?.remove(), {
+          once: true
+        });
+      }
       channel.port1.postMessage({ readableStream }, [readableStream]);
     }
     channel.port1.onmessage = async (evt) => {
       // Service worker sent us a link that we should open.
       if (evt.data.download) {
         // We never remove this iframes because it can interrupt saving
-        makeIframe(evt.data.download, false);
+        frame = makeIframe(evt.data.download, false);
       } else if (evt.data.abort) {
         chunks = [];
         if (channel) {
