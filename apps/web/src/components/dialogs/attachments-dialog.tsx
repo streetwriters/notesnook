@@ -169,7 +169,7 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
             pt: 2,
             overflowY: "hidden",
             overflow: "hidden",
-            table: { width: "100%" },
+            table: { width: "100%", tableLayout: "fixed" },
             "tbody::before": {
               content: `''`,
               display: "block",
@@ -220,6 +220,7 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
                 return (
                   <Attachment
                     {...props}
+                    key={attachment.id}
                     attachment={attachment}
                     isSelected={selected.indexOf(attachment.id) > -1}
                     onSelected={() => {
@@ -272,10 +273,10 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
                   </Label>
                 </Text>
                 {[
-                  { id: "name", title: "Name" },
-                  { id: "status" },
-                  { id: "size", title: "Size" },
-                  { id: "dateUploaded", title: "Date uploaded" }
+                  { id: "name", title: "Name", width: "65%" },
+                  { id: "status", width: "24px" },
+                  { id: "size", title: "Size", width: "15%" },
+                  { id: "dateUploaded", title: "Date uploaded", width: "20%" }
                 ].map((column) =>
                   !column.title ? (
                     <th key={column.id} />
@@ -284,7 +285,7 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
                       as="th"
                       key={column.id}
                       sx={{
-                        width: "auto",
+                        width: column.width,
                         cursor: "pointer",
                         px: 1,
                         mb: 2,
