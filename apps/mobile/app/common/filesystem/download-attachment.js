@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Sodium from "@ammarahmed/react-native-sodium";
 import {
   getFileNameWithExtension,
-  isImage
+  isImage,
+  isDocument
 } from "@notesnook/core/utils/filename";
 import React from "react";
 import { Platform } from "react-native";
@@ -245,7 +246,11 @@ export default async function downloadAttachment(
       });
     }
 
-    if (attachment.dateUploaded && !isImage(attachment.metadata?.type)) {
+    if (
+      attachment.dateUploaded &&
+      !isImage(attachment.metadata?.type) &&
+      !isDocument(attachment.metadata?.type)
+    ) {
       RNFetchBlob.fs
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
         .catch(console.log);
