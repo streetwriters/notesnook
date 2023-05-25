@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/editor",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "GPL-3.0-or-later",
