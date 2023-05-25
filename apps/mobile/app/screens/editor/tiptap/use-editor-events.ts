@@ -349,7 +349,7 @@ export const useEditorEvents = (
             });
             return;
           }
-          ManageTagsSheet.present(editor.note.current);
+          ManageTagsSheet.present([editor.note.current]);
           break;
         case EventTypes.tag:
           if (editorMessage.value) {

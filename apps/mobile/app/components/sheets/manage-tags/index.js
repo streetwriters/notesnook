@@ -31,9 +31,10 @@ import Input from "../../ui/input";
 import { PressableButton } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { IconButton } from "../../ui/icon-button";
 const ManageTagsSheet = (props) => {
   const colors = useThemeStore((state) => state.colors);
-  const [note, setNote] = useState(props.note);
+  const [notes, setNotes] = useState(props.notes || []);
   const allTags = useTagStore((state) => state.tags);
   const [tags, setTags] = useState([]);
   const [query, setQuery] = useState(null);
@@ -42,7 +43,7 @@ const ManageTagsSheet = (props) => {
 
   useEffect(() => {
     sortTags();
-  }, [allTags, note, query, sortTags]);
+  }, [allTags, notes, query, sortTags]);
 
   const sortTags = useCallback(() => {
     let _tags = [...allTags];
@@ -51,13 +52,14 @@ const ManageTagsSheet = (props) => {
     if (query) {
       _tags = _tags.filter((t) => t.title.startsWith(query));
     }
+    const tagsMerged = [...notes.map((note) => note.tags || []).flat()];
 
-    if (!note || !note.tags) {
+    if (!tagsMerged || !tagsMerged.length) {
       setTags(_tags);
       return;
     }
     let noteTags = [];
-    for (let tag of note.tags) {
+    for (let tag of tagsMerged) {
       let index = _tags.findIndex((t) => t.title === tag);
       if (index !== -1) {
         noteTags.push(_tags[index]);
@@ -67,7 +69,7 @@ const ManageTagsSheet = (props) => {
     noteTags = noteTags.sort((a, b) => a.title.localeCompare(b.title));
     let combinedTags = [...noteTags, ..._tags];
     setTags(combinedTags);
-  }, [allTags, note, query]);
+  }, [allTags, notes, query]);
 
   useEffect(() => {
     useTagStore.getState().setTags();
@@ -85,15 +87,23 @@ const ManageTagsSheet = (props) => {
     }
 
     let tag = _query;
-    setNote({ ...note, tags: note.tags ? [...note.tags, tag] : [tag] });
+    setNotes(
+      notes.map((note) => ({
+        ...note,
+        tags: note.tags ? [...note.tags, tag] : [tag]
+      }))
+    );
+
     setQuery(null);
     inputRef.current?.setNativeProps({
       text: ""
     });
     try {
-      await db.notes.note(note.id).tag(tag);
+      for (let note of notes) {
+        await db.notes.note(note.id).tag(tag);
+      }
       useTagStore.getState().setTags();
-      setNote(db.notes.note(note.id).data);
+      setNotes(notes.map((note) => db.notes.note(note.id).data));
     } catch (e) {
       ToastEvent.show({
         heading: "Cannot add tag",
@@ -180,41 +190,52 @@ const ManageTagsSheet = (props) => {
         ) : null}
 
         {tags.map((item) => (
-          <TagItem key={item.title} tag={item} note={note} setNote={setNote} />
+          <TagItem
+            key={item.title}
+            tag={item}
+            notes={notes}
+            setNotes={setNotes}
+          />
         ))}
       </ScrollView>
     </View>
   );
 };
 
-ManageTagsSheet.present = (note) => {
+ManageTagsSheet.present = (notes) => {
   presentSheet({
     component: (ref) => {
-      return <ManageTagsSheet actionSheetRef={ref} note={note} />;
+      return <ManageTagsSheet actionSheetRef={ref} notes={notes} />;
     }
   });
 };
 
 export default ManageTagsSheet;
 
-const TagItem = ({ tag, note, setNote }) => {
+const TagItem = ({ tag, notes, setNotes }) => {
   const colors = useThemeStore((state) => state.colors);
-
+  const someNotesTagged = notes.some(
+    (note) => note.tags?.indexOf(tag.title) !== -1
+  );
+  const allNotesTagged = notes.every(
+    (note) => note.tags?.indexOf(tag.title) !== -1
+  );
   const onPress = async () => {
-    let prevNote = { ...note };
-    try {
-      if (prevNote.tags.indexOf(tag.title) !== -1) {
-        await db.notes
-          .note(note.id)
-          .untag(prevNote.tags[prevNote.tags.indexOf(tag.title)]);
-      } else {
-        await db.notes.note(note.id).tag(tag.title);
+    for (let note of notes) {
+      try {
+        if (someNotesTagged) {
+          await db.notes
+            .note(note.id)
+            .untag(note.tags[note.tags.indexOf(tag.title)]);
+        } else {
+          await db.notes.note(note.id).tag(tag.title);
+        }
+      } catch (e) {
+        console.error(e);
       }
-      useTagStore.getState().setTags();
-      setNote(db.notes.note(note.id).data);
-    } catch (e) {
-      console.error(e);
     }
+    useTagStore.getState().setTags();
+    setNotes(notes.map((note) => db.notes.note(note.id).data));
     setTimeout(() => {
       Navigation.queueRoutesForUpdate();
     }, 1);
@@ -225,39 +246,36 @@ const TagItem = ({ tag, note, setNote }) => {
       customStyle={{
         flexDirection: "row",
         marginVertical: 5,
-        justifyContent: "space-between",
-        padding: 12
+        justifyContent: "flex-start",
+        height: 40
       }}
       onPress={onPress}
-      type={
-        note && note.tags.findIndex((t) => t === tag.title) !== -1
-          ? "shade"
-          : "grayBg"
-      }
+      type="gray"
     >
-      <Heading
-        size={SIZE.sm}
-        color={
-          note && note?.tags.findIndex((t) => t === tag.title) !== -1
-            ? colors.accent
-            : colors.pri
+      <IconButton
+        size={22}
+        customStyle={{
+          marginRight: 5,
+          width: 23,
+          height: 23
+        }}
+        color={someNotesTagged || allNotesTagged ? colors.accent : colors.icon}
+        testID={
+          allNotesTagged
+            ? "check-circle-outline"
+            : someNotesTagged
+            ? "minus-circle-outline"
+            : "checkbox-blank-circle-outline"
         }
-      >
-        {"#" + tag.title}
-      </Heading>
-      <Icon
         name={
-          note && note?.tags.findIndex((t) => t === tag.title) !== -1
-            ? "minus"
-            : "plus"
+          allNotesTagged
+            ? "check-circle-outline"
+            : someNotesTagged
+            ? "minus-circle-outline"
+            : "checkbox-blank-circle-outline"
         }
-        color={
-          note && note?.tags.findIndex((t) => t === tag.title) !== -1
-            ? colors.accent
-            : colors.accent
-        }
-        size={SIZE.lg}
       />
+      <Paragraph size={SIZE.sm}>{"#" + tag.title}</Paragraph>
     </PressableButton>
   );
 };

@@ -36,6 +36,7 @@ import MoveNoteSheet from "../sheets/add-to";
 import ExportNotesSheet from "../sheets/export-notes";
 import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
+import ManageTagsSheet from "../sheets/manage-tags";
 
 export const SelectionHeader = React.memo(() => {
   const colors = useThemeStore((state) => state.colors);
@@ -211,6 +212,20 @@ export const SelectionHeader = React.memo(() => {
           <>
             <IconButton
               onPress={async () => {
+                await sleep(100);
+                ManageTagsSheet.present(selectedItemsList);
+              }}
+              customStyle={{
+                marginLeft: 10
+              }}
+              color={colors.pri}
+              tooltipText="Manage tags"
+              tooltipPosition={4}
+              name="pound"
+              size={SIZE.xl}
+            />
+            <IconButton
+              onPress={async () => {
                 //setSelectionMode(false);
                 await sleep(100);
                 MoveNoteSheet.present();
@@ -224,6 +239,7 @@ export const SelectionHeader = React.memo(() => {
               name="plus"
               size={SIZE.xl}
             />
+
             <IconButton
               onPress={async () => {
                 ExportNotesSheet.present(selectedItemsList);
