@@ -98,7 +98,6 @@ async function getProducts() {
 }
 
 function get() {
-  return false;
   if (__DEV__ || Config.isTesting === "true") return true;
 
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
