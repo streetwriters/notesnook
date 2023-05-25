@@ -43,9 +43,25 @@ import { IconButton } from "../../ui/icon-button";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import { sleep } from "../../../utils/time";
+import { MMKV } from "../../../common/database/mmkv";
 
 const WIN_WIDTH = Dimensions.get("window").width;
 const WIN_HEIGHT = Dimensions.get("window").height;
+
+const attachmentSnapshotsKey = "___attachmentsnapshots";
+const usePDFSnapshot = (attachment) => {
+  const snapshots = useRef(MMKV.getMap(attachmentSnapshotsKey) || {});
+  const snapshot = useRef(snapshots[attachment?.id]);
+
+  function saveSnapshot(ss) {
+    if (!attachment) return;
+    snapshots.current[attachment.id] = ss;
+    MMKV.setMap(attachmentSnapshotsKey, snapshots.current);
+    snapshot.current = snapshots.current[attachment.id];
+  }
+
+  return [snapshot, saveSnapshot];
+};
 
 const PDFPreview = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -61,6 +77,8 @@ const PDFPreview = () => {
   const [attachment, setAttachment] = useState(null);
   const [password, setPassword] = useState("");
   const [progress] = useAttachmentProgress(attachment);
+  const [snapshot, saveSnapshot] = usePDFSnapshot(attachment);
+  const snapshotValue = useRef(snapshot.current);
 
   useEffect(() => {
     eSubscribeEvent("PDFPreview", open);
@@ -96,6 +114,7 @@ const PDFPreview = () => {
         cache: true
       });
       const path = `${cacheDir}/${uri}`;
+      snapshotValue.current = snapshot.current;
       setPDFSource("file://" + path);
       setLoading(false);
     }, 100);
@@ -267,7 +286,19 @@ const PDFPreview = () => {
                       inputRef.current?.setNativeProps({
                         text: page + ""
                       });
+                      saveSnapshot({
+                        currentPage: page,
+                        scale: snapshot?.current?.scale
+                      });
                     }}
+                    // scale={snapshotValue.current?.scale}
+                    // onScaleChanged={(scale) => {
+                    //   saveSnapshot({
+                    //     currentPage: snapshot?.current?.currentPage,
+                    //     scale: scale
+                    //   });
+                    // }}
+                    page={snapshotValue?.current?.currentPage}
                     password={password}
                     maxScale={6}
                     onError={onError}
