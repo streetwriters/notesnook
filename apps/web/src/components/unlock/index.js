@@ -102,12 +102,16 @@ function Unlock(props) {
         </Text>
       </Flex>
       <Text
-        variant="subheading"
+        variant="body"
         mt={1}
         mb={4}
-        sx={{ textAlign: "center", color: "fontTertiary" }}
+        sx={{
+          textAlign: "center",
+          fontSize: "title",
+          color: "fontTertiary"
+        }}
       >
-        Please enter the password to unlock this note
+        Please enter the password to unlock this note.
       </Text>
       <Field
         id="vaultPassword"
