@@ -59,7 +59,7 @@ interface ISelectionStore {
 export const useSelectionStore = create<ISelectionStore>((set) => ({
   selected: [],
   isMultiselect: false,
-  setSelected: (selected) => set({ selected }),
+  setSelected: (selected) => set({ selected: selected.slice() }),
   setIsMultiselect: (isMultiselect) => set({ isMultiselect })
 }));
 
