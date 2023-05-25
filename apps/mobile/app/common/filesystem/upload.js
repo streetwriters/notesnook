@@ -21,7 +21,7 @@ import RNFetchBlob from "react-native-blob-util";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import { cacheDir } from "./utils";
-import { isImage } from "@notesnook/core/utils/filename";
+import { isImage, isDocument } from "@notesnook/core/utils/filename";
 
 export async function uploadFile(filename, data, cancelToken) {
   if (!data) return false;
@@ -64,7 +64,10 @@ export async function uploadFile(filename, data, cancelToken) {
     if (result) {
       let attachment = db.attachments.attachment(filename);
       if (!attachment) return result;
-      if (!isImage(attachment.metadata.type)) {
+      if (
+        !isImage(attachment.metadata.type) &&
+        !isDocument(attachment.metadata?.type)
+      ) {
         RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
       }
     }
