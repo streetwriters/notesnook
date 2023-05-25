@@ -77,7 +77,8 @@ function Notebook(props) {
               sx={{
                 fontSize: "subBody",
                 color: "fontTertiary",
-                alignItems: "center"
+                alignItems: "center",
+                fontFamily: "body"
               }}
             >
               {notebook.pinned && (
