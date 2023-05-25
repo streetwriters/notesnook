@@ -375,12 +375,13 @@ const menuItems = [
   },
   {
     key: "add-tags",
-    title: "Add Tags",
+    title: "Tags",
     icon: Icon.Tag2,
     multiSelect: true,
-    onClick: async ({ items }) => {
-      await showAddTagsDialog(items);
-    }
+    items: tagsMenuItems
+    // onClick: async ({ items }) => {
+    //   await showAddTagsDialog(items.map((i) => i.id));
+    // }
   },
   { key: "sep2", type: "separator" },
   {
@@ -603,6 +604,63 @@ function notebooksMenuItems({ items }) {
           }
         });
       }
+    });
+  }
+
+  return menuItems;
+}
+
+function tagsMenuItems({ items }) {
+  const noteIds = items.map((i) => i.id);
+
+  const menuItems = [];
+  menuItems.push({
+    key: "assign-tags",
+    title: "Assign to...",
+    icon: Icon.Plus,
+    onClick: async () => {
+      await showAddTagsDialog(noteIds);
+    }
+  });
+
+  const tags = items.map((note) => note.tags).flat();
+
+  if (tags?.length > 0) {
+    menuItems.push(
+      {
+        key: "remove-from-all-tags",
+        title: "Remove from all",
+        icon: Icon.RemoveShortcutLink,
+        onClick: async () => {
+          for (const note of items) {
+            for (const tag of tags) {
+              if (!note.tags.includes(tag)) continue;
+              await db.notes.note(note).untag(tag);
+            }
+          }
+          store.refresh();
+        }
+      },
+      { key: "sep", type: "separator" }
+    );
+
+    tags?.forEach((tag) => {
+      if (menuItems.find((item) => item.key === tag)) return;
+
+      menuItems.push({
+        key: tag,
+        title: db.tags.alias(tag),
+        icon: Icon.Tag,
+        checked: true,
+        tooltip: "Click to remove from this tag",
+        onClick: async () => {
+          for (const note of items) {
+            if (!note.tags.includes(tag)) continue;
+            await db.notes.note(note).untag(tag);
+          }
+          store.refresh();
+        }
+      });
     });
   }
 

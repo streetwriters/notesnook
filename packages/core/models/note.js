@@ -194,7 +194,8 @@ export default class Note {
   }
 
   async untag(tag) {
-    if (deleteItem(this._note.tags, tag)) {
+    const tagItem = this._db.tags.tag(tag);
+    if (tagItem && deleteItem(this._note.tags, tagItem.title)) {
       await this._db.notes.add(this._note);
     } else console.error("This note is not tagged by the specified tag.", tag);
     await this._db.tags.untag(tag, this._note.id);
