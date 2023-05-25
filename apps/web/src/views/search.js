@@ -31,6 +31,12 @@ import Placeholder from "../components/placeholders";
 
 async function typeToItems(type, context) {
   switch (type) {
+    case "notebook": {
+      const selectedNotebook = notebookstore.get().selectedNotebook;
+      if (!selectedNotebook) return ["notes", []];
+      const notes = db.relations.to(selectedNotebook, "note");
+      return ["notes", notes];
+    }
     case "notes": {
       await db.notes.init();
       if (!context) return ["notes", db.notes.all];
@@ -113,11 +119,14 @@ function Search({ type }) {
         }
       case "notebooks":
         return "all notebooks";
+      case "notebook":
       case "topics": {
         const selectedNotebook = notebookstore.get().selectedNotebook;
         if (!selectedNotebook) return "";
         const notebook = db.notebooks.notebook(selectedNotebook.id);
-        return `topics in ${notebook.title} notebook`;
+        return `${type === "topics" ? "topics" : "notes"} in ${
+          notebook.title
+        } notebook`;
       }
       case "tags":
         return "all tags";
