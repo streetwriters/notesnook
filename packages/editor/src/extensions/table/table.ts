@@ -18,8 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Table as TiptapTable, TableOptions } from "@tiptap/extension-table";
-import { columnResizing, tableEditing } from "@tiptap/pm/tables";
+import { tableEditing, columnResizing, TableView } from "@tiptap/pm/tables";
 import { TableNodeView } from "./component";
+import { Plugin, PluginKey } from "prosemirror-state";
 
 export const Table = TiptapTable.extend<TableOptions>({
   addProseMirrorPlugins() {
@@ -35,10 +36,20 @@ export const Table = TiptapTable.extend<TableOptions>({
               lastColumnResizable: this.options.lastColumnResizable
             })
           ]
-        : []),
+        : [tiptapTableView(this.options.cellMinWidth)]),
       tableEditing({
         allowTableNodeSelection: this.options.allowTableNodeSelection
       })
     ];
   }
 });
+
+const TiptapTableViewPluginKey = new PluginKey("TiptapTableView");
+function tiptapTableView(cellMinWidth: number): Plugin {
+  return new Plugin({
+    key: TiptapTableViewPluginKey,
+    props: {
+      nodeViews: { [Table.name]: (node) => new TableView(node, cellMinWidth) }
+    }
+  });
+}
