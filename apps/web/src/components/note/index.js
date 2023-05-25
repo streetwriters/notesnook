@@ -378,13 +378,12 @@ const menuItems = [
     title: "Print",
     disabled: ({ note }) => {
       if (!db.notes.note(note.id).synced()) return notFullySyncedText;
-      if (note.locked) return "Locked notes cannot be exported currently.";
+      if (note.locked) return "Locked notes cannot be printed.";
     },
     icon: Icon.Print,
     onClick: async ({ note }) => {
       await exportNotes("pdf", [note.id]);
-    },
-    isPro: true
+    }
   },
   {
     key: "publish",
