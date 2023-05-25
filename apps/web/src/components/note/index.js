@@ -25,6 +25,7 @@ import ListItem from "../list-item";
 import {
   confirm,
   showAddReminderDialog,
+  showAddTagsDialog,
   showMoveNoteDialog
 } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
@@ -372,6 +373,16 @@ const menuItems = [
     icon: Icon.Colors,
     items: colorsToMenuItems()
   },
+  {
+    key: "add-tags",
+    title: "Tags",
+    icon: Icon.Tag2,
+    multiSelect: true,
+    items: tagsMenuItems
+    // onClick: async ({ items }) => {
+    //   await showAddTagsDialog(items.map((i) => i.id));
+    // }
+  },
   { key: "sep2", type: "separator" },
   {
     key: "print",
@@ -593,6 +604,63 @@ function notebooksMenuItems({ items }) {
           }
         });
       }
+    });
+  }
+
+  return menuItems;
+}
+
+function tagsMenuItems({ items }) {
+  const noteIds = items.map((i) => i.id);
+
+  const menuItems = [];
+  menuItems.push({
+    key: "assign-tags",
+    title: "Assign to...",
+    icon: Icon.Plus,
+    onClick: async () => {
+      await showAddTagsDialog(noteIds);
+    }
+  });
+
+  const tags = items.map((note) => note.tags).flat();
+
+  if (tags?.length > 0) {
+    menuItems.push(
+      {
+        key: "remove-from-all-tags",
+        title: "Remove from all",
+        icon: Icon.RemoveShortcutLink,
+        onClick: async () => {
+          for (const note of items) {
+            for (const tag of tags) {
+              if (!note.tags.includes(tag)) continue;
+              await db.notes.note(note).untag(tag);
+            }
+          }
+          store.refresh();
+        }
+      },
+      { key: "sep", type: "separator" }
+    );
+
+    tags?.forEach((tag) => {
+      if (menuItems.find((item) => item.key === tag)) return;
+
+      menuItems.push({
+        key: tag,
+        title: db.tags.alias(tag),
+        icon: Icon.Tag,
+        checked: true,
+        tooltip: "Click to remove from this tag",
+        onClick: async () => {
+          for (const note of items) {
+            if (!note.tags.includes(tag)) continue;
+            await db.notes.note(note).untag(tag);
+          }
+          store.refresh();
+        }
+      });
     });
   }
 

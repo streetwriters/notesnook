@@ -88,6 +88,12 @@ export function closeOpenedDialog() {
   dialogs.forEach((elem) => elem.remove());
 }
 
+export function showAddTagsDialog(noteIds: string[]) {
+  return showDialog("AddTagsDialog", (Dialog, perform) => (
+    <Dialog onClose={(res) => perform(res)} noteIds={noteIds} />
+  ));
+}
+
 export function showAddNotebookDialog() {
   return showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog

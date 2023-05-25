@@ -72,7 +72,7 @@ function Header({ readonly }) {
 }
 export default Header;
 
-function Autosuggest({
+export function Autosuggest({
   sessionId,
   filter,
   onRemove,
