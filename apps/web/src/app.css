@@ -122,6 +122,17 @@ textarea,
   -webkit-tap-highlight-color: transparent;
 }
 
+.rpv-core__text-layer-text::selection {
+  background-color: var(--dimPrimary) !important;
+  color: transparent;
+}
+
+.rpv-core__text-layer-text::-moz-selection {
+  /* Code for Firefox */
+  background-color: var(--dimPrimary) !important;
+  color: transparent;
+}
+
 *::-moz-focus-inner {
   border: 0;
 }

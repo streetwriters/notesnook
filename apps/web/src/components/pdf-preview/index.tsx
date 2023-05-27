@@ -92,6 +92,8 @@ export function PdfPreview(props: PdfPreviewProps) {
                     },
 
                     ".rpv-core__textbox": {
+                      width: "45px",
+                      mr: 1,
                       borderRadius: "default",
                       px: 1,
                       py: "2px",
