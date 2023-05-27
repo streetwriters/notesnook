@@ -111,8 +111,10 @@ async function writeEncryptedBase64(metadata: {
 
   const { hash, type: hashType } = await hashBuffer(bytes);
 
+  const attachment = db.attachments?.attachment(hash);
+
   const file = new File([bytes.buffer], hash, {
-    type: mimeType || "application/octet-stream"
+    type: attachment?.metadata.type || mimeType || "application/octet-stream"
   });
 
   const result = await writeEncryptedFile(file, key, hash);
@@ -337,9 +339,15 @@ function reportProgress(
 async function downloadFile(filename: string, requestOptions: RequestOptions) {
   const { url, headers, chunkSize, signal } = requestOptions;
   const handle = await streamablefs.readFile(filename);
-  if (handle && handle.file.size === (await handle.size())) return true;
+
+  if (
+    handle &&
+    handle.file.size === (await handle.size()) - handle.file.chunks * ABYTES
+  )
+    return true;
   else if (handle) await handle.delete();
 
+  const attachment = db.attachments?.attachment(filename);
   try {
     reportProgress(
       { total: 100, loaded: 0 },
@@ -379,10 +387,18 @@ async function downloadFile(filename: string, requestOptions: RequestOptions) {
       throw new Error(error);
     }
 
+    const totalChunks = Math.ceil(contentLength / chunkSize);
+    const decryptedLength = contentLength - totalChunks * ABYTES;
+    if (attachment && attachment.length !== decryptedLength) {
+      const error = `File length mismatch. Please upload this file again from the attachment manager. (File hash: ${filename})`;
+      await db.attachments?.markAsFailed(filename, error);
+      throw new Error(error);
+    }
+
     const fileHandle = await streamablefs.createFile(
       filename,
-      contentLength,
-      "application/octet-stream"
+      decryptedLength,
+      attachment?.metadata.type || "application/octet-stream"
     );
 
     await response.body

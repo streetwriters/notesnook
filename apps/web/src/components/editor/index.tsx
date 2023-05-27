@@ -41,10 +41,7 @@ import Header from "./header";
 import { Attachment } from "../icons";
 import { useEditorInstance } from "./context";
 import { attachFile, AttachmentProgress, insertAttachment } from "./picker";
-import {
-  downloadAttachment,
-  downloadAttachmentForPreview
-} from "../../common/attachments";
+import { saveAttachment, downloadAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core/common";
 import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
@@ -57,6 +54,7 @@ import { Lightbox } from "../lightbox";
 import ThemeProviderWrapper from "../theme-provider";
 import { Allotment } from "allotment";
 import { PdfPreview } from "../pdf-preview";
+import { showToast } from "../../utils/toast";
 
 type PreviewSession = {
   content: { data: string; type: string };
@@ -408,14 +406,17 @@ export function Editor(props: EditorProps) {
         }}
         onContentChange={onContentChange}
         onChange={onEditorChange}
-        onDownloadAttachment={(attachment) =>
-          downloadAttachment(attachment.hash)
-        }
+        onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
         onPreviewAttachment={async ({ hash, dataurl }) => {
           const attachment = db.attachments?.attachment(hash);
           if (attachment && attachment.metadata.type.startsWith("image/")) {
             const container = document.getElementById("dialogContainer");
             if (!(container instanceof HTMLElement)) return;
+
+            dataurl = dataurl || (await downloadAttachment(hash, "base64"));
+            if (!dataurl)
+              return showToast("error", "This image cannot be previewed.");
+
             ReactDOM.render(
               <ThemeProviderWrapper>
                 <Lightbox
@@ -429,7 +430,7 @@ export function Editor(props: EditorProps) {
             );
           } else if (attachment && onPreviewDocument) {
             onPreviewDocument({ hash });
-            const blob = await downloadAttachmentForPreview(hash);
+            const blob = await downloadAttachment(hash, "blob");
             if (!blob) return;
             onPreviewDocument({ url: URL.createObjectURL(blob), hash });
           }
