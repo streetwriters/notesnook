@@ -25,12 +25,15 @@ import { isUserPremium } from "../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { appVersion } from "../utils/version";
 import { findItemAndDelete } from "@notesnook/core/utils/array";
+import { isTesting } from "../utils/platform";
 
 class AnnouncementStore extends BaseStore {
   inlineAnnouncements = [];
   dialogAnnouncements = [];
 
   refresh = async () => {
+    if (isTesting()) return;
+
     try {
       const inlineAnnouncements = [];
       const dialogAnnouncements = [];
