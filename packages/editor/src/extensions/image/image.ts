@@ -138,7 +138,7 @@ export const ImageNode = Node.create<ImageOptions>({
 
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),
-      type: getDataAttribute("mime"),
+      mime: getDataAttribute("mime"),
       size: getDataAttribute("size"),
       aspectRatio: {
         default: undefined,
@@ -209,6 +209,7 @@ export const ImageNode = Node.create<ImageOptions>({
       insertImage:
         (options) =>
         ({ commands }) => {
+          console.log(options);
           return commands.insertContent({
             type: this.name,
             attrs: options

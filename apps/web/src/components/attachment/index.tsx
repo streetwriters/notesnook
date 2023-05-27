@@ -47,7 +47,7 @@ import {
 } from "../../common/dialog-controller";
 import { store } from "../../stores/attachment-store";
 import { db } from "../../common/db";
-import { downloadAttachment } from "../../common/attachments";
+import { saveAttachment } from "../../common/attachments";
 import { reuploadAttachment } from "../editor/picker";
 import { Multiselect } from "../../common/multi-select";
 import { Menu } from "../../hooks/use-menu";
@@ -264,7 +264,7 @@ const AttachmentMenuItems: MenuItem[] = [
       const isDownloading = attachment.status?.type === "download";
       if (isDownloading) {
         await db.fs.cancel(attachment.metadata.hash, "download");
-      } else await downloadAttachment(attachment.metadata.hash);
+      } else await saveAttachment(attachment.metadata.hash);
     }
   },
   {

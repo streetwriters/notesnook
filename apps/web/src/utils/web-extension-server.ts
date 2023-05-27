@@ -85,7 +85,7 @@ export class WebExtensionServer implements Server {
 
       clipContent += h("iframe", [], {
         "data-hash": attachment.hash,
-        "data-mime": attachment.type,
+        "data-mime": attachment.mime,
         src: clip.url,
         title: clip.pageTitle || clip.title,
         width: clip.width ? `${clip.width}` : undefined,

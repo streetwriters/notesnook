@@ -61,15 +61,7 @@ export function DownloadAttachment(props: ToolProps) {
     />
   );
 }
-const previewableFileExtensions = ["pdf"];
 
-function canPreviewAttachment(attachment: Attachment) {
-  if (!attachment) return false;
-  const extension = attachment.filename?.split(".").pop();
-  if (!extension) return false;
-
-  return previewableFileExtensions.indexOf(extension) > -1;
-}
 export function PreviewAttachment(props: ToolProps) {
   const { editor } = props;
   const attachmentNode =
@@ -104,4 +96,18 @@ export function RemoveAttachment(props: ToolProps) {
       onClick={() => editor.current?.chain().focus().removeAttachment().run()}
     />
   );
+}
+
+const previewableFileExtensions = ["pdf"];
+const previewableMimeTypes = ["application/pdf"];
+
+function canPreviewAttachment(attachment: Attachment) {
+  if (!attachment) return false;
+  if (previewableMimeTypes.some((mime) => attachment.mime.startsWith(mime)))
+    return true;
+
+  const extension = attachment.filename?.split(".").pop();
+  if (!extension) return false;
+
+  return previewableFileExtensions.indexOf(extension) > -1;
 }

@@ -35,7 +35,7 @@ export type AttachmentWithProgress = AttachmentProgress & Attachment;
 export type Attachment = {
   hash: string;
   filename: string;
-  type: string;
+  mime: string;
   size: number;
 };
 
@@ -88,7 +88,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
       },
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),
-      type: getDataAttribute("mime"),
+      mime: getDataAttribute("mime"),
       size: getDataAttribute("size")
     };
   },

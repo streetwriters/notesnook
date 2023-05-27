@@ -155,7 +155,7 @@ export type AttachmentProgress = {
 export type Attachment = {
   hash: string;
   filename: string;
-  type: string;
+  mime: string;
   size: number;
   dataurl?: string;
 };
@@ -206,7 +206,7 @@ async function addAttachment(
     return {
       hash: hash,
       filename: file.name,
-      type: file.type,
+      mime: file.type,
       size: file.size,
       dataurl
     };

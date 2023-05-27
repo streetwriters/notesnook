@@ -83,7 +83,7 @@ export function ImageComponent(
             setSource(url);
             editor.current?.commands.updateImage(
               { src },
-              { src: await toDataURL(blob), size, type }
+              { src: await toDataURL(blob), size, mime: type }
             );
           }
         } catch (e) {
