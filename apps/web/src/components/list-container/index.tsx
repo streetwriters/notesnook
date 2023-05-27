@@ -114,7 +114,7 @@ function ListContainer(props: ListContainerProps) {
         element.focus()
       );
     },
-    skip: (index) => items[index].type === "header",
+    skip: (index) => !items[index] || items[index].type === "header",
     open: (index) => {
       const item = items[index];
       if (!item || !listRef.current) return;

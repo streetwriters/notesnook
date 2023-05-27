@@ -90,6 +90,7 @@ export function useKeyboardListNavigation(
           itemIndex > cursor.current ? itemIndex : cursor.current;
         const indices = [];
         for (let i = startIndex; i <= endIndex; ++i) {
+          if (skip && skip(i)) continue;
           indices.push(i);
         }
         bulkSelect(indices);
@@ -99,7 +100,7 @@ export function useKeyboardListNavigation(
         select(itemIndex);
       }
     },
-    [select, resetSelection, bulkSelect, focusItemAt]
+    [select, resetSelection, bulkSelect, skip, focusItemAt]
   );
 
   const onKeyDown = useCallback(
