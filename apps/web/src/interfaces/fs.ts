@@ -300,9 +300,8 @@ async function uploadFile(filename: string, requestOptions: RequestOptions) {
       });
 
     await fileHandle.addAdditionalData("uploaded", true);
-    // Keep the images cached; delete everything else.
-    if (!fileHandle.file.type?.startsWith("image/")) {
-      console.log("DELETING FILE", fileHandle);
+
+    if (isAttachmentDeletable(fileHandle.file.type)) {
       await streamablefs.deleteFile(filename);
     }
     await checkUpload(filename);
@@ -444,7 +443,8 @@ async function saveFile(filename: string, fileMetadata: FileMetadata) {
   const decrypted = await decryptFile(filename, fileMetadata);
   if (decrypted) saveAs(decrypted, getFileNameWithExtension(name, type));
 
-  if (isUploaded) await streamablefs.deleteFile(filename);
+  if (isUploaded && isAttachmentDeletable(type))
+    await streamablefs.deleteFile(filename);
 }
 
 async function deleteFile(filename: string, requestOptions: RequestOptions) {
@@ -505,6 +505,10 @@ const FS = {
   hashStream
 };
 export default FS;
+
+function isAttachmentDeletable(type: string) {
+  return !type.startsWith("image/") && !type.startsWith("application/pdf");
+}
 
 function isSuccessStatusCode(statusCode: number) {
   return statusCode >= 200 && statusCode <= 299;
