@@ -256,6 +256,23 @@ test("select notes using Shift+Click upwards", async ({ page }, info) => {
   expect(await notesList[0].isFocused()).toBeTruthy();
 });
 
+test("using Shift+Click when no notes are selected should not crash the app", async ({
+  page
+}, info) => {
+  info.setTimeout(60 * 1000);
+
+  const { notes } = await populateList(page, 5);
+  await page.reload();
+
+  const note = await notes.findNote({ title: "Test note 3" });
+
+  await page.keyboard.down("Shift");
+  await note?.click();
+  await page.keyboard.up("Shift");
+
+  expect(await notes.isEmpty()).toBeFalsy();
+});
+
 test("Ctrl+Click to select/unselect notes", async ({ page }, info) => {
   info.setTimeout(60 * 1000);
   const { notesList, notes } = await populateList(page, 10);

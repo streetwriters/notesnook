@@ -70,11 +70,11 @@ function ListItem(props) {
   const isMenuTarget = target && target === listItemRef.current;
 
   const isSelected = useSelectionStore((store) => {
-    const inInSelection =
+    const isInSelection =
       store.selectedItems.findIndex((item) => props.item.id === item.id) > -1;
     return isFocused
-      ? store.selectedItems.length > 1 && inInSelection
-      : inInSelection;
+      ? store.selectedItems.length > 1 && isInSelection
+      : isInSelection;
   });
 
   return (
