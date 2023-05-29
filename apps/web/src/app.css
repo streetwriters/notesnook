@@ -1,3 +1,10 @@
+:root {
+  --focus-border: var(--primary);
+  --separator-border: var(--border);
+  --sash-size: 10px;
+  --sash-hover-size: 4px;
+}
+
 /* open-sans-regular - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
 @font-face {
   font-family: "Open Sans";
@@ -176,13 +183,6 @@ textarea,
 }
 .pane::before {
   width: 1px !important;
-}
-
-:root {
-  --focus-border: var(--primary);
-  --separator-border: var(--border);
-  --sash-size: 10px;
-  --sash-hover-size: 4px;
 }
 
 .route#settings,

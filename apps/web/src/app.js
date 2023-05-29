@@ -25,7 +25,6 @@ import useTablet from "./hooks/use-tablet";
 import { LazyMotion, domAnimation } from "framer-motion";
 import useDatabase from "./hooks/use-database";
 import { Allotment, LayoutPriority } from "allotment";
-import "allotment/dist/style.css";
 import Config from "./utils/config";
 import { useStore } from "./stores/app-store";
 import { Toaster } from "react-hot-toast";
