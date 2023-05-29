@@ -91,14 +91,19 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Billing history",
+            title: "Attachments preview",
             subtitle:
-              "You can now get a list of all the transactions you have made, their amount and when they were made."
+              "You can now preview PDFs & Images directly inside Notesnook."
           },
           {
-            title: "Request refund",
+            title: "New attachments manager",
             subtitle:
-              "You can now request refunds directly from inside the app. No need for emails etc. Go to Settings > Request refund to send your request for a refund."
+              "The new attachments manager makes is much easier to view & interact with your attachments. It also allows you to download all (or some) of your attachments."
+          },
+          {
+            title: "Assign tags to multiple notes",
+            subtitle:
+              "You can now easily tag multiple notes without first opening them."
           }
         ],
     cta: {
