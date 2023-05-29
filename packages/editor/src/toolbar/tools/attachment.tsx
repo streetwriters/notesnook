@@ -103,7 +103,10 @@ const previewableMimeTypes = ["application/pdf"];
 
 function canPreviewAttachment(attachment: Attachment) {
   if (!attachment) return false;
-  if (previewableMimeTypes.some((mime) => attachment.mime.startsWith(mime)))
+  if (
+    attachment.mime &&
+    previewableMimeTypes.some((mime) => attachment.mime.startsWith(mime))
+  )
     return true;
 
   const extension = attachment.filename?.split(".").pop();
