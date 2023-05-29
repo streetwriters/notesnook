@@ -25,7 +25,8 @@
   "devDependencies": {
     "patch-package": "^6.4.7",
     "typescript": "^4.8.2",
-    "otplib": "12.0.1"
+    "otplib": "12.0.1",
+    "react-refresh": "0.14.0"
   },
   "dependencies": {
     "react": "18.0.0",

@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@callstack/repack": "^3.0.0",
+    "@callstack/repack": "^3.2.0",
     "@react-native-clipboard/clipboard": "^1.9.0",
     "@react-native-community/checkbox": "^0.5.8",
     "@react-native-community/netinfo": "^9.3.7",
@@ -101,6 +101,7 @@
     "react-test-renderer": "18.0.0",
     "terser-webpack-plugin": "^5.3.5",
     "ts-jest": "^28.0.7",
-    "webpack": "^5.74.0"
+    "webpack": "^5.74.0",
+    "react-refresh": "0.14.0"
   }
 }
