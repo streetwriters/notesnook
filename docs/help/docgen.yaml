@@ -45,6 +45,7 @@ navigation:
 
   - path: how-is-my-data-encrypted.md
   - path: recovering-your-account.md
+  - path: deleting-your-account.md
 
   - path: privacy-mode.md
   - path: web-clipper
