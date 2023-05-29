@@ -19,4 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FeatureType } from "./components/sheets/new-feature";
 
-export const features: FeatureType[] = [];
+export const features: FeatureType[] = [
+  {
+    title: "Attachments preview",
+    body: "You can now preview PDFs & Images directly inside Notesnook."
+  },
+  {
+    title: "New attachments manager",
+    body: "The new attachments manager makes is much easier to view & interact with your attachments. It also allows you to download all (or some) of your attachments."
+  },
+  {
+    title: "Assign tags to multiple notes",
+    body: "You can now easily tag multiple notes without first opening them."
+  }
+];

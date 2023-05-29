@@ -31,7 +31,7 @@ import { EventTypes, isReactNative, post } from "../utils";
 type Attachment = {
   hash: string;
   filename: string;
-  type: string;
+  mime: string;
   size: number;
 };
 

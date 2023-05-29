@@ -124,7 +124,7 @@ const file = async (fileOptions) => {
       editorController.current?.commands.insertImage({
         hash: hash,
         filename: file.name,
-        type: file.type,
+        mime: file.type,
         size: file.size,
         dataurl: await db.attachments.read(hash, "base64"),
         title: file.name
@@ -133,7 +133,7 @@ const file = async (fileOptions) => {
       editorController.current?.commands.insertAttachment({
         hash: hash,
         filename: file.name,
-        type: file.type,
+        mime: file.type,
         size: file.size
       });
     }
@@ -262,7 +262,7 @@ const handleImageResponse = async (response, options) => {
 
   editorController.current?.commands.insertImage({
     hash: hash,
-    type: image.type,
+    mime: image.type,
     title: fileName,
     dataurl: b64,
     size: image.fileSize,
