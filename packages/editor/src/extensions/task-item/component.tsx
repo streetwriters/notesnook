@@ -38,7 +38,7 @@ export function TaskItemComponent(
   const isMobile = useIsMobile();
 
   const toggle = useCallback(() => {
-    if (!editor.isEditable || !editor.current) return false;
+    if (!editor.current) return false;
 
     const { empty, from, to } = editor.current.state.selection;
     const selectedTaskItems = findChildrenInRange(
@@ -107,7 +107,7 @@ export function TaskItemComponent(
           alignSelf: "start",
           p: "1px",
           mr: 1,
-          cursor: editor.isEditable ? "pointer" : "unset",
+          cursor: "pointer",
           ":hover": {
             borderColor: "checked"
           },
