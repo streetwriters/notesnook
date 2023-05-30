@@ -67,6 +67,7 @@ export function ImageComponent(
   const [error, setError] = useState<string>();
   const [source, setSource] = useState<string>();
   const downloadOptions = useToolbarStore((store) => store.downloadOptions);
+  const isReadonly = !editor.current?.isEditable;
 
   useEffect(
     () => {
@@ -194,36 +195,42 @@ export function ImageComponent(
             >
               <DesktopOnly>
                 {selected && (
-                  <Flex sx={{ position: "relative", justifyContent: "end" }}>
-                    <Flex
+                  <Flex
+                    sx={{
+                      position: "absolute",
+                      top: -40,
+                      right: 0,
+                      mb: 2,
+                      alignItems: "end"
+                    }}
+                  >
+                    <ToolbarGroup
+                      editor={editor}
+                      tools={
+                        isReadonly
+                          ? [
+                              hash ? "previewAttachment" : "none",
+                              hash ? "downloadAttachment" : "none"
+                            ]
+                          : [
+                              hash ? "previewAttachment" : "none",
+                              hash ? "downloadAttachment" : "none",
+                              "imageAlignLeft",
+                              float ? "none" : "imageAlignCenter",
+                              "imageAlignRight",
+                              "imageProperties"
+                            ]
+                      }
                       sx={{
-                        position: "absolute",
-                        top: -40,
-                        mb: 2,
-                        alignItems: "end"
+                        boxShadow: "menu",
+                        borderRadius: "default",
+                        bg: "background"
                       }}
-                    >
-                      <ToolbarGroup
-                        editor={editor}
-                        tools={[
-                          hash ? "previewAttachment" : "none",
-                          hash ? "downloadAttachment" : "none",
-                          "imageAlignLeft",
-                          float ? "none" : "imageAlignCenter",
-                          "imageAlignRight",
-                          "imageProperties"
-                        ]}
-                        sx={{
-                          boxShadow: "menu",
-                          borderRadius: "default",
-                          bg: "background"
-                        }}
-                      />
-                    </Flex>
+                    />
                   </Flex>
                 )}
               </DesktopOnly>
-              {selected && (
+              {selected && !isReadonly && (
                 <Icon
                   className="drag-handle"
                   data-drag-handle
