@@ -90,9 +90,7 @@ export class SelectionBasedNodeView<
     forwardRef?: ForwardRef
   ): React.ReactElement<unknown> | null {
     if (!this.options.component) return null;
-    const isSelected =
-      this.editor.isEditable &&
-      this.isSelectedNode(this.editor.view.state.selection);
+    const isSelected = this.isSelectedNode(this.editor.view.state.selection);
 
     return (
       <ThemeProvider>
