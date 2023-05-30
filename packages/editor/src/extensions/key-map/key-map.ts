@@ -17,11 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Editor, Extension } from "@tiptap/core";
+import {Extension } from "@tiptap/core";
 import { isInTable } from "@tiptap/pm/tables";
 import { LIST_ITEM_NODE_TYPES, LIST_NODE_TYPES } from "../../utils/node-types";
 import { isListActive } from "../../utils/prosemirror";
 import { CodeBlock } from "../code-block";
+import { ShowBlockNodesComponent } from "../../toolbar/popups/blocknodes-popup";
+import { Editor} from "../../types";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -43,10 +45,21 @@ export const KeyMap = Extension.create({
         return true;
       },
       Backspace: ({ editor }) => {
-        return joinUpWithLastListItem(editor);
+        return joinUpWithLastListItem(editor as Editor);
       },
+      "/": ({ editor }) => {
+        const { $from, to } = editor.state.selection;
+        const selectedElement = editor.view.domAtPos($from.pos)
+          .node as HTMLElement;
+
+        ShowBlockNodesComponent({
+          editor: editor as Editor,
+          selectedElement: selectedElement
+        });
+        return false;
+      }
     };
-  },
+  }
 });
 
 /**

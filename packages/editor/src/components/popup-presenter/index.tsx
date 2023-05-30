@@ -309,7 +309,7 @@ export function usePopupHandler(options: UsePopupHandlerOptions) {
 }
 
 type ShowPopupOptions = {
-  popup: (closePopup: () => void) => React.ReactNode;
+  popup?: (closePopup: () => void) => React.ReactNode;
 } & Partial<ResponsivePresenterProps>;
 export function showPopup(options: ShowPopupOptions) {
   const { popup, ...props } = options;
@@ -337,7 +337,7 @@ export function showPopup(options: ShowPopupOptions) {
           props.onClose?.();
         }}
       >
-        {popup(hide)}
+        {popup&&popup(hide)}
       </ResponsivePresenter>
     </ThemeProvider>,
     getPopupContainer()
