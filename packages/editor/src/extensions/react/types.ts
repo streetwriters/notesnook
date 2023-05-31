@@ -62,5 +62,5 @@ export type ReactNodeViewOptions<P> = {
   shouldUpdate?: ShouldUpdate;
   contentDOMFactory?: (() => ContentDOM) | boolean;
   wrapperFactory?: () => HTMLElement;
-  enableSelection?: boolean;
+  forceEnableSelection?: boolean;
 };
