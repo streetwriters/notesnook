@@ -1104,6 +1104,18 @@ function Settings() {
               />
             </Button>
             <Toggle
+              title="Marketing emails"
+              onTip="We will send you occasional promotional offers & product updates on your email (sent once every month)."
+              offTip={
+                "You will not receive any promotional offers, product updates, and other marketing emails from us."
+              }
+              onToggled={async () => {
+                await db.user.changeMarketingConsent(!user.marketingConsent);
+                await refreshUser();
+              }}
+              isToggled={user.marketingConsent}
+            />
+            <Toggle
               title="Enable telemetry"
               onTip="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
               offTip={"Do not collect any data or crash reports"}

@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { showBuyDialog } from "../../common/dialog-controller";
 import Tip from "../tip";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { Flex } from "@theme-ui/components";
 import Switch from "../switch";
+import { Loading } from "../icons";
 
 function Toggle(props) {
   const {
@@ -36,9 +37,16 @@ function Toggle(props) {
     testId,
     disabled
   } = props;
+  const [isLoading, setIsLoading] = useState(false);
   const onClick = useCallback(async () => {
-    if (isUserPremium() || !premium || isToggled) onToggled();
-    else {
+    if (isUserPremium() || !premium || isToggled) {
+      setIsLoading(true);
+      try {
+        await onToggled();
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
       await showBuyDialog();
     }
   }, [onToggled, premium, isToggled]);
@@ -60,7 +68,11 @@ function Toggle(props) {
       }}
     >
       <Tip text={title} tip={isToggled ? onTip : offTip} sx={{ mr: 2 }} />
-      <Switch onClick={disabled ? null : onClick} checked={isToggled} />
+      {isLoading ? (
+        <Loading size={18} />
+      ) : (
+        <Switch onClick={disabled ? null : onClick} checked={isToggled} />
+      )}
     </Flex>
   );
 }
