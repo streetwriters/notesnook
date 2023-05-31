@@ -130,7 +130,7 @@ export async function downloadAttachments(
     RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
     return;
   }
-  if (result.size) {
+  if (result?.size) {
     let sub;
     try {
       onProgress?.(0, `Zipping... Please wait`);

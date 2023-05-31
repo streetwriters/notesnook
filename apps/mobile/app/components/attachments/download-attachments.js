@@ -55,7 +55,7 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
       groupId.current
     );
     if (canceled.current) return;
-    setResult(result);
+    setResult(result || new Map());
     setDownloading(false);
     update({
       disableClosing: false
@@ -113,7 +113,7 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
       <Heading>
         {downloading
           ? "Downloading attachments"
-          : result.size
+          : result?.size
           ? "Downloaded attachments"
           : "Download attachments"}
       </Heading>
@@ -126,7 +126,7 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
         >
           {progress.statusText}
         </Paragraph>
-      ) : result.size ? (
+      ) : result?.size ? (
         <Paragraph
           style={{
             textAlign: "center"
@@ -200,7 +200,7 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
         }}
       />
 
-      {result.size ? (
+      {result?.size ? (
         <Button
           style={{
             width: 250,
