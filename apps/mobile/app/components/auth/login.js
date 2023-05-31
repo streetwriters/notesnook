@@ -34,6 +34,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import { useLogin } from "./use-login";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -61,6 +62,7 @@ export const Login = ({ changeMode }) => {
     await sleep(500);
     Progress.present();
   });
+  const deviceMode = useSettingStore((state) => state.deviceMode);
 
   useEffect(() => {
     async () => {
@@ -98,7 +100,13 @@ export const Login = ({ changeMode }) => {
             backgroundColor: colors.nav,
             marginBottom: 20,
             borderBottomWidth: 1,
-            borderBottomColor: colors.border
+            borderBottomColor: colors.border,
+            alignSelf: deviceMode !== "mobile" ? "center" : undefined,
+            borderWidth: deviceMode !== "mobile" ? 1 : null,
+            borderColor: deviceMode !== "mobile" ? colors.border : null,
+            borderRadius: deviceMode !== "mobile" ? 20 : null,
+            marginTop: deviceMode !== "mobile" ? 50 : null,
+            width: deviceMode === "mobile" ? null : "50%"
           }}
         >
           <View
@@ -127,10 +135,10 @@ export const Login = ({ changeMode }) => {
           </View>
           <Heading
             style={{
-              fontFamily: "OpenSans-Bold",
               marginBottom: 25,
               marginTop: 10
             }}
+            extraBold
             size={SIZE.xxl}
           >
             Login to your {"\n"}account

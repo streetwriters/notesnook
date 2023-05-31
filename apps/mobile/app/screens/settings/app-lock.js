@@ -46,6 +46,7 @@ const AppLock = ({ route }) => {
   const colors = useThemeStore((state) => state.colors);
   const appLockMode = useSettingStore((state) => state.settings.appLockMode);
   const welcome = route?.params?.welcome;
+  const deviceMode = useSettingStore((state) => state.deviceMode);
 
   const modes = [
     {
@@ -135,7 +136,13 @@ const AppLock = ({ route }) => {
                 backgroundColor: colors.nav,
                 marginBottom: 20,
                 borderBottomWidth: 1,
-                borderBottomColor: colors.border
+                borderBottomColor: colors.border,
+                alignSelf: deviceMode !== "mobile" ? "center" : undefined,
+                borderWidth: deviceMode !== "mobile" ? 1 : null,
+                borderColor: deviceMode !== "mobile" ? colors.border : null,
+                borderRadius: deviceMode !== "mobile" ? 20 : null,
+                marginTop: deviceMode !== "mobile" ? 50 : null,
+                width: deviceMode === "mobile" ? null : "50%"
               }}
             >
               <View
@@ -164,9 +171,9 @@ const AppLock = ({ route }) => {
               </View>
               <Heading
                 style={{
-                  fontFamily: "OpenSans-Bold",
                   marginTop: 10
                 }}
+                extraBold
                 size={SIZE.xxl}
               >
                 Protect your notes

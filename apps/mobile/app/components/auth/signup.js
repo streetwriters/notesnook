@@ -34,6 +34,7 @@ import Input from "../ui/input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 export const Signup = ({ changeMode, trial }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -47,6 +48,7 @@ export const Signup = ({ changeMode, trial }) => {
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const setLastSynced = useUserStore((state) => state.setLastSynced);
+  const deviceMode = useSettingStore((state) => state.deviceMode);
 
   const validateInfo = () => {
     if (!password.current || !email.current || !confirmPassword.current) {
@@ -112,7 +114,13 @@ export const Signup = ({ changeMode, trial }) => {
             backgroundColor: colors.nav,
             marginBottom: 20,
             borderBottomWidth: 1,
-            borderBottomColor: colors.border
+            borderBottomColor: colors.border,
+            alignSelf: deviceMode !== "mobile" ? "center" : undefined,
+            borderWidth: deviceMode !== "mobile" ? 1 : null,
+            borderColor: deviceMode !== "mobile" ? colors.border : null,
+            borderRadius: deviceMode !== "mobile" ? 20 : null,
+            marginTop: deviceMode !== "mobile" ? 50 : null,
+            width: deviceMode === "mobile" ? null : "50%"
           }}
         >
           <View
@@ -140,8 +148,8 @@ export const Signup = ({ changeMode, trial }) => {
             />
           </View>
           <Heading
+            extraBold
             style={{
-              fontFamily: "OpenSans-Bold",
               marginBottom: 25,
               marginTop: 10
             }}

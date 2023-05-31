@@ -26,13 +26,10 @@ import {
 } from "react-native";
 import { SwiperFlatList } from "react-native-swiper-flatlist";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { getElevation } from "../../utils";
-import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
@@ -44,20 +41,16 @@ const Intro = ({ navigation }) => {
     (state) => state.settings.telemetry
   );
   const { width } = useWindowDimensions();
-  const insets = useGlobalSafeAreaInsets();
-  useNavigationFocus(navigation, {
-    onFocus: () => {
-      tabBarRef.current.lock();
-    }
-  });
+  const deviceMode = useSettingStore((state) => state.deviceMode);
 
   const renderItem = React.useCallback(
     ({ item }) => (
       <View
         style={{
           justifyContent: "center",
-          width: width,
-          paddingHorizontal: width * 0.05
+          width: deviceMode !== "mobile" ? width / 2 : width,
+          paddingHorizontal:
+            deviceMode !== "mobile" ? (width / 2) * 0.05 : width * 0.05
         }}
       >
         <View
@@ -96,9 +89,9 @@ const Intro = ({ navigation }) => {
             <Heading
               key={heading}
               style={{
-                fontFamily: "OpenSans-Bold",
                 marginBottom: 5
               }}
+              extraBold
               size={SIZE.xxl}
             >
               {heading}
@@ -123,7 +116,7 @@ const Intro = ({ navigation }) => {
         </View>
       </View>
     ),
-    [colors.accent, colors.nav, width]
+    [colors.accent, colors.nav, deviceMode, width]
   );
 
   return (
@@ -137,17 +130,22 @@ const Intro = ({ navigation }) => {
       <View
         style={{
           flex: 0.65,
-          width: "100%",
+          width: deviceMode !== "mobile" ? width / 2 : "100%",
           backgroundColor: colors.nav,
           marginBottom: 20,
           borderBottomWidth: 1,
-          borderBottomColor: colors.border
+          borderBottomColor: colors.border,
+          alignSelf: deviceMode !== "mobile" ? "center" : undefined,
+          borderWidth: deviceMode !== "mobile" ? 1 : null,
+          borderColor: deviceMode !== "mobile" ? colors.border : null,
+          borderRadius: deviceMode !== "mobile" ? 20 : null,
+          marginTop: deviceMode !== "mobile" ? 50 : null
         }}
       >
         <SwiperFlatList
           autoplay
-          //autoplayDelay={10}
-          //autoplayLoop={true}
+          autoplayDelay={10}
+          autoplayLoop={true}
           index={0}
           useReactNativeGestureHandler={true}
           showPagination
@@ -249,11 +247,3 @@ const Intro = ({ navigation }) => {
 };
 
 export default Intro;
-
-/**
- * 1. Welcome Screen
- * 2. Select privacy mode
- * 3. Ask to Sign up
- * 4. Sign up
- * 5. Home Screen
- */
