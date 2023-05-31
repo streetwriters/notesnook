@@ -61,7 +61,8 @@
     "react-native-zip-archive": "6.0.9",
     "react-native-vector-icons": "9.2.0",
     "react-native-pdf": "6.6.2",
-    "react-native-blob-util": "0.17.3"
+    "react-native-blob-util": "0.17.3",
+    "react-native-in-app-review": "4.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

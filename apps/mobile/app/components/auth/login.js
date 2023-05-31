@@ -85,8 +85,9 @@ export const Login = ({ changeMode }) => {
           backgroundColor: colors.bg,
           zIndex: 10,
           width: "100%",
-          minHeight: "100%",
-          alignSelf: "center"
+          alignSelf: "center",
+          height: "100%",
+          minHeight: "100%"
         }}
       >
         <View
@@ -229,7 +230,7 @@ export const Login = ({ changeMode }) => {
               }}
               fontSize={SIZE.md}
               type="accent"
-              title={"Continue"}
+              title={!loading ? "Continue" : null}
             />
 
             {step === LoginSteps.passwordAuth && (

@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { TouchableOpacity, useWindowDimensions, View } from "react-native";
+import {
+  Linking,
+  TouchableOpacity,
+  useWindowDimensions,
+  View
+} from "react-native";
 import { SwiperFlatList } from "react-native-swiper-flatlist";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
@@ -87,7 +92,7 @@ const Intro = ({ navigation }) => {
             width: "100%"
           }}
         >
-          {item.headings.map((heading) => (
+          {item.headings?.map((heading) => (
             <Heading
               key={heading}
               style={{
@@ -100,7 +105,21 @@ const Intro = ({ navigation }) => {
             </Heading>
           ))}
 
-          <Paragraph size={SIZE.sm}>{item.body}</Paragraph>
+          {item.body ? <Paragraph size={SIZE.sm}>{item.body}</Paragraph> : null}
+
+          {item.tesimonial ? (
+            <Paragraph
+              style={{
+                fontStyle: "italic",
+                fontSize: SIZE.lg
+              }}
+              onPress={() => {
+                Linking.openURL(item.link);
+              }}
+            >
+              {item.tesimonial} — {item.user}
+            </Paragraph>
+          ) : null}
         </View>
       </View>
     ),
@@ -127,8 +146,8 @@ const Intro = ({ navigation }) => {
       >
         <SwiperFlatList
           autoplay
-          autoplayDelay={3}
-          autoplayLoop
+          //autoplayDelay={10}
+          //autoplayLoop={true}
           index={0}
           useReactNativeGestureHandler={true}
           showPagination
@@ -136,12 +155,28 @@ const Intro = ({ navigation }) => {
             {
               headings: ["Open source.", "End to end encrypted.", "Private."],
               body: "Write notes with freedom, no spying, no tracking."
+            },
+            {
+              headings: [
+                "Privacy for everyone",
+                "— not just the",
+                "privileged few"
+              ],
+              body: "Your privacy matters to us, no matter who you are. In a world where everyone is trying to spy on you, Notesnook encrypts all your data before it leaves your device. With Notesnook no one can ever sell your data again."
+            },
+            {
+              tesimonial:
+                "You simply cannot get any better of a note taking app than @notesnook. The UI is clean and slick, it is feature rich, encrypted, reasonably priced (esp. for students & educators) & open source",
+              link: "https://twitter.com/andrewsayer/status/1637817220113002503",
+              user: "@andrewsayer on Twitter"
             }
           ]}
           paginationActiveColor={colors.accent}
           paginationStyleItem={{
             width: 10,
-            height: 5
+            height: 5,
+            marginRight: 4,
+            marginLeft: 4
           }}
           paginationDefaultColor={colors.border}
           renderItem={renderItem}

@@ -19,8 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
+import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { ToastEvent } from "../../services/event-manager";
+import { clearMessage, setEmailVerifyMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
@@ -32,8 +34,6 @@ import Input from "../ui/input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
-import { db } from "../../common/database";
-import { clearMessage, setEmailVerifyMessage } from "../../services/message";
 
 export const Signup = ({ changeMode, trial }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -99,9 +99,9 @@ export const Signup = ({ changeMode, trial }) => {
           backgroundColor: colors.bg,
           zIndex: 10,
           width: "100%",
-          minHeight: "90%",
           alignSelf: "center",
-          height: "100%"
+          height: "100%",
+          minHeight: "100%"
         }}
       >
         <View
@@ -222,7 +222,6 @@ export const Signup = ({ changeMode, trial }) => {
 
           <Paragraph
             style={{
-              textAlign: "center",
               marginBottom: 25
             }}
             size={SIZE.xs}
@@ -253,11 +252,13 @@ export const Signup = ({ changeMode, trial }) => {
               color={colors.accent}
             >
               Privacy Policy.
-            </Paragraph>
+            </Paragraph>{" "}
+            You also agree to recieve marketing emails from us which you can
+            opt-out of from app settings.
           </Paragraph>
 
           <Button
-            title="Continue"
+            title={!loading ? "Continue" : null}
             type="accent"
             loading={loading}
             onPress={signup}
