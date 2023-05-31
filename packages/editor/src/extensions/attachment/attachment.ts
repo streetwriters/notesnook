@@ -113,7 +113,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
       shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
         return prev.progress !== next.progress;
       },
-      enableSelection: true
+      forceEnableSelection: true
     });
   },
 
