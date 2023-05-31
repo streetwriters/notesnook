@@ -386,7 +386,8 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
             >
               Privacy Policy
             </Link>
-            .
+            . You also agree to receiving marketing emails from us which you can
+            opt-out of from the app settings.
           </Text>
         </>
       )}
