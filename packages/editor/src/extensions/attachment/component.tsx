@@ -92,7 +92,8 @@ export function AttachmentComponent(
                 "downloadAttachment",
                 "previewAttachment"
               ] : [
-                "downloadAttachment"
+                "downloadAttachment",
+                "previewAttachment"
               ]
             }
               sx={{
