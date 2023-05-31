@@ -309,6 +309,20 @@ class UserManager {
     });
   }
 
+  async changeMarketingConsent(enabled) {
+    let token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+
+    await http.patch(
+      `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
+      {
+        type: "change_marketing_consent",
+        enabled: enabled
+      },
+      token
+    );
+  }
+
   resetPassword(newPassword) {
     return this._updatePassword("reset_password", {
       new_password: newPassword

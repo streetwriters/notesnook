@@ -36,6 +36,7 @@ const _ignore = "";
  *  id: string,
  *  email: string,
  *  isEmailConfirmed: boolean,
+ *  marketingConsent: boolean,
  *  mfa: {
  *      isEnabled: boolean,
  *      primaryMethod: string,
