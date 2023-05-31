@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { AutoLaunch } from "../../autolaunch";
 import { setDesktopIntegration } from "../../config/desktopIntegration";
+import { destroyTray, setupTray } from "../../tray";
 
 export default (args) => {
   if (!globalThis.window) return;
@@ -27,6 +28,12 @@ export default (args) => {
     AutoLaunch.enable(args.startMinimized);
   } else {
     AutoLaunch.disable();
+  }
+
+  if (args.closeToSystemTray || args.minimizeToSystemTray) {
+    setupTray();
+  } else {
+    destroyTray();
   }
 
   setDesktopIntegration(args);

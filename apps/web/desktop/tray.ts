@@ -25,6 +25,10 @@ import { sendMessageToRenderer } from "./ipc/utils";
 import { isFlatpak } from "./utils";
 
 let tray: Tray | undefined = undefined;
+export function destroyTray() {
+  if (tray) tray.destroy();
+}
+
 export function setupTray() {
   if (tray) tray.destroy();
 

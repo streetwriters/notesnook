@@ -47,7 +47,11 @@ export class AutoLaunch {
         LINUX_DESKTOP_ENTRY(hidden)
       );
     } else {
-      app.setLoginItemSettings({ openAtLogin: true, openAsHidden: hidden });
+      app.setLoginItemSettings({
+        openAtLogin: true,
+        openAsHidden: hidden,
+        args: ["--hidden"]
+      });
     }
   }
 

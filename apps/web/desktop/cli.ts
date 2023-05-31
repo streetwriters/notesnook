@@ -24,15 +24,18 @@ export type CLIOptions = {
   note?: boolean | string;
   notebook?: boolean | string;
   reminder?: boolean | string;
+  hidden?: boolean;
 };
 
 export async function parseArguments(): Promise<CLIOptions> {
   const result: CLIOptions = {
     note: false,
     notebook: false,
-    reminder: false
+    reminder: false,
+    hidden: false
   };
-  await yargs(hideBin(process.argv))
+  const { hidden } = await yargs(hideBin(process.argv))
+    .boolean("hidden")
     .command("new", "Create a new item", (yargs) => {
       return yargs
         .command("note", "Create a new note", {}, () => {
@@ -76,5 +79,6 @@ export async function parseArguments(): Promise<CLIOptions> {
         );
     })
     .parse();
+  result.hidden = hidden;
   return result;
 }
