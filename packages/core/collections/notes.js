@@ -433,7 +433,7 @@ export default class Notes extends Collection {
       .replace(DATE_REGEX, date)
       .replace(TIME_REGEX, time)
       .replace(HEADLINE_REGEX, headline)
-      .replace(COUNT_REGEX, this.all.length);
+      .replace(COUNT_REGEX, this.all.length + 1);
   }
 
   _getNoteTitle(note, oldNote, headline) {
