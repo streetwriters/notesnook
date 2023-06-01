@@ -20,7 +20,7 @@
     "react-native": "0.69.7",
     "react-native-background-actions": "^2.6.6",
     "react-native-begin-background-task": "https://github.com/blockfirm/react-native-begin-background-task.git",
-    "react-native-bootsplash": "^4.1.4",
+    "react-native-bootsplash": "4.1.4",
     "react-native-config": "^1.4.6",
     "react-native-device-info": "^8.4.1",
     "react-native-document-picker": "^7.1.1",
