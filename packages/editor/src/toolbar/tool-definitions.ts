@@ -351,7 +351,6 @@ export function getDefaultPresets() {
   return defaultPresets;
 }
 
-export const MOBILE_ONLY_TOOLS: ToolbarDefinition = [["previewAttachment"]];
 export const STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
   [
     "insertBlock",
@@ -366,6 +365,9 @@ export const STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
     "indent",
     "webclipSettings"
   ]
+];
+export const MOBILE_STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
+  [...STATIC_TOOLBAR_GROUPS[0], "previewAttachment"]
 ];
 
 const defaultPresets: Record<"default" | "minimal", ToolbarDefinition> = {

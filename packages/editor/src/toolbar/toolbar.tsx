@@ -25,7 +25,7 @@ import { EditorFloatingMenus } from "./floating-menus";
 import {
   getDefaultPresets,
   STATIC_TOOLBAR_GROUPS,
-  MOBILE_ONLY_TOOLS
+  MOBILE_STATIC_TOOLBAR_GROUPS
 } from "./tool-definitions";
 import { useEffect, useMemo } from "react";
 import {
@@ -64,7 +64,7 @@ export function Toolbar(props: ToolbarProps) {
   const toolbarTools = useMemo(
     () =>
       isMobile
-        ? [...STATIC_TOOLBAR_GROUPS, ...MOBILE_ONLY_TOOLS, ...tools]
+        ? [...MOBILE_STATIC_TOOLBAR_GROUPS, ...tools]
         : [...STATIC_TOOLBAR_GROUPS, ...tools],
     [tools, isMobile]
   );
