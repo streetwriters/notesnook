@@ -21,6 +21,7 @@ import { showPopup } from "../../components/popup-presenter";
 import { Editor } from "../../types";
 import { MenuItem } from "../../components/menu/types";
 import { getToolbarElement } from "../utils/dom";
+import { getAllTools } from "../tool-definitions";
 
 export const ShowBlockNodesComponent = (props: {
   editor: Editor;
@@ -53,13 +54,18 @@ export const ShowBlockNodesComponent = (props: {
       marginRight: isBottom ? "10px" : 0,
       display: "flex",
       alignItems: isBottom ? "center" : "unset"
+    },
+    onFocus: () => {
+      console.log("on foucs");
+    },
+    onBlur: () => {
+      console.log("on bluur");
     }
   });
 };
 
 const blocknodes = [
   { id: "table", title: "Table" },
-  { id: "list", title: "List" },
   { id: "outline-list", title: "Outline list" },
   { id: "task-list", title: "Task list" },
   { id: "bullet-list", title: "Bullet list" },
@@ -76,6 +82,9 @@ function toMenuItems(editor: Editor): MenuItem[] {
       type: "button",
       title: blocknode.title,
       onClick: () => {
+        console.log(getAllTools());
+        editor.current?.chain().focus().insertContent(" ").run();
+
         switch (blocknode.id) {
           case "table":
             editor.current
@@ -83,8 +92,6 @@ function toMenuItems(editor: Editor): MenuItem[] {
               .focus()
               .insertTable({ rows: 3, cols: 3 })
               .run();
-            break;
-          case "list":
             break;
           case "outline-list":
             editor.current?.chain().focus().toggleOutlineList().run();
@@ -105,6 +112,7 @@ function toMenuItems(editor: Editor): MenuItem[] {
             editor.current?.chain().focus().toggleCodeBlock().run();
             break;
         }
+        editor.current?.off("update");
       }
     });
   }

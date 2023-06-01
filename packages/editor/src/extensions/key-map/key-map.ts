@@ -17,13 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {Extension } from "@tiptap/core";
+import { Extension } from "@tiptap/core";
 import { isInTable } from "@tiptap/pm/tables";
 import { LIST_ITEM_NODE_TYPES, LIST_NODE_TYPES } from "../../utils/node-types";
 import { isListActive } from "../../utils/prosemirror";
 import { CodeBlock } from "../code-block";
 import { ShowBlockNodesComponent } from "../../toolbar/popups/blocknodes-popup";
-import { Editor} from "../../types";
+import { Editor } from "../../types";
+import { getAllTools } from "../../toolbar";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -48,7 +49,12 @@ export const KeyMap = Extension.create({
         return joinUpWithLastListItem(editor as Editor);
       },
       "/": ({ editor }) => {
-        const { $from, to } = editor.state.selection;
+        const { state } = editor as Editor;
+        const { $from } = state.selection;
+        const before = $from.nodeBefore?.textContent;
+
+        if (before) return false;
+
         const selectedElement = editor.view.domAtPos($from.pos)
           .node as HTMLElement;
 
@@ -56,7 +62,20 @@ export const KeyMap = Extension.create({
           editor: editor as Editor,
           selectedElement: selectedElement
         });
-        return false;
+
+        (editor as Editor).current?.commands.focus();
+        (editor as Editor).current?.on("update", ({ editor }) => {
+          const { state } = editor as Editor;
+          const { $from } = state.selection;
+          const before = $from.nodeBefore?.textContent;
+          console.log(
+            " inlistenr",
+            Object.keys(getAllTools()).filter(
+              (string) => string.indexOf(before as string) > -1
+            )
+          );
+        });
+        return true;
       }
     };
   }
