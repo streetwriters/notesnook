@@ -45,7 +45,7 @@ export const SelectionPersist = Extension.create({
           apply(tr, _value, oldState) {
             const { isSearching } = (editor.storage.searchreplace ||
               {}) as Partial<SearchStorage>;
-            if (isSearching) return DecorationSet.empty;
+            if (isSearching || !editor.isEditable) return DecorationSet.empty;
 
             // isBlurred should remain true until isFocused becomes true
             // isFocused should remain true until isBlurred becomes true
