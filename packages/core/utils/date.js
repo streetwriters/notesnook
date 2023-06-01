@@ -77,17 +77,12 @@ export function formatDate(
     type: "date-time"
   }
 ) {
+  const timeFormat = options.timeFormat === "12-hour" ? "h:mm A" : "HH:mm";
   switch (options.type) {
     case "date-time":
-      return dayjs(date).format(
-        `${options.dateFormat} ${
-          options.timeFormat === "12-hour" ? "h:mm A" : "HH:mm"
-        }`
-      );
+      return dayjs(date).format(`${options.dateFormat} ${timeFormat}`);
     case "time":
-      return dayjs(date).format(
-        `${options.timeFormat === "12-hour" ? "h:mm A" : "HH:mm"}`
-      );
+      return dayjs(date).format(timeFormat);
     case "date":
       return dayjs(date).format(`${options.dateFormat}`);
   }

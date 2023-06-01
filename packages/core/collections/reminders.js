@@ -148,20 +148,21 @@ export function formatReminderTime(
   if (reminder.mode === "repeat") {
     time = getUpcomingReminderTime(reminder);
   }
+  const timeFormat = options.timeFormat === "12-hour" ? "h:mm A" : "HH:mm";
 
   if (dayjs(time).isTomorrow()) {
     tag = "Upcoming";
-    text = `Tomorrow, ${dayjs(time).format(options.timeFormat)}`;
+    text = `Tomorrow, ${dayjs(time).format(timeFormat)}`;
   } else if (dayjs(time).isYesterday()) {
     tag = "Last";
-    text = `Yesterday, ${dayjs(time).format(options.timeFormat)}`;
+    text = `Yesterday, ${dayjs(time).format(timeFormat)}`;
   } else {
     const isPast = dayjs(time).isSameOrBefore(dayjs());
     tag = isPast ? "Last" : "Upcoming";
     if (dayjs(time).isToday()) {
-      text = `Today, ${dayjs(time).format(options.timeFormat)}`;
+      text = `Today, ${dayjs(time).format(timeFormat)}`;
     } else {
-      text = dayjs(time).format(options.dateFormat);
+      text = dayjs(time).format(`${options.dateFormat} ${timeFormat}`);
     }
   }
 
