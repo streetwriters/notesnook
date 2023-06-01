@@ -178,7 +178,8 @@ export const ImageNode = Node.create<ImageOptions>({
 
   addNodeView() {
     return createSelectionBasedNodeView(ImageComponent, {
-      shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs)
+      shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs),
+      forceEnableSelection: true
     });
   },
 
