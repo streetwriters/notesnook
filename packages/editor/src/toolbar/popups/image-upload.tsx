@@ -26,7 +26,7 @@ import { downloadImage, toDataURL } from "../../utils/downloader";
 import { useToolbarStore } from "../stores/toolbar-store";
 
 export type ImageUploadPopupProps = {
-  onInsert: (image: ImageAttributes) => void;
+  onInsert: (image: Partial<ImageAttributes>) => void;
   onClose: () => void;
 };
 export function ImageUploadPopup(props: ImageUploadPopupProps) {

@@ -256,6 +256,9 @@ export function ImageComponent(
                     : "2px solid transparent",
                   borderRadius: "default"
                 }}
+                onDoubleClick={() =>
+                  editor.current?.commands.previewAttachment(node.attrs)
+                }
                 onLoad={(e) => {
                   const { clientHeight, clientWidth } = e.currentTarget;
                   if (!height && !width && !aspectRatio) {

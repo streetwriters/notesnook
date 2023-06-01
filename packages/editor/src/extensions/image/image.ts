@@ -59,7 +59,7 @@ export interface ImageOptions {
  * data.
  */
 export type ImageAttributes = Partial<ImageSizeOptions> &
-  Partial<Attachment> & {
+  Attachment & {
     src: string;
     dataurl?: string;
     alt?: string;
