@@ -140,6 +140,66 @@ class Settings {
     return this._settings.trashCleanupInterval || 7;
   }
 
+  /**
+   *
+   * @param {{type: "notebook" | "topic", id: string, notebookId?: string} | undefined} item
+   */
+  async setDefaultNotebook(item) {
+    this._settings.defaultNotebook = !item
+      ? undefined
+      : {
+          id: item.id,
+          type: item.type,
+          notebookId: item.type === "topic" ? item.notebookId : undefined
+        };
+    await this._saveSettings();
+  }
+  /**
+   *
+   * @returns {Notebook | Topic | undefined}
+   */
+  getDefaultNotebook() {
+    const notebook = this._settings.defaultNotebook;
+    if (!notebook) return;
+    if (notebook.type === "topic") {
+      return this._db.notebooks
+        .notebook(notebook.notebookId)
+        .topics.topic(notebook.id)._topic;
+    } else {
+      return this._db.notebooks.notebook(notebook.id).data;
+    }
+  }
+
+  async setTitleFormat(format) {
+    this._settings.titleFormat = format || "Note $date$ $time$";
+    await this._saveSettings();
+  }
+
+  getTitleFormat() {
+    return this._settings.titleFormat;
+  }
+
+  getDateFormat() {
+    return this._settings.dateFormat;
+  }
+
+  async setDateFormat(format) {
+    this._settings.dateFormat = format || "DD-MM-YYYY";
+    await this._saveSettings();
+  }
+  /**
+   *
+   * @returns {"12-hour" | "24-hour"}
+   */
+  getTimeFormat() {
+    return this._settings.timeFormat;
+  }
+
+  async setTimeFormat(format) {
+    this._settings.timeFormat = format || "12-hour";
+    await this._saveSettings();
+  }
+
   _initSettings(settings) {
     this._settings = {
       type: "settings",
@@ -150,6 +210,9 @@ class Settings {
       dateModified: 0,
       dateCreated: 0,
       trashCleanupInterval: 7,
+      titleFormat: "Note $date$ $time$",
+      timeFormat: "12-hour",
+      dateFormat: "DD-MM-YYYY",
       ...(settings || {})
     };
   }

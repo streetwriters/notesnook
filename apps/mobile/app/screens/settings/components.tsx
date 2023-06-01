@@ -27,6 +27,8 @@ import SoundPicker from "./sound-picker";
 import { Subscription } from "./subscription";
 import { TrashIntervalSelector } from "./trash-interval-selector";
 import { FontSelector } from "./font-selector";
+import { TitleFormat } from "./title-format";
+import { DateFormatSelector, TimeFormatSelector } from "./date-format";
 export const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker />,
   homeselector: <HomagePageSelector />,
@@ -37,5 +39,8 @@ export const components: { [name: string]: ReactElement } = {
   "sound-picker": <SoundPicker />,
   licenses: <Licenses />,
   "trash-interval-selector": <TrashIntervalSelector />,
-  "font-selector": <FontSelector />
+  "font-selector": <FontSelector />,
+  "title-format": <TitleFormat />,
+  "date-format-selector": <DateFormatSelector />,
+  "time-format-selector": <TimeFormatSelector />
 };

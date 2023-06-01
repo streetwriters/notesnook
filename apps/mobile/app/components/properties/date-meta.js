@@ -21,7 +21,7 @@ import React from "react";
 import { View } from "react-native";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
-import { timeConverter } from "../../utils/time";
+import { getFormattedDate } from "../../utils/time";
 import Paragraph from "../ui/typography/paragraph";
 export const DateMeta = ({ item }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -66,7 +66,7 @@ export const DateMeta = ({ item }) => {
         {getNameFromKey(key)}
       </Paragraph>
       <Paragraph size={SIZE.xs} color={colors.icon}>
-        {timeConverter(item[key])}
+        {getFormattedDate(item[key], "date-time")}
       </Paragraph>
     </View>
   );

@@ -38,8 +38,9 @@ import { useTagStore } from "../../../stores/use-tag-store";
 import { ThemeStore, useThemeStore } from "../../../stores/use-theme-store";
 import { eClearEditor, eOnLoadNote } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
-import { timeConverter } from "../../../utils/time";
+import { getFormattedDate } from "../../../utils/time";
 import { NoteType } from "../../../utils/types";
+import { onNoteCreated } from "../../notes/common";
 import Commands from "./commands";
 import { Content, EditorState, Note, SavePayload } from "./types";
 import {
@@ -198,10 +199,7 @@ export const useEditor = (
           sessionId: isContentInvalid(data) ? null : currentSessionHistoryId
         };
 
-        if (title) {
-          noteData.title = title;
-        }
-
+        noteData.title = title;
         if (data) {
           noteData.content = {
             data: data,
@@ -213,12 +211,19 @@ export const useEditor = (
           id = await db.notes?.add(noteData);
           if (!note && id) {
             currentNote.current = db.notes?.note(id).data as NoteType;
-            state.current?.onNoteCreated && state.current.onNoteCreated(id);
+            const defaultNotebook = db.settings?.getDefaultNotebook();
+            if (!state.current.onNoteCreated && defaultNotebook) {
+              onNoteCreated(id, {
+                type: defaultNotebook.type,
+                id: defaultNotebook.id,
+                notebook: defaultNotebook.notebookId
+              });
+            } else {
+              state.current?.onNoteCreated && state.current.onNoteCreated(id);
+            }
+
             if (!noteData.title) {
-              postMessage(
-                EditorEvents.titleplaceholder,
-                currentNote.current.title
-              );
+              postMessage(EditorEvents.title, currentNote.current.title);
             }
           }
 
@@ -243,7 +248,7 @@ export const useEditor = (
         }
         if (id && sessionIdRef.current === currentSessionId) {
           note = db.notes?.note(id)?.data as Note;
-          await commands.setStatus(timeConverter(note.dateEdited), "Saved");
+          await commands.setStatus(getFormattedDate(note.dateEdited), "Saved");
 
           lastContentChangeTime.current = note.dateEdited;
 
@@ -373,7 +378,7 @@ export const useEditor = (
         commands.setSessionId(nextSessionId);
         sessionIdRef.current = nextSessionId;
         currentNote.current = item as NoteType;
-        await commands.setStatus(timeConverter(item.dateEdited), "Saved");
+        await commands.setStatus(getFormattedDate(item.dateEdited), "Saved");
         await postMessage(EditorEvents.title, item.title);
         await postMessage(
           EditorEvents.html,
@@ -460,7 +465,7 @@ export const useEditor = (
         if (note.tags !== currentNote.current.tags) {
           await commands.setTags(note);
         }
-        await commands.setStatus(timeConverter(note.dateEdited), "Saved");
+        await commands.setStatus(getFormattedDate(note.dateEdited), "Saved");
       }
 
       lock.current = false;

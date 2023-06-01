@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { formatDate } from "@notesnook/core/utils/date";
+import { db } from "../../common/database";
+import { formatReminderTime } from "@notesnook/core/collections/reminders";
+
 export const sleep = (duration: number) =>
   new Promise((resolve) => setTimeout(() => resolve(true), duration));
 
@@ -107,3 +111,21 @@ export const timeConverter = (timestamp: number | undefined | null) => {
 
   return time;
 };
+
+export function getFormattedDate(
+  date: any,
+  type: "time" | "date-time" | "date" = "date-time"
+) {
+  return formatDate(date, {
+    dateFormat: db.settings?.getDateFormat() as string,
+    timeFormat: db.settings?.getTimeFormat() as string,
+    type: type
+  });
+}
+
+export function getFormattedReminderTime(reminder: any, short = false) {
+  return formatReminderTime(reminder, short, {
+    dateFormat: db.settings?.getDateFormat() as string,
+    timeFormat: db.settings?.getTimeFormat() as string
+  });
+}

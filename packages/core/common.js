@@ -106,4 +106,14 @@ export const EVENTS = {
   systemTimeInvalid: "system:invalidTime"
 };
 
+export const DATE_FORMATS = [
+  "DD-MM-YYYY",
+  "YYYY-DD-MM",
+  "DD/MM/YYYY",
+  "YYYY/DD/MM",
+  "MMM D, YYYY"
+];
+
+export const TIME_FORMATS = ["12-hour", "24-hour"];
+
 export const CURRENT_DATABASE_VERSION = 5.8;
