@@ -112,7 +112,8 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return createSelectionBasedNodeView(AttachmentComponent, {
       shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
         return prev.progress !== next.progress;
-      }
+      },
+      forceEnableSelection: true
     });
   },
 

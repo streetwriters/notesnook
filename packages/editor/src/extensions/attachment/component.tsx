@@ -32,7 +32,7 @@ export function AttachmentComponent(
   const { editor, node, selected } = props;
   const { filename, size, progress } = node.attrs;
   const elementRef = useRef<HTMLSpanElement>();
-
+  
   return (
     <>
       <Box
@@ -87,11 +87,15 @@ export function AttachmentComponent(
           {selected && (
             <ToolbarGroup
               editor={editor}
-              tools={[
+              tools={ editor.isEditable ? [
                 "removeAttachment",
                 "downloadAttachment",
                 "previewAttachment"
-              ]}
+              ] : [
+                "downloadAttachment",
+                "previewAttachment"
+              ]
+            }
               sx={{
                 boxShadow: "menu",
                 borderRadius: "default",
