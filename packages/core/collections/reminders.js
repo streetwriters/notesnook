@@ -124,7 +124,14 @@ export default class Reminders extends Collection {
 /**
  * @param {Reminder} reminder
  */
-export function formatReminderTime(reminder, short = false) {
+export function formatReminderTime(
+  reminder,
+  short = false,
+  options = {
+    timeFormat: "12-hour",
+    dateFormat: "DD-MM-YYYY"
+  }
+) {
   const { date } = reminder;
   let time = date;
   let tag = "";
@@ -133,7 +140,9 @@ export function formatReminderTime(reminder, short = false) {
   if (reminder.mode === "permanent") return `Ongoing`;
 
   if (reminder.snoozeUntil && reminder.snoozeUntil > Date.now()) {
-    return `Snoozed until ${dayjs(reminder.snoozeUntil).format("hh:mm A")}`;
+    return `Snoozed until ${dayjs(reminder.snoozeUntil).format(
+      options.timeFormat
+    )}`;
   }
 
   if (reminder.mode === "repeat") {
@@ -142,17 +151,17 @@ export function formatReminderTime(reminder, short = false) {
 
   if (dayjs(time).isTomorrow()) {
     tag = "Upcoming";
-    text = `Tomorrow, ${dayjs(time).format("hh:mm A")}`;
+    text = `Tomorrow, ${dayjs(time).format(options.timeFormat)}`;
   } else if (dayjs(time).isYesterday()) {
     tag = "Last";
-    text = `Yesterday, ${dayjs(time).format("hh:mm A")}`;
+    text = `Yesterday, ${dayjs(time).format(options.timeFormat)}`;
   } else {
     const isPast = dayjs(time).isSameOrBefore(dayjs());
     tag = isPast ? "Last" : "Upcoming";
     if (dayjs(time).isToday()) {
-      text = `Today, ${dayjs(time).format("hh:mm A")}`;
+      text = `Today, ${dayjs(time).format(options.timeFormat)}`;
     } else {
-      text = dayjs(time).format(`ddd, YYYY-MM-DD hh:mm A`);
+      text = dayjs(time).format(options.dateFormat);
     }
   }
 

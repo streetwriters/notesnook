@@ -37,7 +37,7 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { dHeight } from "../../utils";
 import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
-import { sleep, timeConverter } from "../../utils/time";
+import { getFormattedDate, sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
 import DialogButtons from "../dialog/dialog-buttons";
 import DialogContainer from "../dialog/dialog-container";
@@ -166,7 +166,7 @@ const MergeConflicts = () => {
               {isCurrent ? "(This Device)" : "(Incoming)"}
             </Text>
             {"\n"}
-            {timeConverter(contentToKeep?.dateEdited)}
+            {getFormattedDate(contentToKeep?.dateEdited)}
           </Paragraph>
         </View>
 

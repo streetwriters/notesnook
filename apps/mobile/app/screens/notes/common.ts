@@ -86,7 +86,7 @@ export const setOnFirstSave = (
   }, 0);
 };
 
-async function onNoteCreated(id: string, params: FirstSaveData) {
+export async function onNoteCreated(id: string, params: FirstSaveData) {
   if (!params) return;
   switch (params.type) {
     case "notebook": {

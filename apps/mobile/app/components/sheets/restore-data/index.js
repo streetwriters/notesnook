@@ -21,21 +21,22 @@ import { EVENTS } from "@notesnook/core/common";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
+import RNFetchBlob from "react-native-blob-util";
 import DocumentPicker from "react-native-document-picker";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { db } from "../../../common/database";
 import storage from "../../../common/database/storage";
 import {
+  ToastEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
+  eUnSubscribeEvent
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { initialize } from "../../../stores";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { eCloseRestoreDialog, eOpenRestoreDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
-import { timeConverter } from "../../../utils/time";
+import { getFormattedDate } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
@@ -44,7 +45,6 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Paragraph from "../../ui/typography/paragraph";
-import RNFetchBlob from "react-native-blob-util";
 
 const RestoreDataSheet = () => {
   const [visible, setVisible] = useState(false);
@@ -251,7 +251,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         }}
       >
         <Paragraph size={SIZE.sm} style={{ width: "100%", maxWidth: "100%" }}>
-          {timeConverter(item?.lastModified * 1)}
+          {getFormattedDate(item?.lastModified * 1)}
         </Paragraph>
         <Paragraph size={SIZE.xs}>
           {(item.filename || item.name).replace(".nnbackup", "")}

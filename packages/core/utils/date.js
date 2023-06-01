@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import dayjs from "dayjs";
+
 export function getWeekGroupFromTimestamp(timestamp) {
   const date = new Date(timestamp);
   const { start, end } = getWeek(date);
@@ -64,17 +66,31 @@ function getWeek(date) {
 /**
  *
  * @param {number} date
- * @param {Intl.DateTimeFormatOptions} options
+ * @param {{dateFormat: string, timeFormat: string, type: "date-time" | "time" | "date"}} options
  * @returns
  */
 export function formatDate(
   date,
   options = {
-    dateStyle: "medium",
-    timeStyle: "short"
+    dateFormat: "DD-MM-YYYY",
+    timeFormat: "12-hour",
+    type: "date-time"
   }
 ) {
-  return new Date(date).toLocaleString(undefined, options);
+  switch (options.type) {
+    case "date-time":
+      return dayjs(date).format(
+        `${options.dateFormat} ${
+          options.timeFormat === "12-hour" ? "h:mm A" : "HH:mm"
+        }`
+      );
+    case "time":
+      return dayjs(date).format(
+        `${options.timeFormat === "12-hour" ? "h:mm A" : "HH:mm"}`
+      );
+    case "date":
+      return dayjs(date).format(`${options.dateFormat}`);
+  }
 }
 
 export const MONTHS_FULL = [

@@ -525,12 +525,35 @@ export const settingsGroups: SettingSection[] = [
             component: "homeselector"
           },
           {
+            id: "date-format",
+            name: "Date format",
+            description: "Set the format for date used across the app",
+            type: "component",
+            component: "date-format-selector"
+          },
+          {
+            id: "time-format",
+            name: "Time format",
+            description: "Set the format for time used across the app",
+            type: "component",
+            component: "time-format-selector"
+          },
+          {
             id: "clear-trash-interval",
             type: "component",
             name: "Clear trash interval",
             description:
               "Select the duration after which trash items will be cleared",
             component: "trash-interval-selector"
+          },
+          {
+            id: "default-notebook",
+            name: "Clear default notebook",
+            description: "Clear the default notebook for new notes",
+            modifer: () => {
+              db.settings?.setDefaultNotebook(undefined);
+            },
+            hidden: () => !db.settings?.getDefaultNotebook()
           }
         ]
       },
@@ -588,6 +611,13 @@ export const settingsGroups: SettingSection[] = [
             icon: "format-font",
             property: "defaultFontFamily",
             component: "font-selector"
+          },
+          {
+            id: "title-format",
+            name: "Title format",
+            component: "title-format",
+            description: "Customize the formatting for new note title",
+            type: "component"
           }
         ]
       }

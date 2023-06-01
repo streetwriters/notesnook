@@ -71,6 +71,9 @@ export const useActions = ({ close = () => null, item }) => {
   const user = useUserStore((state) => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
   const alias = item.alias || item.title;
+  const [defaultNotebook, setDefaultNotebook] = useState(
+    db.settings.getDefaultNotebook()
+  );
 
   const isPublished =
     item.type === "note" && db.monographs.isPublished(item.id);
@@ -773,6 +776,44 @@ export const useActions = ({ close = () => null, item }) => {
       func: openHistory
     },
 
+    {
+      id: "default-notebook",
+      title:
+        defaultNotebook?.id === item.id
+          ? "Remove as default notebook"
+          : "Set as default notebook",
+      hidden: item.type !== "notebook",
+      icon: "notebook",
+      func: async () => {
+        if (defaultNotebook?.id === item.id) {
+          await db.settings.setDefaultNotebook();
+          setDefaultNotebook();
+        } else {
+          await db.settings.setDefaultNotebook(item);
+          setDefaultNotebook(item);
+        }
+      },
+      on: defaultNotebook?.id === item.id
+    },
+    {
+      id: "default-topic",
+      title:
+        defaultNotebook?.id === item.id
+          ? "Remove as default topic"
+          : "Set as default topic",
+      hidden: item.type !== "topic",
+      icon: "bookmark",
+      func: async () => {
+        if (defaultNotebook?.id === item.id) {
+          await db.settings.setDefaultNotebook();
+          setDefaultNotebook();
+        } else {
+          await db.settings.setDefaultNotebook(item);
+          setDefaultNotebook(item);
+        }
+      },
+      on: defaultNotebook?.id === item.id
+    },
     {
       id: "disable-reminder",
       title: !item.disabled ? "Turn off reminder" : "Turn on reminder",

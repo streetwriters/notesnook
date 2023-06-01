@@ -23,6 +23,12 @@ import getId from "../utils/id";
 import { getContentFromData } from "../content-types";
 import qclone from "qclone";
 import { deleteItem, findById } from "../utils/array";
+import { formatDate } from "../utils/date";
+
+const DATE_REGEX = /\$date\$/gm;
+const COUNT_REGEX = /\$count\$/gm;
+const TIME_REGEX = /\$time\$/gm;
+const HEADLINE_REGEX = /\$headline\$/gm;
 
 /**
  * @typedef {{ id: string, topic?: string, rebuildCache?: boolean }} NotebookReference
@@ -112,7 +118,7 @@ export default class Notes extends Collection {
       });
     }
 
-    const noteTitle = getNoteTitle(note, oldNote);
+    const noteTitle = this._getNoteTitle(note, oldNote, note.headline);
     if (oldNote && oldNote.title !== noteTitle) note.dateEdited = Date.now();
 
     note = {
@@ -408,6 +414,41 @@ export default class Notes extends Collection {
       await this._collection.updateItem(note);
     }
   }
+
+  formatTitle(title, headline) {
+    const date = formatDate(Date.now(), {
+      dateFormat: this._db.settings.getDateFormat(),
+      timeFormat: this._db.settings.getTimeFormat(),
+      type: "date"
+    });
+
+    const time = formatDate(Date.now(), {
+      dateFormat: this._db.settings.getDateFormat(),
+      timeFormat: this._db.settings.getTimeFormat(),
+      type: "time"
+    });
+
+    return title
+      .replace(NEWLINE_STRIP_REGEX, " ")
+      .replace(DATE_REGEX, date)
+      .replace(TIME_REGEX, time)
+      .replace(HEADLINE_REGEX, headline)
+      .replace(COUNT_REGEX, this.all.length);
+  }
+
+  _getNoteTitle(note, oldNote, headline) {
+    if (note.title && note.title.trim().length > 0) {
+      return note.title.replace(NEWLINE_STRIP_REGEX, " ");
+    } else if (
+      oldNote &&
+      oldNote.title &&
+      oldNote.title.trim().length > 0 &&
+      (note.title === undefined || note.title === null)
+    ) {
+      return oldNote.title.replace(NEWLINE_STRIP_REGEX, " ");
+    }
+    return this.formatTitle(this._db.settings.getTitleFormat(), headline);
+  }
 }
 
 function getNoteHeadline(note, content) {
@@ -416,18 +457,6 @@ function getNoteHeadline(note, content) {
 }
 
 const NEWLINE_STRIP_REGEX = /[\r\n\t\v]+/gm;
-function getNoteTitle(note, oldNote) {
-  if (note.title && note.title.trim().length > 0) {
-    return note.title.replace(NEWLINE_STRIP_REGEX, " ");
-  } else if (oldNote && oldNote.title && oldNote.title.trim().length > 0) {
-    return oldNote.title.replace(NEWLINE_STRIP_REGEX, " ");
-  }
-
-  return `Note ${new Date().toLocaleString(undefined, {
-    dateStyle: "short",
-    timeStyle: "short"
-  })}`;
-}
 
 class NoteIdCache {
   /**

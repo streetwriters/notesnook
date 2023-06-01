@@ -31,6 +31,7 @@ import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { getFormattedDate } from "../../../utils/time";
 
 const showActionSheet = (item) => {
   Properties.present(item);
@@ -163,7 +164,7 @@ export const NotebookItem = ({
                 marginRight: 6
               }}
             >
-              {new Date(item[dateBy]).toDateString().substring(4)}
+              {getFormattedDate(item[dateBy], "date")}
             </Paragraph>
           )}
           <Paragraph
