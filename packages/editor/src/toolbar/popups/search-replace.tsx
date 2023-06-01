@@ -203,15 +203,17 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
         </Flex>
         <Flex sx={{ flexDirection: "column" }}>
           <Flex sx={{ alignItems: "center", height: "33.2px" }}>
-            <ToolButton
-              toggled={isReplacing}
-              title="Toggle replace"
-              id="toggleReplace"
-              icon="replace"
-              onClick={() => setIsReplacing((s) => !s)}
-              sx={{ mr: 0 }}
-              iconSize={"big"}
-            />
+            {editor.isEditable && (
+              <ToolButton
+                toggled={isReplacing}
+                title="Toggle replace"
+                id="toggleReplace"
+                icon="replace"
+                onClick={() => setIsReplacing((s) => !s)}
+                sx={{ mr: 0 }}
+                iconSize={"big"}
+              />
+            )}
             <ToolButton
               toggled={false}
               title="Previous match"
