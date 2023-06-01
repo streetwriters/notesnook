@@ -230,7 +230,7 @@ export function ImageComponent(
                   </Flex>
                 )}
               </DesktopOnly>
-              {selected && !isReadonly && (
+              {!isReadonly && selected && (
                 <Icon
                   className="drag-handle"
                   data-drag-handle
