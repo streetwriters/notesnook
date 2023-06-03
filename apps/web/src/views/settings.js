@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useMemo, useState } from "react";
-import { Button, Flex, Input, Text } from "@theme-ui/components";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useNoteStore } from "../stores/note-store";
@@ -57,7 +57,7 @@ import { FlexScrollContainer } from "../components/scroll-container";
 import { showToast } from "../utils/toast";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
-import { CHECK_IDS } from "@notesnook/core/common";
+import { CHECK_IDS, DATE_FORMATS } from "@notesnook/core/common";
 import Tip from "../components/tip";
 import Toggle from "../components/toggle";
 import {
@@ -84,6 +84,7 @@ import useDesktopIntegration from "../hooks/use-desktop-integration";
 import { writeText } from "clipboard-polyfill";
 import { useEditorConfig } from "../components/editor/context";
 import { getFonts } from "@notesnook/editor";
+import { formatDate } from "@notesnook/core/utils/date";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -155,6 +156,7 @@ function Settings() {
   const [groups, setGroups] = useState({
     sync: false,
     appearance: false,
+    behaviour: false,
     editor: false,
     mfa: false,
     backup: false,
@@ -163,7 +165,6 @@ function Settings() {
     developer: false,
     notifications: false,
     desktop: false,
-    trash: false,
     other: true
   });
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
@@ -223,12 +224,17 @@ function Settings() {
     "https://cors.notesnook.com"
   );
   const { editorConfig, setEditorConfig } = useEditorConfig();
+  const [none, setNonce] = useState(0);
 
   useEffect(() => {
     (async () => {
       await scheduleBackups();
     })();
   }, [backupReminderOffset]);
+
+  const forceUpdate = useCallback(() => {
+    setNonce((s) => ++s);
+  });
 
   return (
     <FlexScrollContainer style={{ height: "100%" }}>
@@ -528,19 +534,7 @@ function Settings() {
               onToggled={toggleFollowSystemTheme}
               isToggled={followSystemTheme}
             />
-            <OptionsItem
-              title={"Homepage"}
-              tip={"Default screen to open on app startup."}
-              options={[
-                { value: 0, title: "Notes" },
-                { value: 1, title: "Notebooks" },
-                { value: 2, title: "Favorites" },
-                { value: 3, title: "Tags" }
-              ]}
-              premium
-              selectedOption={homepage}
-              onSelectionChanged={(_option, index) => setHomepage(index)}
-            />
+
             {isDesktop() && (
               <>
                 <Tip
@@ -561,7 +555,141 @@ function Settings() {
             )}
           </>
         )}
+        <Header
+          title="Behaviour"
+          isOpen={groups.behaviour}
+          onClick={() => {
+            setGroups((g) => ({ ...g, behaviour: !g.behaviour }));
+          }}
+        />
+        {groups.behaviour && (
+          <>
+            <OptionsItem
+              title={"Homepage"}
+              tip={"Default screen to open on app startup."}
+              options={[
+                { value: 0, title: "Notes" },
+                { value: 1, title: "Notebooks" },
+                { value: 2, title: "Favorites" },
+                { value: 3, title: "Tags" }
+              ]}
+              premium
+              selectedOption={homepage}
+              onSelectionChanged={(_option, index) => setHomepage(index)}
+            />
 
+            <OptionsItem
+              title="Clear trash interval"
+              tip={"Permanently delete all items in the trash"}
+              options={[
+                { value: 7, title: "Weekly" },
+                { value: 30, title: "Monthly" },
+                { value: 365, title: "Yearly" },
+                { value: -1, title: "Never", premium: true }
+              ]}
+              selectedOption={trashCleanupInterval}
+              onSelectionChanged={async (option) => {
+                setTrashCleanupInterval(option.value);
+                await db.settings.setTrashCleanupInterval(option.value);
+              }}
+            />
+            <OptionsItem
+              title="Default time format"
+              tip={"This time format will be used everywhere in the app."}
+              options={[
+                { value: "12-hour", title: "12h" },
+                { value: "24-hour", title: "24h" }
+              ]}
+              selectedOption={db.settings.getTimeFormat()}
+              onSelectionChanged={async (option) => {
+                await db.settings.setTimeFormat(option.value);
+                forceUpdate();
+              }}
+            />
+            <Flex
+              sx={{
+                justifyContent: "space-between",
+                alignItems: "center",
+                py: 2,
+                ":hover": { borderBottomColor: "primary" },
+                borderBottom: "1px solid var(--border)"
+              }}
+            >
+              <Tip
+                text="Default date format"
+                tip={"This date format will be used everywhere in the app."}
+              />
+              <Box
+                as="select"
+                sx={{
+                  bg: "bgSecondary",
+                  outline: "none",
+                  border: "1px solid var(--border)",
+                  borderRadius: "default",
+                  width: "120px"
+                }}
+                value={db.settings.getDateFormat()}
+                onChange={async (e) => {
+                  await db.settings.setDateFormat(e.target.value);
+                  forceUpdate();
+                }}
+              >
+                {DATE_FORMATS.map((format) => (
+                  <option key={format} value={format}>
+                    {formatDate(undefined, {
+                      dateFormat: format,
+                      type: "date"
+                    })}
+                  </option>
+                ))}
+              </Box>
+            </Flex>
+            <Flex
+              sx={{
+                flexDirection: "column",
+                justifyContent: "center",
+                py: 2,
+                ":hover": { borderBottomColor: "primary" },
+                borderBottom: "1px solid var(--border)"
+              }}
+            >
+              <Tip
+                text="Default note title format"
+                tip={
+                  "This title format will be used as the default note title."
+                }
+              />
+              <Input
+                sx={{ mt: 1, p: 1 }}
+                value={db.settings.getTitleFormat()}
+                onChange={async (e) => {
+                  await db.settings.setTitleFormat(e.target.value);
+                  forceUpdate();
+                }}
+              />
+              <Text variant="subBody" sx={{ mt: 1 }}>
+                Use the following key to format the title:
+                <br />
+                <br />
+                $date$: Current date
+                <br />
+                $time$: Current time
+                <br />
+                $count$: Number of notes + 1<br />
+                $headline$: Use starting line of the note as title
+              </Text>
+            </Flex>
+            <Button
+              variant="list"
+              onClick={() => db.settings.setDefaultNotebook(undefined)}
+            >
+              <Tip
+                text="Clear default notebook/topic"
+                tip="Clear the default notebook for new notes"
+              />
+            </Button>
+          </>
+        )}
         {isDesktop() && (
           <>
             <Header
@@ -850,31 +978,7 @@ function Settings() {
             )}
           </>
         )}
-        <Header
-          title="Trash settings"
-          isOpen={groups.trash}
-          testId="trash-settings"
-          onClick={() => {
-            setGroups((g) => ({ ...g, trash: !g.trash }));
-          }}
-        />
-        {groups.trash && (
-          <OptionsItem
-            title="Clear trash interval"
-            tip={"Permanently delete all items in the trash"}
-            options={[
-              { value: 7, title: "Weekly" },
-              { value: 30, title: "Monthly" },
-              { value: 365, title: "Yearly" },
-              { value: -1, title: "Never", premium: true }
-            ]}
-            selectedOption={trashCleanupInterval}
-            onSelectionChanged={async (option) => {
-              setTrashCleanupInterval(option.value);
-              await db.settings.setTrashCleanupInterval(option.value);
-            }}
-          />
-        )}
+
         <Header
           title="Notesnook Importer"
           isOpen={groups.importer}
