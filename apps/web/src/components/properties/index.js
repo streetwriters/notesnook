@@ -29,7 +29,6 @@ import { store as noteStore } from "../../stores/note-store";
 import { AnimatedFlex } from "../animated";
 import Toggle from "./toggle";
 import ScrollContainer from "../scroll-container";
-import { formatDate } from "@notesnook/core/utils/date";
 import Vault from "../../common/vault";
 import TimeAgo from "../time-ago";
 import { Attachment } from "../attachment";
@@ -38,6 +37,7 @@ import { getTotalSize } from "../../common/attachments";
 import Notebook from "../notebook";
 import { getTotalNotes } from "../../common";
 import Reminder from "../reminder";
+import { getFormattedDate } from "../../utils/time";
 
 const tools = [
   { key: "pin", property: "pinned", icon: Icon.Pin, label: "Pin" },
@@ -66,12 +66,12 @@ const metadataItems = [
   {
     key: "dateCreated",
     label: "Created at",
-    value: (date) => formatDate(date || Date.now())
+    value: (date) => getFormattedDate(date || Date.now())
   },
   {
     key: "dateEdited",
     label: "Last edited at",
-    value: (date) => (date ? formatDate(date) : "never")
+    value: (date) => (date ? getFormattedDate(date) : "never")
   }
 ];
 
@@ -307,18 +307,10 @@ function Properties(props) {
             subtitle={"Your session history is local only."}
           >
             {versionHistory.map((session) => {
-              const fromDate = formatDate(session.dateCreated, {
-                dateStyle: "short"
-              });
-              const toDate = formatDate(session.dateModified, {
-                dateStyle: "short"
-              });
-              const fromTime = formatDate(session.dateCreated, {
-                timeStyle: "short"
-              });
-              const toTime = formatDate(session.dateModified, {
-                timeStyle: "short"
-              });
+              const fromDate = getFormattedDate(session.dateCreated, "date");
+              const toDate = getFormattedDate(session.dateModified, "date");
+              const fromTime = getFormattedDate(session.dateCreated, "time");
+              const toTime = getFormattedDate(session.dateModified, "time");
               const label = `${fromDate}, ${fromTime} — ${
                 fromDate !== toDate ? `${toDate}, ` : ""
               }${toTime}`;

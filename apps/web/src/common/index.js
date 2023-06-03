@@ -38,6 +38,7 @@ import { PATHS } from "@notesnook/desktop/paths";
 import saveFile from "../commands/save-file";
 import { TaskManager } from "./task-manager";
 import { EVENTS } from "@notesnook/core/common";
+import { getFormattedDate } from "../utils/time";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -94,9 +95,7 @@ export async function createBackup() {
     return;
   }
 
-  const filename = sanitizeFilename(
-    `notesnook-backup-${new Date().toLocaleString("en")}`
-  );
+  const filename = sanitizeFilename(`notesnook-backup-${getFormattedDate()}`);
 
   const ext = "nnbackup";
   if (isDesktop()) {

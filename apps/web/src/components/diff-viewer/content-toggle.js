@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatDate } from "@notesnook/core/utils/date";
 import { Flex, Button } from "@theme-ui/components";
+import { getFormattedDate } from "../../utils/time";
 
 function ContentToggle(props) {
   const {
@@ -69,7 +69,7 @@ function ContentToggle(props) {
           alignItems: "center"
         }}
       >
-        {label} | {formatDate(dateEdited, true)}
+        {label} | {getFormattedDate(dateEdited)}
       </Flex>
     </Flex>
   );

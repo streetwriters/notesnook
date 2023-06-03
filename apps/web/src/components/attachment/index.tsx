@@ -38,7 +38,6 @@ import {
   Reupload,
   Uploading
 } from "../icons";
-import { formatDate } from "@notesnook/core/utils/date";
 import { showToast } from "../../utils/toast";
 import { hashNavigate } from "../../navigation";
 import {
@@ -58,6 +57,7 @@ import {
 } from "@notesnook/core/utils/filename";
 import { useEffect, useState } from "react";
 import { AppEventManager, AppEvents } from "../../common/app-events";
+import { getFormattedDate } from "../../utils/time";
 
 const FILE_ICONS: Record<string, Icon> = {
   "image/": FileImage,
@@ -213,10 +213,7 @@ export function Attachment({
       {!compact && (
         <Text as="td" variant="body">
           {attachment.dateUploaded
-            ? formatDate(attachment.dateUploaded, {
-                dateStyle: "short",
-                timeStyle: "short"
-              })
+            ? getFormattedDate(attachment.dateUploaded, "date")
             : "-"}
         </Text>
       )}

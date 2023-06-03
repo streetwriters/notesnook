@@ -23,7 +23,7 @@ import Dialog from "./dialog";
 import { db } from "../../common/db";
 import { Loading } from "../icons";
 import { Flex, Link, Text } from "@theme-ui/components";
-import { formatDate } from "@notesnook/core/utils/date";
+import { getFormattedDate } from "../../utils/time";
 
 type Transaction = {
   order_id: string;
@@ -31,7 +31,7 @@ type Transaction = {
   amount: string;
   currency: string;
   status: keyof typeof TransactionStatusToText;
-  created_at: Date;
+  created_at: string;
   passthrough: null;
   product_id: number;
   is_subscription: boolean;
@@ -118,7 +118,7 @@ export default function BillingHistoryDialog(props: BillingHistoryDialogProps) {
               <Flex sx={{ flexDirection: "column" }}>
                 <Text variant="subtitle">Order #{transaction.order_id}</Text>
                 <Text variant="body" sx={{ color: "fontTertiary" }}>
-                  {formatDate(new Date(transaction.created_at).getTime())} •{" "}
+                  {getFormattedDate(transaction.created_at, "date")} •{" "}
                   {TransactionStatusToText[transaction.status]}
                 </Text>
               </Flex>

@@ -27,10 +27,10 @@ import {
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { store as themestore } from "../stores/theme-store";
 import { store as appstore } from "../stores/app-store";
-import { formatDate } from "@notesnook/core/utils/date";
 import { h } from "./html";
 import { sanitizeFilename } from "./filename";
 import { attachFile } from "../components/editor/picker";
+import { getFormattedDate } from "./time";
 
 export class WebExtensionServer implements Server {
   async login() {
@@ -101,7 +101,7 @@ export class WebExtensionServer implements Server {
     content += h("div", [
       h("hr"),
       h("p", ["Clipped from ", h("a", [clip.title], { href: clip.url })]),
-      h("p", [`Date clipped: ${formatDate(Date.now())}`])
+      h("p", [`Date clipped: ${getFormattedDate(Date.now())}`])
     ]).innerHTML;
 
     const id = await db.notes?.add({

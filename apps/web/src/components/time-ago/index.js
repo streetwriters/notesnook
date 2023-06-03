@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatDate } from "@notesnook/core/utils/date";
 import React, { useEffect, useRef } from "react";
 import { Text } from "@theme-ui/components";
 import { register, format, cancel, render } from "timeago.js";
+import { getFormattedDate } from "../../utils/time";
 
 const shortLocale = [
   ["now", "now"],
@@ -87,7 +87,7 @@ function TimeAgo({ datetime, live, locale, opts, sx, ...restProps }) {
         ...sx,
         color: sx?.color || "inherit"
       }}
-      title={formatDate(datetime)}
+      title={getFormattedDate(datetime)}
       as="time"
       data-test-id="time"
       dateTime={toDate(datetime).toISOString()}

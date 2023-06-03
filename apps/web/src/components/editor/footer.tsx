@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatDate } from "@notesnook/core/utils/date";
 import { Flex, Text } from "@theme-ui/components";
 import { useMemo } from "react";
 import { useStore } from "../../stores/editor-store";
 import { Loading, Saved, NotSaved } from "../icons";
 import { useNoteStatistics } from "./context";
+import { getFormattedDate } from "../../utils/time";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -63,7 +63,7 @@ function EditorFooter() {
         data-test-id="editor-date-edited"
         title={dateEdited?.toString()}
       >
-        {formatDate(dateEdited || Date.now())}
+        {getFormattedDate(dateEdited || Date.now())}
       </Text>
       {SaveStateIcon && <SaveStateIcon size={13} color="bgSecondaryText" />}
     </Flex>
