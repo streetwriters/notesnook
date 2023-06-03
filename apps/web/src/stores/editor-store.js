@@ -201,6 +201,8 @@ class EditorStore extends BaseStore {
         else if (type === "tag") await db.notes.note(id).tag(value);
         // update the note.
         note = db.notes.note(id)?.data;
+      } else if (!sessionId && db.settings.getDefaultNotebook()) {
+        await db.notes.addToNotebook(db.settings.getDefaultNotebook(), id);
       }
 
       const shouldRefreshNotes =

@@ -131,6 +131,25 @@ const menuItems = [
     onClick: ({ notebook }) => hashNavigate(`/notebooks/${notebook.id}/edit`)
   },
   {
+    key: "set-as-default",
+    title: "Set as default",
+    checked: ({ notebook }) => {
+      const defaultNotebook = db.settings.getDefaultNotebook();
+      return defaultNotebook.id === notebook.id && !defaultNotebook.topic;
+    },
+
+    icon: Icon.Notebook,
+    onClick: async ({ notebook }) => {
+      const defaultNotebook = db.settings.getDefaultNotebook();
+      const isDefault =
+        defaultNotebook?.id === notebook.id && !defaultNotebook?.topic;
+
+      await db.settings.setDefaultNotebook(
+        isDefault ? undefined : { id: notebook.id }
+      );
+    }
+  },
+  {
     key: "pin",
     icon: Icon.Pin,
     title: "Pin",
