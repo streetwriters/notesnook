@@ -39,7 +39,7 @@ import {
   useSafeAreaInsets
 } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import ShareExtension from "rn-extensions-share";
+import ShareExtension from "@ammarahmed/react-native-share-extension";
 import isURL from "validator/lib/isURL";
 import { db } from "../app/common/database";
 import { MMKV } from "../app/common/database/mmkv";
