@@ -81,6 +81,27 @@ const menuItems = [
       hashNavigate(`/notebooks/${topic.notebookId}/topics/${topic.id}/edit`)
   },
   {
+    key: "set-as-default",
+    title: "Set as default",
+    checked: ({ topic }) => {
+      const defaultNotebook = db.settings.getDefaultNotebook();
+      return (
+        defaultNotebook?.id === topic.notebookId &&
+        defaultNotebook?.topic === topic.id
+      );
+    },
+    icon: Icon.Topic,
+    onClick: async ({ topic }) => {
+      const defaultNotebook = db.settings.getDefaultNotebook();
+      const isDefault =
+        defaultNotebook?.id === topic.notebookId &&
+        defaultNotebook?.topic === topic.id;
+      await db.settings.setDefaultNotebook(
+        isDefault ? undefined : { id: topic.notebookId, topic: topic.id }
+      );
+    }
+  },
+  {
     key: "shortcut",
     title: ({ topic }) =>
       db.shortcuts.exists(topic.id) ? "Remove shortcut" : "Create shortcut",
