@@ -31,6 +31,7 @@ import { showToast } from "../../utils/toast";
 import { Multiselect } from "../../common/multi-select";
 import { pluralize } from "../../utils/string";
 import { confirm } from "../../common/dialog-controller";
+import { getFormattedDate } from "../../utils/time";
 
 function Notebook(props) {
   const { item, index, totalNotes, date, simplified } = props;
@@ -85,9 +86,7 @@ function Notebook(props) {
                 <Icon.PinFilled color="primary" size={13} sx={{ mr: 1 }} />
               )}
 
-              {new Date(date).toLocaleDateString("en", {
-                dateStyle: "medium"
-              })}
+              {getFormattedDate(date, "date")}
               <Text as="span" mx={1} sx={{ color: "inherit" }}>
                 •
               </Text>

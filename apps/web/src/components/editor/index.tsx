@@ -35,7 +35,6 @@ import {
 import Toolbar from "./toolbar";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
-import { formatDate } from "@notesnook/core/utils/date";
 import Tiptap from "./tiptap";
 import Header from "./header";
 import { Attachment } from "../icons";
@@ -55,6 +54,7 @@ import ThemeProviderWrapper from "../theme-provider";
 import { Allotment } from "allotment";
 import { PdfPreview } from "../pdf-preview";
 import { showToast } from "../../utils/toast";
+import { getFormattedDate } from "../../utils/time";
 
 type PreviewSession = {
   content: { data: string; type: string };
@@ -570,8 +570,8 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
       <Flex mr={4} sx={{ flexDirection: "column" }}>
         <Text variant={"subtitle"}>Preview</Text>
         <Text variant={"body"}>
-          You are previewing note version edited from {formatDate(dateCreated)}{" "}
-          to {formatDate(dateEdited)}.
+          You are previewing note version edited from{" "}
+          {getFormattedDate(dateCreated)} to {getFormattedDate(dateEdited)}.
         </Text>
       </Flex>
       <Flex>

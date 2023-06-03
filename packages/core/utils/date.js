@@ -65,7 +65,7 @@ function getWeek(date) {
 
 /**
  *
- * @param {number} date
+ * @param {string | number | Date | null | undefined} date
  * @param {{dateFormat: string, timeFormat: string, type: "date-time" | "time" | "date"}} options
  * @returns
  */

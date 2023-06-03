@@ -32,7 +32,6 @@ import {
   SortAsc
 } from "../components/icons";
 import { getTotalNotes } from "../common";
-import { formatDate } from "@notesnook/core/utils/date";
 import { pluralize } from "../utils/string";
 import { Allotment } from "allotment";
 import { Plus } from "../components/icons";
@@ -41,6 +40,7 @@ import Placeholder from "../components/placeholders";
 import { showSortMenu } from "../components/group-header";
 import { db } from "../common/db";
 import { groupArray } from "@notesnook/core/utils/grouping";
+import { getFormattedDate } from "../utils/time";
 
 function Notebook() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -287,7 +287,7 @@ function NotebookHeader({ notebook }) {
 
   return (
     <Flex mx={2} my={2} sx={{ flexDirection: "column", minWidth: 200 }}>
-      <Text variant="subBody">{formatDate(dateEdited)}</Text>
+      <Text variant="subBody">{getFormattedDate(dateEdited)}</Text>
       <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
         <Text variant="heading">{title}</Text>
         <Flex>

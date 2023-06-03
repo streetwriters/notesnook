@@ -31,7 +31,6 @@ import { showToast } from "../utils/toast";
 import { Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
-import { formatDate } from "@notesnook/core/utils/date";
 import downloadUpdate from "../commands/download-update";
 import installUpdate from "../commands/install-update";
 import { AppVersion, getChangelog } from "../utils/version";
@@ -41,6 +40,7 @@ import { AuthenticatorType } from "../components/dialogs/mfa/types";
 import { Suspense } from "react";
 import { Reminder } from "@notesnook/core/collections/reminders";
 import { ConfirmDialogProps } from "../components/dialogs/confirm";
+import { getFormattedDate } from "../utils/time";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -693,14 +693,8 @@ export async function showInvalidSystemTimeDialog({
     title: "Your system clock is out of sync",
     subtitle:
       "Please correct your system date & time and reload the app to avoid syncing issues.",
-    message: `Server time: ${formatDate(serverTime, {
-      dateStyle: "medium",
-      timeStyle: "medium"
-    })}
-Local time: ${formatDate(localTime, {
-      dateStyle: "medium",
-      timeStyle: "medium"
-    })}
+    message: `Server time: ${getFormattedDate(serverTime)}
+Local time: ${getFormattedDate(localTime)}
 Please sync your system time with [https://time.is](https://time.is).`,
     positiveButtonText: "Reload app"
   });
