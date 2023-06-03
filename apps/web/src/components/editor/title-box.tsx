@@ -43,21 +43,28 @@ function TitleBox(props: TitleBoxProps) {
     return isMobile || isTablet ? 1.625 : 2.625;
   }, [isMobile, isTablet]);
 
-  const updateFontSize = useCallback(() => {
-    if (!inputRef.current) return;
-    const fontSize = textLengthToFontSize(
-      inputRef.current.value.length,
-      MAX_FONT_SIZE
-    );
-    inputRef.current.style.fontSize = `${fontSize}em`;
-  }, [MAX_FONT_SIZE]);
+  const updateFontSize = useCallback(
+    (length) => {
+      if (!inputRef.current) return;
+      const fontSize = textLengthToFontSize(length, MAX_FONT_SIZE);
+      inputRef.current.style.fontSize = `${fontSize}em`;
+    },
+    [MAX_FONT_SIZE]
+  );
 
   useEffect(() => {
     if (inputRef.current) {
+      inputRef.current.placeholder = "Note title";
       inputRef.current.value = title;
-      updateFontSize();
+      updateFontSize(title.length);
     }
   }, [id, updateFontSize]);
+
+  useEffect(() => {
+    if (inputRef.current && inputRef.current.value !== title) {
+      inputRef.current.placeholder = title || "Note title";
+    }
+  }, [title]);
 
   return (
     <Input
@@ -77,7 +84,7 @@ function TitleBox(props: TitleBoxProps) {
       onChange={(e) => {
         const { sessionId, id } = store.get().session;
         debouncedOnTitleChange(sessionId, id, e.target.value);
-        updateFontSize();
+        updateFontSize(e.target.value.length);
       }}
     />
   );
@@ -88,7 +95,6 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
 });
 
 function onTitleChange(noteId: string, title: string) {
-  if (!title) return;
   store.get().setTitle(noteId, title);
 }
 
