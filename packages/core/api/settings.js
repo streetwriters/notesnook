@@ -142,32 +142,23 @@ class Settings {
 
   /**
    *
-   * @param {{type: "notebook" | "topic", id: string, notebookId?: string} | undefined} item
+   * @param {{id: string, topic?: string} | undefined} item
    */
   async setDefaultNotebook(item) {
     this._settings.defaultNotebook = !item
       ? undefined
       : {
           id: item.id,
-          type: item.type,
-          notebookId: item.type === "topic" ? item.notebookId : undefined
+          topic: item.topic
         };
     await this._saveSettings();
   }
   /**
    *
-   * @returns {Notebook | Topic | undefined}
+   * @returns {{id: string, topic?: string} | undefined}
    */
   getDefaultNotebook() {
-    const notebook = this._settings.defaultNotebook;
-    if (!notebook) return;
-    if (notebook.type === "topic") {
-      return this._db.notebooks
-        .notebook(notebook.notebookId)
-        .topics.topic(notebook.id)._topic;
-    } else {
-      return this._db.notebooks.notebook(notebook.id).data;
-    }
+    return this._settings.defaultNotebook;
   }
 
   async setTitleFormat(format) {
