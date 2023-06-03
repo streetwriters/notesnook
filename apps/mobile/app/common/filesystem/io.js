@@ -23,14 +23,21 @@ import RNFetchBlob from "react-native-blob-util";
 import { cacheDir, getRandomId } from "./utils";
 import { db } from "../database";
 import { compressToBase64 } from "./compress";
+import { IOS_APPGROUPID } from "../../utils/constants";
 
 export async function readEncrypted(filename, key, cipherData) {
   let path = `${cacheDir}/${filename}`;
   try {
-    let exists = await RNFetchBlob.fs.exists(path);
+    const iosAppGroup = await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID);
+    const appGroupPath = `${iosAppGroup}/${filename}`;
+    let exists =
+      (await RNFetchBlob.fs.exists(path)) ||
+      (Platform.OS === "ios" && (await RNFetchBlob.fs.exists(appGroupPath)));
+
     if (!exists) {
       return false;
     }
+
     const attachment = db.attachments.attachment(filename);
     const isPng = /(png)/g.test(attachment?.metadata.type);
     const isJpeg = /(jpeg|jpg)/g.test(attachment?.metadata.type);
@@ -39,7 +46,8 @@ export async function readEncrypted(filename, key, cipherData) {
       key,
       {
         ...cipherData,
-        hash: filename
+        hash: filename,
+        appGroupId: IOS_APPGROUPID
       },
       cipherData.outputType === "base64"
         ? isPng || isJpeg

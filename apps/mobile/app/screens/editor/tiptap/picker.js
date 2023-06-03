@@ -270,7 +270,7 @@ const handleImageResponse = async (response, options) => {
   });
 };
 
-async function attachFile(uri, hash, type, filename, options) {
+export async function attachFile(uri, hash, type, filename, options) {
   try {
     let exists = db.attachments.exists(hash);
     let encryptionInfo;
@@ -289,7 +289,7 @@ async function attachFile(uri, hash, type, filename, options) {
       let key = await db.attachments.generateKey();
       encryptionInfo = await Sodium.encryptFile(key, {
         uri: uri,
-        type: "url",
+        type: options.type || "url",
         hash: hash
       });
       encryptionInfo.type = type;

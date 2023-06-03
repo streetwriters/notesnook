@@ -355,7 +355,7 @@ PODS:
     - React-perflogger (= 0.69.7)
   - rn-extensions-share (2.4.0):
     - React-Core
-  - RNBootSplash (4.7.1):
+  - RNBootSplash (4.1.4):
     - React-Core
   - RNCCheckbox (0.5.15):
     - BEMCheckBox (~> 1.4)
@@ -774,7 +774,7 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 65cd2782a57e1d59a68aa5d504edf94278578e41
   ReactCommon: 1e783348b9aa73ae68236271df972ba898560a95
   rn-extensions-share: 3f0ecce20dfbca1f0358deb4ebfb9ee121a6d92a
-  RNBootSplash: 3f3f7f82efe2addbfe7ddeda20877ff4d579cd81
+  RNBootSplash: de2c568373a9c79a66e9918b8929eb6c9a35246f
   RNCCheckbox: 43bcc6493611468af0e19f19f029dab3da8561c4
   RNCClipboard: 3f0451a8100393908bea5c5c5b16f96d45f30bfc
   RNCMaskedView: 949696f25ec596bfc697fc88e6f95cf0c79669b6

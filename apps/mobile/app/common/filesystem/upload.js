@@ -22,6 +22,8 @@ import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import { cacheDir } from "./utils";
 import { isImage, isDocument } from "@notesnook/core/utils/filename";
+import { Platform } from "react-native";
+import { IOS_APPGROUPID } from "../../utils/constants";
 
 export async function uploadFile(filename, data, cancelToken) {
   if (!data) return false;
@@ -36,6 +38,15 @@ export async function uploadFile(filename, data, cancelToken) {
     if (!res.ok) throw new Error(`${res.status}: Unable to resolve upload url`);
     const uploadUrl = await res.text();
     if (!uploadUrl) throw new Error("Unable to resolve upload url");
+    let uploadFilePath = `${cacheDir}/${filename}`;
+
+    const iosAppGroup = await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID);
+    const appGroupPath = `${iosAppGroup}/${filename}`;
+    let exists = await RNFetchBlob.fs.exists(uploadFilePath);
+    if (!exists && Platform.OS === "ios") {
+      console.log("Upload file from app group path");
+      uploadFilePath = appGroupPath;
+    }
 
     let request = RNFetchBlob.config({
       IOSBackgroundTask: true
@@ -46,7 +57,7 @@ export async function uploadFile(filename, data, cancelToken) {
         {
           "content-type": ""
         },
-        RNFetchBlob.wrap(`${cacheDir}/${filename}`)
+        RNFetchBlob.wrap(uploadFilePath)
       )
       .uploadProgress((sent, total) => {
         useAttachmentStore

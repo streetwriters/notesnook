@@ -33,10 +33,16 @@
 		<dict>
 			<key>NSExtensionActivationRule</key>
 			<dict>
+				<key>NSExtensionActivationSupportsFileWithMaxCount</key>
+				<string>5</string>
+				<key>NSExtensionActivationSupportsImageWithMaxCount</key>
+				<integer>5</integer>
+				<key>NSExtensionActivationSupportsMovieWithMaxCount</key>
+				<string>5</string>
 				<key>NSExtensionActivationSupportsText</key>
 				<true/>
 				<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
-				<integer>10</integer>
+				<integer>1</integer>
 			</dict>
 		</dict>
 		<key>NSExtensionMainStoryboard</key>

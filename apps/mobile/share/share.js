@@ -23,6 +23,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Keyboard,
   Platform,
   SafeAreaView,
@@ -41,14 +42,17 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ShareExtension from "rn-extensions-share";
 import isURL from "validator/lib/isURL";
 import { db } from "../app/common/database";
+import { MMKV } from "../app/common/database/mmkv";
 import Storage from "../app/common/database/storage";
 import { eSendEvent } from "../app/services/event-manager";
-import { getElevation } from "../app/utils";
+import { formatBytes, getElevation } from "../app/utils";
 import { eOnLoadNote } from "../app/utils/events";
 import { Editor } from "./editor";
 import { Search } from "./search";
 import { initDatabase, useShareStore } from "./store";
-import NetInfo from "@react-native-community/netinfo";
+import { isImage } from "@notesnook/core/utils/filename";
+import { NoteBundle } from "../app/utils/note-bundle";
+
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
 };
@@ -193,7 +197,7 @@ const ShareView = ({ quicknote = false }) => {
   const accent = useShareStore((state) => state.accent);
   const appendNote = useShareStore((state) => state.appendNote);
   const [note, setNote] = useState({ ...defaultNote });
-  const noteContent = useRef();
+  const noteContent = useRef("");
   const [loading, setLoading] = useState(false);
   const [loadingExtension, setLoadingExtension] = useState(true);
   const [rawData, setRawData] = useState({
@@ -209,6 +213,7 @@ const ShareView = ({ quicknote = false }) => {
       : // eslint-disable-next-line react-hooks/rules-of-hooks
         useSafeAreaInsets();
   const [searchMode, setSearchMode] = useState(null);
+  const [rawFiles, setRawFiles] = useState([]);
 
   const [kh, setKh] = useState(0);
 
@@ -272,6 +277,19 @@ const ShareView = ({ quicknote = false }) => {
             note.content.data = makeHtmlFromPlainText(item.value);
           }
           noteContent.current = note.content.data;
+        } else {
+          const user = await db.user.getUser();
+          if (user && user.subscription.type !== 0) {
+            setRawFiles((files) => {
+              const index = files.findIndex((file) => file.name === item.name);
+              if (index === -1) {
+                files.push(item);
+                return [...files];
+              } else {
+                return files;
+              }
+            });
+          }
         }
       }
       setNote({ ...note });
@@ -294,7 +312,7 @@ const ShareView = ({ quicknote = false }) => {
 
   useEffect(() => {
     (async () => {
-      //await loadDatabase();
+      await initDatabase();
       setLoadingExtension(false);
       loadData();
       useShareStore.getState().restore();
@@ -313,8 +331,10 @@ const ShareView = ({ quicknote = false }) => {
 
   const onPress = async () => {
     setLoading(true);
-    await initDatabase();
-    if (!noteContent.current) return;
+    if (!noteContent.current && rawFiles.length === 0) {
+      setLoading(false);
+      return;
+    }
     if (appendNote && !db.notes.note(appendNote.id)) {
       useShareStore.getState().setAppendNote(null);
       Alert.alert("The note you are trying to append to has been deleted.");
@@ -340,30 +360,22 @@ const ShareView = ({ quicknote = false }) => {
       _note.sessionId = Date.now();
     }
 
-    let id = await db.notes.add(_note);
-    if (!appendNote) {
-      for (const item of useShareStore.getState().selectedNotebooks) {
-        if (item.type === "notebook") {
-          db.relations.add(item, { id, type: "note" });
-        } else {
-          db.notes.addToNotebook(
-            {
-              id: item.notebookId,
-              topic: item.id
-            },
-            id
-          );
-        }
-      }
+    const noteBundle = {
+      files: rawFiles,
+      note: _note,
+      notebooks: useShareStore.getState().selectedNotebooks
+    };
+    const bundles = MMKV.getArray("shared:noteBundles") || [];
+    bundles.push(noteBundle);
+    MMKV.setArray("shared:noteBundles", bundles);
+    await NoteBundle.createNotes();
+
+    try {
+      await db.sync(false, false);
+    } catch (e) {
+      console.log(e, e.stack);
     }
-    const status = await NetInfo.fetch();
-    if (status.isInternetReachable) {
-      try {
-        await db.sync(false, false);
-      } catch (e) {
-        console.log(e, e.stack);
-      }
-    }
+
     await Storage.write("notesAddedFromIntent", "added");
     close();
     setLoading(false);
@@ -580,10 +592,77 @@ const ShareView = ({ quicknote = false }) => {
                   }}
                 />
               </View>
+
+              <View
+                style={{
+                  paddingHorizontal: 12,
+                  paddingVertical: 12,
+                  backgroundColor: colors.nav
+                }}
+              >
+                <Text style={{ color: colors.pri, marginBottom: 6 }}>
+                  Attaching {rawFiles.length} file(s):
+                </Text>
+                <ScrollView horizontal>
+                  {rawFiles.map((item) =>
+                    isImage(item.type) ? (
+                      <Image
+                        key={item.name}
+                        source={{
+                          uri:
+                            Platform.OS === "android"
+                              ? `file://${item.value}`
+                              : item.value
+                        }}
+                        style={{
+                          width: 100,
+                          height: 100,
+                          borderRadius: 5,
+                          backgroundColor: "black",
+                          marginRight: 6
+                        }}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View
+                        key={item.name}
+                        source={{
+                          uri: `file://${item.value}`
+                        }}
+                        style={{
+                          borderRadius: 5,
+                          backgroundColor: colors.nav,
+                          flexDirection: "row",
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          alignItems: "center",
+                          paddingVertical: 5,
+                          paddingHorizontal: 8,
+                          marginRight: 6
+                        }}
+                        resizeMode="cover"
+                      >
+                        <Icon color={colors.pri} size={15} name="file" />
+
+                        <Text
+                          style={{
+                            marginLeft: 4,
+                            color: colors.pri,
+                            paddingRight: 8,
+                            fontSize: 12
+                          }}
+                        >
+                          {item.name} ({formatBytes(item.size)})
+                        </Text>
+                      </View>
+                    )
+                  )}
+                </ScrollView>
+              </View>
               <View
                 style={{
                   width: "100%",
-                  height: 200,
+                  height: rawFiles.length > 0 ? 100 : 200,
                   paddingBottom: 15,
                   marginBottom: 10,
                   borderBottomColor: colors.nav,

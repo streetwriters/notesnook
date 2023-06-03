@@ -20,6 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Platform } from "react-native";
 import { Monographs } from "../screens/notes/monographs";
 
+export const IOS_APPGROUPID = "group.org.streetwriters.notesnook";
+
 export const STORE_LINK =
   Platform.OS === "ios"
     ? "https://apps.apple.com/us/app/notesnook/id1544027013"

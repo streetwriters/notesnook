@@ -71,6 +71,7 @@ import { tabBarRef } from "../utils/global-refs";
 import BackupService from "../services/backup";
 import { sleep } from "../utils/time";
 import notifee from "@notifee/react-native";
+import { NoteBundle } from "../utils/note-bundle";
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
@@ -219,6 +220,9 @@ export const useAppEvents = () => {
         ) {
           onEmailVerified();
         }
+        NoteBundle.createNotes().then(() => {
+          useNoteStore.getState().setNotes();
+        });
       }, 1000);
       onUserUpdated();
       refValues.current.removeInternetStateListener = NetInfo.addEventListener(
@@ -562,6 +566,7 @@ export const useAppEvents = () => {
           await db.initCollections();
           await db.notes.init();
         }
+        await NoteBundle.createNotes();
         useNoteStore.getState().setNotes();
         eSendEvent(refreshNotesPage);
         MMKV.removeItem("notesAddedFromIntent");
