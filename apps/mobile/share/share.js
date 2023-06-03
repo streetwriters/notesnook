@@ -52,6 +52,7 @@ import { Search } from "./search";
 import { initDatabase, useShareStore } from "./store";
 import { isImage } from "@notesnook/core/utils/filename";
 import { NoteBundle } from "../app/utils/note-bundle";
+import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../app/utils/constants";
 
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
@@ -280,6 +281,12 @@ const ShareView = ({ quicknote = false }) => {
         } else {
           const user = await db.user.getUser();
           if (user && user.subscription.type !== 0) {
+            if (
+              (isImage(item.type) && item.size > IMAGE_SIZE_LIMIT) ||
+              (!isImage(item.type) && item.size > FILE_SIZE_LIMIT)
+            )
+              continue;
+
             setRawFiles((files) => {
               const index = files.findIndex((file) => file.name === item.name);
               if (index === -1) {

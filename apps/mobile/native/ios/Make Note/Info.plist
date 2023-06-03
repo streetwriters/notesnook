@@ -63,5 +63,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>appGroupId</key>
+	<string>group.org.streetwriters.notesnook</string>
 </dict>
 </plist>

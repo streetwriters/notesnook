@@ -35,8 +35,7 @@ import PremiumService from "../../../services/premium";
 import { eCloseSheet } from "../../../utils/events";
 import { editorController, editorState } from "./utils";
 import { isImage } from "@notesnook/core/utils/filename";
-const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
-const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
+import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 
 const showEncryptionSheet = (file) => {
   presentSheet({
