@@ -217,6 +217,10 @@ export default class Note {
     return this._toggle("pinned");
   }
 
+  archive() {
+    return this._toggle("archived");
+  }
+
   readonly() {
     return this._toggle("readonly");
   }

@@ -133,6 +133,7 @@ export default class Notes extends Collection {
       localOnly: !!note.localOnly,
       conflicted: !!note.conflicted,
       readonly: !!note.readonly,
+      archived: !!note.archived,
 
       dateCreated: note.dateCreated,
       dateEdited: note.dateEdited || note.dateCreated || Date.now(),
@@ -165,8 +166,11 @@ export default class Notes extends Collection {
    * @returns {any[]}
    */
   get all() {
-    const items = this._collection.getItems();
-    return items;
+    return this._collection.getItems();
+  }
+
+  get archived() {
+    return this.all.filter((item) => item.archived === true);
   }
 
   get pinned() {
