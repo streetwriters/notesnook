@@ -91,19 +91,24 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Attachments preview",
+            title: "Configurable date/time format",
             subtitle:
-              "You can now preview PDFs & Images directly inside Notesnook."
+              "Notesnook now allows changing the date & time formats across the app. Set it to DD-MM-YYYY or YYYY/DD/MM or whatever you like."
           },
           {
-            title: "New attachments manager",
+            title: "Change default note title",
             subtitle:
-              "The new attachments manager makes is much easier to view & interact with your attachments. It also allows you to download all (or some) of your attachments."
+              "You can now change the default note title for new notes using different templates like $date$, $time$, $headline$ etc. Go to Settings > Behaviour to find out how to use it."
           },
           {
-            title: "Assign tags to multiple notes",
+            title: "Default notebook/topic",
             subtitle:
-              "You can now easily tag multiple notes without first opening them."
+              "Setting a notebook/topic as default is now possible allowing you to automatically assign a specific notebook or topic for newly created notes!"
+          },
+          {
+            title: "Marketing emails opt-out",
+            subtitle:
+              "You can now directly unsubscribed from all marketing emails by going to Settings > Privacy & security and opting-out of Marketing emails."
           }
         ],
     cta: {
