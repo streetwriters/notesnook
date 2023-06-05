@@ -607,6 +607,26 @@ export const settingsGroups: SettingSection[] = [
         property: "telemetry"
       },
       {
+        id: "marketing-emails",
+        type: "switch",
+        name: "Marketing emails",
+        description:
+          "We will send you occasional promotional offers & product updates on your email (sent once every month).",
+        modifer: async () => {
+          try {
+            await db.user?.changeMarketingConsent(
+              !useUserStore.getState().user?.marketingConsent
+            );
+            useUserStore.getState().setUser(await db.user?.fetchUser());
+          } catch (e) {
+            ToastEvent.error(e as Error);
+          }
+        },
+        getter: (current: any) => current?.marketingConsent,
+        useHook: () => useUserStore((state) => state.user),
+        hidden: (current) => !current
+      },
+      {
         id: "cors-bypass",
         type: "input",
         name: "CORS bypass proxy",
