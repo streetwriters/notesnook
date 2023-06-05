@@ -247,7 +247,10 @@ function _MDIIconWrapper({
     />
   );
 }
-const MDIIconWrapper = memo(_MDIIconWrapper, () => true);
+const MDIIconWrapper = memo(
+  _MDIIconWrapper,
+  (prev, next) => prev.rotate === next.rotate
+);
 
 export type IconProps = FlexProps &
   MotionProps &
