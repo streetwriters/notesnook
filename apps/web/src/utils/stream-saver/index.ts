@@ -52,13 +52,17 @@ try {
 }
 
 function checkSupportsTransferable() {
-  // Transferable stream was first enabled in chrome v73 behind a flag
-  const { readable } = new TransformStream();
-  const mc = new MessageChannel();
-  mc.port1.postMessage(readable, [readable]);
-  mc.port1.close();
-  mc.port2.close();
-  supportsTransferable = true;
+  try {
+    // Transferable stream was first enabled in chrome v73 behind a flag
+    const { readable } = new TransformStream();
+    const mc = new MessageChannel();
+    mc.port1.postMessage(readable, [readable]);
+    mc.port1.close();
+    mc.port2.close();
+    supportsTransferable = true;
+  } catch {
+    // ignore
+  }
 }
 checkSupportsTransferable();
 
