@@ -55,7 +55,7 @@ describe("format reminder time", () => {
       mode: "repeat"
     };
     expect(formatReminderTime(reminder)).toBe(
-      "Upcoming: Wed, 2022-06-08 08:00 AM"
+      "Upcoming: Wed, 08-06-2022 08:00 AM"
     );
   });
 
@@ -67,7 +67,7 @@ describe("format reminder time", () => {
       mode: "repeat"
     };
     expect(formatReminderTime(reminder)).toBe(
-      "Upcoming: Sun, 2022-06-12 03:00 AM"
+      "Upcoming: Sun, 12-06-2022 03:00 AM"
     );
   });
 
@@ -79,7 +79,7 @@ describe("format reminder time", () => {
       mode: "repeat"
     };
     expect(formatReminderTime(reminder)).toBe(
-      "Upcoming: Fri, 2022-06-10 08:00 AM"
+      "Upcoming: Fri, 10-06-2022 08:00 AM"
     );
   });
 
@@ -101,7 +101,7 @@ describe("format reminder time", () => {
       mode: "repeat"
     };
     expect(formatReminderTime(reminder)).toBe(
-      "Upcoming: Sun, 2022-06-12 08:00 AM"
+      "Upcoming: Sun, 12-06-2022 08:00 AM"
     );
   });
 
@@ -113,7 +113,7 @@ describe("format reminder time", () => {
       mode: "repeat"
     };
     expect(formatReminderTime(reminder)).toBe(
-      "Upcoming: Fri, 2022-07-01 03:00 AM"
+      "Upcoming: Fri, 01-07-2022 03:00 AM"
     );
   });
 
@@ -184,7 +184,7 @@ describe("format reminder time", () => {
       mode: "repeat"
     };
     expect(formatReminderTime(reminder)).toBe(
-      "Upcoming: Mon, 2022-06-13 03:00 AM"
+      "Upcoming: Mon, 13-06-2022 03:00 AM"
     );
   });
 });
