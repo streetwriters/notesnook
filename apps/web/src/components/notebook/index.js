@@ -135,16 +135,14 @@ const menuItems = [
     title: "Set as default",
     checked: ({ notebook }) => {
       const defaultNotebook = db.settings.getDefaultNotebook();
-      return defaultNotebook.id === notebook.id && !defaultNotebook.topic;
+      return defaultNotebook?.id === notebook.id && !defaultNotebook?.topic;
     },
 
     icon: Icon.Notebook,
     onClick: async ({ notebook }) => {
       const defaultNotebook = db.settings.getDefaultNotebook();
       const isDefault =
-        defaultNotebook &&
-        defaultNotebook.id === notebook.id &&
-        !defaultNotebook.topic;
+        defaultNotebook?.id === notebook.id && !defaultNotebook?.topic;
 
       await db.settings.setDefaultNotebook(
         isDefault ? undefined : { id: notebook.id }
