@@ -251,9 +251,14 @@ const Tiptap = ({
           />
         </div>
 
-        {settings.noToolbar || !layout ? null : (
+        {!layout ? null : (
           <Toolbar
-            sx={{ pl: "10px", pt: "5px", minHeight: 45 }}
+            sx={{
+              pl: "10px",
+              pt: "5px",
+              minHeight: 45,
+              display: settings.noToolbar ? "none" : "flex"
+            }}
             theme={toolbarTheme}
             editor={_editor}
             location="bottom"

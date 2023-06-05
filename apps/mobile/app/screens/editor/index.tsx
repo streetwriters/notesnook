@@ -46,6 +46,7 @@ import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { editorController } from "./tiptap/utils";
 import { useLayoutEffect } from "react";
+import useKeyboard from "../../hooks/use-keyboard";
 
 const style: ViewStyle = {
   height: "100%",
@@ -232,6 +233,8 @@ const AppSection = ({
 
 const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
   const readonly = useEditorStore((state) => state.readonly);
+  const keyboard = useKeyboard();
+
   const onPress = async () => {
     if (editor.note.current) {
       await db.notes?.note(editor.note.current.id).readonly();
@@ -241,7 +244,7 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
     }
   };
 
-  return readonly && IconButton ? (
+  return readonly && IconButton && !keyboard.keyboardShown ? (
     <IconButton
       name="pencil-lock"
       type="grayBg"
@@ -249,7 +252,7 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
       color="accent"
       customStyle={{
         position: "absolute",
-        bottom: 20,
+        bottom: 60,
         width: 60,
         height: 60,
         right: 12,
