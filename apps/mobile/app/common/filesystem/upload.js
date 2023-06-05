@@ -40,11 +40,13 @@ export async function uploadFile(filename, data, cancelToken) {
     if (!uploadUrl) throw new Error("Unable to resolve upload url");
     let uploadFilePath = `${cacheDir}/${filename}`;
 
-    const iosAppGroup = await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID);
+    const iosAppGroup =
+      Platform.OS === "ios"
+        ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+        : null;
     const appGroupPath = `${iosAppGroup}/${filename}`;
     let exists = await RNFetchBlob.fs.exists(uploadFilePath);
     if (!exists && Platform.OS === "ios") {
-      console.log("Upload file from app group path");
       uploadFilePath = appGroupPath;
     }
 
