@@ -283,7 +283,9 @@ PODS:
     - RCTTypeSafety
     - React-Core
     - ReactCommon/turbomodule/core
-  - react-native-sodium (1.3.0):
+  - react-native-share-extension (2.5.2):
+    - React
+  - react-native-sodium (1.4.1):
     - React
   - react-native-webview (11.26.1):
     - React-Core
@@ -353,9 +355,7 @@ PODS:
     - React-jsi (= 0.69.7)
     - React-logger (= 0.69.7)
     - React-perflogger (= 0.69.7)
-  - rn-extensions-share (2.4.0):
-    - React-Core
-  - RNBootSplash (4.7.1):
+  - RNBootSplash (4.1.4):
     - React-Core
   - RNCCheckbox (0.5.15):
     - BEMCheckBox (~> 1.4)
@@ -489,6 +489,7 @@ DEPENDENCIES:
   - react-native-orientation (from `../../node_modules/react-native-orientation`)
   - react-native-pdf (from `../../node_modules/react-native-pdf`)
   - react-native-safe-area-context (from `../../node_modules/react-native-safe-area-context`)
+  - "react-native-share-extension (from `../../node_modules/@ammarahmed/react-native-share-extension`)"
   - "react-native-sodium (from `../../node_modules/@ammarahmed/react-native-sodium`)"
   - react-native-webview (from `../../node_modules/react-native-webview`)
   - React-perflogger (from `../../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -503,7 +504,6 @@ DEPENDENCIES:
   - React-RCTVibration (from `../../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../../node_modules/react-native/ReactCommon`)
-  - rn-extensions-share (from `../../node_modules/rn-extensions-share`)
   - RNBootSplash (from `../../node_modules/react-native-bootsplash`)
   - "RNCCheckbox (from `../../node_modules/@react-native-community/checkbox`)"
   - "RNCClipboard (from `../../node_modules/@react-native-clipboard/clipboard`)"
@@ -625,6 +625,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native-pdf"
   react-native-safe-area-context:
     :path: "../../node_modules/react-native-safe-area-context"
+  react-native-share-extension:
+    :path: "../../node_modules/@ammarahmed/react-native-share-extension"
   react-native-sodium:
     :path: "../../node_modules/@ammarahmed/react-native-sodium"
   react-native-webview:
@@ -653,8 +655,6 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../../node_modules/react-native/ReactCommon"
-  rn-extensions-share:
-    :path: "../../node_modules/rn-extensions-share"
   RNBootSplash:
     :path: "../../node_modules/react-native-bootsplash"
   RNCCheckbox:
@@ -759,7 +759,8 @@ SPEC CHECKSUMS:
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-pdf: 33c622cbdf776a649929e8b9d1ce2d313347c4fa
   react-native-safe-area-context: b8979f5eda6ed5903d4dbc885be3846ea3daa753
-  react-native-sodium: 1681828855ec18fa952f4557cd595bf048cf5c32
+  react-native-share-extension: 828641041123f5489fcb820758fb8bb743d15e34
+  react-native-sodium: f4e3986ddcb73482f8679e534b448a0675d0cf13
   react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
   React-perflogger: 8e832d4e21fdfa613033c76d58d7e617341e804b
   React-RCTActionSheet: 9ca778182a9523991bff6381045885b6e808bb73
@@ -773,8 +774,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: 600a9f8b3537db360563d50fab3d040c262567d4
   React-runtimeexecutor: 65cd2782a57e1d59a68aa5d504edf94278578e41
   ReactCommon: 1e783348b9aa73ae68236271df972ba898560a95
-  rn-extensions-share: 3f0ecce20dfbca1f0358deb4ebfb9ee121a6d92a
-  RNBootSplash: 3f3f7f82efe2addbfe7ddeda20877ff4d579cd81
+  RNBootSplash: de2c568373a9c79a66e9918b8929eb6c9a35246f
   RNCCheckbox: 43bcc6493611468af0e19f19f029dab3da8561c4
   RNCClipboard: 3f0451a8100393908bea5c5c5b16f96d45f30bfc
   RNCMaskedView: 949696f25ec596bfc697fc88e6f95cf0c79669b6

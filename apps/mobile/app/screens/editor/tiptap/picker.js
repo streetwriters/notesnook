@@ -35,8 +35,7 @@ import PremiumService from "../../../services/premium";
 import { eCloseSheet } from "../../../utils/events";
 import { editorController, editorState } from "./utils";
 import { isImage } from "@notesnook/core/utils/filename";
-const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
-const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
+import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 
 const showEncryptionSheet = (file) => {
   presentSheet({
@@ -270,7 +269,7 @@ const handleImageResponse = async (response, options) => {
   });
 };
 
-async function attachFile(uri, hash, type, filename, options) {
+export async function attachFile(uri, hash, type, filename, options) {
   try {
     let exists = db.attachments.exists(hash);
     let encryptionInfo;
@@ -289,7 +288,7 @@ async function attachFile(uri, hash, type, filename, options) {
       let key = await db.attachments.generateKey();
       encryptionInfo = await Sodium.encryptFile(key, {
         uri: uri,
-        type: "url",
+        type: options.type || "url",
         hash: hash
       });
       encryptionInfo.type = type;
