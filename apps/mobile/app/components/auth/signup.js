@@ -18,8 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useRef, useState } from "react";
-import { Dimensions, View } from "react-native";
-import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
+import { TouchableOpacity, View } from "react-native";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { ToastEvent } from "../../services/event-manager";
@@ -32,11 +31,10 @@ import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
-import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { SVG } from "./background";
 import { hideAuth } from "./common";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 export const Signup = ({ changeMode, trial }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -50,6 +48,7 @@ export const Signup = ({ changeMode, trial }) => {
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const setLastSynced = useUserStore((state) => state.setLastSynced);
+  const deviceMode = useSettingStore((state) => state.deviceMode);
 
   const validateInfo = () => {
     if (!password.current || !email.current || !confirmPassword.current) {
@@ -96,69 +95,77 @@ export const Signup = ({ changeMode, trial }) => {
 
   return (
     <>
-      <Animated.View
-        entering={FadeInDown}
-        exiting={FadeOutUp}
+      <View
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.bg,
           zIndex: 10,
           width: "100%",
+          alignSelf: "center",
+          height: "100%",
           minHeight: "100%"
         }}
       >
         <View
           style={{
-            height: 250,
-            overflow: "hidden"
+            flex: 0.35,
+            justifyContent: "flex-end",
+            paddingHorizontal: 20,
+            backgroundColor: colors.nav,
+            marginBottom: 20,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.border,
+            alignSelf: deviceMode !== "mobile" ? "center" : undefined,
+            borderWidth: deviceMode !== "mobile" ? 1 : null,
+            borderColor: deviceMode !== "mobile" ? colors.border : null,
+            borderRadius: deviceMode !== "mobile" ? 20 : null,
+            marginTop: deviceMode !== "mobile" ? 50 : null,
+            width: deviceMode === "mobile" ? null : "50%"
           }}
         >
-          <SvgView
-            src={SVG(colors.night ? colors.icon : "black")}
-            height={700}
-          />
+          <View
+            style={{
+              flexDirection: "row"
+            }}
+          >
+            <View
+              style={{
+                width: 100,
+                height: 5,
+                backgroundColor: colors.accent,
+                borderRadius: 2,
+                marginRight: 7
+              }}
+            />
+
+            <View
+              style={{
+                width: 20,
+                height: 5,
+                backgroundColor: colors.nav,
+                borderRadius: 2
+              }}
+            />
+          </View>
+          <Heading
+            extraBold
+            style={{
+              marginBottom: 25,
+              marginTop: 10
+            }}
+            size={SIZE.xxl}
+          >
+            Create your {"\n"}account
+          </Heading>
         </View>
 
         <View
           style={{
-            width: "100%",
-            justifyContent: "center",
-            alignSelf: "center",
-            paddingHorizontal: 12,
-            marginBottom: 30,
-            marginTop: Dimensions.get("window").height < 700 ? -75 : 15
-          }}
-        >
-          <Heading
-            style={{
-              textAlign: "center"
-            }}
-            size={30}
-            color={colors.heading}
-          >
-            Create your account
-          </Heading>
-          <Paragraph
-            style={{
-              textDecorationLine: "underline",
-              textAlign: "center"
-            }}
-            onPress={() => {
-              if (loading) return;
-              changeMode(0);
-            }}
-            size={SIZE.md}
-          >
-            Already have an account? Log in
-          </Paragraph>
-        </View>
-        <View
-          style={{
             width: DDS.isTab ? "50%" : "100%",
-            padding: 12,
+            paddingHorizontal: 20,
             backgroundColor: colors.bg,
-            flexGrow: 1,
-            alignSelf: "center"
+            alignSelf: "center",
+            flex: 0.6
           }}
         >
           <Input
@@ -217,37 +224,13 @@ export const Signup = ({ changeMode, trial }) => {
             validationType="confirmPassword"
             customValidator={() => password.current}
             placeholder="Confirm password"
-            marginBottom={5}
+            marginBottom={12}
             onSubmit={signup}
           />
-          <View
-            style={{
-              marginTop: 25,
-              alignSelf: "center"
-            }}
-          >
-            <Button
-              style={{
-                width: 250,
-                borderRadius: 100
-              }}
-              loading={loading}
-              onPress={() => {
-                if (loading) return;
-                signup();
-              }}
-              type="accent"
-              title={loading ? null : "Agree and continue"}
-            />
-          </View>
 
           <Paragraph
             style={{
-              textAlign: "center",
-              position: "absolute",
-              bottom: 0,
-              alignSelf: "center",
-              marginBottom: 20
+              marginBottom: 25
             }}
             size={SIZE.xs}
             color={colors.icon}
@@ -263,7 +246,7 @@ export const Signup = ({ changeMode, trial }) => {
               }}
               color={colors.accent}
             >
-              terms of service{" "}
+              Terms of Service{" "}
             </Paragraph>
             and{" "}
             <Paragraph
@@ -276,11 +259,46 @@ export const Signup = ({ changeMode, trial }) => {
               }}
               color={colors.accent}
             >
-              privacy policy.
-            </Paragraph>
+              Privacy Policy.
+            </Paragraph>{" "}
+            You also agree to recieve marketing emails from us which you can
+            opt-out of from app settings.
           </Paragraph>
+
+          <Button
+            title={!loading ? "Continue" : null}
+            type="accent"
+            loading={loading}
+            onPress={signup}
+            fontSize={SIZE.md}
+            style={{
+              marginRight: 12,
+              width: 250,
+              borderRadius: 100
+            }}
+          />
+
+          <TouchableOpacity
+            onPress={() => {
+              if (loading) return;
+              changeMode(0);
+            }}
+            activeOpacity={0.8}
+            style={{
+              alignSelf: "center",
+              marginTop: 12,
+              paddingVertical: 12
+            }}
+          >
+            <Paragraph size={SIZE.xs + 1} color={colors.icon}>
+              Already have an account?{" "}
+              <Paragraph size={SIZE.xs + 1} style={{ color: colors.accent }}>
+                Login
+              </Paragraph>
+            </Paragraph>
+          </TouchableOpacity>
         </View>
-      </Animated.View>
+      </View>
     </>
   );
 };

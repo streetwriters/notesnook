@@ -119,7 +119,7 @@ const Input = ({
     ? colors.red
     : focus
     ? customColor || colors.accent
-    : colors.nav;
+    : colors.border;
 
   const validate = async (value: string) => {
     if (!validationType) return;

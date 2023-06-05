@@ -64,6 +64,7 @@ async function createWindow() {
   setTheme(getTheme());
 
   const mainWindow = new BrowserWindow({
+    show: false,
     x: mainWindowState.x,
     y: mainWindowState.y,
     width: mainWindowState.width,
@@ -87,11 +88,17 @@ async function createWindow() {
     }
   });
 
+  mainWindow.on("show", () => {
+    if (getPrivacyMode()) {
+      setPrivacyMode({ privacyMode: getPrivacyMode() });
+    }
+  });
+
   mainWindowState.manage(mainWindow);
   globalThis.window = mainWindow;
   setupMenu();
   setupJumplist();
-  setupDesktopIntegration();
+  setupDesktopIntegration(cliOptions.hidden);
 
   mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
     "http://dictionaries.notesnook.com/"
@@ -99,10 +106,6 @@ async function createWindow() {
 
   if (isDevelopment())
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });
-
-  if (getPrivacyMode()) {
-    setPrivacyMode({ privacyMode: getPrivacyMode() });
-  }
 
   try {
     await mainWindow.loadURL(`${createURL(cliOptions)}`);
@@ -169,7 +172,7 @@ function createURL(options) {
   return url;
 }
 
-function setupDesktopIntegration() {
+function setupDesktopIntegration(hidden) {
   const desktopIntegration = getDesktopIntegration();
 
   if (
@@ -178,6 +181,17 @@ function setupDesktopIntegration() {
   ) {
     setupTray();
   }
+
+  globalThis.window.on("ready-to-show", () => {
+    if (!hidden) {
+      globalThis.window.show();
+    }
+
+    if (hidden && !desktopIntegration.minimizeToSystemTray) {
+      globalThis.window.show();
+      globalThis.window.minimize();
+    }
+  });
 
   // when close to system tray is enabled, it becomes nigh impossible
   // to "quit" the app. This is necessary in order to fix that.
@@ -212,9 +226,5 @@ function setupDesktopIntegration() {
 
   if (desktopIntegration.autoStart) {
     AutoLaunch.enable(desktopIntegration.startMinimized);
-
-    if (process.platform === "win32" && desktopIntegration.startMinimized) {
-      globalThis.window.minimize();
-    }
   }
 }

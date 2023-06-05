@@ -232,8 +232,7 @@ export const PricingPlans = ({
             width={250}
             style={{
               paddingHorizontal: 12,
-              marginBottom: 15,
-              borderRadius: 100
+              marginBottom: 15
             }}
           />
         </>
@@ -398,8 +397,7 @@ export const PricingPlans = ({
                     style={{
                       paddingHorizontal: 12,
                       marginTop: 30,
-                      marginBottom: 10,
-                      borderRadius: 100
+                      marginBottom: 10
                     }}
                   />
                   {Platform.OS !== "ios" &&

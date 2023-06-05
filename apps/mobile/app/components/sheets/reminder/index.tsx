@@ -243,7 +243,6 @@ export default function ReminderSheet({
             borderRadius: 100,
             paddingHorizontal: 24
           }}
-          fontSize={SIZE.md}
           onPress={saveReminder}
         />
       </View>

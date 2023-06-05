@@ -52,6 +52,7 @@
 	</dict>
 	<key>UIAppFonts</key>
 	<array>
+		<string>OpenSans-Bold.ttf</string>
 		<string>OpenSans-SemiBold.ttf</string>
 		<string>OpenSans-Regular.ttf</string>
 		<string>MaterialCommunityIcons.ttf</string>

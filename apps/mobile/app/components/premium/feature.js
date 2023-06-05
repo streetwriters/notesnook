@@ -41,18 +41,19 @@ export const FeatureBlock = ({
         flexDirection: "row",
         alignItems: "center",
         paddingHorizontal: 12,
-        marginBottom: 10
+        marginBottom: 10,
+        backgroundColor: colors.nav,
+        borderRadius: 10,
+        paddingVertical: 12
       }}
     >
-      <Icon color={colors.accent} name="check" size={SIZE.lg} />
-
       <Paragraph
         style={{
           flexWrap: "wrap",
           marginLeft: 5,
           flexShrink: 1
         }}
-        size={SIZE.md}
+        size={SIZE.sm}
       >
         {content}
       </Paragraph>

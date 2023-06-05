@@ -179,7 +179,6 @@ const onUserStatusCheck = async (type) => {
 const showVerifyEmailDialog = () => {
   presentSheet({
     title: "Confirm your email",
-    icon: "email",
     paragraph:
       "We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder.",
     action: async () => {
@@ -369,7 +368,7 @@ const features_list = [
       "Rich note editing experience with markdown, tables, checklists and more"
   },
   {
-    content: "Export your notes in Pdf, markdown and html formats"
+    content: "Export your notes in PDF, markdown and html formats"
   }
 ];
 
@@ -388,7 +387,7 @@ const sheet = (context, promo, trial) => {
         <Seperator />
         <CompactFeatures
           scrollRef={ref}
-          maxHeight={300}
+          maxHeight={400}
           features={features_list}
           vertical
         />
