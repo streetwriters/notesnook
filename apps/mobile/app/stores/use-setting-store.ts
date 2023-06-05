@@ -106,6 +106,8 @@ export interface SettingStore extends State {
   setRequestBiometrics: (requestBiometrics: boolean) => void;
   insets: Insets;
   setInsets: (insets: Insets) => void;
+  timeFormat: string;
+  dateFormat: string;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -170,6 +172,8 @@ export const useSettingStore = create<SettingStore>((set) => ({
   requestBiometrics: false,
   setRequestBiometrics: (requestBiometrics) => set({ requestBiometrics }),
   setInsets: (insets) => set({ insets }),
+  timeFormat: "12-hour",
+  dateFormat: "DD-MM-YYYY",
   insets: initialWindowMetrics?.insets
     ? initialWindowMetrics.insets
     : { top: 0, right: 0, left: 0, bottom: 0 }

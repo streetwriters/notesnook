@@ -28,6 +28,7 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { DATE_FORMATS, TIME_FORMATS } from "@notesnook/core/common";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 export const DateFormatSelector = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -38,6 +39,9 @@ export const DateFormatSelector = () => {
     menuRef.current?.hide();
     db.settings.setDateFormat(item);
     setDateFormat(item);
+    useSettingStore.setState({
+      dateFormat: item
+    });
   };
 
   return (
@@ -116,6 +120,9 @@ export const TimeFormatSelector = () => {
     menuRef.current?.hide();
     db.settings.setTimeFormat(item);
     setTimeFormat(item);
+    useSettingStore.setState({
+      timeFormat: item
+    });
   };
 
   const TimeFormats = {

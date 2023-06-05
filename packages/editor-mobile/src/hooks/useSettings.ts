@@ -32,7 +32,9 @@ const initialState = {
   readonly: globalThis.readonly,
   doubleSpacedLines: true,
   fontFamily: "sans-serif",
-  fontSize: "16px"
+  fontSize: "16px",
+  timeFormat: "12-hour",
+  dateFormat: "DD-MM-YYYY"
 };
 
 global.settingsController = {

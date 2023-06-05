@@ -110,7 +110,9 @@ const Tiptap = ({
       },
       downloadOptions: {
         corsHost: settings.corsProxy
-      }
+      },
+      dateFormat: settings.dateFormat,
+      timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined
     },
     [layout, settings.readonly, tick, settings.doubleSpacedLines]
   );
