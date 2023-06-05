@@ -53,6 +53,7 @@ import { initDatabase, useShareStore } from "./store";
 import { isImage } from "@notesnook/core/utils/filename";
 import { NoteBundle } from "../app/utils/note-bundle";
 import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../app/utils/constants";
+import RNFetchBlob from "react-native-blob-util";
 
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
@@ -428,6 +429,18 @@ const ShareView = ({ quicknote = false }) => {
     loadData();
   }, [loadData]);
 
+  const onRemoveFile = (item) => {
+    const index = rawFiles.findIndex((file) => file.name === item.name);
+    if (index > -1) {
+      setRawFiles((state) => {
+        const files = [...state];
+        files.splice(index);
+        return files;
+      });
+      RNFetchBlob.fs.unlink(item.value).catch(console.log);
+    }
+  };
+
   const WrapperView = Platform.OS === "android" ? View : ScrollView;
 
   return loadingExtension ? null : (
@@ -614,29 +627,36 @@ const ShareView = ({ quicknote = false }) => {
                   <ScrollView horizontal>
                     {rawFiles.map((item) =>
                       isImage(item.type) ? (
-                        <Image
+                        <TouchableOpacity
+                          onPress={() => onRemoveFile(item)}
                           key={item.name}
-                          source={{
-                            uri:
-                              Platform.OS === "android"
-                                ? `file://${item.value}`
-                                : item.value
-                          }}
-                          style={{
-                            width: 100,
-                            height: 100,
-                            borderRadius: 5,
-                            backgroundColor: "black",
-                            marginRight: 6
-                          }}
-                          resizeMode="cover"
-                        />
+                          activeOpacity={0.9}
+                        >
+                          <Image
+                            source={{
+                              uri:
+                                Platform.OS === "android"
+                                  ? `file://${item.value}`
+                                  : item.value
+                            }}
+                            style={{
+                              width: 100,
+                              height: 100,
+                              borderRadius: 5,
+                              backgroundColor: "black",
+                              marginRight: 6
+                            }}
+                            resizeMode="cover"
+                          />
+                        </TouchableOpacity>
                       ) : (
-                        <View
+                        <TouchableOpacity
+                          activeOpacity={0.9}
                           key={item.name}
                           source={{
                             uri: `file://${item.value}`
                           }}
+                          onPress={() => onRemoveFile(item)}
                           style={{
                             borderRadius: 5,
                             backgroundColor: colors.nav,
@@ -662,10 +682,20 @@ const ShareView = ({ quicknote = false }) => {
                           >
                             {item.name} ({formatBytes(item.size)})
                           </Text>
-                        </View>
+                        </TouchableOpacity>
                       )
                     )}
                   </ScrollView>
+
+                  <Text
+                    style={{
+                      color: colors.icon,
+                      marginTop: 6,
+                      fontSize: 11
+                    }}
+                  >
+                    Tap to remove an attachment.
+                  </Text>
                 </View>
               ) : null}
               <View
