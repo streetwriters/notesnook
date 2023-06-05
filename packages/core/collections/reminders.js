@@ -24,6 +24,7 @@ import isToday from "dayjs/plugin/isToday";
 import isTomorrow from "dayjs/plugin/isTomorrow";
 import isYesterday from "dayjs/plugin/isYesterday";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { formatDate } from "../utils/date";
 
 dayjs.extend(isTomorrow);
 dayjs.extend(isSameOrBefore);
@@ -148,21 +149,31 @@ export function formatReminderTime(
   if (reminder.mode === "repeat") {
     time = getUpcomingReminderTime(reminder);
   }
-  const timeFormat = options.timeFormat === "12-hour" ? "h:mm A" : "HH:mm";
+
+  const formattedTime = formatDate(time, {
+    timeFormat: options.timeFormat,
+    type: "time"
+  });
+
+  const formattedDateTime = formatDate(time, {
+    dateFormat: `ddd, ${options.dateFormat}`,
+    timeFormat: options.timeFormat,
+    type: "date-time"
+  });
 
   if (dayjs(time).isTomorrow()) {
     tag = "Upcoming";
-    text = `Tomorrow, ${dayjs(time).format(timeFormat)}`;
+    text = `Tomorrow, ${formattedTime}`;
   } else if (dayjs(time).isYesterday()) {
     tag = "Last";
-    text = `Yesterday, ${dayjs(time).format(timeFormat)}`;
+    text = `Yesterday, ${formattedTime}`;
   } else {
     const isPast = dayjs(time).isSameOrBefore(dayjs());
     tag = isPast ? "Last" : "Upcoming";
     if (dayjs(time).isToday()) {
-      text = `Today, ${dayjs(time).format(timeFormat)}`;
+      text = `Today, ${formattedTime}`;
     } else {
-      text = dayjs(time).format(`${options.dateFormat} ${timeFormat}`);
+      text = formattedDateTime;
     }
   }
 
