@@ -61,7 +61,7 @@
     "react-native-vector-icons": "9.2.0",
     "react-native-pdf": "6.6.2",
     "react-native-blob-util": "0.17.3",
-    "@ammarahmed/react-native-share-extension": "^2.5.2"
+    "@ammarahmed/react-native-share-extension": "^2.5.2",
     "react-native-in-app-review": "4.3.3"
   },
   "devDependencies": {

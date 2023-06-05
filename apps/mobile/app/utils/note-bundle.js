@@ -95,7 +95,7 @@ async function createNotes() {
       });
       let content = ``;
       if (isImage(file.type)) {
-        content = `<p><img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" /></p>`;
+        content = `<img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" />`;
       } else {
         content = `<p><span data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" /></p>`;
       }

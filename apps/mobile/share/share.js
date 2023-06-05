@@ -217,7 +217,7 @@ const ShareView = ({ quicknote = false }) => {
   const [rawFiles, setRawFiles] = useState([]);
 
   const [kh, setKh] = useState(0);
-
+  globalThis["IS_SHARE_EXTENSION"] = true;
   const onKeyboardDidShow = (event) => {
     let kHeight = event.endCoordinates.height;
     keyboardHeight.current = kHeight;
@@ -600,72 +600,74 @@ const ShareView = ({ quicknote = false }) => {
                 />
               </View>
 
-              <View
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 12,
-                  backgroundColor: colors.nav
-                }}
-              >
-                <Text style={{ color: colors.pri, marginBottom: 6 }}>
-                  Attaching {rawFiles.length} file(s):
-                </Text>
-                <ScrollView horizontal>
-                  {rawFiles.map((item) =>
-                    isImage(item.type) ? (
-                      <Image
-                        key={item.name}
-                        source={{
-                          uri:
-                            Platform.OS === "android"
-                              ? `file://${item.value}`
-                              : item.value
-                        }}
-                        style={{
-                          width: 100,
-                          height: 100,
-                          borderRadius: 5,
-                          backgroundColor: "black",
-                          marginRight: 6
-                        }}
-                        resizeMode="cover"
-                      />
-                    ) : (
-                      <View
-                        key={item.name}
-                        source={{
-                          uri: `file://${item.value}`
-                        }}
-                        style={{
-                          borderRadius: 5,
-                          backgroundColor: colors.nav,
-                          flexDirection: "row",
-                          borderWidth: 1,
-                          borderColor: colors.border,
-                          alignItems: "center",
-                          paddingVertical: 5,
-                          paddingHorizontal: 8,
-                          marginRight: 6
-                        }}
-                        resizeMode="cover"
-                      >
-                        <Icon color={colors.pri} size={15} name="file" />
-
-                        <Text
-                          style={{
-                            marginLeft: 4,
-                            color: colors.pri,
-                            paddingRight: 8,
-                            fontSize: 12
+              {rawFiles?.length > 0 ? (
+                <View
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 12,
+                    backgroundColor: colors.nav
+                  }}
+                >
+                  <Text style={{ color: colors.pri, marginBottom: 6 }}>
+                    Attaching {rawFiles.length} file(s):
+                  </Text>
+                  <ScrollView horizontal>
+                    {rawFiles.map((item) =>
+                      isImage(item.type) ? (
+                        <Image
+                          key={item.name}
+                          source={{
+                            uri:
+                              Platform.OS === "android"
+                                ? `file://${item.value}`
+                                : item.value
                           }}
+                          style={{
+                            width: 100,
+                            height: 100,
+                            borderRadius: 5,
+                            backgroundColor: "black",
+                            marginRight: 6
+                          }}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <View
+                          key={item.name}
+                          source={{
+                            uri: `file://${item.value}`
+                          }}
+                          style={{
+                            borderRadius: 5,
+                            backgroundColor: colors.nav,
+                            flexDirection: "row",
+                            borderWidth: 1,
+                            borderColor: colors.border,
+                            alignItems: "center",
+                            paddingVertical: 5,
+                            paddingHorizontal: 8,
+                            marginRight: 6
+                          }}
+                          resizeMode="cover"
                         >
-                          {item.name} ({formatBytes(item.size)})
-                        </Text>
-                      </View>
-                    )
-                  )}
-                </ScrollView>
-              </View>
+                          <Icon color={colors.pri} size={15} name="file" />
+
+                          <Text
+                            style={{
+                              marginLeft: 4,
+                              color: colors.pri,
+                              paddingRight: 8,
+                              fontSize: 12
+                            }}
+                          >
+                            {item.name} ({formatBytes(item.size)})
+                          </Text>
+                        </View>
+                      )
+                    )}
+                  </ScrollView>
+                </View>
+              ) : null}
               <View
                 style={{
                   width: "100%",

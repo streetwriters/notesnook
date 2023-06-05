@@ -49,9 +49,8 @@ export async function uploadFile(filename, data, cancelToken) {
     if (!exists && Platform.OS === "ios") {
       uploadFilePath = appGroupPath;
     }
-
     let request = RNFetchBlob.config({
-      IOSBackgroundTask: true
+      IOSBackgroundTask: !globalThis["IS_SHARE_EXTENSION"]
     })
       .fetch(
         "PUT",
