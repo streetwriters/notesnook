@@ -289,12 +289,12 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         </View>
       </View>
 
-      {item.type === "switch" && item.property && (
+      {item.type === "switch" && (
         <ToggleSwitch
           isOn={
             item.getter
               ? item.getter(item.property || current)
-              : settings[item.property]
+              : settings[item?.property as never]
           }
           onColor={colors.accent}
           offColor={colors.icon}
