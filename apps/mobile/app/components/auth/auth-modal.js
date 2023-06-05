@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useEffect, useRef, useState } from "react";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import {
   eSubscribeEvent,
@@ -75,7 +75,7 @@ const AuthModal = () => {
   return !visible ? null : (
     <BaseDialog
       overlayOpacity={0}
-      statusBarTranslucent={false}
+      statusBarTranslucent={true}
       onRequestClose={currentAuthMode !== AuthMode.welcomeSignup && close}
       visible={true}
       onClose={close}
@@ -101,7 +101,7 @@ const AuthModal = () => {
       <View
         style={{
           position: "absolute",
-          top: Platform.OS === "ios" ? insets.top : 0,
+          top: insets.top,
           zIndex: 999,
           flexDirection: "row",
           alignItems: "center",
