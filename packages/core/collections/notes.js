@@ -447,7 +447,10 @@ export default class Notes extends Collection {
     ) {
       return oldNote.title.replace(NEWLINE_STRIP_REGEX, " ");
     }
-    return this.formatTitle(this._db.settings.getTitleFormat(), headline);
+    return this.formatTitle(
+      this._db.settings.getTitleFormat(),
+      headline?.split(" ").splice(0, 10)
+    );
   }
 }
 
