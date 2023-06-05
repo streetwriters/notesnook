@@ -36,10 +36,11 @@ import {
   type DownloadOptions,
   getTotalWords,
   countWords,
-  getFontById
+  getFontById,
+  TiptapOptions
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
-import { PropsWithChildren, useEffect, useRef, useState } from "react";
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
 import { Attachment } from "./picker";
 import { IEditor } from "./types";
 import {
@@ -67,7 +68,7 @@ type TipTapProps = {
   onPreviewAttachment?: (attachment: Attachment) => void;
   onAttachFile?: (file: File) => void;
   onFocus?: () => void;
-  content?: string;
+  content?: () => string;
   toolbarContainerId?: string;
   readonly?: boolean;
   nonce?: number;
@@ -131,6 +132,8 @@ function TipTap(props: TipTapProps) {
   const doubleSpacedLines = useSettingsStore(
     (store) => store.doubleSpacedLines
   );
+  const dateFormat = useSettingsStore((store) => store.dateFormat);
+  const timeFormat = useSettingsStore((store) => store.timeFormat);
   const { toolbarConfig } = useToolbarConfig();
   const { isSearching, toggleSearch } = useSearch();
 
@@ -143,8 +146,10 @@ function TipTap(props: TipTapProps) {
     }
   });
 
-  const editor = useTiptap(
-    {
+  const oldNonce = useRef<number>();
+
+  const tiptapOptions = useMemo<Partial<TiptapOptions>>(() => {
+    return {
       editorProps: {
         handlePaste: (view, event) => {
           const hasText = event.clipboardData?.types?.some((type) =>
@@ -166,13 +171,19 @@ function TipTap(props: TipTapProps) {
       },
       downloadOptions,
       doubleSpacedLines,
+      dateFormat,
+      timeFormat,
       isMobile: isMobile || false,
       element: editorContainer,
       editable: !readonly,
-      content,
+      content: content?.(),
       autofocus: "start",
       onFocus,
       onCreate: ({ editor }) => {
+        if (oldNonce.current !== nonce)
+          editor.commands.focus("start", { scrollIntoView: true });
+        oldNonce.current = nonce;
+
         configure({
           editor: toIEditor(editor as Editor),
           canRedo: editor.can().redo(),
@@ -263,9 +274,13 @@ function TipTap(props: TipTapProps) {
         window.open(url, "_blank");
         return true;
       }
-    },
+    };
+  }, [readonly, nonce, doubleSpacedLines, dateFormat, timeFormat]);
+
+  const editor = useTiptap(
+    tiptapOptions,
     // IMPORTANT: only put stuff here that the editor depends on.
-    [readonly, nonce]
+    [tiptapOptions]
   );
 
   useEffect(

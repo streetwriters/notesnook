@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { db } from "../common/db";
 import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
@@ -24,6 +25,34 @@ import BaseStore from "./index";
 class SettingStore extends BaseStore {
   encryptBackups = Config.get("encryptBackups", false);
   doubleSpacedLines = Config.get("doubleSpacedLines", true);
+  /** @type {string} */
+  dateFormat = null;
+  /** @type {"12-hour" | "24-hour"} */
+  timeFormat = null;
+  titleFormat = null;
+
+  refresh = () => {
+    this.set((state) => {
+      state.dateFormat = db.settings.getDateFormat();
+      state.timeFormat = db.settings.getTimeFormat();
+      state.titleFormat = db.settings.getTitleFormat();
+    });
+  };
+
+  setDateFormat = async (dateFormat) => {
+    await db.settings.setDateFormat(dateFormat);
+    this.set((state) => (state.dateFormat = dateFormat));
+  };
+
+  setTimeFormat = async (timeFormat) => {
+    await db.settings.setTimeFormat(timeFormat);
+    this.set((state) => (state.timeFormat = timeFormat));
+  };
+
+  setTitleFormat = async (titleFormat) => {
+    await db.settings.setTitleFormat(titleFormat);
+    this.set((state) => (state.titleFormat = titleFormat));
+  };
 
   setEncryptBackups = (encryptBackups) => {
     this.set((state) => (state.encryptBackups = encryptBackups));

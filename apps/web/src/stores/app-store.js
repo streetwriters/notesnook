@@ -28,6 +28,7 @@ import { store as attachmentStore } from "./attachment-store";
 import { store as monographStore } from "./monograph-store";
 import { store as reminderStore } from "./reminder-store";
 import { store as announcementStore } from "./announcement-store";
+import { store as settingStore } from "./setting-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
@@ -65,6 +66,7 @@ class AppStore extends BaseStore {
   lastSynced = 0;
 
   init = () => {
+    settingStore.refresh();
     // this needs to happen here so reminders can be set on app load.
     reminderStore.refresh();
     announcementStore.refresh();
@@ -151,7 +153,9 @@ class AppStore extends BaseStore {
     tagStore.refresh();
     attachmentStore.refresh();
     monographStore.refresh();
+    settingStore.refresh();
     await editorstore.refresh();
+
     this.refreshNavItems();
 
     logger.measure("refreshing app");
