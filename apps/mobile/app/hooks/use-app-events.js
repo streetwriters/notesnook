@@ -17,22 +17,37 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import NetInfo from "@react-native-community/netinfo";
 import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/common";
-import { useEffect, useRef } from "react";
+import notifee from "@notifee/react-native";
+import NetInfo from "@react-native-community/netinfo";
+import { useCallback, useEffect, useRef } from "react";
 import {
-  Appearance,
   AppState,
+  Appearance,
+  Keyboard,
   Linking,
   NativeEventEmitter,
   NativeModules,
-  Platform,
-  Keyboard
+  Platform
 } from "react-native";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
+import { DatabaseLogger, db } from "../common/database";
+import { MMKV } from "../common/database/mmkv";
 import { Walkthrough } from "../components/walkthroughs";
-import { editorController, editorState } from "../screens/editor/tiptap/utils";
+import {
+  clearAppState,
+  editorController,
+  editorState
+} from "../screens/editor/tiptap/utils";
+import { useDragState } from "../screens/settings/editor/state";
+import BackupService from "../services/backup";
+import {
+  ToastEvent,
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../services/event-manager";
 import {
   clearMessage,
   setEmailVerifyMessage,
@@ -41,37 +56,23 @@ import {
 } from "../services/message";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
+import Sync from "../services/sync";
+import { initAfterSync } from "../stores";
+import { useAttachmentStore } from "../stores/use-attachment-store";
+import { useEditorStore } from "../stores/use-editor-store";
+import { useMessageStore } from "../stores/use-message-store";
+import { useNoteStore } from "../stores/use-notes-store";
+import { useSettingStore } from "../stores/use-setting-store";
+import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { updateStatusBarColor } from "../utils/color-scheme";
-import { DatabaseLogger, db } from "../common/database";
-import { MMKV } from "../common/database/mmkv";
 import {
   eClearEditor,
   eCloseSheet,
   eOnLoadNote,
   refreshNotesPage
 } from "../utils/events";
-import Sync from "../services/sync";
-import { initAfterSync } from "../stores";
-import { SyncStatus, useUserStore } from "../stores/use-user-store";
-import { useMessageStore } from "../stores/use-message-store";
-import { useSettingStore } from "../stores/use-setting-store";
-import { useAttachmentStore } from "../stores/use-attachment-store";
-import { useNoteStore } from "../stores/use-notes-store";
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from "../services/event-manager";
-import { useEditorStore } from "../stores/use-editor-store";
-import { useDragState } from "../screens/settings/editor/state";
-import { useCallback } from "react";
-import { clearAppState } from "../screens/editor/tiptap/utils";
 import { tabBarRef } from "../utils/global-refs";
-import BackupService from "../services/backup";
 import { sleep } from "../utils/time";
-import notifee from "@notifee/react-native";
-import { NoteBundle } from "../utils/note-bundle";
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
@@ -220,9 +221,6 @@ export const useAppEvents = () => {
         ) {
           onEmailVerified();
         }
-        NoteBundle.createNotes().then(() => {
-          useNoteStore.getState().setNotes();
-        });
       }, 1000);
       onUserUpdated();
       refValues.current.removeInternetStateListener = NetInfo.addEventListener(
@@ -566,8 +564,6 @@ export const useAppEvents = () => {
           await db.initCollections();
           await db.notes.init();
         }
-        await NoteBundle.createNotes();
-        useNoteStore.getState().setNotes();
         eSendEvent(refreshNotesPage);
         MMKV.removeItem("notesAddedFromIntent");
         initAfterSync();

@@ -28,7 +28,11 @@ import { IOS_APPGROUPID } from "../../utils/constants";
 export async function readEncrypted(filename, key, cipherData) {
   let path = `${cacheDir}/${filename}`;
   try {
-    const iosAppGroup = await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID);
+    const iosAppGroup =
+      Platform.OS === "ios"
+        ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+        : null;
+
     const appGroupPath = `${iosAppGroup}/${filename}`;
     let exists =
       (await RNFetchBlob.fs.exists(path)) ||
