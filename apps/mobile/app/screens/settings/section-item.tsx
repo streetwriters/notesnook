@@ -22,8 +22,8 @@ import {
   StackActions,
   useNavigation
 } from "@react-navigation/native";
-import React, { useRef } from "react";
-import { View, TextInput } from "react-native";
+import React, { useRef, useState } from "react";
+import { View, TextInput, ActivityIndicator } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ToggleSwitch from "toggle-switch-react-native";
 import Input from "../../components/ui/input";
@@ -46,10 +46,14 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   const current = item.useHook && item.useHook(item);
   const isHidden = item.hidden && item.hidden(item.property || current);
   const inputRef = useRef<TextInput>(null);
+  const [loading, setLoading] = useState(false);
 
-  const onChangeSettings = () => {
+  const onChangeSettings = async () => {
+    if (loading) return;
     if (item.modifer) {
-      item.modifer(item.property || current);
+      setLoading(true);
+      await item.modifer(item.property || current);
+      setLoading(false);
       return;
     }
     if (!item.property) return;
@@ -289,7 +293,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         </View>
       </View>
 
-      {item.type === "switch" && (
+      {item.type === "switch" && !loading && (
         <ToggleSwitch
           isOn={
             item.getter
@@ -303,6 +307,10 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           onToggle={onChangeSettings}
         />
       )}
+
+      {loading ? (
+        <ActivityIndicator size={SIZE.xxl} color={colors.accent} />
+      ) : null}
     </PressableButton>
   );
 };
