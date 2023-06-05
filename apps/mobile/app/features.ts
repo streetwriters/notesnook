@@ -21,15 +21,19 @@ import { FeatureType } from "./components/sheets/new-feature";
 
 export const features: FeatureType[] = [
   {
-    title: "Attachments preview",
-    body: "You can now preview PDFs & Images directly inside Notesnook."
+    title: "File & image sharing",
+    body: "You can now share images and files from other apps to Notesnook and sync them instantly."
   },
   {
-    title: "New attachments manager",
-    body: "The new attachments manager makes is much easier to view & interact with your attachments. It also allows you to download all (or some) of your attachments."
+    title: "Configurable date/time formats",
+    body: "You can now change date and time format across the app from Settings > Behaviour"
   },
   {
-    title: "Assign tags to multiple notes",
-    body: "You can now easily tag multiple notes without first opening them."
+    title: "Change default note title",
+    body: "You can now change default note title for new notes using different templates like $date$, $time$ and $headline$. Go to Settings > Editor to try"
+  },
+  {
+    title: "Default notebook/topic",
+    body: "You can now set a default notebook or topic to add new notes to automatically. You can make a notebook default from properties."
   }
 ];

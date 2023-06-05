@@ -73,4 +73,6 @@ allprojects {
         //    url("${project(':react-native-background-fetch').projectDir}/libs")
         // }
     }
+
 }
+

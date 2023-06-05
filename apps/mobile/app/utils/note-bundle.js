@@ -90,8 +90,7 @@ async function createNotes() {
       await attachFile(uri, hash, file.type, file.name, {
         type: "cache",
         id: id,
-        appGroupId: IOS_APPGROUPID,
-        reupload: true
+        appGroupId: IOS_APPGROUPID
       });
       let content = ``;
       if (isImage(file.type)) {

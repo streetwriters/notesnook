@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Platform } from "react-native";
-import { Monographs } from "../screens/notes/monographs";
 
 export const IOS_APPGROUPID = "group.org.streetwriters.notesnook";
 export const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
@@ -143,6 +142,7 @@ export const MenuItemsList = [
     icon: "text-box-multiple-outline",
     close: true,
     func: () => {
+      const Monographs = require("../screens/notes/monographs").Monographs;
       Monographs.navigate();
     }
   },
