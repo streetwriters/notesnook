@@ -548,8 +548,8 @@ export const settingsGroups: SettingSection[] = [
           },
           {
             id: "default-notebook",
-            name: "Clear default notebook",
-            description: "Clear the default notebook for new notes",
+            name: "Clear default notebook/topic",
+            description: "Clear the default notebook/topic for new notes",
             modifer: () => {
               db.settings?.setDefaultNotebook(undefined);
             },

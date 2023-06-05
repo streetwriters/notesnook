@@ -780,8 +780,8 @@ export const useActions = ({ close = () => null, item }) => {
       id: "default-notebook",
       title:
         defaultNotebook?.id === item.id
-          ? "Remove as default notebook"
-          : "Set as default notebook",
+          ? "Remove as default"
+          : "Set as default",
       hidden: item.type !== "notebook",
       icon: "notebook",
       func: async () => {
@@ -789,30 +789,39 @@ export const useActions = ({ close = () => null, item }) => {
           await db.settings.setDefaultNotebook();
           setDefaultNotebook();
         } else {
-          await db.settings.setDefaultNotebook(item);
-          setDefaultNotebook(item);
+          const notebook = {
+            id: item.id
+          };
+          await db.settings.setDefaultNotebook(notebook);
+          setDefaultNotebook(notebook);
         }
+        close();
       },
-      on: defaultNotebook?.id === item.id
+      on: defaultNotebook?.topic ? false : defaultNotebook?.id === item.id
     },
     {
       id: "default-topic",
       title:
         defaultNotebook?.id === item.id
-          ? "Remove as default topic"
-          : "Set as default topic",
+          ? "Remove as default"
+          : "Set as default",
       hidden: item.type !== "topic",
       icon: "bookmark",
       func: async () => {
-        if (defaultNotebook?.id === item.id) {
+        if (defaultNotebook?.topic === item.id) {
           await db.settings.setDefaultNotebook();
           setDefaultNotebook();
         } else {
-          await db.settings.setDefaultNotebook(item);
-          setDefaultNotebook(item);
+          const notebook = {
+            id: item.notebookId,
+            topic: item.id
+          };
+          await db.settings.setDefaultNotebook(notebook);
+          setDefaultNotebook(notebook);
         }
+        close();
       },
-      on: defaultNotebook?.id === item.id
+      on: defaultNotebook?.topic === item.id
     },
     {
       id: "disable-reminder",
