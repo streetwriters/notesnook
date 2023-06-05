@@ -22,6 +22,7 @@ import TiptapBulletList from "@tiptap/extension-bullet-list";
 export const BulletList = TiptapBulletList.extend({
   addAttributes() {
     return {
+      ...this.parent?.(),
       listType: {
         default: null,
         parseHTML: (element) => element.style.listStyleType,
