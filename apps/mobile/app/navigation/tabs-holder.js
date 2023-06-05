@@ -271,13 +271,13 @@ const _TabsHolder = () => {
     setTimeout(() => {
       switch (current) {
         case "tablet":
-          introCompleted && tabBarRef.current?.goToIndex(0, false);
+          tabBarRef.current?.goToIndex(0, false);
           break;
         case "smallTablet":
           if (!fullscreen) {
-            introCompleted && tabBarRef.current?.closeDrawer(false);
+            tabBarRef.current?.closeDrawer(false);
           } else {
-            introCompleted && tabBarRef.current?.openDrawer(false);
+            tabBarRef.current?.openDrawer(false);
           }
           break;
         case "mobile":
@@ -416,64 +416,66 @@ const _TabsHolder = () => {
         backgroundColor="transparent"
       />
 
-      {deviceMode && widths[deviceMode] ? (
-        <FluidTabs
-          ref={tabBarRef}
-          dimensions={dimensions}
-          widths={!introCompleted ? widths["mobile"] : widths[deviceMode]}
-          enabled={deviceMode !== "tablet" && !fullscreen}
-          onScroll={onScroll}
-          onChangeTab={onChangeTab}
-          onDrawerStateChange={() => true}
-        >
-          <View
-            key="1"
-            style={{
-              height: "100%",
-              width: fullscreen
-                ? 0
-                : widths[!introCompleted ? "mobile" : deviceMode]?.a
-            }}
-          >
-            <SideMenu />
-          </View>
-
-          <View
-            key="2"
-            style={{
-              height: "100%",
-              width: fullscreen
-                ? 0
-                : widths[!introCompleted ? "mobile" : deviceMode]?.b
-            }}
-          >
-            {deviceMode === "mobile" ? (
-              <Animated.View
-                onTouchEnd={() => {
-                  tabBarRef.current?.closeDrawer();
-                  animatedOpacity.value = withTiming(0);
-                  animatedTranslateY.value = withTiming(-9999);
+      {!introCompleted ? (
+        <NavigationStack />
+      ) : (
+        <>
+          {deviceMode && widths[deviceMode] ? (
+            <FluidTabs
+              ref={tabBarRef}
+              dimensions={dimensions}
+              widths={widths[deviceMode]}
+              enabled={deviceMode !== "tablet" && !fullscreen}
+              onScroll={onScroll}
+              onChangeTab={onChangeTab}
+              onDrawerStateChange={() => true}
+            >
+              <View
+                key="1"
+                style={{
+                  height: "100%",
+                  width: fullscreen ? 0 : widths[deviceMode]?.a
                 }}
-                style={[
-                  {
-                    position: "absolute",
-                    width: "100%",
-                    height: "100%",
-                    zIndex: 999,
-                    backgroundColor: "rgba(0,0,0,0.2)"
-                  },
-                  animatedStyle
-                ]}
-                ref={overlayRef}
-              />
-            ) : null}
+              >
+                <SideMenu />
+              </View>
 
-            <NavigationStack />
-          </View>
+              <View
+                key="2"
+                style={{
+                  height: "100%",
+                  width: fullscreen ? 0 : widths[deviceMode]?.b
+                }}
+              >
+                {deviceMode === "mobile" ? (
+                  <Animated.View
+                    onTouchEnd={() => {
+                      tabBarRef.current?.closeDrawer();
+                      animatedOpacity.value = withTiming(0);
+                      animatedTranslateY.value = withTiming(-9999);
+                    }}
+                    style={[
+                      {
+                        position: "absolute",
+                        width: "100%",
+                        height: "100%",
+                        zIndex: 999,
+                        backgroundColor: "rgba(0,0,0,0.2)"
+                      },
+                      animatedStyle
+                    ]}
+                    ref={overlayRef}
+                  />
+                ) : null}
 
-          <EditorWrapper key="3" width={widths} dimensions={dimensions} />
-        </FluidTabs>
-      ) : null}
+                <NavigationStack />
+              </View>
+
+              <EditorWrapper key="3" width={widths} dimensions={dimensions} />
+            </FluidTabs>
+          ) : null}
+        </>
+      )}
     </View>
   );
 };

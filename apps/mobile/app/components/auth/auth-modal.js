@@ -126,11 +126,11 @@ const AuthModal = () => {
 
         {initialAuthMode.current !== AuthMode.welcomeSignup ? null : (
           <Button
-            title="Skip for now"
+            title="Skip"
             onPress={() => {
               hideAuth();
             }}
-            iconSize={20}
+            iconSize={16}
             type="gray"
             iconPosition="right"
             icon="chevron-right"

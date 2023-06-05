@@ -302,6 +302,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
       translateX.value = value;
     })
     .onEnd((event) => {
+      if (locked.value || forcedLock.value) return;
       if (currentTab.value === 2 && Platform.OS === "android") return;
       const velocityX =
         event.velocityX < 0 ? event.velocityX * -1 : event.velocityX;

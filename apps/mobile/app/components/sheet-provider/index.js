@@ -196,12 +196,11 @@ const SheetProvider = ({ context = "global" }) => {
             accentColor={data.iconColor || "accent"}
             accentText="light"
             type="accent"
-            height={45}
+            height={40}
             width={250}
             style={{
-              borderRadius: 100
+              marginBottom: 25
             }}
-            fontSize={SIZE.md}
           />
         ) : null}
 
