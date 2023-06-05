@@ -50,6 +50,8 @@ export type Settings = {
   corsProxy: string;
   fontSize: string;
   fontFamily: string;
+  dateFormat: string;
+  timeFormat: string;
 };
 
 export type EditorProps = {

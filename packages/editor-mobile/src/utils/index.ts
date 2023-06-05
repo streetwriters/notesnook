@@ -41,6 +41,8 @@ export type Settings = {
   corsProxy: string;
   fontSize: number;
   fontFamily: string;
+  timeFormat: string;
+  dateFormat: string;
 };
 
 /* eslint-disable no-var */
