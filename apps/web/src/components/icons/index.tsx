@@ -249,7 +249,10 @@ function _MDIIconWrapper({
 }
 const MDIIconWrapper = memo(
   _MDIIconWrapper,
-  (prev, next) => prev.rotate === next.rotate
+  (prev, next) =>
+    prev.rotate === next.rotate &&
+    prev.color === next.color &&
+    prev.title === next.title
 );
 
 export type IconProps = FlexProps &
