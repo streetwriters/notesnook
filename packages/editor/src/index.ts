@@ -44,7 +44,7 @@ import BulletList from "./extensions/bullet-list";
 import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer";
 import { CodeBlock } from "./extensions/code-block";
 import { Codemark } from "./extensions/code-mark";
-import { DateTime } from "./extensions/date-time";
+import { DateTime, DateTimeOptions } from "./extensions/date-time";
 import { EmbedNode } from "./extensions/embed";
 import FontFamily from "./extensions/font-family";
 import FontSize from "./extensions/font-size";
@@ -88,10 +88,11 @@ const CoreExtensions = Object.entries(TiptapCoreExtensions)
   .filter(([name]) => name !== "ClipboardTextSerializer")
   .map(([, extension]) => extension);
 
-type TiptapOptions = EditorOptions &
+export type TiptapOptions = EditorOptions &
   Omit<AttachmentOptions, "HTMLAttributes"> &
   Omit<WebClipOptions, "HTMLAttributes"> &
   Omit<ImageOptions, "HTMLAttributes"> &
+  DateTimeOptions &
   OpenLinkOptions & {
     downloadOptions?: DownloadOptions;
     theme: Theme;
@@ -113,6 +114,8 @@ const useTiptap = (
     onOpenLink,
     onBeforeCreate,
     downloadOptions,
+    dateFormat,
+    timeFormat,
     ...restOptions
   } = options;
   const PortalProviderAPI = usePortalProvider();
@@ -235,7 +238,7 @@ const useTiptap = (
         MathBlock,
         KeepInView,
         SelectionPersist,
-        DateTime,
+        DateTime.configure({ dateFormat, timeFormat }),
         KeyMap,
         WebClipNode
       ],
@@ -252,7 +255,9 @@ const useTiptap = (
       onOpenAttachmentPicker,
       PortalProviderAPI,
       onBeforeCreate,
-      onOpenLink
+      onOpenLink,
+      dateFormat,
+      timeFormat
     ]
   );
 
