@@ -214,9 +214,9 @@ export const useEditor = (
             const defaultNotebook = db.settings?.getDefaultNotebook();
             if (!state.current.onNoteCreated && defaultNotebook) {
               onNoteCreated(id, {
-                type: defaultNotebook.type,
+                type: defaultNotebook.topic ? "topic" : "notebook",
                 id: defaultNotebook.id,
-                notebook: defaultNotebook.notebookId
+                notebook: defaultNotebook.topic
               });
             } else {
               state.current?.onNoteCreated && state.current.onNoteCreated(id);

@@ -53,7 +53,7 @@ export const TitleFormat = () => {
         {"\n"}
         $date$: Current date{"\n"}
         $time$: Current time{"\n"}
-        $count$: Number of untitled notes + 1{"\n"}
+        $count$: Number of notes + 1{"\n"}
         $headline$: Use starting line of the note as title{"\n"}
       </Paragraph>
     </>
