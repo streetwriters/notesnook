@@ -234,18 +234,17 @@ export class NoteContextMenuModel extends BaseProperties {
     await this.open();
     await this.menu.clickOnItem("export");
 
-    // we need to override date time so
-    // date created & date edited remain fixed.
-    await this.noteLocator.evaluate(() => {
-      // eslint-disable-next-line no-extend-native
-      Date.prototype.toLocaleString = () => "xxx";
-    });
-
-    return await downloadAndReadFile(
+    const content = await downloadAndReadFile(
       this.noteLocator.page(),
       this.menu.getItem(format),
       "utf-8"
     );
+    if (format === "html") {
+      return content
+        .replace(/(name="created-on" content=")(.+?)"/, '$1xxx"')
+        .replace(/(name="last-edited-on" content=")(.+?)"/, '$1xxx"');
+    }
+    return content;
   }
 
   async addToNotebook(notebook: Notebook) {
