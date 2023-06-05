@@ -225,7 +225,7 @@ export default function EditorManager({
           )}
           <Editor
             nonce={timestamp}
-            content={
+            content={() =>
               previewSession.current?.content?.data ||
               editorstore.get().session?.content?.data
             }
@@ -331,7 +331,7 @@ type EditorOptions = {
   onLoadMedia?: () => void;
 };
 type EditorProps = {
-  content: string;
+  content: () => string;
   nonce?: number;
   options?: EditorOptions;
   onContentChange?: () => void;

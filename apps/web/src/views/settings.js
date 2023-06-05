@@ -17,13 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useNoteStore } from "../stores/note-store";
 import { useStore as useThemeStore } from "../stores/theme-store";
-import { useStore as useSettingStore } from "../stores/setting-store";
+import {
+  useStore as useSettingStore,
+  store as settingstore
+} from "../stores/setting-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import AccentItem from "../components/accent-item";
 import {
@@ -224,17 +227,16 @@ function Settings() {
     "https://cors.notesnook.com"
   );
   const { editorConfig, setEditorConfig } = useEditorConfig();
-  const [none, setNonce] = useState(0);
+
+  const dateFormat = useSettingStore((store) => store.dateFormat);
+  const timeFormat = useSettingStore((store) => store.timeFormat);
+  const titleFormat = useSettingStore((store) => store.titleFormat);
 
   useEffect(() => {
     (async () => {
       await scheduleBackups();
     })();
   }, [backupReminderOffset]);
-
-  const forceUpdate = useCallback(() => {
-    setNonce((s) => ++s);
-  });
 
   return (
     <FlexScrollContainer style={{ height: "100%" }}>
@@ -600,11 +602,10 @@ function Settings() {
                 { value: "12-hour", title: "12h" },
                 { value: "24-hour", title: "24h" }
               ]}
-              selectedOption={db.settings.getTimeFormat()}
-              onSelectionChanged={async (option) => {
-                await db.settings.setTimeFormat(option.value);
-                forceUpdate();
-              }}
+              selectedOption={timeFormat}
+              onSelectionChanged={(option) =>
+                settingstore.get().setTimeFormat(option.value)
+              }
             />
             <Flex
               sx={{
@@ -628,11 +629,10 @@ function Settings() {
                   borderRadius: "default",
                   width: "120px"
                 }}
-                value={db.settings.getDateFormat()}
-                onChange={async (e) => {
-                  await db.settings.setDateFormat(e.target.value);
-                  forceUpdate();
-                }}
+                value={dateFormat}
+                onChange={(e) =>
+                  settingstore.get().setDateFormat(e.target.value)
+                }
               >
                 {DATE_FORMATS.map((format) => (
                   <option key={format} value={format}>
@@ -662,10 +662,9 @@ function Settings() {
               <Input
                 sx={{ mt: 1, p: 1 }}
                 value={db.settings.getTitleFormat()}
-                onChange={async (e) => {
-                  await db.settings.setTitleFormat(e.target.value);
-                  forceUpdate();
-                }}
+                onChange={(e) =>
+                  settingstore.get().setTitleFormat(e.target.value)
+                }
               />
               <Text variant="subBody" sx={{ mt: 1 }}>
                 Use the following key to format the title:
