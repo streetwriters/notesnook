@@ -217,7 +217,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     );
   };
 
-  updateWebclip = async ({ src, hash }: ImageAttributes) => {
+  updateWebclip = async ({ src, hash }: Partial<ImageAttributes>) => {
     await this.doAsync(
       `editor && editor.commands.updateWebClip(${JSON.stringify({
         hash
@@ -225,7 +225,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     );
   };
 
-  updateImage = async ({ src, hash }: ImageAttributes) => {
+  updateImage = async ({ src, hash }: Partial<ImageAttributes>) => {
     await this.doAsync(
       `editor && editor.commands.updateImage(${JSON.stringify({
         hash
