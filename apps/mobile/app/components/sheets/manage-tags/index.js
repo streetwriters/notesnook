@@ -240,7 +240,6 @@ const TagItem = ({ tag, notes, setNotes }) => {
       Navigation.queueRoutesForUpdate();
     }, 1);
   };
-
   return (
     <PressableButton
       customStyle={{
@@ -275,7 +274,7 @@ const TagItem = ({ tag, notes, setNotes }) => {
             : "checkbox-blank-circle-outline"
         }
       />
-      <Paragraph size={SIZE.sm}>{"#" + tag.title}</Paragraph>
+      <Paragraph size={SIZE.sm}>{"#" + tag.alias}</Paragraph>
     </PressableButton>
   );
 };

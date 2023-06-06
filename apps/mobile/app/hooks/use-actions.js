@@ -384,11 +384,12 @@ export const useActions = ({ close = () => null, item }) => {
       positivePress: async (value) => {
         if (!value || value === "" || value.trimStart().length == 0) return;
         await db.tags.rename(item.id, db.tags.sanitize(value));
-        setImmediate(() => {
+        setTimeout(() => {
           useTagStore.getState().setTags();
           useMenuStore.getState().setMenuPins();
           Navigation.queueRoutesForUpdate();
-        });
+          useRelationStore.getState().update();
+        }, 1);
       },
       input: true,
       defaultValue: alias,
