@@ -142,19 +142,6 @@ const ListItem = ({ item, mode, close }) => {
             {item.type === "tag" ? "#" : ""}
             {item.alias || item.title}
           </Text>
-
-          {item.type === "note" ? (
-            <Text
-              numberOfLines={1}
-              style={{
-                color: colors.icon,
-                fontSize: 12,
-                fontFamily: "OpenSans-Regular"
-              }}
-            >
-              {item.headline}
-            </Text>
-          ) : null}
         </View>
       </View>
 
