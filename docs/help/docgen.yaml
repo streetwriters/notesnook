@@ -23,7 +23,15 @@ navigation:
       - path: organizing-notes/organize-notes-using-favorites.md
       - path: organizing-notes/pin-notes-and-notebooks.md
       - path: organizing-notes/side-menu-shortcuts.md
-
+  - path: editor
+    children:
+      - path: editor/markdown-shortcuts.md
+      - path: editor/customize-toolbar.md
+      - path: editor/default-note-title-format.md
+      - path: editor/default-font-size-and-font-family.md
+      - path: editor/outline-lists.md
+      - path: editor/tables.md
+      - path: editor/task-lists.md
   - path: importing-notes
     children:
       - path: importing-notes/import-notes-from-evernote.md
