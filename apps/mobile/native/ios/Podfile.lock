@@ -283,7 +283,7 @@ PODS:
     - RCTTypeSafety
     - React-Core
     - ReactCommon/turbomodule/core
-  - react-native-share-extension (2.5.2):
+  - react-native-share-extension (2.5.5):
     - React
   - react-native-sodium (1.4.1):
     - React
@@ -759,7 +759,7 @@ SPEC CHECKSUMS:
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-pdf: 33c622cbdf776a649929e8b9d1ce2d313347c4fa
   react-native-safe-area-context: b8979f5eda6ed5903d4dbc885be3846ea3daa753
-  react-native-share-extension: 828641041123f5489fcb820758fb8bb743d15e34
+  react-native-share-extension: 8fa247810cc533c9d3bab6913f62ce7aec9bcf4a
   react-native-sodium: f4e3986ddcb73482f8679e534b448a0675d0cf13
   react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
   React-perflogger: 8e832d4e21fdfa613033c76d58d7e617341e804b

@@ -1,6 +1,6 @@
-- Preview PDFs & Images directly inside Notesnook."
-- Improved attachments manager with support for downloading all attachments
-- Assign tags to multiple notes
-- Bug fixes and performance improvements
+- Change date and time format across the app
+- Change default note title for new notes using different templates
+- Set a default notebook or topic to add new notes to automatically
+- You can now share images and files from other apps to Notesnook and sync them instantly.
 
 Thank you for using Notesnook!

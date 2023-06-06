@@ -449,7 +449,7 @@ export default class Notes extends Collection {
     }
     return this.formatTitle(
       this._db.settings.getTitleFormat(),
-      headline?.split(" ").splice(0, 10)
+      headline?.split(" ").splice(0, 10).join(" ")
     );
   }
 }
