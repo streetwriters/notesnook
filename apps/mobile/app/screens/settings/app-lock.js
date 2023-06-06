@@ -130,11 +130,10 @@ const AppLock = ({ route }) => {
           ) : (
             <View
               style={{
-                flex: 0.35,
+                flexGrow: 1,
                 justifyContent: "flex-end",
                 paddingHorizontal: 20,
                 backgroundColor: colors.nav,
-                marginBottom: 20,
                 borderBottomWidth: 1,
                 borderBottomColor: colors.border,
                 alignSelf: deviceMode !== "mobile" ? "center" : undefined,
@@ -194,7 +193,7 @@ const AppLock = ({ route }) => {
               paddingHorizontal: 12,
               width: DDS.isTab && welcome ? "50%" : "100%",
               alignSelf: "center",
-              flex: 0.65
+              flexGrow: 1
             }}
           >
             {modes.map((item) => (

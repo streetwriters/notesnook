@@ -108,7 +108,7 @@ export const Signup = ({ changeMode, trial }) => {
       >
         <View
           style={{
-            flex: 0.35,
+            flexGrow: 1,
             justifyContent: "flex-end",
             paddingHorizontal: 20,
             backgroundColor: colors.nav,
@@ -165,7 +165,7 @@ export const Signup = ({ changeMode, trial }) => {
             paddingHorizontal: 20,
             backgroundColor: colors.bg,
             alignSelf: "center",
-            flex: 0.6
+            flexGrow: 0.5
           }}
         >
           <Input

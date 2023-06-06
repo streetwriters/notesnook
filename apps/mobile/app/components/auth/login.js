@@ -94,12 +94,12 @@ export const Login = ({ changeMode }) => {
       >
         <View
           style={{
-            flex: 0.45,
+            flexGrow: 0.8,
             justifyContent: "flex-end",
             paddingHorizontal: 20,
             backgroundColor: colors.nav,
-            marginBottom: 20,
             borderBottomWidth: 1,
+            marginBottom: 12,
             borderBottomColor: colors.border,
             alignSelf: deviceMode !== "mobile" ? "center" : undefined,
             borderWidth: deviceMode !== "mobile" ? 1 : null,
@@ -156,7 +156,8 @@ export const Login = ({ changeMode }) => {
               : "99.9%",
             backgroundColor: colors.bg,
             alignSelf: "center",
-            paddingHorizontal: 20
+            paddingHorizontal: 20,
+            flexGrow: 1
           }}
         >
           <Input
