@@ -107,10 +107,12 @@ export const EVENTS = {
 };
 
 export const DATE_FORMATS = [
+  "MM-DD-YYYY",
   "DD-MM-YYYY",
-  "YYYY-DD-MM",
+  "YYYY-MM-DD",
   "DD/MM/YYYY",
-  "YYYY/DD/MM",
+  "YYYY/MM/DD",
+  "MM/DD/YYYY",
   "MMM D, YYYY"
 ];
 
