@@ -25,10 +25,9 @@ navigation:
       - path: organizing-notes/side-menu-shortcuts.md
   - path: editor
     children:
+      - path: editor/personalizing-editor.md
       - path: editor/markdown-shortcuts.md
-      - path: editor/customize-toolbar.md
-      - path: editor/default-note-title-format.md
-      - path: editor/default-font-size-and-font-family.md
+      - path: editor/toolbar.md
       - path: editor/outline-lists.md
       - path: editor/tables.md
       - path: editor/task-lists.md

@@ -1,1 +1,0 @@
-# Default note title format
