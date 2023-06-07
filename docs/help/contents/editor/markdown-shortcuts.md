@@ -1,5 +1,7 @@
 # Markdown shortcuts
 
+![Markdown editing](/markdown-editing.gif)
+
 The following markdown shortcuts are supported in the editor.
 
 | Shortcut                                                                              | Block           |

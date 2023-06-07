@@ -2,11 +2,15 @@
 
 The editor toolbar has all the basic tools for rich formatting of your notes. It also let's you add various blocks to your notes like task lists, images, videos etc.
 
+![Toolbar](/toolbar-editor.png)
+
 ## Adding blocks
 
 1. Focus inside the note where you want to insert a block.
 2. Click on the ![Toolbar plus](/toolbar-plus.png) button on the toolbar.
 3. Select the block you want to insert, for example a task list.
+
+![Toolbar](/toolbar-blocks.png)
 
 ## Customzing toolbar
 
@@ -15,6 +19,8 @@ One of the great features of the editor is the ability to customize the editor t
 # [Desktop/Web](#/tab/web)
 
 To customize the toolbar go to `Settings` > `Editor Settings` and click on `Configure Toolbar`.
+
+![Configure editor toolbar](/config-toolbar-desktop.png)
 
 # [Mobile](#/tab/mobile)
 
