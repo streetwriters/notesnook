@@ -1,8 +1,8 @@
 # Tables
 
-![Table](/table-example-22.png)
+![Notes editor with table example](/table-example-22.png)
 
-Tables in Notesnook provide all the basic to advanced functionality. On the left size are the `Row properties` and `Insert a new row` buttons while on top of the table are `Table properties` and `Insert a new column` buttons.
+Tables in Notesnook provide all the basic to advanced functionality. On the left side are the `Row properties` and `Insert a new row` buttons while on top of the table are `Table properties` and `Insert a new column` buttons.
 
 The first row of a table is always a header however you can always delete this row.
 
@@ -11,7 +11,7 @@ The first row of a table is always a header however you can always delete this r
 1. Click on the ![Toolbar plus](/toolbar-plus.png) and select the table block.
 2. Select the size of the table grid.
 
-![Create a table](/create-table.png)
+![Create a table in rich text editor](/create-table.png)
 
 ## Resizing table columns
 
@@ -31,42 +31,42 @@ Table columns on desktop and web apps are resizable.
 1. Click on a cell below which you want to insert a new row.
 2. Click on the `Insert row below` button to insert a new row.
 
-![Insert row table](/insert-row-table.gif)
+![Insert row in the table](/insert-row-table.gif)
 
 ## Delete a row
 
 1. Click on the cell of the row you want to delete
 2. Click on the cell properties button and select `Delete row`
 
-![Insert row table](/table-row-delete.png)
+![Delete a row from the table](/table-row-delete.png)
 
 ## Move row
 
 1. Click on the cell of the row you move.
 2. Click on the cell properties button and select `Move row up` to move the row up or `Move row down` to move the row down.
 
-![Move table row](/table-move-row.gif)
+![Move a row in the table](/table-move-row.gif)
 
 ## Insert a column
 
 1. Click on a cell after which you want to insert a new column.
 2. Click on the `Insert column right` button to insert a new column.
 
-![Move table row](/table-insert-column.gif)
+![Insert a column in the table](/table-insert-column.gif)
 
 ## Delete a column
 
 1. Click on the cell of the column you want to delete
 2. Click on the table properties button and select `Delete column`
 
-![Delete table column](/table-delete-column.png)
+![Delete a column from the table](/table-delete-column.png)
 
 ## Move column
 
 1. Click on the cell of the column you move.
 2. Click on the table properties button on top and select `Move column right` to move the column right or `Move column left` to move the column right.
 
-![Move table row](/table-move-column.gif)
+![Move a column in the table](/table-move-column.gif)
 
 ## Merge cells
 
@@ -89,7 +89,7 @@ Table columns on desktop and web apps are resizable.
 3. Select Cell properties
 4. You can now change cell background, text color and border color.
 
-![Cell properties](/cell-properties.png)
+![Customize cell properties](/cell-properties.png)
 
 ## Delete table
 
@@ -97,4 +97,4 @@ Table columns on desktop and web apps are resizable.
 2. Click on table properties button top.
 3. Select `Delete table` from drop down menu
 
-![Delete table](/delete-table.png)
+![Delete a table from the notes editor](/delete-table.png)
