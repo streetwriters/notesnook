@@ -46,7 +46,8 @@ const BaseDialog = ({
   animated = true,
   bounce = true,
   closeOnTouch = true,
-  useSafeArea = true
+  useSafeArea = true,
+  avoidKeyboardResize = false
 }) => {
   const floating = useIsFloatingKeyboard();
 
@@ -94,7 +95,7 @@ const BaseDialog = ({
         }}
       >
         <KeyboardAvoidingView
-          enabled={!floating && Platform.OS === "ios"}
+          enabled={!floating && Platform.OS === "ios" && !avoidKeyboardResize}
           behavior="padding"
         >
           <BouncingView

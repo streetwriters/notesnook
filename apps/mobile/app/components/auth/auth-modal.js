@@ -84,6 +84,7 @@ const AuthModal = () => {
       background={colors.bg}
       transparent={false}
       animated={false}
+      avoidKeyboardResize
     >
       {currentAuthMode !== AuthMode.login ? (
         <Signup
