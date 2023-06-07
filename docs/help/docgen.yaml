@@ -23,7 +23,7 @@ navigation:
       - path: organizing-notes/organize-notes-using-favorites.md
       - path: organizing-notes/pin-notes-and-notebooks.md
       - path: organizing-notes/side-menu-shortcuts.md
-  - path: editor
+  - path: rich-text-editor
     children:
       - path: editor/personalizing-rich-text-editor.md
       - path: editor/markdown-notes-editing.md
