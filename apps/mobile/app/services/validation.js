@@ -36,14 +36,12 @@ export function validatePass(password) {
     SHORT_PASS: false
   };
 
-  if (password?.length <= 0) {
+  if (password?.length < 8) {
     errors.SHORT_PASS = true;
-    return errors;
-  }
-
-  if (password.length >= 8) {
+  } else {
     errors.SHORT_PASS = false;
   }
+
   return errors;
 }
 

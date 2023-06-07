@@ -112,7 +112,7 @@ const Input = ({
   const [secureEntry, setSecureEntry] = useState(true);
   const [showError, setShowError] = useState(false);
   const [errorList, setErrorList] = useState({
-    SHORT_PASS: true
+    SHORT_PASS: false
   });
   type ErrorKey = keyof typeof errorList;
   const color = error
@@ -187,6 +187,12 @@ const Input = ({
     onChangeText && onChangeText(value);
     setShowError(false);
     validate(value);
+    if (value === "") {
+      setError(false);
+      setErrorList({
+        SHORT_PASS: false
+      });
+    }
   };
 
   const onBlur = () => {
