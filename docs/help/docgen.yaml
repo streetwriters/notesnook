@@ -28,7 +28,6 @@ navigation:
       - path: editor/personalizing-editor.md
       - path: editor/markdown-shortcuts.md
       - path: editor/toolbar.md
-      - path: editor/outline-lists.md
       - path: editor/tables.md
       - path: editor/task-lists.md
   - path: importing-notes
