@@ -25,11 +25,11 @@ navigation:
       - path: organizing-notes/side-menu-shortcuts.md
   - path: editor
     children:
-      - path: editor/personalizing-editor.md
-      - path: editor/markdown-shortcuts.md
-      - path: editor/toolbar.md
+      - path: editor/personalizing-rich-text-editor.md
+      - path: editor/markdown-notes-editing.md
+      - path: editor/rich-text-editor-toolbar.md
       - path: editor/tables.md
-      - path: editor/task-lists.md
+      - path: editor/task-and-todo-lists.md
   - path: importing-notes
     children:
       - path: importing-notes/import-notes-from-evernote.md

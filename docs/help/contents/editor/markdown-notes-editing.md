@@ -1,6 +1,6 @@
-# Markdown shortcuts
+# Markdown shortcuts in notes
 
-![Markdown editing](/markdown-editing.gif)
+![Markdown notes editing with markdown shortcuts in Notesnook](/markdown-editing.gif)
 
 The following markdown shortcuts are supported in the editor.
 
