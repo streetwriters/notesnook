@@ -373,81 +373,57 @@ function Settings() {
                 setGroups((g) => ({ ...g, mfa: !g.mfa }));
               }}
             />
-            {groups.mfa &&
-              (user.mfa.isEnabled ? (
-                <>
-                  <Button
-                    variant="list"
-                    onClick={async () => {
-                      if (await verifyAccount()) {
-                        await showMultifactorDialog(user.mfa.primaryMethod);
-                        await refreshUser();
-                      }
-                    }}
-                  >
-                    <Tip
-                      text={
-                        user.mfa.secondaryMethod
-                          ? "Reconfigure fallback 2FA method"
-                          : "Add fallback 2FA method"
-                      }
-                      tip="You can use the fallback 2FA method in case you are unable to login via the primary method."
-                    />
-                  </Button>
+            {groups.mfa && (
+              <>
+                <Button
+                  variant="list"
+                  onClick={async () => {
+                    if (await verifyAccount()) {
+                      await showMultifactorDialog();
+                      await refreshUser();
+                    }
+                  }}
+                >
+                  <Tip
+                    text={"Change primary 2FA method"}
+                    tip={`Your current primary 2FA method is ${user.mfa.primaryMethod}.`}
+                  />
+                </Button>
+                <Button
+                  variant="list"
+                  onClick={async () => {
+                    if (await verifyAccount()) {
+                      await showMultifactorDialog(user.mfa.primaryMethod);
+                      await refreshUser();
+                    }
+                  }}
+                >
+                  <Tip
+                    text={
+                      user.mfa.secondaryMethod
+                        ? "Reconfigure fallback 2FA method"
+                        : "Add fallback 2FA method"
+                    }
+                    tip="You can use the fallback 2FA method in case you are unable to login via the primary method."
+                  />
+                </Button>
 
-                  <Button
-                    variant="list"
-                    onClick={async () => {
-                      if (await verifyAccount()) {
-                        await show2FARecoveryCodesDialog(
-                          user.mfa.primaryMethod
-                        );
-                        await refreshUser();
-                      }
-                    }}
-                  >
-                    <Tip
-                      text="View recovery codes"
-                      tip={`Recovery codes can be used to login in case you cannot use any of the other 2FA methods. You have ${user.mfa.remainingValidCodes} recovery codes left.`}
-                    />
-                  </Button>
-                  <Button
-                    variant="list"
-                    onClick={async () => {
-                      if (await verifyAccount()) {
-                        await db.mfa.disable();
-                        showToast(
-                          "success",
-                          "Two-factor authentication disabled."
-                        );
-                        await refreshUser();
-                      }
-                    }}
-                  >
-                    <Tip
-                      text="Disable two-factor authentication"
-                      tip="You can disable 2FA if you want to reset or change 2FA settings."
-                    />
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    variant="list"
-                    onClick={async () => {
-                      if (await verifyAccount()) {
-                        await showMultifactorDialog();
-                        await refreshUser();
-                      }
-                    }}
-                  >
-                    <Tip
-                      text="Enable two-factor authentication"
-                      tip="Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to sign in."
-                    />
-                  </Button>
-                </>
-              ))}
+                <Button
+                  variant="list"
+                  onClick={async () => {
+                    if (await verifyAccount()) {
+                      await show2FARecoveryCodesDialog(user.mfa.primaryMethod);
+                      await refreshUser();
+                    }
+                  }}
+                >
+                  <Tip
+                    text="View recovery codes"
+                    tip={`Recovery codes can be used to login in case you cannot use any of the other 2FA methods. You have ${user.mfa.remainingValidCodes} recovery codes left.`}
+                  />
+                </Button>
+              </>
+            )}
           </>
         )}
         {isLoggedIn && (
