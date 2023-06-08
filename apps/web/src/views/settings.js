@@ -652,6 +652,9 @@ function Settings() {
                 <br />
                 $count$: Number of notes + 1<br />
                 $headline$: Use starting line of the note as title
+                <br />
+                $timestamp$: Full date &amp; time without any spaces or other
+                symbols (e.g. 202305261253)
               </Text>
             </Flex>
             <Button
