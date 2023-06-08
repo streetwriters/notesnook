@@ -64,15 +64,28 @@ export const NotebookItem = ({
           flexShrink: 1
         }}
       >
-        <Heading
-          size={SIZE.md}
-          numberOfLines={1}
-          style={{
-            flexWrap: "wrap"
-          }}
-        >
-          {item.title}
-        </Heading>
+        {compactMode ? (
+          <Paragraph
+            size={SIZE.sm}
+            numberOfLines={1}
+            style={{
+              flexWrap: "wrap"
+            }}
+          >
+            {item.title}
+          </Paragraph>
+        ) : (
+          <Heading
+            size={SIZE.md}
+            numberOfLines={1}
+            style={{
+              flexWrap: "wrap"
+            }}
+          >
+            {item.title}
+          </Heading>
+        )}
+
         {isTopic || !item.description || compactMode ? null : (
           <Paragraph
             size={SIZE.sm}
@@ -123,40 +136,51 @@ export const NotebookItem = ({
           </View>
         )}
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            marginTop: 5,
-            height: SIZE.md + 2
-          }}
-        >
-          {isTrash ? (
-            <>
+        {!compactMode ? (
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              marginTop: 5,
+              height: SIZE.md + 2
+            }}
+          >
+            {isTrash ? (
+              <>
+                <Paragraph
+                  color={colors.icon}
+                  size={SIZE.xs}
+                  style={{
+                    textAlignVertical: "center",
+                    marginRight: 6
+                  }}
+                >
+                  {"Deleted on " +
+                    new Date(item.dateDeleted).toISOString().slice(0, 10)}
+                </Paragraph>
+                <Paragraph
+                  color={colors.accent}
+                  size={SIZE.xs}
+                  style={{
+                    textAlignVertical: "center",
+                    marginRight: 6
+                  }}
+                >
+                  {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
+                </Paragraph>
+              </>
+            ) : (
               <Paragraph
                 color={colors.icon}
                 size={SIZE.xs}
                 style={{
-                  textAlignVertical: "center",
                   marginRight: 6
                 }}
               >
-                {"Deleted on " +
-                  new Date(item.dateDeleted).toISOString().slice(0, 10)}
+                {getFormattedDate(item[dateBy], "date")}
               </Paragraph>
-              <Paragraph
-                color={colors.accent}
-                size={SIZE.xs}
-                style={{
-                  textAlignVertical: "center",
-                  marginRight: 6
-                }}
-              >
-                {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
-              </Paragraph>
-            </>
-          ) : (
+            )}
             <Paragraph
               color={colors.icon}
               size={SIZE.xs}
@@ -164,50 +188,61 @@ export const NotebookItem = ({
                 marginRight: 6
               }}
             >
-              {getFormattedDate(item[dateBy], "date")}
+              {item && totalNotes > 1
+                ? totalNotes + " notes"
+                : totalNotes === 1
+                ? totalNotes + " note"
+                : "0 notes"}
             </Paragraph>
-          )}
-          <Paragraph
-            color={colors.icon}
-            size={SIZE.xs}
-            style={{
-              marginRight: 6
-            }}
-          >
-            {item && totalNotes > 1
-              ? totalNotes + " notes"
-              : totalNotes === 1
-              ? totalNotes + " note"
-              : "0 notes"}
-          </Paragraph>
 
-          {item.pinned ? (
-            <Icon
-              name="pin-outline"
-              size={SIZE.sm}
-              style={{
-                marginRight: 10,
-                marginTop: 2
-              }}
-              color={colors.accent}
-            />
-          ) : null}
-        </View>
+            {item.pinned ? (
+              <Icon
+                name="pin-outline"
+                size={SIZE.sm}
+                style={{
+                  marginRight: 10,
+                  marginTop: 2
+                }}
+                color={colors.accent}
+              />
+            ) : null}
+          </View>
+        ) : null}
       </View>
-      <IconButton
-        color={colors.heading}
-        name="dots-horizontal"
-        testID={notesnook.ids.notebook.menu}
-        size={SIZE.xl}
-        onPress={() => showActionSheet(item)}
-        customStyle={{
-          justifyContent: "center",
-          height: 35,
-          width: 35,
-          borderRadius: 100,
+      <View
+        style={{
+          flexDirection: "row",
           alignItems: "center"
         }}
-      />
+      >
+        <Paragraph
+          color={colors.icon}
+          size={SIZE.xs}
+          style={{
+            marginRight: 6
+          }}
+        >
+          {item && totalNotes > 1
+            ? totalNotes + " notes"
+            : totalNotes === 1
+            ? totalNotes + " note"
+            : "0 notes"}
+        </Paragraph>
+        <IconButton
+          color={colors.heading}
+          name="dots-horizontal"
+          testID={notesnook.ids.notebook.menu}
+          size={SIZE.xl}
+          onPress={() => showActionSheet(item)}
+          customStyle={{
+            justifyContent: "center",
+            height: 35,
+            width: 35,
+            borderRadius: 100,
+            alignItems: "center"
+          }}
+        />
+      </View>
     </>
   );
 };
