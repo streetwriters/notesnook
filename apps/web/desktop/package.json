@@ -2,7 +2,7 @@
   "name": "@notesnook/desktop",
   "productName": "Notesnook",
   "description": "Your private note taking space",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "appAppleId": "1544027013",
   "private": true,
   "main": "./build/electron.js",
