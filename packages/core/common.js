@@ -117,7 +117,6 @@ export const DATE_FORMATS = [
       return [
         [DD, MM, YYYY].join(sep),
         [MM, DD, YYYY].join(sep),
-        [YYYY, DD, MM].join(sep),
         [YYYY, MM, DD].join(sep)
       ];
     })
