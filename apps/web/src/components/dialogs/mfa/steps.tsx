@@ -669,6 +669,8 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
           gridTemplateColumns: "1fr 1fr 1fr 1fr",
           bg: "bgSecondary",
           p: 2,
+          gap: 1,
+          columnGap: 2,
           borderRadius: "default"
         }}
       >
@@ -677,7 +679,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
             key={code}
             className="selectable"
             as="code"
-            variant={"subheading"}
+            variant={"body"}
             sx={{
               fontFamily: "monospace",
               textAlign: "center",
