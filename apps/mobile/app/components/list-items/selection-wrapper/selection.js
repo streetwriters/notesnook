@@ -23,6 +23,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
+import { useSettingStore } from "../../../stores/use-setting-store";
 
 export const SelectionIcon = ({ item }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -32,6 +33,17 @@ export const SelectionIcon = ({ item }) => {
     (state) => state.selectedItemsList
   );
   const [selected, setSelected] = useState(false);
+  const notebooksListMode = useSettingStore(
+    (state) => state.settings.notebooksListMode
+  );
+  const notesListMode = useSettingStore(
+    (state) => state.settings.notesListMode
+  );
+  const listMode = item.type === "notebook" ? notebooksListMode : notesListMode;
+
+  const compactMode =
+    (item.type === "notebook" || item.type === "note") &&
+    listMode === "compact";
 
   useEffect(() => {
     if (selectionMode) {
@@ -54,8 +66,8 @@ export const SelectionIcon = ({ item }) => {
   return selectionMode ? (
     <View
       style={{
-        width: 40,
-        height: 40,
+        width: compactMode ? 30 : 40,
+        height: compactMode ? 30 : 40,
         justifyContent: "center",
         alignItems: "center",
         marginRight: 10,
@@ -67,7 +79,7 @@ export const SelectionIcon = ({ item }) => {
     >
       {selected ? (
         <Icon
-          size={SIZE.xl}
+          size={compactMode ? SIZE.xl - 2 : SIZE.xl}
           color={selected ? colors.accent : colors.icon}
           name={"check"}
         />

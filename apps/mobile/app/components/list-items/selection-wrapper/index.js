@@ -77,7 +77,7 @@ const SelectionWrapper = ({
         width: "100%",
         overflow: "hidden",
         paddingHorizontal: 12,
-        paddingVertical: compactMode ? 8 : 12,
+        paddingVertical: compactMode ? 4 : 12,
         borderRadius: isSheet ? 10 : 0,
         marginBottom: isSheet ? 12 : undefined
       }}
