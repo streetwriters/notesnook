@@ -19,21 +19,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FeatureType } from "./components/sheets/new-feature";
 
-export const features: FeatureType[] = [
-  {
-    title: "File & image sharing",
-    body: "You can now share images and files from other apps to Notesnook and sync them instantly."
-  },
-  {
-    title: "Configurable date/time formats",
-    body: "You can now change date and time format across the app from Settings > Behaviour"
-  },
-  {
-    title: "Change default note title",
-    body: "You can now change default note title for new notes using different templates like $date$, $time$ and $headline$. Go to Settings > Editor to try"
-  },
-  {
-    title: "Default notebook/topic",
-    body: "You can now set a default notebook or topic to add new notes to automatically. You can make a notebook default from properties."
-  }
-];
+export const features: FeatureType[] = [];
