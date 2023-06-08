@@ -1,41 +1,27 @@
 diff --git a/node_modules/@tiptap/extension-link/dist/index.cjs b/node_modules/@tiptap/extension-link/dist/index.cjs
-index 301cdb9..1390415 100644
+index 301cdb9..a12e459 100644
 --- a/node_modules/@tiptap/extension-link/dist/index.cjs
 +++ b/node_modules/@tiptap/extension-link/dist/index.cjs
-@@ -102,6 +102,7 @@ function clickHandler(options) {
-         props: {
-             handleClick: (view, pos, event) => {
-                 var _a, _b, _c;
-+                event.preventDefault()
-                 if (event.button !== 0) {
-                     return false;
-                 }
-@@ -110,7 +111,7 @@ function clickHandler(options) {
+@@ -110,7 +110,8 @@ function clickHandler(options) {
                  const href = (_b = link === null || link === void 0 ? void 0 : link.href) !== null && _b !== void 0 ? _b : attrs.href;
                  const target = (_c = link === null || link === void 0 ? void 0 : link.target) !== null && _c !== void 0 ? _c : attrs.target;
                  if (link && href) {
 -                    window.open(href, target);
++                    event.preventDefault();
 +                    if (view.editable) window.open(href, target);
                      return true;
                  }
                  return false;
 diff --git a/node_modules/@tiptap/extension-link/dist/index.js b/node_modules/@tiptap/extension-link/dist/index.js
-index e3b8602..b75336f 100644
+index e3b8602..46265e6 100644
 --- a/node_modules/@tiptap/extension-link/dist/index.js
 +++ b/node_modules/@tiptap/extension-link/dist/index.js
-@@ -97,6 +97,7 @@ function clickHandler(options) {
-         key: new PluginKey('handleClickLink'),
-         props: {
-             handleClick: (view, pos, event) => {
-+                event.preventDefault()
-                 var _a, _b, _c;
-                 if (event.button !== 0) {
-                     return false;
-@@ -106,7 +107,7 @@ function clickHandler(options) {
+@@ -106,7 +106,8 @@ function clickHandler(options) {
                  const href = (_b = link === null || link === void 0 ? void 0 : link.href) !== null && _b !== void 0 ? _b : attrs.href;
                  const target = (_c = link === null || link === void 0 ? void 0 : link.target) !== null && _c !== void 0 ? _c : attrs.target;
                  if (link && href) {
 -                    window.open(href, target);
++                    event.preventDefault();
 +                    if (view.editable) window.open(href, target);
                      return true;
                  }
