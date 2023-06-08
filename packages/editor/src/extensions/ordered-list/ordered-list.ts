@@ -17,9 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { mergeAttributes, wrappingInputRule } from "@tiptap/core";
 import TiptapOrderedList from "@tiptap/extension-ordered-list";
-const inputRegex = /^(\d+)\.\s$/;
 
 export const OrderedList = TiptapOrderedList.extend({
   addAttributes() {
@@ -39,44 +37,5 @@ export const OrderedList = TiptapOrderedList.extend({
         }
       }
     };
-  },
-
-  renderHTML({ HTMLAttributes }) {
-    const { start, ...attributesWithoutStart } = HTMLAttributes;
-    console.log("render!", HTMLAttributes);
-    return start === 1
-      ? [
-          "ol",
-          mergeAttributes(this.options.HTMLAttributes, attributesWithoutStart),
-          0
-        ]
-      : ["ol", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-  },
-
-  addInputRules() {
-    const inputRule = wrappingInputRule({
-      find: inputRegex,
-      type: this.type,
-      getAttributes: (match) => ({ start: +match[1] }),
-      joinPredicate: (match, node) =>
-        node.childCount + node.attrs.start === +match[1]
-    });
-
-    // if (this.options.keepMarks || this.options.keepAttributes) {
-    //   inputRule = wrappingInputRule({
-    //     find: inputRegex,
-    //     type: this.type,
-    //     keepMarks: this.options.keepMarks,
-    //     keepAttributes: this.options.keepAttributes,
-    //     getAttributes: (match) => ({
-    //       start: +match[1],
-    //       ...this.editor.getAttributes(TextStyle.name)
-    //     }),
-    //     joinPredicate: (match, node) =>
-    //       node.childCount + node.attrs.start === +match[1],
-    //     editor: this.editor
-    //   });
-    // }
-    return [inputRule];
   }
 });
