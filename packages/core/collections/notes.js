@@ -23,12 +23,7 @@ import getId from "../utils/id";
 import { getContentFromData } from "../content-types";
 import qclone from "qclone";
 import { deleteItem, findById } from "../utils/array";
-import { formatDate } from "../utils/date";
-
-const DATE_REGEX = /\$date\$/gm;
-const COUNT_REGEX = /\$count\$/gm;
-const TIME_REGEX = /\$time\$/gm;
-const HEADLINE_REGEX = /\$headline\$/gm;
+import { NEWLINE_STRIP_REGEX, formatTitle } from "../utils/title-format";
 
 /**
  * @typedef {{ id: string, topic?: string, rebuildCache?: boolean }} NotebookReference
@@ -415,27 +410,6 @@ export default class Notes extends Collection {
     }
   }
 
-  formatTitle(title, headline) {
-    const date = formatDate(Date.now(), {
-      dateFormat: this._db.settings.getDateFormat(),
-      timeFormat: this._db.settings.getTimeFormat(),
-      type: "date"
-    });
-
-    const time = formatDate(Date.now(), {
-      dateFormat: this._db.settings.getDateFormat(),
-      timeFormat: this._db.settings.getTimeFormat(),
-      type: "time"
-    });
-
-    return title
-      .replace(NEWLINE_STRIP_REGEX, " ")
-      .replace(DATE_REGEX, date)
-      .replace(TIME_REGEX, time)
-      .replace(HEADLINE_REGEX, headline)
-      .replace(COUNT_REGEX, this.all.length + 1);
-  }
-
   _getNoteTitle(note, oldNote, headline) {
     if (note.title && note.title.trim().length > 0) {
       return note.title.replace(NEWLINE_STRIP_REGEX, " ");
@@ -447,9 +421,13 @@ export default class Notes extends Collection {
     ) {
       return oldNote.title.replace(NEWLINE_STRIP_REGEX, " ");
     }
-    return this.formatTitle(
+
+    return formatTitle(
       this._db.settings.getTitleFormat(),
-      headline?.split(" ").splice(0, 10).join(" ")
+      this._db.settings.getDateFormat(),
+      this._db.settings.getTimeFormat(),
+      headline?.split(" ").splice(0, 10).join(" "),
+      this._collection.count()
     );
   }
 }
@@ -458,8 +436,6 @@ function getNoteHeadline(note, content) {
   if (note.locked) return "";
   return content.toHeadline();
 }
-
-const NEWLINE_STRIP_REGEX = /[\r\n\t\v]+/gm;
 
 class NoteIdCache {
   /**
