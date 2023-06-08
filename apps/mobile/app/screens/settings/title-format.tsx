@@ -51,10 +51,12 @@ export const TitleFormat = () => {
       <Paragraph style={{ marginTop: 2 }} color={colors.icon} size={SIZE.xs}>
         Use the following key to format the title:{"\n"}
         {"\n"}
-        $date$: Current date{"\n"}
-        $time$: Current time{"\n"}
-        $count$: Number of notes + 1{"\n"}
-        $headline$: Use starting line of the note as title{"\n"}
+        $date$: Current date.{"\n"}
+        $time$: Current time.{"\n"}
+        $timestamp$: Full date and time without any spaces or other symbols.
+        (e.g 202305261253).{"\n"}
+        $count$: Number of notes + 1.{"\n"}
+        $headline$: Use starting line of the note as title.{"\n"}
       </Paragraph>
     </>
   );
