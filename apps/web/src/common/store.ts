@@ -16,34 +16,30 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-import produce, { immerable, setAutoFreeze } from "immer";
-import create from "zustand";
+import { immerable, setAutoFreeze } from "immer";
+import { create } from "zustand";
+import { subscribeWithSelector } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
+import { IStore } from "../stores";
 setAutoFreeze(false);
 
-function immer(config) {
-  return function (set, get, api) {
-    const obj = config(
-      (fn) =>
-        set(() =>
-          produce(get(), (state) => {
-            fn(state);
-          })
-        ),
-      get,
-      api
-    );
-    obj[immerable] = true;
-    return obj;
-  };
-}
-
-/**
- * @returns {[import("zustand").UseStore<any>, any]}
- */
-function createStore(store) {
-  const useStore = create(immer(store.new.bind(store)));
-  return [useStore, useStore.getState()];
+export function createStore<T extends object>(Store: IStore<T>) {
+  const store = create<
+    T,
+    [["zustand/subscribeWithSelector", never], ["zustand/immer", never]]
+  >(
+    subscribeWithSelector(
+      immer((set, get) => {
+        const store = new Store(set, get);
+        (store as any)[immerable] = true;
+        return store;
+      })
+    )
+  );
+  // return Object.defineProperty(store as CustomStore<T>, "get", {
+  //   get: () => store.getState()
+  // });
+  return [store, store.getState()] as const;
 }
 
 export default createStore;

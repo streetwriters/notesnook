@@ -26,7 +26,9 @@ const defaultVariant: ThemeUIStyleObject = {
   fontSize: "body",
   borderRadius: "default",
   cursor: "pointer",
-  p: 2,
+  // p: 0,
+  height: "min-content",
+  px: 2,
   py: "7.5px",
   transition: "filter 200ms ease-in, box-shadow 200ms ease-out",
   ":hover:not(:disabled)": {
@@ -50,6 +52,28 @@ const primary: ThemeUIStyleObject = {
   variant: "buttons.default",
   color: "static",
   bg: "primary"
+};
+
+const error: ThemeUIStyleObject = {
+  variant: "buttons.default",
+  color: "static",
+  bg: "error"
+};
+
+const errorSecondary: ThemeUIStyleObject = {
+  variant: "buttons.default",
+  color: "error",
+  //  fontWeight: "bold",
+  bg: "errorBg",
+  ":hover": {
+    opacity: 0.8
+  }
+  // border: "1px solid",
+  // borderColor: "error",
+  // ":hover": {
+  //   bg: "error",
+  //   color: "static"
+  // }
 };
 
 const dialog: ThemeUIStyleObject = {
@@ -136,7 +160,6 @@ const tool: ThemeUIStyleObject = {
 
 const statusItem: ThemeUIStyleObject = {
   variant: "buttons.icon",
-  p: 0,
   py: 1,
   px: 1
 };
@@ -163,6 +186,10 @@ export const buttonVariants = {
   primary,
   secondary,
   tertiary,
+
+  error,
+  errorSecondary,
+
   list,
   anchor,
   tool,

@@ -41,6 +41,10 @@ import { NetworkCheck } from "../utils/network-check";
 const networkCheck = new NetworkCheck();
 var syncStatusTimeout = 0;
 const BATCH_SIZE = 50;
+
+/**
+ * @extends {BaseStore<AppStore>}
+ */
 class AppStore extends BaseStore {
   // default state
   isSideMenuOpen = false;
@@ -345,8 +349,5 @@ class AppStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<AppStore>, AppStore]}
- */
 const [useStore, store] = createStore(AppStore);
 export { useStore, store };

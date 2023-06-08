@@ -27,7 +27,11 @@ interface DebouncedFunctionWithId<
   Args extends any[],
   F extends (...args: Args) => any
 > {
-  (this: ThisParameterType<F>, id: string, ...args: Args & Parameters<F>): void;
+  (
+    this: ThisParameterType<F>,
+    id: string | number,
+    ...args: Args & Parameters<F>
+  ): void;
 }
 
 export function debounce<Args extends any[], F extends (...args: Args) => void>(
@@ -47,9 +51,9 @@ export function debounceWithId<
   F extends (...args: Args) => void
 >(func: F, waitFor: number): DebouncedFunctionWithId<Args, F> {
   let timeout: number | null;
-  let debounceId: string | null = null;
+  let debounceId: string | number | null = null;
 
-  return (id: string, ...args: Parameters<F>) => {
+  return (id: string | number, ...args: Parameters<F>) => {
     if (timeout && id === debounceId) clearTimeout(timeout);
     debounceId = id;
     timeout = setTimeout(() => {

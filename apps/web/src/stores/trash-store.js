@@ -24,6 +24,9 @@ import { store as appStore } from "./app-store";
 import { store as notestore } from "./note-store";
 import { groupArray } from "@notesnook/core/utils/grouping";
 
+/**
+ * @extends {BaseStore<TrashStore>}
+ */
 class TrashStore extends BaseStore {
   trash = [];
 
@@ -64,8 +67,5 @@ class TrashStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<TrashStore>, TrashStore]}
- */
 const [useStore, store] = createStore(TrashStore);
 export { useStore, store };

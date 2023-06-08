@@ -29,6 +29,9 @@ import { store as notestore } from "./note-store";
 import { isDesktop, isTesting } from "../utils/platform";
 import { desktop } from "../common/desktop-bridge";
 
+/**
+ * @extends {BaseStore<ReminderStore>}
+ */
 class ReminderStore extends BaseStore {
   reminders = [];
 
@@ -47,9 +50,6 @@ class ReminderStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<ReminderStore>, ReminderStore]}
- */
 const [useStore, store] = createStore(ReminderStore);
 export { useStore, store };
 

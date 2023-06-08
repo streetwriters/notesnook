@@ -83,6 +83,7 @@ function TitleBox(props: TitleBoxProps) {
       }}
       onChange={(e) => {
         const { sessionId, id } = store.get().session;
+        if (!id) return;
         debouncedOnTitleChange(sessionId, id, e.target.value);
         updateFontSize(e.target.value.length);
       }}

@@ -189,24 +189,21 @@ export function showPromptDialog(props: {
 }
 
 export function showEmailChangeDialog() {
-  return showDialog<"EmailChangeDialog", string | null>(
-    "EmailChangeDialog",
-    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
-  );
+  return showDialog("EmailChangeDialog", (Dialog, perform) => (
+    <Dialog onClose={() => perform(null)} />
+  ));
 }
 
 export function showLanguageSelectorDialog() {
-  return showDialog<"LanguageSelectorDialog", string | null>(
-    "LanguageSelectorDialog",
-    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
-  );
+  return showDialog("LanguageSelectorDialog", (Dialog, perform) => (
+    <Dialog onClose={() => perform(null)} />
+  ));
 }
 
 export function showToolbarConfigDialog() {
-  return showDialog<"ToolbarConfigDialog", string | null>(
-    "ToolbarConfigDialog",
-    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
-  );
+  return showDialog("ToolbarConfigDialog", (Dialog, perform) => (
+    <Dialog onClose={() => perform(null)} />
+  ));
 }
 
 export function showError(title: string, message: string) {
@@ -451,7 +448,7 @@ function getDialogData(type: string) {
 
 export function showPasswordDialog(
   type: string,
-  validate: (password: string) => boolean
+  validate: (password: string) => boolean | Promise<boolean>
 ) {
   const { title, subtitle, positiveButtonText, checks } = getDialogData(type);
   return showDialog("PasswordDialog", (Dialog, perform) => (
@@ -485,6 +482,7 @@ export function showCreateTopicDialog() {
       onAction={async (topic: Record<string, unknown>) => {
         if (!topic) return;
         const notebook = notebookStore.get().selectedNotebook;
+        if (!notebook) return;
         await db.notebooks?.notebook(notebook.id).topics.add(topic);
         notebookStore.setSelectedNotebook(notebook.id);
         showToast("success", "Topic created!");
@@ -670,6 +668,12 @@ export function show2FARecoveryCodesDialog(primaryMethod: AuthenticatorType) {
 
 export function showAttachmentsDialog() {
   return showDialog("AttachmentsDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} />
+  ));
+}
+
+export function showSettings() {
+  return showDialog("SettingsDialog", (Dialog, perform) => (
     <Dialog onClose={(res: boolean) => perform(res)} />
   ));
 }

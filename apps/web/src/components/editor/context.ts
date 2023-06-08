@@ -21,7 +21,6 @@ import { useCallback, useEffect, useRef } from "react";
 import { IEditor, NoteStatistics } from "./types";
 import createStore from "../../common/store";
 import BaseStore from "../../stores";
-import { UseBoundStore } from "zustand";
 import shallow from "zustand/shallow";
 import type { ToolbarDefinition } from "@notesnook/editor";
 import Config from "../../utils/config";
@@ -37,7 +36,7 @@ type EditorSubState = {
   statistics?: NoteStatistics;
 };
 
-class EditorContext extends BaseStore {
+class EditorContext extends BaseStore<EditorContext> {
   subState: EditorSubState = {
     editorConfig: Config.get("editorConfig", {
       fontFamily: "sans-serif",
@@ -50,7 +49,7 @@ class EditorContext extends BaseStore {
       | Partial<EditorSubState>
       | ((oldState: EditorSubState) => Partial<EditorSubState>)
   ) => {
-    this.set((state: EditorContext) => {
+    this.set((state) => {
       const newPartialState =
         typeof partial === "function" ? partial(state.subState) : partial;
       state.subState = { ...state.subState, ...newPartialState };
@@ -58,10 +57,7 @@ class EditorContext extends BaseStore {
   };
 }
 
-const [useEditorContext] = createStore(EditorContext) as [
-  UseBoundStore<EditorContext>,
-  EditorContext
-];
+const [useEditorContext] = createStore(EditorContext);
 
 export function useEditorInstance() {
   const editor = useEditorContext((store) => store.subState.editor);

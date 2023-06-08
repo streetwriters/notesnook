@@ -17,46 +17,91 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import setDesktopIntegration from "../commands/set-desktop-integration";
 import { db } from "../common/db";
 import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
 
+/**
+ * @extends {BaseStore<SettingStore>}
+ */
 class SettingStore extends BaseStore {
   encryptBackups = Config.get("encryptBackups", false);
   doubleSpacedLines = Config.get("doubleSpacedLines", true);
+  notificationsSettings = Config.get("notifications", { reminder: true });
+
   /** @type {string} */
   dateFormat = null;
   /** @type {"12-hour" | "24-hour"} */
   timeFormat = null;
   titleFormat = null;
+  /** @type {number} */
+  trashCleanupInterval = null;
+  homepage = Config.get("homepage", 0);
+  /**
+   * @type {DesktopIntegrationSettings | undefined}
+   */
+  desktopIntegrationSettings = undefined;
 
-  refresh = () => {
-    this.set((state) => {
-      state.dateFormat = db.settings.getDateFormat();
-      state.timeFormat = db.settings.getTimeFormat();
-      state.titleFormat = db.settings.getTitleFormat();
+  refresh = async () => {
+    this.set({
+      dateFormat: db.settings.getDateFormat(),
+      timeFormat: db.settings.getTimeFormat(),
+      titleFormat: db.settings.getTitleFormat(),
+      trashCleanupInterval: db.settings.getTrashCleanupInterval(),
+      desktopIntegrationSettings: await window.config?.desktopIntegration()
     });
   };
 
   setDateFormat = async (dateFormat) => {
     await db.settings.setDateFormat(dateFormat);
-    this.set((state) => (state.dateFormat = dateFormat));
+    this.set({ dateFormat });
   };
 
   setTimeFormat = async (timeFormat) => {
     await db.settings.setTimeFormat(timeFormat);
-    this.set((state) => (state.timeFormat = timeFormat));
+    this.set({ timeFormat });
   };
 
   setTitleFormat = async (titleFormat) => {
     await db.settings.setTitleFormat(titleFormat);
-    this.set((state) => (state.titleFormat = titleFormat));
+    this.set({ titleFormat });
+  };
+
+  setTrashCleanupInterval = async (trashCleanupInterval) => {
+    await db.settings.setTrashCleanupInterval(trashCleanupInterval);
+    this.set({ trashCleanupInterval });
   };
 
   setEncryptBackups = (encryptBackups) => {
-    this.set((state) => (state.encryptBackups = encryptBackups));
+    this.set({ encryptBackups });
     Config.set("encryptBackups", encryptBackups);
+  };
+
+  setHomepage = (homepage) => {
+    this.set({ homepage });
+    Config.set("homepage", homepage);
+  };
+
+  /**
+   *
+   * @param {Partial<DesktopIntegrationSettings>} settings
+   */
+  setDesktopIntegration = async (settings) => {
+    const { desktopIntegrationSettings } = this.get();
+
+    setDesktopIntegration({ ...desktopIntegrationSettings, ...settings });
+    this.set({
+      desktopIntegrationSettings: await window.config?.desktopIntegration()
+    });
+  };
+
+  setNotificationSettings = (settings) => {
+    const { notificationsSettings } = this.get();
+    Config.set("notifications", { ...notificationsSettings, ...settings });
+
+    this.set({ notificationsSettings: Config.get("notifications") });
   };
 
   toggleEncryptBackups = () => {
@@ -71,8 +116,5 @@ class SettingStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<SettingStore>, SettingStore]}
- */
 const [useStore, store] = createStore(SettingStore);
 export { useStore, store };

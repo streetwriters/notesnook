@@ -19,6 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "vite/client";
 declare interface Window {
-  os: NodeJS.Platform | "mas";
+  os?: NodeJS.Platform | "mas";
   NativeNNCrypto?: new () => import("@notesnook/crypto").NNCrypto;
 }

@@ -67,7 +67,7 @@
     "w3c-keyname": "^2.2.6",
     "web-streams-polyfill": "^3.1.1",
     "wouter": "2.7.3",
-    "zustand": "^3.3.1"
+    "zustand": "^4.3.8"
   },
   "devDependencies": {
     "@playwright/test": "^1.35.0",

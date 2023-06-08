@@ -29,6 +29,9 @@ import { ZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
 
 let abortController = undefined;
+/**
+ * @extends {BaseStore<AttachmentStore>}
+ */
 class AttachmentStore extends BaseStore {
   attachments = [];
   /**
@@ -145,8 +148,5 @@ class AttachmentStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<AttachmentStore>, AttachmentStore]}
- */
 const [useStore, store] = createStore(AttachmentStore);
 export { useStore, store };

@@ -23,6 +23,9 @@ import Config from "../utils/config";
 import { getDefaultAccentColor } from "@notesnook/theme";
 import { desktop } from "../common/desktop-bridge";
 
+/**
+ * @extends {BaseStore<ThemeStore>}
+ */
 class ThemeStore extends BaseStore {
   /**
    * @type {"dark" | "light"}
@@ -62,8 +65,5 @@ class ThemeStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<ThemeStore>, ThemeStore]}
- */
 const [useStore, store] = createStore(ThemeStore);
 export { useStore, store };

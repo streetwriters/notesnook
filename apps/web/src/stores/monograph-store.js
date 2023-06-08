@@ -22,7 +22,10 @@ import { db } from "../common/db";
 import BaseStore from "./index";
 import { store as notestore } from "./note-store";
 
-class TagStore extends BaseStore {
+/**
+ * @extends {BaseStore<MonographStore>}
+ */
+class MonographStore extends BaseStore {
   monographs = [];
 
   refresh = () => {
@@ -43,8 +46,5 @@ class TagStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<TagStore>, TagStore]}
- */
-const [useStore, store] = createStore(TagStore);
+const [useStore, store] = createStore(MonographStore);
 export { useStore, store };
