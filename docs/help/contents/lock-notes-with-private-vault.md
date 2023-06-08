@@ -5,7 +5,7 @@ description: Password protect your most important and sensitive notes with priva
 
 # Locking notes
 
-Notesnook is a private notes app. All your notes are encrypted and secure by default. We can not read them even if we want to on our servers. However you can still add an extra layer of security and encrypt your most important and sensitive notes by adding them to a vault.
+Notesnook is a private notes app. All your notes are encrypted and secure by default. We can not read your notes even if we want to on our servers. However you can still add an extra layer of security and encrypt your most important and sensitive notes by adding them to a vault.
 
 Adding notes to private vault is useful when you do not want anyone to read your notes, _even if they have access to your phone_.
 
@@ -87,5 +87,41 @@ To open, edit or delete a locked note, you must provide the password for the vau
 3. Press on `Change vault password`
 4. Click on Change to update password
 5. All your locked notes will be encrypted with the new password.
+
+---
+
+## Clear vault
+
+# [Desktop/Web](#/tab/web)
+
+1. Go to Settings from Sidebar.
+2. Go to `Privacy and Security` section and Click on `Clear vault`.
+3. Enter your vault password and click on clear vault. All notes in the vault will be deleted.
+
+# [Mobile](#/tab/mobile)
+
+1. Go to Settings from Sidebar.
+2. Scroll down to `Privacy and Security` and go to `Vault`
+3. Tap on `Clear vault`
+4. Enter your vault password and tap on `Clear`. All notes in the vault will be deleted.
+
+---
+
+## Delete vault
+
+In the event that you have forgotten your vault password, you can delete the vault and optionally delete all the notes in it.
+
+# [Desktop/Web](#/tab/web)
+
+1. Go to Settings from Sidebar.
+2. Go to `Privacy and Security` section and Click on `Delete vault`.
+3. Enter your account password and click on clear vault. All notes in the vault will be deleted.
+
+# [Mobile](#/tab/mobile)
+
+1. Go to Settings from Sidebar.
+2. Scroll down to `Privacy and Security` and go to `Vault`
+3. Tap on `Clear vault`
+4. Enter your account password and tap on `Delete`. The vault will be deleted.
 
 ---
