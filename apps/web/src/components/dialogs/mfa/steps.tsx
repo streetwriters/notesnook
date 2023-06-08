@@ -297,7 +297,7 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
             ) : (
               false
             )}
-            <Text variant="body" mt={1} sx={{ fontWeight: "normal" }}>
+            <Text as="div" variant="body" mt={1} sx={{ fontWeight: "normal" }}>
               {auth.subtitle}
             </Text>
           </Text>
