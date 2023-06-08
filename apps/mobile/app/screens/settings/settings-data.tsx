@@ -179,17 +179,15 @@ export const settingsGroups: SettingSection[] = [
             sections: [
               {
                 id: "enable-2fa",
-                name: "Enable two-factor authentication",
+                name: "Change primary two-factor authentication",
                 modifer: () => {
                   verifyUser("global", async () => {
                     MFASheet.present();
                   });
                 },
                 useHook: () => useUserStore((state) => state.user),
-                hidden: (user) => {
-                  return !!(user as User)?.mfa?.isEnabled;
-                },
-                description: "Increased security for your account"
+                description:
+                  "Change your current two-factor authentication method"
               },
               {
                 id: "2fa-fallback",
@@ -241,23 +239,6 @@ export const settingsGroups: SettingSection[] = [
                 },
                 description:
                   "View and save recovery codes for to recover your account"
-              },
-              {
-                id: "disabled-2fa",
-                name: "Disable two-factor authentication",
-                modifer: () => {
-                  verifyUser("global", async () => {
-                    await db.mfa?.disable();
-                    const user = await db.user?.fetchUser();
-                    useUserStore.getState().setUser(user);
-                  });
-                },
-
-                useHook: () => useUserStore((state) => state.user),
-                hidden: (user) => {
-                  return !(user as User)?.mfa?.isEnabled;
-                },
-                description: "Decreased security for your account"
               }
             ]
           },
