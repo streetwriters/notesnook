@@ -106,13 +106,22 @@ export const EVENTS = {
   systemTimeInvalid: "system:invalidTime"
 };
 
+const separators = ["-", "/"];
 export const DATE_FORMATS = [
-  "MM-DD-YYYY",
-  "DD-MM-YYYY",
-  "YYYY-MM-DD",
-  "DD/MM/YYYY",
-  "YYYY/MM/DD",
-  "MM/DD/YYYY",
+  ...separators
+    .map((sep) => {
+      const DD = "DD";
+      const MM = "MM";
+      const YYYY = "YYYY";
+
+      return [
+        [DD, MM, YYYY].join(sep),
+        [MM, DD, YYYY].join(sep),
+        [YYYY, DD, MM].join(sep),
+        [YYYY, MM, DD].join(sep)
+      ];
+    })
+    .flat(),
   "MMM D, YYYY"
 ];
 
