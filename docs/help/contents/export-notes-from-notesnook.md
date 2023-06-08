@@ -1,3 +1,8 @@
+---
+title: Exporting notes
+description: Notesnook is zero lock-in. You can always export and backup your notes to pdf, html, markdown and plain text files anytime from iOS, Android & Desktop.
+---
+
 # Exporting notes
 
 You can export your notes as PDF, HTML, Markdown and Plain text files on desktop and mobile apps.

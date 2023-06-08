@@ -1,6 +1,6 @@
 ---
 title: Notesnook Help
-description: Your complete and free guide to using Notesnook as a daily note taking app to organize your work and life while safeguarding your privacy.
+description: Your complete and free resource to using Notesnook as a daily note taking app to organize your work and life while safeguarding your privacy.
 ---
 
 # Welcome to Notesnook Help

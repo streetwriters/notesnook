@@ -1,3 +1,8 @@
+---
+title: Create your first note
+description: Notesnook let's you create unlimited notes for free. Learn how you can create your first note in Notesnook.
+---
+
 # Creating your first note
 
 You are in a notes app, the first thing you want to do is make a note.

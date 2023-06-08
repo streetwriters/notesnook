@@ -1,5 +1,6 @@
 ---
 title: Installation
+description: Be productive and keep your notes private with Notesnook. Download Notesnook on Windows, Mac, Linux, iOS, android or even access your notes on the web directly.
 ---
 
 # Installation

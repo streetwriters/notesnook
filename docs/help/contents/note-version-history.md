@@ -1,3 +1,8 @@
+---
+title: Note version history
+description: A log of all your notes edit sessions. Preview and go back to older version of a note whenever needed in case of a mishap.
+---
+
 # Note version history
 
 Notesnook keeps a constant log of all your edit sessions. These are stored as "versions" of a particular notes which you can view & restore to in case of data loss.
