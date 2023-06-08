@@ -1,5 +1,6 @@
 ---
 title: Monographs
+description: Anonymous, secure and encrypted note sharing with password protection. Share a note with anyone on the internet even if they do not use Notesnook.
 ---
 
 # Publish notes with monographs

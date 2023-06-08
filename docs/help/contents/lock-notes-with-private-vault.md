@@ -1,3 +1,8 @@
+---
+title: Locking notes with private vault
+description: Password protect your most important and sensitive notes with private vault and store them encrypted even on your device.
+---
+
 # Locking notes
 
 Notesnook is a private notes app. All your notes are encrypted and secure by default. We can not read them even if we want to on our servers. However you can still add an extra layer of security and encrypt your most important and sensitive notes by adding them to a vault.

@@ -1,3 +1,8 @@
+---
+title: Recovering your account
+description: Notesnook is one of the few end-to-end encrypted software that allows users to recovery their account in case they forget their passwords. Here is a detailed step-by-step guide into how you can recover your Notesnook account.
+---
+
 # Recovering your account
 
 Notesnook is one of the few end-to-end encrypted software that allows users to recovery their account in case they forget their passwords. Here is a detailed step-by-step guide into how you can recover your Notesnook account.

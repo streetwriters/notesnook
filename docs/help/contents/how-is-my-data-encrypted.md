@@ -1,3 +1,8 @@
+---
+title: How is my data encrypted?
+description: Every byte of your notes data is encrypted with the strongest encryption algorithms on client with XChaCha-Poly1305-IETF & Argon2.
+---
+
 # How is my data encrypted?
 
 > warn Note
