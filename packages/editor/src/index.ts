@@ -64,7 +64,6 @@ import {
   usePortalProvider
 } from "./extensions/react";
 import { SearchReplace } from "./extensions/search-replace";
-import { SelectionPersist } from "./extensions/selection-persist";
 import { Table } from "./extensions/table";
 import TableCell from "./extensions/table-cell";
 import { TaskItemNode } from "./extensions/task-item";
@@ -237,7 +236,6 @@ const useTiptap = (
         MathInline,
         MathBlock,
         KeepInView,
-        SelectionPersist,
         DateTime.configure({ dateFormat, timeFormat }),
         KeyMap,
         WebClipNode
