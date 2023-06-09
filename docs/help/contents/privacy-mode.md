@@ -1,3 +1,8 @@
+---
+title: Privacy mode
+description: Privacy mode enables some OS specific settings to enhance your privacy while working in Notesnook.
+---
+
 # Privacy mode
 
 > error Not available on Linux

@@ -1,5 +1,6 @@
 ---
 title: Backup and restore
+description: Notesnook allows you to backup all your notes data to a single backup file. Learn how you can backup your notes and restore them.
 ---
 
 # Backup your notes
