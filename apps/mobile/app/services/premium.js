@@ -319,7 +319,8 @@ const subscriptions = {
 
 async function getRemainingTrialDaysStatus() {
   let user = await db.user.getUser();
-  if (!user) return false;
+  if (!user || !user.subscription || user.subscription?.expiry === 0) return;
+
   let premium = user.subscription.type !== SUBSCRIPTION_STATUS.BASIC;
   let isTrial = user.subscription.type === SUBSCRIPTION_STATUS.TRIAL;
   let total = user.subscription.expiry - user.subscription.start;
