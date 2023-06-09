@@ -277,7 +277,6 @@ const ChooseTheme = () => {
   return (
     <View
       style={{
-        maxHeight: 170,
         alignItems: "center",
         marginTop: 20
       }}
@@ -295,7 +294,7 @@ const ChooseTheme = () => {
         Pick a theme of your choice
       </Paragraph>
       <Seperator />
-      <AccentColorPicker settings={false} />
+      <AccentColorPicker />
       <Seperator />
     </View>
   );
