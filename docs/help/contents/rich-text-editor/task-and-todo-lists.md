@@ -1,3 +1,8 @@
+---
+title: Tasks and todo lists
+description: Create todo lists and manage your tasks in Notesnook with ease using task lists.
+---
+
 # Task and todo lists
 
 Create todo lists and manage your tasks in Notesnook with ease using task lists.

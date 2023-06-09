@@ -1,16 +1,13 @@
 ---
 title: Installation
+description: Notesnook Web Clipper is open source and available to download for Firefox and Chromium based browsers.
 ---
 
 # Installation
 
 ## Chromium-based browsers
 
-1. Download the .zip archive from [here](https://notesnook.com/notesnook-web-clipper)
-2. Go to `chrome://extensions/`
-3. Turn on the Developer Mode
-   ![](/static/web-clipper/chrome-dev-mode.png)
-4. Drag & drop the .zip archive in the Google Chrome window
+[Go to chrome webstore](https://chrome.google.com/webstore/detail/notesnook-web-clipper/kljhpemdlcnjohmfmkogahelkcidieaj) to get the latest version of [web clipper for Notesnook](https://notesnook.com/notesnook-web-clipper).
 
 ## Firefox-based browsers
 

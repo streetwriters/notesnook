@@ -1,6 +1,11 @@
-# Clipping your first web page
+---
+title: Clipping your first webpage with web clipper
+description: Clip web pages & save interesting things you find on the web with Notesnook web clipper in a private & secure way.
+---
 
-## Connecting with the web app
+# Clipping your first webpage with web clipper
+
+## Connecting the with the web app
 
 Before you can clip pages, you must connect the web clipper with the Notesnook web app. The web clipper works completely offline and relies on the web app to sync & save your clips.
 
@@ -33,7 +38,7 @@ Before you can clip pages, you must connect the web clipper with the Notesnook w
 
 ## Selecting the clipping area
 
-The web clipper provides a few options to help you clip exactly the part of the page you need:
+The [web clipper](https://notesnook.com/notesnook-web-clipper) provides a few options to help you clip exactly the part of the page you need:
 
 ![Notesnook Web Clipper clipping area options](/static/web-clipper/clipping-area.png)
 
