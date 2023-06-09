@@ -22,16 +22,15 @@ import { ELECTRON_TRPC_CHANNEL } from "electron-trpc/main";
 import { type RendererGlobalElectronTRPC } from "electron-trpc/src/types";
 import { NNCrypto } from "@notesnook/crypto";
 import { ipcRenderer } from "electron";
-import { CHANNEL, ITransport } from "./rpc";
 
 declare global {
   var os: string;
   var electronTRPC: RendererGlobalElectronTRPC;
-  var RPCTransport: ITransport;
   var NativeNNCrypto: new () => NNCrypto;
 }
-
+console.log("HELLO", process);
 process.once("loaded", async () => {
+  console.log("HELLO!");
   const electronTRPC: RendererGlobalElectronTRPC = {
     sendMessage: (operation) =>
       ipcRenderer.send(ELECTRON_TRPC_CHANNEL, operation),
@@ -39,20 +38,6 @@ process.once("loaded", async () => {
       ipcRenderer.on(ELECTRON_TRPC_CHANNEL, (_event, args) => callback(args))
   };
   globalThis.electronTRPC = electronTRPC;
-
-  globalThis.RPCTransport = {
-    send(message) {
-      console.log("[browser] sending message", message);
-      ipcRenderer.send(CHANNEL, message);
-    },
-    receive(callback) {
-      ipcRenderer.removeAllListeners(CHANNEL);
-      ipcRenderer.addListener(CHANNEL, (_event, args) => {
-        console.log("[browser] recevied message", args);
-        callback(args);
-      });
-    }
-  };
 });
 
 globalThis.NativeNNCrypto = NNCrypto;

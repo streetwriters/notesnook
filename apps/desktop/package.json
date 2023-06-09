@@ -11,19 +11,20 @@
   "repository": "https://github.com/streetwriters/notesnook",
   "dependencies": {
     "@notesnook/crypto": "*",
-    "@trpc/client": "^10.18.0",
-    "@trpc/server": "^10.18.0",
+    "@trpc/client": "^10.29.1",
+    "@trpc/server": "^10.29.1",
     "diary": "^0.3.1",
-    "electron-trpc": "^0.4.2",
+    "electron-trpc": "^0.5.0",
     "electron-updater": "^5.3.0",
     "icojs": "^0.17.1",
     "yargs": "^17.6.2",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "typed-emitter": "^2.1.0"
   },
   "devDependencies": {
-    "@electron/rebuild": "^3.2.10",
+    "@electron/rebuild": "^3.2.13",
     "@types/node": "^18.15.0",
-    "electron": "^25.1.0",
+    "electron": "^24.4.0",
     "electron-builder": "^23.6.0",
     "electron-builder-notarize": "^1.5.1",
     "electron-reloader": "^1.2.3",
@@ -32,12 +33,12 @@
     "undici": "^5.22.1"
   },
   "scripts": {
-    "start": "npm run build:electron && electron build/electron.js",
+    "start": "turbowatch scripts/dev.ts",
+    "staging": "zx scripts/staging.mjs",
     "build": "tsc",
     "build:electron": "esbuild electron=./src/main.ts ./src/preload.ts --external:electron --external:fsevents --minify --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=false --define:RELEASE=true",
     "build:mas": "esbuild ./electron.js ./preload.js --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=true --define:RELEASE=true",
-    "pack": "rm -rf ./build && cp -r ../build ./ && npm run build && yarn electron-builder --linux AppImage:x64 AppImage:arm64",
-    "postinstall": "patch-package"
+    "postinstall": "electron-builder install-app-deps && patch-package"
   },
   "author": {
     "name": "Streetwriters (Private) Limited",
@@ -53,8 +54,8 @@
       "!*.chunk.js.map",
       "!*.chunk.js.LICENSE.txt",
       "build/",
-      "!build/screenshots",
-      "!node_modules"
+      "!build/screenshots${/*}",
+      "!node_modules${/*}"
     ],
     "afterSign": "electron-builder-notarize",
     "afterPack": "./scripts/removeLocales.js",
@@ -185,7 +186,7 @@
     ],
     "directories": {
       "buildResources": "assets",
-      "output": "./dist/"
+      "output": "./output/"
     },
     "publish": [
       {

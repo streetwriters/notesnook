@@ -21,7 +21,7 @@ import { app, Menu, Tray } from "electron";
 import { AssetManager } from "./asset-manager";
 import { isFlatpak } from "./index";
 import { bringToFront } from "./bring-to-front";
-import { client } from "../rpc/electron";
+import { bridge } from "../api/bridge";
 
 let tray: Tray | undefined = undefined;
 export function destroyTray() {
@@ -58,7 +58,7 @@ export function setupTray() {
         : AssetManager.icon("note-add", { size: trayIconSize }),
       click: () => {
         bringToFront();
-        client.onCreateItem("note");
+        bridge.onCreateItem("note");
       }
     },
     {
@@ -69,7 +69,7 @@ export function setupTray() {
         : AssetManager.icon("notebook-add", { size: trayIconSize }),
       click: () => {
         bringToFront();
-        client.onCreateItem("notebook");
+        bridge.onCreateItem("notebook");
       }
     },
     { type: "separator" },

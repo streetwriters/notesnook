@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { initTRPC } from "@trpc/server";
+import { observable } from "@trpc/server/observable";
 import { CancellationToken, autoUpdater } from "electron-updater";
+import type { AppUpdaterEvents } from "electron-updater/out/AppUpdater";
+
+type UpdateInfo = { version: string };
+type Progress = { percent: number };
 
 const t = initTRPC.create();
 
@@ -30,5 +35,37 @@ export const updaterRouter = t.router({
   }),
   check: t.procedure.query(async () => {
     await autoUpdater.checkForUpdates();
-  })
+  }),
+
+  onChecking: createSubscription("checking-for-update"),
+  onDownloaded: createSubscription<"update-downloaded", UpdateInfo>(
+    "update-downloaded"
+  ),
+  onDownloadProgress: createSubscription<"download-progress", Progress>(
+    "download-progress"
+  ),
+  onNotAvailable: createSubscription<"update-not-available", UpdateInfo>(
+    "update-not-available"
+  ),
+  onAvailable: createSubscription<"update-available", UpdateInfo>(
+    "update-available"
+  ),
+  onError: createSubscription("error")
 });
+
+function createSubscription<
+  TName extends keyof AppUpdaterEvents,
+  TReturnType = Parameters<AppUpdaterEvents[TName]>[0]
+>(eventName: TName) {
+  return t.procedure.subscription(() => {
+    return observable<TReturnType>((emit) => {
+      const listener: AppUpdaterEvents[TName] = (...args: any[]) => {
+        emit.next(args[0]);
+      };
+      autoUpdater.addListener(eventName, listener);
+      return () => {
+        autoUpdater.removeListener(eventName, listener);
+      };
+    });
+  });
+}

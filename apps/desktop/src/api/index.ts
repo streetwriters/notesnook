@@ -22,6 +22,7 @@ import { compressionRouter } from "./compression";
 import { osIntegrationRouter } from "./os-integration";
 import { spellCheckerRouter } from "./spell-checker";
 import { updaterRouter } from "./updater";
+import { bridgeRouter } from "./bridge";
 
 const t = initTRPC.create();
 
@@ -29,7 +30,8 @@ export const router = t.router({
   compress: compressionRouter,
   integration: osIntegrationRouter,
   spellChecker: spellCheckerRouter,
-  updater: updaterRouter
+  updater: updaterRouter,
+  bridge: bridgeRouter
 });
 
 export const api = router.createCaller({});

@@ -48,7 +48,9 @@
     "nx": "^15.7.2",
     "patch-package": "^6.5.0",
     "prettier": "^2.7.1",
-    "serve": "^14.0.1"
+    "serve": "^14.0.1",
+    "turbowatch": "^2.29.4",
+    "zx": "^7.2.2"
   },
   "dependencies": {
     "@nrwl/nx-cloud": "^14.6.2",

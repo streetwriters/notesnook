@@ -27,7 +27,7 @@ import dayjs from "dayjs";
 import Config from "../utils/config";
 import { store as notestore } from "./note-store";
 import { isDesktop, isTesting } from "../utils/platform";
-import { desktop } from "../common/desktop-client";
+import { desktop } from "../common/desktop-bridge";
 
 class ReminderStore extends BaseStore {
   reminders = [];
@@ -99,26 +99,25 @@ function scheduleReminder(id, reminder, cron) {
     }
 
     if (isDesktop()) {
-      await desktop.integration.showNotification.query(
-        {
-          title: reminder.title,
-          body: reminder.description,
-          silent: reminder.priority === "silent",
-          timeoutType: reminder.priority === "urgent" ? "never" : "default",
-          urgency:
-            reminder.priority === "urgent"
-              ? "critical"
-              : reminder.priority === "vibrate"
-              ? "normal"
-              : "low",
-          focusOnClick: true,
-          tag: id
-        },
-        async () => {
-          await desktop.integration.bringToFront.query();
-          showReminderPreviewDialog(reminder);
-        }
-      );
+      const tag = await desktop?.integration.showNotification.query({
+        title: reminder.title,
+        body: reminder.description,
+        silent: reminder.priority === "silent",
+        timeoutType: reminder.priority === "urgent" ? "never" : "default",
+        urgency:
+          reminder.priority === "urgent"
+            ? "critical"
+            : reminder.priority === "vibrate"
+            ? "normal"
+            : "low",
+        focusOnClick: true,
+        tag: id
+      });
+
+      if (tag) {
+        await desktop?.integration.bringToFront.query();
+        showReminderPreviewDialog(reminder);
+      }
     } else {
       const notification = new Notification(reminder.title, {
         body: reminder.description,

@@ -19,4 +19,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export * from "./constants";
 export type { AppRouter } from "./api";
-export * from "./rpc";
+export { type UpdateInfo } from "builder-util-runtime";

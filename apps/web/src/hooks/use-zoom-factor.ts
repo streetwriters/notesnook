@@ -18,19 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useState } from "react";
-import { desktop } from "../common/desktop-client";
+import { desktop } from "../common/desktop-bridge";
 
 export default function useZoomFactor() {
   const [zoom, setZoom] = useState(1.0);
 
   useEffect(() => {
     (async function () {
-      setZoom(await desktop.integration.zoomFactor.query());
+      setZoom((await desktop?.integration.zoomFactor.query()) || 1.0);
     })();
   }, []);
 
   const set = useCallback(async (zoomFactor) => {
-    await desktop.integration.setZoomFactor.mutate(zoomFactor);
+    await desktop?.integration.setZoomFactor.mutate(zoomFactor);
     setZoom(zoomFactor);
   }, []);
 

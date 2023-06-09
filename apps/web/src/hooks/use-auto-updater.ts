@@ -18,21 +18,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import { AppEventManager } from "../common/app-events";
-import { EVENTS } from "@notesnook/desktop";
 import {
   showUpdateAvailableNotice,
   showUpdateReadyNotice
 } from "../common/dialog-controller";
 import { isDesktop } from "../utils/platform";
 import { checkForUpdate } from "../utils/updater";
+import { AppEventManager, AppEvents } from "../common/app-events";
 
-var checkingForUpdateTimeout = 0;
+type CompletedUpdateStatus = { type: "completed"; version: string };
+type DownloadingUpdateStatus = { type: "downloading"; progress: number };
+type AvailableUpdateStatus = { type: "available"; version: string };
+type GenericUpdateStatus = { type: "checking" | "updated" };
+type UpdateStatus =
+  | AvailableUpdateStatus
+  | CompletedUpdateStatus
+  | DownloadingUpdateStatus
+  | GenericUpdateStatus;
+
+let checkingForUpdateTimeout = 0;
 export function useAutoUpdater() {
-  const [status, setStatus] = useState();
+  const [status, setStatus] = useState<UpdateStatus>();
 
   useEffect(() => {
-    function changeStatus(status) {
+    function changeStatus(status?: UpdateStatus) {
       clearTimeout(checkingForUpdateTimeout);
       setStatus(status);
     }
@@ -41,10 +50,10 @@ export function useAutoUpdater() {
       changeStatus({ type: "checking" });
       checkingForUpdateTimeout = setTimeout(() => {
         changeStatus({ type: "updated" });
-      }, 10000);
+      }, 10000) as unknown as number;
     }
 
-    function updateAvailable(info) {
+    function updateAvailable(info: { version: string }) {
       changeStatus({
         type: "available",
         version: info.version
@@ -59,33 +68,33 @@ export function useAutoUpdater() {
       else changeStatus();
     }
 
-    function updateDownloadCompleted(info) {
+    function updateDownloadCompleted(info: { version: string }) {
       changeStatus({ type: "completed", version: info.version });
       showUpdateReadyNotice({ version: info.version });
     }
 
-    function updateDownloadProgress(progressInfo) {
+    function updateDownloadProgress(progressInfo: { percent: number }) {
       changeStatus({ type: "downloading", progress: progressInfo.percent });
     }
 
     const checkingForUpdateEvent = AppEventManager.subscribe(
-      EVENTS.checkingForUpdate,
+      AppEvents.checkingForUpdate,
       checkingForUpdate
     );
     const updateAvailableEvent = AppEventManager.subscribe(
-      EVENTS.updateAvailable,
+      AppEvents.updateAvailable,
       updateAvailable
     );
     const updateNotAvailableEvent = AppEventManager.subscribe(
-      EVENTS.updateNotAvailable,
+      AppEvents.updateNotAvailable,
       updateNotAvailable
     );
     const updateCompletedEvent = AppEventManager.subscribe(
-      EVENTS.updateDownloadCompleted,
+      AppEvents.updateDownloadCompleted,
       updateDownloadCompleted
     );
     const updateProgressEvent = AppEventManager.subscribe(
-      EVENTS.updateDownloadProgress,
+      AppEvents.updateDownloadProgress,
       updateDownloadProgress
     );
 

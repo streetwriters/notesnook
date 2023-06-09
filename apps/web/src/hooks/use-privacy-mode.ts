@@ -18,19 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useState } from "react";
-import { desktop } from "../common/desktop-client";
+import { desktop } from "../common/desktop-bridge";
 
 export default function usePrivacyMode() {
   const [privacyMode, setPrivacyMode] = useState(false);
 
   useEffect(() => {
     (async function () {
-      setPrivacyMode(await desktop.integration.privacyMode.query());
+      setPrivacyMode((await desktop?.integration.privacyMode.query()) || false);
     })();
   }, []);
 
   const set = useCallback(async (privacyMode) => {
-    await desktop.integration.setPrivacyMode.mutate(privacyMode);
+    await desktop?.integration.setPrivacyMode.mutate(privacyMode);
     setPrivacyMode(privacyMode);
   }, []);
 

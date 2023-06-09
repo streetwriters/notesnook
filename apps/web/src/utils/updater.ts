@@ -17,16 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EVENTS } from "@notesnook/desktop";
-import { AppEventManager } from "../common/app-events";
-import { desktop } from "../common/desktop-client";
+import { AppEventManager, AppEvents } from "../common/app-events";
+import { desktop } from "../common/desktop-bridge";
 import { isDesktop } from "./platform";
 import { appVersion, getServiceWorkerVersion } from "./version";
 
 export async function checkForUpdate() {
-  if (isDesktop()) await desktop.updater.check.query();
+  if (isDesktop()) await desktop?.updater.check.query();
   else {
-    AppEventManager.publish(EVENTS.checkingForUpdate);
+    AppEventManager.publish(AppEvents.checkingForUpdate);
 
     const registrations =
       (await navigator.serviceWorker?.getRegistrations()) || [];
@@ -41,19 +40,19 @@ export async function checkForUpdate() {
           continue;
         }
 
-        AppEventManager.publish(EVENTS.updateDownloadCompleted, {
+        AppEventManager.publish(AppEvents.updateDownloadCompleted, {
           version: workerVersion.formatted
         });
         return;
       }
     }
 
-    AppEventManager.publish(EVENTS.updateNotAvailable);
+    AppEventManager.publish(AppEvents.updateNotAvailable);
   }
 }
 
 export async function downloadUpdate() {
-  if (isDesktop()) await desktop.updater.download.query();
+  if (isDesktop()) await desktop?.updater.download.query();
   else {
     console.log("Force updating");
     if (!("serviceWorker" in navigator)) return;
@@ -63,7 +62,7 @@ export async function downloadUpdate() {
 }
 
 export async function installUpdate() {
-  if (isDesktop()) await desktop.updater.install.query();
+  if (isDesktop()) await desktop?.updater.install.query();
   else {
     const registrations =
       (await navigator.serviceWorker?.getRegistrations()) || [];

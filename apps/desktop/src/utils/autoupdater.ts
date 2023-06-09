@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { autoUpdater } from "electron-updater";
-import { client } from "../rpc/electron";
 
 async function configureAutoUpdater() {
   autoUpdater.setFeedURL({
@@ -31,14 +30,6 @@ async function configureAutoUpdater() {
   autoUpdater.allowDowngrade = false;
   autoUpdater.allowPrerelease = false;
   autoUpdater.autoInstallOnAppQuit = true;
-  autoUpdater.addListener("checking-for-update", client.onCheckingForUpdate);
-  autoUpdater.addListener("update-available", client.onUpdateAvailable);
-  autoUpdater.addListener("download-progress", client.onUpdateDownloadProgress);
-  autoUpdater.addListener(
-    "update-downloaded",
-    client.onUpdateDownloadCompleted
-  );
-  autoUpdater.addListener("update-not-available", client.onUpdateNotAvailable);
 }
 
 export { configureAutoUpdater };
