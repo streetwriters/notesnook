@@ -87,7 +87,7 @@ import { writeText } from "clipboard-polyfill";
 import { useEditorConfig } from "../components/editor/context";
 import { getFonts } from "@notesnook/editor";
 import { formatDate } from "@notesnook/core/utils/date";
-import { desktop } from "../common/desktop-client";
+import { desktop } from "../common/desktop-bridge";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -938,7 +938,7 @@ function Settings() {
                     variant="list"
                     onClick={async () => {
                       const location =
-                        await desktop.integration.selectDirectory.query({
+                        await desktop?.integration.selectDirectory.query({
                           title: "Select where Notesnook should save backups",
                           defaultPath:
                             backupStorageLocation || PATHS.backupsDirectory
@@ -1156,7 +1156,7 @@ function Settings() {
               <Button
                 variant="list"
                 onClick={async () => {
-                  await desktop.integration.openPath.query({
+                  await desktop?.integration.openPath.query({
                     type: "path",
                     link: PATHS.logsDirectory
                   });

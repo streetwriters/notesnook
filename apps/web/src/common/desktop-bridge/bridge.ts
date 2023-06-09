@@ -19,31 +19,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { createTRPCProxyClient } from "@trpc/client";
 import { ipcLink } from "electron-trpc/renderer";
-import { AppRouter, createRPCServer, IClient } from "@notesnook/desktop";
-import "@notesnook/desktop/dist/rpc/browser";
+import type { AppRouter } from "@notesnook/desktop";
+import { AppEventManager, AppEvents } from "../app-events";
 
 export const desktop = createTRPCProxyClient<AppRouter>({
   links: [ipcLink()]
 });
 
-const client: IClient = {
-  onCheckingForUpdate: function (): void {
-    throw new Error("Function not implemented.");
-  },
-  onUpdateAvailable() {},
-  onUpdateDownloadProgress() {},
-  onUpdateDownloadCompleted() {},
-  onUpdateNotAvailable() {},
-  onThemeChanged: function (theme: "system" | "light" | "dark"): void {
-    throw new Error("Function not implemented.");
-  },
-  onNotificationClicked: function (tag: string): void {
-    throw new Error("Function not implemented.");
-  },
-  onCreateItem: function (type: "note" | "notebook" | "reminder") {
-    console.log("GOT", type);
-    return type;
-  }
-};
+desktop.updater.onChecking.subscribe(
+  undefined,
+  attachListener(AppEvents.checkingForUpdate)
+);
 
-createRPCServer(window.RPCTransport, client);
+desktop.updater.onAvailable.subscribe(
+  undefined,
+  attachListener(AppEvents.updateAvailable)
+);
+
+desktop.updater.onDownloaded.subscribe(
+  undefined,
+  attachListener(AppEvents.updateDownloadCompleted)
+);
+
+desktop.updater.onDownloadProgress.subscribe(
+  undefined,
+  attachListener(AppEvents.updateDownloadProgress)
+);
+
+desktop.updater.onNotAvailable.subscribe(
+  undefined,
+  attachListener(AppEvents.updateNotAvailable)
+);
+
+desktop.updater.onError.subscribe(
+  undefined,
+  attachListener(AppEvents.updateError)
+);
+
+function attachListener(event: string) {
+  return {
+    onData(...args: any[]) {
+      AppEventManager.publish(event, ...args);
+    }
+  };
+}

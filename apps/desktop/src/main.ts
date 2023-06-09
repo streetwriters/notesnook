@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* global MAC_APP_STORE, RELEASE */
 
-import { client } from "./rpc/electron";
 import { app, BrowserWindow, nativeTheme, shell } from "electron";
 import { isDevelopment } from "./utils";
 import { registerProtocol, PROTOCOL_URL } from "./utils/protocol";
@@ -118,10 +117,6 @@ async function createWindow() {
   nativeTheme.on("updated", () => {
     setupTray();
     setupJumplist();
-
-    if (getTheme() === "system") {
-      client.onThemeChanged(nativeTheme.shouldUseDarkColors ? "dark" : "light");
-    }
   });
 }
 
@@ -129,7 +124,7 @@ app.commandLine.appendSwitch("lang", "en-US");
 app.on("ready", async () => {
   console.info("App ready. Opening window.");
 
-  registerProtocol();
+  if (!isDevelopment()) registerProtocol();
   await createWindow();
   configureAutoUpdater();
 });

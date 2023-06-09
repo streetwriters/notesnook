@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useState } from "react";
-import { desktop } from "../common/desktop-client";
+import { desktop } from "../common/desktop-bridge";
 
 export type Language = { code: string; name: string };
 export type SpellCheckerOptions = {
@@ -32,9 +32,10 @@ export default function useSpellChecker() {
 
   const loadSpellChecker = useCallback(async () => {
     setSpellChecker({
-      enabledLanguages: await desktop.spellChecker.enabledLanguages.query(),
-      languages: await desktop.spellChecker.languages.query(),
-      enabled: await desktop.spellChecker.isEnabled.query()
+      enabledLanguages:
+        (await desktop?.spellChecker.enabledLanguages.query()) || [],
+      languages: (await desktop?.spellChecker.languages.query()) || [],
+      enabled: (await desktop?.spellChecker.isEnabled.query()) || false
     });
   }, []);
 
@@ -46,7 +47,7 @@ export default function useSpellChecker() {
 
   const toggle = useCallback(
     async (enabled: boolean) => {
-      await desktop.spellChecker.toggle.mutate(enabled);
+      await desktop?.spellChecker.toggle.mutate(enabled);
       await loadSpellChecker();
     },
     [loadSpellChecker]
@@ -54,7 +55,7 @@ export default function useSpellChecker() {
 
   const setLanguages = useCallback(
     async (languages: string[]) => {
-      await desktop.spellChecker.setLanguages.mutate(languages);
+      await desktop?.spellChecker.setLanguages.mutate(languages);
       await loadSpellChecker();
     },
     [loadSpellChecker]

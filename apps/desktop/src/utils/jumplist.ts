@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { app, Menu } from "electron";
-import { client } from "../rpc/electron";
 import { AssetManager } from "./asset-manager";
 import { bringToFront } from "./bring-to-front";
+import { bridge } from "../api/bridge";
 
 export function setupJumplist() {
   if (process.platform === "win32") {
@@ -75,7 +75,7 @@ function setDockMenuOnMacOs() {
       type: "normal",
       click: () => {
         bringToFront();
-        client.onCreateItem("note");
+        bridge.onCreateItem("note");
       }
     },
     {
@@ -83,7 +83,7 @@ function setDockMenuOnMacOs() {
       type: "normal",
       click: () => {
         bringToFront();
-        client.onCreateItem("notebook");
+        bridge.onCreateItem("notebook");
       }
     },
     {
@@ -91,7 +91,7 @@ function setDockMenuOnMacOs() {
       type: "normal",
       click: () => {
         bringToFront();
-        client.onCreateItem("reminder");
+        bridge.onCreateItem("reminder");
       }
     }
   ]);

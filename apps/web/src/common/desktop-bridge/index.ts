@@ -17,22 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { AppEventManager } from "../common/app-events";
-import { isDesktop } from "../utils/platform";
+import { type desktop as bridge } from "./bridge";
 
-export function invokeCommand(type, payload = {}) {
-  if (!isDesktop()) return;
-
-  // window.api.send("fromRenderer", {
-  //   type,
-  //   ...payload
-  // });
-}
-
-// if (isDesktop()) {
-//   window.api.receive("fromMain", (args) => {
-//     console.log(args);
-//     const { type, ...other } = args;
-//     AppEventManager.publish(type, other);
-//   });
-// }
+export const desktop: typeof bridge | undefined =
+  process.env.REACT_APP_PLATFORM === "desktop"
+    ? require("./bridge").desktop
+    : undefined;

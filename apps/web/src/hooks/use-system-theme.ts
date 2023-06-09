@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EVENTS } from "@notesnook/desktop";
 import { useEffect, useState } from "react";
-import { AppEventManager } from "../common/app-events";
 import useMediaQuery from "./use-media-query";
+import { desktop } from "../common/desktop-bridge";
 
 function useSystemTheme() {
   const isDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
@@ -31,12 +30,12 @@ function useSystemTheme() {
   }, [isDarkMode]);
 
   useEffect(() => {
-    function onThemeChanged({ theme }) {
-      setSystemTheme(theme);
-    }
-    AppEventManager.subscribe(EVENTS.themeChanged, onThemeChanged);
+    const { unsubscribe } =
+      desktop?.integration.onThemeChanged.subscribe(undefined, {
+        onData: setSystemTheme
+      }) || {};
     return () => {
-      AppEventManager.unsubscribe(EVENTS.themeChanged, onThemeChanged);
+      unsubscribe?.();
     };
   }, []);
 

@@ -30,7 +30,6 @@ import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
 import { EV, EVENTS } from "@notesnook/core/common";
-import { EVENTS as DESKTOP_APP_EVENTS } from "@notesnook/desktop";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 import {
@@ -46,6 +45,7 @@ import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";
 import { interruptedOnboarding } from "./components/dialogs/onboarding-dialog";
 import { hashNavigate } from "./navigation";
+import { desktop } from "./common/desktop-bridge";
 
 export default function AppEffects({ setShow }) {
   const refreshNavItems = useStore((store) => store.refreshNavItems);
@@ -198,19 +198,26 @@ export default function AppEffects({ setShow }) {
   }, [isSystemThemeDark, followSystemTheme, setTheme]);
 
   useEffect(() => {
-    AppEventManager.subscribe(DESKTOP_APP_EVENTS.createItem, ({ itemType }) => {
-      switch (itemType) {
-        case "note":
-          hashNavigate("/notes/create", { addNonce: true, replace: true });
-          break;
-        case "notebook":
-          hashNavigate("/notebooks/create", { replace: true });
-          break;
-        case "reminder":
-          hashNavigate("/reminders/create", { replace: true });
-          break;
-      }
-    });
+    const { unsubscribe } =
+      desktop?.bridge.onCreateItem.subscribe(undefined, {
+        onData(itemType) {
+          switch (itemType) {
+            case "note":
+              hashNavigate("/notes/create", { addNonce: true, replace: true });
+              break;
+            case "notebook":
+              hashNavigate("/notebooks/create", { replace: true });
+              break;
+            case "reminder":
+              hashNavigate("/reminders/create", { replace: true });
+              break;
+          }
+        }
+      }) || {};
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return <React.Fragment />;

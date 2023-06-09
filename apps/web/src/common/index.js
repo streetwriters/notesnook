@@ -38,6 +38,7 @@ import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
 import { EVENTS } from "@notesnook/core/common";
 import { getFormattedDate } from "../utils/time";
+import { desktop } from "./desktop-bridge";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -103,7 +104,7 @@ export async function createBackup() {
       PATHS.backupsDirectory
     );
     const filePath = `${directory}/${filename}.${ext}`;
-    saveFile(filePath, data);
+    await desktop?.integration.saveFile.query(filePath, data);
     showToast("success", `Backup saved at ${filePath}.`);
   } else {
     FileSaver.saveAs(new Blob([Buffer.from(data)]), `${filename}.${ext}`);

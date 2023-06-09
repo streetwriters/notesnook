@@ -19,16 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
-import { dialog, Notification, shell } from "electron";
+import { dialog, nativeTheme, Notification, shell } from "electron";
 import { AutoLaunch } from "../utils/autolaunch";
 import { config, DesktopIntegration } from "../utils/config";
 import { bringToFront } from "../utils/bring-to-front";
-import { setTheme, Theme } from "../utils/theme";
+import { getTheme, setTheme, Theme } from "../utils/theme";
 import { mkdirSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { platform } from "os";
 import { resolvePath } from "../utils/resolve-path";
-import { client } from "../rpc/electron";
+import { observable } from "@trpc/server/observable";
 
 const t = initTRPC.create();
 
@@ -132,7 +132,10 @@ export const osIntegrationRouter = t.router({
         shell.beep();
       }
 
-      client.onNotificationClicked(input.tag);
+      return new Promise((resolve) => {
+        notification.once("close", () => resolve(undefined));
+        notification.once("click", () => resolve(input.tag));
+      });
     }),
   openPath: t.procedure
     .input(z.object({ type: z.literal("path"), link: z.string() }))
@@ -141,5 +144,17 @@ export const osIntegrationRouter = t.router({
       if (type === "path") return shell.openPath(resolvePath(link));
     }),
   bringToFront: t.procedure.query(() => bringToFront()),
-  changeTheme: t.procedure.input(Theme).mutation(({ input }) => setTheme(input))
+  changeTheme: t.procedure
+    .input(Theme)
+    .mutation(({ input }) => setTheme(input)),
+
+  onThemeChanged: t.procedure.subscription(() =>
+    observable<"dark" | "light">((emit) => {
+      nativeTheme.on("updated", () => {
+        if (getTheme() === "system") {
+          emit.next(nativeTheme.shouldUseDarkColors ? "dark" : "light");
+        }
+      });
+    })
+  )
 });
