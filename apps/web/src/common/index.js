@@ -199,7 +199,7 @@ export async function showUpgradeReminderDialogs() {
   if (isTesting()) return;
 
   const user = userstore.get().user;
-  if (!user) return;
+  if (!user || !user.subscription || user.subscription?.expiry === 0) return;
 
   const consumed = totalSubscriptionConsumed(user);
   const isTrial = user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
