@@ -25,9 +25,10 @@ import * as ScopedStorage from "react-native-scoped-storage";
 import RNFetchBlob from "react-native-blob-util";
 import { DatabaseLogger, db } from "../common/database/index";
 import Storage from "../common/database/storage";
-import { toTXT } from "../utils";
-import { sanitizeFilename } from "../utils/sanitizer";
+import { convertNoteToText } from "../utils/note-to-text";
+
 import { sleep } from "../utils/time";
+import { sanitizeFilename } from "@notesnook/common";
 
 const MIMETypes = {
   txt: "text/plain",
@@ -149,7 +150,7 @@ async function exportAs(type, note, bulk) {
       }
       break;
     case "txt":
-      data = await toTXT(note);
+      data = await convertNoteToText(note);
       break;
   }
 

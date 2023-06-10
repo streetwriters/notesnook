@@ -31,7 +31,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../app/common/database";
-import { getElevation } from "../app/utils";
+import { getElevationStyle } from "../app/utils/elevation";
 import { initDatabase, useShareStore } from "./store";
 
 const ListItem = ({ item, mode, close }) => {
@@ -262,7 +262,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
         alignSelf: "center",
         overflow: "hidden",
         zIndex: 999,
-        ...getElevation(quicknote ? 1 : 5),
+        ...getElevationStyle(quicknote ? 1 : 5),
         ...extra
       }}
     >

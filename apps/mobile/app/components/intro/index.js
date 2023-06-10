@@ -29,7 +29,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
@@ -198,7 +198,7 @@ const Intro = ({ navigation }) => {
           style={{
             paddingHorizontal: 24,
             alignSelf: "center",
-            ...getElevation(5),
+            ...getElevationStyle(5),
             borderRadius: 100
           }}
           fontSize={SIZE.md}

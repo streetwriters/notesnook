@@ -34,10 +34,9 @@ import {
 import Navigation from "../../services/navigation";
 import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { dHeight } from "../../utils";
 import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
-import { getFormattedDate, sleep } from "../../utils/time";
+import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
 import DialogButtons from "../dialog/dialog-buttons";
 import DialogContainer from "../dialog/dialog-container";
@@ -46,6 +45,8 @@ import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { getFormattedDate } from "@notesnook/common";
 
 const MergeConflicts = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -57,6 +58,7 @@ const MergeConflicts = () => {
   const content = useRef(null);
   const isKeepingConflicted = !keep?.conflicted;
   const isKeeping = !!keep;
+  const { height } = useSettingStore((state) => state.dimensions);
 
   const applyChanges = async () => {
     let _content = keep;
@@ -296,7 +298,7 @@ const MergeConflicts = () => {
 
           <Animated.View
             style={{
-              height: dHeight / 2 - (50 + insets.top / 2),
+              height: height / 2 - (50 + insets.top / 2),
               backgroundColor: colors.bg,
               borderBottomWidth: 1,
               borderBottomColor: colors.nav
@@ -332,7 +334,7 @@ const MergeConflicts = () => {
 
           <Animated.View
             style={{
-              height: dHeight / 2 - (50 + insets.top / 2),
+              height: height / 2 - (50 + insets.top / 2),
               backgroundColor: colors.bg,
               borderRadius: 10
             }}

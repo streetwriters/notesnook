@@ -22,10 +22,10 @@ import { ColorValue, GestureResponderEvent, ViewStyle } from "react-native";
 import Animated, { Layout } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ColorKey, useThemeStore } from "../../../stores/use-theme-store";
-import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
 import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/color-scheme/utils";
 import { SIZE } from "../../../utils/size";
 import { PressableButton, PressableButtonProps } from "../pressable";
+import NativeTooltip from "../../../utils/tooltip";
 interface IconButtonProps extends PressableButtonProps {
   name: string;
   color?: ColorValue;
@@ -56,7 +56,7 @@ export const IconButton = ({
   tooltipText,
   type = "gray",
   fwdRef,
-  tooltipPosition = TOOLTIP_POSITIONS.TOP,
+  tooltipPosition = NativeTooltip.POSITIONS.TOP,
   ...restProps
 }: IconButtonProps) => {
   const colors = useThemeStore((state) => state.colors);
@@ -67,7 +67,7 @@ export const IconButton = ({
       return;
     }
     if (tooltipText) {
-      showTooltip(event, tooltipText, tooltipPosition);
+      NativeTooltip.show(event, tooltipText, tooltipPosition);
     }
   };
 

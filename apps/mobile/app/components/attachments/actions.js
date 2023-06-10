@@ -34,7 +34,6 @@ import {
 import PremiumService from "../../services/premium";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { formatBytes } from "../../utils";
 import { eCloseAttachmentDialog, eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -47,6 +46,7 @@ import { Notice } from "../ui/notice";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { formatBytes } from "@notesnook/common";
 
 const Actions = ({ attachment, setAttachments, fwdRef }) => {
   const colors = useThemeStore((state) => state.colors);

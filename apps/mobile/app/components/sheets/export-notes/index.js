@@ -29,7 +29,7 @@ import Exporter from "../../../services/exporter";
 import PremiumService from "../../../services/premium";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { useUserStore } from "../../../stores/use-user-store";
-import { getElevation } from "../../../utils";
+import { getElevationStyle } from "../../../utils/elevation";
 import { ph, pv, SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import DialogHeader from "../../dialog/dialog-header";
@@ -340,7 +340,7 @@ ExportNotesSheet.present = (notes, allNotes) => {
 
 const styles = StyleSheet.create({
   container: {
-    ...getElevation(5),
+    ...getElevationStyle(5),
     borderRadius: 5,
     paddingVertical: pv
   },

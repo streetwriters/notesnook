@@ -1,0 +1,43 @@
+{
+  "name": "@notesnook/common",
+  "version": "1.0.0",
+  "description": "A set of common utilities shared across multiple Notesnook clients and services.",
+  "main": "dist/index.js",
+  "scripts": {
+    "pub": "tsc && np",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/streetwriters/notesnook.git"
+  },
+  "keywords": [
+    "logger"
+  ],
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/streetwriters/notesnook/issues"
+  },
+  "homepage": "https://github.com/streetwriters/notesnook#readme",
+  "np": {
+    "tests": false,
+    "releaseDraft": false,
+    "message": "chore: bump version to %s"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.2",
+    "@notesnook/core": "*",
+    "timeago.js": "4.0.2",
+    "react": "18.2.0",
+    "@types/react": "18.2.9"
+  },
+  "peerDependencies": {
+    "@notesnook/core": "*",
+    "timeago.js": "4.0.2",
+    "react": "*"
+  }
+}

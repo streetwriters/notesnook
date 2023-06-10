@@ -22,23 +22,23 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
+import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { history } from "../../../utils";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { getFormattedDate } from "../../../utils/time";
+import { getFormattedDate } from "@notesnook/common";
 
 const showActionSheet = (item) => {
   Properties.present(item);
 };
 
 const navigateToTopic = (topic) => {
-  if (history.selectedItemsList.length > 0) return;
+  if (useSelectionStore.getState().selectedItemsList.length > 0) return;
   TopicNotes.navigate(topic, true);
 };
 

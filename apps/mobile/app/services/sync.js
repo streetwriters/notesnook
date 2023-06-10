@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import NetInfo from "@react-native-community/netinfo";
 import { EVENTS } from "@notesnook/core/common";
-import { initAfterSync } from "../stores/index";
-import { SyncStatus, useUserStore } from "../stores/use-user-store";
-import { doInBackground } from "../utils";
+import NetInfo from "@react-native-community/netinfo";
 import { db } from "../common/database";
 import { DatabaseLogger } from "../common/database/index";
+import { initAfterSync } from "../stores/index";
+import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { ToastEvent } from "./event-manager";
 import SettingsService from "./settings";
+import BackgroundSync from "./background-sync";
 
 export const ignoredMessages = [
   "Sync already running",
@@ -61,7 +61,7 @@ const run = async (
     let error = null;
 
     try {
-      let res = await doInBackground(async () => {
+      let res = await BackgroundSync.doInBackground(async () => {
         try {
           await db.sync(full, forced);
           return true;

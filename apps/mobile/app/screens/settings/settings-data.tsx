@@ -35,14 +35,14 @@ import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
 import { Progress } from "../../components/sheets/progress";
 import { Update } from "../../components/sheets/update";
-import { useVaultStatus, VaultStatusType } from "../../hooks/use-vault-status";
+import { VaultStatusType, useVaultStatus } from "../../hooks/use-vault-status";
 import BackupService from "../../services/backup";
 import BiometicService from "../../services/biometrics";
 import {
+  ToastEvent,
   eSendEvent,
   openVault,
-  presentSheet,
-  ToastEvent
+  presentSheet
 } from "../../services/event-manager";
 import { setLoginMessage } from "../../services/message";
 import Navigation from "../../services/navigation";
@@ -53,7 +53,6 @@ import Sync from "../../services/sync";
 import { clearAllStores } from "../../stores";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { AndroidModule } from "../../utils";
 import { getColorScheme, toggleDarkMode } from "../../utils/color-scheme/utils";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import {
@@ -63,6 +62,7 @@ import {
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog
 } from "../../utils/events";
+import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
 import { MFARecoveryCodes, MFASheet } from "./2fa";
 import AppLock from "./app-lock";
@@ -762,7 +762,7 @@ export const settingsGroups: SettingSection[] = [
         modifer: () => {
           const settings = SettingsService.get();
           Platform.OS === "android"
-            ? AndroidModule.setSecureMode(!settings.privacyScreen)
+            ? NotesnookModule.setSecureMode(!settings.privacyScreen)
             : enabled(true);
 
           SettingsService.set({ privacyScreen: !settings.privacyScreen });

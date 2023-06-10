@@ -18,29 +18,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { ReactElement } from "react";
-import { AccentColorPicker, HomagePageSelector } from "./appearance";
-import { AutomaticBackupsSelector } from "./backup-restore";
+import { AccentColorPicker } from "./appearance";
 import DebugLogs from "./debug";
 import { ConfigureToolbar } from "./editor/configure-toolbar";
 import { Licenses } from "./licenses";
 import SoundPicker from "./sound-picker";
 import { Subscription } from "./subscription";
-import { TrashIntervalSelector } from "./trash-interval-selector";
-import { FontSelector } from "./font-selector";
 import { TitleFormat } from "./title-format";
-import { DateFormatSelector, TimeFormatSelector } from "./date-format";
+import {
+  HomePicker,
+  DateFormatPicker,
+  FontPicker,
+  TimeFormatPicker,
+  TrashIntervalPicker,
+  BackupReminderPicker
+} from "./picker/pickers";
+
 export const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker />,
-  homeselector: <HomagePageSelector />,
-  autobackups: <AutomaticBackupsSelector />,
+  homeselector: <HomePicker />,
+  autobackups: <BackupReminderPicker />,
   subscription: <Subscription />,
   configuretoolbar: <ConfigureToolbar />,
   "debug-logs": <DebugLogs />,
   "sound-picker": <SoundPicker />,
   licenses: <Licenses />,
-  "trash-interval-selector": <TrashIntervalSelector />,
-  "font-selector": <FontSelector />,
+  "trash-interval-selector": <TrashIntervalPicker />,
+  "font-selector": <FontPicker />,
   "title-format": <TitleFormat />,
-  "date-format-selector": <DateFormatSelector />,
-  "time-format-selector": <TimeFormatSelector />
+  "date-format-selector": <DateFormatPicker />,
+  "time-format-selector": <TimeFormatPicker />
 };

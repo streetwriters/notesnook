@@ -36,7 +36,7 @@ import {
   validateUsername
 } from "../../../services/validation";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { getElevation } from "../../../utils";
+import { getElevationStyle } from "../../../utils/elevation";
 import { SIZE } from "../../../utils/size";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
@@ -344,7 +344,7 @@ const Input = ({
                 paddingVertical: 3,
                 paddingHorizontal: 5,
                 borderRadius: 2.5,
-                ...getElevation(2),
+                ...getElevationStyle(2),
                 top: 0
               }}
             >

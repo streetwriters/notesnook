@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import { useTimeAgo } from "@notesnook/common";
+import React from "react";
 import { TextProps } from "react-native";
-import { timeSince } from "../../../utils/time";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
 interface TimeSinceProps extends TextProps {
@@ -34,20 +34,10 @@ export const TimeSince = ({
   updateFrequency = 30000,
   bold
 }: TimeSinceProps) => {
-  const [timeAgo, setTimeAgo] = useState<string | null>(null);
-  const interval = useRef<NodeJS.Timer>();
-
-  useEffect(() => {
-    let t = timeSince(time || Date.now());
-    setTimeAgo(t);
-    interval.current = setInterval(() => {
-      t = timeSince(time);
-      setTimeAgo(t);
-    }, updateFrequency);
-    return () => {
-      interval.current && clearInterval(interval.current);
-    };
-  }, [time, updateFrequency]);
+  const timeAgo = useTimeAgo(time, {
+    interval: updateFrequency,
+    locale: "short"
+  });
 
   return bold ? (
     <Heading style={style}>{timeAgo}</Heading>

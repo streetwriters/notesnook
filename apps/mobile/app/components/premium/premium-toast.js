@@ -28,7 +28,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import {
   eCloseActionSheet,
   eCloseSheet,
@@ -94,7 +94,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
           position: "absolute",
           backgroundColor: colors.nav,
           zIndex: 999,
-          ...getElevation(20),
+          ...getElevationStyle(20),
           padding: 12,
           borderRadius: 10,
           flexDirection: "row",

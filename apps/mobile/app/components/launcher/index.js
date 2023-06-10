@@ -37,9 +37,9 @@ import { useNoteStore } from "../../stores/use-notes-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { AndroidModule } from "../../utils";
 import { eOpenAnnouncementDialog } from "../../utils/events";
 import { getGithubVersion } from "../../utils/github-version";
+import { NotesnookModule } from "../../utils/notesnook-module";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import Migrate from "../sheets/migrate";
@@ -175,7 +175,7 @@ const Launcher = React.memo(
     const onUnlockBiometrics = useCallback(async () => {
       if (!(await BiometricService.isBiometryAvailable())) return;
       if (Platform.OS === "android") {
-        const activityName = await AndroidModule.getActivityName();
+        const activityName = await NotesnookModule.getActivityName();
         if (activityName !== "MainActivity") return;
       }
 

@@ -21,8 +21,8 @@ import React from "react";
 import { View } from "react-native";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
-import { getFormattedDate } from "../../utils/time";
 import Paragraph from "../ui/typography/paragraph";
+import { getFormattedDate } from "@notesnook/common";
 export const DateMeta = ({ item }) => {
   const colors = useThemeStore((state) => state.colors);
 

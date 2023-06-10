@@ -28,7 +28,7 @@ import {
 } from "../../assets/images/assets";
 import { ThemeStore, useThemeStore } from "../../stores/use-theme-store";
 import { eSendEvent } from "../../services/event-manager";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import { eOpenAddNotebookDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import useRotator from "../../hooks/use-rotator";
@@ -89,7 +89,7 @@ const NotebookWelcome = () => {
           padding: 12,
           width: "100%",
           backgroundColor: colors.bg,
-          ...getElevation(3),
+          ...getElevationStyle(3),
           borderRadius: 10,
           marginVertical: 12
         }}
@@ -142,7 +142,7 @@ const notebooks: { id: string; steps: TStep[] } = {
               padding: 12,
               width: "100%",
               backgroundColor: colors.bg,
-              ...getElevation(3),
+              ...getElevationStyle(3),
               borderRadius: 10,
               marginVertical: 12
             }}

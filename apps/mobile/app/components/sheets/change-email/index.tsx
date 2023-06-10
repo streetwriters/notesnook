@@ -41,11 +41,7 @@ enum EmailChangeSteps {
   changeEmail
 }
 
-export const ChangeEmail = ({
-  actionSheetRef,
-  close,
-  update
-}: ChangeEmailProps) => {
+export const ChangeEmail = ({ close }: ChangeEmailProps) => {
   const [step, setStep] = useState(EmailChangeSteps.verify);
   const emailChangeData = useRef<{
     email?: string;

@@ -17,6 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+export function formatBytes(bytes: number, decimals = 2) {
+  if (bytes === 0) return "0 Bytes";
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+}
+
 /*jshint node:true*/
 
 /**
@@ -69,7 +80,7 @@ function sanitize(input: string, replacement: string) {
 
 export function sanitizeFilename(
   input: string,
-  options: { replacement: string }
+  options?: { replacement: string }
 ) {
   const replacement = (options && options.replacement) || "";
   return sanitize(input, replacement);

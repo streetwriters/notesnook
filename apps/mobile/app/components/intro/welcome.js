@@ -24,7 +24,7 @@ import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import {
   eCloseLoading,
   eOpenLoading,
@@ -91,7 +91,7 @@ export const WelcomeNotice = () => {
           paddingHorizontal: 24,
           alignSelf: "center",
           borderRadius: 100,
-          ...getElevation(5),
+          ...getElevationStyle(5),
           marginTop: 30
         }}
         type="accent"
