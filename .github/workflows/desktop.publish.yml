@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: .github/actions/setup-node-with-cache
+        uses: ./.github/actions/setup-node-with-cache
 
       - name: Install packages
         run: |
@@ -78,7 +78,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: .github/actions/setup-node-with-cache
+        uses: ./.github/actions/setup-node-with-cache
 
       - name: Setup notarization
         run: |
@@ -170,7 +170,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: .github/actions/setup-node-with-cache
+        uses: ./.github/actions/setup-node-with-cache
 
       - name: Setup Snapcraft Auth
         if: inputs.publish-snap
@@ -228,7 +228,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: .github/actions/setup-node-with-cache
+        uses: ./.github/actions/setup-node-with-cache
 
       - name: Download build
         uses: actions/download-artifact@v3
