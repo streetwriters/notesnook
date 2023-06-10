@@ -28,6 +28,7 @@ const SCOPES = [
   "docs",
   "refactor",
   "misc",
+  "common",
   "global"
 ];
 

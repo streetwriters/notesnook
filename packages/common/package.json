@@ -36,8 +36,10 @@
     "@types/react": "18.2.9"
   },
   "peerDependencies": {
-    "@notesnook/core": "*",
     "timeago.js": "4.0.2",
     "react": "*"
+  },
+  "dependencies": {
+    "@notesnook/core": "*"
   }
 }
