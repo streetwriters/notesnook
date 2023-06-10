@@ -215,19 +215,24 @@ export const NotebookItem = ({
           alignItems: "center"
         }}
       >
-        <Paragraph
-          color={colors.icon}
-          size={SIZE.xs}
-          style={{
-            marginRight: 6
-          }}
-        >
-          {item && totalNotes > 1
-            ? totalNotes + " notes"
-            : totalNotes === 1
-            ? totalNotes + " note"
-            : "0 notes"}
-        </Paragraph>
+        {compactMode ? (
+          <>
+            <Paragraph
+              color={colors.icon}
+              size={SIZE.xs}
+              style={{
+                marginRight: 6
+              }}
+            >
+              {item && totalNotes > 1
+                ? totalNotes + " notes"
+                : totalNotes === 1
+                ? totalNotes + " note"
+                : "0 notes"}
+            </Paragraph>
+          </>
+        ) : null}
+
         <IconButton
           color={colors.heading}
           name="dots-horizontal"

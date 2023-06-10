@@ -298,7 +298,7 @@ const NoteItem = ({
                 {item.favorite ? (
                   <Icon
                     testID="icon-star"
-                    name="star"
+                    name="star-outline"
                     size={SIZE.md}
                     style={{
                       marginRight: 6
@@ -368,50 +368,54 @@ const NoteItem = ({
           alignItems: "center"
         }}
       >
-        {item.conflicted ? (
-          <Icon
-            name="alert-circle"
-            style={{
-              marginRight: 6
-            }}
-            size={SIZE.sm}
-            color={colors.red}
-          />
-        ) : null}
+        {compactMode ? (
+          <>
+            {item.conflicted ? (
+              <Icon
+                name="alert-circle"
+                style={{
+                  marginRight: 6
+                }}
+                size={SIZE.sm}
+                color={colors.red}
+              />
+            ) : null}
 
-        {item.locked ? (
-          <Icon
-            name="lock"
-            testID="note-locked-icon"
-            size={SIZE.sm}
-            style={{
-              marginRight: 6
-            }}
-            color={colors.icon}
-          />
-        ) : null}
+            {item.locked ? (
+              <Icon
+                name="lock"
+                testID="note-locked-icon"
+                size={SIZE.sm}
+                style={{
+                  marginRight: 6
+                }}
+                color={colors.icon}
+              />
+            ) : null}
 
-        {item.favorite ? (
-          <Icon
-            testID="icon-star"
-            name="star-outline"
-            size={SIZE.md}
-            style={{
-              marginRight: 6
-            }}
-            color="orange"
-          />
-        ) : null}
+            {item.favorite ? (
+              <Icon
+                testID="icon-star"
+                name="star-outline"
+                size={SIZE.md}
+                style={{
+                  marginRight: 6
+                }}
+                color="orange"
+              />
+            ) : null}
 
-        <TimeSince
-          style={{
-            fontSize: SIZE.xs,
-            color: colors.icon,
-            marginRight: 6
-          }}
-          time={item[dateBy]}
-          updateFrequency={Date.now() - item[dateBy] < 60000 ? 2000 : 60000}
-        />
+            <TimeSince
+              style={{
+                fontSize: SIZE.xs,
+                color: colors.icon,
+                marginRight: 6
+              }}
+              time={item[dateBy]}
+              updateFrequency={Date.now() - item[dateBy] < 60000 ? 2000 : 60000}
+            />
+          </>
+        ) : null}
 
         <IconButton
           testID={notesnook.listitem.menu}
