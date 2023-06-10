@@ -126,7 +126,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
         run: |
           npx nx run release --project @notesnook/desktop -- --variant=mas
-          npx electron-builder --mac mas --universal -p never
+          ./node_modules/.bin/electron-builder --mac mas --universal -p never
         working-directory: ./apps/desktop
 
       - name: Build zip and dmg
@@ -140,9 +140,9 @@ jobs:
         run: |
           npx nx run release --project @notesnook/desktop
           if [ ${{ inputs.publish-github }} == true ]; then
-            npx electron-builder --mac zip dmg --arm64 --x64 -p always
+            ./node_modules/.bin/electron-builder --mac zip dmg --arm64 --x64 -p always
           else
-            npx electron-builder --mac zip dmg --arm64 --x64 -p never
+            ./node_modules/.bin/electron-builder --mac zip dmg --arm64 --x64 -p never
           fi
         working-directory: ./apps/desktop
 
@@ -197,7 +197,7 @@ jobs:
       - name: Build snap
         if: inputs.publish-snap
         run: |
-          npx electron-builder --linux snap:x64 -p never
+          ./node_modules/.bin/electron-builder --linux snap:x64 -p never
         working-directory: ./apps/desktop
 
       - name: Build AppImage
@@ -205,9 +205,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ ${{ inputs.publish-github }} == true ]; then
-            npx electron-builder --linux AppImage:x64 AppImage:arm64 -p always
+            ./node_modules/.bin/electron-builder --linux AppImage:x64 AppImage:arm64 -p always
           else
-            npx electron-builder --linux AppImage:x64 AppImage:arm64 -p never
+            ./node_modules/.bin/electron-builder --linux AppImage:x64 AppImage:arm64 -p never
           fi
         working-directory: ./apps/desktop
 
@@ -249,8 +249,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if ($${{ inputs.publish-github }} -eq $true) {
-            npx electron-builder --win --publish always
+            ./node_modules/.bin/electron-builder --win --publish always
           } else {
-            npx electron-builder --win --publish never
+            ./node_modules/.bin/electron-builder --win --publish never
           }
         working-directory: ./apps/desktop
