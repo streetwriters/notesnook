@@ -17,9 +17,9 @@
     "electron-trpc": "^0.5.0",
     "electron-updater": "^5.3.0",
     "icojs": "^0.17.1",
+    "typed-emitter": "^2.1.0",
     "yargs": "^17.6.2",
-    "zod": "^3.21.4",
-    "typed-emitter": "^2.1.0"
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@electron/rebuild": "^3.2.13",
@@ -31,6 +31,9 @@
     "esbuild": "^0.17.19",
     "patch-package": "^6.5.1",
     "undici": "^5.22.1"
+  },
+  "optionalDependencies": {
+    "dmg-license": "^1.0.11"
   },
   "scripts": {
     "start": "turbowatch scripts/dev.ts",
