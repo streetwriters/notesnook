@@ -35,5 +35,6 @@ export const EventTypes = {
   link: "editor-event:link",
   contentchange: "editor-event:content-change",
   reminders: "editor-event:reminders",
-  previewAttachment: "editor-event:preview-attachment"
+  previewAttachment: "editor-event:preview-attachment",
+  copy: "editor-event:codeblock-copy"
 };
