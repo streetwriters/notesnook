@@ -249,8 +249,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if ($${{ inputs.publish-github }} -eq $true) {
-            yarn electron-builder -c.extraMetadata.main=./build/electron.js --win --publish always
+            yarn electron-builder -c extraMetadata.main=./build/electron.js --win --publish always
           } else {
-            yarn electron-builder -c.extraMetadata.main=./build/electron.js --win --publish never
+            yarn electron-builder -c extraMetadata.main=./build/electron.js --win --publish never
           }
         working-directory: ./apps/desktop
