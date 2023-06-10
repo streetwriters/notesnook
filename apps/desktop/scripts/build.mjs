@@ -50,7 +50,7 @@ if (argv.rebuild) {
 if (argv.variant === "mas") {
   await $`npm run bundle:mas`;
 } else {
-  await $`npm run bundle:electron`;
+  await $`npm run bundle`;
 }
 
 await $`tsc`;
