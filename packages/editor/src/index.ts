@@ -42,7 +42,7 @@ import "./extensions";
 import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
 import BulletList from "./extensions/bullet-list";
 import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer";
-import { CodeBlock } from "./extensions/code-block";
+import { CodeBlock, CodeBlockOptions } from "./extensions/code-block";
 import { Codemark } from "./extensions/code-mark";
 import { DateTime, DateTimeOptions } from "./extensions/date-time";
 import { EmbedNode } from "./extensions/embed";
@@ -89,6 +89,7 @@ const CoreExtensions = Object.entries(TiptapCoreExtensions)
 
 export type TiptapOptions = EditorOptions &
   Omit<AttachmentOptions, "HTMLAttributes"> &
+  Omit<CodeBlockOptions, "HTMLAttributes"> &
   Omit<WebClipOptions, "HTMLAttributes"> &
   Omit<ImageOptions, "HTMLAttributes"> &
   DateTimeOptions &
@@ -112,6 +113,7 @@ const useTiptap = (
     onPreviewAttachment,
     onOpenLink,
     onBeforeCreate,
+    onClickToCopy,
     downloadOptions,
     dateFormat,
     timeFormat,
@@ -208,7 +210,9 @@ const useTiptap = (
         TableCell,
         TableHeader,
         Highlight,
-        CodeBlock,
+        CodeBlock.configure({
+          onClickToCopy
+        }),
         Color,
         TextAlign.configure({
           types: ["heading", "paragraph"],
@@ -255,7 +259,8 @@ const useTiptap = (
       onBeforeCreate,
       onOpenLink,
       dateFormat,
-      timeFormat
+      timeFormat,
+      onClickToCopy
     ]
   );
 

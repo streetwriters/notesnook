@@ -21,6 +21,8 @@ import { UnionCommands, Editor as TiptapEditor } from "@tiptap/core";
 
 export type PermissionRequestEvent = CustomEvent<{ id: keyof UnionCommands }>;
 
+export type Writeable<T> = { -readonly [P in keyof T]: T[P] };
+
 export class Editor extends TiptapEditor {
   /**
    * Use this to get the latest instance of the editor.

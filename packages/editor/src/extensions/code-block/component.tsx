@@ -27,21 +27,59 @@ import { CodeBlockAttributes } from "./code-block";
 import { ReactNodeViewProps } from "../react/types";
 import { ResponsivePresenter } from "../../components/responsive";
 import { Popup } from "../../toolbar/components/popup";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 import { Button } from "../../components/button";
+import { findParentNodeClosestToPos } from "@tiptap/core";
+import { useTimer } from "../../hooks/use-timer";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
 ) {
+  const isMobile = useIsMobile();
   const { editor, updateAttributes, node, forwardRef } = props;
-  const { language, indentLength, indentType, caretPosition } = node.attrs;
+  const { language, indentLength, indentType, caretPosition, lines } =
+    node.attrs;
 
   const [isOpen, setIsOpen] = useState(false);
   // const [caretPosition, setCaretPosition] = useState<CaretPosition>();
   const toolbarRef = useRef<HTMLDivElement>(null);
 
+  const { enabled, start } = useTimer(1000);
+
   const languageDefinition = Languages.find(
     (l) => l.filename === language || l.alias?.some((a) => a === language)
   );
+
+  const onClickToCopy = () => {
+    const firstLine = lines.at(0);
+    if (!firstLine) return;
+
+    const { type } = node;
+    const position = editor.state.doc.resolve(firstLine.from);
+    const codeblock = findParentNodeClosestToPos(
+      position,
+      (node) => node.type.name === type.name
+    );
+
+    if (!codeblock) return;
+    const { $from, $to } = editor.state.selection;
+    const finalPosition = codeblock.pos + codeblock.node.nodeSize - 1;
+
+    if ($from.pos !== codeblock.pos + 1 && $to.pos !== finalPosition) {
+      editor.commands.setTextSelection({
+        from: codeblock.pos + 1,
+        to: finalPosition
+      });
+    }
+    editor.commands.focus();
+    editor.commands.copy(codeblock.node.textContent);
+    start();
+  };
+
+  const copyButtonStyle = {
+    ...(enabled && { borderColor: "primary" }),
+    ...(!isMobile && { "div:hover > &": { opacity: 1 } })
+  };
 
   return (
     <>
@@ -74,7 +112,7 @@ export function CodeblockComponent(
             display: "flex",
             px: 2,
             pt: 2,
-            pb: 1
+            pb: 2
           }}
           spellCheck={false}
         />
@@ -144,6 +182,34 @@ export function CodeblockComponent(
             </Text>
           </Button>
         </Flex>
+
+        {node.textContent.length > 0 ? (
+          <Button
+            variant={"tool"}
+            sx={{
+              position: "absolute",
+              opacity: Number(isMobile),
+              right: 0,
+              p: 1,
+              mr: 1,
+              my: 1,
+              bg: "bgSecondary",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              border: "1px solid var(--codeBorder)",
+              ":hover": { bg: "bgSecondaryHover" },
+              ...copyButtonStyle
+            }}
+            title={enabled ? "Copied to clipboard" : "Copy to clipboard"}
+            onClick={onClickToCopy}
+          >
+            <Icon
+              path={enabled ? Icons.check : Icons.copy}
+              size={"big"}
+              color={enabled ? "primary" : "icon"}
+            />
+          </Button>
+        ) : null}
       </Flex>
       <ResponsivePresenter
         isOpen={isOpen}

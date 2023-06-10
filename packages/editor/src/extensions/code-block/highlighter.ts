@@ -31,6 +31,8 @@ import { toCaretPosition, toCodeLines } from "./code-block";
 import Languages from "./languages.json";
 import { loadLanguage } from "./loader";
 import { getChangedNodes } from "../../utils/prosemirror";
+import { Attrs } from "@tiptap/pm/model";
+import { Writeable } from "@/src/types";
 
 export type ReplaceMergedStep = ReplaceAroundStep | ReplaceStep;
 
@@ -181,7 +183,11 @@ export function HighlighterPlugin({
         const languages: Record<string, string> = {};
         findChildren(state.doc, (node) => node.type.name === name).forEach(
           (block) => {
-            const { id, language } = block.node.attrs;
+            const attrs = block.node.attrs as Writeable<Attrs>;
+            const lines = toCodeLines(block.node.textContent, block.pos);
+            attrs.lines = lines.slice();
+
+            const { id, language } = attrs;
             if (id && language) languages[id] = language;
           }
         );

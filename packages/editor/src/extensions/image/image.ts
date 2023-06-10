@@ -30,8 +30,7 @@ import { Attachment, getDataAttribute } from "../attachment";
 import { createSelectionBasedNodeView } from "../react";
 import { TextDirections } from "../text-direction";
 import { ImageComponent } from "./component";
-
-type Writeable<T> = { -readonly [P in keyof T]: T[P] };
+import { Writeable } from "@/src/types";
 
 export interface ImageOptions {
   inline: boolean;
