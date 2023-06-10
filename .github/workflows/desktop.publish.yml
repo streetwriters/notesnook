@@ -114,7 +114,7 @@ jobs:
         run: |
           npm i --ignore-scripts --prefer-offline --no-audit
           npx lerna bootstrap --ignore=@notesnook/mobile -- --prefer-offline --no-audit
-          npx lerna add --scope=@notesnook/desktop --dev dmg-license
+          npx lerna add --no-bootstrap --scope=@notesnook/desktop --dev dmg-license
       
       - name: Install provisioning profile
         run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
