@@ -17,6 +17,10 @@
         "{projectRoot}/languages"
       ]
     },
+    "release": {
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/build"]
+    },
     "build:test": {
       "dependsOn": ["^build"],
       "outputs": ["{projectRoot}/build"]
