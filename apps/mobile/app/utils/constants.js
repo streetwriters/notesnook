@@ -100,16 +100,6 @@ export const SUBSCRIPTION_PROVIDER = {
   }
 };
 
-export const WeekDayNames = {
-  0: "Sunday",
-  1: "Monday",
-  2: "Tuesday",
-  3: "Wednesday",
-  4: "Thursday",
-  5: "Friday",
-  6: "Saturday"
-};
-
 export const MenuItemsList = [
   {
     name: "Notes",
@@ -213,16 +203,4 @@ export const BUTTON_TYPES = {
     selected: "warningBg",
     opacity: 0.12
   }
-};
-
-export const bgTaskOptions = {
-  taskName: "notesnookSync",
-  taskTitle: "Notesnook Sync",
-  taskDesc: "Syncing your notes.",
-  taskIcon: {
-    name: "ic_stat_name",
-    type: "drawable"
-  },
-  color: "#ffffff",
-  linkingURI: "com.streetwriters.notesnook://launch"
 };

@@ -22,8 +22,8 @@ import Orientation from "react-native-orientation";
 import { enabled } from "react-native-privacy-snapshot";
 import { MMKV } from "../common/database/mmkv";
 import { SettingStore, useSettingStore } from "../stores/use-setting-store";
-import { AndroidModule } from "../utils";
 import { getColorScheme } from "../utils/color-scheme/utils";
+import { NotesnookModule } from "../utils/notesnook-module";
 import { scale, updateSize } from "../utils/size";
 import { DDS } from "./device-detection";
 import { setAutobackOffMessage } from "./message";
@@ -63,13 +63,13 @@ function init() {
 function setPrivacyScreen(settings: SettingStore["settings"]) {
   if (settings.privacyScreen || settings.appLockMode === "background") {
     if (Platform.OS === "android") {
-      AndroidModule.setSecureMode(true);
+      NotesnookModule.setSecureMode(true);
     } else {
       enabled(true);
     }
   } else {
     if (Platform.OS === "android") {
-      AndroidModule.setSecureMode(false);
+      NotesnookModule.setSecureMode(false);
     } else {
       enabled(false);
     }

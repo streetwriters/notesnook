@@ -59,7 +59,6 @@ import {
 import { useEditorStore } from "../stores/use-editor-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useThemeStore } from "../stores/use-theme-store";
-import { setWidthHeight } from "../utils";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -221,7 +220,6 @@ const _TabsHolder = () => {
       width: size.width,
       height: size.height
     });
-    setWidthHeight(size);
     DDS.setSize(size, orientation);
     const nextDeviceMode = DDS.isLargeTablet()
       ? "tablet"

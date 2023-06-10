@@ -21,25 +21,51 @@ import React, { useRef, useState } from "react";
 import { View } from "react-native";
 import Menu, { MenuItem } from "react-native-reanimated-material-menu";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { db } from "../../common/database";
-import { PressableButton } from "../../components/ui/pressable";
-import Paragraph from "../../components/ui/typography/paragraph";
-import PremiumService from "../../services/premium";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { SIZE } from "../../utils/size";
+import { PressableButton } from "../../../components/ui/pressable";
+import Paragraph from "../../../components/ui/typography/paragraph";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { SIZE } from "../../../utils/size";
+import PremiumService from "../../../services/premium";
 
-export const TrashIntervalSelector = () => {
+interface PickerOptions<T> {
+  getValue: () => T;
+  updateValue: (item: T) => Promise<void>;
+  formatValue: (item: T) => any;
+  compareValue: (current: T, item: T) => boolean;
+  getItemKey: (item: T) => string;
+  options: T[];
+  premium?: boolean;
+  onCheckOptionIsPremium?: (item: T) => boolean;
+}
+
+export function SettingsPicker<T>({
+  getValue,
+  updateValue,
+  formatValue,
+  compareValue,
+  options,
+  getItemKey,
+  premium,
+  onCheckOptionIsPremium = () => true
+}: PickerOptions<T>) {
   const colors = useThemeStore((state) => state.colors);
-  const [trashInterval, setTrashInterval] = useState(
-    db.settings.getTrashCleanupInterval()
-  );
-  const menuRef = useRef();
+  const menuRef = useRef<any>();
   const [width, setWidth] = useState(0);
+  const [currentValue, setCurrentValue] = useState(getValue());
 
-  const onChange = (item) => {
+  const onChange = async (item: T) => {
+    if (premium && onCheckOptionIsPremium?.(item)) {
+      await PremiumService.verify(async () => {
+        menuRef.current?.hide();
+        await updateValue(item);
+        setCurrentValue(item);
+      });
+      return;
+    }
+
     menuRef.current?.hide();
-    setTrashInterval(item);
-    db.settings.setTrashCleanupInterval(item);
+    await updateValue(item);
+    setCurrentValue(item);
   };
 
   return (
@@ -78,40 +104,42 @@ export const TrashIntervalSelector = () => {
               padding: 12
             }}
           >
-            <Paragraph>
-              {trashInterval === -1 ? "Never" : trashInterval + " days"}
-            </Paragraph>
+            <Paragraph>{formatValue(currentValue)}</Paragraph>
             <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
           </PressableButton>
         }
       >
-        {[-1, 7, 30, 365].map((item) => (
+        {options.map((item) => (
           <MenuItem
-            key={item.toString()}
+            key={getItemKey(item)}
             onPress={async () => {
-              if (item === -1) {
-                await PremiumService.verify(() => {
-                  onChange(item);
-                });
-                return;
-              }
               onChange(item);
             }}
             style={{
-              backgroundColor:
-                trashInterval === item ? colors.nav : "transparent",
+              backgroundColor: compareValue(currentValue, item)
+                ? colors.nav
+                : "transparent",
               width: "100%",
               maxWidth: width
             }}
             textStyle={{
               fontSize: SIZE.md,
-              color: trashInterval === item ? colors.accent : colors.pri
+              color: compareValue(currentValue, item)
+                ? colors.accent
+                : colors.pri
             }}
           >
-            {item === -1 ? "Never" : item + " days"}
+            {formatValue(item)}
           </MenuItem>
         ))}
       </Menu>
     </View>
   );
-};
+}
+
+export function createSettingsPicker<T>(props: PickerOptions<T>) {
+  const Selector = () => {
+    return <SettingsPicker {...props} />;
+  };
+  return Selector;
+}

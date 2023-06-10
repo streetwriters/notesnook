@@ -36,7 +36,6 @@ import { initialize } from "../../../stores";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { eCloseRestoreDialog, eOpenRestoreDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
-import { getFormattedDate } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
@@ -45,6 +44,7 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Paragraph from "../../ui/typography/paragraph";
+import { getFormattedDate } from "@notesnook/common";
 
 const RestoreDataSheet = () => {
   const [visible, setVisible] = useState(false);

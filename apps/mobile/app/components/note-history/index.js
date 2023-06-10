@@ -26,13 +26,13 @@ import { presentSheet } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
-import { getFormattedDate, timeSince } from "../../utils/time";
 import DialogHeader from "../dialog/dialog-header";
 import SheetProvider from "../sheet-provider";
 import { PressableButton } from "../ui/pressable";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import NotePreview from "./preview";
+import { getFormattedDate, getTimeAgo } from "@notesnook/common";
 
 export default function NoteHistory({ note, fwdRef }) {
   const [history, setHistory] = useState([]);
@@ -90,7 +90,7 @@ export default function NoteHistory({ note, fwdRef }) {
       >
         <Paragraph>{getDate(item.dateCreated, item.dateModified)}</Paragraph>
         <Paragraph color={colors.icon} size={SIZE.xs}>
-          {timeSince(item.dateModified)}
+          {getTimeAgo(item.dateModified)}
         </Paragraph>
       </PressableButton>
     ),

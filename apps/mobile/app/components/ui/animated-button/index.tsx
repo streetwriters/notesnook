@@ -27,9 +27,9 @@ import Animated, {
 } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ColorKey, useThemeStore } from "../../../stores/use-theme-store";
-import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
 import { BUTTON_TYPES } from "../../../utils/constants";
 import { SIZE } from "../../../utils/size";
+import NativeTooltip from "../../../utils/tooltip";
 import { ButtonProps } from "../button";
 import { PressableButton } from "../pressable";
 import Heading from "../typography/heading";
@@ -86,7 +86,7 @@ export const AnimatedButton = ({
             return;
           }
           if (tooltipText) {
-            showTooltip(event, tooltipText, TOOLTIP_POSITIONS.TOP);
+            NativeTooltip.show(event, tooltipText, NativeTooltip.POSITIONS.TOP);
           }
         }}
         disabled={loading}

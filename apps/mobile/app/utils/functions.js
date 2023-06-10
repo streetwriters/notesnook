@@ -18,18 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Linking } from "react-native";
-import { history } from ".";
+import { db } from "../common/database";
+import { presentDialog } from "../components/dialog/functions";
 import { eSendEvent, ToastEvent } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import SearchService from "../services/search";
-import { useSelectionStore } from "../stores/use-selection-store";
 import { useMenuStore } from "../stores/use-menu-store";
-import { db } from "../common/database";
-import { eClearEditor, eOnTopicSheetUpdate } from "./events";
 import { useRelationStore } from "../stores/use-relation-store";
-import { presentDialog } from "../components/dialog/functions";
+import { useSelectionStore } from "../stores/use-selection-store";
+import { eClearEditor, eOnTopicSheetUpdate } from "./events";
 
-function deleteConfirmDialog(items, type, context) {
+function confirmDeleteAllNotes(items, type, context) {
   return new Promise((resolve) => {
     presentDialog({
       title: `Delete ${
@@ -68,33 +67,25 @@ export const deleteItems = async (item, context) => {
     });
     return;
   }
-  if (item && item.id && history.selectedItemsList.length === 0) {
-    history.selectedItemsList = [];
-    history.selectedItemsList.push(item);
+  if (
+    item &&
+    item.id &&
+    useSelectionStore.getState().selectedItemsList.length === 0
+  ) {
+    useSelectionStore.getState().setSelectedItem(item);
   }
 
-  let notes = history.selectedItemsList.filter((i) => i.type === "note");
-  let notebooks = history.selectedItemsList.filter(
-    (i) => i.type === "notebook"
-  );
-  let topics = history.selectedItemsList.filter((i) => i.type === "topic");
-  let reminders = history.selectedItemsList.filter(
-    (i) => i.type === "reminder"
-  );
+  const { selectedItemsList } = useSelectionStore.getState();
 
-  let routesForUpdate = [
-    "TaggedNotes",
-    "ColoredNotes",
-    "TopicNotes",
-    "Favorites",
-    "Notes"
-  ];
+  let notes = selectedItemsList.filter((i) => i.type === "note");
+  let notebooks = selectedItemsList.filter((i) => i.type === "notebook");
+  let topics = selectedItemsList.filter((i) => i.type === "topic");
+  let reminders = selectedItemsList.filter((i) => i.type === "reminder");
 
   if (reminders.length > 0) {
     for (let reminder of reminders) {
       await db.reminders.remove(reminder.id);
     }
-    routesForUpdate.push("Reminders");
     useRelationStore.getState().update();
   }
 
@@ -111,12 +102,11 @@ export const deleteItems = async (item, context) => {
       }
       await db.notes.delete(note.id);
     }
-    routesForUpdate.push("Trash");
     eSendEvent(eClearEditor);
   }
 
   if (topics?.length > 0) {
-    const result = await deleteConfirmDialog(topics, "topic", context);
+    const result = await confirmDeleteAllNotes(topics, "topic", context);
     if (result.delete) {
       for (const topic of topics) {
         if (result.deleteNotes) {
@@ -127,7 +117,6 @@ export const deleteItems = async (item, context) => {
         }
         await db.notebooks.notebook(topic.notebookId).topics.delete(topic.id);
       }
-      routesForUpdate.push("Notebook", "Notebooks");
       useMenuStore.getState().setMenuPins();
       ToastEvent.show({
         heading: `${topics.length > 1 ? "Topics" : "Topic"} deleted`,
@@ -137,7 +126,7 @@ export const deleteItems = async (item, context) => {
   }
 
   if (notebooks?.length > 0) {
-    const result = await deleteConfirmDialog(notebooks, "notebook", context);
+    const result = await confirmDeleteAllNotes(notebooks, "notebook", context);
 
     if (result.delete) {
       let ids = notebooks.map((i) => i.id);
@@ -156,17 +145,17 @@ export const deleteItems = async (item, context) => {
         }
       }
       await db.notebooks.delete(...ids);
-      routesForUpdate.push("Notebook", "Notebooks");
       useMenuStore.getState().setMenuPins();
     }
   }
 
   Navigation.queueRoutesForUpdate();
 
-  let msgPart = history.selectedItemsList.length === 1 ? " item" : " items";
-  let message = history.selectedItemsList.length + msgPart + " moved to trash.";
+  let message = `${selectedItemsList.length} ${
+    selectedItemsList.length === 1 ? "item" : "items"
+  } moved to trash.`;
 
-  let itemsCopy = [...history.selectedItemsList];
+  let deletedItems = [...selectedItemsList];
   if (
     topics.length === 0 &&
     reminders.length === 0 &&
@@ -178,13 +167,12 @@ export const deleteItems = async (item, context) => {
       func: async () => {
         let trash = db.trash.all;
         let ids = [];
-        for (var i = 0; i < itemsCopy.length; i++) {
-          let it = itemsCopy[i];
+        for (var i = 0; i < deletedItems.length; i++) {
+          let it = deletedItems[i];
           let trashItem = trash.find((item) => item.id === it.id);
           ids.push(trashItem.id);
         }
         await db.trash.restore(...ids);
-
         Navigation.queueRoutesForUpdate();
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
@@ -193,9 +181,8 @@ export const deleteItems = async (item, context) => {
       actionText: "Undo"
     });
   }
-  history.selectedItemsList = [];
   Navigation.queueRoutesForUpdate();
-  useSelectionStore.getState().clearSelection(true);
+  useSelectionStore.getState().clearSelection();
   useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();
   SearchService.updateAndSearch();
@@ -204,8 +191,7 @@ export const deleteItems = async (item, context) => {
 
 export const openLinkInBrowser = async (link) => {
   try {
-    const url = link;
-    Linking.openURL(url);
+    Linking.openURL(link);
   } catch (error) {
     console.log(error.message);
   }

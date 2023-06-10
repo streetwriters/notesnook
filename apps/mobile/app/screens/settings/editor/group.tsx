@@ -25,7 +25,7 @@ import { presentDialog } from "../../../components/dialog/functions";
 import { IconButton } from "../../../components/ui/icon-button";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { getElevation } from "../../../utils";
+import { getElevationStyle } from "../../../utils/elevation";
 import { SIZE } from "../../../utils/size";
 import { renderTool } from "./common";
 import { DraggableItem, useDragState } from "./state";
@@ -174,7 +174,7 @@ export const Group = ({
             width: isDragged ? dimensions.current?.width : "100%",
             backgroundColor: colors.bg,
             borderRadius: 10,
-            ...getElevation(hover ? 5 : 0),
+            ...getElevationStyle(hover ? 5 : 0),
             marginTop: isSubgroup ? 0 : 10
           }
         ]}

@@ -22,15 +22,15 @@ import {
   ActivityIndicator,
   ColorValue,
   TextStyle,
-  ViewStyle,
-  View
+  View,
+  ViewStyle
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ColorKey, useThemeStore } from "../../../stores/use-theme-store";
 import { useUserStore } from "../../../stores/use-user-store";
-import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
 import { BUTTON_TYPES } from "../../../utils/constants";
 import { SIZE } from "../../../utils/size";
+import NativeTooltip from "../../../utils/tooltip";
 import { ProTag } from "../../premium/pro-tag";
 import { PressableButton, PressableButtonProps } from "../pressable";
 import Heading from "../typography/heading";
@@ -105,7 +105,7 @@ export const Button = ({
           return;
         }
         if (tooltipText) {
-          showTooltip(event, tooltipText, TOOLTIP_POSITIONS.TOP);
+          NativeTooltip.show(event, tooltipText, NativeTooltip.POSITIONS.TOP);
         }
       }}
       disabled={loading}

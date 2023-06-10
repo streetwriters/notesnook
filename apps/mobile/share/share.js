@@ -45,7 +45,8 @@ import { db } from "../app/common/database";
 import { MMKV } from "../app/common/database/mmkv";
 import Storage from "../app/common/database/storage";
 import { eSendEvent } from "../app/services/event-manager";
-import { formatBytes, getElevation } from "../app/utils";
+import { getElevationStyle } from "../app/utils/elevation";
+import { formatBytes } from "@notesnook/common";
 import { eOnLoadNote } from "../app/utils/events";
 import { Editor } from "./editor";
 import { Search } from "./search";
@@ -459,7 +460,7 @@ const ShareView = ({ quicknote = false }) => {
             backgroundColor: colors.bg,
             height: 50 + insets.top,
             paddingTop: insets.top,
-            ...getElevation(1),
+            ...getElevationStyle(1),
             marginTop: -insets.top,
             flexDirection: "row",
             alignItems: "center",

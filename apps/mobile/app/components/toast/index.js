@@ -28,7 +28,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import { eHideToast, eShowToast } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
@@ -136,7 +136,7 @@ export const Toast = ({ context = "global" }) => {
       >
         <View
           style={{
-            ...getElevation(5),
+            ...getElevationStyle(5),
             maxWidth: "95%",
             backgroundColor: colors.nav,
             minWidth: data?.func ? "95%" : "50%",

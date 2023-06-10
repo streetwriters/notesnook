@@ -48,7 +48,6 @@ import { useNoteStore } from "../stores/use-notes-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useThemeStore } from "../stores/use-theme-store";
-import { history } from "../utils";
 import { rootNavigatorRef } from "../utils/global-refs";
 import Auth from "../components/auth";
 const NativeStack = createNativeStackNavigator();
@@ -191,7 +190,7 @@ const _NavigationStack = () => {
   const clearSelection = useSelectionStore((state) => state.clearSelection);
 
   const onStateChange = React.useCallback(() => {
-    if (history.selectionMode) {
+    if (useSelectionStore.getState().selectionMode) {
       clearSelection(true);
     }
     hideAllTooltips();

@@ -49,9 +49,9 @@ import {
 import { ThemeStore, useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { eCloseSheet } from "../../utils/events";
-import { sanitizeFilename } from "../../utils/sanitizer";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
+import { sanitizeFilename } from "@notesnook/common";
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",

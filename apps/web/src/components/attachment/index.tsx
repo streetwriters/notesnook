@@ -299,7 +299,7 @@ const AttachmentMenuItems: MenuItem[] = [
     onClick: async ({ attachment, status }) => {
       const isDownloading = status?.type === "download";
       if (isDownloading) {
-        await db.fs.cancel(attachment.metadata.hash, "download");
+        await db.fs?.cancel(attachment.metadata.hash, "download");
       } else await saveAttachment(attachment.metadata.hash);
     }
   },
@@ -311,7 +311,7 @@ const AttachmentMenuItems: MenuItem[] = [
     onClick: async ({ attachment, status }) => {
       const isDownloading = status?.type === "upload";
       if (isDownloading) {
-        await db.fs.cancel(attachment.metadata.hash, "upload");
+        await db.fs?.cancel(attachment.metadata.hash, "upload");
       } else
         await reuploadAttachment(
           attachment.metadata.type,

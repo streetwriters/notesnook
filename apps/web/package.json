@@ -26,6 +26,7 @@
     "@notesnook/logger": "*",
     "@notesnook/streamable-fs": "*",
     "@notesnook/theme": "*",
+    "@notesnook/common": "*",
     "@notesnook/web-clipper": "*",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/toolbar": "^3.12.0",
