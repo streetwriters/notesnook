@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Node
-        uses: .github/actions/setup-node-with-cache
+        uses: ./.github/actions/setup-node-with-cache
 
       - name: Use specific Java version for the builds
         uses: joschi/setup-jdk@v2
