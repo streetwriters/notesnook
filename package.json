@@ -8,6 +8,7 @@
     "build:web": "nx build @notesnook/web",
     "build:test:web": "nx build:test @notesnook/web",
     "start:web": "nx start @notesnook/web",
+    "start:desktop": "nx start @notesnook/desktop",
     "install:web": "lerna add --scope=@notesnook/web ",
     "install:mobile": "lerna add --scope=@notesnook/mobile ",
     "test:web": "nx test @notesnook/web",

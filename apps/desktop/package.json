@@ -9,6 +9,7 @@
   "types": "./dist/index.d.ts",
   "homepage": "https://notesnook.com/",
   "repository": "https://github.com/streetwriters/notesnook",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "@notesnook/crypto": "*",
     "@trpc/client": "^10.29.1",

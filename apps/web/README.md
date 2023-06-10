@@ -5,19 +5,10 @@
 <h1 align="center">Notesnook Web</h1>
 <h3 align="center">The web app is built using React, Typescript & Javascript.</h3>
 <p align="center">
-<a href="https://app.notesnook.com/">Try it out!</a> | <a href="#developer-guide">Developer guide</a> | <a href="#build-instructions">How to build?</a> | <a href="./desktop/">Desktop app</a>
+<a href="https://app.notesnook.com/">Try it out!</a> | <a href="#developer-guide">Developer guide</a> | <a href="#build-instructions">How to build?</a> | <a href="../desktop/">Desktop app</a>
 </p>
 
 ## Getting started
-
-### The desktop app?
-
-You can find all the desktop-related code in [the `desktop/` directory](./desktop/). Since it uses the web app directly, we are keeping both together. (We should probably move it to its own project at some point.)
-
-### Downloads & releases
-
-- Web app: [try it out here](https://app.notesnook.com/)
-- Desktop app: [download for your platform from here](https://notesnook.com/downloads)
 
 ## Build instructions
 
