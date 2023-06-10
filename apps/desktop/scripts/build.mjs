@@ -36,16 +36,23 @@ const sodiumNativePrebuildPath = path.join(
   `${os.platform()}-x64`
 );
 
-await fs.rm("./build/", { force: true, recursive: true });
+if (argv.rebuild) {
+  await fs.rm("./build/", { force: true, recursive: true });
 
-if (argv.rebuild) await $`cd ../web/ && npm run build:desktop`;
+  await $`cd ../web/ && npm run build:desktop`;
 
-await fs.cp(path.join("..", "web", "build"), "build", {
-  recursive: true,
-  force: true
-});
+  await fs.cp(path.join("..", "web", "build"), "build", {
+    recursive: true,
+    force: true
+  });
+}
 
-await $`npm run build:electron`;
+if (argv.variant === "mas") {
+  await $`npm run bundle:mas`;
+} else {
+  await $`npm run bundle:electron`;
+}
+
 await $`tsc`;
 await $`npm rebuild`;
 
