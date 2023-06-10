@@ -126,7 +126,7 @@ jobs:
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
         run: |
-          npm run build -- --variant=mas
+          npm run release -- --variant=mas
           npx electron-builder --mac mas --universal -p never
         working-directory: ./apps/desktop
 
@@ -139,7 +139,7 @@ jobs:
           APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
           APPLE_API_KEY_ISSUER: ${{ secrets.api_key_issuer_id }}
         run: |
-          npm run build
+          npm run release
           if [ ${{ inputs.publish-github }} == true ]; then
             npx electron-builder --mac zip dmg --arm64 --x64 -p always
           else
@@ -192,7 +192,7 @@ jobs:
           npx lerna bootstrap --ignore=@notesnook/mobile -- --prefer-offline --no-audit
 
       - name: Build Electron wrapper
-        run: npm run build
+        run: npm run release
         working-directory: ./apps/desktop
 
       - name: Build snap
@@ -242,7 +242,7 @@ jobs:
           npx lerna bootstrap --ignore=@notesnook/mobile -- --prefer-offline --no-audit
 
       - name: Build Electron wrapper
-        run: npm run build
+        run: npm run release
         working-directory: ./apps/desktop
 
       - name: Build app
