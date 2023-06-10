@@ -22,7 +22,8 @@ import StorageInterface from "../__mocks__/storage.mock";
 import { login } from "./utils";
 
 test("refresh token concurrently", async () => {
-  const db = new DB(StorageInterface);
+  const db = new DB();
+  db.setup(StorageInterface);
   await db.init();
 
   await expect(login(db)).resolves.not.toThrow();
@@ -41,7 +42,8 @@ test("refresh token concurrently", async () => {
 }, 30000);
 
 test("refresh token using the same refresh_token multiple time", async () => {
-  const db = new DB(StorageInterface);
+  const db = new DB();
+  db.setup(StorageInterface);
   await db.init();
 
   await expect(login(db)).resolves.not.toThrow();
