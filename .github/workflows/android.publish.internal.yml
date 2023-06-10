@@ -11,21 +11,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - uses: actions/setup-node@master
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: |
-            apps/mobile/package-lock.json
-            apps/web/package-lock.json
-            packages/core/package-lock.json
-            packages/crypto/package-lock.json
-            packages/crypto-worker/package-lock.json
-            packages/editor-mobile/package-lock.json
-            packages/editor/package-lock.json
-            packages/logger/package-lock.json
-            packages/streamable-fs/package-lock.json
-            packages/theme/package-lock.json
+      - name: Setup Node
+        uses: .github/actions/setup-node-with-cache
 
       - name: Use specific Java version for the builds
         uses: joschi/setup-jdk@v2
