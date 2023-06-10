@@ -66,7 +66,7 @@ await fs.cp(
 );
 
 if (argv.run) {
-  await $`yarn electron-builder -c.extraMetadata.main=./build/electron.js --linux AppImage:x64`;
+  await $`npm run builder -- --linux AppImage:x64`;
 
   await $`./output/notesnook_linux_x86_64.AppImage`;
 }
