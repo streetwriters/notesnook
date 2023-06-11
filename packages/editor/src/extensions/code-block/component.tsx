@@ -64,8 +64,9 @@ export function CodeblockComponent(
     if (!codeblock) return;
     const { $from, $to } = editor.state.selection;
     const finalPosition = codeblock.pos + codeblock.node.nodeSize - 1;
+    const isNotSelecting = $from.pos !== codeblock.pos + 1 || $to.pos !== finalPosition
 
-    if ($from.pos !== codeblock.pos + 1 && $to.pos !== finalPosition) {
+    if (isNotSelecting) {
       editor.commands.setTextSelection({
         from: codeblock.pos + 1,
         to: finalPosition
