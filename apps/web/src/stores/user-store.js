@@ -40,7 +40,7 @@ class UserStore extends BaseStore {
   isLoggingIn = false;
   isSigningIn = false;
   /**
-   * @type {User}
+   * @type {User | undefined}
    */
   user = undefined;
   counter = 0;

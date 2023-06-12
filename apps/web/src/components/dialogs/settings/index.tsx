@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text, Button, Input, Switch, Box } from "@theme-ui/components";
+import { Flex, Text, Button, Input, Switch } from "@theme-ui/components";
 import Dialog from "../dialog";
 import {
   About,
@@ -29,7 +29,6 @@ import {
   Developer,
   Documentation,
   Editor,
-  Export,
   Import,
   Legal,
   Loading,
@@ -56,6 +55,11 @@ import { SyncSettings } from "./sync-settings";
 import { BehaviourSettings } from "./behaviour-settings";
 import { DesktopIntegrationSettings } from "./desktop-integration-settings";
 import { NotificationsSettings } from "./notifications-settings";
+import { isDesktop } from "../../../utils/platform";
+import { BackupExportSettings } from "./backup-export-settings";
+import { ImporterSettings } from "./importer-settings";
+import { VaultSettings } from "./vault-settings";
+import { PrivacySettings } from "./privacy-settings";
 
 type SettingsDialogProps = { onClose: Perform };
 
@@ -92,7 +96,12 @@ const sectionGroups: SectionGroup[] = [
       { key: "appearance", title: "Appearance", icon: Appearance },
       { key: "behaviour", title: "Behaviour", icon: Behaviour },
       { key: "editor", title: "Editor", icon: Editor },
-      { key: "desktop", title: "Desktop integration", icon: Desktop },
+      {
+        key: "desktop",
+        title: "Desktop integration",
+        icon: Desktop,
+        isHidden: () => !isDesktop()
+      },
       { key: "notifications", title: "Notifications", icon: Notification }
     ]
   },
@@ -100,14 +109,13 @@ const sectionGroups: SectionGroup[] = [
     key: "import-export",
     title: "Import & export",
     sections: [
-      { key: "backup-restore", title: "Backup & restore", icon: Backup },
-      { key: "importer", title: "Notesnook Importer", icon: Import },
-      { key: "export", title: "Export", icon: Export }
+      { key: "backup-export", title: "Backup & export", icon: Backup },
+      { key: "importer", title: "Notesnook Importer", icon: Import }
     ]
   },
   {
     key: "security",
-    title: "Security",
+    title: "Security & privacy",
     sections: [
       { key: "vault", title: "Vault", icon: ShieldLock },
       { key: "privacy", title: "Privacy", icon: Privacy }
@@ -125,13 +133,17 @@ const sectionGroups: SectionGroup[] = [
   }
 ];
 
-const settingsGroups = [
+const SettingsGroups = () => [
   ...ProfileSettings,
   ...AuthenticationSettings,
   ...SyncSettings,
   ...BehaviourSettings,
   ...DesktopIntegrationSettings,
-  ...NotificationsSettings
+  ...NotificationsSettings,
+  ...BackupExportSettings,
+  ...ImporterSettings,
+  ...VaultSettings,
+  ...PrivacySettings
 ];
 
 // Thoughts:
@@ -149,7 +161,7 @@ const settingsGroups = [
 export default function SettingsDialog(props: SettingsDialogProps) {
   const [route, setRoute] = useState<SectionKeys>("profile");
   const [activeSettings, setActiveSettings] = useState<SettingsGroup[]>(
-    settingsGroups.filter((g) => g.section === route)
+    SettingsGroups().filter((g) => g.section === route)
   );
 
   return (
@@ -185,6 +197,7 @@ export default function SettingsDialog(props: SettingsDialogProps) {
               placeholder="Search"
               sx={{ m: 2, mb: 2, width: "auto", bg: "bgSecondary", py: "7px" }}
               onChange={(e) => {
+                const settingsGroups = SettingsGroups();
                 const query = e.target.value.toLowerCase().trim();
                 if (!query)
                   return setActiveSettings(
@@ -224,7 +237,7 @@ export default function SettingsDialog(props: SettingsDialogProps) {
                     fontWeight: "bold",
                     color: "text",
                     mx: 3,
-                    mb: 1
+                    mb: typeof group.title === "string" ? 1 : 0
                   }}
                 >
                   {group.title}
@@ -239,7 +252,7 @@ export default function SettingsDialog(props: SettingsDialogProps) {
                         selected={section.key === route}
                         onClick={() => {
                           setActiveSettings(
-                            settingsGroups.filter(
+                            SettingsGroups().filter(
                               (g) => g.section === section.key
                             )
                           );
@@ -252,41 +265,47 @@ export default function SettingsDialog(props: SettingsDialogProps) {
             ))}
           </Flex>
         </FlexScrollContainer>
-        <Flex
-          sx={{
-            flexDirection: "column",
-            bg: "background",
-            flex: 1,
-            p: 4,
-            gap: 4
-          }}
+        <FlexScrollContainer
+          style={{ flex: 1, backgroundColor: "var(--background)" }}
         >
-          {activeSettings.map(
-            (group) =>
-              (!group.isHidden || !group.isHidden()) && (
-                <Flex key={group.key} sx={{ flexDirection: "column", gap: 2 }}>
-                  {typeof group.header === "string" ? (
-                    <Text
-                      variant="subBody"
-                      sx={{
-                        fontSize: 11,
-                        fontWeight: "bold",
-                        letterSpacing: 0.3,
-                        color: "primary"
-                      }}
-                    >
-                      {group.header.toUpperCase()}
-                    </Text>
-                  ) : (
-                    <group.header />
-                  )}
-                  {group.settings.map((setting) => (
-                    <SettingItem key={setting.key} item={setting} />
-                  ))}
-                </Flex>
-              )
-          )}
-        </Flex>
+          <Flex
+            sx={{
+              flexDirection: "column",
+              p: 4,
+              gap: 4,
+              overflow: "hidden"
+            }}
+          >
+            {activeSettings.map(
+              (group) =>
+                (!group.isHidden || !group.isHidden()) && (
+                  <Flex
+                    key={group.key}
+                    sx={{ flexDirection: "column", gap: 2, overflow: "hidden" }}
+                  >
+                    {typeof group.header === "string" ? (
+                      <Text
+                        variant="subBody"
+                        sx={{
+                          fontSize: 11,
+                          fontWeight: "bold",
+                          letterSpacing: 0.3,
+                          color: "primary"
+                        }}
+                      >
+                        {group.header.toUpperCase()}
+                      </Text>
+                    ) : (
+                      <group.header />
+                    )}
+                    {group.settings.map((setting) => (
+                      <SettingItem key={setting.key} item={setting} />
+                    ))}
+                  </Flex>
+                )
+            )}
+          </Flex>
+        </FlexScrollContainer>
       </Flex>
     </Dialog>
   );
@@ -343,7 +362,15 @@ function SettingItem(props: { item: Setting }) {
         )}
       </Flex>
 
-      <Flex sx={{ alignItems: "center", flexShrink: 0 }}>
+      <Flex
+        sx={{
+          alignItems: "center",
+          flexShrink: 0,
+          justifyContent: "end",
+          gap: 2,
+          "& > label": { width: "auto" }
+        }}
+      >
         {components.map((component) => {
           switch (component.type) {
             case "button":

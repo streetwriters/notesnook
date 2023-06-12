@@ -29,7 +29,7 @@ export type SectionKeys =
   | "desktop"
   | "notifications"
   | "editor"
-  | "backup-restore"
+  | "backup-export"
   | "export"
   | "importer"
   | "vault"

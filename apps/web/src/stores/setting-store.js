@@ -17,20 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { PATHS } from "@notesnook/desktop";
 import { db } from "../common/db";
 import { desktop } from "../common/desktop-bridge";
 import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
+import { isTelemetryEnabled, setTelemetry } from "../utils/telemetry";
 
 /**
  * @extends {BaseStore<SettingStore>}
  */
 class SettingStore extends BaseStore {
   encryptBackups = Config.get("encryptBackups", false);
+  backupReminderOffset = Config.get("backupReminderOffset", 0);
+  backupStorageLocation = Config.get(
+    "backupStorageLocation",
+    PATHS.backupsDirectory
+  );
   doubleSpacedLines = Config.get("doubleSpacedLines", true);
   notificationsSettings = Config.get("notifications", { reminder: true });
 
+  privacyMode = false;
+  telemetry = isTelemetryEnabled();
   /** @type {string} */
   dateFormat = null;
   /** @type {"12-hour" | "24-hour"} */
@@ -50,7 +59,9 @@ class SettingStore extends BaseStore {
       timeFormat: db.settings.getTimeFormat(),
       titleFormat: db.settings.getTitleFormat(),
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
-      desktopIntegrationSettings: await window.config?.desktopIntegration()
+      desktopIntegrationSettings:
+        await desktop?.integration.desktopIntegration.query(),
+      privacyMode: await desktop?.integration.privacyMode.query()
     });
   };
 
@@ -112,10 +123,32 @@ class SettingStore extends BaseStore {
     this.setEncryptBackups(!encryptBackups);
   };
 
+  setBackupReminderOffset = (offset) => {
+    Config.set("backupReminderOffset", offset);
+    this.set({ backupReminderOffset: offset });
+  };
+
+  setBackupStorageLocation = (location) => {
+    Config.set("backupStorageLocation", location);
+    this.set({ backupStorageLocation: location });
+  };
+
   toggleDoubleSpacedLines = () => {
     const doubleSpacedLines = this.get().doubleSpacedLines;
     this.set((state) => (state.doubleSpacedLines = !doubleSpacedLines));
     Config.set("doubleSpacedLines", !doubleSpacedLines);
+  };
+
+  toggleTelemetry = () => {
+    const telemetry = this.get().telemetry;
+    this.set({ telemetry: !telemetry });
+    setTelemetry(!telemetry);
+  };
+
+  togglePrivacyMode = async () => {
+    const privacyMode = this.get().privacyMode;
+    this.set({ privacyMode: !privacyMode });
+    await desktop?.integration.setPrivacyMode.mutate(!privacyMode);
   };
 }
 

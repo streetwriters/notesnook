@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../../stores/setting-store";
+import { type DesktopIntegrationSettings as DesktopIntegrationSettingsType } from "../../../hooks/use-desktop-integration";
 
 export const DesktopIntegrationSettings: SettingsGroup[] = [
   {
@@ -62,7 +63,7 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
             listener
           ),
         isHidden: (desktopIntegration) =>
-          !(desktopIntegration as DesktopIntegrationSettings)?.autoStart,
+          !(desktopIntegration as DesktopIntegrationSettingsType)?.autoStart,
         components: [
           {
             type: "toggle",
