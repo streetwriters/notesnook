@@ -28,7 +28,7 @@ import { Perform } from "../../common/dialog-controller";
 import { showToast } from "../../utils/toast";
 import { pluralize } from "../../utils/string";
 import { isMac } from "../../utils/platform";
-import create from "zustand";
+import { create } from "zustand";
 import { FilteredList } from "../filtered-list";
 
 type MoveDialogProps = { onClose: Perform; noteIds: string[] };

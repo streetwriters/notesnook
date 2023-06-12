@@ -216,7 +216,7 @@ export default function AppEffects({ setShow }) {
       }) || {};
 
     return () => {
-      unsubscribe();
+      unsubscribe?.();
     };
   }, []);
 

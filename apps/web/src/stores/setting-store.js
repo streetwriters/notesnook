@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import setDesktopIntegration from "../commands/set-desktop-integration";
 import { db } from "../common/db";
+import { desktop } from "../common/desktop-bridge";
 import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
@@ -91,7 +91,10 @@ class SettingStore extends BaseStore {
   setDesktopIntegration = async (settings) => {
     const { desktopIntegrationSettings } = this.get();
 
-    setDesktopIntegration({ ...desktopIntegrationSettings, ...settings });
+    await desktop.integration.setDesktopIntegration.mutate({
+      ...desktopIntegrationSettings,
+      ...settings
+    });
     this.set({
       desktopIntegrationSettings: await window.config?.desktopIntegration()
     });

@@ -21,7 +21,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { IEditor, NoteStatistics } from "./types";
 import createStore from "../../common/store";
 import BaseStore from "../../stores";
-import shallow from "zustand/shallow";
+import { shallow } from "zustand/shallow";
 import type { ToolbarDefinition } from "@notesnook/editor";
 import Config from "../../utils/config";
 
