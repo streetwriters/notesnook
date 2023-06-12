@@ -33,10 +33,14 @@ export function requestInAppReview() {
   }
 
   if (InAppReview.isAvailable()) {
-    useUserStore.getState().setShouldBlockVerifyUser(true);
+    useUserStore.getState().setDisableAppLockRequests(true);
 
     InAppReview.RequestInAppReview()
-      .then(() => {})
+      .then(() => {
+        setTimeout(() => {
+          useUserStore.getState().setDisableAppLockRequests(false);
+        }, 1000);
+      })
       .catch((error) => {
         DatabaseLogger.error(error);
       });
