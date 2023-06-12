@@ -62,7 +62,7 @@ export const eSubscribeEvent = <T = unknown>(
   eventName: string,
   action?: (data: T) => void
 ) => {
-  eventManager.subscribe(eventName, action);
+  return eventManager.subscribe(eventName, action);
 };
 
 export const eUnSubscribeEvent = <T = unknown>(

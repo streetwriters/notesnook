@@ -29,6 +29,7 @@ import {
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
+import { eUserLoggedIn } from "../../../utils/events";
 
 type ChangeEmailProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -84,7 +85,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
           emailChangeData.current.password,
           emailChangeData.current.code
         );
-        eSendEvent("userLoggedIn");
+        eSendEvent(eUserLoggedIn);
         close?.();
         ToastEvent.show({
           heading: `Email changed`,

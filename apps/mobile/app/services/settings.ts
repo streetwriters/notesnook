@@ -21,7 +21,11 @@ import { Platform } from "react-native";
 import Orientation from "react-native-orientation";
 import { enabled } from "react-native-privacy-snapshot";
 import { MMKV } from "../common/database/mmkv";
-import { SettingStore, useSettingStore } from "../stores/use-setting-store";
+import {
+  SettingStore,
+  defaultSettings,
+  useSettingStore
+} from "../stores/use-setting-store";
 import { getColorScheme } from "../utils/color-scheme/utils";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { scale, updateSize } from "../utils/size";
@@ -36,6 +40,14 @@ function reset() {
     set(settings);
     setTimeout(() => setAutobackOffMessage(), 10000);
   }
+}
+
+function resetSettings() {
+  MMKV.setString(
+    "appSettings",
+    JSON.stringify({ ...defaultSettings, introCompleted: true })
+  );
+  init();
 }
 
 function init() {
@@ -140,7 +152,8 @@ const SettingsService = {
   toggle,
   onFirstLaunch,
   checkOrientation,
-  reset
+  reset,
+  resetSettings
 };
 
 export default SettingsService;

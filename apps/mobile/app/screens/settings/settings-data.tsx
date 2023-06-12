@@ -294,23 +294,20 @@ export const settingsGroups: SettingSection[] = [
                     setImmediate(async () => {
                       eSendEvent(eCloseSimpleDialog);
                       Navigation.popToTop();
-                      db.user?.logout();
+                      await db.user?.logout();
                       setLoginMessage();
                       await PremiumService.setPremiumStatus();
                       await BiometicService.resetCredentials();
                       MMKV.clearStore();
-                      await clearAllStores();
-                      SettingsService.init();
-                      setTimeout(() => {
-                        SettingsService.set({
-                          introCompleted: true
-                        });
-                      }, 1000);
+                      clearAllStores();
+                      SettingsService.resetSettings();
                       useUserStore.getState().setUser(null);
                       useUserStore.getState().setSyncing(false);
                       Navigation.goBack();
                       Navigation.popToTop();
-                      eSendEvent("settings-loading", false);
+                      setTimeout(() => {
+                        eSendEvent("settings-loading", false);
+                      }, 2000);
                     });
                   } catch (e) {
                     ToastEvent.error(e as Error, "Error logging out");
