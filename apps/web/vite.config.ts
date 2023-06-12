@@ -139,6 +139,7 @@ const WEB_MANIFEST: Partial<ManifestOptions> = {
   categories: ["productivity", "lifestyle", "education", "books"]
 };
 
+const isTesting = process.env.REACT_APP_TEST === "true";
 export default defineConfig({
   envPrefix: "REACT_APP_",
   build: {
@@ -176,7 +177,11 @@ export default defineConfig({
       srcDir: "src",
       filename: "service-worker.js"
     }),
-    react(),
+    react({
+      plugins: isTesting
+        ? undefined
+        : [["swc-plugin-react-remove-properties", {}]]
+    }),
     envCompatible(),
     svgrPlugin({
       svgrOptions: {

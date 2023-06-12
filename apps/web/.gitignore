@@ -30,3 +30,4 @@ dist
 public/workbox
 scripts/secrets
 test-results
+.swc
