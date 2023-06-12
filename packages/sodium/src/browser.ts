@@ -19,8 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sodium from "libsodium-wrappers-sumo";
 
-export function initialize() {
-  return sodium.ready;
+if (process.env.NODE_ENV === "development") {
+  // this is necessary in development otherwise all the exported functions
+  // are undefined. Since vite supports direct top-level awaits in development
+  // we forcefully ignore typescript.
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  await sodium.ready;
+}
+
+export async function initialize() {
+  await sodium.ready;
 }
 
 export {

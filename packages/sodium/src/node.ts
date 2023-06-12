@@ -54,10 +54,7 @@ export interface StringMessageTag {
   tag: number;
 }
 
-export function initialize() {
-  console.log("Calling node.js API.");
-  return Promise.resolve();
-}
+export async function initialize() {}
 
 export function crypto_pwhash(
   keyLength: number,
