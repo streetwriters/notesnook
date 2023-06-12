@@ -20,12 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { db } from "../common/db";
 import Home from "../views/home";
 import Notebooks from "../views/notebooks";
-import Notes from "../views/notes.js";
+import Notes from "../views/notes";
 import Search from "../views/search";
 import Settings from "../views/settings";
 import Tags from "../views/tags";
 import Topics from "../views/topics";
-import { navigate } from "../navigation";
+import { navigate } from ".";
 import Trash from "../views/trash";
 import { store as notestore } from "../stores/note-store";
 import { store as nbstore } from "../stores/notebook-store";

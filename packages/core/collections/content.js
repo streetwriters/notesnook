@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Collection from "./collection";
-import getId from "../utils/id";
+import { getId } from "../utils/id";
 import { getContentFromData } from "../content-types";
 import { hasItem } from "../utils/array";
 

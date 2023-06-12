@@ -77,7 +77,7 @@ export { useStore, store };
 
 export const allowedPlatforms = [
   "all",
-  process.env.REACT_APP_PLATFORM,
+  import.meta.env.REACT_APP_PLATFORM,
   window.os
 ];
 

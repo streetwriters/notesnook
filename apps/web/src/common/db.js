@@ -50,7 +50,7 @@ async function initializeDatabase(persistence) {
   //   AUTH_HOST: "http://localhost:8264",
   //   SSE_HOST: "http://localhost:7264",
   // });
-  // const base = `http://${process.env.REACT_APP_LOCALHOST}`;
+  // const base = `http://${import.meta.env.REACT_APP_LOCALHOST}`;
   // db.host({
   //   API_HOST: `${base}:5264`,
   //   AUTH_HOST: `${base}:8264`,

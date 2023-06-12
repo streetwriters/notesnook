@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sodium from "libsodium-wrappers-sumo";
 
 export function initialize() {
-  console.log("Calling browser.");
   return sodium.ready;
 }
 

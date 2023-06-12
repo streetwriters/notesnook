@@ -31,18 +31,18 @@ import {
   PricingInfo
 } from "./types";
 
-// const isDev = false; // process.env.NODE_ENV === "development";
+// const isDev = false; // import.meta.env.NODE_ENV === "development";
 // const VENDOR_ID = isDev ? 1506 : 128190;
 const PADDLE_ORIGIN =
-  process.env.NODE_ENV === "development"
+  import.meta.env.NODE_ENV === "development"
     ? "https://sandbox-buy.paddle.com"
     : "https://buy.paddle.com";
 const CHECKOUT_CREATE_ORIGIN =
-  process.env.NODE_ENV === "development"
+  import.meta.env.NODE_ENV === "development"
     ? "https://sandbox-create-checkout.paddle.com"
     : "https://create-checkout.paddle.com";
 const CHECKOUT_SERVICE_ORIGIN =
-  process.env.NODE_ENV === "development"
+  import.meta.env.NODE_ENV === "development"
     ? "https://sandbox-checkout-service.paddle.com"
     : "https://checkout-service.paddle.com";
 

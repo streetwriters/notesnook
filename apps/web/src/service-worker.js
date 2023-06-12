@@ -70,7 +70,7 @@ registerRoute(
 
     return true;
   },
-  createHandlerBoundToURL(process.env.PUBLIC_URL + "/index.html")
+  createHandlerBoundToURL(import.meta.env.PUBLIC_URL + "/index.html")
 );
 
 // An example runtime caching route for requests that aren't handled by the
@@ -101,8 +101,8 @@ self.addEventListener("message", (event) => {
       break;
     case "GET_VERSION":
       {
-        const VERSION = process.env.REACT_APP_VERSION;
-        const HASH = process.env.REACT_APP_GIT_HASH;
+        const VERSION = import.meta.env.REACT_APP_VERSION;
+        const HASH = import.meta.env.REACT_APP_GIT_HASH;
         event.source.postMessage({
           type: data.type,
           version: VERSION,

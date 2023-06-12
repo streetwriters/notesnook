@@ -2,34 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta
+    <!-- <meta
       http-equiv="Content-Security-Policy"
       content="script-src 'self' 'nonce-7WIq8hRwApoXhctoGZZthMLYQLRNiprTwcPi6Azdf' 'unsafe-eval';"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="%PUBLIC_URL%/apple-touch-icon.png"
-    />
+    /> -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
       href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAHUUExURUxpcf////////////////////////////////////////////////////////////////////////////////////39/f39/f////////////////////////////////z8/O3s7P7+/vTz8wAAAPz7++/v7/Py8u/u7vDv7+7t7dfX1/79/ezr66Kiovv6+vf29vX09OTj4w0NDfv7++Ti4vr6+vT09Ovq6vn5+f39/fb19dnX1/b29tvb29/f3xMTE/j4+Pn4+O7s7MnJyerq6uno6M/Pz8jIyN3d3dnZ2d7e3kZGRvj39/38/Pf39+zs7PDw8OPi4ubl5cvLy+rp6czMzPLy8vPz887Ozujo6MrKyuDf3+fn59PT0+bm5uXl5c3NzfX19evr6wsLC+/t7ePj4/Ty8u3r6/Lx8eXk5OPh4dDQ0Nza2tjX19vZ2fHw8Nva2tLR0djW1tbW1tra2tLS0uHh4evp6eLi4tXV1djY2L+/vysrK7q6utHR0aGhoa6urrm5uQICAigoKCEhIZCQkFxcXBgYGFRUVBISEm1tbQ4ODklJSbu7uyAgID09PZqamkVFRXh4eLGxsTg4OOTk5FFRUQEBAQoKCnx8fBcXF7/+rP8AAAAfdFJOUwBOqO2h6KT9Mtyr5+w3Str+6TTZOjXb31M24O8BOd0PapSsAAABxElEQVQ4y2NgYOBgYWWXxwLYBdmEGICAjx9Z1NJJVQfB42QE6hdG0RaoaaCqhKSCl4EF1VxNVAXyTAzcaArUUBXwMLBjKDBBViDAII+uwBZFgTy6AjU1awIKNKz1aa0g1VBfB58CDS08CuIb40AKzLAqsJKXN2tXacChwKS+rTtB3tJHRU9ewxmbFZ6tKiqTrSAKdIO1LDEUaPeoqMzsUwAp0NIt8Uj0ijJXQFVgnDJVZcK0XrACXcXY0sjoHM8AfyUkBbOn9KvMmgRSYFEW4hUVqJagHeaShqTAwX7ijJQusAkW5VXRHu6eruFqaigKkqarqAAVKFbYxWiYq1XGedijuMHBWz6xo7m2Rl7RwtvdJaw6NjzCFl2BVVNdshJQgbqBsqtdpIu7nasjXIFXS2cyRL2CW6i6JTCgFCLitUPs4QrM7cDmKZi7FRYVm6o5QeLbDGICLNEqJAVk59rk2djY5Me4FThawQOKFSzrrxmaZWpqBAamQUGmwRaakNTNzMAm7+ekrKmlqOjsrIgAGcAA1ci0NVPiYhAV8zVURgbp6nBg7isuwsDAKKfkp4AEVOHASklKApS9JZmY5bECaS5ZGQYA3vqpy6NoYh0AAABXelRYdFJhdyBwcm9maWxlIHR5cGUgaXB0YwAAeJzj8gwIcVYoKMpPy8xJ5VIAAyMLLmMLEyMTS5MUAxMgRIA0w2QDI7NUIMvY1MjEzMQcxAfLgEigSi4A6hcRdPJCNZUAAAAASUVORK5CYII="
     />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="%PUBLIC_URL%/favicon-16x16.png"
-    />
-    <link rel="manifest" href="/site.webmanifest" />
-    <!-- <link rel="manifest" href="%PUBLIC_URL%/site.webmanifest" /> -->
-    <link
-      rel="mask-icon"
-      href="%PUBLIC_URL%/safari-pinned-tab.svg"
-      color="#01c352"
-    />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <!-- <link rel="manifest" href="/site.webmanifest" /> -->
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#01c352" />
     <meta name="msapplication-TileColor" content="#01c352" />
     <meta name="theme-color" content="#01c352" />
 
@@ -38,13 +24,13 @@
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-    <!-- <link rel="manifest" href="%PUBLIC_URL%/manifest.json" /> -->
+    <!-- <link rel="manifest" href="/manifest.json" /> -->
     <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
+      Notice the use of  in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      Unlike "/favicon.ico" or "favicon.ico", "/favicon.ico" will
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
@@ -72,6 +58,7 @@
       const root = document.querySelector("html");
       if (root) root.setAttribute("data-theme", theme);
     </script>
+    <script type="module" src="/src/index.tsx"></script>
     <style>
       html[data-theme="dark"] {
         --bg: #1b1b1b;

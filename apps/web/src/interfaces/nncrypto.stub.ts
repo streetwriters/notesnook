@@ -18,10 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { INNCrypto } from "@notesnook/crypto/dist/src/interfaces";
-import "worker-loader?filename=static/workers/nncrypto.worker.js!@notesnook/crypto-worker/dist/src/worker.js";
+import CryptoWorker from "@notesnook/crypto-worker/dist/src/worker.js?worker";
 import { isDesktop } from "../utils/platform";
-
-const WORKER_PATH = "/static/workers/nncrypto.worker.js";
 
 async function loadNNCrypto() {
   const hasWorker = "Worker" in window || "Worker" in global;
@@ -42,7 +40,7 @@ export function getNNCrypto(): Promise<INNCrypto> {
   if (instance) return Promise.resolve(instance);
   return queueify<INNCrypto>(async () => {
     const NNCrypto = await loadNNCrypto();
-    instance = new NNCrypto(WORKER_PATH);
+    instance = new NNCrypto(new CryptoWorker());
     return instance;
   });
 }

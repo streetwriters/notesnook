@@ -17,9 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Worker from "worker-loader?filename=static/workers/network-check.worker.[contenthash].js!./network-check.worker";
+import NetworkCheckWorker from "./network-check.worker.ts?worker";
 import type { NetworkCheck as NetworkWorker } from "./network-check.worker";
 import { wrap, Remote } from "comlink";
 
@@ -28,7 +26,7 @@ export class NetworkCheck {
   private network!: Remote<NetworkWorker>;
 
   constructor() {
-    this.worker = new Worker();
+    this.worker = new NetworkCheckWorker();
     this.network = wrap<NetworkWorker>(this.worker);
   }
 

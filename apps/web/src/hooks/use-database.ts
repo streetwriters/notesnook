@@ -23,7 +23,7 @@ import "allotment/dist/style.css";
 import "../utils/analytics";
 import "../app.css";
 
-if (process.env.NODE_ENV === "production") {
+if (import.meta.env.NODE_ENV === "production") {
   console.log = () => {};
 }
 

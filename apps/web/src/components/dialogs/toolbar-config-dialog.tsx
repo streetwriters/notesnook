@@ -49,7 +49,7 @@ import {
 import { useEffect, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import { createPortal } from "react-dom";
-import id from "@notesnook/core/utils/id";
+import { getId } from "@notesnook/core/utils/id";
 import { Label, Radio } from "@theme-ui/components";
 import { db } from "../../common/db";
 import { useToolbarConfig } from "../editor/context";
@@ -479,7 +479,7 @@ function unflatten(items: TreeNode[]): ToolbarDefinition {
 function createGroup(config: Partial<Group>): Group {
   return {
     type: "group",
-    id: id(),
+    id: getId(),
     depth: 0,
     title: "Group",
     ...config
@@ -489,7 +489,7 @@ function createGroup(config: Partial<Group>): Group {
 function createItem(config: Partial<Item> & { toolId: ToolId }): Item {
   return {
     type: "item",
-    id: id(),
+    id: getId(),
     depth: 0,
     title: "",
     icon: "",

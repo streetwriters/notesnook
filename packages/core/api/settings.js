@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { EV, EVENTS } from "../common";
-import id from "../utils/id";
+import { getId } from "../utils/id";
 import "../types";
 
 class Settings {
@@ -194,7 +194,7 @@ class Settings {
   _initSettings(settings) {
     this._settings = {
       type: "settings",
-      id: id(),
+      id: getId(),
       groupOptions: {},
       toolbarConfig: {},
       aliases: {},

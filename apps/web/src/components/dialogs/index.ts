@@ -34,7 +34,7 @@ const RecoveryKeyDialog = React.lazy(() => import("./recovery-key-dialog"));
 const ItemDialog = React.lazy(() => import("./item-dialog"));
 const FeatureDialog = React.lazy(() => import("./feature-dialog"));
 const TrackingDetailsDialog = React.lazy(
-  () => import("./tracking-details-dialog")
+  () => import("./tracking-details-dialog.jsx")
 );
 const ReminderDialog = React.lazy(() => import("./reminder-dialog"));
 const AddReminderDialog = React.lazy(() => import("./add-reminder-dialog"));
