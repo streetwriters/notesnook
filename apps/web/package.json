@@ -108,6 +108,7 @@
   "scripts": {
     "start": "env-cmd -e all,dev,web vite",
     "start:desktop": "env-cmd -e all,desktop vite",
+    "start:test": "serve -s build/ -p 3000",
     "build": "env-cmd -e all,web vite build",
     "build:test": "env-cmd -e all,dev,web,silent vite build",
     "build:beta": "env-cmd -e all,web,beta vite build",
