@@ -66,7 +66,8 @@
     "w3c-keyname": "^2.2.6",
     "web-streams-polyfill": "^3.1.1",
     "wouter": "2.7.3",
-    "zustand": "^3.3.1"
+    "zustand": "^3.3.1",
+    "pdfjs-dist": "^3.6.172"
   },
   "devDependencies": {
     "@playwright/test": "^1.26.0",
@@ -78,7 +79,6 @@
     "@types/react": "17.0.2",
     "@types/react-dom": "17.0.2",
     "@types/react-modal": "^3.13.1",
-    "@vitejs/plugin-react": "^4.0.0",
     "@vitejs/plugin-react-swc": "^3.3.2",
     "buffer": "^6.0.3",
     "chalk": "^4.1.0",
@@ -92,12 +92,16 @@
     "otplib": "^12.0.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "typescript": "^4.8.2",
     "vite": "^4.3.9",
     "vite-plugin-env-compatible": "^1.1.1",
     "vite-plugin-pwa": "^0.16.3",
     "vite-plugin-svgr": "^3.2.0",
-    "vitest": "^0.29.8"
+    "vitest": "^0.32.0",
+    "workbox-core": "^7.0.0",
+    "workbox-expiration": "^7.0.0",
+    "workbox-precaching": "^7.0.0",
+    "workbox-routing": "^7.0.0",
+    "workbox-strategies": "^7.0.0"
   },
   "overrides": {
     "react@>17": "17.0.2",

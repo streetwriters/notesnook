@@ -139,7 +139,6 @@ const WEB_MANIFEST: Partial<ManifestOptions> = {
   categories: ["productivity", "lifestyle", "education", "books"]
 };
 
-// https://vitejs.dev/config/
 export default defineConfig({
   envPrefix: "REACT_APP_",
   build: {
@@ -150,7 +149,6 @@ export default defineConfig({
     sourcemap: process.env.GENERATE_SOURCEMAP === "true"
   },
   logLevel: process.env.NODE_ENV === "production" ? "warn" : "info",
-  esbuild: { treeShaking: true },
   resolve: {
     alias: {
       react: path.resolve(path.join(__dirname, "node_modules", "react")),
