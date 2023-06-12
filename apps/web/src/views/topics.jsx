@@ -70,10 +70,6 @@ function Notebook() {
       refresh(context.value.id);
   }, [selectedNotebook, context, refresh]);
 
-  useEffect(() => {
-    toggleCollapse(isCollapsed);
-  }, [isCollapsed, toggleCollapse]);
-
   const toggleCollapse = useCallback((isCollapsed) => {
     if (!paneRef.current || !sizes.current) return;
 
@@ -91,6 +87,10 @@ function Notebook() {
       groupArray(context?.notes || [], db.settings.getGroupOptions("notes")),
     [context?.notes]
   );
+
+  useEffect(() => {
+    toggleCollapse(isCollapsed);
+  }, [isCollapsed, toggleCollapse]);
 
   if (!context) return null;
   return (

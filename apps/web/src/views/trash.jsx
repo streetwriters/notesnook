@@ -22,7 +22,6 @@ import ListContainer from "../components/list-container";
 import { confirm } from "../common/dialog-controller";
 import { useStore, store } from "../stores/trash-store";
 import { showToast } from "../utils/toast";
-import { Text } from "@theme-ui/components";
 import useNavigate from "../hooks/use-navigate";
 import { db } from "../common/db";
 import Placeholder from "../components/placeholders";

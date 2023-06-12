@@ -26,7 +26,7 @@ import { isTesting } from "./utils/platform";
 import { initalizeLogger, logger } from "./utils/logger";
 import { Buffer } from "buffer";
 import { AuthProps } from "./views/auth";
-global.Buffer = Buffer;
+window.Buffer = Buffer;
 
 initalizeLogger();
 
@@ -178,7 +178,7 @@ async function initializeServiceWorker() {
   // If you want your app to work offline and load faster, you can change
   // unregister() to register() below. Note this comes with some pitfalls.
   // Learn more about service workers: https://bit.ly/CRA-PWA
-  if (process.env.REACT_APP_PLATFORM !== "desktop") {
+  if (import.meta.env.REACT_APP_PLATFORM !== "desktop") {
     serviceWorker.register({
       onUpdate: async (registration: ServiceWorkerRegistration) => {
         if (!registration.waiting) return;

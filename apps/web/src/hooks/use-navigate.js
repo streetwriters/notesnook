@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { useEffect } = require("react");
-const { NavigationEvents } = require("../navigation");
+import { useEffect } from "react";
+import { NavigationEvents } from "../navigation";
 
 function useNavigate(routeKey, onNavigation) {
   useEffect(() => {

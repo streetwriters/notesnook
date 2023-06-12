@@ -20,10 +20,10 @@ import { postMessage } from "./mitm";
 
 let supportsTransferable = false;
 
-const isSecureContext = global.isSecureContext;
+const isSecureContext = globalThis.isSecureContext;
 // TODO: Must come up with a real detection test (#69)
 let useBlobFallback =
-  /constructor/i.test(global.HTMLElement.toString()) ||
+  /constructor/i.test(globalThis.HTMLElement.toString()) ||
   "safari" in globalThis ||
   "WebKitPoint" in globalThis;
 

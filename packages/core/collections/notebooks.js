@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Collection from "./collection";
 import Notebook from "../models/notebook";
-import getId from "../utils/id";
+import { getId } from "../utils/id";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 import qclone from "qclone";
 
@@ -28,7 +28,7 @@ export default class Notebooks extends Collection {
     if (remoteNotebook.deleted)
       return await this._collection.addItem(remoteNotebook);
 
-    const id = remoteNotebook.id || getId();
+    const id = remoteNotebook.id || id();
     let localNotebook = this._collection.getItem(id);
 
     if (localNotebook && localNotebook.topics?.length) {

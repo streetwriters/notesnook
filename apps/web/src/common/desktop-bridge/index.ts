@@ -20,6 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { type desktop as bridge } from "./bridge";
 
 export const desktop: typeof bridge | undefined =
-  process.env.REACT_APP_PLATFORM === "desktop"
+  import.meta.env.REACT_APP_PLATFORM === "desktop"
     ? require("./bridge").desktop
     : undefined;

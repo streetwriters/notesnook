@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Topic from "../models/topic";
 import qclone from "qclone";
-import id from "../utils/id";
+import { getId } from "../utils/id";
 
 export default class Topics {
   /**
@@ -134,7 +134,7 @@ export function makeTopic(topic, notebookId) {
   if (typeof topic !== "string") return topic;
   return {
     type: "topic",
-    id: id(), //topic,
+    id: getId(), //topic,
     notebookId,
     title: topic.trim(),
     dateCreated: Date.now(),

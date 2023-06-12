@@ -29,20 +29,15 @@ import { NNCryptoWorkerModule } from "./src/worker";
 import { wrap } from "comlink";
 
 export class NNCryptoWorker implements INNCrypto {
-  private worker?: Worker;
   private workermodule?: NNCryptoWorkerModule;
   private isReady = false;
-  private path?: string;
 
-  constructor(path?: string) {
-    this.path = path;
-  }
+  constructor(private readonly worker?: Worker) {}
 
   private async init() {
-    if (!this.path) throw new Error("path cannot be undefined.");
+    if (!this.worker) throw new Error("worker cannot be undefined.");
     if (this.isReady) return;
 
-    this.worker = new Worker(this.path);
     this.workermodule = wrap<NNCryptoWorkerModule>(this.worker);
     // this.workermodule = await spawn<NNCryptoWorkerModule>(this.worker);
     this.isReady = true;

@@ -21,7 +21,7 @@ import Config from "./config";
 
 export function isTelemetryEnabled() {
   // telemetry is always disabled in DEBUG/TEST mode
-  if (process.env.NODE_ENV !== "production") return false;
+  if (import.meta.env.NODE_ENV !== "production") return false;
 
   return Config.get("telemetry", false);
 }

@@ -320,6 +320,7 @@ export function PdfPreview(props: PdfPreviewProps) {
     </Worker>
   );
 }
+export default PdfPreview;
 
 type ToolbarButtonProps = {
   title: string;

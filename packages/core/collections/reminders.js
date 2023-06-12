@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import getId from "../utils/id";
+import { getId } from "../utils/id";
 import Collection from "./collection";
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";

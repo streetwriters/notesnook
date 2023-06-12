@@ -21,6 +21,7 @@ import createStore from "../common/store";
 import BaseStore from "./index";
 import Config from "../utils/config";
 import { getDefaultAccentColor } from "@notesnook/theme";
+import { desktop } from "../common/desktop-bridge";
 
 class ThemeStore extends BaseStore {
   /**
@@ -30,8 +31,9 @@ class ThemeStore extends BaseStore {
   accent = Config.get("accent", getDefaultAccentColor());
   followSystemTheme = Config.get("followSystemTheme", false);
 
-  setTheme = (theme) => {
-    if (!this.get().followSystemTheme) changeAppTheme(theme);
+  setTheme = async (theme) => {
+    if (!this.get().followSystemTheme)
+      await desktop?.integration.changeTheme.mutate(theme);
     this.set((state) => (state.theme = theme));
     Config.set("theme", theme);
   };
@@ -46,10 +48,12 @@ class ThemeStore extends BaseStore {
     Config.set("accent", accent);
   };
 
-  setFollowSystemTheme = (followSystemTheme) => {
+  setFollowSystemTheme = async (followSystemTheme) => {
     this.set((state) => (state.followSystemTheme = followSystemTheme));
     Config.set("followSystemTheme", followSystemTheme);
-    changeAppTheme(followSystemTheme ? "system" : "light");
+    await desktop?.integration.changeTheme.mutate(
+      followSystemTheme ? "system" : "light"
+    );
   };
 
   toggleFollowSystemTheme = () => {
