@@ -275,7 +275,7 @@ function TipTap(props: TipTapProps) {
         return true;
       }
     };
-  }, [readonly, nonce, doubleSpacedLines, dateFormat, timeFormat]);
+  }, [theme, readonly, nonce, doubleSpacedLines, dateFormat, timeFormat]);
 
   const editor = useTiptap(
     tiptapOptions,
