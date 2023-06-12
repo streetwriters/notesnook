@@ -75,6 +75,7 @@ import { usePermissionHandler } from "./hooks/use-permission-handler";
 import Toolbar from "./toolbar";
 import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { DownloadOptions } from "./utils/downloader";
+import { Heading } from "./extensions/heading";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -155,6 +156,7 @@ const useTiptap = (
           bulletList: false,
           paragraph: false,
           hardBreak: false,
+          heading: false,
           history: {
             depth: 200,
             newGroupDelay: 1000
@@ -164,6 +166,7 @@ const useTiptap = (
           },
           horizontalRule: false
         }),
+        Heading,
         HorizontalRule.extend({
           addInputRules() {
             return [

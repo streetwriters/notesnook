@@ -90,6 +90,7 @@ export const TextDirection = Extension.create<TextDirectionOptions>({
             // on Android for some keyboards (GBoard etc.). Empty string works fine.
             default: this.options.defaultDirection || "",
             parseHTML: (element) => element.dir,
+            keepOnSplit: true,
             renderHTML: (attributes) => {
               if (!attributes.textDirection) {
                 return {};
