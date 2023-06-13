@@ -27,6 +27,11 @@ import {
 import { ClipArea, ClipMode } from "../common/bridge";
 import type { Config } from "@notesnook/clipper/dist/types";
 
+declare global {
+  // eslint-disable-next-line no-var
+  var messagingPortAttached: boolean;
+}
+
 type ClipMessage = {
   type: "clip";
   mode?: ClipMode;
@@ -37,30 +42,31 @@ type ClipMessage = {
 type ViewportMessage = {
   type: "viewport";
 };
+function attachMessagePort() {
+  browser.runtime.onMessage.addListener(async (request) => {
+    const message = request as ClipMessage | ViewportMessage;
 
-browser.runtime.onMessage.addListener(async (request) => {
-  const message = request as ClipMessage | ViewportMessage;
-
-  switch (message.type) {
-    case "clip": {
-      const sizeable =
-        message.area === "full-page" &&
-        (message.mode === "complete" || message.mode === "screenshot");
-      return {
-        height: sizeable ? document.body.clientHeight : 0,
-        width: sizeable ? document.body.clientWidth : 0,
-        data: await clip(request)
-      };
+    switch (message.type) {
+      case "clip": {
+        const sizeable =
+          message.area === "full-page" &&
+          (message.mode === "complete" || message.mode === "screenshot");
+        return {
+          height: sizeable ? document.body.clientHeight : 0,
+          width: sizeable ? document.body.clientWidth : 0,
+          data: await clip(request)
+        };
+      }
+      case "viewport":
+        return {
+          x: 0,
+          y: 0,
+          height: document.body.clientHeight,
+          width: document.body.clientWidth
+        };
     }
-    case "viewport":
-      return {
-        x: 0,
-        y: 0,
-        height: document.body.clientHeight,
-        width: document.body.clientWidth
-      };
-  }
-});
+  });
+}
 
 function clip(message: ClipMessage) {
   try {
@@ -86,4 +92,9 @@ function clip(message: ClipMessage) {
   } finally {
     if (message.area !== "selection") cleanup();
   }
+}
+
+if (!globalThis.messagingPortAttached) {
+  attachMessagePort();
+  globalThis.messagingPortAttached = true;
 }
