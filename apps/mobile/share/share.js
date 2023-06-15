@@ -354,7 +354,7 @@ const ShareView = ({ quicknote = false }) => {
       let raw = await db.content.raw(appendNote.contentId);
       _note = {
         content: {
-          data: raw.data + noteContent.current,
+          data: (raw?.data || "") + noteContent.current,
           type: "tiptap"
         },
         id: appendNote.id,
