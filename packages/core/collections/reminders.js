@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getId } from "../utils/id";
-import Collection from "./collection";
 import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isToday from "dayjs/plugin/isToday";
 import isTomorrow from "dayjs/plugin/isTomorrow";
 import isYesterday from "dayjs/plugin/isYesterday";
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { formatDate } from "../utils/date";
+import { getId } from "../utils/id";
+import Collection from "./collection";
 
 dayjs.extend(isTomorrow);
 dayjs.extend(isSameOrBefore);
@@ -141,9 +141,10 @@ export function formatReminderTime(
   if (reminder.mode === "permanent") return `Ongoing`;
 
   if (reminder.snoozeUntil && reminder.snoozeUntil > Date.now()) {
-    return `Snoozed until ${dayjs(reminder.snoozeUntil).format(
-      options.timeFormat
-    )}`;
+    return `Snoozed until ${formatDate(reminder.snoozeUntil, {
+      timeFormat: options.timeFormat,
+      type: "time"
+    })}`;
   }
 
   if (reminder.mode === "repeat") {

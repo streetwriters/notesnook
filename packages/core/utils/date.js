@@ -63,6 +63,10 @@ function getWeek(date) {
   return { start, end };
 }
 
+export function getTimeFormat(format) {
+  return format === "12-hour" ? "hh:mm A" : "HH:mm";
+}
+
 /**
  *
  * @param {string | number | Date | null | undefined} date
@@ -77,7 +81,7 @@ export function formatDate(
     type: "date-time"
   }
 ) {
-  const timeFormat = options.timeFormat === "12-hour" ? "hh:mm A" : "HH:mm";
+  const timeFormat = getTimeFormat(options.timeFormat);
   switch (options.type) {
     case "date-time":
       return dayjs(date).format(`${options.dateFormat} ${timeFormat}`);
