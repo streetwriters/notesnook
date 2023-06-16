@@ -39,7 +39,7 @@ import {
 } from "../icons";
 import { AnimatedFlex } from "../animated";
 import NavigationItem from "./navigation-item";
-import { hardNavigate, navigate } from "../../navigation";
+import { hardNavigate, hashNavigate, navigate } from "../../navigation";
 import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
 import { showRenameColorDialog } from "../../common/dialog-controller";
@@ -282,11 +282,8 @@ function NavigationMenu(props: NavigationMenuProps) {
           title={settings.title}
           icon={settings.icon}
           onClick={() => {
-            if (!isMobile && location === settings.path)
-              return toggleNavigationContainer();
-            _navigate(settings.path);
+            hashNavigate("/settings");
           }}
-          selected={location.startsWith(settings.path)}
         >
           {isTablet ? null : (
             <Button

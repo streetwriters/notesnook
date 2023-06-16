@@ -286,7 +286,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
 
   return (
     <>
-      <Rocket width={200} />
+      <Rocket style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Notesnook Pro
       </Text>
@@ -377,7 +377,7 @@ function AlreadyPremium(props: AlreadyPremiumProps) {
 
   return (
     <>
-      <Rocket width={200} />
+      <Rocket style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Notesnook Pro
       </Text>
@@ -411,7 +411,7 @@ function CheckoutCompleted(props: { onClose: () => void }) {
 
   return (
     <>
-      <Rocket width={200} />
+      <Rocket style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Thank you!
       </Text>
@@ -478,9 +478,9 @@ function SelectedPlan(props: SelectedPlanProps) {
   return (
     <>
       {plan.period === "monthly" ? (
-        <WorkAnywhere width={180} />
+        <WorkAnywhere style={{ flexShrink: 0, width: 180, height: 180 }} />
       ) : (
-        <WorkLate width={180} />
+        <WorkLate style={{ flexShrink: 0, width: 180, height: 180 }} />
       )}
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Notesnook Pro

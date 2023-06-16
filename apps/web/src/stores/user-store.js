@@ -32,14 +32,18 @@ import { isUserPremium } from "../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 
+/**
+ * @extends {BaseStore<UserStore>}
+ */
 class UserStore extends BaseStore {
   isLoggedIn = undefined;
   isLoggingIn = false;
   isSigningIn = false;
   /**
-   * @type {User}
+   * @type {User | undefined}
    */
   user = undefined;
+  counter = 0;
 
   init = () => {
     EV.subscribe(EVENTS.userSessionExpired, async () => {
@@ -142,8 +146,5 @@ class UserStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<UserStore>, UserStore]}
- */
 const [useStore, store] = createStore(UserStore);
 export { useStore, store };

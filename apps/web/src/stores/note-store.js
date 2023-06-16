@@ -29,6 +29,9 @@ import Config from "../utils/config";
 import { hashNavigate } from "../navigation";
 import { groupArray } from "@notesnook/core/utils/grouping";
 
+/**
+ * @extends {BaseStore<NoteStore>}
+ */
 class NoteStore extends BaseStore {
   notes = [];
   context = undefined;
@@ -190,9 +193,6 @@ class NoteStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<NoteStore>, NoteStore]}
- */
 const [useStore, store] = createStore(NoteStore);
 export { useStore, store };
 

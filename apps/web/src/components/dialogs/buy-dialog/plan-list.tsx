@@ -40,7 +40,7 @@ export function PlansList(props: PlansListProps) {
 
   return (
     <>
-      <Nomad width={200} />
+      <Nomad style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Choose a plan
       </Text>

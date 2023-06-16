@@ -70,7 +70,11 @@ type DocumentPreview = {
   hash: string;
 };
 
-function onEditorChange(noteId: string, sessionId: string, content: string) {
+function onEditorChange(
+  noteId: string | undefined,
+  sessionId: number,
+  content: string
+) {
   if (!content) return;
 
   editorstore.get().saveSessionContent(noteId, sessionId, {
@@ -338,7 +342,7 @@ type EditorOptions = {
   onLoadMedia?: () => void;
 };
 type EditorProps = {
-  content: () => string;
+  content: () => string | undefined;
   nonce?: number;
   options?: EditorOptions;
   onContentChange?: () => void;

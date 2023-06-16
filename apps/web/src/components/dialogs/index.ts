@@ -25,7 +25,6 @@ const Confirm = React.lazy(() => import("./confirm"));
 const EmailVerificationDialog = React.lazy(
   () => import("./email-verification-dialog")
 );
-const ImportDialog = React.lazy(() => import("./import-dialog"));
 const LoadingDialog = React.lazy(() => import("./loading-dialog"));
 const ProgressDialog = React.lazy(() => import("./progress-dialog"));
 const MoveDialog = React.lazy(() => import("./move-note-dialog"));
@@ -33,9 +32,6 @@ const PasswordDialog = React.lazy(() => import("./password-dialog"));
 const RecoveryKeyDialog = React.lazy(() => import("./recovery-key-dialog"));
 const ItemDialog = React.lazy(() => import("./item-dialog"));
 const FeatureDialog = React.lazy(() => import("./feature-dialog"));
-const TrackingDetailsDialog = React.lazy(
-  () => import("./tracking-details-dialog.jsx")
-);
 const ReminderDialog = React.lazy(() => import("./reminder-dialog"));
 const AddReminderDialog = React.lazy(() => import("./add-reminder-dialog"));
 const ReminderPreviewDialog = React.lazy(
@@ -54,18 +50,12 @@ const Prompt = React.lazy(() => import("./prompt"));
 const ToolbarConfigDialog = React.lazy(() => import("./toolbar-config-dialog"));
 const MigrationDialog = React.lazy(() => import("./migration-dialog"));
 const EmailChangeDialog = React.lazy(() => import("./email-change-dialog"));
-const LanguageSelectorDialog = React.lazy(
-  () => import("./language-selector-dialog")
-);
-const BillingHistoryDialog = React.lazy(
-  () => import("./billing-history-dialog")
-);
 const AddTagsDialog = React.lazy(() => import("./add-tags-dialog"));
+const SettingsDialog = React.lazy(() => import("./settings"));
 
 export const Dialogs = {
   AddNotebookDialog,
   ToolbarConfigDialog,
-  TrackingDetailsDialog,
   BuyDialog,
   Confirm,
   Prompt,
@@ -80,7 +70,6 @@ export const Dialogs = {
   ReminderDialog,
   AnnouncementDialog,
   IssueDialog,
-  ImportDialog,
   MultifactorDialog,
   RecoveryCodesDialog,
   OnboardingDialog,
@@ -89,7 +78,6 @@ export const Dialogs = {
   AddReminderDialog,
   ReminderPreviewDialog,
   EmailChangeDialog,
-  LanguageSelectorDialog,
-  BillingHistoryDialog,
-  AddTagsDialog
+  AddTagsDialog,
+  SettingsDialog
 };

@@ -17,22 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useState } from "react";
-import { desktop } from "../common/desktop-bridge";
+import { getAllAccents } from "@notesnook/theme";
+import { Flex } from "@theme-ui/components";
+import AccentItem from "../../../accent-item";
 
-export default function usePrivacyMode() {
-  const [privacyMode, setPrivacyMode] = useState(false);
-
-  useEffect(() => {
-    (async function () {
-      setPrivacyMode((await desktop?.integration.privacyMode.query()) || false);
-    })();
-  }, []);
-
-  const set = useCallback(async (privacyMode) => {
-    await desktop?.integration.setPrivacyMode.mutate(privacyMode);
-    setPrivacyMode(privacyMode);
-  }, []);
-
-  return [privacyMode, set];
+export function AccentColors() {
+  return (
+    <Flex
+      sx={{
+        flexWrap: "wrap",
+        borderRadius: "default",
+        justifyContent: "left",
+        mt: 2
+      }}
+    >
+      {getAllAccents().map((color) => (
+        <AccentItem key={color.code} code={color.code} label={color.label} />
+      ))}
+    </Flex>
+  );
 }

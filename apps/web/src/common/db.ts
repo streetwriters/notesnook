@@ -18,14 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
-import { NNStorage } from "../interfaces/storage";
+import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
+import type Database from "@notesnook/core/api";
 
-/**
- * @type {import("@notesnook/core/api/index").default}
- */
-var db;
-async function initializeDatabase(persistence) {
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+let db: Database = {};
+async function initializeDatabase(persistence: DatabasePersistence) {
   logger.measure("Database initialization");
 
   const { default: Database } = await import("@notesnook/core/api");
@@ -33,8 +33,10 @@ async function initializeDatabase(persistence) {
   const { Compressor } = await import("../utils/compressor");
   db = new Database(
     new NNStorage("Notesnook", persistence),
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     EventSource,
-    FS,
+    null,
     new Compressor()
   );
 
@@ -42,7 +44,9 @@ async function initializeDatabase(persistence) {
   db.host({
     API_HOST: "https://api.notesnook.com",
     AUTH_HOST: "https://auth.streetwriters.co",
-    SSE_HOST: "https://events.streetwriters.co"
+    SSE_HOST: "https://events.streetwriters.co",
+    ISSUES_HOST: "https://issues.streetwriters.co",
+    SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co"
   });
   // } else {
   // db.host({
@@ -50,13 +54,13 @@ async function initializeDatabase(persistence) {
   //   AUTH_HOST: "http://localhost:8264",
   //   SSE_HOST: "http://localhost:7264",
   // });
-  // const base = `http://${import.meta.env.REACT_APP_LOCALHOST}`;
+  // const base = `http://localhost`;
   // db.host({
   //   API_HOST: `${base}:5264`,
   //   AUTH_HOST: `${base}:8264`,
   //   SSE_HOST: `${base}:7264`,
   //   ISSUES_HOST: `${base}:2624`,
-  //   SUBSCRIPTIONS_HOST: `${base}:9264`,
+  //   SUBSCRIPTIONS_HOST: `${base}:9264`
   // });
   // }
 
@@ -68,10 +72,11 @@ async function initializeDatabase(persistence) {
 
   logger.measure("Database initialization");
 
-  if (db.migrations.required()) {
+  if (db.migrations?.required()) {
     const { showMigrationDialog } = await import("./dialog-controller");
     await showMigrationDialog();
   }
+
   return db;
 }
 

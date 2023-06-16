@@ -139,7 +139,9 @@ const WEB_MANIFEST: Partial<ManifestOptions> = {
   categories: ["productivity", "lifestyle", "education", "books"]
 };
 
-const isTesting = process.env.REACT_APP_TEST === "true";
+const isTesting =
+  process.env.REACT_APP_TEST === "true" ||
+  process.env.NODE_ENV === "development";
 export default defineConfig({
   envPrefix: "REACT_APP_",
   build: {

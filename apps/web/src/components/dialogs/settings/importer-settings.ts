@@ -17,22 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useState } from "react";
-import { desktop } from "../common/desktop-bridge";
+import { SettingsGroup } from "./types";
+import { Importer } from "./components/importer";
 
-export default function useZoomFactor() {
-  const [zoom, setZoom] = useState(1.0);
-
-  useEffect(() => {
-    (async function () {
-      setZoom((await desktop?.integration.zoomFactor.query()) || 1.0);
-    })();
-  }, []);
-
-  const set = useCallback(async (zoomFactor) => {
-    await desktop?.integration.setZoomFactor.mutate(zoomFactor);
-    setZoom(zoomFactor);
-  }, []);
-
-  return [zoom, set];
-}
+export const ImporterSettings: SettingsGroup[] = [
+  {
+    key: "importer",
+    section: "importer",
+    header: Importer,
+    settings: []
+  }
+];

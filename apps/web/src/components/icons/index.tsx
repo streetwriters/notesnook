@@ -201,7 +201,17 @@ import {
   mdiMagnifyPlusOutline,
   mdiMagnifyMinusOutline,
   mdiRotateRight,
-  mdiRotateLeft
+  mdiRotateLeft,
+  mdiKeyOutline,
+  mdiDatabaseImportOutline,
+  mdiDeveloperBoard,
+  mdiInformationOutline,
+  mdiHeadCogOutline,
+  mdiFormTextarea,
+  mdiDatabaseExportOutline,
+  mdiGavel,
+  mdiDesktopClassic,
+  mdiBellBadgeOutline
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -505,3 +515,17 @@ export const ZoomOut = createIcon(mdiMagnifyMinusOutline);
 export const RotateCW = createIcon(mdiRotateRight);
 export const RotateACW = createIcon(mdiRotateLeft);
 export const Reset = createIcon(mdiRestore);
+
+export const Account = createIcon(mdiAccountOutline);
+export const PasswordAndAuth = createIcon(mdiKeyOutline);
+export const Appearance = createIcon(mdiPaletteSwatchOutline);
+export const Import = createIcon(mdiDatabaseImportOutline);
+export const Privacy = createIcon(mdiEyeOffOutline);
+export const Developer = createIcon(mdiDeveloperBoard);
+export const About = createIcon(mdiInformationOutline);
+export const Behaviour = createIcon(mdiHeadCogOutline);
+export const Editor = createIcon(mdiFormTextarea);
+export const Documentation = createIcon(mdiFileDocumentOutline);
+export const Legal = createIcon(mdiGavel);
+export const Desktop = createIcon(mdiDesktopClassic);
+export const Notification = createIcon(mdiBellBadgeOutline);

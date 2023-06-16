@@ -437,21 +437,17 @@ export function Features() {
         flex: 1,
         flexDirection: "column",
         flexShrink: 0,
-        overflowY: ["hidden", "hidden", "auto"]
+        overflowY: ["hidden", "hidden", "auto"],
+        gap: 50
       }}
-      pt={6}
+      pt={4}
       bg="background"
     >
       {sections.map((section) => {
         if (section.isVisible && !section.isVisible()) return null;
 
         return (
-          <Flex
-            key={section.title}
-            px={6}
-            pb={50}
-            sx={{ flexDirection: "column" }}
-          >
+          <Flex key={section.title} px={6} sx={{ flexDirection: "column" }}>
             {section.pro && (
               <Flex
                 bg="bgSecondary"
