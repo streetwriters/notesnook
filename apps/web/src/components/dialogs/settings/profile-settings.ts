@@ -17,17 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@theme-ui/components";
-import { User } from "../../icons";
 import {
   useStore as useUserStore,
   store as userstore
 } from "../../../stores/user-store";
-import ObjectID from "@notesnook/core/utils/object-id";
-import { getFormattedDate } from "../../../utils/time";
-import { SUBSCRIPTION_STATUS } from "../../../common/constants";
-import dayjs from "dayjs";
-import { useMemo } from "react";
 import { SettingsGroup } from "./types";
 import {
   showClearSessionsConfirmation,
@@ -39,6 +32,7 @@ import {
 } from "../../../common/dialog-controller";
 import { db } from "../../../common/db";
 import { showToast } from "../../../utils/toast";
+import { UserProfile } from "./components/user-profile";
 
 export const ProfileSettings: SettingsGroup[] = [
   {
@@ -153,106 +147,3 @@ export const ProfileSettings: SettingsGroup[] = [
     ]
   }
 ];
-
-function UserProfile() {
-  const user = useUserStore((store) => store.user);
-
-  const {
-    isTrial,
-    isBeta,
-    isPro,
-    isBasic,
-    isProCancelled,
-    isProExpired,
-    remainingDays
-  } = useMemo(() => {
-    const type = user?.subscription?.type;
-    const expiry = user?.subscription?.expiry;
-    if (!expiry) return { isBasic: true, remainingDays: 0 };
-    return {
-      remainingDays: dayjs(expiry).diff(dayjs(), "day"),
-      isTrial: type === SUBSCRIPTION_STATUS.TRIAL,
-      isBasic: type === SUBSCRIPTION_STATUS.BASIC,
-      isBeta: type === SUBSCRIPTION_STATUS.BETA,
-      isPro: type === SUBSCRIPTION_STATUS.PREMIUM,
-      isProCancelled: type === SUBSCRIPTION_STATUS.PREMIUM_CANCELED,
-      isProExpired: type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
-    };
-  }, [user]);
-
-  if (!user)
-    return (
-      <Flex
-        sx={{
-          borderRadius: "default",
-          alignItems: "center",
-          bg: "bgSecondary",
-          p: 2,
-          mb: 4
-        }}
-      >
-        <Flex
-          variant="columnCenter"
-          sx={{
-            bg: "border",
-            mr: 2,
-            size: 60,
-            borderRadius: 80
-          }}
-        >
-          <User size={30} color="icon" />
-        </Flex>
-        <Flex sx={{ flexDirection: "column" }}>
-          <Text variant={"title"}>You are not logged in</Text>
-          <Text variant={"subBody"}>
-            Login or create an account to sync your notes.
-          </Text>
-        </Flex>
-      </Flex>
-    );
-
-  return (
-    <Flex
-      sx={{
-        borderRadius: "default",
-        alignItems: "center",
-        bg: "bgSecondary",
-        p: 2,
-        mb: 4
-      }}
-    >
-      <Flex
-        variant="columnCenter"
-        sx={{
-          bg: "border",
-          mr: 2,
-          size: 60,
-          borderRadius: 80
-        }}
-      >
-        <User size={30} color="icon" />
-      </Flex>
-      <Flex sx={{ flexDirection: "column" }}>
-        <Text
-          variant="subBody"
-          sx={{
-            color: "primary"
-          }}
-        >
-          {remainingDays > 0 && isPro
-            ? `PRO`
-            : remainingDays > 0 && isTrial
-            ? "TRIAL"
-            : isBeta
-            ? "BETA TESTER"
-            : "BASIC"}
-        </Text>
-        <Text variant={"title"}>{user.email}</Text>
-        <Text variant={"subBody"}>
-          Member since{" "}
-          {getFormattedDate(new ObjectID(user.id).getTimestamp(), "date")}
-        </Text>
-      </Flex>
-    </Flex>
-  );
-}

@@ -21,7 +21,11 @@ import { useState } from "react";
 import EventManager from "@notesnook/core/utils/event-manager";
 import Config from "../utils/config";
 
-export function navigate(url, replaceOrQuery, replace) {
+export function navigate(
+  url: string,
+  replaceOrQuery?: boolean | URLSearchParams,
+  replace?: boolean
+) {
   if (typeof url !== "string") {
     throw new Error(`"url" must be a string, was provided a(n) ${typeof url}`);
   }
@@ -39,24 +43,25 @@ export function navigate(url, replaceOrQuery, replace) {
     replace = false;
   }
 
-  window.history[`${replace ? "replace" : "push"}State`](
-    null,
-    null,
-    makeURL(url, getCurrentHash())
-  );
-  dispatchEvent(new PopStateEvent("popstate", null));
+  if (replace)
+    window.history.replaceState(null, "", makeURL(url, getCurrentHash()));
+  else window.history.pushState(null, "", makeURL(url, getCurrentHash()));
+
+  dispatchEvent(new PopStateEvent("popstate"));
 }
+
 let last = 0;
 export function hashNavigate(
-  url,
+  url: string,
   { replace = false, notify = true, addNonce = false } = {}
 ) {
   if (addNonce) url += `/${++last}`;
 
-  window.history[`${replace ? "replace" : "push"}State`](null, null, `#${url}`);
+  if (replace) window.history.replaceState(null, "", `#${url}`);
+  else window.history.pushState(null, "", `#${url}`);
 
   const event = new HashChangeEvent("hashchange");
-  event.notify = notify;
+  (event as any).notify = notify;
   dispatchEvent(event);
 }
 
@@ -65,7 +70,7 @@ export function useQueryParams(parseFn = parseQuery) {
   return [parseFn(querystring)];
 }
 
-function parseQuery(querystring) {
+function parseQuery(querystring: string) {
   return Object.fromEntries(new URLSearchParams(querystring).entries());
 }
 
@@ -99,15 +104,15 @@ export function getHomeRoute() {
   return HOMEPAGE_ROUTE[Config.get("homepage", 0)];
 }
 
-export function extendHomeRoute(route) {
+export function extendHomeRoute(route: string) {
   return `${getHomeRoute()}${route}`;
 }
 
-export function hardNavigate(route) {
+export function hardNavigate(route: string) {
   window.open(makeURL(route, getCurrentHash()), "_self");
 }
 
-export function makeURL(route, hash, search) {
+export function makeURL(route: string, hash?: string, search?: string) {
   const url = new URL(route, window.location.origin);
   if (!url.hash) url.hash = hash || getCurrentHash();
   url.search = search || getQueryString();

@@ -22,7 +22,6 @@ import Home from "../views/home";
 import Notebooks from "../views/notebooks";
 import Notes from "../views/notes";
 import Search from "../views/search";
-import Settings from "../views/settings";
 import Tags from "../views/tags";
 import Topics from "../views/topics";
 import { navigate } from ".";
@@ -54,8 +53,8 @@ const routes = {
       }
     }
   }),
-  "/notebooks/:notebookId": ({ notebookId }) => {
-    const notebook = db.notebooks.notebook(notebookId);
+  "/notebooks/:notebookId": ({ notebookId }: { notebookId: string }) => {
+    const notebook = db.notebooks?.notebook(notebookId);
     if (!notebook) return false;
     nbstore.setSelectedNotebook(notebookId);
     notestore.setContext({
@@ -78,8 +77,14 @@ const routes = {
       }
     };
   },
-  "/notebooks/:notebookId/:topicId": ({ notebookId, topicId }) => {
-    const notebook = db.notebooks.notebook(notebookId);
+  "/notebooks/:notebookId/:topicId": ({
+    notebookId,
+    topicId
+  }: {
+    notebookId: string;
+    topicId: string;
+  }) => {
+    const notebook = db.notebooks?.notebook(notebookId);
     const topic = notebook?.topics?.topic(topicId)?._topic;
     if (!topic) return false;
     nbstore.setSelectedNotebook(notebookId);
@@ -152,17 +157,17 @@ const routes = {
       }
     }
   }),
-  "/tags/:tagId": ({ tagId }) => {
-    const tag = db.tags.tag(tagId);
+  "/tags/:tagId": ({ tagId }: { tagId: string }) => {
+    const tag = db.tags?.tag(tagId);
     if (!tag) return false;
     const { id } = tag;
     notestore.setContext({ type: "tag", value: id });
-    const title = db.tags.alias(id);
+    const title = db.tags?.alias(id);
     return {
       key: "notes",
       type: "notes",
       title: `#${title}`,
-      component: <Notes type="notes" />,
+      component: <Notes />,
       buttons: {
         back: {
           title: "Go back to tags",
@@ -174,11 +179,11 @@ const routes = {
       }
     };
   },
-  "/colors/:colorId": ({ colorId }) => {
-    const color = db.colors.tag(colorId);
+  "/colors/:colorId": ({ colorId }: { colorId: string }) => {
+    const color = db.colors?.tag(colorId);
     if (!color) return navigate("/");
     const { id } = color;
-    const title = db.colors.alias(id);
+    const title = db.colors?.alias(id);
     notestore.setContext({ type: "color", value: id });
     return {
       key: "notes",
@@ -192,11 +197,6 @@ const routes = {
       }
     };
   },
-  "/settings": () => ({
-    key: "settings",
-    title: "Settings",
-    component: <Settings />
-  }),
   "/monographs": () => {
     notestore.setContext({ type: "monographs" });
     return {
@@ -211,7 +211,7 @@ const routes = {
       }
     };
   },
-  "/search/:type": ({ type }) => ({
+  "/search/:type": ({ type }: { type: string }) => ({
     type: "search",
     title: "Search",
     component: <Search type={type} />,
@@ -225,3 +225,4 @@ const routes = {
 };
 
 export default routes;
+export type Route = keyof typeof routes;

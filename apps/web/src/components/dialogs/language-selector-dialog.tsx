@@ -21,7 +21,7 @@ import { deleteItem } from "@notesnook/core/utils/array";
 import { Input, Label } from "@theme-ui/components";
 import { useCallback, useEffect, useState } from "react";
 import { Perform } from "../../common/dialog-controller";
-import useSpellChecker, { Language } from "../../hooks/use-spell-checker";
+import { Language, useSpellChecker } from "../../hooks/use-spell-checker";
 import { FlexScrollContainer } from "../scroll-container";
 import Dialog from "./dialog";
 

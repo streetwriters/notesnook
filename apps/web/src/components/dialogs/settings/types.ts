@@ -44,7 +44,7 @@ export type SectionGroupKeys =
   | "customization"
   | "import-export"
   | "security"
-  | "miscellaneous";
+  | "other";
 
 export type SectionGroup = {
   key: SectionGroupKeys;
@@ -63,8 +63,9 @@ export type SettingsGroup = {
   key: string;
   section: SectionKeys;
   settings: Setting[];
-  header: string | ((props: any) => JSX.Element);
+  header: string | ((props: any) => JSX.Element | null);
   isHidden?: () => boolean;
+  onRender?: () => void | Promise<void>;
 };
 
 export type Setting = {
@@ -83,13 +84,15 @@ export type SettingComponentType =
   | "toggle"
   | "dropdown"
   | "button"
-  | "slider"
+  | "input"
   | "custom";
 
 export type SettingComponent =
   | ButtonSettingComponent
   | ToggleSettingComponent
-  | DropdownSettingComponent;
+  | DropdownSettingComponent
+  | InputSettingComponent
+  | CustomSettingComponent;
 
 export type BaseSettingComponent<TType extends SettingComponentType> = {
   type: TType;
@@ -110,4 +113,25 @@ export type DropdownSettingComponent = BaseSettingComponent<"dropdown"> & {
   options: { value: string; title: string; premium?: boolean }[];
   selectedOption: () => string;
   onSelectionChanged: (value: string) => void | Promise<void>;
+};
+
+export type InputSettingComponent = BaseSettingComponent<"input"> &
+  (TextInputSettingComponent | NumberInputSettingComponent);
+
+export type NumberInputSettingComponent = BaseSettingComponent<"input"> & {
+  inputType: "number";
+  min: number;
+  max: number;
+  defaultValue: () => number;
+  onChange: (value: number) => void;
+};
+
+export type TextInputSettingComponent = BaseSettingComponent<"input"> & {
+  inputType: "text";
+  defaultValue: () => string;
+  onChange: (value: string) => void;
+};
+
+export type CustomSettingComponent = BaseSettingComponent<"custom"> & {
+  component: () => JSX.Element;
 };

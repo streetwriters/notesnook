@@ -81,7 +81,7 @@ import { exportNotes } from "../common/export";
 import { scheduleBackups } from "../common/reminders";
 import usePrivacyMode from "../hooks/use-privacy-mode";
 import { useTelemetry } from "../hooks/use-telemetry";
-import useSpellChecker from "../hooks/use-spell-checker";
+import { useSpellChecker } from "../hooks/use-spell-checker";
 import useDesktopIntegration from "../hooks/use-desktop-integration";
 import { writeText } from "clipboard-polyfill";
 import { useEditorConfig } from "../components/editor/context";
@@ -192,9 +192,11 @@ function Settings() {
     (store) => store.toggleFollowSystemTheme
   );
   const toggleDoubleSpacedLines = useSettingStore(
-    (store) => store.toggleDoubleSpacedLines
+    (store) => store.toggleDoubleSpacedParagraphs
   );
-  const doubleSpacedLines = useSettingStore((store) => store.doubleSpacedLines);
+  const doubleSpacedLines = useSettingStore(
+    (store) => store.doubleSpacedParagraphs
+  );
   const encryptBackups = useSettingStore((store) => store.encryptBackups);
   const toggleEncryptBackups = useSettingStore(
     (store) => store.toggleEncryptBackups

@@ -88,8 +88,4 @@ function CachedRouter() {
   );
 }
 
-export function clearRouteCache() {
-  cache = {};
-}
-
 export default CachedRouter;

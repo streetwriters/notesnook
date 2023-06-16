@@ -130,7 +130,7 @@ function TipTap(props: TipTapProps) {
   const isUserPremium = useIsUserPremium();
   const configure = useConfigureEditor();
   const doubleSpacedLines = useSettingsStore(
-    (store) => store.doubleSpacedLines
+    (store) => store.doubleSpacedParagraphs
   );
   const dateFormat = useSettingsStore((store) => store.dateFormat);
   const timeFormat = useSettingsStore((store) => store.timeFormat);

@@ -17,54 +17,41 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useState } from "react";
 import { desktop } from "../common/desktop-bridge";
+import BaseStore from "../stores";
+import createStore from "../common/store";
 
 export type Language = { code: string; name: string };
-export type SpellCheckerOptions = {
-  languages: Language[];
-  enabledLanguages: Language[];
-  enabled: boolean;
-};
 
-export default function useSpellChecker() {
-  const [spellChecker, setSpellChecker] = useState<SpellCheckerOptions>();
+class SpellCheckerStore extends BaseStore<SpellCheckerStore> {
+  languages: Language[] = [];
+  enabled = true;
+  enabledLanguages: Language[] = [];
 
-  const loadSpellChecker = useCallback(async () => {
-    setSpellChecker({
+  toggleSpellChecker = async () => {
+    const enabled = this.get().enabled;
+    await desktop?.spellChecker.toggle.mutate(!enabled);
+    this.set({
+      enabled: await desktop?.spellChecker.isEnabled.query()
+    });
+  };
+
+  setLanguages = async (languages: string[]) => {
+    await desktop?.spellChecker.setLanguages.mutate(languages);
+    this.set({
+      enabledLanguages: await desktop?.spellChecker.enabledLanguages.query()
+    });
+  };
+
+  refresh = async () => {
+    this.set({
       enabledLanguages:
         (await desktop?.spellChecker.enabledLanguages.query()) || [],
       languages: (await desktop?.spellChecker.languages.query()) || [],
-      enabled: (await desktop?.spellChecker.isEnabled.query()) || false
+      enabled: (await desktop?.spellChecker.isEnabled.query()) || true
     });
-  }, []);
-
-  useEffect(() => {
-    (async function () {
-      await loadSpellChecker();
-    })();
-  }, [loadSpellChecker]);
-
-  const toggle = useCallback(
-    async (enabled: boolean) => {
-      await desktop?.spellChecker.toggle.mutate(enabled);
-      await loadSpellChecker();
-    },
-    [loadSpellChecker]
-  );
-
-  const setLanguages = useCallback(
-    async (languages: string[]) => {
-      await desktop?.spellChecker.setLanguages.mutate(languages);
-      await loadSpellChecker();
-    },
-    [loadSpellChecker]
-  );
-
-  return {
-    ...spellChecker,
-    toggle,
-    setLanguages,
-    loadSpellChecker
   };
 }
+
+const [useSpellChecker] = createStore(SpellCheckerStore);
+export { useSpellChecker };

@@ -17,31 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
-import { initializeDatabase, db } from "../common/db";
-import "allotment/dist/style.css";
-import "../utils/analytics";
-import "../app.css";
+import { SettingsGroup } from "./types";
+import { Importer } from "./components/importer";
 
-if (import.meta.env.NODE_ENV === "production") {
-  console.log = () => {};
-}
-
-const memory = {
-  isAppLoaded: false
-};
-export default function useDatabase(persistence: "db" | "memory" = "db") {
-  const [isAppLoaded, setIsAppLoaded] = useState(memory.isAppLoaded);
-
-  useEffect(() => {
-    if (memory.isAppLoaded) return;
-
-    (async () => {
-      await initializeDatabase(persistence);
-      setIsAppLoaded(true);
-      memory.isAppLoaded = true;
-    })();
-  }, [persistence]);
-
-  return [isAppLoaded];
-}
+export const ImporterSettings: SettingsGroup[] = [
+  {
+    key: "importer",
+    section: "importer",
+    header: Importer,
+    settings: []
+  }
+];

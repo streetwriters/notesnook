@@ -171,7 +171,10 @@ function Search({ type }) {
     })();
   }, [nonce, type, context]);
 
-  if (!title) return hardNavigate("/");
+  if (!title) {
+    hardNavigate("/");
+    return null;
+  }
 
   return (
     <>

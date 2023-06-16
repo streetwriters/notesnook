@@ -17,31 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
-import { initializeDatabase, db } from "../common/db";
-import "allotment/dist/style.css";
-import "../utils/analytics";
-import "../app.css";
+import { getAllAccents } from "@notesnook/theme";
+import { Flex } from "@theme-ui/components";
+import AccentItem from "../../../accent-item";
 
-if (import.meta.env.NODE_ENV === "production") {
-  console.log = () => {};
-}
-
-const memory = {
-  isAppLoaded: false
-};
-export default function useDatabase(persistence: "db" | "memory" = "db") {
-  const [isAppLoaded, setIsAppLoaded] = useState(memory.isAppLoaded);
-
-  useEffect(() => {
-    if (memory.isAppLoaded) return;
-
-    (async () => {
-      await initializeDatabase(persistence);
-      setIsAppLoaded(true);
-      memory.isAppLoaded = true;
-    })();
-  }, [persistence]);
-
-  return [isAppLoaded];
+export function AccentColors() {
+  return (
+    <Flex
+      sx={{
+        flexWrap: "wrap",
+        borderRadius: "default",
+        justifyContent: "left",
+        mt: 2
+      }}
+    >
+      {getAllAccents().map((color) => (
+        <AccentItem key={color.code} code={color.code} label={color.label} />
+      ))}
+    </Flex>
+  );
 }

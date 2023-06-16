@@ -17,25 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SettingsGroup } from "./types";
-import { useStore as useAppStore } from "../../../stores/app-store";
+import { useStore as useAppStore } from "../../../../stores/app-store";
 import { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button, Flex, Input, Link, Text } from "@theme-ui/components";
-import Accordion from "../../accordion";
-import { pluralize } from "../../../utils/string";
-import { db } from "../../../common/db";
-import { importFiles } from "../../../utils/importer";
-import { CheckCircleOutline } from "../../icons";
-
-export const ImporterSettings: SettingsGroup[] = [
-  {
-    key: "importer",
-    section: "importer",
-    header: () => <Importer />,
-    settings: []
-  }
-];
+import { pluralize } from "../../../../utils/string";
+import { db } from "../../../../common/db";
+import { importFiles } from "../../../../utils/importer";
+import { CheckCircleOutline } from "../../../icons";
 
 export function Importer() {
   const [isDone, setIsDone] = useState(false);

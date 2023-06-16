@@ -35,9 +35,10 @@ class SettingStore extends BaseStore {
     "backupStorageLocation",
     PATHS.backupsDirectory
   );
-  doubleSpacedLines = Config.get("doubleSpacedLines", true);
+  doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
   notificationsSettings = Config.get("notifications", { reminder: true });
 
+  zoomFactor = 1.0;
   privacyMode = false;
   telemetry = isTelemetryEnabled();
   /** @type {string} */
@@ -46,7 +47,7 @@ class SettingStore extends BaseStore {
   timeFormat = null;
   titleFormat = null;
   /** @type {number} */
-  trashCleanupInterval = null;
+  trashCleanupInterval = 7;
   homepage = Config.get("homepage", 0);
   /**
    * @type {DesktopIntegrationSettings | undefined}
@@ -61,7 +62,8 @@ class SettingStore extends BaseStore {
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
       desktopIntegrationSettings:
         await desktop?.integration.desktopIntegration.query(),
-      privacyMode: await desktop?.integration.privacyMode.query()
+      privacyMode: await desktop?.integration.privacyMode.query(),
+      zoomFactor: await desktop?.integration.zoomFactor.query()
     });
   };
 
@@ -83,6 +85,11 @@ class SettingStore extends BaseStore {
   setTrashCleanupInterval = async (trashCleanupInterval) => {
     await db.settings.setTrashCleanupInterval(trashCleanupInterval);
     this.set({ trashCleanupInterval });
+  };
+
+  setZoomFactor = async (zoomFactor) => {
+    await desktop?.integration.setZoomFactor.mutate(zoomFactor);
+    this.set({ zoomFactor });
   };
 
   setEncryptBackups = (encryptBackups) => {
@@ -133,10 +140,12 @@ class SettingStore extends BaseStore {
     this.set({ backupStorageLocation: location });
   };
 
-  toggleDoubleSpacedLines = () => {
-    const doubleSpacedLines = this.get().doubleSpacedLines;
-    this.set((state) => (state.doubleSpacedLines = !doubleSpacedLines));
-    Config.set("doubleSpacedLines", !doubleSpacedLines);
+  toggleDoubleSpacedParagraphs = () => {
+    const doubleSpacedParagraphs = this.get().doubleSpacedParagraphs;
+    this.set(
+      (state) => (state.doubleSpacedParagraphs = !doubleSpacedParagraphs)
+    );
+    Config.set("doubleSpacedLines", !doubleSpacedParagraphs);
   };
 
   toggleTelemetry = () => {

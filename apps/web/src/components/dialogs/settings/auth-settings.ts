@@ -66,18 +66,18 @@ export const AuthenticationSettings: SettingsGroup[] = [
           "You can use the fallback 2FA method in case you are unable to login via the primary method.",
         keywords: ["backup 2fa method"],
         onStateChange: (listener) =>
-          useUserStore.subscribe((s) => s.user.mfa.secondaryMethod, listener),
+          useUserStore.subscribe((s) => s.user?.mfa.secondaryMethod, listener),
         components: () => [
           {
             type: "button",
-            title: useUserStore.getState().user.mfa.secondaryMethod
+            title: useUserStore.getState().user?.mfa.secondaryMethod
               ? "Reconfigure fallback 2FA method"
               : "Add fallback 2FA method",
             variant: "secondary",
             action: async () => {
               if (await verifyAccount()) {
                 await showMultifactorDialog(
-                  useUserStore.getState().user.mfa.primaryMethod
+                  useUserStore.getState().user?.mfa.primaryMethod || "email"
                 );
                 await useUserStore.getState().refreshUser();
               }
@@ -99,7 +99,7 @@ export const AuthenticationSettings: SettingsGroup[] = [
             action: async () => {
               if (await verifyAccount()) {
                 await show2FARecoveryCodesDialog(
-                  useUserStore.getState().user.mfa.primaryMethod
+                  useUserStore.getState().user?.mfa.primaryMethod || "email"
                 );
                 await useUserStore.getState().refreshUser();
               }

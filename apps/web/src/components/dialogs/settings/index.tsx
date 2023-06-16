@@ -26,7 +26,6 @@ import {
   Backup,
   Behaviour,
   Desktop,
-  Developer,
   Documentation,
   Editor,
   Import,
@@ -46,10 +45,7 @@ import { useCallback, useEffect, useState } from "react";
 import { SectionGroup, SectionKeys, Setting, SettingsGroup } from "./types";
 import { ProfileSettings } from "./profile-settings";
 import { AuthenticationSettings } from "./auth-settings";
-import {
-  isUserSubscribed,
-  useIsUserPremium
-} from "../../../hooks/use-is-user-premium";
+import { useIsUserPremium } from "../../../hooks/use-is-user-premium";
 import { store as userstore } from "../../../stores/user-store";
 import { SyncSettings } from "./sync-settings";
 import { BehaviourSettings } from "./behaviour-settings";
@@ -60,6 +56,15 @@ import { BackupExportSettings } from "./backup-export-settings";
 import { ImporterSettings } from "./importer-settings";
 import { VaultSettings } from "./vault-settings";
 import { PrivacySettings } from "./privacy-settings";
+import { EditorSettings } from "./editor-settings";
+import {
+  AboutSettings,
+  LegalSettings,
+  SupportSettings
+} from "./other-settings";
+import { AppearanceSettings } from "./appearance-settings";
+import { debounce } from "../../../utils/debounce";
+import { SubscriptionSettings } from "./subscription-settings";
 
 type SettingsDialogProps = { onClose: Perform };
 
@@ -73,7 +78,7 @@ const sectionGroups: SectionGroup[] = [
         key: "subscription",
         title: "Subscription",
         icon: Pro,
-        isHidden: () => !isUserSubscribed()
+        isHidden: () => !userstore.get().isLoggedIn
       },
       {
         key: "auth",
@@ -122,28 +127,33 @@ const sectionGroups: SectionGroup[] = [
     ]
   },
   {
-    key: "miscellaneous",
-    title: "Miscellaneous",
+    key: "other",
+    title: "Other",
     sections: [
       { key: "legal", title: "Legal", icon: Legal },
-      { key: "support", title: "Support", icon: Documentation },
-      { key: "developer", title: "Developer settings", icon: Developer },
+      { key: "support", title: "Help and support", icon: Documentation },
       { key: "about", title: "About", icon: About }
     ]
   }
 ];
 
-const SettingsGroups = () => [
+const SettingsGroups = [
   ...ProfileSettings,
   ...AuthenticationSettings,
   ...SyncSettings,
+  ...AppearanceSettings,
   ...BehaviourSettings,
   ...DesktopIntegrationSettings,
   ...NotificationsSettings,
   ...BackupExportSettings,
   ...ImporterSettings,
   ...VaultSettings,
-  ...PrivacySettings
+  ...PrivacySettings,
+  ...EditorSettings,
+  ...LegalSettings,
+  ...SupportSettings,
+  ...AboutSettings,
+  ...SubscriptionSettings
 ];
 
 // Thoughts:
@@ -161,13 +171,13 @@ const SettingsGroups = () => [
 export default function SettingsDialog(props: SettingsDialogProps) {
   const [route, setRoute] = useState<SectionKeys>("profile");
   const [activeSettings, setActiveSettings] = useState<SettingsGroup[]>(
-    SettingsGroups().filter((g) => g.section === route)
+    SettingsGroups.filter((g) => g.section === route)
   );
 
   return (
     <Dialog
       isOpen={true}
-      width={"55%"}
+      width={"968px"}
       onClose={() => props.onClose(false)}
       noScroll
       sx={{ bg: "transparent" }}
@@ -197,15 +207,14 @@ export default function SettingsDialog(props: SettingsDialogProps) {
               placeholder="Search"
               sx={{ m: 2, mb: 2, width: "auto", bg: "bgSecondary", py: "7px" }}
               onChange={(e) => {
-                const settingsGroups = SettingsGroups();
                 const query = e.target.value.toLowerCase().trim();
                 if (!query)
                   return setActiveSettings(
-                    settingsGroups.filter((g) => g.section === route)
+                    SettingsGroups.filter((g) => g.section === route)
                   );
 
                 const groups: SettingsGroup[] = [];
-                for (const group of settingsGroups) {
+                for (const group of SettingsGroups) {
                   const isTitleMatch =
                     typeof group.header === "string" &&
                     group.header.toLowerCase().includes(query);
@@ -237,7 +246,7 @@ export default function SettingsDialog(props: SettingsDialogProps) {
                     fontWeight: "bold",
                     color: "text",
                     mx: 3,
-                    mb: typeof group.title === "string" ? 1 : 0
+                    mb: 1
                   }}
                 >
                   {group.title}
@@ -252,7 +261,7 @@ export default function SettingsDialog(props: SettingsDialogProps) {
                         selected={section.key === route}
                         onClick={() => {
                           setActiveSettings(
-                            SettingsGroups().filter(
+                            SettingsGroups.filter(
                               (g) => g.section === section.key
                             )
                           );
@@ -276,38 +285,46 @@ export default function SettingsDialog(props: SettingsDialogProps) {
               overflow: "hidden"
             }}
           >
-            {activeSettings.map(
-              (group) =>
-                (!group.isHidden || !group.isHidden()) && (
-                  <Flex
-                    key={group.key}
-                    sx={{ flexDirection: "column", gap: 2, overflow: "hidden" }}
-                  >
-                    {typeof group.header === "string" ? (
-                      <Text
-                        variant="subBody"
-                        sx={{
-                          fontSize: 11,
-                          fontWeight: "bold",
-                          letterSpacing: 0.3,
-                          color: "primary"
-                        }}
-                      >
-                        {group.header.toUpperCase()}
-                      </Text>
-                    ) : (
-                      <group.header />
-                    )}
-                    {group.settings.map((setting) => (
-                      <SettingItem key={setting.key} item={setting} />
-                    ))}
-                  </Flex>
-                )
-            )}
+            {activeSettings.map((group) => (
+              <SettingsGroupComponent key={group.key} item={group} />
+            ))}
           </Flex>
         </FlexScrollContainer>
       </Flex>
     </Dialog>
+  );
+}
+
+function SettingsGroupComponent(props: { item: SettingsGroup }) {
+  const { item } = props;
+  const { onRender } = item;
+
+  useEffect(() => {
+    onRender?.();
+  }, [onRender]);
+
+  if (item.isHidden && item.isHidden()) return null;
+  return (
+    <Flex sx={{ flexDirection: "column", gap: 2, overflow: "hidden" }}>
+      {typeof item.header === "string" ? (
+        <Text
+          variant="subBody"
+          sx={{
+            fontSize: 11,
+            fontWeight: "bold",
+            letterSpacing: 0.3,
+            color: "primary"
+          }}
+        >
+          {item.header.toUpperCase()}
+        </Text>
+      ) : (
+        <item.header />
+      )}
+      {item.settings.map((setting) => (
+        <SettingItem key={setting.key} item={setting} />
+      ))}
+    </Flex>
   );
 }
 
@@ -345,87 +362,127 @@ function SettingItem(props: { item: Setting }) {
   return (
     <Flex
       sx={{
-        flexDirection: "row",
-        justifyContent: "space-between",
+        flexDirection: "column",
         pb: 4,
-        // mb: 4,
-        gap: 4,
         borderBottom: "1px solid var(--border)"
       }}
     >
-      <Flex sx={{ flexDirection: "column" }}>
-        <Text variant={"subtitle"}>{item.title}</Text>
-        {item.description && (
-          <Text variant={"body"} sx={{ mt: 1, color: "fontTertiary" }}>
-            {item.description}
-          </Text>
-        )}
-      </Flex>
-
       <Flex
         sx={{
-          alignItems: "center",
-          flexShrink: 0,
-          justifyContent: "end",
-          gap: 2,
-          "& > label": { width: "auto" }
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "start",
+          gap: 4
         }}
       >
-        {components.map((component) => {
-          switch (component.type) {
-            case "button":
-              return (
-                <Button
-                  disabled={isWorking}
-                  title={component.title}
-                  variant={component.variant}
-                  onClick={() => workWithLoading(component.action)}
-                >
-                  {isWorking ? (
-                    <Loading size={18} sx={{ mr: 2 }} />
-                  ) : (
-                    component.title
-                  )}
-                </Button>
-              );
-            case "toggle":
-              return (
-                <Switch
-                  disabled={isWorking}
-                  onChange={() => workWithLoading(component.toggle)}
-                  checked={component.isToggled()}
-                />
-              );
-            case "dropdown":
-              return (
-                <select
-                  style={{
-                    backgroundColor: "var(--bgSecondary)",
-                    outline: "none",
-                    border: "1px solid var(--border)",
-                    borderRadius: "5px"
-                  }}
-                  value={component.selectedOption()}
-                  onChange={(e) =>
-                    component.onSelectionChanged(
-                      (e.target as HTMLSelectElement).value
-                    )
-                  }
-                >
-                  {component.options.map((option) => (
-                    <option
-                      disabled={option.premium && !isUserPremium}
-                      key={option.value}
-                      value={option.value}
-                    >
-                      {option.title}
-                    </option>
-                  ))}
-                </select>
-              );
-          }
-        })}
+        <Flex sx={{ flexDirection: "column" }}>
+          <Text variant={"subtitle"}>{item.title}</Text>
+          {item.description && (
+            <Text
+              variant={"body"}
+              sx={{ mt: 1, color: "fontTertiary", whiteSpace: "pre-wrap" }}
+            >
+              {item.description}
+            </Text>
+          )}
+        </Flex>
+
+        <Flex
+          sx={{
+            alignItems: "center",
+            flexShrink: 0,
+            justifyContent: "end",
+            gap: 2,
+            "& > label": { width: "auto" }
+          }}
+        >
+          {components.map((component) => {
+            switch (component.type) {
+              case "button":
+                return (
+                  <Button
+                    disabled={isWorking}
+                    title={component.title}
+                    variant={component.variant}
+                    onClick={() => workWithLoading(component.action)}
+                  >
+                    {isWorking ? (
+                      <Loading size={18} sx={{ mr: 2 }} />
+                    ) : (
+                      component.title
+                    )}
+                  </Button>
+                );
+              case "toggle":
+                return (
+                  <Switch
+                    disabled={isWorking}
+                    onChange={() => workWithLoading(component.toggle)}
+                    checked={component.isToggled()}
+                  />
+                );
+              case "dropdown":
+                return (
+                  <select
+                    style={{
+                      backgroundColor: "var(--bgSecondary)",
+                      outline: "none",
+                      border: "1px solid var(--border)",
+                      borderRadius: "5px",
+                      color: "var(--text)",
+                      padding: "5px"
+                    }}
+                    value={component.selectedOption()}
+                    onChange={(e) =>
+                      component.onSelectionChanged(
+                        (e.target as HTMLSelectElement).value
+                      )
+                    }
+                  >
+                    {component.options.map((option) => (
+                      <option
+                        disabled={option.premium && !isUserPremium}
+                        key={option.value}
+                        value={option.value}
+                      >
+                        {option.title}
+                      </option>
+                    ))}
+                  </select>
+                );
+              case "input":
+                return component.inputType === "number" ? (
+                  <Input
+                    type={"number"}
+                    min={component.min}
+                    max={component.max}
+                    defaultValue={component.defaultValue()}
+                    sx={{ width: 80, mr: 1 }}
+                    onChange={debounce(
+                      (e) => component.onChange(e.currentTarget.valueAsNumber),
+                      500
+                    )}
+                  />
+                ) : (
+                  <Input
+                    type={"text"}
+                    defaultValue={component.defaultValue()}
+                    sx={{ width: 250, mr: 1 }}
+                    onChange={debounce(
+                      (e) => component.onChange(e.currentTarget.value),
+                      500
+                    )}
+                  />
+                );
+            }
+          })}
+        </Flex>
       </Flex>
+      {components.map((component) =>
+        component.type === "custom" ? (
+          <component.component key={item.key} />
+        ) : null
+      )}
     </Flex>
   );
 }

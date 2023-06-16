@@ -116,7 +116,7 @@ export function showAddNotebookDialog() {
 
 export function showEditNotebookDialog(notebookId: string) {
   const notebook = db.notebooks?.notebook(notebookId)?.data;
-  if (!notebook) return false;
+  if (!notebook) return;
   return showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog
       isOpen={true}

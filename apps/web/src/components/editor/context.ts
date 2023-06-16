@@ -124,24 +124,35 @@ export function useNoteStatistics(): NoteStatistics {
 
 export function useEditorConfig() {
   const editorConfig = useEditorContext((store) => store.subState.editorConfig);
-  const configure = useEditorContext((store) => store.configure);
-  const setEditorConfig = useCallback(
-    (config: Partial<EditorConfig>) => {
-      if (editorConfig)
-        Config.set("editorConfig", {
-          ...editorConfig,
-          ...config
-        });
-
-      configure({
-        editorConfig: {
-          ...editorConfig,
-          ...config
-        }
-      });
-    },
-    [editorConfig, configure]
-  );
-
   return { editorConfig, setEditorConfig };
 }
+
+export const editorConfig = () =>
+  useEditorContext.getState().subState.editorConfig;
+
+export const setEditorConfig = (config: Partial<EditorConfig>) => {
+  const oldConfig = editorConfig();
+  if (oldConfig)
+    Config.set("editorConfig", {
+      ...oldConfig,
+      ...config
+    });
+
+  useEditorContext.getState().configure({
+    editorConfig: {
+      ...oldConfig,
+      ...config
+    }
+  });
+};
+export const onEditorConfigChange = (
+  selector: (editorConfig: EditorConfig) => any,
+  listener: (
+    selectedState: EditorConfig,
+    previousSelectedState: EditorConfig
+  ) => void
+) =>
+  useEditorContext.subscribe(
+    (s) => selector(s.subState.editorConfig),
+    listener
+  );
