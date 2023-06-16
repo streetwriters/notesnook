@@ -41,7 +41,19 @@ async function typeToItems(type, context) {
       await db.notes.init();
       if (!context) return ["notes", db.notes.all];
       const notes = context.notes;
-      return ["notes", notes];
+      let topicNotes = [];
+      if (context.type === "notebook") {
+        topicNotes = db.notebooks
+          .notebook(context.value.id)
+          .topics.all.map((topic) => {
+            return db.notes.topicReferences
+              .get(topic.id)
+              .map((id) => db.notes.note(id).data);
+          })
+          .flat()
+          .filter((n) => notes.findIndex((note) => note.id !== n.id) === -1);
+      }
+      return ["notes", [...notes, ...topicNotes]];
     }
     case "notebooks":
       return ["notebooks", db.notebooks.all];
@@ -104,6 +116,10 @@ function Search({ type }) {
             const notebook = db.notebooks.notebook(context.value.id);
             const topic = notebook.topics.topic(context.value.topic);
             return `notes of ${topic._topic.title} in ${notebook.title}`;
+          }
+          case "notebook": {
+            const notebook = db.notebooks.notebook(context.value.id);
+            return `notes in ${notebook.title}`;
           }
           case "tag": {
             const tag = db.tags.all.find((tag) => tag.id === context.value);

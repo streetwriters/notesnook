@@ -65,7 +65,7 @@ const routes = {
 
     return {
       key: "notebook",
-      type: "notebook",
+      type: "notes",
       component: <Topics />,
       buttons: {
         back: {
