@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Unzipped } from "fflate";
-import { sanitizeFilename } from "./filename";
+import { sanitizeFilename } from "@notesnook/common";
 
 const textEncoder = new TextEncoder();
 type File = { filename: string; content: string };

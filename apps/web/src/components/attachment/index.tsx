@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Checkbox, Flex, Label, Text } from "@theme-ui/components";
-import { formatBytes } from "../../utils/filename";
+import { formatBytes } from "@notesnook/common";
 import {
   AttachmentError,
   Checkmark,
@@ -57,7 +57,7 @@ import {
 } from "@notesnook/core/utils/filename";
 import { useEffect, useState } from "react";
 import { AppEventManager, AppEvents } from "../../common/app-events";
-import { getFormattedDate } from "../../utils/time";
+import { getFormattedDate } from "@notesnook/common";
 
 const FILE_ICONS: Record<string, Icon> = {
   "image/": FileImage,

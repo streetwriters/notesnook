@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { Input } from "@theme-ui/components";
 import { useStore, store } from "../../stores/editor-store";
-import { debounceWithId } from "../../utils/debounce";
+import { debounceWithId } from "@notesnook/common";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
 import { useEditorConfig } from "./context";

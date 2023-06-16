@@ -26,7 +26,7 @@ import { useStore, store } from "../../stores/notebook-store";
 import { store as notestore } from "../../stores/note-store";
 import { Perform } from "../../common/dialog-controller";
 import { showToast } from "../../utils/toast";
-import { pluralize } from "../../utils/string";
+import { pluralize } from "@notesnook/common";
 import { isMac } from "../../utils/platform";
 import { create } from "zustand";
 import { FilteredList } from "../filtered-list";
@@ -160,7 +160,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
           if (stringified) {
             showToast(
               "success",
-              `${pluralize(noteIds.length, "note", "notes")} ${stringified}`
+              `${pluralize(noteIds.length, "note")} ${stringified}`
             );
           }
 
@@ -290,7 +290,7 @@ function NotebookItem(props: {
               {notebook.title}
               <Text variant="subBody" sx={{ fontWeight: "body" }}>
                 {" "}
-                ({pluralize(notebook.topics.length, "topic", "topics")})
+                ({pluralize(notebook.topics.length, "topic")})
               </Text>
             </Text>
           </Flex>

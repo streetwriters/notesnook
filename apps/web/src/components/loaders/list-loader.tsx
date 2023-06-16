@@ -21,7 +21,7 @@ import { memo } from "react";
 import Skeleton from "react-loading-skeleton";
 import { Box, Flex } from "@theme-ui/components";
 import "react-loading-skeleton/dist/skeleton.css";
-import { getRandomArbitrary } from "../../utils/random";
+import { getRandomArbitrary } from "@notesnook/common";
 
 const Lines = [1, 2].map(() => getRandomArbitrary(40, 90));
 export const ListLoader = memo(function ListLoader() {

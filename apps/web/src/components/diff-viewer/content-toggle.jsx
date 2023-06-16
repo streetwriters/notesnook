@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, Button } from "@theme-ui/components";
-import { getFormattedDate } from "../../utils/time";
+import { getFormattedDate } from "@notesnook/common";
 
 function ContentToggle(props) {
   const {

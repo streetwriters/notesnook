@@ -23,7 +23,7 @@ import * as Icon from "../icons";
 import { store } from "../../stores/trash-store";
 import { Flex, Text } from "@theme-ui/components";
 import TimeAgo from "../time-ago";
-import { pluralize, toTitleCase } from "../../utils/string";
+import { pluralize, toTitleCase } from "@notesnook/common";
 import { showUndoableToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 import { hashNavigate } from "../../navigation";
@@ -66,10 +66,7 @@ const menuItems = [
     icon: Icon.Restore,
     onClick: ({ items }) => {
       store.restore(items.map((i) => i.id));
-      showToast(
-        "success",
-        `${pluralize(items.length, "item", "items")} restored`
-      );
+      showToast("success", `${pluralize(items.length, "item")} restored`);
     },
     multiSelect: true
   },
@@ -83,7 +80,7 @@ const menuItems = [
       if (!(await showMultiPermanentDeleteConfirmation(items.length))) return;
       const ids = items.map((i) => i.id);
       showUndoableToast(
-        `${pluralize(items.length, "item", "items")} permanently deleted`,
+        `${pluralize(items.length, "item")} permanently deleted`,
         () => store.delete(ids),
         () => store.delete(ids, true),
         () => store.refresh()

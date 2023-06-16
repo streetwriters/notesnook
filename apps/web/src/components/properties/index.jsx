@@ -32,12 +32,12 @@ import ScrollContainer from "../scroll-container";
 import Vault from "../../common/vault";
 import TimeAgo from "../time-ago";
 import { Attachment } from "../attachment";
-import { formatBytes } from "../../utils/filename";
+import { formatBytes } from "@notesnook/common";
 import { getTotalSize } from "../../common/attachments";
 import Notebook from "../notebook";
-import { getTotalNotes } from "../../common";
+import { getTotalNotes } from "@notesnook/common";
 import Reminder from "../reminder";
-import { getFormattedDate } from "../../utils/time";
+import { getFormattedDate } from "@notesnook/common";
 
 const tools = [
   { key: "pin", property: "pinned", icon: Icon.Pin, label: "Pin" },

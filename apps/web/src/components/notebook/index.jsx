@@ -29,9 +29,9 @@ import { hashNavigate, navigate } from "../../navigation";
 import IconTag from "../icon-tag";
 import { showToast } from "../../utils/toast";
 import { Multiselect } from "../../common/multi-select";
-import { pluralize } from "../../utils/string";
+import { pluralize } from "@notesnook/common";
 import { confirm } from "../../common/dialog-controller";
-import { getFormattedDate } from "../../utils/time";
+import { getFormattedDate } from "@notesnook/common";
 
 function Notebook(props) {
   const { item, index, totalNotes, date, simplified } = props;
@@ -55,7 +55,7 @@ function Notebook(props) {
         isCompact ? (
           <>
             <Text sx={{ fontSize: "subBody", color: "fontTertiary" }}>
-              {pluralize(totalNotes, "note", "notes")}
+              {pluralize(totalNotes, "note")}
             </Text>
           </>
         ) : (
@@ -91,7 +91,7 @@ function Notebook(props) {
                 •
               </Text>
               <Text sx={{ color: "inherit" }}>
-                {pluralize(totalNotes, "note", "notes")}
+                {pluralize(totalNotes, "note")}
               </Text>
             </Flex>
           </>
@@ -175,7 +175,7 @@ const menuItems = [
     icon: Icon.Trash,
     onClick: async ({ items }) => {
       const result = await confirm({
-        title: `Delete ${pluralize(items.length, "notebook", "notebooks")}?`,
+        title: `Delete ${pluralize(items.length, "notebook")}?`,
         positiveButtonText: `Yes`,
         negativeButtonText: "No",
         checks: {

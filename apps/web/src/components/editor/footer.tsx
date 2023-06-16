@@ -22,7 +22,7 @@ import { useMemo } from "react";
 import { useStore } from "../../stores/editor-store";
 import { Loading, Saved, NotSaved } from "../icons";
 import { useNoteStatistics } from "./context";
-import { getFormattedDate } from "../../utils/time";
+import { getFormattedDate } from "@notesnook/common";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,

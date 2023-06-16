@@ -24,7 +24,6 @@ import * as Icon from "../icons";
 import IconTag from "../icon-tag";
 import {
   Reminder as ReminderType,
-  formatReminderTime,
   isReminderToday
 } from "@notesnook/core/collections/reminders";
 import { hashNavigate } from "../../navigation";
@@ -35,7 +34,8 @@ import {
   confirm,
   showEditReminderDialog
 } from "../../common/dialog-controller";
-import { pluralize } from "../../utils/string";
+import { pluralize } from "@notesnook/common";
+import { getFormattedReminderTime } from "@notesnook/common";
 
 const RECURRING_MODE_MAP = {
   week: "Weekly",
@@ -86,7 +86,7 @@ function Reminder({
           ) : (
             <IconTag
               icon={Icon.Clock}
-              text={formatReminderTime(reminder)}
+              text={getFormattedReminderTime(reminder)}
               highlight={isReminderToday(reminder)}
               testId={"reminder-time"}
             />
@@ -163,7 +163,7 @@ const menuItems: MenuItem[] = [
     icon: Icon.Trash,
     onClick: async ({ items }) => {
       confirm({
-        title: `Delete ${pluralize(items.length, "reminder", "reminders")}`,
+        title: `Delete ${pluralize(items.length, "reminder")}`,
         message: `Are you sure you want to proceed? **This action is IRREVERSIBLE**.`,
         positiveButtonText: "Yes",
         negativeButtonText: "No"

@@ -22,7 +22,7 @@ import { TaskManager } from "./task-manager";
 import { zip } from "../utils/zip";
 import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
-import { sanitizeFilename } from "../utils/filename";
+import { sanitizeFilename } from "@notesnook/common";
 
 export async function exportToPDF(
   title: string,

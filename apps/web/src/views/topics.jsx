@@ -31,8 +31,8 @@ import {
   ShortcutLink,
   SortAsc
 } from "../components/icons";
-import { getTotalNotes } from "../common";
-import { pluralize } from "../utils/string";
+import { getTotalNotes } from "@notesnook/common";
+import { pluralize } from "@notesnook/common";
 import { Allotment } from "allotment";
 import { Plus } from "../components/icons";
 import { useStore as useNotesStore } from "../stores/note-store";
@@ -40,7 +40,7 @@ import Placeholder from "../components/placeholders";
 import { showSortMenu } from "../components/group-header";
 import { db } from "../common/db";
 import { groupArray } from "@notesnook/core/utils/grouping";
-import { getFormattedDate } from "../utils/time";
+import { getFormattedDate } from "@notesnook/common";
 
 function Notebook() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -323,8 +323,7 @@ function NotebookHeader({ notebook }) {
         </Text>
       )}
       <Text as="em" variant="subBody" mt={2}>
-        {pluralize(topics.length, "topic", "topics")},{" "}
-        {pluralize(totalNotes, "note", "notes")}
+        {pluralize(topics.length, "topic")}, {pluralize(totalNotes, "note")}
       </Text>
     </Flex>
   );

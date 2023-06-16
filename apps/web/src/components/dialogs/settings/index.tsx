@@ -63,7 +63,7 @@ import {
   SupportSettings
 } from "./other-settings";
 import { AppearanceSettings } from "./appearance-settings";
-import { debounce } from "../../../utils/debounce";
+import { debounce } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
 
 type SettingsDialogProps = { onClose: Perform };

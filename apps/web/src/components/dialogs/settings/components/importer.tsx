@@ -21,7 +21,7 @@ import { useStore as useAppStore } from "../../../../stores/app-store";
 import { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button, Flex, Input, Link, Text } from "@theme-ui/components";
-import { pluralize } from "../../../../utils/string";
+import { pluralize } from "@notesnook/common";
 import { db } from "../../../../common/db";
 import { importFiles } from "../../../../utils/importer";
 import { CheckCircleOutline } from "../../../icons";
@@ -109,11 +109,7 @@ export function Importer() {
             <Flex sx={{ flexDirection: "column" }}>
               <Text variant="title">
                 {files.length
-                  ? `${pluralize(
-                      files.length,
-                      "file",
-                      "files"
-                    )} ready for import`
+                  ? `${pluralize(files.length, "file")} ready for import`
                   : "Select files to import"}
               </Text>
               <Text variant={"body"} sx={{ color: "fontTertiary" }}>
