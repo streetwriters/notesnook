@@ -206,7 +206,6 @@ export const useEditor = (
             type: type
           };
         }
-
         if (!locked) {
           id = await db.notes?.add(noteData);
           if (!note && id) {

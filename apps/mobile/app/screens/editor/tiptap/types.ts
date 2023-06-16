@@ -35,6 +35,7 @@ export type EditorState = {
   keyboardState: boolean;
   ready: boolean;
   saveCount: 0;
+  isAwaitingResult: boolean;
 };
 
 export type Settings = {
