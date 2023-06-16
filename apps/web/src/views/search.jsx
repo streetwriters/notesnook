@@ -74,14 +74,17 @@ function Search({ type }) {
 
   const onSearch = useCallback(
     async (query) => {
-      if (!query) return;
+      if (!query) {
+        setResults([]);
+        return;
+      }
       cachedQuery.current = query;
 
       const [lookupType, items] = await typeToItems(type, context);
-      setResults([]);
 
       if (items.length <= 0) {
         showToast("error", `There are no items to search in.`);
+        setResults([]);
         return;
       }
       setSearchState({ isSearching: true, totalItems: items.length });
@@ -155,7 +158,7 @@ function Search({ type }) {
         Searching {title}
       </Text>
       <SearchBox onSearch={onSearch} />
-      {searchState.isSearching ? (
+      {searchState.isSearching && results?.length === 0 ? (
         <Flex
           sx={{
             flex: "1",
