@@ -33,6 +33,7 @@ import {
 import { db } from "../../../common/db";
 import { showToast } from "../../../utils/toast";
 import { UserProfile } from "./components/user-profile";
+import { verifyAccount } from "../../../common";
 
 export const ProfileSettings: SettingsGroup[] = [
   {
@@ -67,7 +68,9 @@ export const ProfileSettings: SettingsGroup[] = [
             type: "button",
             title: "Backup your recovery key",
             variant: "secondary",
-            action: showRecoveryKeyDialog
+            action: async () => {
+              if (await verifyAccount()) await showRecoveryKeyDialog();
+            }
           }
         ]
       },

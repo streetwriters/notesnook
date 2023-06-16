@@ -17,42 +17,52 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Locator, Page } from "@playwright/test";
+import { Page } from "@playwright/test";
 import { downloadAndReadFile, getTestId, uploadFile } from "../utils";
 import { confirmDialog, fillPasswordDialog, waitToHaveText } from "./utils";
+import { NavigationMenuModel } from "./navigation-menu.model";
 
 export class SettingsViewModel {
   private readonly page: Page;
-  private readonly logoutButton: Locator;
-  private readonly accountStatusContainer: Locator;
-  private readonly backupRecoveryKeyButton: Locator;
-  private readonly backupRestoreContainer: Locator;
-  private readonly backupData: Locator;
-  private readonly restoreBackup: Locator;
-  private readonly encyptBackups: Locator;
+  private readonly navigation: NavigationMenuModel;
+
   constructor(page: Page) {
     this.page = page;
-    this.logoutButton = page.locator(getTestId("settings-logout"));
-    this.accountStatusContainer = page.locator(getTestId("account-status"));
-    this.backupRecoveryKeyButton = page.locator(
-      getTestId("backup-recovery-key")
-    );
-    this.backupRestoreContainer = page.locator(getTestId("backup-restore"));
-    this.backupData = page.locator(getTestId("backup-data"));
-    this.restoreBackup = page.locator(getTestId("restore-backup"));
-    this.encyptBackups = page.locator(getTestId("encrypt-backups"));
+    this.navigation = new NavigationMenuModel(page, "settings-navigation-menu");
+  }
+
+  async close() {
+    await this.page.locator(getTestId("settings-search")).focus();
+    await this.page.waitForTimeout(100);
+    await this.page.keyboard.press("Escape");
+    await this.page.waitForTimeout(1000);
   }
 
   async logout() {
-    await this.logoutButton.click();
+    const item = await this.navigation.findItem("Profile");
+    await item?.click();
+
+    const logoutButton = this.page
+      .locator(getTestId("setting-logout"))
+      .locator("button");
+
+    await logoutButton.click();
     await confirmDialog(this.page);
+
     await this.page
       .locator(getTestId("not-logged-in"))
       .waitFor({ state: "visible" });
   }
 
   async getRecoveryKey(password: string) {
-    await this.backupRecoveryKeyButton.click();
+    const item = await this.navigation.findItem("Profile");
+    await item?.click();
+
+    const backupRecoveryKeyButton = this.page
+      .locator(getTestId("setting-recovery-key"))
+      .locator("button");
+
+    await backupRecoveryKeyButton.click();
     await fillPasswordDialog(this.page, password);
 
     await waitToHaveText(this.page, "recovery-key");
@@ -65,21 +75,42 @@ export class SettingsViewModel {
   }
 
   async isLoggedIn() {
-    return await this.accountStatusContainer.isVisible();
+    const item = await this.navigation.findItem("Subscription");
+    return !!(await item?.getTitle());
   }
 
   async createBackup(password?: string) {
-    await this.backupRestoreContainer.click();
-    if (password) await this.encyptBackups.click();
-    await this.backupData.click();
-    if (password) await fillPasswordDialog(this.page, password);
-    return await downloadAndReadFile(this.page, this.backupData, "utf-8");
+    const item = await this.navigation.findItem("Backup & export");
+    await item?.click();
+
+    if (password) {
+      const encyptBackups = this.page
+        .locator(getTestId("setting-encrypt-backups"))
+        .locator("label");
+      await encyptBackups.click();
+    }
+
+    const backupData = this.page
+      .locator(getTestId("setting-create-backup"))
+      .locator("button");
+
+    if (password) {
+      await backupData.click();
+      await fillPasswordDialog(this.page, password);
+    }
+
+    return await downloadAndReadFile(this.page, backupData, "utf-8");
   }
 
   async restoreData(filename: string, password?: string) {
-    await this.backupRestoreContainer.click();
-    await this.restoreBackup.click();
-    await uploadFile(this.page, this.restoreBackup, filename);
+    const item = await this.navigation.findItem("Backup & export");
+    await item?.click();
+
+    const restoreBackup = this.page
+      .locator(getTestId("setting-restore-backup"))
+      .locator("button");
+
+    await uploadFile(this.page, restoreBackup, filename);
     if (password) await fillPasswordDialog(this.page, password);
   }
 }

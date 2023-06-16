@@ -97,7 +97,7 @@ export const BackupExportSettings: SettingsGroup[] = [
         ]
       },
       {
-        key: "encrypt-backup",
+        key: "encrypt-backups",
         title: "Backup encryption",
         description: "Encrypt all backup files using your master key.",
         isHidden: () => !isUserPremium(),

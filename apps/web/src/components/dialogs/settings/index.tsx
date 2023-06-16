@@ -202,9 +202,11 @@ export default function SettingsDialog(props: SettingsDialogProps) {
                   backdropFilter: "blur(8px)"
                 }
             }}
+            data-test-id="settings-navigation-menu"
           >
             <Input
               placeholder="Search"
+              data-test-id="settings-search"
               sx={{ m: 2, mb: 2, width: "auto", bg: "bgSecondary", py: "7px" }}
               onChange={(e) => {
                 const query = e.target.value.toLowerCase().trim();
@@ -366,6 +368,7 @@ function SettingItem(props: { item: Setting }) {
         pb: 4,
         borderBottom: "1px solid var(--border)"
       }}
+      data-test-id={`setting-${item.key}`}
     >
       <Flex
         sx={{
