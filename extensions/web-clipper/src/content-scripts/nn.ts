@@ -32,6 +32,9 @@ declare global {
 }
 
 function attachOnConnectListener() {
+  if (globalThis.clipperBridgeConnected) return;
+  globalThis.clipperBridgeConnected = true;
+
   browser.runtime.onConnect.addListener((port) => {
     window.addEventListener("message", (ev) => {
       const { type } = ev.data;
@@ -74,7 +77,4 @@ class BackgroundGateway implements Gateway {
   }
 }
 
-if (!globalThis.clipperBridgeConnected) {
-  globalThis.clipperBridgeConnected = true;
-  attachOnConnectListener();
-}
+attachOnConnectListener();

@@ -43,6 +43,9 @@ type ViewportMessage = {
   type: "viewport";
 };
 function attachMessagePort() {
+  if (globalThis.messagingPortAttached) return;
+  globalThis.messagingPortAttached = true;
+
   browser.runtime.onMessage.addListener(async (request) => {
     const message = request as ClipMessage | ViewportMessage;
 
@@ -94,7 +97,4 @@ function clip(message: ClipMessage) {
   }
 }
 
-if (!globalThis.messagingPortAttached) {
-  attachMessagePort();
-  globalThis.messagingPortAttached = true;
-}
+attachMessagePort();
