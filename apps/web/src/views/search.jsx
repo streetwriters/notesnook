@@ -42,17 +42,22 @@ async function typeToItems(type, context) {
       if (!context) return ["notes", db.notes.all];
       const notes = context.notes;
       let topicNotes = [];
+
       if (context.type === "notebook") {
         topicNotes = db.notebooks
           .notebook(context.value.id)
           .topics.all.map((topic) => {
             return db.notes.topicReferences
               .get(topic.id)
-              .map((id) => db.notes.note(id).data);
+              .map((id) => db.notes.note(id)?.data);
           })
           .flat()
-          .filter((n) => notes.findIndex((note) => note.id !== n.id) === -1);
+          .filter(
+            (topicNote) =>
+              notes.findIndex((note) => note?.id !== topicNote?.id) === -1
+          );
       }
+
       return ["notes", [...notes, ...topicNotes]];
     }
     case "notebooks":
