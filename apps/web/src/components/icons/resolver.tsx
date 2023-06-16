@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { toTitleCase, toCamelCase, KebabCase } from "../../utils/string";
+import { toTitleCase, toCamelCase, KebabCase } from "@notesnook/common";
 import * as Icons from "./index";
 
 export type IconAlias = KebabCase<keyof typeof Icons>;

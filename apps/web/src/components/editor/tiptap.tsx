@@ -55,7 +55,7 @@ import { getCurrentPreset } from "../../common/toolbar-config";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
-import { debounce, debounceWithId } from "../../utils/debounce";
+import { debounce, debounceWithId } from "@notesnook/common";
 import { store as editorstore } from "../../stores/editor-store";
 
 type OnChangeHandler = (

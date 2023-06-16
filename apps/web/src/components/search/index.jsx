@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import * as Icon from "../icons";
 import "./search.css";
 import Field from "../field";
-import { debounce } from "../../utils/debounce";
+import { debounce } from "@notesnook/common";
 function SearchBox({ onSearch }) {
   return (
     <Field

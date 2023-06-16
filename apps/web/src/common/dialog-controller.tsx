@@ -38,7 +38,7 @@ import { AuthenticatorType } from "../components/dialogs/mfa/types";
 import { Suspense } from "react";
 import { Reminder } from "@notesnook/core/collections/reminders";
 import { ConfirmDialogProps } from "../components/dialogs/confirm";
-import { getFormattedDate } from "../utils/time";
+import { getFormattedDate } from "@notesnook/common";
 import { downloadUpdate, installUpdate } from "../utils/updater";
 
 type DialogTypes = typeof Dialogs;

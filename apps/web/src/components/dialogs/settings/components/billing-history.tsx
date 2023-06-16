@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useState } from "react";
 import { Loading } from "../../../icons";
 import { Box, Flex, Link, Text } from "@theme-ui/components";
-import { getFormattedDate } from "../../../../utils/time";
+import { getFormattedDate } from "@notesnook/common";
 import { db } from "../../../../common/db";
 
 type Transaction = {

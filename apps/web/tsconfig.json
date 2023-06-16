@@ -7,5 +7,10 @@
     "maxNodeModuleJsDepth": 5,
     "noEmit": true
   },
-  "include": ["src", "global.d.ts", "__e2e__"]
+  "include": [
+    "src",
+    "global.d.ts",
+    "__e2e__",
+    "../../packages/common/src/utils/debounce.ts"
+  ]
 }

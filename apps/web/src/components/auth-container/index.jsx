@@ -23,7 +23,7 @@ import ThemeProvider from "../theme-provider";
 import Logo from "../../assets/logo.svg";
 import LogoDark from "../../assets/logo-dark.svg";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { getRandom } from "../../utils/random";
+import { getRandom } from "@notesnook/common";
 import Grberk from "../../assets/testimonials/grberk.jpeg";
 import Holenstein from "../../assets/testimonials/holenstein.jpg";
 import Jason from "../../assets/testimonials/jason.jpg";

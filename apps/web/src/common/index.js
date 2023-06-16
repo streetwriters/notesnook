@@ -26,7 +26,7 @@ import {
 import Config from "../utils/config";
 import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
-import { sanitizeFilename } from "../utils/filename";
+import { sanitizeFilename } from "@notesnook/common";
 import { isDesktop, isTesting } from "../utils/platform";
 import { store as userstore } from "../stores/user-store";
 import FileSaver from "file-saver";
@@ -37,7 +37,7 @@ import { logger } from "../utils/logger";
 import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
 import { EVENTS } from "@notesnook/core/common";
-import { getFormattedDate } from "../utils/time";
+import { getFormattedDate } from "@notesnook/common";
 import { desktop } from "./desktop-bridge";
 
 export const CREATE_BUTTON_MAP = {
@@ -170,10 +170,6 @@ export async function restoreBackupFile(backup) {
       }
     });
   }
-}
-
-export function getTotalNotes(notebook) {
-  return db.notebooks.notebook(notebook)?.totalNotes;
 }
 
 export async function verifyAccount() {

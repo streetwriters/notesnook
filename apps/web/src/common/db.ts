@@ -35,10 +35,8 @@ async function initializeDatabase(persistence: DatabasePersistence) {
 
   database.setup(
     new NNStorage("Notesnook", persistence),
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     EventSource,
-    null,
+    FS,
     new Compressor()
   );
 

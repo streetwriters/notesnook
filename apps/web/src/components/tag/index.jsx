@@ -27,7 +27,7 @@ import { store as editorStore } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import * as Icon from "../icons";
 import { showToast } from "../../utils/toast";
-import { pluralize } from "../../utils/string";
+import { pluralize } from "@notesnook/common";
 
 const menuItems = [
   {
@@ -58,7 +58,7 @@ const menuItems = [
           await editorStore.clearSession();
         await db.tags.remove(tag.id);
       }
-      showToast("success", `${pluralize(items.length, "tag", "tags")} deleted`);
+      showToast("success", `${pluralize(items.length, "tag")} deleted`);
       tagStore.refresh();
       noteStore.refresh();
     },

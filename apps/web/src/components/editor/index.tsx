@@ -55,7 +55,7 @@ import ThemeProviderWrapper from "../theme-provider";
 import { Allotment } from "allotment";
 // import { PdfPreview } from "";
 import { showToast } from "../../utils/toast";
-import { getFormattedDate } from "../../utils/time";
+import { getFormattedDate } from "@notesnook/common";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 

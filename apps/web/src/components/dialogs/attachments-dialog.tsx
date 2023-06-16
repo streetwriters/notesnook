@@ -30,7 +30,7 @@ import {
 } from "@theme-ui/components";
 import { getTotalSize } from "../../common/attachments";
 import { useStore, store } from "../../stores/attachment-store";
-import { formatBytes } from "../../utils/filename";
+import { formatBytes } from "@notesnook/common";
 import Dialog from "./dialog";
 import { TableVirtuoso } from "react-virtuoso";
 import {
@@ -49,7 +49,7 @@ import {
   Uploading
 } from "../icons";
 import NavigationItem from "../navigation-menu/navigation-item";
-import { pluralize } from "../../utils/string";
+import { pluralize } from "@notesnook/common";
 import { db } from "../../common/db";
 import { Perform } from "../../common/dialog-controller";
 import { Multiselect } from "../../common/multi-select";
@@ -426,9 +426,7 @@ const Sidebar = memo(
         <Flex sx={{ flexDirection: "column" }}>
           <Flex sx={{ pl: 2, m: 2, mt: 1, justifyContent: "space-between" }}>
             <Flex sx={{ flexDirection: "column" }}>
-              <Text variant="body">
-                {pluralize(counts.all, "file", "files")}
-              </Text>
+              <Text variant="body">{pluralize(counts.all, "file")}</Text>
               <Text variant="subBody">{formatBytes(totalSize)}</Text>
             </Flex>
             <Button
