@@ -194,12 +194,6 @@ export function showEmailChangeDialog() {
   ));
 }
 
-export function showLanguageSelectorDialog() {
-  return showDialog("LanguageSelectorDialog", (Dialog, perform) => (
-    <Dialog onClose={() => perform(null)} />
-  ));
-}
-
 export function showToolbarConfigDialog() {
   return showDialog("ToolbarConfigDialog", (Dialog, perform) => (
     <Dialog onClose={() => perform(null)} />
@@ -331,12 +325,6 @@ export function showProgressDialog<T>(dialogData: ProgressDialogProps) {
 export function showMoveNoteDialog(noteIds: string[]) {
   return showDialog("MoveDialog", (Dialog, perform) => (
     <Dialog noteIds={noteIds} onClose={(res: boolean) => perform(res)} />
-  ));
-}
-
-export function showBillingHistoryDialog() {
-  return showDialog("BillingHistoryDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} />
   ));
 }
 
@@ -611,12 +599,6 @@ export function showReminderPreviewDialog(reminder: Reminder) {
   ));
 }
 
-export function showTrackingDetailsDialog() {
-  return showDialog("TrackingDetailsDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} />
-  ));
-}
-
 export function showAddReminderDialog(noteId?: string) {
   return showDialog("AddReminderDialog", (Dialog, perform) => (
     <Dialog onClose={(res: boolean) => perform(res)} noteId={noteId} />
@@ -645,12 +627,6 @@ export function showIssueDialog() {
         perform(res);
       }}
     />
-  ));
-}
-
-export function showImportDialog() {
-  return showDialog("ImportDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} />
   ));
 }
 

@@ -22,12 +22,10 @@ import { useStore as useSettingStore } from "../../../stores/setting-store";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { getPlatform, isDesktop } from "../../../utils/platform";
 import { db } from "../../../common/db";
-import {
-  showPromptDialog,
-  showTrackingDetailsDialog
-} from "../../../common/dialog-controller";
+import { showPromptDialog } from "../../../common/dialog-controller";
 import Config from "../../../utils/config";
 import { showToast } from "../../../utils/toast";
+import { TrackingDetails } from "./components/tracking-details";
 
 export const PrivacySettings: SettingsGroup[] = [
   {
@@ -36,23 +34,22 @@ export const PrivacySettings: SettingsGroup[] = [
     header: "General",
     settings: [
       {
-        key: "enable-telemetry",
-        title: "Enable telemetry",
-        description:
-          "Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy.",
+        key: "telemetry",
+        title: "Telemetry",
+        description: `Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy.
+
+What data is collected & when?`,
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.telemetry, listener),
         components: [
           {
-            type: "button",
-            title: "View details",
-            action: () => showTrackingDetailsDialog(),
-            variant: "secondary"
-          },
-          {
             type: "toggle",
             isToggled: () => !!useSettingStore.getState().telemetry,
             toggle: () => useSettingStore.getState().toggleTelemetry()
+          },
+          {
+            type: "custom",
+            component: TrackingDetails
           }
         ]
       },

@@ -27,6 +27,7 @@ import { useStore as useSettingStore } from "../../../stores/setting-store";
 import { getFonts } from "@notesnook/editor";
 import { useSpellChecker } from "../../../hooks/use-spell-checker";
 import { SpellCheckerLanguages } from "./components/spell-checker-languages";
+import { isDesktop } from "../../../utils/platform";
 
 export const EditorSettings: SettingsGroup[] = [
   {
@@ -116,6 +117,7 @@ symbols (e.g. 202305261253)`,
     key: "spell-check",
     section: "editor",
     header: "Spell check",
+    isHidden: () => !isDesktop(),
     onRender: () => {
       useSpellChecker.getState().refresh();
     },
