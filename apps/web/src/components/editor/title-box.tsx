@@ -83,7 +83,6 @@ function TitleBox(props: TitleBoxProps) {
       }}
       onChange={(e) => {
         const { sessionId, id } = store.get().session;
-        if (!id) return;
         debouncedOnTitleChange(sessionId, id, e.target.value);
         updateFontSize(e.target.value.length);
       }}
@@ -95,7 +94,7 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
   return prevProps.readonly === nextProps.readonly;
 });
 
-function onTitleChange(noteId: string, title: string) {
+function onTitleChange(noteId: string | undefined, title: string) {
   store.get().setTitle(noteId, title);
 }
 

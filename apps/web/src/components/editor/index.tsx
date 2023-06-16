@@ -70,7 +70,11 @@ type DocumentPreview = {
   hash: string;
 };
 
-function onEditorChange(noteId: string, sessionId: number, content: string) {
+function onEditorChange(
+  noteId: string | undefined,
+  sessionId: number,
+  content: string
+) {
   if (!content) return;
 
   editorstore.get().saveSessionContent(noteId, sessionId, {

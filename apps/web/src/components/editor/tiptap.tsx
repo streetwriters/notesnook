@@ -58,10 +58,15 @@ import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce, debounceWithId } from "../../utils/debounce";
 import { store as editorstore } from "../../stores/editor-store";
 
+type OnChangeHandler = (
+  id: string | undefined,
+  sessionId: number,
+  content: string
+) => void;
 type TipTapProps = {
   editorContainer: HTMLElement;
   onLoad?: () => void;
-  onChange?: (id: string, sessionId: number, content: string) => void;
+  onChange?: OnChangeHandler;
   onContentChange?: () => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
@@ -83,11 +88,11 @@ const SAVE_INTERVAL = import.meta.env.REACT_APP_TEST ? 100 : 300;
 
 function save(
   sessionId: number,
-  noteId: string,
+  noteId: string | undefined,
   editor: Editor,
   content: Fragment,
   preventSave: boolean,
-  onChange?: (id: string, sessionId: number, html: string) => void
+  onChange?: OnChangeHandler
 ) {
   configureEditor({
     statistics: {
@@ -204,8 +209,6 @@ function TipTap(props: TipTapProps) {
 
         const preventSave = transaction?.getMeta("preventSave") as boolean;
         const { id, sessionId } = editorstore.get().session;
-        if (!id) return;
-
         const content = editor.state.doc.content;
         deferredSave(
           sessionId,
