@@ -23,7 +23,7 @@ import { db } from "./db";
 async function download(hash: string) {
   const attachment = db.attachments?.attachment(hash);
   if (!attachment) return;
-  const downloadResult = await db.fs.downloadFile(
+  const downloadResult = await db.fs?.downloadFile(
     attachment.metadata.hash,
     attachment.metadata.hash,
     attachment.chunkSize,

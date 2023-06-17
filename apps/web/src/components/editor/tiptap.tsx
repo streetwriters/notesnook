@@ -55,20 +55,25 @@ import { getCurrentPreset } from "../../common/toolbar-config";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
-import { debounce, debounceWithId } from "../../utils/debounce";
+import { debounce, debounceWithId } from "@notesnook/common";
 import { store as editorstore } from "../../stores/editor-store";
 
+type OnChangeHandler = (
+  id: string | undefined,
+  sessionId: number,
+  content: string
+) => void;
 type TipTapProps = {
   editorContainer: HTMLElement;
   onLoad?: () => void;
-  onChange?: (id: string, sessionId: string, content: string) => void;
+  onChange?: OnChangeHandler;
   onContentChange?: () => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
   onPreviewAttachment?: (attachment: Attachment) => void;
   onAttachFile?: (file: File) => void;
   onFocus?: () => void;
-  content?: () => string;
+  content?: () => string | undefined;
   toolbarContainerId?: string;
   readonly?: boolean;
   nonce?: number;
@@ -79,15 +84,15 @@ type TipTapProps = {
   fontFamily: string;
 };
 
-const SAVE_INTERVAL = process.env.REACT_APP_TEST ? 100 : 300;
+const SAVE_INTERVAL = import.meta.env.REACT_APP_TEST ? 100 : 300;
 
 function save(
-  sessionId: string,
-  noteId: string,
+  sessionId: number,
+  noteId: string | undefined,
   editor: Editor,
   content: Fragment,
   preventSave: boolean,
-  onChange?: (id: string, sessionId: string, html: string) => void
+  onChange?: OnChangeHandler
 ) {
   configureEditor({
     statistics: {
@@ -130,7 +135,7 @@ function TipTap(props: TipTapProps) {
   const isUserPremium = useIsUserPremium();
   const configure = useConfigureEditor();
   const doubleSpacedLines = useSettingsStore(
-    (store) => store.doubleSpacedLines
+    (store) => store.doubleSpacedParagraphs
   );
   const dateFormat = useSettingsStore((store) => store.dateFormat);
   const timeFormat = useSettingsStore((store) => store.timeFormat);
@@ -205,7 +210,6 @@ function TipTap(props: TipTapProps) {
         const preventSave = transaction?.getMeta("preventSave") as boolean;
         const { id, sessionId } = editorstore.get().session;
         const content = editor.state.doc.content;
-
         deferredSave(
           sessionId,
           sessionId,
@@ -275,7 +279,7 @@ function TipTap(props: TipTapProps) {
         return true;
       }
     };
-  }, [readonly, nonce, doubleSpacedLines, dateFormat, timeFormat, theme]);
+  }, [theme, readonly, nonce, doubleSpacedLines, dateFormat, timeFormat]);
 
   const editor = useTiptap(
     tiptapOptions,

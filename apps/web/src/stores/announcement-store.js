@@ -27,6 +27,9 @@ import { appVersion } from "../utils/version";
 import { findItemAndDelete } from "@notesnook/core/utils/array";
 import { isTesting } from "../utils/platform";
 
+/**
+ * @extends {BaseStore<AnnouncementStore>}
+ */
 class AnnouncementStore extends BaseStore {
   inlineAnnouncements = [];
   dialogAnnouncements = [];
@@ -77,7 +80,7 @@ export { useStore, store };
 
 export const allowedPlatforms = [
   "all",
-  process.env.REACT_APP_PLATFORM,
+  import.meta.env.REACT_APP_PLATFORM,
   window.os
 ];
 

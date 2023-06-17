@@ -135,5 +135,5 @@ export function isMacStoreApp() {
 }
 
 export function isTesting() {
-  return !!process.env.REACT_APP_TEST;
+  return !!import.meta.env.REACT_APP_TEST;
 }

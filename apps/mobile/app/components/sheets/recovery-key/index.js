@@ -34,7 +34,6 @@ import SettingsService from "../../../services/settings";
 import { db } from "../../../common/database";
 import Storage from "../../../common/database/storage";
 import { eOpenRecoveryKeyDialog } from "../../../utils/events";
-import { sanitizeFilename } from "../../../utils/sanitizer";
 import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import DialogHeader from "../../dialog/dialog-header";
@@ -44,6 +43,7 @@ import SheetWrapper from "../../ui/sheet";
 import { QRCode } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import RNFetchBlob from "react-native-blob-util";
+import { sanitizeFilename } from "@notesnook/common";
 
 class RecoveryKeySheet extends React.Component {
   constructor(props) {

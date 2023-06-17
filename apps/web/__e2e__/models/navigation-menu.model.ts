@@ -26,9 +26,9 @@ export class NavigationMenuModel {
   protected readonly page: Page;
   private readonly menu: Locator;
 
-  constructor(page: Page) {
+  constructor(page: Page, id: string) {
     this.page = page;
-    this.menu = page.locator(getTestId("navigation-menu"));
+    this.menu = page.locator(getTestId(id));
   }
 
   async findItem(title: string) {

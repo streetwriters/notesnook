@@ -1,3 +1,0 @@
-name = "notesnook-api"
-main = "src/index.ts"
-compatibility_date = "2023-03-24"

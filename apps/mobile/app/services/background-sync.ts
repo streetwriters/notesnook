@@ -16,6 +16,34 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Platform } from "react-native";
+import {
+  beginBackgroundTask,
+  endBackgroundTask
+} from "react-native-begin-background-task";
+
+async function doInBackground(callback: () => Promise<void>) {
+  if (Platform.OS === "ios") {
+    try {
+      const bgTaskId = await beginBackgroundTask();
+      const result = await callback();
+      await endBackgroundTask(bgTaskId);
+      return result;
+    } catch (e) {
+      return (e as Error).message;
+    }
+  } else {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve) => {
+      try {
+        const result = await callback();
+        resolve(result);
+      } catch (e) {
+        resolve((e as Error).message);
+      }
+    });
+  }
+}
 
 // import BackgroundFetch from "react-native-background-fetch";
 // import { DatabaseLogger, db } from "../common/database";
@@ -120,4 +148,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //   start,
 //   registerHeadlessTask
 // };
-export {};
+export default { doInBackground };

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Copied from https://github.com/williamkapke/bson-objectid
 
-const { randomInt } = require("./random");
+import { randomInt } from "./random";
 
 var MACHINE_ID = randomInt();
 var index = (ObjectID.index = randomInt());
@@ -102,8 +102,8 @@ function ObjectID(id) {
     );
   }
 }
-module.exports = ObjectID;
-ObjectID.default = ObjectID;
+
+export default ObjectID;
 
 /**
  * Creates an ObjectID from a second based number, with the rest of the ObjectID zeroed out. Used for comparisons or sorting the ObjectID.

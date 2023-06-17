@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Platform, StatusBar } from "react-native";
-import { AndroidModule } from "..";
 import { eSendEvent } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { eThemeUpdated } from "../events";
+import { NotesnookModule } from "../notesnook-module";
 
 export const ACCENT = {
   color: "#008837",
@@ -137,7 +137,7 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     false
   );
   if (Platform.OS === "android") {
-    AndroidModule.setBackgroundColor(COLOR_SCHEME.bg);
+    NotesnookModule.setBackgroundColor(COLOR_SCHEME.bg);
     StatusBar.setBackgroundColor("transparent", false);
     StatusBar.setTranslucent(true, false);
   }

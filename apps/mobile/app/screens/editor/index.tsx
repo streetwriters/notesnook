@@ -37,7 +37,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useEditorStore } from "../../stores/use-editor-store";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
 import { NoteType } from "../../utils/types";
 import { EDITOR_URI } from "./source";
@@ -256,7 +256,7 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
         width: 60,
         height: 60,
         right: 12,
-        ...getElevation(5)
+        ...getElevationStyle(5)
       }}
     />
   ) : null;

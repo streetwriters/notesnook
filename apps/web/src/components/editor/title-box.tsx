@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { Input } from "@theme-ui/components";
 import { useStore, store } from "../../stores/editor-store";
-import { debounceWithId } from "../../utils/debounce";
+import { debounceWithId } from "@notesnook/common";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
 import { useEditorConfig } from "./context";
@@ -94,7 +94,7 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
   return prevProps.readonly === nextProps.readonly;
 });
 
-function onTitleChange(noteId: string, title: string) {
+function onTitleChange(noteId: string | undefined, title: string) {
   store.get().setTitle(noteId, title);
 }
 

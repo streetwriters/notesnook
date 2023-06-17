@@ -28,5 +28,4 @@ class MapStub {
   }
 }
 
-const instance = new MapStub();
-module.exports = instance;
+export default new MapStub();

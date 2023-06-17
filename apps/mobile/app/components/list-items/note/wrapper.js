@@ -30,7 +30,6 @@ import {
 } from "../../../services/event-manager";
 import { useEditorStore } from "../../../stores/use-editor-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
-import { history } from "../../../utils";
 import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 import { presentDialog } from "../../dialog/functions";
@@ -59,12 +58,14 @@ export const openNote = async (item, isTrash, setSelectedItem, isSheet) => {
       return;
     }
   }
+  const { selectedItemsList, selectionMode, clearSelection } =
+    useSelectionStore.getState();
 
-  if (history.selectedItemsList.length > 0 && history.selectionMode) {
+  if (selectedItemsList.length > 0 && selectionMode) {
     setSelectedItem && setSelectedItem(_note);
     return;
   } else {
-    history.selectedItemsList = [];
+    clearSelection();
   }
 
   if (_note.conflicted) {

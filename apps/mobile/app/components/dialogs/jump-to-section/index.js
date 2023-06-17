@@ -26,7 +26,7 @@ import {
 } from "../../../services/event-manager";
 import { useMessageStore } from "../../../stores/use-message-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { getElevation } from "../../../utils";
+import { getElevationStyle } from "../../../utils/elevation";
 import {
   eCloseJumpToDialog,
   eOpenJumpToDialog,
@@ -124,7 +124,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
     >
       <View
         style={{
-          ...getElevation(5),
+          ...getElevationStyle(5),
           width: DDS.isTab ? 500 : "85%",
           backgroundColor: colors.bg,
           zIndex: 100,

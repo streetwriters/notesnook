@@ -33,7 +33,8 @@ import useTimer from "../../hooks/use-timer";
 import { ToastEvent } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { hexToRGBA } from "../../utils/color-scheme/utils";
-import { sanitizeFilename } from "../../utils/sanitizer";
+import { sanitizeFilename } from "@notesnook/common";
+
 // function getLevelString(level: number) {
 //   switch (level) {
 //     case LogLevel.Debug:

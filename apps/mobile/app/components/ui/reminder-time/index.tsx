@@ -23,8 +23,8 @@ import { ViewStyle } from "react-native";
 import { Reminder } from "../../../services/notifications";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
-import { getFormattedReminderTime } from "../../../utils/time";
 import { Button, ButtonProps } from "../button";
+import { getFormattedReminderTime } from "@notesnook/common";
 
 export const ReminderTime = ({
   checkIsActive = true,

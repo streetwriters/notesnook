@@ -47,7 +47,7 @@ export default class Debug {
    * @param {{
    * title: string,
    * body: string,
-   * userId: string
+   * userId: string | undefined
    * }} reportData
    * @returns {Promise<string>} link to the github issue
    */

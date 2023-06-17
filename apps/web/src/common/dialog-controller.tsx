@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ReactDOM from "react-dom";
-import { Dialogs } from "../components/dialogs";
+import { Dialogs } from "../dialogs";
 import ThemeProvider from "../components/theme-provider";
 import qclone from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
@@ -29,16 +29,16 @@ import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
 import { Text } from "@theme-ui/components";
-import * as Icon from "../components/icons";
+import { Topic } from "../components/icons";
 import Config from "../utils/config";
 import { AppVersion, getChangelog } from "../utils/version";
-import { Period } from "../components/dialogs/buy-dialog/types";
-import { FeatureKeys } from "../components/dialogs/feature-dialog";
-import { AuthenticatorType } from "../components/dialogs/mfa/types";
+import { Period } from "../dialogs/buy-dialog/types";
+import { FeatureKeys } from "../dialogs/feature-dialog";
+import { AuthenticatorType } from "../dialogs/mfa/types";
 import { Suspense } from "react";
 import { Reminder } from "@notesnook/core/collections/reminders";
-import { ConfirmDialogProps } from "../components/dialogs/confirm";
-import { getFormattedDate } from "../utils/time";
+import { ConfirmDialogProps } from "../dialogs/confirm";
+import { getFormattedDate } from "@notesnook/common";
 import { downloadUpdate, installUpdate } from "../utils/updater";
 
 type DialogTypes = typeof Dialogs;
@@ -116,7 +116,7 @@ export function showAddNotebookDialog() {
 
 export function showEditNotebookDialog(notebookId: string) {
   const notebook = db.notebooks?.notebook(notebookId)?.data;
-  if (!notebook) return false;
+  if (!notebook) return;
   return showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog
       isOpen={true}
@@ -189,24 +189,15 @@ export function showPromptDialog(props: {
 }
 
 export function showEmailChangeDialog() {
-  return showDialog<"EmailChangeDialog", string | null>(
-    "EmailChangeDialog",
-    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
-  );
-}
-
-export function showLanguageSelectorDialog() {
-  return showDialog<"LanguageSelectorDialog", string | null>(
-    "LanguageSelectorDialog",
-    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
-  );
+  return showDialog("EmailChangeDialog", (Dialog, perform) => (
+    <Dialog onClose={() => perform(null)} />
+  ));
 }
 
 export function showToolbarConfigDialog() {
-  return showDialog<"ToolbarConfigDialog", string | null>(
-    "ToolbarConfigDialog",
-    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
-  );
+  return showDialog("ToolbarConfigDialog", (Dialog, perform) => (
+    <Dialog onClose={() => perform(null)} />
+  ));
 }
 
 export function showError(title: string, message: string) {
@@ -337,12 +328,6 @@ export function showMoveNoteDialog(noteIds: string[]) {
   ));
 }
 
-export function showBillingHistoryDialog() {
-  return showDialog("BillingHistoryDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} />
-  ));
-}
-
 function getDialogData(type: string) {
   switch (type) {
     case "create_vault":
@@ -451,7 +436,7 @@ function getDialogData(type: string) {
 
 export function showPasswordDialog(
   type: string,
-  validate: (password: string) => boolean
+  validate: (password: string) => boolean | Promise<boolean>
 ) {
   const { title, subtitle, positiveButtonText, checks } = getDialogData(type);
   return showDialog("PasswordDialog", (Dialog, perform) => (
@@ -485,6 +470,7 @@ export function showCreateTopicDialog() {
       onAction={async (topic: Record<string, unknown>) => {
         if (!topic) return;
         const notebook = notebookStore.get().selectedNotebook;
+        if (!notebook) return;
         await db.notebooks?.notebook(notebook.id).topics.add(topic);
         notebookStore.setSelectedNotebook(notebook.id);
         showToast("success", "Topic created!");
@@ -503,7 +489,7 @@ export function showEditTopicDialog(notebookId: string, topicId: string) {
       title={"Edit topic"}
       subtitle={`You are editing "${topic.title}" topic.`}
       defaultValue={topic.title}
-      icon={Icon.Topic}
+      icon={Topic}
       item={topic}
       onClose={() => perform(false)}
       onAction={async (t: string) => {
@@ -613,12 +599,6 @@ export function showReminderPreviewDialog(reminder: Reminder) {
   ));
 }
 
-export function showTrackingDetailsDialog() {
-  return showDialog("TrackingDetailsDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} />
-  ));
-}
-
 export function showAddReminderDialog(noteId?: string) {
   return showDialog("AddReminderDialog", (Dialog, perform) => (
     <Dialog onClose={(res: boolean) => perform(res)} noteId={noteId} />
@@ -650,12 +630,6 @@ export function showIssueDialog() {
   ));
 }
 
-export function showImportDialog() {
-  return showDialog("ImportDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} />
-  ));
-}
-
 export function showMultifactorDialog(primaryMethod?: AuthenticatorType) {
   return showDialog("MultifactorDialog", (Dialog, perform) => (
     <Dialog onClose={(res) => perform(res)} primaryMethod={primaryMethod} />
@@ -670,6 +644,12 @@ export function show2FARecoveryCodesDialog(primaryMethod: AuthenticatorType) {
 
 export function showAttachmentsDialog() {
   return showDialog("AttachmentsDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} />
+  ));
+}
+
+export function showSettings() {
+  return showDialog("SettingsDialog", (Dialog, perform) => (
     <Dialog onClose={(res: boolean) => perform(res)} />
   ));
 }

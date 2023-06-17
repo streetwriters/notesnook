@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Collection from "./collection";
-import getId from "../utils/id";
+import { getId } from "../utils/id";
 import { deleteItem, hasItem } from "../utils/array";
 import { EV, EVENTS, sendAttachmentsProgressEvent } from "../common";
 import dataurl from "../utils/dataurl";

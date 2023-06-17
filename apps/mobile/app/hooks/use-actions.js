@@ -50,7 +50,7 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useThemeStore } from "../stores/use-theme-store";
 import { useUserStore } from "../stores/use-user-store";
-import { toTXT } from "../utils";
+import { convertNoteToText } from "../utils/note-to-text";
 import { toggleDarkMode } from "../utils/color-scheme/utils";
 import {
   eOnTopicSheetUpdate,
@@ -182,7 +182,7 @@ export const useActions = ({ close = () => null, item }) => {
       });
       return;
     }
-    let text = await toTXT(item, false);
+    let text = await convertNoteToText(item, false);
     let html = text.replace(/\n/g, "<br />");
     Notifications.displayNotification({
       title: item.title,
@@ -227,7 +227,7 @@ export const useActions = ({ close = () => null, item }) => {
         description: "Unlock note to copy to clipboard."
       });
     } else {
-      Clipboard.setString(await toTXT(item));
+      Clipboard.setString(await convertNoteToText(item));
       ToastEvent.show({
         heading: "Note copied to clipboard",
         type: "success",
@@ -415,7 +415,7 @@ export const useActions = ({ close = () => null, item }) => {
       Share.open({
         title: "Share note to",
         failOnCancel: false,
-        message: await toTXT(item)
+        message: await convertNoteToText(item)
       });
     }
   }

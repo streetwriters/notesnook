@@ -274,10 +274,10 @@ index 69065f0..0000000
 -export default forwardRef(Menu);
 diff --git a/node_modules/react-native-reanimated-material-menu/src/Menu.tsx b/node_modules/react-native-reanimated-material-menu/src/Menu.tsx
 new file mode 100644
-index 0000000..20469ee
+index 0000000..c3bc1c9
 --- /dev/null
 +++ b/node_modules/react-native-reanimated-material-menu/src/Menu.tsx
-@@ -0,0 +1,289 @@
+@@ -0,0 +1,303 @@
 +import React from 'react';
 +
 +import {
@@ -288,6 +288,7 @@ index 0000000..20469ee
 +  LayoutChangeEvent,
 +  Modal,
 +  Platform,
++  ScrollView,
 +  StatusBar,
 +  StyleSheet,
 +  TouchableWithoutFeedback,
@@ -325,6 +326,7 @@ index 0000000..20469ee
 +
 +const EASING = Easing.bezier(0.4, 0, 0.2, 1);
 +const SCREEN_INDENT = 8;
++const SCREEN_INDENT_VERTICAL = 80;
 +
 +class Menu extends React.Component<MenuProps, State> {
 +  _container: View | null = null;
@@ -384,7 +386,7 @@ index 0000000..20469ee
 +    }
 +
 +    const { width, height } = e.nativeEvent.layout;
-+
++    let timeout:any = 0;
 +    this.setState(
 +      {
 +        menuState: States.Animating,
@@ -405,7 +407,17 @@ index 0000000..20469ee
 +            easing: EASING,
 +            useNativeDriver: false,
 +          }),
-+        ]).start();
++        ]).start(({finished}) => {
++          if (finished) {
++            clearTimeout(timeout);
++            timeout = setTimeout(() => {
++              this.setState({
++                menuState: States.Shown
++              })
++            },20)
++           
++          }
++        });
 +      },
 +    );
 +  };
@@ -464,7 +476,7 @@ index 0000000..20469ee
 +
 +    // Adjust position of menu
 +    let { left, top } = this.state;
-+    const transforms = [];
++    const transforms:any[] = [];
 +
 +    if (
 +      (isRTL && left + buttonWidth - menuWidth > SCREEN_INDENT) ||
@@ -472,7 +484,7 @@ index 0000000..20469ee
 +    ) {
 +      transforms.push({
 +        translateX: Animated.multiply(menuSizeAnimation.x, -1),
-+      });
++      } as never);
 +
 +      left = Math.min(windowWidth - SCREEN_INDENT, left + buttonWidth);
 +    } else if (left < SCREEN_INDENT) {
@@ -480,26 +492,26 @@ index 0000000..20469ee
 +    }
 +
 +    // Flip by Y axis if menu hits bottom screen border
-+    if (top > windowHeight - menuHeight - SCREEN_INDENT) {
++    if (top > windowHeight - menuHeight - SCREEN_INDENT_VERTICAL) {
 +      transforms.push({
 +        translateY: Animated.multiply(menuSizeAnimation.y, -1),
-+      });
++      } as never);
 +
-+      top = windowHeight - SCREEN_INDENT;
-+      top = Math.min(windowHeight - SCREEN_INDENT, top + buttonHeight);
-+    } else if (top < SCREEN_INDENT) {
-+      top = SCREEN_INDENT;
++      top = windowHeight - SCREEN_INDENT_VERTICAL;
++      top = Math.min(windowHeight - SCREEN_INDENT_VERTICAL, top + buttonHeight);
++    } else if (top < SCREEN_INDENT_VERTICAL) {
++      top = SCREEN_INDENT_VERTICAL;
 +    }
 +
 +    const shadowMenuContainerStyle = {
 +      opacity: opacityAnimation,
 +      transform: transforms,
++      maxHeight: 500,
 +      top,
 +
 +      // Switch left to right for rtl devices
 +      ...(isRTL ? { right: left } : { left }),
 +    };
-+
 +    const { menuState } = this.state;
 +    const animationStarted = menuState === States.Animating;
 +    const modalVisible = menuState === States.Shown || animationStarted;
@@ -529,7 +541,9 @@ index 0000000..20469ee
 +                style={[styles.shadowMenuContainer, shadowMenuContainerStyle, style]}
 +              >
 +                <Animated.View style={[styles.menuContainer, animationStarted && menuSize]}>
-+                  {children}
++                  <ScrollView showsVerticalScrollIndicator={menuState !== States.Animating} >
++                    {children}
++                  </ScrollView>
 +                </Animated.View>
 +              </Animated.View>
 +            </View>
@@ -568,3 +582,19 @@ index 0000000..20469ee
 +
 +export default Menu
 \ No newline at end of file
+diff --git a/node_modules/react-native-reanimated-material-menu/src/MenuItem.js b/node_modules/react-native-reanimated-material-menu/src/MenuItem.js
+index 120a870..d6459c0 100644
+--- a/node_modules/react-native-reanimated-material-menu/src/MenuItem.js
++++ b/node_modules/react-native-reanimated-material-menu/src/MenuItem.js
+@@ -14,6 +14,11 @@ const Touchable =
+     ? TouchableNativeFeedback
+     : TouchableHighlight;
+ 
++/**
++ * 
++ * @param {any} param0 
++ * @returns 
++ */
+ function MenuItem({
+   children,
+   disabled,

@@ -19,8 +19,8 @@ module.exports = {
   all: {
     UV_THREADPOOL_SIZE: IS_CI ? NUM_CPUS : 2,
     GENERATE_SOURCEMAP: process.env.NODE_ENV === "development",
-    INLINE_RUNTIME_CHUNK: false,
-    DISABLE_ESLINT_PLUGIN: true,
+    // INLINE_RUNTIME_CHUNK: false,
+    // DISABLE_ESLINT_PLUGIN: true,
     REACT_APP_GIT_HASH: gitHash,
     REACT_APP_VERSION: APP_VERSION
   },
@@ -35,13 +35,13 @@ module.exports = {
     DEBUG: "pw:api"
   },
   silent: {
-    REACT_APP_TEST: true,
-    DISABLE_ESLINT_PLUGIN: "true",
-    FAST_REFRESH: "false",
-    BROWSER: "none"
+    REACT_APP_TEST: true
+    // DISABLE_ESLINT_PLUGIN: "true"
+    // FAST_REFRESH: "false",
+    // BROWSER: "none"
   },
   desktop: {
-    BROWSER: "none",
+    // BROWSER: "none",
     REACT_APP_PLATFORM: "desktop"
   }
 };

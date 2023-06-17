@@ -17,14 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import create from "zustand";
+import { create } from "zustand";
 import produce from "immer";
+import { Icon } from "../components/icons";
 
 type Status = {
   key: string;
   status: string;
   progress?: number;
-  icon?: string | null;
+  icon?: Icon | null;
 };
 interface IStatusStore {
   statuses: Record<string, Status>;

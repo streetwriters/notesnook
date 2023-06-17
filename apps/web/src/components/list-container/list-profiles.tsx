@@ -24,7 +24,7 @@ import Tag from "../tag";
 import Topic from "../topic";
 import TrashItem from "../trash-item";
 import { db } from "../../common/db";
-import { getTotalNotes } from "../../common";
+import { getTotalNotes } from "@notesnook/common";
 import Reminder from "../reminder";
 import type { Reminder as ReminderType } from "@notesnook/core/collections/reminders";
 import { useMemo } from "react";

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Keyboard, Platform, View } from "react-native";
 import Animated, {
   Easing,
@@ -30,10 +30,10 @@ import { notesnook } from "../../../e2e/test.ids";
 import { editorState } from "../../screens/editor/tiptap/utils";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { getElevation, showTooltip, TOOLTIP_POSITIONS } from "../../utils";
-import { normalize, SIZE } from "../../utils/size";
+import { getElevationStyle } from "../../utils/elevation";
+import { SIZE, normalize } from "../../utils/size";
+import NativeTooltip from "../../utils/tooltip";
 import { PressableButton } from "../ui/pressable";
-import { useCallback } from "react";
 
 export const FloatingButton = ({
   title,
@@ -116,11 +116,11 @@ export const FloatingButton = ({
         accentColor={color || "accent"}
         accentText="light"
         customStyle={{
-          ...getElevation(5),
+          ...getElevationStyle(5),
           borderRadius: 100
         }}
         onLongPress={(event) => {
-          showTooltip(event, title, TOOLTIP_POSITIONS.LEFT);
+          NativeTooltip.show(event, title, NativeTooltip.POSITIONS.LEFT);
         }}
         onPress={onPress}
       >

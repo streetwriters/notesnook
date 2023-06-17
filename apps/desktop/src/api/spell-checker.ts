@@ -113,8 +113,10 @@ export const spellCheckerRouter = t.router({
     .mutation(({ input: languages }) =>
       globalThis.window?.webContents.session.setSpellCheckerLanguages(languages)
     ),
-  toggle: t.procedure.input(z.boolean()).mutation(({ input: enabled }) => {
-    globalThis.window?.webContents.session.setSpellCheckerEnabled(enabled);
-    config.isSpellCheckerEnabled = enabled;
-  })
+  toggle: t.procedure
+    .input(z.boolean().optional())
+    .mutation(({ input: enabled }) => {
+      globalThis.window?.webContents.session.setSpellCheckerEnabled(!!enabled);
+      config.isSpellCheckerEnabled = !!enabled;
+    })
 });

@@ -34,7 +34,8 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SearchService from "../../../services/search";
-import { getElevation, toTXT } from "../../../utils";
+import { convertNoteToText } from "../../../utils/note-to-text";
+import { getElevationStyle } from "../../../utils/elevation";
 import {
   eClearEditor,
   eCloseActionSheet,
@@ -564,7 +565,7 @@ export class VaultDialog extends Component {
   }
 
   async _copyNote(note) {
-    Clipboard.setString(await toTXT(note));
+    Clipboard.setString(await convertNoteToText(note));
     ToastEvent.show({
       heading: "Note copied",
       type: "success",
@@ -580,7 +581,7 @@ export class VaultDialog extends Component {
       await Share.open({
         heading: "Share note",
         failOnCancel: false,
-        message: await toTXT(note)
+        message: await convertNoteToText(note)
       });
     } catch (e) {
       console.error(e);
@@ -678,7 +679,7 @@ export class VaultDialog extends Component {
       >
         <View
           style={{
-            ...getElevation(5),
+            ...getElevationStyle(5),
             width: DDS.isTab ? 350 : "85%",
             borderRadius: 10,
             backgroundColor: colors.bg,

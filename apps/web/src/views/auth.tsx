@@ -40,7 +40,7 @@ import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { isTesting } from "../utils/platform";
 import { useTimer } from "../hooks/use-timer";
-import { AuthenticatorType } from "../components/dialogs/mfa/types";
+import { AuthenticatorType } from "../dialogs/mfa/types";
 import {
   showLoadingDialog,
   showLogoutConfirmation

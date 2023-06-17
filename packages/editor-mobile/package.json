@@ -22,7 +22,6 @@
     "@types/node": "^16.11.11",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
-    "patch-package": "^6.4.7",
     "react-error-overlay": "6.0.9",
     "react-scripts": "^5.0.1",
     "web-vitals": "^1.1.2",

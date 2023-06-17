@@ -20,6 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { type desktop as bridge } from "./bridge";
 
 export const desktop: typeof bridge | undefined =
-  process.env.REACT_APP_PLATFORM === "desktop"
-    ? require("./bridge").desktop
+  import.meta.env.REACT_APP_PLATFORM === "desktop"
+    ? process.env.NODE_ENV === "development"
+      ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        (await import("./bridge")).desktop
+      : require("./bridge.ts").desktop
     : undefined;

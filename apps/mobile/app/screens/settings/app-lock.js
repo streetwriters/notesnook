@@ -39,7 +39,7 @@ import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import { eOpenLoginDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 const AppLock = ({ route }) => {
@@ -274,7 +274,7 @@ const AppLock = ({ route }) => {
                 style={{
                   paddingHorizontal: 24,
                   alignSelf: "center",
-                  ...getElevation(5),
+                  ...getElevationStyle(5),
                   marginTop: 30,
                   borderRadius: 100
                 }}

@@ -35,6 +35,9 @@ import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import { useLogin } from "./use-login";
 import { useSettingStore } from "../../stores/use-setting-store";
+import { eUserLoggedIn } from "../../utils/events";
+import { useUserStore } from "../../stores/use-user-store";
+import Sync from "../../services/sync";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -58,9 +61,14 @@ export const Login = ({ changeMode }) => {
     login
   } = useLogin(async () => {
     hideAuth();
-    eSendEvent("userLoggedIn", true);
+    eSendEvent(eUserLoggedIn, true);
     await sleep(500);
     Progress.present();
+    setTimeout(() => {
+      if (!useUserStore.getState().syncing) {
+        Sync.run("global", false, true);
+      }
+    }, 5000);
   });
   const deviceMode = useSettingStore((state) => state.deviceMode);
 

@@ -21,6 +21,9 @@ import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 
+/**
+ * @extends {BaseStore<SearchStore>}
+ */
 class SearchStore extends BaseStore {
   results = [];
 
@@ -31,8 +34,5 @@ class SearchStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<SearchStore>, SearchStore]}
- */
 const [useStore, store] = createStore(SearchStore);
 export { useStore, store };

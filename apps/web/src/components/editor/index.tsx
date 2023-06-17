@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
+import React, {
   useEffect,
   useCallback,
   useState,
   useRef,
-  PropsWithChildren
+  PropsWithChildren,
+  Suspense
 } from "react";
 import ReactDOM from "react-dom";
 import { Box, Button, Flex, Progress, Text } from "@theme-ui/components";
@@ -52,9 +53,11 @@ import { EditorLoader } from "../loaders/editor-loader";
 import { Lightbox } from "../lightbox";
 import ThemeProviderWrapper from "../theme-provider";
 import { Allotment } from "allotment";
-import { PdfPreview } from "../pdf-preview";
+// import { PdfPreview } from "";
 import { showToast } from "../../utils/toast";
-import { getFormattedDate } from "../../utils/time";
+import { getFormattedDate } from "@notesnook/common";
+
+const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
 type PreviewSession = {
   content: { data: string; type: string };
@@ -67,7 +70,11 @@ type DocumentPreview = {
   hash: string;
 };
 
-function onEditorChange(noteId: string, sessionId: string, content: string) {
+function onEditorChange(
+  noteId: string | undefined,
+  sessionId: number,
+  content: string
+) {
   if (!content) return;
 
   editorstore.get().saveSessionContent(noteId, sessionId, {
@@ -266,11 +273,15 @@ export default function EditorManager({
                 height: "100%"
               }}
             >
-              <PdfPreview
-                fileUrl={docPreview.url}
-                hash={docPreview.hash}
-                onClose={() => setDocPreview(undefined)}
-              />
+              <Suspense
+                fallback={<DownloadAttachmentProgress hash={docPreview.hash} />}
+              >
+                <PDFPreview
+                  fileUrl={docPreview.url}
+                  hash={docPreview.hash}
+                  onClose={() => setDocPreview(undefined)}
+                />
+              </Suspense>
             </Flex>
           ) : (
             <DownloadAttachmentProgress hash={docPreview.hash} />
@@ -331,7 +342,7 @@ type EditorOptions = {
   onLoadMedia?: () => void;
 };
 type EditorProps = {
-  content: () => string;
+  content: () => string | undefined;
   nonce?: number;
   options?: EditorOptions;
   onContentChange?: () => void;

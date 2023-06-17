@@ -35,10 +35,10 @@ export interface UserStore extends State {
   setPremium: (premium: boolean) => void;
   setSyncing: (syncing: boolean, status?: SyncStatus) => void;
   setLastSynced: (lastSynced: string) => void;
-  verifyUser: boolean;
-  setVerifyUser: (verified: boolean) => void;
-  shouldBlockVerifyUser: boolean;
-  setShouldBlockVerifyUser: (shouldBlockVerifyUser: boolean) => void;
+  appLocked: boolean;
+  lockApp: (verified: boolean) => void;
+  disableAppLockRequests: boolean;
+  setDisableAppLockRequests: (shouldBlockVerifyUser: boolean) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -46,20 +46,20 @@ export const useUserStore = create<UserStore>((set) => ({
   premium: false,
   lastSynced: "Never",
   syncing: false,
-  verifyUser: false,
+  appLocked: false,
   setUser: (user) => set({ user: user }),
   setPremium: (premium) => set({ premium: premium }),
   setSyncing: (syncing, status = SyncStatus.Passed) => {
     set({ syncing: syncing, lastSyncStatus: status });
   },
   setLastSynced: (lastSynced) => set({ lastSynced: lastSynced }),
-  setVerifyUser: (verified) => set({ verifyUser: verified }),
+  lockApp: (appLocked) => set({ appLocked }),
   lastSyncStatus: SyncStatus.Never,
-  shouldBlockVerifyUser: false,
-  setShouldBlockVerifyUser: (shouldBlockVerifyUser) => {
-    set({ shouldBlockVerifyUser });
+  disableAppLockRequests: false,
+  setDisableAppLockRequests: (disableAppLockRequests) => {
+    set({ disableAppLockRequests });
     setTimeout(() => {
-      set({ shouldBlockVerifyUser: false });
+      set({ disableAppLockRequests: false });
     }, 1000);
   }
 }));

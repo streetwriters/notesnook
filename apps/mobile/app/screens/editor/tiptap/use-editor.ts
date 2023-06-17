@@ -38,7 +38,6 @@ import { useTagStore } from "../../../stores/use-tag-store";
 import { ThemeStore, useThemeStore } from "../../../stores/use-theme-store";
 import { eClearEditor, eOnLoadNote } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
-import { getFormattedDate } from "../../../utils/time";
 import { NoteType } from "../../../utils/types";
 import { onNoteCreated } from "../../notes/common";
 import Commands from "./commands";
@@ -53,6 +52,7 @@ import {
   makeSessionId,
   post
 } from "./utils";
+import { getFormattedDate } from "@notesnook/common";
 
 export const useEditor = (
   editorId = "",
@@ -139,7 +139,7 @@ export const useEditor = (
 
   const reset = useCallback(
     async (resetState = true, resetContent = true) => {
-      currentNote.current?.id && db.fs.cancel(currentNote.current.id);
+      currentNote.current?.id && db.fs?.cancel(currentNote.current.id);
       currentNote.current = null;
       loadedImages.current = {};
       currentContent.current = null;
@@ -206,7 +206,6 @@ export const useEditor = (
             type: type
           };
         }
-
         if (!locked) {
           id = await db.notes?.add(noteData);
           if (!note && id) {

@@ -56,7 +56,7 @@ async function main() {
             await fs.rm("./build/", { force: true, recursive: true });
           }
 
-          await $`npm run build:electron`;
+          await $`npm run bundle`;
           await $`tsc`;
 
           if (first) {
@@ -70,7 +70,7 @@ async function main() {
             await spawnAndWaitUntil(
               path.join(__dirname, "..", "..", "web"),
               "npm run start:desktop",
-              (data) => data.includes("Compiled successfully!")
+              (data) => data.includes("Network: use --host to expose")
             );
             isServerRunning = true;
           }

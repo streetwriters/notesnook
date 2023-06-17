@@ -28,9 +28,9 @@ import { isUserPremium } from "../hooks/use-is-user-premium";
 import { store as themestore } from "../stores/theme-store";
 import { store as appstore } from "../stores/app-store";
 import { h } from "./html";
-import { sanitizeFilename } from "./filename";
+import { sanitizeFilename } from "@notesnook/common";
 import { attachFile } from "../components/editor/picker";
-import { getFormattedDate } from "./time";
+import { getFormattedDate } from "@notesnook/common";
 
 export class WebExtensionServer implements Server {
   async login() {

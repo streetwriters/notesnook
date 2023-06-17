@@ -26,11 +26,11 @@ import { presentDialog } from "../components/dialog/functions";
 import { DatabaseLogger, db } from "../common/database";
 import storage from "../common/database/storage";
 import { eCloseSheet } from "../utils/events";
-import { sanitizeFilename } from "../utils/sanitizer";
 import { sleep } from "../utils/time";
 import { eSendEvent, presentSheet, ToastEvent } from "./event-manager";
 import SettingsService from "./settings";
 import PremiumService from "./premium";
+import { sanitizeFilename } from "@notesnook/common";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;

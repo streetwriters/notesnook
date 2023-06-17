@@ -30,7 +30,6 @@
     "electron-builder-notarize": "^1.5.1",
     "electron-reloader": "^1.2.3",
     "esbuild": "^0.17.19",
-    "patch-package": "^6.5.1",
     "undici": "^5.22.1"
   },
   "optionalDependencies": {
