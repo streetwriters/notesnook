@@ -66,7 +66,6 @@ export type EditorController = {
   openLink: (url: string) => boolean;
   setTitlePlaceholder: React.Dispatch<React.SetStateAction<string>>;
   countWords: (ms: number) => void;
-  onClickToCopy: (text: string) => boolean;
 };
 
 export function useEditorController(update: () => void): EditorController {
@@ -198,10 +197,6 @@ export function useEditorController(update: () => void): EditorController {
     post(EventTypes.link, url);
     return true;
   }, []);
-  const onClickToCopy = useCallback((text: string) => {
-    post(EventTypes.copy, text);
-    return true;
-  }, []);
 
   return {
     contentChange,
@@ -218,7 +213,6 @@ export function useEditorController(update: () => void): EditorController {
     content: htmlContentRef,
     openLink,
     onUpdate: onUpdate,
-    countWords,
-    onClickToCopy
+    countWords
   };
 }

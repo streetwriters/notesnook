@@ -29,8 +29,8 @@ import { ResponsivePresenter } from "../../components/responsive";
 import { Popup } from "../../toolbar/components/popup";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 import { Button } from "../../components/button";
-import { findParentNodeClosestToPos } from "@tiptap/core";
 import { useTimer } from "../../hooks/use-timer";
+import { writeText } from "clipboard-polyfill";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
@@ -49,38 +49,6 @@ export function CodeblockComponent(
   const languageDefinition = Languages.find(
     (l) => l.filename === language || l.alias?.some((a) => a === language)
   );
-
-  const onClickToCopy = () => {
-    const firstLine = lines.at(0);
-    if (!firstLine) return;
-
-    const { type } = node;
-    const position = editor.state.doc.resolve(firstLine.from);
-    const codeblock = findParentNodeClosestToPos(
-      position,
-      (node) => node.type.name === type.name
-    );
-
-    if (!codeblock) return;
-    const { $from, $to } = editor.state.selection;
-    const finalPosition = codeblock.pos + codeblock.node.nodeSize - 1;
-    const isNotSelecting = $from.pos !== codeblock.pos + 1 || $to.pos !== finalPosition
-
-    if (isNotSelecting) {
-      editor.commands.setTextSelection({
-        from: codeblock.pos + 1,
-        to: finalPosition
-      });
-    }
-    editor.commands.focus();
-    editor.commands.copy(codeblock.node.textContent);
-    start();
-  };
-
-  const copyButtonStyle = {
-    ...(enabled && { borderColor: "primary" }),
-    ...(!isMobile && { "div:hover > &": { opacity: 1 } })
-  };
 
   return (
     <>
@@ -189,7 +157,7 @@ export function CodeblockComponent(
             variant={"tool"}
             sx={{
               position: "absolute",
-              opacity: Number(isMobile),
+              opacity: isMobile ? 1 : 0,
               right: 0,
               p: 1,
               mr: 1,
@@ -199,10 +167,16 @@ export function CodeblockComponent(
               justifyContent: "flex-end",
               border: "1px solid var(--codeBorder)",
               ":hover": { bg: "bgSecondaryHover" },
-              ...copyButtonStyle
+              ...{
+                ...(enabled && { borderColor: "primary" }),
+                ...(!isMobile && { "div:hover > &": { opacity: 1 } })
+              }
             }}
             title={enabled ? "Copied to clipboard" : "Copy to clipboard"}
-            onClick={onClickToCopy}
+            onClick={() => {
+              writeText(node.textContent);
+              start();
+            }}
           >
             <Icon
               path={enabled ? Icons.check : Icons.copy}

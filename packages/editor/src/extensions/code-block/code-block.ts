@@ -74,11 +74,6 @@ export interface CodeBlockOptions {
    * Custom HTML attributes that should be added to the rendered HTML tag.
    */
   HTMLAttributes: Record<string, unknown>;
-
-  /**
-   * Function that receives the content to copy.
-   */
-  onClickToCopy: (text: string) => boolean;
 }
 
 declare module "@tiptap/core" {
@@ -97,11 +92,6 @@ declare module "@tiptap/core" {
        * Change code block indentation options
        */
       changeCodeBlockIndentation: (options: Indent) => ReturnType;
-
-      /**
-       * Copy text to clipboard
-       */
-      copy: (text: string) => ReturnType;
     };
   }
 }
@@ -118,8 +108,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
       exitOnTripleEnter: true,
       exitOnArrowDown: true,
       exitOnArrowUp: true,
-      HTMLAttributes: {},
-      onClickToCopy: () => false
+      HTMLAttributes: {}
     };
   },
 
@@ -288,9 +277,6 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           });
           return true;
         },
-      copy: (text) => () => {
-        return this.options.onClickToCopy(text);
-      }
     };
   },
 

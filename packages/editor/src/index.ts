@@ -113,7 +113,6 @@ const useTiptap = (
     onPreviewAttachment,
     onOpenLink,
     onBeforeCreate,
-    onClickToCopy,
     downloadOptions,
     dateFormat,
     timeFormat,
@@ -210,9 +209,7 @@ const useTiptap = (
         TableCell,
         TableHeader,
         Highlight,
-        CodeBlock.configure({
-          onClickToCopy
-        }),
+        CodeBlock,
         Color,
         TextAlign.configure({
           types: ["heading", "paragraph"],
@@ -259,8 +256,7 @@ const useTiptap = (
       onBeforeCreate,
       onOpenLink,
       dateFormat,
-      timeFormat,
-      onClickToCopy
+      timeFormat
     ]
   );
 

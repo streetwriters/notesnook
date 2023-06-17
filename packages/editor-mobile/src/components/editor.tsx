@@ -96,10 +96,6 @@ const Tiptap = ({
         global.editorController.previewAttachment(attachment);
         return true;
       },
-      onClickToCopy(text) {
-        global.editorController.onClickToCopy(text);
-        return true;
-      },
       theme: editorTheme,
       element: !layout ? undefined : contentRef.current || undefined,
       editable: !settings.readonly,
