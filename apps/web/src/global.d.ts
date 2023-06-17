@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import "vite/client";
+import "vite-plugin-svgr/client";
+
 declare global {
   interface Window {
     os?: NodeJS.Platform | "mas";
