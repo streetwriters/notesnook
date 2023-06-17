@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState, Suspense, useMemo, useRef } from "react";
+import React, { useState, Suspense, useRef } from "react";
 import { Box, Flex } from "@theme-ui/components";
 import ThemeProvider from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
@@ -25,7 +25,6 @@ import useTablet from "./hooks/use-tablet";
 import { LazyMotion, domAnimation } from "framer-motion";
 import useDatabase from "./hooks/use-database";
 import { Allotment, LayoutPriority } from "allotment";
-import Config from "./utils/config";
 import { useStore } from "./stores/app-store";
 import { Toaster } from "react-hot-toast";
 import { ViewLoader } from "./components/loaders/view-loader";
@@ -35,6 +34,7 @@ import { EditorLoader } from "./components/loaders/editor-loader";
 import { FlexScrollContainer } from "./components/scroll-container";
 import CachedRouter from "./components/cached-router";
 import { WebExtensionRelay } from "./utils/web-extension-relay";
+import { usePersistentState } from "./hooks/use-persistent-state";
 
 new WebExtensionRelay();
 
@@ -104,16 +104,12 @@ function SuspenseLoader({ condition, props, component: Component, fallback }) {
 function DesktopAppContents({ isAppLoaded, show, setShow }) {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isTablet = useTablet();
-  const defaultSizes = useMemo(
-    () => [isTablet ? 60 : 180, isTablet ? 240 : 380],
-    [isTablet]
-  );
-  const paneSizes = useMemo(
-    () => Config.get("paneSizes", defaultSizes),
-    [defaultSizes]
-  );
+  const [paneSizes, setPaneSizes] = usePersistentState("paneSizes", [
+    isTablet ? 60 : 180,
+    isTablet ? 240 : 380
+  ]);
   const panesRef = useRef();
-  const [isNarrow, setIsNarrow] = useState();
+  const [isNarrow, setIsNarrow] = useState(paneSizes[0] <= 55);
 
   return (
     <>
@@ -126,8 +122,8 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
         <Allotment
           ref={panesRef}
           proportionalLayout={false}
-          onChange={(sizes) => {
-            Config.set("paneSizes", sizes);
+          onDragEnd={(sizes) => {
+            setPaneSizes(sizes);
             setIsNarrow(sizes[0] <= 55);
           }}
         >
@@ -188,6 +184,7 @@ function MobileAppContents({ isAppLoaded }) {
   return (
     <FlexScrollContainer
       id="slider"
+      suppressScrollX
       style={{
         display: "flex",
         flexDirection: "row",
