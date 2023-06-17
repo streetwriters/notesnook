@@ -238,7 +238,7 @@ function DiffViewer(props) {
                 }}
               >
                 <Editor
-                  content={htmlDiff.before}
+                  content={() => htmlDiff.before}
                   nonce={0}
                   options={{ readonly: true, headless: true }}
                 />
@@ -282,7 +282,7 @@ function DiffViewer(props) {
             <ScrollSyncPane>
               <Flex sx={{ px: 2, overflow: "auto" }}>
                 <Editor
-                  content={htmlDiff.after}
+                  content={() => htmlDiff.after}
                   nonce={0}
                   options={{ readonly: true, headless: true }}
                 />
