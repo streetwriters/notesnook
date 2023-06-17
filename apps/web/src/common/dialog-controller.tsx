@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ReactDOM from "react-dom";
-import { Dialogs } from "../components/dialogs";
+import { Dialogs } from "../dialogs";
 import ThemeProvider from "../components/theme-provider";
 import qclone from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
@@ -32,12 +32,12 @@ import { Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
 import { AppVersion, getChangelog } from "../utils/version";
-import { Period } from "../components/dialogs/buy-dialog/types";
-import { FeatureKeys } from "../components/dialogs/feature-dialog";
-import { AuthenticatorType } from "../components/dialogs/mfa/types";
+import { Period } from "../dialogs/buy-dialog/types";
+import { FeatureKeys } from "../dialogs/feature-dialog";
+import { AuthenticatorType } from "../dialogs/mfa/types";
 import { Suspense } from "react";
 import { Reminder } from "@notesnook/core/collections/reminders";
-import { ConfirmDialogProps } from "../components/dialogs/confirm";
+import { ConfirmDialogProps } from "../dialogs/confirm";
 import { getFormattedDate } from "@notesnook/common";
 import { downloadUpdate, installUpdate } from "../utils/updater";
 
