@@ -48,7 +48,8 @@ function PublishView(props) {
 
   const onKeyDown = useCallback(
     (event) => {
-      if (event.keyCode === 27) onClose(false);
+      if (event.keyCode === 27);
+      onClose(false);
     },
     [onClose]
   );

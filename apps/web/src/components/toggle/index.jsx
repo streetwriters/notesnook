@@ -63,14 +63,20 @@ function Toggle(props) {
         borderBottomColor: "border",
         ":hover": { borderBottomColor: "primary" },
         alignItems: "center",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+
+        "& > label": { width: "auto", flexShrink: 0 }
       }}
     >
       <Tip text={title} tip={isToggled ? onTip : offTip} sx={{ mr: 2 }} />
       {isLoading ? (
         <Loading size={18} />
       ) : (
-        <Switch onClick={disabled ? null : onClick} checked={isToggled} />
+        <Switch
+          sx={{ m: 0 }}
+          onClick={disabled ? null : onClick}
+          checked={isToggled}
+        />
       )}
     </Flex>
   );

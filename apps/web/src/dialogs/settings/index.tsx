@@ -419,6 +419,7 @@ function SettingItem(props: { item: Setting }) {
               case "toggle":
                 return (
                   <Switch
+                    sx={{ m: 0 }}
                     disabled={isWorking}
                     onChange={() => workWithLoading(component.toggle)}
                     checked={component.isToggled()}
