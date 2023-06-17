@@ -532,6 +532,7 @@ function EditorChrome(
             initial={{ opacity: 0 }}
             animate={{ opacity: isLoading ? 0 : 1 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
+            sx={{ flex: 1 }}
           >
             {children}
           </AnimatedFlex>
