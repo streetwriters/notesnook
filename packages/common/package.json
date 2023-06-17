@@ -31,15 +31,15 @@
   "devDependencies": {
     "typescript": "^4.8.2",
     "@notesnook/core": "*",
-    "timeago.js": "4.0.2",
-    "react": "18.2.0",
-    "@types/react": "18.2.9"
+    "react": "17.0.2",
+    "@types/react": "17.0.2"
   },
   "peerDependencies": {
     "timeago.js": "4.0.2",
-    "react": "*"
+    "react": ">=17.0.2"
   },
   "dependencies": {
+    "timeago.js": "4.0.2",
     "@notesnook/core": "*"
   }
 }
