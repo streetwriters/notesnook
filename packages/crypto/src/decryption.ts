@@ -67,7 +67,10 @@ export default class Decryption {
       null,
       input,
       null,
-      from_base64(cipherData.iv),
+      from_base64(
+        cipherData.iv.replace(/\//g, "_").replace(/\+/g, "-"),
+        base64_variants.URLSAFE_NO_PADDING
+      ),
       encryptionKey.key
     );
 
