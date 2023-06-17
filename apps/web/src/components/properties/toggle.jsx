@@ -31,7 +31,9 @@ function Toggle(props) {
         borderBottom: "1px solid var(--border)",
         cursor: "pointer",
         alignItems: "center",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+
+        "& label": { width: "auto", flexShrink: 0 }
       }}
       onClick={() => onToggle(!isOn)}
       data-test-id={props.testId}
@@ -44,7 +46,7 @@ function Toggle(props) {
         <ToggleIcon size={13} sx={{ flexShrink: 0, mr: 1 }} />
         {label}
       </Text>
-      <Switch onClick={() => onToggle(!isOn)} checked={isOn} />
+      <Switch sx={{ m: 0 }} onClick={() => onToggle(!isOn)} checked={isOn} />
     </Flex>
   );
 }
