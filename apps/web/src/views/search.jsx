@@ -21,7 +21,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ListContainer from "../components/list-container";
 import { db } from "../common/db";
 import SearchBox from "../components/search";
-import ProgressBar from "../components/progress-bar";
 import { useStore as useNoteStore } from "../stores/note-store";
 import { Flex, Text } from "@theme-ui/components";
 import { showToast } from "../utils/toast";
@@ -194,12 +193,6 @@ function Search({ type }) {
           <Placeholder
             context="search"
             text={`Searching in ${searchState.totalItems} ${type}...`}
-          />
-          <ProgressBar
-            progress={100}
-            width={"60%"}
-            duration={3}
-            sx={{ mt: 2 }}
           />
         </Flex>
       ) : (
