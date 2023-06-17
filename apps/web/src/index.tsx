@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import "./polyfills";
 import "@notesnook/core/types";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { render } from "react-dom";
@@ -24,9 +25,7 @@ import { getCurrentHash, getCurrentPath, makeURL } from "./navigation";
 import Config from "./utils/config";
 import { isTesting } from "./utils/platform";
 import { initalizeLogger, logger } from "./utils/logger";
-import { Buffer } from "buffer";
 import { AuthProps } from "./views/auth";
-window.Buffer = Buffer;
 
 initalizeLogger();
 
