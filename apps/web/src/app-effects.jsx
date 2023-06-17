@@ -43,7 +43,7 @@ import useSystemTheme from "./hooks/use-system-theme";
 import { isTesting } from "./utils/platform";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";
-import { interruptedOnboarding } from "./components/dialog/onboarding-dialog";
+import { interruptedOnboarding } from "./dialogs/onboarding-dialog";
 import { hashNavigate } from "./navigation";
 import { desktop } from "./common/desktop-bridge";
 

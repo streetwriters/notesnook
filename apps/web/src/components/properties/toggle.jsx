@@ -17,9 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@theme-ui/components";
+import { Flex, Switch, Text } from "@theme-ui/components";
 import { useStore } from "../../stores/editor-store";
-import Switch from "../switch";
 
 function Toggle(props) {
   const { icon: ToggleIcon, label, onToggle, toggleKey } = props;

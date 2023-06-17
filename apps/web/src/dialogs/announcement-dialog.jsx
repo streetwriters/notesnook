@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Modal from "react-modal";
 import { useTheme } from "@emotion/react";
 import { Flex } from "@theme-ui/components";
-import AnnouncementBody from "../announcements/body";
+import AnnouncementBody from "../components/announcements/body";
 import { store as announcementStore } from "../stores/announcement-store";
 import { useCallback } from "react";
 

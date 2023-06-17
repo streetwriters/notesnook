@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Search } from "../icons";
-import "./search.css";
 import Field from "../field";
 import { debounce } from "@notesnook/common";
 
