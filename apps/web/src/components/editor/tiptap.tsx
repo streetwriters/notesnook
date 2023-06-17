@@ -57,7 +57,6 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce, debounceWithId } from "../../utils/debounce";
 import { store as editorstore } from "../../stores/editor-store";
-import { writeText } from "clipboard-polyfill";
 
 type TipTapProps = {
   editorContainer: HTMLElement;
@@ -273,10 +272,6 @@ function TipTap(props: TipTapProps) {
       },
       onOpenLink: (url) => {
         window.open(url, "_blank");
-        return true;
-      },
-      onClickToCopy: (text) => {
-        writeText(text);
         return true;
       }
     };
