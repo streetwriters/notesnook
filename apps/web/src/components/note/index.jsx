@@ -19,7 +19,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useMemo } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
-import * as Icon from "../icons";
+import {
+  Topic,
+  Notebook,
+  Reminder,
+  Alert,
+  Lock,
+  Star,
+  SyncOff,
+  Attachment,
+  AttachmentError,
+  Pin,
+  PDF,
+  Markdown,
+  HTML,
+  Readonly,
+  StarOutline,
+  AddReminder,
+  Colors,
+  Tag2,
+  Print,
+  Publish,
+  Export,
+  Duplicate,
+  Sync,
+  Trash,
+  Circle,
+  AddToNotebook,
+  RemoveShortcutLink,
+  Plus,
+  Tag
+} from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
 import {
@@ -123,12 +153,12 @@ function Note(props) {
                 navigate(reference.url);
               }}
               text={reference.title}
-              icon={reference.type === "topic" ? Icon.Topic : Icon.Notebook}
+              icon={reference.type === "topic" ? Topic : Notebook}
             />
           ))}
           {reminder && isReminderActive(reminder) && (
             <IconTag
-              icon={Icon.Reminder}
+              icon={Reminder}
               text={formatReminderTime(reminder, true)}
               title={reminder.title}
               styles={
@@ -154,10 +184,10 @@ function Note(props) {
           {compact ? (
             <>
               {note.conflicted && (
-                <Icon.Alert size={15} color="error" sx={{ mr: 1 }} />
+                <Alert size={15} color="error" sx={{ mr: 1 }} />
               )}
               {note.locked && (
-                <Icon.Lock
+                <Lock
                   size={11}
                   color={"fontTertiary"}
                   sx={{ mr: 1 }}
@@ -165,17 +195,17 @@ function Note(props) {
                 />
               )}
               {note.favorite && (
-                <Icon.Star color={primary} size={15} sx={{ mr: 1 }} />
+                <Star color={primary} size={15} sx={{ mr: 1 }} />
               )}
               <TimeAgo live={true} datetime={date} locale="short" />
             </>
           ) : (
             <>
               {note.conflicted && (
-                <Icon.Alert size={15} color="error" sx={{ mr: 1 }} />
+                <Alert size={15} color="error" sx={{ mr: 1 }} />
               )}
 
-              {note.localOnly && <Icon.SyncOff size={13} sx={{ mr: 1 }} />}
+              {note.localOnly && <SyncOff size={13} sx={{ mr: 1 }} />}
 
               <TimeAgo
                 sx={{ flexShrink: 0 }}
@@ -187,24 +217,24 @@ function Note(props) {
 
               {attachments.length > 0 && (
                 <Flex mr={1}>
-                  <Icon.Attachment size={13} color="fontTertiary" />
+                  <Attachment size={13} color="fontTertiary" />
                   <Text ml={"2px"}>{attachments.length}</Text>
                 </Flex>
               )}
 
               {failed.length > 0 && (
                 <Flex mr={1} title={`Errors in ${failed.length} attachments.`}>
-                  <Icon.AttachmentError size={13} color="error" />
+                  <AttachmentError size={13} color="error" />
                   <Text ml={"2px"}>{failed.length}</Text>
                 </Flex>
               )}
 
               {note.pinned && !props.context && (
-                <Icon.Pin size={13} color={primary} sx={{ mr: 1 }} />
+                <Pin size={13} color={primary} sx={{ mr: 1 }} />
               )}
 
               {note.locked && (
-                <Icon.Lock
+                <Lock
                   size={13}
                   color={"fontTertiary"}
                   sx={{ mr: 1 }}
@@ -213,7 +243,7 @@ function Note(props) {
               )}
 
               {note.favorite && (
-                <Icon.Star color={primary} size={15} sx={{ mr: 1 }} />
+                <Star color={primary} size={15} sx={{ mr: 1 }} />
               )}
 
               {tags?.map((tag) => {
@@ -282,26 +312,26 @@ const formats = [
   {
     type: "pdf",
     title: "PDF",
-    icon: Icon.PDF,
+    icon: PDF,
     subtitle:
       "Can be opened in any PDF reader like Adobe Acrobat or Foxit Reader."
   },
   {
     type: "md",
     title: "Markdown",
-    icon: Icon.Markdown,
+    icon: Markdown,
     subtitle: "Can be opened in any plain-text or markdown editor."
   },
   {
     type: "html",
     title: "HTML",
-    icon: Icon.HTML,
+    icon: HTML,
     subtitle: "Can be opened in any web browser like Google Chrome."
   },
   {
     type: "txt",
     title: "Text",
-    icon: Icon.Text,
+    icon: Text,
     subtitle: "Can be opened in any plain-text editor."
   }
 ];
@@ -313,7 +343,7 @@ const menuItems = [
     key: "pin",
     title: "Pin",
     checked: ({ note }) => note.pinned,
-    icon: Icon.Pin,
+    icon: Pin,
     onClick: async ({ note }) => {
       await pin(note);
     }
@@ -322,14 +352,14 @@ const menuItems = [
     key: "readonly",
     title: "Readonly",
     checked: ({ note }) => note.readonly,
-    icon: Icon.Readonly,
+    icon: Readonly,
     onClick: ({ note }) => store.readonly(note.id)
   },
   {
     key: "favorite",
     title: "Favorite",
     checked: ({ note }) => note.favorite,
-    icon: Icon.StarOutline,
+    icon: StarOutline,
     onClick: ({ note }) => store.favorite(note.id)
   },
   {
@@ -338,7 +368,7 @@ const menuItems = [
       !db.notes.note(note.id).synced() ? notFullySyncedText : false,
     title: "Lock",
     checked: ({ note }) => note.locked,
-    icon: Icon.Lock,
+    icon: Lock,
     onClick: async ({ note }) => {
       const { unlock, lock } = store.get();
       if (!note.locked) {
@@ -354,7 +384,7 @@ const menuItems = [
   {
     key: "remind-me",
     title: "Remind me",
-    icon: Icon.AddReminder,
+    icon: AddReminder,
     onClick: async ({ note }) => {
       await showAddReminderDialog(note.id);
     }
@@ -363,20 +393,20 @@ const menuItems = [
   {
     key: "notebooks",
     title: "Notebooks",
-    icon: Icon.Notebook,
+    icon: Notebook,
     items: notebooksMenuItems,
     multiSelect: true
   },
   {
     key: "colors",
     title: "Assign color",
-    icon: Icon.Colors,
+    icon: Colors,
     items: colorsToMenuItems()
   },
   {
     key: "add-tags",
     title: "Tags",
-    icon: Icon.Tag2,
+    icon: Tag2,
     multiSelect: true,
     items: tagsMenuItems
     // onClick: async ({ items }) => {
@@ -391,7 +421,7 @@ const menuItems = [
       if (!db.notes.note(note.id).synced()) return notFullySyncedText;
       if (note.locked) return "Locked notes cannot be printed.";
     },
-    icon: Icon.Print,
+    icon: Print,
     onClick: async ({ note }) => {
       await exportNotes("pdf", [note.id]);
     }
@@ -403,7 +433,7 @@ const menuItems = [
       if (!db.monographs.isPublished(note.id) && note.locked)
         return "You cannot publish a locked note.";
     },
-    icon: Icon.Publish,
+    icon: Publish,
     title: "Publish",
     checked: ({ note }) => db.monographs.isPublished(note.id),
     onClick: async ({ note }) => {
@@ -415,7 +445,7 @@ const menuItems = [
   {
     key: "export",
     title: "Export as",
-    icon: Icon.Export,
+    icon: Export,
     disabled: ({ note }) => {
       if (!db.notes.note(note.id).synced()) return notFullySyncedText;
       if (note.locked) return "Locked notes cannot be exported currently.";
@@ -447,7 +477,7 @@ const menuItems = [
       if (!db.notes.note(note.id).synced()) return notFullySyncedText;
       if (note.locked) return "Locked notes cannot be duplicated";
     },
-    icon: Icon.Duplicate,
+    icon: Duplicate,
     onClick: async ({ note }) => {
       const id = await store.get().duplicate(note);
       if (
@@ -470,7 +500,7 @@ const menuItems = [
       !db.notes.note(note.id).synced() ? notFullySyncedText : false,
     title: "Local only",
     checked: ({ note }) => note.localOnly,
-    icon: ({ note }) => (note.localOnly ? Icon.Sync : Icon.SyncOff),
+    icon: ({ note }) => (note.localOnly ? Sync : SyncOff),
     onClick: async ({ note }) => {
       if (
         note.localOnly ||
@@ -491,7 +521,7 @@ const menuItems = [
     title: "Move to trash",
     color: "error",
     iconColor: "error",
-    icon: Icon.Trash,
+    icon: Trash,
     disabled: ({ items }) => {
       const areAllSynced = items.reduce((prev, curr) => {
         if (!prev || !db.notes.note(curr.id).synced()) return false;
@@ -520,7 +550,7 @@ function colorsToMenuItems() {
     return {
       key: lowercase,
       title: () => db.colors.alias(lowercase) || label,
-      icon: Icon.Circle,
+      icon: Circle,
       iconColor: lowercase,
       checked: ({ note }) => {
         return note.color === lowercase;
@@ -540,7 +570,7 @@ function notebooksMenuItems({ items }) {
   menuItems.push({
     key: "link-notebooks",
     title: "Link to...",
-    icon: Icon.AddToNotebook,
+    icon: AddToNotebook,
     onClick: async () => {
       await showMoveNoteDialog(noteIds);
     }
@@ -556,7 +586,7 @@ function notebooksMenuItems({ items }) {
       {
         key: "remove-from-all-notebooks",
         title: "Unlink from all",
-        icon: Icon.RemoveShortcutLink,
+        icon: RemoveShortcutLink,
         onClick: async () => {
           await db.notes.removeFromAllNotebooks(...noteIds);
           store.refresh();
@@ -571,7 +601,7 @@ function notebooksMenuItems({ items }) {
       menuItems.push({
         key: notebook.id,
         title: notebook.title,
-        icon: Icon.Notebook,
+        icon: Notebook,
         checked: true,
         tooltip: "Click to remove from this notebook",
         onClick: async () => {
@@ -592,7 +622,7 @@ function notebooksMenuItems({ items }) {
         menuItems.push({
           key: topicId,
           title: topic.title,
-          icon: Icon.Topic,
+          icon: Topic,
           checked: true,
           tooltip: "Click to remove from this topic",
           onClick: async () => {
@@ -617,7 +647,7 @@ function tagsMenuItems({ items }) {
   menuItems.push({
     key: "assign-tags",
     title: "Assign to...",
-    icon: Icon.Plus,
+    icon: Plus,
     onClick: async () => {
       await showAddTagsDialog(noteIds);
     }
@@ -630,7 +660,7 @@ function tagsMenuItems({ items }) {
       {
         key: "remove-from-all-tags",
         title: "Remove from all",
-        icon: Icon.RemoveShortcutLink,
+        icon: RemoveShortcutLink,
         onClick: async () => {
           for (const note of items) {
             for (const tag of tags) {
@@ -650,7 +680,7 @@ function tagsMenuItems({ items }) {
       menuItems.push({
         key: tag,
         title: db.tags.alias(tag),
-        icon: Icon.Tag,
+        icon: Tag,
         checked: true,
         tooltip: "Click to remove from this tag",
         onClick: async () => {

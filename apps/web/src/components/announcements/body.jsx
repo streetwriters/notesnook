@@ -29,7 +29,16 @@ import {
   showBuyDialog
 } from "../../common/dialog-controller";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
-import * as Icon from "../icons";
+import {
+  Sync,
+  Notebook,
+  Tag2,
+  Attachment,
+  Backup,
+  Vault,
+  PDF,
+  Edit
+} from "../icons";
 import { store as appStore } from "../../stores/app-store";
 import { createBackup } from "../../common";
 import { allowedPlatforms } from "../../stores/announcement-store";
@@ -38,14 +47,14 @@ var margins = [0, 2];
 var HORIZONTAL_MARGIN = 3;
 
 const features = [
-  { icon: Icon.Sync, title: "Instant private sync" },
-  { icon: Icon.Notebook, title: "Unlimited notebooks" },
-  { icon: Icon.Tag2, title: "Unlimited tags" },
-  { icon: Icon.Attachment, title: "Encrypted attachments" },
-  { icon: Icon.Backup, title: "Encrypted backups" },
-  { icon: Icon.Vault, title: "Secure private vault" },
-  { icon: Icon.PDF, title: "Export to PDF" },
-  { icon: Icon.Edit, title: "Rich text editor" }
+  { icon: Sync, title: "Instant private sync" },
+  { icon: Notebook, title: "Unlimited notebooks" },
+  { icon: Tag2, title: "Unlimited tags" },
+  { icon: Attachment, title: "Encrypted attachments" },
+  { icon: Backup, title: "Encrypted backups" },
+  { icon: Vault, title: "Secure private vault" },
+  { icon: PDF, title: "Export to PDF" },
+  { icon: Edit, title: "Rich text editor" }
 ];
 
 export default function AnnouncementBody({ components, type, dismiss }) {

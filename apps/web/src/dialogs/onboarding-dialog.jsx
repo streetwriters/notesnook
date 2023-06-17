@@ -19,7 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Text, Flex, Button, Image, Box } from "@theme-ui/components";
 import Dialog from "../components/dialog";
-import * as Icon from "../components/icons";
+import {
+  Pro,
+  Email,
+  Discord,
+  Twitter,
+  Github,
+  Loading
+} from "../components/icons";
 import { ReactComponent as E2E } from "../assets/e2e.svg";
 import { ReactComponent as Note } from "../assets/note2.svg";
 import { ReactComponent as Nomad } from "../assets/nomad.svg";
@@ -73,7 +80,7 @@ const newUserSteps = [
     image: <Friends width={140} />
   },
   {
-    image: <Icon.Pro size={60} color="primary" />,
+    image: <Pro size={60} color="primary" />,
     title: "Notesnook Pro",
     subtitle: "Experience the next level of private note taking",
     component: TrialOffer
@@ -292,25 +299,25 @@ const supportChannels = [
     key: "email",
     url: "mailto:support@streetwriters.co",
     title: "Email us",
-    icon: Icon.Email
+    icon: Email
   },
   {
     key: "discord",
     url: "https://discord.com/invite/zQBK97EE22",
     title: "Join the community",
-    icon: Icon.Discord
+    icon: Discord
   },
   {
     key: "twitter",
     url: "https://twitter.com/notesnook",
     title: "Follow us @notesnook",
-    icon: Icon.Twitter
+    icon: Twitter
   },
   {
     key: "github",
     url: "https://github.com/streetwriters/notesnook",
     title: "Create an issue",
-    icon: Icon.Github
+    icon: Github
   }
 ];
 
@@ -500,7 +507,7 @@ function TrialOffer({ onClose }) {
             }
           }}
         >
-          {loading ? <Icon.Loading size={16} /> : "Try free for 14 days"}
+          {loading ? <Loading size={16} /> : "Try free for 14 days"}
         </Button>
       </Flex>
       <Button

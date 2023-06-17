@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useRef, useState } from "react";
 import { Flex, Text } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { ArrowLeft, Menu, Search, Plus } from "../icons";
 import { useStore } from "../../stores/app-store";
 import { CREATE_BUTTON_MAP } from "../../common";
 import useMobile from "../../hooks/use-mobile";
@@ -66,7 +66,7 @@ function Header(props) {
       <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
         <Flex py={1} sx={{ alignItems: "center", justifyContent: "center" }}>
           {buttons?.back ? (
-            <Icon.ArrowLeft
+            <ArrowLeft
               size={24}
               title={buttons.back.title}
               onClick={buttons.back.action}
@@ -75,7 +75,7 @@ function Header(props) {
               data-test-id="go-back"
             />
           ) : (
-            <Icon.Menu
+            <Menu
               onClick={() => toggleSideMenu(true)}
               sx={{
                 flexShrink: 0,
@@ -98,7 +98,7 @@ function Header(props) {
         </Flex>
         <Flex sx={{ flexShrink: 0 }}>
           {buttons?.search && (
-            <Icon.Search
+            <Search
               data-test-id={"open-search"}
               size={24}
               title={buttons.search.title}
@@ -107,7 +107,7 @@ function Header(props) {
           )}
 
           {!isMobile && createButtonData && (
-            <Icon.Plus
+            <Plus
               data-test-id={`${type}-action-button`}
               color="static"
               size={18}

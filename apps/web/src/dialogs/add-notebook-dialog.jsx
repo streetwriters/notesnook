@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { Flex, Text } from "@theme-ui/components";
-import * as Icon from "../components/icons";
+import { Notebook, Checkmark, Plus, Topic } from "../components/icons";
 import Dialog from "../components/dialog";
 import qclone from "qclone";
 import Field from "../components/field";
@@ -130,7 +130,7 @@ class AddNotebookDialog extends React.Component {
             ? `You are editing "${this.notebookTitle}".`
             : "Notebooks are the best way to organize your notes."
         }
-        icon={Icon.Notebook}
+        icon={Notebook}
         positiveButton={{
           text: props.edit ? "Save" : "Create",
           onClick: () => {
@@ -181,7 +181,7 @@ class AddNotebookDialog extends React.Component {
                   this.addTopic(this._topicInputRef.value);
                 }
               },
-              icon: this.state.isEditting ? Icon.Checkmark : Icon.Plus
+              icon: this.state.isEditting ? Checkmark : Plus
             }}
             onChange={(e) => {
               if (!this.state.isEditting) return;
@@ -241,7 +241,7 @@ function TopicItem(props) {
       data-test-id="topic-item"
     >
       <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
-        <Icon.Topic />
+        <Topic />
         <Text as="span" ml={1} sx={{ fontSize: "body", color: "text" }}>
           {title}
         </Text>

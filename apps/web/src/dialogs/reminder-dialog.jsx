@@ -19,18 +19,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Text, Flex, Box } from "@theme-ui/components";
 import Dialog from "../components/dialog";
-import * as Icon from "../components/icons";
+import {
+  Sync,
+  Notebook,
+  Tag2,
+  Attachment,
+  Backup,
+  Vault,
+  PDF,
+  Edit
+} from "../components/icons";
 import { showBuyDialog } from "../common/dialog-controller";
 
 const features = [
-  { icon: Icon.Sync, title: "Instant private sync" },
-  { icon: Icon.Notebook, title: "Unlimited notebooks" },
-  { icon: Icon.Tag2, title: "Unlimited tags" },
-  { icon: Icon.Attachment, title: "Encrypted attachments" },
-  { icon: Icon.Backup, title: "Encrypted backups" },
-  { icon: Icon.Vault, title: "Secure private vault" },
-  { icon: Icon.PDF, title: "Export to PDF" },
-  { icon: Icon.Edit, title: "Rich text editor" }
+  { icon: Sync, title: "Instant private sync" },
+  { icon: Notebook, title: "Unlimited notebooks" },
+  { icon: Tag2, title: "Unlimited tags" },
+  { icon: Attachment, title: "Encrypted attachments" },
+  { icon: Backup, title: "Encrypted backups" },
+  { icon: Vault, title: "Secure private vault" },
+  { icon: PDF, title: "Export to PDF" },
+  { icon: Edit, title: "Rich text editor" }
 ];
 // TODO create trial expiry coupon codes
 const reminders = {

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ListItem from "../list-item";
 import { showMultiPermanentDeleteConfirmation } from "../../common/dialog-controller";
-import * as Icon from "../icons";
+import { Restore, DeleteForver } from "../icons";
 import { store } from "../../stores/trash-store";
 import { Flex, Text } from "@theme-ui/components";
 import TimeAgo from "../time-ago";
@@ -63,7 +63,7 @@ const menuItems = [
   {
     key: "restore",
     title: "Restore",
-    icon: Icon.Restore,
+    icon: Restore,
     onClick: ({ items }) => {
       store.restore(items.map((i) => i.id));
       showToast("success", `${pluralize(items.length, "item")} restored`);
@@ -73,7 +73,7 @@ const menuItems = [
   {
     key: "delete",
     title: "Delete",
-    icon: Icon.DeleteForver,
+    icon: DeleteForver,
     color: "error",
     iconColor: "error",
     onClick: async ({ items }) => {

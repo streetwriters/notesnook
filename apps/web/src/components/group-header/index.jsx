@@ -17,7 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import * as Icon from "../icons";
+import {
+  GroupBy,
+  OrderAtoZ,
+  OrderOldestNewest,
+  OrderZtoA,
+  OrderNewestOldest,
+  SortBy,
+  SortAsc,
+  SortDesc,
+  DetailedView,
+  CompactView
+} from "../icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { db } from "../../common/db";
@@ -39,7 +50,7 @@ const groupByToTitleMap = {
 const groupByMenu = {
   key: "groupBy",
   title: "Group by",
-  icon: Icon.GroupBy,
+  icon: GroupBy,
   items: map([
     { key: "none", title: "None" },
     { key: "default", title: "Default" },
@@ -56,11 +67,11 @@ const orderByMenu = {
   icon: ({ groupOptions }) =>
     groupOptions.sortDirection === "asc"
       ? groupOptions.sortBy === "title"
-        ? Icon.OrderAtoZ
-        : Icon.OrderOldestNewest
+        ? OrderAtoZ
+        : OrderOldestNewest
       : groupOptions.sortBy === "title"
-      ? Icon.OrderZtoA
-      : Icon.OrderNewestOldest,
+      ? OrderZtoA
+      : OrderNewestOldest,
   items: map([
     {
       key: "asc",
@@ -78,7 +89,7 @@ const orderByMenu = {
 const sortByMenu = {
   key: "sortBy",
   title: "Sort by",
-  icon: Icon.SortBy,
+  icon: SortBy,
   items: map([
     {
       key: "dateCreated",
@@ -253,11 +264,7 @@ function GroupHeader(props) {
           {type && (
             <IconButton
               testId={`${type}-sort-button`}
-              icon={
-                groupOptions.sortDirection === "asc"
-                  ? Icon.SortAsc
-                  : Icon.SortDesc
-              }
+              icon={groupOptions.sortDirection === "asc" ? SortAsc : SortDesc}
               title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy]}`}
               onClick={() => {
                 const groupOptions = db.settings.getGroupOptions(type);
@@ -274,9 +281,7 @@ function GroupHeader(props) {
           )}
           {viewMode && (
             <IconButton
-              icon={
-                viewMode === "compact" ? Icon.DetailedView : Icon.CompactView
-              }
+              icon={viewMode === "compact" ? DetailedView : CompactView}
               title={
                 viewMode === "compact"
                   ? "Switch to detailed view"

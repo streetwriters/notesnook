@@ -40,7 +40,6 @@ import {
   showUpdateAvailableNotice
 } from "../../common/dialog-controller";
 import useStatus from "../../hooks/use-status";
-import { getIconFromAlias } from "../icons/resolver";
 import { checkForUpdate, installUpdate } from "../../utils/updater";
 
 function StatusBar() {
@@ -125,8 +124,7 @@ function StatusBar() {
             Report an issue
           </Text>
         </Button>
-        {statuses?.map(({ key, status, progress, icon }) => {
-          const Icon = getIconFromAlias(icon);
+        {statuses?.map(({ key, status, progress, icon: Icon }) => {
           return (
             <Flex
               key={key}

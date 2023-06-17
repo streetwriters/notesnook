@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { Input, Label } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { PasswordVisible, PasswordInvisible, Check, Cross } from "../icons";
 
 const passwordValidationRules = [
   {
@@ -176,11 +176,7 @@ function Field(props) {
               ":hover": { bg: "border" }
             }}
           >
-            {isPasswordVisible ? (
-              <Icon.PasswordVisible />
-            ) : (
-              <Icon.PasswordInvisible />
-            )}
+            {isPasswordVisible ? <PasswordVisible /> : <PasswordInvisible />}
           </Flex>
         )}
         {action && (
@@ -210,9 +206,9 @@ function Field(props) {
           {rules.map((rule) => (
             <Flex key={rule.title}>
               {rule.isValid ? (
-                <Icon.Check color="success" size={14} />
+                <Check color="success" size={14} />
               ) : (
-                <Icon.Cross color="error" size={14} />
+                <Cross color="error" size={14} />
               )}
               <Text ml={1} sx={{ fontSize: "body", color: "text" }}>
                 {rule.title}

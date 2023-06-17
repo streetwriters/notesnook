@@ -21,7 +21,7 @@ import Config from "../utils/config";
 import { createBackup, verifyAccount } from "./index";
 import { db } from "./db";
 import { store as appStore } from "../stores/app-store";
-import * as Icon from "../components/icons";
+import { Backup, User, Email, Warn } from "../components/icons";
 import dayjs from "dayjs";
 import {
   showBuyDialog,
@@ -114,21 +114,21 @@ export const Reminders = {
     subtitle: "Please upgrade to Pro to enable automatic backups.",
     action: () => showBuyDialog(),
     dismissable: true,
-    icon: Icon.Backup
+    icon: Backup
   },
   login: {
     key: "login",
     title: "Login to sync your notes",
     subtitle: "You are not logged in",
     action: () => hardNavigate("/login"),
-    icon: Icon.User
+    icon: User
   },
   email: {
     key: "email",
     title: "Your email is not confirmed",
     subtitle: "Please confirm your email to sync your notes",
     action: () => hashNavigate("/email/verify"),
-    icon: Icon.Email
+    icon: Email
   },
   recoverykey: {
     key: "recoverykey",
@@ -138,7 +138,7 @@ export const Reminders = {
     action: async () => {
       if (await verifyAccount()) await showRecoveryKeyDialog();
     },
-    icon: Icon.Warn
+    icon: Warn
   }
 };
 

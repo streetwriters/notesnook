@@ -17,10 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import * as Icon from "../icons";
+import { Search } from "../icons";
 import "./search.css";
 import Field from "../field";
 import { debounce } from "@notesnook/common";
+
 function SearchBox({ onSearch }) {
   return (
     <Field
@@ -33,7 +34,7 @@ function SearchBox({ onSearch }) {
       placeholder="Type your query here"
       onChange={debounce((e) => onSearch(e.target.value), 250)}
       action={{
-        icon: Icon.Search,
+        icon: Search,
         testId: "search-button",
         onClick: () => {
           const searchField = document.getElementById("search");

@@ -23,7 +23,7 @@ import { db } from "../../common/db";
 import { store as appStore } from "../../stores/app-store";
 import { hashNavigate } from "../../navigation";
 import { Flex, Text } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Edit, Topic, Shortcut, Trash } from "../icons";
 import { Multiselect } from "../../common/multi-select";
 import { confirm } from "../../common/dialog-controller";
 import { useStore as useNotesStore } from "../../stores/note-store";
@@ -72,7 +72,7 @@ const menuItems = [
   {
     key: "edit",
     title: "Edit",
-    icon: Icon.Edit,
+    icon: Edit,
     onClick: ({ topic }) =>
       hashNavigate(`/notebooks/${topic.notebookId}/topics/${topic.id}/edit`)
   },
@@ -86,7 +86,7 @@ const menuItems = [
         defaultNotebook?.topic === topic.id
       );
     },
-    icon: Icon.Topic,
+    icon: Topic,
     onClick: async ({ topic }) => {
       const defaultNotebook = db.settings.getDefaultNotebook();
       const isDefault =
@@ -102,14 +102,14 @@ const menuItems = [
     key: "shortcut",
     title: ({ topic }) =>
       db.shortcuts.exists(topic.id) ? "Remove shortcut" : "Create shortcut",
-    icon: Icon.Shortcut,
+    icon: Shortcut,
     onClick: ({ topic }) => appStore.addToShortcuts(topic)
   },
   { key: "sep", type: "separator" },
   {
     key: "delete",
     title: "Delete",
-    icon: Icon.Trash,
+    icon: Trash,
     color: "error",
     iconColor: "error",
     onClick: async ({ items, notebookId }) => {

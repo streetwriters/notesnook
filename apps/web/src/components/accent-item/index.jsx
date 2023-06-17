@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Checkmark, Circle } from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
@@ -41,7 +41,7 @@ function AccentItem(props) {
       key={label}
     >
       {code === accent && (
-        <Icon.Checkmark
+        <Checkmark
           sx={{
             position: "absolute",
             zIndex: 1,
@@ -51,7 +51,7 @@ function AccentItem(props) {
           size={20}
         />
       )}
-      <Icon.Circle size={40} sx={{ cursor: "pointer" }} color={code} />
+      <Circle size={40} sx={{ cursor: "pointer" }} color={code} />
     </Flex>
   );
 }

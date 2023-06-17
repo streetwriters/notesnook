@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Flex, Text } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Copy } from "../icons";
 import {
   store as selectionStore,
   useStore as useSelectionStore
@@ -35,7 +35,7 @@ function debugMenuItems(type) {
     {
       key: "copy-data",
       title: () => "Copy data",
-      icon: Icon.Copy,
+      icon: Copy,
       onClick: async ({ [type]: item }) => {
         if (type === "note" && item.contentId) {
           item.additionalData = {

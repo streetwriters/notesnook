@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { Flex, Button } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Plus } from "../icons";
 import { ScrollerProps, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import {
   useStore as useSelectionStore,
@@ -266,7 +266,7 @@ function ListContainer(props: ListContainerProps) {
               height: 45
             }}
           >
-            <Icon.Plus color="static" />
+            <Plus color="static" />
           </Button>
         )}
       </Flex>

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Lock, Alert } from "../icons";
 import { db } from "../../common/db";
 import { useStore as useEditorStore } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -90,7 +90,7 @@ function Unlock(props) {
           justifyContent: "center"
         }}
       >
-        <Icon.Lock size={100} sx={{ opacity: 0.2 }} />
+        <Lock size={100} sx={{ opacity: 0.2 }} />
         <Text
           data-test-id="unlock-note-title"
           variant="heading"
@@ -139,7 +139,7 @@ function Unlock(props) {
             alignSelf: "flex-center"
           }}
         >
-          <Icon.Alert color="error" size={12} />
+          <Alert color="error" size={12} />
           <Text ml={1} sx={{ fontSize: "body" }}>
             Wrong password
           </Text>

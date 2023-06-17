@@ -25,7 +25,7 @@ import { store as tagStore } from "../../stores/tag-store";
 import { store as noteStore } from "../../stores/note-store";
 import { store as editorStore } from "../../stores/editor-store";
 import { db } from "../../common/db";
-import * as Icon from "../icons";
+import { Edit, Shortcut, DeleteForver } from "../icons";
 import { showToast } from "../../utils/toast";
 import { pluralize } from "@notesnook/common";
 
@@ -33,7 +33,7 @@ const menuItems = [
   {
     key: "edit",
     title: "Rename tag",
-    icon: Icon.Edit,
+    icon: Edit,
     onClick: ({ tag }) => {
       hashNavigate(`/tags/${tag.id}/edit`);
     }
@@ -42,7 +42,7 @@ const menuItems = [
     key: "shortcut",
     title: ({ tag }) =>
       db.shortcuts.exists(tag.id) ? "Remove shortcut" : "Create shortcut",
-    icon: Icon.Shortcut,
+    icon: Shortcut,
     onClick: ({ tag }) => appStore.addToShortcuts(tag)
   },
   { key: "sep", type: "separator" },
@@ -51,7 +51,7 @@ const menuItems = [
     color: "error",
     iconColor: "error",
     title: "Delete",
-    icon: Icon.DeleteForver,
+    icon: DeleteForver,
     onClick: async ({ items }) => {
       for (let tag of items) {
         if (tag.noteIds.includes(editorStore.get().session.id))

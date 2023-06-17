@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, Text } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Cross } from "../icons";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import AnnouncementBody from "./body";
 import { useStore as useAnnouncementStore } from "../../stores/announcement-store";
@@ -61,7 +61,7 @@ function Announcements() {
           dismiss(announcement.id);
         }}
       >
-        <Icon.Cross color="error" size={16} />
+        <Cross color="error" size={16} />
       </Text>
       <AnnouncementBody components={announcement.body} type="inline" />
     </Flex>

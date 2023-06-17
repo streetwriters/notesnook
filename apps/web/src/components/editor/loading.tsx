@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, Text } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Loading } from "../icons";
 
 function EditorLoading({ text }: { text?: string }) {
   return (
@@ -30,7 +30,7 @@ function EditorLoading({ text }: { text?: string }) {
         justifyContent: "center"
       }}
     >
-      <Icon.Loading color="primary" sx={{ mt: 2 }} />
+      <Loading color="primary" sx={{ mt: 2 }} />
       <Text variant="body" mt={2} sx={{ textAlign: "center" }}>
         {text || "Loading editor. Please wait..."}
       </Text>

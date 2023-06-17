@@ -23,7 +23,7 @@ import { Flex, Text } from "@theme-ui/components";
 import ThemeProvider from "../components/theme-provider";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { useQueryParams } from "../navigation";
-import * as Icon from "../components/icons";
+import { MailCheck, Discord, Twitter, Reddit } from "../components/icons";
 
 function EmailConfirmed() {
   const [{ userId }] = useQueryParams();
@@ -50,7 +50,7 @@ function EmailConfirmed() {
             justifyContent: "center"
           }}
         >
-          <Icon.MailCheck
+          <MailCheck
             sx={{ bg: "shade", borderRadius: 100, p: 5 }}
             size={72}
             color="primary"
@@ -108,19 +108,19 @@ const social = [
   {
     title: "Discord",
     hoverColor: "#7289da",
-    icon: Icon.Discord,
+    icon: Discord,
     link: "https://discord.com/invite/zQBK97EE22"
   },
   {
     title: "Twitter",
     hoverColor: "#1da1f2",
-    icon: Icon.Twitter,
+    icon: Twitter,
     link: "https://twitter.com/notesnook"
   },
   {
     title: "Reddit",
     hoverColor: "#ff4500",
-    icon: Icon.Reddit,
+    icon: Reddit,
     link: "https://reddit.com/r/Notesnook"
   }
 ];
