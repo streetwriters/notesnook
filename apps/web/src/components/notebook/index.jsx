@@ -24,7 +24,16 @@ import { useStore, store } from "../../stores/notebook-store";
 import { store as appStore } from "../../stores/app-store";
 import { showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common/db";
-import * as Icon from "../icons";
+import {
+  Topic,
+  PinFilled,
+  NotebookEdit,
+  Notebook as NotebookIcon,
+  Pin,
+  RemoveShortcutLink,
+  Shortcut,
+  Trash
+} from "../icons";
 import { hashNavigate, navigate } from "../../navigation";
 import IconTag from "../icon-tag";
 import { showToast } from "../../utils/toast";
@@ -66,7 +75,7 @@ function Notebook(props) {
                   <IconTag
                     key={topic.id}
                     text={topic.title}
-                    icon={Icon.Topic}
+                    icon={Topic}
                     onClick={() => {
                       navigate(`/notebooks/${notebook.id}/${topic.id}`);
                     }}
@@ -83,7 +92,7 @@ function Notebook(props) {
               }}
             >
               {notebook.pinned && (
-                <Icon.PinFilled color="primary" size={13} sx={{ mr: 1 }} />
+                <PinFilled color="primary" size={13} sx={{ mr: 1 }} />
               )}
 
               {getFormattedDate(date, "date")}
@@ -127,7 +136,7 @@ const menuItems = [
   {
     key: "edit",
     title: "Edit",
-    icon: Icon.NotebookEdit,
+    icon: NotebookEdit,
     onClick: ({ notebook }) => hashNavigate(`/notebooks/${notebook.id}/edit`)
   },
   {
@@ -138,7 +147,7 @@ const menuItems = [
       return defaultNotebook?.id === notebook.id && !defaultNotebook?.topic;
     },
 
-    icon: Icon.Notebook,
+    icon: NotebookIcon,
     onClick: async ({ notebook }) => {
       const defaultNotebook = db.settings.getDefaultNotebook();
       const isDefault =
@@ -151,7 +160,7 @@ const menuItems = [
   },
   {
     key: "pin",
-    icon: Icon.Pin,
+    icon: Pin,
     title: "Pin",
     checked: ({ notebook }) => notebook.pinned,
     onClick: ({ notebook }) => pin(notebook)
@@ -159,9 +168,7 @@ const menuItems = [
   {
     key: "shortcut",
     icon: ({ notebook }) =>
-      db.shortcuts.exists(notebook.id)
-        ? Icon.RemoveShortcutLink
-        : Icon.Shortcut,
+      db.shortcuts.exists(notebook.id) ? RemoveShortcutLink : Shortcut,
     title: ({ notebook }) =>
       db.shortcuts.exists(notebook.id) ? "Remove shortcut" : "Create shortcut",
     onClick: ({ notebook }) => appStore.addToShortcuts(notebook)
@@ -172,7 +179,7 @@ const menuItems = [
     title: "Move to trash",
     color: "error",
     iconColor: "error",
-    icon: Icon.Trash,
+    icon: Trash,
     onClick: async ({ items }) => {
       const result = await confirm({
         title: `Delete ${pluralize(items.length, "notebook")}?`,

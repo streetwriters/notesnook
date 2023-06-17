@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Text, Flex, Button } from "@theme-ui/components";
-import * as Icon from "../../components/icons";
+import { Loading } from "../../components/icons";
 import { ReactComponent as Nomad } from "../../assets/nomad.svg";
 import { Period, Plan } from "./types";
 import { PLAN_METADATA, usePlans } from "./plans";
@@ -95,7 +95,7 @@ export function PlansList(props: PlansListProps) {
                   {metadata.subtitle}
                 </Text>
               </Text>
-              {isLoading ? <Icon.Loading /> : <RecurringPricing plan={plan} />}
+              {isLoading ? <Loading /> : <RecurringPricing plan={plan} />}
             </Button>
           );
         })}

@@ -20,7 +20,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import ListItem from "../list-item";
 import { Flex } from "@theme-ui/components";
-import * as Icon from "../icons";
+import {
+  Silent,
+  Vibrate,
+  Loud,
+  ReminderOff,
+  Clock,
+  Refresh,
+  Icon,
+  Edit,
+  Reminders,
+  Trash
+} from "../icons";
 import IconTag from "../icon-tag";
 import {
   Reminder as ReminderType,
@@ -44,9 +55,9 @@ const RECURRING_MODE_MAP = {
 } as const;
 
 const PRIORITY_ICON_MAP = {
-  silent: Icon.Silent,
-  vibrate: Icon.Vibrate,
-  urgent: Icon.Loud
+  silent: Silent,
+  vibrate: Vibrate,
+  urgent: Loud
 } as const;
 
 function Reminder({
@@ -78,14 +89,14 @@ function Reminder({
         >
           {reminder.disabled ? (
             <IconTag
-              icon={Icon.ReminderOff}
+              icon={ReminderOff}
               text={"Disabled"}
               styles={{ icon: { color: "error" } }}
               testId={"disabled"}
             />
           ) : (
             <IconTag
-              icon={Icon.Clock}
+              icon={Clock}
               text={getFormattedReminderTime(reminder)}
               highlight={isReminderToday(reminder)}
               testId={"reminder-time"}
@@ -96,7 +107,7 @@ function Reminder({
           )}
           {reminder.mode === "repeat" && reminder.recurringMode && (
             <IconTag
-              icon={Icon.Refresh}
+              icon={Refresh}
               text={RECURRING_MODE_MAP[reminder.recurringMode]}
               testId={`recurring-mode`}
             />
@@ -126,7 +137,7 @@ type MenuItem = {
   type?: "separator";
   key: string;
   title?: MenuItemValue<string>;
-  icon?: MenuItemValue<Icon.Icon>;
+  icon?: MenuItemValue<Icon>;
   onClick?: (options: MenuActionParams) => void;
   color?: MenuItemValue<string>;
   iconColor?: MenuItemValue<string>;
@@ -138,14 +149,14 @@ const menuItems: MenuItem[] = [
   {
     key: "edit",
     title: "Edit",
-    icon: Icon.Edit,
+    icon: Edit,
     onClick: ({ reminder }) => hashNavigate(`/reminders/${reminder.id}/edit`)
   },
   {
     key: "toggle",
     title: ({ reminder }) => (reminder.disabled ? "Activate" : "Deactivate"),
     icon: ({ reminder }: MenuActionParams) =>
-      reminder.disabled ? Icon.Reminders : Icon.ReminderOff,
+      reminder.disabled ? Reminders : ReminderOff,
     onClick: async ({ reminder }) => {
       await db.reminders?.add({
         id: reminder.id,
@@ -160,7 +171,7 @@ const menuItems: MenuItem[] = [
     title: "Delete",
     color: "error",
     iconColor: "error",
-    icon: Icon.Trash,
+    icon: Trash,
     onClick: async ({ items }) => {
       confirm({
         title: `Delete ${pluralize(items.length, "reminder")}`,

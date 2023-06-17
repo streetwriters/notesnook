@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { Flex, Text, Button, ButtonProps } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Loading, Close } from "../icons";
 import ReactModal from "react-modal";
 import { FlexScrollContainer } from "../scroll-container";
 import { SxProp } from "@theme-ui/core";
@@ -102,7 +102,7 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
         }}
       >
         {props.showCloseButton && (
-          <Icon.Close
+          <Close
             sx={{
               position: "absolute",
               cursor: "pointer",
@@ -199,7 +199,7 @@ function DialogButton(props: DialogButtonProps) {
       disabled={props.disabled}
       onClick={props.disabled ? undefined : props.onClick}
     >
-      {props.loading ? <Icon.Loading size={16} color="primary" /> : props.text}
+      {props.loading ? <Loading size={16} color="primary" /> : props.text}
     </Button>
   );
 }

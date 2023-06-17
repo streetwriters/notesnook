@@ -19,7 +19,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useMemo, useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
-import * as Icon from "../icons";
+import {
+  Published,
+  Publish,
+  EditorNormalWidth,
+  EditorFullWidth,
+  ThemeIcon,
+  FocusMode,
+  NormalMode,
+  ExitFullscreen,
+  Fullscreen,
+  Search,
+  Undo,
+  Redo,
+  Properties,
+  ArrowLeft
+} from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { useStore as useMonographStore } from "../../stores/monograph-store";
@@ -80,7 +95,7 @@ function Toolbar() {
     () => [
       {
         title: isNotePublished ? "Published" : "Publish",
-        icon: isNotePublished ? Icon.Published : Icon.Publish,
+        icon: isNotePublished ? Published : Publish,
         hidden: !sessionId || isDeleted,
         enabled: !isLocked,
         onClick: () => showPublishView(store.get().session.id, "top")
@@ -95,20 +110,20 @@ function Toolbar() {
         title: editorMargins
           ? "Disable editor margins"
           : "Enable editor margins",
-        icon: editorMargins ? Icon.EditorNormalWidth : Icon.EditorFullWidth,
+        icon: editorMargins ? EditorNormalWidth : EditorFullWidth,
         enabled: true,
         onClick: () => toggleEditorMargins()
       },
       {
         title: theme === "dark" ? "Light mode" : "Dark mode",
-        icon: Icon.ThemeIcon,
+        icon: ThemeIcon,
         hidden: !isFocusMode,
         enabled: true,
         onClick: () => toggleNightMode()
       },
       {
         title: isFocusMode ? "Normal mode" : "Focus mode",
-        icon: isFocusMode ? Icon.FocusMode : Icon.NormalMode,
+        icon: isFocusMode ? FocusMode : NormalMode,
         enabled: true,
         hideOnMobile: true,
         onClick: () => {
@@ -122,7 +137,7 @@ function Toolbar() {
       },
       {
         title: isFullscreen ? "Exit fullscreen" : "Enter fullscreen",
-        icon: isFullscreen ? Icon.ExitFullscreen : Icon.Fullscreen,
+        icon: isFullscreen ? ExitFullscreen : Fullscreen,
         enabled: true,
         hidden: !isFocusMode,
         hideOnMobile: true,
@@ -137,28 +152,28 @@ function Toolbar() {
       },
       {
         title: "Search",
-        icon: Icon.Search,
+        icon: Search,
         enabled: true,
         hidden: !sessionId || isDeleted,
         onClick: () => toggleSearch()
       },
       {
         title: "Undo",
-        icon: Icon.Undo,
+        icon: Undo,
         enabled: canUndo,
         hidden: !sessionId || isDeleted,
         onClick: () => undo()
       },
       {
         title: "Redo",
-        icon: Icon.Redo,
+        icon: Redo,
         enabled: canRedo,
         hidden: !sessionId || isDeleted,
         onClick: () => redo()
       },
       {
         title: "Properties",
-        icon: Icon.Properties,
+        icon: Properties,
         enabled: true,
         hidden: !sessionId || isFocusMode || isDeleted,
         onClick: toggleProperties
@@ -187,7 +202,7 @@ function Toolbar() {
   return (
     <Flex mx={2} my={1} sx={{ justifyContent: "space-between" }}>
       <Flex sx={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Icon.ArrowLeft
+        <ArrowLeft
           sx={{
             display: ["block", "none", "none"],
             flexShrink: 0

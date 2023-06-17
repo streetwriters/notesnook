@@ -18,7 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import * as Icon from "../icons";
+import {
+  Pin,
+  StarOutline,
+  Unlock,
+  Readonly,
+  SyncOff,
+  ArrowLeft,
+  Circle,
+  Checkmark,
+  Lock
+} from "../icons";
 import { Flex, Text } from "@theme-ui/components";
 import { useStore, store } from "../../stores/editor-store";
 import { COLORS } from "../../common/constants";
@@ -40,23 +50,23 @@ import Reminder from "../reminder";
 import { getFormattedDate } from "@notesnook/common";
 
 const tools = [
-  { key: "pin", property: "pinned", icon: Icon.Pin, label: "Pin" },
+  { key: "pin", property: "pinned", icon: Pin, label: "Pin" },
   {
     key: "favorite",
     property: "favorite",
-    icon: Icon.StarOutline,
+    icon: StarOutline,
     label: "Favorite"
   },
-  { key: "lock", icon: Icon.Unlock, label: "Lock", property: "locked" },
+  { key: "lock", icon: Unlock, label: "Lock", property: "locked" },
   {
     key: "readonly",
-    icon: Icon.Readonly,
+    icon: Readonly,
     label: "Readonly",
     property: "readonly"
   },
   {
     key: "local-only",
-    icon: Icon.SyncOff,
+    icon: SyncOff,
     label: "Disable sync",
     property: "localOnly"
   }
@@ -171,7 +181,7 @@ function Properties(props) {
           <Card
             title="Properties"
             button={
-              <Icon.ArrowLeft
+              <ArrowLeft
                 data-test-id="properties-close"
                 onClick={() => toggleProperties(false)}
                 size={18}
@@ -237,7 +247,7 @@ function Properties(props) {
                       }}
                       data-test-id={`properties-${label}`}
                     >
-                      <Icon.Circle
+                      <Circle
                         size={35}
                         color={label.toLowerCase()}
                         data-test-id={`toggle-state-${
@@ -247,7 +257,7 @@ function Properties(props) {
                         }`}
                       />
                       {label.toLowerCase() === color?.toLowerCase() && (
-                        <Icon.Checkmark
+                        <Checkmark
                           color="static"
                           size={18}
                           sx={{ position: "absolute", left: "8px" }}
@@ -365,9 +375,7 @@ function Properties(props) {
                     {label}
                   </Text>
                   <Flex sx={{ fontSize: "subBody", color: "fontTertiary" }}>
-                    {session.locked && (
-                      <Icon.Lock size={14} data-test-id="locked" />
-                    )}
+                    {session.locked && <Lock size={14} data-test-id="locked" />}
                     <TimeAgo
                       live
                       datetime={session.dateModified}

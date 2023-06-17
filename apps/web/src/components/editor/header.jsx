@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useStore } from "../../stores/editor-store";
 import { Input } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Tag, Plus } from "../icons";
 import { Flex } from "@theme-ui/components";
 import IconTag from "../icon-tag";
 import { db } from "../../common/db";
@@ -46,7 +46,7 @@ function Header({ readonly }) {
               testId={`tag`}
               key={tag}
               text={db.tags.alias(tag)}
-              icon={Icon.Tag}
+              icon={Tag}
               title={`Click to remove`}
               onClick={() => setTag(tag)}
               styles={{ container: { mr: 1 }, text: { fontSize: "body" } }}
@@ -120,7 +120,7 @@ export function Autosuggest({
         items.push({
           key: "new",
           title: () => `Create "${filterText}" tag`,
-          icon: Icon.Plus,
+          icon: Plus,
           onClick: () => onAction("add", filterText)
         });
       }
@@ -130,7 +130,7 @@ export function Autosuggest({
           ...filtered.map((tag) => ({
             key: tag.id,
             title: () => tag.alias,
-            icon: Icon.Tag,
+            icon: Tag,
             onClick: () => onAction("select", tag)
           }))
         );

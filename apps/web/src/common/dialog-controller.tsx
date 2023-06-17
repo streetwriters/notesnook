@@ -29,7 +29,7 @@ import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
 import { Text } from "@theme-ui/components";
-import * as Icon from "../components/icons";
+import { Topic } from "../components/icons";
 import Config from "../utils/config";
 import { AppVersion, getChangelog } from "../utils/version";
 import { Period } from "../dialogs/buy-dialog/types";
@@ -489,7 +489,7 @@ export function showEditTopicDialog(notebookId: string, topicId: string) {
       title={"Edit topic"}
       subtitle={`You are editing "${topic.title}" topic.`}
       defaultValue={topic.title}
-      icon={Icon.Topic}
+      icon={Topic}
       item={topic}
       onClose={() => perform(false)}
       onAction={async (t: string) => {

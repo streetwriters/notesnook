@@ -21,7 +21,7 @@ import { useMemo } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { Reminders } from "../../common/reminders";
-import * as Icon from "../icons";
+import { Dismiss } from "../icons";
 import Config from "../../utils/config";
 
 function ReminderBar() {
@@ -86,7 +86,7 @@ function ReminderBar() {
           }}
           variant="tool"
         >
-          <Icon.Dismiss size={20} color="primary" />
+          <Dismiss size={20} color="primary" />
         </Button>
       )}
     </Flex>

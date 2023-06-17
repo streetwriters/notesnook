@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Text, Flex, Button } from "@theme-ui/components";
-import * as Icon from "../../components/icons";
+import { Cross, Check, Loading } from "../../components/icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import Modal from "react-modal";
@@ -294,7 +294,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
         Ready to take the next step in your private note taking journey?
       </Text>
       {isLoading || !plan ? (
-        <Icon.Loading sx={{ mt: 4 }} />
+        <Loading sx={{ mt: 4 }} />
       ) : (
         <Text variant={"body"} mt={4} sx={{ fontSize: "title" }}>
           Starting from {getCurrencySymbol(plan.currency)}
@@ -519,10 +519,10 @@ function SelectedPlan(props: SelectedPlanProps) {
             }}
             action={{
               icon: isApplyingCoupon
-                ? Icon.Loading
+                ? Loading
                 : pricingInfo?.coupon
-                ? Icon.Cross
-                : Icon.Check,
+                ? Cross
+                : Check,
               onClick: () =>
                 pricingInfo?.coupon ? removeCoupon() : applyCoupon()
             }}
@@ -541,7 +541,7 @@ function SelectedPlan(props: SelectedPlanProps) {
           )}
         </>
       ) : (
-        <Icon.Loading sx={{ mt: 4 }} />
+        <Loading sx={{ mt: 4 }} />
       )}
     </>
   );

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useCallback, useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { Flex, Text, Button } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Copy, Loading } from "../icons";
 import Toggle from "../toggle";
 import Field from "../field";
 import { db } from "../../common/db";
@@ -170,7 +170,7 @@ function PublishView(props) {
                       );
                     }}
                   >
-                    <Icon.Copy size={20} color="primary" />
+                    <Copy size={20} color="primary" />
                   </Button>
                 </Flex>
               </Flex>
@@ -244,7 +244,7 @@ function PublishView(props) {
         >
           {isPublishing ? (
             <>
-              <Icon.Loading color="static" />
+              <Loading color="static" />
             </>
           ) : publishId ? (
             "Update"

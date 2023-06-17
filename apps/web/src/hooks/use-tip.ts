@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useRef, useState } from "react";
 import { CREATE_BUTTON_MAP } from "../common";
-import { IconAlias } from "../components/icons/resolver";
+import { ArrowTopRight, Icon, Plus } from "../components/icons";
 import Config from "../utils/config";
 
 declare global {
@@ -36,7 +36,7 @@ export type TipButton = {
   title: string;
   type?: string;
   onClick: () => void;
-  icon?: IconAlias;
+  icon?: Icon;
 };
 export type Context =
   | "notes"
@@ -153,7 +153,7 @@ const tips: Tip[] = [
     contexts: ["notes", "notebooks", "tags", "topics"],
     button: {
       title: "Join the Notesnook community",
-      icon: "arrow-top-right",
+      icon: ArrowTopRight,
       onClick: () =>
         window.open("https://discord.gg/notesnook-796015620436787241", "_blank")
     }
@@ -173,7 +173,7 @@ const DEFAULT_TIPS: Record<Context, Omit<Tip, "contexts">> = {
     text: "You haven't published any notes yet.",
     button: {
       title: "What are monographs?",
-      icon: "arrow-top-right",
+      icon: ArrowTopRight,
       onClick() {
         window.open(
           "https://help.notesnook.com/publish-notes-with-monographs",
@@ -184,31 +184,31 @@ const DEFAULT_TIPS: Record<Context, Omit<Tip, "contexts">> = {
   },
   notebooks: {
     text: "You haven't created any notebooks.",
-    button: { ...CREATE_BUTTON_MAP.notebooks, icon: "plus" }
+    button: { ...CREATE_BUTTON_MAP.notebooks, icon: Plus }
   },
   notes: {
     text: "You have not created any notes yet.",
     button: {
       ...CREATE_BUTTON_MAP.notes,
-      icon: "plus"
+      icon: Plus
     }
   },
   topics: {
     text: "You can add topics in notebooks to further organize your notes.",
     button: {
       ...CREATE_BUTTON_MAP.topics,
-      icon: "plus"
+      icon: Plus
     }
   },
   reminders: {
     text: "You can set daily, weekly or monthly reminders & stay ahead of your tasks.",
-    button: { ...CREATE_BUTTON_MAP.reminders, icon: "plus" }
+    button: { ...CREATE_BUTTON_MAP.reminders, icon: Plus }
   },
   tags: {
     text: "You can use #tags to organize your notes.",
     button: {
       ...CREATE_BUTTON_MAP.tags,
-      icon: "plus"
+      icon: Plus
     }
   },
   trash: {

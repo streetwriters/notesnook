@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect } from "react";
 import { Box, Text } from "@theme-ui/components";
 import Dialog from "../components/dialog";
-import * as Icon from "../components/icons";
+import { Loading } from "../components/icons";
 
 type LoadingDialogProps<T> = {
   onClose: (result: T | boolean) => void;
@@ -49,7 +49,7 @@ function LoadingDialog<T>(props: LoadingDialogProps<T>) {
         <Text as="span" variant="body">
           {message}
         </Text>
-        <Icon.Loading rotate sx={{ my: 2 }} color="primary" />
+        <Loading rotate sx={{ my: 2 }} color="primary" />
       </Box>
     </Dialog>
   );

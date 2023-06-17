@@ -19,7 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback, useEffect, useState } from "react";
 import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
-import * as Icon from "../components/icons";
+import {
+  Plus,
+  ChevronDown,
+  ChevronUp,
+  Circle,
+  CheckCircleOutline,
+  CheckIntermediate,
+  CheckRemove,
+  CircleEmpty
+} from "../components/icons";
 import { db } from "../common/db";
 import Dialog from "../components/dialog";
 import { useStore, store } from "../stores/notebook-store";
@@ -302,18 +311,18 @@ function NotebookItem(props: {
               data-test-id="create-topic"
               sx={{ display: "none", p: 1 }}
             >
-              <Icon.Plus
+              <Plus
                 size={18}
                 title="Add a new topic"
                 onClick={() => setIsCreatingNew(true)}
               />
             </Button>
-            <Icon.ChevronDown
+            <ChevronDown
               className="arrow-down"
               size={20}
               sx={{ height: "20px" }}
             />
-            <Icon.ChevronUp
+            <ChevronUp
               className="arrow-up"
               size={20}
               sx={{ display: "none", height: "20px" }}
@@ -378,7 +387,7 @@ function TopicSelectionIndicator({ notebook }: { notebook: Notebook }) {
   );
 
   if (!hasSelectedTopics) return null;
-  return <Icon.Circle size={8} color="primary" sx={{ mr: 1 }} />;
+  return <Circle size={8} color="primary" sx={{ mr: 1 }} />;
 }
 
 function TopicItem(props: { topic: Topic }) {
@@ -438,13 +447,13 @@ function SelectedCheck({
     selectedItem?.op === "remove" ? "remove" : selectedItem?.op === "add";
 
   return selected === true ? (
-    <Icon.CheckCircleOutline size={size} sx={{ mr: 1 }} color="primary" />
+    <CheckCircleOutline size={size} sx={{ mr: 1 }} color="primary" />
   ) : selected === null ? (
-    <Icon.CheckIntermediate size={size} sx={{ mr: 1 }} color="dimPrimary" />
+    <CheckIntermediate size={size} sx={{ mr: 1 }} color="dimPrimary" />
   ) : selected === "remove" ? (
-    <Icon.CheckRemove size={size} sx={{ mr: 1 }} color="error" />
+    <CheckRemove size={size} sx={{ mr: 1 }} color="error" />
   ) : (
-    <Icon.CircleEmpty size={size} sx={{ mr: 1, opacity: 0.4 }} />
+    <CircleEmpty size={size} sx={{ mr: 1, opacity: 0.4 }} />
   );
 }
 

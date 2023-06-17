@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useState, useEffect, useCallback } from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Loading, ImageDownload } from "../icons";
 import ContentToggle from "./content-toggle";
 import { store as notesStore } from "../../stores/note-store";
 import { db } from "../../common/db";
@@ -172,9 +172,9 @@ function DiffViewer(props) {
           }}
         >
           {isDownloadingImages ? (
-            <Icon.Loading size={18} />
+            <Loading size={18} />
           ) : (
-            <Icon.ImageDownload size={18} />
+            <ImageDownload size={18} />
           )}
           <Text
             ml={1}

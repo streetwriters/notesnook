@@ -23,6 +23,7 @@ import {
   Gateway,
   WEB_EXTENSION_CHANNEL_EVENTS
 } from "@notesnook/web-clipper/dist/common/bridge";
+import { Extension } from "../components/icons";
 
 export class WebExtensionRelay {
   private gateway?: Remote<Gateway>;
@@ -60,7 +61,7 @@ export class WebExtensionRelay {
     updateStatus({
       key: metadata.id,
       status: `${metadata.name} connected`,
-      icon: "extension"
+      icon: Extension
     });
 
     return true;
