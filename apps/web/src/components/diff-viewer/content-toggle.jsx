@@ -66,7 +66,8 @@ function ContentToggle(props) {
         sx={{
           fontSize: "subBody",
           color: "fontTertiary",
-          alignItems: "center"
+          alignItems: "center",
+          fontFamily: "body"
         }}
       >
         {label} | {getFormattedDate(dateEdited)}
