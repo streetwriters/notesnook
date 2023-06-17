@@ -19,18 +19,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-export default function useSlider(sliderId, { onSliding, onChange }) {
+type Slide = {
+  index: number;
+  node: HTMLElement;
+  offset: number;
+  width: number;
+};
+
+export default function useSlider(
+  sliderId: string,
+  {
+    onSliding,
+    onChange
+  }: {
+    onSliding?: (
+      e: Event,
+      options: {
+        lastSlide: Slide | null;
+        lastPosition: number;
+        position: number;
+      }
+    ) => void;
+    onChange?: (
+      e: Event,
+      options: { position: number; slide: Slide; lastSlide: Slide | null }
+    ) => void;
+  } = {}
+) {
   const ref = useRef(document.getElementById(sliderId));
-  const slides = useMemo(() => [], []);
+  const slides: Slide[] = useMemo(() => [], []);
 
   useEffect(() => {
     if (!ref.current) return;
     const slider = ref.current;
-    let lastSlide = null;
+    let lastSlide: Slide | null = null;
     let lastPosition = 0;
     let last = 0;
     if (!slides.length) {
-      for (let node of slider.childNodes) {
+      for (const node of slider.childNodes) {
+        if (!(node instanceof HTMLElement)) continue;
         slides.push({
           index: slides.length,
           node,
@@ -41,8 +68,9 @@ export default function useSlider(sliderId, { onSliding, onChange }) {
       }
     }
 
-    function onScroll(e) {
-      const position = e.target.scrollLeft;
+    function onScroll(e: Event) {
+      const position =
+        e.target && e.target instanceof HTMLElement ? e.target.scrollLeft : -1;
       if (onSliding) onSliding(e, { lastSlide, lastPosition, position });
       const slide = slides.find(
         (slide) => slide.offset === Math.round(position)
@@ -63,8 +91,13 @@ export default function useSlider(sliderId, { onSliding, onChange }) {
   const slideToIndex = useCallback(
     (index) => {
       if (!slides || !ref.current || index >= slides.length) return;
+      console.log(slides[index].offset, slides[index].width);
+      const slider = ref.current;
       setTimeout(() => {
-        slides[index].node.scrollIntoView();
+        slider.scrollTo({
+          left: slides[index].offset,
+          behavior: "smooth"
+        });
       }, 100);
     },
     [ref, slides]

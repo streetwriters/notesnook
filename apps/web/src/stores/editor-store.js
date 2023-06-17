@@ -293,7 +293,7 @@ class EditorStore extends BaseStore {
     this.toggleProperties(false);
     if (shouldNavigate)
       hashNavigate(`/notes/create`, { replace: true, addNonce: true });
-    appStore.setIsEditorOpen(false);
+    setTimeout(() => appStore.setIsEditorOpen(false), 100);
     setDocumentTitle();
   };
 

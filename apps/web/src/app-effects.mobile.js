@@ -50,21 +50,19 @@ export default function MobileAppEffects({ sliderId, overlayId, setShow }) {
     },
     onChange: (e, { slide, lastSlide }) => {
       if (!lastSlide || !isMobile) return;
-      toggleSideMenu(slide?.index === 0 ? true : false);
-      console.log("Setting editor", slide?.index === 2 ? true : false);
-      setIsEditorOpen(slide?.index === 2 ? true : false);
+      toggleSideMenu(slide?.index === 1 ? true : false);
+      setIsEditorOpen(slide?.index === 3 ? true : false);
     }
   });
 
   useEffect(() => {
     if (!isMobile) return;
-    slideToIndex(isSideMenuOpen ? 0 : 1);
+    slideToIndex(isSideMenuOpen ? 1 : 2);
   }, [isMobile, slideToIndex, isSideMenuOpen]);
 
   useEffect(() => {
     if (!isMobile) return;
-    console.log(isEditorOpen);
-    slideToIndex(isEditorOpen ? 2 : 1);
+    slideToIndex(isEditorOpen ? 3 : 2);
   }, [isMobile, slideToIndex, isEditorOpen]);
 
   useEffect(() => {
