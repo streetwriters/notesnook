@@ -23,7 +23,7 @@ import { db } from "../../common/db";
 import { store as appStore } from "../../stores/app-store";
 import { hashNavigate } from "../../navigation";
 import { Flex, Text } from "@theme-ui/components";
-import { Edit, Topic, Shortcut, Trash } from "../icons";
+import { Edit, Topic as TopicIcon, Shortcut, Trash } from "../icons";
 import { Multiselect } from "../../common/multi-select";
 import { confirm } from "../../common/dialog-controller";
 import { useStore as useNotesStore } from "../../stores/note-store";
@@ -86,7 +86,7 @@ const menuItems = [
         defaultNotebook?.topic === topic.id
       );
     },
-    icon: Topic,
+    icon: TopicIcon,
     onClick: async ({ topic }) => {
       const defaultNotebook = db.settings.getDefaultNotebook();
       const isDefault =

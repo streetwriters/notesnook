@@ -21,8 +21,7 @@ import { useCallback, useState } from "react";
 import { showBuyDialog } from "../../common/dialog-controller";
 import Tip from "../tip";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
-import { Flex } from "@theme-ui/components";
-import Switch from "../switch";
+import { Flex, Switch } from "@theme-ui/components";
 import { Loading } from "../icons";
 
 function Toggle(props) {
