@@ -153,6 +153,7 @@ export const useEditorEvents = (
   useEffect(() => {
     const handleKeyboardDidShow: KeyboardEventListener = () => {
       editor.commands.keyboardShown(true);
+      editor.postMessage(EditorEvents.keyboardShown, undefined);
     };
     const handleKeyboardDidHide: KeyboardEventListener = () => {
       editor.commands.keyboardShown(false);
@@ -164,7 +165,7 @@ export const useEditorEvents = (
     return () => {
       subscriptions.forEach((subscription) => subscription.remove());
     };
-  }, [editor.commands]);
+  }, [editor.commands, editor.postMessage]);
 
   useEffect(() => {
     editor.commands.setSettings({

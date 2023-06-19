@@ -19,12 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Editor, Extension, posToDOMRect } from "@tiptap/core";
 
+type KeepInViewOptions = {
+  scrollIntoViewOnWindowResize: boolean;
+};
+
 let onWindowResize: ((this: Window, ev: UIEvent) => void) | undefined =
   undefined;
-export const KeepInView = Extension.create({
+export const KeepInView = Extension.create<KeepInViewOptions>({
   name: "keepinview",
-
+  addOptions() {
+    return {
+      scrollIntoViewOnWindowResize: true
+    };
+  },
   onCreate() {
+    if (!this.options.scrollIntoViewOnWindowResize) return;
     onWindowResize = () => {
       keepLastLineInView(this.editor);
     };

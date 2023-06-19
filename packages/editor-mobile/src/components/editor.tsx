@@ -25,7 +25,6 @@ import {
   usePermissionHandler,
   useTiptap
 } from "@notesnook/editor";
-import { keepLastLineInView } from "@notesnook/editor/dist/extensions/keep-in-view/keep-in-view";
 import { Theme, useTheme } from "@notesnook/theme";
 import {
   forwardRef,
@@ -44,9 +43,6 @@ import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
 
-function isIOSBrowser() {
-  return __PLATFORM__ !== "android";
-}
 const Tiptap = ({
   editorTheme,
   toolbarTheme,
@@ -72,17 +68,6 @@ const Tiptap = ({
     {
       onUpdate: ({ editor }) => {
         global.editorController.contentChange(editor as Editor);
-      },
-      onSelectionUpdate: (props) => {
-        if (props.transaction.docChanged) {
-          if (isIOSBrowser()) {
-            setTimeout(() => {
-              keepLastLineInView(props.editor, 80, 1);
-            }, 1);
-          } else {
-            props.transaction.scrollIntoView();
-          }
-        }
       },
       onOpenAttachmentPicker: (editor, type) => {
         global.editorController.openFilePicker(type);

@@ -238,7 +238,9 @@ const useTiptap = (
         Codemark,
         MathInline,
         MathBlock,
-        KeepInView,
+        KeepInView.configure({
+          scrollIntoViewOnWindowResize: !isMobile
+        }),
         DateTime.configure({ dateFormat, timeFormat }),
         KeyMap,
         WebClipNode
