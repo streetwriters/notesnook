@@ -30,7 +30,6 @@ import { Attachment, getDataAttribute } from "../attachment";
 import { createSelectionBasedNodeView } from "../react";
 import { TextDirections } from "../text-direction";
 import { ImageComponent } from "./component";
-import { Writeable } from "@/src/types";
 
 export interface ImageOptions {
   inline: boolean;

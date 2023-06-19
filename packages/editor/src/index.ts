@@ -42,7 +42,7 @@ import "./extensions";
 import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
 import BulletList from "./extensions/bullet-list";
 import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer";
-import { CodeBlock, CodeBlockOptions } from "./extensions/code-block";
+import { CodeBlock } from "./extensions/code-block";
 import { Codemark } from "./extensions/code-mark";
 import { DateTime, DateTimeOptions } from "./extensions/date-time";
 import { EmbedNode } from "./extensions/embed";
@@ -90,7 +90,6 @@ const CoreExtensions = Object.entries(TiptapCoreExtensions)
 
 export type TiptapOptions = EditorOptions &
   Omit<AttachmentOptions, "HTMLAttributes"> &
-  Omit<CodeBlockOptions, "HTMLAttributes"> &
   Omit<WebClipOptions, "HTMLAttributes"> &
   Omit<ImageOptions, "HTMLAttributes"> &
   DateTimeOptions &

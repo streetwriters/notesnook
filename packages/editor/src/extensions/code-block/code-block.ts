@@ -276,7 +276,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             indentLength: options.amount
           });
           return true;
-        },
+        }
     };
   },
 

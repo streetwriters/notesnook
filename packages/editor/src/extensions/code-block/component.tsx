@@ -167,10 +167,8 @@ export function CodeblockComponent(
               justifyContent: "flex-end",
               border: "1px solid var(--codeBorder)",
               ":hover": { bg: "bgSecondaryHover" },
-              ...{
-                ...(enabled && { borderColor: "primary" }),
-                ...(!isMobile && { "div:hover > &": { opacity: 1 } })
-              }
+             borderColor: enabled ? "primary" : "codeBorder",
+             "div:hover > &": { opacity: isMobile ? 0 : 1 }
             }}
             title={enabled ? "Copied to clipboard" : "Copy to clipboard"}
             onClick={() => {
