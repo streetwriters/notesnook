@@ -49,7 +49,8 @@ export const EditorEvents: { [name: string]: string } = {
   theme: "native:theme",
   titleplaceholder: "native:titleplaceholder",
   logger: "native:logger",
-  status: "native:status"
+  status: "native:status",
+  keyboardShown: "native:keyboardShown"
 };
 
 export function randId(prefix: string) {

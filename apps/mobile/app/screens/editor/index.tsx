@@ -226,7 +226,7 @@ const AppSection = ({
       {EditorOverlay ? (
         <EditorOverlay editorId={editorId || ""} editor={editor} />
       ) : null}
-      <ReadonlyButton editor={editor} />
+      {editorId === "" ? <ReadonlyButton editor={editor} /> : null}
     </>
   ) : null;
 };

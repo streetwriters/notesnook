@@ -646,6 +646,7 @@ export const useEditor = (
     onContentChanged,
     editorId: editorId,
     markImageLoaded,
-    overlay
+    overlay,
+    postMessage
   };
 };
