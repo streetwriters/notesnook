@@ -1033,6 +1033,16 @@ export const settingsGroups: SettingSection[] = [
           "Faced an issue or have a suggestion? Click here to create a bug report"
       },
       {
+        id: "email-support",
+        name: "Email support",
+        icon: "mail",
+        modifer: () => {
+          Linking.openURL("mailto:support@streetwriters.co");
+        },
+        description:
+          "Reach out to us via email and let us resolve your issue directly."
+      },
+      {
         id: "docs-link",
         name: "Documentation",
         modifer: async () => {
