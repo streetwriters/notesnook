@@ -155,6 +155,7 @@ export function Importer() {
                 setIsDone(true);
                 setIsImporting(false);
               }}
+              disabled={!files.length}
             >
               Start import
             </Button>
