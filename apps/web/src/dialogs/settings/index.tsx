@@ -462,10 +462,9 @@ function SettingItem(props: { item: Setting }) {
                     max={component.max}
                     defaultValue={component.defaultValue()}
                     sx={{ width: 80, mr: 1 }}
-                    onChange={debounce(
-                      (e) => component.onChange(e.currentTarget.valueAsNumber),
-                      500
-                    )}
+                    onChange={debounce((e) => {
+                      component.onChange(e.target.valueAsNumber);
+                    }, 500)}
                   />
                 ) : (
                   <Input
@@ -473,7 +472,7 @@ function SettingItem(props: { item: Setting }) {
                     defaultValue={component.defaultValue()}
                     sx={{ width: 250, mr: 1 }}
                     onChange={debounce(
-                      (e) => component.onChange(e.currentTarget.value),
+                      (e) => component.onChange(e.target.value),
                       500
                     )}
                   />
