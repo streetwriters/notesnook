@@ -27,7 +27,6 @@ describe("APP LAUNCH AND NAVIGATION", () => {
   it("Basic navigation should work", async () => {
     await prepare();
     await navigate("Notebooks");
-    await tapByText("Skip introduction");
     await sleep(500);
     await navigate("Favorites");
     await navigate("Trash");
