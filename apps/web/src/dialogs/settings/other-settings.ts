@@ -223,6 +223,22 @@ export const SupportSettings: SettingsGroup[] = [
         ]
       },
       {
+        key: "email-us",
+        title: "Email support",
+        description:
+          "Reach out to us via email and let us resolve your issues directly.",
+        components: [
+          {
+            type: "button",
+            action: () => {
+              window.open("mailto:support@streetwriters.co", "_blank");
+            },
+            title: "Send email",
+            variant: "secondary"
+          }
+        ]
+      },
+      {
         key: "docs",
         title: "Documentation",
         description: "Learn about every feature in Notesnook and how it works.",
