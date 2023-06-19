@@ -152,7 +152,7 @@ export const BackupExportSettings: SettingsGroup[] = [
           {
             type: "dropdown",
             options: [
-              { value: "-", title: "" },
+              { value: "-", title: "Select format" },
               { value: "txt", title: "Text" },
               { value: "md", title: "Markdown", premium: true },
               { value: "html", title: "HTML", premium: true }
