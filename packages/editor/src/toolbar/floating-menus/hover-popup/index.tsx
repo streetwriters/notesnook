@@ -90,10 +90,12 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
               blocking: false,
               focusOnRender: false,
               position: {
-                target: element,
+                target: "mouse",
                 align: "center",
                 location: "top",
-                isTargetAbsolute: true
+                isTargetAbsolute: true,
+                yOffset: 10,
+                xOffset: -10
               }
             });
             activePopup.current = { element, hide: hidePopup };

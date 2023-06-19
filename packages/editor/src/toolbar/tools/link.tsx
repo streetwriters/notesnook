@@ -230,6 +230,7 @@ export function OpenLink(props: ToolProps) {
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
+          color: "primary",
           ":visited": { color: "primary" },
           ":hover": { color: "primary", opacity: 0.8 }
         }}
