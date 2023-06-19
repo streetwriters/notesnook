@@ -463,7 +463,14 @@ function SettingItem(props: { item: Setting }) {
                     defaultValue={component.defaultValue()}
                     sx={{ width: 80, mr: 1 }}
                     onChange={debounce((e) => {
-                      component.onChange(e.target.valueAsNumber);
+                      let value = e.target.valueAsNumber;
+                      value =
+                        Number.isNaN(value) || value < component.min
+                          ? component.min
+                          : value > component.max
+                          ? component.max
+                          : value;
+                      component.onChange(value);
                     }, 500)}
                   />
                 ) : (
