@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SettingsGroup } from "./types";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useNotesStore } from "../../stores/note-store";
-import { hashNavigate } from "../../navigation";
 import Vault from "../../common/vault";
 import { showToast } from "../../utils/toast";
 import { db } from "../../common/db";
+import { isUserPremium } from "../../hooks/use-is-user-premium";
+import { showBuyDialog } from "../../common/dialog-controller";
 
 export const VaultSettings: SettingsGroup[] = [
   {
@@ -35,11 +36,19 @@ export const VaultSettings: SettingsGroup[] = [
         key: "reminders",
         title: "Create vault",
         isHidden: () => useAppStore.getState().isVaultCreated,
+        onStateChange: (listener) =>
+          useAppStore.subscribe((s) => s.isVaultCreated, listener),
         components: [
           {
             type: "button",
             title: "Create",
-            action: () => hashNavigate("/vault/create"),
+            action: () => {
+              if (!isUserPremium()) showBuyDialog();
+              else
+                Vault.createVault().then((res) => {
+                  useAppStore.getState().setIsVaultCreated(res);
+                });
+            },
             variant: "secondary"
           }
         ]
@@ -53,7 +62,7 @@ export const VaultSettings: SettingsGroup[] = [
           {
             type: "button",
             title: "Change",
-            action: () => hashNavigate("/vault/create"),
+            action: () => Vault.changeVaultPassword(),
             variant: "secondary"
           }
         ]

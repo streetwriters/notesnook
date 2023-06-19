@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Vault from "../common/vault";
 import {
   showAddReminderDialog,
   showBuyDialog,
@@ -37,7 +36,6 @@ import { closeOpenedDialog } from "../common/dialog-controller";
 import RouteContainer from "../components/route-container";
 import DiffViewer from "../components/diff-viewer";
 import Unlock from "../components/unlock";
-import { store as appStore } from "../stores/app-store";
 import { store as editorStore } from "../stores/editor-store";
 import { isMobile } from "../utils/dimensions";
 import {
@@ -122,14 +120,6 @@ const hashroutes = {
   "/notes/:noteId/conflict": ({ noteId }: { noteId: string }) => {
     closeOpenedDialog();
     return <DiffViewer noteId={noteId} />;
-  },
-  "/vault/changePassword": () => {
-    Vault.changeVaultPassword();
-  },
-  "/vault/create": () => {
-    Vault.createVault().then((res) => {
-      appStore.setIsVaultCreated(res);
-    });
   },
   "/buy": () => {
     showBuyDialog().then(afterAction);
