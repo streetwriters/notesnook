@@ -23,6 +23,7 @@ import {
 } from "../../stores/user-store";
 import { SettingsGroup } from "./types";
 import {
+  showAttachmentsDialog,
   showClearSessionsConfirmation,
   showEmailChangeDialog,
   showLoadingDialog,
@@ -53,6 +54,20 @@ export const ProfileSettings: SettingsGroup[] = [
             title: "Change email",
             variant: "secondary",
             action: showEmailChangeDialog
+          }
+        ]
+      },
+      {
+        key: "manage-attachments",
+        title: "Attachments",
+        description: "Manage all your attachments in one place.",
+        isHidden: () => !useUserStore.getState().isLoggedIn,
+        components: [
+          {
+            type: "button",
+            title: "Open manager",
+            variant: "secondary",
+            action: showAttachmentsDialog
           }
         ]
       },
