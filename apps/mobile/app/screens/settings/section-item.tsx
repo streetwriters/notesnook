@@ -75,6 +75,21 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       text: value + ""
     });
   };
+
+  const onChangeInputSelectorValue = (text: any) => {
+    if (text) {
+      const min = item.minInputValue || 0;
+      const max = item.maxInputValue || 0;
+      const value = parseInt(text);
+      text =
+        Number.isNaN(value) || value < min ? min : value > max ? max : text;
+
+      SettingsService.set({
+        [item.property as string]: `${text}`
+      });
+    }
+  };
+
   return isHidden ? null : (
     <PressableButton
       disabled={item.type === "component"}
@@ -219,7 +234,8 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                   ] as string;
                   if (rawValue) {
                     const currentValue = parseInt(rawValue);
-                    if (currentValue <= 0) return;
+                    const minValue = item.minInputValue || 0;
+                    if (currentValue <= minValue) return;
                     const nextValue = currentValue - 1;
                     SettingsService.set({
                       [item.property as string]: nextValue
@@ -232,33 +248,19 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               <Input
                 {...item.inputProperties}
                 onSubmit={(e) => {
-                  if (e.nativeEvent.text) {
-                    SettingsService.set({
-                      [item.property as string]: e.nativeEvent.text
-                    });
-                  }
+                  onChangeInputSelectorValue(e.nativeEvent.text);
                   item.inputProperties?.onSubmitEditing?.(e);
                 }}
                 onChangeText={(text) => {
-                  if (text) {
-                    if (item.minInputValue) {
-                      text =
-                        parseInt(text) < item.minInputValue
-                          ? item.minInputValue + ""
-                          : text;
-                    }
-                    SettingsService.set({
-                      [item.property as string]: text
-                    });
-                  }
+                  onChangeInputSelectorValue(text);
                   item.inputProperties?.onSubmitEditing?.(text as any);
                 }}
                 keyboardType="decimal-pad"
                 containerStyle={{
-                  width: 45
+                  width: 65
                 }}
                 wrapperStyle={{
-                  maxWidth: 45,
+                  maxWidth: 65,
                   marginBottom: 0,
                   marginHorizontal: 6
                 }}
@@ -279,6 +281,8 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                   ] as string;
                   if (rawValue) {
                     const currentValue = parseInt(rawValue);
+                    const max = item.maxInputValue || 0;
+                    if (currentValue >= max) return;
                     const nextValue = currentValue + 1;
                     SettingsService.set({
                       [item.property as string]: nextValue

@@ -578,6 +578,7 @@ export const settingsGroups: SettingSection[] = [
             description: "Set the default font size in editor",
             type: "input-selector",
             minInputValue: 8,
+            maxInputValue: 120,
             icon: "format-size",
             property: "defaultFontSize"
           },

@@ -44,6 +44,7 @@ export type SettingSection = {
   inputProperties?: TextInput["props"];
   options?: any[];
   minInputValue?: number;
+  maxInputValue?: number;
 };
 
 export type SettingsGroup = {
