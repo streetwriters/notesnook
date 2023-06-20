@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import {
   eSubscribeEvent,
@@ -34,6 +34,7 @@ import { IconButton } from "../ui/icon-button";
 import { hideAuth, initialAuthMode } from "./common";
 import { Login } from "./login";
 import { Signup } from "./signup";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export const AuthMode = {
   login: 0,
@@ -75,7 +76,7 @@ const AuthModal = () => {
   return !visible ? null : (
     <BaseDialog
       overlayOpacity={0}
-      statusBarTranslucent={true}
+      statusBarTranslucent={false}
       onRequestClose={currentAuthMode !== AuthMode.welcomeSignup && close}
       visible={true}
       onClose={close}
@@ -84,66 +85,83 @@ const AuthModal = () => {
       background={colors.bg}
       transparent={false}
       animated={false}
-      avoidKeyboardResize
     >
-      {currentAuthMode !== AuthMode.login ? (
-        <Signup
-          changeMode={(mode) => setCurrentAuthMode(mode)}
-          trial={AuthMode.trialSignup === currentAuthMode}
-          welcome={initialAuthMode.current === AuthMode.welcomeSignup}
-        />
-      ) : (
-        <Login
-          welcome={initialAuthMode.current === AuthMode.welcomeSignup}
-          changeMode={(mode) => setCurrentAuthMode(mode)}
-        />
-      )}
+      <KeyboardAwareScrollView
+        style={{
+          width: "100%"
+        }}
+        contentContainerStyle={{
+          height: Platform.OS === "android" ? "100%" : "100%"
+        }}
+        bounces={false}
+      >
+        {currentAuthMode !== AuthMode.login ? (
+          <Signup
+            changeMode={(mode) => setCurrentAuthMode(mode)}
+            trial={AuthMode.trialSignup === currentAuthMode}
+            welcome={initialAuthMode.current === AuthMode.welcomeSignup}
+          />
+        ) : (
+          <Login
+            welcome={initialAuthMode.current === AuthMode.welcomeSignup}
+            changeMode={(mode) => setCurrentAuthMode(mode)}
+          />
+        )}
+      </KeyboardAwareScrollView>
 
       <View
         style={{
           position: "absolute",
-          top: insets.top,
+          paddingTop: Platform.OS === "android" ? 0 : insets.top,
+          top: 0,
           zIndex: 999,
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: 12,
-          width: "100%",
-          height: 50,
-          justifyContent:
-            initialAuthMode.current !== AuthMode.welcomeSignup
-              ? "space-between"
-              : "flex-end"
+          backgroundColor: colors.nav,
+          width: "100%"
         }}
       >
-        {initialAuthMode.current === AuthMode.welcomeSignup ? null : (
-          <IconButton
-            name="arrow-left"
-            onPress={() => {
-              hideAuth();
-            }}
-            color={colors.pri}
-          />
-        )}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: 12,
+            width: "100%",
+            height: 50,
+            justifyContent:
+              initialAuthMode.current !== AuthMode.welcomeSignup
+                ? "space-between"
+                : "flex-end"
+          }}
+        >
+          {initialAuthMode.current === AuthMode.welcomeSignup ? null : (
+            <IconButton
+              name="arrow-left"
+              onPress={() => {
+                hideAuth();
+              }}
+              color={colors.pri}
+            />
+          )}
 
-        {initialAuthMode.current !== AuthMode.welcomeSignup ? null : (
-          <Button
-            title="Skip"
-            onPress={() => {
-              hideAuth();
-            }}
-            iconSize={16}
-            type="gray"
-            iconPosition="right"
-            icon="chevron-right"
-            height={25}
-            iconStyle={{
-              marginTop: 2
-            }}
-            style={{
-              paddingHorizontal: 6
-            }}
-          />
-        )}
+          {initialAuthMode.current !== AuthMode.welcomeSignup ? null : (
+            <Button
+              title="Skip"
+              onPress={() => {
+                hideAuth();
+              }}
+              iconSize={16}
+              type="gray"
+              iconPosition="right"
+              icon="chevron-right"
+              height={25}
+              iconStyle={{
+                marginTop: 2
+              }}
+              style={{
+                paddingHorizontal: 6
+              }}
+            />
+          )}
+        </View>
       </View>
 
       <Toast context="local" />

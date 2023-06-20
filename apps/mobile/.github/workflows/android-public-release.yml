@@ -17,15 +17,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup npmrc
-        run: |
-          echo "registry=https://npm.pkg.github.com" > .npmrc
-          echo "@streetwriters:registry=https://npm.pkg.github.com" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{secrets.PACKAGES_TOKEN}}" >> .npmrc
-
-      - name: Setup yarnrc
-        run: echo "\"@streetwriters:registry\" \"https://npm.pkg.github.com\"" > .yarnrc
-
       - uses: actions/setup-node@master
         with:
           node-version: "16"

@@ -21,7 +21,6 @@
     "react-native-qrcode-svg": "^6.0.6",
     "react-native-reanimated-material-menu": "github:ammarahm-ed/react-native-reanimated-material-menu",
     "react-native-reanimated-progress-bar": "1.0.1",
-    "@streetwriters/showdown": "3.0.1-alpha",
     "toggle-switch-react-native": "3.2.0",
     "url": "^0.11.0",
     "validator": "^13.5.2",
@@ -29,7 +28,9 @@
     "fflate": "^0.7.3",
     "timeago.js": "4.0.2",
     "react-native-blob-util": "0.17.3",
-    "react-native-swiper-flatlist": "3.2.2"
+    "react-native-swiper-flatlist": "3.2.2",
+    "@streetwriters/showdown": "^3.0.1-alpha.2",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5"
   },
   "sideEffects": false
 }

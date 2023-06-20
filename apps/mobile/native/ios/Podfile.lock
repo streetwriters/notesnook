@@ -1,6 +1,5 @@
 PODS:
   - Base64 (1.1.2)
-  - BEMCheckBox (1.4.1)
   - boost (1.76.0)
   - callstack-repack (3.2.0):
     - JWTDecode (~> 3.0)
@@ -240,9 +239,9 @@ PODS:
     - React
   - react-native-blob-util (0.17.3):
     - React-Core
-  - react-native-config (1.5.1):
-    - react-native-config/App (= 1.5.1)
-  - react-native-config/App (1.5.1):
+  - react-native-config (1.4.11):
+    - react-native-config/App (= 1.4.11)
+  - react-native-config/App (1.4.11):
     - React-Core
   - react-native-date-picker (4.2.6):
     - React-Core
@@ -250,7 +249,7 @@ PODS:
     - React-Core
   - react-native-fingerprint-scanner (5.0.0):
     - React-Core
-  - react-native-get-random-values (1.9.0):
+  - react-native-get-random-values (1.8.0):
     - React-Core
   - react-native-gzip (1.0.0):
     - Base64
@@ -269,7 +268,7 @@ PODS:
   - react-native-mmkv-storage (0.8.0):
     - MMKV (= 1.2.13)
     - React-Core
-  - react-native-netinfo (9.3.10):
+  - react-native-netinfo (9.3.7):
     - React-Core
   - react-native-notification-sounds (0.5.5):
     - React
@@ -277,7 +276,7 @@ PODS:
     - React
   - react-native-pdf (6.6.2):
     - React-Core
-  - react-native-safe-area-context (4.5.3):
+  - react-native-safe-area-context (4.4.1):
     - RCT-Folly
     - RCTRequired
     - RCTTypeSafety
@@ -287,7 +286,7 @@ PODS:
     - React
   - react-native-sodium (1.4.1):
     - React
-  - react-native-webview (11.26.1):
+  - react-native-webview (11.23.1):
     - React-Core
   - React-perflogger (0.69.7)
   - React-RCTActionSheet (0.69.7):
@@ -357,12 +356,11 @@ PODS:
     - React-perflogger (= 0.69.7)
   - RNBootSplash (4.1.4):
     - React-Core
-  - RNCCheckbox (0.5.15):
-    - BEMCheckBox (~> 1.4)
+  - RNCCheckbox (0.5.12):
     - React-Core
-  - RNCClipboard (1.11.2):
+  - RNCClipboard (1.11.1):
     - React-Core
-  - RNCMaskedView (0.2.9):
+  - RNCMaskedView (0.2.8):
     - React-Core
   - RNDateTimePicker (6.6.0):
     - React-Core
@@ -374,7 +372,7 @@ PODS:
     - React-Core
   - RNFlashList (1.4.0):
     - React-Core
-  - RNGestureHandler (2.10.1):
+  - RNGestureHandler (2.7.1):
     - React-Core
   - RNIap (7.5.6):
     - React-Core
@@ -414,14 +412,14 @@ PODS:
     - React-RCTText
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (3.20.0):
+  - RNScreens (3.18.2):
     - React-Core
     - React-RCTImage
   - RNSecureRandom (1.0.1):
     - React
   - RNShare (7.9.1):
     - React-Core
-  - RNSVG (12.5.1):
+  - RNSVG (12.4.4):
     - React-Core
   - RNTooltips (1.0.3):
     - pop (~> 1.0)
@@ -532,7 +530,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - Base64
-    - BEMCheckBox
     - fmt
     - GZIP
     - JWTDecode
@@ -711,7 +708,6 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Base64: cecfb41a004124895a7bcee567a89bae5a89d49b
-  BEMCheckBox: 5ba6e37ade3d3657b36caecc35c8b75c6c2b1a4e
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   callstack-repack: 3e48a96824e0e0411ae1f48749a2ab103aa62a3a
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
@@ -742,11 +738,11 @@ SPEC CHECKSUMS:
   react-native-background-actions: 2c251c986f23347f9c1722f05fd296938f60edb1
   react-native-begin-background-task: 3b889e07458afc5822a7277cf9cbc7cd077e39ee
   react-native-blob-util: 99f4d79189252f597fe0d810c57a3733b1b1dea6
-  react-native-config: 86038147314e2e6d10ea9972022aa171e6b1d4d8
+  react-native-config: bcafda5b4c51491ee1b0e1d0c4e3905bc7b56c1b
   react-native-date-picker: 93e43b3084cea595b4d68b1405d6d99849663bd6
   react-native-document-picker: ec07866a30707f23660c0f3ae591d669d3e89096
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
-  react-native-get-random-values: dee677497c6a740b71e5612e8dbd83e7539ed5bb
+  react-native-get-random-values: a6ea6a8a65dc93e96e24a11105b1a9c8cfe1d72a
   react-native-gzip: 02f9968afa759e189f0414d41f8f4a951a86b4f1
   react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
   react-native-image-picker: 9c8a2687b69300ad9e95cec5d38f35ab9d32467d
@@ -754,14 +750,14 @@ SPEC CHECKSUMS:
   react-native-in-app-review: db8bb167a5f238e7ceca5c242d6b36ce8c4404a4
   react-native-keep-awake: acbee258db16483744910f0da3ace39eb9ab47fd
   react-native-mmkv-storage: 8ba3c0216a6df283ece11205b442a3e435aec4e5
-  react-native-netinfo: ccbe1085dffd16592791d550189772e13bf479e2
+  react-native-netinfo: 2517ad504b3d303e90d7a431b0fcaef76d207983
   react-native-notification-sounds: da78c828fe1bcbb92d8b505d5261890ed315ff39
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-pdf: 33c622cbdf776a649929e8b9d1ce2d313347c4fa
-  react-native-safe-area-context: b8979f5eda6ed5903d4dbc885be3846ea3daa753
+  react-native-safe-area-context: 99b24a0c5acd0d5dcac2b1a7f18c49ea317be99a
   react-native-share-extension: 8fa247810cc533c9d3bab6913f62ce7aec9bcf4a
   react-native-sodium: f4e3986ddcb73482f8679e534b448a0675d0cf13
-  react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
+  react-native-webview: d33e2db8925d090871ffeb232dfa50cb3a727581
   React-perflogger: 8e832d4e21fdfa613033c76d58d7e617341e804b
   React-RCTActionSheet: 9ca778182a9523991bff6381045885b6e808bb73
   React-RCTAnimation: 9ced26ad20b96e532ac791a8ab92a7b1ce2266b8
@@ -775,24 +771,24 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 65cd2782a57e1d59a68aa5d504edf94278578e41
   ReactCommon: 1e783348b9aa73ae68236271df972ba898560a95
   RNBootSplash: de2c568373a9c79a66e9918b8929eb6c9a35246f
-  RNCCheckbox: 43bcc6493611468af0e19f19f029dab3da8561c4
-  RNCClipboard: 3f0451a8100393908bea5c5c5b16f96d45f30bfc
-  RNCMaskedView: 949696f25ec596bfc697fc88e6f95cf0c79669b6
+  RNCCheckbox: ed1b4ca295475b41e7251ebae046360a703b6eb5
+  RNCClipboard: 2834e1c4af68697089cdd455ee4a4cdd198fa7dd
+  RNCMaskedView: bc0170f389056201c82a55e242e5d90070e18e5a
   RNDateTimePicker: 818672afa85519722533d017b832ed09539d9ddb
   RNDeviceInfo: aad3c663b25752a52bf8fce93f2354001dd185aa
   RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
   RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592
   RNFlashList: 399bf6a0db68f594ad2c86aaff3ea39564f39f8a
-  RNGestureHandler: 42ec7c28dd02d540ed6c9159c57a98ff016492dc
+  RNGestureHandler: b7a872907ee289ada902127f2554fa1d2c076122
   RNIap: d248609d1b8937e63bd904e865c318e9b1457eff
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
   RNNotifee: 2ae3c18196e6f307fa62ae5c8e5305dea03ff147
   RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
   RNReanimated: f1b109fb8341505ace9d7d2eedd150da1686716b
-  RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
+  RNScreens: 34cc502acf1b916c582c60003dc3089fa01dc66d
   RNSecureRandom: 07efbdf2cd99efe13497433668e54acd7df49fef
   RNShare: a5dc3b9c53ddc73e155b8cd9a94c70c91913c43c
-  RNSVG: d7d7bc8229af3842c9cfc3a723c815a52cdd1105
+  RNSVG: ecd661f380a07ba690c9c5929c475a44f432d674
   RNTooltips: 5424d4bf0b3d441104127943b1115cc7f0616b1f
   RNZipArchive: 68a0c6db4b1c103f846f1559622050df254a3ade
   SexyTooltip: 5c9b4dec52bfb317938cb0488efd9da3717bb6fd

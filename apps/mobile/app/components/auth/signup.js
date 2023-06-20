@@ -102,8 +102,7 @@ export const Signup = ({ changeMode, trial }) => {
           zIndex: 10,
           width: "100%",
           alignSelf: "center",
-          height: "100%",
-          minHeight: "100%"
+          height: "100%"
         }}
       >
         <View

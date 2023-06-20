@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect } from "react";
 import { View } from "react-native";
-import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
+import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import DelayLayout from "../../components/delay-layout";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import useNavigationStore from "../../stores/use-navigation-store";
@@ -28,7 +29,11 @@ import { tabBarRef } from "../../utils/global-refs";
 import { components } from "./components";
 import { SectionItem } from "./section-item";
 import { RouteParams, SettingSection } from "./types";
+
 const keyExtractor = (item: SettingSection) => item.id;
+const AnimatedKeyboardAvoidingFlatList = Animated.createAnimatedComponent(
+  KeyboardAwareFlatList
+);
 
 const Group = ({
   navigation,
@@ -57,16 +62,15 @@ const Group = ({
   );
 
   return (
-    <DelayLayout type="settings" delay={300}>
+    <DelayLayout type="settings" delay={1}>
       <View
         style={{
           flex: 1
         }}
       >
         {route.params.sections ? (
-          <Animated.FlatList
+          <AnimatedKeyboardAvoidingFlatList
             entering={FadeInDown}
-            exiting={FadeOutDown}
             data={route.params.sections}
             keyExtractor={keyExtractor}
             renderItem={renderItem}
