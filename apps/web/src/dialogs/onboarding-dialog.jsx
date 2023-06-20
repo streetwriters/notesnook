@@ -54,7 +54,7 @@ const newUserSteps = [
     title: "Safe & encrypted notes",
     subtitle: "Write with freedom. Never compromise on privacy again.",
     buttonText: "Get started",
-    image: <Note width={120} />,
+    image: <Note style={{ flexShrink: 0, width: 120, height: 120 }} />,
     component: TrackingConsent
   },
   {
@@ -65,7 +65,7 @@ const newUserSteps = [
     component: ThemeSelector
   },
   {
-    image: <E2E width={180} />,
+    image: <E2E style={{ flexShrink: 0, width: 180, height: 180 }} />,
     title: "Cross platform & 100% encrypted",
     subtitle:
       "Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us.",
@@ -77,7 +77,7 @@ const newUserSteps = [
     subtitle:
       "Meet other privacy-minded people & talk to us directly about your concerns, issues and suggestions.",
     component: JoinCause,
-    image: <Friends width={140} />
+    image: <Friends style={{ flexShrink: 0, width: 140, height: 140 }} />
   },
   {
     image: <Pro size={60} color="primary" />,
@@ -92,7 +92,7 @@ const proUserSteps = [
     title: "Welcome to Notesnook Pro",
     subtitle: "Thank you. You are the proof that privacy always comes first.",
     buttonText: "Next",
-    image: <Nomad width={120} />
+    image: <Nomad style={{ flexShrink: 0, width: 120, height: 120 }} />
   },
   {
     title: "Style your 'nook",
@@ -118,7 +118,7 @@ const trialUserSteps = [
     title: "Congratulations!",
     subtitle: "You 14-day free trial has been activated.",
     buttonText: "Continue",
-    image: <WorkAnywhere width={160} />
+    image: <WorkAnywhere style={{ flexShrink: 0, width: 160, height: 160 }} />
   }
 ];
 

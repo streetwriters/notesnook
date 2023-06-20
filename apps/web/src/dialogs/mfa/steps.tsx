@@ -723,7 +723,7 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
         justifyContent: "center"
       }}
     >
-      <MFA width={120} />
+      <MFA style={{ flexShrink: 0, width: 120, height: 120 }} />
       <Text
         variant={"heading"}
         mt={2}
@@ -777,7 +777,7 @@ function Fallback2FAEnabled(props: Fallback2FAEnabledProps) {
         justifyContent: "center"
       }}
     >
-      <Fallback2FA width={200} />
+      <Fallback2FA style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text
         variant={"heading"}
         mt={2}

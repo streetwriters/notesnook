@@ -193,7 +193,8 @@ function Field(props) {
               bottom: "2px",
               px: 1,
               borderRadius: "default",
-              ":hover": { bg: "border" }
+              ":hover": { bg: "border" },
+              height: "calc(100% - 4px)"
             }}
             disabled={action.disabled}
           >
