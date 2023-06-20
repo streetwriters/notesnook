@@ -75,8 +75,6 @@ async function main() {
             isServerRunning = true;
           }
 
-          log("Starting desktop app!");
-
           await $`npx electron ${path.join("build", "electron.js")}`;
         }
       }
@@ -99,6 +97,7 @@ function spawnAndWaitUntil(
   return new Promise((resolve) => {
     within(async () => {
       $.env = process.env;
+      $.env.NO_COLOR = "true";
       $.quote = (c) => c;
 
       try {
