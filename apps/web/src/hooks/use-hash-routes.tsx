@@ -17,12 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import useHashRoutes from "../../hooks/use-hash-routes";
-import hashroutes from "../../navigation/hash-routes";
+import makeMatcher from "wouter/matcher";
+import useHashLocation from "./use-hash-location";
+import { Params, Routes } from "../navigation/types";
 
-function HashRouter() {
-  const routeResult = useHashRoutes(hashroutes);
-  return routeResult || null;
+let lastRoute: unknown | null = null;
+export default function useHashRoutes<T extends string, TRouteResult>(
+  routes: Routes<T, TRouteResult>
+) {
+  const [{ location, update }] = useHashLocation();
+  if (!update) return lastRoute;
+
+  const matcher = makeMatcher();
+  for (const key in routes) {
+    const [match, params] = matcher(key, location);
+    if (match) {
+      const route = routes[key]((params as Params<typeof key>) || {});
+      if (!route) return lastRoute;
+      lastRoute = route;
+      return route;
+    }
+  }
 }
-export default React.memo(HashRouter, () => true);

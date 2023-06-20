@@ -17,16 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect } from "react";
-import ReactDOM from "react-dom";
+import React, { useEffect, useRef } from "react";
 import { getHomeRoute, NavigationEvents } from "../../navigation";
 import { store as selectionStore } from "../../stores/selection-store";
 import useRoutes from "../../hooks/use-routes";
 import RouteContainer from "../route-container";
-import ThemeProvider from "../theme-provider";
 import routes from "../../navigation/routes";
+import { Flex } from "@theme-ui/components";
 
-var cache = {};
 function CachedRouter() {
   const [RouteResult, location] = useRoutes(routes, {
     fallbackRoute: getHomeRoute(),
@@ -34,58 +32,38 @@ function CachedRouter() {
       beforeNavigate: () => selectionStore.toggleSelectionMode(false)
     }
   });
+  const cachedRoutes = useRef<Record<string, React.FunctionComponent>>({});
 
   useEffect(() => {
     if (!RouteResult) return;
     NavigationEvents.publish("onNavigate", RouteResult, location);
-    window.currentViewType = RouteResult.type;
-    window.currentViewKey = RouteResult.key;
-
-    const key = RouteResult.key || "general";
-
-    const routeContainer = document.getElementById("mainRouteContainer");
-    routeContainer.childNodes.forEach((node) => {
-      node.style.display = "none";
-    });
-
-    var route = document.getElementById(key);
-    if (route) {
-      route.style.display = "flex";
-      if (key !== "general") return;
-      else {
-        route.remove();
-        route = undefined;
-      }
-    } else {
-      cache[key] = false;
-    }
-
-    if (!cache[key]) {
-      if (!route) {
-        cache[key] = key !== "general";
-        route = document.createElement("div");
-        route.id = key;
-        route.className = "route";
-        routeContainer.appendChild(route);
-      }
-      ReactDOM.render(
-        <ThemeProvider>{RouteResult.component}</ThemeProvider>,
-        route
-      );
-    }
   }, [RouteResult, location]);
+
+  if (!RouteResult) return null;
+  if (RouteResult.key === "general" || !cachedRoutes.current[RouteResult.key])
+    cachedRoutes.current[RouteResult.key] = RouteResult.component;
 
   return (
     <RouteContainer
-      id="mainRouteContainer"
-      type={RouteResult?.type}
-      title={RouteResult?.title}
-      subtitle={RouteResult?.subtitle}
-      buttons={RouteResult?.buttons}
-      isEditable={RouteResult?.isEditable}
-      onChange={RouteResult?.onChange}
-    />
+      type={RouteResult.type}
+      title={RouteResult.title}
+      buttons={RouteResult.buttons}
+    >
+      {Object.entries(cachedRoutes.current).map(([key, Component]) => (
+        <Flex
+          id={key}
+          key={key}
+          sx={{
+            display: key === RouteResult.key ? "flex" : "none",
+            flexDirection: "column",
+            flex: 1
+          }}
+        >
+          <Component key={key} />
+        </Flex>
+      ))}
+    </RouteContainer>
   );
 }
 
-export default CachedRouter;
+export default React.memo(CachedRouter, () => true);

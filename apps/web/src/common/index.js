@@ -50,10 +50,6 @@ export const CREATE_BUTTON_MAP = {
     title: "Create a notebook",
     onClick: () => hashNavigate("/notebooks/create", { replace: true })
   },
-  notebook: {
-    title: "Add a note",
-    onClick: () => hashNavigate(`/notes/create`, { replace: true })
-  },
   topics: {
     title: "Create a topic",
     onClick: () => hashNavigate(`/topics/create`, { replace: true })

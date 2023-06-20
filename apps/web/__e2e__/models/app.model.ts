@@ -111,7 +111,7 @@ export class AppModel {
   async getRouteHeader() {
     if (!(await this.routeHeader.isVisible())) return;
 
-    return await this.routeHeader.inputValue();
+    return await this.routeHeader.innerText();
   }
 
   async isSynced() {

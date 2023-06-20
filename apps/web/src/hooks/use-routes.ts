@@ -20,8 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useLocation } from "wouter";
 import makeMatcher from "wouter/matcher";
 import { navigate, getHomeRoute } from "../navigation";
+import { Params, Routes } from "../navigation/types";
 
-export default function useRoutes(routes, options) {
+export default function useRoutes<T extends string, TRouteResult>(
+  routes: Routes<T, TRouteResult>,
+  options?: {
+    hooks?: { beforeNavigate: (location: string) => void };
+    fallbackRoute?: string;
+  }
+) {
   const [location] = useLocation();
   const matcher = makeMatcher();
 
@@ -29,18 +36,18 @@ export default function useRoutes(routes, options) {
 
   options?.hooks?.beforeNavigate(location);
 
-  for (var key in routes) {
+  for (const key in routes) {
     const [match, params] = matcher(key, location);
     if (match) {
-      const result = routes[key](params);
+      const result = routes[key]((params as Params<typeof key>) || {});
       if (!result) break;
-      return [result, location];
+      return [result, location] as const;
     }
   }
-  if (!options) return [];
+  if (!options) return [] as const;
   const { fallbackRoute } = options;
   if (fallbackRoute) {
     navigate(fallbackRoute);
   }
-  return [];
+  return [] as const;
 }
