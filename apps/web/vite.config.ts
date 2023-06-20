@@ -23,6 +23,7 @@ import svgrPlugin from "vite-plugin-svgr";
 import envCompatible from "vite-plugin-env-compatible";
 import { VitePWA, ManifestOptions } from "vite-plugin-pwa";
 import path from "path";
+import topLevelAwait from "vite-plugin-top-level-await";
 
 const WEB_MANIFEST: Partial<ManifestOptions> = {
   name: "Notesnook",
@@ -142,6 +143,8 @@ const WEB_MANIFEST: Partial<ManifestOptions> = {
 const isTesting =
   process.env.REACT_APP_TEST === "true" ||
   process.env.NODE_ENV === "development";
+const isDesktop = process.env.REACT_APP_PLATFORM === "desktop";
+
 export default defineConfig({
   envPrefix: "REACT_APP_",
   build: {
@@ -171,6 +174,16 @@ export default defineConfig({
     format: "es"
   },
   plugins: [
+    ...(isDesktop
+      ? [
+          topLevelAwait({
+            // The export name of top-level await promise for each chunk module
+            promiseExportName: "__tla",
+            // The function to generate import names of top-level await promise in each chunk module
+            promiseImportName: (i) => `__tla_${i}`
+          })
+        ]
+      : []),
     VitePWA({
       strategies: "injectManifest",
       minify: true,
