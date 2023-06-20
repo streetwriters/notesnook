@@ -41,10 +41,7 @@ export const BACKUP_CRON_EXPRESSIONS = [
 ];
 
 export async function scheduleBackups() {
-  const backupReminderOffset = Config.get(
-    "backupReminderOffset",
-    isUserPremium() ? 1 : 0
-  );
+  const backupReminderOffset = Config.get("backupReminderOffset", 0);
 
   await TaskScheduler.stop("automatic-backups");
   if (!backupReminderOffset) return false;
@@ -71,10 +68,7 @@ export function shouldAddAutoBackupsDisabledReminder() {
 }
 
 export async function shouldAddBackupReminder() {
-  const backupReminderOffset = Config.get(
-    "backupReminderOffset",
-    isUserPremium() ? 1 : 0
-  );
+  const backupReminderOffset = Config.get("backupReminderOffset", 0);
   if (!backupReminderOffset) return false;
 
   const lastBackupTime = await db.backup.lastBackupTime();
