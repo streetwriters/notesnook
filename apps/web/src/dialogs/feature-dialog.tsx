@@ -22,7 +22,7 @@ import Dialog from "../components/dialog";
 import { getHomeRoute, hardNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
 import Config from "../utils/config";
-import { isTesting } from "../utils/platform";
+import { isDesktop, isTesting } from "../utils/platform";
 import { useEffect } from "react";
 import { ArrowRight, Checkmark, Icon, Warn } from "../components/icons";
 
@@ -89,26 +89,24 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
+      : isDesktop()
+      ? [
+          {
+            title: "New UI for settings",
+            subtitle:
+              "We have revamped Notesnook Settings from the groundup to be better suited to the desktop form factor. Take a look and let us know what you think!"
+          },
+          {
+            title: "100% native encryption",
+            subtitle:
+              "The desktop app (this app) now uses 100% native encryption instead of a WebAssembly based solution. The result is 10x faster encryption improving the sync performance on desktop significantly."
+          }
+        ]
       : [
           {
-            title: "Configurable date/time format",
+            title: "New UI for settings",
             subtitle:
-              "Notesnook now allows changing the date & time formats across the app. Set it to DD-MM-YYYY or YYYY/DD/MM or whatever you like."
-          },
-          {
-            title: "Change default note title",
-            subtitle:
-              "You can now change the default note title for new notes using different templates like $date$, $time$, $headline$ etc. Go to Settings > Behaviour to find out how to use it."
-          },
-          {
-            title: "Default notebook/topic",
-            subtitle:
-              "Setting a notebook/topic as default is now possible allowing you to automatically assign a specific notebook or topic for newly created notes!"
-          },
-          {
-            title: "Marketing emails opt-out",
-            subtitle:
-              "You can now directly unsubscribed from all marketing emails by going to Settings > Privacy & security and opting-out of Marketing emails."
+              "We have revamped Notesnook Settings from the groundup to be better suited to the desktop form factor. Take a look and let us know what you think!"
           }
         ],
     cta: {
