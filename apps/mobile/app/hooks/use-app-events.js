@@ -508,9 +508,6 @@ export const useAppEvents = () => {
     }
     const user = await db.user.getUser();
     if (PremiumService.get() && user) {
-      if (SettingsService.get().reminder === "off") {
-        SettingsService.set({ reminder: "daily" });
-      }
       if (
         await BackupService.checkBackupRequired(SettingsService.get().reminder)
       ) {
