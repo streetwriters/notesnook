@@ -33,11 +33,19 @@ import { AssetManager } from "./utils/asset-manager";
 import { createIPCHandler } from "electron-trpc/main";
 import { router, api } from "./api";
 import { config } from "./utils/config";
+import path from "path";
 
 if (!RELEASE) {
   require("electron-reloader")(module);
 }
 
+if (process.platform == "win32" && process.env.PORTABLE_EXECUTABLE_DIR) {
+  console.log("Portable app: true");
+  const root = path.join(process.env.PORTABLE_EXECUTABLE_DIR, "Notesnook");
+  app.setPath("appData", path.join(root, "AppData"));
+  app.setPath("documents", path.join(root, "Documents"));
+  app.setPath("userData", path.join(root, "UserData"));
+}
 // only run a single instance
 
 if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
