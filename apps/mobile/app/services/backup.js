@@ -17,20 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { sanitizeFilename } from "@notesnook/common";
 import { Platform } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 import FileViewer from "react-native-file-viewer";
 import * as ScopedStorage from "react-native-scoped-storage";
 import Share from "react-native-share";
-import RNFetchBlob from "react-native-blob-util";
-import { presentDialog } from "../components/dialog/functions";
 import { DatabaseLogger, db } from "../common/database";
 import storage from "../common/database/storage";
+import { presentDialog } from "../components/dialog/functions";
 import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
-import { eSendEvent, presentSheet, ToastEvent } from "./event-manager";
+import { ToastEvent, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
-import PremiumService from "./premium";
-import { sanitizeFilename } from "@notesnook/common";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -167,7 +166,7 @@ async function run(progress, context) {
   try {
     backup = await db.backup.export(
       "mobile",
-      PremiumService.get() ? SettingsService.get().encryptedBackup : false
+      SettingsService.get().encryptedBackup
     );
     if (!backup) throw new Error("Backup returned empty.");
   } catch (e) {
