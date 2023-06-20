@@ -17,50 +17,49 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useRef, useState } from "react";
+import { PropsWithChildren } from "react";
 import { Flex, Text } from "@theme-ui/components";
 import { ArrowLeft, Menu, Search, Plus } from "../icons";
 import { useStore } from "../../stores/app-store";
-import { CREATE_BUTTON_MAP } from "../../common";
 import useMobile from "../../hooks/use-mobile";
 import { navigate } from "../../navigation";
-import { Input } from "@theme-ui/components";
 
-function RouteContainer(props) {
-  const {
-    id,
-    type,
-    title,
-    isEditable,
-    onChange,
-    subtitle,
-    buttons,
-    component
-  } = props;
+export type RouteContainerButtons = {
+  search?: {
+    title: string;
+  };
+  back?: {
+    title: string;
+    onClick: () => void;
+  };
+  create?: {
+    title: string;
+    onClick: () => void;
+  };
+};
+
+export type RouteContainerProps = {
+  type: string;
+  title?: string;
+  buttons?: RouteContainerButtons;
+};
+function RouteContainer(props: PropsWithChildren<RouteContainerProps>) {
+  const { type, title, buttons, children } = props;
   return (
     <>
-      <Header
-        type={type}
-        title={title}
-        subtitle={subtitle}
-        buttons={buttons}
-        isEditable={isEditable}
-        onChange={onChange}
-      />
-      {component || <Flex id={id} sx={{ flex: 1, flexDirection: "column" }} />}
+      <Header type={type} title={title} buttons={buttons} />
+      {children}
     </>
   );
 }
 
 export default RouteContainer;
 
-function Header(props) {
-  const { title, subtitle, onChange, buttons, type, isEditable } = props;
-  const createButtonData = CREATE_BUTTON_MAP[type];
+function Header(props: RouteContainerProps) {
+  const { title, buttons, type } = props;
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
 
-  // if (!subtitle) return null;
   return (
     <Flex mx={2} sx={{ flexDirection: "column", justifyContent: "center" }}>
       <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
@@ -68,8 +67,7 @@ function Header(props) {
           {buttons?.back ? (
             <ArrowLeft
               size={24}
-              title={buttons.back.title}
-              onClick={buttons.back.action}
+              {...buttons.back}
               sx={{ flexShrink: 0, mr: 2, cursor: "pointer" }}
               color="text"
               data-test-id="go-back"
@@ -88,12 +86,9 @@ function Header(props) {
             />
           )}
           {title && (
-            <RouteTitle
-              subtitle={subtitle}
-              title={title}
-              isEditable={isEditable}
-              onChange={onChange}
-            />
+            <Text variant="heading" data-test-id="routeHeader" color="text">
+              {title}
+            </Text>
           )}
         </Flex>
         <Flex sx={{ flexShrink: 0 }}>
@@ -105,8 +100,7 @@ function Header(props) {
               onClick={() => navigate(`/search/${type}`)}
             />
           )}
-
-          {!isMobile && createButtonData && (
+          {!isMobile && buttons?.create && (
             <Plus
               data-test-id={`${type}-action-button`}
               color="static"
@@ -118,66 +112,11 @@ function Header(props) {
                 size: 28,
                 ":hover": { boxShadow: "0px 0px 5px 0px var(--dimPrimary)" }
               }}
-              title={createButtonData.title}
-              onClick={createButtonData.onClick}
+              {...buttons.create}
             />
           )}
         </Flex>
       </Flex>
-    </Flex>
-  );
-}
-
-function RouteTitle({ title, subtitle, isEditable, onChange }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const ref = useRef();
-  useEffect(() => {
-    ref.current.value = title;
-  }, [title]);
-
-  return (
-    <Flex sx={{ flexDirection: "column" }}>
-      {subtitle && <Text variant="subBody">{subtitle}</Text>}
-      <Input
-        ref={ref}
-        variant="clean"
-        data-test-id="routeHeader"
-        title={title}
-        sx={{
-          overflow: "hidden",
-          textOverflow: isEditing ? "initial" : "ellipsis",
-          whiteSpace: "nowrap",
-
-          p: 0,
-          m: 0,
-          fontWeight: "bold",
-          fontFamily: "heading",
-          fontSize: subtitle ? "subheading" : "heading",
-          border: "none",
-          bg: isEditing ? "bgSecondary" : "transparent",
-
-          ":focus-visible": { outline: "none" },
-          color: "text"
-        }}
-        onDoubleClick={(e) => {
-          setIsEditing(isEditable && true);
-          e.target.focus();
-        }}
-        onKeyUp={(e) => {
-          if (e.key === "Escape") {
-            e.target.value = title;
-            setIsEditing(false);
-          } else if (e.key === "Enter") {
-            if (onChange) onChange(e.target.value);
-            setIsEditing(false);
-          }
-        }}
-        onBlur={(e) => {
-          if (onChange) onChange(e.target.value);
-          setIsEditing(false);
-        }}
-        readOnly={!isEditing}
-      />
     </Flex>
   );
 }

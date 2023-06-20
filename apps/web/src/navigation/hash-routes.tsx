@@ -44,8 +44,9 @@ import {
 } from "../common/dialog-controller";
 import { hashNavigate } from ".";
 import Editor from "../components/editor";
+import { defineRoutes } from "./types";
 
-const hashroutes = {
+const hashroutes = defineRoutes({
   "/": () => {
     return (
       !editorStore.get().session.state && <Editor noteId={0} nonce={"-1"} />
@@ -57,7 +58,7 @@ const hashroutes = {
   "/notebooks/create": () => {
     showAddNotebookDialog().then(afterAction);
   },
-  "/notebooks/:notebookId/edit": ({ notebookId }: { notebookId: string }) => {
+  "/notebooks/:notebookId/edit": ({ notebookId }) => {
     showEditNotebookDialog(notebookId)?.then(afterAction);
   },
   "/topics/create": () => {
@@ -66,7 +67,7 @@ const hashroutes = {
   "/reminders/create": () => {
     showAddReminderDialog().then(afterAction);
   },
-  "/reminders/:reminderId/edit": ({ reminderId }: { reminderId: string }) => {
+  "/reminders/:reminderId/edit": ({ reminderId }) => {
     showEditReminderDialog(reminderId).then(afterAction);
   },
   "/notebooks/:notebookId/topics/:topicId/edit": ({
@@ -81,31 +82,32 @@ const hashroutes = {
   "/tags/create": () => {
     showCreateTagDialog().then(afterAction);
   },
-  "/tags/:tagId/edit": ({ tagId }: { tagId: string }) => {
+  "/tags/:tagId/edit": ({ tagId }) => {
     showEditTagDialog(tagId)?.then(afterAction);
   },
   "/notes/create": () => {
     closeOpenedDialog();
     hashNavigate("/notes/create", { addNonce: true, replace: true });
   },
-  "/notes/create/:nonce": ({ nonce }: { nonce: string }) => {
+  "/notes/create/:nonce": ({ nonce }) => {
     closeOpenedDialog();
     return <Editor noteId={0} nonce={nonce} />;
   },
-  "/notes/:noteId/edit": ({ noteId }: { noteId: string }) => {
+  "/notes/:noteId/edit": ({ noteId }) => {
     closeOpenedDialog();
 
     return <Editor noteId={noteId} />;
   },
-  "/notes/:noteId/unlock": ({ noteId }: { noteId: string }) => {
+  "/notes/:noteId/unlock": ({ noteId }) => {
     closeOpenedDialog();
     return (
       <RouteContainer
+        type="unlock"
         buttons={{
           back: isMobile()
             ? {
                 title: "Go back",
-                action: () =>
+                onClick: () =>
                   hashNavigate("/notes/create", {
                     addNonce: true,
                     replace: true
@@ -113,11 +115,12 @@ const hashroutes = {
               }
             : undefined
         }}
-        component={<Unlock noteId={noteId} />}
-      />
+      >
+        <Unlock noteId={noteId} />
+      </RouteContainer>
     );
   },
-  "/notes/:noteId/conflict": ({ noteId }: { noteId: string }) => {
+  "/notes/:noteId/conflict": ({ noteId }) => {
     closeOpenedDialog();
     return <DiffViewer noteId={noteId} />;
   },
@@ -127,14 +130,10 @@ const hashroutes = {
   "/buy/:code": ({ code }: { code: string }) => {
     showBuyDialog("monthly", code).then(afterAction);
   },
-  "/buy/:plan/:code": ({
-    plan,
-    code
-  }: {
-    plan: "monthly" | "yearly";
-    code: string;
-  }) => {
-    showBuyDialog(plan, code).then(afterAction);
+  "/buy/:plan/:code": ({ plan, code }) => {
+    showBuyDialog(plan === "monthly" ? "monthly" : "yearly", code).then(
+      afterAction
+    );
   },
   "/welcome": () => {
     showOnboardingDialog("new")?.then(afterAction);
@@ -145,7 +144,7 @@ const hashroutes = {
   "/settings": () => {
     showSettings().then(afterAction);
   }
-};
+});
 
 export default hashroutes;
 export type HashRoute = keyof typeof hashroutes;

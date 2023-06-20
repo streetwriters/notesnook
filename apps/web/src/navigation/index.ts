@@ -20,23 +20,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useState } from "react";
 import EventManager from "@notesnook/core/utils/event-manager";
 import Config from "../utils/config";
+import { HashRoute } from "./hash-routes";
+import { ReplaceParametersInPath } from "./types";
 
+export function navigate(url: string): void;
+export function navigate(url: string, replace?: boolean): void;
+export function navigate(
+  url: string,
+  query?: URLSearchParams,
+  replace?: boolean
+): void;
 export function navigate(
   url: string,
   replaceOrQuery?: boolean | URLSearchParams,
   replace?: boolean
 ) {
-  if (typeof url !== "string") {
-    throw new Error(`"url" must be a string, was provided a(n) ${typeof url}`);
-  }
-  if (Array.isArray(replaceOrQuery)) {
-    throw new Error(
-      '"replaceOrQuery" must be boolean, object, or URLSearchParams'
-    );
-  }
-
   if (replaceOrQuery !== null && typeof replaceOrQuery === "object") {
-    url += "?" + new URLSearchParams(replaceOrQuery).toString();
+    url += "?" + replaceOrQuery.toString();
   } else if (replace === undefined && replaceOrQuery !== undefined) {
     replace = replaceOrQuery;
   } else if (replace === undefined && replaceOrQuery === undefined) {
@@ -50,12 +50,20 @@ export function navigate(
   dispatchEvent(new PopStateEvent("popstate"));
 }
 
-let last = 0;
-export function hashNavigate(
-  url: string,
-  { replace = false, notify = true, addNonce = false } = {}
+type HashNavigateOptions = {
+  replace?: boolean;
+  notify?: boolean;
+  addNonce?: boolean;
+};
+
+let lastNonce = 0;
+export function hashNavigate<TPath extends HashRoute>(
+  path: ReplaceParametersInPath<TPath>,
+  options: HashNavigateOptions = {}
 ) {
-  if (addNonce) url += `/${++last}`;
+  const { replace = false, notify = true, addNonce = false } = options;
+  let url: string = path;
+  if (addNonce) url += `/${++lastNonce}`;
 
   if (replace) window.history.replaceState(null, "", `#${url}`);
   else window.history.pushState(null, "", `#${url}`);
@@ -99,7 +107,7 @@ const HOMEPAGE_ROUTE = {
   1: "/notebooks",
   2: "/favorites",
   3: "/tags"
-};
+} as const;
 export function getHomeRoute() {
   return HOMEPAGE_ROUTE[Config.get("homepage", 0)];
 }
