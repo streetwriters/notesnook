@@ -23,7 +23,17 @@ module.exports = {
       "react": path.join(__dirname, "../node_modules/react"),
       "react-dom": path.join(__dirname, "../node_modules/react-dom"),
       "@notesnook":  path.join(__dirname, "../../../packages"),
-      "@notifee/react-native": path.join(__dirname, "../node_modules/@ammarahmed/notifee-react-native")
+      "@notifee/react-native": path.join(__dirname, "../node_modules/@ammarahmed/notifee-react-native"),
+    },
+    resolveRequest: (context, moduleName, platform) => {
+      if (moduleName ==='react') {
+        // Resolve react package from mobile app's node_modules folder always.
+        return {
+          filePath: path.resolve(path.join(__dirname, '../node_modules', "react","index.js")),
+          type: 'sourceFile',
+        };
+      }
+      return context.resolveRequest(context, moduleName, platform);
     }
   },
   transformer: {
