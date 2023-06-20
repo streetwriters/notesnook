@@ -23,9 +23,10 @@ import Menu, { MenuItem } from "react-native-reanimated-material-menu";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { PressableButton } from "../../../components/ui/pressable";
 import Paragraph from "../../../components/ui/typography/paragraph";
+import PremiumService from "../../../services/premium";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
-import PremiumService from "../../../services/premium";
+import { sleep } from "../../../utils/time";
 
 interface PickerOptions<T> {
   getValue: () => T;
@@ -55,11 +56,18 @@ export function SettingsPicker<T>({
 
   const onChange = async (item: T) => {
     if (premium && onCheckOptionIsPremium?.(item)) {
-      await PremiumService.verify(async () => {
-        menuRef.current?.hide();
-        await updateValue(item);
-        setCurrentValue(item);
-      });
+      await PremiumService.verify(
+        async () => {
+          menuRef.current?.hide();
+          await updateValue(item);
+          setCurrentValue(item);
+        },
+        async () => {
+          menuRef.current?.hide();
+          await sleep(300);
+          PremiumService.sheet();
+        }
+      );
       return;
     }
 

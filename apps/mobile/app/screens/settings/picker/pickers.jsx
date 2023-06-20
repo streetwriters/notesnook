@@ -126,5 +126,7 @@ export const BackupReminderPicker = createSettingsPicker({
   options: ["useroff", "daily", "weekly", "monthly"],
   compareValue: (current, item) => current === item,
   premium: true,
-  onCheckOptionIsPremium: (item) => item !== "useroff"
+  onCheckOptionIsPremium: (item) => {
+    return item !== "useroff";
+  }
 });
