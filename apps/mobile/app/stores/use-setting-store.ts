@@ -119,7 +119,7 @@ export const defaultSettings: SettingStore["settings"] = {
   forcePortraitOnTablet: false,
   useSystemTheme: true,
   reminder: "off",
-  encryptedBackup: false,
+  encryptedBackup: true,
   homepage: "Notes",
   sort: "default",
   sortOrder: "desc",
