@@ -91,3 +91,28 @@ test("streaming encryption result should be decryptable on node & browser varian
     { message: "chunk3", tag: 3 }
   ]);
 });
+
+test("node & browser variants of base64 should be compatible", async (t) => {
+  const text = new Uint8Array([
+    223, 137, 144, 213, 112, 69, 249, 172, 9, 36, 33, 206, 180, 149, 244, 178,
+    220, 223, 248, 200, 114, 14, 213, 200, 202
+  ]);
+
+  t.expect(browser.to_base64(text)).toBe(node.to_base64(text));
+
+  t.expect(browser.to_base64(text, browser.base64_variants.ORIGINAL)).toBe(
+    node.to_base64(text, node.base64_variants.ORIGINAL)
+  );
+
+  t.expect(
+    browser.to_base64(text, browser.base64_variants.ORIGINAL_NO_PADDING)
+  ).toBe(node.to_base64(text, node.base64_variants.ORIGINAL_NO_PADDING));
+
+  t.expect(
+    browser.to_base64(text, browser.base64_variants.URLSAFE_NO_PADDING)
+  ).toBe(node.to_base64(text, node.base64_variants.URLSAFE_NO_PADDING));
+
+  t.expect(browser.to_base64(text, browser.base64_variants.URLSAFE)).toBe(
+    node.to_base64(text, node.base64_variants.URLSAFE)
+  );
+});

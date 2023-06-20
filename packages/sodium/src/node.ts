@@ -361,7 +361,7 @@ export function from_base64(
 
 export function to_base64(
   input: string | Uint8Array,
-  variant?: base64_variants
+  variant: base64_variants = base64_variants.URLSAFE_NO_PADDING
 ): string {
   const base64 = Buffer.from(toBuffer(input)).toString(
     variant === base64_variants.URLSAFE ||
@@ -372,6 +372,8 @@ export function to_base64(
   return variant === base64_variants.URLSAFE_NO_PADDING ||
     variant === base64_variants.ORIGINAL_NO_PADDING
     ? trimPadding(base64)
+    : variant === base64_variants.URLSAFE
+    ? appendPadding(base64)
     : base64;
 }
 
