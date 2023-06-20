@@ -240,11 +240,10 @@ jobs:
           npm i --ignore-scripts --prefer-offline --no-audit
           npx lerna bootstrap --ignore=@notesnook/mobile -- --prefer-offline --no-audit
 
-      - name: Build Electron wrapper
+      - name: Build
         run: npx nx run release --project @notesnook/desktop
-        working-directory: ./apps/desktop
 
-      - name: Build app
+      - name: Publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
