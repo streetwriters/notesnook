@@ -121,6 +121,7 @@ class UserStore extends BaseStore {
         return await db.user.authenticateMultiFactorCode(code, method);
       } else if (password) {
         await db.user.authenticatePassword(email, password, null);
+        Config.set("encryptBackups", true);
 
         if (skipInit) return true;
         return this.init();
