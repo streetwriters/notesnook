@@ -36,6 +36,7 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { editorRef } from "../../utils/global-refs";
 import { ProgressBar } from "./progress";
 import { editorController, textInput } from "./tiptap/utils";
+
 export const EditorWrapper = ({ width }) => {
   const colors = useThemeStore((state) => state.colors);
   const deviceMode = useSettingStore((state) => state.deviceMode);
