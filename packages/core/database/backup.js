@@ -17,13 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Migrator from "./migrator.js";
-import {
-  CHECK_IDS,
-  checkIsUserPremium,
-  CURRENT_DATABASE_VERSION
-} from "../common.js";
 import SparkMD5 from "spark-md5";
+import { CURRENT_DATABASE_VERSION } from "../common.js";
+import Migrator from "./migrator.js";
 
 const invalidKeys = ["user", "t", "v", "lastBackupTime", "lastSynced"];
 const invalidIndices = ["tags", "colors"];
@@ -51,12 +47,6 @@ export default class Backup {
    * @param {boolean} encrypt
    */
   async export(type, encrypt = false) {
-    if (encrypt && !(await checkIsUserPremium(CHECK_IDS.backupEncrypt))) {
-      throw new Error(
-        "Please upgrade your plan to Pro to use encrypted backups."
-      );
-    }
-
     if (!validTypes.some((t) => t === type))
       throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
 
