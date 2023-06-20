@@ -38,6 +38,7 @@ import {
 } from "../../utils/downloader";
 import { m, LazyMotion, domAnimation } from "framer-motion";
 
+const IMAGE_SOURCE_CACHE: Record<string, string | undefined> = {};
 export const AnimatedImage = m(Image);
 
 export function ImageComponent(
@@ -72,9 +73,10 @@ export function ImageComponent(
   useEffect(
     () => {
       (async () => {
-        if (!src && !dataurl) return;
+        if (!src && !dataurl && !IMAGE_SOURCE_CACHE[hash]) return;
         try {
-          if (dataurl) setSource(await toBlobURL(dataurl));
+          if (IMAGE_SOURCE_CACHE[hash]) setSource(IMAGE_SOURCE_CACHE[hash]);
+          else if (dataurl) setSource(await toBlobURL(dataurl));
           else if (isDataUrl(src)) setSource(await toBlobURL(src));
           else {
             const { url, size, blob, type } = await downloadImage(
@@ -97,6 +99,7 @@ export function ImageComponent(
     [src, dataurl, imageRef, downloadOptions]
   );
 
+  if (source) IMAGE_SOURCE_CACHE[hash] = source;
   const relativeHeight = aspectRatio
     ? editor.view.dom.clientWidth / aspectRatio
     : undefined;
