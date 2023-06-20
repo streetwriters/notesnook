@@ -57,7 +57,7 @@ async function main() {
           }
 
           await $`npm run bundle`;
-          await $`tsc`;
+          await $`npx tsc`;
 
           if (first) {
             await fs.cp(sodiumNativePrebuildPath, "build/prebuilds", {

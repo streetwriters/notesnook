@@ -26,7 +26,7 @@ import { ipcRenderer } from "electron";
 declare global {
   var os: string;
   var electronTRPC: RendererGlobalElectronTRPC;
-  var NativeNNCrypto: new () => NNCrypto;
+  var NativeNNCrypto: (new () => NNCrypto) | undefined;
 }
 console.log("HELLO", process);
 process.once("loaded", async () => {
@@ -40,5 +40,10 @@ process.once("loaded", async () => {
   globalThis.electronTRPC = electronTRPC;
 });
 
-globalThis.NativeNNCrypto = NNCrypto;
+globalThis.NativeNNCrypto =
+  process.platform === "win32" &&
+  process.arch !== "x64" &&
+  process.arch !== "ia32"
+    ? undefined
+    : NNCrypto;
 globalThis.os = MAC_APP_STORE ? "mas" : process.platform;

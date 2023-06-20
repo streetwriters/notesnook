@@ -42,7 +42,6 @@
     "build": "tsc",
     "bundle": "esbuild electron=./src/main.ts ./src/preload.ts --external:electron --external:fsevents --minify --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=false --define:RELEASE=true",
     "bundle:mas": "esbuild electron=./src/main.ts ./src/preload.ts --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=true --define:RELEASE=true",
-    "builder": "./node_modules/.bin/electron-builder",
     "postinstall": "patch-package"
   },
   "author": {
@@ -55,6 +54,7 @@
     "productName": "Notesnook",
     "copyright": "Copyright © 2023 Streetwriters (Private) Limited",
     "artifactName": "notesnook_${os}_${arch}.${ext}",
+    "npmRebuild": false,
     "files": [
       "!*.chunk.js.map",
       "!*.chunk.js.LICENSE.txt",

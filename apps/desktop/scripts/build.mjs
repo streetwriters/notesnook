@@ -19,27 +19,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import path from "path";
 import fs from "fs/promises";
-import { $, argv, os } from "zx";
+import { existsSync } from "fs";
+import { argv, os } from "zx";
+import * as childProcess from "child_process";
 
-$.env = process.env;
-
-const sodiumNativePrebuildPath = path.join(
-  `node_modules`,
-  `@notesnook`,
-  `crypto`,
-  `node_modules`,
-  `@notesnook`,
-  `sodium`,
-  `node_modules`,
-  `sodium-native`,
-  `prebuilds`,
-  `${os.platform()}-x64`
-);
+const sodiumNativePrebuildPath = (arch) =>
+  path.join(
+    `node_modules`,
+    `@notesnook`,
+    `crypto`,
+    `node_modules`,
+    `@notesnook`,
+    `sodium`,
+    `node_modules`,
+    `sodium-native`,
+    `prebuilds`,
+    `${os.platform()}-${arch}`
+  );
 
 if (argv.rebuild) {
   await fs.rm("./build/", { force: true, recursive: true });
 
-  await $`cd ../web/ && npm run build:desktop`;
+  await exec(
+    `cd ${path.resolve(
+      path.join(__dirname, "..", "web")
+    )} && npm run build:desktop`
+  );
 
   await fs.cp(path.join("..", "web", "build"), "build", {
     recursive: true,
@@ -48,25 +53,62 @@ if (argv.rebuild) {
 }
 
 if (argv.variant === "mas") {
-  await $`npm run bundle:mas`;
+  await exec(`npm run bundle:mas`);
 } else {
-  await $`npm run bundle`;
+  await exec(`npm run bundle`);
 }
 
-await $`tsc`;
-await $`npm rebuild`;
+await exec(`npx tsc`);
 
-await fs.cp(
-  sodiumNativePrebuildPath,
-  path.join("build", "prebuilds", `${process.platform}-x64`),
-  {
-    recursive: true,
-    force: true
-  }
-);
+if (existsSync(sodiumNativePrebuildPath("x64"))) {
+  console.log("copying sodium-native-x64");
+  await fs.cp(
+    sodiumNativePrebuildPath("x64"),
+    path.join("build", "prebuilds", `${process.platform}-x64`),
+    {
+      recursive: true,
+      force: true
+    }
+  );
+}
+
+if (existsSync(sodiumNativePrebuildPath("ia32"))) {
+  console.log("copying sodium-native-ia32");
+  await fs.cp(
+    sodiumNativePrebuildPath("ia32"),
+    path.join("build", "prebuilds", `${process.platform}-ia32`),
+    {
+      recursive: true,
+      force: true
+    }
+  );
+}
+
+if (existsSync(sodiumNativePrebuildPath("arm64"))) {
+  console.log("copying sodium-native-arm64");
+  await fs.cp(
+    sodiumNativePrebuildPath("arm64"),
+    path.join("build", "prebuilds", `${process.platform}-arm64`),
+    {
+      recursive: true,
+      force: true
+    }
+  );
+}
 
 if (argv.run) {
-  await $`npm run builder -- --linux AppImage:x64`;
+  if (process.platform === "win32") {
+    await exec(`npx electron-builder --win --x64`);
+    // await exec(`.\\output\\notesnook_win_x64_portable.exe`);
+  } else {
+    await exec(`npx electron-builder --linux AppImage:x64`);
+    // await exec(`./output/notesnook_linux_x86_64.AppImage`);
+  }
+}
 
-  await $`./output/notesnook_linux_x86_64.AppImage`;
+async function exec(cmd) {
+  return childProcess.execSync(cmd, {
+    env: process.env,
+    stdio: "inherit"
+  });
 }
