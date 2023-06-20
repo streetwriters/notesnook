@@ -439,10 +439,13 @@ export const useAppEvents = () => {
 
         clearMessage();
         subscribeToIAPListeners();
-
         if (!login) {
           user = await db.user.fetchUser();
           setUser(user);
+        } else {
+          SettingsService.set({
+            encryptedBackup: true
+          });
         }
 
         await PremiumService.setPremiumStatus();
