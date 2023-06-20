@@ -36,17 +36,13 @@ const sodiumNativePrebuildPath = (arch) =>
     `prebuilds`,
     `${os.platform()}-${arch}`
   );
-
+const webAppPath = path.resolve(path.join(__dirname, "..", "..", "web"));
 if (argv.rebuild) {
   await fs.rm("./build/", { force: true, recursive: true });
 
-  await exec(
-    `cd ${path.resolve(
-      path.join(__dirname, "..", "web")
-    )} && npm run build:desktop`
-  );
+  await exec(`cd ${webAppPath} && npm run build:desktop`);
 
-  await fs.cp(path.join("..", "web", "build"), "build", {
+  await fs.cp(path.join(webAppPath, "build"), "build", {
     recursive: true,
     force: true
   });
@@ -102,7 +98,7 @@ if (argv.run) {
     // await exec(`.\\output\\notesnook_win_x64_portable.exe`);
   } else {
     await exec(`npx electron-builder --linux AppImage:x64`);
-    // await exec(`./output/notesnook_linux_x86_64.AppImage`);
+    await exec(`./output/notesnook_linux_x86_64.AppImage`);
   }
 }
 
