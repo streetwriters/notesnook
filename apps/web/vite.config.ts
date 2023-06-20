@@ -174,7 +174,7 @@ export default defineConfig({
     format: "es"
   },
   plugins: [
-    ...(isDesktop
+    ...(isDesktop && process.env.NODE_ENV === "production"
       ? [
           topLevelAwait({
             // The export name of top-level await promise for each chunk module
