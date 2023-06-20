@@ -82,7 +82,8 @@ export async function introduceFeatures() {
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
 
 export async function createBackup() {
-  const encryptBackups = Config.get("encryptBackups", false);
+  const encryptBackups =
+    userstore.get().isLoggedIn && Config.get("encryptBackups", false);
   const data = await showLoadingDialog({
     title: "Creating backup",
     subtitle: "We are creating a backup of your data. Please wait...",
