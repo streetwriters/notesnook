@@ -291,7 +291,6 @@ export const useAppEvents = () => {
 
   useEffect(() => {
     let eventSubscriptions = [
-      Appearance.addChangeListener(SettingsService.setTheme),
       Linking.addEventListener("url", onAppOpenedFromURL),
       SodiumEventEmitter.addListener(
         "onSodiumProgress",

@@ -17,7 +17,7 @@ module.exports = {
     path.join(__dirname, "../../../packages"),
   ],
   resolver: {
-    sourceExts: ['jsx', 'js', 'ts', 'tsx', 'cjs'],
+    sourceExts: ['jsx', 'js', 'ts', 'tsx', 'cjs', "json"],
     nodeModulesPaths,
     extraNodeModules: {
       "react": path.join(__dirname, "../node_modules/react"),

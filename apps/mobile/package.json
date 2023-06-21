@@ -24,16 +24,19 @@
   },
   "devDependencies": {
     "otplib": "12.0.1",
-    "react-refresh": "0.14.0"
+    "react-refresh": "0.14.0",
+    "patch-package": "7.0.0"
   },
   "dependencies": {
-    "react": "18.0.0",
-    "react-native": "0.69.7",
+    "react": "18.2.0",
+    "react-native": "0.71.11",
     "@notesnook/core": "*",
     "@notesnook/editor": "*",
     "@notesnook/editor-mobile": "*",
     "react-native-swiper-flatlist": "3.2.2",
     "@notesnook/logger": "*",
-    "@notesnook/common": "*"
+    "@notesnook/common": "*",
+    "react-native-mmkv-storage": "^0.9.1",
+    "react-native-reanimated": "^3.3.0"
   }
 }
