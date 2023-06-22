@@ -57,7 +57,7 @@ navigation:
   - path: web-clipper
     children:
       - path: web-clipper/installation.md
-      - path: web-clipper/clipping-your-first-web-page.md
+      - path: web-clipper/clipping-your-first-web-page-with-web-clipper.md
       - path: web-clipper/troubleshooting.md
   - path: mobile-integration
     children:
