@@ -194,12 +194,6 @@ export function showEmailChangeDialog() {
   ));
 }
 
-export function showToolbarConfigDialog() {
-  return showDialog("ToolbarConfigDialog", (Dialog, perform) => (
-    <Dialog onClose={() => perform(null)} />
-  ));
-}
-
 export function showError(title: string, message: string) {
   return confirm({ title, message, positiveButtonText: "Okay" });
 }
