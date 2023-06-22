@@ -189,15 +189,16 @@ export default defineConfig({
             promiseImportName: (i) => `__tla_${i}`
           })
         ]
-      : []),
-    VitePWA({
-      strategies: "injectManifest",
-      minify: true,
-      manifest: WEB_MANIFEST,
-      injectRegister: null,
-      srcDir: "src",
-      filename: "service-worker.js"
-    }),
+      : [
+          VitePWA({
+            strategies: "injectManifest",
+            minify: true,
+            manifest: WEB_MANIFEST,
+            injectRegister: null,
+            srcDir: "src",
+            filename: "service-worker.js"
+          })
+        ]),
     react({
       plugins: isTesting
         ? undefined
