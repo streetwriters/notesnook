@@ -18,9 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Language, useSpellChecker } from "../../../hooks/use-spell-checker";
-import { Checkbox, Input, Label } from "@theme-ui/components";
+import { Input, Label } from "@theme-ui/components";
 import { useCallback, useEffect, useState } from "react";
 import { deleteItem } from "@notesnook/core/utils/array";
+import { FlexScrollContainer } from "../../../components/scroll-container";
 
 export function SpellCheckerLanguages() {
   const spellChecker = useSpellChecker();
@@ -55,24 +56,32 @@ export function SpellCheckerLanguages() {
         sx={{ mx: "2px", my: 2, width: "auto" }}
         onChange={(e) => filter(e.currentTarget.value.toLowerCase().trim())}
       />
-      {languages.map((lang) => (
-        <Label key={lang.code} variant="text.body" sx={{ mb: 1 }}>
-          <Checkbox
-            checked={enabledLanguages.includes(lang.code)}
-            onChange={async (e) => {
-              const { checked } = e.currentTarget;
-              const copiedLanguages = enabledLanguages.slice();
+      <FlexScrollContainer suppressAutoHide style={{ maxHeight: 400 }}>
+        {languages.map((lang) => (
+          <Label key={lang.code} variant="text.body" sx={{ mb: 1 }}>
+            <input
+              type="checkbox"
+              style={{
+                accentColor: "var(--primary)",
+                marginRight: 1,
+                width: 14,
+                height: 14
+              }}
+              checked={enabledLanguages.includes(lang.code)}
+              onChange={async (e) => {
+                const { checked } = e.currentTarget;
+                const copiedLanguages = enabledLanguages.slice();
 
-              if (checked) copiedLanguages.push(lang.code);
-              else deleteItem(copiedLanguages, lang.code);
+                if (checked) copiedLanguages.push(lang.code);
+                else deleteItem(copiedLanguages, lang.code);
 
-              await spellChecker.setLanguages(copiedLanguages);
-            }}
-            sx={{ mr: 1, width: 20, height: 20 }}
-          />
-          {lang.name}
-        </Label>
-      ))}
+                await spellChecker.setLanguages(copiedLanguages);
+              }}
+            />
+            <span style={{ marginLeft: 5 }}>{lang.name}</span>
+          </Label>
+        ))}
+      </FlexScrollContainer>
     </>
   );
 }
