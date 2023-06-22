@@ -24,7 +24,7 @@ Table columns on desktop and web apps are resizable.
 
 > info
 >
-> Tablec column resizing is not supported on mobile editor yet.
+> Table column resizing is not supported on mobile editor yet.
 
 ## Insert a row
 

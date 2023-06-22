@@ -34,8 +34,10 @@ Go to `Settings` > `Editor` > `Title format` to customize the title formatting.
 
 **$count$**: Current note count + 1
 
+**$timestamp$**: Full date & time without any spaces or symbols (e.g. 202305261253)
+
 You can use a combination of these templates in the note title. For example `$headline$ - $date$` will become `Your note headline - 06-22-2023`.
 
-## Line spacing
+## Paragraph spacing
 
-By default when you press enter on a line in the text editor, a new paragraph is created and the spacing is double. You can go to `Settings` > `Customization` > `Editor` to turn of `Double spaced lines` so when you press enter, the space between the lines is normal.
+By default when you press enter on a line in the text editor, a new paragraph is created with double spacing. You can go to `Settings` > `Customization` > `Editor` to turn off `Double spaced lines`.
