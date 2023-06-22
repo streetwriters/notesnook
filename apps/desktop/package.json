@@ -30,7 +30,7 @@
     "electron-builder-notarize": "^1.5.1",
     "electron-reloader": "^1.2.3",
     "esbuild": "^0.17.19",
-    "undici": "^5.22.1"
+    "node-fetch": "^3.3.1"
   },
   "optionalDependencies": {
     "dmg-license": "^1.0.11"
