@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, FlexProps, Text } from "@theme-ui/components";
-import { Perform } from "../common/dialog-controller";
-import Dialog from "../components/dialog";
 import {
   getAllTools,
   getToolDefinition,
@@ -50,9 +48,9 @@ import { useEffect, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import { createPortal } from "react-dom";
 import { getId } from "@notesnook/core/utils/id";
-import { Label, Radio } from "@theme-ui/components";
-import { db } from "../common/db";
-import { useToolbarConfig } from "../components/editor/context";
+import { Label } from "@theme-ui/components";
+import { db } from "../../../common/db";
+import { useToolbarConfig } from "../../../components/editor/context";
 import {
   getAllPresets,
   getCurrentPreset,
@@ -60,15 +58,12 @@ import {
   getPresetTools,
   Preset,
   PresetId
-} from "../common/toolbar-config";
-import { showToast } from "../utils/toast";
-import { isUserPremium } from "../hooks/use-is-user-premium";
-import { Pro } from "../components/icons";
-export type ToolbarConfigDialogProps = {
-  onClose: Perform;
-};
+} from "../../../common/toolbar-config";
+import { showToast } from "../../../utils/toast";
+import { isUserPremium } from "../../../hooks/use-is-user-premium";
+import { Pro } from "../../../components/icons";
 
-export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
+export function CustomizeToolbar() {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -89,185 +84,177 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
     setItems(items);
   }, [currentPreset]);
 
+  useEffect(() => {
+    (async () => {
+      const tools = unflatten(items).slice(0, -1);
+
+      await db.settings?.setToolbarConfig("desktop", {
+        preset: currentPreset.id,
+        config: currentPreset.id === "custom" ? tools : undefined
+      });
+
+      setToolbarConfig(tools);
+    })();
+  }, [items]);
+
   return (
-    <Dialog
-      isOpen={true}
-      title={"Configure toolbar"}
-      description={"Customize the editor toolbar to fit your needs."}
-      width={500}
-      onClose={() => props.onClose(false)}
-      positiveButton={{
-        text: "Save",
-        onClick: async () => {
-          const tools = unflatten(items).slice(0, -1);
-
-          await db.settings?.setToolbarConfig("desktop", {
-            preset: currentPreset.id,
-            config: currentPreset.id === "custom" ? tools : undefined
-          });
-
-          setToolbarConfig(tools);
-          props.onClose(true);
-        }
-      }}
-      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
-    >
-      <Flex sx={{ flexDirection: "column" }}>
-        <Flex
-          sx={{ p: 1, justifyContent: "space-between", alignItems: "center" }}
-        >
-          <Flex>
-            {getAllPresets().map((preset) => (
-              <Label
-                key={preset.id}
-                variant="text.body"
-                sx={{ alignItems: "center", width: "auto", mr: 2 }}
-              >
-                <Radio
-                  id={preset.id.toString()}
-                  name="preset"
-                  value={preset.id}
-                  checked={preset.id === currentPreset.id}
-                  disabled={preset.id === "custom" && !isUserPremium()}
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    if (preset.id === "custom" && !isUserPremium()) {
-                      showToast(
-                        "info",
-                        "You need to be Pro to use the custom preset."
-                      );
-                      return;
-                    }
-
-                    setCurrentPreset(getPreset(value as PresetId));
-                  }}
-                />
-                {preset.title}
-                {preset.id === "custom" && !isUserPremium() ? (
-                  <Pro color="primary" size={18} sx={{ ml: 1 }} />
-                ) : null}
-              </Label>
-            ))}
-          </Flex>
-          {currentPreset.editable && (
-            <Button
-              variant={"secondary"}
-              sx={{
-                display: "flex",
-                flexShrink: 0,
-                alignItems: "center",
-                p: 1
-              }}
-              title="Add group"
-              onClick={() => {
-                setItems(addGroup);
-                showToast("success", "Group added successfully");
-              }}
+    <Flex sx={{ flexDirection: "column" }}>
+      <Flex
+        sx={{ py: 2, justifyContent: "space-between", alignItems: "center" }}
+      >
+        <Flex sx={{ gap: 2 }}>
+          {getAllPresets().map((preset) => (
+            <Label
+              key={preset.id}
+              variant="text.body"
+              sx={{ alignItems: "center", width: "auto" }}
             >
-              <Icon path={Icons.plus} color="text" size={18} />
-            </Button>
-          )}
+              <input
+                id={preset.id.toString()}
+                name="preset"
+                type="radio"
+                value={preset.id}
+                checked={preset.id === currentPreset.id}
+                defaultChecked={preset.id === currentPreset.id}
+                disabled={preset.id === "custom" && !isUserPremium()}
+                style={{ accentColor: "var(--primary)" }}
+                onChange={async (e) => {
+                  const { value } = e.target;
+                  if (preset.id === "custom" && !isUserPremium()) {
+                    showToast(
+                      "info",
+                      "You need to be Pro to use the custom preset."
+                    );
+                    return;
+                  }
+
+                  setCurrentPreset(getPreset(value as PresetId));
+                }}
+              />
+              <span style={{ marginLeft: 5 }}>{preset.title}</span>
+              {preset.id === "custom" && !isUserPremium() ? (
+                <Pro color="primary" size={18} sx={{ ml: 1 }} />
+              ) : null}
+            </Label>
+          ))}
         </Flex>
-
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={(event) => {
-            if (!isUserPremium()) {
-              showToast("info", "You need to be Pro to customize the toolbar.");
-              return;
-            }
-
-            if (currentPreset.id !== "custom") {
-              setCurrentPreset((c) => ({
-                ...getPreset("custom"),
-                tools: getPresetTools(c)
-              }));
-            }
-
-            const { active } = event;
-            const activeItem = items.find((item) => item.id === active.id);
-            setActiveItem(activeItem);
-          }}
-          onDragEnd={(event) => {
-            const { active, over } = event;
-            if (activeItem && over && active.id !== over.id) {
-              // const newIndex = items.findIndex((i) => i.id === over.id);
-              if (isGroup(activeItem) || isSubgroup(activeItem)) {
-                setItems(moveGroup(items, activeItem.id, over.id as string));
-              } else {
-                setItems(moveItem(items, activeItem.id, over.id as string));
-              }
-
-              setTimeout(() => {
-                const element = document.getElementById(over.id as string);
-                element?.scrollIntoView({ behavior: "auto", block: "nearest" });
-              }, 500);
-            }
-            setActiveItem(undefined);
-          }}
-          measuring={{
-            droppable: { strategy: MeasuringStrategy.Always }
-          }}
-        >
-          <SortableContext items={items} strategy={verticalListSortingStrategy}>
-            {items?.map((item) => {
-              const deleted = isDeleted(items, item);
-              const hasSubGroup =
-                isGroup(item) &&
-                !!getGroup(items, item.id)?.items.some((t) => isSubgroup(t));
-              const canAddSubGroup =
-                currentPreset.editable && !deleted && !hasSubGroup;
-              const canRemoveGroup = currentPreset.editable && !deleted;
-              const canRemoveItem = currentPreset.editable && !deleted;
-
-              return (
-                <TreeNodeComponent
-                  key={item.id}
-                  item={item}
-                  activeItem={activeItem}
-                  onAddSubGroup={
-                    canAddSubGroup
-                      ? () => {
-                          setItems((items) => addSubGroup(items, item.id));
-                          showToast("success", "Subgroup added successfully");
-                        }
-                      : undefined
-                  }
-                  onRemoveGroup={
-                    canRemoveGroup
-                      ? (group) => {
-                          setItems(removeGroup(items, group.id));
-                        }
-                      : undefined
-                  }
-                  onRemoveItem={
-                    canRemoveItem
-                      ? (item) => {
-                          setItems(removeItem(items, item.id));
-                        }
-                      : undefined
-                  }
-                />
-              );
-            })}
-            {activeItem &&
-              createPortal(
-                <DragOverlay
-                // dropAnimation={dropAnimationConfig}
-                // modifiers={indicator ? [adjustTranslate] : undefined}
-                >
-                  <TreeNodeComponent overlay item={activeItem} />
-                </DragOverlay>,
-                document.querySelector(".ReactModal__Overlay") || document.body
-              )}
-          </SortableContext>
-        </DndContext>
+        {currentPreset.editable && (
+          <Button
+            variant={"secondary"}
+            sx={{
+              display: "flex",
+              flexShrink: 0,
+              alignItems: "center",
+              p: 1
+            }}
+            title="Add group"
+            onClick={() => {
+              setItems(addGroup);
+              showToast("success", "Group added successfully");
+            }}
+          >
+            <Icon path={Icons.plus} color="text" size={18} />
+          </Button>
+        )}
       </Flex>
-    </Dialog>
+
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={(event) => {
+          if (!isUserPremium()) {
+            showToast("info", "You need to be Pro to customize the toolbar.");
+            return;
+          }
+
+          if (currentPreset.id !== "custom") {
+            setCurrentPreset((c) => ({
+              ...getPreset("custom"),
+              tools: getPresetTools(c)
+            }));
+          }
+
+          const { active } = event;
+          const activeItem = items.find((item) => item.id === active.id);
+          setActiveItem(activeItem);
+        }}
+        onDragEnd={(event) => {
+          const { active, over } = event;
+          if (activeItem && over && active.id !== over.id) {
+            // const newIndex = items.findIndex((i) => i.id === over.id);
+            if (isGroup(activeItem) || isSubgroup(activeItem)) {
+              setItems(moveGroup(items, activeItem.id, over.id as string));
+            } else {
+              setItems(moveItem(items, activeItem.id, over.id as string));
+            }
+
+            setTimeout(() => {
+              const element = document.getElementById(over.id as string);
+              element?.scrollIntoView({ behavior: "auto", block: "nearest" });
+            }, 500);
+          }
+          setActiveItem(undefined);
+        }}
+        measuring={{
+          droppable: { strategy: MeasuringStrategy.Always }
+        }}
+      >
+        <SortableContext items={items} strategy={verticalListSortingStrategy}>
+          {items?.map((item) => {
+            const deleted = isDeleted(items, item);
+            const hasSubGroup =
+              isGroup(item) &&
+              !!getGroup(items, item.id)?.items.some((t) => isSubgroup(t));
+            const canAddSubGroup =
+              currentPreset.editable && !deleted && !hasSubGroup;
+            const canRemoveGroup = currentPreset.editable && !deleted;
+            const canRemoveItem = currentPreset.editable && !deleted;
+
+            return (
+              <TreeNodeComponent
+                key={item.id}
+                item={item}
+                activeItem={activeItem}
+                onAddSubGroup={
+                  canAddSubGroup
+                    ? () => {
+                        setItems((items) => addSubGroup(items, item.id));
+                        showToast("success", "Subgroup added successfully");
+                      }
+                    : undefined
+                }
+                onRemoveGroup={
+                  canRemoveGroup
+                    ? (group) => {
+                        setItems(removeGroup(items, group.id));
+                      }
+                    : undefined
+                }
+                onRemoveItem={
+                  canRemoveItem
+                    ? (item) => {
+                        setItems(removeItem(items, item.id));
+                      }
+                    : undefined
+                }
+              />
+            );
+          })}
+          {activeItem &&
+            createPortal(
+              <DragOverlay
+              // dropAnimation={dropAnimationConfig}
+              // modifiers={indicator ? [adjustTranslate] : undefined}
+              >
+                <TreeNodeComponent overlay item={activeItem} />
+              </DragOverlay>,
+              document.querySelector(".ReactModal__Overlay") || document.body
+            )}
+        </SortableContext>
+      </DndContext>
+    </Flex>
   );
 }
-
 type TreeNodeComponentProps = {
   item: TreeNode;
   activeItem?: TreeNode;
@@ -463,7 +450,6 @@ function unflatten(items: TreeNode[]): ToolbarDefinition {
     const item = items[i];
     if (isGroup(item) || isSubgroup(item)) {
       const group = getGroup(items, item.id);
-      console.log(group?.items);
       if (!group) continue;
       tools.push(unflatten(group.items.slice(1)) as ToolbarGroupDefinition);
 
@@ -707,7 +693,7 @@ function addGroup(items: TreeNode[]) {
   return newArray;
 }
 
-export function getDisabledTools(tools: TreeNode[]) {
+function getDisabledTools(tools: TreeNode[]) {
   const allTools = getAllTools();
   const disabled: ToolbarGroupDefinition = [];
   const items: Item[] = tools.filter((t) => isItem(t)) as Item[];

@@ -28,6 +28,7 @@ import { getFonts } from "@notesnook/editor";
 import { useSpellChecker } from "../../hooks/use-spell-checker";
 import { SpellCheckerLanguages } from "./components/spell-checker-languages";
 import { isDesktop } from "../../utils/platform";
+import { CustomizeToolbar } from "./components/customize-toolbar";
 
 export const EditorSettings: SettingsGroup[] = [
   {
@@ -146,6 +147,23 @@ symbols (e.g. 202305261253)`,
           {
             type: "custom",
             component: SpellCheckerLanguages
+          }
+        ]
+      }
+    ]
+  },
+  {
+    key: "toolbar",
+    section: "editor",
+    header: "Toolbar",
+    settings: [
+      {
+        key: "customize-toolbar",
+        title: "Customize toolbar",
+        components: [
+          {
+            type: "custom",
+            component: CustomizeToolbar
           }
         ]
       }
