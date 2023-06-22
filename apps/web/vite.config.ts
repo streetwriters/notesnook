@@ -24,6 +24,7 @@ import envCompatible from "vite-plugin-env-compatible";
 import { VitePWA, ManifestOptions } from "vite-plugin-pwa";
 import path from "path";
 import topLevelAwait from "vite-plugin-top-level-await";
+import autoprefixer from "autoprefixer";
 
 const WEB_MANIFEST: Partial<ManifestOptions> = {
   name: "Notesnook",
@@ -172,6 +173,11 @@ export default defineConfig({
   },
   worker: {
     format: "es"
+  },
+  css: {
+    postcss: {
+      plugins: [autoprefixer()]
+    }
   },
   plugins: [
     ...(isDesktop && process.env.NODE_ENV === "production"
