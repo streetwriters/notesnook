@@ -185,112 +185,115 @@ export default function SettingsDialog(props: SettingsDialogProps) {
       <Flex
         sx={{
           height: "80vw",
-          overflow: "hidden"
+          overflow: "hidden",
+          "& #settings-side-menu": {
+            "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
+              {
+                backgroundColor: "bgTransparent",
+                backdropFilter: "blur(8px)"
+              }
+          }
         }}
       >
-        <FlexScrollContainer>
-          <Flex
-            sx={{
-              flexDirection: "column",
-              width: 240,
-              overflow: "hidden",
-              minHeight: "min-content",
-              bg: "bgSecondary",
-              "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
-                {
-                  bg: "bgTransparent",
-                  backdropFilter: "blur(8px)"
+        <FlexScrollContainer
+          id="settings-side-menu"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            borderRadius: "10px",
+            width: 240,
+            overflow: "auto",
+            minHeight: "min-content",
+            backgroundColor: "bgSecondary"
+          }}
+          data-test-id="settings-navigation-menu"
+        >
+          <Input
+            placeholder="Search"
+            data-test-id="settings-search"
+            sx={{ m: 2, mb: 2, width: "auto", bg: "bgSecondary", py: "7px" }}
+            onChange={(e) => {
+              const query = e.target.value.toLowerCase().trim();
+              if (!query)
+                return setActiveSettings(
+                  SettingsGroups.filter((g) => g.section === route)
+                );
+
+              const groups: SettingsGroup[] = [];
+              for (const group of SettingsGroups) {
+                const isTitleMatch =
+                  typeof group.header === "string" &&
+                  group.header.toLowerCase().includes(query);
+
+                if (isTitleMatch) {
+                  groups.push(group);
+                  continue;
                 }
+
+                const settings = group.settings.filter(
+                  (setting) =>
+                    setting.description?.toLowerCase().includes(query) ||
+                    setting.keywords?.some((keyword) =>
+                      keyword.toLowerCase().includes(query)
+                    ) ||
+                    setting.title.toLowerCase().includes(query)
+                );
+                if (!settings.length) continue;
+                groups.push({ ...group, settings });
+              }
+              setActiveSettings(groups);
             }}
-            data-test-id="settings-navigation-menu"
-          >
-            <Input
-              placeholder="Search"
-              data-test-id="settings-search"
-              sx={{ m: 2, mb: 2, width: "auto", bg: "bgSecondary", py: "7px" }}
-              onChange={(e) => {
-                const query = e.target.value.toLowerCase().trim();
-                if (!query)
-                  return setActiveSettings(
-                    SettingsGroups.filter((g) => g.section === route)
-                  );
-
-                const groups: SettingsGroup[] = [];
-                for (const group of SettingsGroups) {
-                  const isTitleMatch =
-                    typeof group.header === "string" &&
-                    group.header.toLowerCase().includes(query);
-
-                  if (isTitleMatch) {
-                    groups.push(group);
-                    continue;
-                  }
-
-                  const settings = group.settings.filter(
-                    (setting) =>
-                      setting.description?.toLowerCase().includes(query) ||
-                      setting.keywords?.some((keyword) =>
-                        keyword.toLowerCase().includes(query)
-                      ) ||
-                      setting.title.toLowerCase().includes(query)
-                  );
-                  if (!settings.length) continue;
-                  groups.push({ ...group, settings });
-                }
-                setActiveSettings(groups);
-              }}
-            />
-            {sectionGroups.map((group) => (
-              <Flex key={group.key} sx={{ flexDirection: "column", mb: 2 }}>
-                <Text
-                  variant={"subBody"}
-                  sx={{
-                    fontWeight: "bold",
-                    color: "text",
-                    mx: 3,
-                    mb: 1
-                  }}
-                >
-                  {group.title}
-                </Text>
-                {group.sections.map(
-                  (section) =>
-                    (!section.isHidden || !section.isHidden()) && (
-                      <NavigationItem
-                        key={section.key}
-                        icon={section.icon}
-                        title={section.title}
-                        selected={section.key === route}
-                        onClick={() => {
-                          setActiveSettings(
-                            SettingsGroups.filter(
-                              (g) => g.section === section.key
-                            )
-                          );
-                          setRoute(section.key);
-                        }}
-                      />
-                    )
-                )}
-              </Flex>
-            ))}
-          </Flex>
+          />
+          {sectionGroups.map((group) => (
+            <Flex key={group.key} sx={{ flexDirection: "column", mb: 2 }}>
+              <Text
+                variant={"subBody"}
+                sx={{
+                  fontWeight: "bold",
+                  color: "text",
+                  mx: 3,
+                  mb: 1
+                }}
+              >
+                {group.title}
+              </Text>
+              {group.sections.map(
+                (section) =>
+                  (!section.isHidden || !section.isHidden()) && (
+                    <NavigationItem
+                      key={section.key}
+                      icon={section.icon}
+                      title={section.title}
+                      selected={section.key === route}
+                      onClick={() => {
+                        setActiveSettings(
+                          SettingsGroups.filter(
+                            (g) => g.section === section.key
+                          )
+                        );
+                        setRoute(section.key);
+                      }}
+                    />
+                  )
+              )}
+            </Flex>
+          ))}
         </FlexScrollContainer>
         <FlexScrollContainer
-          style={{ flex: 1, backgroundColor: "var(--background)" }}
+          style={{
+            display: "flex",
+            backgroundColor: "var(--background)",
+            flex: 1,
+            flexDirection: "column",
+            padding: 20,
+            gap: 20,
+            minHeight: "min-content",
+            overflow: "auto"
+          }}
         >
-          <Flex
-            sx={{
-              flexDirection: "column",
-              p: 4,
-              gap: 4,
-              overflow: "hidden"
-            }}
-          >
-            {activeSettings.map((group) => (
-              <SettingsGroupComponent key={group.key} item={group} />
-            ))}
-          </Flex>
+          {activeSettings.map((group) => (
+            <SettingsGroupComponent key={group.key} item={group} />
+          ))}
         </FlexScrollContainer>
       </Flex>
     </Dialog>
@@ -307,7 +310,14 @@ function SettingsGroupComponent(props: { item: SettingsGroup }) {
 
   if (item.isHidden && item.isHidden()) return null;
   return (
-    <Flex sx={{ flexDirection: "column", gap: 2, overflow: "hidden" }}>
+    <Flex
+      sx={{
+        flexDirection: "column",
+        flexShrink: 0,
+        gap: 2,
+        overflow: "hidden"
+      }}
+    >
       {typeof item.header === "string" ? (
         <Text
           variant="subBody"
