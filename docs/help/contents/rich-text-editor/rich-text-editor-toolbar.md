@@ -1,6 +1,6 @@
 # Editor Toolbar
 
-The notes editor toolbar has all the basic tools for rich formatting of your notes. It also let's you add various blocks to your notes like task lists, images, videos etc.
+The notes editor toolbar has all the basic tools for rich formatting of your notes. It also lets you add various blocks to your notes like task lists, images, videos etc.
 
 ![Toolbar](/toolbar-editor.png)
 
@@ -8,11 +8,15 @@ The notes editor toolbar has all the basic tools for rich formatting of your not
 
 1. Focus inside the note where you want to insert a block.
 2. Click on the ![Toolbar plus](/toolbar-plus.png) button on the toolbar.
-3. Select the block you want to insert, for example a task list.
+3. Select the block you want to insert; for example a task list.
 
 ![Toolbar](/toolbar-blocks.png)
 
 ## Customzing editor toolbar
+
+> info
+>
+> Toolbar configuration is automatically synced across all your devices.
 
 One of the great features of the editor is the ability to customize the editor toolbar to fit your own needs. There's usually many tools in an editor toolbar and being able to hide the tools you never use and just keep what you use more frequently on top helps focus on your note taking.
 
@@ -109,7 +113,3 @@ You can remove a group and all it's tools from the toolbar.
 A tool can be disabled from the toolbar by clicking on the `-` button on the tool.
 
 ---
-
-> info
->
-> Toolbar configuration is automatically synced across all your devices.

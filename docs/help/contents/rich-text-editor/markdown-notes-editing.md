@@ -29,3 +29,9 @@ Notesnook supports the following (Markdown) shortcuts in the editor:
 | Current Date        | `/date`                                                               |
 | Date Time           | `/time`                                                               |
 | Current Date & Time | `/now`                                                                |
+
+## FAQs
+
+### Does Notesnook support Markdown editing?
+
+No. The Markdown shortcuts listed above are just that: shortcuts. They'll help you to quickly use the various formats & blocks in the editor but they aren't raw Markdown.
