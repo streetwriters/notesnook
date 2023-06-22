@@ -22,7 +22,7 @@ import { isDevelopment } from "./index";
 import { createReadStream, statSync } from "fs";
 import { extname, join, normalize } from "path";
 import { URL } from "url";
-import { Readable } from "stream";
+import fetch, { Response } from "node-fetch";
 
 const BASE_PATH = isDevelopment() ? "../public" : "";
 const HOSTNAME = `app.notesnook.com`;
@@ -88,7 +88,7 @@ function registerProtocol() {
         }
         callback({
           statusCode: response.status,
-          data: response.body ? Readable.fromWeb(response.body) : undefined,
+          data: response.body || undefined,
           headers: Object.fromEntries(response.headers.entries()),
           mimeType: response.headers.get("Content-Type") || undefined
         });
@@ -156,7 +156,7 @@ async function getBody(request: ProtocolRequest) {
     }
   }
   const blob = new Blob(blobParts);
-  return await blob.arrayBuffer();
+  return blob;
 }
 
 function getPath(filePath: string): string | undefined {
