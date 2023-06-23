@@ -81,6 +81,8 @@ export function Importer() {
             variant="secondary"
             sx={{ alignSelf: "center" }}
             onClick={async () => {
+              setErrors([]);
+              setFiles([]);
               setIsDone(false);
               setIsImporting(false);
             }}
