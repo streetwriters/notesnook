@@ -63,6 +63,7 @@ export const SessionExpired = () => {
     () => {
       eSendEvent(eUserLoggedIn, true);
       setVisible(false);
+      setFocused(false);
     }
   );
 
@@ -87,7 +88,6 @@ export const SessionExpired = () => {
     const sub = eSubscribeEvent(eLoginSessionExpired, open);
     return () => {
       sub.unsubscribe?.();
-      setFocused(false);
     };
   }, [visible, open]);
 
@@ -103,6 +103,7 @@ export const SessionExpired = () => {
           if (!user) return;
           email.current = user.email;
           setVisible(true);
+          setFocused(false);
           return;
         }
         SettingsService.set({
@@ -115,6 +116,7 @@ export const SessionExpired = () => {
       let user = await db.user.getUser();
       if (!user) return;
       email.current = user.email;
+      setFocused(false);
       setVisible(true);
     }
   }, [email]);

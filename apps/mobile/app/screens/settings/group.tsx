@@ -74,6 +74,8 @@ const Group = ({
             data={route.params.sections}
             keyExtractor={keyExtractor}
             renderItem={renderItem}
+            enableOnAndroid
+            enableAutomaticScroll
           />
         ) : null}
         {route.params.component ? components[route.params.component] : null}

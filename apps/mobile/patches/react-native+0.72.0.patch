@@ -1,8 +1,8 @@
 diff --git a/node_modules/react-native/ReactCommon/jsc/JSCRuntime.cpp b/node_modules/react-native/ReactCommon/jsc/JSCRuntime.cpp
-index bbc6065..a10ecf7 100644
+index 7958519..25f58b1 100644
 --- a/node_modules/react-native/ReactCommon/jsc/JSCRuntime.cpp
 +++ b/node_modules/react-native/ReactCommon/jsc/JSCRuntime.cpp
-@@ -407,12 +407,12 @@ JSCRuntime::~JSCRuntime() {
+@@ -409,12 +409,12 @@ JSCRuntime::~JSCRuntime() {
    // has started.
    ctxInvalid_ = true;
    JSGlobalContextRelease(ctx_);
@@ -28,43 +28,43 @@ index 0000000..361f5fb
 +++ b/node_modules/react-native/scripts/.packager.env
 @@ -0,0 +1 @@
 +export RCT_METRO_PORT=8081
+diff --git a/node_modules/react-native/scripts/launchPackager.command b/node_modules/react-native/scripts/launchPackager.command
+index efd1f2e..c2fbbb3 100755
+--- a/node_modules/react-native/scripts/launchPackager.command
++++ b/node_modules/react-native/scripts/launchPackager.command
+@@ -10,7 +10,7 @@ clear
+ 
+ THIS_DIR=$(cd -P "$(dirname "$(readlink "${BASH_SOURCE[0]}" || echo "${BASH_SOURCE[0]}")")" && pwd)
+ 
+-export PODS_ROOT="$THIS_DIR/../../../ios/Pods"
++export PODS_ROOT="$THIS_DIR/../../../native/ios/Pods"
+ WITH_ENVIRONMENT="$THIS_DIR/xcode/with-environment.sh"
+ source $WITH_ENVIRONMENT
+ 
 diff --git a/node_modules/react-native/scripts/packager.sh b/node_modules/react-native/scripts/packager.sh
-index acb1581..122c7af 100755
+index cb8b101..519070a 100755
 --- a/node_modules/react-native/scripts/packager.sh
 +++ b/node_modules/react-native/scripts/packager.sh
-@@ -8,17 +8,17 @@
+@@ -8,17 +8,16 @@
  THIS_DIR=$(cd -P "$(dirname "$(readlink "${BASH_SOURCE[0]}" || echo "${BASH_SOURCE[0]}")")" && pwd)
  REACT_NATIVE_ROOT="$THIS_DIR/.."
  # Application root directory - General use case: react-native is a dependency
--PROJECT_ROOT="$THIS_DIR/../../.."
-+PROJECT_ROOT="$THIS_DIR/../../../native"
- 
+-PROJECT_ROOT=${PROJECT_ROOT:-"$THIS_DIR/../../.."}
+-
++PROJECT_ROOT=${PROJECT_ROOT:-"$THIS_DIR/../../../native"}
  # check and assign NODE_BINARY env
  # shellcheck disable=SC1090
  source "${THIS_DIR}/node-binary.sh"
  
  # When running react-native tests, react-native doesn't live in node_modules but in the PROJECT_ROOT
--if [ ! -d "$PROJECT_ROOT/node_modules/react-native" ];
+-if [ ! -d "$THIS_DIR/../../../node_modules/react-native" ];
 -then
--  PROJECT_ROOT="$THIS_DIR/.."
+-  PROJECT_ROOT="$THIS_DIR/../../.."
 -fi
-+# if [ ! -d "$PROJECT_ROOT/node_modules/react-native" ];
++# if [ ! -d "$THIS_DIR/../../../node_modules/react-native" ];
 +# then
-+#   PROJECT_ROOT="$THIS_DIR/.."
++#   PROJECT_ROOT="$THIS_DIR/../../.."
 +# fi
  # Start packager from PROJECT_ROOT
  cd "$PROJECT_ROOT" || exit
  "$NODE_BINARY" "$REACT_NATIVE_ROOT/cli.js" start --custom-log-reporter-path "$THIS_DIR/packager-reporter.js" "$@"
-diff --git a/node_modules/react-native/scripts/react-native-xcode.sh b/node_modules/react-native/scripts/react-native-xcode.sh
-index 30a5ac2..6619215 100755
---- a/node_modules/react-native/scripts/react-native-xcode.sh
-+++ b/node_modules/react-native/scripts/react-native-xcode.sh
-@@ -60,7 +60,7 @@ esac
- REACT_NATIVE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
- # The project should be located next to where react-native is installed
- # in node_modules.
--PROJECT_ROOT=${PROJECT_ROOT:-"$REACT_NATIVE_DIR/../.."}
-+PROJECT_ROOT=${PROJECT_ROOT:-"$REACT_NATIVE_DIR/../../native"}
- 
- cd "$PROJECT_ROOT" || exit
- 

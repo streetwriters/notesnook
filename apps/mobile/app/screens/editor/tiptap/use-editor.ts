@@ -595,7 +595,7 @@ export const useEditor = (
 
   const onReady = useCallback(async () => {
     if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
-      eSendEvent("webview_reset");
+      eSendEvent("webview_reset", "reset");
     } else {
       isDefaultEditor && restoreEditorState();
     }
@@ -618,7 +618,7 @@ export const useEditor = (
         await commands.setPlaceholder(placeholderTip.current);
       }
       state.current.ready = true;
-    }, 300);
+    }, 1000);
   }, [
     onReady,
     postMessage,
