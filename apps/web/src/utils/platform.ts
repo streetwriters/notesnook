@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export function getPlatform() {
-  if (window.os) return window.os;
+  if (window.os) return window.os();
 
   const userAgent = window.navigator.userAgent,
     platform = window.navigator.platform,
@@ -123,15 +123,17 @@ export function getDownloadLink(platform: string) {
 }
 
 export function isDesktop() {
-  return "os" in window;
+  return "os" in window || import.meta.env.REACT_APP_PLATFORM === "desktop";
 }
 
 export function isMac() {
-  return getPlatform() === "macOS" || window.os === "darwin" || isMacStoreApp();
+  return (
+    getPlatform() === "macOS" || getPlatform() === "darwin" || isMacStoreApp()
+  );
 }
 
 export function isMacStoreApp() {
-  return window.os === "mas";
+  return window.os && window.os() === "mas";
 }
 
 export function isTesting() {

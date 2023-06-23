@@ -22,9 +22,10 @@ import { ELECTRON_TRPC_CHANNEL } from "electron-trpc/main";
 import { type RendererGlobalElectronTRPC } from "electron-trpc/src/types";
 import type { NNCrypto } from "@notesnook/crypto";
 import { ipcRenderer } from "electron";
+import { platform } from "os";
 
 declare global {
-  var os: string;
+  var os: () => "mas" | ReturnType<typeof platform>;
   var electronTRPC: RendererGlobalElectronTRPC;
   var NativeNNCrypto: (new () => NNCrypto) | undefined;
 }
@@ -47,4 +48,4 @@ globalThis.NativeNNCrypto =
     ? undefined
     : require("@notesnook/crypto").NNCrypto;
 
-globalThis.os = MAC_APP_STORE ? "mas" : process.platform;
+globalThis.os = () => (MAC_APP_STORE ? "mas" : platform());

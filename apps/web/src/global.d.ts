@@ -22,7 +22,7 @@ import "vite-plugin-svgr/client";
 
 declare global {
   interface Window {
-    os?: NodeJS.Platform | "mas";
+    os?: () => NodeJS.Platform | "mas";
     NativeNNCrypto?: new () => import("@notesnook/crypto").NNCrypto;
   }
 }

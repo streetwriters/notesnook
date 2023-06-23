@@ -81,7 +81,7 @@ export { useStore, store };
 export const allowedPlatforms = [
   "all",
   import.meta.env.REACT_APP_PLATFORM,
-  window.os
+  ...(window.os ? [window.os()] : [])
 ];
 
 async function shouldShowAnnouncement(announcement) {
