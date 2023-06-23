@@ -209,8 +209,16 @@ export const ImageNode = Node.create<ImageOptions>({
     return {
       insertImage:
         (options) =>
-        ({ commands }) => {
-          console.log(options);
+        ({ commands, state }) => {
+          const { $from } = state.selection;
+          const maybeImageNode = state.doc.nodeAt($from.pos);
+          if (maybeImageNode?.type === this.type) {
+            return commands.insertContentAt($from.pos + 1, {
+              type: this.name,
+              attrs: options
+            });
+          }
+
           return commands.insertContent({
             type: this.name,
             attrs: options

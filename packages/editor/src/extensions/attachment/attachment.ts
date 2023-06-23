@@ -121,7 +121,18 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return {
       insertAttachment:
         (attachment) =>
-        ({ commands }) => {
+        ({ commands, state }) => {
+          const { $from } = state.selection;
+          const maybeAttachmentNode = state.doc.nodeAt($from.pos);
+          if (maybeAttachmentNode?.type === this.type) {
+            return commands.insertContentAt(
+              $from.pos + maybeAttachmentNode.nodeSize,
+              {
+                type: this.name,
+                attrs: attachment
+              }
+            );
+          }
           return commands.insertContent({
             type: this.name,
             attrs: attachment
