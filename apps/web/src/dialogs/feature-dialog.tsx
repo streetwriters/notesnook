@@ -22,7 +22,7 @@ import Dialog from "../components/dialog";
 import { getHomeRoute, hardNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
 import Config from "../utils/config";
-import { isDesktop, isTesting } from "../utils/platform";
+import { isTesting } from "../utils/platform";
 import { useEffect } from "react";
 import { ArrowRight, Checkmark, Icon, Warn } from "../components/icons";
 
@@ -89,26 +89,7 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : isDesktop()
-      ? [
-          {
-            title: "New UI for settings",
-            subtitle:
-              "We have revamped Notesnook Settings from the groundup to be better suited to the desktop form factor. Take a look and let us know what you think!"
-          },
-          {
-            title: "100% native encryption",
-            subtitle:
-              "The desktop app (this app) now uses 100% native encryption instead of a WebAssembly based solution. The result is 10x faster encryption improving the sync performance on desktop significantly."
-          }
-        ]
-      : [
-          {
-            title: "New UI for settings",
-            subtitle:
-              "We have revamped Notesnook Settings from the groundup to be better suited to the desktop form factor. Take a look and let us know what you think!"
-          }
-        ],
+      : [],
     cta: {
       title: "Got it",
       icon: Checkmark,
