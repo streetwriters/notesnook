@@ -85,7 +85,7 @@ const regex = (s: string, settings: SearchSettings): RegExp => {
   console.log(boundary);
   return RegExp(
     boundary +
-      (enableRegex ? s : s.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")) +
+      (enableRegex ? s : s.replace(/[/\\^$*+?.()|[\]]/g, "\\$&")) +
       boundary,
     matchCase ? "gu" : "gui"
   );
