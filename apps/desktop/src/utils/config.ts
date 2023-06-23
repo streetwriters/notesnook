@@ -22,10 +22,10 @@ import { JSONStorage } from "./json-storage";
 import { z } from "zod";
 
 export const DesktopIntegration = z.object({
-  autoStart: z.boolean(),
-  startMinimized: z.boolean(),
-  minimizeToSystemTray: z.boolean(),
-  closeToSystemTray: z.boolean()
+  autoStart: z.boolean().optional(),
+  startMinimized: z.boolean().optional(),
+  minimizeToSystemTray: z.boolean().optional(),
+  closeToSystemTray: z.boolean().optional()
 });
 
 export type DesktopIntegration = z.infer<typeof DesktopIntegration>;

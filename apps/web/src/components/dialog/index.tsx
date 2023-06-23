@@ -23,6 +23,7 @@ import { Loading, Close } from "../icons";
 import ReactModal from "react-modal";
 import { FlexScrollContainer } from "../scroll-container";
 import { SxProp } from "@theme-ui/core";
+import { useStore as useThemeStore } from "../../stores/theme-store";
 
 ReactModal.setAppElement("#root");
 
@@ -52,7 +53,8 @@ type DialogProps = SxProp & {
 };
 
 function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
-  // const theme: any = useTheme();
+  const theme = useThemeStore((store) => store.theme);
+
   return (
     <ReactModal
       isOpen={props.isOpen || false}
@@ -95,7 +97,9 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
           justifyContent: "stretch",
           position: "relative",
           overflow: "hidden",
-          boxShadow: "4px 5px 18px 2px #00000038",
+          boxShadow: `0px 0px 25px 5px ${
+            theme === "dark" ? "#000000aa" : "#0000004e"
+          }`,
           borderRadius: "dialog",
 
           ...props.sx

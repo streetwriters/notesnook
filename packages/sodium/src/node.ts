@@ -155,12 +155,13 @@ export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   key: Uint8Array,
   outputFormat?: StringOutputFormat | Uint8ArrayOutputFormat | null
 ): string | Uint8Array {
+  const m = toBuffer(message);
   return wrap(
-    message.length + crypto_aead_xchacha20poly1305_ietf_ABYTES,
+    m.byteLength + crypto_aead_xchacha20poly1305_ietf_ABYTES,
     (output) =>
       sodium_native_crypto_aead_xchacha20poly1305_ietf_encrypt(
         output,
-        toBuffer(message),
+        m,
         toBuffer(additional_data) || null,
         null,
         toBuffer(public_nonce),
@@ -182,9 +183,7 @@ export function crypto_secretstream_xchacha20poly1305_init_push(
   key: Uint8Array,
   outputFormat?: StringOutputFormat | Uint8ArrayOutputFormat | null
 ): { state: StateAddress; header: string | Uint8Array } {
-  const state = Buffer.allocUnsafe(
-    crypto_secretstream_xchacha20poly1305_STATEBYTES
-  );
+  const state = Buffer.alloc(crypto_secretstream_xchacha20poly1305_STATEBYTES);
 
   const header = wrap(
     crypto_secretstream_xchacha20poly1305_HEADERBYTES,
@@ -220,13 +219,14 @@ export function crypto_secretstream_xchacha20poly1305_push(
   tag: number,
   outputFormat?: StringOutputFormat | Uint8ArrayOutputFormat | null
 ): string | Uint8Array {
+  const message = toBuffer(message_chunk);
   return wrap(
-    message_chunk.length + crypto_secretstream_xchacha20poly1305_ABYTES,
+    message.byteLength + crypto_secretstream_xchacha20poly1305_ABYTES,
     (cipher) =>
       sodium_native_crypto_secretstream_xchacha20poly1305_push(
         state_address as unknown as Buffer,
         cipher,
-        toBuffer(message_chunk),
+        message,
         toBuffer(ad) || null,
         tag
       ),
@@ -258,13 +258,14 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
   key: Uint8Array,
   outputFormat?: StringOutputFormat | Uint8ArrayOutputFormat | null
 ): string | Uint8Array {
+  const cipher = toBuffer(ciphertext);
   return wrap(
-    ciphertext.length - crypto_aead_xchacha20poly1305_ietf_ABYTES,
+    cipher.byteLength - crypto_aead_xchacha20poly1305_ietf_ABYTES,
     (message) =>
       sodium_native_crypto_aead_xchacha20poly1305_ietf_decrypt(
         message,
         null,
-        toBuffer(ciphertext),
+        cipher,
         toBuffer(additional_data) || null,
         toBuffer(public_nonce),
         toBuffer(key)
@@ -277,9 +278,7 @@ export function crypto_secretstream_xchacha20poly1305_init_pull(
   header: Uint8Array,
   key: Uint8Array
 ): StateAddress {
-  const state = Buffer.allocUnsafe(
-    crypto_secretstream_xchacha20poly1305_STATEBYTES
-  );
+  const state = Buffer.alloc(crypto_secretstream_xchacha20poly1305_STATEBYTES);
   sodium_native_crypto_secretstream_xchacha20poly1305_init_pull(
     state,
     toBuffer(header),
@@ -302,19 +301,20 @@ export function crypto_secretstream_xchacha20poly1305_pull(
 ): StringMessageTag;
 export function crypto_secretstream_xchacha20poly1305_pull(
   state_address: StateAddress,
-  cipher: string | Uint8Array,
+  ciphertext: string | Uint8Array,
   ad?: string | Uint8Array | null,
   outputFormat?: StringOutputFormat | Uint8ArrayOutputFormat | null
 ): MessageTag | StringMessageTag {
   const tag = Buffer.alloc(crypto_secretstream_xchacha20poly1305_TAGBYTES);
+  const cipher = toBuffer(ciphertext);
   const message = wrap(
-    cipher.length - crypto_secretstream_xchacha20poly1305_ABYTES,
+    cipher.byteLength - crypto_secretstream_xchacha20poly1305_ABYTES,
     (message) =>
       sodium_native_crypto_secretstream_xchacha20poly1305_pull(
         state_address as unknown as Buffer,
         message,
         tag,
-        toBuffer(cipher),
+        cipher,
         toBuffer(ad) || null
       ),
     outputFormat
@@ -425,7 +425,7 @@ function wrap(
   action: (buffer: Buffer) => void,
   outputFormat?: StringOutputFormat | Uint8ArrayOutputFormat | null
 ): string | Uint8Array {
-  const output = Buffer.allocUnsafe(length);
+  const output = Buffer.alloc(length);
 
   action(output);
 

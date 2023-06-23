@@ -28,7 +28,7 @@ declare global {
   var electronTRPC: RendererGlobalElectronTRPC;
   var NativeNNCrypto: (new () => NNCrypto) | undefined;
 }
-console.log("HELLO", process);
+
 process.once("loaded", async () => {
   console.log("HELLO!");
   const electronTRPC: RendererGlobalElectronTRPC = {
@@ -46,4 +46,5 @@ globalThis.NativeNNCrypto =
   process.arch !== "ia32"
     ? undefined
     : require("@notesnook/crypto").NNCrypto;
+
 globalThis.os = MAC_APP_STORE ? "mas" : process.platform;

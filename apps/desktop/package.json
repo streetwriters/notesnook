@@ -15,7 +15,7 @@
     "@trpc/client": "^10.29.1",
     "@trpc/server": "^10.29.1",
     "diary": "^0.3.1",
-    "electron-trpc": "^0.5.0",
+    "electron-trpc": "^0.5.2",
     "electron-updater": "^5.3.0",
     "icojs": "^0.17.1",
     "typed-emitter": "^2.1.0",
@@ -30,7 +30,7 @@
     "electron-builder-notarize": "^1.5.1",
     "electron-reloader": "^1.2.3",
     "esbuild": "^0.17.19",
-    "undici": "^5.22.1"
+    "node-fetch": "^3.3.1"
   },
   "optionalDependencies": {
     "dmg-license": "^1.0.11"

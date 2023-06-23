@@ -114,7 +114,8 @@ class SettingStore extends BaseStore {
       ...settings
     });
     this.set({
-      desktopIntegrationSettings: await window.config?.desktopIntegration()
+      desktopIntegrationSettings:
+        await desktop?.integration.desktopIntegration.query()
     });
   };
 

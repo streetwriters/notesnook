@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
+import SettingsDialog from "./settings";
 
 const AddNotebookDialog = React.lazy(() => import("./add-notebook-dialog"));
 const BuyDialog = React.lazy(() => import("./buy-dialog"));
@@ -47,15 +48,12 @@ const RecoveryCodesDialog = React.lazy(
 const OnboardingDialog = React.lazy(() => import("./onboarding-dialog"));
 const AttachmentsDialog = React.lazy(() => import("./attachments-dialog"));
 const Prompt = React.lazy(() => import("./prompt"));
-const ToolbarConfigDialog = React.lazy(() => import("./toolbar-config-dialog"));
 const MigrationDialog = React.lazy(() => import("./migration-dialog"));
 const EmailChangeDialog = React.lazy(() => import("./email-change-dialog"));
 const AddTagsDialog = React.lazy(() => import("./add-tags-dialog"));
-const SettingsDialog = React.lazy(() => import("./settings"));
 
 export const Dialogs = {
   AddNotebookDialog,
-  ToolbarConfigDialog,
   BuyDialog,
   Confirm,
   Prompt,

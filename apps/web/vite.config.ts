@@ -24,6 +24,7 @@ import envCompatible from "vite-plugin-env-compatible";
 import { VitePWA, ManifestOptions } from "vite-plugin-pwa";
 import path from "path";
 import topLevelAwait from "vite-plugin-top-level-await";
+import autoprefixer from "autoprefixer";
 
 const WEB_MANIFEST: Partial<ManifestOptions> = {
   name: "Notesnook",
@@ -173,6 +174,11 @@ export default defineConfig({
   worker: {
     format: "es"
   },
+  css: {
+    postcss: {
+      plugins: [autoprefixer()]
+    }
+  },
   plugins: [
     ...(isDesktop && process.env.NODE_ENV === "production"
       ? [
@@ -183,15 +189,16 @@ export default defineConfig({
             promiseImportName: (i) => `__tla_${i}`
           })
         ]
-      : []),
-    VitePWA({
-      strategies: "injectManifest",
-      minify: true,
-      manifest: WEB_MANIFEST,
-      injectRegister: null,
-      srcDir: "src",
-      filename: "service-worker.js"
-    }),
+      : [
+          VitePWA({
+            strategies: "injectManifest",
+            minify: true,
+            manifest: WEB_MANIFEST,
+            injectRegister: null,
+            srcDir: "src",
+            filename: "service-worker.js"
+          })
+        ]),
     react({
       plugins: isTesting
         ? undefined

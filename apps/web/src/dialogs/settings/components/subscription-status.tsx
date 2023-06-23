@@ -115,7 +115,7 @@ export function SubscriptionStatus() {
             mt: 2
           }}
         >
-          {remainingDays > 0 && isPro
+          {remainingDays > 0 && (isPro || isProCancelled)
             ? `Pro`
             : remainingDays > 0 && isTrial
             ? "Trial"
@@ -124,7 +124,7 @@ export function SubscriptionStatus() {
             : "Basic"}
         </Text>
         <Text variant="body">
-          {remainingDays > 0 && (isPro || isTrial || isBeta)
+          {remainingDays > 0 && (isPro || isProCancelled || isTrial || isBeta)
             ? `Access to all Pro features including unlimited storage for attachments,
           notebooks & tags.`
             : "Access only to basic features including unlimited notes & end-to-end encrypted syncing to unlimited devices."}
@@ -133,38 +133,39 @@ export function SubscriptionStatus() {
           {subtitle}
         </Text>
         <Flex sx={{ gap: 1, mt: 2 }}>
-          {/* <Button variant="secondary">Downgrade</Button> */}
-          {provider === "Web" && isPro ? (
+          {provider === "Web" && (isPro || isProCancelled) ? (
             <>
-              <Button
-                variant="secondary"
-                onClick={async () => {
-                  const cancelSubscription = await confirm({
-                    title: "Cancel subscription?",
-                    message:
-                      "Cancelling your subscription will automatically downgrade you to the Basic plan at the end of your billing period. You will have to resubscribe to continue using the Pro features.",
-                    negativeButtonText: "No",
-                    positiveButtonText: "Yes"
-                  });
-                  if (cancelSubscription) {
-                    await TaskManager.startTask({
-                      type: "modal",
-                      title: "Cancelling your subscription",
-                      subtitle: "Please wait...",
-                      action: () => db.subscriptions?.cancel()
-                    })
-                      .catch((e) => showToast("error", e.message))
-                      .then(() =>
-                        showToast(
-                          "success",
-                          "Your subscription has been canceled."
-                        )
-                      );
-                  }
-                }}
-              >
-                Cancel subscription
-              </Button>
+              {isPro && (
+                <Button
+                  variant="secondary"
+                  onClick={async () => {
+                    const cancelSubscription = await confirm({
+                      title: "Cancel subscription?",
+                      message:
+                        "Cancelling your subscription will automatically downgrade you to the Basic plan at the end of your billing period. You will have to resubscribe to continue using the Pro features.",
+                      negativeButtonText: "No",
+                      positiveButtonText: "Yes"
+                    });
+                    if (cancelSubscription) {
+                      await TaskManager.startTask({
+                        type: "modal",
+                        title: "Cancelling your subscription",
+                        subtitle: "Please wait...",
+                        action: () => db.subscriptions?.cancel()
+                      })
+                        .catch((e) => showToast("error", e.message))
+                        .then(() =>
+                          showToast(
+                            "success",
+                            "Your subscription has been canceled."
+                          )
+                        );
+                    }
+                  }}
+                >
+                  Cancel subscription
+                </Button>
+              )}
               <Button
                 variant="secondary"
                 onClick={async () => {

@@ -216,6 +216,6 @@ function setupDesktopIntegration(hidden: boolean) {
   });
 
   if (desktopIntegration.autoStart) {
-    AutoLaunch.enable(desktopIntegration.startMinimized);
+    AutoLaunch.enable(!!desktopIntegration.startMinimized);
   }
 }

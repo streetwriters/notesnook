@@ -52,12 +52,12 @@ export const osIntegrationRouter = t.router({
 
   privacyMode: t.procedure.query(() => config.privacyMode),
   setPrivacyMode: t.procedure
-    .input(z.boolean())
+    .input(z.boolean().optional())
     .mutation(({ input: privacyMode }) => {
       if (!globalThis.window || !["win32", "darwin"].includes(process.platform))
         return;
 
-      globalThis.window.setContentProtection(privacyMode);
+      globalThis.window.setContentProtection(!!privacyMode);
 
       if (process.platform === "win32") {
         globalThis.window.setThumbnailClip(
@@ -66,7 +66,7 @@ export const osIntegrationRouter = t.router({
             : { x: 0, y: 0, width: 0, height: 0 }
         );
       }
-      config.privacyMode = privacyMode;
+      config.privacyMode = !!privacyMode;
     }),
 
   desktopIntegration: t.procedure.query(() => config.desktopSettings),
@@ -74,7 +74,7 @@ export const osIntegrationRouter = t.router({
     .input(DesktopIntegration)
     .mutation(({ input: settings }) => {
       if (settings.autoStart) {
-        AutoLaunch.enable(settings.startMinimized);
+        AutoLaunch.enable(!!settings.startMinimized);
       } else {
         AutoLaunch.disable();
       }
