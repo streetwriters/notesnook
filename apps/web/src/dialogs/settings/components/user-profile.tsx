@@ -111,7 +111,7 @@ export function UserProfile() {
             color: "primary"
           }}
         >
-          {remainingDays > 0 && isPro
+          {remainingDays > 0 && (isPro || isProCancelled)
             ? `PRO`
             : remainingDays > 0 && isTrial
             ? "TRIAL"
