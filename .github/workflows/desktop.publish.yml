@@ -113,7 +113,7 @@ jobs:
       - name: Install packages
         run: |
           npm i --ignore-scripts --prefer-offline --no-audit
-          npx lerna bootstrap --ignore=@notesnook/mobile -- --prefer-offline --no-audit
+          npx lerna bootstrap --scope=@notesnook/desktop --scope=@notesnook/crypto --scope=@notesnook/sodium -- --prefer-offline --no-audit
       
       - name: Install provisioning profile
         run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
@@ -188,7 +188,7 @@ jobs:
       - name: Install packages
         run: |
           npm i --ignore-scripts --prefer-offline --no-audit
-          npx lerna bootstrap --ignore=@notesnook/mobile -- --prefer-offline --no-audit
+          npx lerna bootstrap --scope=@notesnook/desktop --scope=@notesnook/crypto --scope=@notesnook/sodium -- --prefer-offline --no-audit
 
       - name: Build Electron wrapper
         run: npx nx run release --project @notesnook/desktop
@@ -238,7 +238,7 @@ jobs:
       - name: Install packages
         run: |
           npm i --ignore-scripts --prefer-offline --no-audit
-          npx lerna bootstrap --ignore=@notesnook/mobile -- --prefer-offline --no-audit
+          npx lerna bootstrap --scope=@notesnook/desktop --scope=@notesnook/crypto --scope=@notesnook/sodium -- --prefer-offline --no-audit
 
       - name: Build
         run: npx nx run release --project @notesnook/desktop
