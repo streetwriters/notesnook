@@ -33,7 +33,7 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
           "If true, Notesnook will automatically start up when you turn on & login to your system.",
         onStateChange: (listener) =>
           useSettingStore.subscribe(
-            (s) => s.desktopIntegrationSettings?.autoStart,
+            (s) => s.desktopIntegrationSettings,
             listener
           ),
         components: [
@@ -42,12 +42,13 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
             isToggled: () =>
               !!useSettingStore.getState().desktopIntegrationSettings
                 ?.autoStart,
-            toggle: () =>
-              useSettingStore.getState().setDesktopIntegration({
-                autoStart:
-                  !useSettingStore.getState().desktopIntegrationSettings
-                    ?.autoStart
-              })
+            toggle: () => {
+              const { setDesktopIntegration, desktopIntegrationSettings } =
+                useSettingStore.getState();
+              setDesktopIntegration({
+                autoStart: !desktopIntegrationSettings?.autoStart
+              });
+            }
           }
         ]
       },
@@ -61,8 +62,8 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
             (s) => s.desktopIntegrationSettings,
             listener
           ),
-        isHidden: (desktopIntegration) =>
-          !(desktopIntegration as any)?.autoStart,
+        isHidden: () =>
+          !useSettingStore.getState().desktopIntegrationSettings?.autoStart,
         components: [
           {
             type: "toggle",
@@ -84,7 +85,7 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
         description: 'Pressing "—" will hide the app in your system tray.',
         onStateChange: (listener) =>
           useSettingStore.subscribe(
-            (s) => s.desktopIntegrationSettings?.minimizeToSystemTray,
+            (s) => s.desktopIntegrationSettings,
             listener
           ),
         components: [
@@ -95,7 +96,7 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
                 ?.minimizeToSystemTray,
             toggle: () =>
               useSettingStore.getState().setDesktopIntegration({
-                autoStart:
+                minimizeToSystemTray:
                   !useSettingStore.getState().desktopIntegrationSettings
                     ?.minimizeToSystemTray
               })
@@ -108,7 +109,7 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
         description: 'Pressing "X" will hide the app in your system tray.',
         onStateChange: (listener) =>
           useSettingStore.subscribe(
-            (s) => s.desktopIntegrationSettings?.closeToSystemTray,
+            (s) => s.desktopIntegrationSettings,
             listener
           ),
         components: [
@@ -119,7 +120,7 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
                 ?.closeToSystemTray,
             toggle: () =>
               useSettingStore.getState().setDesktopIntegration({
-                autoStart:
+                closeToSystemTray:
                   !useSettingStore.getState().desktopIntegrationSettings
                     ?.closeToSystemTray
               })
