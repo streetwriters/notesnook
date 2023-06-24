@@ -41,6 +41,7 @@ export class ZipStream extends TransformStream<ZipFile, Uint8Array> {
       },
       flush() {
         zipper.end();
+        zipper.terminate();
       }
     });
   }
