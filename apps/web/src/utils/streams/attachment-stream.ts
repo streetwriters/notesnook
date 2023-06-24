@@ -63,7 +63,7 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
         });
 
         if (file) {
-          const filePath = `/${attachment.metadata.filename}`;
+          const filePath = attachment.metadata.filename;
           controller.enqueue({
             path: filePath,
             data: new Uint8Array(await file.arrayBuffer())
