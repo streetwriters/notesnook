@@ -412,7 +412,7 @@ function toBuffer<TInput extends ToBufferInput>(
   input: TInput
 ): ToBufferResult<TInput> {
   if (input instanceof Uint8Array) {
-    return Buffer.from(input.buffer);
+    return Buffer.from(input.buffer, 0, input.byteLength);
   } else if (typeof input === "undefined" || input === null) {
     return undefined as ToBufferResult<TInput>;
   } else {
