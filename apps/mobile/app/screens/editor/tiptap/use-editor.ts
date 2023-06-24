@@ -369,6 +369,10 @@ export const useEditor = (
         } else {
           overlay(true);
         }
+        if (!state.current.ready) {
+          currentNote.current = item as NoteType;
+          return;
+        }
         lastContentChangeTime.current = item.dateEdited;
         const nextSessionId = makeSessionId(item as NoteType);
         lockedSessionId.current = nextSessionId;
@@ -595,7 +599,7 @@ export const useEditor = (
 
   const onReady = useCallback(async () => {
     if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
-      eSendEvent("webview_reset", "reset");
+      eSendEvent("webview_reset");
     } else {
       isDefaultEditor && restoreEditorState();
     }
@@ -611,13 +615,13 @@ export const useEditor = (
       );
       await commands.setSessionId(sessionIdRef.current);
       await onReady();
+      state.current.ready = true;
       await commands.setSettings();
       if (currentNote.current) {
         loadNote({ ...currentNote.current, forced: true });
       } else {
         await commands.setPlaceholder(placeholderTip.current);
       }
-      state.current.ready = true;
     }, 1000);
   }, [
     onReady,

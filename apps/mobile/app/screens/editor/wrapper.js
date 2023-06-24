@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   AppState,
   KeyboardAvoidingView,
@@ -47,11 +47,18 @@ export const EditorWrapper = ({ width }) => {
     (state) => state.settings.introCompleted
   );
   const keyboard = useKeyboard();
+  const prevState = useRef();
 
   const onAppStateChanged = async (state) => {
+    if (!prevState.current) {
+      prevState.current = state;
+      return;
+    }
     if (state === "active") {
       editorController.current.onReady();
       editorController.current.overlay(false);
+    } else {
+      prevState.current = state;
     }
   };
 

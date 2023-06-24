@@ -68,7 +68,7 @@ export const openNote = async (item, isTrash, setSelectedItem, isSheet) => {
     clearSelection();
   }
 
-  if (_note.conflicted) {
+  if (!_note.conflicted) {
     eSendEvent(eShowMergeDialog, _note);
     return;
   }

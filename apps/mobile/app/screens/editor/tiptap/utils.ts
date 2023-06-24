@@ -67,7 +67,7 @@ export async function isEditorLoaded(
   ref: RefObject<WebView>,
   sessionId: string
 ) {
-  return await post(ref, sessionId, EditorEvents.status, undefined, 150);
+  return await post(ref, sessionId, EditorEvents.status);
 }
 
 export async function post<T>(
