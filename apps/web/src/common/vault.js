@@ -55,8 +55,12 @@ class Vault {
     );
   }
 
+  /**
+   *
+   * @returns {Promise<boolean>}
+   */
   static unlockVault() {
-    return showPasswordDialog("lock_note", ({ password }) => {
+    return showPasswordDialog("ask_vault_password", ({ password }) => {
       return db.vault
         .unlock(password)
         .then(() => true)

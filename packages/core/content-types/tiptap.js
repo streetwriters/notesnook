@@ -56,7 +56,9 @@ export class Tiptap {
       formatters: {
         taskList: (elem, walk, builder, formatOptions) => {
           return formatList(elem, walk, builder, formatOptions, (elem) => {
-            return elem.attribs.class.includes("checked") ? " ✅ " : " ☐ ";
+            return elem.attribs.class && elem.attribs.class.includes("checked")
+              ? " ✅ "
+              : " ☐ ";
           });
         },
         paragraph: (elem, walk, builder) => {
@@ -108,6 +110,7 @@ export class Tiptap {
     }).parse(this.data);
 
     const images = {};
+    let hasImages = false;
     for (let i = 0; i < hashes.length; ++i) {
       const hash = hashes[i];
       const src = await getData(hash, {
@@ -116,8 +119,10 @@ export class Tiptap {
       });
       if (!src) continue;
       images[hash] = src;
+      hasImages = true;
     }
 
+    if (!hasImages) return this.data;
     return new HTMLRewriter({
       ontag: (name, attr) => {
         const hash = attr[ATTRIBUTES.hash];
