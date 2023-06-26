@@ -90,6 +90,7 @@ export async function uploadFile(filename, data, cancelToken) {
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
     DatabaseLogger.info(`File upload error: ${filename}, ${e}`);
+    DatabaseLogger.error(e);
     return false;
   }
 }
