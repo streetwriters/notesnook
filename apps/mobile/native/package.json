@@ -61,7 +61,8 @@
     "react-native-pdf": "6.6.2",
     "react-native-blob-util": "0.17.3",
     "@ammarahmed/react-native-share-extension": "^2.5.5",
-    "react-native-in-app-review": "4.3.3"
+    "react-native-in-app-review": "4.3.3",
+    "react-native-swiper-flatlist": "3.2.2"
   },
   "devDependencies": {
     "@react-native/eslint-config": "^0.72.2",

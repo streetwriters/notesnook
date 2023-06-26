@@ -75,7 +75,6 @@
             android:launchMode="singleTask"
             android:resizeableActivity="true"
             android:exported="true"
-            android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

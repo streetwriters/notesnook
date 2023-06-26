@@ -16,8 +16,8 @@ public class MainActivity extends ReactActivity {
 
   @Override
     protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(null);
     RNBootSplash.init(this);
+    super.onCreate(null);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && BuildConfig.DEBUG) {
       WebView.setWebContentsDebuggingEnabled(true);
     }

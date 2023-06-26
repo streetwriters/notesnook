@@ -594,9 +594,12 @@ export const useAppEvents = () => {
 
   useEffect(() => {
     if (!loading) {
-      doAppLoadActions();
+      (async () => {
+        onUserUpdated();
+        doAppLoadActions();
+      })();
     }
-  }, [loading]);
+  }, [loading, onUserUpdated]);
 
   const initializeDatabase = useCallback(async () => {
     if (!db.isInitialized) {
@@ -604,10 +607,9 @@ export const useAppEvents = () => {
       DatabaseLogger.info("Initializing database");
       await db.init();
     }
-    await onUserUpdated();
     if (IsDatabaseMigrationRequired()) return;
     loadNotes();
-  }, [IsDatabaseMigrationRequired, loadNotes, onUserUpdated]);
+  }, [IsDatabaseMigrationRequired, loadNotes]);
 
   useEffect(() => {
     let sub;
