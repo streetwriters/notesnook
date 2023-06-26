@@ -10,7 +10,9 @@
     "types": ["node", "jest", "detox"],
     "paths": {
       "@notesnook/*": ["../../packages"],
-      "@notifee/react-native": ["./node_modules/@ammarahmed/notifee-react-native"]
+      "@notifee/react-native": [
+        "./node_modules/@ammarahmed/notifee-react-native"
+      ]
     },
     "incremental": true
   },

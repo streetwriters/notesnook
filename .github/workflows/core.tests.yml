@@ -8,7 +8,7 @@ on:
     paths:
       - "packages/core/**"
       # re-run workflow if workflow file changes
-      - ".github/workflows/core.tests.yml" 
+      - ".github/workflows/core.tests.yml"
   pull_request:
     types:
       - "ready_for_review"

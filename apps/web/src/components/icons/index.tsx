@@ -208,7 +208,6 @@ import {
   mdiInformationOutline,
   mdiHeadCogOutline,
   mdiFormTextarea,
-  mdiDatabaseExportOutline,
   mdiGavel,
   mdiDesktopClassic,
   mdiBellBadgeOutline

@@ -17,8 +17,8 @@ jobs:
       - name: Use specific Java version for the builds
         uses: joschi/setup-jdk@v2
         with:
-          java-version: '11'
-          architecture: 'x64'
+          java-version: "11"
+          architecture: "x64"
 
       - name: Install node modules
         run: |
@@ -37,7 +37,7 @@ jobs:
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}   
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
 
       - name: Publish to Playstore
         id: deploy
@@ -48,4 +48,4 @@ jobs:
           releaseFile: ${{steps.sign_app.outputs.signedReleaseFile}}
           track: internal
           status: completed
-          whatsNewDirectory: apps/mobile/native/android/releasenotes/             
+          whatsNewDirectory: apps/mobile/native/android/releasenotes/

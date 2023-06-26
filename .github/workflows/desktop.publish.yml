@@ -93,7 +93,7 @@ jobs:
           echo ::set-output name=app_bundle_id::$(cat package.json | jq -r .build.appId)
           echo ::set-output name=app_version::$(cat package.json | jq -r .version)
           echo ::set-output name=bundle_version::$(cat package.json | jq -r .build.mac.bundleVersion)
-        
+
       - name: Get App Store Version
         id: appstore
         uses: streetwriters/appstore-connect-app-version@develop
@@ -114,7 +114,7 @@ jobs:
         run: |
           npm i --ignore-scripts --prefer-offline --no-audit
           npx lerna bootstrap --scope=@notesnook/desktop --scope=@notesnook/crypto --scope=@notesnook/sodium -- --prefer-offline --no-audit
-      
+
       - name: Install provisioning profile
         run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
         working-directory: ./apps/desktop
@@ -151,7 +151,7 @@ jobs:
         env:
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
-        run: |       
+        run: |
           package=$(find ./output/mas-universal/notesnook*.pkg)
 
           echo "Uploading ${package} using altool..."

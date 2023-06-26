@@ -21,10 +21,10 @@ The following steps will help you import your notes from Simplenote easily.
 6. Drop the .zip backup file you exported earlier from Simplenote in the box or click anywhere to open system file picker to select the backup and click "Start processing".
    <img style="margin-bottom:15px;" src="/static/simplenote-importer/4.png" alt="Drop the .zip backup file you exported earlier from Standard Notes in the box or click anywhere to open system file picker to select the backup."/>
 
-5. Once importer completes processing, download the .zip file.
+7. Once importer completes processing, download the .zip file.
    <img style="margin-bottom:15px;" src="/static/simplenote-importer/5.png" alt="Download importer .zip file"/>
 
-6. After you have downloaded the `.zip` file, go to Notesnook app > Settings > Notesnook Importer and click on "Import from ZIP file" & select the .zip you downloaded earlier.
-<img style="margin-bottom:15px;" src="/static/import-zip-app.png" alt="Import .zip in Notesnook app"/>
+8. After you have downloaded the `.zip` file, go to Notesnook app > Settings > Notesnook Importer and click on "Import from ZIP file" & select the .zip you downloaded earlier.
+   <img style="margin-bottom:15px;" src="/static/import-zip-app.png" alt="Import .zip in Notesnook app"/>
 
-7. Once importing completes you should see all your notes in Notesnook. If you face any issues during importing, [report it on github](https://github.com/streetwriters/notesnook).
+9. Once importing completes you should see all your notes in Notesnook. If you face any issues during importing, [report it on github](https://github.com/streetwriters/notesnook).

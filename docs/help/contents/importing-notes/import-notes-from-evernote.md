@@ -26,6 +26,6 @@ The following steps will help you import your notes from EverNote easily.
    <img style="margin-bottom:15px;" src="/static/evernote-importer/6.png" alt="Download importer .zip file"/>
 
 7. After you have downloaded the `.zip` file, go to Notesnook app > Settings > Notesnook Importer and click on "Import from ZIP file" & select the .zip you downloaded earlier.
-<img style="margin-bottom:15px;" src="/static/import-zip-app.png" alt="Import .zip in Notesnook app"/>
+   <img style="margin-bottom:15px;" src="/static/import-zip-app.png" alt="Import .zip in Notesnook app"/>
 
 8. Once importing completes you should see all your notes in Notesnook. If you face any issues during importing, [report it on github](https://github.com/streetwriters/notesnook).

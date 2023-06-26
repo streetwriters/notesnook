@@ -45,7 +45,8 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
     style
   } = props;
 
-  if (!editor.isEditable) return <Flex sx={{position:"relative"}}>{children}</Flex>;
+  if (!editor.isEditable)
+    return <Flex sx={{ position: "relative" }}>{children}</Flex>;
 
   return (
     <Resizable
