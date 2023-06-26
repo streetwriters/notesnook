@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import path from "path";
 import fs from "fs/promises";
 import { watch } from "turbowatch";
-import { $, within } from "zx";
+import { execSync, spawn } from "child_process";
 
 const sodiumNativePrebuildPath = path.join(
   `node_modules`,
@@ -51,13 +51,13 @@ async function main() {
         onTeardown: async () => {
           await fs.rm("./build/", { force: true, recursive: true });
         },
-        onChange: async ({ spawn: $, first, log }) => {
+        onChange: async ({ first }) => {
           if (first) {
             await fs.rm("./build/", { force: true, recursive: true });
           }
 
-          await $`npm run bundle`;
-          await $`npx tsc`;
+          await exec(`npm run bundle`);
+          await exec(`npx tsc`);
 
           if (first) {
             await fs.cp(sodiumNativePrebuildPath, "build/prebuilds", {
@@ -68,14 +68,14 @@ async function main() {
 
           if (!isServerRunning) {
             await spawnAndWaitUntil(
+              ["npm", "run", "start:desktop"],
               path.join(__dirname, "..", "..", "web"),
-              "npm run start:desktop",
               (data) => data.includes("Network: use --host to expose")
             );
             isServerRunning = true;
           }
 
-          await $`npx electron ${path.join("build", "electron.js")}`;
+          await exec(`npx electron ${path.join("build", "electron.js")}`);
         }
       }
     ]
@@ -90,27 +90,29 @@ async function main() {
 main();
 
 function spawnAndWaitUntil(
+  cmd: string[],
   cwd: string,
-  cmd: string,
   predicate: (data: string) => boolean
 ) {
   return new Promise((resolve) => {
-    within(async () => {
-      $.env = process.env;
-      $.env.NO_COLOR = "true";
-      $.quote = (c) => c;
-
-      try {
-        const s = $`cd ${cwd} && ${cmd}`;
-        s.stdout.on("data", (data) => {
-          if (predicate(data)) resolve(undefined); //
-        });
-        await s;
-      } catch (e) {
-        //ignore
-      } finally {
-        isServerRunning = false;
-      }
+    const s = spawn(cmd[0], cmd.slice(1), {
+      cwd,
+      env: { ...process.env, NO_COLOR: "true" }
     });
+
+    process.once("beforeExit", () => {
+      s.kill(-1);
+    });
+
+    s.stdout.on("data", (data) => {
+      if (predicate(data)) resolve(undefined); //
+    });
+  });
+}
+
+async function exec(cmd) {
+  return execSync(cmd, {
+    env: process.env,
+    stdio: "inherit"
   });
 }
