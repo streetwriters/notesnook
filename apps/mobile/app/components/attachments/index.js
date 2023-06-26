@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef, useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
-import { FlatList } from "react-native-actions-sheet";
+
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
@@ -41,10 +41,12 @@ import {
   isImage,
   isVideo
 } from "@notesnook/core/utils/filename";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 
 export const AttachmentDialog = ({ note }) => {
   const colors = useThemeStore((state) => state.colors);
-
+  const { height } = useSettingStore((state) => state.dimensions);
   const [attachments, setAttachments] = useState(
     note
       ? db.attachments.ofNote(note.id, "all")
@@ -159,7 +161,8 @@ export const AttachmentDialog = ({ note }) => {
       style={{
         width: "100%",
         alignSelf: "center",
-        paddingHorizontal: 12
+        paddingHorizontal: 12,
+        height: height * 0.85
       }}
     >
       <SheetProvider context="attachments-list" />
@@ -228,51 +231,48 @@ export const AttachmentDialog = ({ note }) => {
         }}
       />
 
-      <FlatList
+      <View>
+        <ScrollView
+          style={{
+            width: "100%",
+            height: 50,
+            flexDirection: "row",
+            backgroundColor: colors.bg
+          }}
+          contentContainerStyle={{
+            minWidth: "100%",
+            height: 50
+          }}
+          horizontal
+        >
+          {attachmentTypes.map((item) => (
+            <Button
+              type={currentFilter === item.filterBy ? "grayAccent" : "gray"}
+              key={item.title}
+              title={
+                item.title +
+                ` (${filterAttachments(item.filterBy)?.length || 0})`
+              }
+              style={{
+                borderRadius: 0,
+                borderBottomWidth: 1,
+                flexGrow: 1,
+                borderBottomColor:
+                  currentFilter !== item.filterBy
+                    ? "transparent"
+                    : colors.accent
+              }}
+              onPress={() => {
+                setCurrentFilter(item.filterBy);
+                setAttachments(filterAttachments(item.filterBy));
+              }}
+            />
+          ))}
+        </ScrollView>
+      </View>
+      <FlashList
         keyboardDismissMode="none"
         keyboardShouldPersistTaps="always"
-        maxToRenderPerBatch={10}
-        initialNumToRender={10}
-        windowSize={5}
-        stickyHeaderIndices={[0]}
-        ListHeaderComponent={
-          <ScrollView
-            style={{
-              width: "100%",
-              height: 50,
-              flexDirection: "row",
-              backgroundColor: colors.bg
-            }}
-            contentContainerStyle={{
-              minWidth: "100%"
-            }}
-            horizontal
-          >
-            {attachmentTypes.map((item) => (
-              <Button
-                type={currentFilter === item.filterBy ? "grayAccent" : "gray"}
-                key={item.title}
-                title={
-                  item.title +
-                  ` (${filterAttachments(item.filterBy)?.length || 0})`
-                }
-                style={{
-                  borderRadius: 0,
-                  borderBottomWidth: 1,
-                  flexGrow: 1,
-                  borderBottomColor:
-                    currentFilter !== item.filterBy
-                      ? "transparent"
-                      : colors.accent
-                }}
-                onPress={() => {
-                  setCurrentFilter(item.filterBy);
-                  setAttachments(filterAttachments(item.filterBy));
-                }}
-              />
-            ))}
-          </ScrollView>
-        }
         ListEmptyComponent={
           <View
             style={{
@@ -294,8 +294,8 @@ export const AttachmentDialog = ({ note }) => {
             }}
           />
         }
+        estimatedItemSize={50}
         data={attachments}
-        keyExtractor={(item) => item.id}
         renderItem={renderItem}
       />
 
