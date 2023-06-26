@@ -30,7 +30,7 @@ export default class Note {
   /**
    *
    * @param {import('../api').default} db
-   * @param {Object} note
+   * @param {any} note
    */
   constructor(note, db) {
     this._note = note;
@@ -97,9 +97,11 @@ export default class Note {
       createdOn: formatDate(this.data.dateCreated),
       tags: this.tags.join(", ")
     };
-    contentItem =
-      contentItem || (await this._db.content.raw(this._note.contentId));
-    if (!contentItem) return false;
+    contentItem = contentItem ||
+      (await this._db.content.raw(this._note.contentId)) || {
+        type: "tiptap",
+        data: "<p></p>"
+      };
     const { data, type } = await this._db.content.downloadMedia(
       `export-${this.id}`,
       contentItem,
