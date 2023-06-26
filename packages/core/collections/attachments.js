@@ -331,7 +331,9 @@ export default class Attachments extends Collection {
     const { metadata, chunkSize } = attachment;
     const filename = metadata.hash;
 
-    sendAttachmentsProgressEvent("download", groupId, total, current);
+    if (notify)
+      sendAttachmentsProgressEvent("download", groupId, total, current);
+
     const isDownloaded = await this._db.fs.downloadFile(
       groupId,
       filename,
