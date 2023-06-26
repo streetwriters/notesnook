@@ -110,6 +110,7 @@ export class Tiptap {
     }).parse(this.data);
 
     const images = {};
+    let hasImages = false;
     for (let i = 0; i < hashes.length; ++i) {
       const hash = hashes[i];
       const src = await getData(hash, {
@@ -118,8 +119,10 @@ export class Tiptap {
       });
       if (!src) continue;
       images[hash] = src;
+      hasImages = true;
     }
 
+    if (!hasImages) return this.data;
     return new HTMLRewriter({
       ontag: (name, attr) => {
         const hash = attr[ATTRIBUTES.hash];
