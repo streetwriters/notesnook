@@ -344,6 +344,14 @@ export const useEditor = (
     ) => {
       state.current.currentlyEditing = true;
       const editorState = useEditorStore.getState();
+
+      if (
+        !state.current.ready &&
+        (await isEditorLoaded(editorRef, sessionIdRef.current))
+      ) {
+        state.current.ready = true;
+      }
+
       if (item && item.type === "new") {
         currentNote.current && (await reset());
         const nextSessionId = makeSessionId(item as NoteType);
