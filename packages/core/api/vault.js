@@ -251,6 +251,14 @@ export default class Vault {
       password = this._password;
     }
 
+    if (encryptedContent.noteId && typeof encryptedContent.data !== "object") {
+      await this._db.notes.add({
+        id: encryptedContent.noteId,
+        locked: false
+      });
+      return encryptedContent;
+    }
+
     let decryptedContent = await this._storage.decrypt(
       { password },
       encryptedContent.data
