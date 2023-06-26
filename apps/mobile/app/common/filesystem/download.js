@@ -46,6 +46,7 @@ export async function downloadFile(filename, data, cancelToken) {
 
     if (!downloadUrl) throw new Error("Unable to resolve download url");
     let totalSize = 0;
+    console.log("Download starting");
     let request = RNFetchBlob.config({
       path: path,
       IOSBackgroundTask: true
