@@ -25,14 +25,16 @@ type File = { filename: string; content: string };
 async function zip(files: File[], format: string): Promise<Uint8Array> {
   const obj: Unzipped = Object.create(null);
   files.forEach((file) => {
-    const name = sanitizeFilename(file.filename);
+    const name = sanitizeFilename(file.filename, { replacement: "-" });
     let counter = 0;
     while (obj[makeFilename(name, format, counter)]) ++counter;
 
     obj[makeFilename(name, format, counter)] = textEncoder.encode(file.content);
   });
-  const { zipSync } = await import("fflate");
-  return zipSync(obj);
+  const { zip } = await import("fflate");
+  return new Promise((resolve, reject) =>
+    zip(obj, (err, data) => (err ? reject(err) : resolve(data)))
+  );
 }
 export { zip };
 
