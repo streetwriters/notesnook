@@ -56,7 +56,9 @@ export class Tiptap {
       formatters: {
         taskList: (elem, walk, builder, formatOptions) => {
           return formatList(elem, walk, builder, formatOptions, (elem) => {
-            return elem.attribs.class.includes("checked") ? " ✅ " : " ☐ ";
+            return elem.attribs.class && elem.attribs.class.includes("checked")
+              ? " ✅ "
+              : " ☐ ";
           });
         },
         paragraph: (elem, walk, builder) => {
