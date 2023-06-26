@@ -3,7 +3,8 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
-import com.tencent.mmkv.MMKV;
+
+import com.ammarahmed.mmkv.MMKV;
 
 public class OnClearFromRecentService extends Service {
 
@@ -33,7 +34,6 @@ public class OnClearFromRecentService extends Service {
         } catch (Exception e) {
 
         }
-
         //System.exit(0);
     }
 }

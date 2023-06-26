@@ -87,7 +87,7 @@ class Commands {
         this.ref?.current?.requestFocus();
       }, 1);
     } else {
-      await sleep(200);
+      await sleep(400);
       await this.doAsync("editor.commands.focus()");
     }
   };

@@ -344,6 +344,14 @@ export const useEditor = (
     ) => {
       state.current.currentlyEditing = true;
       const editorState = useEditorStore.getState();
+
+      if (
+        !state.current.ready &&
+        (await isEditorLoaded(editorRef, sessionIdRef.current))
+      ) {
+        state.current.ready = true;
+      }
+
       if (item && item.type === "new") {
         currentNote.current && (await reset());
         const nextSessionId = makeSessionId(item as NoteType);
@@ -368,6 +376,10 @@ export const useEditor = (
           if (state.current.ready) overlay(false);
         } else {
           overlay(true);
+        }
+        if (!state.current.ready) {
+          currentNote.current = item as NoteType;
+          return;
         }
         lastContentChangeTime.current = item.dateEdited;
         const nextSessionId = makeSessionId(item as NoteType);
@@ -611,14 +623,14 @@ export const useEditor = (
       );
       await commands.setSessionId(sessionIdRef.current);
       await onReady();
+      state.current.ready = true;
       await commands.setSettings();
       if (currentNote.current) {
         loadNote({ ...currentNote.current, forced: true });
       } else {
         await commands.setPlaceholder(placeholderTip.current);
       }
-      state.current.ready = true;
-    }, 300);
+    }, 1000);
   }, [
     onReady,
     postMessage,

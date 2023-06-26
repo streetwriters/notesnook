@@ -93,6 +93,7 @@ const AuthModal = () => {
         contentContainerStyle={{
           height: Platform.OS === "android" ? "100%" : "100%"
         }}
+        keyboardShouldPersistTaps="handled"
         bounces={false}
       >
         {currentAuthMode !== AuthMode.login ? (

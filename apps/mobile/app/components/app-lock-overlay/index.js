@@ -202,7 +202,7 @@ const AppLockedOverlay = () => {
                 width={250}
                 onPress={onUnlockAppRequested}
                 icon={"fingerprint"}
-                type={user ? "grayAccent" : "accent"}
+                type="transparent"
               />
             </View>
           </View>

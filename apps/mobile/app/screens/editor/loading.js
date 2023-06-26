@@ -72,7 +72,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
         translateValue.value = 0;
         timers.current.error = setTimeout(() => {
           setError(true);
-        }, 15 * 1000);
+        }, 60 * 1000);
       } else {
         clearTimers();
         const timeDiffSinceLoadStarted =
@@ -109,7 +109,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
       clearTimers();
       eUnSubscribeEvent("loadingNote" + editorId, load);
     };
-  }, [editorId, load, translateValue]);
+  }, [editorId, load, translateValue, opacity]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {

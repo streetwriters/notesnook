@@ -23,7 +23,6 @@ import NetInfo from "@react-native-community/netinfo";
 import React, { useCallback, useEffect, useRef } from "react";
 import {
   AppState,
-  Appearance,
   Keyboard,
   Linking,
   NativeEventEmitter,
@@ -37,6 +36,9 @@ import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
 import { DatabaseLogger, db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
+import Migrate from "../components/sheets/migrate";
+import NewFeature from "../components/sheets/new-feature";
+import { Update } from "../components/sheets/update";
 import { Walkthrough } from "../components/walkthroughs";
 import {
   clearAppState,
@@ -78,12 +80,9 @@ import {
   eUserLoggedIn,
   refreshNotesPage
 } from "../utils/events";
+import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
-import Migrate from "../components/sheets/migrate";
-import NewFeature from "../components/sheets/new-feature";
-import { getGithubVersion } from "../utils/github-version";
-import { Update } from "../components/sheets/update";
 
 const onCheckSyncStatus = async (type) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -291,7 +290,6 @@ export const useAppEvents = () => {
 
   useEffect(() => {
     let eventSubscriptions = [
-      Appearance.addChangeListener(SettingsService.setTheme),
       Linking.addEventListener("url", onAppOpenedFromURL),
       SodiumEventEmitter.addListener(
         "onSodiumProgress",
@@ -596,9 +594,12 @@ export const useAppEvents = () => {
 
   useEffect(() => {
     if (!loading) {
-      doAppLoadActions();
+      (async () => {
+        onUserUpdated();
+        doAppLoadActions();
+      })();
     }
-  }, [loading]);
+  }, [loading, onUserUpdated]);
 
   const initializeDatabase = useCallback(async () => {
     if (!db.isInitialized) {
@@ -606,15 +607,28 @@ export const useAppEvents = () => {
       DatabaseLogger.info("Initializing database");
       await db.init();
     }
-    await onUserUpdated();
     if (IsDatabaseMigrationRequired()) return;
     loadNotes();
-  }, [IsDatabaseMigrationRequired, loadNotes, onUserUpdated]);
+  }, [IsDatabaseMigrationRequired, loadNotes]);
 
   useEffect(() => {
-    if (appLocked || !db.isInitialized || !loading) return;
-    initializeDatabase();
-  }, [initializeDatabase, appLocked, loading]);
+    let sub;
+    if (appLocked) {
+      const sub = useUserStore.subscribe((state) => {
+        if (
+          !state.appLocked &&
+          db.isInitialized &&
+          useNoteStore.getState().loading
+        ) {
+          initializeDatabase();
+          sub();
+        }
+      });
+    }
+    return () => {
+      sub?.();
+    };
+  }, [appLocked, initializeDatabase]);
 
   return initializeDatabase;
 };
@@ -631,7 +645,6 @@ const doAppLoadActions = async () => {
   if (await checkAppUpdateAvailable()) return;
   if (await checkForRateAppRequest()) return;
   if (await PremiumService.getRemainingTrialDaysStatus()) return;
-
   if (SettingsService.get().introCompleted) {
     useMessageStore.subscribe((state) => {
       let dialogs = state.dialogs;
