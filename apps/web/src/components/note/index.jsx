@@ -33,6 +33,7 @@ import {
   PDF,
   Markdown,
   HTML,
+  Text as Plaintext,
   Readonly,
   StarOutline,
   AddReminder,
@@ -331,7 +332,7 @@ const formats = [
   {
     type: "txt",
     title: "Text",
-    icon: Text,
+    icon: Plaintext,
     subtitle: "Can be opened in any plain-text editor."
   }
 ];
@@ -419,7 +420,6 @@ const menuItems = [
     title: "Print",
     disabled: ({ note }) => {
       if (!db.notes.note(note.id).synced()) return notFullySyncedText;
-      if (note.locked) return "Locked notes cannot be printed.";
     },
     icon: Print,
     onClick: async ({ note }) => {
@@ -448,7 +448,6 @@ const menuItems = [
     icon: Export,
     disabled: ({ note }) => {
       if (!db.notes.note(note.id).synced()) return notFullySyncedText;
-      if (note.locked) return "Locked notes cannot be exported currently.";
     },
     items: formats.map((format) => ({
       key: format.type,
