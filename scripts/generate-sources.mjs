@@ -17,26 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { $, fs, path, which } from "zx";
+import fs from "fs/promises";
+import fsSync from "fs";
+import path from "path";
+import { spawnSync } from "child_process";
+import { fileURLToPath } from "url";
 
-function uniqBy(a, key) {
-  let seen = new Set();
-  return a.filter((item) => {
-    let k = key(item);
-    if (!k) return true;
-    return seen.has(k) ? false : seen.add(k);
-  });
+async function move(from, to) {
+  try {
+    await fs.rename(from, to);
+  } catch {
+    await fs.cp(from, to, { overwrite: true, force: true, recursive: true });
+    await fs.rm(from, { force: true, recursive: true });
+  }
 }
 
-$.env = process.env;
-$.quote = (s) => s;
+function execute(cmd, args) {
+  spawnSync(cmd, args, { env: process.env, stdio: "inherit" });
+}
 
-const generators = await which("flatpak-node-generator");
-
-if (generators.length <= 0)
-  throw new Error(
-    "flatpak-node-generator not found. Please install flatpak-node-generator from https://github.com/flatpak/flatpak-builder-tools."
-  );
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const lockfiles = [
   {
@@ -60,7 +61,7 @@ const lockfiles = [
 
 let allSources = [];
 for (const lockfile of lockfiles) {
-  if (!fs.existsSync(lockfile.path)) {
+  if (!fsSync.existsSync(lockfile.path)) {
     console.error("skipping. lockfile does not exist at", lockfile.path);
     continue;
   }
@@ -71,23 +72,30 @@ for (const lockfile of lockfiles) {
     "node_modules"
   );
   console.log("backing up node_modules at", nodeModulesPath);
-  fs.moveSync(
+  await move(
     nodeModulesPath,
     path.join(path.dirname(lockfile.path), "node_modules.backup")
   );
 
   const output = `${lockfile.name}-sources.json`;
-  await $`flatpak-node-generator${
-    lockfile.ignoreDev ? " --no-devel" : ""
-  } npm ${lockfile.path} -o ${output}`;
+  execute(
+    `flatpak-node-generator`,
+    [
+      lockfile.ignoreDev ? "--no-devel" : false,
+      "npm",
+      lockfile.path,
+      "-o",
+      output
+    ].filter(Boolean)
+  );
 
-  const sources = JSON.parse(fs.readFileSync(output, "utf-8"));
+  const sources = JSON.parse(await fs.readFile(output, "utf-8"));
   allSources = [...allSources, ...sources];
 
-  fs.rmSync(output, { force: true });
+  await fs.rm(output, { force: true });
 
   console.log("recovering node_modules to", nodeModulesPath);
-  fs.moveSync(
+  await move(
     path.join(path.dirname(lockfile.path), "node_modules.backup"),
     nodeModulesPath
   );
@@ -95,9 +103,9 @@ for (const lockfile of lockfiles) {
 
 console.log("writing sources");
 
-fs.writeFileSync(
+await fs.writeFile(
   "generated-sources.json",
-  JSON.stringify(uniqBy(allSources, (i) => i.url))
+  JSON.stringify(allSources, undefined, 4)
 );
 
 console.log("done");
