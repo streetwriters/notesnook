@@ -143,6 +143,7 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            buildConfigField "boolean", "FDROID_BUILD", "${fdroidBuild()}"
         }
         release {
             if (file("debug.keystore").exists()) {
@@ -152,6 +153,7 @@ android {
             shrinkResources false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             proguardFile "${rootProject.projectDir}/../../node_modules/detox/android/detox/proguard-rules-app.pro"
+            buildConfigField "boolean", "FDROID_BUILD", "${fdroidBuild()}"
         
         }
     }

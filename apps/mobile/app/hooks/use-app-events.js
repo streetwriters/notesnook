@@ -656,7 +656,7 @@ const doAppLoadActions = async () => {
 };
 
 const checkAppUpdateAvailable = async () => {
-  if (__DEV__ || Config.isTesting === "true") return;
+  if (__DEV__ || Config.isTesting === "true" || Config.FDROID_BUILD) return;
   try {
     const version =
       Config.GITHUB_RELEASE === "true"
