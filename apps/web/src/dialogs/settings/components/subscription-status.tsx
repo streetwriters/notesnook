@@ -201,7 +201,7 @@ export function SubscriptionStatus() {
               <Button
                 variant="primary"
                 onClick={async () => {
-                  showBuyDialog("monthly");
+                  showBuyDialog();
                 }}
               >
                 Upgrade to Pro
@@ -219,7 +219,7 @@ export function SubscriptionStatus() {
               <Button
                 variant="primary"
                 onClick={async () => {
-                  showBuyDialog("monthly");
+                  showBuyDialog();
                 }}
               >
                 Upgrade to Pro
