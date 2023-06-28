@@ -101,7 +101,7 @@ export async function createBackup() {
       PATHS.backupsDirectory
     );
     const filePath = `${directory}/${filename}.${ext}`;
-    await desktop?.integration.saveFile.query(filePath, data);
+    await desktop?.integration.saveFile.query({ filePath, data });
     showToast("success", `Backup saved at ${filePath}.`);
   } else {
     FileSaver.saveAs(new Blob([Buffer.from(data)]), `${filename}.${ext}`);
