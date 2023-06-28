@@ -179,6 +179,7 @@ function SideBar(props: SideBarProps) {
         onChangePlan={() => {
           onApplyCoupon(undefined);
           onPlanSelected(undefined);
+          setShowPlans(true);
         }}
       />
     );
@@ -193,7 +194,7 @@ function SideBar(props: SideBarProps) {
     return (
       <PlansList
         onPlansLoaded={(plans) => {
-          if (!initialPlan) return;
+          if (!initialPlan || showPlans) return;
           const plan = plans.find((p) => p.period === initialPlan);
           onPlanSelected(plan);
         }}
