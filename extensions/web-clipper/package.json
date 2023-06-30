@@ -13,7 +13,6 @@
     "@theme-ui/components": "^0.14.7",
     "@theme-ui/core": "^0.14.7",
     "comlink": "^4.3.1",
-    "comlink-extension": "^1.0.8",
     "hyperapp": "^2.0.22",
     "mac-scrollbar": "^0.10.3",
     "react": "^17.0.2",
