@@ -57,12 +57,9 @@ if (process.platform === "win32") {
 }
 
 async function createWindow() {
-  await AssetManager.loadIcons();
   const cliOptions = await parseArguments();
 
   const mainWindowState = new WindowState({});
-  setTheme(getTheme());
-
   const mainWindow = new BrowserWindow({
     show: false,
     x: mainWindowState.x,
@@ -79,57 +76,55 @@ async function createWindow() {
     }),
     webPreferences: {
       zoomFactor: config.zoomFactor,
-      devTools: true, // isDev,
-      nodeIntegration: true, //true,
+      nodeIntegration: true,
       contextIsolation: false,
       spellcheck: config.isSpellCheckerEnabled,
       preload: __dirname + "/preload.js"
     }
   });
 
-  mainWindow.on("show", async () => {
+  globalThis.window = mainWindow;
+  mainWindowState.manage(mainWindow);
+
+  mainWindow.once("show", async () => {
+    setTheme(getTheme());
+    setupMenu();
+    setupJumplist();
+
+    if (isDevelopment())
+      mainWindow.webContents.openDevTools({ mode: "right", activate: true });
+
+    mainWindow.webContents.setWindowOpenHandler((details) => {
+      shell.openExternal(details.url);
+      return { action: "deny" };
+    });
+
+    nativeTheme.on("updated", () => {
+      setupTray();
+      setupJumplist();
+    });
+
+    await AssetManager.loadIcons();
     if (config.privacyMode) {
       await api.integration.setPrivacyMode(config.privacyMode);
     }
   });
 
-  mainWindowState.manage(mainWindow);
-  globalThis.window = mainWindow;
-  setupMenu();
-  setupJumplist();
   setupDesktopIntegration(cliOptions.hidden);
   createIPCHandler({ router, windows: [mainWindow] });
 
+  mainWindow.webContents.loadURL(`${createURL(cliOptions, "/")}`);
   mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
     "http://dictionaries.notesnook.com/"
   );
 
-  if (isDevelopment())
-    mainWindow.webContents.openDevTools({ mode: "right", activate: true });
-
-  try {
-    await mainWindow.loadURL(`${createURL(cliOptions)}`);
-  } catch (e) {
-    if (e instanceof Error) console.error(e);
-  }
-
-  mainWindow.on("closed", () => {
+  mainWindow.once("closed", () => {
     globalThis.window = null;
-  });
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url);
-    return { action: "deny" };
-  });
-
-  nativeTheme.on("updated", () => {
-    setupTray();
-    setupJumplist();
   });
 }
 
 app.commandLine.appendSwitch("lang", "en-US");
-app.on("ready", async () => {
+app.once("ready", async () => {
   console.info("App ready. Opening window.");
 
   if (!isDevelopment()) registerProtocol();
@@ -137,7 +132,7 @@ app.on("ready", async () => {
   configureAutoUpdater();
 });
 
-app.on("window-all-closed", () => {
+app.once("window-all-closed", () => {
   if (process.platform !== "darwin" || MAC_APP_STORE) {
     app.quit();
   }
@@ -149,9 +144,10 @@ app.on("activate", () => {
   }
 });
 
-function createURL(options: CLIOptions) {
+function createURL(options: CLIOptions, path = "/") {
   const url = new URL(isDevelopment() ? "http://localhost:3000" : PROTOCOL_URL);
 
+  url.pathname = path;
   if (options.note === true) url.hash = "/notes/create/1";
   else if (options.notebook === true) url.hash = "/notebooks/create";
   else if (options.reminder === true) url.hash = "/reminders/create";
@@ -173,9 +169,10 @@ function setupDesktopIntegration(hidden: boolean) {
     setupTray();
   }
 
-  globalThis.window?.on("ready-to-show", () => {
+  globalThis.window?.once("ready-to-show", () => {
     if (!hidden) {
       globalThis.window?.show();
+      globalThis.window?.focus();
     }
 
     if (hidden && !desktopIntegration.minimizeToSystemTray) {
@@ -190,7 +187,7 @@ function setupDesktopIntegration(hidden: boolean) {
     app.on("before-quit", () => app.exit(0));
   }
 
-  globalThis.window?.on("close", (e) => {
+  globalThis.window?.once("close", (e) => {
     if (config.desktopSettings.closeToSystemTray) {
       e.preventDefault();
       if (process.platform == "darwin") {
