@@ -55,11 +55,15 @@
     "copyright": "Copyright © 2023 Streetwriters (Private) Limited",
     "artifactName": "notesnook_${os}_${arch}.${ext}",
     "npmRebuild": false,
+    "asar": false,
     "files": [
       "!*.chunk.js.map",
       "!*.chunk.js.LICENSE.txt",
       "build/",
       "!build/screenshots${/*}",
+      "!build/banner.jpg",
+      "!build/*.ico",
+      "!build/*.png",
       "!node_modules${/*}"
     ],
     "afterSign": "electron-builder-notarize",
