@@ -30,8 +30,9 @@ import dayjs from "dayjs";
 export const FontPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
   updateValue: (item) => {
+    console.log(item.id);
     SettingsService.set({
-      defaultFontFamily: item
+      defaultFontFamily: item.id
     });
   },
   formatValue: (item) => {
