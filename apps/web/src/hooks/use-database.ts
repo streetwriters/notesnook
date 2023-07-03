@@ -28,20 +28,21 @@ if (import.meta.env.NODE_ENV === "production") {
 }
 
 const memory = {
-  isAppLoaded: false
+  isDatabaseLoaded: false
 };
 export default function useDatabase(persistence: "db" | "memory" = "db") {
-  const [isAppLoaded, setIsAppLoaded] = useState(memory.isAppLoaded);
+  const [isAppLoaded, setIsAppLoaded] = useState(memory.isDatabaseLoaded);
 
   useEffect(() => {
-    if (memory.isAppLoaded) return;
-
-    (async () => {
-      await initializeDatabase(persistence);
-      setIsAppLoaded(true);
-      memory.isAppLoaded = true;
-    })();
+    loadDatabase(persistence).then(() => setIsAppLoaded(true));
   }, [persistence]);
 
   return [isAppLoaded];
+}
+
+export async function loadDatabase(persistence: "db" | "memory" = "db") {
+  if (memory.isDatabaseLoaded) return;
+
+  await initializeDatabase(persistence);
+  memory.isDatabaseLoaded = true;
 }
