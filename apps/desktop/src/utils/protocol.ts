@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { protocol, ProtocolRequest } from "electron";
 import { isDevelopment } from "./index";
-import { createReadStream, statSync } from "fs";
-import { extname, join, normalize } from "path";
+import { createReadStream } from "fs";
+import { extname, normalize } from "path";
 import { URL } from "url";
 import fetch, { Response } from "node-fetch";
 
@@ -46,14 +46,13 @@ function registerProtocol() {
         console.info("Intercepting request:", request.url);
 
         const loadIndex = !extname(url.pathname);
-        const absoluteFilePath = normalize(
+        const filePath = normalize(
           `${__dirname}${
             loadIndex
               ? `${BASE_PATH}/index.html`
               : `${BASE_PATH}/${url.pathname}`
           }`
         );
-        const filePath = getPath(absoluteFilePath);
         if (!filePath) {
           console.error("Local asset file not found at", filePath);
           callback({ error: FILE_NOT_FOUND });
@@ -159,18 +158,3 @@ async function getBody(request: ProtocolRequest) {
   return blob;
 }
 
-function getPath(filePath: string): string | undefined {
-  try {
-    const result = statSync(filePath);
-
-    if (result.isFile()) {
-      return filePath;
-    }
-
-    if (result.isDirectory()) {
-      return getPath(join(filePath, "index.html"));
-    }
-  } catch (_) {
-    // ignore
-  }
-}
