@@ -21,8 +21,8 @@ import { NativeImage, nativeImage } from "electron";
 import path from "path";
 import { isDevelopment } from "./index";
 import { parse, ParsedImage } from "icojs";
-import { readFileSync } from "fs";
 import { getSystemTheme } from "./theme";
+import { readFile } from "fs/promises";
 
 type Formats = "ico" | "png" | "icns";
 type IconOptions<TFormat extends Formats> = {
@@ -70,7 +70,7 @@ export class AssetManager {
           "icons",
           `${icon}${prefix}.ico`
         );
-        const icoBuffer = readFileSync(icoPath);
+        const icoBuffer = await readFile(icoPath);
         const images = await parse(icoBuffer, "image/png");
         ALL_ICONS.push({ id: icon, images, prefix });
       }
@@ -80,10 +80,10 @@ export class AssetManager {
   static appIcon(options: IconOptions<Formats>) {
     const { size = 32, format = "png" } = options;
 
-    if (format === "ico") return path.join("assets", "icons", "app.ico");
-    if (format === "icns") return path.join("assets", "icons", "app.icns");
+    if (format === "ico") return "assets\\icons\\app.ico";
+    if (format === "icns") return "assets/icons/app.icns";
 
-    return path.join("assets", "icons", `${size}x${size}.png`);
+    return `assets/icons/${size}x${size}.png`;
   }
 
   static icon<TFormat extends Formats>(

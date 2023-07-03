@@ -16,9 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* global MAC_APP_STORE, RELEASE */
 
-import { app, BrowserWindow, nativeTheme, shell } from "electron";
+import { app, BrowserWindow, nativeTheme, session, shell } from "electron";
 import { isDevelopment } from "./utils";
 import { registerProtocol, PROTOCOL_URL } from "./utils/protocol";
 import { configureAutoUpdater } from "./utils/autoupdater";
@@ -46,8 +45,8 @@ if (process.platform == "win32" && process.env.PORTABLE_EXECUTABLE_DIR) {
   app.setPath("documents", path.join(root, "Documents"));
   app.setPath("userData", path.join(root, "UserData"));
 }
-// only run a single instance
 
+// only run a single instance
 if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
   app.exit();
 }
@@ -56,19 +55,22 @@ if (process.platform === "win32") {
   app.setAppUserModelId(app.name);
 }
 
+app.commandLine.appendSwitch("lang", "en-US");
+
 async function createWindow() {
   const cliOptions = await parseArguments();
+  setTheme(getTheme());
 
   const mainWindowState = new WindowState({});
   const mainWindow = new BrowserWindow({
-    show: false,
+    show: !cliOptions.hidden,
     x: mainWindowState.x,
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
     darkTheme: getTheme() === "dark",
     backgroundColor: getBackgroundColor(),
-
+    opacity: 0,
     autoHideMenuBar: true,
     icon: AssetManager.appIcon({
       size: 512,
@@ -86,34 +88,18 @@ async function createWindow() {
   globalThis.window = mainWindow;
   mainWindowState.manage(mainWindow);
 
-  mainWindow.once("show", async () => {
-    setTheme(getTheme());
-    setupMenu();
-    setupJumplist();
+  if (cliOptions.hidden && !config.desktopSettings.minimizeToSystemTray)
+    mainWindow.minimize();
 
-    if (isDevelopment())
-      mainWindow.webContents.openDevTools({ mode: "right", activate: true });
+  setTimeout(() => {
+    mainWindow.setOpacity(1);
+  }, 70);
 
-    mainWindow.webContents.setWindowOpenHandler((details) => {
-      shell.openExternal(details.url);
-      return { action: "deny" };
-    });
-
-    nativeTheme.on("updated", () => {
-      setupTray();
-      setupJumplist();
-    });
-
-    await AssetManager.loadIcons();
-    if (config.privacyMode) {
-      await api.integration.setPrivacyMode(config.privacyMode);
-    }
-  });
-
-  setupDesktopIntegration(cliOptions.hidden);
+  setupDesktopIntegration();
   createIPCHandler({ router, windows: [mainWindow] });
 
-  mainWindow.webContents.loadURL(`${createURL(cliOptions, "/")}`);
+  await mainWindow.webContents.loadURL(`${createURL(cliOptions, "/")}`);
+
   mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
     "http://dictionaries.notesnook.com/"
   );
@@ -121,9 +107,29 @@ async function createWindow() {
   mainWindow.once("closed", () => {
     globalThis.window = null;
   });
+
+  setupMenu();
+  setupJumplist();
+
+  if (isDevelopment())
+    mainWindow.webContents.openDevTools({ mode: "right", activate: true });
+
+  mainWindow.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url);
+    return { action: "deny" };
+  });
+
+  nativeTheme.on("updated", () => {
+    setupTray();
+    setupJumplist();
+  });
+
+  await AssetManager.loadIcons();
+  if (config.privacyMode) {
+    await api.integration.setPrivacyMode(config.privacyMode);
+  }
 }
 
-app.commandLine.appendSwitch("lang", "en-US");
 app.once("ready", async () => {
   console.info("App ready. Opening window.");
 
@@ -159,7 +165,7 @@ function createURL(options: CLIOptions, path = "/") {
   return url;
 }
 
-function setupDesktopIntegration(hidden: boolean) {
+function setupDesktopIntegration() {
   const desktopIntegration = config.desktopSettings;
 
   if (
@@ -168,18 +174,6 @@ function setupDesktopIntegration(hidden: boolean) {
   ) {
     setupTray();
   }
-
-  globalThis.window?.once("ready-to-show", () => {
-    if (!hidden) {
-      globalThis.window?.show();
-      globalThis.window?.focus();
-    }
-
-    if (hidden && !desktopIntegration.minimizeToSystemTray) {
-      globalThis.window?.show();
-      globalThis.window?.minimize();
-    }
-  });
 
   // when close to system tray is enabled, it becomes nigh impossible
   // to "quit" the app. This is necessary in order to fix that.
