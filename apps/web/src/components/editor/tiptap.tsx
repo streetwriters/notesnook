@@ -185,6 +185,7 @@ function TipTap(props: TipTapProps) {
       autofocus: "start",
       onFocus,
       onCreate: ({ editor }) => {
+        if (onLoad) onLoad();
         if (oldNonce.current !== nonce)
           editor.commands.focus("start", { scrollIntoView: true });
         oldNonce.current = nonce;
@@ -201,7 +202,6 @@ function TipTap(props: TipTapProps) {
             }
           }
         });
-        if (onLoad) onLoad();
         editor.commands.refreshSearch();
       },
       onUpdate: ({ editor, transaction }) => {

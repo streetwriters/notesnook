@@ -95,7 +95,11 @@ function SuspenseLoader({ condition, props, component: Component, fallback }) {
   if (!condition) return fallback;
 
   return (
-    <Suspense fallback={fallback}>
+    <Suspense
+      fallback={
+        import.meta.env.REACT_APP_PLATFORM === "desktop" ? null : fallback
+      }
+    >
       <Component {...props} />
     </Suspense>
   );
