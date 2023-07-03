@@ -18,19 +18,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { expose } from "comlink";
-import { gzipSync, gunzipSync } from "fflate";
+import { gzip, gunzip } from "fflate";
 import { fromBase64, toBase64 } from "@aws-sdk/util-base64-browser";
 
 const module = {
   gzip: ({ data, level }: { data: string; level: number }) => {
-    return toBase64(
-      gzipSync(new TextEncoder().encode(data), {
-        level: level as any
-      })
-    );
+    return new Promise<string>((resolve, reject) => {
+      gzip(
+        new TextEncoder().encode(data),
+        { level: level as any },
+        (err, data) => (err ? reject(err) : resolve(toBase64(data)))
+      );
+    });
   },
   gunzip: ({ data }: { data: string }) => {
-    return new TextDecoder().decode(gunzipSync(fromBase64(data)));
+    return new Promise<string>((resolve, reject) => {
+      gunzip(fromBase64(data), (err, data) =>
+        err ? reject(err) : resolve(new TextDecoder().decode(data))
+      );
+    });
   }
 };
 
