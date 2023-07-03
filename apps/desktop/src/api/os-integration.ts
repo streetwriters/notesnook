@@ -25,10 +25,10 @@ import { config, DesktopIntegration } from "../utils/config";
 import { bringToFront } from "../utils/bring-to-front";
 import { getTheme, setTheme, Theme } from "../utils/theme";
 import { mkdirSync, writeFileSync } from "fs";
-import { dirname, join } from "path";
-import { platform } from "os";
+import { dirname } from "path";
 import { resolvePath } from "../utils/resolve-path";
 import { observable } from "@trpc/server/observable";
+import { AssetManager } from "../utils/asset-manager";
 
 const t = initTRPC.create();
 
@@ -122,10 +122,10 @@ export const osIntegrationRouter = t.router({
     .query(({ input }) => {
       const notification = new Notification({
         ...input,
-        icon: join(
-          __dirname,
-          platform() === "win32" ? "app.ico" : "favicon-72x72.png"
-        )
+        icon: AssetManager.appIcon({
+          size: 64,
+          format: process.platform === "win32" ? "ico" : "png"
+        })
       });
       notification.show();
       if (input.urgency === "critical") {
