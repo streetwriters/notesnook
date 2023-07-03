@@ -40,7 +40,8 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
         ref={ref}
         sx={{
           borderRadius: "default",
-          flexShrink: 0
+          flexShrink: 0,
+          alignItems: "center"
         }}
       >
         <ToolButton
