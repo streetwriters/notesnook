@@ -134,8 +134,6 @@ class EditorStore extends BaseStore {
   };
 
   openSession = async (noteId, force) => {
-    await db.notes.init();
-
     const session = this.get().session;
 
     if (session.id) await db.fs.cancel(session.id);

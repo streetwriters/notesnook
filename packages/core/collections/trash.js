@@ -26,10 +26,7 @@ export default class Trash {
    */
   constructor(db) {
     this._db = db;
-    this.collections = {
-      notes: db.notes,
-      notebooks: db.notebooks
-    };
+    this.collections = ["notes", "notebooks"];
   }
 
   async init() {
@@ -48,16 +45,16 @@ export default class Trash {
 
   get all() {
     let trashItems = [];
-    for (let key in this.collections) {
-      const collection = this.collections[key];
+    for (const key of this.collections) {
+      const collection = this._db[key];
       trashItems.push(...collection.deleted);
     }
     return trashItems;
   }
 
   _getItem(id) {
-    for (let key in this.collections) {
-      const collection = this.collections[key]._collection;
+    for (const key of this.collections) {
+      const collection = this._db[key]._collection;
       if (collection.has(id)) return [collection.getItem(id), collection];
     }
     return [];
@@ -67,7 +64,7 @@ export default class Trash {
     const collection = collectionNameFromItem(item);
     if (!item || !item.type || !collection) return;
 
-    await this.collections[collection]._collection.updateItem({
+    await this._db[collection]._collection.updateItem({
       ...item,
       id: item.itemId || item.id,
       type: "trash",
@@ -104,9 +101,9 @@ export default class Trash {
       delete item.itemType;
 
       if (item.type === "note") {
-        await this.collections.notes.add(item);
+        await this._db.notes.add(item);
       } else if (item.type === "notebook") {
-        await this.collections.notebooks.add(item);
+        await this._db.notebooks.add(item);
       }
     }
     this._db.notes.topicReferences.rebuild();

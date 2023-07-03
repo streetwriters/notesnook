@@ -31,18 +31,14 @@ function Home() {
   const isCompact = useStore((store) => store.viewMode === "compact");
   const refresh = useStore((store) => store.refresh);
   const clearContext = useStore((store) => store.clearContext);
-  const [isLoading, setIsLoading] = useState(true);
-  useNavigate("home", () => {
-    clearContext();
-  });
+
+  useNavigate("home", clearContext);
 
   useEffect(() => {
     (async function () {
       const initialized = db.notes.initialized;
       if (!initialized || !notes.length) {
-        await db.notes.init();
         store.refresh();
-        setIsLoading(false);
       }
       // const note = db.notes.note("62bc3f28a1a1a10000707077").data;
       // const data = await db.content.raw(note.contentId);
@@ -64,7 +60,6 @@ function Home() {
       groupType="home"
       compact={isCompact}
       refresh={refresh}
-      isLoading={isLoading}
       items={notes}
       placeholder={<Placeholder context="notes" />}
       button={{

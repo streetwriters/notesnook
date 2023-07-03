@@ -32,7 +32,7 @@ import { NEWLINE_STRIP_REGEX, formatTitle } from "../utils/title-format";
 export default class Notes extends Collection {
   constructor(db, name, cached) {
     super(db, name, cached);
-    this.topicReferences = new NoteIdCache(this._db);
+    this.topicReferences = new NoteIdCache(this);
   }
 
   async init() {
@@ -440,16 +440,16 @@ function getNoteHeadline(note, content) {
 class NoteIdCache {
   /**
    *
-   * @param {import("../api/index").default} db
+   * @param {Notes} notes
    */
-  constructor(db) {
-    this._db = db;
+  constructor(notes) {
+    this.notes = notes;
     this.cache = new Map();
   }
 
   rebuild() {
     this.cache = new Map();
-    const notes = this._db.notes.all;
+    const notes = this.notes.all;
 
     for (const note of notes) {
       const { notebooks } = note;

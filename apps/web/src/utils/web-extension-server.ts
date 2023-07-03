@@ -41,8 +41,6 @@ export class WebExtensionServer implements Server {
   }
 
   async getNotes(): Promise<ItemReference[] | undefined> {
-    await db.notes?.init();
-
     return db.notes?.all
       .filter((n) => !n.locked)
       .map((note) => ({ id: note.id, title: note.title }));
