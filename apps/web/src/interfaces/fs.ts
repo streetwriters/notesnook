@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import "web-streams-polyfill/dist/ponyfill";
-import localforage from "localforage";
 import { xxhash64, createXXHash64 } from "hash-wasm";
 import axios, { AxiosProgressEvent } from "axios";
 import { AppEventManager, AppEvents } from "../common/app-events";
@@ -37,6 +36,7 @@ import { Base64DecoderStream } from "../utils/streams/base64-decoder-stream";
 import { toBlob } from "@notesnook-importer/core/dist/src/utils/stream";
 import { Cipher, OutputFormat, SerializedKey } from "@notesnook/crypto";
 import { IDataType } from "hash-wasm/dist/lib/util";
+import { IndexedDBKVStore } from "./key-value";
 
 const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
@@ -53,7 +53,7 @@ async function writeEncryptedFile(
 ) {
   const crypto = await getNNCrypto();
 
-  if (!localforage.supports(localforage.INDEXEDDB))
+  if (!IndexedDBKVStore.isIndexedDBSupported())
     throw new Error("This browser does not support IndexedDB.");
 
   if (await streamablefs.exists(hash)) await streamablefs.deleteFile(hash);
