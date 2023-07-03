@@ -93,12 +93,13 @@ if (existsSync(sodiumNativePrebuildPath("arm64"))) {
 }
 
 if (argv.run) {
+  await exec(`npx electron-builder --dir --x64`);
   if (process.platform === "win32") {
-    await exec(`npx electron-builder --win --x64`);
-    // await exec(`.\\output\\notesnook_win_x64_portable.exe`);
+    await exec(`.\\output\\win-unpacked\\Notesnook.exe`);
+  } else if (process.platform === "darwin") {
+    await exec(`./output/darwin-unpacked/Notesnook`);
   } else {
-    await exec(`npx electron-builder --linux AppImage:x64`);
-    await exec(`./output/notesnook_linux_x86_64.AppImage`);
+    await exec(`./output/linux-unpacked/Notesnook`);
   }
 }
 
