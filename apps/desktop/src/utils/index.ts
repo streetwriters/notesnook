@@ -18,13 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { app } from "electron";
-import { join } from "path";
 import { existsSync } from "fs";
-
-export const APP_ICON_PATH = join(
-  __dirname,
-  process.platform === "win32" ? "app.ico" : "favicon-72x72.png"
-);
 
 export function isDevelopment() {
   return process.env.ELECTRON_IS_DEV
