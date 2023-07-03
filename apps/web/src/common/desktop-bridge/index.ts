@@ -17,11 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { type desktop as bridge } from "./bridge";
+import { type desktop as bridge } from "./index.desktop";
 
-export const desktop: typeof bridge | undefined =
-  import.meta.env.REACT_APP_PLATFORM === "desktop"
-    ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      (await import("./bridge")).desktop
-    : undefined;
+export const desktop: typeof bridge | undefined = undefined;
