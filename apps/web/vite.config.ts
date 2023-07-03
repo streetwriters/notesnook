@@ -22,8 +22,6 @@ import react from "@vitejs/plugin-react-swc";
 import svgrPlugin from "vite-plugin-svgr";
 import envCompatible from "vite-plugin-env-compatible";
 import { VitePWA, ManifestOptions } from "vite-plugin-pwa";
-import path from "path";
-import topLevelAwait from "vite-plugin-top-level-await";
 import autoprefixer from "autoprefixer";
 
 const WEB_MANIFEST: Partial<ManifestOptions> = {
@@ -149,6 +147,7 @@ const isDesktop = process.env.REACT_APP_PLATFORM === "desktop";
 export default defineConfig({
   envPrefix: "REACT_APP_",
   build: {
+    target: isDesktop ? "esnext" : "modules",
     outDir: "build",
     minify: "esbuild",
     cssMinify: true,
@@ -157,16 +156,16 @@ export default defineConfig({
   },
   logLevel: process.env.NODE_ENV === "production" ? "warn" : "info",
   resolve: {
-    alias: {
-      react: path.resolve(path.join(__dirname, "node_modules", "react")),
-      "react-dom": path.resolve(
-        path.join(__dirname, "node_modules", "react-dom")
-      ),
-      "@mdi/js": path.resolve(path.join(__dirname, "node_modules", "@mdi/js")),
-      "@mdi/react": path.resolve(
-        path.join(__dirname, "node_modules", "@mdi/react")
-      )
-    }
+    dedupe: ["react", "react-dom", "@mdi/js", "@mdi/react", "@emotion/react"],
+
+    alias: [
+      {
+        find: /desktop-bridge/gm,
+        replacement: isDesktop
+          ? "desktop-bridge/index.desktop"
+          : "desktop-bridge/index"
+      }
+    ]
   },
   server: {
     port: 3000
@@ -181,14 +180,7 @@ export default defineConfig({
   },
   plugins: [
     ...(isDesktop && process.env.NODE_ENV === "production"
-      ? [
-          topLevelAwait({
-            // The export name of top-level await promise for each chunk module
-            promiseExportName: "__tla",
-            // The function to generate import names of top-level await promise in each chunk module
-            promiseImportName: (i) => `__tla_${i}`
-          })
-        ]
+      ? []
       : [
           VitePWA({
             strategies: "injectManifest",
