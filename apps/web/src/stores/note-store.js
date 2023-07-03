@@ -89,10 +89,8 @@ class NoteStore extends BaseStore {
   };
 
   setContext = (context) => {
-    db.notes.init().then(() => {
-      this.get().context = { ...context, notes: notesFromContext(context) };
-      this._forceUpdate();
-    });
+    this.get().context = { ...context, notes: notesFromContext(context) };
+    this._forceUpdate();
   };
 
   delete = async (...ids) => {

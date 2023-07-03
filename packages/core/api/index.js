@@ -80,6 +80,23 @@ class Database {
     this.storage = storage ? new Storage(storage) : null;
     this.fs = fs && storage ? new FileStorage(fs, storage) : null;
     NNEventSource = eventsource;
+
+    this.session = new Session(this.storage);
+    this.user = new UserManager(this.storage, this);
+    this.mfa = new MFAManager(this.storage, this);
+    this.syncer = new Sync(this);
+    this.vault = new Vault(this);
+    this.lookup = new Lookup(this);
+    this.backup = new Backup(this);
+    this.settings = new Settings(this);
+    this.migrations = new Migrations(this);
+    this.outbox = new Outbox(this);
+    this.monographs = new Monographs(this);
+    this.offers = new Offers();
+    this.debug = new Debug();
+    this.pricing = new Pricing();
+    this.subscriptions = new Subscriptions(this.user.tokenManager);
+    this.trash = new Trash(this);
   }
 
   async _validate() {
@@ -105,40 +122,12 @@ class Database {
       await this.fs.clear();
       this.disconnectSSE();
     });
-    EV.subscribe(EVENTS.databaseCollectionInitiated, async (collectionName) => {
-      switch (collectionName) {
-        case "notes": {
-          await this.monographs.init();
-          await this.trash.init();
-          await this.relations.cleanup();
-          break;
-        }
-      }
-    });
 
-    this.session = new Session(this.storage);
     await this._validate();
-
-    this.user = new UserManager(this.storage, this);
-    this.mfa = new MFAManager(this.storage, this);
-    this.syncer = new Sync(this);
-    this.vault = new Vault(this);
-    this.lookup = new Lookup(this);
-    this.backup = new Backup(this);
-    this.settings = new Settings(this);
-    this.migrations = new Migrations(this);
-    this.outbox = new Outbox(this);
-    this.monographs = new Monographs(this);
-    this.offers = new Offers();
-    this.debug = new Debug();
-    this.pricing = new Pricing();
-    this.subscriptions = new Subscriptions(this.user.tokenManager);
 
     await this.initCollections();
 
-    await this.settings.init();
     await this.outbox.init();
-    await this.user.init();
     await this.migrations.init();
     this.isInitialized = true;
     if (this.migrations.required()) {
@@ -147,9 +136,8 @@ class Database {
   }
 
   async initCollections() {
+    await this.settings.init();
     // collections
-    /** @type {Notes} */
-    this.notes = await Notes.new(this, "notes", true, true);
     /** @type {Notebooks} */
     this.notebooks = await Notebooks.new(this, "notebooks");
     /** @type {Tags} */
@@ -168,8 +156,13 @@ class Database {
     this.reminders = await Reminders.new(this, "reminders");
     /**@type {Relations} */
     this.relations = await Relations.new(this, "relations");
+    /** @type {Notes} */
+    this.notes = await Notes.new(this, "notes");
 
-    this.trash = new Trash(this);
+    await this.trash.init();
+    await this.relations.cleanup();
+
+    this.monographs.init().catch(console.error);
   }
 
   disconnectSSE() {

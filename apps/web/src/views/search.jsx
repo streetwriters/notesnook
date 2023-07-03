@@ -37,7 +37,6 @@ async function typeToItems(type, context) {
       return ["notes", notes];
     }
     case "notes": {
-      await db.notes.init();
       if (!context) return ["notes", db.notes.all];
       const notes = context.notes;
       let topicNotes = [];

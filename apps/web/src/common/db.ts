@@ -64,9 +64,6 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   // });
   // }
 
-  // db.eventManager.subscribe(EVENTS.databaseMigrating, async ({ from, to }) => {
-
-  // });
 
   await db.init();
 

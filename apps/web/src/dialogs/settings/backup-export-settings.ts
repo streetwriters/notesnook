@@ -165,7 +165,6 @@ export const BackupExportSettings: SettingsGroup[] = [
             onSelectionChanged: async (value) => {
               if (!db.notes || value === "-") return;
 
-              await db.notes.init();
               await exportNotes(
                 value as "txt" | "md" | "html",
                 db.notes.all.map((n) => n.id)

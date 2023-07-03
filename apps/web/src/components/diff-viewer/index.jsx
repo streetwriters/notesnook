@@ -92,7 +92,6 @@ function DiffViewer(props) {
 
   useEffect(() => {
     (async function () {
-      await db.notes.init();
       let note = db.notes.note(noteId);
       if (!note) {
         hashNavigate(`/notes/create`, { replace: true });
