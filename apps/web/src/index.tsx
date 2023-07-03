@@ -26,6 +26,7 @@ import Config from "./utils/config";
 import { isTesting } from "./utils/platform";
 import { initalizeLogger, logger } from "./utils/logger";
 import { AuthProps } from "./views/auth";
+import { loadDatabase } from "./hooks/use-database";
 
 initalizeLogger();
 
@@ -155,6 +156,8 @@ async function renderApp() {
   } = getRoute();
 
   if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
+  if (import.meta.env.REACT_APP_PLATFORM === "desktop")
+    await loadDatabase("db");
 
   logger.measure("app render");
 
@@ -171,13 +174,13 @@ async function renderApp() {
 }
 
 async function initializeServiceWorker() {
-  logger.info("Initializing service worker...");
-  const serviceWorker = await import("./service-worker-registration");
-
-  // If you want your app to work offline and load faster, you can change
-  // unregister() to register() below. Note this comes with some pitfalls.
-  // Learn more about service workers: https://bit.ly/CRA-PWA
   if (import.meta.env.REACT_APP_PLATFORM !== "desktop") {
+    logger.info("Initializing service worker...");
+    const serviceWorker = await import("./service-worker-registration");
+
+    // If you want your app to work offline and load faster, you can change
+    // unregister() to register() below. Note this comes with some pitfalls.
+    // Learn more about service workers: https://bit.ly/CRA-PWA
     serviceWorker.register({
       onUpdate: async (registration: ServiceWorkerRegistration) => {
         if (!registration.waiting) return;
@@ -191,7 +194,7 @@ async function initializeServiceWorker() {
       }
     });
     // window.addEventListener("beforeinstallprompt", () => showInstallNotice());
-  } else serviceWorker.unregister();
+  }
 }
 
 function shouldSkipInitiation() {
