@@ -33,14 +33,6 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   const { Compressor } = await import("../utils/compressor");
   db = database;
 
-  database.setup(
-    new NNStorage("Notesnook", persistence),
-    EventSource,
-    FS,
-    new Compressor()
-  );
-
-  // if (isTesting()) {
   db.host({
     API_HOST: "https://api.notesnook.com",
     AUTH_HOST: "https://auth.streetwriters.co",
@@ -48,6 +40,15 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     ISSUES_HOST: "https://issues.streetwriters.co",
     SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co"
   });
+
+  database.setup(
+    new NNStorage("Notesnook", persistence),
+    EventSource,
+    FS,
+    new Compressor()
+  );
+  // if (isTesting()) {
+
   // } else {
   // db.host({
   //   API_HOST: "http://localhost:5264",
@@ -63,7 +64,6 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   //   SUBSCRIPTIONS_HOST: `${base}:9264`
   // });
   // }
-
 
   await db.init();
 
