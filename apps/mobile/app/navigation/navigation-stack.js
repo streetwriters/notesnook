@@ -188,7 +188,7 @@ const Tabs = React.memo(_Tabs, () => true);
 
 const _NavigationStack = () => {
   const clearSelection = useSelectionStore((state) => state.clearSelection);
-
+  const loading = useNoteStore((state) => state.loading);
   const onStateChange = React.useCallback(() => {
     if (useSelectionStore.getState().selectionMode) {
       clearSelection(true);
@@ -202,7 +202,7 @@ const _NavigationStack = () => {
       <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
         <Tabs />
       </NavigationContainer>
-      <TopicsSheet />
+      {loading ? null : <TopicsSheet />}
     </Container>
   );
 };
