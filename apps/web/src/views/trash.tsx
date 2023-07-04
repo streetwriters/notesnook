@@ -39,9 +39,6 @@ function Trash() {
       placeholder={<Placeholder context="trash" />}
       items={items}
       button={{
-        show: !!items.length,
-        content: "Clear Trash",
-        icon: TrashIcon,
         onClick: function () {
           confirm({
             title: "Clear Trash",
@@ -55,10 +52,11 @@ function Trash() {
                 await clearTrash();
                 showToast("success", "Trash cleared successfully!");
               } catch (e) {
-                showToast(
-                  "error",
-                  `Could not clear trash. Error: ${e.message}`
-                );
+                if (e instanceof Error)
+                  showToast(
+                    "error",
+                    `Could not clear trash. Error: ${e.message}`
+                  );
               }
             }
           });

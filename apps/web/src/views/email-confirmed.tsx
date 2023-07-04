@@ -96,7 +96,7 @@ function EmailConfirmed() {
           p={5}
           sx={{ flexDirection: "column", justifyContent: "center" }}
         >
-          <BlogPromoBanner link="https://blog.notesnook.com/why-another-note-taking-app/" />
+          <BlogPromoBanner />
         </Flex>
       </Flex>
     </ThemeProvider>
@@ -152,7 +152,6 @@ function BlogPromoBanner() {
         {social.map((account) => (
           <account.icon
             key={account.title}
-            hoverColor={account.hoverColor}
             title={account.title}
             onClick={() => {
               window.open(account.link, "_blank");

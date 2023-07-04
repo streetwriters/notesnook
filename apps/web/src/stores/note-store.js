@@ -34,6 +34,9 @@ import { groupArray } from "@notesnook/core/utils/grouping";
  */
 class NoteStore extends BaseStore {
   notes = [];
+  /**
+   * @type {{ type: "tag" | "color" | "notebook" | "topic" | "favorite" | "monographs", notes: any[] } | undefined}
+   */
   context = undefined;
   selectedNote = 0;
   nonce = 0;

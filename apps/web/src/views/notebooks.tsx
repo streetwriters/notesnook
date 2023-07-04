@@ -37,7 +37,6 @@ function Notebooks() {
         items={notebooks}
         placeholder={<Placeholder context="notebooks" />}
         button={{
-          content: "Create a notebook",
           onClick: () => hashNavigate("/notebooks/create")
         }}
       />

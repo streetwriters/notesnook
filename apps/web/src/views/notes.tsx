@@ -45,7 +45,7 @@ function Notes() {
       refresh={refreshContext}
       compact={isCompact}
       context={{ ...context, notes: undefined }}
-      items={groupArray(context.notes, db.settings.getGroupOptions(type))}
+      items={groupArray(context.notes, db.settings?.getGroupOptions(type))}
       placeholder={
         <Placeholder
           context={
@@ -58,7 +58,6 @@ function Notes() {
         />
       }
       button={{
-        content: "Make a new note",
         onClick: () =>
           hashNavigate("/notes/create", { addNonce: true, replace: true })
       }}
