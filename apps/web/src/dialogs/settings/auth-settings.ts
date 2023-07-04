@@ -22,8 +22,11 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { verifyAccount } from "../../common";
 import {
   show2FARecoveryCodesDialog,
-  showMultifactorDialog
+  showMultifactorDialog,
+  showPasswordDialog
 } from "../../common/dialog-controller";
+import { db } from "../../common/db";
+import { showToast } from "../../utils/toast";
 
 export const AuthenticationSettings: SettingsGroup[] = [
   {
@@ -41,7 +44,21 @@ export const AuthenticationSettings: SettingsGroup[] = [
             type: "button",
             title: "Change password",
             variant: "secondary",
-            action: () => {}
+            action: async () => {
+              const result = await showPasswordDialog(
+                "change_account_password",
+                async (data) => {
+                  await db.user?.clearSessions();
+                  return (
+                    db.user?.changePassword(
+                      data.oldPassword,
+                      data.newPassword
+                    ) || false
+                  );
+                }
+              );
+              if (result) showToast("success", "Account password changed!");
+            }
           }
         ]
       }

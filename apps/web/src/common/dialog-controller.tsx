@@ -430,7 +430,13 @@ function getDialogData(type: string) {
 
 export function showPasswordDialog(
   type: string,
-  validate: ({ password }: { password: string }) => boolean | Promise<boolean>
+  validate: ({
+    password
+  }: {
+    password?: string;
+    oldPassword?: string;
+    newPassword?: string;
+  }) => boolean | Promise<boolean>
 ) {
   const { title, subtitle, positiveButtonText, checks } = getDialogData(type);
   return showDialog("PasswordDialog", (Dialog, perform) => (
