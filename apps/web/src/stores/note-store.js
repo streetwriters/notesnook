@@ -44,15 +44,6 @@ class NoteStore extends BaseStore {
     Config.set("notes:viewMode", viewMode);
   };
 
-  init = () => {
-    EV.subscribe(EVENTS.noteRemoved, (id) => {
-      const { session } = editorStore.get();
-      if (session.id === id) {
-        hashNavigate("/notes/create", { addNonce: true });
-      }
-    });
-  };
-
   setSelectedNote = (id) => {
     if (!id) selectionStore.get().toggleSelectionMode(false);
     this.set((state) => (state.selectedNote = id));

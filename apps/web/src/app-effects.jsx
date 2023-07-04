@@ -54,7 +54,6 @@ export default function AppEffects({ setShow }) {
   const addReminder = useStore((store) => store.addReminder);
   const initUser = useUserStore((store) => store.init);
   const initStore = useStore((store) => store.init);
-  const initNotes = useNotesStore((store) => store.init);
   const initAttachments = useAttachmentStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
   const setTheme = useThemeStore((store) => store.setTheme);
@@ -86,7 +85,6 @@ export default function AppEffects({ setShow }) {
       initStore();
       initAttachments();
       refreshNavItems();
-      initNotes();
       initEditorStore();
 
       (async function () {
