@@ -562,20 +562,6 @@ export const useAppEvents = () => {
     }
   }
 
-  const loadNotes = useCallback(async () => {
-    if (appLocked) return;
-
-    setImmediate(() => {
-      db.notes.init().then(() => {
-        Walkthrough.init();
-        initialize();
-        setImmediate(() => {
-          setLoading(false);
-        });
-      });
-    });
-  }, [setLoading, appLocked]);
-
   const IsDatabaseMigrationRequired = useCallback(() => {
     if (!db.migrations.required() || appLocked) return false;
 
@@ -585,12 +571,13 @@ export const useAppEvents = () => {
         if (!db.isInitialized) {
           await db.init();
         }
-        loadNotes();
+        initialize();
+        setLoading(false);
       },
       disableClosing: true
     });
     return true;
-  }, [appLocked, loadNotes]);
+  }, [appLocked]);
 
   useEffect(() => {
     if (!loading) {
@@ -608,8 +595,10 @@ export const useAppEvents = () => {
       await db.init();
     }
     if (IsDatabaseMigrationRequired()) return;
-    loadNotes();
-  }, [IsDatabaseMigrationRequired, loadNotes]);
+    initialize();
+    setLoading(false);
+    Walkthrough.init();
+  }, [IsDatabaseMigrationRequired]);
 
   useEffect(() => {
     let sub;

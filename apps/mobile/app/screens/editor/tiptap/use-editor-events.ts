@@ -62,6 +62,7 @@ import { useDragState } from "../../settings/editor/state";
 import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { EditorEvents, editorState } from "./utils";
+import { useNoteStore } from "../../../stores/use-notes-store";
 
 const publishNote = async (editor: useEditorType) => {
   const user = useUserStore.getState().user;
@@ -130,6 +131,7 @@ export const useEditorEvents = (
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const corsProxy = useSettingStore((state) => state.settings.corsProxy);
+  const loading = useNoteStore((state) => state.loading);
   const [dateFormat, timeFormat] = useSettingStore((state) => [
     state.dateFormat,
     state.timeFormat
@@ -168,6 +170,7 @@ export const useEditorEvents = (
   }, [editor.commands, editor.postMessage]);
 
   useEffect(() => {
+    if (loading) return;
     editor.commands.setSettings({
       deviceMode: deviceMode || "mobile",
       fullscreen: fullscreen || false,
@@ -200,7 +203,8 @@ export const useEditorEvents = (
     defaultFontSize,
     defaultFontFamily,
     dateFormat,
-    timeFormat
+    timeFormat,
+    loading
   ]);
 
   const onBackPress = useCallback(async () => {
