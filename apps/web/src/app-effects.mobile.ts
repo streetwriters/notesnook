@@ -23,7 +23,16 @@ import useSlider from "./hooks/use-slider";
 import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
 
-export default function MobileAppEffects({ sliderId, overlayId, setShow }) {
+type MobileAppEffectsProps = {
+  sliderId: string;
+  overlayId: string;
+  setShow: (show: boolean) => void;
+};
+export default function MobileAppEffects({
+  sliderId,
+  overlayId,
+  setShow
+}: MobileAppEffectsProps) {
   const isMobile = useMobile();
   const isTablet = useTablet();
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
@@ -40,6 +49,7 @@ export default function MobileAppEffects({ sliderId, overlayId, setShow }) {
 
       const percent = offset - (position / width) * offset;
       const overlay = document.getElementById("overlay");
+      if (!overlay) return;
       if (percent > 0) {
         overlay.style.opacity = `${percent}%`;
         overlay.style.pointerEvents = "all";
@@ -74,6 +84,7 @@ export default function MobileAppEffects({ sliderId, overlayId, setShow }) {
   useEffect(() => {
     if (!overlayId) return;
     const overlay = document.getElementById(overlayId);
+    if (!overlay) return;
     overlay.onclick = () => toggleSideMenu(false);
     return () => {
       overlay.onclick = null;

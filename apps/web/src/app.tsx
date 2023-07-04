@@ -24,7 +24,7 @@ import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
 import { LazyMotion, domAnimation } from "framer-motion";
 import useDatabase from "./hooks/use-database";
-import { Allotment, LayoutPriority } from "allotment";
+import { Allotment, AllotmentHandle, LayoutPriority } from "allotment";
 import { useStore } from "./stores/app-store";
 import { Toaster } from "react-hot-toast";
 import { ViewLoader } from "./components/loaders/view-loader";
@@ -38,8 +38,8 @@ import { usePersistentState } from "./hooks/use-persistent-state";
 
 new WebExtensionRelay();
 
-const GlobalMenuWrapper = React.lazy(() =>
-  import("./components/global-menu-wrapper")
+const GlobalMenuWrapper = React.lazy(
+  () => import("./components/global-menu-wrapper")
 );
 const AppEffects = React.lazy(() => import("./app-effects"));
 const MobileAppEffects = React.lazy(() => import("./app-effects.mobile"));
@@ -91,9 +91,25 @@ function App() {
 
 export default App;
 
-function SuspenseLoader({ condition, props, component: Component, fallback }) {
+type SuspenseLoaderProps<TComponent extends React.JSXElementConstructor<any>> =
+  {
+    condition: boolean;
+    props?: React.ComponentProps<TComponent>;
+    component: TComponent;
+    fallback: JSX.Element;
+  };
+
+function SuspenseLoader<TComponent extends React.JSXElementConstructor<any>>({
+  condition,
+  props,
+  component,
+  fallback
+}: SuspenseLoaderProps<TComponent>) {
   if (!condition) return fallback;
 
+  const Component = component as (
+    props: any
+  ) => React.ReactComponentElement<any, any>;
   return (
     <Suspense
       fallback={
@@ -105,14 +121,23 @@ function SuspenseLoader({ condition, props, component: Component, fallback }) {
   );
 }
 
-function DesktopAppContents({ isAppLoaded, show, setShow }) {
+type DesktopAppContentsProps = {
+  isAppLoaded: boolean;
+  show: boolean;
+  setShow: (show: boolean) => void;
+};
+function DesktopAppContents({
+  isAppLoaded,
+  show,
+  setShow
+}: DesktopAppContentsProps) {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isTablet = useTablet();
   const [paneSizes, setPaneSizes] = usePersistentState("paneSizes", [
     isTablet ? 60 : 180,
     isTablet ? 240 : 380
   ]);
-  const panesRef = useRef();
+  const panesRef = useRef<AllotmentHandle>(null);
   const [isNarrow, setIsNarrow] = useState(paneSizes[0] <= 55);
 
   return (
@@ -184,7 +209,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
   );
 }
 
-function MobileAppContents({ isAppLoaded }) {
+function MobileAppContents({ isAppLoaded }: { isAppLoaded: boolean }) {
   return (
     <FlexScrollContainer
       id="slider"

@@ -72,9 +72,6 @@ class AnnouncementStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<AnnouncementStore>, AnnouncementStore]}
- */
 const [useStore, store] = createStore(AnnouncementStore);
 export { useStore, store };
 

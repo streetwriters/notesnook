@@ -648,7 +648,7 @@ export function showSettings() {
   ));
 }
 
-export function showOnboardingDialog(type: string) {
+export function showOnboardingDialog(type?: string) {
   if (!type) return;
   return showDialog("OnboardingDialog", (Dialog, perform) => (
     <Dialog type={type} onClose={(res: boolean) => perform(res)} />

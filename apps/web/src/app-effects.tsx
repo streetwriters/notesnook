@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useEffect } from "react";
 import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
-import { useStore as useNotesStore } from "./stores/note-store";
 import { useStore as useThemeStore } from "./stores/theme-store";
 import { useStore as useAttachmentStore } from "./stores/attachment-store";
 import { useStore as useEditorStore } from "./stores/editor-store";
@@ -47,11 +46,13 @@ import { interruptedOnboarding } from "./dialogs/onboarding-dialog";
 import { hashNavigate } from "./navigation";
 import { desktop } from "./common/desktop-bridge";
 
-export default function AppEffects({ setShow }) {
+type AppEffectsProps = {
+  setShow: (show: boolean) => void;
+};
+export default function AppEffects({ setShow }: AppEffectsProps) {
   const refreshNavItems = useStore((store) => store.refreshNavItems);
   const updateLastSynced = useStore((store) => store.updateLastSynced);
   const isFocusMode = useStore((store) => store.isFocusMode);
-  const addReminder = useStore((store) => store.addReminder);
   const initUser = useUserStore((store) => store.init);
   const initStore = useStore((store) => store.init);
   const initAttachments = useAttachmentStore((store) => store.init);
@@ -68,7 +69,7 @@ export default function AppEffects({ setShow }) {
     function initializeApp() {
       const userCheckStatusEvent = EV.subscribe(
         EVENTS.userCheckStatus,
-        async (type) => {
+        async (type: string) => {
           if (isUserPremium()) {
             return { type, result: true };
           } else {
@@ -93,7 +94,7 @@ export default function AppEffects({ setShow }) {
           showUpgradeReminderDialogs();
         }
         await resetReminders();
-        setIsVaultCreated(await db.vault.exists());
+        setIsVaultCreated(await db.vault?.exists());
 
         await showOnboardingDialog(interruptedOnboarding());
         await showFeatureDialog("highlights");
@@ -111,23 +112,29 @@ export default function AppEffects({ setShow }) {
       updateLastSynced,
       refreshNavItems,
       initUser,
-      initNotes,
-      addReminder,
       setIsVaultCreated
     ]
   );
 
   useEffect(() => {
-    const systemTimeInvalidEvent = EV.subscribe(
-      EVENTS.systemTimeInvalid,
-      async ({ serverTime, localTime }) => {
-        await showInvalidSystemTimeDialog({ serverTime, localTime });
-      }
-    );
+    // const systemTimeInvalidEvent = EV.subscribe(
+    //   EVENTS.systemTimeInvalid,
+    //   async ({ serverTime, localTime }) => {
+    //     await showInvalidSystemTimeDialog({ serverTime, localTime });
+    //   }
+    // );
 
     const attachmentsLoadingEvent = EV.subscribe(
       EVENTS.attachmentsLoading,
-      ({ type, total, current }) => {
+      ({
+        type,
+        total,
+        current
+      }: {
+        type: ProcessingType;
+        total: number;
+        current: number;
+      }) => {
         const [key, status] = getProcessingStatusFromType(type);
 
         if (current === total) {
@@ -144,7 +151,15 @@ export default function AppEffects({ setShow }) {
 
     const progressEvent = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
-      ({ type, total, loaded }) => {
+      ({
+        type,
+        total,
+        loaded
+      }: {
+        type: ProcessingType;
+        total: number;
+        loaded: number;
+      }) => {
         const [key, status] = getProcessingStatusFromType(type);
         if (!key) return;
 
@@ -167,7 +182,7 @@ export default function AppEffects({ setShow }) {
     return () => {
       attachmentsLoadingEvent.unsubscribe();
       progressEvent.unsubscribe();
-      systemTimeInvalidEvent.unsubscribe();
+      //  systemTimeInvalidEvent.unsubscribe();
     };
   }, []);
 
@@ -221,7 +236,8 @@ export default function AppEffects({ setShow }) {
   return <React.Fragment />;
 }
 
-function getProcessingStatusFromType(type) {
+type ProcessingType = "download" | "upload" | "encrypt";
+function getProcessingStatusFromType(type: ProcessingType) {
   switch (type) {
     case "download":
       return ["downloadingAttachments", "Downloading"];
@@ -230,6 +246,6 @@ function getProcessingStatusFromType(type) {
     case "encrypt":
       return ["encryptingAttachments", "Encrypting"];
     default:
-      return undefined;
+      return [];
   }
 }

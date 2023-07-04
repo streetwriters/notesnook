@@ -33,11 +33,6 @@ const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
   (document.getElementById("p")?.clientHeight || 16) - 1;
 export const DEFAULT_ITEM_HEIGHT = SINGLE_LINE_HEIGHT * 2 * DEFAULT_LINE_HEIGHT;
-// const MAX_HEIGHTS = {
-//   note: SINGLE_LINE_HEIGHT * 7 * DEFAULT_LINE_HEIGHT,
-//   notebook: SINGLE_LINE_HEIGHT * 7 * DEFAULT_LINE_HEIGHT,
-//   generic: SINGLE_LINE_HEIGHT * 4 * DEFAULT_LINE_HEIGHT
-// };
 
 export type Item = { id: string; type: string; title: string } & Record<
   string,

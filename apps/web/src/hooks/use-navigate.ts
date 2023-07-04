@@ -20,14 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect } from "react";
 import { NavigationEvents } from "../navigation";
 
-function useNavigate(routeKey, onNavigation) {
+function useNavigate(routeKey: string, onNavigation: () => void) {
   useEffect(() => {
     onNavigation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    function onNavigate(route) {
+    function onNavigate(route: { key: string }) {
       if (route?.key === routeKey) {
         onNavigation();
       }
