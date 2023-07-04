@@ -31,7 +31,7 @@
     "@react-pdf-viewer/toolbar": "^3.12.0",
     "@theme-ui/components": "^0.14.7",
     "@theme-ui/core": "^0.14.7",
-    "@trpc/client": "^10.31.0",
+    "@trpc/client": "10.31.0",
     "allotment": "^1.19.0",
     "axios": "^1.3.4",
     "clipboard-polyfill": "^3.0.3",
