@@ -85,7 +85,8 @@ export default class Attachments extends Collection {
       ...oldAttachment,
       ...oldAttachment.metadata,
       ...attachmentArg,
-      noteIds
+      noteIds,
+      key: attachmentArg.key || oldAttachment.key
     };
 
     const {
