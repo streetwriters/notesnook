@@ -317,7 +317,11 @@ class AppStore extends BaseStore {
         this.updateSyncStatus("failed");
       }
 
-      if (err?.message?.indexOf("Failed to fetch") > -1) return;
+      if (
+        err?.message?.indexOf("Failed to fetch") > -1 ||
+        err?.message?.indexOf("Could not connect to the Sync server.") > -1
+      )
+        return;
 
       showToast("error", err.message);
     }
