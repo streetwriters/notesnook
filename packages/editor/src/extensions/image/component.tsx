@@ -99,7 +99,7 @@ export function ImageComponent(
     [src, dataurl, imageRef, downloadOptions]
   );
 
-  if (source) IMAGE_SOURCE_CACHE[hash] = source;
+  if (source && hash) IMAGE_SOURCE_CACHE[hash] = source;
   const relativeHeight = aspectRatio
     ? editor.view.dom.clientWidth / aspectRatio
     : undefined;
