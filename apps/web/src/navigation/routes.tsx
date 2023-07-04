@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { db } from "../common/db";
-import Home from "../views/home";
+import AllNotes from "../views/all-notes";
 import Notebooks from "../views/notebooks";
 import Notes from "../views/notes";
 import Search from "../views/search";
@@ -52,7 +52,7 @@ const routes = defineRoutes({
       key: "home",
       type: "notes",
       title: "Notes",
-      component: Home,
+      component: AllNotes,
       buttons: {
         create: CREATE_BUTTON_MAP.notes,
         search: {

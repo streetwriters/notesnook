@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
-import { useStore, store } from "../stores/note-store";
+import React, { useEffect } from "react";
+import { useStore } from "../stores/note-store";
 import ListContainer from "../components/list-container";
-import { db } from "../common/db";
 import { hashNavigate } from "../navigation";
 import useNavigate from "../hooks/use-navigate";
 import Placeholder from "../components/placeholders";
@@ -36,23 +35,16 @@ function Home() {
 
   useEffect(() => {
     (async function () {
-      const initialized = db.notes.initialized;
-      if (!initialized || !notes.length) {
-        store.refresh();
-      }
       // const note = db.notes.note("62bc3f28a1a1a10000707077").data;
       // const data = await db.content.raw(note.contentId);
-
       // const note2 = db.notes.note("62bc3f1ca1a1a10000707075").data;
       // const data2 = await db.content.raw(note2.contentId);
-
       // const data3 = { ...data, conflicted: data2 };
-
       // await db.content.add(data3);
       // await db.notes.add({ id: note.id, conflicted: true, resolved: false });
       // console.log(data3);
     })();
-  }, [notes.length]);
+  }, []);
 
   return (
     <ListContainer
@@ -63,7 +55,6 @@ function Home() {
       items={notes}
       placeholder={<Placeholder context="notes" />}
       button={{
-        content: "Make a new note",
         onClick: () =>
           hashNavigate("/notes/create", { replace: true, addNonce: true })
       }}
