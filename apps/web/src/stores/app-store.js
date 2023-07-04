@@ -287,8 +287,13 @@ class AppStore extends BaseStore {
   };
 
   sync = async (full = true, force = false) => {
-    if (!this.get().isSyncEnabled || !navigator.onLine) return;
-    if (this.isSyncing()) return;
+    if (
+      this.isSyncing() ||
+      !this.get().isSyncEnabled ||
+      !navigator.onLine ||
+      !(await networkCheck.waitForInternet())
+    )
+      return;
 
     clearTimeout(syncStatusTimeout);
     this.updateLastSynced();
