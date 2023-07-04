@@ -12,10 +12,10 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@notesnook/crypto": "*",
-    "@trpc/client": "^10.29.1",
-    "@trpc/server": "^10.29.1",
+    "@trpc/client": "10.31.0",
+    "@trpc/server": "10.31.0",
     "diary": "^0.3.1",
-    "electron-trpc": "^0.5.2",
+    "electron-trpc": "0.5.2",
     "electron-updater": "^5.3.0",
     "icojs": "^0.17.1",
     "typed-emitter": "^2.1.0",
