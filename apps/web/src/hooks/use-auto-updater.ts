@@ -18,10 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import {
-  showUpdateAvailableNotice,
-  showUpdateReadyNotice
-} from "../common/dialog-controller";
 import { isDesktop } from "../utils/platform";
 import { checkForUpdate } from "../utils/updater";
 import { AppEventManager, AppEvents } from "../common/app-events";
@@ -58,9 +54,6 @@ export function useAutoUpdater() {
         type: "available",
         version: info.version
       });
-      showUpdateAvailableNotice({
-        version: info.version
-      });
     }
 
     function updateNotAvailable() {
@@ -70,7 +63,6 @@ export function useAutoUpdater() {
 
     function updateDownloadCompleted(info: { version: string }) {
       changeStatus({ type: "completed", version: info.version });
-      showUpdateReadyNotice({ version: info.version });
     }
 
     function updateDownloadProgress(progressInfo: { percent: number }) {
