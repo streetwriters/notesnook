@@ -237,7 +237,7 @@ function ListContainer(props: ListContainerProps) {
           sx={{
             position: "absolute",
             bottom: 0,
-            display: ["block", "block", "none"],
+            display: ["block", "none", "none"],
             alignSelf: "end",
             borderRadius: 100,
             p: 0,
