@@ -161,7 +161,7 @@ export const useSettingStore = create<SettingStore>((set) => ({
   settings: { ...defaultSettings },
   sheetKeyboardHandler: true,
   fullscreen: false,
-  deviceMode: "mobile",
+  deviceMode: null,
   dimensions: { width, height },
   appLoading: true,
   setSettings: (settings) => set({ settings }),
