@@ -77,6 +77,26 @@ export const AuthenticationSettings: SettingsGroup[] = [
         components: []
       },
       {
+        key: "primary-2fa-method",
+        title: "Primary method",
+        keywords: ["primary 2fa method"],
+        onStateChange: (listener) =>
+          useUserStore.subscribe((s) => s.user?.mfa.primaryMethod, listener),
+        components: [
+          {
+            type: "button",
+            title: "Change",
+            action: async () => {
+              if (await verifyAccount()) {
+                await showMultifactorDialog();
+                await useUserStore.getState().refreshUser();
+              }
+            },
+            variant: "primary"
+          }
+        ]
+      },
+      {
         key: "fallback-2fa-method",
         title: "Fallback method",
         description:
