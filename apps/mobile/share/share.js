@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import ShareExtension from "@ammarahmed/react-native-share-extension";
 import { getPreviewData } from "@flyerhq/react-native-link-preview";
+import { formatBytes } from "@notesnook/common";
+import { isImage } from "@notesnook/core/utils/filename";
 import { parseHTML } from "@notesnook/core/utils/html-parser";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -34,27 +37,23 @@ import {
   View,
   useWindowDimensions
 } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 import {
   SafeAreaProvider,
   useSafeAreaInsets
 } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import ShareExtension from "@ammarahmed/react-native-share-extension";
 import isURL from "validator/lib/isURL";
 import { db } from "../app/common/database";
-import { MMKV } from "../app/common/database/mmkv";
 import Storage from "../app/common/database/storage";
 import { eSendEvent } from "../app/services/event-manager";
+import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../app/utils/constants";
 import { getElevationStyle } from "../app/utils/elevation";
-import { formatBytes } from "@notesnook/common";
 import { eOnLoadNote } from "../app/utils/events";
+import { NoteBundle } from "../app/utils/note-bundle";
 import { Editor } from "./editor";
 import { Search } from "./search";
 import { initDatabase, useShareStore } from "./store";
-import { isImage } from "@notesnook/core/utils/filename";
-import { NoteBundle } from "../app/utils/note-bundle";
-import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../app/utils/constants";
-import RNFetchBlob from "react-native-blob-util";
 
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
@@ -369,15 +368,11 @@ const ShareView = ({ quicknote = false }) => {
       _note.sessionId = Date.now();
     }
 
-    const noteBundle = {
+    await NoteBundle.createNotes({
       files: rawFiles,
       note: _note,
       notebooks: useShareStore.getState().selectedNotebooks
-    };
-    const bundles = MMKV.getArray("shared:noteBundles") || [];
-    bundles.push(noteBundle);
-    MMKV.setArray("shared:noteBundles", bundles);
-    await NoteBundle.createNotes();
+    });
 
     try {
       await db.sync(false, false);

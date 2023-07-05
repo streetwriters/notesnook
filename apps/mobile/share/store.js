@@ -30,6 +30,8 @@ import { db } from "../app/common/database";
 export async function initDatabase() {
   if (!db.isInitialized) {
     await db.init();
+  } else {
+    await db.initCollections();
   }
   await db.notes.init();
 }

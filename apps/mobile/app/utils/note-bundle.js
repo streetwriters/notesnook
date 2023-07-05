@@ -22,7 +22,6 @@ import { isImage } from "@notesnook/core/utils/filename";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { db } from "../common/database";
-import { MMKV } from "../common/database/mmkv";
 import { IOS_APPGROUPID } from "./constants";
 
 export async function attachFile(uri, hash, type, filename, options) {
@@ -57,63 +56,53 @@ export async function attachFile(uri, hash, type, filename, options) {
   }
 }
 
-async function createNotes() {
-  const bundles = MMKV.getArray("shared:noteBundles") || [];
-  console.log("creating notes from note bundles", bundles);
+async function createNotes(bundle) {
+  const sessionId = bundle.note.sessionId;
+  const id = await db.notes.add(bundle.note);
 
-  for (let i = 0; i < bundles.length; i++) {
-    const bundle = bundles[i];
-    const id = await db.notes.add(bundle.note);
-    for (const item of bundle.notebooks) {
-      if (item.type === "notebook") {
-        db.relations.add(item, { id, type: "note" });
-      } else {
-        db.notes.addToNotebook(
-          {
-            id: item.notebookId,
-            topic: item.id
-          },
-          id
-        );
-      }
-    }
-
-    for (const file of bundle.files) {
-      const uri =
-        Platform.OS === "ios"
-          ? `${file.value.replace("file://", "")}`
-          : `${file.value}`;
-      const hash = await Sodium.hashFile({
-        uri: uri,
-        type: "cache"
-      });
-      await attachFile(uri, hash, file.type, file.name, {
-        type: "cache",
-        id: id,
-        appGroupId: IOS_APPGROUPID
-      });
-      let content = ``;
-      if (isImage(file.type)) {
-        content = `<img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" />`;
-      } else {
-        content = `<p><span data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" /></p>`;
-      }
-      const rawContent = await db.content.raw(
-        db.notes.note(id).data?.contentId
-      );
-      await db.notes.add({
-        id: id,
-        content: {
-          type: "tiptap",
-          data: rawContent?.data ? rawContent?.data + content : content
+  for (const item of bundle.notebooks) {
+    if (item.type === "notebook") {
+      db.relations.add(item, { id, type: "note" });
+    } else {
+      db.notes.addToNotebook(
+        {
+          id: item.notebookId,
+          topic: item.id
         },
-        sessionId: Date.now()
-      });
+        id
+      );
     }
+  }
 
-    const _bundles = [...bundles];
-    _bundles.splice(i, 1);
-    MMKV.setArray("shared:noteBundles", _bundles);
+  for (const file of bundle.files) {
+    const uri =
+      Platform.OS === "ios"
+        ? `${file.value.replace("file://", "")}`
+        : `${file.value}`;
+    const hash = await Sodium.hashFile({
+      uri: uri,
+      type: "cache"
+    });
+    await attachFile(uri, hash, file.type, file.name, {
+      type: "cache",
+      id: id,
+      appGroupId: IOS_APPGROUPID
+    });
+    let content = ``;
+    if (isImage(file.type)) {
+      content = `<img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" />`;
+    } else {
+      content = `<p><span data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" /></p>`;
+    }
+    const rawContent = await db.content.raw(db.notes.note(id).data?.contentId);
+    await db.notes.add({
+      id: id,
+      content: {
+        type: "tiptap",
+        data: rawContent?.data ? rawContent?.data + content : content
+      },
+      sessionId: sessionId
+    });
   }
 }
 

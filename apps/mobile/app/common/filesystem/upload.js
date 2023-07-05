@@ -85,7 +85,7 @@ export async function uploadFile(filename, data, cancelToken) {
         RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
       }
     }
-    DatabaseLogger.info(`File uploaded: ${filename}`);
+    DatabaseLogger.info(`File upload status: ${filename}, ${status}, ${text}`);
     return result;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);

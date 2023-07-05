@@ -41,7 +41,7 @@ import { EventTypes } from "../app/screens/editor/tiptap/editor-events";
 
 const useEditor = () => {
   const ref = useRef();
-  const [sessionId] = useState("share-editor-session");
+  const [sessionId] = useState("share-editor-session" + Date.now());
   const colors = useShareStore((state) => state.colors);
   const accent = useShareStore((state) => state.accent);
   const commands = useMemo(() => new Commands(ref), [ref]);
