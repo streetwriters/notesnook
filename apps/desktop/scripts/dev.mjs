@@ -103,7 +103,7 @@ function spawnAndWaitUntil(cmd, cwd, predicate) {
     const s = spawn(cmd[0], cmd.slice(1), {
       cwd,
       env: { ...process.env, NO_COLOR: "true" },
-      shell: "pwsh.exe"
+      shell: false
     });
 
     RUNNING_PROCESSES.push(s);
@@ -123,7 +123,7 @@ async function exec(cmd) {
     return execSync(cmd, {
       env: process.env,
       stdio: "inherit",
-      shell: "pwsh.exe"
+      shell: false
     });
   } catch {
     //ignore
@@ -137,12 +137,13 @@ function execAsync(cmd, args, restartable, onExit) {
     const proc = spawn(cmd, args, {
       stdio: "inherit",
       env: process.env,
-      shell: "pwsh.exe"
+      shell: false
     });
 
     const array = restartable ? RESTARTABLE_PROCESSES : RUNNING_PROCESSES;
     array.push(proc);
     proc.on("exit", (code, signal) => {
+      console.log(cmd, ...args, "closed with code", code);
       if (code === 0 && !signal) {
         array.splice(array.indexOf(proc), 1);
         onExit && onExit();

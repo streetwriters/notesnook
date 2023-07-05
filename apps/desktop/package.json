@@ -38,7 +38,7 @@
     "dmg-license": "^1.0.11"
   },
   "scripts": {
-    "start": "node scripts/dev.ts",
+    "start": "node scripts/dev.mjs",
     "staging": "node scripts/build.mjs --run",
     "release": "node scripts/build.mjs",
     "build": "tsc",
