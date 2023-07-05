@@ -44,28 +44,30 @@ function wrapIntoHTMLDocument(input) {
 
 export function extractFirstParagraph(html) {
   let text = "";
-  let start = false;
-  const parser = new Parser(
-    {
-      onopentag: (name) => {
-        if (name === "p") start = true;
-      },
-      onclosetag: (name) => {
-        if (name === "p") {
-          start = false;
-          parser.pause();
-          parser.reset();
+  try {
+    let start = false;
+    const parser = new Parser(
+      {
+        onopentag: (name) => {
+          if (name === "p") start = true;
+        },
+        onclosetag: (name) => {
+          if (name === "p") {
+            start = false;
+            parser.pause();
+            parser.reset();
+          }
+        },
+        ontext: (data) => {
+          if (start) text += data;
         }
       },
-      ontext: (data) => {
-        if (start) text += data;
+      {
+        lowerCaseTags: false,
+        decodeEntities: true
       }
-    },
-    {
-      lowerCaseTags: false,
-      decodeEntities: true
-    }
-  );
-  parser.end(html);
+    );
+    parser.end(html);
+  } catch (e) {}
   return text;
 }
