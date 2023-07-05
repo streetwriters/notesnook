@@ -56,9 +56,9 @@ const correction = (size, multiplier) => {
   } else if (dSize >= 6.5 && dSize <= 7.2 && DDS.isTab) {
     return size * multiplier;
   } else if (dSize > 7.2 && dSize <= 8.5 && DDS.isTab) {
-    return size * 0.85;
+    return size * 0.92;
   } else if (dSize > 8.5 && dSize <= 9.2 && DDS.isTab) {
-    return size * 0.9;
+    return size * 0.92;
   } else if (dSize > 9.2 && dSize <= 10.5 && DDS.isTab) {
     return size * 0.95;
   } else if (dSize > 10.5) {
