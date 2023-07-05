@@ -32,6 +32,9 @@
     "start": {
       "dependsOn": ["^build"]
     },
+    "start:desktop": {
+      "dependsOn": ["^build"]
+    },
     "test:e2e": {
       "dependsOn": ["^build"]
     },

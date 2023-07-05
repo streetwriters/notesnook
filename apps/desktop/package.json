@@ -23,6 +23,8 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "chokidar": "^3.5.3",
+    "tree-kill": "^1.2.2",
     "@electron/rebuild": "^3.2.13",
     "@types/node": "^18.15.0",
     "electron": "^24.4.0",
