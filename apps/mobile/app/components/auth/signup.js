@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useRef, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { ToastEvent } from "../../services/event-manager";
@@ -49,7 +49,7 @@ export const Signup = ({ changeMode, trial }) => {
   const setUser = useUserStore((state) => state.setUser);
   const setLastSynced = useUserStore((state) => state.setLastSynced);
   const deviceMode = useSettingStore((state) => state.deviceMode);
-
+  const { width, height } = useWindowDimensions();
   const validateInfo = () => {
     if (!password.current || !email.current || !confirmPassword.current) {
       ToastEvent.show({
@@ -101,13 +101,11 @@ export const Signup = ({ changeMode, trial }) => {
           backgroundColor: colors.bg,
           zIndex: 10,
           width: "100%",
-          alignSelf: "center",
-          height: "100%"
+          alignSelf: "center"
         }}
       >
         <View
           style={{
-            flexGrow: 1,
             justifyContent: "flex-end",
             paddingHorizontal: 20,
             backgroundColor: colors.nav,
@@ -119,7 +117,8 @@ export const Signup = ({ changeMode, trial }) => {
             borderColor: deviceMode !== "mobile" ? colors.border : null,
             borderRadius: deviceMode !== "mobile" ? 20 : null,
             marginTop: deviceMode !== "mobile" ? 50 : null,
-            width: deviceMode === "mobile" ? null : "50%"
+            width: deviceMode === "mobile" ? null : "50%",
+            minHeight: height * 0.4
           }}
         >
           <View
@@ -163,8 +162,7 @@ export const Signup = ({ changeMode, trial }) => {
             width: DDS.isTab ? "50%" : "100%",
             paddingHorizontal: 20,
             backgroundColor: colors.bg,
-            alignSelf: "center",
-            flexGrow: 0.5
+            alignSelf: "center"
           }}
         >
           <Input

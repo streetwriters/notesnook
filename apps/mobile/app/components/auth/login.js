@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useEffect, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
@@ -71,7 +71,7 @@ export const Login = ({ changeMode }) => {
     }, 5000);
   });
   const deviceMode = useSettingStore((state) => state.deviceMode);
-
+  const { width, height } = useWindowDimensions();
   useEffect(() => {
     async () => {
       setStep(LoginSteps.emailAuth);
@@ -95,14 +95,11 @@ export const Login = ({ changeMode }) => {
           backgroundColor: colors.bg,
           zIndex: 10,
           width: "100%",
-          alignSelf: "center",
-          height: "100%",
-          minHeight: "100%"
+          alignSelf: "center"
         }}
       >
         <View
           style={{
-            flexGrow: 0.8,
             justifyContent: "flex-end",
             paddingHorizontal: 20,
             backgroundColor: colors.nav,
@@ -114,7 +111,8 @@ export const Login = ({ changeMode }) => {
             borderColor: deviceMode !== "mobile" ? colors.border : null,
             borderRadius: deviceMode !== "mobile" ? 20 : null,
             marginTop: deviceMode !== "mobile" ? 50 : null,
-            width: deviceMode === "mobile" ? null : "50%"
+            width: deviceMode === "mobile" ? null : "50%",
+            minHeight: height * 0.4
           }}
         >
           <View
@@ -164,8 +162,7 @@ export const Login = ({ changeMode }) => {
               : "99.9%",
             backgroundColor: colors.bg,
             alignSelf: "center",
-            paddingHorizontal: 20,
-            flexGrow: 1
+            paddingHorizontal: 20
           }}
         >
           <Input

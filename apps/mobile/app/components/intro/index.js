@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import {
   Linking,
+  ScrollView,
   TouchableOpacity,
   useWindowDimensions,
   View
@@ -34,15 +35,16 @@ import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 
 const Intro = ({ navigation }) => {
   const colors = useThemeStore((state) => state.colors);
   const isTelemetryEnabled = useSettingStore(
     (state) => state.settings.telemetry
   );
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const deviceMode = useSettingStore((state) => state.deviceMode);
-
+  const insets = useGlobalSafeAreaInsets();
   const renderItem = React.useCallback(
     ({ item }) => (
       <View
@@ -80,7 +82,6 @@ const Intro = ({ navigation }) => {
         <View
           style={{
             marginTop: 10,
-            marginBottom: 20,
             maxWidth: "90%",
             width: "100%"
           }}
@@ -120,16 +121,14 @@ const Intro = ({ navigation }) => {
   );
 
   return (
-    <View
+    <ScrollView
       testID="notesnook.splashscreen"
       style={{
-        width: "100%",
-        height: "100%"
+        width: "100%"
       }}
     >
       <View
         style={{
-          flex: 0.65,
           width: deviceMode !== "mobile" ? width / 2 : "100%",
           backgroundColor: colors.nav,
           marginBottom: 20,
@@ -139,7 +138,10 @@ const Intro = ({ navigation }) => {
           borderWidth: deviceMode !== "mobile" ? 1 : null,
           borderColor: deviceMode !== "mobile" ? colors.border : null,
           borderRadius: deviceMode !== "mobile" ? 20 : null,
-          marginTop: deviceMode !== "mobile" ? 50 : null
+          marginTop: deviceMode !== "mobile" ? 50 : null,
+          paddingTop: insets.top + 10,
+          paddingBottom: insets.top + 10,
+          minHeight: height * 0.7
         }}
       >
         <SwiperFlatList
@@ -184,8 +186,8 @@ const Intro = ({ navigation }) => {
       <View
         style={{
           width: "100%",
-          flex: 0.3,
-          justifyContent: "center"
+          justifyContent: "center",
+          minHeight: height * 0.3
         }}
       >
         <Button
@@ -242,7 +244,7 @@ const Intro = ({ navigation }) => {
           </Paragraph>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
