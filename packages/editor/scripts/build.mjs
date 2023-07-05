@@ -17,9 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import "zx/globals";
+import path from "path";
+import fs from "fs";
 import { langen } from "./langen.mjs";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(path.join(__dirname, ".."));
 
 const pathsToCopy = {
@@ -31,8 +35,8 @@ const pathsToCopy = {
 for (const name in pathsToCopy) {
   const src = pathsToCopy[name];
   const fullPath = path.join(ROOT_DIR, src);
-  fs.copySync(fullPath, path.join(ROOT_DIR, "styles", name), {
-    overwrite: true,
+  fs.cpSync(fullPath, path.join(ROOT_DIR, "styles", name), {
+    force: true,
     recursive: true,
     errorOnExist: false
   });

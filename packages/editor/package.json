@@ -75,8 +75,8 @@
   },
   "scripts": {
     "test": "vitest run",
-    "prebuild": "zx ./scripts/build.mjs",
-    "prewatch": "zx ./scripts/build.mjs",
+    "prebuild": "node ./scripts/build.mjs",
+    "prewatch": "node ./scripts/build.mjs",
     "build": "tsc",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build && npm run test",

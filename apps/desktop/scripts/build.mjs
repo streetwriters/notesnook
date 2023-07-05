@@ -20,9 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import path from "path";
 import fs from "fs/promises";
 import { existsSync } from "fs";
-import { argv, os } from "zx";
+import yargs from "yargs-parser";
+import os from "os";
 import * as childProcess from "child_process";
+import { fileURLToPath } from "url";
 
+const args = yargs(process.argv);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const sodiumNativePrebuildPath = (arch) =>
   path.join(
     `node_modules`,
@@ -37,7 +42,7 @@ const sodiumNativePrebuildPath = (arch) =>
     `${os.platform()}-${arch}`
   );
 const webAppPath = path.resolve(path.join(__dirname, "..", "..", "web"));
-if (argv.rebuild) {
+if (args.rebuild) {
   await fs.rm("./build/", { force: true, recursive: true });
 
   await exec(`cd ${webAppPath} && npm run build:desktop`);
@@ -48,7 +53,7 @@ if (argv.rebuild) {
   });
 }
 
-if (argv.variant === "mas") {
+if (args.variant === "mas") {
   await exec(`npm run bundle:mas`);
 } else {
   await exec(`npm run bundle`);
@@ -92,7 +97,7 @@ if (existsSync(sodiumNativePrebuildPath("arm64"))) {
   );
 }
 
-if (argv.run) {
+if (args.run) {
   await exec(`npx electron-builder --dir --x64`);
   if (process.platform === "win32") {
     await exec(`.\\output\\win-unpacked\\Notesnook.exe`);
