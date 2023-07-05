@@ -20,23 +20,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useMemo } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { Reminders } from "../../common/reminders";
+import { NoticesData } from "../../common/notices";
 import { Dismiss } from "../icons";
 import Config from "../../utils/config";
 
-function ReminderBar() {
-  const reminders = useAppStore((store) => store.reminders);
-  const dismissReminders = useAppStore((store) => store.dismissReminders);
-  const reminder = useMemo(() => {
-    if (!reminders) return null;
-
-    const copy = reminders.slice();
-    const reminder = copy.sort((a, b) => a.priority - b.priority)[0];
-    if (!reminder) return;
-    return Reminders[reminder.type];
-  }, [reminders]);
-
-  if (!reminder) return null;
+function Notice() {
+  const notices = useAppStore((store) => store.notices);
+  const dismissNotices = useAppStore((store) => store.dismissNotices);
+  const notice = useMemo(() => {
+    if (!notices) return null;
+    return notices.slice().sort((a, b) => a.priority - b.priority)[0];
+  }, [notices]);
+  if (!notice) return null;
+  const NoticeData = NoticesData[notice.type];
   return (
     <Flex
       sx={{
@@ -47,34 +43,34 @@ function ReminderBar() {
         minWidth: 250
       }}
       p={1}
-      onClick={reminder?.action}
+      onClick={() => NoticeData.action()}
       mx={1}
     >
       <Flex sx={{ flex: 1, alignItems: "center" }}>
-        <reminder.icon
+        <NoticeData.icon
           size={18}
           color="primary"
           sx={{ bg: "shade", mr: 2, p: 2, borderRadius: 80 }}
         />
         <Flex variant="columnCenter" sx={{ alignItems: "flex-start" }}>
           <Text variant="body" sx={{ fontSize: "body" }}>
-            {reminder.title}
+            {NoticeData.title}
           </Text>
           <Text variant="subBody" sx={{ display: "block" }}>
-            {reminder.subtitle}
+            {NoticeData.subtitle}
           </Text>
         </Flex>
       </Flex>
-      {reminder.dismissable && (
+      {NoticeData.dismissable && (
         <Button
           onClick={(e) => {
             e.stopPropagation();
             const dontShowAgain = window.confirm(
               "Don't show again on this device?"
             );
-            dismissReminders(reminder);
+            dismissNotices(notice);
             if (dontShowAgain) {
-              Config.set(`ignored:${reminder.key}`, true);
+              Config.set(`ignored:${NoticeData.key}`, true);
             }
           }}
           sx={{
@@ -92,4 +88,4 @@ function ReminderBar() {
     </Flex>
   );
 }
-export default ReminderBar;
+export default Notice;

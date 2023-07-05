@@ -24,7 +24,7 @@ import { useStore as useThemeStore } from "./stores/theme-store";
 import { useStore as useAttachmentStore } from "./stores/attachment-store";
 import { useStore as useEditorStore } from "./stores/editor-store";
 import { useStore as useAnnouncementStore } from "./stores/announcement-store";
-import { resetReminders, scheduleBackups } from "./common/reminders";
+import { resetNotices, scheduleBackups } from "./common/notices";
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
@@ -93,7 +93,7 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
         if (await initUser()) {
           showUpgradeReminderDialogs();
         }
-        await resetReminders();
+        await resetNotices();
         setIsVaultCreated(await db.vault?.exists());
 
         await showOnboardingDialog(interruptedOnboarding());

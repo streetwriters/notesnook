@@ -31,7 +31,7 @@ import { store as announcementStore } from "./announcement-store";
 import { store as settingStore } from "./setting-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
-import { resetReminders } from "../common/reminders";
+import { resetNotices } from "../common/notices";
 import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/common";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
@@ -65,7 +65,10 @@ class AppStore extends BaseStore {
   };
   colors = [];
   globalMenu = { items: [], data: {} };
-  reminders = [];
+  /**
+   * @type {import("../common/notices").Notice[]}
+   */
+  notices = [];
   shortcuts = [];
   lastSynced = 0;
 
@@ -147,7 +150,7 @@ class AppStore extends BaseStore {
     logger.measure("refreshing app");
 
     await this.updateLastSynced();
-    await resetReminders();
+    await resetNotices();
     noteStore.refresh();
     notebookStore.refresh();
     reminderStore.refresh();
@@ -219,28 +222,22 @@ class AppStore extends BaseStore {
 
   /**
    *
-   * @param {"backup"|"signup"|"email"|"recoverykey"} type
-   * @param {string} title
-   * @param {string} detail
-   * @param {"high"|"medium"|"low"} priority
+   * @param {import("../common/notices").Notice[]} notices
    */
-  setReminders = (...reminders) => {
+  setNotices = (...notices) => {
     this.set((state) => {
-      state.reminders = [];
-      for (let reminder of reminders) {
-        const { priority, type } = reminder;
-        state.reminders.push({
-          type,
-          priority: priority === "high" ? 1 : priority === "medium" ? 2 : 1
-        });
+      for (const notice of notices) {
+        const oldIndex = state.notices.findIndex((a) => a.type === notice.type);
+        if (oldIndex > -1) state.notices.splice(oldIndex, 1);
+        state.notices.push(notice);
       }
     });
   };
 
-  dismissReminders = (...reminders) => {
+  dismissNotices = (...reminders) => {
     this.set((state) => {
       for (let reminder of reminders) {
-        state.reminders.splice(state.reminders.indexOf(reminder), 1);
+        state.notices.splice(state.notices.indexOf(reminder), 1);
       }
     });
   };

@@ -22,7 +22,7 @@ import { Cross } from "../icons";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import AnnouncementBody from "./body";
 import { useStore as useAnnouncementStore } from "../../stores/announcement-store";
-import ReminderBar from "../reminder-bar";
+import Notice from "../notice";
 
 function Announcements() {
   const announcements = useAnnouncementStore(
@@ -31,7 +31,7 @@ function Announcements() {
   const dismiss = useAnnouncementStore((store) => store.dismiss);
   const announcement = announcements[0];
 
-  if (!announcement) return <ReminderBar />;
+  if (!announcement) return <Notice />;
   return (
     <Flex
       mx={1}

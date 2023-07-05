@@ -21,17 +21,22 @@ import Config from "../utils/config";
 import { createBackup, verifyAccount } from "./index";
 import { db } from "./db";
 import { store as appStore } from "../stores/app-store";
-import { Backup, User, Email, Warn } from "../components/icons";
+import { Backup, User, Email, Warn, Icon } from "../components/icons";
 import dayjs from "dayjs";
-import {
-  showBuyDialog,
-  showRecoveryKeyDialog
-} from "../common/dialog-controller";
+import { showBuyDialog, showRecoveryKeyDialog } from "./dialog-controller";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { isDesktop, isTesting } from "../utils/platform";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { showToast } from "../utils/toast";
 import { TaskScheduler } from "../utils/task-scheduler";
+
+export type NoticeType = "autoBackupsOff" | "login" | "email" | "recoverykey";
+
+export type Notice = {
+  type: NoticeType;
+  priority: number;
+  params?: any;
+};
 
 export const BACKUP_CRON_EXPRESSIONS = [
   "",
@@ -41,15 +46,15 @@ export const BACKUP_CRON_EXPRESSIONS = [
 ];
 
 export async function scheduleBackups() {
-  const backupReminderOffset = Config.get("backupReminderOffset", 0);
+  const backupInterval = Config.get("backupReminderOffset", 0);
 
   await TaskScheduler.stop("automatic-backups");
-  if (!backupReminderOffset) return false;
+  if (!backupInterval) return false;
 
   console.log("Scheduling automatic backups");
   await TaskScheduler.register(
     "automatic-backups",
-    BACKUP_CRON_EXPRESSIONS[backupReminderOffset],
+    BACKUP_CRON_EXPRESSIONS[backupInterval],
     () => {
       console.log("Backing up automatically");
       saveBackup();
@@ -57,9 +62,9 @@ export async function scheduleBackups() {
   );
 }
 
-export function shouldAddAutoBackupsDisabledReminder() {
-  const backupReminderOffset = Config.get("backupReminderOffset", 0);
-  if (!isUserPremium() && backupReminderOffset) {
+export function shouldAddAutoBackupsDisabledNotice() {
+  const backupInterval = Config.get("backupReminderOffset", 0);
+  if (!isUserPremium() && backupInterval) {
     Config.set("backupReminderOffset", 0);
     return true;
   }
@@ -67,23 +72,22 @@ export function shouldAddAutoBackupsDisabledReminder() {
   return false;
 }
 
-export async function shouldAddBackupReminder() {
-  const backupReminderOffset = Config.get("backupReminderOffset", 0);
-  if (!backupReminderOffset) return false;
+export async function shouldAddBackupNotice() {
+  const backupInterval = Config.get("backupReminderOffset", 0);
+  if (!backupInterval) return false;
 
-  const lastBackupTime = await db.backup.lastBackupTime();
+  const lastBackupTime = await db.backup?.lastBackupTime();
   if (!lastBackupTime) {
-    await db.backup.updateBackupTime();
+    await db.backup?.updateBackupTime();
     return false;
   }
 
-  const offsetToDays =
-    backupReminderOffset === 1 ? 1 : backupReminderOffset === 2 ? 7 : 30;
+  const offsetToDays = backupInterval === 1 ? 1 : backupInterval === 2 ? 7 : 30;
 
   return dayjs(lastBackupTime).add(offsetToDays, "d").isBefore(dayjs());
 }
 
-export async function shouldAddRecoveryKeyBackupReminder() {
+export async function shouldAddRecoveryKeyBackupNotice() {
   if (isIgnored("recoverykey")) return false;
 
   const recoveryKeyBackupDate = Config.get("recoveryKeyBackupDate", 0);
@@ -91,17 +95,26 @@ export async function shouldAddRecoveryKeyBackupReminder() {
   return dayjs(recoveryKeyBackupDate).add(30, "d").isBefore(dayjs());
 }
 
-export async function shouldAddLoginReminder() {
-  const user = await db.user.getUser();
+export async function shouldAddLoginNotice() {
+  const user = await db.user?.getUser();
   if (!user) return true;
 }
 
-export async function shouldAddConfirmEmailReminder() {
-  const user = await db.user.getUser();
+export async function shouldAddConfirmEmailNotice() {
+  const user = await db.user?.getUser();
   return !user?.isEmailConfirmed;
 }
 
-export const Reminders = {
+type NoticeData = {
+  key: string;
+  title: string;
+  subtitle: string;
+  action: (params?: any) => void;
+  dismissable?: boolean;
+  icon: Icon;
+};
+
+export const NoticesData: Record<NoticeType, NoticeData> = {
   autoBackupsOff: {
     key: "autoBackupsOff",
     title: "Automatic backups disabled",
@@ -136,32 +149,32 @@ export const Reminders = {
   }
 };
 
-var openedToast = null;
-export async function resetReminders() {
-  const reminders = [];
+export async function resetNotices() {
+  const notices: Notice[] = [];
 
-  if (shouldAddAutoBackupsDisabledReminder()) {
-    reminders.push({ type: "autoBackupsOff", priority: "high" });
+  if (shouldAddAutoBackupsDisabledNotice()) {
+    notices.push({ type: "autoBackupsOff", priority: 3 });
   }
-  if (await shouldAddBackupReminder()) {
+  if (await shouldAddBackupNotice()) {
     await saveBackup();
   }
-  if (await shouldAddLoginReminder()) {
-    reminders.push({ type: "login", priority: "low" });
+  if (await shouldAddLoginNotice()) {
+    notices.push({ type: "login", priority: 1 });
   }
-  if (await shouldAddConfirmEmailReminder()) {
-    reminders.push({ type: "email", priority: "high" });
+  if (await shouldAddConfirmEmailNotice()) {
+    notices.push({ type: "email", priority: 4 });
   }
-  if (await shouldAddRecoveryKeyBackupReminder()) {
-    reminders.push({ type: "recoverykey", priority: "high" });
+  if (await shouldAddRecoveryKeyBackupNotice()) {
+    notices.push({ type: "recoverykey", priority: 5 });
   }
-  appStore.get().setReminders(...reminders);
+  appStore.get().setNotices(...notices);
 }
 
-function isIgnored(key) {
+function isIgnored(key: keyof typeof NoticesData) {
   return Config.get(`ignored:${key}`, false);
 }
 
+var openedToast: { hide: () => void } | null = null;
 async function saveBackup() {
   if (isDesktop()) {
     await createBackup();
@@ -174,7 +187,7 @@ async function saveBackup() {
         {
           text: "Later",
           onClick: async () => {
-            await db.backup.updateBackupTime();
+            await db.backup?.updateBackupTime();
             openedToast?.hide();
             openedToast = null;
           },
