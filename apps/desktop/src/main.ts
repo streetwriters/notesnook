@@ -91,14 +91,16 @@ async function createWindow() {
   if (cliOptions.hidden && !config.desktopSettings.minimizeToSystemTray)
     mainWindow.minimize();
 
-  setTimeout(() => {
-    mainWindow.setOpacity(1);
-  }, 70);
+  await mainWindow.webContents.loadURL(`${createURL(cliOptions, "/")}`);
+  mainWindow.setOpacity(1);
 
+  if (config.privacyMode) {
+    await api.integration.setPrivacyMode(config.privacyMode);
+  }
+
+  await AssetManager.loadIcons();
   setupDesktopIntegration();
   createIPCHandler({ router, windows: [mainWindow] });
-
-  await mainWindow.webContents.loadURL(`${createURL(cliOptions, "/")}`);
 
   mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
     "http://dictionaries.notesnook.com/"
@@ -123,11 +125,6 @@ async function createWindow() {
     setupTray();
     setupJumplist();
   });
-
-  await AssetManager.loadIcons();
-  if (config.privacyMode) {
-    await api.integration.setPrivacyMode(config.privacyMode);
-  }
 }
 
 app.once("ready", async () => {
