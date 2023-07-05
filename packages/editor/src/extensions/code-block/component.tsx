@@ -27,17 +27,24 @@ import { CodeBlockAttributes } from "./code-block";
 import { ReactNodeViewProps } from "../react/types";
 import { ResponsivePresenter } from "../../components/responsive";
 import { Popup } from "../../toolbar/components/popup";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 import { Button } from "../../components/button";
+import { useTimer } from "../../hooks/use-timer";
+import { writeText } from "clipboard-polyfill";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
 ) {
+  const isMobile = useIsMobile();
   const { editor, updateAttributes, node, forwardRef } = props;
-  const { language, indentLength, indentType, caretPosition } = node.attrs;
+  const { language, indentLength, indentType, caretPosition, lines } =
+    node.attrs;
 
   const [isOpen, setIsOpen] = useState(false);
   // const [caretPosition, setCaretPosition] = useState<CaretPosition>();
   const toolbarRef = useRef<HTMLDivElement>(null);
+
+  const { enabled, start } = useTimer(1000);
 
   const languageDefinition = Languages.find(
     (l) => l.filename === language || l.alias?.some((a) => a === language)
@@ -74,7 +81,7 @@ export function CodeblockComponent(
             display: "flex",
             px: 2,
             pt: 2,
-            pb: 1
+            pb: 2
           }}
           spellCheck={false}
         />
@@ -144,6 +151,38 @@ export function CodeblockComponent(
             </Text>
           </Button>
         </Flex>
+
+        {node.textContent.length > 0 ? (
+          <Button
+            variant={"tool"}
+            sx={{
+              position: "absolute",
+              opacity: isMobile ? 1 : 0,
+              right: 0,
+              p: 1,
+              mr: 1,
+              my: 1,
+              bg: "bgSecondary",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              border: "1px solid var(--codeBorder)",
+              ":hover": { bg: "bgSecondaryHover" },
+             borderColor: enabled ? "primary" : "codeBorder",
+             "div:hover > &": { opacity: isMobile ? 0 : 1 }
+            }}
+            title={enabled ? "Copied to clipboard" : "Copy to clipboard"}
+            onClick={() => {
+              writeText(node.textContent);
+              start();
+            }}
+          >
+            <Icon
+              path={enabled ? Icons.check : Icons.copy}
+              size={"big"}
+              color={enabled ? "primary" : "icon"}
+            />
+          </Button>
+        ) : null}
       </Flex>
       <ResponsivePresenter
         isOpen={isOpen}

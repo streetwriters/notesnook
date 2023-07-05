@@ -31,8 +31,6 @@ import { createSelectionBasedNodeView } from "../react";
 import { TextDirections } from "../text-direction";
 import { ImageComponent } from "./component";
 
-type Writeable<T> = { -readonly [P in keyof T]: T[P] };
-
 export interface ImageOptions {
   inline: boolean;
   allowBase64: boolean;
