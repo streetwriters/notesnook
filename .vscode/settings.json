@@ -8,5 +8,6 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "eslint.execArgv": ["--cache"]
+  "eslint.execArgv": ["--cache"],
+  "git.rebaseWhenSync": true
 }
