@@ -33,7 +33,7 @@ export const VaultSettings: SettingsGroup[] = [
     header: "Vault",
     settings: [
       {
-        key: "reminders",
+        key: "create-vault",
         title: "Create vault",
         isHidden: () => useAppStore.getState().isVaultCreated,
         onStateChange: (listener) =>
@@ -54,7 +54,7 @@ export const VaultSettings: SettingsGroup[] = [
         ]
       },
       {
-        key: "reminders",
+        key: "change-vault-password",
         title: "Change vault password",
         description: "Set a new password for your vault",
         isHidden: () => !useAppStore.getState().isVaultCreated,
@@ -68,7 +68,7 @@ export const VaultSettings: SettingsGroup[] = [
         ]
       },
       {
-        key: "reminders",
+        key: "clear-vault",
         title: "Clear vault",
         description: "Unlock all locked notes and clear vault.",
         isHidden: () => !useAppStore.getState().isVaultCreated,
@@ -87,7 +87,7 @@ export const VaultSettings: SettingsGroup[] = [
         ]
       },
       {
-        key: "reminders",
+        key: "delete-vault",
         title: "Delete vault",
         description: "Delete vault including all locked notes.",
         isHidden: () => !useAppStore.getState().isVaultCreated,
