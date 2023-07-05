@@ -695,19 +695,6 @@ export async function showUpdateAvailableNotice({
   });
 }
 
-export async function showUpdateReadyNotice({ version }: { version: string }) {
-  const changelog = await getChangelog(version);
-  return await showUpdateDialog({
-    title: `Update ready for installation`,
-    subtitle: `v${version} is ready to be installed.`,
-    changelog,
-    action: {
-      text: "Install now",
-      onClick: () => installUpdate()
-    }
-  });
-}
-
 type UpdateDialogProps = {
   title: string;
   subtitle: string;
