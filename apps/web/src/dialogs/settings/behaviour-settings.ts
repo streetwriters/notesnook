@@ -28,13 +28,13 @@ export const BehaviourSettings: SettingsGroup[] = [
     key: "general",
     section: "behaviour",
     header: "General",
+    isHidden: () => !isUserPremium(),
     settings: [
       {
         key: "default-homepage",
         title: "Home page",
         description: "Default screen to open on app startup.",
         keywords: ["welcome page", "default screen"],
-        isHidden: () => !isUserPremium(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.homepage, listener),
         components: [

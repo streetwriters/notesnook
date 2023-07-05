@@ -80,6 +80,10 @@ export const AuthenticationSettings: SettingsGroup[] = [
         key: "primary-2fa-method",
         title: "Primary method",
         keywords: ["primary 2fa method"],
+        description: () =>
+          `Your current 2FA method is ${
+            useUserStore.getState().user?.mfa.primaryMethod
+          }.`,
         onStateChange: (listener) =>
           useUserStore.subscribe((s) => s.user?.mfa.primaryMethod, listener),
         components: [
@@ -92,7 +96,7 @@ export const AuthenticationSettings: SettingsGroup[] = [
                 await useUserStore.getState().refreshUser();
               }
             },
-            variant: "primary"
+            variant: "secondary"
           }
         ]
       },

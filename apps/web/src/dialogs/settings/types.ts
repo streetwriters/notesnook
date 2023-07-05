@@ -72,7 +72,7 @@ export type Setting = {
   key: string;
   keywords?: string[];
   title: string;
-  description?: string;
+  description?: string | ((state?: unknown) => string);
   components: SettingComponent[] | ((state?: unknown) => SettingComponent[]);
   isHidden?: (state?: unknown) => boolean;
   onStateChange?: (

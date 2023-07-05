@@ -224,20 +224,28 @@ export default function SettingsDialog(props: SettingsDialogProps) {
                 const isTitleMatch =
                   typeof group.header === "string" &&
                   group.header.toLowerCase().includes(query);
+                const isSectionMatch = group.section.includes(query);
 
-                if (isTitleMatch) {
+                if (isTitleMatch || isSectionMatch) {
                   groups.push(group);
                   continue;
                 }
 
-                const settings = group.settings.filter(
-                  (setting) =>
-                    setting.description?.toLowerCase().includes(query) ||
-                    setting.keywords?.some((keyword) =>
-                      keyword.toLowerCase().includes(query)
-                    ) ||
-                    setting.title.toLowerCase().includes(query)
-                );
+                const settings = group.settings.filter((setting) => {
+                  const description =
+                    typeof setting.description === "function"
+                      ? setting.description()
+                      : setting.description;
+
+                  return [
+                    description || "",
+                    setting.keywords?.join(" ") || "",
+                    setting.title
+                  ]
+                    .join(" ")
+                    ?.toLowerCase()
+                    .includes(query);
+                });
                 if (!settings.length) continue;
                 groups.push({ ...group, settings });
               }
@@ -292,7 +300,7 @@ export default function SettingsDialog(props: SettingsDialogProps) {
           }}
         >
           {activeSettings.map((group) => (
-            <SettingsGroupComponent key={group.key} item={group} />
+            <SettingsGroupComponent item={group} />
           ))}
         </FlexScrollContainer>
       </Flex>
@@ -308,7 +316,7 @@ function SettingsGroupComponent(props: { item: SettingsGroup }) {
     onRender?.();
   }, [onRender]);
 
-  if (item.isHidden && item.isHidden()) return null;
+  if (item.isHidden?.()) return null;
   return (
     <Flex
       sx={{
@@ -395,7 +403,9 @@ function SettingItem(props: { item: Setting }) {
               variant={"body"}
               sx={{ mt: 1, color: "fontTertiary", whiteSpace: "pre-wrap" }}
             >
-              {item.description}
+              {typeof item.description === "function"
+                ? item.description(state)
+                : item.description}
             </Text>
           )}
         </Flex>
