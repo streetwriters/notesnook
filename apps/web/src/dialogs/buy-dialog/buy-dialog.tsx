@@ -43,6 +43,7 @@ import { Theme } from "@notesnook/theme";
 import { isMacStoreApp } from "../../utils/platform";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
+import { desktop } from "../../common/desktop-bridge";
 
 type BuyDialogProps = {
   couponCode?: string;
@@ -198,7 +199,23 @@ function SideBar(props: SideBarProps) {
           const plan = plans.find((p) => p.period === initialPlan);
           onPlanSelected(plan);
         }}
-        onPlanSelected={onPlanSelected}
+        onPlanSelected={async (plan) => {
+          if (plan?.platform === "macos") {
+            const [product] =
+              (await desktop?.iap.getProducts.query([plan.id])) || [];
+            if (!product) return;
+
+            console.log(
+              "purchase",
+              await desktop?.iap.purchase.query({
+                productId: product.id,
+                userId: user.id
+              })
+            );
+          } else {
+            onPlanSelected(plan);
+          }
+        }}
       />
     );
 
@@ -246,7 +263,7 @@ function Details() {
 
   if (isCheckoutCompleted) return null;
 
-  if (selectedPlan && user)
+  if (selectedPlan && user && selectedPlan.platform === "web")
     return (
       <PaddleCheckout
         plan={selectedPlan}
@@ -303,13 +320,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
           {formatPeriod(plan.period)}
         </Text>
       )}
-      {isMacStoreApp() ? (
-        <>
-          <Text variant={"subBody"} mt={2} sx={{ textAlign: "center" }}>
-            You cannot upgrade from the macOS app.
-          </Text>
-        </>
-      ) : user ? (
+      {user ? (
         <>
           <Button
             variant="primary"

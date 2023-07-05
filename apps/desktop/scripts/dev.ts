@@ -56,7 +56,7 @@ async function main() {
             await fs.rm("./build/", { force: true, recursive: true });
           }
 
-          await exec(`npm run bundle`);
+          await exec(`npm run bundle:mas`);
           await exec(`npx tsc`);
 
           if (first) {

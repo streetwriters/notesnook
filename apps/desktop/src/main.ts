@@ -17,7 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { app, BrowserWindow, nativeTheme, session, shell } from "electron";
+import {
+  app,
+  BrowserWindow,
+  inAppPurchase,
+  nativeTheme,
+  session,
+  shell
+} from "electron";
 import { isDevelopment } from "./utils";
 import { registerProtocol, PROTOCOL_URL } from "./utils/protocol";
 import { configureAutoUpdater } from "./utils/autoupdater";
@@ -135,6 +142,75 @@ app.once("ready", async () => {
 
   if (!isDevelopment()) registerProtocol();
   await createWindow();
+
+  // Listen for transactions as soon as possible.
+  inAppPurchase.on("transactions-updated", (_: any, transactions: any[]) => {
+    if (!Array.isArray(transactions)) {
+      return;
+    }
+
+    // Check each transaction.
+    transactions.forEach((transaction) => {
+      const payment = transaction.payment;
+
+      switch (transaction.transactionState) {
+        case "purchasing":
+          console.log(`Purchasing ${payment.productIdentifier}...`);
+          break;
+
+        case "purchased": {
+          console.log(`${payment.productIdentifier} purchased.`);
+
+          // Get the receipt url.
+          const receiptURL = inAppPurchase.getReceiptURL();
+
+          console.log(`Receipt URL: ${receiptURL}`);
+
+          // Submit the receipt file to the server and check if it is valid.
+          // @see https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html
+          // ...
+          // If the receipt is valid, the product is purchased
+          // ...
+
+          // Finish the transaction.
+          // inAppPurchase.finishTransactionByDate(transaction.transactionDate);
+
+          break;
+        }
+
+        case "failed":
+          console.log(
+            `Failed to purchase ${payment.productIdentifier}.`,
+            JSON.stringify(transaction, undefined, 2)
+          );
+
+          // Finish the transaction.
+          // inAppPurchase.finishTransactionByDate(transaction.transactionDate);
+
+          break;
+        case "restored":
+          console.log(
+            `The purchase of ${payment.productIdentifier} has been restored.`
+          );
+
+          break;
+        case "deferred":
+          console.log(
+            `The purchase of ${payment.productIdentifier} has been deferred.`
+          );
+
+          break;
+        default:
+          break;
+      }
+    });
+  });
+
+  // Check if the user is allowed to make in-app purchase.
+  if (!inAppPurchase.canMakePayments()) {
+    console.log("The user is not allowed to make in-app purchase.");
+  }
+
   configureAutoUpdater();
 });
 
