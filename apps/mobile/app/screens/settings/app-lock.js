@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { Platform, View } from "react-native";
+import { Platform, ScrollView, View } from "react-native";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { AuthMode } from "../../components/auth";
@@ -141,7 +141,8 @@ const AppLock = ({ route }) => {
                 borderColor: deviceMode !== "mobile" ? colors.border : null,
                 borderRadius: deviceMode !== "mobile" ? 20 : null,
                 marginTop: deviceMode !== "mobile" ? 50 : null,
-                width: deviceMode === "mobile" ? null : "50%"
+                width: deviceMode === "mobile" ? null : "50%",
+                minHeight: 180
               }}
             >
               <View
@@ -188,7 +189,7 @@ const AppLock = ({ route }) => {
           )}
 
           <Seperator />
-          <View
+          <ScrollView
             style={{
               paddingHorizontal: 12,
               width: DDS.isTab && welcome ? "50%" : "100%",
@@ -203,7 +204,8 @@ const AppLock = ({ route }) => {
                 onPress={async () => {
                   if (
                     !(await BiometicService.isBiometryAvailable()) &&
-                    !useUserStore.getState().user
+                    !useUserStore.getState().user &&
+                    item.value !== modes[0].value
                   ) {
                     ToastEvent.show({
                       heading: "Biometrics not enrolled",
@@ -276,13 +278,14 @@ const AppLock = ({ route }) => {
                   alignSelf: "center",
                   ...getElevationStyle(5),
                   marginTop: 30,
-                  borderRadius: 100
+                  borderRadius: 100,
+                  marginBottom: 30
                 }}
                 type="accent"
                 title="Next"
               />
             )}
-          </View>
+          </ScrollView>
         </>
       </Animated.View>
     </>
