@@ -134,5 +134,27 @@ export const BehaviourSettings: SettingsGroup[] = [
         ]
       }
     ]
+  },
+  {
+    key: "updates",
+    section: "behaviour",
+    header: "Updates",
+    settings: [
+      {
+        key: "auto-updates",
+        title: "Automatic updates",
+        description:
+          "Automatically download & install updates in the background without prompting first.",
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.autoUpdates, listener),
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => useSettingStore.getState().autoUpdates,
+            toggle: () => useSettingStore.getState().toggleAutoUpdates()
+          }
+        ]
+      }
+    ]
   }
 ];

@@ -40,7 +40,8 @@ export const config = {
   privacyMode: false,
   isSpellCheckerEnabled: false,
   zoomFactor: 0,
-  theme: nativeTheme.themeSource
+  theme: nativeTheme.themeSource,
+  automaticUpdates: true
 };
 
 type ConfigKey = keyof typeof config;
