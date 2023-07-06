@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.15.0",
+    "@types/yargs": "^17.0.24",
     "chokidar": "^3.5.3",
     "electron": "24.5.1",
     "electron-builder": "24.4.0",
