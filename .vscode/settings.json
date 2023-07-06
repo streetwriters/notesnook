@@ -3,11 +3,13 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
-  "eslint.packageManager": "npm",
   "eslint.run": "onSave",
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "eslint.execArgv": ["--cache"],
+  "eslint.options": {
+    "cache": true,
+    "cacheStrategy": "content"
+  },
   "git.rebaseWhenSync": true
 }
