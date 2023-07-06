@@ -125,8 +125,9 @@ class AppStore extends BaseStore {
       this.updateSyncStatus("failed");
     });
 
-    db.eventManager.subscribe(EVENTS.syncCompleted, () => {
-      this.updateSyncStatus("synced", false);
+    db.eventManager.subscribe(EVENTS.syncCompleted, async () => {
+      await this.updateLastSynced();
+      this.updateSyncStatus("completed", true);
       count = 0;
       this.refresh();
     });
