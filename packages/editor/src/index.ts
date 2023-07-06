@@ -76,6 +76,7 @@ import Toolbar from "./toolbar";
 import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { DownloadOptions } from "./utils/downloader";
 import { Heading } from "./extensions/heading";
+import Clipboard, { ClipboardOptions } from "./extensions/clipboard";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -93,6 +94,7 @@ export type TiptapOptions = EditorOptions &
   Omit<WebClipOptions, "HTMLAttributes"> &
   Omit<ImageOptions, "HTMLAttributes"> &
   DateTimeOptions &
+  ClipboardOptions &
   OpenLinkOptions & {
     downloadOptions?: DownloadOptions;
     theme: Theme;
@@ -116,6 +118,7 @@ const useTiptap = (
     downloadOptions,
     dateFormat,
     timeFormat,
+    copyToClipboard,
     ...restOptions
   } = options;
   const PortalProviderAPI = usePortalProvider();
@@ -207,6 +210,9 @@ const useTiptap = (
           allowTableNodeSelection: true,
           cellMinWidth: 50
         }),
+        Clipboard.configure({
+          copyToClipboard
+        }),
         TableRow,
         TableCell,
         TableHeader,
@@ -260,7 +266,8 @@ const useTiptap = (
       onBeforeCreate,
       onOpenLink,
       dateFormat,
-      timeFormat
+      timeFormat,
+      copyToClipboard
     ]
   );
 

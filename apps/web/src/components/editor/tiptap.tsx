@@ -57,6 +57,7 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce, debounceWithId } from "@notesnook/common";
 import { store as editorstore } from "../../stores/editor-store";
+import { writeText } from "clipboard-polyfill";
 
 type OnChangeHandler = (
   id: string | undefined,
@@ -234,6 +235,9 @@ function TipTap(props: TipTapProps) {
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo()
         });
+      },
+      copyToClipboard(text) {
+        writeText(text);
       },
       onSelectionUpdate: debounce(({ editor, transaction }) => {
         const isEmptySelection = transaction.selection.empty;

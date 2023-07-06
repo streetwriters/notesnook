@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
+import Clipboard from "@react-native-clipboard/clipboard";
 import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
 import { useCallback, useEffect, useRef } from "react";
@@ -63,6 +64,7 @@ import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { EditorEvents, editorState } from "./utils";
 import { useNoteStore } from "../../../stores/use-notes-store";
+import SettingsService from "../../../services/settings";
 
 const publishNote = async (editor: useEditorType) => {
   const user = useUserStore.getState().user;
@@ -171,6 +173,12 @@ export const useEditorEvents = (
 
   useEffect(() => {
     if (loading) return;
+    if (typeof defaultFontFamily === "object") {
+      SettingsService.set({
+        defaultFontFamily: (defaultFontFamily as any).id
+      });
+    }
+
     editor.commands.setSettings({
       deviceMode: deviceMode || "mobile",
       fullscreen: fullscreen || false,
@@ -182,7 +190,7 @@ export const useEditorEvents = (
       doubleSpacedLines: doubleSpacedLines,
       corsProxy: corsProxy,
       fontSize: defaultFontSize,
-      fontFamily: defaultFontFamily,
+      fontFamily: SettingsService.get().defaultFontFamily,
       dateFormat: db.settings?.getDateFormat(),
       timeFormat: db.settings?.getTimeFormat()
     });
@@ -425,12 +433,17 @@ export const useEditorEvents = (
         case EventTypes.previewAttachment: {
           const hash = (editorMessage.value as Attachment)?.hash;
           const attachment = db.attachments?.attachment(hash);
+          if (!attachment) return;
           if (attachment.metadata.type.startsWith("image/")) {
             eSendEvent("ImagePreview", editorMessage.value);
           } else {
             eSendEvent("PDFPreview", attachment);
           }
 
+          break;
+        }
+        case EventTypes.copyToClipboard: {
+          Clipboard.setString(editorMessage.value as string);
           break;
         }
 

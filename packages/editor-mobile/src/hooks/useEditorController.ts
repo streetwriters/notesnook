@@ -96,6 +96,7 @@ export type EditorController = {
   openLink: (url: string) => boolean;
   setTitlePlaceholder: React.Dispatch<React.SetStateAction<string>>;
   countWords: (ms: number) => void;
+  copyToClipboard: (text: string) => void;
 };
 
 export function useEditorController(update: () => void): EditorController {
@@ -233,6 +234,10 @@ export function useEditorController(update: () => void): EditorController {
     return true;
   }, []);
 
+  const copyToClipboard = (text: string) => {
+    post(EventTypes.copyToClipboard, text);
+  };
+
   return {
     contentChange,
     selectionChange,
@@ -248,6 +253,7 @@ export function useEditorController(update: () => void): EditorController {
     content: htmlContentRef,
     openLink,
     onUpdate: onUpdate,
-    countWords
+    countWords,
+    copyToClipboard
   };
 }

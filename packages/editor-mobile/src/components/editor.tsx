@@ -93,6 +93,9 @@ const Tiptap = ({
       onOpenLink: (url) => {
         return global.editorController.openLink(url);
       },
+      copyToClipboard: (text) => {
+        globalThis.editorController.copyToClipboard(text);
+      },
       downloadOptions: {
         corsHost: settings.corsProxy
       },

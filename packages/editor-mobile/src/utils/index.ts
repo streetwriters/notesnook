@@ -150,7 +150,8 @@ export const EventTypes = {
   link: "editor-event:link",
   contentchange: "editor-event:content-change",
   reminders: "editor-event:reminders",
-  previewAttachment: "editor-event:preview-attachment"
+  previewAttachment: "editor-event:preview-attachment",
+  copyToClipboard: "editor-events:copy-to-clipboard"
 } as const;
 
 export function isReactNative(): boolean {

@@ -17,20 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Flex, Input, Text } from "@theme-ui/components";
 import { useRef, useState } from "react";
-import { Flex, Text } from "@theme-ui/components";
-import Languages from "./languages.json";
-import { Input } from "@theme-ui/components";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
-import { CodeBlockAttributes } from "./code-block";
-import { ReactNodeViewProps } from "../react/types";
-import { ResponsivePresenter } from "../../components/responsive";
-import { Popup } from "../../toolbar/components/popup";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 import { Button } from "../../components/button";
+import { ResponsivePresenter } from "../../components/responsive";
 import { useTimer } from "../../hooks/use-timer";
-import { writeText } from "clipboard-polyfill";
+import { Icon } from "../../toolbar/components/icon";
+import { Popup } from "../../toolbar/components/popup";
+import { Icons } from "../../toolbar/icons";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
+import { ReactNodeViewProps } from "../react/types";
+import { CodeBlockAttributes } from "./code-block";
+import Languages from "./languages.json";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
@@ -96,18 +94,18 @@ export function CodeblockComponent(
           }}
         >
           {caretPosition ? (
-            <Text variant={"subBody"} sx={{ mr: 2, color: "codeFg" }}>
+            <Text variant={"subBody"} sx={{ mr: 1, color: "codeFg" }}>
               Line {caretPosition.line}, Column {caretPosition.column}{" "}
               {caretPosition.selected
                 ? `(${caretPosition.selected} selected)`
                 : ""}
             </Text>
           ) : null}
+
           <Button
             variant={"icon"}
             sx={{
               p: 1,
-              mr: 1,
               opacity: "1 !important",
               ":hover": { bg: "codeSelection" }
             }}
@@ -125,12 +123,12 @@ export function CodeblockComponent(
               {indentType === "space" ? "Spaces" : "Tabs"}: {indentLength}
             </Text>
           </Button>
+
           <Button
             variant={"icon"}
             sx={{
               opacity: "1 !important",
               p: 1,
-              mr: 1,
               bg: isOpen ? "codeSelection" : "transparent",
               ":hover": { bg: "codeSelection" }
             }}
@@ -150,39 +148,34 @@ export function CodeblockComponent(
               {languageDefinition?.title || "Plaintext"}
             </Text>
           </Button>
-        </Flex>
 
-        {node.textContent.length > 0 ? (
-          <Button
-            variant={"tool"}
-            sx={{
-              position: "absolute",
-              opacity: isMobile ? 1 : 0,
-              right: 0,
-              p: 1,
-              mr: 1,
-              my: 1,
-              bg: "bgSecondary",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              border: "1px solid var(--codeBorder)",
-              ":hover": { bg: "bgSecondaryHover" },
-             borderColor: enabled ? "primary" : "codeBorder",
-             "div:hover > &": { opacity: isMobile ? 0 : 1 }
-            }}
-            title={enabled ? "Copied to clipboard" : "Copy to clipboard"}
-            onClick={() => {
-              writeText(node.textContent);
-              start();
-            }}
-          >
-            <Icon
-              path={enabled ? Icons.check : Icons.copy}
-              size={"big"}
-              color={enabled ? "primary" : "icon"}
-            />
-          </Button>
-        ) : null}
+          {node.textContent?.length > 0 ? (
+            <Button
+              variant={"icon"}
+              sx={{
+                opacity: "1 !important",
+                p: 1,
+                mr: 1,
+                bg: "transparent",
+                ":hover": { bg: "codeSelection" }
+              }}
+              disabled={!editor.isEditable}
+              onClick={() => {
+                editor.commands.copyToClipboard(node.textContent);
+                start();
+              }}
+              title="Copy to clipboard"
+            >
+              <Text
+                variant={"subBody"}
+                spellCheck={false}
+                sx={{ color: "codeFg" }}
+              >
+                Copy
+              </Text>
+            </Button>
+          ) : null}
+        </Flex>
       </Flex>
       <ResponsivePresenter
         isOpen={isOpen}
