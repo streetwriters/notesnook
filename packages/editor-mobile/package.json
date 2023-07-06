@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@notesnook/editor": "*",
-    "@notesnook/theme": "*",
+    "@notesnook/editor": "file:../editor",
+    "@notesnook/theme": "file:../theme",
     "framer-motion": "^6.5.1",
     "@mdi/js": "^6.9.96",
     "@mdi/react": "^1.6.0",

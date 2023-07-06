@@ -3,14 +3,13 @@
   "private": true,
   "scripts": {
     "prepare": "husky install && npm run bootstrap",
-    "bootstrap": "lerna bootstrap -- --legacy-peer-deps --no-audit",
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "clean": "node scripts/clean.mjs",
     "build": "nx run-many --target=build --all --exclude=@notesnook/mobile,@notesnook/web",
     "build:web": "nx build @notesnook/web",
     "build:test:web": "nx build:test @notesnook/web",
     "start:web": "nx start @notesnook/web",
     "start:desktop": "nx start @notesnook/desktop",
-    "install:web": "lerna add --scope=@notesnook/web ",
-    "install:mobile": "lerna add --scope=@notesnook/mobile ",
     "test:web": "nx test @notesnook/web",
     "test:core": "nx test @notesnook/core",
     "start:android": "nx run-android @notesnook/mobile",
@@ -49,13 +48,15 @@
     "serve": "^14.0.1"
   },
   "dependencies": {
-    "@lerna/legacy-package-management": "^7.0.0",
     "@nrwl/nx-cloud": "^14.6.2",
     "eslint-plugin-header": "^3.1.1",
-    "typescript": "^5.1.3",
-    "lerna": "^7.0.0",
+    "fast-glob": "^3.3.0",
+    "listr": "^0.14.3",
     "nx": "^16.3.2",
-    "patch-package": "^7.0.0"
+    "patch-package": "^7.0.0",
+    "rxjs": "^7.8.1",
+    "typescript": "^5.1.3",
+    "yargs-parser": "^21.1.1"
   },
   "license": "GPL-3.0-or-later",
   "volta": {

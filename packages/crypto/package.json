@@ -12,7 +12,7 @@
   "author": "",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@notesnook/sodium": "*"
+    "@notesnook/sodium": "file:../sodium"
   },
   "devDependencies": {},
   "repository": {

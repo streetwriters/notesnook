@@ -7,8 +7,8 @@
   "dependencies": {
     "clipboard-polyfill": "^4.0.0",
     "@emotion/react": "^11.10.0",
-    "@notesnook/theme": "*",
-    "@notesnook/core": "*",
+    "@notesnook/theme": "file:../theme",
+    "@notesnook/core": "file:../core",
     "@social-embed/lib": "^0.0.2-next.1",
     "@theme-ui/components": "^0.14.7",
     "@theme-ui/core": "^0.14.7",

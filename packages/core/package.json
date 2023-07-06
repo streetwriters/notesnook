@@ -12,7 +12,7 @@
     "@babel/plugin-transform-runtime": "^7.18.9",
     "@babel/preset-env": "^7.18.9",
     "@babel/runtime": "^7.18.9",
-    "@notesnook/crypto": "^1.0.1",
+    "@notesnook/crypto": "file:../crypto",
     "@types/html-to-text": "^9.0.0",
     "@types/jest": "^28.1.6",
     "@types/showdown": "^2.0.0",
@@ -38,7 +38,7 @@
   "dependencies": {
     "@microsoft/signalr": "^6.0.7",
     "@microsoft/signalr-protocol-msgpack": "^6.0.7",
-    "@notesnook/logger": "*",
+    "@notesnook/logger": "file:../logger",
     "@streetwriters/showdown": "^3.0.1-alpha.2",
     "async-mutex": "^0.3.2",
     "dayjs": "^1.11.3",

@@ -10,7 +10,7 @@
   "author": "",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@notesnook/crypto": "*",
+    "@notesnook/crypto": "file:../crypto",
     "localforage": "^1.10.0"
   },
   "devDependencies": {
