@@ -11,28 +11,25 @@
   "repository": "https://github.com/streetwriters/notesnook",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@notesnook/crypto": "*",
+    "@notesnook/crypto": "file:../../packages/crypto",
     "@trpc/client": "10.31.0",
     "@trpc/server": "10.31.0",
-    "diary": "^0.3.1",
     "electron-trpc": "0.5.2",
-    "electron-updater": "^5.3.0",
+    "electron-updater": "6.1.1",
     "icojs": "^0.17.1",
     "typed-emitter": "^2.1.0",
     "yargs": "^17.6.2",
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "chokidar": "^3.5.3",
-    "tree-kill": "^1.2.2",
-    "@electron/rebuild": "^3.2.13",
     "@types/node": "^18.15.0",
-    "electron": "^24.4.0",
-    "electron-builder": "^23.6.0",
+    "chokidar": "^3.5.3",
+    "electron": "24.5.1",
+    "electron-builder": "24.4.0",
     "electron-builder-notarize": "^1.5.1",
-    "electron-reloader": "^1.2.3",
     "esbuild": "^0.17.19",
-    "node-fetch": "^3.3.1"
+    "node-fetch": "^3.3.1",
+    "tree-kill": "^1.2.2"
   },
   "optionalDependencies": {
     "dmg-license": "^1.0.11"

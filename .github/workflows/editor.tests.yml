@@ -29,8 +29,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm i --ignore-scripts --prefer-offline --no-audit
-          npx lerna bootstrap --ignore=@notesnook/mobile -- --prefer-offline --no-audit
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=editor
 
       - name: Setup environment
         run: |

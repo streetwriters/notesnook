@@ -32,8 +32,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm i --ignore-scripts --prefer-offline --no-audit
-          npx lerna bootstrap --ignore=@notesnook/mobile -- --prefer-offline --no-audit
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=web
 
       - name: Setup environment
         run: |
@@ -112,8 +112,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm i --ignore-scripts --prefer-offline --no-audit
-          npx lerna bootstrap --scope=@notesnook/desktop --scope=@notesnook/crypto --scope=@notesnook/sodium -- --prefer-offline --no-audit
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
 
       - name: Install provisioning profile
         run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
@@ -187,8 +187,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm i --ignore-scripts --prefer-offline --no-audit
-          npx lerna bootstrap --scope=@notesnook/desktop --scope=@notesnook/crypto --scope=@notesnook/sodium -- --prefer-offline --no-audit
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
 
       - name: Build Electron wrapper
         run: npx nx run release --project @notesnook/desktop
@@ -237,8 +237,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm i --ignore-scripts --prefer-offline --no-audit
-          npx lerna bootstrap --scope=@notesnook/desktop --scope=@notesnook/crypto --scope=@notesnook/sodium -- --prefer-offline --no-audit
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
 
       - name: Build
         run: npx nx run release --project @notesnook/desktop

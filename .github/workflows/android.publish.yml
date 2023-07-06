@@ -22,7 +22,9 @@ jobs:
 
       - name: Install node modules
         run: |
-          npm ci
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=mobile
+
       - name: Make Gradlew Executable
         run: cd apps/mobile/native/android && chmod +x ./gradlew
 
