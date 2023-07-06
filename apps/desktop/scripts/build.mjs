@@ -42,16 +42,17 @@ const sodiumNativePrebuildPath = (arch) =>
     `${os.platform()}-${arch}`
   );
 const webAppPath = path.resolve(path.join(__dirname, "..", "..", "web"));
-if (args.rebuild) {
-  await fs.rm("./build/", { force: true, recursive: true });
 
+await fs.rm("./build/", { force: true, recursive: true });
+
+if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
   await exec(`cd ${webAppPath} && npm run build:desktop`);
-
-  await fs.cp(path.join(webAppPath, "build"), "build", {
-    recursive: true,
-    force: true
-  });
 }
+
+await fs.cp(path.join(webAppPath, "build"), "build", {
+  recursive: true,
+  force: true
+});
 
 if (args.variant === "mas") {
   await exec(`npm run bundle:mas`);

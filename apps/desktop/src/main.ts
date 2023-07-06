@@ -34,10 +34,6 @@ import { router, api } from "./api";
 import { config } from "./utils/config";
 import path from "path";
 
-if (!RELEASE) {
-  require("electron-reloader")(module);
-}
-
 if (process.platform == "win32" && process.env.PORTABLE_EXECUTABLE_DIR) {
   console.log("Portable app: true");
   const root = path.join(process.env.PORTABLE_EXECUTABLE_DIR, "Notesnook");

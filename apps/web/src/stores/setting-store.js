@@ -53,6 +53,7 @@ class SettingStore extends BaseStore {
    * @type {DesktopIntegrationSettings | undefined}
    */
   desktopIntegrationSettings = undefined;
+  autoUpdates = true;
 
   refresh = async () => {
     this.set({
@@ -63,7 +64,8 @@ class SettingStore extends BaseStore {
       desktopIntegrationSettings:
         await desktop?.integration.desktopIntegration.query(),
       privacyMode: await desktop?.integration.privacyMode.query(),
-      zoomFactor: await desktop?.integration.zoomFactor.query()
+      zoomFactor: await desktop?.integration.zoomFactor.query(),
+      autoUpdates: await desktop?.updater.autoUpdates.query()
     });
   };
 
@@ -159,6 +161,12 @@ class SettingStore extends BaseStore {
     const privacyMode = this.get().privacyMode;
     this.set({ privacyMode: !privacyMode });
     await desktop?.integration.setPrivacyMode.mutate(!privacyMode);
+  };
+
+  toggleAutoUpdates = async () => {
+    const autoUpdates = this.get().autoUpdates;
+    this.set({ autoUpdates: !autoUpdates });
+    await desktop?.updater.toggleAutoUpdates.mutate(!autoUpdates);
   };
 }
 

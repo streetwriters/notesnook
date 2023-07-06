@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { autoUpdater } from "electron-updater";
+import { config } from "./config";
 
 async function configureAutoUpdater() {
   autoUpdater.setFeedURL({
@@ -26,7 +27,7 @@ async function configureAutoUpdater() {
     useMultipleRangeRequest: false
   });
 
-  autoUpdater.autoDownload = false;
+  autoUpdater.autoDownload = config.automaticUpdates;
   autoUpdater.allowDowngrade = false;
   autoUpdater.allowPrerelease = false;
   autoUpdater.autoInstallOnAppQuit = true;

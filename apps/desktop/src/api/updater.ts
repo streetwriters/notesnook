@@ -21,6 +21,8 @@ import { initTRPC } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
 import { CancellationToken, autoUpdater } from "electron-updater";
 import type { AppUpdaterEvents } from "electron-updater/out/AppUpdater";
+import { z } from "zod";
+import { config } from "../utils/config";
 
 type UpdateInfo = { version: string };
 type Progress = { percent: number };
@@ -28,6 +30,7 @@ type Progress = { percent: number };
 const t = initTRPC.create();
 
 export const updaterRouter = t.router({
+  autoUpdates: t.procedure.query(() => config.automaticUpdates),
   install: t.procedure.query(() => autoUpdater.quitAndInstall()),
   download: t.procedure.query(async () => {
     const cancellationToken = new CancellationToken();
@@ -36,6 +39,13 @@ export const updaterRouter = t.router({
   check: t.procedure.query(async () => {
     await autoUpdater.checkForUpdates();
   }),
+
+  toggleAutoUpdates: t.procedure
+    .input(z.boolean().optional())
+    .mutation(({ input }) => {
+      config.automaticUpdates =
+        input === undefined ? !config.automaticUpdates : input;
+    }),
 
   onChecking: createSubscription("checking-for-update"),
   onDownloaded: createSubscription<"update-downloaded", UpdateInfo>(
