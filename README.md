@@ -27,7 +27,7 @@ Notesnook is built using the following technologies:
 3. React Native — For mobile apps we are using React Native
 4. Electron — For desktop app
 5. NPM — listed here because we **don't** use Yarn or PNPM or XYZ across any of our projects.
-6. Lerna & Nx — maintaining monorepos is hard but Nx makes it easier.
+6. Nx — maintaining monorepos is hard but Nx makes it easier.
 
 > **Note: Each project in the monorepo contains its own architecture details which you can refer to.**
 
