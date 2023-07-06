@@ -76,6 +76,9 @@ export async function uploadFile(filename, data, cancelToken) {
     let result = status >= 200 && status < 300 && text.length === 0;
     useAttachmentStore.getState().remove(filename);
     if (result) {
+      DatabaseLogger.info(
+        `File upload status: ${filename}, ${status}, ${text}`
+      );
       let attachment = db.attachments.attachment(filename);
       if (!attachment) return result;
       if (
@@ -84,8 +87,13 @@ export async function uploadFile(filename, data, cancelToken) {
       ) {
         RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
       }
+    } else {
+      const fileInfo = await RNFetchBlob.fs.stat(uploadFilePath);
+      throw new Error(
+        `${status}, ${text}, name: ${fileInfo.filename}, length: ${fileInfo}`
+      );
     }
-    DatabaseLogger.info(`File upload status: ${filename}, ${status}, ${text}`);
+
     return result;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);

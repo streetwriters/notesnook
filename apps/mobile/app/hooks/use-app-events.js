@@ -58,7 +58,8 @@ import {
   setEmailVerifyMessage,
   setLoginMessage,
   setRateAppMessage,
-  setRecoveryKeyMessage
+  setRecoveryKeyMessage,
+  setUpdateAvailableMessage
 } from "../services/message";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
@@ -424,9 +425,7 @@ export const useAppEvents = () => {
         await PremiumService.setPremiumStatus();
         setLastSynced(await db.lastSynced());
         await useDragState.getState().init();
-        if (!user) {
-          return setLoginMessage();
-        }
+        if (!user) return;
 
         let userEmailConfirmed = SettingsService.get().userEmailConfirmed;
         setUser(user);
@@ -623,7 +622,6 @@ export const useAppEvents = () => {
 };
 
 const doAppLoadActions = async () => {
-  await sleep(500);
   if (SettingsService.get().sessionExpired) {
     eSendEvent(eLoginSessionExpired);
     return;
@@ -632,6 +630,10 @@ const doAppLoadActions = async () => {
   await useMessageStore.getState().setAnnouncement();
   if (NewFeature.present()) return;
   if (await checkAppUpdateAvailable()) return;
+  if (!(await db.user.getUser())) {
+    setLoginMessage();
+    return;
+  }
   if (await checkForRateAppRequest()) return;
   if (await PremiumService.getRemainingTrialDaysStatus()) return;
   if (SettingsService.get().introCompleted) {
@@ -652,9 +654,8 @@ const checkAppUpdateAvailable = async () => {
         ? await getGithubVersion()
         : await checkVersion();
     if (!version || !version?.needsUpdate) return false;
-    presentSheet({
-      component: (ref) => <Update version={version} fwdRef={ref} />
-    });
+
+    setUpdateAvailableMessage(version);
     return true;
   } catch (e) {
     return false;
