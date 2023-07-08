@@ -25,7 +25,7 @@ import { EmotionThemeVariant } from "@notesnook/theme";
 export function InlineTag(props: {
   title: string;
   icon: string;
-  iconColor?: keyof SchemeColors;
+  iconColor?: SchemeColors;
   onClick: () => void;
 }) {
   const { title, icon, onClick, iconColor = "icon" } = props;
