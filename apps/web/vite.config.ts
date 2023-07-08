@@ -152,7 +152,13 @@ export default defineConfig({
     minify: "esbuild",
     cssMinify: true,
     emptyOutDir: true,
-    sourcemap: process.env.GENERATE_SOURCEMAP === "true"
+    sourcemap: process.env.GENERATE_SOURCEMAP === "true",
+    rollupOptions: {
+      output: {
+        assetFileNames: "assets/[name]-[hash:12][extname]",
+        chunkFileNames: "[name]-[hash:12].js"
+      }
+    }
   },
   logLevel: process.env.NODE_ENV === "production" ? "warn" : "info",
   resolve: {
