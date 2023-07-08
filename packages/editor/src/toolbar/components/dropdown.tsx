@@ -77,7 +77,12 @@ export function Dropdown(props: DropdownProps) {
       >
         {typeof selectedItem === "string" ? (
           <Text
-            sx={{ fontSize: "subBody", mr: 1, color: "text", flexShrink: 0 }}
+            sx={{
+              fontSize: "subBody",
+              mr: 1,
+              color: "paragraph",
+              flexShrink: 0
+            }}
           >
             {selectedItem}
           </Text>

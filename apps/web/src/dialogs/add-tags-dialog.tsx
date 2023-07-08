@@ -192,7 +192,7 @@ function TagItem(props: {
           className="title"
           data-test-id="notebook-title"
           variant="subtitle"
-          sx={{ fontWeight: "body", color: "text" }}
+          sx={{ fontWeight: "body", color: "paragraph" }}
         >
           #{tag.title}
         </Text>

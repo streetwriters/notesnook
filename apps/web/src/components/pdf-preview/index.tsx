@@ -104,7 +104,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                       fontFamily: "body",
                       fontWeight: "body",
                       fontSize: "input",
-                      color: "text",
+                      color: "paragraph",
                       ":focus": {
                         outline: "2px solid var(--primary)"
                       },

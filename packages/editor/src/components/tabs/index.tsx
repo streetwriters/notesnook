@@ -64,7 +64,7 @@ export function Tabs(props: PropsWithChildren<TabsProps>) {
                 borderTopRightRadius: "default",
                 bg: activeTab === index ? "background" : "transparent",
                 fontWeight: activeTab === index ? "bold" : "normal",
-                color: "text",
+                color: "paragraph",
                 ":last-of-type": { mr: 0 },
                 borderBottom: "2px solid",
                 borderBottomColor:

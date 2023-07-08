@@ -82,6 +82,7 @@
     "prewatch": "node ./scripts/build.mjs",
     "build": "tsc",
     "watch": "tsc --watch",
+    "start": "npm run watch",
     "prepublishOnly": "npm run build && npm run test",
     "postinstall": "npx patch-package"
   },

@@ -258,7 +258,7 @@ export default function SettingsDialog(props: SettingsDialogProps) {
                 variant={"subBody"}
                 sx={{
                   fontWeight: "bold",
-                  color: "text",
+                  color: "paragraph",
                   mx: 3,
                   mb: 1
                 }}

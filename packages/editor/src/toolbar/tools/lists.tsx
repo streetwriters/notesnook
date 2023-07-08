@@ -230,7 +230,7 @@ function ListThumbnail(props: ListThumbnailProps) {
           as="li"
           sx={{
             display: "list-item",
-            color: "text",
+            color: "paragraph",
             fontSize: 8,
             mb: "1px"
           }}

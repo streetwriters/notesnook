@@ -3267,7 +3267,7 @@ index d5371c3ed..83f0b31ad 100644
  import { ThemeUIStyleObject } from "@theme-ui/core";
  
  const defaultVariant: ThemeUIStyleObject = {
--  color: "text",
+-  color: "paragraph",
 +  color: "paragraph",
    fontFamily: "body"
  };

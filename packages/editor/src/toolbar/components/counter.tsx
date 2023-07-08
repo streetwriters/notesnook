@@ -52,7 +52,7 @@ function _Counter(props: CounterProps) {
 
       <Button
         sx={{
-          color: "text",
+          color: "paragraph",
           bg: "transparent",
           px: 0,
           fontSize: "subBody",

@@ -99,14 +99,14 @@ const dialog: ThemeUIStyleObject = {
 
 const secondary: ThemeUIStyleObject = {
   variant: "buttons.default",
-  color: "text",
+  color: "paragraph",
   bg: "background",
   borderRadius: "default"
 };
 
 const tertiary: ThemeUIStyleObject = {
   variant: "buttons.default",
-  color: "text",
+  color: "paragraph",
   bg: "transparent",
   border: "2px solid",
   borderColor: "border",
@@ -145,7 +145,7 @@ const anchor: ThemeUIStyleObject = {
 
 const icon: ThemeUIStyleObject = {
   variant: "buttons.default",
-  color: "text",
+  color: "paragraph",
   borderRadius: "none",
   ":hover": {
     backgroundColor: "hover",
@@ -155,7 +155,7 @@ const icon: ThemeUIStyleObject = {
 
 const tool: ThemeUIStyleObject = {
   variant: "buttons.default",
-  color: "text",
+  color: "paragraph",
   backgroundColor: "background",
   borderRadius: "default"
 };
@@ -172,7 +172,7 @@ const menuItem: ThemeUIStyleObject = {
   py: "8px",
   px: 3,
   borderRadius: 0,
-  color: "text",
+  color: "paragraph",
   cursor: "pointer",
   ":hover:not(:disabled),:focus:not(:disabled)": {
     backgroundColor: "hover",
