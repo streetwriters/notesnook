@@ -23,7 +23,7 @@ import { AppEventManager, AppEvents } from "./common/app-events";
 import { render } from "react-dom";
 import { getCurrentHash, getCurrentPath, makeURL } from "./navigation";
 import Config from "./utils/config";
-import { isTesting } from "./utils/platform";
+
 import { initalizeLogger, logger } from "./utils/logger";
 import { AuthProps } from "./views/auth";
 import { loadDatabase } from "./hooks/use-database";
@@ -125,7 +125,7 @@ function fallbackRoute(): RouteWithPath {
 }
 
 function redirectToRegistration(path: Routes): RouteWithPath<AuthProps> | null {
-  if (!isTesting() && !shouldSkipInitiation() && !routes[path]) {
+  if (!IS_TESTING && !shouldSkipInitiation() && !routes[path]) {
     window.history.replaceState({}, "", makeURL("/signup", getCurrentHash()));
     return { route: routes["/signup"], path: "/signup" };
   }
@@ -156,8 +156,7 @@ async function renderApp() {
   } = getRoute();
 
   if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
-  if (import.meta.env.REACT_APP_PLATFORM === "desktop")
-    await loadDatabase("db");
+  if (IS_DESKTOP_APP) await loadDatabase("db");
 
   logger.measure("app render");
 
@@ -174,7 +173,7 @@ async function renderApp() {
 }
 
 async function initializeServiceWorker() {
-  if (import.meta.env.REACT_APP_PLATFORM !== "desktop") {
+  if (!IS_DESKTOP_APP) {
     logger.info("Initializing service worker...");
     const serviceWorker = await import("./service-worker-registration");
 

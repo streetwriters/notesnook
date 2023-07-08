@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import { isTesting } from "../../utils/platform";
+
 import { Period, Plan } from "./types";
 
 type PlanMetadata = {
@@ -32,7 +32,7 @@ export const DEFAULT_PLANS: Plan[] = [
     country: "PK",
     currency: "USD",
     discount: 0,
-    id: import.meta.env.NODE_ENV === "development" ? "9822" : "648884",
+    id: import.meta.env.DEV ? "9822" : "648884",
     price: { gross: 4.49, net: 0, tax: 0 }
   },
   {
@@ -40,7 +40,7 @@ export const DEFAULT_PLANS: Plan[] = [
     country: "PK",
     currency: "USD",
     discount: 0,
-    id: import.meta.env.NODE_ENV === "development" ? "50305" : "658759",
+    id: import.meta.env.DEV ? "50305" : "658759",
     price: { gross: 49.99, net: 0, tax: 0 }
   }
 ];
@@ -52,8 +52,7 @@ export const PLAN_METADATA: Record<Period, PlanMetadata> = {
 
 let CACHED_PLANS: Plan[];
 export async function getPlans(): Promise<Plan[] | null> {
-  if (isTesting() || import.meta.env.NODE_ENV === "development")
-    return DEFAULT_PLANS;
+  if (IS_TESTING || import.meta.env.DEV) return DEFAULT_PLANS;
   if (CACHED_PLANS) return CACHED_PLANS;
 
   const url = `https://notesnook.com/api/v1/prices/products/web`;

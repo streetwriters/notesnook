@@ -21,128 +21,23 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import svgrPlugin from "vite-plugin-svgr";
 import envCompatible from "vite-plugin-env-compatible";
-import { VitePWA, ManifestOptions } from "vite-plugin-pwa";
+import { VitePWA } from "vite-plugin-pwa";
 import autoprefixer from "autoprefixer";
+import { WEB_MANIFEST } from "./web-manifest";
+import { execSync } from "child_process";
+import { version } from "./package.json";
 
-const WEB_MANIFEST: Partial<ManifestOptions> = {
-  name: "Notesnook",
-  description:
-    "A fully open source & end-to-end encrypted note taking alternative to Evernote.",
-  short_name: "Notesnook",
-  shortcuts: [
-    {
-      name: "New note",
-      url: "/#/notes/create",
-      description: "Create a new note",
-      icons: [
-        {
-          src: "/android-chrome-192x192.png",
-          sizes: "192x192",
-          type: "image/png"
-        }
-      ]
-    },
-    {
-      name: "New notebook",
-      url: "/#/notebooks/create",
-      description: "Create a new notebook",
-      icons: [
-        {
-          src: "/android-chrome-192x192.png",
-          sizes: "192x192",
-          type: "image/png"
-        }
-      ]
-    }
-  ],
-  icons: [
-    {
-      src: "favicon-16x16.png",
-      sizes: "16x16",
-      type: "image/png"
-    },
-    {
-      src: "favicon-32x32.png",
-      sizes: "32x32",
-      type: "image/png"
-    },
-    {
-      src: "favicon-72x72.png",
-      sizes: "72x72",
-      type: "image/png"
-    },
-    {
-      src: "/android-chrome-192x192.png",
-      sizes: "192x192",
-      type: "image/png"
-    },
-    {
-      src: "/android-chrome-512x512.png",
-      sizes: "512x512",
-      type: "image/png"
-    }
-  ],
-  screenshots: [
-    {
-      src: "/screenshots/screenshot-1.jpg",
-      sizes: "1080x1920",
-      type: "image/jpeg"
-    },
-    {
-      src: "/screenshots/screenshot-2.jpg",
-      sizes: "1080x1920",
-      type: "image/jpeg"
-    },
-    {
-      src: "/screenshots/screenshot-3.jpg",
-      sizes: "1080x1920",
-      type: "image/jpeg"
-    },
-    {
-      src: "/screenshots/screenshot-4.jpg",
-      sizes: "1080x1920",
-      type: "image/jpeg"
-    },
-    {
-      src: "/screenshots/screenshot-5.jpg",
-      sizes: "1080x1920",
-      type: "image/jpeg"
-    },
-    {
-      src: "/screenshots/screenshot-6.jpg",
-      sizes: "1080x1920",
-      type: "image/jpeg"
-    },
-    {
-      src: "/screenshots/screenshot-7.jpg",
-      sizes: "1080x1920",
-      type: "image/jpeg"
-    }
-  ],
-  related_applications: [
-    {
-      platform: "play",
-      url: "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook",
-      id: "com.streetwriters.notesnook"
-    },
-    {
-      platform: "itunes",
-      url: "https://apps.apple.com/us/app/notesnook-private-notes-app/id1544027013"
-    }
-  ],
-  prefer_related_applications: true,
-  orientation: "any",
-  start_url: ".",
-  theme_color: "#01c352",
-  background_color: "#ffffff",
-  display: "standalone",
-  categories: ["productivity", "lifestyle", "education", "books"]
-};
-
+const gitHash = (() => {
+  try {
+    return execSync("git rev-parse --short HEAD").toString().trim();
+  } catch (e) {
+    return process.env.GIT_HASH || "gitless";
+  }
+})();
+const appVersion = version.replaceAll(".", "");
 const isTesting =
-  process.env.REACT_APP_TEST === "true" ||
-  process.env.NODE_ENV === "development";
-const isDesktop = process.env.REACT_APP_PLATFORM === "desktop";
+  process.env.TEST === "true" || process.env.NODE_ENV === "development";
+const isDesktop = process.env.PLATFORM === "desktop";
 
 export default defineConfig({
   envPrefix: "REACT_APP_",
@@ -152,13 +47,22 @@ export default defineConfig({
     minify: "esbuild",
     cssMinify: true,
     emptyOutDir: true,
-    sourcemap: process.env.GENERATE_SOURCEMAP === "true",
+    sourcemap: true,
     rollupOptions: {
       output: {
         assetFileNames: "assets/[name]-[hash:12][extname]",
-        chunkFileNames: "[name]-[hash:12].js"
+        chunkFileNames: "assets/[name]-[hash:12].js"
       }
     }
+  },
+  define: {
+    GIT_HASH: `"${gitHash}"`,
+    APP_VERSION: `"${appVersion}"`,
+    PUBLIC_URL: `"${process.env.PUBLIC_URL || ""}"`,
+    IS_DESKTOP_APP: isDesktop,
+    PLATFORM: `"${process.env.PLATFORM}"`,
+    IS_TESTING: process.env.TEST === "true",
+    IS_BETA: process.env.BETA === "true"
   },
   logLevel: process.env.NODE_ENV === "production" ? "warn" : "info",
   resolve: {
@@ -194,7 +98,7 @@ export default defineConfig({
             manifest: WEB_MANIFEST,
             injectRegister: null,
             srcDir: "src",
-            filename: "service-worker.js"
+            filename: "service-worker.ts"
           })
         ]),
     react({

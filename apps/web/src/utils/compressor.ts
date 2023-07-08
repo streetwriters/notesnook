@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import CompressorWorker from "./compressor.worker.ts?worker";
 import type { Compressor as CompressorWorkerType } from "./compressor.worker";
 import { wrap, Remote } from "comlink";
-import { isDesktop } from "./platform";
+
 import { desktop } from "../common/desktop-bridge";
 
 export class Compressor {
@@ -28,21 +28,21 @@ export class Compressor {
   private compressor!: Remote<CompressorWorkerType>;
 
   constructor() {
-    if (!isDesktop()) {
+    if (!IS_DESKTOP_APP) {
       this.worker = new CompressorWorker();
       this.compressor = wrap<CompressorWorkerType>(this.worker);
     }
   }
 
   async compress(data: string) {
-    if (isDesktop())
+    if (IS_DESKTOP_APP)
       return await desktop?.compress.gzip.query({ data, level: 6 });
 
     return await this.compressor.gzip({ data, level: 6 });
   }
 
   async decompress(data: string) {
-    if (isDesktop()) return await desktop?.compress.gunzip.query(data);
+    if (IS_DESKTOP_APP) return await desktop?.compress.gunzip.query(data);
 
     return await this.compressor.gunzip({ data });
   }

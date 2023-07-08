@@ -38,7 +38,7 @@ import useDatabase from "../hooks/use-database";
 import Loader from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
-import { isTesting } from "../utils/platform";
+
 import { useTimer } from "../hooks/use-timer";
 import { AuthenticatorType } from "../dialogs/mfa/types";
 import {
@@ -521,7 +521,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
 
         const url = await db.user?.recoverAccount(form.email.toLowerCase());
         console.log(url);
-        if (isTesting()) {
+        if (IS_TESTING) {
           window.open(url, "_self");
           return;
         }

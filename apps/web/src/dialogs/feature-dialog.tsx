@@ -22,7 +22,7 @@ import Dialog from "../components/dialog";
 import { getHomeRoute, hardNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
 import Config from "../utils/config";
-import { isTesting } from "../utils/platform";
+
 import { useEffect } from "react";
 import { ArrowRight, Checkmark, Icon, Warn } from "../components/icons";
 
@@ -106,7 +106,7 @@ const features: Record<FeatureKeys, Feature> = {
         appVersion.isBeta || Config.has((k) => k.endsWith(":highlights"));
       if (!hasShownAny) Config.set(key, true);
 
-      return hasShownAny && !isTesting() && !hasShownBefore;
+      return hasShownAny && !IS_TESTING && !hasShownBefore;
     }
   }
 };

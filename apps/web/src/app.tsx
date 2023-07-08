@@ -111,11 +111,7 @@ function SuspenseLoader<TComponent extends React.JSXElementConstructor<any>>({
     props: any
   ) => React.ReactComponentElement<any, any>;
   return (
-    <Suspense
-      fallback={
-        import.meta.env.REACT_APP_PLATFORM === "desktop" ? null : fallback
-      }
-    >
+    <Suspense fallback={IS_DESKTOP_APP ? null : fallback}>
       <Component {...props} />
     </Suspense>
   );

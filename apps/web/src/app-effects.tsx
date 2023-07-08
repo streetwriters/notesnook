@@ -39,7 +39,7 @@ import {
   showOnboardingDialog
 } from "./common/dialog-controller";
 import useSystemTheme from "./hooks/use-system-theme";
-import { isTesting } from "./utils/platform";
+
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";
 import { interruptedOnboarding } from "./dialogs/onboarding-dialog";
@@ -199,7 +199,7 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
   }, []);
 
   useEffect(() => {
-    if (!dialogAnnouncements.length || isTesting()) return;
+    if (!dialogAnnouncements.length || IS_TESTING) return;
     (async () => {
       await showAnnouncementDialog(dialogAnnouncements[0]);
     })();

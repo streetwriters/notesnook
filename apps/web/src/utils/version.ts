@@ -20,15 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export type Platforms = "web" | "desktop";
 export type AppVersion = typeof appVersion;
 export const appVersion = {
-  formatted: format(
-    import.meta.env.REACT_APP_VERSION,
-    import.meta.env.REACT_APP_GIT_HASH,
-    import.meta.env.REACT_APP_PLATFORM as Platforms,
-    import.meta.env.REACT_APP_BETA === "true"
-  ),
-  clean: formatVersion(import.meta.env.REACT_APP_VERSION),
-  numerical: parseInt(import.meta.env.REACT_APP_VERSION || "0"),
-  isBeta: import.meta.env.REACT_APP_BETA === "true"
+  formatted: format(APP_VERSION, GIT_HASH, PLATFORM, IS_BETA),
+  clean: formatVersion(APP_VERSION),
+  numerical: parseInt(APP_VERSION || "0"),
+  hash: GIT_HASH,
+  isBeta: IS_BETA
 };
 
 function format(
@@ -59,11 +55,12 @@ export function getServiceWorkerVersion(
       if (type !== "GET_VERSION") return;
       clearTimeout(timeout);
 
-      const { version } = ev.data;
+      const { version, hash } = ev.data;
       resolve({
         formatted: formatVersion(version),
         numerical: parseInt(version),
         clean: formatVersion(version),
+        hash,
         isBeta: appVersion.isBeta
       });
     });

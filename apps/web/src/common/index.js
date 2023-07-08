@@ -27,7 +27,7 @@ import Config from "../utils/config";
 import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
 import { sanitizeFilename } from "@notesnook/common";
-import { isDesktop, isTesting } from "../utils/platform";
+
 import { store as userstore } from "../stores/user-store";
 import FileSaver from "file-saver";
 import { showToast } from "../utils/toast";
@@ -66,7 +66,7 @@ export const CREATE_BUTTON_MAP = {
 
 export async function introduceFeatures() {
   const hash = getCurrentHash().replace("#", "");
-  if (!!hash || isTesting()) return;
+  if (!!hash || IS_TESTING) return;
   const features = [];
   for (let feature of features) {
     if (!Config.get(`feature:${feature}`)) {
@@ -95,7 +95,7 @@ export async function createBackup() {
   const filename = sanitizeFilename(`notesnook-backup-${getFormattedDate()}`);
 
   const ext = "nnbackup";
-  if (isDesktop()) {
+  if (IS_DESKTOP_APP) {
     const directory = Config.get(
       "backupStorageLocation",
       PATHS.backupsDirectory
@@ -189,7 +189,7 @@ export function totalSubscriptionConsumed(user) {
 }
 
 export async function showUpgradeReminderDialogs() {
-  if (isTesting()) return;
+  if (IS_TESTING) return;
 
   const user = userstore.get().user;
   if (!user || !user.subscription || user.subscription?.expiry === 0) return;

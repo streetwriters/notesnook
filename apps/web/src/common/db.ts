@@ -47,7 +47,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     FS,
     new Compressor()
   );
-  // if (isTesting()) {
+  // if (IS_TESTING) {
 
   // } else {
   // db.host({

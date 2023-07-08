@@ -24,7 +24,7 @@ import { createBackup } from "../common";
 import { db } from "../common/db";
 import { Perform } from "../common/dialog-controller";
 import { TaskManager } from "../common/task-manager";
-import { isDesktop } from "../utils/platform";
+
 import Dialog from "../components/dialog";
 
 type MigrationProgressEvent = {
@@ -74,7 +74,7 @@ export default function MigrationDialog(props: MigrationDialogProps) {
   }, [props]);
 
   useEffect(() => {
-    if (isDesktop()) {
+    if (IS_DESKTOP_APP) {
       (async () => {
         await startMigration();
       })();
@@ -115,7 +115,7 @@ export default function MigrationDialog(props: MigrationDialogProps) {
     );
   }
 
-  if (isDesktop() || isProcessing) return null;
+  if (IS_DESKTOP_APP || isProcessing) return null;
 
   return (
     <Dialog

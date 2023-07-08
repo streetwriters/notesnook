@@ -22,7 +22,6 @@ import {
   useStore as useUserStore,
   store as userstore
 } from "../stores/user-store";
-import { isTesting } from "../utils/platform";
 
 export function useIsUserPremium() {
   const user = useUserStore((store) => store.user);
@@ -30,7 +29,7 @@ export function useIsUserPremium() {
 }
 
 export function isUserPremium(user?: User) {
-  if (isTesting()) return true;
+  if (IS_TESTING) return true;
   if (!user) user = userstore.get().user;
 
   const subStatus = user?.subscription?.type;
