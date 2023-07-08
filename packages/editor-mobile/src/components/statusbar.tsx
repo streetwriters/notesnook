@@ -80,7 +80,7 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
     marginTop: 0,
     marginBottom: 0,
     fontSize: "12px",
-    color: "var(--nn_primary_icon)",
+    color: "var(--nn_secondary_paragraph)",
     marginRight: 8,
     paddingBottom: 0,
     userSelect: "none",

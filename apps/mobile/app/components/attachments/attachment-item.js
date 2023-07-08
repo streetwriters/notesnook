@@ -23,7 +23,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import { useThemeColors } from "@notesnook/theme";
-import { formatBytes } from "../../utils";
+import { formatBytes } from "@notesnook/common";
 import { SIZE } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
 import { IconButton } from "../ui/icon-button";

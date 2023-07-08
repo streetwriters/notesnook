@@ -28,7 +28,7 @@ import {
 } from "react-native";
 import { SwiperFlatList } from "react-native-swiper-flatlist";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { getElevationStyle } from "../../../utils/elevation";
+import { getElevationStyle } from "../../utils/elevation";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
