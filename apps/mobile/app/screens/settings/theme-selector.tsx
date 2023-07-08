@@ -134,8 +134,7 @@ export default function ThemeSelector() {
   const select = (item: ThemeDefinition) => {
     presentSheet({
       context: item.id,
-      component: (ref, close) => <ThemeSetter close={close} theme={item} />,
-      noBottomPadding: true
+      component: (ref, close) => <ThemeSetter close={close} theme={item} />
     });
   };
 
