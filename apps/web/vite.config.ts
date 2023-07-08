@@ -47,7 +47,7 @@ export default defineConfig({
     minify: "esbuild",
     cssMinify: true,
     emptyOutDir: true,
-    sourcemap: true,
+    sourcemap: isTesting,
     rollupOptions: {
       output: {
         assetFileNames: "assets/[name]-[hash:12][extname]",
