@@ -96,7 +96,7 @@ export function Toolbar(props: ToolbarProps) {
             flexWrap: isMobile ? "nowrap" : "wrap",
             overflowX: isMobile ? "auto" : "hidden",
             bg: "background",
-            borderRadius: "default",
+            borderRadius: isMobile ? "0px" : "default",
             px: 1
           }}
           {...flexProps}

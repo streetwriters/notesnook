@@ -248,7 +248,7 @@ const Tiptap = ({
               sx={{
                 pl: "10px",
                 pt: "5px",
-                minHeight: 45,
+                minHeight: 50,
                 display: settings.noToolbar ? "none" : "flex"
               }}
               editor={_editor}
