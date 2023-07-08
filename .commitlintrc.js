@@ -20,6 +20,7 @@ const SCOPES = [
   "logger",
   "theme",
   "core",
+  "fs",
   "clipper",
   "config",
   "ci",
@@ -27,7 +28,9 @@ const SCOPES = [
   "docs",
   "refactor",
   "misc",
-  "global"
+  "common",
+  "global",
+  "docs"
 ];
 
 module.exports = {

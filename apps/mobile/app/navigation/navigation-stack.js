@@ -48,8 +48,8 @@ import { useNoteStore } from "../stores/use-notes-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
-import { history } from "../utils";
 import { rootNavigatorRef } from "../utils/global-refs";
+import Auth from "../components/auth";
 const NativeStack = createNativeStackNavigator();
 const IntroStack = createNativeStackNavigator();
 
@@ -64,6 +64,7 @@ const IntroStack = createNativeStackNavigator();
 
 const IntroStackNavigator = () => {
   const { colors } = useThemeColors();
+  const height = useSettingStore((state) => state.dimensions.height);
   return (
     <IntroStack.Navigator
       screenOptions={{
@@ -71,12 +72,14 @@ const IntroStackNavigator = () => {
         lazy: false,
         animation: "none",
         contentStyle: {
-          backgroundColor: colors.primary.background
+          backgroundColor: colors.primary.background,
+          minHeight: height
         }
       }}
       initialRouteName={"Intro"}
     >
       <NativeStack.Screen name="Intro" component={Intro} />
+      <NativeStack.Screen name="Auth" component={Auth} />
       <NativeStack.Screen name="AppLock" component={AppLock} />
     </IntroStack.Navigator>
   );
@@ -120,7 +123,7 @@ const _Tabs = () => {
         animation: "none",
         contentStyle: {
           backgroundColor: colors.primary.background,
-          height: !introCompleted ? undefined : screenHeight
+          minHeight: !introCompleted ? undefined : screenHeight
         }
       }}
     >
@@ -185,9 +188,9 @@ const Tabs = React.memo(_Tabs, () => true);
 
 const _NavigationStack = () => {
   const clearSelection = useSelectionStore((state) => state.clearSelection);
-
+  const loading = useNoteStore((state) => state.loading);
   const onStateChange = React.useCallback(() => {
-    if (history.selectionMode) {
+    if (useSelectionStore.getState().selectionMode) {
       clearSelection(true);
     }
     hideAllTooltips();
@@ -199,7 +202,7 @@ const _NavigationStack = () => {
       <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
         <Tabs />
       </NavigationContainer>
-      <TopicsSheet />
+      {loading ? null : <TopicsSheet />}
     </Container>
   );
 };

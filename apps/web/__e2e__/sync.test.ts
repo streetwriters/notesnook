@@ -39,7 +39,7 @@ async function actAndSync<T>(
 ) {
   const results = await Promise.all([
     ...actions.filter((a) => !!a),
-    ...devices.map((d) => d.waitForSync("synced", "now"))
+    ...devices.map((d) => d.waitForSync("completed"))
   ]);
 
   await Promise.all(devices.map((d) => d.page.waitForTimeout(2000)));

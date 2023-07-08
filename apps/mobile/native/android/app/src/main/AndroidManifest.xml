@@ -31,6 +31,11 @@
             <intent>
                 <action android:name="android.intent.action.VIEW" />
                 <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+                <data android:mimeType="image/*" />
+            </intent>
+            <intent>
+                <action android:name="android.intent.action.VIEW" />
+                <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
 
                 <data android:mimeType="video/*" />
             </intent>
@@ -51,8 +56,7 @@
         android:theme="@style/BootTheme"
         android:largeHeap="true"
         android:supportsRtl="false"
-        tools:replace="android:supportsRtl"
-        android:usesCleartextTraffic="true">
+        tools:replace="android:supportsRtl">
     
         <receiver android:exported="false" android:name=".NoteWidget">
             <intent-filter>
@@ -109,13 +113,17 @@
             android:excludeFromRecents="true"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppThemeB">
+
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.SEND" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="text/*" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="application/*" />
             </intent-filter>
+
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.PROCESS_TEXT" />
                 <category android:name="android.intent.category.DEFAULT" />

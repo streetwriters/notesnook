@@ -1,4 +1,0 @@
-allowRemediationCommits:
-  individual: true
-require:
-  members: false

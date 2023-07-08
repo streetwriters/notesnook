@@ -1,0 +1,7 @@
+- Better compact mode for notes & notebooks in lists
+- Add all standard date formats
+- Add new template $timestamp$ for full date & time
+- Allow changing primary 2fa method in settings
+- Hide note headlines in share & home widgets
+
+Thank you for using Notesnook!

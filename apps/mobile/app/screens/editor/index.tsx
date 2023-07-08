@@ -37,7 +37,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useEditorStore } from "../../stores/use-editor-store";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
 import { NoteType } from "../../utils/types";
 import { EDITOR_URI } from "./source";
@@ -46,6 +46,7 @@ import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { editorController } from "./tiptap/utils";
 import { useLayoutEffect } from "react";
+import useKeyboard from "../../hooks/use-keyboard";
 
 const style: ViewStyle = {
   height: "100%",
@@ -126,6 +127,7 @@ const Editor = React.memo(
       const onError = useCallback(() => {
         renderKey.current =
           renderKey.current === `editor-0` ? `editor-1` : `editor-0`;
+        editor.state.current.ready = false;
         editor.setLoading(true);
       }, [editor]);
 
@@ -224,13 +226,15 @@ const AppSection = ({
       {EditorOverlay ? (
         <EditorOverlay editorId={editorId || ""} editor={editor} />
       ) : null}
-      <ReadonlyButton editor={editor} />
+      {editorId === "" ? <ReadonlyButton editor={editor} /> : null}
     </>
   ) : null;
 };
 
 const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
   const readonly = useEditorStore((state) => state.readonly);
+  const keyboard = useKeyboard();
+
   const onPress = async () => {
     if (editor.note.current) {
       await db.notes?.note(editor.note.current.id).readonly();
@@ -240,7 +244,7 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
     }
   };
 
-  return readonly && IconButton ? (
+  return readonly && IconButton && !keyboard.keyboardShown ? (
     <IconButton
       name="pencil-lock"
       type="grayBg"
@@ -248,11 +252,11 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
       color="accent"
       customStyle={{
         position: "absolute",
-        bottom: 20,
+        bottom: 60,
         width: 60,
         height: 60,
         right: 12,
-        ...getElevation(5)
+        ...getElevationStyle(5)
       }}
     />
   ) : null;

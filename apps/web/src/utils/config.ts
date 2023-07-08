@@ -29,12 +29,16 @@ function get<T>(key: string, def?: T): T {
   return value ? tryParse(value) : def;
 }
 
+function remove(key: string) {
+  window.localStorage.removeItem(key);
+}
+
 function clear() {
   window.localStorage.clear();
 }
 
-function all(): Record<string, unknown> {
-  const data: Record<string, unknown> = {};
+function all<T>(): Record<string, T> {
+  const data: Record<string, T> = {};
   for (let i = 0; i < window.localStorage.length; ++i) {
     const key = window.localStorage.key(i);
     if (!key) continue;
@@ -52,5 +56,5 @@ function has(predicate: (key: string) => boolean) {
   return false;
 }
 
-const Config = { set, get, clear, all, has };
+const Config = { set, get, clear, all, has, remove };
 export default Config;

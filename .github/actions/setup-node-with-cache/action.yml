@@ -1,0 +1,27 @@
+name: "Setup node with cache action"
+description: "Setups node with cache"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+        cache: "npm"
+        cache-dependency-path: |
+          package-lock.json
+          apps/mobile/package-lock.json
+          apps/desktop/package-lock.json
+          apps/web/package-lock.json
+          extensions/web-clipper/package-lock.json
+          packages/core/package-lock.json
+          packages/crypto/package-lock.json
+          packages/sodium/package-lock.json
+          packages/clipper/package-lock.json
+          packages/crypto-worker/package-lock.json
+          packages/editor-mobile/package-lock.json
+          packages/editor/package-lock.json
+          packages/logger/package-lock.json
+          packages/streamable-fs/package-lock.json
+          packages/theme/package-lock.json

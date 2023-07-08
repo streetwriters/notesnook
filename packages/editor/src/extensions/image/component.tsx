@@ -38,6 +38,7 @@ import {
 } from "../../utils/downloader";
 import { m, LazyMotion, domAnimation } from "framer-motion";
 
+const IMAGE_SOURCE_CACHE: Record<string, string | undefined> = {};
 export const AnimatedImage = m(Image);
 
 export function ImageComponent(
@@ -67,13 +68,15 @@ export function ImageComponent(
   const [error, setError] = useState<string>();
   const [source, setSource] = useState<string>();
   const downloadOptions = useToolbarStore((store) => store.downloadOptions);
+  const isReadonly = !editor.current?.isEditable;
 
   useEffect(
     () => {
       (async () => {
-        if (!src && !dataurl) return;
+        if (!src && !dataurl && !IMAGE_SOURCE_CACHE[hash]) return;
         try {
-          if (dataurl) setSource(await toBlobURL(dataurl));
+          if (IMAGE_SOURCE_CACHE[hash]) setSource(IMAGE_SOURCE_CACHE[hash]);
+          else if (dataurl) setSource(await toBlobURL(dataurl));
           else if (isDataUrl(src)) setSource(await toBlobURL(src));
           else {
             const { url, size, blob, type } = await downloadImage(
@@ -83,7 +86,7 @@ export function ImageComponent(
             setSource(url);
             editor.current?.commands.updateImage(
               { src },
-              { src: await toDataURL(blob), size, type }
+              { src: await toDataURL(blob), size, mime: type }
             );
           }
         } catch (e) {
@@ -96,6 +99,7 @@ export function ImageComponent(
     [src, dataurl, imageRef, downloadOptions]
   );
 
+  if (source && hash) IMAGE_SOURCE_CACHE[hash] = source;
   const relativeHeight = aspectRatio
     ? editor.view.dom.clientWidth / aspectRatio
     : undefined;
@@ -194,35 +198,42 @@ export function ImageComponent(
             >
               <DesktopOnly>
                 {selected && (
-                  <Flex sx={{ position: "relative", justifyContent: "end" }}>
-                    <Flex
+                  <Flex
+                    sx={{
+                      position: "absolute",
+                      top: -40,
+                      right: 0,
+                      mb: 2,
+                      alignItems: "end"
+                    }}
+                  >
+                    <ToolbarGroup
+                      editor={editor}
+                      tools={
+                        isReadonly
+                          ? [
+                              hash ? "previewAttachment" : "none",
+                              hash ? "downloadAttachment" : "none"
+                            ]
+                          : [
+                              hash ? "previewAttachment" : "none",
+                              hash ? "downloadAttachment" : "none",
+                              "imageAlignLeft",
+                              float ? "none" : "imageAlignCenter",
+                              "imageAlignRight",
+                              "imageProperties"
+                            ]
+                      }
                       sx={{
-                        position: "absolute",
-                        top: -40,
-                        mb: 2,
-                        alignItems: "end"
+                        boxShadow: "menu",
+                        borderRadius: "default",
+                        bg: "background"
                       }}
-                    >
-                      <ToolbarGroup
-                        editor={editor}
-                        tools={[
-                          hash ? "downloadAttachment" : "none",
-                          "imageAlignLeft",
-                          float ? "none" : "imageAlignCenter",
-                          "imageAlignRight",
-                          "imageProperties"
-                        ]}
-                        sx={{
-                          boxShadow: "menu",
-                          borderRadius: "default",
-                          bg: "background"
-                        }}
-                      />
-                    </Flex>
+                    />
                   </Flex>
                 )}
               </DesktopOnly>
-              {selected && (
+              {!isReadonly && selected && (
                 <Icon
                   className="drag-handle"
                   data-drag-handle
@@ -255,6 +266,9 @@ export function ImageComponent(
                     : "2px solid transparent",
                   borderRadius: "default"
                 }}
+                onDoubleClick={() =>
+                  editor.current?.commands.previewAttachment(node.attrs)
+                }
                 onLoad={(e) => {
                   const { clientHeight, clientWidth } = e.currentTarget;
                   if (!height && !width && !aspectRatio) {

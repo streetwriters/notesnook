@@ -87,7 +87,7 @@ class Commands {
         this.ref?.current?.requestFocus();
       }, 1);
     } else {
-      await sleep(200);
+      await sleep(400);
       await this.doAsync("editor.commands.focus()");
     }
   };
@@ -217,7 +217,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     );
   };
 
-  updateWebclip = async ({ src, hash }: ImageAttributes) => {
+  updateWebclip = async ({ src, hash }: Partial<ImageAttributes>) => {
     await this.doAsync(
       `editor && editor.commands.updateWebClip(${JSON.stringify({
         hash
@@ -225,7 +225,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     );
   };
 
-  updateImage = async ({ src, hash }: ImageAttributes) => {
+  updateImage = async ({ src, hash }: Partial<ImageAttributes>) => {
     await this.doAsync(
       `editor && editor.commands.updateImage(${JSON.stringify({
         hash

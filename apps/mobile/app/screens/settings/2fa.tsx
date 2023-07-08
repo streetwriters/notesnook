@@ -28,7 +28,7 @@ import React, {
 import { ActivityIndicator, Linking, Platform, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import * as ScopedStorage from "react-native-scoped-storage";
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import { db } from "../../common/database";
 import Storage from "../../common/database/storage";
 import DialogHeader from "../../components/dialog/dialog-header";
@@ -49,10 +49,9 @@ import {
 import { useThemeColors, VariantsWithStaticColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { eCloseSheet } from "../../utils/events";
-import { sanitizeFilename } from "../../utils/sanitizer";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-
+import { sanitizeFilename } from "@notesnook/common";
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",

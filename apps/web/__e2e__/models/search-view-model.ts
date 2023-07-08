@@ -30,7 +30,7 @@ export class SearchViewModel extends BaseViewModel {
   async findItem(item: Item) {
     const titleToCompare = item.title;
     for await (const _item of this.iterateItems()) {
-      const itemModel = new ItemModel(_item);
+      const itemModel = new ItemModel(_item, "tag");
       const title = await itemModel.getTitle();
       if (title === titleToCompare) return itemModel;
     }

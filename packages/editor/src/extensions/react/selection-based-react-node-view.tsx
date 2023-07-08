@@ -91,7 +91,7 @@ export class SelectionBasedNodeView<
   ): React.ReactElement<unknown> | null {
     if (!this.options.component) return null;
     const isSelected =
-      this.editor.isEditable &&
+      (this.options.forceEnableSelection || this.editor.isEditable) &&
       this.isSelectedNode(this.editor.view.state.selection);
 
     return (

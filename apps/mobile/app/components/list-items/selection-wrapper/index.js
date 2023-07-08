@@ -42,11 +42,16 @@ const SelectionWrapper = ({
   const notesListMode = useSettingStore(
     (state) => state.settings.notesListMode
   );
-  const listMode = item.type === "notebook" ? notebooksListMode : notesListMode;
+  const listMode =
+    item.type === "notebook" || item.itemType === "notebook"
+      ? notebooksListMode
+      : notesListMode;
   const compactMode =
-    (item.type === "notebook" || item.type === "note") &&
+    (item.type === "notebook" ||
+      item.itemType === "notebook" ||
+      item.itemType === "note" ||
+      item.type === "note") &&
     listMode === "compact";
-
   if (item.id !== itemId.current) {
     itemId.current = item.id;
   }
@@ -77,7 +82,7 @@ const SelectionWrapper = ({
         width: "100%",
         overflow: "hidden",
         paddingHorizontal: 12,
-        paddingVertical: compactMode ? 8 : 12,
+        paddingVertical: compactMode ? 4 : 12,
         borderRadius: isSheet ? 10 : 0,
         marginBottom: isSheet ? 12 : undefined
       }}

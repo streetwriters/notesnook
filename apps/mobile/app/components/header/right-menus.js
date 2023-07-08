@@ -92,7 +92,7 @@ export const RightMenus = () => {
           onRequestClose={() => {
             menuRef.current?.hide();
           }}
-          anchor={
+          button={
             <IconButton
               onPress={() => {
                 menuRef.current?.show();

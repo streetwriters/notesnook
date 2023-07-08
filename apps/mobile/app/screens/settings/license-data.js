@@ -268,10 +268,10 @@ export const LICENSES = [
     link: "https://github.com/RocketChat/rn-extensions-share"
   },
   {
-    name: "rn-fetch-blob",
+    name: "react-native-blob-util",
     licenseType: "MIT",
-    author: "Joltup",
-    link: "https://github.com/joltup/rn-fetch-blob"
+    author: "RonRadtke",
+    link: "https://github.com/RonRadtke/react-native-blob-util"
   },
   {
     name: "react-native-gzip",

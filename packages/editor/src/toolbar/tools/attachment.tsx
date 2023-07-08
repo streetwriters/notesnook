@@ -64,9 +64,12 @@ export function DownloadAttachment(props: ToolProps) {
 
 export function PreviewAttachment(props: ToolProps) {
   const { editor } = props;
-  const isBottom = useToolbarLocation() === "bottom";
+  const attachmentNode =
+    findSelectedNode(editor, "attachment") || findSelectedNode(editor, "image");
+  const attachment = (attachmentNode?.attrs || {}) as Attachment;
 
-  if (!editor.isActive("image") || !isBottom) return null;
+  if (!editor.isActive("image") && !canPreviewAttachment(attachment))
+    return null;
 
   return (
     <ToolButton
@@ -78,7 +81,7 @@ export function PreviewAttachment(props: ToolProps) {
           findSelectedNode(editor, "image");
 
         const attachment = (attachmentNode?.attrs || {}) as Attachment;
-        editor.current?.chain().focus().previewAttachment(attachment).run();
+        editor.current?.commands.previewAttachment(attachment);
       }}
     />
   );
@@ -93,4 +96,21 @@ export function RemoveAttachment(props: ToolProps) {
       onClick={() => editor.current?.chain().focus().removeAttachment().run()}
     />
   );
+}
+
+const previewableFileExtensions = ["pdf"];
+const previewableMimeTypes = ["application/pdf"];
+
+function canPreviewAttachment(attachment: Attachment) {
+  if (!attachment) return false;
+  if (
+    attachment.mime &&
+    previewableMimeTypes.some((mime) => attachment.mime.startsWith(mime))
+  )
+    return true;
+
+  const extension = attachment.filename?.split(".").pop();
+  if (!extension) return false;
+
+  return previewableFileExtensions.indexOf(extension) > -1;
 }

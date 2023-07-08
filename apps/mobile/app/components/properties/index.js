@@ -191,13 +191,25 @@ Properties.present = (item, buttons = [], isSheet) => {
       break;
     case "notebook":
       props[0] = db.notebooks.notebook(item.id).data;
-      props.push(["edit-notebook", "pin", "add-shortcut", "trash"]);
+      props.push([
+        "edit-notebook",
+        "pin",
+        "add-shortcut",
+        "trash",
+        "default-notebook"
+      ]);
       break;
     case "topic":
       props[0] = db.notebooks
         .notebook(item.notebookId)
         .topics.topic(item.id)._topic;
-      props.push(["move-notes", "edit-topic", "add-shortcut", "trash"]);
+      props.push([
+        "move-notes",
+        "edit-topic",
+        "add-shortcut",
+        "trash",
+        "default-topic"
+      ]);
       break;
     case "tag":
       props[0] = db.tags.tag(item.id);

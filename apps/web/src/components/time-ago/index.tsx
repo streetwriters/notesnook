@@ -17,120 +17,44 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatDate } from "@notesnook/core/utils/date";
-import React, { useEffect, useRef } from "react";
-import { BoxProps, Text } from "@theme-ui/components";
-import { register, format, cancel, render, Opts } from "timeago.js";
-import { ForwardRef } from "@theme-ui/components/dist/declarations/src/types";
-import { ThemeUICSSObject } from "@theme-ui/core";
+import React, { useRef } from "react";
+import { Text, TextProps } from "@theme-ui/components";
+import { type TDate } from "timeago.js";
+import { useTimeAgo } from "@notesnook/common";
 
-const shortLocale = [
-  ["now", "now"],
-  ["%ss", "in %ss"],
-  ["1m", "in 1m"],
-  ["%sm", "in %sm"],
-  ["1h", "in 1h"],
-  ["%sh", "in %sh"],
-  ["1d", "in 1d"],
-  ["%sd", "in %sd"],
-  ["1w", "in 1w"],
-  ["%sw", "in %sw"],
-  ["1mo", "in 1mo"],
-  ["%smo", "in %smo"],
-  ["1yr", "in 1yr"],
-  ["%syr", "in %syr"]
-] as [string, string][];
-
-const enShortLocale = [
-  ["now", "now"],
-  ["%ss ago", "in %ss"],
-  ["1m ago", "in 1m"],
-  ["%sm ago", "in %sm"],
-  ["1h ago", "in 1h"],
-  ["%sh ago", "in %sh"],
-  ["1d ago", "in 1d"],
-  ["%sd ago", "in %sd"],
-  ["1w ago", "in 1w"],
-  ["%sw ago", "in %sw"],
-  ["1mo ago", "in 1mo"],
-  ["%smo ago", "in %smo"],
-  ["1yr ago", "in 1yr"],
-  ["%syr ago", "in %syr"]
-] as [string, string][];
-
-register("short", (_n, index) => shortLocale[index]);
-register("en_short", (_n, index) => enShortLocale[index]);
-
-export type TimeAgoProps = BoxProps & {
-  datetime: number | string | Date;
+type TimeAgoProps = {
+  datetime: TDate;
+  locale?: "short" | "en_short";
   live?: boolean;
-  locale?: string;
-  opts?: Opts;
+  interval?: number;
 };
-
-const Time = Text as ForwardRef<
-  HTMLTimeElement,
-  BoxProps & { dateTime: string }
->;
-
 function TimeAgo({
   datetime,
   live,
   locale,
-  opts,
+  interval,
   sx,
   ...restProps
-}: TimeAgoProps) {
-  const timeRef = useRef<HTMLTimeElement>();
-  useEffect(() => {
-    const element = timeRef.current;
-    if (!element) return;
+}: TimeAgoProps & TextProps) {
+  const timeRef = useRef<HTMLDivElement>(null);
 
-    // cancel all the interval
-    cancel(element);
-    // if is live
-    if (live !== false) {
-      // live render
-      element.setAttribute("datetime", toDate(datetime).toISOString());
-      render(element, locale, opts);
-    }
-
-    return () => {
-      cancel(element);
-    };
-  }, [datetime, live, locale, opts]);
+  const time = useTimeAgo(datetime, { live, locale, interval });
 
   return (
-    <Time
-      ref={(ref) => (timeRef.current = ref || undefined)}
+    <Text
       {...restProps}
+      ref={timeRef}
       sx={{
+        fontFamily: "body",
         ...sx,
-        color: (sx as ThemeUICSSObject)?.color || "inherit"
+        color: (sx && (sx as any)["color"]) || "inherit"
       }}
-      title={formatDate(datetime)}
       as="time"
       data-test-id="time"
-      dateTime={toDate(datetime).toISOString()}
     >
-      {format(datetime, locale, opts)}
-    </Time>
+      {time}
+    </Text>
   );
 }
 
 export default React.memo(TimeAgo);
-
-/**
- * Convert input to a valid datetime string of <time> tag
- * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/time
- * @param input
- * @returns datetime string
- */
-const toDate = (input: number | string | Date) => {
-  let date = null; // new Date();
-  if (input instanceof Date) {
-    date = input;
-  } else date = new Date(input);
-
-  return date;
-};

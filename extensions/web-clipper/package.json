@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/web-clipper",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "private": true,
   "main": "./dist/index.js",
   "dependencies": {
@@ -8,12 +8,11 @@
     "@hot-loader/react-dom": "^17.0.2",
     "@mdi/js": "^6.9.96",
     "@mdi/react": "^1.6.0",
-    "@notesnook/clipper": "*",
-    "@notesnook/theme": "*",
-    "@theme-ui/components": "0.14.7",
-    "@theme-ui/core": "0.14.7",
+    "@notesnook/clipper": "file:../../packages/clipper",
+    "@notesnook/theme": "file:../../packages/theme",
+    "@theme-ui/components": "^0.14.7",
+    "@theme-ui/core": "^0.14.7",
     "comlink": "^4.3.1",
-    "comlink-extension": "^1.0.8",
     "hyperapp": "^2.0.22",
     "mac-scrollbar": "^0.10.3",
     "react": "^17.0.2",
@@ -84,7 +83,6 @@
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.1",
     "ts-loader": "^9.2.6",
-    "typescript": "^4.6.3",
     "webpack": "^5.68.0",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.4"

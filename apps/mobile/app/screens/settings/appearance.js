@@ -17,107 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useRef, useState } from "react";
+import React from "react";
 import { View } from "react-native";
-import Menu, { MenuItem } from "react-native-reanimated-material-menu";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { PressableButton } from "../../components/ui/pressable";
-import Paragraph from "../../components/ui/typography/paragraph";
 import { DDS } from "../../services/device-detection";
-import { ToastEvent } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
-import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
 import {
-  hexToRGBA,
   RGB_Linear_Shade,
+  hexToRGBA,
   switchAccentColor
 } from "../../utils/color-scheme/utils";
-import { MenuItemsList } from "../../utils/constants";
 import { SIZE } from "../../utils/size";
-export const HomagePageSelector = () => {
-  const { colors, isDark } = useThemeColors();
-  const settings = useSettingStore((state) => state.settings);
-  const menuRef = useRef();
-  const [width, setWidth] = useState(0);
-  return (
-    <View
-      onLayout={(event) => {
-        setWidth(event.nativeEvent.layout.width);
-      }}
-      style={{
-        width: "100%"
-      }}
-    >
-      <Menu
-        ref={menuRef}
-        animationDuration={200}
-        style={{
-          borderRadius: 5,
-          backgroundColor: colors.primary.background,
-          width: width,
-          marginTop: 60
-        }}
-        onRequestClose={() => {
-          menuRef.current?.hide();
-        }}
-        anchor={
-          <PressableButton
-            onPress={async () => {
-              await PremiumService.verify(menuRef.current?.show);
-            }}
-            type="grayBg"
-            customStyle={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginTop: 10,
-              width: "100%",
-              justifyContent: "space-between",
-              padding: 12
-            }}
-          >
-            <Paragraph>{settings.homepage}</Paragraph>
-            <Icon color={colors.primary.icon} name="menu-down" size={SIZE.md} />
-          </PressableButton>
-        }
-      >
-        {MenuItemsList.slice(0, MenuItemsList.length - 1).map(
-          (item) =>
-            item.name !== "Monographs" && (
-              <MenuItem
-                key={item.name}
-                onPress={async () => {
-                  menuRef.current?.hide();
-                  await SettingsService.set({ homepage: item.name });
-                  ToastEvent.show({
-                    heading: "Homepage set to " + item.name,
-                    message: "Restart the app for changes to take effect.",
-                    type: "success"
-                  });
-                }}
-                style={{
-                  backgroundColor:
-                    settings.homepage === item.name
-                      ? colors.secondary.background
-                      : "transparent",
-                  width: "100%",
-                  maxWidth: width
-                }}
-                textStyle={{
-                  fontSize: SIZE.md,
-                  color:
-                    settings.homepage === item.name ? colors.primary.accent : colors.primary.paragraph
-                }}
-              >
-                {item.name}
-              </MenuItem>
-            )
-        )}
-      </Menu>
-    </View>
-  );
-};
 
 export const AccentColorPicker = () => {
   const { colors, isDark } = useThemeColors();

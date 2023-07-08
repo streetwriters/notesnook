@@ -34,7 +34,6 @@ import {
 import PremiumService from "../../services/premium";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { useThemeColors } from "@notesnook/theme";
-import { formatBytes } from "../../utils";
 import { eCloseAttachmentDialog, eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -47,6 +46,7 @@ import { Notice } from "../ui/notice";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { formatBytes } from "@notesnook/common";
 
 const Actions = ({ attachment, setAttachments, fwdRef }) => {
   const { colors } = useThemeColors();
@@ -102,15 +102,21 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
         if (res.failed) {
           db.attachments.markAsFailed(attachment.id, res.failed);
           setFailed(res.failed);
+          ToastEvent.show({
+            heading: "File check failed with error: " + res.failed,
+            type: "error",
+            context: "local"
+          });
         } else {
           setFailed(null);
           db.attachments.markAsFailed(attachment.id, null);
+          ToastEvent.show({
+            heading: "File check passed",
+            type: "success",
+            context: "local"
+          });
         }
-        ToastEvent.show({
-          heading: "File check passed",
-          type: "success",
-          context: "local"
-        });
+
         setAttachments([...db.attachments.all]);
         setLoading({
           name: null

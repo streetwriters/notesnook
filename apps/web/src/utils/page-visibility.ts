@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { debounce } from "@notesnook/common";
+
 function visibilityChange() {
   return "msHidden" in document
     ? "msvisibilityChange"
@@ -39,25 +41,32 @@ export function onPageVisibilityChanged(
     bool: boolean
   ) => void
 ) {
-  onDeviceOnline(() => handler("online", false));
-  onDeviceOffline(() => handler("offline", false));
-
-  // Handle page visibility change
-  document.addEventListener(visibilityChange(), () =>
-    handler("visibilitychange", isDocumentHidden())
+  window.addEventListener(
+    "online",
+    debounce((_) => {
+      handler("online", false);
+    }, 1000)
+  );
+  window.addEventListener(
+    "offline",
+    debounce((_) => {
+      handler("offline", false);
+    }, 1000)
   );
 
-  window.addEventListener("focus", () => handler("focus", false));
-}
+  // Handle page visibility change
+  document.addEventListener(
+    visibilityChange(),
+    debounce((_) => {
+      handler("visibilitychange", isDocumentHidden());
+    }, 1000)
+  );
 
-function onDeviceOnline(handler: () => void) {
-  window.addEventListener("online", function () {
-    handler();
-  });
-}
-
-function onDeviceOffline(handler: () => void) {
-  window.addEventListener("offline", function () {
-    handler();
-  });
+  window.addEventListener(
+    "focus",
+    debounce((_) => {
+      if (!window.document.hasFocus()) return;
+      handler("focus", false);
+    }, 1000)
+  );
 }

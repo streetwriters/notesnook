@@ -24,6 +24,7 @@ import { Icon } from "../icons/icon";
 import { Icons } from "../icons";
 import { useAppStore } from "../../stores/app-store";
 import { Picker } from "../picker";
+import { CheckListItem } from "../check-list-item";
 
 type NotePickerProps = {
   selectedNote?: ItemReference;
@@ -95,7 +96,7 @@ export const NotePicker = (props: NotePickerProps) => {
         )}
       </Flex>
 
-      <Picker onClose={close} isOpen={modalVisible}>
+      <Picker onClose={close} onDone={() => {}} isOpen={modalVisible}>
         <FilteredList
           getAll={() => notes}
           filter={(items, query) =>
@@ -105,12 +106,13 @@ export const NotePicker = (props: NotePickerProps) => {
           placeholder={"Search for a note"}
           refreshItems={() => notes}
           renderItem={(note) => (
-            <Note
-              note={note}
+            <CheckListItem
+              title={note.title}
               onSelected={() => {
                 onSelected(note);
                 close();
               }}
+              isSelected={selectedNote?.id === note.id}
             />
           )}
         />
@@ -118,17 +120,3 @@ export const NotePicker = (props: NotePickerProps) => {
     </>
   );
 };
-
-function Note({
-  note,
-  onSelected
-}: {
-  note: ItemReference;
-  onSelected: () => void;
-}) {
-  return (
-    <Button onClick={onSelected} variant="list" sx={{ py: "7px" }}>
-      <Text variant="body">{note.title}</Text>
-    </Button>
-  );
-}

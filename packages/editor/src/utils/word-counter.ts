@@ -20,14 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Editor } from "@tiptap/core";
 
 export function getTotalWords(editor: Editor): number {
-    const documentText = editor.state.doc.textBetween(
-      0,
-      editor.state.doc.content.size,
-      "\n",
-      " "
-    );
-    return countWords(documentText);
-  }
+  const documentText = editor.state.doc.textBetween(
+    0,
+    editor.state.doc.content.size,
+    "\n",
+    " "
+  );
+  return countWords(documentText);
+}
 
 export function countWords(str: string) {
   let count = 0;

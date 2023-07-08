@@ -22,14 +22,15 @@ import React from "react";
 import {
   ActivityIndicator,
   ColorValue,
+  DimensionValue,
   TextStyle,
   View,
   ViewStyle
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useUserStore } from "../../../stores/use-user-store";
-import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
 import { SIZE } from "../../../utils/size";
+import NativeTooltip from "../../../utils/tooltip";
 import { ProTag } from "../../premium/pro-tag";
 import { PressableButton, PressableButtonProps, useButton } from "../pressable";
 import Heading from "../typography/heading";
@@ -104,7 +105,7 @@ export const Button = ({
           return;
         }
         if (tooltipText) {
-          showTooltip(event, tooltipText, TOOLTIP_POSITIONS.TOP);
+          NativeTooltip.show(event, tooltipText, NativeTooltip.POSITIONS.TOP);
         }
       }}
       disabled={loading}
@@ -117,7 +118,7 @@ export const Button = ({
       customAlpha={buttonType?.alpha}
       customStyle={{
         height: height,
-        width: width || undefined,
+        width: (width as DimensionValue) || undefined,
         paddingHorizontal: 12,
         borderRadius: 5,
         alignSelf: "center",
@@ -133,7 +134,7 @@ export const Button = ({
       {icon && !loading && iconPosition === "left" ? (
         <Icon
           name={icon}
-          style={[{ marginRight: 0 }, iconStyle]}
+          style={[{ marginRight: 0 }, iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
         />
@@ -169,7 +170,7 @@ export const Button = ({
       {icon && !loading && iconPosition === "right" ? (
         <Icon
           name={icon}
-          style={[{ marginLeft: 0 }, iconStyle]}
+          style={[{ marginLeft: 0 }, iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
         />

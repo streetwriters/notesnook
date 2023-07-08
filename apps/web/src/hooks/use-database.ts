@@ -19,28 +19,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useState } from "react";
 import { initializeDatabase } from "../common/db";
+import "allotment/dist/style.css";
 import "../utils/analytics";
 import "../app.css";
 
-if (process.env.NODE_ENV === "production") {
+if (import.meta.env.NODE_ENV === "production") {
   console.log = () => {};
 }
 
 const memory = {
-  isAppLoaded: false
+  isDatabaseLoaded: false
 };
-export default function useDatabase(persistence?: "db" | "memory") {
-  const [isAppLoaded, setIsAppLoaded] = useState(memory.isAppLoaded);
+export default function useDatabase(persistence: "db" | "memory" = "db") {
+  const [isAppLoaded, setIsAppLoaded] = useState(memory.isDatabaseLoaded);
 
   useEffect(() => {
-    if (memory.isAppLoaded) return;
-
-    (async () => {
-      await initializeDatabase(persistence);
-      setIsAppLoaded(true);
-      memory.isAppLoaded = true;
-    })();
+    loadDatabase(persistence).then(() => setIsAppLoaded(true));
   }, [persistence]);
 
   return [isAppLoaded];
+}
+
+export async function loadDatabase(persistence: "db" | "memory" = "db") {
+  if (memory.isDatabaseLoaded) return;
+
+  await initializeDatabase(persistence);
+  memory.isDatabaseLoaded = true;
 }

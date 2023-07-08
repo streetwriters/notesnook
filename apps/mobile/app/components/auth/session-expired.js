@@ -22,14 +22,14 @@ import { Modal, View } from "react-native";
 import { db } from "../../common/database";
 import BiometricService from "../../services/biometrics";
 import {
+  ToastEvent,
   eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
+  eSubscribeEvent
 } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
 import { useThemeColors } from "@notesnook/theme";
+import { eLoginSessionExpired, eUserLoggedIn } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
@@ -61,8 +61,9 @@ export const SessionExpired = () => {
   const [focused, setFocused] = useState(false);
   const { step, password, email, passwordInputRef, loading, login } = useLogin(
     () => {
-      eSendEvent("userLoggedIn", true);
+      eSendEvent(eUserLoggedIn, true);
       setVisible(false);
+      setFocused(false);
     }
   );
 
@@ -84,10 +85,9 @@ export const SessionExpired = () => {
   };
 
   useEffect(() => {
-    eSubscribeEvent("session_expired", open);
+    const sub = eSubscribeEvent(eLoginSessionExpired, open);
     return () => {
-      eUnSubscribeEvent("session_expired", open);
-      setFocused(false);
+      sub.unsubscribe?.();
     };
   }, [visible, open]);
 
@@ -103,6 +103,7 @@ export const SessionExpired = () => {
           if (!user) return;
           email.current = user.email;
           setVisible(true);
+          setFocused(false);
           return;
         }
         SettingsService.set({
@@ -115,6 +116,7 @@ export const SessionExpired = () => {
       let user = await db.user.getUser();
       if (!user) return;
       email.current = user.email;
+      setFocused(false);
       setVisible(true);
     }
   }, [email]);

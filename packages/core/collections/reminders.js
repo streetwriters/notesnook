@@ -17,13 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import getId from "../utils/id";
-import Collection from "./collection";
 import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isToday from "dayjs/plugin/isToday";
 import isTomorrow from "dayjs/plugin/isTomorrow";
 import isYesterday from "dayjs/plugin/isYesterday";
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { formatDate } from "../utils/date";
+import { getId } from "../utils/id";
+import Collection from "./collection";
 
 dayjs.extend(isTomorrow);
 dayjs.extend(isSameOrBefore);
@@ -124,7 +125,14 @@ export default class Reminders extends Collection {
 /**
  * @param {Reminder} reminder
  */
-export function formatReminderTime(reminder, short = false) {
+export function formatReminderTime(
+  reminder,
+  short = false,
+  options = {
+    timeFormat: "12-hour",
+    dateFormat: "DD-MM-YYYY"
+  }
+) {
   const { date } = reminder;
   let time = date;
   let tag = "";
@@ -133,26 +141,40 @@ export function formatReminderTime(reminder, short = false) {
   if (reminder.mode === "permanent") return `Ongoing`;
 
   if (reminder.snoozeUntil && reminder.snoozeUntil > Date.now()) {
-    return `Snoozed until ${dayjs(reminder.snoozeUntil).format("hh:mm A")}`;
+    return `Snoozed until ${formatDate(reminder.snoozeUntil, {
+      timeFormat: options.timeFormat,
+      type: "time"
+    })}`;
   }
 
   if (reminder.mode === "repeat") {
     time = getUpcomingReminderTime(reminder);
   }
 
+  const formattedTime = formatDate(time, {
+    timeFormat: options.timeFormat,
+    type: "time"
+  });
+
+  const formattedDateTime = formatDate(time, {
+    dateFormat: `ddd, ${options.dateFormat}`,
+    timeFormat: options.timeFormat,
+    type: "date-time"
+  });
+
   if (dayjs(time).isTomorrow()) {
     tag = "Upcoming";
-    text = `Tomorrow, ${dayjs(time).format("hh:mm A")}`;
+    text = `Tomorrow, ${formattedTime}`;
   } else if (dayjs(time).isYesterday()) {
     tag = "Last";
-    text = `Yesterday, ${dayjs(time).format("hh:mm A")}`;
+    text = `Yesterday, ${formattedTime}`;
   } else {
     const isPast = dayjs(time).isSameOrBefore(dayjs());
     tag = isPast ? "Last" : "Upcoming";
     if (dayjs(time).isToday()) {
-      text = `Today, ${dayjs(time).format("hh:mm A")}`;
+      text = `Today, ${formattedTime}`;
     } else {
-      text = dayjs(time).format(`ddd, YYYY-MM-DD hh:mm A`);
+      text = formattedDateTime;
     }
   }
 

@@ -36,7 +36,7 @@ import { NoteWrapper } from "../list-items/note/wrapper";
 import { NotebookWrapper } from "../list-items/notebook/wrapper";
 import TagItem from "../list-items/tag";
 import { Empty } from "./empty";
-import { getTotalNotes } from "../../utils";
+import { getTotalNotes } from "@notesnook/common";
 import { useSettingStore } from "../../stores/use-setting-store";
 import ReminderItem from "../list-items/reminder";
 

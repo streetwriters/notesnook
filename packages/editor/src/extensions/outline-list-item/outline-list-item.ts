@@ -143,6 +143,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
       else li.classList.remove("nested");
 
       function onClick(e: MouseEvent | TouchEvent) {
+        if (e instanceof MouseEvent && e.button !== 0) return;
         if (!(e.target instanceof HTMLParagraphElement)) return;
         if (!li.classList.contains("nested")) return;
 

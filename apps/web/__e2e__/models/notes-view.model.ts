@@ -36,7 +36,7 @@ export class NotesViewModel extends BaseViewModel {
     super(page, pageId, pageId === "home" ? "home" : "notes");
     this.createButton = page.locator(
       // TODO:
-      getTestId(`${pageId === "notebook" ? "notebook" : "notes"}-action-button`)
+      getTestId(`notes-action-button`)
     );
     this.editor = new EditorModel(page);
   }

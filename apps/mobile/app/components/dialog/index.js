@@ -25,7 +25,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import { eCloseSimpleDialog, eOpenSimpleDialog } from "../../utils/events";
 import { sleep } from "../../utils/time";
 import { Toast } from "../toast";
@@ -111,7 +111,7 @@ export const Dialog = ({ context = "global" }) => {
   };
 
   const style = {
-    ...getElevation(5),
+    ...getElevationStyle(5),
     width: DDS.isTab ? 400 : "85%",
     maxHeight: 450,
     borderRadius: 5,

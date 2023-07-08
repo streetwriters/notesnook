@@ -17,46 +17,41 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useState } from "react";
-import setSpellCheckerLanguages from "../commands/set-spell-checker-languages";
-import toggleSpellChecker from "../commands/toggle-spell-checker";
+import { desktop } from "../common/desktop-bridge";
+import BaseStore from "../stores";
+import createStore from "../common/store";
 
-export default function useSpellChecker() {
-  const [spellChecker, setSpellChecker] = useState<SpellCheckerOptions>();
+export type Language = { code: string; name: string };
 
-  const loadSpellChecker = useCallback(async () => {
-    const options = await window.config.spellChecker();
-    setSpellChecker(options);
-    return options;
-  }, []);
+class SpellCheckerStore extends BaseStore<SpellCheckerStore> {
+  languages: Language[] = [];
+  enabled = true;
+  enabledLanguages: Language[] = [];
 
-  useEffect(() => {
-    if (!window.config) return;
-    (async function () {
-      await loadSpellChecker();
-    })();
-  }, [loadSpellChecker]);
+  toggleSpellChecker = async () => {
+    const enabled = this.get().enabled;
+    await desktop?.spellChecker.toggle.mutate(!enabled);
+    this.set({
+      enabled: await desktop?.spellChecker.isEnabled.query()
+    });
+  };
 
-  const toggle = useCallback(
-    async (enabled: boolean) => {
-      toggleSpellChecker(enabled);
-      await loadSpellChecker();
-    },
-    [loadSpellChecker]
-  );
+  setLanguages = async (languages: string[]) => {
+    await desktop?.spellChecker.setLanguages.mutate(languages);
+    this.set({
+      enabledLanguages: await desktop?.spellChecker.enabledLanguages.query()
+    });
+  };
 
-  const setLanguages = useCallback(
-    async (languages: string[]) => {
-      setSpellCheckerLanguages(languages);
-      await loadSpellChecker();
-    },
-    [loadSpellChecker]
-  );
-
-  return {
-    ...spellChecker,
-    toggle,
-    setLanguages,
-    loadSpellChecker
+  refresh = async () => {
+    this.set({
+      enabledLanguages:
+        (await desktop?.spellChecker.enabledLanguages.query()) || [],
+      languages: (await desktop?.spellChecker.languages.query()) || [],
+      enabled: (await desktop?.spellChecker.isEnabled.query()) || true
+    });
   };
 }
+
+const [useSpellChecker] = createStore(SpellCheckerStore);
+export { useSpellChecker };

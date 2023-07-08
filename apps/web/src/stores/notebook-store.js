@@ -25,8 +25,14 @@ import BaseStore from "./index";
 import { groupArray } from "@notesnook/core/utils/grouping";
 import Config from "../utils/config";
 
+/**
+ * @extends {BaseStore<NotebookStore>}
+ */
 class NotebookStore extends BaseStore {
   notebooks = [];
+  /**
+   * @type {any | undefined}
+   */
   selectedNotebook = undefined;
   selectedNotebookTopics = [];
   viewMode = Config.get("notebooks:viewMode", "detailed");
@@ -74,8 +80,5 @@ class NotebookStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<NotebookStore>, NotebookStore]}
- */
 const [useStore, store] = createStore(NotebookStore);
 export { useStore, store };

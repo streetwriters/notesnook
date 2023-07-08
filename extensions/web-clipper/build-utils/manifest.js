@@ -31,39 +31,30 @@ const ACTION = {
   default_popup: "popup.html"
 };
 
+const nnHost =
+  process.env.NODE_ENV === "production"
+    ? "*://app.notesnook.com/*"
+    : "*://localhost/*";
+const corsHost = "https://cors.notesnook.com/*";
 const common = {
   name: "Notesnook Web Clipper",
-  version: "0.1",
-  description: "Clip web pages.",
-  permissions: [
-    "activeTab",
-    "tabs",
-    "storage",
-    "contextMenus",
-    "notifications",
-    "<all_urls>"
-  ],
-  content_scripts: [
-    {
-      js: ["nnContentScript.bundle.js"],
-      matches: ["*://app.notesnook.com/*", "*://localhost/*"]
-    },
-    {
-      js: ["contentScript.bundle.js"],
-      matches: ["http://*/*", "https://*/*"],
-      exclude_matches: ["*://app.notesnook.com/*", "*://localhost/*"]
-    }
-  ],
-  browser_specific_settings: {
-    gecko: {
-      strict_min_version: "105.0"
-    }
-  },
+  version: "0.2.2",
+  description:
+    "Clip web pages & save interesting things you find on the web directly into Notesnook in a private & secure way.",
+  permissions: ["activeTab", "tabs", "storage", "notifications"],
   icons: ICONS
 };
 
 const v2 = {
   ...common,
+  permissions: [...common.permissions, corsHost, nnHost],
+  optional_permissions: ["http://*/*", "https://*/*"],
+  browser_specific_settings: {
+    gecko: {
+      id: "notesnook-web-clipper-unlisted@notesnook.com",
+      strict_min_version: "105.0"
+    }
+  },
   manifest_version: 2,
   background: {
     scripts: [BACKGROUND_SCRIPT]
@@ -73,6 +64,9 @@ const v2 = {
 
 const v3 = {
   ...common,
+  permissions: [...common.permissions, "scripting"],
+  host_permissions: [corsHost, nnHost],
+  optional_host_permissions: ["http://*/*", "https://*/*"],
   manifest_version: 3,
   background: {
     service_worker: BACKGROUND_SCRIPT

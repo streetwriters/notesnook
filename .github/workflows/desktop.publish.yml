@@ -28,26 +28,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-          cache: "npm"
-          cache-dependency-path: |
-            apps/mobile/package-lock.json
-            apps/web/package-lock.json
-            packages/core/package-lock.json
-            packages/crypto/package-lock.json
-            packages/crypto-worker/package-lock.json
-            packages/editor-mobile/package-lock.json
-            packages/editor/package-lock.json
-            packages/logger/package-lock.json
-            packages/streamable-fs/package-lock.json
-            packages/theme/package-lock.json
+        uses: ./.github/actions/setup-node-with-cache
 
       - name: Install packages
         run: |
-          npm i --ignore-scripts --prefer-offline --no-audit
-          npx lerna bootstrap --ignore=@notesnook/mobile -- --prefer-offline --no-audit
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=web
 
       - name: Setup environment
         run: |
@@ -64,7 +50,7 @@ jobs:
 
       - name: Collect app metadata
         id: app_metadata
-        working-directory: ./apps/web/desktop
+        working-directory: ./apps/desktop
         run: |
           echo ::set-output name=app_version::$(cat package.json | jq -r .version)
 
@@ -91,6 +77,9 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
 
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
       - name: Setup notarization
         run: |
           mkdir -p ~/private_keys/
@@ -98,13 +87,13 @@ jobs:
 
       - name: Collect app metadata
         id: app_metadata
-        working-directory: ./apps/web/desktop
+        working-directory: ./apps/desktop
         run: |
           echo ::set-output name=apple_app_id::$(cat package.json | jq -r .appAppleId)
           echo ::set-output name=app_bundle_id::$(cat package.json | jq -r .build.appId)
           echo ::set-output name=app_version::$(cat package.json | jq -r .version)
           echo ::set-output name=bundle_version::$(cat package.json | jq -r .build.mac.bundleVersion)
-        
+
       - name: Get App Store Version
         id: appstore
         uses: streetwriters/appstore-connect-app-version@develop
@@ -115,26 +104,20 @@ jobs:
           private-key-raw: ${{ secrets.api_key }}
           platform: "MAC_OS"
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-
       - name: Download build
         uses: actions/download-artifact@v3
         with:
           name: build
-          path: ./apps/web/desktop/build
+          path: ./apps/desktop/build
 
       - name: Install packages
         run: |
-          npm i
-          npm i dmg-license
-        working-directory: ./apps/web/desktop
-      
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+
       - name: Install provisioning profile
         run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
-        working-directory: ./apps/web/desktop
+        working-directory: ./apps/desktop
 
       - name: Build app for Mac App Store
         if: inputs.publish-apple && steps.appstore.outputs.app-version-latest != steps.app_metadata.outputs.app_version
@@ -142,9 +125,9 @@ jobs:
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
         run: |
-          npm run build:mas
+          npx nx run release --project @notesnook/desktop -- --variant=mas
           npx electron-builder --mac mas --universal -p never
-        working-directory: ./apps/web/desktop
+        working-directory: ./apps/desktop
 
       - name: Build zip and dmg
         env:
@@ -155,26 +138,26 @@ jobs:
           APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
           APPLE_API_KEY_ISSUER: ${{ secrets.api_key_issuer_id }}
         run: |
-          npm run build
+          npx nx run release --project @notesnook/desktop
           if [ ${{ inputs.publish-github }} == true ]; then
             npx electron-builder --mac zip dmg --arm64 --x64 -p always
           else
             npx electron-builder --mac zip dmg --arm64 --x64 -p never
           fi
-        working-directory: ./apps/web/desktop
+        working-directory: ./apps/desktop
 
       - name: Deploy to Testflight
         if: inputs.publish-apple && steps.appstore.outputs.app-version-latest != steps.app_metadata.outputs.app_version
         env:
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
-        run: |       
-          package=$(find ./dist/mas-universal/notesnook*.pkg)
+        run: |
+          package=$(find ./output/mas-universal/notesnook*.pkg)
 
           echo "Uploading ${package} using altool..."
 
           xcrun altool --upload-package $package -t osx --apiKey $API_KEY_ID --apiIssuer $API_KEY_ISSUER_ID --apple-id ${{ steps.app_metadata.outputs.apple_app_id }} --bundle-id ${{ steps.app_metadata.outputs.app_bundle_id }} --bundle-short-version-string ${{ steps.app_metadata.outputs.app_version }} --bundle-version ${{ steps.app_metadata.outputs.bundle_version }}
-        working-directory: ./apps/web/desktop
+        working-directory: ./apps/desktop
 
   build-linux:
     name: Build for Linux
@@ -185,6 +168,9 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
 
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
       - name: Setup Snapcraft Auth
         if: inputs.publish-snap
         run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.snapcraft_token }}" >> $GITHUB_ENV
@@ -192,31 +178,27 @@ jobs:
       - name: Install Snapcraft
         uses: samuelmeuli/action-snapcraft@v1
         if: inputs.publish-snap
-        
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
 
       - name: Download build
         uses: actions/download-artifact@v3
         with:
           name: build
-          path: ./apps/web/desktop/build
+          path: ./apps/desktop/build
 
       - name: Install packages
-        run: npm i
-        working-directory: ./apps/web/desktop
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
 
       - name: Build Electron wrapper
-        run: npm run build
-        working-directory: ./apps/web/desktop
+        run: npx nx run release --project @notesnook/desktop
+        working-directory: ./apps/desktop
 
       - name: Build snap
         if: inputs.publish-snap
         run: |
           npx electron-builder --linux snap:x64 -p never
-        working-directory: ./apps/web/desktop
+        working-directory: ./apps/desktop
 
       - name: Build AppImage
         env:
@@ -227,13 +209,13 @@ jobs:
           else
             npx electron-builder --linux AppImage:x64 AppImage:arm64 -p never
           fi
-        working-directory: ./apps/web/desktop
+        working-directory: ./apps/desktop
 
       - name: Publish on Snapcraft
         if: inputs.publish-snap
         run: |
-          snapcraft upload --release=stable ./dist/notesnook_linux_amd64.snap
-        working-directory: ./apps/web/desktop
+          snapcraft upload --release=stable ./output/notesnook_linux_amd64.snap
+        working-directory: ./apps/desktop
 
   build-windows:
     name: Build for Windows
@@ -245,31 +227,29 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
+        uses: ./.github/actions/setup-node-with-cache
 
       - name: Download build
         uses: actions/download-artifact@v3
         with:
           name: build
-          path: ./apps/web/desktop/build
+          path: ./apps/desktop/build
 
       - name: Install packages
-        run: npm i
-        working-directory: ./apps/web/desktop
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
 
-      - name: Build Electron wrapper
-        run: npm run build
-        working-directory: ./apps/web/desktop
+      - name: Build
+        run: npx nx run release --project @notesnook/desktop
 
-      - name: Build app
+      - name: Publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if ($${{ inputs.publish-github }} -eq $true) {
-            npx electron-builder --win --publish always
+            yarn electron-builder --win --publish always
           } else {
-            npx electron-builder --win --publish never
+            yarn electron-builder --win --publish never
           }
-        working-directory: ./apps/web/desktop
+        working-directory: ./apps/desktop

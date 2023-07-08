@@ -35,17 +35,15 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import TimeAgo from "../time-ago";
 import { hardNavigate, hashNavigate, navigate } from "../../navigation";
-import useAutoUpdater, { UpdateStatus } from "../../hooks/use-auto-updater";
-import installUpdate from "../../commands/install-update";
-import checkForUpdate from "../../commands/check-for-update";
+import { useAutoUpdater, UpdateStatus } from "../../hooks/use-auto-updater";
 import {
   showIssueDialog,
   showUpdateAvailableNotice
 } from "../../common/dialog-controller";
 import useStatus from "../../hooks/use-status";
-import { getIconFromAlias } from "../icons/resolver";
 import { ScopedThemeProvider, ThemeVariant } from "../theme-provider";
 import { Variants } from "@notesnook/theme";
+import { checkForUpdate, installUpdate } from "../../utils/updater";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -70,7 +68,7 @@ function StatusBar() {
           <>
             <Button
               onClick={() =>
-                user.isEmailConfirmed
+                user?.isEmailConfirmed
                   ? navigate("/settings")
                   : hashNavigate("/email/verify")
               }
@@ -82,7 +80,7 @@ function StatusBar() {
               }}
             >
               <ThemeVariant
-                variant={user.isEmailConfirmed ? "success" : "warning"}
+                variant={user?.isEmailConfirmed ? "success" : "warning"}
               >
                 <Circle size={7} color={"icon"} />
               </ThemeVariant>
@@ -92,8 +90,8 @@ function StatusBar() {
                 ml={1}
                 sx={{ color: "paragraph" }}
               >
-                {user.email}
-                {user.isEmailConfirmed ? "" : " (not verified)"}
+                {user?.email}
+                {user?.isEmailConfirmed ? "" : " (not verified)"}
               </Text>
             </Button>
 
@@ -133,8 +131,7 @@ function StatusBar() {
             Report an issue
           </Text>
         </Button>
-        {statuses?.map(({ key, status, progress, icon }) => {
-          const Icon = icon && getIconFromAlias(icon);
+        {statuses?.map(({ key, status, progress, icon: Icon }) => {
           return (
             <Flex
               key={key}
@@ -271,7 +268,11 @@ type SyncStatus =
 type SyncStatusFilter = {
   key: SyncStatus | "emailNotConfirmed";
   icon: Icon;
-  isActive: (syncStatus: SyncStatus, user: User, lastSynced: number) => boolean;
+  isActive: (
+    syncStatus: SyncStatus,
+    user: User | undefined,
+    lastSynced: number
+  ) => boolean;
   text:
     | string
     | ((props: {
@@ -322,7 +323,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
   },
   {
     key: "emailNotConfirmed",
-    isActive: (_syncStatus, user) => !user.isEmailConfirmed,
+    isActive: (_syncStatus, user) => !user?.isEmailConfirmed,
     icon: Alert,
     variant: "warning",
     text: "Sync disabled",

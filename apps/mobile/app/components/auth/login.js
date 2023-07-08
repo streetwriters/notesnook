@@ -18,9 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
-import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
@@ -30,13 +29,15 @@ import SheetProvider from "../sheet-provider";
 import { Progress } from "../sheets/progress";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
-import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { SVG } from "./background";
 import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import { useLogin } from "./use-login";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { eUserLoggedIn } from "../../utils/events";
+import { useUserStore } from "../../stores/use-user-store";
+import Sync from "../../services/sync";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -60,11 +61,17 @@ export const Login = ({ changeMode }) => {
     login
   } = useLogin(async () => {
     hideAuth();
-    eSendEvent("userLoggedIn", true);
+    eSendEvent(eUserLoggedIn, true);
     await sleep(500);
     Progress.present();
+    setTimeout(() => {
+      if (!useUserStore.getState().syncing) {
+        Sync.run("global", false, true);
+      }
+    }, 5000);
   });
-
+  const deviceMode = useSettingStore((state) => state.deviceMode);
+  const { width, height } = useWindowDimensions();
   useEffect(() => {
     async () => {
       setStep(LoginSteps.emailAuth);
@@ -82,62 +89,68 @@ export const Login = ({ changeMode }) => {
     <>
       <ForgotPassword />
       <SheetProvider context="two_factor_verify" />
-      <Animated.View
-        entering={FadeInDown}
-        exiting={FadeOutUp}
+      <View
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.primary.background,
           zIndex: 10,
           width: "100%",
-          minHeight: "100%"
+          alignSelf: "center"
         }}
       >
         <View
           style={{
-            height: 250,
-            overflow: "hidden"
+            justifyContent: "flex-end",
+            paddingHorizontal: 20,
+            backgroundColor: colors.secondary.background,
+            borderBottomWidth: 1,
+            marginBottom: 12,
+            borderBottomColor: colors.primary.border,
+            alignSelf: deviceMode !== "mobile" ? "center" : undefined,
+            borderWidth: deviceMode !== "mobile" ? 1 : null,
+            borderColor: deviceMode !== "mobile" ? colors.primary.border : null,
+            borderRadius: deviceMode !== "mobile" ? 20 : null,
+            marginTop: deviceMode !== "mobile" ? 50 : null,
+            width: deviceMode === "mobile" ? null : "50%",
+            minHeight: height * 0.4
           }}
         >
-          <SvgView
-            src={SVG(colors.primary.icon)}
-            height={700}
-          />
-        </View>
-        <View
-          style={{
-            width: "100%",
-            justifyContent: "center",
-            alignSelf: "center",
-            paddingHorizontal: 12,
-            marginBottom: 30,
-            marginTop: 15
-          }}
-        >
+          <View
+            style={{
+              flexDirection: "row"
+            }}
+          >
+            <View
+              style={{
+                width: 100,
+                height: 5,
+                backgroundColor: colors.primary.accent,
+                borderRadius: 2,
+                marginRight: 7
+              }}
+            />
+
+            <View
+              style={{
+                width: 20,
+                height: 5,
+                backgroundColor: colors.secondary.background,
+                borderRadius: 2
+              }}
+            />
+          </View>
           <Heading
             style={{
-              textAlign: "center"
+              marginBottom: 25,
+              marginTop: 10
             }}
-            size={30}
-            color={colors.primary.heading}
+            extraBold
+            size={SIZE.xxl}
           >
-            Welcome back!
+            Login to your {"\n"}account
           </Heading>
-          <Paragraph
-            style={{
-              textDecorationLine: "underline",
-              textAlign: "center",
-              marginTop: 5
-            }}
-            onPress={() => {
-              if (loading) return;
-              changeMode(1);
-            }}
-            size={SIZE.md}
-          >
-            {"Don't have an account? Sign up"}
-          </Paragraph>
         </View>
+
         <View
           style={{
             width: DDS.isTab
@@ -147,10 +160,9 @@ export const Login = ({ changeMode }) => {
               : focused
               ? "100%"
               : "99.9%",
-            padding: 12,
             backgroundColor: colors.primary.background,
-            flexGrow: 1,
-            alignSelf: "center"
+            alignSelf: "center",
+            paddingHorizontal: 20
           }}
         >
           <Input
@@ -217,28 +229,22 @@ export const Login = ({ changeMode }) => {
 
           <View
             style={{
-              marginTop: 25,
-              alignSelf: "center"
+              marginTop: 25
             }}
           >
             <Button
-              style={{
-                width: 250,
-                borderRadius: 100
-              }}
               loading={loading}
               onPress={() => {
                 if (loading) return;
                 login();
               }}
+              style={{
+                width: 250,
+                borderRadius: 100
+              }}
+              fontSize={SIZE.md}
               type="accent"
-              title={
-                loading
-                  ? null
-                  : step === LoginSteps.emailAuth
-                  ? "Login"
-                  : "Continue"
-              }
+              title={!loading ? "Continue" : null}
             />
 
             {step === LoginSteps.passwordAuth && (
@@ -261,9 +267,37 @@ export const Login = ({ changeMode }) => {
                 type="errorShade"
               />
             )}
+
+            {!loading ? (
+              <TouchableOpacity
+                onPress={() => {
+                  if (loading) return;
+                  changeMode(1);
+                }}
+                activeOpacity={0.8}
+                style={{
+                  alignSelf: "center",
+                  marginTop: 12,
+                  paddingVertical: 12
+                }}
+              >
+                <Paragraph
+                  size={SIZE.xs + 1}
+                  color={colors.secondary.paragraph}
+                >
+                  Don't have an account?{" "}
+                  <Paragraph
+                    size={SIZE.xs + 1}
+                    style={{ color: colors.primary.accent }}
+                  >
+                    Sign up
+                  </Paragraph>
+                </Paragraph>
+              </TouchableOpacity>
+            ) : null}
           </View>
         </View>
-      </Animated.View>
+      </View>
     </>
   );
 };

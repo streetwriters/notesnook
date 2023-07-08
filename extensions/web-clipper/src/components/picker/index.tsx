@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { PropsWithChildren } from "react";
 import Modal from "react-modal";
+import { Button, Flex } from "@theme-ui/components";
 import { ThemeProvider } from "../theme-provider";
 import { useThemeProvider } from "@notesnook/theme";
 Modal.setAppElement("#root");
@@ -25,10 +26,12 @@ Modal.setAppElement("#root");
 type PickerProps = {
   isOpen: boolean;
   onClose: () => void;
+  onDone: () => void;
 };
 export const Picker = (props: PropsWithChildren<PickerProps>) => {
-  const { children, isOpen, onClose } = props;
+  const { children, isOpen, onClose, onDone } = props;
   const { theme } = useThemeProvider();
+
   return (
     <Modal
       style={{
@@ -67,7 +70,29 @@ export const Picker = (props: PropsWithChildren<PickerProps>) => {
           overflow: "hidden"
         }}
       >
-        {children}
+        <Flex
+          sx={{
+            flexDirection: "column",
+            overflow: "hidden",
+            height: "100%"
+          }}
+        >
+          <Flex
+            sx={{
+              flexDirection: "column",
+              overflow: "hidden",
+              flex: 1,
+              padding: 2
+            }}
+          >
+            {children}
+          </Flex>
+          <Flex sx={{ bg: "bgSecondary", p: 1, justifyContent: "end" }}>
+            <Button variant="dialog" onClick={onDone}>
+              Done
+            </Button>
+          </Flex>
+        </Flex>
       </ThemeProvider>
     </Modal>
   );

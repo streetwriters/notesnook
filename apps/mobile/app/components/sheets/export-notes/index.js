@@ -29,7 +29,7 @@ import Exporter from "../../../services/exporter";
 import PremiumService from "../../../services/premium";
 import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../../stores/use-user-store";
-import { getElevation } from "../../../utils";
+import { getElevationStyle } from "../../../utils/elevation";
 import { ph, pv, SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import DialogHeader from "../../dialog/dialog-header";
@@ -42,6 +42,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { eSendEvent } from "../../../services/event-manager";
 import { eCloseSheet } from "../../../utils/events";
+import { requestInAppReview } from "../../../services/app-review";
 
 const ExportNotesSheet = ({ notes, update }) => {
   const { colors } = useThemeColors();
@@ -72,6 +73,7 @@ const ExportNotesSheet = ({ notes, update }) => {
     update({ disableClosing: false });
     setComplete(true);
     setExporting(false);
+    requestInAppReview();
   };
 
   const actions = [
@@ -338,7 +340,7 @@ ExportNotesSheet.present = (notes, allNotes) => {
 
 const styles = StyleSheet.create({
   container: {
-    ...getElevation(5),
+    ...getElevationStyle(5),
     borderRadius: 5,
     paddingVertical: pv
   },

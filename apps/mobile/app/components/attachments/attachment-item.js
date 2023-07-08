@@ -35,12 +35,14 @@ function getFileExtension(filename) {
   var ext = /^.+\.([^.]+)$/.exec(filename);
   return ext == null ? "" : ext[1];
 }
-/**
- *
- * @param {any} param0
- * @returns
- */
-export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
+
+export const AttachmentItem = ({
+  attachment,
+  encryption,
+  setAttachments,
+  pressable = true,
+  hideWhenNotDownloading
+}) => {
   const { colors } = useThemeColors();
   const [currentProgress, setCurrentProgress] = useAttachmentProgress(
     attachment,
@@ -48,9 +50,12 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
   );
 
   const onPress = () => {
+    if (!pressable) return;
     Actions.present(attachment, setAttachments, attachment.metadata.hash);
   };
-  return (
+
+  return hideWhenNotDownloading &&
+    (!currentProgress || !currentProgress.value) ? null : (
     <TouchableOpacity
       activeOpacity={0.9}
       onPress={onPress}
@@ -113,12 +118,14 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
             {attachment.metadata.filename}
           </Paragraph>
 
-          <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
-            {formatBytes(attachment.length)}{" "}
-            {currentProgress?.type
-              ? "(" + currentProgress.type + "ing - tap to cancel)"
-              : ""}
-          </Paragraph>
+          {!hideWhenNotDownloading ? (
+            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+              {formatBytes(attachment.length)}{" "}
+              {currentProgress?.type
+                ? "(" + currentProgress.type + "ing - tap to cancel)"
+                : ""}
+            </Paragraph>
+          ) : null}
         </View>
       </View>
 
@@ -126,7 +133,7 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={() => {
-            if (encryption) return;
+            if (encryption || !pressable) return;
             db.fs.cancel(attachment.metadata.hash);
             setCurrentProgress(null);
           }}

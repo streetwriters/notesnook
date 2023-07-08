@@ -31,7 +31,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../app/common/database";
-import { getElevation } from "../app/utils";
+import { getElevationStyle } from "../app/utils/elevation";
 import { initDatabase, useShareStore } from "./store";
 import { useThemeColors } from "@notesnook/theme";
 
@@ -143,19 +143,6 @@ const ListItem = ({ item, mode, close }) => {
             {item.type === "tag" ? "#" : ""}
             {item.alias || item.title}
           </Text>
-
-          {item.type === "note" ? (
-            <Text
-              numberOfLines={1}
-              style={{
-                color: colors.secondary.paragraph,
-                fontSize: 12,
-                fontFamily: "OpenSans-Regular"
-              }}
-            >
-              {item.headline}
-            </Text>
-          ) : null}
         </View>
       </View>
 
@@ -276,7 +263,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
         alignSelf: "center",
         overflow: "hidden",
         zIndex: 999,
-        ...getElevation(quicknote ? 1 : 5),
+        ...getElevationStyle(quicknote ? 1 : 5),
         ...extra
       }}
     >

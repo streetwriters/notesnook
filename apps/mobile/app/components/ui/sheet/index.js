@@ -106,6 +106,9 @@ const SheetWrapper = ({
         defaultOverlayOpacity={overlayOpacity}
         overlayColor={pitchBlack ? "#585858" : "#2b2b2b"}
         keyboardShouldPersistTaps="always"
+        openAnimationConfig={{
+          friction: 9
+        }}
         ExtraOverlayComponent={
           <>
             {overlay}

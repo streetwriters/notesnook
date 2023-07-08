@@ -160,3 +160,7 @@ export const eOpenLoading = "605";
 export const eCloseLoading = "606";
 
 export const eOnTopicSheetUpdate = "607";
+
+export const eUserLoggedIn = "608";
+
+export const eLoginSessionExpired = "609";

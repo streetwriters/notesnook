@@ -19,10 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Copied from https://github.com/williamkapke/bson-objectid
 
-const { randomInt } = require("./random");
+import { randomInt } from "./random";
 
 var MACHINE_ID = randomInt();
-var index = (ObjectID.index = randomInt());
+var index = randomInt();
 var pid =
   (typeof process === "undefined" || typeof process.pid !== "number"
     ? randomInt()
@@ -66,142 +66,137 @@ while (i < 16) decodeLookup[0x41 - 10 + i] = decodeLookup[0x61 - 10 + i] = i++;
  * @param {String|Number} id Can be a 24 byte hex string, 12 byte binary string or a Number.
  * @return {Object} instance of ObjectID.
  */
-function ObjectID(id) {
-  if (!(this instanceof ObjectID)) return new ObjectID(id);
-  if (id && (id instanceof ObjectID || id._bsontype === "ObjectID")) return id;
+class ObjectID {
+  constructor(id) {
+    if (!(this instanceof ObjectID)) return new ObjectID(id);
+    if (id && (id instanceof ObjectID || id._bsontype === "ObjectID"))
+      return id;
 
-  this._bsontype = "ObjectID";
+    this._bsontype = "ObjectID";
 
-  // The most common usecase (blank id, new objectId instance)
-  if (id == null || typeof id === "number") {
-    // Generate a new id
-    this.id = this.generate(id);
-    // Return the object
-    return;
+    // The most common usecase (blank id, new objectId instance)
+    if (id == null || typeof id === "number") {
+      // Generate a new id
+      this.id = this.generate(id);
+      // Return the object
+      return;
+    }
+
+    // Check if the passed in id is valid
+    var valid = ObjectID.isValid(id);
+
+    // Throw an error if it's not a valid setup
+    if (!valid && id != null) {
+      throw new Error(
+        "Argument passed in must be a single String of 12 bytes or a string of 24 hex characters"
+      );
+    } else if (valid && typeof id === "string" && id.length === 24) {
+      return ObjectID.createFromHexString(id);
+    } else if (id != null && id.length === 12) {
+      // assume 12 byte string
+      this.id = id;
+    } else if (id != null && typeof id.toHexString === "function") {
+      // Duck-typing to support ObjectId from different npm packages
+      return id;
+    } else {
+      throw new Error(
+        "Argument passed in must be a single String of 12 bytes or a string of 24 hex characters"
+      );
+    }
   }
-
-  // Check if the passed in id is valid
-  var valid = ObjectID.isValid(id);
-
-  // Throw an error if it's not a valid setup
-  if (!valid && id != null) {
-    throw new Error(
-      "Argument passed in must be a single String of 12 bytes or a string of 24 hex characters"
-    );
-  } else if (valid && typeof id === "string" && id.length === 24) {
-    return ObjectID.createFromHexString(id);
-  } else if (id != null && id.length === 12) {
-    // assume 12 byte string
-    this.id = id;
-  } else if (id != null && typeof id.toHexString === "function") {
-    // Duck-typing to support ObjectId from different npm packages
-    return id;
-  } else {
-    throw new Error(
-      "Argument passed in must be a single String of 12 bytes or a string of 24 hex characters"
-    );
+  /**
+   * Creates an ObjectID from a second based number, with the rest of the ObjectID zeroed out. Used for comparisons or sorting the ObjectID.
+   *
+   * @param {Number} time an integer number representing a number of seconds.
+   * @return {ObjectID} return the created ObjectID
+   * @api public
+   */
+  static createFromTime(time) {
+    time = parseInt(time, 10) % 0xffffffff;
+    return new ObjectID(hex(8, time) + "0000000000000000");
   }
-}
-module.exports = ObjectID;
-ObjectID.default = ObjectID;
+  /**
+   * Creates an ObjectID from a hex string representation of an ObjectID.
+   *
+   * @param {String} hexString create a ObjectID from a passed in 24 byte hexstring.
+   * @return {ObjectID} return the created ObjectID
+   * @api public
+   */
+  static createFromHexString(hexString) {
+    // Throw an error if it's not a valid setup
+    if (
+      typeof hexString === "undefined" ||
+      (hexString != null && hexString.length !== 24)
+    ) {
+      throw new Error(
+        "Argument passed in must be a single String of 12 bytes or a string of 24 hex characters"
+      );
+    }
 
-/**
- * Creates an ObjectID from a second based number, with the rest of the ObjectID zeroed out. Used for comparisons or sorting the ObjectID.
- *
- * @param {Number} time an integer number representing a number of seconds.
- * @return {ObjectID} return the created ObjectID
- * @api public
- */
-ObjectID.createFromTime = function (time) {
-  time = parseInt(time, 10) % 0xffffffff;
-  return new ObjectID(hex(8, time) + "0000000000000000");
-};
+    // Calculate lengths
+    var data = "";
+    var i = 0;
 
-/**
- * Creates an ObjectID from a hex string representation of an ObjectID.
- *
- * @param {String} hexString create a ObjectID from a passed in 24 byte hexstring.
- * @return {ObjectID} return the created ObjectID
- * @api public
- */
-ObjectID.createFromHexString = function (hexString) {
-  // Throw an error if it's not a valid setup
-  if (
-    typeof hexString === "undefined" ||
-    (hexString != null && hexString.length !== 24)
-  ) {
-    throw new Error(
-      "Argument passed in must be a single String of 12 bytes or a string of 24 hex characters"
-    );
+    while (i < 24) {
+      data += String.fromCharCode(
+        (decodeLookup[hexString.charCodeAt(i++)] << 4) |
+          decodeLookup[hexString.charCodeAt(i++)]
+      );
+    }
+
+    return new ObjectID(data);
   }
+  /**
+   * Checks if a value is a valid bson ObjectId
+   *
+   * @param {String} objectid Can be a 24 byte hex string or an instance of ObjectID.
+   * @return {Boolean} return true if the value is a valid bson ObjectID, return false otherwise.
+   * @api public
+   *
+   * THE NATIVE DOCUMENTATION ISN'T CLEAR ON THIS GUY!
+   * http://mongodb.github.io/node-mongodb-native/api-bson-generated/objectid.html#objectid-isvalid
+   */
+  static isValid(id) {
+    if (id == null) return false;
 
-  // Calculate lengths
-  var data = "";
-  var i = 0;
+    if (typeof id === "number") {
+      return true;
+    }
 
-  while (i < 24) {
-    data += String.fromCharCode(
-      (decodeLookup[hexString.charCodeAt(i++)] << 4) |
-        decodeLookup[hexString.charCodeAt(i++)]
-    );
+    if (typeof id === "string") {
+      return (
+        id.length === 12 || (id.length === 24 && checkForHexRegExp.test(id))
+      );
+    }
+
+    if (id instanceof ObjectID) {
+      return true;
+    }
+
+    if (isBuffer(id)) {
+      return true;
+    }
+
+    // Duck-Typing detection of ObjectId like objects
+    if (
+      typeof id.toHexString === "function" &&
+      (id.id instanceof Buffer || typeof id.id === "string")
+    ) {
+      return (
+        id.id.length === 12 ||
+        (id.id.length === 24 && checkForHexRegExp.test(id.id))
+      );
+    }
+
+    return false;
   }
-
-  return new ObjectID(data);
-};
-
-/**
- * Checks if a value is a valid bson ObjectId
- *
- * @param {String} objectid Can be a 24 byte hex string or an instance of ObjectID.
- * @return {Boolean} return true if the value is a valid bson ObjectID, return false otherwise.
- * @api public
- *
- * THE NATIVE DOCUMENTATION ISN'T CLEAR ON THIS GUY!
- * http://mongodb.github.io/node-mongodb-native/api-bson-generated/objectid.html#objectid-isvalid
- */
-ObjectID.isValid = function (id) {
-  if (id == null) return false;
-
-  if (typeof id === "number") {
-    return true;
-  }
-
-  if (typeof id === "string") {
-    return id.length === 12 || (id.length === 24 && checkForHexRegExp.test(id));
-  }
-
-  if (id instanceof ObjectID) {
-    return true;
-  }
-
-  if (isBuffer(id)) {
-    return true;
-  }
-
-  // Duck-Typing detection of ObjectId like objects
-  if (
-    typeof id.toHexString === "function" &&
-    (id.id instanceof Buffer || typeof id.id === "string")
-  ) {
-    return (
-      id.id.length === 12 ||
-      (id.id.length === 24 && checkForHexRegExp.test(id.id))
-    );
-  }
-
-  return false;
-};
-
-ObjectID.prototype = {
-  constructor: ObjectID,
-
   /**
    * Return the ObjectID id as a 24 byte hex string representation
    *
    * @return {String} return the 24 byte hex string representation.
    * @api public
    */
-  toHexString: function () {
+  toHexString() {
     if (!this.id || !this.id.length) {
       throw new Error(
         "invalid ObjectId, ObjectId.id must be either a string or a Buffer, but is [" +
@@ -224,8 +219,7 @@ ObjectID.prototype = {
     }
 
     return hexString;
-  },
-
+  }
   /**
    * Compares the equality of this ObjectID with `otherID`.
    *
@@ -233,7 +227,7 @@ ObjectID.prototype = {
    * @return {Boolean} the result of comparing two ObjectID's
    * @api public
    */
-  equals: function (otherId) {
+  equals(otherId) {
     if (otherId instanceof ObjectID) {
       return this.toString() === otherId.toString();
     } else if (
@@ -263,15 +257,14 @@ ObjectID.prototype = {
     } else {
       return false;
     }
-  },
-
+  }
   /**
    * Returns the generation date (accurate up to the second) that this ID was generated.
    *
    * @return {Date} the generation date
    * @api public
    */
-  getTimestamp: function () {
+  getTimestamp() {
     var timestamp = new Date();
     var time;
     if (isBuffer(this.id)) {
@@ -289,8 +282,7 @@ ObjectID.prototype = {
     }
     timestamp.setTime(Math.floor(time) * 1000);
     return timestamp;
-  },
-
+  }
   /**
    * Generate a 12 byte id buffer used in ObjectID's
    *
@@ -298,7 +290,7 @@ ObjectID.prototype = {
    * @param {number} [time] optional parameter allowing to pass in a second based timestamp.
    * @return {string} return the 12 byte id buffer string.
    */
-  generate: function (time) {
+  generate(time) {
     if ("number" !== typeof time) {
       time = ~~(Date.now() / 1000);
     }
@@ -323,7 +315,16 @@ ObjectID.prototype = {
       inc & 0xff
     );
   }
-};
+
+  toJSON() {
+    return this.toHexString();
+  }
+  toString() {
+    return this.toHexString();
+  }
+}
+
+export default ObjectID;
 
 function next() {
   return (index = (index + 1) % 0xffffff);
@@ -333,30 +334,3 @@ function hex(length, n) {
   n = n.toString(16);
   return n.length === length ? n : "00000000".substring(n.length, length) + n;
 }
-
-// function buffer(str) {
-//   var i = 0,
-//     out = [];
-
-//   if (str.length === 24)
-//     for (; i < 24; out.push(parseInt(str[i] + str[i + 1], 16)), i += 2);
-//   else if (str.length === 12) for (; i < 12; out.push(str.charCodeAt(i)), i++);
-
-//   return out;
-// }
-
-var inspect =
-  (Symbol && Symbol.for && Symbol.for("nodejs.util.inspect.custom")) ||
-  "inspect";
-
-/**
- * Converts to a string representation of this Id.
- *
- * @return {String} return the 24 byte hex string representation.
- * @api private
- */
-ObjectID.prototype[inspect] = function () {
-  return "ObjectID(" + this + ")";
-};
-ObjectID.prototype.toJSON = ObjectID.prototype.toHexString;
-ObjectID.prototype.toString = ObjectID.prototype.toHexString;

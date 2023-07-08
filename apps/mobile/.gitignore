@@ -14,7 +14,9 @@ build_cache/
 .yarnrc.yml
 .yarn
 *.log
-
+.cxx/
+*.keystore
+!debug.keystore
 
 # Xcode
 #

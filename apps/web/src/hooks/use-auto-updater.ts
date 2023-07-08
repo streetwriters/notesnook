@@ -18,32 +18,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import { AppEventManager } from "../common/app-events";
-import { EVENTS } from "@notesnook/desktop/events";
-import {
-  showUpdateAvailableNotice,
-  showUpdateReadyNotice
-} from "../common/dialog-controller";
-import checkForUpdate from "../commands/check-for-update";
 import { isDesktop } from "../utils/platform";
+import { checkForUpdate } from "../utils/updater";
+import { AppEventManager, AppEvents } from "../common/app-events";
 
-type UpdateAvailableStatus = {
-  type: "available" | "completed";
-  version: string;
-};
-
-type UpdateDownloadingStatus = {
-  type: "downloading";
-  progress: number;
-};
-
+type CompletedUpdateStatus = { type: "completed"; version: string };
+type DownloadingUpdateStatus = { type: "downloading"; progress: number };
+type AvailableUpdateStatus = { type: "available"; version: string };
+type GenericUpdateStatus = { type: "checking" | "updated" };
 export type UpdateStatus =
-  | UpdateAvailableStatus
-  | UpdateDownloadingStatus
-  | { type: "checking" | "updated" };
+  | AvailableUpdateStatus
+  | CompletedUpdateStatus
+  | DownloadingUpdateStatus
+  | GenericUpdateStatus;
 
 let checkingForUpdateTimeout = 0;
-export default function useAutoUpdater() {
+export function useAutoUpdater() {
   const [status, setStatus] = useState<UpdateStatus>();
 
   useEffect(() => {
@@ -64,9 +54,6 @@ export default function useAutoUpdater() {
         type: "available",
         version: info.version
       });
-      showUpdateAvailableNotice({
-        version: info.version
-      });
     }
 
     function updateNotAvailable() {
@@ -76,7 +63,6 @@ export default function useAutoUpdater() {
 
     function updateDownloadCompleted(info: { version: string }) {
       changeStatus({ type: "completed", version: info.version });
-      showUpdateReadyNotice({ version: info.version });
     }
 
     function updateDownloadProgress(progressInfo: { percent: number }) {
@@ -84,23 +70,23 @@ export default function useAutoUpdater() {
     }
 
     const checkingForUpdateEvent = AppEventManager.subscribe(
-      EVENTS.checkingForUpdate,
+      AppEvents.checkingForUpdate,
       checkingForUpdate
     );
     const updateAvailableEvent = AppEventManager.subscribe(
-      EVENTS.updateAvailable,
+      AppEvents.updateAvailable,
       updateAvailable
     );
     const updateNotAvailableEvent = AppEventManager.subscribe(
-      EVENTS.updateNotAvailable,
+      AppEvents.updateNotAvailable,
       updateNotAvailable
     );
     const updateCompletedEvent = AppEventManager.subscribe(
-      EVENTS.updateDownloadCompleted,
+      AppEvents.updateDownloadCompleted,
       updateDownloadCompleted
     );
     const updateProgressEvent = AppEventManager.subscribe(
-      EVENTS.updateDownloadProgress,
+      AppEvents.updateDownloadProgress,
       updateDownloadProgress
     );
 

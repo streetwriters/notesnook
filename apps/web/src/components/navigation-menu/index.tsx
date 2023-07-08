@@ -49,6 +49,7 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import useLocation from "../../hooks/use-location";
 import { FlexScrollContainer } from "../scroll-container";
 import { ScopedThemeProvider, ThemeVariant } from "../theme-provider";
+import { isDesktop } from "../../utils/platform";
 
 type Route = {
   title: string;
@@ -196,7 +197,7 @@ function NavigationMenu(props: NavigationMenuProps) {
               ))}
               {colors.map((color, index) => (
                 <NavigationItem
-                  animate
+                  animate={!isDesktop()}
                   index={index}
                   isTablet={isTablet}
                   key={color.id}
@@ -225,7 +226,7 @@ function NavigationMenu(props: NavigationMenuProps) {
               />
               {shortcuts.map((item, index) => (
                 <NavigationItem
-                  animate
+                  animate={!isDesktop()}
                   index={colors.length - 1 + index}
                   isTablet={isTablet}
                   key={item.id}

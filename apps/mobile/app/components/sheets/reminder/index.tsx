@@ -243,7 +243,6 @@ export default function ReminderSheet({
             borderRadius: 100,
             paddingHorizontal: 24
           }}
-          fontSize={SIZE.md}
           onPress={saveReminder}
         />
       </View>
@@ -456,6 +455,7 @@ export default function ReminderSheet({
               mode="date"
               onConfirm={handleConfirm}
               onCancel={hideDatePicker}
+              is24Hour={db.settings?.getTimeFormat() === "24-hour"}
               date={date || new Date(Date.now())}
             />
 
@@ -466,8 +466,13 @@ export default function ReminderSheet({
               textColor={isDark ? colors.static.white : colors.static.black}
               fadeToColor={colors.primary.background}
               theme={isDark ? "dark" : "light"}
-              is24hourSource="locale"
               androidVariant="nativeAndroid"
+              is24hourSource="locale"
+              locale={
+                db.settings?.getTimeFormat() === "24-hour"
+                  ? "en_GB.UTF8"
+                  : "en_US.UTF8"
+              }
               mode={reminderMode === ReminderModes.Repeat ? "time" : "datetime"}
             />
 

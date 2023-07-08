@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Dimensions, Platform } from "react-native";
 import ImageResizer from "@bam.tech/react-native-image-resizer";
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 /**
  * Scale down & compress images to screen width
  * for loading in editor.

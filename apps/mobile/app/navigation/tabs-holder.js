@@ -59,7 +59,6 @@ import {
 import { useEditorStore } from "../stores/use-editor-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
-import { setWidthHeight } from "../utils";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -221,7 +220,6 @@ const _TabsHolder = () => {
       width: size.width,
       height: size.height
     });
-    setWidthHeight(size);
     DDS.setSize(size, orientation);
     const nextDeviceMode = DDS.isLargeTablet()
       ? "tablet"
@@ -271,13 +269,13 @@ const _TabsHolder = () => {
     setTimeout(() => {
       switch (current) {
         case "tablet":
-          introCompleted && tabBarRef.current?.goToIndex(0, false);
+          tabBarRef.current?.goToIndex(0, false);
           break;
         case "smallTablet":
           if (!fullscreen) {
-            introCompleted && tabBarRef.current?.closeDrawer(false);
+            tabBarRef.current?.closeDrawer(false);
           } else {
-            introCompleted && tabBarRef.current?.openDrawer(false);
+            tabBarRef.current?.openDrawer(false);
           }
           break;
         case "mobile":
@@ -416,70 +414,72 @@ const _TabsHolder = () => {
         backgroundColor="transparent"
       />
 
-      {deviceMode && widths[deviceMode] ? (
-        <FluidTabs
-          ref={tabBarRef}
-          dimensions={dimensions}
-          widths={!introCompleted ? widths["mobile"] : widths[deviceMode]}
-          enabled={deviceMode !== "tablet" && !fullscreen}
-          onScroll={onScroll}
-          onChangeTab={onChangeTab}
-          onDrawerStateChange={() => true}
-        >
-          <View
-            key="1"
-            style={{
-              height: "100%",
-              width: fullscreen
-                ? 0
-                : widths[!introCompleted ? "mobile" : deviceMode]?.a
-            }}
-          >
-            <ScopedThemeProvider value="navigationMenu">
-              <SideMenu />
-            </ScopedThemeProvider>
-          </View>
+      {!introCompleted ? (
+        <NavigationStack />
+      ) : (
+        <>
+          {deviceMode && widths[deviceMode] ? (
+            <FluidTabs
+              ref={tabBarRef}
+              dimensions={dimensions}
+              widths={widths[deviceMode]}
+              enabled={deviceMode !== "tablet" && !fullscreen}
+              onScroll={onScroll}
+              onChangeTab={onChangeTab}
+              onDrawerStateChange={() => true}
+            >
+              <View
+                key="1"
+                style={{
+                  height: "100%",
+                  width: fullscreen ? 0 : widths[deviceMode]?.a
+                }}
+              >
+                <ScopedThemeProvider value="navigationMenu">
+                  <SideMenu />
+                </ScopedThemeProvider>
+              </View>
 
-          <View
-            key="2"
-            style={{
-              height: "100%",
-              width: fullscreen
-                ? 0
-                : widths[!introCompleted ? "mobile" : deviceMode]?.b
-            }}
-          >
-            <ScopedThemeProvider value="list">
-              {deviceMode === "mobile" ? (
-                <Animated.View
-                  onTouchEnd={() => {
-                    tabBarRef.current?.closeDrawer();
-                    animatedOpacity.value = withTiming(0);
-                    animatedTranslateY.value = withTiming(-9999);
-                  }}
-                  style={[
-                    {
-                      position: "absolute",
-                      width: "100%",
-                      height: "100%",
-                      zIndex: 999,
-                      backgroundColor: "rgba(0,0,0,0.2)"
-                    },
-                    animatedStyle
-                  ]}
-                  ref={overlayRef}
-                />
-              ) : null}
+              <View
+                key="2"
+                style={{
+                  height: "100%",
+                  width: fullscreen ? 0 : widths[deviceMode]?.b
+                }}
+              >
+                <ScopedThemeProvider value="list">
+                  {deviceMode === "mobile" ? (
+                    <Animated.View
+                      onTouchEnd={() => {
+                        tabBarRef.current?.closeDrawer();
+                        animatedOpacity.value = withTiming(0);
+                        animatedTranslateY.value = withTiming(-9999);
+                      }}
+                      style={[
+                        {
+                          position: "absolute",
+                          width: "100%",
+                          height: "100%",
+                          zIndex: 999,
+                          backgroundColor: "rgba(0,0,0,0.2)"
+                        },
+                        animatedStyle
+                      ]}
+                      ref={overlayRef}
+                    />
+                  ) : null}
 
-              <NavigationStack />
-            </ScopedThemeProvider>
-          </View>
+                  <NavigationStack />
+                </ScopedThemeProvider>
+              </View>
 
-          <ScopedThemeProvider value="editor">
-            <EditorWrapper key="3" width={widths} dimensions={dimensions} />
-          </ScopedThemeProvider>
-        </FluidTabs>
-      ) : null}
+              <ScopedThemeProvider value="editor">
+                <EditorWrapper key="3" width={widths} dimensions={dimensions} />
+              </ScopedThemeProvider>
+            </FluidTabs>
+          ) : null}
+        </>
+      )}
     </View>
   );
 };

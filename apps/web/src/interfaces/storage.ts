@@ -17,50 +17,49 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import localforage from "localforage";
-import { extendPrototype } from "@notesnook/localforage-getitems";
-import * as MemoryDriver from "localforage-driver-memory";
+import {
+  IndexedDBKVStore,
+  LocalStorageKVStore,
+  MemoryKVStore,
+  IKVStore
+} from "./key-value";
 import { getNNCrypto } from "./nncrypto.stub";
 import type { Cipher, SerializedKey } from "@notesnook/crypto/dist/src/types";
-
-localforage.defineDriver(MemoryDriver);
-extendPrototype(localforage);
 
 type EncryptedKey = { iv: Uint8Array; cipher: BufferSource };
 export type DatabasePersistence = "memory" | "db";
 
 const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
 
+
 export class NNStorage {
-  database: LocalForage;
+  database: IKVStore;
 
   constructor(name: string, persistence: DatabasePersistence = "db") {
-    const drivers =
+    this.database =
       persistence === "memory"
-        ? [MemoryDriver._driver]
-        : [localforage.INDEXEDDB, localforage.WEBSQL, localforage.LOCALSTORAGE];
-    this.database = localforage.createInstance({
-      name,
-      driver: drivers
-    });
+        ? new MemoryKVStore()
+        : IndexedDBKVStore.isIndexedDBSupported()
+        ? new IndexedDBKVStore(name, "keyvaluepairs")
+        : new LocalStorageKVStore();
   }
 
-  read<T>(key: string): Promise<T | null> {
-    if (!key) return Promise.resolve(null);
-    return this.database.getItem(key);
+  read<T>(key: string): Promise<T | undefined> {
+    if (!key) return Promise.resolve(undefined);
+    return this.database.get(key);
   }
 
   readMulti(keys: string[]) {
     if (keys.length <= 0) return [];
-    return this.database.getItems(keys.sort());
+    return this.database.getMany(keys.sort());
   }
 
   write<T>(key: string, data: T) {
-    return this.database.setItem(key, data);
+    return this.database.set(key, data);
   }
 
   remove(key: string) {
-    return this.database.removeItem(key);
+    return this.database.delete(key);
   }
 
   clear() {
@@ -78,7 +77,11 @@ export class NNStorage {
     const crypto = await getNNCrypto();
     const keyData = await crypto.exportKey(password, salt);
 
-    if (this.isIndexedDBSupported() && window?.crypto?.subtle && keyData.key) {
+    if (
+      IndexedDBKVStore.isIndexedDBSupported() &&
+      window?.crypto?.subtle &&
+      keyData.key
+    ) {
       const pbkdfKey = await derivePBKDF2Key(password);
       await this.write(name, pbkdfKey);
       const cipheredKey = await aesEncrypt(pbkdfKey, keyData.key);
@@ -91,7 +94,7 @@ export class NNStorage {
   }
 
   async getCryptoKey(name: string): Promise<string | undefined> {
-    if (this.isIndexedDBSupported() && window?.crypto?.subtle) {
+    if (IndexedDBKVStore.isIndexedDBSupported() && window?.crypto?.subtle) {
       const pbkdfKey = await this.read<CryptoKey>(name);
       const cipheredKey = await this.read<EncryptedKey | string>(`${name}@_k`);
       if (typeof cipheredKey === "string") return cipheredKey;
@@ -102,10 +105,6 @@ export class NNStorage {
       if (!key) return;
       return key;
     }
-  }
-
-  isIndexedDBSupported(): boolean {
-    return this.database.driver() === "asyncStorage";
   }
 
   async generateCryptoKey(
@@ -207,3 +206,23 @@ async function aesDecrypt(
   );
   return dec.decode(plainText);
 }
+
+// async function main() {
+//   const nncrypto = await getNNCrypto();
+//   const electronNNCrypto = new NNCryptoElectron();
+
+//   console.time("nncrypto");
+//   for (let i = 0; i < 100; ++i) {
+//     await nncrypto.hash("mypassword", APP_SALT);
+//   }
+//   console.timeEnd("nncrypto");
+
+//   console.time("electron");
+//   for (let i = 0; i < 100; ++i) {
+//     await electronNNCrypto.hash("mypassword", APP_SALT);
+//   }
+//   console.timeEnd("electron");
+// }
+
+// main();
+// setTimeout(main, 10000);

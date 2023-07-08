@@ -34,7 +34,7 @@ import useNavigationStore, {
   NotebookScreenParams
 } from "../../stores/use-navigation-store";
 import { eOnNewTopicAdded } from "../../utils/events";
-import { NotebookType } from "../../utils/types";
+import { NoteType, NotebookType, TopicType } from "../../utils/types";
 import { openEditor, setOnFirstSave } from "../notes/common";
 const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState(
@@ -119,7 +119,22 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
         const notebook = db.notebooks?.notebook(params?.current?.item?.id)
           ?.data as NotebookType;
         if (!notebook) return [];
-        return db.relations?.from(notebook, "note");
+
+        const notes = db.relations?.from(notebook, "note") || [];
+        const topicNotes = db.notebooks
+          ?.notebook(notebook.id)
+          .topics.all.map((topic: TopicType) => {
+            return db.notes?.topicReferences
+              .get(topic.id)
+              .map((id: string) => db.notes?.note(id)?.data);
+          })
+          .flat()
+          .filter(
+            (topicNote: NoteType) =>
+              notes.findIndex((note) => note?.id !== topicNote?.id) === -1
+          );
+
+        return [...(notes as []), ...(topicNotes as [])];
       }
     });
   };

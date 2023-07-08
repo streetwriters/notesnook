@@ -151,5 +151,7 @@
 			</dict>
 		</dict>
 	</array>
+	<key>appGroupId</key>
+	<string>group.org.streetwriters.notesnook</string>
 </dict>
 </plist>

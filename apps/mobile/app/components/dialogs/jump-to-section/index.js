@@ -26,7 +26,7 @@ import {
 } from "../../../services/event-manager";
 import { useMessageStore } from "../../../stores/use-message-store";
 import { useThemeColors } from "@notesnook/theme";
-import { getElevation } from "../../../utils";
+import { getElevationStyle } from "../../../utils/elevation";
 import {
   eCloseJumpToDialog,
   eOpenJumpToDialog,
@@ -124,7 +124,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
     >
       <View
         style={{
-          ...getElevation(5),
+          ...getElevationStyle(5),
           width: DDS.isTab ? 500 : "85%",
           backgroundColor: colors.primary.background,
           zIndex: 100,
@@ -171,7 +171,9 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
                     <Paragraph
                       size={SIZE.sm}
                       color={
-                        currentIndex === index ? colors.static.white : colors.primary.accent
+                        currentIndex === index
+                          ? colors.static.white
+                          : colors.primary.accent
                       }
                       style={{
                         textAlign: "center"

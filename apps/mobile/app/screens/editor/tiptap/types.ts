@@ -34,6 +34,7 @@ export type EditorState = {
   keyboardState: boolean;
   ready: boolean;
   saveCount: 0;
+  isAwaitingResult: boolean;
 };
 
 export type Settings = {
@@ -49,6 +50,8 @@ export type Settings = {
   corsProxy: string;
   fontSize: string;
   fontFamily: string;
+  dateFormat: string;
+  timeFormat: string;
 };
 
 export type EditorProps = {

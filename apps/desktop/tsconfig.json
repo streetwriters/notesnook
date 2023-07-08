@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "lib": ["ESNext"]
+  },
+  "include": ["src", "global.d.ts"]
+}

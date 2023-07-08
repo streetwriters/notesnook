@@ -54,7 +54,7 @@ async function inlineImage(element: HTMLImageElement, options?: FetchOptions) {
     return element;
   }
 
-  return new Promise<HTMLImageElement | null>(function(resolve, reject) {
+  return new Promise<HTMLImageElement | null>(function (resolve, reject) {
     if (element.parentElement?.tagName === "PICTURE") {
       element.parentElement?.replaceWith(element);
     }

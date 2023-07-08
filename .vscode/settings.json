@@ -1,0 +1,15 @@
+{
+  "files.eol": "\n",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "eslint.run": "onSave",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "eslint.options": {
+    "cache": true,
+    "cacheStrategy": "content"
+  },
+  "git.rebaseWhenSync": true
+}

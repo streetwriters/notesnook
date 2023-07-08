@@ -21,8 +21,8 @@ import React from "react";
 import { View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
-import { timeConverter } from "../../utils/time";
 import Paragraph from "../ui/typography/paragraph";
+import { getFormattedDate } from "@notesnook/common";
 export const DateMeta = ({ item }) => {
   const { colors } = useThemeColors();
 
@@ -66,7 +66,7 @@ export const DateMeta = ({ item }) => {
         {getNameFromKey(key)}
       </Paragraph>
       <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
-        {timeConverter(item[key])}
+        {getFormattedDate(item[key], "date-time")}
       </Paragraph>
     </View>
   );

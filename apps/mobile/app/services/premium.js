@@ -98,7 +98,7 @@ async function getProducts() {
 }
 
 function get() {
-  if (__DEV__ || Config.isTesting) return true;
+  if (__DEV__ || Config.isTesting === "true") return true;
 
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
@@ -154,9 +154,11 @@ const onUserStatusCheck = async (type) => {
         };
         break;
       case CHECK_IDS.notebookAdd:
-        setTimeout(() => {
-          eSendEvent(eOpenPremiumDialog);
-        }, 500);
+        message = {
+          context: "sheet",
+          title: "Get Notesnook Pro",
+          desc: "With Notesnook Pro you can create unlimited notebooks and do so much more! Get it now."
+        };
         break;
       case CHECK_IDS.vaultAdd:
         message = {
@@ -177,7 +179,6 @@ const onUserStatusCheck = async (type) => {
 const showVerifyEmailDialog = () => {
   presentSheet({
     title: "Confirm your email",
-    icon: "email",
     paragraph:
       "We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder.",
     action: async () => {
@@ -318,7 +319,8 @@ const subscriptions = {
 
 async function getRemainingTrialDaysStatus() {
   let user = await db.user.getUser();
-  if (!user) return false;
+  if (!user || !user.subscription || user.subscription?.expiry === 0) return;
+
   let premium = user.subscription.type !== SUBSCRIPTION_STATUS.BASIC;
   let isTrial = user.subscription.type === SUBSCRIPTION_STATUS.TRIAL;
   let total = user.subscription.expiry - user.subscription.start;
@@ -367,7 +369,7 @@ const features_list = [
       "Rich note editing experience with markdown, tables, checklists and more"
   },
   {
-    content: "Export your notes in Pdf, markdown and html formats"
+    content: "Export your notes in PDF, markdown and html formats"
   }
 ];
 
@@ -386,7 +388,7 @@ const sheet = (context, promo, trial) => {
         <Seperator />
         <CompactFeatures
           scrollRef={ref}
-          maxHeight={300}
+          maxHeight={400}
           features={features_list}
           vertical
         />

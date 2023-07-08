@@ -120,7 +120,7 @@ describe("NOTEBOOKS", () => {
     await visibleByText(note.body);
   });
 
-  it.only("Add new topic to notebook", async () => {
+  it("Add new topic to notebook", async () => {
     await prepare();
     await navigate("Notebooks");
     await sleep(500);
@@ -133,7 +133,6 @@ describe("NOTEBOOKS", () => {
     await elementById("input-title").typeText("Topic");
     await tapByText("Add");
     await sleep(500);
-    await tapByText("Topic");
   });
 
   it("Edit topic", async () => {

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useMemo } from "react";
-import { Platform, Text, TextProps } from "react-native";
+import { Platform, Text, TextProps, ViewStyle } from "react-native";
 import Animated, {
   ComplexAnimationBuilder,
   Layout
@@ -30,15 +30,26 @@ interface HeadingProps extends TextProps {
   size?: number;
   layout?: ComplexAnimationBuilder;
   animated?: boolean;
+  extraBold?: boolean;
 }
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
+
+const extraBoldStyle = {
+  fontFamily: Platform.OS === "android" ? "OpenSans-Bold" : undefined,
+  fontWeight: Platform.OS === "ios" ? "800" : undefined
+};
+const boldStyle = {
+  fontFamily: Platform.OS === "android" ? "OpenSans-SemiBold" : undefined,
+  fontWeight: Platform.OS === "ios" ? "600" : undefined
+};
 
 const Heading = ({
   color,
   size = SIZE.xl,
   style,
   animated,
+  extraBold,
   ...restProps
 }: HeadingProps) => {
   const { colors } = useThemeColors();
@@ -53,11 +64,9 @@ const Heading = ({
       style={[
         {
           fontSize: size || SIZE.xl,
-          color: color || colors.primary.heading,
-          fontFamily:
-            Platform.OS === "android" ? "OpenSans-SemiBold" : undefined,
-          fontWeight: Platform.OS === "ios" ? "600" : undefined
+          color: color || colors.primary.heading
         },
+        extraBold ? (extraBoldStyle as ViewStyle) : (boldStyle as ViewStyle),
         style
       ]}
     ></Component>

@@ -29,8 +29,14 @@ import Config from "../utils/config";
 import { hashNavigate } from "../navigation";
 import { groupArray } from "@notesnook/core/utils/grouping";
 
+/**
+ * @extends {BaseStore<NoteStore>}
+ */
 class NoteStore extends BaseStore {
   notes = [];
+  /**
+   * @type {{ type: "tag" | "color" | "notebook" | "topic" | "favorite" | "monographs", notes: any[] } | undefined}
+   */
   context = undefined;
   selectedNote = 0;
   nonce = 0;
@@ -39,15 +45,6 @@ class NoteStore extends BaseStore {
   setViewMode = (viewMode) => {
     this.set((state) => (state.viewMode = viewMode));
     Config.set("notes:viewMode", viewMode);
-  };
-
-  init = () => {
-    EV.subscribe(EVENTS.noteRemoved, (id) => {
-      const { session } = editorStore.get();
-      if (session.id === id) {
-        hashNavigate("/notes/create", { addNonce: true });
-      }
-    });
   };
 
   setSelectedNote = (id) => {
@@ -86,10 +83,8 @@ class NoteStore extends BaseStore {
   };
 
   setContext = (context) => {
-    db.notes.init().then(() => {
-      this.get().context = { ...context, notes: notesFromContext(context) };
-      this._forceUpdate();
-    });
+    this.get().context = { ...context, notes: notesFromContext(context) };
+    this._forceUpdate();
   };
 
   delete = async (...ids) => {
@@ -190,9 +185,6 @@ class NoteStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<NoteStore>, NoteStore]}
- */
 const [useStore, store] = createStore(NoteStore);
 export { useStore, store };
 

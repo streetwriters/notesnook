@@ -18,13 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Collection from "./collection";
-import getId from "../utils/id";
+import { getId } from "../utils/id";
 import { deleteItem, hasItem } from "../utils/array";
 import { EV, EVENTS, sendAttachmentsProgressEvent } from "../common";
 import dataurl from "../utils/dataurl";
 import dayjs from "dayjs";
 import setManipulator from "../utils/set";
-import { getFileNameWithExtension } from "../utils/filename";
+import {
+  getFileNameWithExtension,
+  isImage,
+  isWebClip
+} from "../utils/filename";
 
 export default class Attachments extends Collection {
   constructor(db, name, cached) {
@@ -81,7 +85,8 @@ export default class Attachments extends Collection {
       ...oldAttachment,
       ...oldAttachment.metadata,
       ...attachmentArg,
-      noteIds
+      noteIds,
+      key: attachmentArg.key || oldAttachment.key
     };
 
     const {
@@ -327,7 +332,9 @@ export default class Attachments extends Collection {
     const { metadata, chunkSize } = attachment;
     const filename = metadata.hash;
 
-    sendAttachmentsProgressEvent("download", groupId, total, current);
+    if (notify)
+      sendAttachmentsProgressEvent("download", groupId, total, current);
+
     const isDownloaded = await this._db.fs.downloadFile(
       groupId,
       filename,
@@ -387,31 +394,25 @@ export default class Attachments extends Collection {
   }
 
   get images() {
-    return this.all.filter((attachment) =>
-      attachment.metadata.type.startsWith("image/")
-    );
+    return this.all.filter((attachment) => isImage(attachment.metadata.type));
   }
 
   get webclips() {
-    return this.all.filter(
-      (attachment) =>
-        attachment.metadata.type === "application/vnd.notesnook.web-clip"
-    );
+    return this.all.filter((attachment) => isWebClip(attachment.metadata.type));
   }
 
   get media() {
     return this.all.filter(
       (attachment) =>
-        attachment.metadata.type.startsWith("image/") ||
-        attachment.metadata.type === "application/vnd.notesnook.web-clip"
+        isImage(attachment.metadata.type) || isWebClip(attachment.metadata.type)
     );
   }
 
   get files() {
     return this.all.filter(
       (attachment) =>
-        !attachment.metadata.type.startsWith("image/") &&
-        attachment.metadata.type !== "application/vnd.notesnook.web-clip"
+        !isImage(attachment.metadata.type) &&
+        !isWebClip(attachment.metadata.type)
     );
   }
 

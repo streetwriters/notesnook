@@ -17,12 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import ShareExtension from "@ammarahmed/react-native-share-extension";
 import { getPreviewData } from "@flyerhq/react-native-link-preview";
+import { formatBytes } from "@notesnook/common";
+import { isImage } from "@notesnook/core/utils/filename";
 import { parseHTML } from "@notesnook/core/utils/html-parser";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Keyboard,
   Platform,
   SafeAreaView,
@@ -33,18 +37,20 @@ import {
   View,
   useWindowDimensions
 } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 import {
   SafeAreaProvider,
   useSafeAreaInsets
 } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import ShareExtension from "rn-extensions-share";
 import isURL from "validator/lib/isURL";
 import { db } from "../app/common/database";
 import Storage from "../app/common/database/storage";
 import { eSendEvent } from "../app/services/event-manager";
-import { getElevation } from "../app/utils";
+import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../app/utils/constants";
+import { getElevationStyle } from "../app/utils/elevation";
 import { eOnLoadNote } from "../app/utils/events";
+import { NoteBundle } from "../app/utils/note-bundle";
 import { Editor } from "./editor";
 import { Search } from "./search";
 import { initDatabase, useShareStore } from "./store";
@@ -193,7 +199,7 @@ const ShareView = ({ quicknote = false }) => {
   const { colors } = useThemeColors();
   const appendNote = useShareStore((state) => state.appendNote);
   const [note, setNote] = useState({ ...defaultNote });
-  const noteContent = useRef();
+  const noteContent = useRef("");
   const [loading, setLoading] = useState(false);
   const [loadingExtension, setLoadingExtension] = useState(true);
   const [rawData, setRawData] = useState({
@@ -209,9 +215,10 @@ const ShareView = ({ quicknote = false }) => {
       : // eslint-disable-next-line react-hooks/rules-of-hooks
         useSafeAreaInsets();
   const [searchMode, setSearchMode] = useState(null);
+  const [rawFiles, setRawFiles] = useState([]);
 
   const [kh, setKh] = useState(0);
-
+  globalThis["IS_SHARE_EXTENSION"] = true;
   const onKeyboardDidShow = (event) => {
     let kHeight = event.endCoordinates.height;
     keyboardHeight.current = kHeight;
@@ -271,6 +278,25 @@ const ShareView = ({ quicknote = false }) => {
             note.content.data = makeHtmlFromPlainText(item.value);
           }
           noteContent.current = note.content.data;
+        } else {
+          const user = await db.user.getUser();
+          if (user && user.subscription.type !== 0) {
+            if (
+              (isImage(item.type) && item.size > IMAGE_SIZE_LIMIT) ||
+              (!isImage(item.type) && item.size > FILE_SIZE_LIMIT)
+            )
+              continue;
+
+            setRawFiles((files) => {
+              const index = files.findIndex((file) => file.name === item.name);
+              if (index === -1) {
+                files.push(item);
+                return [...files];
+              } else {
+                return files;
+              }
+            });
+          }
         }
       }
       setNote({ ...note });
@@ -293,7 +319,7 @@ const ShareView = ({ quicknote = false }) => {
 
   useEffect(() => {
     (async () => {
-      //await loadDatabase();
+      await initDatabase();
       setLoadingExtension(false);
       loadData();
       useShareStore.getState().restore();
@@ -312,8 +338,10 @@ const ShareView = ({ quicknote = false }) => {
 
   const onPress = async () => {
     setLoading(true);
-    await initDatabase();
-    if (!noteContent.current) return;
+    if (!noteContent.current && rawFiles.length === 0) {
+      setLoading(false);
+      return;
+    }
     if (appendNote && !db.notes.note(appendNote.id)) {
       useShareStore.getState().setAppendNote(null);
       Alert.alert("The note you are trying to append to has been deleted.");
@@ -325,7 +353,7 @@ const ShareView = ({ quicknote = false }) => {
       let raw = await db.content.raw(appendNote.contentId);
       _note = {
         content: {
-          data: raw.data + noteContent.current,
+          data: (raw?.data || "") + noteContent.current,
           type: "tiptap"
         },
         id: appendNote.id,
@@ -339,23 +367,18 @@ const ShareView = ({ quicknote = false }) => {
       _note.sessionId = Date.now();
     }
 
-    let id = await db.notes.add(_note);
-    if (!appendNote) {
-      for (const item of useShareStore.getState().selectedNotebooks) {
-        if (item.type === "notebook") {
-          db.relations.add(item, { id, type: "note" });
-        } else {
-          db.notes.addToNotebook(
-            {
-              id: item.notebookId,
-              topic: item.id
-            },
-            id
-          );
-        }
-      }
+    await NoteBundle.createNotes({
+      files: rawFiles,
+      note: _note,
+      notebooks: useShareStore.getState().selectedNotebooks
+    });
+
+    try {
+      await db.sync(false, false);
+    } catch (e) {
+      console.log(e, e.stack);
     }
-    await db.sync(false, false);
+
     await Storage.write("notesAddedFromIntent", "added");
     close();
     setLoading(false);
@@ -397,6 +420,18 @@ const ShareView = ({ quicknote = false }) => {
     loadData();
   }, [loadData]);
 
+  const onRemoveFile = (item) => {
+    const index = rawFiles.findIndex((file) => file.name === item.name);
+    if (index > -1) {
+      setRawFiles((state) => {
+        const files = [...state];
+        files.splice(index);
+        return files;
+      });
+      RNFetchBlob.fs.unlink(item.value).catch(console.log);
+    }
+  };
+
   const WrapperView = Platform.OS === "android" ? View : ScrollView;
 
   return loadingExtension ? null : (
@@ -415,7 +450,7 @@ const ShareView = ({ quicknote = false }) => {
             backgroundColor: colors.primary.background,
             height: 50 + insets.top,
             paddingTop: insets.top,
-            ...getElevation(1),
+            ...getElevationStyle(1),
             marginTop: -insets.top,
             flexDirection: "row",
             alignItems: "center",
@@ -569,10 +604,102 @@ const ShareView = ({ quicknote = false }) => {
                   }}
                 />
               </View>
+
+              {rawFiles?.length > 0 ? (
+                <View
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 12,
+                    backgroundColor: colors.secondary.background
+                  }}
+                >
+                  <Text
+                    style={{ color: colors.primary.paragraph, marginBottom: 6 }}
+                  >
+                    Attaching {rawFiles.length} file(s):
+                  </Text>
+                  <ScrollView horizontal>
+                    {rawFiles.map((item) =>
+                      isImage(item.type) ? (
+                        <TouchableOpacity
+                          onPress={() => onRemoveFile(item)}
+                          key={item.name}
+                          activeOpacity={0.9}
+                        >
+                          <Image
+                            source={{
+                              uri:
+                                Platform.OS === "android"
+                                  ? `file://${item.value}`
+                                  : item.value
+                            }}
+                            style={{
+                              width: 100,
+                              height: 100,
+                              borderRadius: 5,
+                              backgroundColor: "black",
+                              marginRight: 6
+                            }}
+                            resizeMode="cover"
+                          />
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          activeOpacity={0.9}
+                          key={item.name}
+                          source={{
+                            uri: `file://${item.value}`
+                          }}
+                          onPress={() => onRemoveFile(item)}
+                          style={{
+                            borderRadius: 5,
+                            backgroundColor: colors.secondary.background,
+                            flexDirection: "row",
+                            borderWidth: 1,
+                            borderColor: colors.primary.border,
+                            alignItems: "center",
+                            paddingVertical: 5,
+                            paddingHorizontal: 8,
+                            marginRight: 6
+                          }}
+                          resizeMode="cover"
+                        >
+                          <Icon
+                            color={colors.primary.icon}
+                            size={15}
+                            name="file"
+                          />
+
+                          <Text
+                            style={{
+                              marginLeft: 4,
+                              color: colors.primary.paragraph,
+                              paddingRight: 8,
+                              fontSize: 12
+                            }}
+                          >
+                            {item.name} ({formatBytes(item.size)})
+                          </Text>
+                        </TouchableOpacity>
+                      )
+                    )}
+                  </ScrollView>
+
+                  <Text
+                    style={{
+                      color: colors.secondary.paragraph,
+                      marginTop: 6,
+                      fontSize: 11
+                    }}
+                  >
+                    Tap to remove an attachment.
+                  </Text>
+                </View>
+              ) : null}
               <View
                 style={{
                   width: "100%",
-                  height: 200,
+                  height: rawFiles.length > 0 ? 100 : 200,
                   paddingBottom: 15,
                   marginBottom: 10,
                   borderBottomColor: colors.secondary.background,

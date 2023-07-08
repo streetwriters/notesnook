@@ -19,10 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Collection from "./collection";
 import Note from "../models/note";
-import getId from "../utils/id";
+import { getId } from "../utils/id";
 import { getContentFromData } from "../content-types";
 import qclone from "qclone";
 import { deleteItem, findById } from "../utils/array";
+import { NEWLINE_STRIP_REGEX, formatTitle } from "../utils/title-format";
 
 /**
  * @typedef {{ id: string, topic?: string, rebuildCache?: boolean }} NotebookReference
@@ -31,7 +32,7 @@ import { deleteItem, findById } from "../utils/array";
 export default class Notes extends Collection {
   constructor(db, name, cached) {
     super(db, name, cached);
-    this.topicReferences = new NoteIdCache(this._db);
+    this.topicReferences = new NoteIdCache(this);
   }
 
   async init() {
@@ -112,7 +113,7 @@ export default class Notes extends Collection {
       });
     }
 
-    const noteTitle = getNoteTitle(note, oldNote);
+    const noteTitle = this._getNoteTitle(note, oldNote, note.headline);
     if (oldNote && oldNote.title !== noteTitle) note.dateEdited = Date.now();
 
     note = {
@@ -408,6 +409,27 @@ export default class Notes extends Collection {
       await this._collection.updateItem(note);
     }
   }
+
+  _getNoteTitle(note, oldNote, headline) {
+    if (note.title && note.title.trim().length > 0) {
+      return note.title.replace(NEWLINE_STRIP_REGEX, " ");
+    } else if (
+      oldNote &&
+      oldNote.title &&
+      oldNote.title.trim().length > 0 &&
+      (note.title === undefined || note.title === null)
+    ) {
+      return oldNote.title.replace(NEWLINE_STRIP_REGEX, " ");
+    }
+
+    return formatTitle(
+      this._db.settings.getTitleFormat(),
+      this._db.settings.getDateFormat(),
+      this._db.settings.getTimeFormat(),
+      headline?.split(" ").splice(0, 10).join(" "),
+      this._collection.count()
+    );
+  }
 }
 
 function getNoteHeadline(note, content) {
@@ -415,33 +437,19 @@ function getNoteHeadline(note, content) {
   return content.toHeadline();
 }
 
-const NEWLINE_STRIP_REGEX = /[\r\n\t\v]+/gm;
-function getNoteTitle(note, oldNote) {
-  if (note.title && note.title.trim().length > 0) {
-    return note.title.replace(NEWLINE_STRIP_REGEX, " ");
-  } else if (oldNote && oldNote.title && oldNote.title.trim().length > 0) {
-    return oldNote.title.replace(NEWLINE_STRIP_REGEX, " ");
-  }
-
-  return `Note ${new Date().toLocaleString(undefined, {
-    dateStyle: "short",
-    timeStyle: "short"
-  })}`;
-}
-
 class NoteIdCache {
   /**
    *
-   * @param {import("../api/index").default} db
+   * @param {Notes} notes
    */
-  constructor(db) {
-    this._db = db;
+  constructor(notes) {
+    this.notes = notes;
     this.cache = new Map();
   }
 
   rebuild() {
     this.cache = new Map();
-    const notes = this._db.notes.all;
+    const notes = this.notes.all;
 
     for (const note of notes) {
       const { notebooks } = note;

@@ -42,7 +42,7 @@ export const useAttachmentProgress = (
   );
 
   useEffect(() => {
-    const attachmentProgress = progress?.[attachment.metadata.hash];
+    const attachmentProgress = progress?.[attachment?.metadata?.hash];
     if (attachmentProgress) {
       const type = attachmentProgress.type;
       const loaded =
@@ -56,9 +56,11 @@ export const useAttachmentProgress = (
         type: type
       });
     } else {
-      setCurrentProgress(undefined);
+      setTimeout(() => {
+        setCurrentProgress(undefined);
+      }, 300);
     }
-  }, [attachment.metadata.hash, progress]);
+  }, [attachment, progress]);
 
   return [currentProgress, setCurrentProgress];
 };

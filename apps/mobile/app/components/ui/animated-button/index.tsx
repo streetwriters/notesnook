@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { ActivityIndicator, ViewStyle } from "react-native";
+import { ActivityIndicator, DimensionValue, ViewStyle } from "react-native";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -26,8 +26,8 @@ import Animated, {
   LightSpeedInLeft
 } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
 import { SIZE } from "../../../utils/size";
+import NativeTooltip from "../../../utils/tooltip";
 import { ButtonProps } from "../button";
 import { PressableButton, useButton } from "../pressable";
 import Heading from "../typography/heading";
@@ -81,7 +81,7 @@ export const AnimatedButton = ({
             return;
           }
           if (tooltipText) {
-            showTooltip(event, tooltipText, TOOLTIP_POSITIONS.TOP);
+            NativeTooltip.show(event, tooltipText, NativeTooltip.POSITIONS.TOP);
           }
         }}
         disabled={loading}
@@ -94,7 +94,7 @@ export const AnimatedButton = ({
         customAlpha={buttonType?.alpha}
         customStyle={{
           height: height,
-          width: width || undefined,
+          width: (width as DimensionValue) || undefined,
           paddingHorizontal: 12,
           borderRadius: 5,
           alignSelf: "center",

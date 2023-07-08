@@ -110,7 +110,8 @@ export const WebClipNode = Node.create<WebClipOptions>({
 
   addNodeView() {
     return createSelectionBasedNodeView(WebClipComponent, {
-      shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs)
+      shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs),
+      forceEnableSelection: true
     });
   },
 

@@ -25,7 +25,7 @@ import { presentDialog } from "../../../components/dialog/functions";
 import { IconButton } from "../../../components/ui/icon-button";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import { useThemeColors } from "@notesnook/theme";
-import { getElevation } from "../../../utils";
+import { getElevationStyle } from "../../../utils/elevation";
 import { SIZE } from "../../../utils/size";
 import { renderTool } from "./common";
 import { DraggableItem, useDragState } from "./state";
@@ -174,7 +174,7 @@ export const Group = ({
             width: isDragged ? dimensions.current?.width : "100%",
             backgroundColor: colors.primary.background,
             borderRadius: 10,
-            ...getElevation(hover ? 5 : 0),
+            ...getElevationStyle(hover ? 5 : 0),
             marginTop: isSubgroup ? 0 : 10
           }
         ]}
@@ -285,7 +285,10 @@ export const Group = ({
         receivingStyle={{
           paddingBottom: recievePosition === "below" ? 50 : 0,
           paddingTop: recievePosition === "above" ? 50 : 0,
-          backgroundColor: dragged.type === "subgroup" ? colors.secondary.background : undefined,
+          backgroundColor:
+            dragged.type === "subgroup"
+              ? colors.secondary.background
+              : undefined,
           marginTop: recievePosition === "above" ? 10 : 0,
           marginBottom: recievePosition === "below" ? 10 : 0,
           borderRadius: 10

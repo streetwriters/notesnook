@@ -20,24 +20,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import FileStreamSource from "./filestreamsource";
 import { File } from "./types";
 
-export default class FileHandle extends ReadableStream {
+export default class FileHandle {
   private storage: LocalForage;
-  private file: File;
+  public file: File;
 
   constructor(storage: LocalForage, file: File) {
-    super(new FileStreamSource(storage, file));
-
     this.file = file;
     this.storage = storage;
   }
 
-  /**
-   *
-   * @param {Uint8Array} chunk
-   */
-  async write(chunk: Uint8Array) {
-    await this.storage.setItem(this.getChunkKey(this.file.chunks++), chunk);
-    await this.storage.setItem(this.file.filename, this.file);
+  get readable() {
+    return new ReadableStream(new FileStreamSource(this.storage, this.file));
+  }
+
+  get writeable() {
+    return new WritableStream<Uint8Array>({
+      write: async (chunk, controller) => {
+        if (controller.signal.aborted) return;
+
+        await this.storage.setItem(this.getChunkKey(this.file.chunks++), chunk);
+        await this.storage.setItem(this.file.filename, this.file);
+      },
+      abort: async () => {
+        for (let i = 0; i < this.file.chunks; ++i) {
+          await this.storage.removeItem(this.getChunkKey(i));
+        }
+      }
+    });
   }
 
   async addAdditionalData<T>(key: string, value: T) {
@@ -82,5 +91,15 @@ export default class FileHandle extends ReadableStream {
       blobParts.push(array.buffer);
     }
     return new Blob(blobParts, { type: this.file.type });
+  }
+
+  async size() {
+    let size = 0;
+    for (let i = 0; i < this.file.chunks; ++i) {
+      const array = await this.readChunk(i);
+      if (!array) continue;
+      size += array.length;
+    }
+    return size;
   }
 }

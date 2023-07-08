@@ -25,9 +25,10 @@ import {
   eOpenRateDialog,
   eOpenRecoveryKeyDialog
 } from "../utils/events";
-import { eSendEvent } from "./event-manager";
+import { eSendEvent, presentSheet } from "./event-manager";
 import PremiumService from "./premium";
 import SettingsService from "./settings";
+import { Update } from "../components/sheets/update";
 
 const rateAppMessage = {
   visible: true,
@@ -135,4 +136,22 @@ const autoBackupsOff = {
 
 export function setAutobackOffMessage() {
   useMessageStore.getState().setMessage(autoBackupsOff);
+}
+
+const updateAvailableMessage = (version) => ({
+  visible: true,
+  message: "New update available",
+  actionText: "Tap here to update to the latest version",
+  onPress: () => {
+    presentSheet({
+      component: (ref) => <Update version={version} fwdRef={ref} />
+    });
+  },
+  data: {},
+  icon: "update",
+  type: "normal"
+});
+
+export function setUpdateAvailableMessage(version) {
+  useMessageStore.getState().setMessage(updateAvailableMessage(version));
 }

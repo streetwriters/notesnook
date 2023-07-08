@@ -34,10 +34,11 @@ import {
   type DownloadOptions,
   getTotalWords,
   countWords,
-  getFontById
+  getFontById,
+  TiptapOptions
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
-import { PropsWithChildren, useEffect, useRef, useState } from "react";
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
 import { Attachment } from "./picker";
 import { IEditor } from "./types";
 import {
@@ -52,21 +53,28 @@ import { getCurrentPreset } from "../../common/toolbar-config";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
-import { debounce, debounceWithId } from "../../utils/debounce";
+import { debounce, debounceWithId } from "@notesnook/common";
 import { store as editorstore } from "../../stores/editor-store";
 import { ScopedThemeProvider } from "../theme-provider";
 import { useTheme } from "../../hooks/use-theme";
+import { writeText } from "clipboard-polyfill";
 
+type OnChangeHandler = (
+  id: string | undefined,
+  sessionId: number,
+  content: string
+) => void;
 type TipTapProps = {
   editorContainer: HTMLElement;
   onLoad?: () => void;
-  onChange?: (id: string, sessionId: string, content: string) => void;
+  onChange?: OnChangeHandler;
   onContentChange?: () => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
+  onPreviewAttachment?: (attachment: Attachment) => void;
   onAttachFile?: (file: File) => void;
   onFocus?: () => void;
-  content?: string;
+  content?: () => string | undefined;
   toolbarContainerId?: string;
   readonly?: boolean;
   nonce?: number;
@@ -77,15 +85,15 @@ type TipTapProps = {
   fontFamily: string;
 };
 
-const SAVE_INTERVAL = process.env.REACT_APP_TEST ? 100 : 300;
+const SAVE_INTERVAL = import.meta.env.REACT_APP_TEST ? 100 : 300;
 
 function save(
-  sessionId: string,
-  noteId: string,
+  sessionId: number,
+  noteId: string | undefined,
   editor: Editor,
   content: Fragment,
   preventSave: boolean,
-  onChange?: (id: string, sessionId: string, html: string) => void
+  onChange?: OnChangeHandler
 ) {
   configureEditor({
     statistics: {
@@ -109,6 +117,7 @@ function TipTap(props: TipTapProps) {
     onChange,
     onInsertAttachment,
     onDownloadAttachment,
+    onPreviewAttachment,
     onAttachFile,
     onContentChange,
     onFocus = () => {},
@@ -127,8 +136,10 @@ function TipTap(props: TipTapProps) {
   const isUserPremium = useIsUserPremium();
   const configure = useConfigureEditor();
   const doubleSpacedLines = useSettingsStore(
-    (store) => store.doubleSpacedLines
+    (store) => store.doubleSpacedParagraphs
   );
+  const dateFormat = useSettingsStore((store) => store.dateFormat);
+  const timeFormat = useSettingsStore((store) => store.timeFormat);
   const { toolbarConfig } = useToolbarConfig();
   const { isSearching, toggleSearch } = useSearch();
 
@@ -141,8 +152,10 @@ function TipTap(props: TipTapProps) {
     }
   });
 
-  const editor = useTiptap(
-    {
+  const oldNonce = useRef<number>();
+
+  const tiptapOptions = useMemo<Partial<TiptapOptions>>(() => {
+    return {
       editorProps: {
         handlePaste: (view, event) => {
           const hasText = event.clipboardData?.types?.some((type) =>
@@ -164,13 +177,20 @@ function TipTap(props: TipTapProps) {
       },
       downloadOptions,
       doubleSpacedLines,
+      dateFormat,
+      timeFormat,
       isMobile: isMobile || false,
       element: editorContainer,
       editable: !readonly,
-      content,
+      content: content?.(),
       autofocus: "start",
       onFocus,
       onCreate: ({ editor }) => {
+        if (onLoad) onLoad();
+        if (oldNonce.current !== nonce)
+          editor.commands.focus("start", { scrollIntoView: true });
+        oldNonce.current = nonce;
+
         configure({
           editor: toIEditor(editor as Editor),
           canRedo: editor.can().redo(),
@@ -183,7 +203,6 @@ function TipTap(props: TipTapProps) {
             }
           }
         });
-        if (onLoad) onLoad();
         editor.commands.refreshSearch();
       },
       onUpdate: ({ editor, transaction }) => {
@@ -192,7 +211,6 @@ function TipTap(props: TipTapProps) {
         const preventSave = transaction?.getMeta("preventSave") as boolean;
         const { id, sessionId } = editorstore.get().session;
         const content = editor.state.doc.content;
-
         deferredSave(
           sessionId,
           sessionId,
@@ -217,6 +235,9 @@ function TipTap(props: TipTapProps) {
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo()
         });
+      },
+      copyToClipboard(text) {
+        writeText(text);
       },
       onSelectionUpdate: debounce(({ editor, transaction }) => {
         const isEmptySelection = transaction.selection.empty;
@@ -253,13 +274,21 @@ function TipTap(props: TipTapProps) {
         onDownloadAttachment?.(attachment);
         return true;
       },
+      onPreviewAttachment(_editor, attachment) {
+        onPreviewAttachment?.(attachment);
+        return true;
+      },
       onOpenLink: (url) => {
         window.open(url, "_blank");
         return true;
       }
-    },
+    };
+  }, [theme, readonly, nonce, doubleSpacedLines, dateFormat, timeFormat]);
+
+  const editor = useTiptap(
+    tiptapOptions,
     // IMPORTANT: only put stuff here that the editor depends on.
-    [readonly, nonce]
+    [tiptapOptions]
   );
 
   useEffect(

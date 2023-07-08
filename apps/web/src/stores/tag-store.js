@@ -22,6 +22,9 @@ import { db } from "../common/db";
 import BaseStore from "./index";
 import { groupArray } from "@notesnook/core/utils/grouping";
 
+/**
+ * @extends {BaseStore<TagStore>}
+ */
 class TagStore extends BaseStore {
   tags = [];
 
@@ -36,8 +39,5 @@ class TagStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<TagStore>, TagStore]}
- */
 const [useStore, store] = createStore(TagStore);
 export { useStore, store };

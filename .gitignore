@@ -8,3 +8,5 @@ nx-cloud.env
 .eslintcache
 .env.local
 .nyc_output
+site
+node_modules.backup

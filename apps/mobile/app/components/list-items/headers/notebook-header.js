@@ -23,7 +23,7 @@ import { View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 import { useMenuStore } from "../../../stores/use-menu-store";
 import { ToastEvent } from "../../../services/event-manager";
-import { getTotalNotes } from "../../../utils";
+import { getTotalNotes } from "@notesnook/common";
 import { db } from "../../../common/database";
 import { SIZE } from "../../../utils/size";
 import { IconButton } from "../../ui/icon-button";

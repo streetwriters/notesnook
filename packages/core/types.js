@@ -36,10 +36,11 @@ const _ignore = "";
  *  id: string,
  *  email: string,
  *  isEmailConfirmed: boolean,
+ *  marketingConsent: boolean,
  *  mfa: {
  *      isEnabled: boolean,
- *      primaryMethod: string,
- *      secondaryMethod: string,
+ *      primaryMethod: "app" | "sms" | "email",
+ *      secondaryMethod: "app" | "sms" | "email",
  *      remainingValidCodes: number
  *  },
  *  subscription: {

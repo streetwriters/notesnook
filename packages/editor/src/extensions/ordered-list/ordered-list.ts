@@ -22,6 +22,7 @@ import TiptapOrderedList from "@tiptap/extension-ordered-list";
 export const OrderedList = TiptapOrderedList.extend({
   addAttributes() {
     return {
+      ...this.parent?.(),
       listType: {
         default: null,
         parseHTML: (element) => element.style.listStyleType,

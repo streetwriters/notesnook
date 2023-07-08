@@ -1,3 +1,10 @@
+:root {
+  --focus-border: var(--accent);
+  --separator-border: var(--border);
+  --sash-size: 10px;
+  --sash-hover-size: 4px;
+}
+
 /* open-sans-regular - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
 @font-face {
   font-family: "Open Sans";
@@ -95,6 +102,8 @@
       format("truetype");
 }
 
+.rpv-core__text-layer,
+.rpv-core__text-layer *,
 .selectable,
 .selectable *,
 input,
@@ -118,6 +127,17 @@ textarea,
   user-select: none;
   outline: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+.rpv-core__text-layer-text::selection {
+  background-color: var(--dimPrimary) !important;
+  color: transparent;
+}
+
+.rpv-core__text-layer-text::-moz-selection {
+  /* Code for Firefox */
+  background-color: var(--dimPrimary) !important;
+  color: transparent;
 }
 
 *::-moz-focus-inner {
@@ -163,13 +183,6 @@ textarea,
 }
 .pane::before {
   width: 1px !important;
-}
-
-#app {
-  --focus-border: var(--accent);
-  --separator-border: var(--border);
-  --sash-size: 10px;
-  --sash-hover-size: 4px;
 }
 
 .route#settings,

@@ -56,21 +56,19 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
   toolbarLocation: "top",
   setToolbarLocation: (location) => set({ toolbarLocation: location }),
   closePopup: (id) =>
-    set((state) => {
-      state.openedPopups = {
-        ...state.openedPopups,
+    set({
+      openedPopups: {
+        ...get().openedPopups,
         [id]: undefined
-      };
-      return state;
+      }
     }),
   isPopupOpen: (id) => !!get().openedPopups[id],
   openPopup: (ref) =>
-    set((state) => {
-      state.openedPopups = {
-        ...state.openedPopups,
+    set({
+      openedPopups: {
+        ...get().openedPopups,
         [ref.id]: ref
-      };
-      return state;
+      }
     }),
   closePopupGroup: (group, excluded) =>
     set((state) => {
@@ -82,25 +80,11 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
       }
       return state;
     }),
-  closeAllPopups: () =>
-    set((state) => {
-      for (const key in state.openedPopups) {
-        state.openedPopups[key] = undefined;
-      }
-      return state;
-    }),
+  closeAllPopups: () => set({ openedPopups: {} }),
   fontFamily: "sans-serif",
-  setFontFamily: (fontFamily) =>
-    set((state) => {
-      state.fontFamily = fontFamily;
-      return state;
-    }),
+  setFontFamily: (fontFamily) => set({ fontFamily }),
   fontSize: 16,
-  setFontSize: (fontSize) =>
-    set((state) => {
-      state.fontSize = fontSize;
-      return state;
-    })
+  setFontSize: (fontSize) => set({ fontSize })
 }));
 
 export function useToolbarLocation() {

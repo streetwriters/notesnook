@@ -26,7 +26,7 @@ import { IconButton } from "../../../components/ui/icon-button";
 import { SvgView } from "../../../components/ui/svg";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import { useThemeColors } from "@notesnook/theme";
-import { getElevation } from "../../../utils";
+import { getElevationStyle } from "../../../utils/elevation";
 import { SIZE } from "../../../utils/size";
 import { renderGroup } from "./common";
 import { DraggableItem, useDragState } from "./state";
@@ -190,7 +190,7 @@ export const Tool = ({
             alignItems: "center",
             justifyContent: "space-between",
             paddingLeft: isSubgroup ? 30 : 12,
-            ...getElevation(hover ? 3 : 0)
+            ...getElevationStyle(hover ? 3 : 0)
           }}
         >
           <View

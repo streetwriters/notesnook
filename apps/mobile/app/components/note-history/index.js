@@ -26,13 +26,13 @@ import { presentSheet } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
-import { timeConverter, timeSince } from "../../utils/time";
 import DialogHeader from "../dialog/dialog-header";
 import SheetProvider from "../sheet-provider";
 import { PressableButton } from "../ui/pressable";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import NotePreview from "./preview";
+import { getFormattedDate, getTimeAgo } from "@notesnook/common";
 
 export default function NoteHistory({ note, fwdRef }) {
   const [history, setHistory] = useState([]);
@@ -63,15 +63,15 @@ export default function NoteHistory({ note, fwdRef }) {
   }, []);
 
   const getDate = (start, end) => {
-    let _start = timeConverter(start);
-    let _end = timeConverter(end + 60000);
-    if (_start === _end) return _start;
-    let final = _end.lastIndexOf(",");
-    let part = _end.slice(0, final + 1);
-    if (_start.includes(part)) {
-      return _start + " —" + _end.replace(part, "");
-    }
-    return _start + " — " + _end;
+    let _start_date = getFormattedDate(start, "date");
+    let _end_date = getFormattedDate(end + 60000, "date");
+
+    let _start_time = getFormattedDate(start, "time");
+    let _end_time = getFormattedDate(end + 60000, "time");
+
+    return `${_start_date} ${_start_time} - ${
+      _end_date === _start_date ? " " : _end_date + " "
+    }${_end_time}`;
   };
 
   const renderItem = useCallback(
@@ -90,7 +90,7 @@ export default function NoteHistory({ note, fwdRef }) {
       >
         <Paragraph>{getDate(item.dateCreated, item.dateModified)}</Paragraph>
         <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
-          {timeSince(item.dateModified)}
+          {getTimeAgo(item.dateModified)}
         </Paragraph>
       </PressableButton>
     ),
@@ -151,7 +151,10 @@ export default function NoteHistory({ note, fwdRef }) {
               colors
             );
           }}
-          style={{ color: colors.primary.accent, textDecorationLine: "underline" }}
+          style={{
+            color: colors.primary.accent,
+            textDecorationLine: "underline"
+          }}
         >
           Learn how this works.
         </Text>

@@ -39,6 +39,7 @@ test("restore a backup", async ({ page }) => {
 
   await settings.restoreData("backup.nnbackup");
 
+  await settings.close();
   const notes = await app.goToNotes();
   expect(await notes.isEmpty()).toBeFalsy();
   const notebooks = await app.goToNotebooks();
@@ -65,6 +66,7 @@ test("restore an encrypted backup", async ({ page }) => {
 
   await settings.restoreData("encrypted.nnbackup", USER.CURRENT.password);
 
+  await settings.close();
   const notes = await app.goToNotes();
   expect(await notes.isEmpty()).toBeFalsy();
   const notebooks = await app.goToNotebooks();

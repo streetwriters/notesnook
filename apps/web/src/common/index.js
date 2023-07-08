@@ -26,7 +26,7 @@ import {
 import Config from "../utils/config";
 import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
-import { sanitizeFilename } from "../utils/filename";
+import { sanitizeFilename } from "@notesnook/common";
 import { isDesktop, isTesting } from "../utils/platform";
 import { store as userstore } from "../stores/user-store";
 import FileSaver from "file-saver";
@@ -34,10 +34,11 @@ import { showToast } from "../utils/toast";
 import { SUBSCRIPTION_STATUS } from "./constants";
 import { showFilePicker } from "../components/editor/picker";
 import { logger } from "../utils/logger";
-import { PATHS } from "@notesnook/desktop/paths";
-import saveFile from "../commands/save-file";
+import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
 import { EVENTS } from "@notesnook/core/common";
+import { getFormattedDate } from "@notesnook/common";
+import { desktop } from "./desktop-bridge";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -48,10 +49,6 @@ export const CREATE_BUTTON_MAP = {
   notebooks: {
     title: "Create a notebook",
     onClick: () => hashNavigate("/notebooks/create", { replace: true })
-  },
-  notebook: {
-    title: "Add a note",
-    onClick: () => hashNavigate(`/notes/create`, { replace: true })
   },
   topics: {
     title: "Create a topic",
@@ -81,7 +78,8 @@ export async function introduceFeatures() {
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
 
 export async function createBackup() {
-  const encryptBackups = Config.get("encryptBackups", false);
+  const encryptBackups =
+    userstore.get().isLoggedIn && Config.get("encryptBackups", false);
   const data = await showLoadingDialog({
     title: "Creating backup",
     subtitle: "We are creating a backup of your data. Please wait...",
@@ -94,9 +92,7 @@ export async function createBackup() {
     return;
   }
 
-  const filename = sanitizeFilename(
-    `notesnook-backup-${new Date().toLocaleString("en")}`
-  );
+  const filename = sanitizeFilename(`notesnook-backup-${getFormattedDate()}`);
 
   const ext = "nnbackup";
   if (isDesktop()) {
@@ -105,7 +101,7 @@ export async function createBackup() {
       PATHS.backupsDirectory
     );
     const filePath = `${directory}/${filename}.${ext}`;
-    saveFile(filePath, data);
+    await desktop?.integration.saveFile.query({ filePath, data });
     showToast("success", `Backup saved at ${filePath}.`);
   } else {
     FileSaver.saveAs(new Blob([Buffer.from(data)]), `${filename}.${ext}`);
@@ -173,10 +169,6 @@ export async function restoreBackupFile(backup) {
   }
 }
 
-export function getTotalNotes(notebook) {
-  return db.notebooks.notebook(notebook)?.totalNotes;
-}
-
 export async function verifyAccount() {
   if (!(await db.user.getUser())) return true;
   return showPasswordDialog("verify_account", ({ password }) => {
@@ -200,7 +192,7 @@ export async function showUpgradeReminderDialogs() {
   if (isTesting()) return;
 
   const user = userstore.get().user;
-  if (!user) return;
+  if (!user || !user.subscription || user.subscription?.expiry === 0) return;
 
   const consumed = totalSubscriptionConsumed(user);
   const isTrial = user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;

@@ -32,7 +32,7 @@ import { injectCss, transform } from "../utils/css";
 type Attachment = {
   hash: string;
   filename: string;
-  type: string;
+  mime: string;
   size: number;
 };
 
@@ -51,6 +51,36 @@ type Timers = {
   wordCounter: NodeJS.Timeout | null;
 };
 
+function isInViewport(element: any) {
+  const rect = element.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <=
+      (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+  );
+}
+
+function scrollIntoView(editor: Editor) {
+  setTimeout(() => {
+    const node = editor?.state.selection.$from;
+    const dom = node ? editor?.view?.domAtPos(node.pos) : null;
+    let domNode = dom?.node;
+
+    if (domNode) {
+      if (domNode.nodeType === Node.TEXT_NODE && domNode.parentNode) {
+        domNode = domNode.parentNode;
+      }
+      if (isInViewport(domNode)) return;
+      (domNode as HTMLElement).scrollIntoView({
+        behavior: "smooth",
+        block: "end"
+      });
+    }
+  }, 100);
+}
+
 export type EditorController = {
   selectionChange: (editor: Editor) => void;
   titleChange: (title: string) => void;
@@ -67,6 +97,7 @@ export type EditorController = {
   openLink: (url: string) => boolean;
   setTitlePlaceholder: React.Dispatch<React.SetStateAction<string>>;
   countWords: (ms: number) => void;
+  copyToClipboard: (text: string) => void;
 };
 
 export function useEditorController(update: () => void): EditorController {
@@ -168,6 +199,11 @@ export function useEditorController(update: () => void): EditorController {
           break;
         case "native:status":
           break;
+        case "native:keyboardShown":
+          if (editor?.current) {
+            scrollIntoView(editor?.current as any);
+          }
+          break;
         default:
           break;
       }
@@ -205,6 +241,10 @@ export function useEditorController(update: () => void): EditorController {
     return true;
   }, []);
 
+  const copyToClipboard = (text: string) => {
+    post(EventTypes.copyToClipboard, text);
+  };
+
   return {
     contentChange,
     selectionChange,
@@ -220,6 +260,7 @@ export function useEditorController(update: () => void): EditorController {
     content: htmlContentRef,
     openLink,
     onUpdate: onUpdate,
-    countWords
+    countWords,
+    copyToClipboard
   };
 }

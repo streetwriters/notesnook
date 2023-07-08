@@ -27,7 +27,7 @@ import { useToolbarStore } from "../stores/toolbar-store";
 import { EmotionThemeVariant } from "@notesnook/theme";
 
 export type ImageUploadPopupProps = {
-  onInsert: (image: ImageAttributes) => void;
+  onInsert: (image: Partial<ImageAttributes>) => void;
   onClose: () => void;
 };
 export function ImageUploadPopup(props: ImageUploadPopupProps) {
@@ -54,7 +54,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
               url,
               downloadOptions
             );
-            onInsert({ src: await toDataURL(blob), size, type });
+            onInsert({ src: await toDataURL(blob), size, mime: type });
           } catch (e) {
             if (e instanceof Error) setError(e.message);
           } finally {

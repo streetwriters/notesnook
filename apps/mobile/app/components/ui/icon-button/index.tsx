@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { ColorValue, GestureResponderEvent, ViewStyle } from "react-native";
+import { ColorValue, GestureResponderEvent, TextStyle } from "react-native";
 import Animated, { Layout } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
-import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/color-scheme/utils";
+import { RGB_Linear_Shade, hexToRGBA } from "../../../utils/color-scheme/utils";
 import { SIZE } from "../../../utils/size";
+import NativeTooltip from "../../../utils/tooltip";
 import { PressableButton, PressableButtonProps } from "../pressable";
-import { useThemeColors } from "@notesnook/theme";
 interface IconButtonProps extends PressableButtonProps {
   name: string;
   color?: ColorValue;
@@ -37,7 +37,7 @@ interface IconButtonProps extends PressableButtonProps {
   disabled?: boolean;
   tooltipText?: string;
   tooltipPosition?: number;
-  iconStyle?: ViewStyle;
+  iconStyle?: TextStyle;
 }
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
@@ -56,7 +56,7 @@ export const IconButton = ({
   tooltipText,
   type = "gray",
   fwdRef,
-  tooltipPosition = TOOLTIP_POSITIONS.TOP,
+  tooltipPosition = NativeTooltip.POSITIONS.TOP,
   ...restProps
 }: IconButtonProps) => {
   const { colors } = useThemeColors();
@@ -67,7 +67,7 @@ export const IconButton = ({
       return;
     }
     if (tooltipText) {
-      showTooltip(event, tooltipText, tooltipPosition);
+      NativeTooltip.show(event, tooltipText, tooltipPosition);
     }
   };
 
@@ -91,7 +91,7 @@ export const IconButton = ({
       <AnimatedIcon
         layout={Layout}
         name={name}
-        style={iconStyle}
+        style={iconStyle as any}
         color={
           restProps.disabled
             ? RGB_Linear_Shade(-0.05, hexToRGBA(colors.secondary.background))

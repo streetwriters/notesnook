@@ -45,9 +45,18 @@ export const getDefaultSession = (sessionId = Date.now()) => {
     state: undefined,
     saveState: 1, // -1 = not saved, 0 = saving, 1 = saved
     sessionId,
+    /**
+     * @type {string  | undefined}
+     */
     contentId: undefined,
+    /**
+     * @type {any[]}
+     */
     notebooks: undefined,
     title: "",
+    /**
+     * @type {string | undefined}
+     */
     id: undefined,
     pinned: false,
     localOnly: false,
@@ -58,10 +67,18 @@ export const getDefaultSession = (sessionId = Date.now()) => {
     color: undefined,
     dateEdited: 0,
     attachmentsLength: 0,
-    isDeleted: false
+    isDeleted: false,
+
+    /**
+     * @type {{data: string; type: "tiptap"} | undefined}
+     */
+    content: undefined
   };
 };
 
+/**
+ * @extends {BaseStore<EditorStore>}
+ */
 class EditorStore extends BaseStore {
   session = getDefaultSession();
   arePropertiesVisible = false;
@@ -83,6 +100,11 @@ class EditorStore extends BaseStore {
       state.session.tags = state.session.tags.slice();
     });
   };
+
+  async refresh() {
+    const sessionId = this.get().session.id;
+    if (sessionId && !db.notes.note(sessionId)) await this.clearSession();
+  }
 
   updateSession = async (item) => {
     this.set((state) => {
@@ -112,8 +134,6 @@ class EditorStore extends BaseStore {
   };
 
   openSession = async (noteId, force) => {
-    await db.notes.init();
-
     const session = this.get().session;
 
     if (session.id) await db.fs.cancel(session.id);
@@ -156,6 +176,7 @@ class EditorStore extends BaseStore {
       }
     });
     appStore.setIsEditorOpen(true);
+    this.toggleProperties(false);
   };
 
   saveSession = async (sessionId, session) => {
@@ -195,6 +216,8 @@ class EditorStore extends BaseStore {
         else if (type === "tag") await db.notes.note(id).tag(value);
         // update the note.
         note = db.notes.note(id)?.data;
+      } else if (!sessionId && db.settings.getDefaultNotebook()) {
+        await db.notes.addToNotebook(db.settings.getDefaultNotebook(), id);
       }
 
       const shouldRefreshNotes =
@@ -268,7 +291,7 @@ class EditorStore extends BaseStore {
     this.toggleProperties(false);
     if (shouldNavigate)
       hashNavigate(`/notes/create`, { replace: true, addNonce: true });
-    appStore.setIsEditorOpen(false);
+    setTimeout(() => appStore.setIsEditorOpen(false), 100);
     setDocumentTitle();
   };
 
@@ -347,8 +370,5 @@ class EditorStore extends BaseStore {
   }
 }
 
-/**
- * @type {[import("zustand").UseStore<EditorStore>, EditorStore]}
- */
 const [useStore, store] = createStore(EditorStore);
 export { useStore, store, SESSION_STATES };

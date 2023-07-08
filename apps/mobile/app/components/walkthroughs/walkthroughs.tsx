@@ -28,7 +28,7 @@ import {
 } from "../../assets/images/assets";
 import { ThemeStore } from "../../stores/use-theme-store";
 import { eSendEvent } from "../../services/event-manager";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import { eOpenAddNotebookDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import useRotator from "../../hooks/use-rotator";
@@ -39,7 +39,7 @@ import { PinItem } from "../side-menu/pinned-section";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import {useThemeColors} from "@notesnook/theme";
+import { useThemeColors } from "@notesnook/theme";
 
 export type TStep = {
   text?: string;
@@ -90,7 +90,7 @@ const NotebookWelcome = () => {
           padding: 12,
           width: "100%",
           backgroundColor: colors.primary.background,
-          ...getElevation(3),
+          ...getElevationStyle(3),
           borderRadius: 10,
           marginVertical: 12
         }}
@@ -143,7 +143,7 @@ const notebooks: { id: string; steps: TStep[] } = {
               padding: 12,
               width: "100%",
               backgroundColor: colors.primary.background,
-              ...getElevation(3),
+              ...getElevationStyle(3),
               borderRadius: 10,
               marginVertical: 12
             }}
@@ -174,7 +174,11 @@ const notebooks: { id: string; steps: TStep[] } = {
             }}
           >
             <Paragraph color={colors.primary.accent}>
-              <Icon color={colors.primary.accent} size={SIZE.sm} name="bookmark" />{" "}
+              <Icon
+                color={colors.primary.accent}
+                size={SIZE.sm}
+                name="bookmark"
+              />{" "}
               Tasks
             </Paragraph>
           </View>
@@ -190,8 +194,8 @@ const notebooks: { id: string; steps: TStep[] } = {
             }}
           >
             <Paragraph size={SIZE.xs}>
-              <Icon color={colors.primary.icon} size={SIZE.sm} name="note" /> Feburary
-              2022 Week 2
+              <Icon color={colors.primary.icon} size={SIZE.sm} name="note" />{" "}
+              Feburary 2022 Week 2
             </Paragraph>
           </View>
           <View
@@ -206,8 +210,8 @@ const notebooks: { id: string; steps: TStep[] } = {
             }}
           >
             <Paragraph size={SIZE.xs}>
-              <Icon color={colors.primary.icon} size={SIZE.sm} name="note" /> Feburary
-              2022 Week 1
+              <Icon color={colors.primary.icon} size={SIZE.sm} name="note" />{" "}
+              Feburary 2022 Week 1
             </Paragraph>
           </View>
           <View
@@ -221,7 +225,11 @@ const notebooks: { id: string; steps: TStep[] } = {
             }}
           >
             <Paragraph color={colors.primary.accent}>
-              <Icon color={colors.primary.accent} size={SIZE.sm} name="bookmark" />{" "}
+              <Icon
+                color={colors.primary.accent}
+                size={SIZE.sm}
+                name="bookmark"
+              />{" "}
               Meetings
             </Paragraph>
           </View>
@@ -278,7 +286,6 @@ const ChooseTheme = () => {
   return (
     <View
       style={{
-        maxHeight: 170,
         alignItems: "center",
         marginTop: 20
       }}
@@ -296,7 +303,7 @@ const ChooseTheme = () => {
         Pick a theme of your choice
       </Paragraph>
       <Seperator />
-      <AccentColorPicker settings={false} />
+      <AccentColorPicker />
       <Seperator />
     </View>
   );
@@ -308,7 +315,9 @@ const trialstarted: { id: string; steps: TStep[] } = {
     {
       title: "Your trial is activated",
       text: "You can use all premium features for free for the next 14 days",
-      walkthroughItem: (colors) => <SvgView src={LAUNCH_ROCKET(colors.primary.paragraph)} />,
+      walkthroughItem: (colors) => (
+        <SvgView src={LAUNCH_ROCKET(colors.primary.paragraph)} />
+      ),
       button: {
         type: "next",
         title: "Next"
@@ -325,7 +334,9 @@ const trialstarted: { id: string; steps: TStep[] } = {
     {
       title: "Join the cause",
       text: "Meet other privacy-minded people and talk to us directly about your concerns, issues and suggestions.",
-      walkthroughItem: (colors) => <SvgView src={COMMUNITY_SVG(colors.primary.paragraph)} />,
+      walkthroughItem: (colors) => (
+        <SvgView src={COMMUNITY_SVG(colors.primary.paragraph)} />
+      ),
       button: {
         type: "done",
         title: "Continue"
@@ -346,7 +357,9 @@ const emailconfirmed: { id: string; steps: TStep[] } = {
     {
       title: "Email confirmed",
       text: "Your email was confirmed successfully. Thank you for choosing end-to-end encrypted note taking.",
-      walkthroughItem: (colors) => <SvgView src={WELCOME_SVG(colors.primary.paragraph)} />,
+      walkthroughItem: (colors) => (
+        <SvgView src={WELCOME_SVG(colors.primary.paragraph)} />
+      ),
       button: {
         type: "done",
         title: "Continue"
@@ -433,7 +446,9 @@ const prouser: { id: string; steps: TStep[] } = {
     {
       title: "Welcome to Notesnook Pro",
       text: "Thank you for reaffirming our idea that privacy comes first",
-      walkthroughItem: (colors) => <SvgView src={LAUNCH_ROCKET(colors.primary.paragraph)} />,
+      walkthroughItem: (colors) => (
+        <SvgView src={LAUNCH_ROCKET(colors.primary.paragraph)} />
+      ),
       button: {
         type: "next",
         title: "Next"

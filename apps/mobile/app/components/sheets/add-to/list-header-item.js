@@ -72,7 +72,7 @@ export const ListHeaderInputItem = ({
       {inputValue ? (
         <View
           style={{
-            backgroundColor: colors.shade,
+            backgroundColor: colors.primary.shade,
             padding: 5,
             borderRadius: 5,
             marginBottom: 10

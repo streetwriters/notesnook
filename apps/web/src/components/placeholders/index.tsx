@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Button, Flex, Text } from "@theme-ui/components";
 import { Context, useTip } from "../../hooks/use-tip";
 import { Info } from "../icons";
-import { AliasIcon } from "../icons/resolver";
 
 type PlaceholderProps = { context: Context; text?: string };
 function Placeholder(props: PlaceholderProps) {
@@ -71,7 +70,7 @@ function Placeholder(props: PlaceholderProps) {
             <Text mr={1} color="primary">
               {tip.button.title}
             </Text>
-            <AliasIcon alias={tip.button.icon} size={18} color="primary" />
+            {tip.button.icon && <tip.button.icon size={18} color="primary" />}
           </Button>
         )}
       </Flex>

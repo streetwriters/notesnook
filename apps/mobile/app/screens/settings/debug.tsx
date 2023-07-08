@@ -18,12 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Clipboard from "@react-native-clipboard/clipboard";
-import { LogMessage } from "@streetwriters/logger";
+import { LogMessage } from "@notesnook/logger";
 import { format, LogLevel, logManager } from "@notesnook/core/logger";
 import React, { useEffect, useState } from "react";
 import { FlatList, Platform, TouchableOpacity, View } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import Storage from "../../common/database/storage";
 import { presentDialog } from "../../components/dialog/functions";
 import { IconButton } from "../../components/ui/icon-button";
@@ -33,7 +33,8 @@ import useTimer from "../../hooks/use-timer";
 import { ToastEvent } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { hexToRGBA } from "../../utils/color-scheme/utils";
-import { sanitizeFilename } from "../../utils/sanitizer";
+import { sanitizeFilename } from "@notesnook/common";
+
 // function getLevelString(level: number) {
 //   switch (level) {
 //     case LogLevel.Debug:
@@ -131,7 +132,12 @@ export default function DebugLogs() {
         </TouchableOpacity>
       );
     },
-    [colors.secondary.background, colors.warning.icon, colors.primary.paragraph, colors.error.paragraph]
+    [
+      colors.secondary.background,
+      colors.warning.icon,
+      colors.primary.paragraph,
+      colors.error.paragraph
+    ]
   );
 
   const downloadLogs = React.useCallback(async () => {
@@ -297,7 +303,7 @@ export default function DebugLogs() {
                     marginRight: 5
                   }}
                   name="content-copy"
-                  color={colors.gray}
+                  color={colors.secondary.paragraph}
                 />
                 <IconButton
                   onPress={downloadLogs}
@@ -308,7 +314,7 @@ export default function DebugLogs() {
                   }}
                   size={20}
                   name="download"
-                  color={colors.gray}
+                  color={colors.secondary.paragraph}
                 />
 
                 <IconButton
@@ -320,7 +326,7 @@ export default function DebugLogs() {
                   }}
                   size={20}
                   name="delete"
-                  color={colors.gray}
+                  color={colors.secondary.paragraph}
                 />
               </View>
             </View>

@@ -35,14 +35,14 @@ import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
 import { Progress } from "../../components/sheets/progress";
 import { Update } from "../../components/sheets/update";
-import { useVaultStatus, VaultStatusType } from "../../hooks/use-vault-status";
+import { VaultStatusType, useVaultStatus } from "../../hooks/use-vault-status";
 import BackupService from "../../services/backup";
 import BiometicService from "../../services/biometrics";
 import {
+  ToastEvent,
   eSendEvent,
   openVault,
-  presentSheet,
-  ToastEvent
+  presentSheet
 } from "../../services/event-manager";
 import { setLoginMessage } from "../../services/message";
 import Navigation from "../../services/navigation";
@@ -53,7 +53,6 @@ import Sync from "../../services/sync";
 import { clearAllStores } from "../../stores";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { AndroidModule } from "../../utils";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import {
   eCloseSheet,
@@ -62,6 +61,7 @@ import {
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog
 } from "../../utils/events";
+import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
 import { MFARecoveryCodes, MFASheet } from "./2fa";
 import AppLock from "./app-lock";
@@ -177,17 +177,15 @@ export const settingsGroups: SettingSection[] = [
             sections: [
               {
                 id: "enable-2fa",
-                name: "Enable two-factor authentication",
+                name: "Change primary two-factor authentication",
                 modifer: () => {
                   verifyUser("global", async () => {
                     MFASheet.present();
                   });
                 },
                 useHook: () => useUserStore((state) => state.user),
-                hidden: (user) => {
-                  return !!(user as User)?.mfa?.isEnabled;
-                },
-                description: "Increased security for your account"
+                description:
+                  "Change your current two-factor authentication method"
               },
               {
                 id: "2fa-fallback",
@@ -239,23 +237,6 @@ export const settingsGroups: SettingSection[] = [
                 },
                 description:
                   "View and save recovery codes for to recover your account"
-              },
-              {
-                id: "disabled-2fa",
-                name: "Disable two-factor authentication",
-                modifer: () => {
-                  verifyUser("global", async () => {
-                    await db.mfa?.disable();
-                    const user = await db.user?.fetchUser();
-                    useUserStore.getState().setUser(user);
-                  });
-                },
-
-                useHook: () => useUserStore((state) => state.user),
-                hidden: (user) => {
-                  return !(user as User)?.mfa?.isEnabled;
-                },
-                description: "Decreased security for your account"
               }
             ]
           },
@@ -311,23 +292,20 @@ export const settingsGroups: SettingSection[] = [
                     setImmediate(async () => {
                       eSendEvent(eCloseSimpleDialog);
                       Navigation.popToTop();
-                      db.user?.logout();
+                      await db.user?.logout();
                       setLoginMessage();
                       await PremiumService.setPremiumStatus();
                       await BiometicService.resetCredentials();
                       MMKV.clearStore();
-                      await clearAllStores();
-                      SettingsService.init();
-                      setTimeout(() => {
-                        SettingsService.set({
-                          introCompleted: true
-                        });
-                      }, 1000);
+                      clearAllStores();
+                      SettingsService.resetSettings();
                       useUserStore.getState().setUser(null);
                       useUserStore.getState().setSyncing(false);
                       Navigation.goBack();
                       Navigation.popToTop();
-                      eSendEvent("settings-loading", false);
+                      setTimeout(() => {
+                        eSendEvent("settings-loading", false);
+                      }, 2000);
                     });
                   } catch (e) {
                     ToastEvent.error(e as Error, "Error logging out");
@@ -539,12 +517,35 @@ export const settingsGroups: SettingSection[] = [
             component: "homeselector"
           },
           {
+            id: "date-format",
+            name: "Date format",
+            description: "Set the format for date used across the app",
+            type: "component",
+            component: "date-format-selector"
+          },
+          {
+            id: "time-format",
+            name: "Time format",
+            description: "Set the format for time used across the app",
+            type: "component",
+            component: "time-format-selector"
+          },
+          {
             id: "clear-trash-interval",
             type: "component",
             name: "Clear trash interval",
             description:
               "Select the duration after which trash items will be cleared",
             component: "trash-interval-selector"
+          },
+          {
+            id: "default-notebook",
+            name: "Clear default notebook/topic",
+            description: "Clear the default notebook/topic for new notes",
+            modifer: () => {
+              db.settings?.setDefaultNotebook(undefined);
+            },
+            hidden: () => !db.settings?.getDefaultNotebook()
           }
         ]
       },
@@ -591,6 +592,7 @@ export const settingsGroups: SettingSection[] = [
             description: "Set the default font size in editor",
             type: "input-selector",
             minInputValue: 8,
+            maxInputValue: 120,
             icon: "format-size",
             property: "defaultFontSize"
           },
@@ -602,6 +604,13 @@ export const settingsGroups: SettingSection[] = [
             icon: "format-font",
             property: "defaultFontFamily",
             component: "font-selector"
+          },
+          {
+            id: "title-format",
+            name: "Title format",
+            component: "title-format",
+            description: "Customize the formatting for new note title",
+            type: "component"
           }
         ]
       }
@@ -619,6 +628,26 @@ export const settingsGroups: SettingSection[] = [
         description:
           "Contribute towards a better Notesnook. All tracking information is anonymous.",
         property: "telemetry"
+      },
+      {
+        id: "marketing-emails",
+        type: "switch",
+        name: "Marketing emails",
+        description:
+          "We will send you occasional promotional offers & product updates on your email (sent once every month).",
+        modifer: async () => {
+          try {
+            await db.user?.changeMarketingConsent(
+              !useUserStore.getState().user?.marketingConsent
+            );
+            useUserStore.getState().setUser(await db.user?.fetchUser());
+          } catch (e) {
+            ToastEvent.error(e as Error);
+          }
+        },
+        getter: (current: any) => current?.marketingConsent,
+        useHook: () => useUserStore((state) => state.user),
+        hidden: (current) => !current
       },
       {
         id: "cors-bypass",
@@ -745,7 +774,7 @@ export const settingsGroups: SettingSection[] = [
         modifer: () => {
           const settings = SettingsService.get();
           Platform.OS === "android"
-            ? AndroidModule.setSecureMode(!settings.privacyScreen)
+            ? NotesnookModule.setSecureMode(!settings.privacyScreen)
             : enabled(true);
 
           SettingsService.set({ privacyScreen: !settings.privacyScreen });
@@ -1016,6 +1045,16 @@ export const settingsGroups: SettingSection[] = [
         },
         description:
           "Faced an issue or have a suggestion? Click here to create a bug report"
+      },
+      {
+        id: "email-support",
+        name: "Email support",
+        icon: "mail",
+        modifer: () => {
+          Linking.openURL("mailto:support@streetwriters.co");
+        },
+        description:
+          "Reach out to us via email and let us resolve your issue directly."
       },
       {
         id: "docs-link",

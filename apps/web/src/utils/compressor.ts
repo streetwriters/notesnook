@@ -17,32 +17,32 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Worker from "worker-loader?filename=static/workers/compressor.worker.[contenthash].js!./compressor.worker";
-import type { Compressor as CompressorWorker } from "./compressor.worker";
+import CompressorWorker from "./compressor.worker.ts?worker";
+import type { Compressor as CompressorWorkerType } from "./compressor.worker";
 import { wrap, Remote } from "comlink";
 import { isDesktop } from "./platform";
+import { desktop } from "../common/desktop-bridge";
 
 export class Compressor {
   private worker!: globalThis.Worker;
-  private compressor!: Remote<CompressorWorker>;
+  private compressor!: Remote<CompressorWorkerType>;
 
   constructor() {
     if (!isDesktop()) {
-      this.worker = new Worker();
-      this.compressor = wrap<CompressorWorker>(this.worker);
+      this.worker = new CompressorWorker();
+      this.compressor = wrap<CompressorWorkerType>(this.worker);
     }
   }
 
   async compress(data: string) {
-    if (isDesktop()) return await window.native.gzip({ data, level: 6 });
+    if (isDesktop())
+      return await desktop?.compress.gzip.query({ data, level: 6 });
 
     return await this.compressor.gzip({ data, level: 6 });
   }
 
   async decompress(data: string) {
-    if (isDesktop()) return await window.native.gunzip({ data });
+    if (isDesktop()) return await desktop?.compress.gunzip.query(data);
 
     return await this.compressor.gunzip({ data });
   }

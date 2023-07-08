@@ -26,7 +26,7 @@ import { DDS } from "../../services/device-detection";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import {
   eClosePremiumDialog,
   eCloseSheet,
@@ -271,7 +271,7 @@ export const Component = ({ close, promo }) => {
             position: "absolute",
             borderRadius: 100,
             bottom: 30,
-            ...getElevation(10)
+            ...getElevationStyle(10)
           }}
         />
       ) : null}

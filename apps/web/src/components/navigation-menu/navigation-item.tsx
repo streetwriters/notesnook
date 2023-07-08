@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Button, Text } from "@theme-ui/components";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { useMenuTrigger } from "../../hooks/use-menu";
+import { Menu } from "../../hooks/use-menu";
 import useMobile from "../../hooks/use-mobile";
 import { PropsWithChildren } from "react";
 import { Icon, Shortcut } from "../icons";
@@ -61,7 +61,6 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
     index = 0
   } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
-  const { openMenu } = useMenuTrigger();
   const isMobile = useMobile();
 
   return (
@@ -105,7 +104,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
         onContextMenu={(e) => {
           if (!menuItems) return;
           e.preventDefault();
-          openMenu(menuItems);
+          Menu.openMenu(menuItems);
         }}
         onClick={() => {
           if (isMobile) toggleSideMenu(false);

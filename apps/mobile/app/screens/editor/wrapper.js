@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   AppState,
   KeyboardAvoidingView,
@@ -35,7 +35,8 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
 import { editorRef } from "../../utils/global-refs";
 import { ProgressBar } from "./progress";
-import { editorController, editorState, textInput } from "./tiptap/utils";
+import { editorController, textInput } from "./tiptap/utils";
+
 export const EditorWrapper = ({ width }) => {
   const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
@@ -46,12 +47,18 @@ export const EditorWrapper = ({ width }) => {
     (state) => state.settings.introCompleted
   );
   const keyboard = useKeyboard();
+  const prevState = useRef();
 
   const onAppStateChanged = async (state) => {
-    if (editorState().movedAway) return;
+    if (!prevState.current) {
+      prevState.current = state;
+      return;
+    }
     if (state === "active") {
       editorController.current.onReady();
       editorController.current.overlay(false);
+    } else {
+      prevState.current = state;
     }
   };
 

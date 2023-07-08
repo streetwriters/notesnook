@@ -16,16 +16,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import "react-native-gesture-handler";
-import React, { useEffect, useState } from "react";
 import { ThemeProvider } from "@notesnook/theme";
-import NetInfo from "@react-native-community/netinfo";
+import React, { useEffect } from "react";
 import { View } from "react-native";
+import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import AppLockedOverlay from "./components/app-lock-overlay";
 import { withErrorBoundry } from "./components/exception-handler";
 import GlobalSafeAreaProvider from "./components/globalsafearea";
-import Launcher from "./components/launcher";
 import { useAppEvents } from "./hooks/use-app-events";
 import { ApplicationHolder } from "./navigation";
 import Notifications from "./services/notifications";
@@ -33,27 +32,17 @@ import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
 import { useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
-//import { BackgroundSync } from "./services/background-sync";
-NetInfo.configure({
-  reachabilityUrl: "https://notesnook.com",
-  reachabilityTest: (response) => {
-    if (!response) return false;
-    return response?.status >= 200 && response?.status < 300;
-  }
-});
 
 SettingsService.init();
 SettingsService.checkOrientation();
 const App = () => {
-  useAppEvents();
-  const [init, setInit] = useState(false);
+  const init = useAppEvents();
   useEffect(() => {
     let { appLockMode } = SettingsService.get();
     if (appLockMode && appLockMode !== "none") {
-      useUserStore.getState().setVerifyUser(true);
+      useUserStore.getState().lockApp(true);
     }
-    //BackgroundSync.start();
-    setInit(true);
+    init();
     setTimeout(async () => {
       SettingsService.onFirstLaunch();
       await Notifications.get();
@@ -62,7 +51,10 @@ const App = () => {
       }
       TipManager.init();
     }, 100);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return (
     <View
       style={{
@@ -91,8 +83,8 @@ const App = () => {
         }}
       >
         <ApplicationHolder />
-        {init && <Launcher />}
       </GestureHandlerRootView>
+      <AppLockedOverlay />
     </View>
   );
 };

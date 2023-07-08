@@ -28,7 +28,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import { eHideToast, eShowToast } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
@@ -136,7 +136,7 @@ export const Toast = ({ context = "global" }) => {
       >
         <View
           style={{
-            ...getElevation(5),
+            ...getElevationStyle(5),
             maxWidth: "95%",
             backgroundColor: colors.secondary.background,
             minWidth: data?.func ? "95%" : "50%",
@@ -173,7 +173,9 @@ export const Toast = ({ context = "global" }) => {
                 name={data?.type === "success" ? "check" : "close"}
                 size={SIZE.lg}
                 color={
-                  data?.type === "error" ? colors.error.icon : colors.primary.accent
+                  data?.type === "error"
+                    ? colors.error.icon
+                    : colors.primary.accent
                 }
               />
             </View>

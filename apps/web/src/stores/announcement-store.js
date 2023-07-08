@@ -25,12 +25,18 @@ import { isUserPremium } from "../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { appVersion } from "../utils/version";
 import { findItemAndDelete } from "@notesnook/core/utils/array";
+import { isTesting } from "../utils/platform";
 
+/**
+ * @extends {BaseStore<AnnouncementStore>}
+ */
 class AnnouncementStore extends BaseStore {
   inlineAnnouncements = [];
   dialogAnnouncements = [];
 
   refresh = async () => {
+    if (isTesting()) return;
+
     try {
       const inlineAnnouncements = [];
       const dialogAnnouncements = [];
@@ -66,16 +72,13 @@ class AnnouncementStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<AnnouncementStore>, AnnouncementStore]}
- */
 const [useStore, store] = createStore(AnnouncementStore);
 export { useStore, store };
 
 export const allowedPlatforms = [
   "all",
-  process.env.REACT_APP_PLATFORM,
-  window.os
+  import.meta.env.REACT_APP_PLATFORM,
+  ...(window.os ? [window.os()] : [])
 ];
 
 async function shouldShowAnnouncement(announcement) {

@@ -60,8 +60,8 @@ export const Settings = () => {
     <SettingsStack.Navigator
       initialRouteName="SettingsHome"
       screenListeners={{
-        beforeRemove: (e) => {
-          if (e.target?.startsWith("SettingsGroup")) {
+        focus: (e) => {
+          if (e.target?.startsWith("SettingsHome-")) {
             useNavigationStore.getState().update({ name: "Settings" }, false);
           }
         }

@@ -18,6 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, FlexProps } from "@theme-ui/components";
+import {
+  getDefaultPresets,
+  STATIC_TOOLBAR_GROUPS,
+  MOBILE_STATIC_TOOLBAR_GROUPS
+} from "./tool-definitions";
 import { useEffect, useMemo } from "react";
 import {
   EditorContext,
@@ -31,7 +36,6 @@ import {
   useIsMobile,
   useToolbarStore
 } from "./stores/toolbar-store";
-import { STATIC_TOOLBAR_GROUPS, getDefaultPresets } from "./tool-definitions";
 import { ToolbarDefinition } from "./types";
 
 type ToolbarProps = FlexProps & {
@@ -52,12 +56,14 @@ export function Toolbar(props: ToolbarProps) {
     sx,
     ...flexProps
   } = props;
-  const toolbarTools = useMemo(
-    () => [...STATIC_TOOLBAR_GROUPS, ...tools],
-    [tools]
-  );
-
   const isMobile = useIsMobile();
+  const toolbarTools = useMemo(
+    () =>
+      isMobile
+        ? [...MOBILE_STATIC_TOOLBAR_GROUPS, ...tools]
+        : [...STATIC_TOOLBAR_GROUPS, ...tools],
+    [tools, isMobile]
+  );
 
   const setToolbarLocation = useToolbarStore(
     (store) => store.setToolbarLocation

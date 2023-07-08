@@ -27,9 +27,11 @@ import dayjs from "dayjs";
 import Config from "../utils/config";
 import { store as notestore } from "./note-store";
 import { isDesktop, isTesting } from "../utils/platform";
-import showNotification from "../commands/show-notification";
-import bringToFront from "../commands/bring-to-front";
+import { desktop } from "../common/desktop-bridge";
 
+/**
+ * @extends {BaseStore<ReminderStore>}
+ */
 class ReminderStore extends BaseStore {
   reminders = [];
 
@@ -48,9 +50,6 @@ class ReminderStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<ReminderStore>, ReminderStore]}
- */
 const [useStore, store] = createStore(ReminderStore);
 export { useStore, store };
 
@@ -91,7 +90,7 @@ async function resetReminders(reminders) {
  * @returns
  */
 function scheduleReminder(id, reminder, cron) {
-  return TaskScheduler.register(`reminder:${id}`, cron, () => {
+  return TaskScheduler.register(`reminder:${id}`, cron, async () => {
     if (!Config.get("reminderNotifications", true)) return;
 
     if (isTesting()) {
@@ -100,26 +99,25 @@ function scheduleReminder(id, reminder, cron) {
     }
 
     if (isDesktop()) {
-      showNotification(
-        {
-          title: reminder.title,
-          body: reminder.description,
-          silent: reminder.priority === "silent",
-          timeoutType: reminder.priority === "urgent" ? "never" : "default",
-          urgency:
-            reminder.priority === "urgent"
-              ? "critical"
-              : reminder.priority === "vibrate"
-              ? "normal"
-              : "low",
-          focusOnClick: true,
-          tag: id
-        },
-        () => {
-          bringToFront();
-          showReminderPreviewDialog(reminder);
-        }
-      );
+      const tag = await desktop?.integration.showNotification.query({
+        title: reminder.title,
+        body: reminder.description,
+        silent: reminder.priority === "silent",
+        timeoutType: reminder.priority === "urgent" ? "never" : "default",
+        urgency:
+          reminder.priority === "urgent"
+            ? "critical"
+            : reminder.priority === "vibrate"
+            ? "normal"
+            : "low",
+        focusOnClick: true,
+        tag: id
+      });
+
+      if (tag) {
+        await desktop?.integration.bringToFront.query();
+        showReminderPreviewDialog(reminder);
+      }
     } else {
       const notification = new Notification(reminder.title, {
         body: reminder.description,

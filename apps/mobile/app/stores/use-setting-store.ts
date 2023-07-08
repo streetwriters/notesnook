@@ -24,8 +24,8 @@ import { initialWindowMetrics } from "react-native-safe-area-context";
 import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
 import { Reminder } from "../services/notifications";
-import { ACCENT } from "../utils/color-scheme";
 import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
+
 export type Settings = {
   showToolbarOnTop?: boolean;
   showKeyboardOnOpen?: boolean;
@@ -54,10 +54,6 @@ export type Settings = {
   lastBackupDate?: number | undefined;
   userEmailConfirmed?: boolean;
   recoveryKeySaved?: boolean;
-  theme: {
-    accent: string;
-    dark: boolean;
-  };
   backupDirectoryAndroid?: FileType | null;
   showBackupCompleteSheet: boolean;
   lastRecoveryEmailTime?: number;
@@ -109,61 +105,61 @@ export interface SettingStore extends State {
   setRequestBiometrics: (requestBiometrics: boolean) => void;
   insets: Insets;
   setInsets: (insets: Insets) => void;
+  timeFormat: string;
+  dateFormat: string;
 }
 
 const { width, height } = Dimensions.get("window");
 
+export const defaultSettings: SettingStore["settings"] = {
+  showToolbarOnTop: false,
+  showKeyboardOnOpen: false,
+  fontScale: 1,
+  forcePortraitOnTablet: false,
+  useSystemTheme: true,
+  reminder: "off",
+  encryptedBackup: false,
+  homepage: "Notes",
+  sort: "default",
+  sortOrder: "desc",
+  screenshotMode: true,
+  privacyScreen: false,
+  appLockMode: "none",
+  telemetry: false,
+  notebooksListMode: "normal",
+  notesListMode: "normal",
+  devMode: false,
+  notifNotes: false,
+  pitchBlack: false,
+  reduceAnimations: false,
+  rateApp: false,
+  migrated: false,
+  introCompleted: Config.isTesting ? true : false,
+  nextBackupRequestTime: undefined,
+  lastBackupDate: undefined,
+  userEmailConfirmed: false,
+  recoveryKeySaved: false,
+  showBackupCompleteSheet: true,
+  sessionExpired: false,
+  version: null,
+  doubleSpacedLines: true,
+  reminderNotifications: true,
+  defaultSnoozeTime: "5",
+  corsProxy: "https://cors.notesnook.com",
+  reminderNotificationMode: "urgent",
+  notificationSound: undefined,
+  defaultFontFamily: "sans-serif",
+  defaultFontSize: "16",
+  colorScheme: "light",
+  lighTheme: ThemeLight,
+  darkTheme: ThemeDark
+};
+
 export const useSettingStore = create<SettingStore>((set) => ({
-  settings: {
-    showToolbarOnTop: false,
-    showKeyboardOnOpen: false,
-    fontScale: 1,
-    forcePortraitOnTablet: false,
-    useSystemTheme: true,
-    reminder: "off",
-    encryptedBackup: false,
-    homepage: "Notes",
-    sort: "default",
-    sortOrder: "desc",
-    screenshotMode: true,
-    privacyScreen: false,
-    appLockMode: "none",
-    telemetry: false,
-    notebooksListMode: "normal",
-    notesListMode: "normal",
-    devMode: false,
-    notifNotes: false,
-    pitchBlack: false,
-    reduceAnimations: false,
-    rateApp: false,
-    migrated: false,
-    introCompleted: Config.isTesting ? true : false,
-    nextBackupRequestTime: undefined,
-    lastBackupDate: undefined,
-    userEmailConfirmed: false,
-    recoveryKeySaved: false,
-    theme: {
-      accent: ACCENT?.color,
-      dark: false
-    },
-    showBackupCompleteSheet: true,
-    sessionExpired: false,
-    version: null,
-    doubleSpacedLines: true,
-    reminderNotifications: true,
-    defaultSnoozeTime: "5",
-    corsProxy: "https://cors.notesnook.com",
-    reminderNotificationMode: "urgent",
-    notificationSound: undefined,
-    defaultFontFamily: "sans-serif",
-    defaultFontSize: "16",
-    colorScheme: "light",
-    lighTheme: ThemeLight,
-    darkTheme: ThemeDark
-  },
+  settings: { ...defaultSettings },
   sheetKeyboardHandler: true,
   fullscreen: false,
-  deviceMode: "mobile",
+  deviceMode: null,
   dimensions: { width, height },
   appLoading: true,
   setSettings: (settings) => set({ settings }),
@@ -176,6 +172,8 @@ export const useSettingStore = create<SettingStore>((set) => ({
   requestBiometrics: false,
   setRequestBiometrics: (requestBiometrics) => set({ requestBiometrics }),
   setInsets: (insets) => set({ insets }),
+  timeFormat: "12-hour",
+  dateFormat: "DD-MM-YYYY",
   insets: initialWindowMetrics?.insets
     ? initialWindowMetrics.insets
     : { top: 0, right: 0, left: 0, bottom: 0 }

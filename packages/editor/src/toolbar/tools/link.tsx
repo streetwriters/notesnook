@@ -224,6 +224,7 @@ export function OpenLink(props: ToolProps) {
         variant="body"
         sx={{
           fontSize: "subBody",
+          fontFamily: "body",
           mr: 1,
           maxWidth: [150, 250],
           overflow: "hidden",

@@ -26,7 +26,7 @@ import { NotebookPicker } from "../components/notebook-picker";
 import { TagPicker } from "../components/tag-picker";
 import {
   ItemReference,
-  SelectedNotebook,
+  SelectedReference,
   ClipArea,
   ClipMode,
   ClipData
@@ -40,6 +40,10 @@ import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./settings";
 import type { Config } from "@notesnook/clipper/dist/types";
 import { EmotionThemeVariant } from "@notesnook/theme";
 
+const ERROR_MAP: Record<string, string> = {
+  "Could not establish connection. Receiving end does not exist.":
+    "Please refresh this web page and try again. If the error persists, it means you don't have the required permission."
+};
 const clipAreas: { name: string; id: ClipArea; icon: string }[] = [
   {
     name: "Full page",
@@ -93,6 +97,7 @@ export function Main() {
 
   const [settings] = usePersistentState<Config>(SETTINGS_KEY, DEFAULT_SETTINGS);
   const [title, setTitle] = useState<string>();
+  const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [url, setUrl] = useState<string>();
   const [clipNonce, setClipNonce] = useState(0);
   const [clipMode, setClipMode] = usePersistentState<ClipMode>(
@@ -105,15 +110,18 @@ export function Main() {
   );
   const [isClipping, setIsClipping] = useState(false);
   const [note, setNote] = usePersistentState<ItemReference>("note");
-  const [notebook, setNotebook] =
-    usePersistentState<SelectedNotebook>("notebook");
+  const [refs, setRefs] = usePersistentState<SelectedReference[]>("refs", []);
   const [tags, setTags] = usePersistentState<string[]>("tags", []);
   const [clipData, setClipData] = useState<ClipData>();
   const pageTitle = useRef<string>();
 
   useEffect(() => {
     (async () => {
-      const [tab] = await browser.tabs.query({ active: true });
+      const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true,
+        windowType: "normal"
+      });
 
       setTitle(tab?.title ? tab.title : "Untitled");
       setUrl(tab?.url);
@@ -124,6 +132,13 @@ export function Main() {
   useEffect(() => {
     (async () => {
       if (!clipArea || !clipMode) return;
+      if (
+        !isPremium &&
+        (clipMode === "complete" || clipMode === "screenshot")
+      ) {
+        setClipMode("simplified");
+        return;
+      }
 
       try {
         setIsClipping(true);
@@ -135,7 +150,58 @@ export function Main() {
         setIsClipping(false);
       }
     })();
-  }, [clipArea, clipMode, clipNonce]);
+  }, [isPremium, clipArea, clipMode, clipNonce]);
+
+  useEffect(() => {
+    (async () => {
+      if (!settings || !settings.corsProxy) return;
+      setHasPermission(
+        await browser.permissions.contains({
+          origins: [`${settings.corsProxy}/*`]
+        })
+      );
+    })();
+  }, [settings]);
+
+  if (!hasPermission && !!settings?.corsProxy) {
+    return (
+      <FlexScrollContainer style={{ maxHeight: 560 }}>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            p: 2,
+            width: 320,
+            backgroundColor: "background"
+          }}
+        >
+          <Text
+            variant="subtitle"
+            sx={{ mt: 2, mb: 1, color: "icon", fontSize: "body" }}
+          >
+            Permission required
+          </Text>
+          <Text
+            variant="body"
+            sx={{ mt: 2, mb: 1, color: "icon", fontSize: "body" }}
+          >
+            Permission is required to use the CORS proxy: {settings.corsProxy}
+          </Text>
+          <Button
+            onClick={async () => {
+              if (!settings.corsProxy) return;
+              setHasPermission(
+                await browser.permissions.request({
+                  origins: [`${settings.corsProxy}/*`]
+                })
+              );
+            }}
+          >
+            Grant permission
+          </Button>
+        </Flex>
+      </FlexScrollContainer>
+    );
+  }
 
   return (
     <FlexScrollContainer style={{ maxHeight: 560 }}>
@@ -291,7 +357,7 @@ export function Main() {
                 setClipNonce((s) => ++s);
               }}
             >
-              {error}
+              {ERROR_MAP[error] || error}
               <br />
               Click here to retry.
             </Text>
@@ -305,7 +371,7 @@ export function Main() {
           Organization
         </Text>
 
-        {notebook || tags?.length ? null : (
+        {refs?.length || tags?.length ? null : (
           <NotePicker
             selectedNote={note}
             onSelected={(note) => setNote(note)}
@@ -313,34 +379,19 @@ export function Main() {
         )}
         {note ? null : (
           <>
-            {notebook || tags?.length ? null : (
+            {refs?.length || tags?.length ? null : (
               <Text variant="subBody" sx={{ my: 1, textAlign: "center" }}>
                 — or —
               </Text>
             )}
             <NotebookPicker
-              selectedNotebook={notebook}
-              onSelected={(notebook) => setNotebook(notebook)}
+              selectedItems={refs || []}
+              onSelected={(items) => setRefs(items)}
             />
             <Box sx={{ mt: 1 }} />
             <TagPicker
               selectedTags={tags || []}
-              onDeselected={(tag) => {
-                setTags((tags) => {
-                  const copy = tags?.slice() || [];
-                  copy.splice(copy.indexOf(tag), 1);
-                  return copy;
-                });
-              }}
-              onSelected={(tag) => {
-                setTags((tags) => {
-                  const copy = tags?.slice() || [];
-                  if (copy.indexOf(tag) > -1) {
-                    copy.splice(copy.indexOf(tag), 1);
-                  } else copy.push(tag);
-                  return copy;
-                });
-              }}
+              onSelected={(tags) => setTags(tags)}
             />
           </>
         )}
@@ -363,12 +414,21 @@ export function Main() {
               mode: clipMode,
               tags,
               note,
-              notebook,
+              refs,
               pageTitle: pageTitle.current,
               ...clipData
             });
 
             setClipData(undefined);
+
+            await browser.notifications?.create({
+              title: "Clip saved!",
+              message: "Open the Notesnook app to view the result.",
+              type: "basic",
+              iconUrl: browser.runtime.getURL("256x256.png"),
+              isClickable: false
+            });
+
             window.close();
           }}
         >
@@ -409,8 +469,23 @@ export async function clip(
     return { data: clipData };
   }
 
-  const [tab] = await browser.tabs.query({ active: true });
+  const [tab] = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+    windowType: "normal"
+  });
   if (!tab || !tab.id) return;
+
+  if (browser.scripting) {
+    await browser.scripting.executeScript({
+      files: ["contentScript.bundle.js"],
+      target: { tabId: tab.id }
+    });
+  } else {
+    await browser.tabs.executeScript(tab.id, {
+      file: "contentScript.bundle.js"
+    });
+  }
 
   if (area === "visible" && mode === "screenshot") {
     if (!tab.height || !tab.width) return;

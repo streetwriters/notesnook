@@ -20,6 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import BaseStore from "./index";
 
+/**
+ * @extends {BaseStore<SelectionStore>}
+ */
 class SelectionStore extends BaseStore {
   selectedItems = [];
   shouldSelectAll = false;
@@ -71,8 +74,5 @@ class SelectionStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<SelectionStore>, SelectionStore]}
- */
 const [useStore, store] = createStore(SelectionStore);
 export { useStore, store };

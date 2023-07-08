@@ -59,7 +59,7 @@ export interface ImageOptions {
  * data.
  */
 export type ImageAttributes = Partial<ImageSizeOptions> &
-  Partial<Attachment> & {
+  Attachment & {
     src: string;
     dataurl?: string;
     alt?: string;
@@ -138,7 +138,7 @@ export const ImageNode = Node.create<ImageOptions>({
 
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),
-      type: getDataAttribute("mime"),
+      mime: getDataAttribute("mime"),
       size: getDataAttribute("size"),
       aspectRatio: {
         default: undefined,
@@ -178,7 +178,8 @@ export const ImageNode = Node.create<ImageOptions>({
 
   addNodeView() {
     return createSelectionBasedNodeView(ImageComponent, {
-      shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs)
+      shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs),
+      forceEnableSelection: true
     });
   },
 
@@ -208,7 +209,16 @@ export const ImageNode = Node.create<ImageOptions>({
     return {
       insertImage:
         (options) =>
-        ({ commands }) => {
+        ({ commands, state }) => {
+          const { $from } = state.selection;
+          const maybeImageNode = state.doc.nodeAt($from.pos);
+          if (maybeImageNode?.type === this.type) {
+            return commands.insertContentAt($from.pos + 1, {
+              type: this.name,
+              attrs: options
+            });
+          }
+
           return commands.insertContent({
             type: this.name,
             attrs: options

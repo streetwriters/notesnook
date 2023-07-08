@@ -35,7 +35,7 @@ export type AttachmentWithProgress = AttachmentProgress & Attachment;
 export type Attachment = {
   hash: string;
   filename: string;
-  type: string;
+  mime: string;
   size: number;
 };
 
@@ -88,7 +88,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
       },
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),
-      type: getDataAttribute("mime"),
+      mime: getDataAttribute("mime"),
       size: getDataAttribute("size")
     };
   },
@@ -112,7 +112,8 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return createSelectionBasedNodeView(AttachmentComponent, {
       shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
         return prev.progress !== next.progress;
-      }
+      },
+      forceEnableSelection: true
     });
   },
 
@@ -120,7 +121,18 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return {
       insertAttachment:
         (attachment) =>
-        ({ commands }) => {
+        ({ commands, state }) => {
+          const { $from } = state.selection;
+          const maybeAttachmentNode = state.doc.nodeAt($from.pos);
+          if (maybeAttachmentNode?.type === this.type) {
+            return commands.insertContentAt(
+              $from.pos + maybeAttachmentNode.nodeSize,
+              {
+                type: this.name,
+                attrs: attachment
+              }
+            );
+          }
           return commands.insertContent({
             type: this.name,
             attrs: attachment
@@ -166,6 +178,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
       previewAttachment:
         (attachment) =>
         ({ editor }) => {
+          if (!this.options.onPreviewAttachment) return false;
           return this.options.onPreviewAttachment(editor, attachment);
         }
     };

@@ -36,7 +36,7 @@ import {
   validateUsername
 } from "../../../services/validation";
 import { useThemeColors } from "@notesnook/theme";
-import { getElevation } from "../../../utils";
+import { getElevationStyle } from "../../../utils/elevation";
 import { SIZE } from "../../../utils/size";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
@@ -112,14 +112,14 @@ const Input = ({
   const [secureEntry, setSecureEntry] = useState(true);
   const [showError, setShowError] = useState(false);
   const [errorList, setErrorList] = useState({
-    SHORT_PASS: true
+    SHORT_PASS: false
   });
   type ErrorKey = keyof typeof errorList;
   const color = error
     ? colors.error.paragraph
     : focus
     ? customColor || colors.primary.accent
-    : colors.secondary.background;
+    : colors.primary.border;
 
   const validate = async (value: string) => {
     if (!validationType) return;
@@ -187,6 +187,12 @@ const Input = ({
     onChangeText && onChangeText(value);
     setShowError(false);
     validate(value);
+    if (value === "") {
+      setError(false);
+      setErrorList({
+        SHORT_PASS: false
+      });
+    }
   };
 
   const onBlur = () => {
@@ -220,7 +226,8 @@ const Input = ({
   const textStyle: TextInputProps["style"] = {
     paddingHorizontal: 0,
     fontSize: fontSize,
-    color: onPress && loading ? colors.primary.accent : colors.primary.paragraph,
+    color:
+      onPress && loading ? colors.primary.accent : colors.primary.paragraph,
     paddingVertical: 0,
     paddingBottom: 2.5,
     flexGrow: 1,
@@ -294,7 +301,9 @@ const Input = ({
                   width: 25,
                   marginLeft: 5
                 }}
-                color={secureEntry ? colors.primary.icon : colors.primary.accent}
+                color={
+                  secureEntry ? colors.primary.icon : colors.primary.accent
+                }
               />
             )}
 
@@ -338,7 +347,7 @@ const Input = ({
                 paddingVertical: 3,
                 paddingHorizontal: 5,
                 borderRadius: 2.5,
-                ...getElevation(2),
+                ...getElevationStyle(2),
                 top: 0
               }}
             >

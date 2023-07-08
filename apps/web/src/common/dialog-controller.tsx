@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ReactDOM from "react-dom";
-import { Dialogs } from "../components/dialogs";
+import { Dialogs } from "../dialogs";
 import { BaseThemeProvider } from "../components/theme-provider";
 import qclone from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
@@ -29,18 +29,17 @@ import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
 import { Text } from "@theme-ui/components";
-import * as Icon from "../components/icons";
+import { Topic } from "../components/icons";
 import Config from "../utils/config";
-import { formatDate } from "@notesnook/core/utils/date";
-import downloadUpdate from "../commands/download-update";
-import installUpdate from "../commands/install-update";
 import { AppVersion, getChangelog } from "../utils/version";
-import { Period } from "../components/dialogs/buy-dialog/types";
-import { FeatureKeys } from "../components/dialogs/feature-dialog";
-import { AuthenticatorType } from "../components/dialogs/mfa/types";
+import { Period } from "../dialogs/buy-dialog/types";
+import { FeatureKeys } from "../dialogs/feature-dialog";
+import { AuthenticatorType } from "../dialogs/mfa/types";
 import { Suspense } from "react";
 import { Reminder } from "@notesnook/core/collections/reminders";
-import { ConfirmDialogProps } from "../components/dialogs/confirm";
+import { ConfirmDialogProps } from "../dialogs/confirm";
+import { getFormattedDate } from "@notesnook/common";
+import { downloadUpdate } from "../utils/updater";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -88,6 +87,12 @@ export function closeOpenedDialog() {
   dialogs.forEach((elem) => elem.remove());
 }
 
+export function showAddTagsDialog(noteIds: string[]) {
+  return showDialog("AddTagsDialog", (Dialog, perform) => (
+    <Dialog onClose={(res) => perform(res)} noteIds={noteIds} />
+  ));
+}
+
 export function showAddNotebookDialog() {
   return showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog
@@ -111,7 +116,7 @@ export function showAddNotebookDialog() {
 
 export function showEditNotebookDialog(notebookId: string) {
   const notebook = db.notebooks?.notebook(notebookId)?.data;
-  if (!notebook) return false;
+  if (!notebook) return;
   return showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog
       isOpen={true}
@@ -184,24 +189,9 @@ export function showPromptDialog(props: {
 }
 
 export function showEmailChangeDialog() {
-  return showDialog<"EmailChangeDialog", string | null>(
-    "EmailChangeDialog",
-    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
-  );
-}
-
-export function showLanguageSelectorDialog() {
-  return showDialog<"LanguageSelectorDialog", string | null>(
-    "LanguageSelectorDialog",
-    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
-  );
-}
-
-export function showToolbarConfigDialog() {
-  return showDialog<"ToolbarConfigDialog", string | null>(
-    "ToolbarConfigDialog",
-    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
-  );
+  return showDialog("EmailChangeDialog", (Dialog, perform) => (
+    <Dialog onClose={() => perform(null)} />
+  ));
 }
 
 export function showError(title: string, message: string) {
@@ -211,8 +201,9 @@ export function showError(title: string, message: string) {
 export function showMultiDeleteConfirmation(length: number) {
   return confirm({
     title: `Delete ${length} items?`,
-    message: `These items will be **kept in your Trash for ${db.settings?.getTrashCleanupInterval() || 7
-      } days** after which they will be permanently deleted.`,
+    message: `These items will be **kept in your Trash for ${
+      db.settings?.getTrashCleanupInterval() || 7
+    } days** after which they will be permanently deleted.`,
     positiveButtonText: "Yes",
     negativeButtonText: "No"
   });
@@ -439,7 +430,13 @@ function getDialogData(type: string) {
 
 export function showPasswordDialog(
   type: string,
-  validate: (password: string) => boolean
+  validate: ({
+    password
+  }: {
+    password?: string;
+    oldPassword?: string;
+    newPassword?: string;
+  }) => boolean | Promise<boolean>
 ) {
   const { title, subtitle, positiveButtonText, checks } = getDialogData(type);
   return showDialog("PasswordDialog", (Dialog, perform) => (
@@ -473,6 +470,7 @@ export function showCreateTopicDialog() {
       onAction={async (topic: Record<string, unknown>) => {
         if (!topic) return;
         const notebook = notebookStore.get().selectedNotebook;
+        if (!notebook) return;
         await db.notebooks?.notebook(notebook.id).topics.add(topic);
         notebookStore.setSelectedNotebook(notebook.id);
         showToast("success", "Topic created!");
@@ -491,7 +489,7 @@ export function showEditTopicDialog(notebookId: string, topicId: string) {
       title={"Edit topic"}
       subtitle={`You are editing "${topic.title}" topic.`}
       defaultValue={topic.title}
-      icon={Icon.Topic}
+      icon={Topic}
       item={topic}
       onClose={() => perform(false)}
       onAction={async (t: string) => {
@@ -601,12 +599,6 @@ export function showReminderPreviewDialog(reminder: Reminder) {
   ));
 }
 
-export function showTrackingDetailsDialog() {
-  return showDialog("TrackingDetailsDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} />
-  ));
-}
-
 export function showAddReminderDialog(noteId?: string) {
   return showDialog("AddReminderDialog", (Dialog, perform) => (
     <Dialog onClose={(res: boolean) => perform(res)} noteId={noteId} />
@@ -638,12 +630,6 @@ export function showIssueDialog() {
   ));
 }
 
-export function showImportDialog() {
-  return showDialog("ImportDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} />
-  ));
-}
-
 export function showMultifactorDialog(primaryMethod?: AuthenticatorType) {
   return showDialog("MultifactorDialog", (Dialog, perform) => (
     <Dialog onClose={(res) => perform(res)} primaryMethod={primaryMethod} />
@@ -662,7 +648,13 @@ export function showAttachmentsDialog() {
   ));
 }
 
-export function showOnboardingDialog(type: string) {
+export function showSettings() {
+  return showDialog("SettingsDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} />
+  ));
+}
+
+export function showOnboardingDialog(type?: string) {
   if (!type) return;
   return showDialog("OnboardingDialog", (Dialog, perform) => (
     <Dialog type={type} onClose={(res: boolean) => perform(res)} />
@@ -680,14 +672,8 @@ export async function showInvalidSystemTimeDialog({
     title: "Your system clock is out of sync",
     subtitle:
       "Please correct your system date & time and reload the app to avoid syncing issues.",
-    message: `Server time: ${formatDate(serverTime, {
-      dateStyle: "medium",
-      timeStyle: "medium"
-    })}
-Local time: ${formatDate(localTime, {
-      dateStyle: "medium",
-      timeStyle: "medium"
-    })}
+    message: `Server time: ${getFormattedDate(serverTime)}
+Local time: ${getFormattedDate(localTime)}
 Please sync your system time with [https://time.is](https://time.is).`,
     positiveButtonText: "Reload app"
   });
@@ -706,19 +692,6 @@ export async function showUpdateAvailableNotice({
     subtitle: `v${version} is available for download`,
     changelog,
     action: { text: `Update now`, onClick: () => downloadUpdate() }
-  });
-}
-
-export async function showUpdateReadyNotice({ version }: { version: string }) {
-  const changelog = await getChangelog(version);
-  return await showUpdateDialog({
-    title: `Update ready for installation`,
-    subtitle: `v${version} is ready to be installed.`,
-    changelog,
-    action: {
-      text: "Install now",
-      onClick: () => installUpdate()
-    }
   });
 }
 

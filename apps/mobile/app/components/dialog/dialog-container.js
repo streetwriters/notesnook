@@ -21,7 +21,7 @@ import React from "react";
 import { View } from "react-native";
 import { DDS } from "../../services/device-detection";
 import { useThemeColors } from "@notesnook/theme";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 
 const DialogContainer = ({ width, height, ...restProps }) => {
   const { colors } = useThemeColors();
@@ -30,7 +30,7 @@ const DialogContainer = ({ width, height, ...restProps }) => {
     <View
       {...restProps}
       style={{
-        ...getElevation(5),
+        ...getElevationStyle(5),
         width: width || DDS.isTab ? 500 : "85%",
         maxHeight: height || 450,
         borderRadius: 10,

@@ -178,16 +178,33 @@ const NoteItem = ({
           </View>
         ) : null}
 
-        <Heading
-          numberOfLines={1}
-          color={COLORS_NOTE[item.color?.toLowerCase()] || colors.primary.heading}
-          style={{
-            flexWrap: "wrap"
-          }}
-          size={SIZE.md}
-        >
-          {item.title}
-        </Heading>
+        {compactMode ? (
+          <Paragraph
+            numberOfLines={1}
+            color={
+              COLORS_NOTE[item.color?.toLowerCase()] || colors.primary.heading
+            }
+            style={{
+              flexWrap: "wrap"
+            }}
+            size={SIZE.sm}
+          >
+            {item.title}
+          </Paragraph>
+        ) : (
+          <Heading
+            numberOfLines={1}
+            color={
+              COLORS_NOTE[item.color?.toLowerCase()] || colors.primary.heading
+            }
+            style={{
+              flexWrap: "wrap"
+            }}
+            size={SIZE.md}
+          >
+            {item.title}
+          </Heading>
+        )}
 
         {item.headline && !compactMode ? (
           <Paragraph
@@ -202,161 +219,227 @@ const NoteItem = ({
           </Paragraph>
         ) : null}
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            width: "100%",
-            marginTop: 5,
-            height: SIZE.md + 2
-          }}
-        >
-          {!isTrash ? (
-            <>
-              {item.conflicted ? (
-                <Icon
-                  name="alert-circle"
+        {compactMode ? null : (
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              width: "100%",
+              marginTop: 5,
+              height: SIZE.md + 2
+            }}
+          >
+            {!isTrash ? (
+              <>
+                {item.conflicted ? (
+                  <Icon
+                    name="alert-circle"
+                    style={{
+                      marginRight: 6
+                    }}
+                    size={SIZE.sm}
+                    color={colors.error.accent}
+                  />
+                ) : null}
+                <TimeSince
                   style={{
+                    fontSize: SIZE.xs,
+                    color: colors.secondary.paragraph,
                     marginRight: 6
                   }}
-                  size={SIZE.sm}
-                  color={colors.error.icon}
+                  time={item[dateBy]}
+                  updateFrequency={
+                    Date.now() - item[dateBy] < 60000 ? 2000 : 60000
+                  }
                 />
-              ) : null}
-              <TimeSince
-                style={{
-                  fontSize: SIZE.xs,
-                  color: colors.secondary.paragraph,
-                  marginRight: 6
-                }}
-                time={item[dateBy]}
-                updateFrequency={
-                  Date.now() - item[dateBy] < 60000 ? 2000 : 60000
-                }
-              />
 
-              {attachmentCount > 0 ? (
-                <View
+                {attachmentCount > 0 ? (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginRight: 6
+                    }}
+                  >
+                    <Icon
+                      name="attachment"
+                      size={SIZE.md}
+                      color={colors.primary.icon}
+                    />
+                    <Paragraph
+                      color={colors.secondary.paragraph}
+                      size={SIZE.xs}
+                    >
+                      {attachmentCount}
+                    </Paragraph>
+                  </View>
+                ) : null}
+
+                {item.pinned ? (
+                  <Icon
+                    testID="icon-pinned"
+                    name="pin-outline"
+                    size={SIZE.sm}
+                    style={{
+                      marginRight: 6
+                    }}
+                    color={
+                      COLORS_NOTE[item.color?.toLowerCase()] ||
+                      colors.primary.accent
+                    }
+                  />
+                ) : null}
+
+                {item.locked ? (
+                  <Icon
+                    name="lock"
+                    testID="note-locked-icon"
+                    size={SIZE.sm}
+                    style={{
+                      marginRight: 6
+                    }}
+                    color={colors.primary.icon}
+                  />
+                ) : null}
+
+                {item.favorite ? (
+                  <Icon
+                    testID="icon-star"
+                    name="star-outline"
+                    size={SIZE.md}
+                    style={{
+                      marginRight: 6
+                    }}
+                    color="orange"
+                  />
+                ) : null}
+
+                {!isTrash && !compactMode && tags
+                  ? tags.map((item) =>
+                      item.id ? (
+                        <Button
+                          title={"#" + item.alias}
+                          key={item.id}
+                          height={23}
+                          type="gray"
+                          textStyle={{
+                            textDecorationLine: "underline"
+                          }}
+                          hitSlop={{ top: 8, bottom: 12, left: 0, right: 0 }}
+                          fontSize={SIZE.xs}
+                          style={{
+                            borderRadius: 5,
+                            paddingHorizontal: 6,
+                            marginRight: 4,
+                            zIndex: 10,
+                            maxWidth: tags.length > 1 ? 130 : null
+                          }}
+                          onPress={() => navigateToTag(item)}
+                        />
+                      ) : null
+                    )
+                  : null}
+              </>
+            ) : (
+              <>
+                <Paragraph
+                  color={colors.secondary.background}
+                  size={SIZE.xs}
                   style={{
-                    flexDirection: "row",
-                    alignItems: "center",
                     marginRight: 6
                   }}
                 >
-                  <Icon name="attachment" size={SIZE.md} color={colors.primary.icon} />
-                  <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
-                    {attachmentCount}
-                  </Paragraph>
-                </View>
-              ) : null}
+                  Deleted on{" "}
+                  {item && item.dateDeleted
+                    ? new Date(item.dateDeleted).toISOString().slice(0, 10)
+                    : null}
+                </Paragraph>
 
-              {item.pinned ? (
-                <Icon
-                  testID="icon-pinned"
-                  name="pin-outline"
-                  size={SIZE.sm}
+                <Paragraph
+                  color={colors.primary.accent}
+                  size={SIZE.xs}
                   style={{
                     marginRight: 6
                   }}
-                  color={
-                    COLORS_NOTE[item.color?.toLowerCase()] || colors.primary.accent
-                  }
-                />
-              ) : null}
-
-              {item.locked ? (
-                <Icon
-                  name="lock"
-                  testID="note-locked-icon"
-                  size={SIZE.sm}
-                  style={{
-                    marginRight: 6
-                  }}
-                  color={colors.primary.icon}
-                />
-              ) : null}
-
-              {item.favorite ? (
-                <Icon
-                  testID="icon-star"
-                  name="star"
-                  size={SIZE.md}
-                  style={{
-                    marginRight: 6
-                  }}
-                  color="orange"
-                />
-              ) : null}
-
-              {!isTrash && !compactMode && tags
-                ? tags.map((item) =>
-                    item.id ? (
-                      <Button
-                        title={"#" + item.alias}
-                        key={item.id}
-                        height={23}
-                        type="gray"
-                        textStyle={{
-                          textDecorationLine: "underline"
-                        }}
-                        hitSlop={{ top: 8, bottom: 12, left: 0, right: 0 }}
-                        fontSize={SIZE.xs}
-                        style={{
-                          borderRadius: 5,
-                          paddingHorizontal: 6,
-                          marginRight: 4,
-                          zIndex: 10,
-                          maxWidth: tags.length > 1 ? 130 : null
-                        }}
-                        onPress={() => navigateToTag(item)}
-                      />
-                    ) : null
-                  )
-                : null}
-            </>
-          ) : (
-            <>
-              <Paragraph
-                color={colors.secondary.paragraph}
-                size={SIZE.xs}
-                style={{
-                  marginRight: 6
-                }}
-              >
-                Deleted on{" "}
-                {item && item.dateDeleted
-                  ? new Date(item.dateDeleted).toISOString().slice(0, 10)
-                  : null}
-              </Paragraph>
-
-              <Paragraph
-                color={colors.primary.accent}
-                size={SIZE.xs}
-                style={{
-                  marginRight: 6
-                }}
-              >
-                {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
-              </Paragraph>
-            </>
-          )}
-        </View>
+                >
+                  {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
+                </Paragraph>
+              </>
+            )}
+          </View>
+        )}
       </View>
-      <IconButton
-        testID={notesnook.listitem.menu}
-        color={colors.primary.paragraph}
-        name="dots-horizontal"
-        size={SIZE.xl}
-        onPress={() => !noOpen && showActionSheet(item, isTrash)}
-        customStyle={{
-          justifyContent: "center",
-          height: 35,
-          width: 35,
-          borderRadius: 100,
+      <View
+        style={{
+          flexDirection: "row",
           alignItems: "center"
         }}
-      />
+      >
+        {compactMode ? (
+          <>
+            {item.conflicted ? (
+              <Icon
+                name="alert-circle"
+                style={{
+                  marginRight: 6
+                }}
+                size={SIZE.sm}
+                color={colors.error.accent}
+              />
+            ) : null}
+
+            {item.locked ? (
+              <Icon
+                name="lock"
+                testID="note-locked-icon"
+                size={SIZE.sm}
+                style={{
+                  marginRight: 6
+                }}
+                color={colors.secondary.background}
+              />
+            ) : null}
+
+            {item.favorite ? (
+              <Icon
+                testID="icon-star"
+                name="star-outline"
+                size={SIZE.md}
+                style={{
+                  marginRight: 6
+                }}
+                color="orange"
+              />
+            ) : null}
+
+            <TimeSince
+              style={{
+                fontSize: SIZE.xs,
+                color: colors.secondary.paragraph,
+                marginRight: 6
+              }}
+              time={item[dateBy]}
+              updateFrequency={Date.now() - item[dateBy] < 60000 ? 2000 : 60000}
+            />
+          </>
+        ) : null}
+
+        <IconButton
+          testID={notesnook.listitem.menu}
+          color={colors.primary.paragraph}
+          name="dots-horizontal"
+          size={SIZE.xl}
+          onPress={() => !noOpen && showActionSheet(item, isTrash)}
+          customStyle={{
+            justifyContent: "center",
+            height: 35,
+            width: 35,
+            borderRadius: 100,
+            alignItems: "center"
+          }}
+        />
+      </View>
     </>
   );
 };

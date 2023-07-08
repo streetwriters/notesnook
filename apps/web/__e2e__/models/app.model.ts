@@ -42,7 +42,7 @@ export class AppModel {
   constructor(page: Page) {
     this.page = page;
     this.toasts = new ToastsModel(page);
-    this.navigation = new NavigationMenuModel(page);
+    this.navigation = new NavigationMenuModel(page, "navigation-menu");
     this.auth = new AuthModel(page);
     this.checkout = new CheckoutModel(page);
     this.routeHeader = this.page.locator(getTestId("routeHeader"));
@@ -111,7 +111,7 @@ export class AppModel {
   async getRouteHeader() {
     if (!(await this.routeHeader.isVisible())) return;
 
-    return await this.routeHeader.inputValue();
+    return await this.routeHeader.innerText();
   }
 
   async isSynced() {

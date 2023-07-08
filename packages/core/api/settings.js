@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { EV, EVENTS } from "../common";
-import id from "../utils/id";
+import { getId } from "../utils/id";
 import "../types";
 
 class Settings {
@@ -140,16 +140,70 @@ class Settings {
     return this._settings.trashCleanupInterval || 7;
   }
 
+  /**
+   *
+   * @param {{id: string, topic?: string} | undefined} item
+   */
+  async setDefaultNotebook(item) {
+    this._settings.defaultNotebook = !item
+      ? undefined
+      : {
+          id: item.id,
+          topic: item.topic
+        };
+    await this._saveSettings();
+  }
+  /**
+   *
+   * @returns {{id: string, topic?: string} | undefined}
+   */
+  getDefaultNotebook() {
+    return this._settings.defaultNotebook;
+  }
+
+  async setTitleFormat(format) {
+    this._settings.titleFormat = format || "Note $date$ $time$";
+    await this._saveSettings();
+  }
+
+  getTitleFormat() {
+    return this._settings.titleFormat;
+  }
+
+  getDateFormat() {
+    return this._settings.dateFormat;
+  }
+
+  async setDateFormat(format) {
+    this._settings.dateFormat = format || "DD-MM-YYYY";
+    await this._saveSettings();
+  }
+  /**
+   *
+   * @returns {"12-hour" | "24-hour"}
+   */
+  getTimeFormat() {
+    return this._settings.timeFormat;
+  }
+
+  async setTimeFormat(format) {
+    this._settings.timeFormat = format || "12-hour";
+    await this._saveSettings();
+  }
+
   _initSettings(settings) {
     this._settings = {
       type: "settings",
-      id: id(),
+      id: getId(),
       groupOptions: {},
       toolbarConfig: {},
       aliases: {},
       dateModified: 0,
       dateCreated: 0,
       trashCleanupInterval: 7,
+      titleFormat: "Note $date$ $time$",
+      timeFormat: "12-hour",
+      dateFormat: "DD-MM-YYYY",
       ...(settings || {})
     };
   }

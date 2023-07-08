@@ -48,7 +48,6 @@ export default class CachedCollection extends IndexedCollection {
     // }
 
     this.map = new MapStub.Map(data, this.type);
-    this.invalidateCache();
   }
 
   async clear() {

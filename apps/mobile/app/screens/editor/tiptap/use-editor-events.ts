@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
+import Clipboard from "@react-native-clipboard/clipboard";
 import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
 import { useCallback, useEffect, useRef } from "react";
@@ -62,6 +63,8 @@ import { useDragState } from "../../settings/editor/state";
 import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { EditorEvents, editorState } from "./utils";
+import { useNoteStore } from "../../../stores/use-notes-store";
+import SettingsService from "../../../services/settings";
 
 const publishNote = async (editor: useEditorType) => {
   const user = useUserStore.getState().user;
@@ -130,6 +133,12 @@ export const useEditorEvents = (
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const corsProxy = useSettingStore((state) => state.settings.corsProxy);
+  const loading = useNoteStore((state) => state.loading);
+  const [dateFormat, timeFormat] = useSettingStore((state) => [
+    state.dateFormat,
+    state.timeFormat
+  ]);
+
   const handleBack = useRef<NativeEventSubscription>();
   const readonly = useEditorStore((state) => state.readonly);
   const isPremium = useUserStore((state) => state.premium);
@@ -148,6 +157,7 @@ export const useEditorEvents = (
   useEffect(() => {
     const handleKeyboardDidShow: KeyboardEventListener = () => {
       editor.commands.keyboardShown(true);
+      editor.postMessage(EditorEvents.keyboardShown, undefined);
     };
     const handleKeyboardDidHide: KeyboardEventListener = () => {
       editor.commands.keyboardShown(false);
@@ -159,9 +169,16 @@ export const useEditorEvents = (
     return () => {
       subscriptions.forEach((subscription) => subscription.remove());
     };
-  }, [editor.commands]);
+  }, [editor.commands, editor.postMessage]);
 
   useEffect(() => {
+    if (loading) return;
+    if (typeof defaultFontFamily === "object") {
+      SettingsService.set({
+        defaultFontFamily: (defaultFontFamily as any).id
+      });
+    }
+
     editor.commands.setSettings({
       deviceMode: deviceMode || "mobile",
       fullscreen: fullscreen || false,
@@ -173,7 +190,9 @@ export const useEditorEvents = (
       doubleSpacedLines: doubleSpacedLines,
       corsProxy: corsProxy,
       fontSize: defaultFontSize,
-      fontFamily: defaultFontFamily
+      fontFamily: SettingsService.get().defaultFontFamily,
+      dateFormat: db.settings?.getDateFormat(),
+      timeFormat: db.settings?.getTimeFormat()
     });
   }, [
     fullscreen,
@@ -190,7 +209,10 @@ export const useEditorEvents = (
     noToolbar,
     corsProxy,
     defaultFontSize,
-    defaultFontFamily
+    defaultFontFamily,
+    dateFormat,
+    timeFormat,
+    loading
   ]);
 
   const onBackPress = useCallback(async () => {
@@ -239,8 +261,11 @@ export const useEditorEvents = (
       }
     });
   }, [onHardwareBackPress]);
-  const onCallClear = useCallback(
+
+  const onClearEditorSessionRequest = useCallback(
     async (value: string) => {
+      if (editorState()?.isAwaitingResult) return;
+
       if (value === "removeHandler") {
         if (handleBack.current) {
           handleBack.current.remove();
@@ -282,12 +307,15 @@ export const useEditorEvents = (
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote + editor.editorId, onLoadNote);
-    eSubscribeEvent(eClearEditor + editor.editorId, onCallClear);
+    eSubscribeEvent(
+      eClearEditor + editor.editorId,
+      onClearEditorSessionRequest
+    );
     return () => {
-      eUnSubscribeEvent(eClearEditor, onCallClear);
+      eUnSubscribeEvent(eClearEditor, onClearEditorSessionRequest);
       eUnSubscribeEvent(eOnLoadNote, onLoadNote);
     };
-  }, [editor.editorId, onCallClear, onLoadNote]);
+  }, [editor.editorId, onClearEditorSessionRequest, onLoadNote]);
 
   const onMessage = useCallback(
     (event: WebViewMessageEvent) => {
@@ -349,7 +377,7 @@ export const useEditorEvents = (
             });
             return;
           }
-          ManageTagsSheet.present(editor.note.current);
+          ManageTagsSheet.present([editor.note.current]);
           break;
         case EventTypes.tag:
           if (editorMessage.value) {
@@ -365,8 +393,12 @@ export const useEditorEvents = (
           }
           break;
         case EventTypes.filepicker:
+          editorState().isAwaitingResult = true;
           const { pick } = require("./picker.js").default;
           pick({ type: editorMessage.value });
+          setTimeout(() => {
+            editorState().isAwaitingResult = false;
+          }, 1000);
           break;
         case EventTypes.download: {
           const downloadAttachment =
@@ -398,9 +430,23 @@ export const useEditorEvents = (
           openLinkInBrowser(editorMessage.value as string);
           break;
 
-        case EventTypes.previewAttachment:
-          eSendEvent("ImagePreview", editorMessage.value);
+        case EventTypes.previewAttachment: {
+          const hash = (editorMessage.value as Attachment)?.hash;
+          const attachment = db.attachments?.attachment(hash);
+          if (!attachment) return;
+          if (attachment.metadata.type.startsWith("image/")) {
+            eSendEvent("ImagePreview", editorMessage.value);
+          } else {
+            eSendEvent("PDFPreview", attachment);
+          }
+
           break;
+        }
+        case EventTypes.copyToClipboard: {
+          Clipboard.setString(editorMessage.value as string);
+          break;
+        }
+
         default:
           break;
       }

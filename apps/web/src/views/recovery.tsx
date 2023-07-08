@@ -361,7 +361,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
 
         const user = await db.user?.getUser();
         if (!user) throw new Error("User not authenticated");
-        await db.storage.write(`_uk_@${user.email}@_k`, form.recoveryKey);
+        await db.storage?.write(`_uk_@${user.email}@_k`, form.recoveryKey);
         await db.sync(true, true);
         navigate("backup");
       }}

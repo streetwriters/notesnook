@@ -25,7 +25,7 @@ import {
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
-import { getElevation } from "../../../utils";
+import { getElevationStyle } from "../../../utils/elevation";
 import { eCloseResultDialog, eOpenResultDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import BaseDialog from "../../dialog/base-dialog";
@@ -68,7 +68,7 @@ const ResultDialog = () => {
     <BaseDialog visible={true} onRequestClose={close}>
       <View
         style={{
-          ...getElevation(5),
+          ...getElevationStyle(5),
           width: DDS.isTab ? 350 : "85%",
           maxHeight: 500,
           borderRadius: 10,

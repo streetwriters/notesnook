@@ -60,11 +60,12 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { MMKV } from "../../../common/database/mmkv";
 import { openEditor } from "../../../screens/notes/common";
-import { getTotalNotes, history } from "../../../utils";
+import { getTotalNotes } from "@notesnook/common";
 import { deleteItems } from "../../../utils/functions";
 import { presentDialog } from "../../dialog/functions";
 import { Properties } from "../../properties";
 import Sort from "../sort";
+import { useSelectionStore } from "../../../stores/use-selection-store";
 
 type ConfigItem = { id: string; type: string };
 class TopicSheetConfig {
@@ -333,7 +334,9 @@ export const TopicsSheet = () => {
                 }}
                 onPress={async () => {
                   //@ts-ignore
-                  history.selectedItemsList = selection;
+                  useSelectionStore.setState({
+                    selectedItemsList: selection
+                  });
                   presentDialog({
                     title: `Delete ${
                       selection.length > 1 ? "topics" : "topics"
@@ -345,7 +348,7 @@ export const TopicsSheet = () => {
                     negativeText: "Cancel",
                     positivePress: async () => {
                       await deleteItems();
-                      history.selectedItemsList = [];
+                      useSelectionStore.getState().clearSelection();
                       setEnabled(false);
                       setSelection([]);
                     },

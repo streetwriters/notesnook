@@ -29,6 +29,7 @@ import {
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
+import { eUserLoggedIn } from "../../../utils/events";
 
 type ChangeEmailProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -41,11 +42,7 @@ enum EmailChangeSteps {
   changeEmail
 }
 
-export const ChangeEmail = ({
-  actionSheetRef,
-  close,
-  update
-}: ChangeEmailProps) => {
+export const ChangeEmail = ({ close }: ChangeEmailProps) => {
   const [step, setStep] = useState(EmailChangeSteps.verify);
   const emailChangeData = useRef<{
     email?: string;
@@ -88,7 +85,7 @@ export const ChangeEmail = ({
           emailChangeData.current.password,
           emailChangeData.current.code
         );
-        eSendEvent("userLoggedIn");
+        eSendEvent(eUserLoggedIn);
         close?.();
         ToastEvent.show({
           heading: `Email changed`,

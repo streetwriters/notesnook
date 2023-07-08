@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import create from "zustand";
-import shallow from "zustand/shallow";
+import { create } from "zustand";
+import { shallow } from "zustand/shallow";
 import { isUserPremium } from "./use-is-user-premium";
 
 const mousePosition = { x: 0, y: 0, actualX: 0, actualY: 0 };

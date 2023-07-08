@@ -37,7 +37,8 @@ const TEST_NOTEBOOK2 = {
 };
 
 function databaseTest() {
-  let db = new DB(StorageInterface, null, FS, Compressor);
+  let db = new DB();
+  db.setup(StorageInterface, null, FS, Compressor);
   return db.init().then(() => db);
 }
 

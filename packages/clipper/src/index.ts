@@ -463,7 +463,7 @@ async function getPage(
     fetchOptions: resolveFetchOptions(config),
     inlineOptions: {
       fonts: false,
-      images: true,
+      images: styles,
       stylesheets: styles
     },
     styles,

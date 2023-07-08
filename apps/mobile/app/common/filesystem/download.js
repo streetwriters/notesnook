@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import hosts from "@notesnook/core/utils/constants";
 import NetInfo from "@react-native-community/netinfo";
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import { ToastEvent } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
@@ -46,6 +46,7 @@ export async function downloadFile(filename, data, cancelToken) {
 
     if (!downloadUrl) throw new Error("Unable to resolve download url");
     let totalSize = 0;
+    console.log("Download starting");
     let request = RNFetchBlob.config({
       path: path,
       IOSBackgroundTask: true

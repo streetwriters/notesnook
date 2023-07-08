@@ -25,7 +25,6 @@ import {
   usePermissionHandler,
   useTiptap
 } from "@notesnook/editor";
-import { keepLastLineInView } from "@notesnook/editor/dist/extensions/keep-in-view/keep-in-view";
 import {
   ThemeDefinition,
   useThemeColors,
@@ -48,9 +47,6 @@ import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
 
-function isIOSBrowser() {
-  return __PLATFORM__ !== "android";
-}
 const Tiptap = ({
   editorTheme,
   settings
@@ -74,17 +70,6 @@ const Tiptap = ({
     {
       onUpdate: ({ editor }) => {
         global.editorController.contentChange(editor as Editor);
-      },
-      onSelectionUpdate: (props) => {
-        if (props.transaction.docChanged) {
-          if (isIOSBrowser()) {
-            setTimeout(() => {
-              keepLastLineInView(props.editor, 80, 1);
-            }, 1);
-          } else {
-            props.transaction.scrollIntoView();
-          }
-        }
       },
       onOpenAttachmentPicker: (editor, type) => {
         global.editorController.openFilePicker(type);
@@ -110,9 +95,14 @@ const Tiptap = ({
       onOpenLink: (url) => {
         return global.editorController.openLink(url);
       },
+      copyToClipboard: (text) => {
+        globalThis.editorController.copyToClipboard(text);
+      },
       downloadOptions: {
         corsHost: settings.corsProxy
-      }
+      },
+      dateFormat: settings.dateFormat,
+      timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined
     },
     [layout, settings.readonly, tick, settings.doubleSpacedLines]
   );
@@ -252,10 +242,15 @@ const Tiptap = ({
           />
         </div>
 
-        {settings.noToolbar || !layout ? null : (
+        {!layout ? null : (
           <EmotionEditorToolbarTheme>
             <Toolbar
-              sx={{ pl: "10px", pt: "5px", minHeight: 45 }}
+              sx={{
+                pl: "10px",
+                pt: "5px",
+                minHeight: 45,
+                display: settings.noToolbar ? "none" : "flex"
+              }}
               editor={_editor}
               location="bottom"
               tools={[...settings.tools]}

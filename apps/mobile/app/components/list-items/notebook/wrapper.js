@@ -24,7 +24,6 @@ import { ToastEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useTrashStore } from "../../../stores/use-trash-store";
-import { history } from "../../../utils";
 import { db } from "../../../common/database";
 import { presentDialog } from "../../dialog/functions";
 import SelectionWrapper from "../selection-wrapper";
@@ -49,11 +48,13 @@ const navigateToNotebook = (item, canGoBack) => {
 
 export const openNotebookTopic = (item) => {
   const isTrash = item.type === "trash";
-  if (history.selectedItemsList.length > 0 && history.selectionMode) {
-    useSelectionStore.getState().setSelectedItem(item);
+  const { selectedItemsList, setSelectedItem, selectionMode, clearSelection } =
+    useSelectionStore.getState();
+  if (selectedItemsList.length > 0 && selectionMode) {
+    setSelectedItem(item);
     return;
   } else {
-    history.selectedItemsList = [];
+    clearSelection();
   }
 
   if (isTrash) {

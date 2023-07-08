@@ -50,7 +50,7 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../stores/use-user-store";
-import { toTXT } from "../utils";
+import { convertNoteToText } from "../utils/note-to-text";
 import { toggleDarkMode } from "../utils/color-scheme/utils";
 import {
   eOnTopicSheetUpdate,
@@ -71,6 +71,9 @@ export const useActions = ({ close = () => null, item }) => {
   const user = useUserStore((state) => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
   const alias = item.alias || item.title;
+  const [defaultNotebook, setDefaultNotebook] = useState(
+    db.settings.getDefaultNotebook()
+  );
 
   const isPublished =
     item.type === "note" && db.monographs.isPublished(item.id);
@@ -179,7 +182,7 @@ export const useActions = ({ close = () => null, item }) => {
       });
       return;
     }
-    let text = await toTXT(item, false);
+    let text = await convertNoteToText(item, false);
     let html = text.replace(/\n/g, "<br />");
     Notifications.displayNotification({
       title: item.title,
@@ -224,7 +227,7 @@ export const useActions = ({ close = () => null, item }) => {
         description: "Unlock note to copy to clipboard."
       });
     } else {
-      Clipboard.setString(await toTXT(item));
+      Clipboard.setString(await convertNoteToText(item));
       ToastEvent.show({
         heading: "Note copied to clipboard",
         type: "success",
@@ -381,11 +384,12 @@ export const useActions = ({ close = () => null, item }) => {
       positivePress: async (value) => {
         if (!value || value === "" || value.trimStart().length == 0) return;
         await db.tags.rename(item.id, db.tags.sanitize(value));
-        setImmediate(() => {
+        setTimeout(() => {
           useTagStore.getState().setTags();
           useMenuStore.getState().setMenuPins();
           Navigation.queueRoutesForUpdate();
-        });
+          useRelationStore.getState().update();
+        }, 1);
       },
       input: true,
       defaultValue: alias,
@@ -411,7 +415,7 @@ export const useActions = ({ close = () => null, item }) => {
       Share.open({
         title: "Share note to",
         failOnCancel: false,
-        message: await toTXT(item)
+        message: await convertNoteToText(item)
       });
     }
   }
@@ -773,6 +777,53 @@ export const useActions = ({ close = () => null, item }) => {
       func: openHistory
     },
 
+    {
+      id: "default-notebook",
+      title:
+        defaultNotebook?.id === item.id
+          ? "Remove as default"
+          : "Set as default",
+      hidden: item.type !== "notebook",
+      icon: "notebook",
+      func: async () => {
+        if (defaultNotebook?.id === item.id) {
+          await db.settings.setDefaultNotebook();
+          setDefaultNotebook();
+        } else {
+          const notebook = {
+            id: item.id
+          };
+          await db.settings.setDefaultNotebook(notebook);
+          setDefaultNotebook(notebook);
+        }
+        close();
+      },
+      on: defaultNotebook?.topic ? false : defaultNotebook?.id === item.id
+    },
+    {
+      id: "default-topic",
+      title:
+        defaultNotebook?.id === item.id
+          ? "Remove as default"
+          : "Set as default",
+      hidden: item.type !== "topic",
+      icon: "bookmark",
+      func: async () => {
+        if (defaultNotebook?.topic === item.id) {
+          await db.settings.setDefaultNotebook();
+          setDefaultNotebook();
+        } else {
+          const notebook = {
+            id: item.notebookId,
+            topic: item.id
+          };
+          await db.settings.setDefaultNotebook(notebook);
+          setDefaultNotebook(notebook);
+        }
+        close();
+      },
+      on: defaultNotebook?.topic === item.id
+    },
     {
       id: "disable-reminder",
       title: !item.disabled ? "Turn off reminder" : "Turn on reminder",

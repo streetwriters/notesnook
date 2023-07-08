@@ -26,42 +26,47 @@ import {
   WEB_EXTENSION_CHANNEL_EVENTS
 } from "../common/bridge";
 
-let mainPort: MessagePort | undefined;
+declare global {
+  // eslint-disable-next-line no-var
+  var clipperBridgeConnected: boolean;
+}
 
-browser.runtime.onConnect.addListener((port) => {
-  if (mainPort) {
-    const server: Remote<Server> = wrap<Server>(mainPort);
-    expose(
-      {
-        login: () => server.login(),
-        getNotes: () => server.getNotes(),
-        getNotebooks: () => server.getNotebooks(),
-        getTags: () => server.getTags(),
-        saveClip: (clip: Clip) => server.saveClip(clip)
-      },
-      createEndpoint(port)
-    );
-    port.postMessage({ success: true });
-  } else {
-    port.postMessage({ success: false });
-  }
-});
+function attachOnConnectListener() {
+  if (globalThis.clipperBridgeConnected) return;
+  globalThis.clipperBridgeConnected = true;
 
-window.addEventListener("message", (ev) => {
-  const { type } = ev.data;
-  switch (type) {
-    case WEB_EXTENSION_CHANNEL_EVENTS.ON_CREATED:
-      if (ev.ports.length) {
-        const [port] = ev.ports;
-        mainPort = port;
-        expose(new BackgroundGateway(), port);
-        browser.runtime.sendMessage(undefined, { type: "start_connection" });
+  browser.runtime.onConnect.addListener((port) => {
+    window.addEventListener("message", (ev) => {
+      const { type } = ev.data;
+      switch (type) {
+        case WEB_EXTENSION_CHANNEL_EVENTS.ON_CREATED:
+          if (ev.ports.length) {
+            const mainPort = ev.ports.at(0);
+            if (mainPort) {
+              expose(new BackgroundGateway(), mainPort);
+              const server: Remote<Server> = wrap<Server>(mainPort);
+              expose(
+                {
+                  login: () => server.login(),
+                  getNotes: () => server.getNotes(),
+                  getNotebooks: () => server.getNotebooks(),
+                  getTags: () => server.getTags(),
+                  saveClip: (clip: Clip) => server.saveClip(clip)
+                },
+                createEndpoint(port)
+              );
+              port.postMessage({ success: true });
+            } else {
+              port.postMessage({ success: false });
+            }
+          }
+          break;
       }
-      break;
-  }
-});
+    });
 
-window.postMessage({ type: WEB_EXTENSION_CHANNEL_EVENTS.ON_READY }, "*");
+    window.postMessage({ type: WEB_EXTENSION_CHANNEL_EVENTS.ON_READY }, "*");
+  });
+}
 
 class BackgroundGateway implements Gateway {
   connect() {
@@ -71,3 +76,5 @@ class BackgroundGateway implements Gateway {
     };
   }
 }
+
+attachOnConnectListener();

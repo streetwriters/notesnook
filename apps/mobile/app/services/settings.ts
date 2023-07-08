@@ -21,8 +21,13 @@ import { Platform } from "react-native";
 import Orientation from "react-native-orientation";
 import { enabled } from "react-native-privacy-snapshot";
 import { MMKV } from "../common/database/mmkv";
-import { SettingStore, useSettingStore } from "../stores/use-setting-store";
-import { AndroidModule } from "../utils";
+import {
+  SettingStore,
+  defaultSettings,
+  useSettingStore
+} from "../stores/use-setting-store";
+
+import { NotesnookModule } from "../utils/notesnook-module";
 import { scale, updateSize } from "../utils/size";
 import { DDS } from "./device-detection";
 import { setAutobackOffMessage } from "./message";
@@ -35,6 +40,14 @@ function reset() {
     set(settings);
     setTimeout(() => setAutobackOffMessage(), 10000);
   }
+}
+
+function resetSettings() {
+  MMKV.setString(
+    "appSettings",
+    JSON.stringify({ ...defaultSettings, introCompleted: true })
+  );
+  init();
 }
 
 function init() {
@@ -61,13 +74,13 @@ function init() {
 function setPrivacyScreen(settings: SettingStore["settings"]) {
   if (settings.privacyScreen || settings.appLockMode === "background") {
     if (Platform.OS === "android") {
-      AndroidModule.setSecureMode(true);
+      NotesnookModule.setSecureMode(true);
     } else {
       enabled(true);
     }
   } else {
     if (Platform.OS === "android") {
-      AndroidModule.setSecureMode(false);
+      NotesnookModule.setSecureMode(false);
     } else {
       enabled(false);
     }
@@ -155,7 +168,8 @@ const SettingsService = {
   checkOrientation,
   reset,
   getProperty,
-  setProperty
+  setProperty,
+  resetSettings
 };
 
 export default SettingsService;

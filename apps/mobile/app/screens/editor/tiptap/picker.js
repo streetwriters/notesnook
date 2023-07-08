@@ -22,7 +22,7 @@ import React from "react";
 import { Platform, View } from "react-native";
 import DocumentPicker from "react-native-document-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import { db } from "../../../common/database";
 import { compressToBase64 } from "../../../common/filesystem/compress";
 import { AttachmentItem } from "../../../components/attachments/attachment-item";
@@ -34,8 +34,8 @@ import {
 import PremiumService from "../../../services/premium";
 import { eCloseSheet } from "../../../utils/events";
 import { editorController, editorState } from "./utils";
-const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
-const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
+import { isImage } from "@notesnook/core/utils/filename";
+import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 
 const showEncryptionSheet = (file) => {
   presentSheet({
@@ -74,7 +74,7 @@ const file = async (fileOptions) => {
       mode: "import",
       allowMultiSelection: false
     };
-    if (Platform.OS == "ios") {
+    if (Platform.OS === "ios") {
       options.copyTo = "cachesDirectory";
     }
     await db.attachments.generateKey();
@@ -87,14 +87,9 @@ const file = async (fileOptions) => {
     }
 
     file = file[0];
-    if (file.type.startsWith("image")) {
-      ToastEvent.show({
-        title: "Type not supported",
-        message: "Please add images from gallery or camera picker.",
-        type: "error"
-      });
-      return;
-    }
+
+    let uri = Platform.OS === "ios" ? file.fileCopyUri : file.uri;
+
     if (file.size > FILE_SIZE_LIMIT) {
       ToastEvent.show({
         title: "File too large",
@@ -114,7 +109,6 @@ const file = async (fileOptions) => {
       return;
     }
 
-    let uri = Platform.OS === "ios" ? file.fileCopyUri : file.uri;
     console.log("file uri: ", uri);
     uri = Platform.OS === "ios" ? santizeUri(uri) : uri;
     showEncryptionSheet(file);
@@ -125,12 +119,24 @@ const file = async (fileOptions) => {
     if (!(await attachFile(uri, hash, file.type, file.name, fileOptions)))
       return;
     if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
-    editorController.current?.commands.insertAttachment({
-      hash: hash,
-      filename: file.name,
-      type: file.type,
-      size: file.size
-    });
+    if (isImage(file.type)) {
+      editorController.current?.commands.insertImage({
+        hash: hash,
+        filename: file.name,
+        mime: file.type,
+        size: file.size,
+        dataurl: await db.attachments.read(hash, "base64"),
+        title: file.name
+      });
+    } else {
+      editorController.current?.commands.insertAttachment({
+        hash: hash,
+        filename: file.name,
+        mime: file.type,
+        size: file.size
+      });
+    }
+
     setTimeout(() => {
       eSendEvent(eCloseSheet);
     }, 1000);
@@ -255,7 +261,7 @@ const handleImageResponse = async (response, options) => {
 
   editorController.current?.commands.insertImage({
     hash: hash,
-    type: image.type,
+    mime: image.type,
     title: fileName,
     dataurl: b64,
     size: image.fileSize,
@@ -263,7 +269,7 @@ const handleImageResponse = async (response, options) => {
   });
 };
 
-async function attachFile(uri, hash, type, filename, options) {
+export async function attachFile(uri, hash, type, filename, options) {
   try {
     let exists = db.attachments.exists(hash);
     let encryptionInfo;
@@ -282,7 +288,7 @@ async function attachFile(uri, hash, type, filename, options) {
       let key = await db.attachments.generateKey();
       encryptionInfo = await Sodium.encryptFile(key, {
         uri: uri,
-        type: "url",
+        type: options.type || "url",
         hash: hash
       });
       encryptionInfo.type = type;

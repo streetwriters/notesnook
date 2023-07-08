@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import SparkMD5 from "spark-md5";
 import ObjectID from "./object-id";
 
-export default function () {
+export function getId() {
   return new ObjectID().toHexString();
 }
 

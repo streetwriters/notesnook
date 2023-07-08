@@ -1,0 +1,73 @@
+---
+title: Notesnook
+subtitle: HELP
+docs_dir: ./contents
+logo: logo.png
+edit_root: https://github.com/streetwriters/notesnook/tree/master/docs/help
+base_url: https://help.notesnook.com
+
+meta:
+  title: Notesnook Help
+
+footer:
+  copyright: Copyright © 2023 Streetwriters (Private) Limited
+
+navigation:
+  - path: installation.md
+  - path: create-a-note-in-notesnook.md
+  - path: organizing-notes
+    children:
+      - path: organizing-notes/organize-notes-using-notebooks.md
+      - path: organizing-notes/organize-notes-using-colors.md
+      - path: organizing-notes/organize-notes-using-tags.md
+      - path: organizing-notes/organize-notes-using-favorites.md
+      - path: organizing-notes/pin-notes-and-notebooks.md
+      - path: organizing-notes/side-menu-shortcuts.md
+  - path: rich-text-editor
+    children:
+      - path: rich-text-editor/personalizing-rich-text-editor.md
+      - path: rich-text-editor/markdown-notes-editing.md
+      - path: rich-text-editor/rich-text-editor-toolbar.md
+      - path: rich-text-editor/tables.md
+      - path: rich-text-editor/task-and-todo-lists.md
+  - path: importing-notes
+    children:
+      - path: importing-notes/import-notes-from-evernote.md
+      - path: importing-notes/import-notes-from-googlekeep.md
+      - path: importing-notes/import-notes-from-html-files.md
+      - path: importing-notes/import-notes-from-joplin.md
+      - path: importing-notes/import-notes-from-mardown-files.md
+      - path: importing-notes/import-notes-from-onenote.md
+      - path: importing-notes/import-notes-from-simplenote.md
+      - path: importing-notes/import-notes-from-standardnotes.md
+      - path: importing-notes/import-notes-from-zoho-notebook.md
+  - path: export-notes-from-notesnook.md
+  - path: backup-and-restore-notes-in-notesnook.md
+
+  - path: lock-notes-with-private-vault.md
+  - path: note-version-history.md
+
+  - path: publish-notes-with-monographs.md
+
+  - path: how-is-my-data-encrypted.md
+  - path: recovering-your-account.md
+  - path: deleting-your-account.md
+
+  - path: privacy-mode.md
+  - path: web-clipper
+    children:
+      - path: web-clipper/installation.md
+      - path: web-clipper/clipping-your-first-web-page-with-web-clipper.md
+      - path: web-clipper/troubleshooting.md
+  - path: mobile-integration
+    children:
+      - path: mobile-integration/home-screen-widgets.md
+      - path: mobile-integration/pin-notes-to-notifications.md
+      - path: mobile-integration/quick-note-from-notification.md
+      - path: mobile-integration/share-things-from-other-apps.md
+  - path: desktop-integration
+    children:
+      - path: desktop-integration/auto-start-on-system-startup.md
+      - path: desktop-integration/jumplist-and-dock-menu.md
+      - path: desktop-integration/spell-checker.md
+      - path: desktop-integration/system-tray-menu.md

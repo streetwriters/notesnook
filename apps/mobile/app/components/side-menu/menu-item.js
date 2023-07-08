@@ -113,7 +113,7 @@ export const MenuItem = React.memo(
             name={item.icon}
             color={
               item.icon === "crown"
-                ? colors.yellow
+                ? colors.static.yellow
                 : isFocused
                 ? colors.primary.accent
                 : colors.secondary.icon

@@ -27,11 +27,11 @@ import CharacterCount from "@tiptap/extension-character-count";
 import { Code } from "@tiptap/extension-code";
 import Color from "@tiptap/extension-color";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
-import { Link } from "@tiptap/extension-link";
+import { Link } from "./extensions/link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
-import TableHeader from "@tiptap/extension-table-header";
+import TableHeader from "./extensions/table-header";
 import TableRow from "@tiptap/extension-table-row";
 import TextAlign from "@tiptap/extension-text-align";
 import TextStyle from "@tiptap/extension-text-style";
@@ -44,7 +44,7 @@ import BulletList from "./extensions/bullet-list";
 import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer";
 import { CodeBlock } from "./extensions/code-block";
 import { Codemark } from "./extensions/code-mark";
-import { DateTime } from "./extensions/date-time";
+import { DateTime, DateTimeOptions } from "./extensions/date-time";
 import { EmbedNode } from "./extensions/embed";
 import FontFamily from "./extensions/font-family";
 import FontSize from "./extensions/font-size";
@@ -64,7 +64,6 @@ import {
   usePortalProvider
 } from "./extensions/react";
 import { SearchReplace } from "./extensions/search-replace";
-import { SelectionPersist } from "./extensions/selection-persist";
 import { Table } from "./extensions/table";
 import TableCell from "./extensions/table-cell";
 import { TaskItemNode } from "./extensions/task-item";
@@ -76,6 +75,8 @@ import { usePermissionHandler } from "./hooks/use-permission-handler";
 import Toolbar from "./toolbar";
 import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { DownloadOptions } from "./utils/downloader";
+import { Heading } from "./extensions/heading";
+import Clipboard, { ClipboardOptions } from "./extensions/clipboard";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -88,10 +89,12 @@ const CoreExtensions = Object.entries(TiptapCoreExtensions)
   .filter(([name]) => name !== "ClipboardTextSerializer")
   .map(([, extension]) => extension);
 
-type TiptapOptions = EditorOptions &
+export type TiptapOptions = EditorOptions &
   Omit<AttachmentOptions, "HTMLAttributes"> &
   Omit<WebClipOptions, "HTMLAttributes"> &
   Omit<ImageOptions, "HTMLAttributes"> &
+  DateTimeOptions &
+  ClipboardOptions &
   OpenLinkOptions & {
     downloadOptions?: DownloadOptions;
     isMobile?: boolean;
@@ -114,6 +117,9 @@ const useTiptap = (
     onOpenLink,
     onBeforeCreate,
     downloadOptions,
+    dateFormat,
+    timeFormat,
+    copyToClipboard,
     ...restOptions
   } = options;
   const PortalProviderAPI = usePortalProvider();
@@ -154,6 +160,7 @@ const useTiptap = (
           bulletList: false,
           paragraph: false,
           hardBreak: false,
+          heading: false,
           history: {
             depth: 200,
             newGroupDelay: 1000
@@ -163,6 +170,7 @@ const useTiptap = (
           },
           horizontalRule: false
         }),
+        Heading,
         HorizontalRule.extend({
           addInputRules() {
             return [
@@ -203,6 +211,9 @@ const useTiptap = (
           allowTableNodeSelection: true,
           cellMinWidth: 50
         }),
+        Clipboard.configure({
+          copyToClipboard
+        }),
         TableRow,
         TableCell,
         TableHeader,
@@ -234,9 +245,10 @@ const useTiptap = (
         Codemark,
         MathInline,
         MathBlock,
-        KeepInView,
-        SelectionPersist,
-        DateTime,
+        KeepInView.configure({
+          scrollIntoViewOnWindowResize: !isMobile
+        }),
+        DateTime.configure({ dateFormat, timeFormat }),
         KeyMap,
         WebClipNode
       ],
@@ -253,7 +265,10 @@ const useTiptap = (
       onOpenAttachmentPicker,
       PortalProviderAPI,
       onBeforeCreate,
-      onOpenLink
+      onOpenLink,
+      dateFormat,
+      timeFormat,
+      copyToClipboard
     ]
   );
 

@@ -22,6 +22,7 @@ import { Resizable } from "re-resizable";
 import { PropsWithChildren } from "react";
 import { Icon, Icons } from "../../toolbar";
 import { Editor } from "../../types";
+import { Flex } from "@theme-ui/components";
 
 type ResizerProps = {
   editor: Editor;
@@ -44,7 +45,8 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
     style
   } = props;
 
-  if (!editor.isEditable) return <>{children}</>;
+  if (!editor.isEditable)
+    return <Flex sx={{ position: "relative" }}>{children}</Flex>;
 
   return (
     <Resizable

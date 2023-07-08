@@ -34,10 +34,9 @@ import {
 import Navigation from "../../services/navigation";
 import Sync from "../../services/sync";
 import { useThemeColors } from "@notesnook/theme";
-import { dHeight } from "../../utils";
 import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
-import { sleep, timeConverter } from "../../utils/time";
+import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
 import DialogButtons from "../dialog/dialog-buttons";
 import DialogContainer from "../dialog/dialog-container";
@@ -46,6 +45,8 @@ import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { getFormattedDate } from "@notesnook/common";
 
 const MergeConflicts = () => {
   const { colors } = useThemeColors();
@@ -57,6 +58,7 @@ const MergeConflicts = () => {
   const content = useRef(null);
   const isKeepingConflicted = !keep?.conflicted;
   const isKeeping = !!keep;
+  const { height } = useSettingStore((state) => state.dimensions);
 
   const applyChanges = async () => {
     let _content = keep;
@@ -150,7 +152,11 @@ const MergeConflicts = () => {
           }}
         >
           {back && (
-            <IconButton onPress={close} color={colors.primary.paragraph} name="arrow-left" />
+            <IconButton
+              onPress={close}
+              color={colors.primary.paragraph}
+              name="arrow-left"
+            />
           )}
           <Paragraph
             style={{ flexWrap: "wrap" }}
@@ -166,7 +172,7 @@ const MergeConflicts = () => {
               {isCurrent ? "(This Device)" : "(Incoming)"}
             </Text>
             {"\n"}
-            {timeConverter(contentToKeep?.dateEdited)}
+            {getFormattedDate(contentToKeep?.dateEdited)}
           </Paragraph>
         </View>
 
@@ -298,7 +304,7 @@ const MergeConflicts = () => {
 
           <Animated.View
             style={{
-              height: dHeight / 2 - (50 + insets.top / 2),
+              height: height / 2 - (50 + insets.top / 2),
               backgroundColor: colors.primary.background,
               borderBottomWidth: 1,
               borderBottomColor: colors.secondary.background
@@ -334,7 +340,7 @@ const MergeConflicts = () => {
 
           <Animated.View
             style={{
-              height: dHeight / 2 - (50 + insets.top / 2),
+              height: height / 2 - (50 + insets.top / 2),
               backgroundColor: colors.primary.background,
               borderRadius: 10
             }}

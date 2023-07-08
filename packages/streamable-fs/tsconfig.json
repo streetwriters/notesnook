@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig",
   "compilerOptions": {
-    "lib": ["DOM", "ES2015"],
+    "lib": ["DOM", "ESNext"],
     "outDir": "./dist"
   },
   "include": ["./index.ts", "./src/"]

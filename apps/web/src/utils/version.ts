@@ -21,14 +21,14 @@ export type Platforms = "web" | "desktop";
 export type AppVersion = typeof appVersion;
 export const appVersion = {
   formatted: format(
-    process.env.REACT_APP_VERSION,
-    process.env.REACT_APP_GIT_HASH,
-    process.env.REACT_APP_PLATFORM as Platforms,
-    process.env.REACT_APP_BETA === "true"
+    import.meta.env.REACT_APP_VERSION,
+    import.meta.env.REACT_APP_GIT_HASH,
+    import.meta.env.REACT_APP_PLATFORM as Platforms,
+    import.meta.env.REACT_APP_BETA === "true"
   ),
-  clean: formatVersion(process.env.REACT_APP_VERSION),
-  numerical: parseInt(process.env.REACT_APP_VERSION || "0"),
-  isBeta: process.env.REACT_APP_BETA === "true"
+  clean: formatVersion(import.meta.env.REACT_APP_VERSION),
+  numerical: parseInt(import.meta.env.REACT_APP_VERSION || "0"),
+  isBeta: import.meta.env.REACT_APP_BETA === "true"
 };
 
 function format(

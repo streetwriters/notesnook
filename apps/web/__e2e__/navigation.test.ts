@@ -32,8 +32,7 @@ const routes = [
   createRoute("monographs", "Monographs"),
   createRoute("reminders", "Reminders"),
   createRoute("tags", "Tags"),
-  createRoute("trash", "Trash"),
-  createRoute("settings", "Settings")
+  createRoute("trash", "Trash")
 ];
 
 for (const route of routes) {

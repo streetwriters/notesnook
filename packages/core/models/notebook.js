@@ -35,7 +35,7 @@ export default class Notebook {
     for (const topic of this._notebook.topics) {
       count += this._db.notes.topicReferences.count(topic.id);
     }
-    return count + this._db.relations.count(this._notebook, "note");
+    return count + this._db.relations.from(this._notebook, "note").length;
   }
 
   get title() {

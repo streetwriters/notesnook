@@ -17,20 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import "./polyfills";
 import "@notesnook/core/types";
-import { EVENTS } from "@notesnook/desktop/events";
-import { AppEventManager } from "./common/app-events";
+import { AppEventManager, AppEvents } from "./common/app-events";
 import { render } from "react-dom";
 import { getCurrentHash, getCurrentPath, makeURL } from "./navigation";
 import Config from "./utils/config";
 import { isTesting } from "./utils/platform";
 import { initalizeLogger, logger } from "./utils/logger";
-import { Buffer } from "buffer";
 import { AuthProps } from "./views/auth";
-global.Buffer = Buffer;
+import { loadDatabase } from "./hooks/use-database";
 
 initalizeLogger();
-if (process.env.REACT_APP_PLATFORM === "desktop") require("./commands");
 
 type Route<TProps = null> = {
   component: () => Promise<{
@@ -158,6 +156,8 @@ async function renderApp() {
   } = getRoute();
 
   if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
+  if (import.meta.env.REACT_APP_PLATFORM === "desktop")
+    await loadDatabase("db");
 
   logger.measure("app render");
 
@@ -174,13 +174,13 @@ async function renderApp() {
 }
 
 async function initializeServiceWorker() {
-  logger.info("Initializing service worker...");
-  const serviceWorker = await import("./service-worker-registration");
+  if (import.meta.env.REACT_APP_PLATFORM !== "desktop") {
+    logger.info("Initializing service worker...");
+    const serviceWorker = await import("./service-worker-registration");
 
-  // If you want your app to work offline and load faster, you can change
-  // unregister() to register() below. Note this comes with some pitfalls.
-  // Learn more about service workers: https://bit.ly/CRA-PWA
-  if (process.env.REACT_APP_PLATFORM !== "desktop") {
+    // If you want your app to work offline and load faster, you can change
+    // unregister() to register() below. Note this comes with some pitfalls.
+    // Learn more about service workers: https://bit.ly/CRA-PWA
     serviceWorker.register({
       onUpdate: async (registration: ServiceWorkerRegistration) => {
         if (!registration.waiting) return;
@@ -188,13 +188,13 @@ async function initializeServiceWorker() {
         const { formatted } = await getServiceWorkerVersion(
           registration.waiting
         );
-        AppEventManager.publish(EVENTS.updateDownloadCompleted, {
+        AppEventManager.publish(AppEvents.updateDownloadCompleted, {
           version: formatted
         });
       }
     });
     // window.addEventListener("beforeinstallprompt", () => showInstallNotice());
-  } else serviceWorker.unregister();
+  }
 }
 
 function shouldSkipInitiation() {

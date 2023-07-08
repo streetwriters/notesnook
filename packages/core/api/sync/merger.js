@@ -21,6 +21,7 @@ import { migrateItem } from "../../migrations";
 import setManipulator from "../../utils/set";
 import { logger } from "../../logger";
 import { isHTMLEqual } from "../../utils/html-diff";
+import { EV, EVENTS } from "../../common";
 
 class Merger {
   /**
@@ -225,8 +226,8 @@ class Merger {
     if (!type || !item || !definition) return;
 
     if (!this.key) this.key = await this._db.user.getEncryptionKey();
-    if (!this.key.key || !this.key.salt) {
-      await this._db.user.logout(true, "User encryption key not generated.");
+    if (!this.key || !this.key.key || !this.key.salt) {
+      EV.publish(EVENTS.userSessionExpired);
       throw new Error("User encryption key not generated. Please relogin.");
     }
 

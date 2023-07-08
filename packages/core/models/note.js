@@ -30,7 +30,7 @@ export default class Note {
   /**
    *
    * @param {import('../api').default} db
-   * @param {Object} note
+   * @param {any} note
    */
   constructor(note, db) {
     this._note = note;
@@ -97,9 +97,11 @@ export default class Note {
       createdOn: formatDate(this.data.dateCreated),
       tags: this.tags.join(", ")
     };
-    contentItem =
-      contentItem || (await this._db.content.raw(this._note.contentId));
-    if (!contentItem) return false;
+    contentItem = contentItem ||
+      (await this._db.content.raw(this._note.contentId)) || {
+        type: "tiptap",
+        data: "<p></p>"
+      };
     const { data, type } = await this._db.content.downloadMedia(
       `export-${this.id}`,
       contentItem,
@@ -135,7 +137,7 @@ export default class Note {
 
   async duplicate() {
     const content = await this._db.content.raw(this._note.contentId);
-    return await this._db.notes.add({
+    const duplicateId = await this._db.notes.add({
       ...qclone(this._note),
       id: undefined,
       content: content
@@ -153,6 +155,12 @@ export default class Note {
       dateCreated: null,
       dateModified: null
     });
+
+    for (const notebook of this._db.relations.to(this._note, "notebook")) {
+      await this._db.relations.add(notebook, { id: duplicateId, type: "note" });
+    }
+
+    return duplicateId;
   }
 
   async color(color) {
@@ -188,7 +196,8 @@ export default class Note {
   }
 
   async untag(tag) {
-    if (deleteItem(this._note.tags, tag)) {
+    const tagItem = this._db.tags.tag(tag);
+    if (tagItem && deleteItem(this._note.tags, tagItem.title)) {
       await this._db.notes.add(this._note);
     } else console.error("This note is not tagged by the specified tag.", tag);
     await this._db.tags.untag(tag, this._note.id);

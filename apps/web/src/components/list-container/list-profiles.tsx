@@ -23,9 +23,8 @@ import Notebook from "../notebook";
 import Tag from "../tag";
 import Topic from "../topic";
 import TrashItem from "../trash-item";
-import Attachment from "../attachment";
 import { db } from "../../common/db";
-import { getTotalNotes } from "../../common";
+import { getTotalNotes } from "@notesnook/common";
 import Reminder from "../reminder";
 import type { Reminder as ReminderType } from "@notesnook/core/collections/reminders";
 import { useMemo } from "react";
@@ -34,11 +33,6 @@ const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
   (document.getElementById("p")?.clientHeight || 16) - 1;
 export const DEFAULT_ITEM_HEIGHT = SINGLE_LINE_HEIGHT * 2 * DEFAULT_LINE_HEIGHT;
-// const MAX_HEIGHTS = {
-//   note: SINGLE_LINE_HEIGHT * 7 * DEFAULT_LINE_HEIGHT,
-//   notebook: SINGLE_LINE_HEIGHT * 7 * DEFAULT_LINE_HEIGHT,
-//   generic: SINGLE_LINE_HEIGHT * 4 * DEFAULT_LINE_HEIGHT
-// };
 
 export type Item = { id: string; type: string; title: string } & Record<
   string,
@@ -111,10 +105,6 @@ const TrashProfile: ItemWrapper = ({ index, item, type }) => (
   <TrashItem index={index} item={item} date={getDate(item, type)} />
 );
 
-const AttachmentProfile: ItemWrapper = ({ index, item }) => (
-  <Attachment index={index} item={item} isCompact={false} />
-);
-
 export const ListProfiles = {
   home: NotesProfile,
   notebooks: NotebooksProfile,
@@ -122,8 +112,7 @@ export const ListProfiles = {
   reminders: RemindersProfile,
   tags: TagsProfile,
   topics: TopicsProfile,
-  trash: TrashProfile,
-  attachments: AttachmentProfile
+  trash: TrashProfile
 } as const;
 
 function getTags(item: Item) {
@@ -191,8 +180,6 @@ function getReminder(noteId: string) {
 }
 
 function getDate(item: Item, groupType: keyof typeof ListProfiles) {
-  if (groupType === "attachments") return item.dateCreated;
-
   const sortBy = db.settings?.getGroupOptions(groupType).sortBy;
   switch (sortBy) {
     case "dateEdited":

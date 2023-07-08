@@ -22,8 +22,8 @@ import {
   StackActions,
   useNavigation
 } from "@react-navigation/native";
-import React, { useRef } from "react";
-import { View, TextInput } from "react-native";
+import React, { useRef, useState } from "react";
+import { View, TextInput, ActivityIndicator } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ToggleSwitch from "toggle-switch-react-native";
 import Input from "../../components/ui/input";
@@ -46,10 +46,14 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   const current = item.useHook && item.useHook(item);
   const isHidden = item.hidden && item.hidden(item.property || current);
   const inputRef = useRef<TextInput>(null);
+  const [loading, setLoading] = useState(false);
 
-  const onChangeSettings = () => {
+  const onChangeSettings = async () => {
+    if (loading) return;
     if (item.modifer) {
-      item.modifer(item.property || current);
+      setLoading(true);
+      await item.modifer(item.property || current);
+      setLoading(false);
       return;
     }
     if (!item.property) return;
@@ -71,6 +75,21 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       text: value + ""
     });
   };
+
+  const onChangeInputSelectorValue = (text: any) => {
+    if (text) {
+      const min = item.minInputValue || 0;
+      const max = item.maxInputValue || 0;
+      const value = parseInt(text);
+      text =
+        Number.isNaN(value) || value < min ? min : value > max ? max : text;
+
+      SettingsService.set({
+        [item.property as string]: `${text}`
+      });
+    }
+  };
+
   return isHidden ? null : (
     <PressableButton
       disabled={item.type === "component"}
@@ -229,7 +248,8 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                   ] as string;
                   if (rawValue) {
                     const currentValue = parseInt(rawValue);
-                    if (currentValue <= 0) return;
+                    const minValue = item.minInputValue || 0;
+                    if (currentValue <= minValue) return;
                     const nextValue = currentValue - 1;
                     SettingsService.set({
                       [item.property as string]: nextValue
@@ -242,33 +262,19 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               <Input
                 {...item.inputProperties}
                 onSubmit={(e) => {
-                  if (e.nativeEvent.text) {
-                    SettingsService.set({
-                      [item.property as string]: e.nativeEvent.text
-                    });
-                  }
+                  onChangeInputSelectorValue(e.nativeEvent.text);
                   item.inputProperties?.onSubmitEditing?.(e);
                 }}
                 onChangeText={(text) => {
-                  if (text) {
-                    if (item.minInputValue) {
-                      text =
-                        parseInt(text) < item.minInputValue
-                          ? item.minInputValue + ""
-                          : text;
-                    }
-                    SettingsService.set({
-                      [item.property as string]: text
-                    });
-                  }
+                  onChangeInputSelectorValue(text);
                   item.inputProperties?.onSubmitEditing?.(text as any);
                 }}
                 keyboardType="decimal-pad"
                 containerStyle={{
-                  width: 45
+                  width: 65
                 }}
                 wrapperStyle={{
-                  maxWidth: 45,
+                  maxWidth: 65,
                   marginBottom: 0,
                   marginHorizontal: 6
                 }}
@@ -289,6 +295,8 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                   ] as string;
                   if (rawValue) {
                     const currentValue = parseInt(rawValue);
+                    const max = item.maxInputValue || 0;
+                    if (currentValue >= max) return;
                     const nextValue = currentValue + 1;
                     SettingsService.set({
                       [item.property as string]: nextValue
@@ -303,12 +311,12 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         </View>
       </View>
 
-      {item.type === "switch" && item.property && (
+      {item.type === "switch" && !loading && (
         <ToggleSwitch
           isOn={
             item.getter
               ? item.getter(item.property || current)
-              : settings[item.property]
+              : settings[item?.property as never]
           }
           onColor={colors.primary.accent}
           offColor={colors.secondary.icon}
@@ -317,6 +325,10 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           onToggle={onChangeSettings}
         />
       )}
+
+      {loading ? (
+        <ActivityIndicator size={SIZE.xxl} color={colors.primary.accent} />
+      ) : null}
     </PressableButton>
   );
 };

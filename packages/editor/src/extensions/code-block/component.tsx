@@ -17,19 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Flex, Input, Text } from "@theme-ui/components";
 import { useRef, useState } from "react";
-import { Flex, Text } from "@theme-ui/components";
-import Languages from "./languages.json";
-import { Input } from "@theme-ui/components";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
-import { CodeBlockAttributes } from "./code-block";
-import { ReactNodeViewProps } from "../react/types";
-import { ResponsivePresenter } from "../../components/responsive";
-import { Popup } from "../../toolbar/components/popup";
 import { Button } from "../../components/button";
 import { useTheme } from "../../toolbar/stores/toolbar-store";
 import { EmotionThemeVariant } from "@notesnook/theme";
+import { ResponsivePresenter } from "../../components/responsive";
+import { useTimer } from "../../hooks/use-timer";
+import { Icon } from "../../toolbar/components/icon";
+import { Popup } from "../../toolbar/components/popup";
+import { Icons } from "../../toolbar/icons";
+import { ReactNodeViewProps } from "../react/types";
+import { CodeBlockAttributes } from "./code-block";
+import Languages from "./languages.json";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
@@ -41,6 +41,8 @@ export function CodeblockComponent(
   const [isOpen, setIsOpen] = useState(false);
   // const [caretPosition, setCaretPosition] = useState<CaretPosition>();
   const toolbarRef = useRef<HTMLDivElement>(null);
+
+  const { enabled, start } = useTimer(1000);
 
   const languageDefinition = Languages.find(
     (l) => l.filename === language || l.alias?.some((a) => a === language)
@@ -89,7 +91,7 @@ export function CodeblockComponent(
             display: "flex",
             px: 2,
             pt: 2,
-            pb: 1
+            pb: 2
           }}
           spellCheck={false}
         />
@@ -104,18 +106,18 @@ export function CodeblockComponent(
           }}
         >
           {caretPosition ? (
-            <Text variant={"subBody"} sx={{ mr: 2, color: "paragraph" }}>
+            <Text variant={"subBody"} sx={{ mr: 1, color: "paragraph" }}>
               Line {caretPosition.line}, Column {caretPosition.column}{" "}
               {caretPosition.selected
                 ? `(${caretPosition.selected} selected)`
                 : ""}
             </Text>
           ) : null}
+
           <Button
             variant={"icon"}
             sx={{
               p: 1,
-              mr: 1,
               opacity: "1 !important",
               ":hover": { bg: "textSelection" }
             }}
@@ -133,6 +135,7 @@ export function CodeblockComponent(
               {indentType === "space" ? "Spaces" : "Tabs"}: {indentLength}
             </Text>
           </Button>
+
           <Button
             variant={"icon"}
             sx={{
@@ -158,6 +161,33 @@ export function CodeblockComponent(
               {languageDefinition?.title || "Plaintext"}
             </Text>
           </Button>
+
+          {node.textContent?.length > 0 ? (
+            <Button
+              variant={"icon"}
+              sx={{
+                opacity: "1 !important",
+                p: 1,
+                mr: 1,
+                bg: "transparent",
+                ":hover": { bg: "codeSelection" }
+              }}
+              disabled={!editor.isEditable}
+              onClick={() => {
+                editor.commands.copyToClipboard(node.textContent);
+                start();
+              }}
+              title="Copy to clipboard"
+            >
+              <Text
+                variant={"subBody"}
+                spellCheck={false}
+                sx={{ color: "codeFg" }}
+              >
+                {enabled ? "Copied!" : "Copy"}
+              </Text>
+            </Button>
+          ) : null}
         </Flex>
       </Flex>
       <ResponsivePresenter

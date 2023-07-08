@@ -41,7 +41,7 @@ import { eOnLoadNote } from "../app/utils/events";
 
 const useEditor = () => {
   const ref = useRef();
-  const [sessionId] = useState("share-editor-session");
+  const [sessionId] = useState("share-editor-session" + Date.now());
   const { theme } = useThemeProvider();
   const commands = useMemo(() => new Commands(ref), [ref]);
   const currentNote = useRef();

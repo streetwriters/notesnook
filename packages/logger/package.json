@@ -28,7 +28,5 @@
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"
   },
-  "devDependencies": {
-    "typescript": "^4.8.2"
-  }
+  "devDependencies": {}
 }

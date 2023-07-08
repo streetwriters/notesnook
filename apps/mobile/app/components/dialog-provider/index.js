@@ -36,6 +36,7 @@ import SheetProvider from "../sheet-provider";
 import RateAppSheet from "../sheets/rate-app";
 import RecoveryKeySheet from "../sheets/recovery-key";
 import RestoreDataSheet from "../sheets/restore-data";
+import PDFPreview from "../dialogs/pdf-preview";
 
 const DialogProvider = () => {
   const { colors } = useThemeColors();
@@ -60,6 +61,7 @@ const DialogProvider = () => {
       {loading ? null : <Expiring />}
       <AnnouncementDialog />
       <SessionExpired />
+      <PDFPreview />
     </>
   );
 };
