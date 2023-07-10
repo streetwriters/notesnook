@@ -1,0 +1,25 @@
+{
+  "name": "@notesnook/themes-server",
+  "version": "1.0.0",
+  "description": "A simple rest api for notesnook themes",
+  "private": "true",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "nodemon src/index.ts",
+    "production": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@orama/orama": "^1.0.8",
+    "@trpc/server": "^10.34.0",
+    "nodemon": "^3.0.1",
+    "util": "^0.12.5",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@notesnook/theme": "file:../../packages/theme",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
+  }
+}

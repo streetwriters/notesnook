@@ -19,6 +19,7 @@ const SCOPES = [
   "editor",
   "logger",
   "theme",
+  "server",
   "core",
   "fs",
   "clipper",

@@ -1,0 +1,4 @@
+node_modules/
+google-api.json
+themes-metadata.json
+**/notesnook-themes/

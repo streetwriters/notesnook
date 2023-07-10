@@ -25,6 +25,7 @@
     "start:repack": "nx repack @notesnook/mobile",
     "start:editor-mobile": "nx start @notesnook/editor-mobile",
     "start:editor": "nx start @notesnook/editor",
+    "start:server:themes": "nx start @notesnook/themes-server",
     "prettier": "npx prettier . --write",
     "lint": "npx eslint ./apps/ ./packages/",
     "linc": "npx eslint ./apps/ ./packages/ --cache"

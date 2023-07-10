@@ -40,10 +40,13 @@ if (args.scope && !scopes[args.scope])
 const IS_BOOTSTRAP_ALL = !args.scope;
 
 if (IS_BOOTSTRAP_ALL) {
-  const allPackages = await glob(["packages/**", "apps/**", "extensions/**"], {
-    deep: 1,
-    onlyDirectories: true
-  });
+  const allPackages = await glob(
+    ["packages/**", "apps/**", "extensions/**", "servers/**"],
+    {
+      deep: 1,
+      onlyDirectories: true
+    }
+  );
 
   const dependencies = Array.from(
     new Set(
