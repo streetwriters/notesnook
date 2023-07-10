@@ -25,12 +25,7 @@ import { THEME_METADATA_JSON } from "./constants";
 import { getThemes } from "./orama";
 import { getThemesMetadata, syncThemes } from "./sync";
 import { publicProcedure, router } from "./trpc";
-
-if (!fs.existsSync(path.join(__dirname, THEME_METADATA_JSON))) {
-  fs.writeFileSync(THEME_METADATA_JSON, "{}");
-}
-
-syncThemes();
+import ip from "ip";
 
 const ThemesRouter = router({
   themes: publicProcedure
@@ -71,5 +66,13 @@ export type ThemesRouter = typeof ThemesRouter;
 const server = createHTTPServer({
   router: ThemesRouter
 });
+const PORT = 1000;
+server.listen(PORT);
+console.log(`Server started successfully on: http://${ip.address()}:${PORT}/ `);
 
-server.listen(1000);
+Promise.resolve().then(() => {
+  if (!fs.existsSync(path.join(__dirname, THEME_METADATA_JSON))) {
+    fs.writeFileSync(THEME_METADATA_JSON, "{}");
+  }
+  syncThemes();
+});
