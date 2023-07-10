@@ -36,12 +36,12 @@ const ThemesRouter = router({
   themes: publicProcedure
     .input(
       z.object({
-        count: z.number(),
-        offset: z.number()
+        limit: z.number(),
+        cursor: z.number().default(0)
       })
     )
-    .query(async ({ input: { count, offset } }) => {
-      return getThemes("", count, offset);
+    .query(async ({ input: { limit, cursor } }) => {
+      return getThemes("", limit, cursor);
     }),
   getTheme: publicProcedure.input(z.string()).query(({ input }) => {
     const theme = getThemesMetadata().find((theme) => theme.id === input);
@@ -52,13 +52,13 @@ const ThemesRouter = router({
   search: publicProcedure
     .input(
       z.object({
-        count: z.number(),
-        offset: z.number(),
+        limit: z.number(),
+        cursor: z.number().default(0),
         query: z.string()
       })
     )
-    .query(async ({ input: { query, offset, count } }) => {
-      return getThemes(query, count, offset);
+    .query(async ({ input: { query, cursor, limit } }) => {
+      return getThemes(query, limit, cursor);
     }),
   sync: publicProcedure.query(() => {
     syncThemes();

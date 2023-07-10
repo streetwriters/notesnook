@@ -74,12 +74,13 @@ async function generateMetadataJson() {
       secondaryBackground: metadata.scopes.base.secondary.background
     };
     metadata.previewColors = previewColors;
+    THEME_METADATA_CACHE.push({ ...metadata });
     delete metadata.scopes;
     delete metadata.codeBlockCSS;
     ThemesMetadata.push(metadata);
     await insert(db, metadata);
   }
-  THEME_METADATA_CACHE = ThemesMetadata;
+
   await writeAsync(
     THEME_METADATA_JSON,
     JSON.stringify(ThemesMetadata),

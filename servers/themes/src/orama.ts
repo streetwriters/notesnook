@@ -43,14 +43,73 @@ export async function getThemes(query = "", count, from) {
   const results = await search(db, {
     term: query
   });
+  results.hits = [
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits,
+    ...results.hits
+  ];
   const themes = results.hits
     .map((hit) => hit.document)
     .slice(from, from + count) as Omit<
     ThemeDefinition,
     "scopes" | "codeBlockCss"
   >[];
+
   return {
     themes,
-    hasReachedEnd: from + count >= results.hits.length
+    nextCursor: from + count < results.hits.length ? from + count : undefined
   };
 }
