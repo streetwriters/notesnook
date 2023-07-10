@@ -79,5 +79,13 @@ export type ThemeDefinition = {
   codeBlockCSS: string;
   tags?: string[];
   compatibilityVersion: string;
+  previewColors?: {
+    background: string;
+    accent: string;
+    shade: string;
+    heading: string;
+    paragraph: string;
+    secondaryBackground: string;
+  };
   scopes: ThemeScopes;
 };

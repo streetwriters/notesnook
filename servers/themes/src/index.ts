@@ -16,13 +16,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { ThemeDefinition } from "@notesnook/theme";
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import fs from "fs";
 import path from "path";
 import { z } from "zod";
 import { THEME_METADATA_JSON } from "./constants";
 import { getThemes } from "./orama";
-import { syncThemes } from "./sync";
+import { getThemesMetadata, syncThemes } from "./sync";
 import { publicProcedure, router } from "./trpc";
 
 if (!fs.existsSync(path.join(__dirname, THEME_METADATA_JSON))) {
@@ -42,6 +43,12 @@ const ThemesRouter = router({
     .query(async ({ input: { count, offset } }) => {
       return getThemes("", count, offset);
     }),
+  getTheme: publicProcedure.input(z.string()).query(({ input }) => {
+    const theme = getThemesMetadata().find((theme) => theme.id === input);
+    if (theme) return theme as ThemeDefinition;
+
+    return undefined;
+  }),
   search: publicProcedure
     .input(
       z.object({

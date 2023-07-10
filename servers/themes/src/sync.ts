@@ -27,6 +27,9 @@ import {
 } from "./constants";
 import { insert } from "@orama/orama";
 import { getDB } from "./orama";
+import { ThemeDefinition } from "@notesnook/theme";
+
+let THEME_METADATA_CACHE = [];
 
 const readDirAsync = util.promisify(fs.readdir);
 const writeAsync = util.promisify(fs.writeFile);
@@ -56,16 +59,34 @@ async function generateMetadataJson() {
 
   for (const file of files) {
     const themeMetadataPath = `${THEMES_PATH}/${file}/theme.json`;
-    const metadata = JSON.parse(fs.readFileSync(themeMetadataPath, "utf-8"));
+    const metadata = JSON.parse(
+      fs.readFileSync(themeMetadataPath, "utf-8")
+    ) as ThemeDefinition;
+    const { background, accent, shade, heading, paragraph } =
+      metadata.scopes.base.primary;
+
+    const previewColors = {
+      background,
+      accent,
+      shade,
+      heading,
+      paragraph,
+      secondaryBackground: metadata.scopes.base.secondary.background
+    };
+    metadata.previewColors = previewColors;
     delete metadata.scopes;
     delete metadata.codeBlockCSS;
     ThemesMetadata.push(metadata);
     await insert(db, metadata);
   }
-
+  THEME_METADATA_CACHE = ThemesMetadata;
   await writeAsync(
     THEME_METADATA_JSON,
     JSON.stringify(ThemesMetadata),
     "utf-8"
   );
+}
+
+export function getThemesMetadata() {
+  return THEME_METADATA_CACHE;
 }

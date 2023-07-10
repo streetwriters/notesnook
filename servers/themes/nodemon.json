@@ -1,3 +1,3 @@
 {
-  "ignore": ["src/themes-metadata.json", "src/notesnook-themes/**"]
+  "ignore": ["src/themes-metadata.json", "src/notesnook-themes/**", "dist/**"]
 }

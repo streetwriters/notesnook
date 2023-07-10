@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "nodemon src/index.ts",
-    "production": "tsc"
+    "build": "rm -rf ./dist && yarn tsc"
   },
   "author": "",
   "license": "ISC",
