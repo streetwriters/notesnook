@@ -27,7 +27,7 @@ import SheetProvider from "../../components/sheet-provider";
 import { Button } from "../../components/ui/button";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
-import { presentSheet } from "../../services/event-manager";
+import { ToastEvent, presentSheet } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { MasonryFlashList } from "@shopify/flash-list";
@@ -54,7 +54,7 @@ function ThemeSelector() {
   );
   const [searchQuery, setSearchQuery] = useState<string>();
   const searchResults = trpc.search.useInfiniteQuery(
-    { limit: 10, query: searchQuery },
+    { limit: 10, query: searchQuery || "" },
     {
       enabled: false,
       getNextPageParam: (lastPage) => lastPage.nextCursor
@@ -317,10 +317,15 @@ const ThemeSetter = ({
             if (!theme.id) return;
             try {
               const fullTheme = await trpcClient.getTheme.query(theme.id);
-              console.log(fullTheme);
+              if (!fullTheme) return;
               theme.colorScheme === "dark"
                 ? useThemeStore.getState().setDarkTheme(fullTheme)
                 : useThemeStore.getState().setLightTheme(fullTheme);
+              ToastEvent.show({
+                heading: `${theme.name} applied successfully`,
+                type: "success",
+                context: "global"
+              });
             } catch (e) {
               console.log("Error", e);
             }

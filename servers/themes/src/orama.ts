@@ -110,6 +110,8 @@ export async function getThemes(query = "", count, from) {
 
   return {
     themes,
-    nextCursor: from + count < results.hits.length ? from + count : undefined
+    nextCursor: (from + count < results.hits.length
+      ? from + count
+      : undefined) as number | undefined
   };
 }
