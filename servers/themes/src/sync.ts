@@ -56,7 +56,7 @@ async function generateMetadataJson() {
   const files = await readDirAsync(THEMES_PATH);
   const ThemesMetadata = [];
   const db = await getDB(true);
-
+  THEME_METADATA_CACHE = [];
   for (const file of files) {
     const themeMetadataPath = `${THEMES_PATH}/${file}/theme.json`;
     const metadata = JSON.parse(
