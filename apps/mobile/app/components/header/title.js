@@ -110,7 +110,7 @@ export const Title = () => {
         <Heading
           onPress={navigateToNotebook}
           numberOfLines={1}
-          size={SIZE.xl}
+          size={SIZE.lg}
           style={{
             flexWrap: "wrap",
             marginTop: Platform.OS === "ios" ? -1 : 0

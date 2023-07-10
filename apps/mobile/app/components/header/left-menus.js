@@ -61,11 +61,11 @@ export const LeftMenus = () => {
         width: 40,
         borderRadius: 100,
         marginLeft: -5,
-        marginRight: DDS.isLargeTablet() ? 10 : 25
+        marginRight: DDS.isLargeTablet() ? 10 : 7
       }}
       left={40}
       top={40}
-      right={DDS.isLargeTablet() ? 10 : 25}
+      right={DDS.isLargeTablet() ? 10 : 10}
       onPress={onLeftButtonPress}
       onLongPress={() => {
         Navigation.popToTop();

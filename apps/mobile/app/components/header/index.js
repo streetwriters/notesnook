@@ -72,7 +72,9 @@ const _Header = () => {
             backgroundColor: colors.primary.background,
             overflow: "hidden",
             borderBottomWidth: 1,
-            borderBottomColor: hide ? "transparent" : colors.secondary.background,
+            borderBottomColor: hide
+              ? "transparent"
+              : colors.secondary.background,
             justifyContent: "space-between"
           }
         ]}
