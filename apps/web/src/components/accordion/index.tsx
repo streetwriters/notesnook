@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { SchemeColors } from "@notesnook/theme";
 import { Flex, FlexProps, Text } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "../icons";

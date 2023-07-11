@@ -24,7 +24,7 @@ import useMobile from "../../hooks/use-mobile";
 import { PropsWithChildren } from "react";
 import { Icon, Shortcut } from "../icons";
 import { AnimatedFlex } from "../animated";
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { SchemeColors } from "@notesnook/theme";
 import { ThemeVariant } from "../theme-provider";
 import { MenuItem } from "@notesnook/ui";
 

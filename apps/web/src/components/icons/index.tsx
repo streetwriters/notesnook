@@ -213,10 +213,7 @@ import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
 import { Flex, FlexProps } from "@theme-ui/components";
 import { MotionProps } from "framer-motion";
-import {
-  isThemeColor,
-  SchemeColors
-} from "@notesnook/theme/dist/theme/colorscheme";
+import { isThemeColor, SchemeColors } from "@notesnook/theme";
 
 type MDIIconWrapperProps = {
   title?: string;
