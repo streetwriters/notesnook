@@ -33,6 +33,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { ColoredNotes } from "../../screens/notes/colored";
 import { useCallback } from "react";
+import ReorderableList from "../list/reorderable-list";
 
 export const ColorSection = React.memo(
   function ColorSection() {
@@ -46,12 +47,29 @@ export const ColorSection = React.memo(
       }
     }, [loading, setColorNotes]);
 
-    return colorNotes.map((item, index) => {
-      let alias = db.colors.alias(item.id);
-      return (
-        <ColorItem key={item.id} alias={alias} item={item} index={index} />
-      );
-    });
+    return (
+      <ReorderableList
+        onListOrderChanged={(data) => {
+          console.log(data);
+        }}
+        alwaysBounceVertical={false}
+        initialListData={colorNotes.map((color) => ({
+          ...color,
+          visible: true
+        }))}
+        style={{
+          width: "100%",
+          paddingHorizontal: 12
+        }}
+        showsVerticalScrollIndicator={false}
+        renderDraggableItem={({ item, index }) => {
+          let alias = db.colors.alias(item.id);
+          return (
+            <ColorItem key={item.id} alias={alias} item={item} index={index} />
+          );
+        }}
+      />
+    );
   },
   () => true
 );

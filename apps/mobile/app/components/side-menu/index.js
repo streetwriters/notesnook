@@ -31,6 +31,7 @@ import { useUserStore } from "../../stores/use-user-store";
 import { toggleDarkMode } from "../../utils/color-scheme/utils";
 import { MenuItemsList, SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
+import ReorderableList from "../list/reorderable-list";
 import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
 import { TagsSection } from "./pinned-section";
@@ -82,14 +83,29 @@ export const SideMenu = React.memo(
     const renderItem = useCallback(
       () => (
         <>
-          {MenuItemsList.map((item, index) => (
-            <MenuItem
-              key={item.name}
-              item={item}
-              testID={item.name}
-              index={index}
-            />
-          ))}
+          <ReorderableList
+            onListOrderChanged={(data) => {
+              console.log(data);
+            }}
+            alwaysBounceVertical={false}
+            initialListData={MenuItemsList}
+            style={{
+              width: "100%",
+              paddingHorizontal: 12
+            }}
+            showsVerticalScrollIndicator={false}
+            renderDraggableItem={({ item, index }) => {
+              return (
+                <MenuItem
+                  key={item.name}
+                  item={item}
+                  testID={item.name}
+                  index={index}
+                />
+              );
+            }}
+          />
+
           <ColorSection noTextMode={noTextMode} />
           <TagsSection />
         </>
@@ -110,8 +126,7 @@ export const SideMenu = React.memo(
             height: "100%",
             width: "100%",
             backgroundColor: deviceMode !== "mobile" ? colors.nav : colors.bg,
-            paddingTop: insets.top,
-            borderRadius: 10
+            paddingTop: insets.top
           }}
         >
           <FlatList
@@ -119,16 +134,12 @@ export const SideMenu = React.memo(
             contentContainerStyle={{
               flexGrow: 1
             }}
-            style={{
-              height: "100%",
-              width: "100%",
-              paddingHorizontal: 12
-            }}
             showsVerticalScrollIndicator={false}
             data={[0]}
             keyExtractor={() => "mainMenuView"}
             renderItem={renderItem}
           />
+
           <View
             style={{
               paddingHorizontal: 12

@@ -104,33 +104,39 @@ export const MenuItemsList = [
   {
     name: "Notes",
     icon: "home-variant-outline",
-    close: true
+    close: true,
+    visible: true
   },
   {
     name: "Notebooks",
     icon: "book-outline",
+    visible: true,
     close: true
   },
   {
     name: "Favorites",
     icon: "star-outline",
+    visible: true,
     close: true
   },
   {
     name: "Tags",
     icon: "pound",
+    visible: true,
     close: true
   },
   {
     name: "Reminders",
     icon: "bell",
     close: true,
+    visible: true,
     isBeta: true
   },
   {
     name: "Monographs",
     icon: "text-box-multiple-outline",
     close: true,
+    visible: true,
     func: () => {
       const Monographs = require("../screens/notes/monographs").Monographs;
       Monographs.navigate();
@@ -139,6 +145,7 @@ export const MenuItemsList = [
   {
     name: "Trash",
     icon: "delete-outline",
+    visible: true,
     close: true
   }
 ];
