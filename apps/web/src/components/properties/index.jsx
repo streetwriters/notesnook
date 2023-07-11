@@ -48,6 +48,7 @@ import Notebook from "../notebook";
 import { getTotalNotes } from "@notesnook/common";
 import Reminder from "../reminder";
 import { getFormattedDate } from "@notesnook/common";
+import { ThemeVariant } from "../theme-provider";
 
 const tools = [
   { key: "pin", property: "pinned", icon: Pin, label: "Pin" },
@@ -202,29 +203,27 @@ function Properties(props) {
                 ))}
               </>
             )}
-            {metadataItems.map((item) => (
-              <Flex
-                key={item.key}
-                py={2}
-                px={2}
-                sx={{
-                  borderBottom: "1px solid var(--border)",
-                  alignItems: "center",
-                  justifyContent: "space-between"
-                }}
-              >
-                <Text variant="body" sx={{ color: "fontTertiary" }}>
-                  {item.label}
-                </Text>
-                <Text
-                  className="selectable"
-                  variant="body"
-                  sx={{ color: "fontTertiary" }}
+            <ThemeVariant variant="secondary">
+              {metadataItems.map((item) => (
+                <Flex
+                  key={item.key}
+                  py={2}
+                  px={2}
+                  sx={{
+                    borderBottom: "1px solid var(--separator)",
+                    alignItems: "center",
+                    justifyContent: "space-between"
+                  }}
                 >
-                  {item.value(session[item.key])}
-                </Text>
-              </Flex>
-            ))}
+                  <Text variant="body" sx={{ color: "paragraph" }}>
+                    {item.label}
+                  </Text>
+                  <Text className="selectable" variant="body" color="paragraph">
+                    {item.value(session[item.key])}
+                  </Text>
+                </Flex>
+              ))}
+            </ThemeVariant>
             {!isPreviewMode && (
               <>
                 <Flex
@@ -335,7 +334,7 @@ function Properties(props) {
                   px={2}
                   sx={{
                     cursor: "pointer",
-                    bg: isSelected ? "bgSecondary" : "transparent",
+                    bg: isSelected ? "shade" : "transparent",
                     ":hover": {
                       bg: "hover"
                     },
@@ -374,14 +373,18 @@ function Properties(props) {
                   <Text variant={"body"} data-test-id="title">
                     {label}
                   </Text>
-                  <Flex sx={{ fontSize: "subBody", color: "fontTertiary" }}>
-                    {session.locked && <Lock size={14} data-test-id="locked" />}
-                    <TimeAgo
-                      live
-                      datetime={session.dateModified}
-                      locale={"en_short"}
-                    />
-                  </Flex>
+                  <ThemeVariant variant="secondary">
+                    <Flex sx={{ fontSize: "subBody", color: "paragraph" }}>
+                      {session.locked && (
+                        <Lock size={14} data-test-id="locked" />
+                      )}
+                      <TimeAgo
+                        live
+                        datetime={session.dateModified}
+                        locale={"en_short"}
+                      />
+                    </Flex>
+                  </ThemeVariant>
                 </Flex>
               );
             })}
@@ -406,9 +409,11 @@ function Card({ title, subtitle, button, children }) {
         <Text variant="subtitle">{title}</Text>
       </Flex>
       {subtitle && (
-        <Text variant="subBody" mb={1} mx={2}>
-          {subtitle}
-        </Text>
+        <ThemeVariant variant="secondary">
+          <Text variant="subBody" mb={1} mx={2}>
+            {subtitle}
+          </Text>
+        </ThemeVariant>
       )}
       {children}
     </Flex>

@@ -44,7 +44,7 @@ export function CheckListItem(props: CheckListItemProps) {
     >
       <Icon
         path={isSelected ? Icons.checkCircle : Icons.circle}
-        color={isSelected ? "primary" : "text"}
+        color={isSelected ? "accent" : "paragraph"}
         size={16}
       />
       <Text

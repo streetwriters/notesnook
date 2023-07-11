@@ -26,7 +26,7 @@ import { ColorPicker, DEFAULT_COLORS } from "../popups/color-picker";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { ToolProps } from "../types";
 import { getToolbarElement } from "../utils/dom";
-import { PositionOptions } from "../../utils/position";
+import { PositionOptions } from "@notesnook/ui";
 
 type ColorToolProps = ToolProps & {
   onColorChange: (color?: string) => void;

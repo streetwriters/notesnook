@@ -68,6 +68,7 @@ import {
   CustomToolbar,
   SyncOff
 } from "../../components/icons";
+import { ThemeVariant } from "../../components/theme-provider";
 
 type Feature = {
   id: string;
@@ -449,18 +450,20 @@ export function Features() {
         return (
           <Flex key={section.title} px={6} sx={{ flexDirection: "column" }}>
             {section.pro && (
-              <Flex
-                bg="bgSecondary"
-                px={2}
-                py="2px"
-                sx={{ borderRadius: 50, alignSelf: "start" }}
-                mb={1}
-              >
-                <Pro color="accent" size={16} />
-                <Text variant="body" ml={"2px"} sx={{ color: "primary" }}>
-                  Pro
-                </Text>
-              </Flex>
+              <ThemeVariant variant="secondary">
+                <Flex
+                  bg="background"
+                  px={2}
+                  py="2px"
+                  sx={{ borderRadius: 50, alignSelf: "start" }}
+                  mb={1}
+                >
+                  <Pro color="accent" size={16} />
+                  <Text variant="body" ml={"2px"} sx={{ color: "accent" }}>
+                    Pro
+                  </Text>
+                </Flex>
+              </ThemeVariant>
             )}
             <Text variant="body" sx={{ fontSize: "1.3rem" }}>
               {section.title}
@@ -468,7 +471,7 @@ export function Features() {
             <Text
               variant="body"
               mt={1}
-              sx={{ fontSize: "title", color: "fontTertiary" }}
+              sx={{ fontSize: "title", color: "paragraph" }}
             >
               {section.detail}
             </Text>
@@ -488,9 +491,7 @@ export function Features() {
                     key={feature.id}
                     sx={{ flexDirection: "column", alignItems: "start" }}
                   >
-                    {feature.icon && (
-                      <feature.icon size={20}  sx={{ mb: 1 }} />
-                    )}
+                    {feature.icon && <feature.icon size={20} sx={{ mb: 1 }} />}
                     {feature.pro && (
                       <Flex
                         sx={{ alignItems: "center", justifyContent: "center" }}
@@ -499,7 +500,7 @@ export function Features() {
                         <Text
                           variant="subBody"
                           ml={"2px"}
-                          sx={{ color: "primary" }}
+                          sx={{ color: "accent" }}
                         >
                           Pro
                         </Text>

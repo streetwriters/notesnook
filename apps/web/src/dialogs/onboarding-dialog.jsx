@@ -48,6 +48,8 @@ import { useCallback, useState } from "react";
 import Config from "../utils/config";
 import { getAllAccents } from "@notesnook/theme";
 import { isMacStoreApp } from "../utils/platform";
+import { ErrorText } from "../components/error-text";
+import { ThemeVariant } from "../components/theme-provider";
 
 const newUserSteps = [
   {
@@ -176,12 +178,14 @@ function OnboardingDialog({ onClose: _onClose, type }) {
         <Text variant={"heading"} mt={2}>
           {title}
         </Text>
-        <Text
-          variant={"body"}
-          sx={{ textAlign: "center", maxWidth: "70%", color: "fontTertiary" }}
-        >
-          {subtitle}
-        </Text>
+        <ThemeVariant variant="secondary">
+          <Text
+            variant={"body"}
+            sx={{ textAlign: "center", maxWidth: "70%", color: "paragraph" }}
+          >
+            {subtitle}
+          </Text>
+        </ThemeVariant>
         {Component && <Component onClose={onClose} onNext={onNext} />}
         {buttonText && (
           <Button
@@ -211,14 +215,16 @@ function JoinCause({ onNext }) {
       >
         Join the community
       </Button>
-      <Button
-        variant={"anchor"}
-        mt={2}
-        onClick={() => onNext()}
-        sx={{ color: "fontTertiary" }}
-      >
-        Skip for now
-      </Button>
+      <ThemeVariant variant="secondary">
+        <Button
+          variant={"anchor"}
+          mt={2}
+          onClick={() => onNext()}
+          sx={{ color: "paragraph" }}
+        >
+          Skip for now
+        </Button>
+      </ThemeVariant>
     </Flex>
   );
 }
@@ -265,14 +271,16 @@ function Importer({ onClose }) {
       >
         Start importing now
       </Button>
-      <Button
-        variant={"anchor"}
-        mt={2}
-        onClick={() => onClose()}
-        sx={{ color: "fontTertiary" }}
-      >
-        Skip for now
-      </Button>
+      <ThemeVariant variant="secondary">
+        <Button
+          variant={"anchor"}
+          mt={2}
+          onClick={() => onClose()}
+          sx={{ color: "paragraph" }}
+        >
+          Skip for now
+        </Button>
+      </ThemeVariant>
     </Flex>
   );
 }
@@ -369,7 +377,7 @@ function ThemeSelector() {
             p={20}
             sx={{
               borderRight: "1px solid var(--border)",
-              bg: isSelected ? "bgSecondary" : "transparent",
+              bg: isSelected ? "shade" : "transparent",
               cursor: "pointer",
               ":last-of-type": {
                 borderRight: "0px"
@@ -389,7 +397,8 @@ function ThemeSelector() {
               src={theme.image}
               sx={{
                 borderRadius: "default",
-                border: isSelected ? "2px solid var(--primary)" : "none",
+                border: isSelected ? "2px solid" : "none",
+                borderColor: "accent",
                 boxShadow: isSelected ? "0px 0px 10px 1px #00000016" : "none"
               }}
             />
@@ -450,25 +459,19 @@ function TrialOffer({ onClose }) {
     >
       <Features item={{ style: {} }} />
       {error ? (
-        <Text
-          variant={"body"}
-          mt={2}
-          bg="errorBg"
-          p={1}
-          sx={{ borderRadius: "default", color: "error" }}
-        >
-          {error}
-        </Text>
+        <ErrorText error={error} />
       ) : (
-        <Text
-          variant={"body"}
-          mt={2}
-          bg="bgSecondary"
-          p={1}
-          sx={{ borderRadius: "default", color: "icon" }}
-        >
-          <b>Note:</b> Upgrade now and get 50% discount on all plans.
-        </Text>
+        <ThemeVariant variant="secondary">
+          <Text
+            variant={"body"}
+            mt={2}
+            bg="background"
+            p={1}
+            sx={{ borderRadius: "default", color: "paragraph" }}
+          >
+            <b>Note:</b> Upgrade now and get 50% discount on all plans.
+          </Text>
+        </ThemeVariant>
       )}
 
       <Flex mt={2} sx={{ justifyContent: "center", width: "100%" }}>
@@ -510,14 +513,16 @@ function TrialOffer({ onClose }) {
           {loading ? <Loading size={16} /> : "Try free for 14 days"}
         </Button>
       </Flex>
-      <Button
-        variant={"anchor"}
-        mt={2}
-        onClick={() => onClose()}
-        sx={{ color: "fontTertiary" }}
-      >
-        Skip for now
-      </Button>
+      <ThemeVariant variant="secondary">
+        <Button
+          variant={"anchor"}
+          mt={2}
+          onClick={() => onClose()}
+          sx={{ color: "paragraph" }}
+        >
+          Skip for now
+        </Button>
+      </ThemeVariant>
     </Flex>
   );
 }

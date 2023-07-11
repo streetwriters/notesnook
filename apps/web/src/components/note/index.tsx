@@ -73,18 +73,36 @@ import { exportNotes } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";
 import { store as selectionStore } from "../../stores/selection-store";
 import {
+  Reminder as ReminderType,
   formatReminderTime,
   isReminderActive,
   isReminderToday
 } from "@notesnook/core/collections/reminders";
 import { ThemeVariant } from "../theme-provider";
+import { MenuItem } from "@notesnook/ui";
+import {
+  Context,
+  Item,
+  ReferencesWithDateEdited
+} from "../list-container/types";
+import { SchemeColors } from "@notesnook/theme";
 
-function Note(props) {
+type NoteProps = {
+  tags: Item[];
+  references?: ReferencesWithDateEdited;
+  item: Item;
+  context?: Context;
+  date: number;
+  reminder?: ReminderType;
+  simplified?: boolean;
+  compact?: boolean;
+};
+
+function Note(props: NoteProps) {
   const {
     tags,
     references,
     item,
-    index,
     context,
     date,
     reminder,
@@ -101,40 +119,32 @@ function Note(props) {
     () => attachments.filter((a) => a.failed),
     [attachments]
   );
-
-  const primary = useMemo(() => {
-    if (!note.color) return "accent";
-    return note.color.toLowerCase();
-  }, [note.color]);
+  const primary: SchemeColors = !note.color
+    ? "accent"
+    : (note.color as string).toLowerCase();
 
   return (
     <ListItem
-      selectable
       isFocused={isOpened}
       isCompact={compact}
       isSimple={simplified}
       item={note}
       title={note.title}
-      body={note.headline}
-      id={note.id}
-      index={index}
+      body={note.headline as string}
       onKeyPress={async (e) => {
         if (e.key === "Delete") {
-          let selectedItems = selectionStore
+          const selectedItems = selectionStore
             .get()
             .selectedItems.filter((i) => i.type === item.type && i !== item);
           await Multiselect.moveNotesToTrash([item, ...selectedItems]);
         }
       }}
       colors={{
-        primary,
-        text: note.color ? primary : "text",
-        background: isOpened ? "bgSecondary" : "background"
+        accent: primary,
+        paragraph: note.color ? primary : "heading",
+        background: "background"
       }}
-      menu={{
-        items: menuItems,
-        extraData: { note, context }
-      }}
+      menuItems={menuItems}
       onClick={() => {
         if (note.conflicted) {
           hashNavigate(`/notes/${note.id}/conflict`, { replace: true });
@@ -187,15 +197,12 @@ function Note(props) {
             {compact ? (
               <>
                 {note.conflicted && (
-                  <Alert size={15} color="error" sx={{ mr: 1 }} />
+                  <ThemeVariant variant="error">
+                    <Alert size={15} sx={{ mr: 1 }} />
+                  </ThemeVariant>
                 )}
                 {note.locked && (
-                  <Lock
-                    size={11}
-                    color={"fontTertiary"}
-                    sx={{ mr: 1 }}
-                    data-test-id={`locked`}
-                  />
+                  <Lock size={11} sx={{ mr: 1 }} data-test-id={`locked`} />
                 )}
                 {note.favorite && (
                   <Star color={primary} size={15} sx={{ mr: 1 }} />
@@ -220,8 +227,10 @@ function Note(props) {
 
                 {attachments.length > 0 && (
                   <Flex mr={1}>
-                    <Attachment size={13} color="fontTertiary" />
-                    <Text ml={"2px"}>{attachments.length}</Text>
+                    <Attachment size={13} />
+                    <Text ml={"2px"} color="paragraph">
+                      {attachments.length}
+                    </Text>
                   </Flex>
                 )}
 
@@ -240,42 +249,40 @@ function Note(props) {
                 )}
 
                 {note.locked && (
-                  <Lock
-                    size={13}
-                    color={"fontTertiary"}
-                    sx={{ mr: 1 }}
-                    data-test-id={`locked`}
-                  />
+                  <Lock size={13} sx={{ mr: 1 }} data-test-id={`locked`} />
                 )}
 
                 {note.favorite && (
                   <Star color={primary} size={15} sx={{ mr: 1 }} />
                 )}
 
-                {tags?.map((tag) => {
-                  return (
-                    <Button
-                      data-test-id={`tag-item`}
-                      key={tag.id}
-                      variant="anchor"
-                      mr={1}
-                      title={`Go to #${tag.alias}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (!tag.id) return showToast("Tag not found.");
-                        navigate(`/tags/${tag.id}`);
-                      }}
-                      sx={{
-                        maxWidth: `calc(100% / ${tags.length})`,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        color: "fontTertiary"
-                      }}
-                    >
-                      #{tag.alias}
-                    </Button>
-                  );
-                })}
+                <ThemeVariant variant="secondary">
+                  {tags?.map((tag) => {
+                    return (
+                      <Button
+                        data-test-id={`tag-item`}
+                        key={tag.id}
+                        variant="anchor"
+                        mr={1}
+                        title={`Go to #${tag.alias}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!tag.id)
+                            return showToast("error", "Tag not found.");
+                          navigate(`/tags/${tag.id}`);
+                        }}
+                        sx={{
+                          maxWidth: `calc(100% / ${tags.length})`,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          color: "paragraph"
+                        }}
+                      >
+                        #{tag.alias}
+                      </Button>
+                    );
+                  })}
+                </ThemeVariant>
               </>
             )}
           </Flex>
@@ -306,7 +313,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
   );
 });
 
-const pin = (note) => {
+const pin = (note: Item) => {
   return store
     .pin(note.id)
     .then(async () => {
@@ -341,244 +348,229 @@ const formats = [
     icon: Plaintext,
     subtitle: "Can be opened in any plain-text editor."
   }
-];
+] as const;
 
 const notFullySyncedText =
   "Cannot perform this action because note is not fully synced.";
-const menuItems = [
-  {
-    key: "pin",
-    title: "Pin",
-    checked: ({ note }) => note.pinned,
-    icon: Pin,
-    onClick: async ({ note }) => {
-      await pin(note);
-    }
-  },
-  {
-    key: "readonly",
-    title: "Readonly",
-    checked: ({ note }) => note.readonly,
-    icon: Readonly,
-    onClick: ({ note }) => store.readonly(note.id)
-  },
-  {
-    key: "favorite",
-    title: "Favorite",
-    checked: ({ note }) => note.favorite,
-    icon: StarOutline,
-    onClick: ({ note }) => store.favorite(note.id)
-  },
-  {
-    key: "lock",
-    disabled: ({ note }) =>
-      !db.notes.note(note.id).synced() ? notFullySyncedText : false,
-    title: "Lock",
-    checked: ({ note }) => note.locked,
-    icon: Lock,
-    onClick: async ({ note }) => {
-      const { unlock, lock } = store.get();
-      if (!note.locked) {
-        if (await lock(note.id))
+const menuItems: (note: any, items?: any[]) => MenuItem[] = (
+  note,
+  items = []
+) => {
+  const isSynced = db.notes?.note(note.id).synced();
+  const ids = items.map((i) => i.id);
+
+  return [
+    {
+      type: "button",
+      key: "pin",
+      title: "Pin",
+      isChecked: note.pinned,
+      icon: Pin.path,
+      onClick: () => pin(note)
+    },
+    {
+      type: "button",
+      key: "readonly",
+      title: "Readonly",
+      isChecked: note.readonly,
+      icon: Readonly.path,
+      onClick: () => store.readonly(note.id)
+    },
+    {
+      type: "button",
+      key: "favorite",
+      title: "Favorite",
+      isChecked: note.favorite,
+      icon: StarOutline.path,
+      onClick: () => store.favorite(note.id)
+    },
+    {
+      type: "button",
+      key: "lock",
+      isDisabled: !isSynced,
+      title: "Lock",
+      isChecked: note.locked,
+      icon: Lock.path,
+      onClick: async () => {
+        const { unlock, lock } = store.get();
+        if (!note.locked) {
+          await lock(note.id);
           showToast("success", "Note locked successfully!");
-      } else {
-        if (await unlock(note.id))
+        } else {
+          await unlock(note.id);
           showToast("success", "Note unlocked successfully!");
+        }
+      },
+      isPro: true
+    },
+    {
+      type: "button",
+      key: "remind-me",
+      title: "Remind me",
+      icon: AddReminder.path,
+      onClick: async () => {
+        await showAddReminderDialog(note.id);
       }
     },
-    isPro: true
-  },
-  {
-    key: "remind-me",
-    title: "Remind me",
-    icon: AddReminder,
-    onClick: async ({ note }) => {
-      await showAddReminderDialog(note.id);
-    }
-  },
-  { key: "sep1", type: "separator" },
-  {
-    key: "notebooks",
-    title: "Notebooks",
-    icon: Notebook,
-    items: notebooksMenuItems,
-    multiSelect: true
-  },
-  {
-    key: "colors",
-    title: "Assign color",
-    icon: Colors,
-    items: colorsToMenuItems()
-  },
-  {
-    key: "add-tags",
-    title: "Tags",
-    icon: Tag2,
-    multiSelect: true,
-    items: tagsMenuItems
-    // onClick: async ({ items }) => {
-    //   await showAddTagsDialog(items.map((i) => i.id));
-    // }
-  },
-  { key: "sep2", type: "separator" },
-  {
-    key: "print",
-    title: "Print",
-    disabled: ({ note }) => {
-      if (!db.notes.note(note.id).synced()) return notFullySyncedText;
+    { key: "sep1", type: "separator" },
+    {
+      type: "button",
+      key: "notebooks",
+      title: "Notebooks",
+      icon: Notebook.path,
+      menu: { items: notebooksMenuItems(items) },
+      multiSelect: true
     },
-    icon: Print,
-    onClick: async ({ note }) => {
-      await exportNotes("pdf", [note.id]);
-    }
-  },
-  {
-    key: "publish",
-    disabled: ({ note }) => {
-      if (!db.notes.note(note.id).synced()) return notFullySyncedText;
-      if (!db.monographs.isPublished(note.id) && note.locked)
-        return "You cannot publish a locked note.";
+    {
+      type: "button",
+      key: "colors",
+      title: "Assign color",
+      icon: Colors.path,
+      menu: { items: colorsToMenuItems(note) }
     },
-    icon: Publish,
-    title: "Publish",
-    checked: ({ note }) => db.monographs.isPublished(note.id),
-    onClick: async ({ note }) => {
-      const isPublished = db.monographs.isPublished(note.id);
-      if (isPublished) await db.monographs.unpublish(note.id);
-      else await showPublishView(note.id, "bottom");
-    }
-  },
-  {
-    key: "export",
-    title: "Export as",
-    icon: Export,
-    disabled: ({ note }) => {
-      if (!db.notes.note(note.id).synced()) return notFullySyncedText;
+    {
+      type: "button",
+      key: "add-tags",
+      title: "Tags",
+      icon: Tag2.path,
+      multiSelect: true,
+      menu: { items: tagsMenuItems(items) }
+      // onClick: async ({ items }) => {
+      //   await showAddTagsDialog(items.map((i) => i.id));
+      // }
     },
-    items: formats.map((format) => ({
-      key: format.type,
-      title: format.title,
-      tooltip: `Export as ${format.title} - ${format.subtitle}`,
-      icon: format.icon,
-      disabled: ({ items }) =>
-        format.type === "pdf" && items.length > 1
-          ? "Multiple notes cannot be exported as PDF."
-          : false,
-      isPro: format.type !== "txt",
-      onClick: async ({ items }) => {
-        await exportNotes(
-          format.type,
-          items.map((i) => i.id)
-        );
+    { key: "sep2", type: "separator" },
+    {
+      type: "button",
+      key: "print",
+      title: "Print",
+      isDisabled: !isSynced,
+      icon: Print.path,
+      onClick: async () => {
+        await exportNotes("pdf", [note.id]);
       }
-    })),
-    multiSelect: true,
-    isPro: true
-  },
-  {
-    key: "duplicate",
-    title: "Duplicate",
-    disabled: ({ note }) => {
-      if (!db.notes.note(note.id).synced()) return notFullySyncedText;
-      if (note.locked) return "Locked notes cannot be duplicated";
     },
-    icon: Duplicate,
-    onClick: async ({ note }) => {
-      const id = await store.get().duplicate(note);
-      if (
-        await confirm({
-          title: "Open duplicated note?",
-          message: "Do you want to open the duplicated note?",
-          negativeButtonText: "No",
-          positiveButtonText: "Yes"
-        })
-      ) {
-        hashNavigate(`/notes/${id}/edit`, { replace: true });
+    {
+      type: "button",
+      key: "publish",
+      isDisabled:
+        !isSynced || (!db.monographs?.isPublished(note.id) && note.locked),
+      icon: Publish.path,
+      title: "Publish",
+      isChecked: db.monographs?.isPublished(note.id),
+      onClick: async () => {
+        const isPublished = db.monographs?.isPublished(note.id);
+        if (isPublished) await db.monographs?.unpublish(note.id);
+        else await showPublishView(note.id, "bottom");
       }
-    }
-  },
-  { key: "sep3", type: "separator" },
-  {
-    key: "local-only",
-    hidden: () => !userstore.get().isLoggedIn,
-    disabled: ({ note }) =>
-      !db.notes.note(note.id).synced() ? notFullySyncedText : false,
-    title: "Local only",
-    checked: ({ note }) => note.localOnly,
-    icon: ({ note }) => (note.localOnly ? Sync : SyncOff),
-    onClick: async ({ note }) => {
-      if (
-        note.localOnly ||
-        (await confirm({
-          title: "Prevent this item from syncing?",
-          message:
-            "Turning sync off for this item will automatically delete it from all other devices & any future changes to this item won't get synced. Are you sure you want to continue?",
-          positiveButtonText: "Yes",
-          negativeButtonText: "No"
+    },
+    {
+      type: "button",
+      key: "export",
+      title: "Export as",
+      icon: Export.path,
+      isDisabled: !isSynced,
+      menu: {
+        items: formats.map((format) => ({
+          type: "button",
+          key: format.type,
+          title: format.title,
+          tooltip: `Export as ${format.title} - ${format.subtitle}`,
+          icon: format.icon.path,
+          isDisabled: format.type === "pdf" && items.length > 1,
+          // ? "Multiple notes cannot be exported as PDF."
+          // : false,
+          isPro: format.type !== "txt",
+          onClick: () => exportNotes(format.type, ids)
         }))
-      )
-        await store.get().localOnly(note.id);
+      },
+      multiSelect: true,
+      isPro: true
+    },
+    {
+      type: "button",
+      key: "duplicate",
+      title: "Duplicate",
+      isDisabled: !isSynced || note.locked,
+      icon: Duplicate.path,
+      onClick: async () => {
+        const id = await store.get().duplicate(note);
+        if (
+          await confirm({
+            title: "Open duplicated note?",
+            message: "Do you want to open the duplicated note?",
+            negativeButtonText: "No",
+            positiveButtonText: "Yes"
+          })
+        ) {
+          hashNavigate(`/notes/${id}/edit`, { replace: true });
+        }
+      }
+    },
+    {
+      type: "button",
+      key: "local-only",
+      isHidden: !userstore.get().isLoggedIn,
+      isDisabled: !isSynced,
+      title: "Local only",
+      isChecked: note.localOnly,
+      icon: note.localOnly ? Sync.path : SyncOff.path,
+      onClick: async () => {
+        if (
+          note.localOnly ||
+          (await confirm({
+            title: "Prevent this item from syncing?",
+            message:
+              "Turning sync off for this item will automatically delete it from all other devices & any future changes to this item won't get synced. Are you sure you want to continue?",
+            positiveButtonText: "Yes",
+            negativeButtonText: "No"
+          }))
+        )
+          await store.get().localOnly(note.id);
+      }
+    },
+    { key: "sep3", type: "separator" },
+    {
+      type: "button",
+      key: "movetotrash",
+      title: "Move to trash",
+      styles: { icon: { color: "red" }, text: { color: "red" } },
+      icon: Trash.path,
+      isDisabled:
+        items.length === 1
+          ? db.monographs?.isPublished(note.id) || note.locked
+          : items.some((item) => !db.notes?.note(item.id).synced()),
+      onClick: () => Multiselect.moveNotesToTrash(items, items.length > 1),
+      multiSelect: true
     }
-  },
-  { key: "sep3", type: "separator" },
-  {
-    key: "movetotrash",
-    title: "Move to trash",
-    color: "error",
-    iconColor: "error",
-    icon: Trash,
-    disabled: ({ items }) => {
-      const areAllSynced = items.reduce((prev, curr) => {
-        if (!prev || !db.notes.note(curr.id).synced()) return false;
-        return prev;
-      }, true);
-      if (!areAllSynced) return notFullySyncedText;
+  ];
+};
 
-      if (items.length !== 1) return false;
-
-      if (db.monographs.isPublished(items[0].id))
-        return "Please unpublish this note to move it to trash";
-
-      if (items[0].locked)
-        return "Please unlock this note to move it to trash.";
-    },
-    onClick: async ({ items }) => {
-      await Multiselect.moveNotesToTrash(items, items.length > 1);
-    },
-    multiSelect: true
-  }
-];
-
-function colorsToMenuItems() {
+function colorsToMenuItems(note: any): MenuItem[] {
   return COLORS.map((label) => {
     const lowercase = label.toLowerCase();
     return {
+      type: "button",
       key: lowercase,
-      title: () => db.colors.alias(lowercase) || label,
-      icon: Circle,
-      iconColor: lowercase,
-      checked: ({ note }) => {
-        return note.color === lowercase;
-      },
-      onClick: ({ note }) => {
-        const { id } = note;
-        store.setColor(id, lowercase);
-      }
+      title: db.colors?.alias(lowercase) || label,
+      icon: Circle.path,
+      styles: { icon: { color: lowercase } },
+      isChecked: note.color === lowercase,
+      onClick: () => store.setColor(note.id, lowercase)
     };
   });
 }
 
-function notebooksMenuItems({ items }) {
+function notebooksMenuItems(items: any[]): MenuItem[] {
   const noteIds = items.map((i) => i.id);
 
-  const menuItems = [];
+  const menuItems: MenuItem[] = [];
   menuItems.push({
+    type: "button",
     key: "link-notebooks",
     title: "Link to...",
-    icon: AddToNotebook,
-    onClick: async () => {
-      await showMoveNoteDialog(noteIds);
-    }
+    icon: AddToNotebook.path,
+    onClick: () => showMoveNoteDialog(noteIds)
   });
 
   const notebooks = items
@@ -589,11 +581,12 @@ function notebooksMenuItems({ items }) {
   if (topics?.length > 0 || notebooks?.length > 0) {
     menuItems.push(
       {
+        type: "button",
         key: "remove-from-all-notebooks",
         title: "Unlink from all",
-        icon: RemoveShortcutLink,
+        icon: RemoveShortcutLink.path,
         onClick: async () => {
-          await db.notes.removeFromAllNotebooks(...noteIds);
+          await db.notes?.removeFromAllNotebooks(...noteIds);
           store.refresh();
         }
       },
@@ -601,16 +594,18 @@ function notebooksMenuItems({ items }) {
     );
 
     notebooks?.forEach((notebook) => {
-      if (menuItems.find((item) => item.key === notebook.id)) return;
+      if (!notebook || menuItems.find((item) => item.key === notebook.id))
+        return;
 
       menuItems.push({
+        type: "button",
         key: notebook.id,
-        title: notebook.title,
-        icon: Notebook,
-        checked: true,
+        title: db.notebooks?.notebook(notebook.id).title,
+        icon: Notebook.path,
+        isChecked: true,
         tooltip: "Click to remove from this notebook",
         onClick: async () => {
-          await db.notes.removeFromNotebook({ id: notebook.id }, ...noteIds);
+          await db.notes?.removeFromNotebook({ id: notebook.id }, ...noteIds);
           store.refresh();
         }
       });
@@ -625,13 +620,14 @@ function notebooksMenuItems({ items }) {
 
         const topic = notebook.topics.topic(topicId)._topic;
         menuItems.push({
+          type: "button",
           key: topicId,
           title: topic.title,
-          icon: Topic,
-          checked: true,
+          icon: Topic.path,
+          isChecked: true,
           tooltip: "Click to remove from this topic",
           onClick: async () => {
-            await db.notes.removeFromNotebook(
+            await db.notes?.removeFromNotebook(
               { id: ref.id, topic: topic.id },
               ...noteIds
             );
@@ -645,14 +641,15 @@ function notebooksMenuItems({ items }) {
   return menuItems;
 }
 
-function tagsMenuItems({ items }) {
+function tagsMenuItems(items: any[]): MenuItem[] {
   const noteIds = items.map((i) => i.id);
 
-  const menuItems = [];
+  const menuItems: MenuItem[] = [];
   menuItems.push({
+    type: "button",
     key: "assign-tags",
     title: "Assign to...",
-    icon: Plus,
+    icon: Plus.path,
     onClick: async () => {
       await showAddTagsDialog(noteIds);
     }
@@ -663,14 +660,15 @@ function tagsMenuItems({ items }) {
   if (tags?.length > 0) {
     menuItems.push(
       {
+        type: "button",
         key: "remove-from-all-tags",
         title: "Remove from all",
-        icon: RemoveShortcutLink,
+        icon: RemoveShortcutLink.path,
         onClick: async () => {
           for (const note of items) {
             for (const tag of tags) {
               if (!note.tags.includes(tag)) continue;
-              await db.notes.note(note).untag(tag);
+              await db.notes?.note(note).untag(tag);
             }
           }
           store.refresh();
@@ -683,15 +681,16 @@ function tagsMenuItems({ items }) {
       if (menuItems.find((item) => item.key === tag)) return;
 
       menuItems.push({
+        type: "button",
         key: tag,
-        title: db.tags.alias(tag),
-        icon: Tag,
-        checked: true,
+        title: db.tags?.alias(tag),
+        icon: Tag.path,
+        isChecked: true,
         tooltip: "Click to remove from this tag",
         onClick: async () => {
           for (const note of items) {
             if (!note.tags.includes(tag)) continue;
-            await db.notes.note(note).untag(tag);
+            await db.notes?.note(note).untag(tag);
           }
           store.refresh();
         }

@@ -17,16 +17,4 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Theme } from "..";
-import css from "./css";
-
-const transformers = {
-  css: css
-};
-
-export type Transformers = keyof typeof transformers;
-export class TransformerFactory {
-  construct(type: Transformers, theme: Theme) {
-    return transformers[type](theme);
-  }
-}
+export * from "./css";

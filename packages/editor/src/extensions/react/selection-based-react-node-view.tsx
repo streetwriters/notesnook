@@ -95,7 +95,7 @@ export class SelectionBasedNodeView<
       this.isSelectedNode(this.editor.view.state.selection);
 
     return (
-      <ThemeProvider>
+      <ThemeProvider injectCssVars={false}>
         <this.options.component
           {...props}
           editor={this.editor}

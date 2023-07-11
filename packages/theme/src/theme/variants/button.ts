@@ -60,17 +60,18 @@ const primary: ThemeUIStyleObject = {
 
 const error: ThemeUIStyleObject = {
   variant: "buttons.default",
-  color: "static",
-  bg: "error"
+  color: "white",
+  bg: "paragraph"
 };
 
 const errorSecondary: ThemeUIStyleObject = {
   variant: "buttons.default",
-  color: "error",
+  color: "paragraph",
   //  fontWeight: "bold",
-  bg: "errorBg",
+  bg: "background",
   ":hover": {
-    opacity: 0.8
+    opacity: 0.8,
+    color: "white"
   }
   // border: "1px solid",
   // borderColor: "error",

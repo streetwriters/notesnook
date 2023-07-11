@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ButtonProps, Flex } from "@theme-ui/components";
 import { Input } from "@theme-ui/components";
-import { Icon } from "../components/icon";
+import { Icon } from "@notesnook/ui";
 import { Icons } from "../icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import tinycolor from "tinycolor2";

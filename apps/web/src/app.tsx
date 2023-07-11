@@ -55,7 +55,7 @@ function App() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <BaseThemeProvider sx={{ height: "100%" }}>
+      <BaseThemeProvider sx={{ height: "100%" }} addGlobalStyles>
         {isAppLoaded && (
           <Suspense fallback={<div style={{ display: "none" }} />}>
             <div id="menu-wrapper">
@@ -197,9 +197,7 @@ function DesktopAppContents({
             className="pane editor-pane"
             priority={LayoutPriority.High}
           >
-            <ScopedThemeProvider
-              className="listMenu"
-              scope="editor"
+            <Flex
               sx={{
                 display: "flex",
                 overflow: "hidden",
@@ -215,7 +213,7 @@ function DesktopAppContents({
                   condition={isAppLoaded}
                 />
               )}
-            </ScopedThemeProvider>
+            </Flex>
           </Allotment.Pane>
         </Allotment>
       </Flex>

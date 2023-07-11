@@ -21,6 +21,7 @@ import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
 import { Flex, FlexProps, Text } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "../icons";
+import { ThemeVariant } from "../theme-provider";
 
 export type AccordionProps = {
   title: string;
@@ -41,29 +42,31 @@ export default function Accordion(
 
   return (
     <Flex sx={{ flexDirection: "column", ...sx }} {...restProps}>
-      <Flex
-        sx={{
-          justifyContent: "space-between",
-          alignItems: "center",
-          cursor: "pointer",
-          bg: "bgSecondary",
-          p: 1,
-          borderRadius: "default"
-        }}
-        onClick={() => {
-          setIsContentHidden((state) => !state);
-        }}
-        data-test-id={testId}
-      >
-        <Text variant="subtitle" sx={{ color }}>
-          {title}
-        </Text>
-        {isContentHidden ? (
-          <ChevronDown size={16} color={color} />
-        ) : (
-          <ChevronUp size={16} color={color} />
-        )}
-      </Flex>
+      <ThemeVariant variant="secondary">
+        <Flex
+          sx={{
+            justifyContent: "space-between",
+            alignItems: "center",
+            cursor: "pointer",
+            bg: "background",
+            p: 1,
+            borderRadius: "default"
+          }}
+          onClick={() => {
+            setIsContentHidden((state) => !state);
+          }}
+          data-test-id={testId}
+        >
+          <Text variant="subtitle" sx={{ color }}>
+            {title}
+          </Text>
+          {isContentHidden ? (
+            <ChevronDown size={16} color={color} />
+          ) : (
+            <ChevronUp size={16} color={color} />
+          )}
+        </Flex>
+      </ThemeVariant>
       {!isContentHidden && children}
     </Flex>
   );

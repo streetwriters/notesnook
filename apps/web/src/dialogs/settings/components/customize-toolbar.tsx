@@ -21,7 +21,6 @@ import { Button, Flex, FlexProps, Text } from "@theme-ui/components";
 import {
   getAllTools,
   getToolDefinition,
-  Icon,
   Icons,
   ToolbarDefinition,
   ToolbarGroupDefinition,
@@ -62,6 +61,8 @@ import {
 import { showToast } from "../../../utils/toast";
 import { isUserPremium } from "../../../hooks/use-is-user-premium";
 import { Pro } from "../../../components/icons";
+import { ThemeVariant } from "../../../components/theme-provider";
+import { Icon } from "@notesnook/ui";
 
 export function CustomizeToolbar() {
   const sensors = useSensors(
@@ -117,7 +118,7 @@ export function CustomizeToolbar() {
                 checked={preset.id === currentPreset.id}
                 defaultChecked={preset.id === currentPreset.id}
                 disabled={preset.id === "custom" && !isUserPremium()}
-                style={{ accentColor: "var(--primary)" }}
+                style={{ accentColor: "var(--accent)" }}
                 onChange={async (e) => {
                   const { value } = e.target;
                   if (preset.id === "custom" && !isUserPremium()) {
@@ -133,125 +134,129 @@ export function CustomizeToolbar() {
               />
               <span style={{ marginLeft: 5 }}>{preset.title}</span>
               {preset.id === "custom" && !isUserPremium() ? (
-                <Pro color="primary" size={18} sx={{ ml: 1 }} />
+                <Pro color="accent" size={18} sx={{ ml: 1 }} />
               ) : null}
             </Label>
           ))}
         </Flex>
         {currentPreset.editable && (
-          <Button
-            variant={"secondary"}
-            sx={{
-              display: "flex",
-              flexShrink: 0,
-              alignItems: "center",
-              p: 1
-            }}
-            title="Add group"
-            onClick={() => {
-              setItems(addGroup);
-              showToast("success", "Group added successfully");
-            }}
-          >
-            <Icon path={Icons.plus} color="text" size={18} />
-          </Button>
+          <ThemeVariant variant="secondary">
+            <Button
+              variant={"secondary"}
+              sx={{
+                display: "flex",
+                flexShrink: 0,
+                alignItems: "center",
+                p: 1
+              }}
+              title="Add group"
+              onClick={() => {
+                setItems(addGroup);
+                showToast("success", "Group added successfully");
+              }}
+            >
+              <Icon path={Icons.plus} color="paragraph" size={18} />
+            </Button>
+          </ThemeVariant>
         )}
       </Flex>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={(event) => {
-          if (!isUserPremium()) {
-            showToast("info", "You need to be Pro to customize the toolbar.");
-            return;
-          }
-
-          if (currentPreset.id !== "custom") {
-            setCurrentPreset((c) => ({
-              ...getPreset("custom"),
-              tools: getPresetTools(c)
-            }));
-          }
-
-          const { active } = event;
-          const activeItem = items.find((item) => item.id === active.id);
-          setActiveItem(activeItem);
-        }}
-        onDragEnd={(event) => {
-          const { active, over } = event;
-          if (activeItem && over && active.id !== over.id) {
-            // const newIndex = items.findIndex((i) => i.id === over.id);
-            if (isGroup(activeItem) || isSubgroup(activeItem)) {
-              setItems(moveGroup(items, activeItem.id, over.id as string));
-            } else {
-              setItems(moveItem(items, activeItem.id, over.id as string));
+      <ThemeVariant variant="secondary">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={(event) => {
+            if (!isUserPremium()) {
+              showToast("info", "You need to be Pro to customize the toolbar.");
+              return;
             }
 
-            setTimeout(() => {
-              const element = document.getElementById(over.id as string);
-              element?.scrollIntoView({ behavior: "auto", block: "nearest" });
-            }, 500);
-          }
-          setActiveItem(undefined);
-        }}
-        measuring={{
-          droppable: { strategy: MeasuringStrategy.Always }
-        }}
-      >
-        <SortableContext items={items} strategy={verticalListSortingStrategy}>
-          {items?.map((item) => {
-            const deleted = isDeleted(items, item);
-            const hasSubGroup =
-              isGroup(item) &&
-              !!getGroup(items, item.id)?.items.some((t) => isSubgroup(t));
-            const canAddSubGroup =
-              currentPreset.editable && !deleted && !hasSubGroup;
-            const canRemoveGroup = currentPreset.editable && !deleted;
-            const canRemoveItem = currentPreset.editable && !deleted;
+            if (currentPreset.id !== "custom") {
+              setCurrentPreset((c) => ({
+                ...getPreset("custom"),
+                tools: getPresetTools(c)
+              }));
+            }
 
-            return (
-              <TreeNodeComponent
-                key={item.id}
-                item={item}
-                activeItem={activeItem}
-                onAddSubGroup={
-                  canAddSubGroup
-                    ? () => {
-                        setItems((items) => addSubGroup(items, item.id));
-                        showToast("success", "Subgroup added successfully");
-                      }
-                    : undefined
-                }
-                onRemoveGroup={
-                  canRemoveGroup
-                    ? (group) => {
-                        setItems(removeGroup(items, group.id));
-                      }
-                    : undefined
-                }
-                onRemoveItem={
-                  canRemoveItem
-                    ? (item) => {
-                        setItems(removeItem(items, item.id));
-                      }
-                    : undefined
-                }
-              />
-            );
-          })}
-          {activeItem &&
-            createPortal(
-              <DragOverlay
-              // dropAnimation={dropAnimationConfig}
-              // modifiers={indicator ? [adjustTranslate] : undefined}
-              >
-                <TreeNodeComponent overlay item={activeItem} />
-              </DragOverlay>,
-              document.querySelector(".ReactModal__Overlay") || document.body
-            )}
-        </SortableContext>
-      </DndContext>
+            const { active } = event;
+            const activeItem = items.find((item) => item.id === active.id);
+            setActiveItem(activeItem);
+          }}
+          onDragEnd={(event) => {
+            const { active, over } = event;
+            if (activeItem && over && active.id !== over.id) {
+              // const newIndex = items.findIndex((i) => i.id === over.id);
+              if (isGroup(activeItem) || isSubgroup(activeItem)) {
+                setItems(moveGroup(items, activeItem.id, over.id as string));
+              } else {
+                setItems(moveItem(items, activeItem.id, over.id as string));
+              }
+
+              setTimeout(() => {
+                const element = document.getElementById(over.id as string);
+                element?.scrollIntoView({ behavior: "auto", block: "nearest" });
+              }, 500);
+            }
+            setActiveItem(undefined);
+          }}
+          measuring={{
+            droppable: { strategy: MeasuringStrategy.Always }
+          }}
+        >
+          <SortableContext items={items} strategy={verticalListSortingStrategy}>
+            {items?.map((item) => {
+              const deleted = isDeleted(items, item);
+              const hasSubGroup =
+                isGroup(item) &&
+                !!getGroup(items, item.id)?.items.some((t) => isSubgroup(t));
+              const canAddSubGroup =
+                currentPreset.editable && !deleted && !hasSubGroup;
+              const canRemoveGroup = currentPreset.editable && !deleted;
+              const canRemoveItem = currentPreset.editable && !deleted;
+
+              return (
+                <TreeNodeComponent
+                  key={item.id}
+                  item={item}
+                  activeItem={activeItem}
+                  onAddSubGroup={
+                    canAddSubGroup
+                      ? () => {
+                          setItems((items) => addSubGroup(items, item.id));
+                          showToast("success", "Subgroup added successfully");
+                        }
+                      : undefined
+                  }
+                  onRemoveGroup={
+                    canRemoveGroup
+                      ? (group) => {
+                          setItems(removeGroup(items, group.id));
+                        }
+                      : undefined
+                  }
+                  onRemoveItem={
+                    canRemoveItem
+                      ? (item) => {
+                          setItems(removeItem(items, item.id));
+                        }
+                      : undefined
+                  }
+                />
+              );
+            })}
+            {activeItem &&
+              createPortal(
+                <DragOverlay
+                // dropAnimation={dropAnimationConfig}
+                // modifiers={indicator ? [adjustTranslate] : undefined}
+                >
+                  <TreeNodeComponent overlay item={activeItem} />
+                </DragOverlay>,
+                document.querySelector(".ReactModal__Overlay") || document.body
+              )}
+          </SortableContext>
+        </DndContext>
+      </ThemeVariant>
     </Flex>
   );
 }
@@ -285,7 +290,6 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         onAdd={isGroup(item) ? onAddSubGroup : undefined}
         sx={{
           bg: "background",
-          border: "1px solid var(--border)",
           borderRadius: "default",
           p: 1,
           mb: 1,
@@ -294,9 +298,9 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         }}
       >
         {isDraggable ? (
-          <Icon path={Icons.dragHandle} size={18} color="icon" />
+          <Icon path={Icons.dragHandle} size={18} color="accent" />
         ) : null}
-        <Text variant={"body"} sx={{ ml: 1 }}>
+        <Text variant={"body"} sx={{ ml: 1, color: "accent" }}>
           {item.title}
         </Text>
       </SortableWrapper>
@@ -313,7 +317,7 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         p: 1,
         alignItems: "center",
         justifyContent: "space-between",
-        bg: "bgSecondary",
+        bg: "background",
         borderRadius: "default",
         mb: 1,
         ml: item.depth * 15,

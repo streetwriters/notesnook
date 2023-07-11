@@ -25,13 +25,16 @@ import { Flex } from "@theme-ui/components";
 import IconTag from "../icon-tag";
 import { db } from "../../common/db";
 import { useMenuTrigger } from "../../hooks/use-menu";
+import { MenuItem } from "@notesnook/ui";
 
-function Header({ readonly }) {
+type HeaderProps = { readonly: boolean };
+function Header(props: HeaderProps) {
+  const { readonly } = props;
   const id = useStore((store) => store.session.id);
   const tags = useStore((store) => store.session.tags);
   const setTag = useStore((store) => store.setTag);
   const filterableTags = useMemo(() => {
-    return db.tags.all.filter((t) => tags?.every((tag) => tag !== t?.title));
+    return db.tags?.all.filter((t) => tags?.every((tag) => tag !== t?.title));
   }, [tags]);
 
   return (
@@ -45,7 +48,7 @@ function Header({ readonly }) {
             <IconTag
               testId={`tag`}
               key={tag}
-              text={db.tags.alias(tag)}
+              text={db.tags?.alias(tag)}
               icon={Tag}
               title={`Click to remove`}
               onClick={() => setTag(tag)}
@@ -55,7 +58,7 @@ function Header({ readonly }) {
           <Autosuggest
             sessionId={id}
             filter={(query) =>
-              db.lookup.tags(filterableTags, query).slice(0, 10)
+              db.lookup?.tags(filterableTags, query).slice(0, 10) || []
             }
             onAdd={(value) => setTag(value)}
             onSelect={(item) => setTag(item.title)}
@@ -63,7 +66,7 @@ function Header({ readonly }) {
               if (tags.length <= 0) return;
               setTag(tags[tags.length - 1]);
             }}
-            defaultItems={filterableTags.slice(0, 10)}
+            defaultItems={filterableTags?.slice(0, 10) || []}
           />
         </Flex>
       )}
@@ -72,23 +75,27 @@ function Header({ readonly }) {
 }
 export default Header;
 
-export function Autosuggest({
-  sessionId,
-  filter,
-  onRemove,
-  onSelect,
-  onAdd,
-  defaultItems
-}) {
-  const inputRef = useRef();
-  const filteredItems = useRef([]);
+type AutosuggestProps = {
+  sessionId: string;
+  filter: (query: string) => any[];
+  onRemove: () => void;
+  onSelect: (item: any) => void;
+  onAdd: (item: any) => void;
+  defaultItems: any[];
+};
+export function Autosuggest(props: AutosuggestProps) {
+  const { sessionId, filter, onRemove, onSelect, onAdd, defaultItems } = props;
+  const inputRef = useRef<HTMLInputElement>(null);
+  const filteredItems = useRef<any[]>([]);
   const { openMenu, closeMenu, isOpen } = useMenuTrigger();
   const clearInput = useCallback(() => {
+    if (!inputRef.current) return;
     inputRef.current.value = "";
     inputRef.current.focus();
   }, []);
 
   const getInputValue = useCallback(() => {
+    if (!inputRef.current) return;
     return inputRef.current.value.trim().toLowerCase();
   }, []);
 
@@ -106,9 +113,9 @@ export function Autosuggest({
   );
 
   const onOpenMenu = useCallback(
-    (filtered) => {
+    (filtered: any[]) => {
       const filterText = getInputValue();
-      let items = [];
+      const items: MenuItem[] = [];
 
       if (!filterText && filtered.length <= 0) {
         closeMenu();
@@ -118,9 +125,10 @@ export function Autosuggest({
       const isExactMatch = filtered.some((item) => item.title === filterText);
       if (filterText && !isExactMatch) {
         items.push({
+          type: "button",
           key: "new",
-          title: () => `Create "${filterText}" tag`,
-          icon: Plus,
+          title: `Create "${filterText}" tag`,
+          icon: Plus.path,
           onClick: () => onAction("add", filterText)
         });
       }
@@ -128,19 +136,20 @@ export function Autosuggest({
       if (filtered.length > 0) {
         items.push(
           ...filtered.map((tag) => ({
+            type: "button" as const,
             key: tag.id,
-            title: () => tag.alias,
-            icon: Tag,
+            title: tag.alias,
+            icon: Tag.path,
             onClick: () => onAction("select", tag)
           }))
         );
       }
 
       openMenu(items, {
-        type: "autocomplete",
-        positionOptions: {
-          relativeTo: inputRef.current,
-          absolute: true,
+        blocking: true,
+        position: {
+          target: inputRef.current,
+          isTargetAbsolute: true,
           location: "below"
         }
       });

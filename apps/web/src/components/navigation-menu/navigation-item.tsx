@@ -25,6 +25,8 @@ import { PropsWithChildren } from "react";
 import { Icon, Shortcut } from "../icons";
 import { AnimatedFlex } from "../animated";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { ThemeVariant } from "../theme-provider";
+import { MenuItem } from "@notesnook/ui";
 
 type NavigationItemProps = {
   icon: Icon;
@@ -39,8 +41,7 @@ type NavigationItemProps = {
   count?: number;
   animate?: boolean;
   index?: number;
-  // TODO: add proper typings here
-  menuItems?: any[];
+  menuItems?: MenuItem[];
 };
 
 function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
@@ -156,26 +157,28 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
           )} */}
         </Text>
       </Button>
-      {children ? (
-        children
-      ) : !isTablet && count !== undefined ? (
-        <Text
-          variant="subBody"
-          sx={{ mr: 1, bg: "hover", px: "3px", borderRadius: "default" }}
-        >
-          {count > 100 ? "100+" : count}
-        </Text>
-      ) : !isTablet && tag ? (
-        <Text
-          variant="subBody"
-          sx={{
-            mr: 1,
-            borderRadius: "100px"
-          }}
-        >
-          {tag}
-        </Text>
-      ) : null}
+      <ThemeVariant variant="secondary">
+        {children ? (
+          children
+        ) : !isTablet && count !== undefined ? (
+          <Text
+            variant="subBody"
+            sx={{ mr: 1, bg: "hover", px: "3px", borderRadius: "default" }}
+          >
+            {count > 100 ? "100+" : count}
+          </Text>
+        ) : !isTablet && tag ? (
+          <Text
+            variant="subBody"
+            sx={{
+              mr: 1,
+              borderRadius: "100px"
+            }}
+          >
+            {tag}
+          </Text>
+        ) : null}
+      </ThemeVariant>
     </AnimatedFlex>
   );
 }

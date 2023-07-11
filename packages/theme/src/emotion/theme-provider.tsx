@@ -29,30 +29,31 @@ import {
 import { PropsWithChildren, useMemo } from "react";
 import { Box, BoxProps } from "@theme-ui/components";
 
-type ScopedThemeProviderProps = {
+export type EmotionThemeProviderProps = {
   scope?: keyof ThemeScopes;
   variant?: keyof Variants;
   injectCssVars?: boolean;
 } & Omit<BoxProps, "variant">;
 
 export function EmotionThemeProvider(
-  props: PropsWithChildren<ScopedThemeProviderProps>
+  props: PropsWithChildren<EmotionThemeProviderProps>
 ) {
   const {
     children,
-    scope,
-    variant,
+    scope = "base",
+    variant = "primary",
     injectCssVars = true,
     className,
     ...restProps
   } = props;
   const { theme } = useThemeProvider();
-  const { colors } = useThemeColors(scope);
+  const themeScope = useThemeColors(scope);
+  const { colors } = themeScope;
 
   const themeProperties = useMemo(
     () =>
       ThemeFactory.construct({
-        colors: colors[variant || "primary"],
+        colors: { ...colors[variant], ...colors.static },
         colorScheme: theme.colorScheme
       }),
     [colors, theme.colorScheme, variant]
@@ -60,18 +61,13 @@ export function EmotionThemeProvider(
 
   return (
     <ThemeProvider theme={themeProperties}>
-      <NNScopedThemeProvider value={scope || "base"}>
+      <NNScopedThemeProvider value={themeScope}>
         {injectCssVars ? (
           <Box
             {...restProps}
-            className={`${className || ""} theme-scope-${scope || "base"}-${
-              variant || "primary"
-            }`}
-            css={`
-              & {
-                ${ThemeFactory.transform("css", themeProperties)}
-              }
-            `}
+            className={`${
+              className ? className + " " : ""
+            }theme-scope-${scope}-${variant}`}
           >
             {children}
           </Box>

@@ -26,6 +26,7 @@ import { Perform } from "../common/dialog-controller";
 import { TaskManager } from "../common/task-manager";
 import { isDesktop } from "../utils/platform";
 import Dialog from "../components/dialog";
+import { ErrorText } from "../components/error-text";
 
 type MigrationProgressEvent = {
   collection: string;
@@ -92,19 +93,15 @@ export default function MigrationDialog(props: MigrationDialogProps) {
           onClick: startMigration
         }}
       >
-        <Text
+        <ErrorText
+          error={error.stack}
           as="p"
-          variant={"error"}
           sx={{
-            bg: "errorBg",
-            p: 1,
             borderRadius: "default",
             wordWrap: "normal",
             overflowWrap: "break-word"
           }}
-        >
-          {error.stack}
-        </Text>
+        />
         <Text as="p" variant={"subBody"} sx={{ mt: 2 }}>
           If this continues to happen, please reach out to us via{" "}
           <a href="https://discord.com/invite/zQBK97EE22">Discord</a> or email

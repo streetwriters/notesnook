@@ -22,7 +22,7 @@ import { ImageAlignmentOptions, ImageAttributes } from "./image";
 import { useEffect, useRef, useState } from "react";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { DesktopOnly } from "../../components/responsive";
-import { Icon } from "../../toolbar/components/icon";
+import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 import {

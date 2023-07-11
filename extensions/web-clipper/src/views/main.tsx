@@ -250,7 +250,7 @@ export function Main() {
           >
             <Flex>
               <Icon path={item.icon} color="icon" size={16} />
-              <Text variant="text" sx={{ ml: 1 }}>
+              <Text variant="body" sx={{ ml: 1 }}>
                 {item.name}
               </Text>
             </Flex>
@@ -292,7 +292,7 @@ export function Main() {
           >
             <Flex>
               <Icon path={item.icon} color="icon" size={16} />
-              <Text variant="text" sx={{ ml: 1 }}>
+              <Text variant="body" sx={{ ml: 1 }}>
                 {item.name}
               </Text>
             </Flex>
@@ -432,7 +432,7 @@ export function Main() {
             window.close();
           }}
         >
-          <Text variant="text">Save clip</Text>
+          <Text variant="body">Save clip</Text>
         </Button>
 
         <Flex

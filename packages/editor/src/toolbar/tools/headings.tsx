@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ToolProps } from "../types";
 import { Editor } from "../../types";
 import { Dropdown } from "../components/dropdown";
-import { MenuItem } from "../../components/menu/types";
+import { MenuItem } from "@notesnook/ui";
 import { ToolbarLocation, useToolbarLocation } from "../stores/toolbar-store";
 import { useMemo } from "react";
 

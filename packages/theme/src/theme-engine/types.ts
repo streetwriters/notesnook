@@ -16,6 +16,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import * as CSS from "csstype";
+
+export type SchemeColors = keyof Colors | CSS.Property.Color;
+export type SchemeColorsAsCSSVariables = `var(--${keyof Colors})`;
+
+export function isThemeColor(
+  color: string,
+  colors: Colors
+): color is keyof Colors {
+  return color in colors;
+}
+
 export type Colors = {
   accent: string;
   paragraph: string;
@@ -89,3 +101,15 @@ export type ThemeDefinition = {
   };
   scopes: ThemeScopes;
 };
+
+export const ThemeScopeKeys = [
+  "base",
+  "statusBar",
+  "list",
+  "editor",
+  "dialog",
+  "navigationMenu",
+  "contextMenu",
+  "editorToolbar",
+  "sheet"
+] as const;

@@ -26,16 +26,12 @@ import {
   store as selectionStore
 } from "../../stores/selection-store";
 import GroupHeader from "../group-header";
-import {
-  Context,
-  DEFAULT_ITEM_HEIGHT,
-  Item,
-  ListProfiles
-} from "./list-profiles";
+import { DEFAULT_ITEM_HEIGHT, ListProfiles } from "./list-profiles";
 import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
 import ScrollContainer from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
+import { Context, Item } from "./types";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
@@ -218,7 +214,6 @@ function ListContainer(props: ListContainerProps) {
                       <Component
                         item={item}
                         context={context}
-                        index={index}
                         type={type}
                         compact={compact}
                       />

@@ -65,6 +65,8 @@ import {
 import { AppearanceSettings } from "./appearance-settings";
 import { debounce } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
+import { ThemeVariant } from "../../components/theme-provider";
+import { alpha } from "@theme-ui/color";
 
 type SettingsDialogProps = { onClose: Perform };
 
@@ -169,9 +171,8 @@ const SettingsGroups = [
 // can appear independent of others (e.g. as a search result)
 
 export default function SettingsDialog(props: SettingsDialogProps) {
-  const [route, setRoute] = useState<SectionKeys>("profile");
   const [activeSettings, setActiveSettings] = useState<SettingsGroup[]>(
-    SettingsGroups.filter((g) => g.section === route)
+    SettingsGroups.filter((g) => g.section === "profile")
   );
 
   return (
@@ -185,108 +186,14 @@ export default function SettingsDialog(props: SettingsDialogProps) {
       <Flex
         sx={{
           height: "80vw",
-          overflow: "hidden",
-          "& #settings-side-menu": {
-            "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
-              {
-                backgroundColor: "bgTransparent",
-                backdropFilter: "blur(8px)"
-              }
-          }
+          overflow: "hidden"
         }}
       >
-        <FlexScrollContainer
-          id="settings-side-menu"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            borderRadius: "10px",
-            width: 240,
-            overflow: "auto",
-            minHeight: "min-content",
-            backgroundColor: "bgSecondary"
-          }}
-          data-test-id="settings-navigation-menu"
-        >
-          <Input
-            placeholder="Search"
-            data-test-id="settings-search"
-            sx={{ m: 2, mb: 2, width: "auto", bg: "bgSecondary", py: "7px" }}
-            onChange={(e) => {
-              const query = e.target.value.toLowerCase().trim();
-              if (!query)
-                return setActiveSettings(
-                  SettingsGroups.filter((g) => g.section === route)
-                );
-
-              const groups: SettingsGroup[] = [];
-              for (const group of SettingsGroups) {
-                const isTitleMatch =
-                  typeof group.header === "string" &&
-                  group.header.toLowerCase().includes(query);
-                const isSectionMatch = group.section.includes(query);
-
-                if (isTitleMatch || isSectionMatch) {
-                  groups.push(group);
-                  continue;
-                }
-
-                const settings = group.settings.filter((setting) => {
-                  const description =
-                    typeof setting.description === "function"
-                      ? setting.description()
-                      : setting.description;
-
-                  return [
-                    description || "",
-                    setting.keywords?.join(" ") || "",
-                    setting.title
-                  ]
-                    .join(" ")
-                    ?.toLowerCase()
-                    .includes(query);
-                });
-                if (!settings.length) continue;
-                groups.push({ ...group, settings });
-              }
-              setActiveSettings(groups);
-            }}
+        <ThemeVariant variant="secondary">
+          <SettingsSideBar
+            onNavigate={(settings) => setActiveSettings(settings)}
           />
-          {sectionGroups.map((group) => (
-            <Flex key={group.key} sx={{ flexDirection: "column", mb: 2 }}>
-              <Text
-                variant={"subBody"}
-                sx={{
-                  fontWeight: "bold",
-                  color: "paragraph",
-                  mx: 3,
-                  mb: 1
-                }}
-              >
-                {group.title}
-              </Text>
-              {group.sections.map(
-                (section) =>
-                  (!section.isHidden || !section.isHidden()) && (
-                    <NavigationItem
-                      key={section.key}
-                      icon={section.icon}
-                      title={section.title}
-                      selected={section.key === route}
-                      onClick={() => {
-                        setActiveSettings(
-                          SettingsGroups.filter(
-                            (g) => g.section === section.key
-                          )
-                        );
-                        setRoute(section.key);
-                      }}
-                    />
-                  )
-              )}
-            </Flex>
-          ))}
-        </FlexScrollContainer>
+        </ThemeVariant>
         <FlexScrollContainer
           style={{
             display: "flex",
@@ -305,6 +212,121 @@ export default function SettingsDialog(props: SettingsDialogProps) {
         </FlexScrollContainer>
       </Flex>
     </Dialog>
+  );
+}
+
+type SettingsSideBarProps = { onNavigate: (settings: SettingsGroup[]) => void };
+function SettingsSideBar(props: SettingsSideBarProps) {
+  const { onNavigate } = props;
+  const [route, setRoute] = useState<SectionKeys>("profile");
+
+  return (
+    <FlexScrollContainer
+      id="settings-side-menu"
+      style={{
+        width: 240,
+        overflow: "auto"
+      }}
+      data-test-id="settings-navigation-menu"
+    >
+      <Flex
+        sx={{
+          flexDirection: "column",
+          display: "flex",
+          overflow: "hidden",
+          "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
+            {
+              backgroundColor: alpha("background", 0.6),
+              backdropFilter: "blur(8px)"
+            },
+          backgroundColor: "background",
+          borderRadius: "dialog"
+        }}
+      >
+        <Input
+          placeholder="Search"
+          data-test-id="settings-search"
+          sx={{
+            m: 2,
+            mb: 2,
+            width: "auto",
+            bg: "background",
+            py: "7px"
+          }}
+          onChange={(e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (!query)
+              return onNavigate(
+                SettingsGroups.filter((g) => g.section === route)
+              );
+
+            const groups: SettingsGroup[] = [];
+            for (const group of SettingsGroups) {
+              const isTitleMatch =
+                typeof group.header === "string" &&
+                group.header.toLowerCase().includes(query);
+              const isSectionMatch = group.section.includes(query);
+
+              if (isTitleMatch || isSectionMatch) {
+                groups.push(group);
+                continue;
+              }
+
+              const settings = group.settings.filter((setting) => {
+                const description =
+                  typeof setting.description === "function"
+                    ? setting.description()
+                    : setting.description;
+
+                return [
+                  description || "",
+                  setting.keywords?.join(" ") || "",
+                  setting.title
+                ]
+                  .join(" ")
+                  ?.toLowerCase()
+                  .includes(query);
+              });
+              if (!settings.length) continue;
+              groups.push({ ...group, settings });
+            }
+            onNavigate(groups);
+          }}
+        />
+        {sectionGroups.map((group) => (
+          <Flex key={group.key} sx={{ flexDirection: "column", mb: 2 }}>
+            <Text
+              variant={"subBody"}
+              sx={{
+                fontWeight: "bold",
+                color: "paragraph",
+                mx: 3,
+                mb: 1
+              }}
+            >
+              {group.title}
+            </Text>
+            {group.sections.map(
+              (section) =>
+                (!section.isHidden || !section.isHidden()) && (
+                  <NavigationItem
+                    key={section.key}
+                    icon={section.icon}
+                    title={section.title}
+                    selected={section.key === route}
+                    onClick={() => {
+                      onNavigate(
+                        SettingsGroups.filter((g) => g.section === section.key)
+                      );
+                      setRoute(section.key);
+                    }}
+                  />
+                )
+            )}
+          </Flex>
+        ))}
+      </Flex>
+    </FlexScrollContainer>
   );
 }
 
@@ -333,7 +355,7 @@ function SettingsGroupComponent(props: { item: SettingsGroup }) {
             fontSize: 11,
             fontWeight: "bold",
             letterSpacing: 0.3,
-            color: "primary"
+            color: "accent"
           }}
         >
           {item.header.toUpperCase()}
@@ -384,7 +406,7 @@ function SettingItem(props: { item: Setting }) {
       sx={{
         flexDirection: "column",
         pb: 4,
-        borderBottom: "1px solid var(--border)"
+        borderBottom: "1px solid var(--separator)"
       }}
       data-test-id={`setting-${item.key}`}
     >
@@ -401,7 +423,7 @@ function SettingItem(props: { item: Setting }) {
           {item.description && (
             <Text
               variant={"body"}
-              sx={{ mt: 1, color: "fontTertiary", whiteSpace: "pre-wrap" }}
+              sx={{ mt: 1, color: "paragraph", whiteSpace: "pre-wrap" }}
             >
               {typeof item.description === "function"
                 ? item.description(state)
@@ -423,23 +445,31 @@ function SettingItem(props: { item: Setting }) {
             switch (component.type) {
               case "button":
                 return (
-                  <Button
-                    disabled={isWorking}
-                    title={component.title}
-                    variant={component.variant}
-                    onClick={() => workWithLoading(component.action)}
+                  <ThemeVariant
+                    variant={
+                      component.variant === "errorSecondary"
+                        ? "error"
+                        : component.variant
+                    }
                   >
-                    {isWorking ? (
-                      <Loading size={18} sx={{ mr: 2 }} />
-                    ) : (
-                      component.title
-                    )}
-                  </Button>
+                    <Button
+                      disabled={isWorking}
+                      title={component.title}
+                      variant={component.variant}
+                      onClick={() => workWithLoading(component.action)}
+                    >
+                      {isWorking ? (
+                        <Loading size={18} sx={{ mr: 2 }} />
+                      ) : (
+                        component.title
+                      )}
+                    </Button>
+                  </ThemeVariant>
                 );
               case "toggle":
                 return (
                   <Switch
-                    sx={{ m: 0 }}
+                    sx={{ m: 0, background: "accent" }}
                     disabled={isWorking}
                     onChange={() => workWithLoading(component.toggle)}
                     checked={component.isToggled()}
@@ -447,32 +477,34 @@ function SettingItem(props: { item: Setting }) {
                 );
               case "dropdown":
                 return (
-                  <select
-                    style={{
-                      backgroundColor: "var(--bgSecondary)",
-                      outline: "none",
-                      border: "1px solid var(--border)",
-                      borderRadius: "5px",
-                      color: "var(--text)",
-                      padding: "5px"
-                    }}
-                    value={component.selectedOption()}
-                    onChange={(e) =>
-                      component.onSelectionChanged(
-                        (e.target as HTMLSelectElement).value
-                      )
-                    }
-                  >
-                    {component.options.map((option) => (
-                      <option
-                        disabled={option.premium && !isUserPremium}
-                        key={option.value}
-                        value={option.value}
-                      >
-                        {option.title}
-                      </option>
-                    ))}
-                  </select>
+                  <ThemeVariant variant="secondary" injectCssVars>
+                    <select
+                      style={{
+                        backgroundColor: "var(--background)",
+                        outline: "none",
+                        border: "1px solid var(--border)",
+                        borderRadius: "5px",
+                        color: "var(--paragraph)",
+                        padding: "5px"
+                      }}
+                      value={component.selectedOption()}
+                      onChange={(e) =>
+                        component.onSelectionChanged(
+                          (e.target as HTMLSelectElement).value
+                        )
+                      }
+                    >
+                      {component.options.map((option) => (
+                        <option
+                          disabled={option.premium && !isUserPremium}
+                          key={option.value}
+                          value={option.value}
+                        >
+                          {option.title}
+                        </option>
+                      ))}
+                    </select>
+                  </ThemeVariant>
                 );
               case "input":
                 return component.inputType === "number" ? (

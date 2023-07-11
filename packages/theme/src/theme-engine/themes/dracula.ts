@@ -45,7 +45,7 @@ export const ThemeDracula: ThemeDefinition = {
         background: "#343746",
         border: "#383838",
         placeholder: "#404040",
-        heading: "#808080",
+        heading: "#f8f8f2",
         paragraph: "#c5c5c5",
         icon: "#c5c5c5",
         separator: "#383838",
@@ -78,7 +78,7 @@ export const ThemeDracula: ThemeDefinition = {
         icon: "#ff5555",
         separator: "#383838",
         backdrop: "#35353580",
-        hover: "#ffffff10",
+        hover: "#ff5555aa",
         shade: "#ff555512",
         textSelection: "#ff555555"
       },
@@ -154,14 +154,6 @@ export const ThemeDracula: ThemeDefinition = {
         background: "#343746",
         border: "#c5c5c512",
         hover: "#44475a"
-      }
-    },
-    dialog: {
-      primary: {
-        background: "#282a36"
-      },
-      secondary: {
-        background: "#bd93f9"
       }
     }
   }

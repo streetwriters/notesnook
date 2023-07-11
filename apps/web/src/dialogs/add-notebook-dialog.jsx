@@ -230,10 +230,10 @@ function TopicItem(props) {
       pl={0}
       sx={{
         borderWidth: 1,
-        borderBottomColor: isEditing ? "primary" : "border",
+        borderBottomColor: isEditing ? "accent" : "border",
         borderBottomStyle: "solid",
         cursor: "pointer",
-        ":hover": { borderBottomColor: "primary" },
+        ":hover": { borderBottomColor: "accent" },
         alignItems: "center",
         justifyContent: "space-between"
       }}
@@ -254,7 +254,7 @@ function TopicItem(props) {
               alignItems: "center",
               ":hover": { opacity: 0.8 },
               height: "25px",
-              color: "primary",
+              color: "accent",
               display: "flex"
             }}
             onClick={isEditing ? onDoneEditing : onEdit}
@@ -272,7 +272,7 @@ function TopicItem(props) {
               alignItems: "center",
               ":hover": { opacity: 0.8 },
               height: "25px",
-              color: "error",
+              color: "red",
               display: "flex"
             }}
           >

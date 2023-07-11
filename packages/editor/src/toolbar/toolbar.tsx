@@ -24,10 +24,6 @@ import {
   MOBILE_STATIC_TOOLBAR_GROUPS
 } from "./tool-definitions";
 import { useEffect, useMemo } from "react";
-import {
-  EditorContext,
-  PopupRenderer
-} from "../components/popup-presenter/popuprenderer";
 import { Editor } from "../types";
 import { ToolbarGroup } from "./components/toolbar-group";
 import { EditorFloatingMenus } from "./floating-menus";
@@ -87,39 +83,37 @@ export function Toolbar(props: ToolbarProps) {
 
   if (!editor) return null;
   return (
-    <EditorContext.Provider value={editor}>
-      <PopupRenderer editor={editor}>
-        <Flex
-          className="editor-toolbar"
-          sx={{
-            ...sx,
-            flexWrap: isMobile ? "nowrap" : "wrap",
-            overflowX: isMobile ? "auto" : "hidden",
-            bg: "background",
-            borderRadius: isMobile ? "0px" : "default",
-            px: 1
-          }}
-          {...flexProps}
-        >
-          {toolbarTools.map((tools) => {
-            return (
-              <ToolbarGroup
-                key={tools.join("")}
-                tools={tools}
-                editor={editor}
-                sx={{
-                  flexShrink: 0,
-                  pr: 2,
-                  mr: 2,
-                  borderRight: "1px solid var(--border)",
-                  ":last-of-type": { mr: 0, pr: 0, borderRight: "none" }
-                }}
-              />
-            );
-          })}
-        </Flex>
-        <EditorFloatingMenus editor={editor} />
-      </PopupRenderer>
-    </EditorContext.Provider>
+    <>
+      <Flex
+        className="editor-toolbar"
+        sx={{
+          ...sx,
+          flexWrap: isMobile ? "nowrap" : "wrap",
+          overflowX: isMobile ? "auto" : "hidden",
+          bg: "background",
+          borderRadius: isMobile ? "0px" : "default",
+          px: 1
+        }}
+        {...flexProps}
+      >
+        {toolbarTools.map((tools) => {
+          return (
+            <ToolbarGroup
+              key={tools.join("")}
+              tools={tools}
+              editor={editor}
+              sx={{
+                flexShrink: 0,
+                pr: 2,
+                mr: 2,
+                borderRight: "1px solid var(--border)",
+                ":last-of-type": { mr: 0, pr: 0, borderRight: "none" }
+              }}
+            />
+          );
+        })}
+      </Flex>
+      <EditorFloatingMenus editor={editor} />
+    </>
   );
 }

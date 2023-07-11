@@ -39,6 +39,7 @@ import { pluralize } from "@notesnook/common";
 import { isMac } from "../utils/platform";
 import { create } from "zustand";
 import { FilteredList } from "../components/filtered-list";
+import { ThemeVariant } from "../components/theme-provider";
 
 type MoveDialogProps = { onClose: Perform; noteIds: string[] };
 type NotebookReference = {
@@ -202,32 +203,34 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
         sx={{ overflowY: "hidden", flexDirection: "column" }}
         data-test-id="notebook-list"
       >
-        <FilteredList
-          placeholders={{
-            empty: "Add a new notebook",
-            filter: "Search or add a new notebook"
-          }}
-          items={getAllNotebooks}
-          filter={(notebooks, query) =>
-            db.lookup?.notebooks(notebooks, query) || []
-          }
-          onCreateNewItem={async (title) =>
-            await db.notebooks?.add({
-              title
-            })
-          }
-          renderItem={(notebook, _index, refresh, isSearching) => (
-            <NotebookItem
-              key={notebook.id}
-              notebook={notebook}
-              isSearching={isSearching}
-              onCreateItem={async (title) => {
-                await db.notebooks?.notebook(notebook.id).topics.add(title);
-                refresh();
-              }}
-            />
-          )}
-        />
+        <ThemeVariant variant="secondary">
+          <FilteredList
+            placeholders={{
+              empty: "Add a new notebook",
+              filter: "Search or add a new notebook"
+            }}
+            items={getAllNotebooks}
+            filter={(notebooks, query) =>
+              db.lookup?.notebooks(notebooks, query) || []
+            }
+            onCreateNewItem={async (title) =>
+              await db.notebooks?.add({
+                title
+              })
+            }
+            renderItem={(notebook, _index, refresh, isSearching) => (
+              <NotebookItem
+                key={notebook.id}
+                notebook={notebook}
+                isSearching={isSearching}
+                onCreateItem={async (title) => {
+                  await db.notebooks?.notebook(notebook.id).topics.add(title);
+                  refresh();
+                }}
+              />
+            )}
+          />
+        </ThemeVariant>
       </Flex>
     </Dialog>
   );
@@ -266,7 +269,7 @@ function NotebookItem(props: {
             cursor: "pointer",
             justifyContent: "space-between",
             alignItems: "center",
-            bg: "bgSecondary",
+            bg: "background",
             borderRadius: "default",
             p: 1,
             height: "40px"
@@ -354,7 +357,7 @@ function NotebookItem(props: {
                 data-test-id={`new-topic-input`}
                 autoFocus
                 sx={{
-                  bg: "bgSecondary",
+                  bg: "background",
                   p: "small",
                   border: "1px solid var(--border)"
                 }}
@@ -387,7 +390,7 @@ function TopicSelectionIndicator({ notebook }: { notebook: Notebook }) {
   );
 
   if (!hasSelectedTopics) return null;
-  return <Circle size={8} color="primary" sx={{ mr: 1 }} />;
+  return <Circle size={8} color="accent" sx={{ mr: 1 }} />;
 }
 
 function TopicItem(props: { topic: Topic }) {
@@ -447,7 +450,7 @@ function SelectedCheck({
     selectedItem?.op === "remove" ? "remove" : selectedItem?.op === "add";
 
   return selected === true ? (
-    <CheckCircleOutline size={size} sx={{ mr: 1 }} color="primary" />
+    <CheckCircleOutline size={size} sx={{ mr: 1 }} color="accent" />
   ) : selected === null ? (
     <CheckIntermediate size={size} sx={{ mr: 1 }} color="dimPrimary" />
   ) : selected === "remove" ? (

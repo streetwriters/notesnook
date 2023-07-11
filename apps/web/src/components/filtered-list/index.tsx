@@ -141,7 +141,7 @@ export function FilteredList<T extends FilterableItem>(
             }}
           >
             <Text variant={"body"}>{`Add "${query}"`}</Text>
-            <Plus size={16} color="primary" />
+            <Plus size={16} color="accent" />
           </Button>
         )}
         {items.map((item, index) => renderItem(item, index, refresh, !!query))}

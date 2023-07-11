@@ -22,6 +22,7 @@ import { Loading } from "../../../components/icons";
 import { Box, Flex, Link, Text } from "@theme-ui/components";
 import { getFormattedDate } from "@notesnook/common";
 import { db } from "../../../common/db";
+import { ThemeVariant } from "../../../components/theme-provider";
 
 type Transaction = {
   order_id: string;
@@ -84,13 +85,15 @@ export function BillingHistory() {
       {isLoading ? (
         <Loading sx={{ mt: 2 }} />
       ) : error ? (
-        <Flex sx={{ bg: "errorBg", p: 1, borderRadius: "default" }}>
-          <Text variant="error" sx={{ whiteSpace: "pre-wrap" }}>
-            {error.message}
-            <br />
-            {error.stack}
-          </Text>
-        </Flex>
+        <ThemeVariant variant="error">
+          <Flex sx={{ bg: "background", p: 1, borderRadius: "default" }}>
+            <Text variant="paragraph" sx={{ whiteSpace: "pre-wrap" }}>
+              {error.message}
+              <br />
+              {error.stack}
+            </Text>
+          </Flex>
+        </ThemeVariant>
       ) : (
         <table
           style={{ tableLayout: "fixed", borderCollapse: "collapse" }}
@@ -102,7 +105,7 @@ export function BillingHistory() {
               as="tr"
               sx={{
                 height: 30,
-                th: { borderBottom: "1px solid var(--border)" }
+                th: { borderBottom: "1px solid var(--separator)" }
               }}
             >
               {[
@@ -157,7 +160,7 @@ export function BillingHistory() {
                     target="_blank"
                     rel="noreferer nofollow"
                     variant="text.subBody"
-                    sx={{ color: "primary" }}
+                    sx={{ color: "accent" }}
                   >
                     View receipt
                   </Link>

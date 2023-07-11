@@ -174,7 +174,7 @@ function isIgnored(key: keyof typeof NoticesData) {
   return Config.get(`ignored:${key}`, false);
 }
 
-var openedToast: { hide: () => void } | null = null;
+let openedToast: { hide: () => void } | null = null;
 async function saveBackup() {
   if (isDesktop()) {
     await createBackup();
@@ -191,7 +191,7 @@ async function saveBackup() {
             openedToast?.hide();
             openedToast = null;
           },
-          type: "text"
+          type: "paragraph"
         },
         {
           text: "Download",
@@ -200,7 +200,7 @@ async function saveBackup() {
             openedToast?.hide();
             openedToast = null;
           },
-          type: "primary"
+          type: "accent"
         }
       ],
       0

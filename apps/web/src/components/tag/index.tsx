@@ -28,59 +28,32 @@ import { db } from "../../common/db";
 import { Edit, Shortcut, DeleteForver } from "../icons";
 import { showToast } from "../../utils/toast";
 import { pluralize } from "@notesnook/common";
+import { Item } from "../list-container/types";
+import { MenuItem } from "@notesnook/ui";
 
-const menuItems = [
-  {
-    key: "edit",
-    title: "Rename tag",
-    icon: Edit,
-    onClick: ({ tag }) => {
-      hashNavigate(`/tags/${tag.id}/edit`);
-    }
-  },
-  {
-    key: "shortcut",
-    title: ({ tag }) =>
-      db.shortcuts.exists(tag.id) ? "Remove shortcut" : "Create shortcut",
-    icon: Shortcut,
-    onClick: ({ tag }) => appStore.addToShortcuts(tag)
-  },
-  { key: "sep", type: "separator" },
-  {
-    key: "delete",
-    color: "error",
-    iconColor: "error",
-    title: "Delete",
-    icon: DeleteForver,
-    onClick: async ({ items }) => {
-      for (let tag of items) {
-        if (tag.noteIds.includes(editorStore.get().session.id))
-          await editorStore.clearSession();
-        await db.tags.remove(tag.id);
-      }
-      showToast("success", `${pluralize(items.length, "tag")} deleted`);
-      tagStore.refresh();
-      noteStore.refresh();
-    },
-    multiSelect: true
-  }
-];
-
-function Tag({ item, index }) {
+type TagProps = { item: Item };
+function Tag(props: TagProps) {
+  const { item } = props;
   const { id, noteIds, alias } = item;
+
   return (
     <ListItem
       item={item}
       isCompact
-      selectable={false}
-      index={index}
-      title={<TagNode title={alias} />}
-      footer={
-        <Text mt={1} variant="subBody">
-          {noteIds.length}
+      title={
+        <Text as="span">
+          <Text as="span" sx={{ color: "accent" }}>
+            {"#"}
+          </Text>
+          {alias}
         </Text>
       }
-      menu={{ items: menuItems, extraData: { tag: item } }}
+      footer={
+        <Text mt={1} variant="subBody">
+          {(noteIds as string[]).length}
+        </Text>
+      }
+      menuItems={menuItems}
       onClick={() => {
         navigate(`/tags/${id}`);
       }}
@@ -89,13 +62,47 @@ function Tag({ item, index }) {
 }
 export default Tag;
 
-function TagNode({ title }) {
-  return (
-    <Text as="span">
-      <Text as="span" sx={{ color: "primary" }}>
-        {"#"}
-      </Text>
-      {title}
-    </Text>
-  );
-}
+const menuItems: (tag: any, items?: any[]) => MenuItem[] = (
+  tag,
+  items = []
+) => {
+  return [
+    {
+      type: "button",
+      key: "edit",
+      title: "Rename tag",
+      icon: Edit.path,
+      onClick: () => {
+        hashNavigate(`/tags/${tag.id}/edit`);
+      }
+    },
+    {
+      type: "button",
+      key: "shortcut",
+      title: db.shortcuts?.exists(tag.id)
+        ? "Remove shortcut"
+        : "Create shortcut",
+      icon: Shortcut.path,
+      onClick: () => appStore.addToShortcuts(tag)
+    },
+    { key: "sep", type: "separator" },
+    {
+      type: "button",
+      key: "delete",
+      styles: { icon: { color: "red" }, text: { color: "red" } },
+      title: "Delete",
+      icon: DeleteForver.path,
+      onClick: async () => {
+        for (const tag of items) {
+          if (tag.noteIds.includes(editorStore.get().session.id))
+            await editorStore.clearSession();
+          await db.tags?.remove(tag.id);
+        }
+        showToast("success", `${pluralize(items.length, "tag")} deleted`);
+        tagStore.refresh();
+        noteStore.refresh();
+      },
+      multiSelect: true
+    }
+  ];
+};

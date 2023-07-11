@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
 import { Resizable } from "re-resizable";
 import { PropsWithChildren } from "react";
-import { Icon, Icons } from "../../toolbar";
+import { Icons } from "../../toolbar";
+import { Icon } from "@notesnook/ui";
 import { Editor } from "../../types";
 import { Flex } from "@theme-ui/components";
 

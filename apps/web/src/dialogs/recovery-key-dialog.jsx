@@ -26,6 +26,8 @@ import * as clipboard from "clipboard-polyfill/text";
 import { Suspense } from "react";
 import Config from "../utils/config";
 import FileSaver from "file-saver";
+import { ErrorText } from "../components/error-text";
+import { ThemeVariant } from "../components/theme-provider";
 
 const QRCode = React.lazy(() => import("../re-exports/react-qrcode-logo"));
 
@@ -57,34 +59,28 @@ function RecoveryKeyDialog(props) {
     >
       <Flex sx={{ overflow: "hidden", flex: 1, flexDirection: "column" }}>
         <Flex sx={{ overflowY: "auto", flexDirection: "column" }}>
-          <Text
-            bg="errorBg"
-            p={2}
-            sx={{
-              borderRadius: "default",
-              fontSize: "subBody",
-              color: "error"
-            }}
-          >
-            In case you forget your password, your recovery key is the only way
-            to recover your data.
-          </Text>
-          <Text
-            data-test-id="recovery-key"
-            className="selectable"
-            mt={2}
-            bg="bgSecondary"
-            p={2}
-            sx={{
-              borderRadius: "default",
-              overflowWrap: "anywhere",
-              fontSize: "body",
-              fontFamily: "monospace",
-              color: "paragraph"
-            }}
-          >
-            {key}
-          </Text>
+          <ErrorText
+            error="In case you forget your password, your recovery key is the only way to recover your data."
+            mt={0}
+          />
+          <ThemeVariant variant="secondary">
+            <Text
+              data-test-id="recovery-key"
+              className="selectable"
+              mt={2}
+              bg="background"
+              p={2}
+              sx={{
+                borderRadius: "default",
+                overflowWrap: "anywhere",
+                fontSize: "body",
+                fontFamily: "monospace",
+                color: "paragraph"
+              }}
+            >
+              {key}
+            </Text>
+          </ThemeVariant>
           <Flex
             mt={4}
             sx={{ alignItems: "center", justifyContent: "space-around" }}

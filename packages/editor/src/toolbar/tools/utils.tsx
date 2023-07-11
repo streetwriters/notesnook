@@ -18,19 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor } from "../../types";
-import { MenuButton } from "../../components/menu/types";
+import { MenuButtonItem } from "@notesnook/ui";
 import { ToolButton } from "../components/tool-button";
 import { ToolProps } from "../types";
+import { IconNames } from "../icons";
 
 export function menuButtonToTool(
-  constructItem: (editor: Editor) => MenuButton
+  constructItem: (editor: Editor) => MenuButtonItem
 ) {
-  return function Tool(props: ToolProps) {
+  return function Tool(props: ToolProps & { icon: IconNames }) {
     const item = constructItem(props.editor);
     return (
       <ToolButton
         {...props}
-        icon={item.icon || props.icon}
+        icon={props.icon}
         toggled={item.isChecked || false}
         title={item.title}
         onClick={item.onClick}

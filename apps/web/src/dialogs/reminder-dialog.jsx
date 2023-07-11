@@ -50,7 +50,7 @@ const reminders = {
       title: (
         <>
           Subscribe now to{" "}
-          <Text as="span" sx={{ fontWeight: "bold", color: "primary" }}>
+          <Text as="span" sx={{ fontWeight: "bold", color: "accent" }}>
             get 30% off
           </Text>
           *

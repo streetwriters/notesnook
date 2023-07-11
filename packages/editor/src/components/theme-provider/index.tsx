@@ -37,7 +37,7 @@ export function ThemeProvider(
     } & Omit<BoxProps, "variant">
   >
 ) {
-  const { children, scope, variant, ...restProps } = props;
+  const { children, scope, variant, injectCssVars, ...restProps } = props;
   const theme = useTheme();
   return (
     <NNThemeProvider
@@ -49,6 +49,7 @@ export function ThemeProvider(
       <EmotionThemeProvider
         scope={scope || "editor"}
         variant={variant || "primary"}
+        injectCssVars={injectCssVars}
         {...restProps}
       >
         {children}

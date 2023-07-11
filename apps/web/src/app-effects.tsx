@@ -35,7 +35,6 @@ import {
   showAnnouncementDialog,
   showBuyDialog,
   showFeatureDialog,
-  showInvalidSystemTimeDialog,
   showOnboardingDialog
 } from "./common/dialog-controller";
 import useSystemTheme from "./hooks/use-system-theme";

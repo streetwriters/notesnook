@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Trash as TrashIcon } from "../components/icons";
 import ListContainer from "../components/list-container";
 import { confirm } from "../common/dialog-controller";
 import { useStore, store } from "../stores/trash-store";

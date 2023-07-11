@@ -24,6 +24,7 @@ import { Period, Plan } from "./types";
 import { PLAN_METADATA, usePlans } from "./plans";
 import { useEffect } from "react";
 import { getCurrencySymbol } from "./helpers";
+import { ThemeVariant } from "../../components/theme-provider";
 
 type PlansListProps = {
   onPlanSelected: (plan: Plan) => void;
@@ -88,12 +89,14 @@ export function PlansList(props: PlansListProps) {
               >
                 {metadata.title}
                 <br />
-                <Text
-                  variant="body"
-                  sx={{ fontWeight: "normal", color: "fontTertiary" }}
-                >
-                  {metadata.subtitle}
-                </Text>
+                <ThemeVariant variant="secondary">
+                  <Text
+                    variant="body"
+                    sx={{ fontWeight: "normal", color: "paragraph" }}
+                  >
+                    {metadata.subtitle}
+                  </Text>
+                </ThemeVariant>
               </Text>
               {isLoading ? <Loading /> : <RecurringPricing plan={plan} />}
             </Button>
@@ -115,16 +118,18 @@ function RecurringPricing(props: RecurringPricingProps) {
       variant="body"
     >
       {plan.originalPrice && (
-        <Text
-          sx={{
-            textDecorationLine: "line-through",
-            fontSize: "body",
-            color: "fontTertiary"
-          }}
-        >
-          {getCurrencySymbol(plan.currency)}
-          {plan.originalPrice.gross}
-        </Text>
+        <ThemeVariant variant="secondary">
+          <Text
+            sx={{
+              textDecorationLine: "line-through",
+              fontSize: "body",
+              color: "paragraph"
+            }}
+          >
+            {getCurrencySymbol(plan.currency)}
+            {plan.originalPrice.gross}
+          </Text>
+        </ThemeVariant>
       )}
       <Text>
         <Text as="span" sx={{ fontSize: "subtitle" }}>

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, Text } from "@theme-ui/components";
-import { Icon } from "./icon";
+import { Icon } from "@notesnook/ui";
 import { Icons } from "../icons";
 import { PropsWithChildren } from "react";
 import { DesktopOnly, MobileOnly } from "../../components/responsive";
@@ -77,7 +77,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
             <EmotionThemeVariant variant="secondary">
               <Flex
                 sx={{ justifyContent: "end" }}
-                bg="secondary"
+                bg="background"
                 p={1}
                 px={2}
                 mt={2}

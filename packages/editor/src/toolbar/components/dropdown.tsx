@@ -19,12 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef, useState } from "react";
 import { Text } from "@theme-ui/components";
-import { Icon } from "./icon";
+import { Icon, MenuItem, MenuPresenter } from "@notesnook/ui";
 import { Icons } from "../icons";
-// import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
-import { MenuItem } from "../../components/menu/types";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
-import { MenuPresenter } from "../../components/menu";
 import { getToolbarElement } from "../utils/dom";
 import { Button } from "../../components/button";
 import { usePopupHandler } from "../../components/popup-presenter";

@@ -25,6 +25,8 @@ import { useStore as useEditorStore } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import Field from "../field";
 import { showToast } from "../../utils/toast";
+import { ErrorText } from "../error-text";
+import { ThemeVariant } from "../theme-provider";
 
 function Unlock(props) {
   const { noteId } = props;
@@ -101,18 +103,20 @@ function Unlock(props) {
           {note?.title || "Open note"}
         </Text>
       </Flex>
-      <Text
-        variant="body"
-        mt={1}
-        mb={4}
-        sx={{
-          textAlign: "center",
-          fontSize: "title",
-          color: "fontTertiary"
-        }}
-      >
-        Please enter the password to unlock this note.
-      </Text>
+      <ThemeVariant variant="secondary">
+        <Text
+          variant="body"
+          mt={1}
+          mb={4}
+          sx={{
+            textAlign: "center",
+            fontSize: "title",
+            color: "paragraph"
+          }}
+        >
+          Please enter the password to unlock this note.
+        </Text>
+      </ThemeVariant>
       <Field
         id="vaultPassword"
         data-test-id="unlock-note-password"
@@ -129,22 +133,7 @@ function Unlock(props) {
           }
         }}
       />
-      {isWrong && (
-        <Flex
-          mt={2}
-          sx={{
-            alignItems: "center",
-            justifyContent: "center",
-            color: "error",
-            alignSelf: "flex-center"
-          }}
-        >
-          <Alert color="error" size={12} />
-          <Text ml={1} sx={{ fontSize: "body" }}>
-            Wrong password
-          </Text>
-        </Flex>
-      )}
+      {isWrong && <ErrorText error="Wrong password" />}
       <Button
         mt={3}
         variant="primary"

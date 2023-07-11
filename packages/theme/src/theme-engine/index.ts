@@ -21,9 +21,18 @@ import { createContext, useContext, useMemo } from "react";
 import { ThemeLight } from "./themes/light";
 import {
   ThemeDefinition,
+  ThemeScopeKeys,
   ThemeScopes,
+  Variants,
   VariantsWithStaticColors
 } from "./types";
+import { colorsToCss } from "../theme/transformer";
+
+type ThemeScope = {
+  colors: VariantsWithStaticColors<true>;
+  scope: keyof ThemeScopes;
+  isDark: boolean;
+};
 
 export const StaticColors = {
   red: "#f44336",
@@ -44,16 +53,16 @@ const ThemeContext = createContext<{
   theme: ThemeLight,
   setTheme: () => null
 });
-const ThemeScope = createContext<keyof ThemeScopes>("base");
 
-export const useThemeColors = (
-  scope?: keyof ThemeScopes
-): {
-  colors: VariantsWithStaticColors<true>;
-  scope: string;
-  isDark: boolean;
-} => {
-  const currentScope = useCurrentThemeScope();
+const ThemeScopeContext = createContext<ThemeScope>({
+  colors: { ...ThemeLight.scopes.base, static: StaticColors },
+  isDark: false,
+  scope: "base"
+});
+const ThemeVariantContext = createContext<keyof Variants>("primary");
+
+export function useThemeColors(scope?: keyof ThemeScopes): ThemeScope {
+  const { scope: currentScope } = useCurrentThemeScope();
   const { theme } = useThemeProvider();
   const themeScope = useMemo(
     () => theme.scopes[scope || currentScope] || theme.scopes.base,
@@ -62,33 +71,7 @@ export const useThemeColors = (
 
   const currentTheme = useMemo(
     () => ({
-      colors: {
-        primary: {
-          ...theme.scopes.base.primary,
-          ...themeScope.primary
-        },
-        secondary: {
-          ...theme.scopes.base.secondary,
-          ...themeScope.secondary
-        },
-        disabled: {
-          ...theme.scopes.base.disabled,
-          ...themeScope.disabled
-        },
-        error: {
-          ...theme.scopes.base.error,
-          ...themeScope.error
-        },
-        warning: {
-          ...theme.scopes.base.warning,
-          ...themeScope.warning
-        },
-        success: {
-          ...theme.scopes.base.success,
-          ...themeScope.success
-        },
-        static: StaticColors
-      },
+      colors: buildVariants(theme, themeScope),
       isDark: theme.colorScheme === "dark",
       scope: currentScope
     }),
@@ -96,9 +79,63 @@ export const useThemeColors = (
   );
 
   return currentTheme;
-};
+}
+
+export function themeToCSS(theme: ThemeDefinition) {
+  const css: string[] = [];
+  for (const scopeKey of ThemeScopeKeys) {
+    const scope = theme.scopes[scopeKey] || {};
+    const variants = buildVariants(theme, scope);
+
+    for (const variantKey in variants) {
+      const variant = variants[variantKey as keyof Variants];
+      if (!variant) continue;
+
+      css.push(`.theme-scope-${scopeKey}-${variantKey} {
+        ${colorsToCss(variant)}
+      }`);
+    }
+  }
+
+  return css.join("\n\n");
+}
 
 export const useThemeProvider = () => useContext(ThemeContext);
-export const useCurrentThemeScope = () => useContext(ThemeScope);
+export const useCurrentThemeScope = () => useContext(ThemeScopeContext);
+export const useThemeVariant = () => useContext(ThemeVariantContext);
 export const ThemeProvider = ThemeContext.Provider;
-export const ScopedThemeProvider = ThemeScope.Provider;
+export const ScopedThemeProvider = ThemeScopeContext.Provider;
+export const ThemeVariantProvider = ThemeVariantContext.Provider;
+
+function buildVariants(
+  theme: ThemeDefinition,
+  themeScope: Partial<Variants>
+): VariantsWithStaticColors<true> {
+  return {
+    primary: {
+      ...theme.scopes.base.primary,
+      ...themeScope.primary
+    },
+    secondary: {
+      ...theme.scopes.base.secondary,
+      ...themeScope.secondary
+    },
+    disabled: {
+      ...theme.scopes.base.disabled,
+      ...themeScope.disabled
+    },
+    error: {
+      ...theme.scopes.base.error,
+      ...themeScope.error
+    },
+    warning: {
+      ...theme.scopes.base.warning,
+      ...themeScope.warning
+    },
+    success: {
+      ...theme.scopes.base.success,
+      ...themeScope.success
+    },
+    static: StaticColors
+  };
+}

@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Button, Flex, Text } from "@theme-ui/components";
 import { Context, useTip } from "../../hooks/use-tip";
 import { Info } from "../icons";
+import { ThemeVariant } from "../theme-provider";
 
 type PlaceholderProps = { context: Context; text?: string };
 function Placeholder(props: PlaceholderProps) {
@@ -42,20 +43,22 @@ function Placeholder(props: PlaceholderProps) {
       >
         <Flex
           sx={{
-            border: "1px solid var(--primary)",
+            border: "1px solid var(--accent)",
             borderRadius: 50,
             p: 1,
             py: "1.5px"
           }}
         >
-          <Info color="primary" size={13} sx={{ mr: "small" }} />
-          <Text variant="subBody" sx={{ fontSize: 10 }} color="primary">
+          <Info color="accent" size={13} sx={{ mr: "small" }} />
+          <Text variant="subBody" sx={{ fontSize: 10 }} color="accent">
             TIP
           </Text>
         </Flex>
-        <Text variant="body" sx={{ color: "icon", mt: 1 }}>
-          {text || tip.text}
-        </Text>
+        <ThemeVariant variant="secondary">
+          <Text variant="body" sx={{ color: "paragraph", mt: 1 }}>
+            {text || tip.text}
+          </Text>
+        </ThemeVariant>
         {tip.button && (
           <Button
             sx={{
@@ -67,10 +70,10 @@ function Placeholder(props: PlaceholderProps) {
             variant="tool"
             onClick={tip.button.onClick}
           >
-            <Text mr={1} color="primary">
+            <Text mr={1} color="accent">
               {tip.button.title}
             </Text>
-            {tip.button.icon && <tip.button.icon size={18} color="primary" />}
+            {tip.button.icon && <tip.button.icon size={18} color="accent" />}
           </Button>
         )}
       </Flex>

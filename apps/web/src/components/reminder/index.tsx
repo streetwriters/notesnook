@@ -27,7 +27,6 @@ import {
   ReminderOff,
   Clock,
   Refresh,
-  Icon,
   Edit,
   Reminders,
   Trash
@@ -47,6 +46,8 @@ import {
 } from "../../common/dialog-controller";
 import { pluralize } from "@notesnook/common";
 import { getFormattedReminderTime } from "@notesnook/common";
+import { Item } from "../list-container/types";
+import { MenuItem } from "@notesnook/ui";
 
 const RECURRING_MODE_MAP = {
   week: "Weekly",
@@ -60,21 +61,18 @@ const PRIORITY_ICON_MAP = {
   urgent: Loud
 } as const;
 
-function Reminder({
-  item,
-  index,
-  simplified
-}: {
-  item: ReminderType;
-  index: number;
+type ReminderProps = {
+  item: Item;
   simplified?: boolean;
-}) {
-  const reminder = item;
+};
+
+function Reminder(props: ReminderProps) {
+  const { item, simplified } = props;
+  const reminder = item as unknown as ReminderType;
   const PriorityIcon = PRIORITY_ICON_MAP[reminder.priority];
   return (
     <ListItem
-      selectable
-      item={reminder}
+      item={item}
       title={reminder.title}
       body={reminder.description}
       isDisabled={reminder.disabled}
@@ -88,11 +86,7 @@ function Reminder({
           }}
         >
           {reminder.disabled ? (
-            <IconTag
-              icon={ReminderOff}
-              text={"Disabled"}
-              testId={"disabled"}
-            />
+            <IconTag icon={ReminderOff} text={"Disabled"} testId={"disabled"} />
           ) : (
             <IconTag
               icon={Clock}
@@ -101,9 +95,7 @@ function Reminder({
               testId={"reminder-time"}
             />
           )}
-          {reminder.disabled ? null : (
-            <PriorityIcon size={14} color="fontTertiary" />
-          )}
+          {reminder.disabled ? null : <PriorityIcon size={14} />}
           {reminder.mode === "repeat" && reminder.recurringMode && (
             <IconTag
               icon={Refresh}
@@ -113,11 +105,7 @@ function Reminder({
           )}
         </Flex>
       }
-      index={index}
-      menu={{
-        items: menuItems,
-        extraData: { reminder }
-      }}
+      menuItems={menuItems}
     />
   );
 }
@@ -126,61 +114,49 @@ export default React.memo(Reminder, (prev, next) => {
   return prev?.item?.title === next?.item?.title;
 });
 
-type MenuActionParams = {
-  reminder: ReminderType;
-  items: ReminderType[];
-};
-
-type MenuItemValue<T> = T | ((options: MenuActionParams) => T);
-type MenuItem = {
-  type?: "separator";
-  key: string;
-  title?: MenuItemValue<string>;
-  icon?: MenuItemValue<Icon>;
-  onClick?: (options: MenuActionParams) => void;
-  color?: MenuItemValue<string>;
-  iconColor?: MenuItemValue<string>;
-  multiSelect?: boolean;
-  items?: MenuItemValue<MenuItem[]>;
-};
-
-const menuItems: MenuItem[] = [
-  {
-    key: "edit",
-    title: "Edit",
-    icon: Edit,
-    onClick: ({ reminder }) => hashNavigate(`/reminders/${reminder.id}/edit`)
-  },
-  {
-    key: "toggle",
-    title: ({ reminder }) => (reminder.disabled ? "Activate" : "Deactivate"),
-    icon: ({ reminder }: MenuActionParams) =>
-      reminder.disabled ? Reminders : ReminderOff,
-    onClick: async ({ reminder }) => {
-      await db.reminders?.add({
-        id: reminder.id,
-        disabled: !reminder.disabled
-      });
-      store.refresh();
-    }
-  },
-  { key: "sep", type: "separator" },
-  {
-    key: "delete",
-    title: "Delete",
-    color: "error",
-    iconColor: "error",
-    icon: Trash,
-    onClick: async ({ items }) => {
-      confirm({
-        title: `Delete ${pluralize(items.length, "reminder")}`,
-        message: `Are you sure you want to proceed? **This action is IRREVERSIBLE**.`,
-        positiveButtonText: "Yes",
-        negativeButtonText: "No"
-      }).then((result) => {
-        result && Multiselect.moveRemindersToTrash(items);
-      });
+const menuItems: (
+  reminder: ReminderType,
+  items?: ReminderType[]
+) => MenuItem[] = (reminder, items = []) => {
+  return [
+    {
+      type: "button",
+      key: "edit",
+      title: "Edit",
+      icon: Edit.path,
+      onClick: () => hashNavigate(`/reminders/${reminder.id}/edit`)
     },
-    multiSelect: true
-  }
-];
+    {
+      type: "button",
+      key: "toggle",
+      title: reminder.disabled ? "Activate" : "Deactivate",
+      icon: reminder.disabled ? Reminders.path : ReminderOff.path,
+      onClick: async () => {
+        await db.reminders?.add({
+          id: reminder.id,
+          disabled: !reminder.disabled
+        });
+        store.refresh();
+      }
+    },
+    { key: "sep", type: "separator" },
+    {
+      type: "button",
+      key: "delete",
+      title: "Delete",
+      styles: { icon: { color: "red" }, text: { color: "red" } },
+      icon: Trash.path,
+      onClick: async () => {
+        confirm({
+          title: `Delete ${pluralize(items.length, "reminder")}`,
+          message: `Are you sure you want to proceed? **This action is IRREVERSIBLE**.`,
+          positiveButtonText: "Yes",
+          negativeButtonText: "No"
+        }).then((result) => {
+          result && Multiselect.moveRemindersToTrash(items);
+        });
+      },
+      multiSelect: true
+    }
+  ];
+};

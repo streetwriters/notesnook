@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex, Button } from "@theme-ui/components";
 import { getFormattedDate } from "@notesnook/common";
+import { ThemeVariant } from "../theme-provider";
 
 function ContentToggle(props) {
   const {
@@ -45,33 +46,37 @@ function ContentToggle(props) {
             Save copy
           </Button>
         )}
-        <Button
-          variant="primary"
-          onClick={() => {
-            if (isOtherSelected) {
-              resolveConflict({ saveCopy: false });
-            } else {
-              onToggle();
-            }
+        <ThemeVariant variant={isOtherSelected ? "error" : "primary"}>
+          <Button
+            variant="primary"
+            onClick={() => {
+              if (isOtherSelected) {
+                resolveConflict({ saveCopy: false });
+              } else {
+                onToggle();
+              }
+            }}
+            p={1}
+            px={2}
+            bg={"background"}
+          >
+            {isSelected ? "Undo" : isOtherSelected ? "Discard" : "Keep"}
+          </Button>
+        </ThemeVariant>
+      </Flex>
+      <ThemeVariant variant="secondary">
+        <Flex
+          mt={1}
+          sx={{
+            fontSize: "subBody",
+            color: "paragraph",
+            alignItems: "center",
+            fontFamily: "body"
           }}
-          p={1}
-          px={2}
-          bg={isOtherSelected ? "error" : "primary"}
         >
-          {isSelected ? "Undo" : isOtherSelected ? "Discard" : "Keep"}
-        </Button>
-      </Flex>
-      <Flex
-        mt={1}
-        sx={{
-          fontSize: "subBody",
-          color: "fontTertiary",
-          alignItems: "center",
-          fontFamily: "body"
-        }}
-      >
-        {label} | {getFormattedDate(dateEdited)}
-      </Flex>
+          {label} | {getFormattedDate(dateEdited)}
+        </Flex>
+      </ThemeVariant>
     </Flex>
   );
 }

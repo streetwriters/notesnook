@@ -65,7 +65,18 @@ function EditorFooter() {
       >
         {getFormattedDate(dateEdited || Date.now())}
       </Text>
-      {SaveStateIcon && <SaveStateIcon size={13} color="paragraph" />}
+      {SaveStateIcon && (
+        <SaveStateIcon
+          size={13}
+          color={
+            saveState === 1
+              ? "accent"
+              : saveState === "-1"
+              ? "red"
+              : "paragraph"
+          }
+        />
+      )}
     </Flex>
   );
 }

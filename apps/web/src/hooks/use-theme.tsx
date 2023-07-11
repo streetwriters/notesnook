@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ThemeDracula } from "@notesnook/theme";
 import { usePersistentState } from "./use-persistent-state";
-import Config from "../utils/config";
 
 export function useTheme() {
   const [theme, setTheme] = usePersistentState("settings:theme", ThemeDracula);

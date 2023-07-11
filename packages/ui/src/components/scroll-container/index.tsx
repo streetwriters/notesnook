@@ -17,19 +17,32 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box } from "@theme-ui/components";
+import { PropsWithChildren } from "react";
+import { MacScrollbar, MacScrollbarProps } from "mac-scrollbar";
+import "mac-scrollbar/dist/mac-scrollbar.css";
 
-export function MenuSeparator() {
+type ScrollContainerProps = {
+  id?: string;
+  className?: string;
+  style?: React.CSSProperties;
+} & MacScrollbarProps;
+
+export function ScrollContainer({
+  id,
+  children,
+  style,
+  className,
+  ...restProps
+}: PropsWithChildren<ScrollContainerProps>) {
   return (
-    <Box
-      as="li"
-      sx={{
-        width: "95%",
-        height: "0.5px",
-        bg: "border",
-        my: 2,
-        alignSelf: "center"
-      }}
-    />
+    <MacScrollbar
+      {...restProps}
+      id={id}
+      className={className}
+      style={style}
+      minThumbSize={40}
+    >
+      {children}
+    </MacScrollbar>
   );
 }

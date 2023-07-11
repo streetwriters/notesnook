@@ -28,7 +28,7 @@ function Toggle(props) {
       py={2}
       px={2}
       sx={{
-        borderBottom: "1px solid var(--border)",
+        borderBottom: "1px solid var(--separator)",
         cursor: "pointer",
         alignItems: "center",
         justifyContent: "space-between",
@@ -46,7 +46,11 @@ function Toggle(props) {
         <ToggleIcon size={13} sx={{ flexShrink: 0, mr: 1 }} />
         {label}
       </Text>
-      <Switch sx={{ m: 0 }} onClick={() => onToggle(!isOn)} checked={isOn} />
+      <Switch
+        sx={{ m: 0, bg: isOn ? "accent" : "icon" }}
+        onClick={() => onToggle(!isOn)}
+        checked={isOn}
+      />
     </Flex>
   );
 }

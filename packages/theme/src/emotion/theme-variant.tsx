@@ -17,24 +17,57 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Variants, useCurrentThemeScope } from "../";
+import {
+  Colors,
+  ThemeVariantProvider,
+  Variants,
+  useCurrentThemeScope,
+  useThemeVariant
+} from "../";
 import { PropsWithChildren } from "react";
-import { EmotionThemeProvider } from "./theme-provider";
+import { Box, BoxProps } from "@theme-ui/components";
+import { ThemeProvider } from "@theme-ui/core";
 
-type ThemeVariantProps = { variant: keyof Variants; injectCssVars?: boolean };
+type ThemeVariantProps = {
+  variant: keyof Variants;
+  injectCssVars?: boolean;
+} & Omit<BoxProps, "variant">;
 export function EmotionThemeVariant(
   props: PropsWithChildren<ThemeVariantProps>
 ) {
-  const { variant, injectCssVars = false, children } = props;
-  const scope = useCurrentThemeScope();
+  const {
+    variant,
+    injectCssVars = false,
+    children,
+    className,
+    ...restProps
+  } = props;
+  const { colors, scope } = useCurrentThemeScope();
+  const parentVariant = useThemeVariant();
 
+  // no need to nest same variant providers
+  if (parentVariant === variant) return <>{children}</>;
+
+  const variantColors: Colors = {
+    ...colors[variant],
+    ...colors.static
+  };
   return (
-    <EmotionThemeProvider
-      scope={scope}
-      variant={variant}
-      injectCssVars={injectCssVars}
-    >
-      {children}
-    </EmotionThemeProvider>
+    <ThemeProvider theme={{ colors: variantColors }}>
+      <ThemeVariantProvider value={variant}>
+        {injectCssVars ? (
+          <Box
+            {...restProps}
+            className={`${
+              className + " " || ""
+            }theme-scope-${scope}-${variant}`}
+          >
+            {children}
+          </Box>
+        ) : (
+          children
+        )}
+      </ThemeVariantProvider>
+    </ThemeProvider>
   );
 }

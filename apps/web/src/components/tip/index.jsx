@@ -18,22 +18,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Text } from "@theme-ui/components";
+import { ThemeVariant } from "../theme-provider";
 
 function TextWithTip({ text, tip, sx, color }) {
   return (
-    <Text sx={{ ...sx, fontSize: "body", color: color || "text" }}>
+    <Text sx={{ ...sx, fontSize: "body", color: color || "paragraph" }}>
       {text}
       <br />
-      <Text
-        sx={{
-          wordBreak: "break-word",
-          whiteSpace: "pre-wrap",
-          fontSize: "subBody",
-          color: "fontTertiary"
-        }}
-      >
-        {tip}
-      </Text>
+      <ThemeVariant variant="secondary">
+        <Text
+          sx={{
+            wordBreak: "break-word",
+            whiteSpace: "pre-wrap",
+            fontSize: "subBody",
+            color: "paragraph"
+          }}
+        >
+          {tip}
+        </Text>
+      </ThemeVariant>
     </Text>
   );
 }

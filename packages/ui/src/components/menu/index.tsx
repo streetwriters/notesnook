@@ -20,17 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useCallback, useRef, useEffect, PropsWithChildren } from "react";
 import { Box, Flex, FlexProps, Text } from "@theme-ui/components";
 import { getPosition } from "../../utils/position";
-import {
-  MenuButton as MenuButtonType,
-  MenuItem as MenuItemType
-} from "./types";
+import { MenuButtonItem, MenuItem } from "./types";
 import { useFocus } from "./use-focus";
 import { MenuSeparator } from "./menu-separator";
 import { MenuButton } from "./menu-button";
 import { PopupPresenter, PopupPresenterProps } from "../popup-presenter";
+import { ScrollContainer } from "../scroll-container";
 
 type MenuProps = MenuContainerProps & {
-  items?: MenuItemType[];
+  items?: MenuItem[];
   onClose: () => void;
 };
 
@@ -38,7 +36,7 @@ export function Menu(props: MenuProps) {
   const { items = [], onClose, ...containerProps } = props;
   const hoverTimeout = useRef<number>();
   const onAction = useCallback(
-    (e?: Event, item?: MenuButtonType) => {
+    (e?: Event, item?: MenuButtonItem) => {
       e?.stopPropagation();
 
       if (item?.onClick) {
@@ -110,20 +108,23 @@ export function Menu(props: MenuProps) {
                       setFocusIndex(-1);
                       return;
                     }
+                    if (!isSubmenuOpen) setFocusIndex(index);
 
-                    if (hoverTimeout.current)
-                      clearTimeout(hoverTimeout.current);
-                    setFocusIndex(index);
-                    setIsSubmenuOpen(false);
-                    if (item.menu) {
-                      hoverTimeout.current = setTimeout(() => {
+                    clearTimeout(hoverTimeout.current);
+                    hoverTimeout.current = setTimeout(() => {
+                      if (isSubmenuOpen) {
+                        setFocusIndex(index);
+                      } else {
                         setIsSubmenuOpen(true);
-                      }, 500) as unknown as number;
-                    }
+                      }
+
+                      if (!item.menu) {
+                        setIsSubmenuOpen(false);
+                      }
+                    }, 200) as unknown as number;
                   }}
                   onMouseLeave={() => {
-                    if (hoverTimeout.current)
-                      clearTimeout(hoverTimeout.current);
+                    clearTimeout(hoverTimeout.current);
                   }}
                 />
               );
@@ -169,7 +170,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
         margin: 0,
         borderRadius: "default",
         boxShadow: "menu",
-        border: "1px solid var(--border)",
+        border: "1px solid var(--separator)",
         minWidth: 220,
         ...sx
       }}
@@ -191,18 +192,48 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
           {title}
         </Text>
       )}
-      {children}
+      <ScrollContainer>{children}</ScrollContainer>
       {/* <FlexScrollContainer>{children}</FlexScrollContainer> */}
     </Box>
   );
 }
 
-export type MenuPresenterProps = PopupPresenterProps & MenuProps;
+export type MenuPresenterProps = Omit<
+  PopupPresenterProps,
+  "movable" | "scope"
+> &
+  MenuProps;
 export function MenuPresenter(props: PropsWithChildren<MenuPresenterProps>) {
-  const { items = [], ...restProps } = props;
+  const {
+    items = [],
+    position,
+    isOpen,
+    onClose,
+    blocking,
+    focusOnRender,
+    isMobile,
+    ...restProps
+  } = props;
+
   return (
-    <PopupPresenter {...restProps}>
-      {props.children ? props.children : <Menu items={items} {...restProps} />}
+    <PopupPresenter
+      scope="contextMenu"
+      position={position}
+      isOpen={isOpen}
+      onClose={onClose}
+      blocking={blocking}
+      focusOnRender={focusOnRender}
+      isMobile={isMobile}
+    >
+      {props.children ? (
+        props.children
+      ) : (
+        <Menu items={items} onClose={onClose} {...restProps} />
+      )}
     </PopupPresenter>
   );
 }
+
+export * from "./types";
+export * from "./menu-button";
+export * from "./menu-separator";

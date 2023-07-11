@@ -56,6 +56,8 @@ import { Multiselect } from "../common/multi-select";
 import { CustomScrollbarsVirtualList } from "../components/list-container";
 import { Attachment } from "../components/attachment";
 import { isDocument, isImage, isVideo } from "@notesnook/core/utils/filename";
+import { ThemeVariant } from "../components/theme-provider";
+import { alpha } from "@theme-ui/color";
 
 type ToolbarAction = {
   title: string;
@@ -146,20 +148,22 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
           height: "80vw"
         }}
       >
-        <Sidebar
-          totalSize={totalSize}
-          filter={(query) => {
-            setAttachments(
-              db.lookup?.attachments(db.attachments?.all || [], query) || []
-            );
-          }}
-          counts={getCounts(allAttachments)}
-          onRouteChange={(route) => {
-            currentRoute.current = route;
-            setSelected([]);
-            setAttachments(filterAttachments(route, allAttachments));
-          }}
-        />
+        <ThemeVariant variant="secondary">
+          <Sidebar
+            totalSize={totalSize}
+            filter={(query) => {
+              setAttachments(
+                db.lookup?.attachments(db.attachments?.all || [], query) || []
+              );
+            }}
+            counts={getCounts(allAttachments)}
+            onRouteChange={(route) => {
+              currentRoute.current = route;
+              setSelected([]);
+              setAttachments(filterAttachments(route, allAttachments));
+            }}
+          />
+        </ThemeVariant>
         <Flex
           variant="columnFill"
           sx={{
@@ -245,7 +249,7 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
                 as="tr"
                 sx={{
                   height: 40,
-                  th: { borderBottom: "1px solid var(--border)" },
+                  th: { borderBottom: "1px solid var(--separator)" },
                   bg: "background"
                 }}
               >
@@ -392,18 +396,18 @@ const Sidebar = memo(
           flexDirection: "column",
           justifyContent: "space-between",
           width: 240,
-          bg: "bgSecondary",
           "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
             {
-              bg: "bgTransparent",
+              backgroundColor: alpha("background", 0.6),
               backdropFilter: "blur(8px)"
-            }
+            },
+          backgroundColor: "background"
         }}
       >
         <Flex sx={{ flexDirection: "column" }}>
           <Input
             placeholder="Search"
-            sx={{ m: 2, mb: 0, width: "auto", bg: "bgSecondary", py: "7px" }}
+            sx={{ m: 2, mb: 0, width: "auto", bg: "background", py: "7px" }}
             onChange={(e) => {
               setRoute(e.target.value ? "none" : "all");
               if (e.target.value) filter(e.target.value);

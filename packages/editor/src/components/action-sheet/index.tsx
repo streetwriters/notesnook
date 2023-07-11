@@ -24,12 +24,9 @@ import React, {
   useState,
   useEffect
 } from "react";
-import { MenuItem } from "../menu/types";
+import { MenuItem, Icon, MenuButton, MenuSeparator } from "@notesnook/ui";
 import { Box, Button, Flex, Text, FlexProps } from "@theme-ui/components";
-import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { MenuButton } from "../menu/menu-button";
-import { MenuSeparator } from "../menu/menu-separator";
 import Modal from "react-modal";
 import {
   motion,

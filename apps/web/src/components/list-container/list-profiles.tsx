@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { navigate } from "../../navigation";
 import Note from "../note";
 import Notebook from "../notebook";
 import Tag from "../tag";
@@ -26,36 +25,22 @@ import TrashItem from "../trash-item";
 import { db } from "../../common/db";
 import { getTotalNotes } from "@notesnook/common";
 import Reminder from "../reminder";
-import type { Reminder as ReminderType } from "@notesnook/core/collections/reminders";
 import { useMemo } from "react";
+import {
+  ReferencesWithDateEdited,
+  ItemWrapper,
+  Item,
+  NotebookReference,
+  NotebookType,
+  Reference
+} from "./types";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
   (document.getElementById("p")?.clientHeight || 16) - 1;
 export const DEFAULT_ITEM_HEIGHT = SINGLE_LINE_HEIGHT * 2 * DEFAULT_LINE_HEIGHT;
 
-export type Item = { id: string; type: string; title: string } & Record<
-  string,
-  unknown
->;
-
-type NotebookReference = Item & { topics: string[] };
-type NotebookType = Item & { topics: Item[] };
-
-export type Context = { type: string } & Record<string, unknown>;
-type ItemWrapperProps<TItem = Item> = {
-  index: number;
-  item: TItem;
-  type: keyof typeof ListProfiles;
-  context?: Context;
-  compact?: boolean;
-};
-
-type ItemWrapper<TItem = Item> = (
-  props: ItemWrapperProps<TItem>
-) => JSX.Element;
-
-const NotesProfile: ItemWrapper = ({ index, item, type, context, compact }) => {
+const NotesProfile: ItemWrapper = ({ item, type, context, compact }) => {
   const references = useMemo(
     () => getReferences(item.id, item.notebooks as Item[], context?.type),
     [item, context]
@@ -64,8 +49,6 @@ const NotesProfile: ItemWrapper = ({ index, item, type, context, compact }) => {
   return (
     <Note
       compact={compact}
-      index={index}
-      pinnable={!context}
       item={item}
       tags={getTags(item)}
       references={references}
@@ -76,42 +59,25 @@ const NotesProfile: ItemWrapper = ({ index, item, type, context, compact }) => {
   );
 };
 
-const NotebooksProfile: ItemWrapper = ({ index, item, type }) => (
+const NotebooksProfile: ItemWrapper = ({ item, type }) => (
   <Notebook
-    index={index}
     item={item}
     totalNotes={getTotalNotes(item)}
     date={getDate(item, type)}
   />
 );
 
-const TagsProfile: ItemWrapper = ({ index, item }) => (
-  <Tag item={item} index={index} />
-);
-
-const TopicsProfile: ItemWrapper = ({ index, item }) => (
-  <Topic
-    index={index}
-    item={item}
-    onClick={() => navigate(`/notebooks/${item.notebookId}/${item.id}`)}
-  />
-);
-
-const RemindersProfile: ItemWrapper = ({ index, item }) => (
-  <Reminder item={item as ReminderType} index={index} />
-);
-
-const TrashProfile: ItemWrapper = ({ index, item, type }) => (
-  <TrashItem index={index} item={item} date={getDate(item, type)} />
+const TrashProfile: ItemWrapper = ({ item, type }) => (
+  <TrashItem item={item} date={getDate(item, type)} />
 );
 
 export const ListProfiles = {
   home: NotesProfile,
   notebooks: NotebooksProfile,
   notes: NotesProfile,
-  reminders: RemindersProfile,
-  tags: TagsProfile,
-  topics: TopicsProfile,
+  reminders: Reminder,
+  tags: Tag,
+  topics: Topic,
   trash: TrashProfile
 } as const;
 
@@ -126,17 +92,11 @@ function getTags(item: Item) {
   return tags || [];
 }
 
-type Reference = {
-  type: "topic" | "notebook";
-  url: string;
-  title: string;
-};
-
 function getReferences(
   noteId: string,
   notebooks: Item[],
   contextType?: string
-): { dateEdited: number; references: Reference[] } | undefined {
+): ReferencesWithDateEdited | undefined {
   if (["topic", "notebook"].includes(contextType || "")) return;
 
   const references: Reference[] = [];
@@ -179,7 +139,7 @@ function getReminder(noteId: string) {
   return db.relations?.from({ id: noteId, type: "note" }, "reminder")[0];
 }
 
-function getDate(item: Item, groupType: keyof typeof ListProfiles) {
+function getDate(item: Item, groupType: keyof typeof ListProfiles): number {
   const sortBy = db.settings?.getGroupOptions(groupType).sortBy;
   switch (sortBy) {
     case "dateEdited":

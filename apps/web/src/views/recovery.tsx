@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { Error as ErrorIcon } from "../components/icons";
 import { makeURL, useQueryParams } from "../navigation";
 import { db } from "../common/db";
 import useDatabase from "../hooks/use-database";
@@ -31,6 +30,8 @@ import { createBackup, restoreBackupFile, selectBackupFile } from "../common";
 import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { EVENTS } from "@notesnook/core/common";
+import { ErrorText } from "../components/error-text";
+import { ThemeVariant } from "../components/theme-provider";
 
 type RecoveryMethodType = "key" | "backup" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;
@@ -286,37 +287,35 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
       }}
     >
       {recoveryMethods.map((method, index) => (
-        <Button
+        <ThemeVariant
           key={method.testId}
-          data-test-id={method.testId}
-          type="submit"
-          variant={"secondary"}
-          mt={2}
-          sx={{
-            ":first-of-type": { mt: 2 },
-            display: "flex",
-            flexDirection: "column",
-            bg: method.isDangerous ? "errorBg" : "bgSecondary",
-            alignSelf: "stretch",
-            // alignItems: "center",
-            textAlign: "left",
-            px: 2
-          }}
-          onClick={() => setSelected(index)}
+          variant={method.isDangerous ? "error" : "secondary"}
         >
-          <Text
-            variant={"title"}
-            sx={{ color: method.isDangerous ? "error" : "text" }}
+          <Button
+            data-test-id={method.testId}
+            type="submit"
+            variant={"secondary"}
+            mt={2}
+            sx={{
+              ":first-of-type": { mt: 2 },
+              display: "flex",
+              flexDirection: "column",
+              bg: "background",
+              alignSelf: "stretch",
+              // alignItems: "center",
+              textAlign: "left",
+              px: 2
+            }}
+            onClick={() => setSelected(index)}
           >
-            {method.title}
-          </Text>
-          <Text
-            variant={"body"}
-            sx={{ color: method.isDangerous ? "error" : "fontTertiary" }}
-          >
-            {method.description}
-          </Text>
-        </Button>
+            <Text variant={"title"} sx={{ color: "heading" }}>
+              {method.title}
+            </Text>
+            <Text variant={"body"} sx={{ color: "paragraph" }}>
+              {method.description}
+            </Text>
+          </Button>
+        </ThemeVariant>
       ))}
     </RecoveryForm>
   );
@@ -407,19 +406,10 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
       type="method:backup"
       title="Recover your account"
       subtitle={
-        <Text
-          variant="body"
-          sx={{
-            borderRadius: "default",
-            color: "error",
-            bg: "errorBg",
-            px: 1,
-            mt: 2
-          }}
-        >
-          All the data in your account will be overwritten with the data in the
-          backup file. There is no way to reverse this action.
-        </Text>
+        <ErrorText
+          sx={{ fontSize: "body" }}
+          error="All the data in your account will be overwritten with the data in the backup file. There is no way to reverse this action."
+        />
       }
       onSubmit={async () => {
         navigate("new", { backupFile, userResetRequired: true });
@@ -651,23 +641,18 @@ export function RecoveryForm<T extends RecoveryRoutes>(
       <Text variant={"heading"} sx={{ fontSize: 32, textAlign: "center" }}>
         {title}
       </Text>
-      <Text
-        variant="body"
-        mt={2}
-        mb={35}
-        sx={{ fontSize: "title", textAlign: "center", color: "fontTertiary" }}
-      >
-        {subtitle}
-      </Text>
+      <ThemeVariant variant="secondary">
+        <Text
+          variant="body"
+          mt={2}
+          mb={35}
+          sx={{ fontSize: "title", textAlign: "center", color: "paragraph" }}
+        >
+          {subtitle}
+        </Text>
+      </ThemeVariant>
       {typeof children === "function" ? children(form) : children}
-      {error && (
-        <Flex bg="errorBg" p={1} mt={2} sx={{ borderRadius: "default" }}>
-          <ErrorIcon size={15} color="error" />
-          <Text variant="error" ml={1}>
-            {error}
-          </Text>
-        </Flex>
-      )}
+      <ErrorText error={error} />
     </Flex>
   );
 }

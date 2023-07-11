@@ -43,6 +43,8 @@ import { Theme } from "@notesnook/theme";
 import { isMacStoreApp } from "../../utils/platform";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
+import { ThemeVariant } from "../../components/theme-provider";
+import { alpha } from "@theme-ui/color";
 
 type BuyDialogProps = {
   couponCode?: string;
@@ -126,28 +128,30 @@ export function BuyDialog(props: BuyDialogProps) {
           overflowY: ["scroll", "scroll", "hidden"]
         }}
       >
-        <Flex
-          sx={{
-            borderTopLeftRadius: "dialog",
-            borderBottomLeftRadius: [0, 0, "dialog"],
-            overflow: "hidden",
-            bg: "bgSecondary",
-            "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
-              {
-                bg: "bgTransparent",
-                backdropFilter: "blur(8px)"
-              },
-            flexDirection: "column",
-            flexShrink: 0,
-            alignItems: "center",
-            justifyContent: "center",
-            width: ["100%", "100%", isCheckoutCompleted ? "100%" : 350]
-          }}
-          p={4}
-          py={50}
-        >
-          <SideBar onClose={onClose} initialPlan={plan} />
-        </Flex>
+        <ThemeVariant variant="secondary">
+          <Flex
+            sx={{
+              borderTopLeftRadius: "dialog",
+              borderBottomLeftRadius: [0, 0, "dialog"],
+              overflow: "hidden",
+              bg: "background",
+              "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
+                {
+                  bg: alpha("background", 0.6),
+                  backdropFilter: "blur(8px)"
+                },
+              flexDirection: "column",
+              flexShrink: 0,
+              alignItems: "center",
+              justifyContent: "center",
+              width: ["100%", "100%", isCheckoutCompleted ? "100%" : 350]
+            }}
+            p={4}
+            py={50}
+          >
+            <SideBar onClose={onClose} initialPlan={plan} />
+          </Flex>
+        </ThemeVariant>
         <Details />
       </Flex>
     </Modal>
@@ -354,7 +358,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
           bg="shade"
           mt={4}
           p={1}
-          sx={{ borderRadius: "default", color: "primary" }}
+          sx={{ borderRadius: "default", color: "accent" }}
         >
           {user
             ? "Please select a plan to use your coupon:"
@@ -563,13 +567,13 @@ function CheckoutPricing(props: CheckoutPricingProps) {
     {
       key: "tax",
       label: "Sales tax",
-      color: "error",
+      color: "red",
       value: formatPrice(currency, price.tax.toFixed(2), null)
     },
     {
       key: "discount",
       label: "Discount",
-      color: "primary",
+      color: "accent",
       value: formatPrice(
         currency,
         discount.amount.toFixed(2),
@@ -609,7 +613,7 @@ function CheckoutPricing(props: CheckoutPricingProps) {
           <Text
             data-test-id={`value`}
             variant="body"
-            sx={{ fontSize: "subtitle", color: field.color || "text" }}
+            sx={{ fontSize: "subtitle", color: field.color || "paragraph" }}
           >
             {field.value}
           </Text>

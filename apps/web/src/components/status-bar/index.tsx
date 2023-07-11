@@ -224,7 +224,8 @@ function SyncStatus() {
         alignItems: "center",
         justifyContent: "center",
         display: "flex",
-        color: "paragraph"
+        color: "paragraph",
+        height: "100%"
       }}
       title={status.tooltip}
       data-test-id={`sync-status-${status.key}`}

@@ -24,6 +24,7 @@ import ReactModal from "react-modal";
 import { FlexScrollContainer } from "../scroll-container";
 import { SxProp } from "@theme-ui/core";
 import { useStore as useThemeStore } from "../../stores/theme-store";
+import { ScopedThemeProvider, ThemeVariant } from "../theme-provider";
 
 ReactModal.setAppElement("#root");
 
@@ -84,8 +85,11 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
         }
       }}
     >
-      <Flex
+      <ScopedThemeProvider
+        scope="dialog"
+        injectCssVars
         sx={{
+          display: "flex",
           flexDirection: "column",
           width: ["100%", "90%", props.width || "380px"],
           maxHeight: ["100%", "80%", "70%"],
@@ -138,7 +142,7 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                 variant="body"
                 sx={{
                   textAlign: props.textAlignment || "left",
-                  color: "fontTertiary"
+                  color: "paragraph"
                 }}
               >
                 {props.description}
@@ -157,31 +161,33 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
         )}
 
         {(props.positiveButton || props.negativeButton) && (
-          <Flex
-            sx={{ justifyContent: props.buttonsAlignment || "end" }}
-            bg="bgSecondary"
-            p={1}
-            px={2}
-            mt={2}
-          >
-            {props.negativeButton && (
-              <DialogButton
-                {...props.negativeButton}
-                color="text"
-                data-test-id="dialog-no"
-              />
-            )}
-            {props.positiveButton && (
-              <DialogButton
-                {...props.positiveButton}
-                color="primary"
-                data-test-id="dialog-yes"
-              />
-            )}
-          </Flex>
+          <ThemeVariant variant="secondary">
+            <Flex
+              sx={{ justifyContent: props.buttonsAlignment || "end" }}
+              bg="background"
+              p={1}
+              px={2}
+              mt={2}
+            >
+              {props.negativeButton && (
+                <DialogButton
+                  {...props.negativeButton}
+                  color="paragraph"
+                  data-test-id="dialog-no"
+                />
+              )}
+              {props.positiveButton && (
+                <DialogButton
+                  {...props.positiveButton}
+                  color="accent"
+                  data-test-id="dialog-yes"
+                />
+              )}
+            </Flex>
+          </ThemeVariant>
         )}
         {props.footer}
-      </Flex>
+      </ScopedThemeProvider>
     </ReactModal>
   );
 }
@@ -198,12 +204,12 @@ function DialogButton(props: DialogButtonProps) {
         fontWeight: "bold",
         bg: "transparent",
 
-        ":hover": { bg: "bgSecondary" }
+        ":hover": { bg: "background" }
       }}
       disabled={props.disabled}
       onClick={props.disabled ? undefined : props.onClick}
     >
-      {props.loading ? <Loading size={16} color="primary" /> : props.text}
+      {props.loading ? <Loading size={16} color="accent" /> : props.text}
     </Button>
   );
 }

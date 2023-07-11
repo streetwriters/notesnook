@@ -33,7 +33,7 @@ export function TrackingDetails() {
           as="tr"
           sx={{
             height: 30,
-            th: { borderBottom: "1px solid var(--border)" }
+            th: { borderBottom: "1px solid var(--separator)" }
           }}
         >
           {[

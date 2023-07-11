@@ -31,13 +31,14 @@ import {
   ZoomIn,
   ZoomOut,
   Close,
-  Search,
-  Alert
+  Search
 } from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import Field from "../field";
 import { LinkPlugin } from "./links-plugin";
 import Config from "../../utils/config";
+import { ThemeVariant } from "../theme-provider";
+import { ErrorText } from "../error-text";
 
 export type PdfPreviewProps = {
   fileUrl: string | Uint8Array;
@@ -56,7 +57,11 @@ export function PdfPreview(props: PdfPreviewProps) {
 
   return (
     <Worker workerUrl="/pdf.worker.min.js">
-      <Flex sx={{ p: 1, justifyContent: "space-between" }}>
+      <ThemeVariant
+        variant="secondary"
+        injectCssVars
+        sx={{ display: "flex", p: 1, justifyContent: "space-between" }}
+      >
         <Toolbar>
           {(props: ToolbarSlot) => {
             const {
@@ -72,7 +77,7 @@ export function PdfPreview(props: PdfPreviewProps) {
               <>
                 <Flex
                   sx={{
-                    bg: "bgSecondary",
+                    bg: "background",
                     borderRadius: "default",
                     overflow: "hidden",
                     alignItems: "center",
@@ -88,7 +93,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                     },
 
                     ".rpv-search__popover-label-checkbox": {
-                      accentColor: "var(--primary)"
+                      accentColor: "var(--accent)"
                     },
 
                     ".rpv-core__textbox": {
@@ -106,7 +111,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                       fontSize: "input",
                       color: "paragraph",
                       ":focus": {
-                        outline: "2px solid var(--primary)"
+                        outline: "2px solid var(--accent)"
                       },
                       ":hover:not(:focus)": {
                         outline: "1.5px solid var(--dimPrimary)"
@@ -155,7 +160,7 @@ export function PdfPreview(props: PdfPreviewProps) {
 
                 <Flex
                   sx={{
-                    bg: "bgSecondary",
+                    bg: "background",
                     borderRadius: "default",
                     overflow: "hidden",
                     alignItems: "center"
@@ -190,7 +195,7 @@ export function PdfPreview(props: PdfPreviewProps) {
 
                 <Flex
                   sx={{
-                    bg: "bgSecondary",
+                    bg: "background",
                     borderRadius: "default",
                     overflow: "hidden",
                     alignItems: "center"
@@ -227,7 +232,7 @@ export function PdfPreview(props: PdfPreviewProps) {
             );
           }}
         </Toolbar>
-      </Flex>
+      </ThemeVariant>
       <Viewer
         fileUrl={fileUrl}
         theme={theme}
@@ -272,7 +277,7 @@ export function PdfPreview(props: PdfPreviewProps) {
               variant="subheading"
               mt={1}
               mb={4}
-              sx={{ textAlign: "center", color: "fontTertiary" }}
+              sx={{ textAlign: "center", color: "paragraph" }}
             >
               Please enter the password to unlock this document.
             </Text>
@@ -289,20 +294,7 @@ export function PdfPreview(props: PdfPreviewProps) {
               }}
             />
             {props.passwordStatus === PasswordStatus.WrongPassword && (
-              <Flex
-                mt={2}
-                sx={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "error",
-                  alignSelf: "flex-center"
-                }}
-              >
-                <Alert color="error" size={12} />
-                <Text ml={1} sx={{ fontSize: "body" }}>
-                  Wrong password
-                </Text>
-              </Flex>
+              <ErrorText error="Wrong password" />
             )}
             <Button
               mt={3}
@@ -335,28 +327,27 @@ function ToolbarButton(props: ToolbarButtonProps) {
   const { title, disabled, hideOnMobile, hidden, onClick, iconSize } = props;
 
   return (
-    <Button
-      data-test-id={title}
-      disabled={disabled}
-      variant="tool"
-      bg="transparent"
-      title={title}
-      sx={{
-        borderRadius: 0,
-        display: [hideOnMobile ? "none" : "flex", hidden ? "none" : "flex"],
-        color: !disabled ? "text" : "disabled",
-        cursor: !disabled ? "pointer" : "not-allowed",
-        flexDirection: "row",
-        flexShrink: 0,
-        alignItems: "center"
-      }}
-      onClick={onClick}
-    >
-      <props.icon
-        size={iconSize || 18}
-        color={!disabled ? "text" : "disabled"}
-      />
-    </Button>
+    <ThemeVariant variant={disabled ? "disabled" : "secondary"}>
+      <Button
+        data-test-id={title}
+        disabled={disabled}
+        variant="tool"
+        bg="transparent"
+        title={title}
+        sx={{
+          borderRadius: 0,
+          display: [hideOnMobile ? "none" : "flex", hidden ? "none" : "flex"],
+          color: "paragraph",
+          cursor: !disabled ? "pointer" : "not-allowed",
+          flexDirection: "row",
+          flexShrink: 0,
+          alignItems: "center"
+        }}
+        onClick={onClick}
+      >
+        <props.icon size={iconSize || 18} />
+      </Button>
+    </ThemeVariant>
   );
 }
 

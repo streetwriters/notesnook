@@ -241,8 +241,7 @@ function Toolbar() {
             borderRadius: "default",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            overflow: "hidden",
-            ":focus": { bg: "bgSecondary" }
+            overflow: "hidden"
           }}
         />
       </Flex>
@@ -250,34 +249,38 @@ function Toolbar() {
       <ThemeVariant variant="secondary">
         <Flex>
           {tools.map((tool) => (
-            <Button
-              variant="secondary"
-              data-test-id={tool.title}
-              disabled={!tool.enabled}
-              title={tool.title}
+            <ThemeVariant
               key={tool.title}
-              mr={1}
-              sx={{
-                display: [
-                  tool.hideOnMobile ? "none" : "flex",
-                  tool.hidden ? "none" : "flex"
-                ],
-                color: tool.enabled ? "text" : "disabled",
-                flexDirection: "row",
-                flexShrink: 0,
-                alignItems: "center"
-              }}
-              onClick={tool.onClick}
+              variant={tool.enabled ? "secondary" : "disabled"}
             >
-              <tool.icon size={18} />
-              <Text
-                variant="body"
-                ml={1}
-                sx={{ display: ["none", "none", "block"] }}
+              <Button
+                variant="secondary"
+                data-test-id={tool.title}
+                disabled={!tool.enabled}
+                title={tool.title}
+                mr={1}
+                sx={{
+                  display: [
+                    tool.hideOnMobile ? "none" : "flex",
+                    tool.hidden ? "none" : "flex"
+                  ],
+                  color: "paragraph",
+                  flexDirection: "row",
+                  flexShrink: 0,
+                  alignItems: "center"
+                }}
+                onClick={tool.onClick}
               >
-                {tool.title}
-              </Text>
-            </Button>
+                <tool.icon size={18} />
+                <Text
+                  variant="body"
+                  ml={1}
+                  sx={{ display: ["none", "none", "block"] }}
+                >
+                  {tool.title}
+                </Text>
+              </Button>
+            </ThemeVariant>
           ))}
           <Flex
             bg="background"

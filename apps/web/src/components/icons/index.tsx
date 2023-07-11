@@ -151,8 +151,6 @@ import {
   mdiOrderNumericDescending,
   mdiOrderNumericAscending,
   mdiSelectGroup,
-  mdiContentSaveCheckOutline,
-  mdiContentSaveAlertOutline,
   mdiCurrencyUsd,
   mdiCellphoneKey,
   mdiEmailOutline,
@@ -275,6 +273,7 @@ export type IconProps = FlexProps &
 export type Icon = {
   (props: IconProps): JSX.Element;
   isReactComponent: boolean;
+  path: string;
 };
 
 function createIcon(path: string, rotate = false) {
@@ -301,6 +300,7 @@ function createIcon(path: string, rotate = false) {
     );
   };
   NNIcon.isReactComponent = true;
+  NNIcon.path = path;
   return NNIcon;
 }
 
@@ -468,8 +468,8 @@ export const OrderAtoZ = createIcon(mdiOrderAlphabeticalAscending);
 export const OrderZtoA = createIcon(mdiOrderAlphabeticalDescending);
 export const OrderOldestNewest = createIcon(mdiOrderNumericDescending);
 export const OrderNewestOldest = createIcon(mdiOrderNumericAscending);
-export const Saved = createIcon(mdiContentSaveCheckOutline);
-export const NotSaved = createIcon(mdiContentSaveAlertOutline);
+export const Saved = createIcon(mdiCheckAll);
+export const NotSaved = createIcon(mdiClose);
 
 export const MfaAuthenticator = createIcon(mdiCellphoneKey);
 export const MfaEmail = createIcon(mdiEmailOutline);

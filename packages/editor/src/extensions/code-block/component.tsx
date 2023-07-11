@@ -24,7 +24,7 @@ import { useTheme } from "../../toolbar/stores/toolbar-store";
 import { EmotionThemeVariant } from "@notesnook/theme";
 import { ResponsivePresenter } from "../../components/responsive";
 import { useTimer } from "../../hooks/use-timer";
-import { Icon } from "../../toolbar/components/icon";
+import { Icon } from "@notesnook/ui";
 import { Popup } from "../../toolbar/components/popup";
 import { Icons } from "../../toolbar/icons";
 import { ReactNodeViewProps } from "../react/types";

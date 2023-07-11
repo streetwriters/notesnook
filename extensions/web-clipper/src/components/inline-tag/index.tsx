@@ -37,7 +37,7 @@ export function InlineTag(props: {
         sx={{
           alignItems: "center",
           justifyContent: "center",
-          bg: "bgSecondary",
+          bg: "background",
           border: "1px solid var(--border)",
           borderRadius: "small",
           p: "3px",
@@ -49,7 +49,7 @@ export function InlineTag(props: {
         }}
       >
         <Icon path={icon} color={iconColor} size={14} />
-        <Text variant="subBody" sx={{ color: "icon", ml: 1 }}>
+        <Text variant="subBody" sx={{ color: "paragraph", ml: 1 }}>
           {title}
         </Text>
       </Flex>

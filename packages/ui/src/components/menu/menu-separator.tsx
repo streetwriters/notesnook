@@ -17,26 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Colors } from "../../theme-engine/types";
-import * as CSS from "csstype";
+import { Box } from "@theme-ui/components";
 
-export type SchemeColors = keyof Colors | CSS.Property.Color;
-export function isThemeColor(
-  color: string,
-  colors: Colors
-): color is keyof Colors {
-  return color in colors;
+export function MenuSeparator() {
+  return (
+    <Box
+      as="li"
+      sx={{
+        width: "95%",
+        height: "1px",
+        bg: "separator",
+        my: 2,
+        alignSelf: "center"
+      }}
+    />
+  );
 }
-
-// export function getColors(variants: Variants): Colors {
-//   const colorScheme: ColorModesScale = {};
-
-//   // for (const variant in variants) {
-//   //   const colors = variants[variant as keyof Variants];
-//   //   for (const color in colors) {
-//   //     const colorValue = colors[color as keyof Colors];
-//   //     colorScheme[`${variant}.${color}`] = colorValue;
-//   //   }
-//   // }
-//   // return colorScheme;
-// }

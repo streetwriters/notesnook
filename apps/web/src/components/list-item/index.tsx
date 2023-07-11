@@ -18,60 +18,59 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Flex, Text } from "@theme-ui/components";
-import { Copy } from "../icons";
 import {
   store as selectionStore,
   useStore as useSelectionStore
 } from "../../stores/selection-store";
 import { useMenuTrigger } from "../../hooks/use-menu";
-import Config from "../../utils/config";
-import { db } from "../../common/db";
-import * as clipboard from "clipboard-polyfill/text";
-import { useRef } from "react";
+import React, { useRef } from "react";
+import { SchemeColors } from "@notesnook/theme";
+import { Item } from "../list-container/types";
+import { MenuItem } from "@notesnook/ui";
 
-function debugMenuItems(type) {
-  if (!type) return [];
-  return [
-    {
-      key: "copy-data",
-      title: () => "Copy data",
-      icon: Copy,
-      onClick: async ({ [type]: item }) => {
-        if (type === "note" && item.contentId) {
-          item.additionalData = {
-            content: db.debug.strip(await db.content.raw(item.contentId))
-          };
-        }
-        item.additionalData = {
-          ...item.additionalData,
-          lastSynced: await db.lastSynced()
-        };
-        await clipboard.writeText(db.debug.strip(item));
-      }
-    }
-  ];
-}
+type ListItemProps = {
+  colors?: {
+    accent: SchemeColors;
+    paragraph: SchemeColors;
+    background: SchemeColors;
+  };
+  isFocused?: boolean;
+  isCompact?: boolean;
+  isDisabled?: boolean;
+  isSimple?: boolean;
+  item: Item;
 
-function ListItem(props) {
+  onKeyPress?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+  onClick?: () => void;
+  title: string | JSX.Element;
+  header?: JSX.Element;
+  body?: JSX.Element | string;
+  footer?: JSX.Element;
+
+  menuItems?: (item: any, items?: any[]) => MenuItem[];
+};
+
+function ListItem(props: ListItemProps) {
   const {
-    colors: { text, background, primary } = {
-      primary: "primary",
-      text: "text",
+    colors: { paragraph, background, accent } = {
+      accent: "accent",
+      paragraph: "paragraph",
       background: "background"
     },
     isFocused,
     isCompact,
     isDisabled,
-    isSimple
+    isSimple,
+    item
   } = props;
 
-  const listItemRef = useRef();
+  const listItemRef = useRef<HTMLDivElement>(null);
   const { openMenu, target } = useMenuTrigger();
   const isMenuTarget = target && target === listItemRef.current;
 
   const isSelected = useSelectionStore((store) => {
     const isInSelection =
-      store.selectedItems.findIndex((item) => props.item.id === item.id) > -1;
+      store.selectedItems.findIndex((item) => item.id === props.item.id) > -1;
     return isFocused
       ? store.selectedItems.length > 1 && isInSelection
       : isInSelection;
@@ -79,38 +78,32 @@ function ListItem(props) {
 
   return (
     <Flex
-      id={`id_${props.item.id}`}
+      id={`id_${item.id}`}
       className={isSelected ? "selected" : ""}
       ref={listItemRef}
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        let items = props.menu?.items?.slice() || [];
         let title = undefined;
         let selectedItems = selectionStore
           .get()
-          .selectedItems.filter((i) => i.type === props.item.type);
+          .selectedItems.filter((i) => i.type === item.type);
 
-        if (selectedItems.findIndex((i) => i.id === props.item.id) === -1) {
+        if (selectedItems.findIndex((i) => i.id === item.id) === -1) {
           selectedItems = [];
-          selectedItems.push(props.item);
+          selectedItems.push(item);
         }
 
         if (selectedItems.length > 1) {
           title = `${selectedItems.length} items selected`;
-          items = items.filter((item) => item.multiSelect);
-        } else if (Config.get("debugMode", false)) {
-          items.push(...debugMenuItems(props.item.type));
         }
 
-        if (items.length <= 0) return;
+        const menuItems = props.menuItems?.(item, selectedItems);
+        if (!menuItems) return;
 
-        openMenu(items, {
-          title,
-          items: selectedItems,
-          target: listItemRef.current,
-          ...props.menu?.extraData
+        openMenu(menuItems, {
+          title
         });
       }}
       pl={1}
@@ -132,7 +125,7 @@ function ListItem(props) {
         opacity: isDisabled ? 0.7 : 1,
 
         borderLeft: "5px solid",
-        borderLeftColor: isFocused ? primary : "transparent",
+        borderLeftColor: isFocused ? accent : "transparent",
         ml: "2px",
         mr: "1px",
 
@@ -150,7 +143,7 @@ function ListItem(props) {
         },
         ":focus-visible": {
           outline: `1px solid var(--${
-            primary === "accent" ? "dimPrimary" : primary
+            accent === "accent" ? "dimPrimary" : accent
           })`,
           backgroundColor: isSelected ? "textSelection" : background
         }
@@ -177,7 +170,7 @@ function ListItem(props) {
           overflow: "hidden",
           textOverflow: "ellipsis",
           fontWeight: isCompact || isSimple ? "body" : "bold",
-          color: text,
+          color: paragraph,
           display: "block"
         }}
       >

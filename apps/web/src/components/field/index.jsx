@@ -21,6 +21,7 @@ import { useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { Input, Label } from "@theme-ui/components";
 import { PasswordVisible, PasswordInvisible, Check, Cross } from "../icons";
+import { ThemeVariant } from "../theme-provider";
 
 const passwordValidationRules = [
   {
@@ -93,24 +94,26 @@ function Field(props) {
           fontSize: "subtitle",
           fontWeight: "bold",
           fontFamily: "body",
-          color: "icon",
+          color: "paragraph",
           flexDirection: "column",
           ...styles.label
         }}
       >
         {label}{" "}
         {helpText && (
-          <Text
-            as="span"
-            sx={{
-              fontSize: "subBody",
-              fontWeight: "normal",
-              color: "fontTertiary",
-              ...styles.helpText
-            }}
-          >
-            {helpText}
-          </Text>
+          <ThemeVariant variant="secondary">
+            <Text
+              as="span"
+              sx={{
+                fontSize: "subBody",
+                fontWeight: "normal",
+                color: "paragraph",
+                ...styles.helpText
+              }}
+            >
+              {helpText}
+            </Text>
+          </ThemeVariant>
         )}
       </Label>
 
@@ -180,26 +183,28 @@ function Field(props) {
           </Flex>
         )}
         {action && (
-          <Button
-            type="button"
-            variant={"secondary"}
-            data-test-id={action.testId}
-            onClick={action.onClick}
-            sx={{
-              position: "absolute",
-              right: "2px",
-              top: "2px",
-              cursor: "pointer",
-              bottom: "2px",
-              px: 1,
-              borderRadius: "default",
-              ":hover": { bg: "border" },
-              height: "calc(100% - 4px)"
-            }}
-            disabled={action.disabled}
-          >
-            {action.component ? action.component : <action.icon size={20} />}
-          </Button>
+          <ThemeVariant variant="secondary">
+            <Button
+              type="button"
+              variant={"secondary"}
+              data-test-id={action.testId}
+              onClick={action.onClick}
+              sx={{
+                position: "absolute",
+                right: "2px",
+                top: "2px",
+                cursor: "pointer",
+                bottom: "2px",
+                px: 1,
+                borderRadius: "default",
+                ":hover": { bg: "border" },
+                height: "calc(100% - 4px)"
+              }}
+              disabled={action.disabled}
+            >
+              {action.component ? action.component : <action.icon size={20} />}
+            </Button>
+          </ThemeVariant>
         )}
       </Flex>
       {validatePassword && (

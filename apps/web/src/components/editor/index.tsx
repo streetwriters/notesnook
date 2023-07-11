@@ -50,7 +50,7 @@ import useTablet from "../../hooks/use-tablet";
 import Config from "../../utils/config";
 import { AnimatedFlex } from "../animated";
 import { EditorLoader } from "../loaders/editor-loader";
-import { ScopedThemeProvider } from "../theme-provider";
+import { ScopedThemeProvider, ThemeVariant } from "../theme-provider";
 import { Lightbox } from "../lightbox";
 import { Allotment } from "allotment";
 import { showToast } from "../../utils/toast";
@@ -401,8 +401,7 @@ export function Editor(props: EditorProps) {
 
   return (
     <EditorChrome isLoading={isLoading} {...props}>
-      <ScopedThemeProvider scope="editor">
-        {" "}
+      <ScopedThemeProvider scope="editor" sx={{ flex: 1 }}>
         <Tiptap
           isMobile={isMobile}
           nonce={nonce}
@@ -529,7 +528,7 @@ function EditorChrome(
             />
           )}
           <Titlebox readonly={readonly || false} />
-          <Header readonly={readonly} />
+          <Header readonly={readonly || false} />
           <AnimatedFlex
             initial={{ opacity: 0 }}
             animate={{ opacity: isLoading ? 0 : 1 }}
@@ -575,40 +574,42 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
   );
 
   return (
-    <Flex
-      bg="bgSecondary"
-      p={2}
-      sx={{ alignItems: "center", justifyContent: "space-between" }}
-      data-test-id="preview-notice"
-    >
-      <Flex mr={4} sx={{ flexDirection: "column" }}>
-        <Text variant={"subtitle"}>Preview</Text>
-        <Text variant={"body"}>
-          You are previewing note version edited from{" "}
-          {getFormattedDate(dateCreated)} to {getFormattedDate(dateEdited)}.
-        </Text>
+    <ThemeVariant variant="secondary">
+      <Flex
+        bg="background"
+        p={2}
+        sx={{ alignItems: "center", justifyContent: "space-between" }}
+        data-test-id="preview-notice"
+      >
+        <Flex mr={4} sx={{ flexDirection: "column" }}>
+          <Text variant={"subtitle"}>Preview</Text>
+          <Text variant={"body"}>
+            You are previewing note version edited from{" "}
+            {getFormattedDate(dateCreated)} to {getFormattedDate(dateEdited)}.
+          </Text>
+        </Flex>
+        <Flex>
+          <Button
+            data-test-id="preview-notice-cancel"
+            variant={"secondary"}
+            mr={1}
+            px={4}
+            onClick={() => disablePreviewMode(true)}
+          >
+            Cancel
+          </Button>
+          <Button
+            data-test-id="preview-notice-restore"
+            px={4}
+            onClick={async () => {
+              await disablePreviewMode(false);
+            }}
+          >
+            Restore
+          </Button>
+        </Flex>
       </Flex>
-      <Flex>
-        <Button
-          data-test-id="preview-notice-cancel"
-          variant={"secondary"}
-          mr={1}
-          px={4}
-          onClick={() => disablePreviewMode(true)}
-        >
-          Cancel
-        </Button>
-        <Button
-          data-test-id="preview-notice-restore"
-          px={4}
-          onClick={async () => {
-            await disablePreviewMode(false);
-          }}
-        >
-          Restore
-        </Button>
-      </Flex>
-    </Flex>
+    </ThemeVariant>
   );
 }
 

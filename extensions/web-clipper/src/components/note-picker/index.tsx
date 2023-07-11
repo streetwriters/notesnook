@@ -63,7 +63,7 @@ export const NotePicker = (props: NotePickerProps) => {
           }
         >
           <Text
-            variant="text"
+            variant="body"
             sx={{
               whiteSpace: "nowrap",
               textOverflow: "ellipsis",

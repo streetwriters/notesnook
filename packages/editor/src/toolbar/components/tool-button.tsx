@@ -24,7 +24,7 @@ import { ButtonProps } from "@theme-ui/components";
 import { IconNames, Icons } from "../icons";
 import { ToolButtonVariant } from "../types";
 import { Button } from "../../components/button";
-import { Icon } from "./icon";
+import { Icon } from "@notesnook/ui";
 
 export type ToolButtonProps = ButtonProps & {
   icon: IconNames;

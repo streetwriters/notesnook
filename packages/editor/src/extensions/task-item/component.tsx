@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Box, Flex } from "@theme-ui/components";
 import { ReactNodeViewProps } from "../react";
-import { Icon } from "../../toolbar/components/icon";
+import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Transaction } from "prosemirror-state";

@@ -62,7 +62,7 @@ export function SpellCheckerLanguages() {
             <input
               type="checkbox"
               style={{
-                accentColor: "var(--primary)",
+                accentColor: "var(--accent)",
                 marginRight: 1,
                 width: 14,
                 height: 14

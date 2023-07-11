@@ -18,15 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef } from "react";
-import { Flex, Text } from "@theme-ui/components";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
-import { useToolbarLocation } from "../../toolbar/stores/toolbar-store";
-import { Button } from "../button";
-import { MenuButton, MenuItemComponentProps } from "./types";
+import { Flex, Text, Button } from "@theme-ui/components";
+import { Icon } from "../icon";
+import { MenuButtonItem, MenuItemComponentProps } from "./types";
+import { mdiCheck, mdiChevronRight } from "@mdi/js";
 
 type MenuButtonProps = {
-  item: MenuButton;
+  item: MenuButtonItem;
   isFocused?: boolean;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
@@ -46,8 +44,6 @@ export function MenuButton(props: MenuButtonProps) {
     styles
   } = item;
   const itemRef = useRef<HTMLButtonElement>(null);
-  const toolbarLocation = useToolbarLocation();
-  const isBottom = toolbarLocation === "bottom";
 
   return (
     <Flex
@@ -67,30 +63,40 @@ export function MenuButton(props: MenuButtonProps) {
         disabled={isDisabled}
         onClick={(e) => onClick?.(e.nativeEvent)}
         sx={{
-          ...styles,
-          bg: isFocused && !isBottom ? "hover" : "transparent",
+          bg: isFocused && "hover",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           ":hover": {
-            bg: isBottom ? "transparent" : "hover"
+            bg: "hover"
           }
         }}
       >
         <Flex sx={{ fontSize: "inherit", fontFamily: "inherit" }}>
-          {icon && <Icon path={Icons[icon]} size={"medium"} sx={{ mr: 2 }} />}
+          {icon && (
+            <Icon
+              path={icon}
+              size={"medium"}
+              sx={{ mr: 2, ...styles?.icon }}
+              color={styles?.icon?.color as string}
+            />
+          )}
           <Text
             as="span"
             variant={"body"}
-            sx={{ fontSize: "inherit", fontFamily: "inherit" }}
+            sx={{
+              fontSize: "inherit",
+              fontFamily: "inherit",
+              ...styles?.title
+            }}
           >
             {title}
           </Text>
         </Flex>
         {isChecked || menu || modifier ? (
           <Flex sx={{ ml: 4 }}>
-            {isChecked && <Icon path={Icons.check} size={"small"} />}
-            {menu && <Icon path={Icons.chevronRight} size={"small"} />}
+            {isChecked && <Icon path={mdiCheck} size={"small"} />}
+            {menu && <Icon path={mdiChevronRight} size={"small"} />}
             {modifier && (
               <Text
                 as="span"

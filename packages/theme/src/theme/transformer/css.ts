@@ -17,14 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Theme } from "..";
 import { Colors } from "../../theme-engine/types";
 
-function transform(theme: Theme) {
+export function colorsToCss(colors: Colors) {
   let root = "";
-  for (const color in theme.colors) {
-    root += `--${color}: ${theme.colors[color as keyof Colors]};`;
+  for (const color in colors) {
+    root += `--${color}: ${colors[color as keyof Colors]};`;
   }
   return root;
 }
-export default transform;

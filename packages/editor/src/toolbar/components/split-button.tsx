@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { PropsWithChildren, useRef } from "react";
 import { Flex } from "@theme-ui/components";
 import { Icons } from "../icons";
-import { Icon } from "./icon";
+import { Icon } from "@notesnook/ui";
 import { ToolButton, ToolButtonProps } from "./tool-button";
 import { useToolbarLocation } from "../stores/toolbar-store";
 

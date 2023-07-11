@@ -27,7 +27,14 @@ type ToastType = "success" | "error" | "warn" | "info";
 type ToastAction = {
   text: string;
   onClick: () => void;
-  type?: "primary" | "text";
+  type?: "accent" | "paragraph";
+};
+
+const ToastIcons = {
+  error: Error,
+  success: Success,
+  warn: Warn,
+  info: Info
 };
 
 function showToast(
@@ -38,20 +45,9 @@ function showToast(
 ): { hide: () => void } {
   if (appstore.get().isFocusMode) return { hide: () => {} }; // TODO
 
-  const IconComponent =
-    type === "error"
-      ? Error
-      : type === "success"
-      ? Success
-      : type === "warn"
-      ? Warn
-      : Info;
-
-  const RenderedIcon = () => <IconComponent size={24} />;
-
   const id = toast(<ToastContainer message={message} actions={actions} />, {
     duration: hideAfter || Infinity,
-    icon: <RenderedIcon />,
+    icon: <ToastIcon type={type} />,
     id: message,
     position: "bottom-right",
     style: {
@@ -94,12 +90,12 @@ function ToastContainer(props: ToastContainerProps) {
             bg={"transparent"}
             sx={{
               py: "7px",
-              ":hover": { bg: "bgSecondary" },
+              ":hover": { bg: "hover" },
               m: 0,
               flexShrink: 0,
               fontSize: "body",
               fontWeight: "bold",
-              color: action.type || "primary"
+              color: action.type || "accent"
             }}
             key={action.text}
             onClick={action.onClick}
@@ -113,3 +109,8 @@ function ToastContainer(props: ToastContainerProps) {
 }
 
 export { showToast };
+
+function ToastIcon({ type }: { type: ToastType }) {
+  const IconComponent = ToastIcons[type];
+  return <IconComponent size={24} />;
+}

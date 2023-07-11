@@ -29,6 +29,7 @@ import { showToast } from "../utils/toast";
 import { useIsUserPremium } from "../hooks/use-is-user-premium";
 import { Pro } from "../components/icons";
 import { usePersistentState } from "../hooks/use-persistent-state";
+import { ThemeVariant } from "../components/theme-provider";
 
 export type AddReminderDialogProps = {
   onClose: Perform;
@@ -256,6 +257,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
               defaultChecked={m.id === Modes.ONCE}
               checked={m.id === mode}
               disabled={m.premium && !isUserPremium}
+              sx={{ color: m.id === mode ? "accent" : "icon" }}
               onChange={() => {
                 if (m.premium && !isUserPremium) return;
                 setMode(m.id);
@@ -271,84 +273,88 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
         ))}
       </Flex>
       {mode === Modes.REPEAT ? (
-        <Flex
-          sx={{
-            mt: 2,
-            bg: "bgSecondary",
-            borderRadius: "default",
-            p: 1,
-            flexDirection: "column"
-          }}
-        >
-          <Flex sx={{ alignItems: "center", gap: 1 }}>
-            {recurringModes.map((mode) => (
-              <Button
-                key={mode.id}
-                variant="tool"
-                data-test-id={`recurring-mode-${mode.id}`}
-                onClick={() => {
-                  setRecurringMode(mode.id);
-                  setSelectedDays([]);
-                }}
-                sx={{
-                  borderRadius: 100,
-                  py: 1,
-                  px: 2,
-                  flexShrink: 0,
-                  color: mode.id === recurringMode ? "primary" : "text"
-                }}
-              >
-                {mode.title}
-              </Button>
-            ))}
+        <ThemeVariant variant="secondary">
+          <Flex
+            sx={{
+              mt: 2,
+              bg: "background",
+              borderRadius: "default",
+              p: 1,
+              flexDirection: "column"
+            }}
+          >
+            <Flex sx={{ alignItems: "center", gap: 1 }}>
+              {recurringModes.map((mode) => (
+                <Button
+                  key={mode.id}
+                  variant="tool"
+                  data-test-id={`recurring-mode-${mode.id}`}
+                  onClick={() => {
+                    setRecurringMode(mode.id);
+                    setSelectedDays([]);
+                  }}
+                  sx={{
+                    borderRadius: 100,
+                    py: 1,
+                    px: 2,
+                    flexShrink: 0,
+                    color: mode.id === recurringMode ? "accent" : "paragraph"
+                  }}
+                >
+                  {mode.title}
+                </Button>
+              ))}
+            </Flex>
+            {recurringModes.map((mode) =>
+              mode.id === recurringMode ? (
+                <Box
+                  key={mode.id}
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      mode.id === RecurringModes.WEEK
+                        ? "1fr 1fr 1fr 1fr 1fr 1fr 1fr"
+                        : "1fr 1fr 1fr 1fr 1fr 1fr 1fr",
+                    mt: mode.options.length > 0 ? 1 : 0,
+                    maxHeight: 150,
+                    overflowY: "auto",
+                    gap: 1
+                  }}
+                >
+                  {mode.options.map((day, i) => (
+                    <Button
+                      key={day}
+                      variant="tool"
+                      data-test-id={`day-${day}`}
+                      onClick={() => {
+                        setSelectedDays((days) => {
+                          const clone = days.slice();
+                          if (clone.indexOf(day) > -1)
+                            clone.splice(clone.indexOf(day), 1);
+                          else clone.push(day);
+                          return clone;
+                        });
+                      }}
+                      sx={{
+                        borderRadius: "default",
+                        py: 1,
+                        px: 2,
+                        flexShrink: 0,
+                        textAlign: "left",
+                        bg: selectedDays.includes(day) ? "shade" : "background",
+                        color: selectedDays.includes(day)
+                          ? "accent"
+                          : "paragraph"
+                      }}
+                    >
+                      {mode.id === "week" ? WEEK_DAYS[i] : day}
+                    </Button>
+                  ))}
+                </Box>
+              ) : null
+            )}
           </Flex>
-          {recurringModes.map((mode) =>
-            mode.id === recurringMode ? (
-              <Box
-                key={mode.id}
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns:
-                    mode.id === RecurringModes.WEEK
-                      ? "1fr 1fr 1fr 1fr 1fr 1fr 1fr"
-                      : "1fr 1fr 1fr 1fr 1fr 1fr 1fr",
-                  mt: mode.options.length > 0 ? 1 : 0,
-                  maxHeight: 150,
-                  overflowY: "auto",
-                  gap: 1
-                }}
-              >
-                {mode.options.map((day, i) => (
-                  <Button
-                    key={day}
-                    variant="tool"
-                    data-test-id={`day-${day}`}
-                    onClick={() => {
-                      setSelectedDays((days) => {
-                        const clone = days.slice();
-                        if (clone.indexOf(day) > -1)
-                          clone.splice(clone.indexOf(day), 1);
-                        else clone.push(day);
-                        return clone;
-                      });
-                    }}
-                    sx={{
-                      borderRadius: "default",
-                      py: 1,
-                      px: 2,
-                      flexShrink: 0,
-                      textAlign: "left",
-                      bg: selectedDays.includes(day) ? "shade" : "bgSecondary",
-                      color: selectedDays.includes(day) ? "primary" : "text"
-                    }}
-                  >
-                    {mode.id === "week" ? WEEK_DAYS[i] : day}
-                  </Button>
-                ))}
-              </Box>
-            ) : null
-          )}
-        </Flex>
+        </ThemeVariant>
       ) : null}
 
       <Flex sx={{ gap: 2, overflowX: "auto", mt: 2 }}>
@@ -396,6 +402,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             <Radio
               id="priority"
               name="priority"
+              sx={{ color: p.id === priority ? "accent" : "icon" }}
               defaultChecked={p.id === Priorities.VIBRATE}
               checked={p.id === priority}
               onChange={() => setPriority(p.id)}

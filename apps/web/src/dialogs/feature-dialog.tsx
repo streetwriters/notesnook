@@ -25,6 +25,7 @@ import Config from "../utils/config";
 import { isTesting } from "../utils/platform";
 import { useEffect } from "react";
 import { ArrowRight, Checkmark, Icon, Warn } from "../components/icons";
+import { ThemeVariant } from "../components/theme-provider";
 
 type CallToAction = {
   title: string;
@@ -148,31 +149,33 @@ function FeatureDialog(props: FeatureDialogProps) {
       }}
     >
       <Flex mt={2} sx={{ flexDirection: "column", overflowY: "auto" }}>
-        {feature.subFeatures?.map((feature) => (
-          <Flex
-            key={feature.title}
-            mb={2}
-            bg="bgSecondary"
-            p={2}
-            sx={{
-              borderRadius: "default",
-              ":hover": { bg: "hover" },
-              flexDirection: "column"
-            }}
-          >
-            <Flex sx={{ alignItems: "center", justifyContent: "start" }}>
-              {feature.icon && <feature.icon size={14} color="accent" />}
-              <Text variant="subtitle" ml={1} sx={{ fontWeight: "normal" }}>
-                {feature.title}
-              </Text>
+        <ThemeVariant variant="secondary">
+          {feature.subFeatures?.map((feature) => (
+            <Flex
+              key={feature.title}
+              mb={2}
+              bg="background"
+              p={2}
+              sx={{
+                borderRadius: "default",
+                ":hover": { bg: "hover" },
+                flexDirection: "column"
+              }}
+            >
+              <Flex sx={{ alignItems: "center", justifyContent: "start" }}>
+                {feature.icon && <feature.icon size={14} color="accent" />}
+                <Text variant="subtitle" ml={1} sx={{ fontWeight: "normal" }}>
+                  {feature.title}
+                </Text>
+              </Flex>
+              {feature.subtitle && (
+                <Text variant="body" sx={{ color: "icon" }}>
+                  {feature.subtitle}
+                </Text>
+              )}
             </Flex>
-            {feature.subtitle && (
-              <Text variant="body" sx={{ color: "icon" }}>
-                {feature.subtitle}
-              </Text>
-            )}
-          </Flex>
-        ))}
+          ))}
+        </ThemeVariant>
       </Flex>
     </Dialog>
   );

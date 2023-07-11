@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useState } from "react";
-import { MenuButton, MenuItem } from "./types";
+import { MenuButtonItem, MenuItem } from "./types";
 
 export function useFocus(
   items: MenuItem[],
@@ -43,13 +43,13 @@ export function useFocus(
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      const as = <T>(i: number) => items[i] as unknown as T;
+      const as = <T>(i: number) => items[i] as unknown as T | undefined;
       const isSeperator = (i: number) =>
         items &&
-        (items[i]?.type === "separator" || as<MenuButton>(i)?.isDisabled);
+        (items[i]?.type === "separator" || as<MenuButtonItem>(i)?.isDisabled);
       const moveDown = (i: number) => (i < items.length - 1 ? ++i : 0);
       const moveUp = (i: number) => (i > 0 ? --i : items.length - 1);
-      const hasSubmenu = (i: number) => items && as<MenuButton>(i).menu;
+      const hasSubmenu = (i: number) => items && as<MenuButtonItem>(i)?.menu;
       const openSubmenu = (index: number) => {
         if (!hasSubmenu(index)) return;
         setIsSubmenuOpen(true);

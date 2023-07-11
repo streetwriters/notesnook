@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Box, Text } from "@theme-ui/components";
 import { AttachmentWithProgress } from "./attachment";
 import { useRef } from "react";
-import { Icon } from "../../toolbar/components/icon";
+import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";

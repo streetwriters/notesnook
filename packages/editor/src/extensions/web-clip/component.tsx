@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Box, Flex, Text } from "@theme-ui/components";
 import { useEffect, useRef, useState } from "react";
 import { SelectionBasedReactNodeViewProps } from "../react";
-import { Icon, Icons } from "../../toolbar";
+import { Icons } from "../../toolbar";
+import { Icon } from "@notesnook/ui";
 import { WebClipAttributes } from "./web-clip";
 import { DesktopOnly } from "../../components/responsive";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";

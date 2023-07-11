@@ -21,28 +21,43 @@ import {
   ThemeProvider,
   ThemeDracula,
   EmotionThemeProvider,
-  EmotionThemeVariant
+  EmotionThemeVariant,
+  themeToCSS
 } from "@notesnook/theme";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useMemo } from "react";
 import { BoxProps } from "@theme-ui/components";
-import { useTheme } from "../../hooks/use-theme";
+import { Global, css } from "@emotion/react";
 
 export function BaseThemeProvider(
   props: PropsWithChildren<
-    { injectCssVars?: boolean } & Omit<BoxProps, "variant">
+    { injectCssVars?: boolean; addGlobalStyles?: boolean } & Omit<
+      BoxProps,
+      "variant"
+    >
   >
 ) {
-  const { children, ...restProps } = props;
-  const [theme, setTheme] = useTheme();
+  const { children, addGlobalStyles = false, ...restProps } = props;
+  //  const [theme, setTheme] = useTheme();
+  const theme = ThemeDracula;
+  const setTheme = () => {};
+  const cssTheme = useMemo(() => themeToCSS(theme), [theme]);
 
   return (
     <ThemeProvider
       value={{
-        theme: ThemeDracula,
+        theme,
         setTheme
       }}
     >
-      <EmotionThemeProvider scope="base" {...restProps}>
+      {addGlobalStyles && (
+        <Global
+          styles={css`
+            ${cssTheme}
+          `}
+        />
+      )}
+
+      <EmotionThemeProvider {...restProps} scope="base">
         {children}
       </EmotionThemeProvider>
     </ThemeProvider>

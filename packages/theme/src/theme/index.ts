@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { variants } from "./variants";
 import { FontConfig, getFontConfig } from "./font";
-import { TransformerFactory, Transformers } from "./transformer";
 import { ThemeConfig } from "./types";
 import { Colors } from "../theme-engine/types";
 import { ThemeUIConfig } from "@theme-ui/css/dist/declarations/src/options";
@@ -46,11 +45,6 @@ export type Theme = {
   typeof variants;
 
 export class ThemeFactory {
-  static transform(type: Transformers, theme: Theme) {
-    const factory = new TransformerFactory();
-    return factory.construct(type, theme);
-  }
-
   static construct(config: ThemeConfig): Theme {
     const theme: Theme = {
       breakpoints: ["480px", "1000px", "1000px"],

@@ -23,6 +23,8 @@ import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import AnnouncementBody from "./body";
 import { useStore as useAnnouncementStore } from "../../stores/announcement-store";
 import Notice from "../notice";
+import { ThemeVariant } from "../theme-provider";
+import { alpha } from "@theme-ui/color";
 
 function Announcements() {
   const announcements = useAnnouncementStore(
@@ -33,38 +35,40 @@ function Announcements() {
 
   if (!announcement) return <Notice />;
   return (
-    <Flex
-      mx={1}
-      mb={2}
-      py={2}
-      bg="bgSecondary"
-      sx={{
-        borderRadius: "default",
-        position: "relative",
-        flexDirection: "column"
-      }}
-    >
-      <Text
-        bg="errorBg"
-        p="2px"
+    <ThemeVariant variant="secondary">
+      <Flex
+        mx={1}
+        mb={2}
+        py={2}
+        bg="background"
         sx={{
-          position: "absolute",
-          right: 2,
-          top: 2,
-          borderRadius: 50,
-          cursor: "pointer",
-          alignSelf: "end"
-        }}
-        title="Dismiss announcement"
-        onClick={() => {
-          trackEvent(ANALYTICS_EVENTS.announcementDismissed, announcement);
-          dismiss(announcement.id);
+          borderRadius: "default",
+          position: "relative",
+          flexDirection: "column"
         }}
       >
-        <Cross color="error" size={16} />
-      </Text>
-      <AnnouncementBody components={announcement.body} type="inline" />
-    </Flex>
+        <Text
+          p="2px"
+          sx={{
+            bg: alpha("red", 0.2),
+            position: "absolute",
+            right: 2,
+            top: 2,
+            borderRadius: 50,
+            cursor: "pointer",
+            alignSelf: "end"
+          }}
+          title="Dismiss announcement"
+          onClick={() => {
+            trackEvent(ANALYTICS_EVENTS.announcementDismissed, announcement);
+            dismiss(announcement.id);
+          }}
+        >
+          <Cross size={16} color="red" />
+        </Text>
+        <AnnouncementBody components={announcement.body} type="inline" />
+      </Flex>
+    </ThemeVariant>
   );
 }
 

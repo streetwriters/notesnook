@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ThemeUIStyleObject } from "@theme-ui/core";
-import { IconNames } from "../../toolbar/icons";
+import { ThemeUICSSObject } from "@theme-ui/core";
 
 export type MenuItemComponentProps = {
   onClick?: (e?: Event) => void;
@@ -31,22 +30,26 @@ export type BaseMenuItem<TType extends MenuItemTypes> = {
   isHidden?: boolean;
 };
 
-export type MenuSeperator = BaseMenuItem<"separator">;
+export type MenuSeperatorItem = BaseMenuItem<"separator">;
 
-export type MenuPopup = BaseMenuItem<"popup"> & {
+export type MenuPopupItem = BaseMenuItem<"popup"> & {
   component: (props: MenuItemComponentProps) => JSX.Element;
 };
 
-export type MenuButton = BaseMenuItem<"button"> & {
+export type MenuButtonItem = BaseMenuItem<"button"> & {
   onClick?: () => void;
   title: string;
-  icon?: IconNames;
+  icon?: string;
   tooltip?: string;
   isDisabled?: boolean;
   isChecked?: boolean;
   modifier?: string;
-  menu?: { title: string; items: MenuItem[] };
-  styles?: ThemeUIStyleObject;
+  menu?: { title?: string; items: MenuItem[] };
+
+  styles?: {
+    title?: ThemeUICSSObject;
+    icon?: ThemeUICSSObject;
+  };
 };
 
-export type MenuItem = MenuButton | MenuSeperator | MenuPopup;
+export type MenuItem = MenuButtonItem | MenuSeperatorItem | MenuPopupItem;

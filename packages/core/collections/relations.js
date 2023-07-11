@@ -160,7 +160,7 @@ export default class Relations extends Collection {
    * @param {"from" | "to"} resolveType
    * @private
    *
-   * @returns {Relation[]}
+   * @returns {any[]}
    */
   resolve(relations, resolveType) {
     const items = [];

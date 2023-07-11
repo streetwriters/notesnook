@@ -23,7 +23,8 @@ import { EmbedAlignmentOptions, EmbedAttributes } from "./embed";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { DesktopOnly } from "../../components/responsive";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
-import { Icon, Icons } from "../../toolbar";
+import { Icons } from "../../toolbar";
+import { Icon } from "@notesnook/ui";
 import { Resizer } from "../../components/resizer";
 import { EmotionThemeVariant } from "@notesnook/theme";
 
