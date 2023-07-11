@@ -50,7 +50,7 @@ const ManageTagsSheet = (props) => {
     _tags = _tags.filter((t) => t.type === "tag");
     _tags = _tags.sort((a, b) => a.title.localeCompare(b.title));
     if (query) {
-      _tags = _tags.filter((t) => t.title.startsWith(query));
+      _tags = db.lookup.tags(_tags, query);
     }
     const tagsMerged = [...notes.map((note) => note.tags || []).flat()];
 
