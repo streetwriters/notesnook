@@ -66,7 +66,7 @@ export const TopicNotes = ({
         placeholderData={PLACEHOLDER_DATA}
         onPressFloatingButton={openEditor}
         rightButtons={headerRightButtons}
-        canGoBack={route.params.canGoBack}
+        canGoBack={route.params?.canGoBack}
         focusControl={true}
       />
     </>

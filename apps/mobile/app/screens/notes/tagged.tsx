@@ -36,7 +36,7 @@ export const TaggedNotes = ({
       get={TaggedNotes.get}
       placeholderData={PLACEHOLDER_DATA}
       onPressFloatingButton={openEditor}
-      canGoBack={route.params.canGoBack}
+      canGoBack={route.params?.canGoBack}
       focusControl={true}
     />
   );

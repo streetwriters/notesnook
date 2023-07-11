@@ -169,6 +169,11 @@ const _Tabs = () => {
       <NativeStack.Screen
         options={{ lazy: true }}
         name="Monographs"
+        initialParams={{
+          item: { type: "monograph" },
+          canGoBack: false,
+          title: "Monographs"
+        }}
         component={Monographs}
       />
       <NativeStack.Screen

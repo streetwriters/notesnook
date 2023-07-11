@@ -144,7 +144,7 @@ function push<T extends RouteName>(
   screen: CurrentScreen,
   params: RouteParams[T]
 ) {
-  useNavigationStore.getState().update(screen, !!params.canGoBack);
+  useNavigationStore.getState().update(screen, !!params?.canGoBack);
   rootNavigatorRef.current?.dispatch(StackActions.push(screen.name, params));
 }
 
