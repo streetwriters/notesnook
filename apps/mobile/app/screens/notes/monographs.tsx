@@ -36,7 +36,7 @@ export const Monographs = ({
       get={Monographs.get}
       placeholderData={PLACEHOLDER_DATA}
       onPressFloatingButton={openMonographsWebpage}
-      canGoBack={route.params.canGoBack}
+      canGoBack={route.params?.canGoBack}
       focusControl={true}
     />
   );
@@ -56,7 +56,7 @@ Monographs.navigate = (item: MonographType, canGoBack: boolean) => {
       type: "monograph"
     },
     {
-      item: { type: "monograph" },
+      item: { type: "monograph" } as any,
       canGoBack,
       title: "Monographs"
     }
