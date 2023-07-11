@@ -25,11 +25,10 @@ import {
   DraxListRenderItemContent,
   DraxProvider
 } from "react-native-drax";
-import { IconButton } from "../ui/icon-button";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
-import Paragraph from "../ui/typography/paragraph";
 import { Button } from "../ui/button";
+import { IconButton } from "../ui/icon-button";
 
 interface ReorderableListProps<T = never>
   extends Omit<DraxListProps<T>, "renderItem"> {
