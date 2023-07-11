@@ -27,7 +27,7 @@ import { HexColorPicker } from "react-colorful";
 import { Button } from "../../components/button";
 import { debounce } from "../../utils/debounce";
 import { Popup } from "../components/popup";
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { SchemeColors } from "@notesnook/theme";
 import { EmotionThemeVariant } from "@notesnook/theme";
 
 export const DEFAULT_COLORS = [
