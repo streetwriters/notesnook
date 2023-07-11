@@ -8,7 +8,7 @@
     "url": "git://github.com/streetwriters/themeprovider.git"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.8",
+    "@emotion/react": "11.11.1",
     "@theme-ui/components": "0.14.7",
     "@theme-ui/core": "0.14.7",
     "tinycolor2": "^1.4.2"
