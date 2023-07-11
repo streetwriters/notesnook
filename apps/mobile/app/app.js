@@ -32,6 +32,7 @@ import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
 import { useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
+import { themeTrpcClient } from "./screens/settings/theme-selector";
 
 SettingsService.init();
 SettingsService.checkOrientation();
@@ -96,6 +97,19 @@ export const withThemeProvider = (Element) => {
       state.darkTheme,
       state.lightTheme
     ]);
+
+    useEffect(() => {
+      const currentTheme = colorScheme === "dark" ? darkTheme : lightTheme;
+      if (!currentTheme) return;
+      themeTrpcClient.updateTheme.query(currentTheme.version).then((theme) => {
+        if (theme) {
+          theme.colorScheme === "dark"
+            ? useThemeStore.getState().setDarkTheme(theme)
+            : useThemeStore.getState().setLightTheme(theme);
+        }
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
       <ThemeProvider

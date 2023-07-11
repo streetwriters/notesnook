@@ -32,12 +32,12 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { MasonryFlashList } from "@shopify/flash-list";
 import Input from "../../components/ui/input";
-
+const THEME_SERVER_URL = "http://192.168.43.127:1000";
 //@ts-ignore
-const trpcClient = createTRPCProxyClient<ThemesRouter>({
+export const themeTrpcClient = createTRPCProxyClient<ThemesRouter>({
   links: [
     httpBatchLink({
-      url: "http://192.168.8.103:1000"
+      url: THEME_SERVER_URL
     })
   ]
 });
@@ -150,6 +150,17 @@ function ThemeSelector() {
     }, 500);
   };
 
+  function getThemes() {
+    const pages = searchQuery ? searchResults.data?.pages : themes.data?.pages;
+    return (
+      pages
+        ?.map((page) => {
+          return page.themes;
+        })
+        .flat() || []
+    );
+  }
+
   return (
     <View
       style={{
@@ -167,19 +178,7 @@ function ThemeSelector() {
 
       <MasonryFlashList
         numColumns={2}
-        data={
-          searchQuery
-            ? searchResults?.data?.pages
-                .map((page) => {
-                  return page.themes;
-                })
-                .flat()
-            : themes.data?.pages
-                .map((page) => {
-                  return page.themes;
-                })
-                .flat() || []
-        }
+        data={getThemes()}
         ListEmptyComponent={
           <View
             style={{
@@ -224,7 +223,7 @@ export default function ThemeSelectorWithQueryClient() {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: "http://192.168.8.103:1000"
+          url: THEME_SERVER_URL
         })
       ]
     })
@@ -316,7 +315,7 @@ const ThemeSetter = ({
           onPress={async () => {
             if (!theme.id) return;
             try {
-              const fullTheme = await trpcClient.getTheme.query(theme.id);
+              const fullTheme = await themeTrpcClient.getTheme.query(theme.id);
               if (!fullTheme) return;
               theme.colorScheme === "dark"
                 ? useThemeStore.getState().setDarkTheme(fullTheme)

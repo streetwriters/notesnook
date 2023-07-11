@@ -44,6 +44,15 @@ const ThemesRouter = router({
 
     return undefined;
   }),
+  updateTheme: publicProcedure.input(z.string()).query(({ input }) => {
+    const theme = getThemesMetadata().find(
+      (theme) => theme.id === input
+    ) as ThemeDefinition;
+    if (theme) {
+      return theme.version === input ? undefined : (theme as ThemeDefinition);
+    }
+    return undefined;
+  }),
   search: publicProcedure
     .input(
       z.object({
