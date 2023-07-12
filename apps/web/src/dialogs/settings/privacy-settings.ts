@@ -81,7 +81,7 @@ What data is collected & when?`,
           "Prevent Notesnook app from being captured by any screen capturing software like TeamViewer & AnyDesk.",
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.privacyMode, listener),
-        isHidden: () => !isDesktop() || getPlatform() === "linux",
+        isHidden: () => !IS_DESKTOP_APP || getPlatform() === "linux",
         components: [
           {
             type: "toggle",

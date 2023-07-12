@@ -25,7 +25,7 @@ import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { createBackup, importBackup, verifyAccount } from "../../common";
 import { db } from "../../common/db";
 import { exportNotes } from "../../common/export";
-import { isDesktop, isTesting } from "../../utils/platform";
+
 import { desktop } from "../../common/desktop-bridge";
 import { PATHS } from "@notesnook/desktop";
 
@@ -56,7 +56,7 @@ export const BackupExportSettings: SettingsGroup[] = [
         key: "restore-backup",
         title: "Restore backup",
         description: "Restore a backup file from your disk drive.",
-        isHidden: () => !useUserStore.getState().isLoggedIn && !isTesting(),
+        isHidden: () => !useUserStore.getState().isLoggedIn && !IS_TESTING,
         components: [
           {
             type: "button",
@@ -71,8 +71,8 @@ export const BackupExportSettings: SettingsGroup[] = [
       },
       {
         key: "auto-backup",
-        title: isDesktop() ? "Automatic backups" : "Backup reminders",
-        description: isDesktop()
+        title: IS_DESKTOP_APP ? "Automatic backups" : "Backup reminders",
+        description: IS_DESKTOP_APP
           ? "Backup all your data automatically at a set interval."
           : "You will be shown regular reminders to backup your data.",
         isHidden: () => !isUserPremium(),
@@ -119,7 +119,7 @@ export const BackupExportSettings: SettingsGroup[] = [
         key: "backup-directory",
         title: "Backups directory",
         description: "Select directory to store all backup files.",
-        isHidden: () => !isDesktop(),
+        isHidden: () => !IS_DESKTOP_APP,
         components: [
           {
             type: "button",

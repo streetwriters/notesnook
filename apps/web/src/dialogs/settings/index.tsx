@@ -51,7 +51,7 @@ import { SyncSettings } from "./sync-settings";
 import { BehaviourSettings } from "./behaviour-settings";
 import { DesktopIntegrationSettings } from "./desktop-integration-settings";
 import { NotificationsSettings } from "./notifications-settings";
-import { isDesktop } from "../../utils/platform";
+
 import { BackupExportSettings } from "./backup-export-settings";
 import { ImporterSettings } from "./importer-settings";
 import { VaultSettings } from "./vault-settings";
@@ -105,7 +105,7 @@ const sectionGroups: SectionGroup[] = [
         key: "desktop",
         title: "Desktop integration",
         icon: Desktop,
-        isHidden: () => !isDesktop()
+        isHidden: () => !IS_DESKTOP_APP
       },
       { key: "notifications", title: "Notifications", icon: Notification }
     ]

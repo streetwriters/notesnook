@@ -26,7 +26,7 @@ import { showReminderPreviewDialog } from "../common/dialog-controller";
 import dayjs from "dayjs";
 import Config from "../utils/config";
 import { store as notestore } from "./note-store";
-import { isDesktop, isTesting } from "../utils/platform";
+
 import { desktop } from "../common/desktop-bridge";
 
 /**
@@ -57,7 +57,7 @@ async function resetReminders(reminders) {
   await TaskScheduler.stopAllWithPrefix("reminder:");
 
   if (
-    !isTesting() &&
+    !IS_TESTING &&
     (!("Notification" in window) || Notification.permission !== "granted")
   )
     return;
@@ -93,12 +93,12 @@ function scheduleReminder(id, reminder, cron) {
   return TaskScheduler.register(`reminder:${id}`, cron, async () => {
     if (!Config.get("reminderNotifications", true)) return;
 
-    if (isTesting()) {
+    if (IS_TESTING) {
       window.confirm("Reminder activated!");
       return;
     }
 
-    if (isDesktop()) {
+    if (IS_DESKTOP_APP) {
       const tag = await desktop?.integration.showNotification.query({
         title: reminder.title,
         body: reminder.description,

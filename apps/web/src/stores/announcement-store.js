@@ -25,7 +25,6 @@ import { isUserPremium } from "../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { appVersion } from "../utils/version";
 import { findItemAndDelete } from "@notesnook/core/utils/array";
-import { isTesting } from "../utils/platform";
 
 /**
  * @extends {BaseStore<AnnouncementStore>}
@@ -35,7 +34,7 @@ class AnnouncementStore extends BaseStore {
   dialogAnnouncements = [];
 
   refresh = async () => {
-    if (isTesting()) return;
+    if (IS_TESTING) return;
 
     try {
       const inlineAnnouncements = [];
@@ -77,7 +76,7 @@ export { useStore, store };
 
 export const allowedPlatforms = [
   "all",
-  import.meta.env.REACT_APP_PLATFORM,
+  PLATFORM,
   ...(window.os ? [window.os()] : [])
 ];
 

@@ -82,8 +82,8 @@
     "autoprefixer": "^10.4.14",
     "buffer": "^6.0.3",
     "chalk": "^4.1.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
-    "env-cmd": "^10.1.0",
     "file-loader": "^6.2.0",
     "find-process": "^1.4.4",
     "happy-dom": "^8.9.0",
@@ -111,13 +111,13 @@
     "@types/react-dom@>17": "17.0.2"
   },
   "scripts": {
-    "start": "env-cmd -e all,dev,web vite",
-    "start:desktop": "env-cmd -e all,desktop vite",
+    "start": "cross-env PLATFORM=web vite",
+    "start:desktop": "cross-env PLATFORM=desktop vite",
     "start:test": "serve -s build/ -p 3000",
-    "build": "env-cmd -e all,web vite build",
-    "build:test": "env-cmd -e all,dev,web,silent vite build",
-    "build:beta": "env-cmd -e all,web,beta vite build",
-    "build:desktop": "env-cmd -e all,desktop vite build",
+    "build": "cross-env PLATFORM=web vite build",
+    "build:test": "cross-env PLATFORM=web TEST=true vite build",
+    "build:beta": "cross-env PLATFORM=web BETA=true vite build",
+    "build:desktop": "cross-env PLATFORM=desktop vite build",
     "test": "playwright test -u"
   },
   "browserslist": {

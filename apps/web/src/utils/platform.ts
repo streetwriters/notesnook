@@ -122,10 +122,6 @@ export function getDownloadLink(platform: string) {
   }
 }
 
-export function isDesktop() {
-  return "os" in window || import.meta.env.REACT_APP_PLATFORM === "desktop";
-}
-
 export function isMac() {
   return (
     getPlatform() === "macOS" || getPlatform() === "darwin" || isMacStoreApp()
@@ -134,8 +130,4 @@ export function isMac() {
 
 export function isMacStoreApp() {
   return window.os && window.os() === "mas";
-}
-
-export function isTesting() {
-  return !!import.meta.env.REACT_APP_TEST;
 }

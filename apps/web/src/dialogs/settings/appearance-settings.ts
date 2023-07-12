@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { isDesktop } from "../../utils/platform";
+
 import { AccentColors } from "./components/accent-colors";
 
 export const AppearanceSettings: SettingsGroup[] = [
@@ -72,7 +72,7 @@ export const AppearanceSettings: SettingsGroup[] = [
         key: "zoom-factor",
         title: "Zoom factor",
         description: "Zoom in or out the app content.",
-        isHidden: () => !isDesktop(),
+        isHidden: () => !IS_DESKTOP_APP,
         onStateChange: (listener) =>
           useThemeStore.subscribe(
             (s) => [s.theme, s.followSystemTheme],

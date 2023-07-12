@@ -23,9 +23,9 @@ import "allotment/dist/style.css";
 import "../utils/analytics";
 import "../app.css";
 
-if (import.meta.env.NODE_ENV === "production") {
-  console.log = () => {};
-}
+// if (import.meta.env.PROD) {
+//   console.log = () => {};
+// }
 
 const memory = {
   isDatabaseLoaded: false
