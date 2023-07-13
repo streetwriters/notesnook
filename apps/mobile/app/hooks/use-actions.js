@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import Share from "react-native-share";
 import { db } from "../common/database";
@@ -68,6 +68,7 @@ export const useActions = ({ close = () => null, item }) => {
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
   );
+  const processingId = useRef();
   const user = useUserStore((state) => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
   const alias = item.alias || item.title;
@@ -214,6 +215,14 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   async function copyContent() {
+    if (processingId.current === "copyContent") {
+      ToastEvent.show({
+        heading: "Please wait...",
+        message: "We are preparing your note for copy to clipboard",
+        context: "local"
+      });
+      return;
+    }
     if (!checkNoteSynced()) return;
     if (item.locked) {
       close();
@@ -227,7 +236,9 @@ export const useActions = ({ close = () => null, item }) => {
         description: "Unlock note to copy to clipboard."
       });
     } else {
+      processingId.current = "copyContent";
       Clipboard.setString(await convertNoteToText(item));
+      processingId.current = null;
       ToastEvent.show({
         heading: "Note copied to clipboard",
         type: "success",
@@ -399,6 +410,14 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   async function shareNote() {
+    if (processingId.current === "shareNote") {
+      ToastEvent.show({
+        heading: "Please wait...",
+        message: "We are preparing your note for sharing",
+        context: "local"
+      });
+      return;
+    }
     if (!checkNoteSynced()) return;
     if (item.locked) {
       close();
@@ -412,10 +431,13 @@ export const useActions = ({ close = () => null, item }) => {
         description: "Unlock note to share it."
       });
     } else {
+      processingId.current = "shareNote";
+      const convertedText = await convertNoteToText(item);
+      processingId.current = null;
       Share.open({
         title: "Share note to",
         failOnCancel: false,
-        message: await convertNoteToText(item)
+        message: convertedText
       });
     }
   }
