@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Clipboard from "@react-native-clipboard/clipboard";
 import { LogMessage } from "@notesnook/logger";
 import { format, LogLevel, logManager } from "@notesnook/core/logger";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Platform, TouchableOpacity, View } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";
 import RNFetchBlob from "react-native-blob-util";
@@ -55,6 +55,8 @@ import { sanitizeFilename } from "@notesnook/common";
 export default function DebugLogs() {
   const colors = useThemeStore((state) => state.colors);
   const { seconds, start } = useTimer("debug_logs_timer");
+  const listRef = useRef<FlatList>(null);
+  const currentOffset = useRef(0);
   const [logs, setLogs] = useState<
     {
       key: string;
@@ -229,6 +231,7 @@ export default function DebugLogs() {
 
       {currentLog && (
         <FlatList
+          ref={listRef}
           ListHeaderComponent={
             <View
               style={{
