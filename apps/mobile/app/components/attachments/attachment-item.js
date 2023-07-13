@@ -17,15 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { formatBytes } from "@notesnook/common";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { formatBytes } from "@notesnook/common";
 import { SIZE } from "../../utils/size";
-import SheetProvider from "../sheet-provider";
 import { IconButton } from "../ui/icon-button";
 import { ProgressCircleComponent } from "../ui/svg/lazy";
 import Paragraph from "../ui/typography/paragraph";
@@ -41,7 +40,8 @@ export const AttachmentItem = ({
   encryption,
   setAttachments,
   pressable = true,
-  hideWhenNotDownloading
+  hideWhenNotDownloading,
+  context
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const [currentProgress, setCurrentProgress] = useAttachmentProgress(
@@ -51,7 +51,7 @@ export const AttachmentItem = ({
 
   const onPress = () => {
     if (!pressable) return;
-    Actions.present(attachment, setAttachments, attachment.metadata.hash);
+    Actions.present(attachment, setAttachments, context);
   };
 
   return hideWhenNotDownloading &&
@@ -70,7 +70,6 @@ export const AttachmentItem = ({
       }}
       type="grayBg"
     >
-      <SheetProvider context={attachment.metadata.hash} />
       <View
         style={{
           flexShrink: 1,

@@ -1,0 +1,136 @@
+diff --git a/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilReq.java b/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilReq.java
+index 9aee829..87124b3 100644
+--- a/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilReq.java
++++ b/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilReq.java
+@@ -634,7 +634,9 @@ public class ReactNativeBlobUtilReq extends BroadcastReceiver implements Runnabl
+      */
+     private void done(Response resp) {
+         boolean isBlobResp = isBlobResponse(resp);
+-        emitStateEvent(getResponseInfo(resp, isBlobResp));
++        WritableMap map = getResponseInfo(resp,isBlobResp);
++        emitStateEvent(getResponseInfo(resp,isBlobResp));
++
+         switch (responseType) {
+             case KeepInMemory:
+                 try {
+@@ -652,7 +654,7 @@ public class ReactNativeBlobUtilReq extends BroadcastReceiver implements Runnabl
+                         ins.close();
+                         os.flush();
+                         os.close();
+-                        invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_PATH, dest);
++                        invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_PATH, dest, map);
+                     }
+                     // response data directly pass to JS context as string.
+                     else {
+@@ -674,11 +676,11 @@ public class ReactNativeBlobUtilReq extends BroadcastReceiver implements Runnabl
+                                 invoke_callback("Error from file transformer:" + e.getLocalizedMessage(), null);
+                                 return;
+                             }
+-                            invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_PATH, this.destPath);
++                            invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_PATH, this.destPath,map);
+                             return;
+                         }
+                         if (responseFormat == ResponseFormat.BASE64) {
+-                            invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_BASE64, android.util.Base64.encodeToString(b, Base64.NO_WRAP));
++                            invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_BASE64, android.util.Base64.encodeToString(b, Base64.NO_WRAP),map);
+                             return;
+                         }
+                         try {
+@@ -688,21 +690,21 @@ public class ReactNativeBlobUtilReq extends BroadcastReceiver implements Runnabl
+                             decoder.decode(ByteBuffer.wrap(b));
+                             // If the data contains invalid characters the following lines will be skipped.
+                             String utf8 = new String(b, charSet);
+-                            invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_UTF8, utf8);
++                            invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_UTF8, utf8,map);
+                         }
+                         // This usually means the data contains invalid unicode characters but still valid data,
+                         // it's binary data, so send it as a normal string
+                         catch (CharacterCodingException ignored) {
+                             if (responseFormat == ResponseFormat.UTF8) {
+                                 String utf8 = new String(b);
+-                                invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_UTF8, utf8);
++                                invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_UTF8, utf8,map);
+                             } else {
+-                                invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_BASE64, android.util.Base64.encodeToString(b, Base64.NO_WRAP));
++                                invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_BASE64, android.util.Base64.encodeToString(b, Base64.NO_WRAP),map);
+                             }
+                         }
+                     }
+                 } catch (IOException e) {
+-                    invoke_callback("ReactNativeBlobUtil failed to encode response data to BASE64 string.", null);
++                    invoke_callback("ReactNativeBlobUtil failed to encode response data to BASE64 string.", null,map);
+                 }
+                 break;
+             case FileStorage:
+@@ -742,18 +744,18 @@ public class ReactNativeBlobUtilReq extends BroadcastReceiver implements Runnabl
+                 }
+ 
+                 if (ReactNativeBlobUtilFileResp != null && !ReactNativeBlobUtilFileResp.isDownloadComplete()) {
+-                    invoke_callback("Download interrupted.", null);
++                    invoke_callback("Download interrupted.", null,map);
+                 } else {
+                     this.destPath = this.destPath.replace("?append=true", "");
+-                    invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_PATH, this.destPath);
++                    invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_PATH, this.destPath,map);
+                 }
+ 
+                 break;
+             default:
+                 try {
+-                    invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_UTF8, new String(resp.body().bytes(), "UTF-8"));
++                    invoke_callback(null, ReactNativeBlobUtilConst.RNFB_RESPONSE_UTF8, new String(resp.body().bytes(), "UTF-8"),map);
+                 } catch (IOException e) {
+-                    invoke_callback("ReactNativeBlobUtil failed to encode response data to UTF8 string.", null);
++                    invoke_callback("ReactNativeBlobUtil failed to encode response data to UTF8 string.", null,map);
+                 }
+                 break;
+         }
+diff --git a/node_modules/react-native-blob-util/fetch.js b/node_modules/react-native-blob-util/fetch.js
+index 97e5263..45c086c 100644
+--- a/node_modules/react-native-blob-util/fetch.js
++++ b/node_modules/react-native-blob-util/fetch.js
+@@ -244,7 +244,7 @@ export function fetch(...args: any): Promise {
+          *                  dose the response data presents.
+          * @param data {string} Response data or its reference.
+          */
+-        req(options, taskId, method, url, headers || {}, body, (err, rawType, data) => {
++        req(options, taskId, method, url, headers || {}, body, (err, rawType, data, responseInfo) => {
+ 
+             // task done, remove event listeners
+             subscription.remove();
+@@ -270,6 +270,9 @@ export function fetch(...args: any): Promise {
+                         fs.session(options.session).add(data);
+                 }
+                 respInfo.rnfbEncode = rawType;
++                if (respInfo.status === undefined || respInfo.status === null) {
++                    respInfo.status = responseInfo?.status
++                }
+                 resolve(new FetchBlobResponse(taskId, respInfo, data));
+             }
+ 
+diff --git a/node_modules/react-native-blob-util/ios/ReactNativeBlobUtilRequest.mm b/node_modules/react-native-blob-util/ios/ReactNativeBlobUtilRequest.mm
+index d4e468a..25b8d81 100644
+--- a/node_modules/react-native-blob-util/ios/ReactNativeBlobUtilRequest.mm
++++ b/node_modules/react-native-blob-util/ios/ReactNativeBlobUtilRequest.mm
+@@ -438,13 +438,20 @@ - (void) URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCom
+         }
+     }
+     
++    NSHTTPURLResponse *response = (NSHTTPURLResponse *) [task response];
++    
+ 
+     callback(@[
+                errMsg ?: [NSNull null],
+                rnfbRespType ?: @"",
+-               respStr ?: [NSNull null]
++               respStr ?: [NSNull null],
++                 @{
++                     @"status": [NSNumber numberWithInteger:[response statusCode]]
++                 }
+                ]);
+     
++    
++
+     respData = nil;
+     receivedBytes = 0;
+     [session finishTasksAndInvalidate];

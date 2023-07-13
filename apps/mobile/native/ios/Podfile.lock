@@ -299,7 +299,7 @@ PODS:
     - React-Core
   - react-native-begin-background-task (0.1.0):
     - React
-  - react-native-blob-util (0.17.3):
+  - react-native-blob-util (0.18.3):
     - React-Core
   - react-native-config (1.5.1):
     - react-native-config/App (= 1.5.1)
@@ -862,7 +862,7 @@ SPEC CHECKSUMS:
   react-native-actions-shortcuts: 5d9cf0c9c308333dfcc1e05c3f9afa8c428e2533
   react-native-background-actions: 2c251c986f23347f9c1722f05fd296938f60edb1
   react-native-begin-background-task: 3b889e07458afc5822a7277cf9cbc7cd077e39ee
-  react-native-blob-util: 99f4d79189252f597fe0d810c57a3733b1b1dea6
+  react-native-blob-util: 2d36383bb52c15c5451be81cb7ddf22bc34a12a6
   react-native-config: 86038147314e2e6d10ea9972022aa171e6b1d4d8
   react-native-date-picker: 93e43b3084cea595b4d68b1405d6d99849663bd6
   react-native-document-picker: ec07866a30707f23660c0f3ae591d669d3e89096

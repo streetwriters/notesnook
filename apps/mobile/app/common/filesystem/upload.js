@@ -51,6 +51,7 @@ export async function uploadFile(filename, data, cancelToken) {
       uploadFilePath = appGroupPath;
     }
     DatabaseLogger.info(`Starting upload: ${filename}`);
+
     let request = RNFetchBlob.config({
       IOSBackgroundTask: !globalThis["IS_SHARE_EXTENSION"]
     })
@@ -66,8 +67,11 @@ export async function uploadFile(filename, data, cancelToken) {
         useAttachmentStore
           .getState()
           .setProgress(sent, total, filename, 0, "upload");
-        DatabaseLogger.info(`uploading file: ${sent}/${total}`);
+        DatabaseLogger.info(
+          `File upload progress: ${filename}, ${sent}/${total}`
+        );
       });
+
     cancelToken.cancel = request.cancel;
     let response = await request;
 
@@ -90,7 +94,9 @@ export async function uploadFile(filename, data, cancelToken) {
     } else {
       const fileInfo = await RNFetchBlob.fs.stat(uploadFilePath);
       throw new Error(
-        `${status}, ${text}, name: ${fileInfo.filename}, length: ${fileInfo}`
+        `${status}, ${text}, name: ${fileInfo.filename}, length: ${
+          fileInfo.size
+        }, info: ${JSON.stringify(response.info())}`
       );
     }
 
