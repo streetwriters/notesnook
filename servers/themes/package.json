@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@orama/orama": "^1.0.8",
-    "@trpc/server": "^10.34.0",
+    "@trpc/server": "10.31.0",
     "ip": "^1.1.8",
     "nodemon": "^3.0.1",
     "util": "^0.12.5",
