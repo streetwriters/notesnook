@@ -301,7 +301,7 @@ img.ProseMirror-separator {
   position: absolute;
   left: 0;
   pointer-events: none;
-  background-color: var(--overlay);
+  background-color: var(--backdrop);
 }
 
 .hide-scrollbar::-webkit-scrollbar {

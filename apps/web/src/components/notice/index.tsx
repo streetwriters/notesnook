@@ -23,7 +23,6 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { NoticesData } from "../../common/notices";
 import { Dismiss } from "../icons";
 import Config from "../../utils/config";
-import { ThemeVariant } from "../theme-provider";
 
 function Notice() {
   const notices = useAppStore((store) => store.notices);
@@ -57,11 +56,9 @@ function Notice() {
           <Text variant="body" sx={{ fontSize: "body" }}>
             {NoticeData.title}
           </Text>
-          <ThemeVariant variant="secondary">
-            <Text variant="subBody" sx={{ display: "block" }}>
-              {NoticeData.subtitle}
-            </Text>
-          </ThemeVariant>
+          <Text variant="subBody" sx={{ display: "block" }}>
+            {NoticeData.subtitle}
+          </Text>
         </Flex>
       </Flex>
       {NoticeData.dismissable && (
@@ -80,10 +77,9 @@ function Notice() {
             borderRadius: 50,
             p: 1,
             mr: 1,
-            bg: "transparent",
-            ":hover": { backgroundColor: "shade" }
+            bg: "transparent"
           }}
-          variant="tool"
+          variant="accentSecondary"
         >
           <Dismiss size={20} color="accent" />
         </Button>

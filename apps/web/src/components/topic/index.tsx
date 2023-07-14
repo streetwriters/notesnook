@@ -31,7 +31,6 @@ import { pluralize } from "@notesnook/common";
 import { getTotalNotes } from "@notesnook/common";
 import { Item } from "../list-container/types";
 import { MenuItem } from "@notesnook/ui";
-import { ThemeVariant } from "../theme-provider";
 
 type TopicProps = { item: Item };
 function Topic(props: TopicProps) {
@@ -47,19 +46,7 @@ function Topic(props: TopicProps) {
       item={topic}
       onClick={() => navigate(`/notebooks/${topic.notebookId}/${topic.id}`)}
       title={topic.title}
-      footer={
-        <ThemeVariant variant="secondary">
-          <Flex
-            sx={{
-              fontSize: "subBody",
-              color: "paragraph",
-              alignItems: "center"
-            }}
-          >
-            <Text variant="subBody">{getTotalNotes(topic)}</Text>
-          </Flex>
-        </ThemeVariant>
-      }
+      footer={<Text variant="subBody">{getTotalNotes(topic)}</Text>}
       menuItems={menuItems}
     />
   );

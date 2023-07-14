@@ -30,7 +30,6 @@ import { hashNavigate } from "../../navigation";
 import { useStore } from "../../stores/note-store";
 import { Item } from "../list-container/types";
 import { MenuItem } from "@notesnook/ui";
-import { ThemeVariant } from "../theme-provider";
 
 type TrashItemProps = { item: Item; date: number };
 function TrashItem(props: TrashItemProps) {
@@ -44,17 +43,18 @@ function TrashItem(props: TrashItemProps) {
       title={item.title}
       body={(item.headline || item.description) as string}
       footer={
-        <ThemeVariant variant="secondary">
-          <Flex mt={1} sx={{ fontSize: "subBody", color: "paragraph" }}>
-            <TimeAgo live={true} datetime={date} />
-            <Text as="span" mx={1}>
-              •
-            </Text>
-            <Text sx={{ color: "accent" }}>
-              {toTitleCase(item.itemType as string)}
-            </Text>
-          </Flex>
-        </ThemeVariant>
+        <Flex
+          mt={1}
+          sx={{ fontSize: "subBody", color: "var(--paragraph-secondary)" }}
+        >
+          <TimeAgo live={true} datetime={date} />
+          <Text as="span" mx={1}>
+            •
+          </Text>
+          <Text sx={{ color: "accent" }}>
+            {toTitleCase(item.itemType as string)}
+          </Text>
+        </Flex>
       }
       menuItems={menuItems}
       onClick={() => {

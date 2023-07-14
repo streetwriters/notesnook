@@ -71,7 +71,7 @@ export function ColorTool(props: ColorToolProps) {
       sx={{
         mr: 0,
         bg: activeColor || "transparent",
-        ":hover": {
+        ":hover:not(:disabled):not(:active)": {
           bg: activeColor ? tColor.darken(5).toRgbString() : "transparent"
         }
       }}

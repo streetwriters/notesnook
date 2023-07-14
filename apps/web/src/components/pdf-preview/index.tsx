@@ -37,7 +37,6 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import Field from "../field";
 import { LinkPlugin } from "./links-plugin";
 import Config from "../../utils/config";
-import { ThemeVariant } from "../theme-provider";
 import { ErrorText } from "../error-text";
 
 export type PdfPreviewProps = {
@@ -57,11 +56,7 @@ export function PdfPreview(props: PdfPreviewProps) {
 
   return (
     <Worker workerUrl="/pdf.worker.min.js">
-      <ThemeVariant
-        variant="secondary"
-        injectCssVars
-        sx={{ display: "flex", p: 1, justifyContent: "space-between" }}
-      >
+      <Flex sx={{ p: 1, justifyContent: "space-between" }}>
         <Toolbar>
           {(props: ToolbarSlot) => {
             const {
@@ -77,7 +72,7 @@ export function PdfPreview(props: PdfPreviewProps) {
               <>
                 <Flex
                   sx={{
-                    bg: "background",
+                    bg: "var(--background-secondary)",
                     borderRadius: "default",
                     overflow: "hidden",
                     alignItems: "center",
@@ -160,7 +155,7 @@ export function PdfPreview(props: PdfPreviewProps) {
 
                 <Flex
                   sx={{
-                    bg: "background",
+                    bg: "var(--background-secondary)",
                     borderRadius: "default",
                     overflow: "hidden",
                     alignItems: "center"
@@ -195,7 +190,7 @@ export function PdfPreview(props: PdfPreviewProps) {
 
                 <Flex
                   sx={{
-                    bg: "background",
+                    bg: "var(--background-secondary)",
                     borderRadius: "default",
                     overflow: "hidden",
                     alignItems: "center"
@@ -232,7 +227,7 @@ export function PdfPreview(props: PdfPreviewProps) {
             );
           }}
         </Toolbar>
-      </ThemeVariant>
+      </Flex>
       <Viewer
         fileUrl={fileUrl}
         theme={theme}
@@ -298,7 +293,7 @@ export function PdfPreview(props: PdfPreviewProps) {
             )}
             <Button
               mt={3}
-              variant="primary"
+              variant="accent"
               data-test-id="unlock-note-submit"
               sx={{ borderRadius: 100, px: 30 }}
               onClick={async () => {}}
@@ -327,27 +322,24 @@ function ToolbarButton(props: ToolbarButtonProps) {
   const { title, disabled, hideOnMobile, hidden, onClick, iconSize } = props;
 
   return (
-    <ThemeVariant variant={disabled ? "disabled" : "secondary"}>
-      <Button
-        data-test-id={title}
-        disabled={disabled}
-        variant="tool"
-        bg="transparent"
-        title={title}
-        sx={{
-          borderRadius: 0,
-          display: [hideOnMobile ? "none" : "flex", hidden ? "none" : "flex"],
-          color: "paragraph",
-          cursor: !disabled ? "pointer" : "not-allowed",
-          flexDirection: "row",
-          flexShrink: 0,
-          alignItems: "center"
-        }}
-        onClick={onClick}
-      >
-        <props.icon size={iconSize || 18} />
-      </Button>
-    </ThemeVariant>
+    <Button
+      data-test-id={title}
+      disabled={disabled}
+      variant="secondary"
+      bg="transparent"
+      title={title}
+      sx={{
+        borderRadius: 0,
+        display: [hideOnMobile ? "none" : "flex", hidden ? "none" : "flex"],
+        cursor: !disabled ? "pointer" : "not-allowed",
+        flexDirection: "row",
+        flexShrink: 0,
+        alignItems: "center"
+      }}
+      onClick={onClick}
+    >
+      <props.icon size={iconSize || 18} />
+    </Button>
   );
 }
 

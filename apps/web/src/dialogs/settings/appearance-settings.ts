@@ -21,53 +21,15 @@ import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { isDesktop } from "../../utils/platform";
-import { AccentColors } from "./components/accent-colors";
+import { ThemesSelector } from "./components/themes-selector";
 
 export const AppearanceSettings: SettingsGroup[] = [
   {
     key: "theme",
     section: "appearance",
-    header: "Theme",
+    header: "General",
+    isHidden: () => !isDesktop(),
     settings: [
-      {
-        key: "accent-color",
-        title: "Accent color",
-        description: "Pick the color that matches your mood.",
-        components: [
-          {
-            type: "custom",
-            component: AccentColors
-          }
-        ]
-      },
-      {
-        key: "theme",
-        title: "App theme",
-        description: "Dark or light, we won't judge.",
-        onStateChange: (listener) =>
-          useThemeStore.subscribe(
-            (s) => [s.theme, s.followSystemTheme],
-            listener
-          ),
-        components: [
-          {
-            type: "dropdown",
-            options: [
-              { title: "Light", value: "light" },
-              { title: "Dark", value: "dark" },
-              { title: "Auto", value: "auto" }
-            ],
-            selectedOption: () =>
-              useThemeStore.getState().followSystemTheme
-                ? "auto"
-                : useThemeStore.getState().theme,
-            onSelectionChanged: (value) => {
-              useThemeStore.getState().setFollowSystemTheme(value === "auto");
-              if (value !== "auto") useThemeStore.getState().setTheme(value);
-            }
-          }
-        ]
-      },
       {
         key: "zoom-factor",
         title: "Zoom factor",
@@ -89,6 +51,46 @@ export const AppearanceSettings: SettingsGroup[] = [
           }
         ]
       }
+    ]
+  },
+  {
+    key: "theme",
+    section: "appearance",
+    header: "Themes",
+    settings: [
+      {
+        key: "themes",
+        title: "Select a theme",
+        components: [{ type: "custom", component: ThemesSelector }]
+      }
+      // {
+      //   key: "theme",
+      //   title: "App theme",
+      //   description: "Dark or light, we won't judge.",
+      //   onStateChange: (listener) =>
+      //     useThemeStore.subscribe(
+      //       (s) => [s.theme, s.followSystemTheme],
+      //       listener
+      //     ),
+      //   components: [
+      //     {
+      //       type: "dropdown",
+      //       options: [
+      //         { title: "Light", value: "light" },
+      //         { title: "Dark", value: "dark" },
+      //         { title: "Auto", value: "auto" }
+      //       ],
+      //       selectedOption: () =>
+      //         useThemeStore.getState().followSystemTheme
+      //           ? "auto"
+      //           : useThemeStore.getState().theme,
+      //       onSelectionChanged: (value) => {
+      //         useThemeStore.getState().setFollowSystemTheme(value === "auto");
+      //         if (value !== "auto") useThemeStore.getState().setTheme(value);
+      //       }
+      //     }
+      //   ]
+      // }
     ]
   }
 ];

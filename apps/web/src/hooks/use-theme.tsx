@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ThemeDracula } from "@notesnook/theme";
+import { ThemeLight } from "@notesnook/theme";
 import { usePersistentState } from "./use-persistent-state";
 
 export function useTheme() {
-  const [theme, setTheme] = usePersistentState("settings:theme", ThemeDracula);
-  return [ThemeDracula, setTheme] as const;
+  const [theme, setTheme] = usePersistentState("settings:theme", ThemeLight);
+  return [ThemeLight, setTheme] as const;
 }
 
 export function getTheme() {
-  return ThemeDracula; //  Config.get("settings:theme", ThemeDracula);
+  return ThemeLight; //  Config.get("settings:theme", ThemeDracula);
 }

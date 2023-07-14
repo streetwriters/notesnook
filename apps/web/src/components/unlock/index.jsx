@@ -19,14 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
-import { Lock, Alert } from "../icons";
+import { Lock } from "../icons";
 import { db } from "../../common/db";
 import { useStore as useEditorStore } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import Field from "../field";
 import { showToast } from "../../utils/toast";
 import { ErrorText } from "../error-text";
-import { ThemeVariant } from "../theme-provider";
 
 function Unlock(props) {
   const { noteId } = props;
@@ -103,20 +102,18 @@ function Unlock(props) {
           {note?.title || "Open note"}
         </Text>
       </Flex>
-      <ThemeVariant variant="secondary">
-        <Text
-          variant="body"
-          mt={1}
-          mb={4}
-          sx={{
-            textAlign: "center",
-            fontSize: "title",
-            color: "paragraph"
-          }}
-        >
-          Please enter the password to unlock this note.
-        </Text>
-      </ThemeVariant>
+      <Text
+        variant="body"
+        mt={1}
+        mb={4}
+        sx={{
+          textAlign: "center",
+          fontSize: "title",
+          color: "var(--paragraph-secondary)"
+        }}
+      >
+        Please enter the password to unlock this note.
+      </Text>
       <Field
         id="vaultPassword"
         data-test-id="unlock-note-password"
@@ -136,7 +133,7 @@ function Unlock(props) {
       {isWrong && <ErrorText error="Wrong password" />}
       <Button
         mt={3}
-        variant="primary"
+        variant="accent"
         data-test-id="unlock-note-submit"
         disabled={isUnlocking}
         sx={{ borderRadius: 100, px: 30 }}

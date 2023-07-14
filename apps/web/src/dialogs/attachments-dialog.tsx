@@ -56,7 +56,7 @@ import { Multiselect } from "../common/multi-select";
 import { CustomScrollbarsVirtualList } from "../components/list-container";
 import { Attachment } from "../components/attachment";
 import { isDocument, isImage, isVideo } from "@notesnook/core/utils/filename";
-import { ThemeVariant } from "../components/theme-provider";
+
 import { alpha } from "@theme-ui/color";
 
 type ToolbarAction = {
@@ -148,22 +148,20 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
           height: "80vw"
         }}
       >
-        <ThemeVariant variant="secondary">
-          <Sidebar
-            totalSize={totalSize}
-            filter={(query) => {
-              setAttachments(
-                db.lookup?.attachments(db.attachments?.all || [], query) || []
-              );
-            }}
-            counts={getCounts(allAttachments)}
-            onRouteChange={(route) => {
-              currentRoute.current = route;
-              setSelected([]);
-              setAttachments(filterAttachments(route, allAttachments));
-            }}
-          />
-        </ThemeVariant>
+        <Sidebar
+          totalSize={totalSize}
+          filter={(query) => {
+            setAttachments(
+              db.lookup?.attachments(db.attachments?.all || [], query) || []
+            );
+          }}
+          counts={getCounts(allAttachments)}
+          onRouteChange={(route) => {
+            currentRoute.current = route;
+            setSelected([]);
+            setAttachments(filterAttachments(route, allAttachments));
+          }}
+        />
         <Flex
           variant="columnFill"
           sx={{
@@ -185,7 +183,7 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
             <Flex sx={{ gap: 1 }}>
               {TOOLBAR_ACTIONS.map((tool) => (
                 <Button
-                  variant="tool"
+                  variant="secondary"
                   key={tool.title}
                   title={tool.title}
                   onClick={() =>
@@ -401,7 +399,7 @@ const Sidebar = memo(
               backgroundColor: alpha("background", 0.6),
               backdropFilter: "blur(8px)"
             },
-          backgroundColor: "background"
+          backgroundColor: "var(--background-secondary)"
         }}
       >
         <Flex sx={{ flexDirection: "column" }}>
@@ -434,7 +432,7 @@ const Sidebar = memo(
               <Text variant="subBody">{formatBytes(totalSize)}</Text>
             </Flex>
             <Button
-              variant="tool"
+              variant="secondary"
               sx={{
                 bg: "transparent",
                 borderRadius: 100,

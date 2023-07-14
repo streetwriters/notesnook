@@ -25,7 +25,6 @@ import { Icon } from "@notesnook/ui";
 import { WebClipAttributes } from "./web-clip";
 import { DesktopOnly } from "../../components/responsive";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
-import { EmotionThemeVariant } from "@notesnook/theme";
 
 const FAILED_CONTENT = `<html><head>
 <title>Failed to load web clip</title>
@@ -103,71 +102,68 @@ export function WebClipComponent(
           borderRadius: "default"
         }}
       >
-        <EmotionThemeVariant variant="secondary">
-          <Flex
-            sx={{
-              width: "100%",
-              p: 1,
-              bg: "background",
-              borderTopLeftRadius: "default",
-              borderTopRightRadius: "default",
-              cursor: "pointer",
-              justifyContent: "space-between"
-            }}
-            title={title}
-          >
-            <Flex sx={{ alignItems: "center" }}>
-              <Icon
-                path={Icons.webClip}
-                size={14}
-                onClick={() => {
-                  window.open(src, "_blank", "noreferrer");
-                }}
-              />
-              <Text
-                variant="subBody"
-                sx={{
-                  color: "icon",
-                  ml: 1,
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis"
-                }}
-              >
-                {title}
-              </Text>
-            </Flex>
-
-            <DesktopOnly>
-              {selected && (
-                <Flex sx={{ position: "relative", justifyContent: "end" }}>
-                  <Flex
-                    sx={{
-                      position: "absolute",
-                      top: -10,
-                      mb: 2,
-                      alignItems: "end"
-                    }}
-                  >
-                    <ToolbarGroup
-                      editor={editor}
-                      tools={[
-                        "webclipFullScreen",
-                        "webclipOpenExternal",
-                        "webclipOpenSource"
-                      ]}
-                      sx={{
-                        boxShadow: "menu",
-                        borderRadius: "default",
-                        bg: "background"
-                      }}
-                    />
-                  </Flex>
-                </Flex>
-              )}
-            </DesktopOnly>
+        <Flex
+          sx={{
+            width: "100%",
+            p: 1,
+            bg: "var(--background-secondary)",
+            borderTopLeftRadius: "default",
+            borderTopRightRadius: "default",
+            cursor: "pointer",
+            justifyContent: "space-between"
+          }}
+          title={title}
+        >
+          <Flex sx={{ alignItems: "center" }}>
+            <Icon
+              path={Icons.webClip}
+              size={14}
+              onClick={() => {
+                window.open(src, "_blank", "noreferrer");
+              }}
+            />
+            <Text
+              variant="subBody"
+              sx={{
+                ml: 1,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis"
+              }}
+            >
+              {title}
+            </Text>
           </Flex>
-        </EmotionThemeVariant>
+
+          <DesktopOnly>
+            {selected && (
+              <Flex sx={{ position: "relative", justifyContent: "end" }}>
+                <Flex
+                  sx={{
+                    position: "absolute",
+                    top: -10,
+                    mb: 2,
+                    alignItems: "end"
+                  }}
+                >
+                  <ToolbarGroup
+                    editor={editor}
+                    tools={[
+                      "webclipFullScreen",
+                      "webclipOpenExternal",
+                      "webclipOpenSource"
+                    ]}
+                    sx={{
+                      boxShadow: "menu",
+                      borderRadius: "default",
+                      bg: "background"
+                    }}
+                  />
+                </Flex>
+              </Flex>
+            )}
+          </DesktopOnly>
+        </Flex>
         <Box
           sx={{
             overflow: "hidden auto",

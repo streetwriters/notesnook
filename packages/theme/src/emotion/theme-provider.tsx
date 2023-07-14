@@ -23,7 +23,6 @@ import {
   useThemeColors,
   useThemeProvider,
   ScopedThemeProvider as NNScopedThemeProvider,
-  Variants,
   ThemeFactory
 } from "../";
 import { PropsWithChildren, useMemo } from "react";
@@ -31,7 +30,6 @@ import { Box, BoxProps } from "@theme-ui/components";
 
 export type EmotionThemeProviderProps = {
   scope?: keyof ThemeScopes;
-  variant?: keyof Variants;
   injectCssVars?: boolean;
 } & Omit<BoxProps, "variant">;
 
@@ -41,7 +39,6 @@ export function EmotionThemeProvider(
   const {
     children,
     scope = "base",
-    variant = "primary",
     injectCssVars = true,
     className,
     ...restProps
@@ -53,10 +50,10 @@ export function EmotionThemeProvider(
   const themeProperties = useMemo(
     () =>
       ThemeFactory.construct({
-        colors: { ...colors[variant], ...colors.static },
+        scope: colors,
         colorScheme: theme.colorScheme
       }),
-    [colors, theme.colorScheme, variant]
+    [colors, theme.colorScheme]
   );
 
   return (
@@ -67,7 +64,7 @@ export function EmotionThemeProvider(
             {...restProps}
             className={`${
               className ? className + " " : ""
-            }theme-scope-${scope}-${variant}`}
+            }theme-scope-${scope}`}
           >
             {children}
           </Box>

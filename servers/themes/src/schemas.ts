@@ -17,24 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import ListContainer from "../components/list-container";
-import { useStore, store } from "../stores/tag-store";
-import useNavigate from "../hooks/use-navigate";
-import Placeholder from "../components/placeholders";
+import { THEME_COMPATIBILITY_VERSION } from "@notesnook/theme";
+import { z } from "zod";
 
-function Tags() {
-  useNavigate("tags", () => store.refresh());
-  const tags = useStore((store) => store.tags);
-  const refresh = useStore((store) => store.refresh);
-  return (
-    <ListContainer
-      type="tags"
-      groupingKey="tags"
-      refresh={refresh}
-      items={tags}
-      placeholder={<Placeholder context="tags" />}
-    />
-  );
-}
-
-export default Tags;
+export const ThemeQuerySchema = z.object({
+  filters: z
+    .array(
+      z.object({
+        type: z.enum(["term", "colorScheme"]),
+        value: z.string()
+      })
+    )
+    .optional(),
+  limit: z.number(),
+  cursor: z.number().default(0),
+  compatibilityVersion: z.number().default(THEME_COMPATIBILITY_VERSION)
+});

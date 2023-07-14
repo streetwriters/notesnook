@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Colors } from "../theme-engine/types";
+import { VariantsWithStaticColors } from "../theme-engine/types";
 export type ThemeConfig = {
   colorScheme: "dark" | "light";
-  colors: Colors;
+  scope: VariantsWithStaticColors;
 };

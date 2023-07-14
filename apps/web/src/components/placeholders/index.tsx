@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Button, Flex, Text } from "@theme-ui/components";
 import { Context, useTip } from "../../hooks/use-tip";
 import { Info } from "../icons";
-import { ThemeVariant } from "../theme-provider";
 
 type PlaceholderProps = { context: Context; text?: string };
 function Placeholder(props: PlaceholderProps) {
@@ -54,11 +53,9 @@ function Placeholder(props: PlaceholderProps) {
             TIP
           </Text>
         </Flex>
-        <ThemeVariant variant="secondary">
-          <Text variant="body" sx={{ color: "paragraph", mt: 1 }}>
-            {text || tip.text}
-          </Text>
-        </ThemeVariant>
+        <Text variant="subBody" sx={{ fontSize: "body", mt: 1 }}>
+          {text || tip.text}
+        </Text>
         {tip.button && (
           <Button
             sx={{
@@ -67,7 +64,7 @@ function Placeholder(props: PlaceholderProps) {
               justifyContent: "center",
               display: "flex"
             }}
-            variant="tool"
+            variant="secondary"
             onClick={tip.button.onClick}
           >
             <Text mr={1} color="accent">

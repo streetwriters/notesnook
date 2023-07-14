@@ -22,6 +22,8 @@ import { ThemeUIStyleObject } from "@theme-ui/core";
 const defaultVariant: ThemeUIStyleObject = {
   borderRadius: "default",
   border: "none",
+  width: "auto",
+  mx: "2px",
   outline: "1.5px solid var(--border)",
   fontFamily: "body",
   fontWeight: "body",

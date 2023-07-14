@@ -19,9 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   ThemeProvider,
-  ThemeDracula,
+  ThemeLight,
   EmotionThemeProvider,
-  EmotionThemeVariant,
   themeToCSS
 } from "@notesnook/theme";
 import { PropsWithChildren, useMemo } from "react";
@@ -38,7 +37,7 @@ export function BaseThemeProvider(
 ) {
   const { children, addGlobalStyles = false, ...restProps } = props;
   //  const [theme, setTheme] = useTheme();
-  const theme = ThemeDracula;
+  const theme = ThemeLight;
   const setTheme = () => {};
   const cssTheme = useMemo(() => themeToCSS(theme), [theme]);
 
@@ -64,7 +63,4 @@ export function BaseThemeProvider(
   );
 }
 
-export {
-  EmotionThemeProvider as ScopedThemeProvider,
-  EmotionThemeVariant as ThemeVariant
-};
+export { EmotionThemeProvider as ScopedThemeProvider };

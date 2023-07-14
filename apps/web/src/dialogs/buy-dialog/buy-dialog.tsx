@@ -43,7 +43,7 @@ import { Theme } from "@notesnook/theme";
 import { isMacStoreApp } from "../../utils/platform";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
-import { ThemeVariant } from "../../components/theme-provider";
+
 import { alpha } from "@theme-ui/color";
 
 type BuyDialogProps = {
@@ -128,30 +128,28 @@ export function BuyDialog(props: BuyDialogProps) {
           overflowY: ["scroll", "scroll", "hidden"]
         }}
       >
-        <ThemeVariant variant="secondary">
-          <Flex
-            sx={{
-              borderTopLeftRadius: "dialog",
-              borderBottomLeftRadius: [0, 0, "dialog"],
-              overflow: "hidden",
-              bg: "background",
-              "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
-                {
-                  bg: alpha("background", 0.6),
-                  backdropFilter: "blur(8px)"
-                },
-              flexDirection: "column",
-              flexShrink: 0,
-              alignItems: "center",
-              justifyContent: "center",
-              width: ["100%", "100%", isCheckoutCompleted ? "100%" : 350]
-            }}
-            p={4}
-            py={50}
-          >
-            <SideBar onClose={onClose} initialPlan={plan} />
-          </Flex>
-        </ThemeVariant>
+        <Flex
+          sx={{
+            borderTopLeftRadius: "dialog",
+            borderBottomLeftRadius: [0, 0, "dialog"],
+            overflow: "hidden",
+            bg: "var(--background-secondary)",
+            "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
+              {
+                bg: alpha("background", 0.6),
+                backdropFilter: "blur(8px)"
+              },
+            flexDirection: "column",
+            flexShrink: 0,
+            alignItems: "center",
+            justifyContent: "center",
+            width: ["100%", "100%", isCheckoutCompleted ? "100%" : 350]
+          }}
+          p={4}
+          py={50}
+        >
+          <SideBar onClose={onClose} initialPlan={plan} />
+        </Flex>
         <Details />
       </Flex>
     </Modal>
@@ -316,7 +314,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
       ) : user ? (
         <>
           <Button
-            variant="primary"
+            variant="accent"
             mt={2}
             sx={{ borderRadius: 100, px: 6 }}
             onClick={onShowPlans}
@@ -338,7 +336,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
       ) : (
         <>
           <Button
-            variant="primary"
+            variant="accent"
             mt={4}
             sx={{ borderRadius: 100, px: 6 }}
             onClick={() => hardNavigate("/signup")}
@@ -393,7 +391,7 @@ function AlreadyPremium(props: AlreadyPremiumProps) {
             subscription.
           </Text>
           <Button
-            variant="primary"
+            variant="accent"
             mt={2}
             sx={{ borderRadius: 100, px: 6 }}
             onClick={onShowPlans}
@@ -424,7 +422,7 @@ function CheckoutCompleted(props: { onClose: () => void }) {
         You have successfully subscribed to Notesnook Pro.
       </Text>
       <Button
-        variant="primary"
+        variant="accent"
         mt={2}
         sx={{ borderRadius: 100, px: 6 }}
         onClick={onClose}

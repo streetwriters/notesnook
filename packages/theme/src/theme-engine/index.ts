@@ -18,15 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { createContext, useContext, useMemo } from "react";
-import { ThemeLight } from "./themes/light";
 import {
   ThemeDefinition,
+  ThemeCompatibilityVersion,
   ThemeScopeKeys,
   ThemeScopes,
   Variants,
   VariantsWithStaticColors
 } from "./types";
 import { colorsToCss } from "../theme/transformer";
+import _ThemeLight from "./themes/default-light.json";
+import _ThemeDark from "./themes/default-dark.json";
+
+const ThemeLight = _ThemeLight as ThemeDefinition;
+const ThemeDark = _ThemeDark as ThemeDefinition;
 
 type ThemeScope = {
   colors: VariantsWithStaticColors<true>;
@@ -59,7 +64,6 @@ const ThemeScopeContext = createContext<ThemeScope>({
   isDark: false,
   scope: "base"
 });
-const ThemeVariantContext = createContext<keyof Variants>("primary");
 
 export function useThemeColors(scope?: keyof ThemeScopes): ThemeScope {
   const { scope: currentScope } = useCurrentThemeScope();
@@ -71,11 +75,11 @@ export function useThemeColors(scope?: keyof ThemeScopes): ThemeScope {
 
   const currentTheme = useMemo(
     () => ({
-      colors: buildVariants(theme, themeScope),
+      colors: buildVariants(scope || currentScope || "base", theme, themeScope),
       isDark: theme.colorScheme === "dark",
       scope: currentScope
     }),
-    [themeScope, theme, currentScope]
+    [themeScope, theme, scope, currentScope]
   );
 
   return currentTheme;
@@ -85,16 +89,22 @@ export function themeToCSS(theme: ThemeDefinition) {
   const css: string[] = [];
   for (const scopeKey of ThemeScopeKeys) {
     const scope = theme.scopes[scopeKey] || {};
-    const variants = buildVariants(theme, scope);
+    const variants = buildVariants(scopeKey, theme, scope);
 
+    let scopeCss = `.theme-scope-${scopeKey} {`;
     for (const variantKey in variants) {
       const variant = variants[variantKey as keyof Variants];
       if (!variant) continue;
 
-      css.push(`.theme-scope-${scopeKey}-${variantKey} {
-        ${colorsToCss(variant)}
+      css.push(`.theme-scope-${scopeKey}-${variant} {
+        ${colorsToCss(variant, variantKey)}
       }`);
+
+      scopeCss += colorsToCss(variant, variantKey);
+      scopeCss += "\n\n";
     }
+    scopeCss += "}";
+    css.push(scopeCss);
   }
 
   return css.join("\n\n");
@@ -102,37 +112,49 @@ export function themeToCSS(theme: ThemeDefinition) {
 
 export const useThemeProvider = () => useContext(ThemeContext);
 export const useCurrentThemeScope = () => useContext(ThemeScopeContext);
-export const useThemeVariant = () => useContext(ThemeVariantContext);
 export const ThemeProvider = ThemeContext.Provider;
 export const ScopedThemeProvider = ThemeScopeContext.Provider;
-export const ThemeVariantProvider = ThemeVariantContext.Provider;
+export const THEME_COMPATIBILITY_VERSION: ThemeCompatibilityVersion = 1;
+export { ThemeLight, ThemeDark };
 
 function buildVariants(
+  scope: keyof ThemeScopes,
   theme: ThemeDefinition,
   themeScope: Partial<Variants>
 ): VariantsWithStaticColors<true> {
+  const defaultTheme = theme.colorScheme === "dark" ? ThemeDark : ThemeLight;
+  const defaultThemeBase = defaultTheme.scopes.base;
+  const defaultThemeScope = (defaultTheme.scopes as any)[scope] || {};
   return {
+    ...defaultThemeBase,
+    ...defaultThemeScope,
     primary: {
+      ...defaultThemeBase.primary,
+      ...defaultThemeScope.primary,
       ...theme.scopes.base.primary,
       ...themeScope.primary
     },
     secondary: {
+      ...defaultThemeBase.secondary,
+      ...defaultThemeScope.secondary,
       ...theme.scopes.base.secondary,
       ...themeScope.secondary
     },
     disabled: {
+      ...defaultThemeBase.disabled,
+      ...defaultThemeScope.disabled,
       ...theme.scopes.base.disabled,
       ...themeScope.disabled
     },
     error: {
+      ...defaultThemeBase.error,
+      ...defaultThemeScope.error,
       ...theme.scopes.base.error,
       ...themeScope.error
     },
-    warning: {
-      ...theme.scopes.base.warning,
-      ...themeScope.warning
-    },
     success: {
+      ...defaultThemeBase.success,
+      ...defaultThemeScope.success,
       ...theme.scopes.base.success,
       ...themeScope.success
     },

@@ -68,7 +68,6 @@ import {
   CustomToolbar,
   SyncOff
 } from "../../components/icons";
-import { ThemeVariant } from "../../components/theme-provider";
 
 type Feature = {
   id: string;
@@ -450,20 +449,18 @@ export function Features() {
         return (
           <Flex key={section.title} px={6} sx={{ flexDirection: "column" }}>
             {section.pro && (
-              <ThemeVariant variant="secondary">
-                <Flex
-                  bg="background"
-                  px={2}
-                  py="2px"
-                  sx={{ borderRadius: 50, alignSelf: "start" }}
-                  mb={1}
-                >
-                  <Pro color="accent" size={16} />
-                  <Text variant="body" ml={"2px"} sx={{ color: "accent" }}>
-                    Pro
-                  </Text>
-                </Flex>
-              </ThemeVariant>
+              <Flex
+                bg="var(--background-secondary)"
+                px={2}
+                py="2px"
+                sx={{ borderRadius: 50, alignSelf: "start" }}
+                mb={1}
+              >
+                <Pro color="accent" size={16} />
+                <Text variant="body" ml={"2px"} sx={{ color: "accent" }}>
+                  Pro
+                </Text>
+              </Flex>
             )}
             <Text variant="body" sx={{ fontSize: "1.3rem" }}>
               {section.title}

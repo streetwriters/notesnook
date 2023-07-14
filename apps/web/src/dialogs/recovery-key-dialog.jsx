@@ -27,7 +27,6 @@ import { Suspense } from "react";
 import Config from "../utils/config";
 import FileSaver from "file-saver";
 import { ErrorText } from "../components/error-text";
-import { ThemeVariant } from "../components/theme-provider";
 
 const QRCode = React.lazy(() => import("../re-exports/react-qrcode-logo"));
 
@@ -63,24 +62,22 @@ function RecoveryKeyDialog(props) {
             error="In case you forget your password, your recovery key is the only way to recover your data."
             mt={0}
           />
-          <ThemeVariant variant="secondary">
-            <Text
-              data-test-id="recovery-key"
-              className="selectable"
-              mt={2}
-              bg="background"
-              p={2}
-              sx={{
-                borderRadius: "default",
-                overflowWrap: "anywhere",
-                fontSize: "body",
-                fontFamily: "monospace",
-                color: "paragraph"
-              }}
-            >
-              {key}
-            </Text>
-          </ThemeVariant>
+          <Text
+            data-test-id="recovery-key"
+            className="selectable"
+            mt={2}
+            bg="var(--background-secondary)"
+            p={2}
+            sx={{
+              borderRadius: "default",
+              overflowWrap: "anywhere",
+              fontSize: "body",
+              fontFamily: "monospace",
+              color: "paragraph"
+            }}
+          >
+            {key}
+          </Text>
           <Flex
             mt={4}
             sx={{ alignItems: "center", justifyContent: "space-around" }}

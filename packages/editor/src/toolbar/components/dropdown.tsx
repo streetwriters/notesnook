@@ -52,6 +52,7 @@ export function Dropdown(props: DropdownProps) {
   return (
     <>
       <Button
+        variant="secondary"
         ref={(ref) => {
           internalRef.current = ref || undefined;
           if (buttonRef) buttonRef.current = ref || undefined;
@@ -60,11 +61,11 @@ export function Dropdown(props: DropdownProps) {
           p: 1,
           m: 0,
           bg: isPopupOpen ? "hover" : "transparent",
+          height: "100%",
           mr: 1,
           flexShrink: 0,
           display: "flex",
           alignItems: "center",
-          ":hover": { bg: "hover" },
           ":last-of-type": {
             mr: 0
           }

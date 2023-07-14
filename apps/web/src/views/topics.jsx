@@ -41,7 +41,6 @@ import { showSortMenu } from "../components/group-header";
 import { db } from "../common/db";
 import { groupArray } from "@notesnook/core/utils/grouping";
 import { getFormattedDate } from "@notesnook/common";
-import { ThemeVariant } from "../components/theme-provider";
 
 function Notebook() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -97,32 +96,30 @@ function Notebook() {
   return (
     <>
       {context.type === "topic" && selectedNotebook ? (
-        <ThemeVariant variant="secondary">
-          <Flex sx={{ alignItems: "center", mx: 2, mb: 1 }}>
-            {[
-              { title: "Notebooks", onClick: () => navigate(`/notebooks/`) },
-              {
-                title: selectedNotebook.title,
-                onClick: () => navigate(`/notebooks/${selectedNotebook.id}`)
-              }
-            ].map((crumb, index, array) => (
-              <>
-                <Button
-                  variant="anchor"
-                  sx={{
-                    fontSize: "subBody",
-                    textDecoration: "none",
-                    color: "paragraph"
-                  }}
-                  onClick={crumb.onClick}
-                >
-                  {crumb.title}
-                </Button>
-                {index === array.length - 1 ? null : <ChevronRight size={18} />}
-              </>
-            ))}
-          </Flex>
-        </ThemeVariant>
+        <Flex sx={{ alignItems: "center", mx: 2, mb: 1 }}>
+          {[
+            { title: "Notebooks", onClick: () => navigate(`/notebooks/`) },
+            {
+              title: selectedNotebook.title,
+              onClick: () => navigate(`/notebooks/${selectedNotebook.id}`)
+            }
+          ].map((crumb, index, array) => (
+            <>
+              <Button
+                variant="anchor"
+                sx={{
+                  fontSize: "subBody",
+                  textDecoration: "none",
+                  color: "var(--paragraph-secondary)"
+                }}
+                onClick={crumb.onClick}
+              >
+                {crumb.title}
+              </Button>
+              {index === array.length - 1 ? null : <ChevronRight size={18} />}
+            </>
+          ))}
+        </Flex>
       ) : null}
       <Allotment
         ref={paneRef}
@@ -141,7 +138,7 @@ function Notebook() {
           <Flex variant="columnFill" sx={{ height: "100%" }}>
             <ListContainer
               type="notes"
-              groupType={"notes"}
+              groupingKey={"notes"}
               refresh={refreshContext}
               compact={isCompact}
               context={{ ...context, notes: undefined }}
@@ -223,10 +220,10 @@ function Topics({ selectedNotebook, isCollapsed, onClick }) {
         </Flex>
         <Flex sx={{ alignItems: "center" }}>
           <Button
-            variant="tool"
+            variant="secondary"
             data-test-id="topics-sort-button"
             sx={{
-              p: "3.5px",
+              p: "small",
               bg: "transparent",
               visibility: isCollapsed ? "collapse" : "visible"
             }}
@@ -238,7 +235,7 @@ function Topics({ selectedNotebook, isCollapsed, onClick }) {
             <SortAsc size={15} />
           </Button>
           <Button
-            variant="tool"
+            variant="secondary"
             sx={{
               p: "1px",
               bg: "transparent",
@@ -284,14 +281,12 @@ function NotebookHeader({ notebook }) {
 
   return (
     <Flex mx={2} my={2} sx={{ flexDirection: "column", minWidth: 200 }}>
-      <ThemeVariant variant="secondary">
-        <Text variant="subBody">{getFormattedDate(dateEdited)}</Text>
-      </ThemeVariant>
+      <Text variant="subBody">{getFormattedDate(dateEdited)}</Text>
       <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
         <Text variant="heading">{title}</Text>
         <Flex>
           <Button
-            variant="tool"
+            variant="secondary"
             sx={{ borderRadius: 100, width: 30, height: 30 }}
             mr={1}
             p={0}
@@ -305,7 +300,7 @@ function NotebookHeader({ notebook }) {
             )}
           </Button>
           <Button
-            variant="tool"
+            variant="secondary"
             sx={{ borderRadius: 100, width: 30, height: 30 }}
             p={0}
             title="Edit notebook"
@@ -321,11 +316,9 @@ function NotebookHeader({ notebook }) {
           {description}
         </Text>
       )}
-      <ThemeVariant variant="secondary">
-        <Text as="em" variant="subBody" mt={2}>
-          {pluralize(topics.length, "topic")}, {pluralize(totalNotes, "note")}
-        </Text>
-      </ThemeVariant>
+      <Text as="em" variant="subBody" mt={2}>
+        {pluralize(topics.length, "topic")}, {pluralize(totalNotes, "note")}
+      </Text>
     </Flex>
   );
 }

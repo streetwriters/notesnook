@@ -86,15 +86,12 @@ function ToastContainer(props: ToastContainerProps) {
         </Text>
         {actions?.map((action) => (
           <Button
-            variant="primary"
-            bg={"transparent"}
+            variant="dialog"
             sx={{
               py: "7px",
-              ":hover": { bg: "hover" },
               m: 0,
               flexShrink: 0,
               fontSize: "body",
-              fontWeight: "bold",
               color: action.type || "accent"
             }}
             key={action.text}
@@ -112,5 +109,10 @@ export { showToast };
 
 function ToastIcon({ type }: { type: ToastType }) {
   const IconComponent = ToastIcons[type];
-  return <IconComponent size={24} />;
+  return (
+    <IconComponent
+      size={24}
+      color={type === "info" ? "blue" : `var(--icon-${type})`}
+    />
+  );
 }

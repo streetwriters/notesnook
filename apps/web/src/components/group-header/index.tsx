@@ -37,7 +37,6 @@ import { Menu, useMenuTrigger } from "../../hooks/use-menu";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import useMobile from "../../hooks/use-mobile";
-import { ThemeVariant } from "../theme-provider";
 import { MenuButtonItem, MenuItem } from "@notesnook/ui";
 
 const groupByToTitleMap = {
@@ -245,124 +244,127 @@ function GroupHeader(props: GroupHeaderProps) {
   ]);
 
   return (
-    <ThemeVariant variant="secondary" injectCssVars>
-      <Flex
-        ref={groupHeaderRef}
-        onClick={(e) => {
-          if (e.ctrlKey) {
-            onSelectGroup();
-            return;
+    <Flex
+      ref={groupHeaderRef}
+      onClick={(e) => {
+        if (e.ctrlKey) {
+          onSelectGroup();
+          return;
+        }
+        if (groups.length <= 0) return;
+        e.stopPropagation();
+        const items: MenuItem[] = groups.map((group) => {
+          const groupTitle = group.title.toString();
+          return {
+            type: "button",
+            key: groupTitle,
+            title: groupTitle,
+            onClick: () => onJump(groupTitle),
+            checked: group.title === title
+          };
+        });
+        openMenu(items, {
+          title: "Jump to group",
+          position: {
+            target: groupHeaderRef.current,
+            align: "start",
+            isTargetAbsolute: true,
+            location: "below",
+            yOffset: 10
           }
-          if (groups.length <= 0) return;
-          e.stopPropagation();
-          const items: MenuItem[] = groups.map((group) => {
-            const groupTitle = group.title.toString();
-            return {
-              type: "button",
-              key: groupTitle,
-              title: groupTitle,
-              onClick: () => onJump(groupTitle),
-              checked: group.title === title
-            };
-          });
-          openMenu(items, {
-            title: "Jump to group",
-            position: {
-              target: groupHeaderRef.current
-            }
-          });
-        }}
-        mx={1}
-        my={1}
-        py={1}
-        pl={1}
-        pr={0}
-        bg="background"
+        });
+      }}
+      mx={1}
+      my={1}
+      py={1}
+      pl={1}
+      pr={0}
+      bg="var(--background-secondary)"
+      sx={{
+        borderRadius: "default",
+        cursor: "pointer",
+        border: isMenuTarget ? "1px solid" : "none",
+        borderColor: isMenuTarget ? "accent" : "transparent",
+        ":focus": {
+          border: "1px solid",
+          borderColor: "accent",
+          outline: "none"
+        },
+        alignItems: "center",
+        justifyContent: "space-between"
+      }}
+      tabIndex={0}
+      data-test-id="group-header"
+    >
+      <Text
+        data-test-id="title"
+        variant="subtitle"
         sx={{
-          borderRadius: "default",
-          cursor: "pointer",
-          border: isMenuTarget ? "1px solid var(--accent)" : "none",
-          ":focus": {
-            border: "1px solid var(--accent)",
-            outline: "none"
-          },
-          alignItems: "center",
-          justifyContent: "space-between"
+          fontSize: "body",
+          color: title === "Conflicted" ? "error" : "accent"
         }}
-        tabIndex={0}
-        data-test-id="group-header"
       >
-        <Text
-          data-test-id="title"
-          variant="subtitle"
-          sx={{
-            fontSize: "body",
-            color: title === "Conflicted" ? "error" : "accent"
-          }}
-        >
-          {title}
-        </Text>
+        {title}
+      </Text>
 
-        {index === 0 && (
-          <Flex mr={1}>
-            {groupingKey && (
-              <IconButton
-                testId={`${groupingKey}-sort-button`}
-                icon={groupOptions.sortDirection === "asc" ? SortAsc : SortDesc}
-                title={`Grouped by ${
-                  groupByToTitleMap[groupOptions.groupBy || "default"]
-                }`}
-                onClick={() => {
-                  const groupOptions =
-                    db.settings!.getGroupOptions(groupingKey);
-                  setGroupOptions(groupOptions);
+      {index === 0 && (
+        <Flex mr={1}>
+          {groupingKey && (
+            <IconButton
+              testId={`${groupingKey}-sort-button`}
+              icon={groupOptions.sortDirection === "asc" ? SortAsc : SortDesc}
+              title={`Grouped by ${
+                groupByToTitleMap[groupOptions.groupBy || "default"]
+              }`}
+              onClick={() => {
+                const groupOptions = db.settings!.getGroupOptions(groupingKey);
+                setGroupOptions(groupOptions);
 
-                  const menuOptions: Omit<GroupingMenuOptions, "parentKey"> = {
-                    groupingKey,
-                    groupOptions,
-                    isUngrouped: false,
-                    refresh
-                  };
+                const menuOptions: Omit<GroupingMenuOptions, "parentKey"> = {
+                  groupingKey,
+                  groupOptions,
+                  isUngrouped: false,
+                  refresh
+                };
 
-                  openMenu(
-                    [
-                      orderByMenu({
-                        ...menuOptions,
-                        parentKey: "sortDirection"
-                      }),
-                      sortByMenu({
-                        ...menuOptions,
-                        parentKey: "sortBy"
-                      }),
-                      groupByMenu({
-                        ...menuOptions,
-                        parentKey: "groupBy"
-                      })
-                    ],
-                    {
-                      title: "Group & sort"
-                    }
-                  );
-                }}
-              />
-            )}
-            {viewMode && (
-              <IconButton
-                icon={viewMode === "compact" ? DetailedView : CompactView}
-                title={
-                  viewMode === "compact"
-                    ? "Switch to detailed view"
-                    : "Switch to compact view"
-                }
-                onClick={() =>
-                  setViewMode(viewMode === "compact" ? "detailed" : "compact")
-                }
-              />
-            )}
-          </Flex>
-        )}
-      </Flex>
-    </ThemeVariant>
+                openMenu(
+                  [
+                    orderByMenu({
+                      ...menuOptions,
+                      parentKey: "sortDirection"
+                    }),
+                    sortByMenu({
+                      ...menuOptions,
+                      parentKey: "sortBy"
+                    }),
+                    groupByMenu({
+                      ...menuOptions,
+                      parentKey: "groupBy"
+                    })
+                  ],
+                  {
+                    title: "Group & sort"
+                  }
+                );
+              }}
+            />
+          )}
+          {viewMode && (
+            <IconButton
+              icon={viewMode === "compact" ? DetailedView : CompactView}
+              title={
+                viewMode === "compact"
+                  ? "Switch to detailed view"
+                  : "Switch to compact view"
+              }
+              onClick={() =>
+                setViewMode(viewMode === "compact" ? "detailed" : "compact")
+              }
+            />
+          )}
+        </Flex>
+      )}
+    </Flex>
   );
 }
 export default GroupHeader;

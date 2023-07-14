@@ -41,7 +41,6 @@ import { Multiselect } from "../../common/multi-select";
 import { pluralize } from "@notesnook/common";
 import { confirm } from "../../common/dialog-controller";
 import { getFormattedDate } from "@notesnook/common";
-import { ThemeVariant } from "../theme-provider";
 import { MenuItem } from "@notesnook/ui";
 import { Item } from "../list-container/types";
 
@@ -68,12 +67,10 @@ function Notebook(props: NotebookProps) {
       body={notebook.description as string}
       menuItems={menuItems}
       footer={
-        <ThemeVariant variant="secondary">
+        <>
           {isCompact ? (
             <>
-              <Text sx={{ fontSize: "subBody", color: "paragraph" }}>
-                {pluralize(totalNotes, "note")}
-              </Text>
+              <Text variant="subBody">{pluralize(totalNotes, "note")}</Text>
             </>
           ) : (
             <>
@@ -94,7 +91,7 @@ function Notebook(props: NotebookProps) {
               <Flex
                 sx={{
                   fontSize: "subBody",
-                  color: "paragraph",
+                  color: "var(--paragraph-secondary)",
                   alignItems: "center",
                   fontFamily: "body"
                 }}
@@ -113,7 +110,7 @@ function Notebook(props: NotebookProps) {
               </Flex>
             </>
           )}
-        </ThemeVariant>
+        </>
       }
     />
   );

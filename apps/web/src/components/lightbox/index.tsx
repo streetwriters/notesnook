@@ -29,7 +29,6 @@ import {
   ZoomIn,
   ZoomOut
 } from "../icons";
-import { ThemeVariant } from "../theme-provider";
 
 const DEFAULT_ZOOM_STEP = 0.3;
 const DEFAULT_LARGE_ZOOM = 4;
@@ -332,47 +331,40 @@ export class Lightbox extends React.Component<LightboxProps> {
             zIndex: 10
           }}
         >
-          <ThemeVariant variant="secondary">
-            <Flex
-              bg="background"
-              sx={{
-                borderRadius: "0px 0px 0px 5px",
-                overflow: "hidden",
-                alignItems: "center",
-                justifyContent: "flex-end"
-              }}
-            >
-              {tools.map((tool) => (
-                <ThemeVariant
-                  key={tool.title}
-                  variant={tool.enabled ? "secondary" : "disabled"}
-                >
-                  <Button
-                    data-test-id={tool.title}
-                    disabled={!tool.enabled}
-                    variant="tool"
-                    bg="transparent"
-                    title={tool.title}
-                    sx={{
-                      borderRadius: 0,
-                      display: [
-                        tool.hideOnMobile ? "none" : "flex",
-                        tool.hidden ? "none" : "flex"
-                      ],
-                      color: "paragraph",
-                      cursor: tool.enabled ? "pointer" : "not-allowed",
-                      flexDirection: "row",
-                      flexShrink: 0,
-                      alignItems: "center"
-                    }}
-                    onClick={tool.onClick}
-                  >
-                    <tool.icon size={18} color={"icon"} />
-                  </Button>
-                </ThemeVariant>
-              ))}
-            </Flex>
-          </ThemeVariant>
+          <Flex
+            bg="var(--background-secondary)"
+            sx={{
+              borderRadius: "0px 0px 0px 5px",
+              overflow: "hidden",
+              alignItems: "center",
+              justifyContent: "flex-end"
+            }}
+          >
+            {tools.map((tool) => (
+              <Button
+                key={tool.title}
+                data-test-id={tool.title}
+                disabled={!tool.enabled}
+                variant="secondary"
+                bg="transparent"
+                title={tool.title}
+                sx={{
+                  borderRadius: 0,
+                  display: [
+                    tool.hideOnMobile ? "none" : "flex",
+                    tool.hidden ? "none" : "flex"
+                  ],
+                  cursor: tool.enabled ? "pointer" : "not-allowed",
+                  flexDirection: "row",
+                  flexShrink: 0,
+                  alignItems: "center"
+                }}
+                onClick={tool.onClick}
+              >
+                <tool.icon size={18} color={"icon"} />
+              </Button>
+            ))}
+          </Flex>
         </Flex>
         <Flex
           sx={{

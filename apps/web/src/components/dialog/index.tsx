@@ -24,7 +24,7 @@ import ReactModal from "react-modal";
 import { FlexScrollContainer } from "../scroll-container";
 import { SxProp } from "@theme-ui/core";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { ScopedThemeProvider, ThemeVariant } from "../theme-provider";
+import { ScopedThemeProvider } from "../theme-provider";
 
 ReactModal.setAppElement("#root");
 
@@ -64,6 +64,7 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
       shouldReturnFocusAfterClose
       shouldFocusAfterRender
       onAfterOpen={(e) => onAfterOpen(e, props)}
+      overlayClassName={"theme-scope-dialog"}
       style={{
         content: {
           top: 0,
@@ -73,16 +74,17 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          backgroundColor: undefined,
+          // backgroundColor: undefined,
           padding: 0,
           overflowY: "hidden",
           border: 0,
-          zIndex: 0
-        },
-        overlay: {
           zIndex: 999,
-          background: "var(--overlay)"
+          backgroundColor: "var(--backdrop)"
         }
+        // overlay: {
+        //   zIndex: 999,
+        //   background: "var(--backdrop)"
+        // }
       }}
     >
       <ScopedThemeProvider
@@ -142,7 +144,7 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                 variant="body"
                 sx={{
                   textAlign: props.textAlignment || "left",
-                  color: "paragraph"
+                  color: "var(--paragraph-secondary)"
                 }}
               >
                 {props.description}
@@ -161,30 +163,28 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
         )}
 
         {(props.positiveButton || props.negativeButton) && (
-          <ThemeVariant variant="secondary">
-            <Flex
-              sx={{ justifyContent: props.buttonsAlignment || "end" }}
-              bg="background"
-              p={1}
-              px={2}
-              mt={2}
-            >
-              {props.negativeButton && (
-                <DialogButton
-                  {...props.negativeButton}
-                  color="paragraph"
-                  data-test-id="dialog-no"
-                />
-              )}
-              {props.positiveButton && (
-                <DialogButton
-                  {...props.positiveButton}
-                  color="accent"
-                  data-test-id="dialog-yes"
-                />
-              )}
-            </Flex>
-          </ThemeVariant>
+          <Flex
+            sx={{ justifyContent: props.buttonsAlignment || "end" }}
+            bg="var(--background-secondary)"
+            p={1}
+            px={2}
+            mt={2}
+          >
+            {props.negativeButton && (
+              <DialogButton
+                {...props.negativeButton}
+                color="paragraph"
+                data-test-id="dialog-no"
+              />
+            )}
+            {props.positiveButton && (
+              <DialogButton
+                {...props.positiveButton}
+                color="accent"
+                data-test-id="dialog-yes"
+              />
+            )}
+          </Flex>
         )}
         {props.footer}
       </ScopedThemeProvider>
@@ -194,18 +194,11 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
 
 export default BaseDialog;
 
-function DialogButton(props: DialogButtonProps) {
+export function DialogButton(props: DialogButtonProps) {
   return (
     <Button
       {...props}
-      variant="primary"
-      sx={{
-        opacity: props.disabled ? 0.7 : 1,
-        fontWeight: "bold",
-        bg: "transparent",
-
-        ":hover": { bg: "background" }
-      }}
+      variant="dialog"
       disabled={props.disabled}
       onClick={props.disabled ? undefined : props.onClick}
     >

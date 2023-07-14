@@ -302,14 +302,7 @@ function NavigationMenu(props: NavigationMenuProps) {
               <Button
                 variant={"icon"}
                 title="Toggle dark/light mode"
-                sx={{
-                  bg: "transparent",
-                  borderRadius: "default",
-                  ":hover:not(disabled)": {
-                    bg: "hover",
-                    filter: "brightness(100%)"
-                  }
-                }}
+                sx={{ borderLeft: "1px solid var(--border)" }}
                 onClick={() => {
                   setFollowSystemTheme(false);
                   toggleNightMode();

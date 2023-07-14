@@ -25,7 +25,6 @@ import { PropsWithChildren } from "react";
 import { Icon, Shortcut } from "../icons";
 import { AnimatedFlex } from "../animated";
 import { SchemeColors } from "@notesnook/theme";
-import { ThemeVariant } from "../theme-provider";
 import { MenuItem } from "@notesnook/ui";
 
 type NavigationItemProps = {
@@ -76,24 +75,25 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
         x: 0
       }}
       transition={{ duration: 0.1, delay: index * 0.05, ease: "easeIn" }}
-      bg={selected ? "shade" : "transparent"}
       sx={{
+        variant: "buttons.secondary",
+        bg: selected ? "shade" : "transparent",
         borderRadius: "default",
         mx: 1,
+        p: 0,
         mt: isTablet ? 1 : "3px",
         alignItems: "center",
         position: "relative",
         ":first-of-type": { mt: 1 },
-        ":last-of-type": { mb: 1 },
-        ":hover:not(:disabled)": {
-          bg: "hover",
-          filter: "brightness(100%)"
-        }
+        ":last-of-type": { mb: 1 }
+        // ":hover:not(:disabled)": {
+        //   bg: "hover",
+        //   filter: "brightness(100%)"
+        // }
       }}
     >
       <Button
         data-test-id={`navigation-item`}
-        bg={"transparent"}
         sx={{
           px: 2,
           flex: 1,
@@ -157,28 +157,26 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
           )} */}
         </Text>
       </Button>
-      <ThemeVariant variant="secondary">
-        {children ? (
-          children
-        ) : !isTablet && count !== undefined ? (
-          <Text
-            variant="subBody"
-            sx={{ mr: 1, bg: "hover", px: "3px", borderRadius: "default" }}
-          >
-            {count > 100 ? "100+" : count}
-          </Text>
-        ) : !isTablet && tag ? (
-          <Text
-            variant="subBody"
-            sx={{
-              mr: 1,
-              borderRadius: "100px"
-            }}
-          >
-            {tag}
-          </Text>
-        ) : null}
-      </ThemeVariant>
+      {children ? (
+        children
+      ) : !isTablet && count !== undefined ? (
+        <Text
+          variant="subBody"
+          sx={{ mr: 1, bg: "hover", px: "3px", borderRadius: "default" }}
+        >
+          {count > 100 ? "100+" : count}
+        </Text>
+      ) : !isTablet && tag ? (
+        <Text
+          variant="subBody"
+          sx={{
+            mr: 1,
+            borderRadius: "100px"
+          }}
+        >
+          {tag}
+        </Text>
+      ) : null}
     </AnimatedFlex>
   );
 }

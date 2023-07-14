@@ -60,14 +60,14 @@ export function InsertBlock(props: ToolProps) {
     <>
       <Button
         ref={buttonRef}
+        variant="secondary"
         sx={{
           p: 1,
           m: 0,
-          bg: isOpen ? "hover" : "transparent",
+          bg: isOpen ? "var(--background-secondary)" : "transparent",
           mr: 1,
           display: "flex",
           alignItems: "center",
-          ":hover": { bg: "hover" },
           ":last-of-type": {
             mr: 0
           }

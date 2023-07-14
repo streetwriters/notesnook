@@ -18,13 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { SchemeColors, SchemeColorsAsCSSVariables } from "./theme-engine/types";
 
-export * from "./theme/accents";
 export * from "./theme";
 export * from "./theme-engine";
-export * from "./theme-engine/themes/dark";
-export * from "./theme-engine/themes/light";
-export * from "./theme-engine/themes/pitch-black";
-export * from "./theme-engine/themes/dracula";
 export * from "./theme-engine/types";
 export * from "./emotion";
 

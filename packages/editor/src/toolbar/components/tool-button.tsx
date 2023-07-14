@@ -50,6 +50,7 @@ export const ToolButton = React.memo(
 
     return (
       <Button
+        variant="secondary"
         ref={buttonRef}
         tabIndex={-1}
         id={`tool-${id || icon}`}
@@ -58,9 +59,8 @@ export const ToolButton = React.memo(
           p: variant === "small" ? "small" : 1,
           borderRadius: variant === "small" ? "small" : "default",
           m: 0,
-          bg: toggled ? "hover" : "transparent",
+          bg: toggled ? "background-secondary" : "transparent",
           mr: variant === "small" ? 0 : 1,
-          ":hover": { bg: "hover" },
           ":last-of-type": {
             mr: 0
           },

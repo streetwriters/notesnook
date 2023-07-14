@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, FlexProps, Text } from "@theme-ui/components";
-import { ThemeVariant } from "../theme-provider";
+
 import { Error } from "../icons";
 
 type ErrorTextProps = { error?: string | null | false } & FlexProps;
@@ -27,19 +27,17 @@ export function ErrorText(props: ErrorTextProps) {
 
   if (!error) return null;
   return (
-    <ThemeVariant variant="error">
-      <Flex
-        bg="background"
-        p={1}
-        mt={2}
-        sx={{ borderRadius: "default", ...sx }}
-        {...restProps}
-      >
-        <Error size={15} color="error" />
-        <Text variant={"error"} bg="background" color="paragraph" ml={1}>
-          {error}
-        </Text>
-      </Flex>
-    </ThemeVariant>
+    <Flex
+      bg="var(--background-error)"
+      p={1}
+      mt={2}
+      sx={{ borderRadius: "default", ...sx }}
+      {...restProps}
+    >
+      <Error size={15} color="var(--icon-error)" />
+      <Text variant={"error"} ml={1}>
+        {error}
+      </Text>
+    </Flex>
   );
 }

@@ -20,16 +20,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { Flex, Text, Button } from "@theme-ui/components";
-import { Copy, Loading } from "../icons";
+import { Copy } from "../icons";
 import Toggle from "../toggle";
 import Field from "../field";
 import { db } from "../../common/db";
 import * as clipboard from "clipboard-polyfill/text";
-import { BaseThemeProvider, ThemeVariant } from "../theme-provider";
+import { ScopedThemeProvider } from "../theme-provider";
 import { showToast } from "../../utils/toast";
 import { EV, EVENTS } from "@notesnook/core/common";
 import { useStore } from "../../stores/monograph-store";
 import ReactModal from "react-modal";
+import { DialogButton } from "../dialog";
 
 function PublishView(props) {
   const { noteId, onClose } = props;
@@ -63,7 +64,9 @@ function PublishView(props) {
   }, [noteId]);
 
   return (
-    <Flex
+    <ScopedThemeProvider
+      scope="dialog"
+      injectCssVars
       sx={{
         width: ["100%", 350, 350],
         border: "1px solid",
@@ -100,62 +103,57 @@ function PublishView(props) {
           </Flex>
         ) : (
           <>
-            <ThemeVariant variant="secondary">
-              {publishId ? (
+            {publishId ? (
+              <Flex mt={1} sx={{ flexDirection: "column", overflow: "hidden" }}>
+                <Text
+                  variant="body"
+                  sx={{ fontWeight: "bold", color: "paragraph" }}
+                >
+                  Published at
+                </Text>
                 <Flex
-                  mt={1}
-                  sx={{ flexDirection: "column", overflow: "hidden" }}
+                  sx={{
+                    bg: "var(--background-secondary)",
+                    mt: 1,
+                    p: 1,
+                    borderRadius: "default",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
                 >
                   <Text
                     variant="body"
-                    sx={{ fontWeight: "bold", color: "paragraph" }}
-                  >
-                    Published at
-                  </Text>
-                  <Flex
+                    as="a"
+                    target="_blank"
+                    href={`https://monograph.notesnook.com/${publishId}`}
                     sx={{
-                      bg: "background",
-                      mt: 1,
-                      p: 1,
-                      borderRadius: "default",
-                      alignItems: "center",
-                      justifyContent: "center"
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      textDecoration: "none",
+                      overflow: "hidden",
+                      mr: 2
                     }}
                   >
-                    <Text
-                      variant="body"
-                      as="a"
-                      target="_blank"
-                      href={`https://monograph.notesnook.com/${publishId}`}
-                      sx={{
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        textDecoration: "none",
-                        overflow: "hidden",
-                        mr: 2
-                      }}
-                    >
-                      {`https://monograph.notesnook.com/${publishId}`}
-                    </Text>
-                    <Button
-                      variant="anchor"
-                      className="copyPublishLink"
-                      onClick={() => {
-                        clipboard.writeText(
-                          `https://monograph.notesnook.com/${publishId}`
-                        );
-                      }}
-                    >
-                      <Copy size={20} color="accent" />
-                    </Button>
-                  </Flex>
+                    {`https://monograph.notesnook.com/${publishId}`}
+                  </Text>
+                  <Button
+                    variant="anchor"
+                    className="copyPublishLink"
+                    onClick={() => {
+                      clipboard.writeText(
+                        `https://monograph.notesnook.com/${publishId}`
+                      );
+                    }}
+                  >
+                    <Copy size={20} color="accent" />
+                  </Button>
                 </Flex>
-              ) : (
-                <Text variant="body" sx={{ color: "paragraph" }}>
-                  This note will be published to a public URL.
-                </Text>
-              )}
-            </ThemeVariant>
+              </Flex>
+            ) : (
+              <Text variant="body" sx={{ color: "paragraph" }}>
+                This note will be published to a public URL.
+              </Text>
+            )}
             <Toggle
               title="Self destruct?"
               onTip="Note will be automatically unpublished after first view."
@@ -183,100 +181,70 @@ function PublishView(props) {
         )}
       </Flex>
 
-      <ThemeVariant variant="secondary">
-        <Flex
-          bg="background"
-          p={1}
-          px={2}
-          sx={{ alignItems: "center", justifyContent: "end" }}
-        >
-          <Button
-            variant="primary"
-            bg={"transparent"}
-            sx={{
-              ":hover": { bg: "background" },
-              fontWeight: "bold",
-              color: "accent"
-            }}
+      <Flex
+        bg="var(--background-secondary)"
+        p={1}
+        px={2}
+        sx={{ alignItems: "center", justifyContent: "end" }}
+      >
+        <DialogButton
+          color="accent"
+          onClick={async () => {
+            try {
+              setIsPublishing(true);
+              const password =
+                document.getElementById("publishPassword")?.value;
+
+              const publishId = await publishNote(noteId, {
+                selfDestruct,
+                password
+              });
+              setPublishId(publishId);
+              showToast("success", "Note published.");
+            } catch (e) {
+              console.error(e);
+              showToast("error", "Note could not be published: " + e.message);
+            } finally {
+              setIsPublishing(false);
+            }
+          }}
+          loading={isPublishing}
+          text={publishId ? "Update" : "Publish"}
+        />
+        {publishId && (
+          <DialogButton
+            color="red"
             onClick={async () => {
               try {
                 setIsPublishing(true);
-                const password =
-                  document.getElementById("publishPassword")?.value;
-
-                const publishId = await publishNote(noteId, {
-                  selfDestruct,
-                  password
-                });
-                setPublishId(publishId);
-                showToast("success", "Note published.");
+                await unpublishNote(noteId);
+                setPublishId();
+                onClose(true);
+                showToast("success", "Note unpublished.");
               } catch (e) {
                 console.error(e);
-                showToast("error", "Note could not be published: " + e.message);
+                showToast(
+                  "error",
+                  "Note could not be unpublished: " + e.message
+                );
               } finally {
                 setIsPublishing(false);
               }
             }}
-          >
-            {isPublishing ? (
-              <>
-                <Loading color="white" />
-              </>
-            ) : publishId ? (
-              "Update"
-            ) : (
-              "Publish"
-            )}
-          </Button>
-          {publishId && (
-            <Button
-              variant="primary"
-              bg={"transparent"}
-              sx={{
-                ":hover": { bg: "background" },
-                fontWeight: "bold",
-                color: "red"
-              }}
-              onClick={async () => {
-                try {
-                  setIsPublishing(true);
-                  await unpublishNote(noteId);
-                  setPublishId();
-                  onClose(true);
-                  showToast("success", "Note unpublished.");
-                } catch (e) {
-                  console.error(e);
-                  showToast(
-                    "error",
-                    "Note could not be unpublished: " + e.message
-                  );
-                } finally {
-                  setIsPublishing(false);
-                }
-              }}
-            >
-              Unpublish
-            </Button>
-          )}
+            text={"Unpublish"}
+          />
+        )}
 
-          <Button
-            variant="primary"
-            data-test-id="dialog-no"
-            bg={"transparent"}
-            sx={{
-              ":hover": { bg: "background" },
-              fontWeight: "bold",
-              color: "paragraph"
-            }}
-            onClick={() => {
-              onClose(false);
-            }}
-          >
-            Cancel
-          </Button>
-        </Flex>
-      </ThemeVariant>
-    </Flex>
+        <DialogButton
+          data-test-id="dialog-no"
+          onClick={() => {
+            onClose(false);
+          }}
+          color="paragraph"
+          text="Cancel"
+        />
+      </Flex>
+    </ScopedThemeProvider>
   );
 }
 
@@ -316,9 +284,7 @@ export function showPublishView(noteId, location = "top") {
             }
           }}
         >
-          <BaseThemeProvider scope="dialog" injectCssVars={false}>
-            <PublishView noteId={noteId} onClose={perform} />
-          </BaseThemeProvider>
+          <PublishView noteId={noteId} onClose={perform} />
         </ReactModal>,
         root
       );

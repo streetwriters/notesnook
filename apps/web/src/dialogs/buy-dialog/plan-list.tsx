@@ -24,7 +24,6 @@ import { Period, Plan } from "./types";
 import { PLAN_METADATA, usePlans } from "./plans";
 import { useEffect } from "react";
 import { getCurrencySymbol } from "./helpers";
-import { ThemeVariant } from "../../components/theme-provider";
 
 type PlansListProps = {
   onPlanSelected: (plan: Plan) => void;
@@ -63,7 +62,7 @@ export function PlansList(props: PlansListProps) {
               key={metadata.title}
               disabled={isLoading}
               data-test-id={`checkout-plan`}
-              variant="tool"
+              variant="secondary"
               mt={1}
               bg="transparent"
               // sx={
@@ -89,14 +88,15 @@ export function PlansList(props: PlansListProps) {
               >
                 {metadata.title}
                 <br />
-                <ThemeVariant variant="secondary">
-                  <Text
-                    variant="body"
-                    sx={{ fontWeight: "normal", color: "paragraph" }}
-                  >
-                    {metadata.subtitle}
-                  </Text>
-                </ThemeVariant>
+                <Text
+                  variant="body"
+                  sx={{
+                    fontWeight: "normal",
+                    color: "var(--paragraph-secondary)"
+                  }}
+                >
+                  {metadata.subtitle}
+                </Text>
               </Text>
               {isLoading ? <Loading /> : <RecurringPricing plan={plan} />}
             </Button>
@@ -118,18 +118,16 @@ function RecurringPricing(props: RecurringPricingProps) {
       variant="body"
     >
       {plan.originalPrice && (
-        <ThemeVariant variant="secondary">
-          <Text
-            sx={{
-              textDecorationLine: "line-through",
-              fontSize: "body",
-              color: "paragraph"
-            }}
-          >
-            {getCurrencySymbol(plan.currency)}
-            {plan.originalPrice.gross}
-          </Text>
-        </ThemeVariant>
+        <Text
+          sx={{
+            textDecorationLine: "line-through",
+            fontSize: "body",
+            color: "var(--paragraph-secondary)"
+          }}
+        >
+          {getCurrencySymbol(plan.currency)}
+          {plan.originalPrice.gross}
+        </Text>
       )}
       <Text>
         <Text as="span" sx={{ fontSize: "subtitle" }}>

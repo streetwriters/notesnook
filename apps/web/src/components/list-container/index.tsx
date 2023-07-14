@@ -51,7 +51,7 @@ export const CustomScrollbarsVirtualList = forwardRef<
 type ListContainerProps = {
   type: keyof typeof ListProfiles;
   items: Item[];
-  groupType?: string;
+  groupingKey?: GroupingKey;
   compact?: boolean;
   context?: Context;
   refresh: () => void;
@@ -64,8 +64,16 @@ type ListContainerProps = {
 };
 
 function ListContainer(props: ListContainerProps) {
-  const { type, groupType, items, context, refresh, header, button, compact } =
-    props;
+  const {
+    type,
+    groupingKey,
+    items,
+    context,
+    refresh,
+    header,
+    button,
+    compact
+  } = props;
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
@@ -170,10 +178,10 @@ function ListContainer(props: ListContainerProps) {
 
                 switch (item.type) {
                   case "header":
-                    if (!groupType) return null;
+                    if (!groupingKey) return null;
                     return (
                       <GroupHeader
-                        type={groupType}
+                        groupingKey={groupingKey}
                         refresh={refresh}
                         title={item.title}
                         isFocused={index === focusedGroupIndex}
@@ -226,7 +234,7 @@ function ListContainer(props: ListContainerProps) {
       )}
       {button && (
         <Button
-          variant="primary"
+          variant="accent"
           data-test-id={`${props.type}-action-button`}
           onClick={button.onClick}
           sx={{

@@ -43,13 +43,10 @@ import { showBuyDialog } from "../common/dialog-controller";
 import { TaskManager } from "../common/task-manager";
 import { db } from "../common/db";
 import { usePersistentState } from "../hooks/use-persistent-state";
-import AccentItem from "../components/accent-item";
 import { useCallback, useState } from "react";
 import Config from "../utils/config";
-import { getAllAccents } from "@notesnook/theme";
 import { isMacStoreApp } from "../utils/platform";
 import { ErrorText } from "../components/error-text";
-import { ThemeVariant } from "../components/theme-provider";
 
 const newUserSteps = [
   {
@@ -96,12 +93,12 @@ const proUserSteps = [
     buttonText: "Next",
     image: <Nomad style={{ flexShrink: 0, width: 120, height: 120 }} />
   },
-  {
-    title: "Style your 'nook",
-    subtitle: "Let's make Notesnook your new note taking home",
-    buttonText: "Next",
-    component: AccentSelector
-  },
+  // {
+  //   title: "Style your 'nook",
+  //   subtitle: "Let's make Notesnook your new note taking home",
+  //   buttonText: "Next",
+  //   component: AccentSelector
+  // },
   {
     title: "We are always listening",
     subtitle: "If you face any issue, you can reach out to us anytime.",
@@ -178,14 +175,16 @@ function OnboardingDialog({ onClose: _onClose, type }) {
         <Text variant={"heading"} mt={2}>
           {title}
         </Text>
-        <ThemeVariant variant="secondary">
-          <Text
-            variant={"body"}
-            sx={{ textAlign: "center", maxWidth: "70%", color: "paragraph" }}
-          >
-            {subtitle}
-          </Text>
-        </ThemeVariant>
+        <Text
+          variant={"body"}
+          sx={{
+            textAlign: "center",
+            maxWidth: "70%",
+            color: "var(--paragraph-secondary)"
+          }}
+        >
+          {subtitle}
+        </Text>
         {Component && <Component onClose={onClose} onNext={onNext} />}
         {buttonText && (
           <Button
@@ -209,22 +208,20 @@ function JoinCause({ onNext }) {
         href="https://discord.com/invite/zQBK97EE22"
         target="_blank"
         mt={4}
-        variant={"primary"}
+        variant="accent"
         sx={{ borderRadius: 50, alignSelf: "center", px: 30 }}
         onClick={() => onNext()}
       >
         Join the community
       </Button>
-      <ThemeVariant variant="secondary">
-        <Button
-          variant={"anchor"}
-          mt={2}
-          onClick={() => onNext()}
-          sx={{ color: "paragraph" }}
-        >
-          Skip for now
-        </Button>
-      </ThemeVariant>
+      <Button
+        variant={"anchor"}
+        mt={2}
+        onClick={() => onNext()}
+        sx={{ color: "var(--paragraph-secondary)" }}
+      >
+        Skip for now
+      </Button>
     </Flex>
   );
 }
@@ -265,39 +262,20 @@ function Importer({ onClose }) {
         href="https://importer.notesnook.com/"
         target="_blank"
         mt={4}
-        variant={"primary"}
+        variant="accent"
         sx={{ borderRadius: 50, alignSelf: "center", px: 30 }}
         onClick={() => onClose()}
       >
         Start importing now
       </Button>
-      <ThemeVariant variant="secondary">
-        <Button
-          variant={"anchor"}
-          mt={2}
-          onClick={() => onClose()}
-          sx={{ color: "paragraph" }}
-        >
-          Skip for now
-        </Button>
-      </ThemeVariant>
-    </Flex>
-  );
-}
-
-function AccentSelector() {
-  return (
-    <Flex my={4}>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr"
-        }}
+      <Button
+        variant={"anchor"}
+        mt={2}
+        onClick={() => onClose()}
+        sx={{ color: "var(--paragraph-secondary)" }}
       >
-        {getAllAccents().map((color) => (
-          <AccentItem key={color.code} code={color.code} label={color.label} />
-        ))}
-      </Box>
+        Skip for now
+      </Button>
     </Flex>
   );
 }
@@ -461,17 +439,15 @@ function TrialOffer({ onClose }) {
       {error ? (
         <ErrorText error={error} />
       ) : (
-        <ThemeVariant variant="secondary">
-          <Text
-            variant={"body"}
-            mt={2}
-            bg="background"
-            p={1}
-            sx={{ borderRadius: "default", color: "paragraph" }}
-          >
-            <b>Note:</b> Upgrade now and get 50% discount on all plans.
-          </Text>
-        </ThemeVariant>
+        <Text
+          variant={"body"}
+          mt={2}
+          bg="var(--background-secondary)"
+          p={1}
+          sx={{ borderRadius: "default", color: "var(--paragraph-secondary)" }}
+        >
+          <b>Note:</b> Upgrade now and get 50% discount on all plans.
+        </Text>
       )}
 
       <Flex mt={2} sx={{ justifyContent: "center", width: "100%" }}>
@@ -513,16 +489,14 @@ function TrialOffer({ onClose }) {
           {loading ? <Loading size={16} /> : "Try free for 14 days"}
         </Button>
       </Flex>
-      <ThemeVariant variant="secondary">
-        <Button
-          variant={"anchor"}
-          mt={2}
-          onClick={() => onClose()}
-          sx={{ color: "paragraph" }}
-        >
-          Skip for now
-        </Button>
-      </ThemeVariant>
+      <Button
+        variant={"anchor"}
+        mt={2}
+        onClick={() => onClose()}
+        sx={{ color: "var(--paragraph-secondary)" }}
+      >
+        Skip for now
+      </Button>
     </Flex>
   );
 }

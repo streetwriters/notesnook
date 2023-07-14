@@ -30,7 +30,6 @@ import { useStore, store } from "../stores/tag-store";
 import { store as notestore } from "../stores/note-store";
 import { Perform } from "../common/dialog-controller";
 import { FilteredList } from "../components/filtered-list";
-import { ThemeVariant } from "../components/theme-provider";
 
 type SelectedReference = {
   id: string;
@@ -173,33 +172,31 @@ function TagItem(props: {
   const { tag, selected, onSelect } = props;
 
   return (
-    <ThemeVariant variant="secondary">
-      <Flex
-        as="li"
-        data-test-id="tag"
-        sx={{
-          cursor: "pointer",
-          justifyContent: "space-between",
-          alignItems: "center",
-          bg: "background",
-          borderRadius: "default",
-          p: 1
-        }}
-        onClick={onSelect}
-      >
-        <Flex sx={{ alignItems: "center" }}>
-          <SelectedCheck size={20} selected={selected} />
-          <Text
-            className="title"
-            data-test-id="notebook-title"
-            variant="subtitle"
-            sx={{ fontWeight: "body", color: "paragraph" }}
-          >
-            #{tag.title}
-          </Text>
-        </Flex>
+    <Flex
+      as="li"
+      data-test-id="tag"
+      sx={{
+        cursor: "pointer",
+        justifyContent: "space-between",
+        alignItems: "center",
+        bg: "var(--background-secondary)",
+        borderRadius: "default",
+        p: 1
+      }}
+      onClick={onSelect}
+    >
+      <Flex sx={{ alignItems: "center" }}>
+        <SelectedCheck size={20} selected={selected} />
+        <Text
+          className="title"
+          data-test-id="notebook-title"
+          variant="subtitle"
+          sx={{ fontWeight: "body", color: "paragraph" }}
+        >
+          #{tag.title}
+        </Text>
       </Flex>
-    </ThemeVariant>
+    </Flex>
   );
 }
 

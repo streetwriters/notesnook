@@ -41,8 +41,7 @@ import {
   showUpdateAvailableNotice
 } from "../../common/dialog-controller";
 import useStatus from "../../hooks/use-status";
-import { ScopedThemeProvider, ThemeVariant } from "../theme-provider";
-import { Variants } from "@notesnook/theme";
+import { ScopedThemeProvider } from "../theme-provider";
 import { checkForUpdate, installUpdate } from "../../utils/updater";
 
 function StatusBar() {
@@ -79,11 +78,14 @@ function StatusBar() {
                 display: "flex"
               }}
             >
-              <ThemeVariant
-                variant={user?.isEmailConfirmed ? "success" : "warning"}
-              >
-                <Circle size={7} color={"icon"} />
-              </ThemeVariant>
+              <Circle
+                size={7}
+                color={
+                  user?.isEmailConfirmed
+                    ? "var(--icon-success)"
+                    : "var(--icon-error)"
+                }
+              />
               <Text
                 className="selectable"
                 variant="subBody"
@@ -108,9 +110,7 @@ function StatusBar() {
             }}
             data-test-id="not-logged-in"
           >
-            <ThemeVariant variant="error">
-              <Circle size={7} />
-            </ThemeVariant>
+            <Circle size={7} color="var(--icon-error)" />
             <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
               Not logged in
             </Text>
@@ -233,9 +233,11 @@ function SyncStatus() {
       {syncStatus.progress ? (
         <Text variant={"subBody"}>{syncStatus.progress}%</Text>
       ) : (
-        <ThemeVariant variant={status.variant || "primary"}>
-          <status.icon size={12} rotate={status.loading} />
-        </ThemeVariant>
+        <status.icon
+          size={12}
+          rotate={status.loading}
+          color={status.iconColor}
+        />
       )}
       <Text variant="subBody" ml={status.text ? "3px" : 0}>
         {status.text ? (
@@ -282,7 +284,7 @@ type SyncStatusFilter = {
         lastSynced: number;
       }) => JSX.Element);
   tooltip?: string;
-  variant?: keyof Variants;
+  iconColor?: string;
   loading?: boolean;
 };
 
@@ -311,14 +313,14 @@ const syncStatusFilters: SyncStatusFilter[] = [
     key: "completed",
     isActive: (syncStatus) => syncStatus === "completed",
     icon: Checkmark,
-    variant: "success",
+    iconColor: "var(--icon-success)",
     text: ""
   },
   {
     key: "conflicts",
     isActive: (syncStatus) => syncStatus === "conflicts",
     icon: Alert,
-    variant: "error",
+    iconColor: "var(--icon-error)",
     text: "Merge conflicts",
     tooltip: "Please resolve all merge conflicts and run the sync again."
   },
@@ -326,7 +328,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
     key: "emailNotConfirmed",
     isActive: (_syncStatus, user) => !user?.isEmailConfirmed,
     icon: Alert,
-    variant: "warning",
+    iconColor: "var(--icon-error)",
     text: "Sync disabled",
     tooltip: "Please confirm your email to start syncing."
   },
@@ -334,7 +336,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
     key: "failed",
     isActive: (syncStatus) => syncStatus === "failed",
     icon: SyncError,
-    variant: "error",
+    iconColor: "var(--icon-error)",
     text: "Sync failed",
     tooltip: "Sync failed to completed. Please try again."
   },
@@ -352,7 +354,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
   },
   {
     key: "disabled",
-    variant: "disabled",
+    iconColor: "var(--icon-disabled)",
     isActive: (syncStatus) => syncStatus === "disabled",
     icon: SyncOff,
     text: "Sync disabled",

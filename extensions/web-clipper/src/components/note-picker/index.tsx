@@ -45,7 +45,7 @@ export const NotePicker = (props: NotePickerProps) => {
     <>
       <Flex sx={{ alignItems: "center" }}>
         <Button
-          variant="tool"
+          variant="secondary"
           onClick={open}
           sx={{
             display: "flex",
@@ -78,7 +78,7 @@ export const NotePicker = (props: NotePickerProps) => {
         </Button>
         {selectedNote && (
           <Button
-            variant="tool"
+            variant="secondary"
             onClick={() => onSelected(undefined)}
             sx={{
               display: "flex",

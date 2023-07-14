@@ -21,10 +21,10 @@ import { Flex, Input, Text } from "@theme-ui/components";
 import { useRef, useState } from "react";
 import { Button } from "../../components/button";
 import { useTheme } from "../../toolbar/stores/toolbar-store";
-import { EmotionThemeVariant } from "@notesnook/theme";
+
 import { ResponsivePresenter } from "../../components/responsive";
 import { useTimer } from "../../hooks/use-timer";
-import { Icon } from "@notesnook/ui";
+import { Icon, ScrollContainer } from "@notesnook/ui";
 import { Popup } from "../../toolbar/components/popup";
 import { Icons } from "../../toolbar/icons";
 import { ReactNodeViewProps } from "../react/types";
@@ -49,7 +49,7 @@ export function CodeblockComponent(
   );
 
   return (
-    <EmotionThemeVariant variant="secondary">
+    <>
       <Flex
         sx={{
           flexDirection: "column",
@@ -66,9 +66,11 @@ export function CodeblockComponent(
             pre: {
               fontFamily: "inherit !important",
               tabSize: "inherit !important",
-              background: "transparent !important",
+              // background: "transparent !important",
+              padding: "10px !important",
               margin: "0px !important",
-              padding: "0px !important",
+              width: "100%",
+              borderRadius: `0px !important`,
 
               "::selection,*::selection": {
                 bg: "textSelection",
@@ -85,13 +87,10 @@ export function CodeblockComponent(
             tabSize: 1,
             position: "relative",
             lineHeight: "20px",
-            bg: "background",
+            // bg: "var(--background-secondary)",
             color: "white",
-            overflowX: "auto",
-            display: "flex",
-            px: 2,
-            pt: 2,
-            pb: 2
+            overflowX: "hidden",
+            display: "flex"
           }}
           spellCheck={false}
         />
@@ -99,14 +98,14 @@ export function CodeblockComponent(
           ref={toolbarRef}
           contentEditable={false}
           sx={{
-            bg: "background",
+            bg: "var(--background-secondary)",
             alignItems: "center",
             justifyContent: "flex-end",
-            borderTop: "1px solid var(--border)"
+            borderTop: "1px solid var(--border-secondary)"
           }}
         >
           {caretPosition ? (
-            <Text variant={"subBody"} sx={{ mr: 1, color: "paragraph" }}>
+            <Text variant={"subBody"} sx={{ mr: 1, mt: "2px" }}>
               Line {caretPosition.line}, Column {caretPosition.column}{" "}
               {caretPosition.selected
                 ? `(${caretPosition.selected} selected)`
@@ -118,8 +117,7 @@ export function CodeblockComponent(
             variant={"icon"}
             sx={{
               p: 1,
-              opacity: "1 !important",
-              ":hover": { bg: "textSelection" }
+              opacity: "1 !important"
             }}
             title="Toggle indentation mode"
             disabled={!editor.isEditable}
@@ -131,7 +129,7 @@ export function CodeblockComponent(
               });
             }}
           >
-            <Text variant={"subBody"} sx={{ color: "paragraph" }}>
+            <Text variant={"subBody"}>
               {indentType === "space" ? "Spaces" : "Tabs"}: {indentLength}
             </Text>
           </Button>
@@ -142,8 +140,7 @@ export function CodeblockComponent(
               opacity: "1 !important",
               p: 1,
               mr: 1,
-              bg: isOpen ? "textSelection" : "transparent",
-              ":hover": { bg: "hover" }
+              bg: isOpen ? "textSelection" : "transparent"
             }}
             disabled={!editor.isEditable}
             onClick={() => {
@@ -153,11 +150,7 @@ export function CodeblockComponent(
             }}
             title="Change language"
           >
-            <Text
-              variant={"subBody"}
-              spellCheck={false}
-              sx={{ color: "paragraph" }}
-            >
+            <Text variant={"subBody"} spellCheck={false}>
               {languageDefinition?.title || "Plaintext"}
             </Text>
           </Button>
@@ -169,8 +162,7 @@ export function CodeblockComponent(
                 opacity: "1 !important",
                 p: 1,
                 mr: 1,
-                bg: "transparent",
-                ":hover": { bg: "codeSelection" }
+                bg: "transparent"
               }}
               disabled={!editor.isEditable}
               onClick={() => {
@@ -226,7 +218,7 @@ export function CodeblockComponent(
           onClose={() => setIsOpen(false)}
         />
       </ResponsivePresenter>
-    </EmotionThemeVariant>
+    </>
   );
 }
 

@@ -182,7 +182,7 @@ export function ActionSheetPresenter(
                   width: "100%",
                   opacity,
                   position: "absolute",
-                  backgroundColor: "var(--overlay)"
+                  backgroundColor: "var(--backdrop)"
                 }}
                 tabIndex={-1}
               />

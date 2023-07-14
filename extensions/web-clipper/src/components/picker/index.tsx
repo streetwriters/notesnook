@@ -20,7 +20,8 @@ import { PropsWithChildren } from "react";
 import Modal from "react-modal";
 import { Button, Flex } from "@theme-ui/components";
 import { ThemeProvider } from "../theme-provider";
-import { EmotionThemeVariant, useThemeProvider } from "@notesnook/theme";
+import { useThemeProvider } from "@notesnook/theme";
+
 Modal.setAppElement("#root");
 
 type PickerProps = {
@@ -87,13 +88,17 @@ export const Picker = (props: PropsWithChildren<PickerProps>) => {
           >
             {children}
           </Flex>
-          <EmotionThemeVariant variant="secondary">
-            <Flex sx={{ bg: "background", p: 1, justifyContent: "end" }}>
-              <Button variant="dialog" onClick={onDone}>
-                Done
-              </Button>
-            </Flex>
-          </EmotionThemeVariant>
+          <Flex
+            sx={{
+              bg: "var(--background-secondary)",
+              p: 1,
+              justifyContent: "end"
+            }}
+          >
+            <Button variant="dialog" onClick={onDone}>
+              Done
+            </Button>
+          </Flex>
         </Flex>
       </ThemeProvider>
     </Modal>

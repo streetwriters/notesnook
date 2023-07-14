@@ -16,72 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { ThemeDefinition } from "@notesnook/theme";
-import { createHTTPServer } from "@trpc/server/adapters/standalone";
-import fs from "fs";
-import path from "path";
-import { z } from "zod";
-import { THEME_METADATA_JSON } from "./constants";
-import { getThemes } from "./orama";
-import { getThemesMetadata, syncThemes } from "./sync";
-import { publicProcedure, router } from "./trpc";
-import ip from "ip";
 
-const ThemesRouter = router({
-  themes: publicProcedure
-    .input(
-      z.object({
-        limit: z.number(),
-        cursor: z.number().default(0)
-      })
-    )
-    .query(async ({ input: { limit, cursor } }) => {
-      return getThemes("", limit, cursor);
-    }),
-  getTheme: publicProcedure.input(z.string()).query(({ input }) => {
-    const theme = getThemesMetadata().find((theme) => theme.id === input);
-    if (theme) return theme as ThemeDefinition;
+import { ThemesAPI } from "./api";
 
-    return undefined;
-  }),
-  updateTheme: publicProcedure.input(z.string()).query(({ input }) => {
-    const theme = getThemesMetadata().find(
-      (theme) => theme.id === input
-    ) as ThemeDefinition;
-    if (theme) {
-      return theme.version === input ? undefined : (theme as ThemeDefinition);
-    }
-    return undefined;
-  }),
-  search: publicProcedure
-    .input(
-      z.object({
-        limit: z.number(),
-        cursor: z.number().default(0),
-        query: z.string()
-      })
-    )
-    .query(async ({ input: { query, cursor, limit } }) => {
-      return getThemes(query, limit, cursor);
-    }),
-  sync: publicProcedure.query(() => {
-    syncThemes();
-    return true;
-  })
-});
-
-export type ThemesRouter = typeof ThemesRouter;
-
-const server = createHTTPServer({
-  router: ThemesRouter
-});
-const PORT = 1000;
-server.listen(PORT);
-console.log(`Server started successfully on: http://${ip.address()}:${PORT}/ `);
-
-Promise.resolve().then(() => {
-  if (!fs.existsSync(path.join(__dirname, THEME_METADATA_JSON))) {
-    fs.writeFileSync(THEME_METADATA_JSON, "{}");
-  }
-  syncThemes();
-});
+export type ThemesRouter = typeof ThemesAPI;

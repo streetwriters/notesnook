@@ -390,28 +390,24 @@ function getDialogData(type: string) {
         subtitle: (
           <>
             All your data will be re-encrypted and synced with the new password.
-            <ThemeVariant variant="error">
-              <Text
-                as="div"
-                mt={1}
-                p={1}
-                bg="background"
-                sx={{ color: "paragraph" }}
-              >
-                <Text as="p" my={0} sx={{ color: "inherit" }}>
-                  It is recommended that you{" "}
-                  <b>log out from all other devices</b> before continuing.
-                </Text>
-                <Text as="p" my={0} mt={1} sx={{ color: "inherit" }}>
-                  If this process is interrupted, there is a high chance of data
-                  corruption so{" "}
-                  <b>
-                    please do NOT shut down your device or close your browser
-                  </b>{" "}
-                  until this process completes.
-                </Text>
+            <Text
+              as="div"
+              mt={1}
+              p={1}
+              bg="var(--background-error)"
+              sx={{ color: "var(--paragraph-error)" }}
+            >
+              <Text as="p" my={0} sx={{ color: "inherit" }}>
+                It is recommended that you <b>log out from all other devices</b>{" "}
+                before continuing.
               </Text>
-            </ThemeVariant>
+              <Text as="p" my={0} mt={1} sx={{ color: "inherit" }}>
+                If this process is interrupted, there is a high chance of data
+                corruption so{" "}
+                <b>please do NOT shut down your device or close your browser</b>{" "}
+                until this process completes.
+              </Text>
+            </Text>
           </>
         ),
         positiveButtonText: "Change password"
@@ -426,12 +422,10 @@ function getDialogData(type: string) {
       return {
         title: "Delete your account",
         subtitle: (
-          <ThemeVariant variant="error">
-            <Text as="span" sx={{ color: "paragraph" }}>
-              All your data will be permanently deleted with{" "}
-              <b>no way of recovery</b>. Proceed with caution.
-            </Text>
-          </ThemeVariant>
+          <Text as="span" sx={{ color: "var(--paragraph-error)" }}>
+            All your data will be permanently deleted with{" "}
+            <b>no way of recovery</b>. Proceed with caution.
+          </Text>
         ),
         positiveButtonText: "Delete Account"
       };

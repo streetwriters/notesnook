@@ -38,7 +38,6 @@ import { connectApi } from "../api";
 import { FlexScrollContainer } from "../components/scroll-container";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./settings";
 import type { Config } from "@notesnook/clipper/dist/types";
-import { EmotionThemeVariant } from "@notesnook/theme";
 
 const ERROR_MAP: Record<string, string> = {
   "Could not establish connection. Receiving end does not exist.":
@@ -337,31 +336,28 @@ export function Main() {
         )}
 
         {error && (
-          <EmotionThemeVariant variant="error">
-            <Text
-              variant="body"
-              sx={{
-                mt: 1,
-                bg: "background",
-                color: "paragraph",
-                p: 1,
-                border: "1px solid black",
-                borderColor: "accent",
-                borderRadius: "default",
-                cursor: "pointer",
-                ":hover": {
-                  filter: "brightness(80%)"
-                }
-              }}
-              onClick={async () => {
-                setClipNonce((s) => ++s);
-              }}
-            >
-              {ERROR_MAP[error] || error}
-              <br />
-              Click here to retry.
-            </Text>
-          </EmotionThemeVariant>
+          <Text
+            variant="body"
+            sx={{
+              mt: 1,
+              bg: "var(--background-error)",
+              color: "var(--paragraph-error)",
+              p: 1,
+              border: "1px solid var(--border-error)",
+              borderRadius: "default",
+              cursor: "pointer",
+              ":hover": {
+                filter: "brightness(80%)"
+              }
+            }}
+            onClick={async () => {
+              setClipNonce((s) => ++s);
+            }}
+          >
+            {ERROR_MAP[error] || error}
+            <br />
+            Click here to retry.
+          </Text>
         )}
 
         <Text
@@ -396,7 +392,7 @@ export function Main() {
           </>
         )}
         <Button
-          variant="primary"
+          variant="accent"
           sx={{ mt: 1 }}
           disabled={!clipData}
           onClick={async () => {

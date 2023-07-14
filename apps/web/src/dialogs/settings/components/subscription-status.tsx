@@ -28,7 +28,6 @@ import { TaskManager } from "../../../common/task-manager";
 import { showToast } from "../../../utils/toast";
 import { Loading } from "../../../components/icons";
 import { Features } from "../../buy-dialog/features";
-import { ThemeVariant } from "../../../components/theme-provider";
 
 const PROVIDER_MAP = {
   0: "Streetwriters",
@@ -87,14 +86,14 @@ export function SubscriptionStatus() {
 
   if (!user) return null;
   return (
-    <ThemeVariant variant="secondary">
+    <>
       <Flex
         sx={{
           flexDirection: "column",
           borderRadius: "default",
           justifyContent: "center",
           alignItems: "start",
-          bg: "background",
+          bg: "var(--background-secondary)",
           p: 2,
           mb: isBasic ? 0 : 4
         }}
@@ -200,7 +199,7 @@ export function SubscriptionStatus() {
           ) : isBasic ? (
             <>
               <Button
-                variant="primary"
+                variant="accent"
                 onClick={async () => {
                   showBuyDialog();
                 }}
@@ -218,7 +217,7 @@ export function SubscriptionStatus() {
           ) : isTrial ? (
             <>
               <Button
-                variant="primary"
+                variant="accent"
                 onClick={async () => {
                   showBuyDialog();
                 }}
@@ -230,7 +229,7 @@ export function SubscriptionStatus() {
         </Flex>
       </Flex>
       {isBasic ? <Features /> : null}
-    </ThemeVariant>
+    </>
   );
 }
 

@@ -66,10 +66,7 @@ export function MenuButton(props: MenuButtonProps) {
           bg: isFocused && "hover",
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
-          ":hover": {
-            bg: "hover"
-          }
+          justifyContent: "space-between"
         }}
       >
         <Flex sx={{ fontSize: "inherit", fontFamily: "inherit" }}>

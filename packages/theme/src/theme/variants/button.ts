@@ -17,187 +17,122 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ThemeUIStyleObject } from "@theme-ui/core";
+import { Theme, ThemeUIStyleObject } from "@theme-ui/core";
+import { shade, darken, alpha } from "@theme-ui/color";
+import { SchemeColors } from "../../theme-engine/types";
 
-const defaultVariant: ThemeUIStyleObject = {
-  bg: "transparent",
+const createButtonVariant = (
+  background: SchemeColors = "transparent",
+  color: SchemeColors = "paragraph",
+  states?: {
+    hover: SchemeColors | ((theme: Theme) => string);
+    active: SchemeColors | ((theme: Theme) => string);
+  }
+): ThemeUIStyleObject => ({
+  bg: background,
+  color,
+
   fontFamily: "body",
   fontWeight: "body",
   fontSize: "body",
+
+  outline: "none",
   borderRadius: "default",
   cursor: "pointer",
-  // p: 0,
+
   height: "min-content",
   px: 2,
   py: "7.5px",
-  // transition: "filter 200ms ease-in, box-shadow 200ms ease-out",
-  ":hover:not(:disabled)": {
-    // filter: "brightness(90%)"
-    bg: "hover"
+
+  ":hover:not(:disabled):not(:active)": {
+    bg: states?.hover || shade(background, 0.1)
   },
   ":active": {
-    bg: "active"
+    bg: states?.active || shade(background, 0.2)
   },
-  outline: "none",
   ":focus-visible:not(:active)": {
-    filter: "brightness(90%)",
-    bg: "background"
+    outline: `2px solid var(--paragraph)`
   },
   ":disabled": {
     opacity: 0.5,
     cursor: "not-allowed"
   }
-};
+});
 
-const primary: ThemeUIStyleObject = {
-  variant: "buttons.default",
-  color: "white",
-  bg: "accent",
-  ":hover:not(:disabled)": {
-    filter: "brightness(90%)"
+const primary = createButtonVariant();
+
+const secondary: ThemeUIStyleObject = createButtonVariant(
+  "background-secondary",
+  "paragraph",
+  {
+    hover: darken("background-secondary", 0.1),
+    active: darken("background-secondary", 0.2)
   }
-};
+);
 
-const error: ThemeUIStyleObject = {
-  variant: "buttons.default",
-  color: "white",
-  bg: "paragraph"
-};
+const accent = createButtonVariant("accent", "white");
+const accentSecondary = createButtonVariant("shade", "accent", {
+  hover: darken("shade", 0.2),
+  active: alpha("shade", 0.2)
+});
 
-const errorSecondary: ThemeUIStyleObject = {
-  variant: "buttons.default",
-  color: "paragraph",
-  //  fontWeight: "bold",
-  bg: "background",
-  ":hover": {
-    opacity: 0.8,
-    color: "white"
+const error = createButtonVariant("accent-error", "white");
+
+const errorSecondary: ThemeUIStyleObject = createButtonVariant(
+  "background-error",
+  "accent-error",
+  {
+    hover: darken("background-error", 0.2),
+    active: darken("background-error", 0.4)
   }
-  // border: "1px solid",
-  // borderColor: "error",
-  // ":hover": {
-  //   bg: "error",
-  //   color: "static"
-  // }
-};
+);
 
 const dialog: ThemeUIStyleObject = {
-  variant: "buttons.primary",
+  variant: "buttons.secondary",
   color: "accent",
   fontWeight: "bold",
-  bg: "transparent",
-  ":hover": { bg: "hover" },
-  ":focus:not(:active), :focus-within:not(:active), :focus-visible:not(:active)":
-    {
-      bg: "hover",
-      filter: "brightness(90%)"
-    },
-  ":disabled": {
-    opacity: 0.7,
-    cursor: "not-allowed"
-  }
-};
-
-const secondary: ThemeUIStyleObject = {
-  variant: "buttons.default",
-  color: "paragraph",
-  bg: "background",
-  borderRadius: "default"
-};
-
-const tertiary: ThemeUIStyleObject = {
-  variant: "buttons.default",
-  color: "paragraph",
-  bg: "transparent",
-  border: "2px solid",
-  borderColor: "border",
-  ":hover": {
-    borderColor: "accent"
-  }
-};
-
-const list: ThemeUIStyleObject = {
-  variant: "buttons.tertiary",
-  border: "0px solid",
-  borderBottom: "1px solid",
-  borderBottomColor: "border",
-  borderRadius: 0,
-  textAlign: "left",
-  py: 2,
-  px: 0,
-  cursor: "pointer",
-  ":hover": {
-    borderBottomColor: "accent"
-  }
+  bg: "transparent"
 };
 
 const anchor: ThemeUIStyleObject = {
-  variant: "buttons.default",
+  variant: "buttons.primary",
   color: "accent",
   p: 0,
   m: 0,
   px: 0,
   py: 0,
   textDecoration: "underline",
-  ":hover": {
-    filter: "brightness(90%)"
+  ":hover:not(:disabled)": {
+    opacity: 0.8
   }
-};
-
-const icon: ThemeUIStyleObject = {
-  variant: "buttons.default",
-  color: "paragraph",
-  borderRadius: "none",
-  ":hover": {
-    backgroundColor: "hover",
-    filter: "brightness(90%)"
-  }
-};
-
-const tool: ThemeUIStyleObject = {
-  variant: "buttons.default",
-  color: "paragraph",
-  backgroundColor: "background",
-  borderRadius: "default"
 };
 
 const statusItem: ThemeUIStyleObject = {
-  variant: "buttons.icon",
+  variant: "buttons.menuitem",
   py: "small",
   px: "small"
 };
 
 const menuItem: ThemeUIStyleObject = {
-  variant: "buttons.default",
-  // bg: "transparent",
-  py: "8px",
-  px: 3,
-  borderRadius: 0,
-  color: "paragraph",
-  cursor: "pointer",
-  ":hover:not(:disabled),:focus:not(:disabled)": {
-    backgroundColor: "hover",
-    boxShadow: "none"
-  },
-  ":active:not(:disabled)": {
-    backgroundColor: "border"
-  }
+  ...createButtonVariant("transparent", "paragraph", {
+    hover: "hover",
+    active: alpha("hover", 0.2)
+  }),
+  borderRadius: 0
 };
 
 export const buttonVariants = {
-  default: defaultVariant,
   primary,
   secondary,
-  tertiary,
 
+  accent,
+  accentSecondary,
   error,
   errorSecondary,
 
-  list,
   anchor,
-  tool,
-  icon,
   dialog,
   statusitem: statusItem,
+  icon: menuItem,
   menuitem: menuItem
 };

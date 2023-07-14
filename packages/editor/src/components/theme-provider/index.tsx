@@ -22,8 +22,7 @@ import { PropsWithChildren } from "react";
 import {
   EmotionThemeProvider,
   ThemeProvider as NNThemeProvider,
-  ThemeScopes,
-  Variants
+  ThemeScopes
 } from "@notesnook/theme";
 import { BoxProps } from "@theme-ui/components";
 import { useTheme } from "../../toolbar/stores/toolbar-store";
@@ -33,11 +32,10 @@ export function ThemeProvider(
     {
       injectCssVars?: boolean;
       scope?: keyof ThemeScopes;
-      variant?: keyof Variants;
     } & Omit<BoxProps, "variant">
   >
 ) {
-  const { children, scope, variant, injectCssVars, ...restProps } = props;
+  const { children, scope, injectCssVars, ...restProps } = props;
   const theme = useTheme();
   return (
     <NNThemeProvider
@@ -48,7 +46,6 @@ export function ThemeProvider(
     >
       <EmotionThemeProvider
         scope={scope || "editor"}
-        variant={variant || "primary"}
         injectCssVars={injectCssVars}
         {...restProps}
       >

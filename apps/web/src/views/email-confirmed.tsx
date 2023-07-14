@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "../app.css";
 import { useEffect } from "react";
 import { Flex, Text } from "@theme-ui/components";
-import { BaseThemeProvider, ThemeVariant } from "../components/theme-provider";
+import { BaseThemeProvider } from "../components/theme-provider";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { useQueryParams } from "../navigation";
 import { MailCheck, Discord, Twitter, Reddit } from "../components/icons";
@@ -78,30 +78,26 @@ function EmailConfirmed() {
           >
             Your email has been confirmed.
           </Text>
-          <ThemeVariant variant="secondary">
-            <Text
-              variant="body"
-              mt={2}
-              sx={{
-                wordWrap: "break-word",
-                fontSize: "1.2em",
-                textAlign: "center",
-                color: "paragraph"
-              }}
-            >
-              Thank you for choosing end-to-end encrypted note taking.
-            </Text>
-          </ThemeVariant>
-        </Flex>
-        <ThemeVariant variant="secondary">
-          <Flex
-            bg="background"
-            p={5}
-            sx={{ flexDirection: "column", justifyContent: "center" }}
+          <Text
+            variant="body"
+            mt={2}
+            sx={{
+              wordWrap: "break-word",
+              fontSize: "1.2em",
+              textAlign: "center",
+              color: "var(--paragraph-secondary)"
+            }}
           >
-            <BlogPromoBanner />
-          </Flex>
-        </ThemeVariant>
+            Thank you for choosing end-to-end encrypted note taking.
+          </Text>
+        </Flex>
+        <Flex
+          bg="var(--background-secondary)"
+          p={5}
+          sx={{ flexDirection: "column", justifyContent: "center" }}
+        >
+          <BlogPromoBanner />
+        </Flex>
       </Flex>
     </BaseThemeProvider>
   );

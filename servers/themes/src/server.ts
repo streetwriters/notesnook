@@ -17,24 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import ListContainer from "../components/list-container";
-import { useStore, store } from "../stores/tag-store";
-import useNavigate from "../hooks/use-navigate";
-import Placeholder from "../components/placeholders";
+import { createHTTPServer } from "@trpc/server/adapters/standalone";
+import { ThemesAPI } from "./api";
+import { syncThemes } from "./sync";
 
-function Tags() {
-  useNavigate("tags", () => store.refresh());
-  const tags = useStore((store) => store.tags);
-  const refresh = useStore((store) => store.refresh);
-  return (
-    <ListContainer
-      type="tags"
-      groupingKey="tags"
-      refresh={refresh}
-      items={tags}
-      placeholder={<Placeholder context="tags" />}
-    />
-  );
+const server = createHTTPServer({
+  router: ThemesAPI
+});
+const PORT = parseInt(process.env.PORT || "9000");
+server.listen(PORT);
+console.log(`Server started successfully on: http://localhost:${PORT}/`);
+
+syncThemes();
+
+if (import.meta.hot) {
+  import.meta.hot.on("vite:beforeFullReload", () => {
+    server.server.close();
+  });
 }
-
-export default Tags;

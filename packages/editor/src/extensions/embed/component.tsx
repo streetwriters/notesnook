@@ -26,7 +26,6 @@ import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 import { Icons } from "../../toolbar";
 import { Icon } from "@notesnook/ui";
 import { Resizer } from "../../components/resizer";
-import { EmotionThemeVariant } from "@notesnook/theme";
 
 export function EmbedComponent(
   props: SelectionBasedReactNodeViewProps<
@@ -64,64 +63,64 @@ export function EmbedComponent(
           );
         }}
       >
-        <EmotionThemeVariant variant="secondary">
-          <Box
-            sx={{
-              width: "100%",
-              display: editor.isEditable ? "flex" : "none",
-              position: "absolute",
-              top: -24,
-              justifyContent: "end",
-              p: "small",
-              bg: editor.isEditable ? "background" : "transparent",
-              borderTopLeftRadius: "default",
-              borderTopRightRadius: "default",
-              borderColor: selected ? "border" : "background",
-              cursor: "pointer",
-              ":hover": {
-                borderColor: "border"
-              }
-            }}
-          >
-            <Icon path={Icons.dragHandle} size={"big"} />
-            <DesktopOnly>
-              {selected && (
-                <Flex sx={{ position: "relative", justifyContent: "end" }}>
-                  <Flex
+        <Box
+          sx={{
+            width: "100%",
+            display: editor.isEditable ? "flex" : "none",
+            position: "absolute",
+            top: -24,
+            justifyContent: "end",
+            p: "small",
+            bg: editor.isEditable
+              ? "var(--background-secondary)"
+              : "transparent",
+            borderTopLeftRadius: "default",
+            borderTopRightRadius: "default",
+            borderColor: selected ? "border" : "var(--border-secondary)",
+            cursor: "pointer",
+            ":hover": {
+              borderColor: "border"
+            }
+          }}
+        >
+          <Icon path={Icons.dragHandle} size={"big"} />
+          <DesktopOnly>
+            {selected && (
+              <Flex sx={{ position: "relative", justifyContent: "end" }}>
+                <Flex
+                  sx={{
+                    position: "absolute",
+                    top: -10,
+                    mb: 2,
+                    alignItems: "end"
+                  }}
+                >
+                  <ToolbarGroup
+                    editor={editor}
+                    tools={[
+                      "embedAlignLeft",
+                      "embedAlignCenter",
+                      "embedAlignRight",
+                      "embedProperties"
+                    ]}
                     sx={{
-                      position: "absolute",
-                      top: -10,
-                      mb: 2,
-                      alignItems: "end"
+                      boxShadow: "menu",
+                      borderRadius: "default",
+                      bg: "background"
                     }}
-                  >
-                    <ToolbarGroup
-                      editor={editor}
-                      tools={[
-                        "embedAlignLeft",
-                        "embedAlignCenter",
-                        "embedAlignRight",
-                        "embedProperties"
-                      ]}
-                      sx={{
-                        boxShadow: "menu",
-                        borderRadius: "default",
-                        bg: "background"
-                      }}
-                    />
-                  </Flex>
+                  />
                 </Flex>
-              )}
-            </DesktopOnly>
-          </Box>
-        </EmotionThemeVariant>
+              </Flex>
+            )}
+          </DesktopOnly>
+        </Box>
         <Embed
           ref={embedRef}
           src={src}
           width={"100%"}
           height={"100%"}
           sx={{
-            bg: "background",
+            bg: "var(--background-secondary)",
             border: selected
               ? "2px solid var(--accent)"
               : "2px solid transparent",

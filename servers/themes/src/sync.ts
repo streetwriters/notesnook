@@ -18,76 +18,124 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { execSync } from "child_process";
 import fs from "fs";
+import { readdir, readFile } from "fs/promises";
 import path from "path";
-import util from "util";
 import {
-  THEME_METADATA_JSON,
+  InstallsCounter,
   THEMES_REPO_URL,
-  THEME_REPO_DIR_NAME
+  THEME_REPO_DIR_PATH
 } from "./constants";
-import { insert } from "@orama/orama";
-import { getDB } from "./orama";
-import { ThemeDefinition } from "@notesnook/theme";
+import { insertMultiple } from "@orama/orama";
+import { initializeDatabase } from "./orama";
+import { ThemeCompatibilityVersion, ThemeDefinition } from "@notesnook/theme";
 
-let THEME_METADATA_CACHE = [];
+export type CompiledThemeDefinition = ThemeDefinition & {
+  totalInstalls: number;
+  previewColors: {
+    editor: string;
+    navigationMenu: { accent: string; background: string; icon: string };
+    list: {
+      heading: string;
+      accent: string;
+      background: string;
+    };
+    statusBar: {
+      paragraph: string;
+      background: string;
+      icon: string;
+    };
+    border: string;
+    paragraph: string;
+    background: string;
+    accent: string;
+  };
+};
 
-const readDirAsync = util.promisify(fs.readdir);
-const writeAsync = util.promisify(fs.writeFile);
+export type ThemeMetadata = Omit<
+  CompiledThemeDefinition,
+  "scopes" | "codeBlockCSS"
+>;
+
+const THEME_COMPATIBILITY_VERSIONS: ThemeCompatibilityVersion[] = [1];
 
 export async function syncThemes() {
-  if (!fs.existsSync(path.join(__dirname, THEME_REPO_DIR_NAME))) {
+  if (!fs.existsSync(THEME_REPO_DIR_PATH)) {
     execSync(`git clone ${THEMES_REPO_URL}`, {
       stdio: [0, 1, 2],
-      cwd: path.resolve(__dirname, "")
+      cwd: path.dirname(THEME_REPO_DIR_PATH)
     });
-    console.log(`Cloned github repo to path ${THEME_REPO_DIR_NAME}`);
+    console.log(`Cloned github repo to path ${THEME_REPO_DIR_PATH}`);
   } else {
     execSync(`git pull`, {
       stdio: [0, 1, 2],
-      cwd: path.resolve(__dirname, THEME_REPO_DIR_NAME)
+      cwd: THEME_REPO_DIR_PATH
     });
     console.log(`Synced github repo ${THEMES_REPO_URL}`);
   }
-  generateMetadataJson();
+  await generateThemesMetadata();
 }
 
-async function generateMetadataJson() {
-  const THEMES_PATH = path.join(__dirname, THEME_REPO_DIR_NAME, "generated");
-  const files = await readDirAsync(THEMES_PATH);
-  const ThemesMetadata = [];
-  const db = await getDB(true);
-  THEME_METADATA_CACHE = [];
-  for (const file of files) {
-    const themeMetadataPath = `${THEMES_PATH}/${file}/theme.json`;
-    const metadata = JSON.parse(
-      fs.readFileSync(themeMetadataPath, "utf-8")
-    ) as ThemeDefinition;
-    const { background, accent, shade, heading, paragraph } =
-      metadata.scopes.base.primary;
+async function generateThemesMetadata() {
+  const themeDefinitions: CompiledThemeDefinition[] = [];
+  const db = await initializeDatabase();
 
-    const previewColors = {
-      background,
-      accent,
-      shade,
-      heading,
-      paragraph,
-      secondaryBackground: metadata.scopes.base.secondary.background
-    };
-    metadata.previewColors = previewColors;
-    THEME_METADATA_CACHE.push({ ...metadata });
-    delete metadata.scopes;
-    delete metadata.codeBlockCSS;
-    ThemesMetadata.push(metadata);
-    await insert(db, metadata);
+  const THEMES_PATH = path.join(THEME_REPO_DIR_PATH, "themes");
+  const themes = await readdir(THEMES_PATH);
+  const counts = await InstallsCounter.counts();
+
+  for (const themeId of themes) {
+    for (const version of THEME_COMPATIBILITY_VERSIONS) {
+      const themeDirectory = path.join(THEMES_PATH, themeId, `v${version}`);
+      const themeFilePath = path.join(themeDirectory, "theme.json");
+      const theme: ThemeDefinition = JSON.parse(
+        await readFile(themeFilePath, "utf-8")
+      );
+      const hasCodeBlockCSS = fs.existsSync(
+        path.join(themeDirectory, "code-block.css")
+      );
+      const codeBlockCSS = await readFile(
+        path.join(
+          THEMES_PATH,
+          hasCodeBlockCSS ? themeId : `default-${theme.colorScheme}`,
+          `v${version}`,
+          "code-block.css"
+        ),
+        "utf-8"
+      );
+
+      const { base, navigationMenu, statusBar, list, editor } = theme.scopes;
+      const { primary, success } = base;
+
+      themeDefinitions.push({
+        ...theme,
+        codeBlockCSS,
+        totalInstalls: counts[theme.id]?.length || 0,
+        previewColors: {
+          navigationMenu: {
+            accent: navigationMenu?.primary?.accent || primary.accent,
+            background:
+              navigationMenu?.primary?.background || primary.background,
+            icon: navigationMenu?.primary?.icon || primary.icon
+          },
+          statusBar: {
+            paragraph: statusBar?.primary?.paragraph || primary.paragraph,
+            background: statusBar?.primary?.background || primary.background,
+            icon: statusBar?.success?.icon || success.icon
+          },
+          editor: editor?.primary?.background || primary.background,
+          list: {
+            heading: list?.primary?.heading || primary.heading,
+            background: list?.primary?.background || primary.background,
+            accent: list?.primary?.accent || primary.accent
+          },
+          border: primary.border,
+          paragraph: primary.paragraph,
+          background: primary.background,
+          accent: primary.accent
+        }
+      });
+    }
   }
-
-  await writeAsync(
-    THEME_METADATA_JSON,
-    JSON.stringify(ThemesMetadata),
-    "utf-8"
-  );
-}
-
-export function getThemesMetadata() {
-  return THEME_METADATA_CACHE;
+  await insertMultiple(db, themeDefinitions);
+  console.log("Metadata generated and cached.");
 }

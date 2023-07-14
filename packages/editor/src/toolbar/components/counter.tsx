@@ -53,12 +53,10 @@ function _Counter(props: CounterProps) {
       <Button
         sx={{
           color: "paragraph",
-          bg: "transparent",
           px: 0,
           fontSize: "subBody",
           mx: 1,
-          textAlign: "center",
-          ":hover": { bg: "transparent" }
+          textAlign: "center"
         }}
         onClick={onReset}
         title={`Reset ${title}`}

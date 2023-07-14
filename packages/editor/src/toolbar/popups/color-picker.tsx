@@ -28,7 +28,6 @@ import { Button } from "../../components/button";
 import { debounce } from "../../utils/debounce";
 import { Popup } from "../components/popup";
 import { SchemeColors } from "@notesnook/theme";
-import { EmotionThemeVariant } from "@notesnook/theme";
 
 export const DEFAULT_COLORS = [
   "#e91e63",
@@ -140,7 +139,7 @@ export function ColorPicker(props: ColorPickerProps) {
                   p: 0,
                   borderRadius: 0,
                   fontSize: ["title", "title", "body"],
-                  color: "paragraph",
+                  color: "var(--paragraph-secondary)",
                   width: [75, 75, 65],
                   letterSpacing: 1.5,
                   textAlign: "center"
@@ -191,20 +190,18 @@ export function ColorPicker(props: ColorPickerProps) {
                 iconSize={15}
               />
             )}
-            <EmotionThemeVariant variant={deleteMode ? "error" : "primary"}>
-              <PaletteButton
-                icon={Icons.delete}
-                iconColor={"icon"}
-                bg={deleteMode ? "background" : "transparent"}
-                onClick={() => setDeleteMode((s) => !s)}
-                title={
-                  deleteMode
-                    ? "Disable delete mode"
-                    : "Enable delete mode for deleting custom colors"
-                }
-                iconSize={18}
-              />
-            </EmotionThemeVariant>
+            <PaletteButton
+              icon={Icons.delete}
+              iconColor={deleteMode ? "var(--icon-error)" : "icon"}
+              bg={deleteMode ? "var(--background-error)" : "transparent"}
+              onClick={() => setDeleteMode((s) => !s)}
+              title={
+                deleteMode
+                  ? "Disable delete mode"
+                  : "Enable delete mode for deleting custom colors"
+              }
+              iconSize={18}
+            />
             {!deleteMode && (
               <PaletteButton
                 icon={Icons.palette}
@@ -274,7 +271,11 @@ function PaletteButton(props: PaletteButtonProps) {
         p: 0,
         ml: [2, 2, 1],
         bg,
-        ":hover": { bg },
+        ":hover:not(:disabled):not(:active)": {
+          bg: bg?.startsWith("#")
+            ? tinycolor(bg).darken(5).toRgbString()
+            : "hover"
+        },
         ...sx
       }}
       {...restProps}

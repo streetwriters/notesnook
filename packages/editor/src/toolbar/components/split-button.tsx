@@ -46,17 +46,18 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
       >
         <ToolButton
           {...toolButtonProps}
-          sx={{ mr: 0, ":hover": { bg: "hover" }, ...sx }}
+          sx={{ mr: 0, ...sx }}
           toggled={false}
         />
         <Button
+          variant="secondary"
           sx={{
             flexShrink: 0,
             p: 0,
             m: 0,
             px: "3px",
-            bg: "background",
-            ":hover": { bg: "hover" },
+            bg: "transparent",
+            height: "100%",
             ":last-of-type": {
               mr: 0
             }

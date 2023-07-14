@@ -19,10 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Colors } from "../../theme-engine/types";
 
-export function colorsToCss(colors: Colors) {
+export function colorsToCss(colors: Colors, variantKey?: string) {
   let root = "";
+  const suffix =
+    !variantKey || variantKey === "primary" ? "" : `-${variantKey}`;
   for (const color in colors) {
-    root += `--${color}: ${colors[color as keyof Colors]};`;
+    root += `--${color}${suffix}: ${colors[color as keyof Colors]};\n`;
   }
   return root;
 }

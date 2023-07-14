@@ -17,13 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { writeFile } from "fs/promises";
 import path from "path";
-import { Counter } from "./counter";
+import tsj from "ts-json-schema-generator";
+import { fileURLToPath } from "url";
 
-export const THEMES_REPO_URL = `https://github.com/streetwriters/notesnook-themes.git`;
-export const THEME_REPO_DIR_NAME = "notesnook-themes";
-export const THEME_METADATA_JSON = path.join(__dirname, "themes-metadata.json");
-export const THEME_REPO_DIR_PATH = path.resolve(
-  path.join(__dirname, "..", THEME_REPO_DIR_NAME)
-);
-export const InstallsCounter = new Counter("installs", path.dirname(__dirname));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const generator = tsj.createGenerator({
+  path: path.join(__dirname, "..", "src", "theme-engine", "types.ts"),
+  tsconfig: path.join(__dirname, "..", "tsconfig.json"),
+  type: "ThemeDefinition"
+});
+
+const schema = generator.createSchema("ThemeDefinition");
+
+delete schema.definitions.ThemeDefinition.properties.codeBlockCSS;
+const required = schema.definitions.ThemeDefinition.required;
+required.splice(required.indexOf("codeBlockCSS"), 1);
+
+await writeFile(`v1.schema.json`, JSON.stringify(schema, undefined, 2));

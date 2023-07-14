@@ -22,7 +22,6 @@ import { Icon } from "@notesnook/ui";
 import { Icons } from "../icons";
 import { PropsWithChildren } from "react";
 import { DesktopOnly, MobileOnly } from "../../components/responsive";
-import { EmotionThemeVariant } from "@notesnook/theme";
 
 type Action = {
   title: string;
@@ -64,7 +63,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
             >
               <Text variant={"title"}>{title}</Text>
               <Button
-                variant={"tool"}
+                variant={"secondary"}
                 sx={{ p: 0, bg: "transparent" }}
                 onClick={onClose}
               >
@@ -74,31 +73,27 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
           )}
           {children}
           {title && action && (
-            <EmotionThemeVariant variant="secondary">
-              <Flex
-                sx={{ justifyContent: "end" }}
-                bg="background"
-                p={1}
-                px={2}
-                mt={2}
+            <Flex
+              sx={{ justifyContent: "end" }}
+              bg="var(--background-secondary)"
+              p={1}
+              px={2}
+              mt={2}
+            >
+              <Button
+                variant="dialog"
+                onClick={
+                  action.disabled || action.loading ? undefined : action.onClick
+                }
+                disabled={action.disabled || action.loading}
               >
-                <Button
-                  variant="dialog"
-                  onClick={
-                    action.disabled || action.loading
-                      ? undefined
-                      : action.onClick
-                  }
-                  disabled={action.disabled || action.loading}
-                >
-                  {action.loading ? (
-                    <Icon path={Icons.loading} rotate size="medium" />
-                  ) : (
-                    action.title
-                  )}
-                </Button>
-              </Flex>
-            </EmotionThemeVariant>
+                {action.loading ? (
+                  <Icon path={Icons.loading} rotate size="medium" />
+                ) : (
+                  action.title
+                )}
+              </Button>
+            </Flex>
           )}
         </Flex>
       </DesktopOnly>
@@ -107,7 +102,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
 
         {action && (
           <Button
-            variant={"primary"}
+            variant="accent"
             sx={{
               alignSelf: "stretch",
               mb: 1,

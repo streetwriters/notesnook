@@ -24,7 +24,6 @@ import { ImageAttributes } from "../../extensions/image";
 import { Popup } from "../components/popup";
 import { downloadImage, toDataURL } from "../../utils/downloader";
 import { useToolbarStore } from "../stores/toolbar-store";
-import { EmotionThemeVariant } from "@notesnook/theme";
 
 export type ImageUploadPopupProps = {
   onInsert: (image: Partial<ImageAttributes>) => void;
@@ -76,20 +75,17 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
         />
 
         {error ? (
-          <EmotionThemeVariant variant="error">
-            <Text
-              variant={"error"}
-              sx={{
-                bg: "background",
-                color: "paragraph",
-                mt: 1,
-                p: 1,
-                borderRadius: "default"
-              }}
-            >
-              Failed to download image: {error.toLowerCase()}.
-            </Text>
-          </EmotionThemeVariant>
+          <Text
+            variant={"error"}
+            sx={{
+              bg: "var(--background-error)",
+              mt: 1,
+              p: 1,
+              borderRadius: "default"
+            }}
+          >
+            Failed to download image: {error.toLowerCase()}.
+          </Text>
         ) : (
           <Text
             variant={"subBody"}

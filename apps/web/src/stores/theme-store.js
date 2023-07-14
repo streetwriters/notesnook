@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import BaseStore from "./index";
 import Config from "../utils/config";
-import { getDefaultAccentColor } from "@notesnook/theme";
 import { desktop } from "../common/desktop-bridge";
 
 /**
@@ -31,7 +30,6 @@ class ThemeStore extends BaseStore {
    * @type {"dark" | "light"}
    */
   theme = Config.get("theme", "light");
-  accent = Config.get("accent", getDefaultAccentColor());
   followSystemTheme = Config.get("followSystemTheme", false);
 
   setTheme = async (theme) => {
@@ -44,11 +42,6 @@ class ThemeStore extends BaseStore {
   toggleNightMode = () => {
     const theme = this.get().theme;
     this.setTheme(theme === "dark" ? "light" : "dark");
-  };
-
-  setAccent = (accent) => {
-    this.set((state) => (state.accent = accent));
-    Config.set("accent", accent);
   };
 
   setFollowSystemTheme = async (followSystemTheme) => {

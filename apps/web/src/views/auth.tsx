@@ -45,7 +45,6 @@ import {
   showLogoutConfirmation
 } from "../common/dialog-controller";
 import { ErrorText } from "../components/error-text";
-import { ThemeVariant } from "../components/theme-provider";
 
 type EmailFormData = {
   email: string;
@@ -466,33 +465,30 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         Forgot password?
       </Button>
       <SubmitButton text="Relogin to your account" />
-      <ThemeVariant variant="error">
-        <Button
-          type="button"
-          variant="anchor"
-          sx={{
-            mt: 5,
-            color: "paragraph",
-            textDecoration: "none",
-            ":hover": {
-              color: "paragraph",
-              opacity: 0.8
-            }
-          }}
-          onClick={async () => {
-            if (await showLogoutConfirmation()) {
-              await showLoadingDialog({
-                title: "You are being logged out",
-                action: () => db.user?.logout(true),
-                subtitle: "Please wait..."
-              });
-              openURL("/login");
-            }
-          }}
-        >
-          Logout permanently
-        </Button>
-      </ThemeVariant>
+      <Button
+        type="button"
+        variant="anchor"
+        sx={{
+          mt: 5,
+          color: "var(--paragraph-error)",
+          textDecoration: "none",
+          ":hover": {
+            color: "var(--paragraph-error)"
+          }
+        }}
+        onClick={async () => {
+          if (await showLogoutConfirmation()) {
+            await showLoadingDialog({
+              title: "You are being logged out",
+              action: () => db.user?.logout(true),
+              subtitle: "Please wait..."
+            });
+            openURL("/login");
+          }
+        }}
+      >
+        Logout permanently
+      </Button>
     </AuthForm>
   );
 }
@@ -754,44 +750,42 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
         navigate("mfa:code", formData);
       }}
     >
-      <ThemeVariant variant="secondary">
-        {MFAMethods.map(
-          (method, index) =>
-            isValidMethod(method.type) && (
-              <Button
-                key={method.type}
-                type="submit"
-                variant={"secondary"}
-                mt={2}
+      {MFAMethods.map(
+        (method, index) =>
+          isValidMethod(method.type) && (
+            <Button
+              key={method.type}
+              type="submit"
+              variant={"secondary"}
+              mt={2}
+              sx={{
+                ":first-of-type": { mt: 2 },
+                display: "flex",
+                bg: "background",
+                alignSelf: "stretch",
+                alignItems: "center",
+                textAlign: "left",
+                px: 2
+              }}
+              onClick={() => setSelected(index)}
+            >
+              <method.icon
                 sx={{
-                  ":first-of-type": { mt: 2 },
-                  display: "flex",
-                  bg: "background",
-                  alignSelf: "stretch",
-                  alignItems: "center",
-                  textAlign: "left",
-                  px: 2
+                  bg: selected === index ? "shade" : "border",
+                  borderRadius: 100,
+                  width: 35,
+                  height: 35,
+                  mr: 2
                 }}
-                onClick={() => setSelected(index)}
-              >
-                <method.icon
-                  sx={{
-                    bg: selected === index ? "shade" : "border",
-                    borderRadius: 100,
-                    width: 35,
-                    height: 35,
-                    mr: 2
-                  }}
-                  size={16}
-                  color={selected === index ? "accent" : "icon"}
-                />
-                <Text variant={"title"} sx={{ fontWeight: "body" }}>
-                  {method.title}
-                </Text>
-              </Button>
-            )
-        )}
-      </ThemeVariant>
+                size={16}
+                color={selected === index ? "accent" : "icon"}
+              />
+              <Text variant={"title"} sx={{ fontWeight: "body" }}>
+                {method.title}
+              </Text>
+            </Button>
+          )
+      )}
       {/* <SubmitButton
         text="Submit"
         disabled={!isAppLoaded}
@@ -867,16 +861,18 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
       <Text variant={"heading"} sx={{ fontSize: 32, textAlign: "center" }}>
         {title}
       </Text>
-      <ThemeVariant variant="secondary">
-        <Text
-          variant="body"
-          mt={2}
-          mb={35}
-          sx={{ fontSize: "title", textAlign: "center", color: "paragraph" }}
-        >
-          {subtitle}
-        </Text>
-      </ThemeVariant>
+      <Text
+        variant="body"
+        mt={2}
+        mb={35}
+        sx={{
+          fontSize: "title",
+          textAlign: "center",
+          color: "var(--paragraph-secondary)"
+        }}
+      >
+        {subtitle}
+      </Text>
       {typeof children === "function" ? children(form) : children}
       {canSkip && (
         <Button
@@ -919,7 +915,6 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
         variant="anchor"
         sx={{
           textDecoration: "underline",
-          ":hover": { color: "dimPrimary" },
           fontWeight: "bold",
           fontSize: "subtitle",
           color: "paragraph",
@@ -994,7 +989,7 @@ export function SubmitButton(props: SubmitButtonProps) {
       data-test-id="submitButton"
       type="submit"
       mt={50}
-      variant="primary"
+      variant="accent"
       px={50}
       sx={{
         borderRadius: 50,

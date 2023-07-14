@@ -41,7 +41,7 @@ function Notes() {
   return (
     <ListContainer
       type="notes"
-      groupType={type}
+      groupingKey={type}
       refresh={refreshContext}
       compact={isCompact}
       context={{ ...context, notes: undefined }}

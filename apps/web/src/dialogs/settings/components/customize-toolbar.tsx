@@ -61,7 +61,7 @@ import {
 import { showToast } from "../../../utils/toast";
 import { isUserPremium } from "../../../hooks/use-is-user-premium";
 import { Pro } from "../../../components/icons";
-import { ThemeVariant } from "../../../components/theme-provider";
+
 import { Icon } from "@notesnook/ui";
 
 export function CustomizeToolbar() {
@@ -140,123 +140,119 @@ export function CustomizeToolbar() {
           ))}
         </Flex>
         {currentPreset.editable && (
-          <ThemeVariant variant="secondary">
-            <Button
-              variant={"secondary"}
-              sx={{
-                display: "flex",
-                flexShrink: 0,
-                alignItems: "center",
-                p: 1
-              }}
-              title="Add group"
-              onClick={() => {
-                setItems(addGroup);
-                showToast("success", "Group added successfully");
-              }}
-            >
-              <Icon path={Icons.plus} color="paragraph" size={18} />
-            </Button>
-          </ThemeVariant>
+          <Button
+            variant={"secondary"}
+            sx={{
+              display: "flex",
+              flexShrink: 0,
+              alignItems: "center",
+              p: 1
+            }}
+            title="Add group"
+            onClick={() => {
+              setItems(addGroup);
+              showToast("success", "Group added successfully");
+            }}
+          >
+            <Icon path={Icons.plus} color="paragraph" size={18} />
+          </Button>
         )}
       </Flex>
 
-      <ThemeVariant variant="secondary">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={(event) => {
-            if (!isUserPremium()) {
-              showToast("info", "You need to be Pro to customize the toolbar.");
-              return;
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={(event) => {
+          if (!isUserPremium()) {
+            showToast("info", "You need to be Pro to customize the toolbar.");
+            return;
+          }
+
+          if (currentPreset.id !== "custom") {
+            setCurrentPreset((c) => ({
+              ...getPreset("custom"),
+              tools: getPresetTools(c)
+            }));
+          }
+
+          const { active } = event;
+          const activeItem = items.find((item) => item.id === active.id);
+          setActiveItem(activeItem);
+        }}
+        onDragEnd={(event) => {
+          const { active, over } = event;
+          if (activeItem && over && active.id !== over.id) {
+            // const newIndex = items.findIndex((i) => i.id === over.id);
+            if (isGroup(activeItem) || isSubgroup(activeItem)) {
+              setItems(moveGroup(items, activeItem.id, over.id as string));
+            } else {
+              setItems(moveItem(items, activeItem.id, over.id as string));
             }
 
-            if (currentPreset.id !== "custom") {
-              setCurrentPreset((c) => ({
-                ...getPreset("custom"),
-                tools: getPresetTools(c)
-              }));
-            }
+            setTimeout(() => {
+              const element = document.getElementById(over.id as string);
+              element?.scrollIntoView({ behavior: "auto", block: "nearest" });
+            }, 500);
+          }
+          setActiveItem(undefined);
+        }}
+        measuring={{
+          droppable: { strategy: MeasuringStrategy.Always }
+        }}
+      >
+        <SortableContext items={items} strategy={verticalListSortingStrategy}>
+          {items?.map((item) => {
+            const deleted = isDeleted(items, item);
+            const hasSubGroup =
+              isGroup(item) &&
+              !!getGroup(items, item.id)?.items.some((t) => isSubgroup(t));
+            const canAddSubGroup =
+              currentPreset.editable && !deleted && !hasSubGroup;
+            const canRemoveGroup = currentPreset.editable && !deleted;
+            const canRemoveItem = currentPreset.editable && !deleted;
 
-            const { active } = event;
-            const activeItem = items.find((item) => item.id === active.id);
-            setActiveItem(activeItem);
-          }}
-          onDragEnd={(event) => {
-            const { active, over } = event;
-            if (activeItem && over && active.id !== over.id) {
-              // const newIndex = items.findIndex((i) => i.id === over.id);
-              if (isGroup(activeItem) || isSubgroup(activeItem)) {
-                setItems(moveGroup(items, activeItem.id, over.id as string));
-              } else {
-                setItems(moveItem(items, activeItem.id, over.id as string));
-              }
-
-              setTimeout(() => {
-                const element = document.getElementById(over.id as string);
-                element?.scrollIntoView({ behavior: "auto", block: "nearest" });
-              }, 500);
-            }
-            setActiveItem(undefined);
-          }}
-          measuring={{
-            droppable: { strategy: MeasuringStrategy.Always }
-          }}
-        >
-          <SortableContext items={items} strategy={verticalListSortingStrategy}>
-            {items?.map((item) => {
-              const deleted = isDeleted(items, item);
-              const hasSubGroup =
-                isGroup(item) &&
-                !!getGroup(items, item.id)?.items.some((t) => isSubgroup(t));
-              const canAddSubGroup =
-                currentPreset.editable && !deleted && !hasSubGroup;
-              const canRemoveGroup = currentPreset.editable && !deleted;
-              const canRemoveItem = currentPreset.editable && !deleted;
-
-              return (
-                <TreeNodeComponent
-                  key={item.id}
-                  item={item}
-                  activeItem={activeItem}
-                  onAddSubGroup={
-                    canAddSubGroup
-                      ? () => {
-                          setItems((items) => addSubGroup(items, item.id));
-                          showToast("success", "Subgroup added successfully");
-                        }
-                      : undefined
-                  }
-                  onRemoveGroup={
-                    canRemoveGroup
-                      ? (group) => {
-                          setItems(removeGroup(items, group.id));
-                        }
-                      : undefined
-                  }
-                  onRemoveItem={
-                    canRemoveItem
-                      ? (item) => {
-                          setItems(removeItem(items, item.id));
-                        }
-                      : undefined
-                  }
-                />
-              );
-            })}
-            {activeItem &&
-              createPortal(
-                <DragOverlay
-                // dropAnimation={dropAnimationConfig}
-                // modifiers={indicator ? [adjustTranslate] : undefined}
-                >
-                  <TreeNodeComponent overlay item={activeItem} />
-                </DragOverlay>,
-                document.querySelector(".ReactModal__Overlay") || document.body
-              )}
-          </SortableContext>
-        </DndContext>
-      </ThemeVariant>
+            return (
+              <TreeNodeComponent
+                key={item.id}
+                item={item}
+                activeItem={activeItem}
+                onAddSubGroup={
+                  canAddSubGroup
+                    ? () => {
+                        setItems((items) => addSubGroup(items, item.id));
+                        showToast("success", "Subgroup added successfully");
+                      }
+                    : undefined
+                }
+                onRemoveGroup={
+                  canRemoveGroup
+                    ? (group) => {
+                        setItems(removeGroup(items, group.id));
+                      }
+                    : undefined
+                }
+                onRemoveItem={
+                  canRemoveItem
+                    ? (item) => {
+                        setItems(removeItem(items, item.id));
+                      }
+                    : undefined
+                }
+              />
+            );
+          })}
+          {activeItem &&
+            createPortal(
+              <DragOverlay
+              // dropAnimation={dropAnimationConfig}
+              // modifiers={indicator ? [adjustTranslate] : undefined}
+              >
+                <TreeNodeComponent overlay item={activeItem} />
+              </DragOverlay>,
+              document.querySelector(".ReactModal__Overlay") || document.body
+            )}
+        </SortableContext>
+      </DndContext>
     </Flex>
   );
 }
@@ -289,7 +285,7 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         onRemove={onRemoveGroup}
         onAdd={isGroup(item) ? onAddSubGroup : undefined}
         sx={{
-          bg: "background",
+          bg: "var(--background-secondary)",
           borderRadius: "default",
           p: 1,
           mb: 1,
@@ -317,7 +313,7 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         p: 1,
         alignItems: "center",
         justifyContent: "space-between",
-        bg: "background",
+        bg: "var(--background-secondary)",
         borderRadius: "default",
         mb: 1,
         ml: item.depth * 15,
@@ -385,7 +381,7 @@ function SortableWrapper(props: SortableWrapperProps) {
         {onAdd && (
           <Button
             id="add-item"
-            variant={"tool"}
+            variant={"secondary"}
             sx={{ p: "small", opacity: 0, mr: 1 }}
             onClick={() => onAdd()}
           >
@@ -395,7 +391,7 @@ function SortableWrapper(props: SortableWrapperProps) {
         {onRemove && (
           <Button
             id="remove-item"
-            variant={"tool"}
+            variant={"secondary"}
             sx={{ p: "small", opacity: 0 }}
             onClick={() => onRemove(item)}
           >

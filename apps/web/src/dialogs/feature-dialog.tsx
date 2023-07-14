@@ -25,7 +25,6 @@ import Config from "../utils/config";
 import { isTesting } from "../utils/platform";
 import { useEffect } from "react";
 import { ArrowRight, Checkmark, Icon, Warn } from "../components/icons";
-import { ThemeVariant } from "../components/theme-provider";
 
 type CallToAction = {
   title: string;
@@ -149,33 +148,31 @@ function FeatureDialog(props: FeatureDialogProps) {
       }}
     >
       <Flex mt={2} sx={{ flexDirection: "column", overflowY: "auto" }}>
-        <ThemeVariant variant="secondary">
-          {feature.subFeatures?.map((feature) => (
-            <Flex
-              key={feature.title}
-              mb={2}
-              bg="background"
-              p={2}
-              sx={{
-                borderRadius: "default",
-                ":hover": { bg: "hover" },
-                flexDirection: "column"
-              }}
-            >
-              <Flex sx={{ alignItems: "center", justifyContent: "start" }}>
-                {feature.icon && <feature.icon size={14} color="accent" />}
-                <Text variant="subtitle" ml={1} sx={{ fontWeight: "normal" }}>
-                  {feature.title}
-                </Text>
-              </Flex>
-              {feature.subtitle && (
-                <Text variant="body" sx={{ color: "icon" }}>
-                  {feature.subtitle}
-                </Text>
-              )}
+        {feature.subFeatures?.map((feature) => (
+          <Flex
+            key={feature.title}
+            mb={2}
+            bg="var(--background-secondary)"
+            p={2}
+            sx={{
+              borderRadius: "default",
+              ":hover": { bg: "hover" },
+              flexDirection: "column"
+            }}
+          >
+            <Flex sx={{ alignItems: "center", justifyContent: "start" }}>
+              {feature.icon && <feature.icon size={14} color="accent" />}
+              <Text variant="subtitle" ml={1} sx={{ fontWeight: "normal" }}>
+                {feature.title}
+              </Text>
             </Flex>
-          ))}
-        </ThemeVariant>
+            {feature.subtitle && (
+              <Text variant="subBody" sx={{ fontSize: "body" }}>
+                {feature.subtitle}
+              </Text>
+            )}
+          </Flex>
+        ))}
       </Flex>
     </Dialog>
   );

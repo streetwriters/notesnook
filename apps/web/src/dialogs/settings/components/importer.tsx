@@ -25,7 +25,6 @@ import { pluralize } from "@notesnook/common";
 import { db } from "../../../common/db";
 import { importFiles } from "../../../utils/importer";
 import { CheckCircleOutline } from "../../../components/icons";
-import { ThemeVariant } from "../../../components/theme-provider";
 
 export function Importer() {
   const [isDone, setIsDone] = useState(false);
@@ -91,26 +90,24 @@ export function Importer() {
             Start over
           </Button>
           {errors.length > 0 && (
-            <ThemeVariant variant="error">
-              <Flex
-                my={1}
-                bg="background"
-                p={1}
-                sx={{ flexDirection: "column" }}
-              >
-                {errors.map((error) => (
-                  <Text
-                    key={error.message}
-                    variant="body"
-                    sx={{
-                      color: "paragraph"
-                    }}
-                  >
-                    {error.message}
-                  </Text>
-                ))}
-              </Flex>
-            </ThemeVariant>
+            <Flex
+              my={1}
+              bg="var(--background-error)"
+              p={1}
+              sx={{ flexDirection: "column" }}
+            >
+              {errors.map((error) => (
+                <Text
+                  key={error.message}
+                  variant="body"
+                  sx={{
+                    color: "var(--paragraph-error)"
+                  }}
+                >
+                  {error.message}
+                </Text>
+              ))}
+            </Flex>
           )}
         </>
       ) : (
@@ -122,18 +119,19 @@ export function Importer() {
                   ? `${pluralize(files.length, "file")} ready for import`
                   : "Select files to import"}
               </Text>
-              <ThemeVariant variant="secondary">
-                <Text variant={"body"} sx={{ color: "paragraph" }}>
-                  Please refer to the{" "}
-                  <Link
-                    href="https://help.notesnook.com/importing-notes/import-notes-from-evernote"
-                    target="_blank"
-                  >
-                    import guide
-                  </Link>{" "}
-                  for help regarding how to use the Notesnook Importer.
-                </Text>
-              </ThemeVariant>
+              <Text
+                variant={"body"}
+                sx={{ color: "var(--paragraph-secondary)" }}
+              >
+                Please refer to the{" "}
+                <Link
+                  href="https://help.notesnook.com/importing-notes/import-notes-from-evernote"
+                  target="_blank"
+                >
+                  import guide
+                </Link>{" "}
+                for help regarding how to use the Notesnook Importer.
+              </Text>
             </Flex>
             <Button
               onClick={async () => {

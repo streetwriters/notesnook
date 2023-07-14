@@ -44,7 +44,6 @@ import { AnimatedInput } from "../animated";
 import { showPublishView } from "../publish-view";
 import { db } from "../../common/db";
 import { useEditorInstance, useHistory, useSearch } from "./context";
-import { ScopedThemeProvider, ThemeVariant } from "../theme-provider";
 
 // TODO: this needs to be cleaned up!
 function Toolbar() {
@@ -233,6 +232,7 @@ function Toolbar() {
             setTitle(sessionId, title);
           }}
           sx={{
+            flex: 1,
             fontWeight: "heading",
             fontSize: "heading",
             color: "paragraph",
@@ -246,74 +246,68 @@ function Toolbar() {
         />
       </Flex>
 
-      <ThemeVariant variant="secondary">
-        <Flex>
-          {tools.map((tool) => (
-            <ThemeVariant
-              key={tool.title}
-              variant={tool.enabled ? "secondary" : "disabled"}
-            >
-              <Button
-                variant="secondary"
-                data-test-id={tool.title}
-                disabled={!tool.enabled}
-                title={tool.title}
-                mr={1}
-                sx={{
-                  display: [
-                    tool.hideOnMobile ? "none" : "flex",
-                    tool.hidden ? "none" : "flex"
-                  ],
-                  color: "paragraph",
-                  flexDirection: "row",
-                  flexShrink: 0,
-                  alignItems: "center"
-                }}
-                onClick={tool.onClick}
-              >
-                <tool.icon size={18} />
-                <Text
-                  variant="body"
-                  ml={1}
-                  sx={{ display: ["none", "none", "block"] }}
-                >
-                  {tool.title}
-                </Text>
-              </Button>
-            </ThemeVariant>
-          ))}
-          <Flex
-            bg="background"
+      <Flex>
+        {tools.map((tool) => (
+          <Button
+            key={tool.title}
+            variant="secondary"
+            data-test-id={tool.title}
+            disabled={!tool.enabled}
+            title={tool.title}
+            mr={1}
             sx={{
-              borderRadius: "default",
-              overflow: "hidden",
-              alignItems: "center",
-              justifyContent: "flex-end"
+              display: [
+                tool.hideOnMobile ? "none" : "flex",
+                tool.hidden ? "none" : "flex"
+              ],
+              color: "paragraph",
+              flexDirection: "row",
+              flexShrink: 0,
+              alignItems: "center"
             }}
+            onClick={tool.onClick}
           >
-            {inlineTools.map((tool) => (
-              <Button
-                data-test-id={tool.title}
-                disabled={!tool.enabled}
-                variant="secondary"
-                title={tool.title}
-                key={tool.title}
-                sx={{
-                  display: [
-                    tool.hideOnMobile ? "none" : "flex",
-                    tool.hidden ? "none" : "flex"
-                  ],
-                  borderRadius: 0,
-                  flexShrink: 0
-                }}
-                onClick={tool.onClick}
-              >
-                <tool.icon size={18} />
-              </Button>
-            ))}
-          </Flex>
+            <tool.icon size={18} />
+            <Text
+              variant="body"
+              ml={1}
+              sx={{ display: ["none", "none", "block"] }}
+            >
+              {tool.title}
+            </Text>
+          </Button>
+        ))}
+        <Flex
+          bg="background"
+          sx={{
+            borderRadius: "default",
+            overflow: "hidden",
+            alignItems: "center",
+            justifyContent: "flex-end"
+          }}
+        >
+          {inlineTools.map((tool) => (
+            <Button
+              data-test-id={tool.title}
+              disabled={!tool.enabled}
+              variant="secondary"
+              title={tool.title}
+              key={tool.title}
+              sx={{
+                display: [
+                  tool.hideOnMobile ? "none" : "flex",
+                  tool.hidden ? "none" : "flex"
+                ],
+                borderRadius: 0,
+                flexShrink: 0
+              }}
+              onClick={tool.onClick}
+            >
+              <tool.icon size={18} />
+            </Button>
+          ))}
         </Flex>
-      </ThemeVariant>
+      </Flex>
     </Flex>
   );
 }

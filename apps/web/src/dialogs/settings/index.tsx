@@ -65,7 +65,6 @@ import {
 import { AppearanceSettings } from "./appearance-settings";
 import { debounce } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
-import { ThemeVariant } from "../../components/theme-provider";
 import { alpha } from "@theme-ui/color";
 
 type SettingsDialogProps = { onClose: Perform };
@@ -189,11 +188,9 @@ export default function SettingsDialog(props: SettingsDialogProps) {
           overflow: "hidden"
         }}
       >
-        <ThemeVariant variant="secondary">
-          <SettingsSideBar
-            onNavigate={(settings) => setActiveSettings(settings)}
-          />
-        </ThemeVariant>
+        <SettingsSideBar
+          onNavigate={(settings) => setActiveSettings(settings)}
+        />
         <FlexScrollContainer
           style={{
             display: "flex",
@@ -239,7 +236,7 @@ function SettingsSideBar(props: SettingsSideBarProps) {
               backgroundColor: alpha("background", 0.6),
               backdropFilter: "blur(8px)"
             },
-          backgroundColor: "background",
+          backgroundColor: "var(--background-secondary)",
           borderRadius: "dialog"
         }}
       >
@@ -445,26 +442,18 @@ function SettingItem(props: { item: Setting }) {
             switch (component.type) {
               case "button":
                 return (
-                  <ThemeVariant
-                    variant={
-                      component.variant === "errorSecondary"
-                        ? "error"
-                        : component.variant
-                    }
+                  <Button
+                    disabled={isWorking}
+                    title={component.title}
+                    variant={component.variant}
+                    onClick={() => workWithLoading(component.action)}
                   >
-                    <Button
-                      disabled={isWorking}
-                      title={component.title}
-                      variant={component.variant}
-                      onClick={() => workWithLoading(component.action)}
-                    >
-                      {isWorking ? (
-                        <Loading size={18} sx={{ mr: 2 }} />
-                      ) : (
-                        component.title
-                      )}
-                    </Button>
-                  </ThemeVariant>
+                    {isWorking ? (
+                      <Loading size={18} sx={{ mr: 2 }} />
+                    ) : (
+                      component.title
+                    )}
+                  </Button>
                 );
               case "toggle":
                 return (
@@ -477,34 +466,32 @@ function SettingItem(props: { item: Setting }) {
                 );
               case "dropdown":
                 return (
-                  <ThemeVariant variant="secondary" injectCssVars>
-                    <select
-                      style={{
-                        backgroundColor: "var(--background)",
-                        outline: "none",
-                        border: "1px solid var(--border)",
-                        borderRadius: "5px",
-                        color: "var(--paragraph)",
-                        padding: "5px"
-                      }}
-                      value={component.selectedOption()}
-                      onChange={(e) =>
-                        component.onSelectionChanged(
-                          (e.target as HTMLSelectElement).value
-                        )
-                      }
-                    >
-                      {component.options.map((option) => (
-                        <option
-                          disabled={option.premium && !isUserPremium}
-                          key={option.value}
-                          value={option.value}
-                        >
-                          {option.title}
-                        </option>
-                      ))}
-                    </select>
-                  </ThemeVariant>
+                  <select
+                    style={{
+                      backgroundColor: "var(--background-secondary)",
+                      outline: "none",
+                      border: "1px solid var(--border-secondary)",
+                      borderRadius: "5px",
+                      color: "var(--paragraph)",
+                      padding: "5px"
+                    }}
+                    value={component.selectedOption()}
+                    onChange={(e) =>
+                      component.onSelectionChanged(
+                        (e.target as HTMLSelectElement).value
+                      )
+                    }
+                  >
+                    {component.options.map((option) => (
+                      <option
+                        disabled={option.premium && !isUserPremium}
+                        key={option.value}
+                        value={option.value}
+                      >
+                        {option.title}
+                      </option>
+                    ))}
+                  </select>
                 );
               case "input":
                 return component.inputType === "number" ? (

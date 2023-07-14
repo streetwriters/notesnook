@@ -33,7 +33,7 @@ function Trash() {
   return (
     <ListContainer
       type="trash"
-      groupType="trash"
+      groupingKey="trash"
       refresh={refresh}
       placeholder={<Placeholder context="trash" />}
       items={items}

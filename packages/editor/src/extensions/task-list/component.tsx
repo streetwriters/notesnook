@@ -27,7 +27,6 @@ import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
 import { countCheckedItems, deleteCheckedItems, sortList } from "./utils";
-import { EmotionThemeVariant } from "@notesnook/theme";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
@@ -73,112 +72,111 @@ export function TaskListComponent(
   return (
     <>
       {!isNested && (
-        <EmotionThemeVariant variant="secondary">
-          <Flex
+        <Flex
+          sx={{
+            position: "relative",
+            bg: "var(--background-secondary)",
+            py: "5px",
+            borderRadius: "default",
+            mb: 2,
+            alignItems: "center",
+            justifyContent: "end",
+            overflow: "hidden"
+          }}
+          className="task-list-tools"
+          dir={textDirection}
+          contentEditable={false}
+        >
+          <Box
             sx={{
-              position: "relative",
-              bg: "background",
-              py: "5px",
-              borderRadius: "default",
-              mb: 2,
-              alignItems: "center",
-              justifyContent: "end",
-              overflow: "hidden"
+              height: "100%",
+              width: `${stats.percentage}%`,
+              position: "absolute",
+              bg: "shade",
+
+              zIndex: 0,
+              left: 0,
+              transition: "width 250ms ease-out"
             }}
-            className="task-list-tools"
-            dir={textDirection}
-            contentEditable={false}
+          />
+          <Input
+            readOnly={!editor.isEditable}
+            value={title || ""}
+            variant={"clean"}
+            sx={{
+              flex: 1,
+              p: 0,
+              px: 2,
+              zIndex: 1,
+              color: "var(--paragraph-secondary)",
+              fontSize: "inherit",
+              fontFamily: "inherit"
+            }}
+            placeholder="Untitled"
+            onChange={(e) => {
+              updateAttributes(
+                { title: e.target.value },
+                { addToHistory: true, preventUpdate: false }
+              );
+            }}
+          />
+          {editor.isEditable && (
+            <>
+              <ToolButton
+                toggled={false}
+                title="Move all checked tasks to bottom"
+                icon="sortTaskList"
+                variant="small"
+                sx={{
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  const pos = getPos();
+                  editor.current
+                    ?.chain()
+                    .focus()
+                    .command(({ tr }) => {
+                      return !!sortList(tr, pos);
+                    })
+                    .run();
+                }}
+              />
+              <ToolButton
+                toggled={false}
+                title="Clear completed tasks"
+                icon="clear"
+                variant="small"
+                sx={{
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  const pos = getPos();
+
+                  editor.current
+                    ?.chain()
+                    .focus()
+                    .command(({ tr }) => {
+                      return !!deleteCheckedItems(tr, pos);
+                    })
+                    .run();
+                }}
+              />
+            </>
+          )}
+          <Text
+            variant={"body"}
+            sx={{
+              ml: 1,
+              mr: 2,
+              color: "var(--paragraph-secondary)",
+              flexShrink: 0,
+              zIndex: 1,
+              fontFamily: "inherit"
+            }}
           >
-            <Box
-              sx={{
-                height: "100%",
-                width: `${stats.percentage}%`,
-                position: "absolute",
-                bg: "shade",
-
-                zIndex: 0,
-                left: 0,
-                transition: "width 250ms ease-out"
-              }}
-            />
-            <Input
-              readOnly={!editor.isEditable}
-              value={title || ""}
-              variant={"clean"}
-              sx={{
-                p: 0,
-                px: 2,
-                zIndex: 1,
-                color: "paragraph",
-                fontSize: "inherit",
-                fontFamily: "inherit"
-              }}
-              placeholder="Untitled"
-              onChange={(e) => {
-                updateAttributes(
-                  { title: e.target.value },
-                  { addToHistory: true, preventUpdate: false }
-                );
-              }}
-            />
-            {editor.isEditable && (
-              <>
-                <ToolButton
-                  toggled={false}
-                  title="Move all checked tasks to bottom"
-                  icon="sortTaskList"
-                  variant="small"
-                  sx={{
-                    zIndex: 1
-                  }}
-                  onClick={() => {
-                    const pos = getPos();
-                    editor.current
-                      ?.chain()
-                      .focus()
-                      .command(({ tr }) => {
-                        return !!sortList(tr, pos);
-                      })
-                      .run();
-                  }}
-                />
-                <ToolButton
-                  toggled={false}
-                  title="Clear completed tasks"
-                  icon="clear"
-                  variant="small"
-                  sx={{
-                    zIndex: 1
-                  }}
-                  onClick={() => {
-                    const pos = getPos();
-
-                    editor.current
-                      ?.chain()
-                      .focus()
-                      .command(({ tr }) => {
-                        return !!deleteCheckedItems(tr, pos);
-                      })
-                      .run();
-                  }}
-                />
-              </>
-            )}
-            <Text
-              variant={"body"}
-              sx={{
-                ml: 1,
-                mr: 2,
-                color: "paragraph",
-                flexShrink: 0,
-                zIndex: 1,
-                fontFamily: "inherit"
-              }}
-            >
-              {stats.checked}/{stats.total}
-            </Text>
-          </Flex>
-        </EmotionThemeVariant>
+            {stats.checked}/{stats.total}
+          </Text>
+        </Flex>
       )}
       <Box
         ref={forwardRef}

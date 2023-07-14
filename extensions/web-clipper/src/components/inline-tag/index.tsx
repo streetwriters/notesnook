@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Flex, Text } from "@theme-ui/components";
 import { Icon } from "../icons/icon";
 import { SchemeColors } from "@notesnook/theme";
-import { EmotionThemeVariant } from "@notesnook/theme";
 
 export function InlineTag(props: {
   title: string;
@@ -31,28 +30,26 @@ export function InlineTag(props: {
   const { title, icon, onClick, iconColor = "icon" } = props;
 
   return (
-    <EmotionThemeVariant variant="secondary">
-      <Flex
-        onClick={onClick}
-        sx={{
-          alignItems: "center",
-          justifyContent: "center",
-          bg: "background",
-          border: "1px solid var(--border)",
-          borderRadius: "small",
-          p: "3px",
-          pr: 1,
-          cursor: "pointer",
-          ":hover": {
-            bg: "hover"
-          }
-        }}
-      >
-        <Icon path={icon} color={iconColor} size={14} />
-        <Text variant="subBody" sx={{ color: "paragraph", ml: 1 }}>
-          {title}
-        </Text>
-      </Flex>
-    </EmotionThemeVariant>
+    <Flex
+      onClick={onClick}
+      sx={{
+        alignItems: "center",
+        justifyContent: "center",
+        bg: "var(--background-secondary)",
+        border: "1px solid var(--border)",
+        borderRadius: "small",
+        p: "3px",
+        pr: 1,
+        cursor: "pointer",
+        ":hover": {
+          bg: "hover"
+        }
+      }}
+    >
+      <Icon path={icon} color={iconColor} size={14} />
+      <Text variant="subBody" sx={{ ml: 1 }}>
+        {title}
+      </Text>
+    </Flex>
   );
 }

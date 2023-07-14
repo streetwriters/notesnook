@@ -101,7 +101,7 @@ export default function ReminderPreviewDialog(
         {SNOOZE_TIMES.map((time) => (
           <Button
             key={time.id}
-            variant="tool"
+            variant="secondary"
             onClick={() => {
               db.reminders?.add({
                 id: reminder.id,

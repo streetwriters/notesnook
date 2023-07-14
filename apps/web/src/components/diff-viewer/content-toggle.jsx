@@ -17,9 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Button } from "@theme-ui/components";
+import { Flex, Button, Text } from "@theme-ui/components";
 import { getFormattedDate } from "@notesnook/common";
-import { ThemeVariant } from "../theme-provider";
 
 function ContentToggle(props) {
   const {
@@ -37,7 +36,7 @@ function ContentToggle(props) {
       <Flex>
         {isOtherSelected && (
           <Button
-            variant="primary"
+            variant="accent"
             mr={2}
             onClick={() => resolveConflict({ saveCopy: true })}
             p={1}
@@ -46,37 +45,24 @@ function ContentToggle(props) {
             Save copy
           </Button>
         )}
-        <ThemeVariant variant={isOtherSelected ? "error" : "primary"}>
-          <Button
-            variant="primary"
-            onClick={() => {
-              if (isOtherSelected) {
-                resolveConflict({ saveCopy: false });
-              } else {
-                onToggle();
-              }
-            }}
-            p={1}
-            px={2}
-            bg={"background"}
-          >
-            {isSelected ? "Undo" : isOtherSelected ? "Discard" : "Keep"}
-          </Button>
-        </ThemeVariant>
-      </Flex>
-      <ThemeVariant variant="secondary">
-        <Flex
-          mt={1}
-          sx={{
-            fontSize: "subBody",
-            color: "paragraph",
-            alignItems: "center",
-            fontFamily: "body"
+        <Button
+          variant={isOtherSelected ? "error" : "primary"}
+          onClick={() => {
+            if (isOtherSelected) {
+              resolveConflict({ saveCopy: false });
+            } else {
+              onToggle();
+            }
           }}
+          p={1}
+          px={2}
         >
-          {label} | {getFormattedDate(dateEdited)}
-        </Flex>
-      </ThemeVariant>
+          {isSelected ? "Undo" : isOtherSelected ? "Discard" : "Keep"}
+        </Button>
+      </Flex>
+      <Text variant="subBody" mt={1}>
+        {label} | {getFormattedDate(dateEdited)}
+      </Text>
     </Flex>
   );
 }

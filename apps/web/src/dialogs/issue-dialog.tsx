@@ -28,7 +28,7 @@ import { isUserPremium } from "../hooks/use-is-user-premium";
 import * as clipboard from "clipboard-polyfill/text";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
-import { ThemeVariant } from "../components/theme-provider";
+
 import { ErrorText } from "../components/error-text";
 
 const PLACEHOLDERS = {
@@ -119,30 +119,26 @@ function IssueDialog(props: IssueDialogProps) {
             }
           }}
         />
-        <ThemeVariant variant="error">
-          <Text
-            variant="error"
-            bg={"background"}
-            mt={1}
-            p={1}
-            sx={{ borderRadius: "default", color: "paragraph" }}
-          >
-            Your bug report is public. Do NOT include sensitive information
-            (email, passwords etc) in the issue title or description.
-          </Text>
-        </ThemeVariant>
-        <ThemeVariant variant="secondary">
-          <Text variant="subBody" mt={1}>
-            {getDeviceInfo()
-              .split("\n")
-              .map((t) => (
-                <>
-                  {t}
-                  <br />
-                </>
-              ))}
-          </Text>
-        </ThemeVariant>
+        <Text
+          variant="error"
+          bg={"var(--background-error)"}
+          mt={1}
+          p={1}
+          sx={{ borderRadius: "default" }}
+        >
+          Your bug report is public. Do NOT include sensitive information
+          (email, passwords etc) in the issue title or description.
+        </Text>
+        <Text variant="subBody" mt={1}>
+          {getDeviceInfo()
+            .split("\n")
+            .map((t) => (
+              <>
+                {t}
+                <br />
+              </>
+            ))}
+        </Text>
         <ErrorText error={error} />
       </Flex>
     </Dialog>

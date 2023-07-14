@@ -31,7 +31,6 @@ import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { EVENTS } from "@notesnook/core/common";
 import { ErrorText } from "../components/error-text";
-import { ThemeVariant } from "../components/theme-provider";
 
 type RecoveryMethodType = "key" | "backup" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;
@@ -287,35 +286,45 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
       }}
     >
       {recoveryMethods.map((method, index) => (
-        <ThemeVariant
+        <Button
           key={method.testId}
-          variant={method.isDangerous ? "error" : "secondary"}
+          data-test-id={method.testId}
+          type="submit"
+          variant={"secondary"}
+          mt={2}
+          sx={{
+            ":first-of-type": { mt: 2 },
+            display: "flex",
+            flexDirection: "column",
+            bg: method.isDangerous
+              ? "var(--background-secondary)"
+              : "var(--background-error)",
+            alignSelf: "stretch",
+            // alignItems: "center",
+            textAlign: "left",
+            px: 2
+          }}
+          onClick={() => setSelected(index)}
         >
-          <Button
-            data-test-id={method.testId}
-            type="submit"
-            variant={"secondary"}
-            mt={2}
+          <Text
+            variant={"title"}
             sx={{
-              ":first-of-type": { mt: 2 },
-              display: "flex",
-              flexDirection: "column",
-              bg: "background",
-              alignSelf: "stretch",
-              // alignItems: "center",
-              textAlign: "left",
-              px: 2
+              color: method.isDangerous ? "var(--heading-error)" : "heading"
             }}
-            onClick={() => setSelected(index)}
           >
-            <Text variant={"title"} sx={{ color: "heading" }}>
-              {method.title}
-            </Text>
-            <Text variant={"body"} sx={{ color: "paragraph" }}>
-              {method.description}
-            </Text>
-          </Button>
-        </ThemeVariant>
+            {method.title}
+          </Text>
+          <Text
+            variant={"body"}
+            sx={{
+              color: method.isDangerous
+                ? "var(--paragraph-error)"
+                : "var(--paragraph-secondary)"
+            }}
+          >
+            {method.description}
+          </Text>
+        </Button>
       ))}
     </RecoveryForm>
   );
@@ -641,16 +650,18 @@ export function RecoveryForm<T extends RecoveryRoutes>(
       <Text variant={"heading"} sx={{ fontSize: 32, textAlign: "center" }}>
         {title}
       </Text>
-      <ThemeVariant variant="secondary">
-        <Text
-          variant="body"
-          mt={2}
-          mb={35}
-          sx={{ fontSize: "title", textAlign: "center", color: "paragraph" }}
-        >
-          {subtitle}
-        </Text>
-      </ThemeVariant>
+      <Text
+        variant="body"
+        mt={2}
+        mb={35}
+        sx={{
+          fontSize: "title",
+          textAlign: "center",
+          color: "var(--paragraph-secondary)"
+        }}
+      >
+        {subtitle}
+      </Text>
       {typeof children === "function" ? children(form) : children}
       <ErrorText error={error} />
     </Flex>
