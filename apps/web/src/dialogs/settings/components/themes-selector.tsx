@@ -36,6 +36,9 @@ import {
   Trash
 } from "../../../components/icons";
 import { THEME_COMPATIBILITY_VERSION } from "@notesnook/theme";
+import { debounce } from "@notesnook/common";
+import { useStore as useThemeStore } from "../../../stores/theme-store";
+import { useStore as useUserStore } from "../../../stores/user-store";
 
 const THEME_SERVER_URL = "http://localhost:9000";
 const themesRouter = createTRPCProxyClient<ThemesRouter>({
@@ -67,27 +70,34 @@ export function ThemesSelector() {
 
 function ThemesList() {
   const [searchQuery, setSearchQuery] = useState<string>();
-  const [filters, setFilters] = useState<string[]>(["dark", "light"]);
+  const [colorSchemes, setColorSchemes] = useState<string[]>(["dark", "light"]);
+  const currentTheme = useThemeStore((store) => store.theme);
+  const setCurrentTheme = useThemeStore((store) => store.setTheme);
+  const user = useUserStore((store) => store.user);
+
+  const filters = [];
+  if (searchQuery) filters.push({ type: "term" as const, value: searchQuery });
+  if (colorSchemes.length < 2)
+    filters.push({ type: "colorScheme" as const, value: colorSchemes[0] });
+
   const themes = ThemesTRPC.themes.useInfiniteQuery(
     {
       limit: 10,
-      compatibilityVersion: THEME_COMPATIBILITY_VERSION
+      compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+      filters
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor
     }
   );
-  // const searchResults = ThemesTRPC.search.useInfiniteQuery(
-  //   { limit: 10, query: searchQuery || "" },
-  //   {
-  //     enabled: false,
-  //     getNextPageParam: (lastPage) => lastPage.nextCursor
-  //   }
-  // );
 
   return (
     <>
-      <Input placeholder="Search themes" sx={{ mt: 2 }} />
+      <Input
+        placeholder="Search themes"
+        sx={{ mt: 2 }}
+        onChange={debounce((e) => setSearchQuery(e.target.value), 500)}
+      />
       <Flex sx={{ mt: 2, gap: 1 }}>
         {[
           { id: "dark", title: "Dark" },
@@ -97,7 +107,7 @@ function ThemesList() {
             key={filter.id}
             variant="secondary"
             onClick={() => {
-              setFilters((filters) => {
+              setColorSchemes((filters) => {
                 const copy = filters.slice();
                 const index = copy.indexOf(filter.id);
                 if (index > -1) copy.splice(index, 1);
@@ -112,8 +122,8 @@ function ThemesList() {
               py: 1,
               px: 2,
               flexShrink: 0,
-              bg: filters.includes(filter.id) ? "shade" : "transparent",
-              color: filters.includes(filter.id) ? "accent" : "paragraph"
+              bg: colorSchemes.includes(filter.id) ? "shade" : "transparent",
+              color: colorSchemes.includes(filter.id) ? "accent" : "paragraph"
             }}
           >
             {filter.title}
@@ -128,14 +138,34 @@ function ThemesList() {
           .map((theme) => (
             <Flex
               key={theme.id}
-              sx={{ flexDirection: "column", flex: 1, cursor: "pointer" }}
+              sx={{
+                flexDirection: "column",
+                flex: 1,
+                cursor: "pointer",
+                p: 2,
+                border: "1px solid transparent",
+                borderRadius: "default",
+                ":hover": {
+                  bg: "background-secondary",
+                  border: "1px solid var(--border)"
+                }
+              }}
+              onClick={async () => {
+                const fullTheme = await themesRouter.installTheme.query({
+                  id: theme.id,
+                  compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+                  userId: user?.id
+                });
+                if (!fullTheme) return;
+                setCurrentTheme(fullTheme);
+              }}
             >
               <Flex
                 sx={{
                   position: "relative",
                   flexDirection: "column",
                   height: 200,
-                  borderRadius: 10,
+                  borderRadius: "default",
                   overflow: "hidden",
                   bg: alpha(theme.previewColors.accent, 0.2),
                   //m: 2,

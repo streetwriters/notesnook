@@ -99,16 +99,16 @@ export type TiptapOptions = EditorOptions &
     downloadOptions?: DownloadOptions;
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
+  } & {
+    theme: ThemeDefinition;
   };
 
 const useTiptap = (
-  options: Partial<TiptapOptions> & {
-    theme: ThemeDefinition;
-  } = { theme: ThemeLight },
+  options: Partial<TiptapOptions>,
   deps: React.DependencyList = []
 ) => {
   const {
-    theme,
+    theme = ThemeLight,
     doubleSpacedLines = true,
     isMobile,
     onDownloadAttachment,

@@ -339,8 +339,8 @@ const themes = [
 ];
 
 function ThemeSelector() {
-  const currentTheme = useThemeStore((store) => store.theme);
-  const setTheme = useThemeStore((store) => store.setTheme);
+  const currentTheme = useThemeStore((store) => store.colorScheme);
+  const setTheme = useThemeStore((store) => store.setColorScheme);
 
   return (
     <Flex

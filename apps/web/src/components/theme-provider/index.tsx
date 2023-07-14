@@ -19,13 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   ThemeProvider,
-  ThemeLight,
   EmotionThemeProvider,
   themeToCSS
 } from "@notesnook/theme";
 import { PropsWithChildren, useMemo } from "react";
 import { BoxProps } from "@theme-ui/components";
 import { Global, css } from "@emotion/react";
+import { useStore as useThemeStore } from "../../stores/theme-store";
 
 export function BaseThemeProvider(
   props: PropsWithChildren<
@@ -36,9 +36,9 @@ export function BaseThemeProvider(
   >
 ) {
   const { children, addGlobalStyles = false, ...restProps } = props;
-  //  const [theme, setTheme] = useTheme();
-  const theme = ThemeLight;
-  const setTheme = () => {};
+
+  const theme = useThemeStore((store) => store.theme);
+  const setTheme = useThemeStore((store) => store.setTheme);
   const cssTheme = useMemo(() => themeToCSS(theme), [theme]);
 
   return (

@@ -54,7 +54,7 @@ type DialogProps = SxProp & {
 };
 
 function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
-  const theme = useThemeStore((store) => store.theme);
+  const theme = useThemeStore((store) => store.colorScheme);
 
   return (
     <ReactModal

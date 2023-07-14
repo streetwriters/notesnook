@@ -120,8 +120,8 @@ function NavigationMenu(props: NavigationMenuProps) {
   const refreshNavItems = useAppStore((store) => store.refreshNavItems);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const isMobile = useMobile();
-  const theme = useThemeStore((store) => store.theme);
-  const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
+  const theme = useThemeStore((store) => store.colorScheme);
+  const toggleNightMode = useThemeStore((store) => store.toggleColorScheme);
   const setFollowSystemTheme = useThemeStore(
     (store) => store.setFollowSystemTheme
   );

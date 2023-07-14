@@ -52,7 +52,7 @@ export function PdfPreview(props: PdfPreviewProps) {
   const searchPluginInstance = searchPlugin();
   const { ShowSearchPopover } = searchPluginInstance;
 
-  const theme = useThemeStore((state) => state.theme);
+  const theme = useThemeStore((state) => state.colorScheme);
 
   return (
     <Worker workerUrl="/pdf.worker.min.js">

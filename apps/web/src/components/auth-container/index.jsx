@@ -77,7 +77,7 @@ function randomTitle() {
 }
 
 function AuthContainer(props) {
-  const theme = useThemeStore((store) => store.theme);
+  const theme = useThemeStore((store) => store.colorScheme);
   const testimonial = useMemo(() => randomTestimonial(), []);
   const title = useMemo(() => randomTitle(), []);
 

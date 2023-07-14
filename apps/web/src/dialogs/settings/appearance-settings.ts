@@ -37,7 +37,7 @@ export const AppearanceSettings: SettingsGroup[] = [
         isHidden: () => !isDesktop(),
         onStateChange: (listener) =>
           useThemeStore.subscribe(
-            (s) => [s.theme, s.followSystemTheme],
+            (s) => [s.colorScheme, s.followSystemTheme],
             listener
           ),
         components: [

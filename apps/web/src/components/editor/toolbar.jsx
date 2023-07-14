@@ -59,8 +59,8 @@ function Toolbar() {
   const editorMargins = useStore((store) => store.editorMargins);
   const clearSession = useStore((store) => store.clearSession);
   const title = useStore((store) => store.session.title);
-  const theme = useThemeStore((store) => store.theme);
-  const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
+  const theme = useThemeStore((store) => store.colorScheme);
+  const toggleNightMode = useThemeStore((store) => store.toggleColorScheme);
   const [isTitleVisible, setIsTitleVisible] = useState(false);
 
   const monographs = useMonographStore((store) => store.monographs);

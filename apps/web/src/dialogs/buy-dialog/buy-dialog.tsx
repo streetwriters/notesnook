@@ -244,7 +244,7 @@ function Details() {
   const setIsApplyingCoupon = useCheckoutStore(
     (store) => store.setIsApplyingCoupon
   );
-  const theme = useThemeStore((store) => store.theme);
+  const theme = useThemeStore((store) => store.colorScheme);
 
   if (isCheckoutCompleted) return null;
 

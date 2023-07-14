@@ -48,11 +48,11 @@
     <title>Notesnook</title>
 
     <script nonce="7WIq8hRwApoXhctoGZZthMLYQLRNiprTwcPi6Azdf">
-      const theme = JSON.parse(
-        window.localStorage.getItem("theme") || '"light"'
+      const colorScheme = JSON.parse(
+        window.localStorage.getItem("colorScheme") || '"light"'
       );
       const root = document.querySelector("html");
-      if (root) root.setAttribute("data-theme", theme);
+      if (root) root.setAttribute("data-theme", colorScheme);
     </script>
     <script type="module" src="/src/index.tsx"></script>
     <style>

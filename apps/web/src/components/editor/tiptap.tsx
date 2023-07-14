@@ -56,8 +56,8 @@ import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce, debounceWithId } from "@notesnook/common";
 import { store as editorstore } from "../../stores/editor-store";
 import { ScopedThemeProvider } from "../theme-provider";
-import { useTheme } from "../../hooks/use-theme";
 import { writeText } from "clipboard-polyfill";
+import { useStore as useThemeStore } from "../../stores/theme-store";
 
 type OnChangeHandler = (
   id: string | undefined,
@@ -359,7 +359,7 @@ function TiptapWrapper(
     "editorContainer" | "theme" | "fontSize" | "fontFamily"
   >
 ) {
-  const [theme] = useTheme();
+  const theme = useThemeStore((state) => state.theme);
   const [isReady, setIsReady] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const { editorConfig } = useEditorConfig();

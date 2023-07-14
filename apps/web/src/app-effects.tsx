@@ -56,7 +56,7 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
   const initStore = useStore((store) => store.init);
   const initAttachments = useAttachmentStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
-  const setTheme = useThemeStore((store) => store.setTheme);
+  const setTheme = useThemeStore((store) => store.setColorScheme);
   const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
   const initEditorStore = useEditorStore((store) => store.init);
   const dialogAnnouncements = useAnnouncementStore(

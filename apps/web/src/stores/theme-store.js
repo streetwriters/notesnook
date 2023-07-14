@@ -21,6 +21,7 @@ import createStore from "../common/store";
 import BaseStore from "./index";
 import Config from "../utils/config";
 import { desktop } from "../common/desktop-bridge";
+import { ThemeDark, ThemeLight } from "@notesnook/theme";
 
 /**
  * @extends {BaseStore<ThemeStore>}
@@ -29,23 +30,36 @@ class ThemeStore extends BaseStore {
   /**
    * @type {"dark" | "light"}
    */
-  theme = Config.get("theme", "light");
+  colorScheme = Config.get("colorScheme", "light");
+  theme = getTheme(this.colorScheme);
+
   followSystemTheme = Config.get("followSystemTheme", false);
 
+  /**
+   * @param {import("@notesnook/theme").ThemeDefinition} theme
+   */
   setTheme = async (theme) => {
-    if (!this.get().followSystemTheme)
-      await desktop?.integration.changeTheme.mutate(theme);
-    this.set((state) => (state.theme = theme));
-    Config.set("theme", theme);
+    Config.set(`theme:${theme.colorScheme}`, theme);
+    this.set({ theme, colorScheme: theme.colorScheme });
   };
 
-  toggleNightMode = () => {
-    const theme = this.get().theme;
-    this.setTheme(theme === "dark" ? "light" : "dark");
+  setColorScheme = async (colorScheme) => {
+    if (!this.get().followSystemTheme)
+      await desktop?.integration.changeTheme.mutate(colorScheme);
+    this.set({
+      colorScheme,
+      theme: getTheme(colorScheme)
+    });
+    Config.set("colorScheme", colorScheme);
+  };
+
+  toggleColorScheme = () => {
+    const theme = this.get().colorScheme;
+    this.setColorScheme(theme === "dark" ? "light" : "dark");
   };
 
   setFollowSystemTheme = async (followSystemTheme) => {
-    this.set((state) => (state.followSystemTheme = followSystemTheme));
+    this.set({ followSystemTheme });
     Config.set("followSystemTheme", followSystemTheme);
     await desktop?.integration.changeTheme.mutate(
       followSystemTheme ? "system" : "light"
@@ -60,3 +74,9 @@ class ThemeStore extends BaseStore {
 
 const [useStore, store] = createStore(ThemeStore);
 export { useStore, store };
+
+function getTheme(colorScheme) {
+  return colorScheme === "dark"
+    ? Config.get("theme:dark", ThemeDark)
+    : Config.get("theme:light", ThemeLight);
+}
