@@ -18,6 +18,8 @@
   },
   "devDependencies": {
     "@notesnook/theme": "file:../../packages/theme",
+    "@vitejs/plugin-react": "^4.0.3",
+    "react": "17.0.2",
     "vite-node": "^0.33.0"
   }
 }
