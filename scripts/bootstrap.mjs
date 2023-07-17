@@ -24,7 +24,7 @@ import parser from "yargs-parser";
 import glob from "fast-glob";
 import Listr from "listr";
 
-const args = parser(process.argv, { alias: { scope: ["s"] } });
+const args = parser(process.argv, { alias: { scope: ["s"], offline: ["o"] } });
 const IS_CI = process.env.CI;
 const scopes = {
   mobile: "apps/mobile",
@@ -85,9 +85,9 @@ async function bootstrapPackages(dependencies) {
 function bootstrapPackage(cwd, outputs) {
   return new Promise((resolve, reject) =>
     exec(
-      `npm ${
-        IS_CI ? "ci" : "i"
-      } --legacy-peer-deps --no-audit --no-fund --prefer-offline --progress=false`,
+      `npm ${IS_CI ? "ci" : "i"} --legacy-peer-deps --no-audit --no-fund ${
+        args.offline ? "--offline" : "--prefer-offline"
+      } --progress=false`,
       {
         cwd,
         env: process.env,
