@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilReq.java b/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilReq.java
-index 9aee829..87124b3 100644
+index 9aee829..0ecc59b 100644
 --- a/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilReq.java
 +++ b/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilReq.java
 @@ -634,7 +634,9 @@ public class ReactNativeBlobUtilReq extends BroadcastReceiver implements Runnabl
@@ -86,7 +86,7 @@ index 9aee829..87124b3 100644
                  break;
          }
 diff --git a/node_modules/react-native-blob-util/fetch.js b/node_modules/react-native-blob-util/fetch.js
-index 97e5263..45c086c 100644
+index 97e5263..640aaea 100644
 --- a/node_modules/react-native-blob-util/fetch.js
 +++ b/node_modules/react-native-blob-util/fetch.js
 @@ -244,7 +244,7 @@ export function fetch(...args: any): Promise {
@@ -108,14 +108,38 @@ index 97e5263..45c086c 100644
                  resolve(new FetchBlobResponse(taskId, respInfo, data));
              }
  
+diff --git a/node_modules/react-native-blob-util/index.js b/node_modules/react-native-blob-util/index.js
+index ecaddf9..40a5c37 100644
+--- a/node_modules/react-native-blob-util/index.js
++++ b/node_modules/react-native-blob-util/index.js
+@@ -14,6 +14,7 @@ import ios from './ios';
+ import JSONStream from './json-stream';
+ import {config, fetch} from './fetch';
+ import URIUtil from './utils/uri';
++import getUUID from "./utils/uuid";
+ import CanceledFetchError from './class/ReactNativeBlobUtilCanceledFetchError';
+ 
+ const {
+@@ -45,9 +46,9 @@ if (!ReactNativeBlobUtil || !ReactNativeBlobUtil.fetchBlobForm || !ReactNativeBl
+ }
+ 
+ export {ReactNativeBlobUtilConfig, ReactNativeBlobUtilResponseInfo, ReactNativeBlobUtilStream} from './types';
+-export { URIUtil } from './utils/uri';
++export { URIUtil, getUUID };
+ export {FetchBlobResponse} from './class/ReactNativeBlobUtilBlobResponse';
+-export { getUUID } from './utils/uuid';
++
+ export default {
+     fetch,
+     base64,
 diff --git a/node_modules/react-native-blob-util/ios/ReactNativeBlobUtilRequest.mm b/node_modules/react-native-blob-util/ios/ReactNativeBlobUtilRequest.mm
-index d4e468a..25b8d81 100644
+index d4e468a..ac9e42a 100644
 --- a/node_modules/react-native-blob-util/ios/ReactNativeBlobUtilRequest.mm
 +++ b/node_modules/react-native-blob-util/ios/ReactNativeBlobUtilRequest.mm
 @@ -438,13 +438,20 @@ - (void) URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCom
          }
      }
-     
+ 
 +    NSHTTPURLResponse *response = (NSHTTPURLResponse *) [task response];
 +    
  
@@ -128,7 +152,7 @@ index d4e468a..25b8d81 100644
 +                     @"status": [NSNumber numberWithInteger:[response statusCode]]
 +                 }
                 ]);
-     
+ 
 +    
 +
      respData = nil;

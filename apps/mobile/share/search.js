@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { FlashList } from "@shopify/flash-list";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, FlatList } from "react";
 import {
   Platform,
   StatusBar,
@@ -132,10 +131,7 @@ const ListItem = ({ item, mode, close }) => {
             numberOfLines={1}
             style={{
               color: colors.pri,
-              fontFamily:
-                item.type === "topic"
-                  ? "OpenSans-Regular"
-                  : "OpenSans-SemiBold",
+              fontWeight: item.type === "topic" ? "normal" : "bold",
               fontSize: 15
             }}
           >
@@ -292,7 +288,6 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
           placeholderTextColor={colors.placeholder}
           style={{
             fontSize: 15,
-            fontFamily: "OpenSans-Regular",
             flex: 1
           }}
           onChangeText={(value) => {
@@ -315,12 +310,11 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
           height: searchHeight > 550 ? 550 : searchHeight
         }}
       >
-        <FlashList
+        <FlatList
           data={searchResults}
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="none"
           renderItem={renderItem}
-          estimatedItemSize={50}
           ListHeaderComponent={
             mode === "selectTags" &&
             (searchResults.length === 0 ||
@@ -351,7 +345,6 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
             >
               <Text
                 style={{
-                  fontFamily: "OpenSans-Regular",
                   color: colors.icon
                 }}
               >

@@ -26,7 +26,7 @@ react {
     // nodeExecutableAndArgs = ["node"]
     //
     //   The command to run when bundling. By default is 'bundle'
-    bundleCommand = "webpack-bundle"
+    bundleCommand = "bundle"
     //
     //   The path to the CLI configuration file. Default is empty.
     // bundleConfig = file(../rn-cli.config.js)

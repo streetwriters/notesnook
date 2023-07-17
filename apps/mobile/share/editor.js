@@ -17,46 +17,58 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React, {
-  useRef,
-  useState,
-  useMemo,
   useCallback,
   useEffect,
-  useLayoutEffect
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
 } from "react";
-import { WebView } from "react-native-webview";
-import { EDITOR_URI } from "../app/screens/editor/source";
 import { Linking, Platform, View } from "react-native";
-import { EditorEvents, post } from "../app/screens/editor/tiptap/utils";
+import { WebView } from "react-native-webview";
 import Commands from "../app/screens/editor/tiptap/commands";
-import { useShareStore } from "./store";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../app/services/event-manager";
 import { eOnLoadNote } from "../app/utils/events";
-import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
-import { useSettingStore } from "../app/stores/use-setting-store";
-import { EventTypes } from "../app/screens/editor/tiptap/editor-events";
+import { useShareStore } from "./store";
+
+const EditorMobileSourceUrl =
+  Platform.OS === "android"
+    ? "file:///android_asset/index.html"
+    : "extension.bundle/plaineditor.html";
+/**
+ * Replace this with dev url when debugging or working on the editor mobile repo.
+ * The url should be something like this: http://192.168.100.126:3000/index.html
+ */
+export const EDITOR_URI = __DEV__
+  ? EditorMobileSourceUrl
+  : EditorMobileSourceUrl;
+
+export async function post(ref, type, value = null) {
+  const message = {
+    type,
+    value
+  };
+  setImmediate(() => ref.current?.postMessage(JSON.stringify(message)));
+}
 
 const useEditor = () => {
   const ref = useRef();
-  const [sessionId] = useState("share-editor-session" + Date.now());
   const colors = useShareStore((state) => state.colors);
   const accent = useShareStore((state) => state.accent);
   const commands = useMemo(() => new Commands(ref), [ref]);
   const currentNote = useRef();
-  const doubleSpacedLines = useSettingStore(
-    (state) => state.settings?.doubleSpacedLines
-  );
+
   const postMessage = useCallback(
-    async (type, data) => post(ref, sessionId, type, data),
-    [sessionId]
+    async (type, data) => post(ref, type, data),
+    []
   );
 
   const loadNote = useCallback(
     (note) => {
-      postMessage(EditorEvents.html, note.content.data);
+      postMessage("html", note.content.data);
       currentNote.current = note;
     },
     [postMessage]
@@ -70,57 +82,41 @@ const useEditor = () => {
   }, [loadNote]);
 
   const onLoad = () => {
-    postMessage(EditorEvents.theme, { ...colors, accent });
-    commands.setInsets({ top: 0, left: 0, right: 0, bottom: 0 });
-    commands.setSettings({
-      deviceMode: "mobile",
-      fullscreen: false,
-      premium: false,
-      readonly: false,
-      tools: getDefaultPresets().default,
-      noHeader: true,
-      noToolbar: true,
-      keyboardShown: false,
-      doubleSpacedLines: doubleSpacedLines
-    });
+    setTimeout(() => {
+      postMessage(
+        "theme",
+        `
+          body * {
+            color: ${colors.pri};
+          }
+  
+          h1,
+          h2,
+          h3,
+          h4,
+          h5,
+          h6 {
+            color: ${colors.heading};
+          }
+  
+          a {
+            color: ${accent};
+          }
+        `
+      );
+    }, 300);
   };
 
-  return { ref, onLoad, sessionId, currentNote, commands };
+  return { ref, onLoad, currentNote, commands };
 };
 
 const useEditorEvents = (editor, onChange) => {
-  const doubleSpacedLines = useSettingStore(
-    (state) => state.settings?.doubleSpacedLines
-  );
-  useEffect(() => {
-    editor.commands.setSettings({
-      deviceMode: "mobile",
-      fullscreen: false,
-      premium: false,
-      readonly: false,
-      tools: getDefaultPresets().default,
-      noHeader: true,
-      noToolbar: true,
-      keyboardShown: false,
-      doubleSpacedLines: doubleSpacedLines
-    });
-  }, [editor, doubleSpacedLines]);
-
   const onMessage = (event) => {
     const data = event.nativeEvent.data;
     const editorMessage = JSON.parse(data);
-    if (
-      editorMessage.sessionId !== editor.sessionId &&
-      editorMessage.type !== EditorEvents.status
-    ) {
-      return;
-    }
 
     switch (editorMessage.type) {
-      case EventTypes.logger:
-        console.log("[WEBVIEW LOG]", editorMessage.value);
-        break;
-      case EventTypes.content:
+      case "content":
         console.log("[WEBVIEW LOG]", "EditorTypes.content");
         onChange(editorMessage.value);
         break;
@@ -173,12 +169,6 @@ export const Editor = ({ onChange, onLoad }) => {
         ref={editor.ref}
         onLoad={editor.onLoad}
         nestedScrollEnabled
-        injectedJavaScriptBeforeContentLoaded={`
-  globalThis.readonly=${false};
-  globalThis.noToolbar=${true};
-  globalThis.noHeader=${true};
-  `}
-        injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
         javaScriptEnabled={true}
         focusable={true}
         setSupportMultipleWindows={false}

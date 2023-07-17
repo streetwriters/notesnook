@@ -21,7 +21,7 @@ import { db } from "../../../common/database";
 import { ToastEvent } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { MenuItemsList } from "../../../utils/constants";
+import { MenuItemsList } from "../../../utils/menu-items";
 import { createSettingsPicker } from ".";
 import { getFontById, getFonts } from "@notesnook/editor/dist/utils/font";
 import { DATE_FORMATS, TIME_FORMATS } from "@notesnook/core/common";

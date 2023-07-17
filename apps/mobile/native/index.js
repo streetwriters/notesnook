@@ -51,6 +51,8 @@ const ShareProvider = () => {
   );
 };
 
+
+
 AppRegistry.registerComponent('NotesnookShare', () => ShareProvider);
 
 const QuickNoteProvider = () => {
