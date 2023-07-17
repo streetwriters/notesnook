@@ -107,22 +107,27 @@ function bootstrapPackage(cwd, outputs) {
 }
 
 async function findDependencies(scope) {
-  const packageJsonPath = path.join(scope, "package.json");
-  const packageJson = JSON.parse(await readFile(packageJsonPath, "utf-8"));
+  try {
+    const packageJsonPath = path.join(scope, "package.json");
+    const packageJson = JSON.parse(await readFile(packageJsonPath, "utf-8"));
 
-  const dependencies = new Set([
-    ...filterDependencies(scope, packageJson.dependencies),
-    ...filterDependencies(scope, packageJson.devDependencies),
-    ...filterDependencies(scope, packageJson.optionalDependencies),
-    ...filterDependencies(scope, packageJson.peerDependencies)
-  ]);
+    const dependencies = new Set([
+      ...filterDependencies(scope, packageJson.dependencies),
+      ...filterDependencies(scope, packageJson.devDependencies),
+      ...filterDependencies(scope, packageJson.optionalDependencies),
+      ...filterDependencies(scope, packageJson.peerDependencies)
+    ]);
 
-  for (const dependency of dependencies) {
-    (await findDependencies(dependency)).forEach((v) => dependencies.add(v));
+    for (const dependency of dependencies) {
+      (await findDependencies(dependency)).forEach((v) => dependencies.add(v));
+    }
+
+    dependencies.add(path.resolve(scope));
+    return Array.from(dependencies.values());
+  } catch (e) {
+    console.error("Failed to bootstrap", scope, "Error:", e);
+    return [];
   }
-
-  dependencies.add(path.resolve(scope));
-  return Array.from(dependencies.values());
 }
 
 function filterDependencies(basePath, dependencies) {
