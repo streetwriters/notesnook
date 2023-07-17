@@ -21,7 +21,12 @@ import createStore from "../common/store";
 import BaseStore from "./index";
 import Config from "../utils/config";
 import { desktop } from "../common/desktop-bridge";
-import { ThemeDark, ThemeLight } from "@notesnook/theme";
+import {
+  THEME_COMPATIBILITY_VERSION,
+  ThemeDark,
+  ThemeLight
+} from "@notesnook/theme";
+import { ThemesRouter } from "../common/themes-router";
 
 /**
  * @extends {BaseStore<ThemeStore>}
@@ -35,6 +40,13 @@ class ThemeStore extends BaseStore {
 
   followSystemTheme = Config.get("followSystemTheme", false);
 
+  init = async () => {
+    const { theme, colorScheme } = this.get();
+    this.set({
+      theme: await updateTheme(theme.id, theme.version, colorScheme)
+    });
+  };
+
   /**
    * @param {import("@notesnook/theme").ThemeDefinition} theme
    */
@@ -46,11 +58,16 @@ class ThemeStore extends BaseStore {
   setColorScheme = async (colorScheme) => {
     if (!this.get().followSystemTheme)
       await desktop?.integration.changeTheme.mutate(colorScheme);
+    const theme = getTheme(colorScheme);
     this.set({
       colorScheme,
-      theme: getTheme(colorScheme)
+      theme
     });
     Config.set("colorScheme", colorScheme);
+
+    updateTheme(theme.id, theme.version, colorScheme).then((theme) =>
+      this.set({ theme })
+    );
   };
 
   toggleColorScheme = () => {
@@ -79,4 +96,19 @@ function getTheme(colorScheme) {
   return colorScheme === "dark"
     ? Config.get("theme:dark", ThemeDark)
     : Config.get("theme:light", ThemeLight);
+}
+
+async function updateTheme(id, version, colorScheme) {
+  try {
+    const theme = await ThemesRouter.updateTheme.query({
+      compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+      id,
+      version
+    });
+    console.log("UPDATED!", theme);
+    if (!theme) return getTheme(colorScheme);
+    return theme;
+  } catch (e) {
+    return getTheme(colorScheme);
+  }
 }

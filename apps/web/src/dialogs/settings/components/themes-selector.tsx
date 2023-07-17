@@ -16,39 +16,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import type { ThemesRouter } from "@notesnook/themes-server";
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
-import { createTRPCReact } from "@trpc/react-query";
+import { httpBatchLink } from "@trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
-import { VirtuosoGrid } from "react-virtuoso";
-import { alpha, mix, shade } from "@theme-ui/color";
+import { alpha } from "@theme-ui/color";
 import {
   Circle,
-  Monographs,
   Notebook,
   Notes,
   Plus,
-  Reminders,
   StarOutline,
-  Tag,
-  Trash
+  Tag
 } from "../../../components/icons";
 import { THEME_COMPATIBILITY_VERSION } from "@notesnook/theme";
 import { debounce } from "@notesnook/common";
 import { useStore as useThemeStore } from "../../../stores/theme-store";
 import { useStore as useUserStore } from "../../../stores/user-store";
+import {
+  ThemesRouter,
+  THEME_SERVER_URL,
+  ThemesTRPC
+} from "../../../common/themes-router";
 
-const THEME_SERVER_URL = "http://localhost:9000";
-const themesRouter = createTRPCProxyClient<ThemesRouter>({
-  links: [
-    httpBatchLink({
-      url: THEME_SERVER_URL
-    })
-  ]
-});
-const ThemesTRPC = createTRPCReact<ThemesRouter>();
 const ThemesClient = ThemesTRPC.createClient({
   links: [
     httpBatchLink({
@@ -151,7 +141,7 @@ function ThemesList() {
                 }
               }}
               onClick={async () => {
-                const fullTheme = await themesRouter.installTheme.query({
+                const fullTheme = await ThemesRouter.installTheme.query({
                   id: theme.id,
                   compatibilityVersion: THEME_COMPATIBILITY_VERSION,
                   userId: user?.id
@@ -298,7 +288,7 @@ function ThemesList() {
               <Text variant="title" sx={{ mt: 1 }}>
                 {theme.name}
               </Text>
-              <Text variant="body">{theme.author}</Text>
+              <Text variant="body">{theme.authors[0].name}</Text>
             </Flex>
           ))}
       </Box>

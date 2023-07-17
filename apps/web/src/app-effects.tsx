@@ -98,6 +98,7 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
         await showOnboardingDialog(interruptedOnboarding());
         await showFeatureDialog("highlights");
         await scheduleBackups();
+        await useThemeStore.getState().init();
       })();
 
       return () => {
