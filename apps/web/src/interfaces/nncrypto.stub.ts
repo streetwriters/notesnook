@@ -22,9 +22,10 @@ import CryptoWorker from "@notesnook/crypto-worker/dist/src/worker.js?worker";
 
 async function loadNNCrypto() {
   const hasWorker = "Worker" in window || "Worker" in global;
-  if (IS_DESKTOP_APP && window.NativeNNCrypto) {
-    return window.NativeNNCrypto;
-  } else if (hasWorker) {
+  // if (IS_DESKTOP_APP && window.NativeNNCrypto) {
+  //   return window.NativeNNCrypto;
+  // } else
+  if (hasWorker) {
     const { NNCryptoWorker } = await import("@notesnook/crypto-worker");
     return NNCryptoWorker;
   } else {
