@@ -108,7 +108,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
-          path: ./apps/desktop/build
+          path: ./apps/web/build
 
       - name: Install packages
         run: |
@@ -183,7 +183,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
-          path: ./apps/desktop/build
+          path: ./apps/web/build
 
       - name: Install packages
         run: |
@@ -233,7 +233,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
-          path: ./apps/desktop/build
+          path: ./apps/web/build
 
       - name: Install packages
         run: |
