@@ -20,10 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { exec } from "child_process";
 import { readFile } from "fs/promises";
 import path from "path";
+import os from "os";
 import parser from "yargs-parser";
 import glob from "fast-glob";
 import Listr from "listr";
 
+const THREADS = Math.min(4, process.env.THREADS || os.cpus().length / 2);
 const args = parser(process.argv, { alias: { scope: ["s"], offline: ["o"] } });
 const IS_CI = process.env.CI;
 const scopes = {
@@ -63,9 +65,13 @@ if (IS_BOOTSTRAP_ALL) {
 
 async function bootstrapPackages(dependencies) {
   console.log("> Found", dependencies.length, "dependencies to bootstrap.");
+  console.log("> Using", THREADS, "threads.");
 
   const outputs = { stdout: [], stderr: [] };
-  const tasks = new Listr({ concurrent: 4, exitOnError: false });
+  const tasks = new Listr({
+    concurrent: THREADS,
+    exitOnError: false
+  });
   for (const dependency of dependencies) {
     tasks.add({
       task: () => bootstrapPackage(dependency, outputs),
