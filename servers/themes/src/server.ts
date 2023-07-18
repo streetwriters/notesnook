@@ -20,8 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import { ThemesAPI } from "./api";
 import { syncThemes } from "./sync";
+import cors from "cors";
 
 const server = createHTTPServer({
+  middleware: cors(),
   router: ThemesAPI
 });
 const PORT = parseInt(process.env.PORT || "9000");

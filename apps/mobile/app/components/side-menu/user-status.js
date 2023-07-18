@@ -98,7 +98,10 @@ export const UserStatus = () => {
                 <>
                   Synced{" "}
                   <TimeSince
-                    style={{ fontSize: SIZE.xs, color: colors.secondary.paragraph }}
+                    style={{
+                      fontSize: SIZE.xs,
+                      color: colors.secondary.paragraph
+                    }}
                     time={lastSynced}
                     bold={true}
                   />
@@ -114,7 +117,7 @@ export const UserStatus = () => {
                   !user || lastSyncStatus === SyncStatus.Failed
                     ? colors.error.icon
                     : isOffline
-                    ? colors.warning.icon
+                    ? colors.static.orange
                     : colors.success.icon
                 }
               />
@@ -142,7 +145,11 @@ export const UserStatus = () => {
             syncing ? (
               <ActivityIndicator color={colors.primary.accent} size={SIZE.xl} />
             ) : lastSyncStatus === SyncStatus.Failed ? (
-              <Icon color={colors.error.icon} name="sync-alert" size={SIZE.lg} />
+              <Icon
+                color={colors.error.icon}
+                name="sync-alert"
+                size={SIZE.lg}
+              />
             ) : (
               <Icon color={colors.primary.accent} name="sync" size={SIZE.lg} />
             )

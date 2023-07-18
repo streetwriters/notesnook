@@ -29,9 +29,11 @@ import {
 import { colorsToCss } from "../theme/transformer";
 import _ThemeLight from "./themes/default-light.json";
 import _ThemeDark from "./themes/default-dark.json";
+import _ThemePitchBlack from "./themes/default-pitch-black.json";
 
 const ThemeLight = _ThemeLight as ThemeDefinition;
 const ThemeDark = _ThemeDark as ThemeDefinition;
+const ThemePitchBlack = _ThemePitchBlack as ThemeDefinition;
 
 type ThemeScope = {
   colors: VariantsWithStaticColors<true>;
@@ -115,7 +117,7 @@ export const useCurrentThemeScope = () => useContext(ThemeScopeContext);
 export const ThemeProvider = ThemeContext.Provider;
 export const ScopedThemeProvider = ThemeScopeContext.Provider;
 export const THEME_COMPATIBILITY_VERSION: ThemeCompatibilityVersion = 1;
-export { ThemeLight, ThemeDark };
+export { ThemeLight, ThemeDark, ThemePitchBlack };
 
 function buildVariants(
   scope: keyof ThemeScopes,

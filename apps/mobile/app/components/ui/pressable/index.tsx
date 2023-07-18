@@ -133,9 +133,9 @@ export const useButton = ({
       selected: colors.error.background
     },
     warn: {
-      primary: colors.warning.background,
-      text: colors.warning.paragraph,
-      selected: colors.warning.background
+      primary: colors.static.orange,
+      text: colors.static.white,
+      selected: colors.static.orange
     }
   };
 

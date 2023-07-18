@@ -24,17 +24,17 @@
   },
   "devDependencies": {
     "otplib": "12.0.1",
-    "react-refresh": "0.14.0",
-    "patch-package": "7.0.0"
+    "patch-package": "7.0.0",
+    "react-refresh": "0.14.0"
   },
   "dependencies": {
-    "react": "18.2.0",
-    "react-native": "0.72.0",
+    "@notesnook/common": "file:../../packages/common",
     "@notesnook/core": "file:../../packages/core",
     "@notesnook/editor": "file:../../packages/editor",
     "@notesnook/editor-mobile": "file:../../packages/editor-mobile",
     "@notesnook/logger": "file:../../packages/logger",
-    "@notesnook/common": "file:../../packages/common",
-    "@notesnook/themes-server": "file:../../servers/themes"
+    "@notesnook/themes-server": "file:../../servers/themes",
+    "react": "18.2.0",
+    "react-native": "0.72.0"
   }
 }

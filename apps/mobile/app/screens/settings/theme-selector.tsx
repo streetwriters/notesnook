@@ -16,23 +16,37 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { ThemeDefinition, useThemeColors } from "@notesnook/theme";
-import type { ThemesRouter } from "@notesnook/themes-server";
+import { THEME_COMPATIBILITY_VERSION, useThemeColors } from "@notesnook/theme";
+import type {
+  CompiledThemeDefinition,
+  ThemeMetadata,
+  ThemesRouter
+} from "@notesnook/themes-server";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { MasonryFlashList } from "@shopify/flash-list";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import React, { useState } from "react";
-import { ActivityIndicator, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Linking,
+  TouchableOpacity,
+  View
+} from "react-native";
+import { db } from "../../common/database";
 import SheetProvider from "../../components/sheet-provider";
 import { Button } from "../../components/ui/button";
+import Input from "../../components/ui/input";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { ToastEvent, presentSheet } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
-import { MasonryFlashList } from "@shopify/flash-list";
-import Input from "../../components/ui/input";
-const THEME_SERVER_URL = "http://192.168.43.127:1000";
+import { getElevationStyle } from "../../utils/elevation";
+import { MenuItemsList } from "../../utils/constants";
+
+const THEME_SERVER_URL = "http://192.168.43.127:9000";
 //@ts-ignore
 export const themeTrpcClient = createTRPCProxyClient<ThemesRouter>({
   links: [
@@ -44,35 +58,44 @@ export const themeTrpcClient = createTRPCProxyClient<ThemesRouter>({
 
 function ThemeSelector() {
   const { colors } = useThemeColors();
+  const themeColors = colors;
+  const [searchQuery, setSearchQuery] = useState<string>();
+  const [colorScheme, setColorScheme] = useState<string>();
   const themes = trpc.themes.useInfiniteQuery(
     {
-      limit: 10
+      limit: 10,
+      compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+      filters: [
+        ...(searchQuery && searchQuery !== ""
+          ? [
+              {
+                type: "term" as const,
+                value: searchQuery
+              }
+            ]
+          : []),
+        ...(colorScheme && colorScheme !== ""
+          ? [
+              {
+                type: "colorScheme" as const,
+                value: colorScheme
+              }
+            ]
+          : [])
+      ]
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor
     }
   );
-  const [searchQuery, setSearchQuery] = useState<string>();
-  const searchResults = trpc.search.useInfiniteQuery(
-    { limit: 10, query: searchQuery || "" },
-    {
-      enabled: false,
-      getNextPageParam: (lastPage) => lastPage.nextCursor
-    }
-  );
 
-  const select = (item: Partial<ThemeDefinition>) => {
+  const select = (item: Partial<ThemeMetadata>) => {
     presentSheet({
       context: item.id,
       component: (ref, close) => <ThemeSetter close={close} theme={item} />
     });
   };
-  const renderItem = ({
-    item
-  }: {
-    item: Omit<ThemeDefinition, "scopes" | "codeBlockCss">;
-    index: number;
-  }) => {
+  const renderItem = ({ item }: { item: ThemeMetadata; index: number }) => {
     const colors = item.previewColors;
 
     return (
@@ -81,77 +104,150 @@ function ThemeSelector() {
         <TouchableOpacity
           activeOpacity={0.9}
           style={{
-            backgroundColor: colors?.background,
             borderRadius: 10,
-            padding: 12,
+            padding: 6,
             marginBottom: 10,
-            flexShrink: 1,
-            borderWidth: 1,
-            borderColor: colors?.accent,
-            marginHorizontal: 5
+            flexShrink: 1
           }}
           onPress={() => select(item)}
         >
           <View
             style={{
-              backgroundColor: colors?.accent,
-              height: 40,
+              backgroundColor: colors?.background,
+              height: 200,
               width: "100%",
-              borderRadius: 10
-            }}
-          />
-          <View
-            style={{
+              borderRadius: 10,
+              marginBottom: 10,
+              overflow: "hidden",
               flexDirection: "row",
-              marginTop: 6
+              justifyContent: "space-between",
+              ...getElevationStyle(3)
             }}
           >
             <View
               style={{
-                flex: 1,
-                backgroundColor: colors?.shade,
-                height: 40,
-                borderRadius: 10,
-                marginRight: 6
+                height: "100%",
+                width: "49.5%",
+                backgroundColor: colors.navigationMenu.background,
+                padding: 5,
+                paddingVertical: 3,
+                borderRadius: 5
               }}
-            />
+            >
+              {MenuItemsList.map((item, index) => (
+                <View
+                  key={item.name}
+                  style={{
+                    height: 12,
+                    width: "100%",
+                    backgroundColor:
+                      index === 0
+                        ? colors.navigationMenu.accent + 40
+                        : colors.navigationMenu.background,
+                    borderRadius: 2,
+                    paddingHorizontal: 3,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 4
+                  }}
+                >
+                  <Icon
+                    size={8}
+                    name={item.icon}
+                    color={
+                      index === 0
+                        ? colors.navigationMenu.accent
+                        : colors.navigationMenu.icon
+                    }
+                  />
+
+                  <View
+                    style={{
+                      height: 3,
+                      width: "40%",
+                      backgroundColor:
+                        index === 0
+                          ? colors.navigationMenu.accent
+                          : colors.paragraph,
+                      borderRadius: 2,
+                      marginLeft: 3
+                    }}
+                  ></View>
+                </View>
+              ))}
+            </View>
 
             <View
               style={{
-                flex: 1,
-                backgroundColor: colors?.secondaryBackground,
-                height: 40,
-                borderRadius: 10
+                height: "100%",
+                width: "49.5%",
+                backgroundColor: colors.list.background,
+                borderRadius: 5,
+                paddingHorizontal: 2,
+                paddingRight: 6
               }}
-            />
+            >
+              <View
+                style={{
+                  height: 12,
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginTop: 3
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center"
+                  }}
+                >
+                  <Icon size={8} color={colors.list.heading} name="menu" />
+                  <Heading
+                    style={{
+                      marginLeft: 3
+                    }}
+                    color={colors.list.heading}
+                    size={7}
+                  >
+                    Notes
+                  </Heading>
+                </View>
+
+                <Icon name="magnify" color={colors.list.heading} size={7} />
+              </View>
+            </View>
           </View>
-          <Heading size={SIZE.md} color={colors?.heading}>
+
+          <Heading size={SIZE.md} color={themeColors.primary.heading}>
             {item.name}
           </Heading>
-          <Paragraph color={colors?.paragraph}>{item.description}</Paragraph>
-
-          <Paragraph size={SIZE.xs} color={colors?.paragraph}>
-            By {item.author}
+          {/* <Paragraph color={themeColors.primary?.paragraph}>
+            {item.description}
+          </Paragraph> */}
+          <Paragraph size={SIZE.xs} color={themeColors.secondary?.paragraph}>
+            By {item.authors?.[0].name}
           </Paragraph>
         </TouchableOpacity>
       </>
     );
   };
   let resetTimer: NodeJS.Timeout;
-  let refetchTimer: NodeJS.Timeout;
+  //let refetchTimer: NodeJS.Timeout;
   const onSearch = (text: string) => {
     clearTimeout(resetTimer as NodeJS.Timeout);
     resetTimer = setTimeout(() => {
       setSearchQuery(text);
-      clearTimeout(refetchTimer);
-      refetchTimer = setTimeout(() => {
-        searchResults.refetch();
-      }, 300);
-    }, 500);
+      // clearTimeout(refetchTimer);
+      // refetchTimer = setTimeout(() => {
+      //   themes.refetch();
+      // }, 300);
+    }, 400);
   };
 
-  function getThemes() {
-    const pages = searchQuery ? searchResults.data?.pages : themes.data?.pages;
+  function getThemes(): ThemeMetadata[] {
+    const pages = themes.data?.pages;
     return (
       pages
         ?.map((page) => {
@@ -170,10 +266,46 @@ function ThemeSelector() {
     >
       <View
         style={{
-          paddingHorizontal: 4
+          paddingHorizontal: 4,
+          marginBottom: 12
         }}
       >
         <Input onChangeText={onSearch} placeholder="Search themes" />
+
+        <View
+          style={{
+            flexDirection: "row",
+            columnGap: 10
+          }}
+        >
+          <Button
+            height={35}
+            style={{ borderRadius: 100 }}
+            type={colorScheme === "" || !colorScheme ? "accent" : "grayBg"}
+            title="All"
+            onPress={() => {
+              setColorScheme("");
+            }}
+          />
+          <Button
+            style={{ borderRadius: 100 }}
+            height={35}
+            type={colorScheme === "dark" ? "accent" : "grayBg"}
+            title="Dark"
+            onPress={() => {
+              setColorScheme("dark");
+            }}
+          />
+          <Button
+            style={{ borderRadius: 100 }}
+            height={35}
+            type={colorScheme === "light" ? "accent" : "grayBg"}
+            title="Light"
+            onPress={() => {
+              setColorScheme("light");
+            }}
+          />
+        </View>
       </View>
 
       <MasonryFlashList
@@ -188,7 +320,7 @@ function ThemeSelector() {
               alignItems: "center"
             }}
           >
-            {themes.isLoading || searchResults.isLoading ? (
+            {themes.isLoading ? (
               <ActivityIndicator color={colors.primary.accent} />
             ) : searchQuery ? (
               <Paragraph color={colors.secondary.paragraph}>
@@ -203,12 +335,7 @@ function ThemeSelector() {
         renderItem={renderItem}
         onEndReachedThreshold={0.1}
         onEndReached={() => {
-          if (searchQuery) {
-            console.log("fetching next page");
-            searchResults.fetchNextPage();
-          } else {
-            themes.fetchNextPage();
-          }
+          themes.fetchNextPage();
         }}
       />
     </View>
@@ -242,9 +369,11 @@ const ThemeSetter = ({
   theme,
   close
 }: {
-  theme: Partial<ThemeDefinition>;
+  theme: Partial<CompiledThemeDefinition>;
   close?: (ctx?: string) => void;
 }) => {
+  const themeColors = useThemeColors();
+
   const colors = theme?.previewColors;
 
   return (
@@ -256,7 +385,6 @@ const ThemeSetter = ({
       >
         <View
           style={{
-            backgroundColor: colors?.background,
             borderRadius: 10,
             marginBottom: 12,
             padding: 12
@@ -264,47 +392,181 @@ const ThemeSetter = ({
         >
           <View
             style={{
-              backgroundColor: colors?.accent,
-              height: 70,
               width: "100%",
-              borderRadius: 10
-            }}
-          />
-          <View
-            style={{
-              flexDirection: "row",
-              marginTop: 6,
-              marginBottom: 10
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: colors?.accent + "20",
+              padding: 12,
+              borderRadius: 15,
+              marginBottom: 12
             }}
           >
             <View
               style={{
-                flex: 1,
-                backgroundColor: colors?.shade,
-                height: 50,
+                backgroundColor: colors?.background,
+                borderWidth: 0.5,
+                borderColor: colors?.border,
+                height: 200,
+                width: "100%",
                 borderRadius: 10,
-                marginRight: 6
+                marginBottom: 10,
+                overflow: "hidden",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                ...getElevationStyle(3),
+                maxWidth: 200
               }}
-            />
+            >
+              <View
+                style={{
+                  height: "100%",
+                  width: "49.5%",
+                  backgroundColor: colors?.navigationMenu.background,
+                  padding: 5,
+                  paddingVertical: 3,
+                  borderRadius: 5
+                }}
+              >
+                {MenuItemsList.map((item, index) => (
+                  <View
+                    key={item.name}
+                    style={{
+                      height: 12,
+                      width: "100%",
+                      backgroundColor:
+                        index === 0
+                          ? //@ts-ignore
+                            colors?.navigationMenu?.accent + 40
+                          : colors?.navigationMenu.background,
+                      borderRadius: 2,
+                      paddingHorizontal: 3,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginBottom: 4
+                    }}
+                  >
+                    <Icon
+                      size={8}
+                      name={item.icon}
+                      color={
+                        index === 0
+                          ? colors?.navigationMenu.accent
+                          : colors?.navigationMenu.icon
+                      }
+                    />
 
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: colors?.secondaryBackground,
-                height: 50,
-                borderRadius: 10
-              }}
-            />
+                    <View
+                      style={{
+                        height: 3,
+                        width: "40%",
+                        backgroundColor:
+                          index === 0
+                            ? colors?.navigationMenu.accent
+                            : colors?.paragraph,
+                        borderRadius: 2,
+                        marginLeft: 3
+                      }}
+                    ></View>
+                  </View>
+                ))}
+              </View>
+
+              <View
+                style={{
+                  height: "100%",
+                  width: "49.5%",
+                  backgroundColor: colors?.list.background,
+                  borderRadius: 5,
+                  paddingHorizontal: 2,
+                  paddingRight: 6
+                }}
+              >
+                <View
+                  style={{
+                    height: 12,
+                    width: "100%",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: 3
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Icon size={8} color={colors?.list.heading} name="menu" />
+                    <Heading
+                      style={{
+                        marginLeft: 3
+                      }}
+                      color={colors?.list.heading}
+                      size={7}
+                    >
+                      Notes
+                    </Heading>
+                  </View>
+
+                  <Icon name="magnify" color={colors?.list.heading} size={7} />
+                </View>
+              </View>
+            </View>
           </View>
 
-          <Heading size={SIZE.md} color={colors?.heading}>
+          <Heading size={SIZE.md} color={themeColors.colors.primary.heading}>
             {theme.name}
           </Heading>
-          <Paragraph color={colors?.paragraph}>{theme.description}</Paragraph>
-
-          <Paragraph size={SIZE.xs} color={colors?.paragraph}>
-            By {theme.author}
+          <Paragraph color={themeColors.colors.primary.paragraph}>
+            {theme.description}
           </Paragraph>
+
+          <Paragraph
+            size={SIZE.xs}
+            color={themeColors.colors.secondary.paragraph}
+          >
+            By {theme.authors?.[0]?.name}
+          </Paragraph>
+          <View
+            style={{
+              marginTop: 5,
+              flexDirection: "column",
+              rowGap: 3
+            }}
+          >
+            <Paragraph
+              size={SIZE.xs}
+              color={themeColors.colors.secondary.paragraph}
+            >
+              Version {theme.version}
+            </Paragraph>
+
+            <Paragraph
+              size={SIZE.xs}
+              color={themeColors.colors.secondary.paragraph}
+            >
+              {theme.license}
+            </Paragraph>
+
+            {theme.homepage ? (
+              <View
+                style={{
+                  flexDirection: "row"
+                }}
+              >
+                <Paragraph
+                  size={SIZE.xs}
+                  color={themeColors.colors.secondary.accent}
+                  onPress={() => {
+                    Linking.openURL(theme.homepage as string);
+                  }}
+                >
+                  Visit homepage
+                </Paragraph>
+              </View>
+            ) : null}
+          </View>
         </View>
 
         <Button
@@ -315,7 +577,12 @@ const ThemeSetter = ({
           onPress={async () => {
             if (!theme.id) return;
             try {
-              const fullTheme = await themeTrpcClient.getTheme.query(theme.id);
+              const user = await db.user?.getUser();
+              const fullTheme = await themeTrpcClient.installTheme.query({
+                compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+                id: theme.id,
+                userId: user?.id
+              });
               if (!fullTheme) return;
               theme.colorScheme === "dark"
                 ? useThemeStore.getState().setDarkTheme(fullTheme)
@@ -338,7 +605,7 @@ const ThemeSetter = ({
               ? "Set as dark theme"
               : "Set as light theme"
           }
-          type="grayBg"
+          type="grayAccent"
         />
       </View>
     </>

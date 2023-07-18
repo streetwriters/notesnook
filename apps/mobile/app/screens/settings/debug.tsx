@@ -88,14 +88,14 @@ export default function DebugLogs() {
         item.level === LogLevel.Error || item.level === LogLevel.Fatal
           ? hexToRGBA(colors.error.paragraph, 0.2)
           : item.level === LogLevel.Warn
-          ? hexToRGBA(colors.warning.icon, 0.2)
+          ? hexToRGBA(colors.static.orange, 0.2)
           : "transparent";
 
       const color =
         item.level === LogLevel.Error || item.level === LogLevel.Fatal
           ? colors.error.paragraph
           : item.level === LogLevel.Warn
-          ? colors.warning.icon
+          ? colors.static.black
           : colors.primary.paragraph;
 
       return !item ? null : (
@@ -134,7 +134,6 @@ export default function DebugLogs() {
     },
     [
       colors.secondary.background,
-      colors.warning.icon,
       colors.primary.paragraph,
       colors.error.paragraph
     ]
