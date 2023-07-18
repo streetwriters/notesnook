@@ -159,7 +159,6 @@ export function CodeblockComponent(
                 bg: "transparent",
                 ":hover": { bg: "codeSelection" }
               }}
-              disabled={!editor.isEditable}
               onClick={() => {
                 editor.commands.copyToClipboard(node.textContent);
                 start();
