@@ -23,13 +23,14 @@ import {
 } from "@sayem314/react-native-keep-awake";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, StatusBar, View } from "react-native";
+import changeNavigationBarColor from "react-native-navigation-bar-color";
 import {
+  addOrientationListener,
   addSpecificOrientationListener,
   getInitialOrientation,
   getSpecificOrientation,
-  removeSpecificOrientationListener,
-  addOrientationListener,
-  removeOrientationListener
+  removeOrientationListener,
+  removeSpecificOrientationListener
 } from "react-native-orientation";
 import Animated, {
   useAnimatedStyle,
@@ -68,7 +69,6 @@ import {
 import { editorRef, tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
-import changeNavigationBarColor from "react-native-navigation-bar-color";
 
 const _TabsHolder = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -199,11 +199,7 @@ const _TabsHolder = () => {
     toggleView
   ]);
 
-  const _onLayout = async (event) => {
-    if (layoutTimer) {
-      clearTimeout(layoutTimer);
-      layoutTimer = null;
-    }
+  const _onLayout = (event) => {
     let size = event?.nativeEvent?.layout;
     if (!size || (size.width === dimensions.width && deviceMode !== null)) {
       DDS.setSize(size, orientation);
@@ -226,11 +222,13 @@ const _TabsHolder = () => {
       : DDS.isSmallTab
       ? "smallTablet"
       : "mobile";
+
     setDeviceMode(nextDeviceMode, size);
   }
 
   function setDeviceMode(current, size) {
     setDeviceModeState(current);
+
     let needsUpdate = current !== deviceMode;
 
     if (fullscreen && current !== "mobile") {
@@ -289,7 +287,7 @@ const _TabsHolder = () => {
           }
           break;
       }
-    }, 1);
+    }, 1000);
   }
 
   const onScroll = (scrollOffset) => {
