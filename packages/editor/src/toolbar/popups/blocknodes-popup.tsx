@@ -21,14 +21,14 @@ import { showPopup } from "../../components/popup-presenter";
 import { Editor } from "../../types";
 import { MenuItem } from "../../components/menu/types";
 import { getToolbarElement } from "../utils/dom";
-import { getAllTools } from "../tool-definitions";
 
 export const ShowBlockNodesComponent = (props: {
   editor: Editor;
   selectedElement: HTMLElement;
+  items: MenuItem[];
 }) => {
-  const { editor, selectedElement } = props;
-  const items = toMenuItems(editor);
+  const { editor, selectedElement, items } = props;
+  //const items = toMenuItems(editor);
   const toolbarLocation = useToolbarStore.getState().toolbarLocation;
   const isMobile = useToolbarStore.getState().isMobile;
   const isBottom = toolbarLocation === "bottom";
@@ -55,66 +55,8 @@ export const ShowBlockNodesComponent = (props: {
       display: "flex",
       alignItems: isBottom ? "center" : "unset"
     },
-    onFocus: () => {
-      console.log("on foucs");
-    },
-    onBlur: () => {
-      console.log("on bluur");
+    onClose: () => {
+      editor.current?.off("update");
     }
   });
 };
-
-const blocknodes = [
-  { id: "table", title: "Table" },
-  { id: "outline-list", title: "Outline list" },
-  { id: "task-list", title: "Task list" },
-  { id: "bullet-list", title: "Bullet list" },
-  { id: "ordered-list", title: "Ordered list" },
-  { id: "block-quote", title: "Quote" },
-  { id: "code-block", title: "Code block" }
-];
-
-function toMenuItems(editor: Editor): MenuItem[] {
-  const menuItems: MenuItem[] = [];
-  for (const blocknode of blocknodes) {
-    menuItems.push({
-      key: blocknode.id,
-      type: "button",
-      title: blocknode.title,
-      onClick: () => {
-        console.log(getAllTools());
-        editor.current?.chain().focus().insertContent(" ").run();
-
-        switch (blocknode.id) {
-          case "table":
-            editor.current
-              ?.chain()
-              .focus()
-              .insertTable({ rows: 3, cols: 3 })
-              .run();
-            break;
-          case "outline-list":
-            editor.current?.chain().focus().toggleOutlineList().run();
-            break;
-          case "task-list":
-            editor.current?.chain().focus().toggleTaskList().run();
-            break;
-          case "bullet-list":
-            editor.current?.chain().focus().toggleBulletList().run();
-            break;
-          case "ordered-list":
-            editor.current?.chain().focus().toggleOrderedList().run();
-            break;
-          case "block-quote":
-            editor.current?.chain().focus().setBlockquote().run();
-            break;
-          case "code-block":
-            editor.current?.chain().focus().toggleCodeBlock().run();
-            break;
-        }
-        editor.current?.off("update");
-      }
-    });
-  }
-  return menuItems;
-}

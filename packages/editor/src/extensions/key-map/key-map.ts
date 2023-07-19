@@ -25,6 +25,8 @@ import { CodeBlock } from "../code-block";
 import { ShowBlockNodesComponent } from "../../toolbar/popups/blocknodes-popup";
 import { Editor } from "../../types";
 import { getAllTools } from "../../toolbar";
+import { ToolId } from "../../toolbar/tools";
+import { MenuItem } from "../../components/menu/types";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -58,22 +60,60 @@ export const KeyMap = Extension.create({
         const selectedElement = editor.view.domAtPos($from.pos)
           .node as HTMLElement;
 
+        const menuItems: MenuItem[] = [];
+        const defaultTools = Object.keys(getAllTools()).splice(1, 6);
+        for (const key of defaultTools) {
+          const blocknode = getAllTools()[key as ToolId];
+          menuItems.push({
+            key: blocknode.icon,
+            type: "button",
+            title: blocknode.title,
+            icon: blocknode.icon,
+            onClick() {
+              console.log("clicked");
+              /* 
+              How to apply on click methods
+              editor.current?.chain().focus()....
+              //.toggleOutlineList().run();//
+              */
+            }
+          });
+        }
         ShowBlockNodesComponent({
           editor: editor as Editor,
-          selectedElement: selectedElement
+          selectedElement: selectedElement,
+          items: menuItems
         });
 
         (editor as Editor).current?.commands.focus();
+
         (editor as Editor).current?.on("update", ({ editor }) => {
+          const menuItems: MenuItem[] = [];
           const { state } = editor as Editor;
           const { $from } = state.selection;
           const before = $from.nodeBefore?.textContent;
-          console.log(
-            " inlistenr",
-            Object.keys(getAllTools()).filter(
-              (string) => string.indexOf(before as string) > -1
-            )
+
+          let keys = Object.keys(getAllTools()).filter(
+            (string) => string.indexOf(before as string) > -1
           );
+          console.log("keys", keys);
+          if (!before && keys.length === 0) keys = defaultTools;
+          for (const key of keys.slice(0, 6)) {
+            const blocknode = getAllTools()[key as ToolId];
+            console.log(blocknode);
+            menuItems.push({
+              key: blocknode.icon,
+              icon: blocknode.icon,
+              type: "button",
+              title: blocknode.title
+            });
+          }
+          ShowBlockNodesComponent({
+            editor: editor as Editor,
+            selectedElement: selectedElement,
+            items: menuItems
+          });
+          (editor as Editor).current?.commands.focus();
         });
         return true;
       }
