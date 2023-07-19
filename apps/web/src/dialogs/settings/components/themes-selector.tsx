@@ -18,17 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { httpBatchLink } from "@trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
-import { alpha } from "@theme-ui/color";
-import {
-  Circle,
-  Notebook,
-  Notes,
-  Plus,
-  StarOutline,
-  Tag
-} from "../../../components/icons";
+import { CheckCircleOutline } from "../../../components/icons";
 import { THEME_COMPATIBILITY_VERSION } from "@notesnook/theme";
 import { debounce } from "@notesnook/common";
 import { useStore as useThemeStore } from "../../../stores/theme-store";
@@ -38,6 +30,9 @@ import {
   THEME_SERVER_URL,
   ThemesTRPC
 } from "../../../common/themes-router";
+import { ThemeMetadata } from "@notesnook/themes-server";
+import { showThemeDetails } from "../../../common/dialog-controller";
+import { ThemePreview } from "../../../components/theme-preview";
 
 const ThemesClient = ThemesTRPC.createClient({
   links: [
@@ -58,17 +53,29 @@ export function ThemesSelector() {
   );
 }
 
+const COLOR_SCHEMES = [
+  { id: "all", title: "All" },
+  { id: "dark", title: "Dark" },
+  { id: "light", title: "Light" }
+] as const;
+
 function ThemesList() {
   const [searchQuery, setSearchQuery] = useState<string>();
-  const [colorSchemes, setColorSchemes] = useState<string[]>(["dark", "light"]);
-  const currentTheme = useThemeStore((store) => store.theme);
+  const [colorScheme, setColorScheme] = useState<"all" | "dark" | "light">(
+    "all"
+  );
+  const isThemeCurrentlyApplied = useThemeStore(
+    (store) => store.isThemeCurrentlyApplied
+  );
   const setCurrentTheme = useThemeStore((store) => store.setTheme);
   const user = useUserStore((store) => store.user);
+  useThemeStore((store) => store.darkTheme);
+  useThemeStore((store) => store.lightTheme);
 
   const filters = [];
   if (searchQuery) filters.push({ type: "term" as const, value: searchQuery });
-  if (colorSchemes.length < 2)
-    filters.push({ type: "colorScheme" as const, value: colorSchemes[0] });
+  if (colorScheme !== "all")
+    filters.push({ type: "colorScheme" as const, value: colorScheme });
 
   const themes = ThemesTRPC.themes.useInfiniteQuery(
     {
@@ -81,6 +88,20 @@ function ThemesList() {
     }
   );
 
+  const setTheme = useCallback(
+    async (theme: ThemeMetadata) => {
+      if (isThemeCurrentlyApplied(theme.id)) return;
+      const fullTheme = await ThemesRouter.installTheme.query({
+        id: theme.id,
+        compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+        userId: user?.id
+      });
+      if (!fullTheme) return;
+      setCurrentTheme(fullTheme);
+    },
+    [isThemeCurrentlyApplied, setCurrentTheme, user?.id]
+  );
+
   return (
     <>
       <Input
@@ -89,22 +110,12 @@ function ThemesList() {
         onChange={debounce((e) => setSearchQuery(e.target.value), 500)}
       />
       <Flex sx={{ mt: 2, gap: 1 }}>
-        {[
-          { id: "dark", title: "Dark" },
-          { id: "light", title: "Light" }
-        ].map((filter) => (
+        {COLOR_SCHEMES.map((filter) => (
           <Button
             key={filter.id}
             variant="secondary"
             onClick={() => {
-              setColorSchemes((filters) => {
-                const copy = filters.slice();
-                const index = copy.indexOf(filter.id);
-                if (index > -1) copy.splice(index, 1);
-                else copy.push(filter.id);
-                if (copy.length < 1) return filters;
-                return copy;
-              });
+              setColorScheme(filter.id);
             }}
             sx={{
               borderRadius: 100,
@@ -112,8 +123,8 @@ function ThemesList() {
               py: 1,
               px: 2,
               flexShrink: 0,
-              bg: colorSchemes.includes(filter.id) ? "shade" : "transparent",
-              color: colorSchemes.includes(filter.id) ? "accent" : "paragraph"
+              bg: colorScheme === filter.id ? "shade" : "transparent",
+              color: colorScheme === filter.id ? "accent" : "paragraph"
             }}
           >
             {filter.title}
@@ -137,158 +148,41 @@ function ThemesList() {
                 borderRadius: "default",
                 ":hover": {
                   bg: "background-secondary",
-                  border: "1px solid var(--border)"
+                  border: "1px solid var(--border)",
+                  ".set-as-button": { opacity: 1 }
                 }
               }}
               onClick={async () => {
-                const fullTheme = await ThemesRouter.installTheme.query({
-                  id: theme.id,
-                  compatibilityVersion: THEME_COMPATIBILITY_VERSION,
-                  userId: user?.id
-                });
-                if (!fullTheme) return;
-                setCurrentTheme(fullTheme);
+                if (await showThemeDetails(theme)) {
+                  await setTheme(theme);
+                }
               }}
             >
-              <Flex
-                sx={{
-                  position: "relative",
-                  flexDirection: "column",
-                  height: 200,
-                  borderRadius: "default",
-                  overflow: "hidden",
-                  bg: alpha(theme.previewColors.accent, 0.2),
-                  //m: 2,
-
-                  border: `2px solid ${theme.previewColors.accent}`,
-                  gap: 0,
-                  transition: "all 300ms ease-out",
-                  ":hover": {
-                    gap: 1,
-                    p: 1,
-                    "&> div.ui": { gap: 1 },
-                    "& *": { border: "none" }
-                  }
-                }}
-              >
-                <Flex
-                  sx={{
-                    borderRadius: "default",
-                    p: "small",
-                    position: "absolute",
-                    bottom: 1,
-                    right: 1
-                  }}
-                >
-                  {[
-                    theme.previewColors.accent,
-                    theme.previewColors.paragraph,
-                    theme.previewColors.background
-                  ].map((color) => (
-                    <Circle
-                      key={color}
-                      color={color}
-                      size={18}
-                      sx={{
-                        ml: -12
-                      }}
-                    />
-                  ))}
-                </Flex>
-                <Flex
-                  className="ui"
-                  sx={{ flex: 1, gap: 0, transition: "all 300ms ease-out" }}
-                >
-                  <Flex
-                    className="navigation"
-                    sx={{
-                      bg: theme.previewColors.navigationMenu.background,
-                      width: 20,
-                      flexDirection: "column",
-                      gap: 2,
-                      py: 1,
-                      borderRight: `1px solid ${theme.previewColors.border}`
-                    }}
-                  >
-                    {[Notes, Notebook, StarOutline, Tag].map((Icon, index) => (
-                      <Icon
-                        key={index.toString()}
-                        color={
-                          index === 0
-                            ? theme.previewColors.navigationMenu.accent
-                            : theme.previewColors.navigationMenu.icon
-                        }
-                        size={8}
-                      />
-                    ))}
-                  </Flex>
-                  <Flex
-                    className="list"
-                    sx={{
-                      bg: theme.previewColors.list.background,
-                      flex: 0.3,
-                      p: 1,
-                      borderRight: `1px solid ${theme.previewColors.border}`
-                    }}
-                  >
-                    <Flex
-                      sx={{
-                        justifyContent: "space-between",
-                        width: 120
-                      }}
-                    >
-                      <Text
-                        variant="heading"
-                        sx={{
-                          color: theme.previewColors.list.heading,
-                          fontSize: 7
-                        }}
-                      >
-                        Notes
-                      </Text>
-                      <Plus
-                        color="white"
-                        size={8}
-                        sx={{
-                          bg: theme.previewColors.list.accent,
-                          size: 10,
-                          borderRadius: 100
-                        }}
-                      />
-                    </Flex>
-                  </Flex>
-                  <Flex
-                    className="editor"
-                    sx={{ bg: theme.previewColors.editor, flex: 1 }}
-                  />
-                </Flex>
-                <Flex
-                  className="statusbar"
-                  sx={{
-                    height: 10,
-                    bg: theme.previewColors.statusBar.background,
-                    px: 1,
-                    alignItems: "center",
-                    gap: 1,
-                    borderTop: `1px solid ${theme.previewColors.border}`
-                  }}
-                >
-                  <Circle color={theme.previewColors.statusBar.icon} size={3} />
-                  <Text
-                    variant="subBody"
-                    sx={{
-                      fontSize: 5,
-                      color: theme.previewColors.statusBar.paragraph
-                    }}
-                  >
-                    johndoe@email.com
-                  </Text>
-                </Flex>
-              </Flex>
+              <ThemePreview theme={theme} />
               <Text variant="title" sx={{ mt: 1 }}>
                 {theme.name}
               </Text>
               <Text variant="body">{theme.authors[0].name}</Text>
+              <Flex
+                sx={{ justifyContent: "space-between", alignItems: "center" }}
+              >
+                <Text variant="subBody">{theme.totalInstalls} installs</Text>
+                {isThemeCurrentlyApplied(theme.id) ? (
+                  <CheckCircleOutline color="accent" size={20} />
+                ) : (
+                  <Button
+                    className="set-as-button"
+                    variant="secondary"
+                    sx={{ opacity: 0, bg: "background" }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTheme(theme);
+                    }}
+                  >
+                    Set as {theme.colorScheme}
+                  </Button>
+                )}
+              </Flex>
             </Flex>
           ))}
       </Box>

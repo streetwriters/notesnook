@@ -359,7 +359,10 @@ function TiptapWrapper(
     "editorContainer" | "theme" | "fontSize" | "fontFamily"
   >
 ) {
-  const theme = useThemeStore((state) => state.theme);
+  const colorScheme = useThemeStore((store) => store.colorScheme);
+  const theme = useThemeStore((store) =>
+    colorScheme === "dark" ? store.darkTheme : store.lightTheme
+  );
   const [isReady, setIsReady] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const { editorConfig } = useEditorConfig();

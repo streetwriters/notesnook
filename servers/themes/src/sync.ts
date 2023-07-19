@@ -33,7 +33,12 @@ export type CompiledThemeDefinition = ThemeDefinition & {
   totalInstalls: number;
   previewColors: {
     editor: string;
-    navigationMenu: { accent: string; background: string; icon: string };
+    navigationMenu: {
+      shade: string;
+      accent: string;
+      background: string;
+      icon: string;
+    };
     list: {
       heading: string;
       accent: string;
@@ -112,6 +117,7 @@ async function generateThemesMetadata() {
         totalInstalls: counts[theme.id]?.length || 0,
         previewColors: {
           navigationMenu: {
+            shade: navigationMenu?.primary?.shade || primary.shade,
             accent: navigationMenu?.primary?.accent || primary.accent,
             background:
               navigationMenu?.primary?.background || primary.background,

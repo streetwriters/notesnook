@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ReactDOM from "react-dom";
 import { Dialogs } from "../dialogs";
-import { BaseThemeProvider, ThemeVariant } from "../components/theme-provider";
+import { BaseThemeProvider } from "../components/theme-provider";
 import qclone from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as tagStore } from "../stores/tag-store";
@@ -40,6 +40,7 @@ import { Reminder } from "@notesnook/core/collections/reminders";
 import { ConfirmDialogProps } from "../dialogs/confirm";
 import { getFormattedDate } from "@notesnook/common";
 import { downloadUpdate } from "../utils/updater";
+import { ThemeMetadata } from "@notesnook/themes-server";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -314,6 +315,12 @@ export function showProgressDialog<T>(dialogData: ProgressDialogProps) {
       />
     )
   );
+}
+
+export function showThemeDetails(theme: ThemeMetadata) {
+  return showDialog("ThemeDetailsDialog", (Dialog, perform) => (
+    <Dialog theme={theme} onClose={(res: boolean) => perform(res)} />
+  ));
 }
 
 export function showMoveNoteDialog(noteIds: string[]) {

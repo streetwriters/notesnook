@@ -37,7 +37,10 @@ export function BaseThemeProvider(
 ) {
   const { children, addGlobalStyles = false, ...restProps } = props;
 
-  const theme = useThemeStore((store) => store.theme);
+  const colorScheme = useThemeStore((store) => store.colorScheme);
+  const theme = useThemeStore((store) =>
+    colorScheme === "dark" ? store.darkTheme : store.lightTheme
+  );
   const setTheme = useThemeStore((store) => store.setTheme);
   const cssTheme = useMemo(() => themeToCSS(theme), [theme]);
 

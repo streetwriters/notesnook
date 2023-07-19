@@ -36,14 +36,15 @@ class ThemeStore extends BaseStore {
    * @type {"dark" | "light"}
    */
   colorScheme = Config.get("colorScheme", "light");
-  theme = getTheme(this.colorScheme);
-
+  darkTheme = getTheme("dark");
+  lightTheme = getTheme("light");
   followSystemTheme = Config.get("followSystemTheme", false);
 
   init = async () => {
-    const { theme, colorScheme } = this.get();
+    const { darkTheme, lightTheme } = this.get();
     this.set({
-      theme: await updateTheme(theme.id, theme.version, colorScheme)
+      darkTheme: await updateTheme(darkTheme),
+      lightTheme: await updateTheme(lightTheme)
     });
   };
 
@@ -52,7 +53,10 @@ class ThemeStore extends BaseStore {
    */
   setTheme = async (theme) => {
     Config.set(`theme:${theme.colorScheme}`, theme);
-    this.set({ theme, colorScheme: theme.colorScheme });
+    this.set({
+      [getKey(theme)]: theme,
+      colorScheme: theme.colorScheme
+    });
   };
 
   setColorScheme = async (colorScheme) => {
@@ -65,8 +69,10 @@ class ThemeStore extends BaseStore {
     });
     Config.set("colorScheme", colorScheme);
 
-    updateTheme(theme.id, theme.version, colorScheme).then((theme) =>
-      this.set({ theme })
+    updateTheme(theme).then((theme) =>
+      this.set({
+        [getKey(theme)]: theme
+      })
     );
   };
 
@@ -87,10 +93,18 @@ class ThemeStore extends BaseStore {
     const followSystemTheme = this.get().followSystemTheme;
     this.setFollowSystemTheme(!followSystemTheme);
   };
+
+  isThemeCurrentlyApplied = (id) => {
+    return this.get().darkTheme.id === id || this.get().lightTheme.id === id;
+  };
 }
 
 const [useStore, store] = createStore(ThemeStore);
 export { useStore, store };
+
+function getKey(theme) {
+  return theme.colorScheme === "dark" ? "darkTheme" : "lightTheme";
+}
 
 function getTheme(colorScheme) {
   return colorScheme === "dark"
@@ -98,17 +112,17 @@ function getTheme(colorScheme) {
     : Config.get("theme:light", ThemeLight);
 }
 
-async function updateTheme(id, version, colorScheme) {
+async function updateTheme(theme) {
+  const { id, version } = theme;
   try {
-    const theme = await ThemesRouter.updateTheme.query({
+    const updatedTheme = await ThemesRouter.updateTheme.query({
       compatibilityVersion: THEME_COMPATIBILITY_VERSION,
       id,
       version
     });
-    console.log("UPDATED!", theme);
-    if (!theme) return getTheme(colorScheme);
-    return theme;
+    if (!updatedTheme) return theme;
+    return updatedTheme;
   } catch (e) {
-    return getTheme(colorScheme);
+    return theme;
   }
 }
