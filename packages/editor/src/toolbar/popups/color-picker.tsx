@@ -178,7 +178,6 @@ export function ColorPicker(props: ColorPickerProps) {
               p: 1,
               overflowX: ["auto", "hidden"],
               flexWrap: ["nowrap", "wrap"],
-              maxHeight: ["auto", 100],
               overflowY: ["hidden", "auto"]
             }}
           >
