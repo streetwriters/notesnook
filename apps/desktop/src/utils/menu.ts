@@ -101,6 +101,26 @@ function setupMenu() {
         })
       );
 
+    if (params.linkURL?.length) {
+      menu.append(
+        new MenuItem({
+          label: "Copy link",
+          click() {
+            clipboard.writeText(params.linkURL);
+          }
+        })
+      );
+
+      menu.append(
+        new MenuItem({
+          label: "Copy link text",
+          click() {
+            clipboard.writeText(params.linkText);
+          }
+        })
+      );
+    }
+
     if (params.selectionText.length) {
       menu.append(
         new MenuItem({
