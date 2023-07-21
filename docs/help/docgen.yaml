@@ -34,13 +34,15 @@ navigation:
     children:
       - path: importing-notes/import-notes-from-evernote.md
       - path: importing-notes/import-notes-from-googlekeep.md
-      - path: importing-notes/import-notes-from-html-files.md
       - path: importing-notes/import-notes-from-joplin.md
-      - path: importing-notes/import-notes-from-mardown-files.md
       - path: importing-notes/import-notes-from-onenote.md
       - path: importing-notes/import-notes-from-simplenote.md
       - path: importing-notes/import-notes-from-standardnotes.md
       - path: importing-notes/import-notes-from-zoho-notebook.md
+      - path: importing-notes/import-notes-from-obsidian.md
+      - path: importing-notes/import-notes-from-html-files.md
+      - path: importing-notes/import-notes-from-markdown-files.md
+      - path: importing-notes/import-notes-from-plaintext-files.md
   - path: export-notes-from-notesnook.md
   - path: backup-and-restore-notes-in-notesnook.md
 
