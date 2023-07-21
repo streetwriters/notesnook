@@ -60,6 +60,11 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: "Open link",
     conditional: true
   },
+  copyLink: {
+    icon: "copyLink",
+    title: "Copy link",
+    conditional: true
+  },
   linkSettings: {
     icon: "linkSettings",
     title: "Link settings",
