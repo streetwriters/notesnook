@@ -34,7 +34,7 @@ function LinkHoverPopup(props: HoverPopupProps) {
   return (
     <ToolbarGroup
       force
-      tools={["openLink", "editLink", "removeLink"]}
+      tools={["openLink", "editLink", "removeLink", "copyLink"]}
       editor={editor}
       selectedNode={selectedNode}
       sx={{

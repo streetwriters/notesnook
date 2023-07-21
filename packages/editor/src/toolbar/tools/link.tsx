@@ -41,7 +41,7 @@ export function LinkSettings(props: ToolProps) {
       autoOpen
       autoCloseOnUnmount
       popupId="linkSettings"
-      tools={["openLink", "editLink", "removeLink"]}
+      tools={["openLink", "editLink", "removeLink", "copyLink"]}
     />
   );
 }
@@ -244,6 +244,27 @@ export function OpenLink(props: ToolProps) {
         }}
       />
     </Flex>
+  );
+}
+
+export function CopyLink(props: ToolProps) {
+  const { editor, selectedNode: _selectedNode } = props;
+  const selectedNode = useRefValue(
+    _selectedNode || selectionToOffset(editor.state)
+  );
+  const { node } = selectedNode.current || {};
+  const link = node ? findMark(node, "link") : null;
+  if (!link) return null;
+  const href = link?.attrs.href;
+
+  return (
+    <ToolButton
+      {...props}
+      toggled={false}
+      onClick={() => {
+        editor.commands.copyToClipboard(href);
+      }}
+    />
   );
 }
 
