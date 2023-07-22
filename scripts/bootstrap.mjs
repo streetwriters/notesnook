@@ -31,7 +31,8 @@ const scopes = {
   web: "apps/web",
   desktop: "apps/desktop",
   core: "packages/core",
-  editor: "packages/editor"
+  editor: "packages/editor",
+  themes: "servers/themes"
 };
 
 if (args.scope && !scopes[args.scope])
