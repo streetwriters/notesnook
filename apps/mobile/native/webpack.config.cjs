@@ -97,6 +97,7 @@ module.exports = (env) => {
         "deepmerge": path.join(__dirname, "../node_modules/deepmerge"),
         "@selderee/plugin-htmlparser2": path.join(__dirname, "../node_modules/@selderee/plugin-htmlparser2"),
         "peberminta": path.join(__dirname, "../node_modules/peberminta"),
+        "react-native-blob-util": path.join(__dirname, "../node_modules/react-native-blob-util")
       },
     },
     /**
@@ -223,7 +224,7 @@ module.exports = (env) => {
                   : [
                       "react-native-reanimated/plugin",
                       `@babel/plugin-transform-named-capturing-groups-regex`,
-                      "transform-remove-console",
+                      //"transform-remove-console",
                     ],
             },
           },

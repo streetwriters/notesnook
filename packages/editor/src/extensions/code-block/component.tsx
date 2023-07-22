@@ -164,7 +164,6 @@ export function CodeblockComponent(
                 mr: 1,
                 bg: "transparent"
               }}
-              disabled={!editor.isEditable}
               onClick={() => {
                 editor.commands.copyToClipboard(node.textContent);
                 start();

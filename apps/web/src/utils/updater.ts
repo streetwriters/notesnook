@@ -19,11 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { AppEventManager, AppEvents } from "../common/app-events";
 import { desktop } from "../common/desktop-bridge";
-import { isDesktop } from "./platform";
 import { appVersion, getServiceWorkerVersion } from "./version";
 
 export async function checkForUpdate() {
-  if (isDesktop()) await desktop?.updater.check.query();
+  if (IS_DESKTOP_APP) await desktop?.updater.check.query();
   else {
     AppEventManager.publish(AppEvents.checkingForUpdate);
 
@@ -35,7 +34,11 @@ export async function checkForUpdate() {
         const workerVersion = await getServiceWorkerVersion(
           registration.waiting
         );
-        if (!workerVersion || workerVersion.numerical <= appVersion.numerical) {
+        if (
+          !workerVersion ||
+          workerVersion.numerical <= appVersion.numerical ||
+          workerVersion.hash === appVersion.hash
+        ) {
           registration.waiting.postMessage({ type: "SKIP_WAITING" });
           continue;
         }
@@ -52,17 +55,21 @@ export async function checkForUpdate() {
 }
 
 export async function downloadUpdate() {
-  if (isDesktop()) await desktop?.updater.download.query();
+  if (IS_DESKTOP_APP) await desktop?.updater.download.query();
   else {
     console.log("Force updating");
-    if (!("serviceWorker" in navigator)) return;
-    const registration = await navigator.serviceWorker.ready;
-    await registration.update();
+    try {
+      if (!("serviceWorker" in navigator)) return;
+      const registration = await navigator.serviceWorker.ready;
+      await registration.update();
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 
 export async function installUpdate() {
-  if (isDesktop()) await desktop?.updater.install.query();
+  if (IS_DESKTOP_APP) await desktop?.updater.install.query();
   else {
     const registrations =
       (await navigator.serviceWorker?.getRegistrations()) || [];

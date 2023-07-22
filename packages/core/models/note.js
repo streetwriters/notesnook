@@ -102,12 +102,19 @@ export default class Note {
         type: "tiptap",
         data: "<p></p>"
       };
-    const { data, type } = await this._db.content.downloadMedia(
-      `export-${this.id}`,
-      contentItem,
-      false
-    );
-    let content = getContentFromData(type, data);
+
+    let content;
+
+    if (to !== "txt") {
+      const { data, type } = await this._db.content.downloadMedia(
+        `export-${this.id}`,
+        contentItem,
+        false
+      );
+      content = getContentFromData(type, data);
+    } else {
+      content = getContentFromData(contentItem.type, contentItem.data);
+    }
 
     switch (to) {
       case "html":

@@ -111,7 +111,13 @@ const List = ({
         index={index}
         color={headerProps?.color}
         title={headerProps?.heading}
-        type={screen === "Notes" ? "home" : type}
+        type={
+          screen === "Notes"
+            ? "home"
+            : screen === "Favorites"
+            ? "favorites"
+            : type
+        }
         screen={screen}
         isSheet={isSheet}
       />

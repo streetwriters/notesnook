@@ -18,47 +18,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Sodium from "@ammarahmed/react-native-sodium";
-import React from "react";
-import { Platform, View } from "react-native";
+import { isImage } from "@notesnook/core/utils/filename";
+import { Platform } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 import DocumentPicker from "react-native-document-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
-import RNFetchBlob from "react-native-blob-util";
 import { db } from "../../../common/database";
 import { compressToBase64 } from "../../../common/filesystem/compress";
-import { AttachmentItem } from "../../../components/attachments/attachment-item";
 import {
+  ToastEvent,
   eSendEvent,
-  presentSheet,
-  ToastEvent
+  presentSheet
 } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
+import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 import { eCloseSheet } from "../../../utils/events";
 import { editorController, editorState } from "./utils";
-import { isImage } from "@notesnook/core/utils/filename";
-import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 
 const showEncryptionSheet = (file) => {
   presentSheet({
     title: "Encrypting attachment",
-    paragraph: "Please wait while we encrypt file for upload",
-    icon: "attachment",
-    component: (
-      <View
-        style={{
-          paddingHorizontal: 12
-        }}
-      >
-        <AttachmentItem
-          attachment={{
-            metadata: {
-              filename: file.name
-            },
-            length: file.size
-          }}
-          encryption
-        />
-      </View>
-    )
+    paragraph: `Please wait while we encrypt ${file.name} file for upload`,
+    icon: "attachment"
   });
 };
 

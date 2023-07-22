@@ -196,6 +196,10 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
       },
       isDrawerOpen: () => isDrawerOpen.value,
       openDrawer: (animated = true) => {
+        if (deviceMode === "tablet") {
+          translateX.value = animated ? withTiming(0) : 0;
+          return;
+        }
         translateX.value = animated
           ? withSpring(drawerPosition, {
               mass: 0.5
@@ -379,6 +383,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
       ]
     };
   }, []);
+
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View
@@ -391,7 +396,15 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
             width: containerWidth,
             flexDirection: "row"
           },
-          animatedStyles
+          deviceMode === "tablet"
+            ? {
+                transform: [
+                  {
+                    translateX: 0
+                  }
+                ]
+              }
+            : animatedStyles
         ]}
       >
         {children}

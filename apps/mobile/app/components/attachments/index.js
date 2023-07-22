@@ -82,7 +82,11 @@ export const AttachmentDialog = ({ note }) => {
   };
 
   const renderItem = ({ item }) => (
-    <AttachmentItem setAttachments={setAttachments} attachment={item} />
+    <AttachmentItem
+      setAttachments={setAttachments}
+      attachment={item}
+      context="attachments-list"
+    />
   );
 
   const onCheck = async () => {

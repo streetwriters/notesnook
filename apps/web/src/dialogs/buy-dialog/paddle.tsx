@@ -31,20 +31,17 @@ import {
   PricingInfo
 } from "./types";
 
-// const isDev = false; // import.meta.env.NODE_ENV === "development";
+// const isDev = false; // import.meta.env.DEV;
 // const VENDOR_ID = isDev ? 1506 : 128190;
-const PADDLE_ORIGIN =
-  import.meta.env.NODE_ENV === "development"
-    ? "https://sandbox-buy.paddle.com"
-    : "https://buy.paddle.com";
-const CHECKOUT_CREATE_ORIGIN =
-  import.meta.env.NODE_ENV === "development"
-    ? "https://sandbox-create-checkout.paddle.com"
-    : "https://create-checkout.paddle.com";
-const CHECKOUT_SERVICE_ORIGIN =
-  import.meta.env.NODE_ENV === "development"
-    ? "https://sandbox-checkout-service.paddle.com"
-    : "https://checkout-service.paddle.com";
+const PADDLE_ORIGIN = import.meta.env.DEV
+  ? "https://sandbox-buy.paddle.com"
+  : "https://buy.paddle.com";
+const CHECKOUT_CREATE_ORIGIN = import.meta.env.DEV
+  ? "https://sandbox-create-checkout.paddle.com"
+  : "https://create-checkout.paddle.com";
+const CHECKOUT_SERVICE_ORIGIN = import.meta.env.DEV
+  ? "https://sandbox-checkout-service.paddle.com"
+  : "https://checkout-service.paddle.com";
 
 const SUBSCRIBED_EVENTS: PaddleEvents[] = [
   PaddleEvents["Checkout.Loaded"],

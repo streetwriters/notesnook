@@ -25,7 +25,7 @@ import { Backup, User, Email, Warn, Icon } from "../components/icons";
 import dayjs from "dayjs";
 import { showBuyDialog, showRecoveryKeyDialog } from "./dialog-controller";
 import { hardNavigate, hashNavigate } from "../navigation";
-import { isDesktop, isTesting } from "../utils/platform";
+
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { showToast } from "../utils/toast";
 import { TaskScheduler } from "../utils/task-scheduler";
@@ -176,9 +176,9 @@ function isIgnored(key: keyof typeof NoticesData) {
 
 let openedToast: { hide: () => void } | null = null;
 async function saveBackup() {
-  if (isDesktop()) {
+  if (IS_DESKTOP_APP) {
     await createBackup();
-  } else if (isUserPremium() && !isTesting()) {
+  } else if (isUserPremium() && !IS_TESTING) {
     if (openedToast !== null) return;
     openedToast = showToast(
       "success",

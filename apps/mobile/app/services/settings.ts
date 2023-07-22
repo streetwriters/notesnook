@@ -141,22 +141,22 @@ function onFirstLaunch() {
 }
 
 function checkOrientation() {
-  Orientation.getOrientation((e: Error, orientation: string) => {
-    DDS.checkSmallTab(orientation);
-    useSettingStore.getState().setDimensions({
-      width: DDS.width as number,
-      height: DDS.height as number
-    });
-    useSettingStore
-      .getState()
-      .setDeviceMode(
-        DDS.isLargeTablet()
-          ? "tablet"
-          : DDS.isSmallTab
-          ? "smallTablet"
-          : "mobile"
-      );
-  });
+  //Orientation.getOrientation((e: Error, orientation: string) => {
+  // DDS.checkSmallTab(orientation);
+  // useSettingStore.getState().setDimensions({
+  //   width: DDS.width as number,
+  //   height: DDS.height as number
+  // });
+  // useSettingStore
+  //   .getState()
+  //   .setDeviceMode(
+  //     DDS.isLargeTablet()
+  //       ? "tablet"
+  //       : DDS.isSmallTab
+  //       ? "smallTablet"
+  //       : "mobile"
+  //   );
+  //});
 }
 
 const SettingsService = {

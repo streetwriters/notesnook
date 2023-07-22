@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import { isDesktop } from "../utils/platform";
+
 import { checkForUpdate } from "../utils/updater";
 import { AppEventManager, AppEvents } from "../common/app-events";
 
@@ -57,7 +57,7 @@ export function useAutoUpdater() {
     }
 
     function updateNotAvailable() {
-      if (isDesktop()) changeStatus({ type: "updated" });
+      if (IS_DESKTOP_APP) changeStatus({ type: "updated" });
       else changeStatus();
     }
 
