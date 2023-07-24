@@ -132,73 +132,73 @@ function ThemesList() {
           </Button>
         ))}
       </Flex>
-      <VirtuosoGrid
-        style={{ height: 700 }}
-        data={themes.data?.pages.flatMap((a) => a.themes) || []}
-        endReached={() => (themes.hasNextPage ? themes.fetchNextPage() : null)}
-        components={{
-          List: (props) => (
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 4,
-                mt: 2
-              }}
-              {...props}
-            />
-          )
+      <Box
+        sx={{
+          ".virtuoso-grid-list": {
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 2
+          },
+          mt: 2
         }}
-        itemContent={(_index, theme) => (
-          <Flex
-            key={theme.id}
-            sx={{
-              flexDirection: "column",
-              flex: 1,
-              cursor: "pointer",
-              p: 2,
-              border: "1px solid transparent",
-              borderRadius: "default",
-              ":hover": {
-                bg: "background-secondary",
-                border: "1px solid var(--border)",
-                ".set-as-button": { opacity: 1 }
-              }
-            }}
-            onClick={async () => {
-              if (await showThemeDetails(theme)) {
-                await setTheme(theme);
-              }
-            }}
-          >
-            <ThemePreview theme={theme} />
-            <Text variant="title" sx={{ mt: 1 }}>
-              {theme.name}
-            </Text>
-            <Text variant="body">{theme.authors[0].name}</Text>
+      >
+        <VirtuosoGrid
+          style={{ height: 700 }}
+          data={themes.data?.pages.flatMap((a) => a.themes) || []}
+          endReached={() =>
+            themes.hasNextPage ? themes.fetchNextPage() : null
+          }
+          itemContent={(_index, theme) => (
             <Flex
-              sx={{ justifyContent: "space-between", alignItems: "center" }}
+              key={theme.id}
+              sx={{
+                flexDirection: "column",
+                flex: 1,
+                cursor: "pointer",
+                p: 2,
+                border: "1px solid transparent",
+                borderRadius: "default",
+                ":hover": {
+                  bg: "background-secondary",
+                  border: "1px solid var(--border)",
+                  ".set-as-button": { opacity: 1 }
+                }
+              }}
+              onClick={async () => {
+                if (await showThemeDetails(theme)) {
+                  await setTheme(theme);
+                }
+              }}
             >
-              <Text variant="subBody">{theme.totalInstalls} installs</Text>
-              {isThemeCurrentlyApplied(theme.id) ? (
-                <CheckCircleOutline color="accent" size={20} />
-              ) : (
-                <Button
-                  className="set-as-button"
-                  variant="secondary"
-                  sx={{ opacity: 0, bg: "background" }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setTheme(theme);
-                  }}
-                >
-                  Set as {theme.colorScheme}
-                </Button>
-              )}
+              <ThemePreview theme={theme} />
+              <Text variant="title" sx={{ mt: 1 }}>
+                {theme.name}
+              </Text>
+              <Text variant="body">{theme.authors[0].name}</Text>
+              <Flex
+                sx={{ justifyContent: "space-between", alignItems: "center" }}
+              >
+                <Text variant="subBody">{theme.totalInstalls} installs</Text>
+                {isThemeCurrentlyApplied(theme.id) ? (
+                  <CheckCircleOutline color="accent" size={20} />
+                ) : (
+                  <Button
+                    className="set-as-button"
+                    variant="secondary"
+                    sx={{ opacity: 0, bg: "background" }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTheme(theme);
+                    }}
+                  >
+                    Set as {theme.colorScheme}
+                  </Button>
+                )}
+              </Flex>
             </Flex>
-          </Flex>
-        )}
-      ></VirtuosoGrid>
+          )}
+        />
+      </Box>
     </>
   );
 }
