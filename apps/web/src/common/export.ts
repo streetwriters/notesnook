@@ -31,9 +31,11 @@ export async function exportToPDF(
 ): Promise<boolean> {
   if (!content) return false;
   const { default: printjs } = await import("print-js");
+  const _content = content.replaceAll(/<p [a-z\-="]*><\/p>/gm, "<p>&nbsp;</p>");
   return new Promise((resolve) => {
     printjs({
-      printable: content,
+      printable: _content,
+      targetStyles: "*",
       type: "raw-html",
       documentTitle: title,
       header: '<h3 class="custom-h3">My custom header</h3>',
