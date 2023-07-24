@@ -24,7 +24,7 @@ import useMobile from "../../hooks/use-mobile";
 import { PropsWithChildren } from "react";
 import { Icon, Shortcut } from "../icons";
 import { AnimatedFlex } from "../animated";
-import { SchemeColors } from "@notesnook/theme";
+import { SchemeColors, createButtonVariant } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
 
 type NavigationItemProps = {
@@ -76,8 +76,14 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
       }}
       transition={{ duration: 0.1, delay: index * 0.05, ease: "easeIn" }}
       sx={{
-        variant: "buttons.secondary",
-        bg: selected ? "background-selected" : "transparent",
+        ...createButtonVariant(
+          selected ? "background-selected" : "transparent",
+          "transparent",
+          {
+            hover: selected ? "hover-selected" : "hover",
+            active: selected ? "hover-selected" : "hover"
+          }
+        ),
         borderRadius: "default",
         mx: 1,
         p: 0,
