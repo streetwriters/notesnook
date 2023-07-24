@@ -21,7 +21,7 @@ import { Theme, ThemeUIStyleObject } from "@theme-ui/core";
 import { shade, darken, alpha } from "@theme-ui/color";
 import { SchemeColors } from "../../theme-engine/types";
 
-const createButtonVariant = (
+export const createButtonVariant = (
   background: SchemeColors = "transparent",
   color: SchemeColors = "paragraph",
   states?: {

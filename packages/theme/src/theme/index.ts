@@ -23,6 +23,7 @@ import { ThemeConfig } from "./types";
 import { ThemeColor, VariantsWithStaticColors } from "../theme-engine/types";
 import { ThemeUIConfig } from "@theme-ui/css/dist/declarations/src/options";
 
+export { createButtonVariant } from "./variants/button";
 export type Theme = {
   breakpoints: string[];
   space: number[] & { small?: number | string };
