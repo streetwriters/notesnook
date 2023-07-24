@@ -156,6 +156,7 @@ export function Autosuggest({
   return (
     <Input
       ref={inputRef}
+      tabIndex={-1}
       variant="clean"
       sx={{
         width: "auto",
