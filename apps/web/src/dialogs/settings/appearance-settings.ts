@@ -58,38 +58,39 @@ export const AppearanceSettings: SettingsGroup[] = [
     header: "Themes",
     settings: [
       {
+        key: "color-scheme",
+        title: "Color scheme",
+        description: "Dark or light, we won't judge.",
+        onStateChange: (listener) =>
+          useThemeStore.subscribe(
+            (s) => [s.colorScheme, s.followSystemTheme],
+            listener
+          ),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              { title: "Light", value: "light" },
+              { title: "Dark", value: "dark" },
+              { title: "Auto", value: "auto" }
+            ],
+            selectedOption: () =>
+              useThemeStore.getState().followSystemTheme
+                ? "auto"
+                : useThemeStore.getState().colorScheme,
+            onSelectionChanged: (value) => {
+              useThemeStore.getState().setFollowSystemTheme(value === "auto");
+              if (value !== "auto")
+                useThemeStore.getState().setColorScheme(value);
+            }
+          }
+        ]
+      },
+      {
         key: "themes",
         title: "Select a theme",
         components: [{ type: "custom", component: ThemesSelector }]
       }
-      // {
-      //   key: "theme",
-      //   title: "App theme",
-      //   description: "Dark or light, we won't judge.",
-      //   onStateChange: (listener) =>
-      //     useThemeStore.subscribe(
-      //       (s) => [s.theme, s.followSystemTheme],
-      //       listener
-      //     ),
-      //   components: [
-      //     {
-      //       type: "dropdown",
-      //       options: [
-      //         { title: "Light", value: "light" },
-      //         { title: "Dark", value: "dark" },
-      //         { title: "Auto", value: "auto" }
-      //       ],
-      //       selectedOption: () =>
-      //         useThemeStore.getState().followSystemTheme
-      //           ? "auto"
-      //           : useThemeStore.getState().theme,
-      //       onSelectionChanged: (value) => {
-      //         useThemeStore.getState().setFollowSystemTheme(value === "auto");
-      //         if (value !== "auto") useThemeStore.getState().setTheme(value);
-      //       }
-      //     }
-      //   ]
-      // }
     ]
   }
 ];
