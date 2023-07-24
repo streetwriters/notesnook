@@ -53,7 +53,7 @@ export function MenuButton(props: MenuButtonProps) {
       onMouseLeave={onMouseLeave}
     >
       <Button
-        id={key}
+        id={`${key}-menu-item`}
         data-test-id={`MenuButton-${key}`}
         key={key}
         ref={itemRef}

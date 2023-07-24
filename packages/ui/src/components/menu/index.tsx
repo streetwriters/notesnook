@@ -63,7 +63,7 @@ export function Menu(props: MenuProps) {
     const item = items[focusIndex];
     if (!item || !subMenuRef.current) return;
 
-    const menuItemElement = document.getElementById(item.key);
+    const menuItemElement = document.getElementById(`${item.key}-menu-item`);
     if (!menuItemElement) return;
 
     if (!isSubmenuOpen) {
@@ -129,7 +129,9 @@ export function Menu(props: MenuProps) {
                 />
               );
             case "popup":
-              return <item.component onClick={(e) => onAction(e)} />;
+              return (
+                <item.component key={item.key} onClick={(e) => onAction(e)} />
+              );
           }
         })}
       </MenuContainer>
