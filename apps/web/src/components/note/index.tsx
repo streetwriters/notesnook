@@ -99,16 +99,7 @@ type NoteProps = {
 };
 
 function Note(props: NoteProps) {
-  const {
-    tags,
-    references,
-    item,
-    context,
-    date,
-    reminder,
-    simplified,
-    compact
-  } = props;
+  const { tags, references, item, date, reminder, simplified, compact } = props;
   const note = item;
 
   const isOpened = useStore((store) => store.selectedNote === note.id);
@@ -120,7 +111,7 @@ function Note(props: NoteProps) {
     [attachments]
   );
   const primary: SchemeColors = !note.color
-    ? "accent"
+    ? "accent-selected"
     : (note.color as string).toLowerCase();
 
   return (

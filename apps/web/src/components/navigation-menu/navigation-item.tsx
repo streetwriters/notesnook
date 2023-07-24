@@ -77,7 +77,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
       transition={{ duration: 0.1, delay: index * 0.05, ease: "easeIn" }}
       sx={{
         variant: "buttons.secondary",
-        bg: selected ? "shade" : "transparent",
+        bg: selected ? "background-selected" : "transparent",
         borderRadius: "default",
         mx: 1,
         p: 0,
@@ -114,7 +114,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
       >
         <Icon
           size={isTablet ? 16 : 15}
-          color={color || (selected ? "accent" : "icon")}
+          color={color || (selected ? "icon-selected" : "icon")}
           rotate={isLoading}
         />
         {isShortcut && (
@@ -133,6 +133,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
             overflow: "hidden",
             textOverflow: "ellipsis",
             fontWeight: selected ? "bold" : "normal",
+            color: selected ? "paragraph-selected" : "paragraph",
             fontSize: "subtitle",
             display: isTablet ? "none" : "block"
           }}

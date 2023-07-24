@@ -296,8 +296,14 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                   py: 1,
                   px: 2,
                   flexShrink: 0,
-                  bg: "transparent",
-                  color: mode.id === recurringMode ? "accent" : "paragraph"
+                  bg:
+                    mode.id === recurringMode
+                      ? "background-selected"
+                      : "transparent",
+                  color:
+                    mode.id === recurringMode
+                      ? "paragraph-selected"
+                      : "paragraph"
                 }}
               >
                 {mode.title}
@@ -340,8 +346,12 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                       px: 2,
                       flexShrink: 0,
                       textAlign: "left",
-                      bg: selectedDays.includes(day) ? "shade" : "transparent",
-                      color: selectedDays.includes(day) ? "accent" : "paragraph"
+                      bg: selectedDays.includes(day)
+                        ? "background-selected"
+                        : "transparent",
+                      color: selectedDays.includes(day)
+                        ? "paragraph-selected"
+                        : "paragraph"
                     }}
                   >
                     {mode.id === "week" ? WEEK_DAYS[i] : day}

@@ -335,9 +335,9 @@ function Properties(props) {
                   px={2}
                   sx={{
                     cursor: "pointer",
-                    bg: isSelected ? "shade" : "transparent",
+                    bg: isSelected ? "background-selected" : "transparent",
                     ":hover": {
-                      bg: "hover"
+                      bg: isSelected ? "hover-selected" : "hover"
                     },
                     alignItems: "center",
                     justifyContent: "space-between"
@@ -377,7 +377,7 @@ function Properties(props) {
                   <Flex
                     sx={{
                       fontSize: "subBody",
-                      color: "var(--paragraph-secondary)"
+                      color: "paragraph-secondary"
                     }}
                   >
                     {session.locked && <Lock size={14} data-test-id="locked" />}

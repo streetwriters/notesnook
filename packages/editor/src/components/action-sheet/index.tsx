@@ -217,6 +217,8 @@ export function ActionSheetPresenter(
     >
       <AnimatedFlex
         animate={animation}
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         style={{ y }}
         initial={{ y: 1000 }}
         sx={{

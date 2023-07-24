@@ -59,7 +59,7 @@ export const ToolButton = React.memo(
           p: variant === "small" ? "small" : 1,
           borderRadius: variant === "small" ? "small" : "default",
           m: 0,
-          bg: toggled ? "background-secondary" : "transparent",
+          bg: toggled ? "background-selected" : "transparent",
           mr: variant === "small" ? 0 : 1,
           ":last-of-type": {
             mr: 0
@@ -71,7 +71,7 @@ export const ToolButton = React.memo(
       >
         <Icon
           path={Icons[icon]}
-          color={iconColor || "icon"}
+          color={iconColor || (toggled ? "icon-selected" : "icon")}
           size={iconSize || (variant === "small" ? "medium" : "big")}
         />
       </Button>

@@ -66,6 +66,7 @@ import { AppearanceSettings } from "./appearance-settings";
 import { debounce } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
 import { alpha } from "@theme-ui/color";
+import { ScopedThemeProvider } from "../../components/theme-provider";
 
 type SettingsDialogProps = { onClose: Perform };
 
@@ -218,112 +219,116 @@ function SettingsSideBar(props: SettingsSideBarProps) {
   const [route, setRoute] = useState<SectionKeys>("profile");
 
   return (
-    <FlexScrollContainer
-      id="settings-side-menu"
-      style={{
-        width: 240,
-        overflow: "auto"
-      }}
-      data-test-id="settings-navigation-menu"
-    >
-      <Flex
-        sx={{
-          flexDirection: "column",
-          display: "flex",
-          overflow: "hidden",
-          "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
-            {
-              backgroundColor: alpha("background", 0.6),
-              backdropFilter: "blur(8px)"
-            },
-          backgroundColor: "var(--background-secondary)",
-          borderRadius: "dialog"
+    <ScopedThemeProvider scope="navigationMenu">
+      <FlexScrollContainer
+        id="settings-side-menu"
+        style={{
+          width: 240,
+          overflow: "auto"
         }}
+        data-test-id="settings-navigation-menu"
       >
-        <Input
-          placeholder="Search"
-          data-test-id="settings-search"
+        <Flex
           sx={{
-            m: 2,
-            mb: 2,
-            width: "auto",
-            bg: "background",
-            py: "7px"
+            flexDirection: "column",
+            display: "flex",
+            overflow: "hidden",
+            "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
+              {
+                backgroundColor: alpha("background", 0.6),
+                backdropFilter: "blur(8px)"
+              },
+            backgroundColor: "var(--background-secondary)",
+            borderRadius: "dialog"
           }}
-          onChange={(e) => {
-            const query = e.target.value.toLowerCase().trim();
-            if (!query)
-              return onNavigate(
-                SettingsGroups.filter((g) => g.section === route)
-              );
+        >
+          <Input
+            placeholder="Search"
+            data-test-id="settings-search"
+            sx={{
+              m: 2,
+              mb: 2,
+              width: "auto",
+              bg: "background",
+              py: "7px"
+            }}
+            onChange={(e) => {
+              const query = e.target.value.toLowerCase().trim();
+              if (!query)
+                return onNavigate(
+                  SettingsGroups.filter((g) => g.section === route)
+                );
 
-            const groups: SettingsGroup[] = [];
-            for (const group of SettingsGroups) {
-              const isTitleMatch =
-                typeof group.header === "string" &&
-                group.header.toLowerCase().includes(query);
-              const isSectionMatch = group.section.includes(query);
+              const groups: SettingsGroup[] = [];
+              for (const group of SettingsGroups) {
+                const isTitleMatch =
+                  typeof group.header === "string" &&
+                  group.header.toLowerCase().includes(query);
+                const isSectionMatch = group.section.includes(query);
 
-              if (isTitleMatch || isSectionMatch) {
-                groups.push(group);
-                continue;
+                if (isTitleMatch || isSectionMatch) {
+                  groups.push(group);
+                  continue;
+                }
+
+                const settings = group.settings.filter((setting) => {
+                  const description =
+                    typeof setting.description === "function"
+                      ? setting.description()
+                      : setting.description;
+
+                  return [
+                    description || "",
+                    setting.keywords?.join(" ") || "",
+                    setting.title
+                  ]
+                    .join(" ")
+                    ?.toLowerCase()
+                    .includes(query);
+                });
+                if (!settings.length) continue;
+                groups.push({ ...group, settings });
               }
-
-              const settings = group.settings.filter((setting) => {
-                const description =
-                  typeof setting.description === "function"
-                    ? setting.description()
-                    : setting.description;
-
-                return [
-                  description || "",
-                  setting.keywords?.join(" ") || "",
-                  setting.title
-                ]
-                  .join(" ")
-                  ?.toLowerCase()
-                  .includes(query);
-              });
-              if (!settings.length) continue;
-              groups.push({ ...group, settings });
-            }
-            onNavigate(groups);
-          }}
-        />
-        {sectionGroups.map((group) => (
-          <Flex key={group.key} sx={{ flexDirection: "column", mb: 2 }}>
-            <Text
-              variant={"subBody"}
-              sx={{
-                fontWeight: "bold",
-                color: "paragraph",
-                mx: 3,
-                mb: 1
-              }}
-            >
-              {group.title}
-            </Text>
-            {group.sections.map(
-              (section) =>
-                (!section.isHidden || !section.isHidden()) && (
-                  <NavigationItem
-                    key={section.key}
-                    icon={section.icon}
-                    title={section.title}
-                    selected={section.key === route}
-                    onClick={() => {
-                      onNavigate(
-                        SettingsGroups.filter((g) => g.section === section.key)
-                      );
-                      setRoute(section.key);
-                    }}
-                  />
-                )
-            )}
-          </Flex>
-        ))}
-      </Flex>
-    </FlexScrollContainer>
+              onNavigate(groups);
+            }}
+          />
+          {sectionGroups.map((group) => (
+            <Flex key={group.key} sx={{ flexDirection: "column", mb: 2 }}>
+              <Text
+                variant={"subBody"}
+                sx={{
+                  fontWeight: "bold",
+                  color: "paragraph",
+                  mx: 3,
+                  mb: 1
+                }}
+              >
+                {group.title}
+              </Text>
+              {group.sections.map(
+                (section) =>
+                  (!section.isHidden || !section.isHidden()) && (
+                    <NavigationItem
+                      key={section.key}
+                      icon={section.icon}
+                      title={section.title}
+                      selected={section.key === route}
+                      onClick={() => {
+                        onNavigate(
+                          SettingsGroups.filter(
+                            (g) => g.section === section.key
+                          )
+                        );
+                        setRoute(section.key);
+                      }}
+                    />
+                  )
+              )}
+            </Flex>
+          ))}
+        </Flex>
+      </FlexScrollContainer>
+    </ScopedThemeProvider>
   );
 }
 

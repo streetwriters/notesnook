@@ -27,6 +27,7 @@ import React, { useRef } from "react";
 import { SchemeColors } from "@notesnook/theme";
 import { Item } from "../list-container/types";
 import { MenuItem } from "@notesnook/ui";
+import { alpha } from "@theme-ui/color";
 
 type ListItemProps = {
   colors?: {
@@ -129,22 +130,20 @@ function ListItem(props: ListItemProps) {
         ml: "2px",
         mr: "1px",
 
-        backgroundColor: isSelected
-          ? "shade"
-          : isMenuTarget || isFocused
-          ? "hover"
-          : background,
+        backgroundColor:
+          isSelected || isMenuTarget || isFocused
+            ? "background-selected"
+            : background,
 
         ":hover": {
-          backgroundColor: isSelected ? "shade" : "hover"
+          backgroundColor: isSelected ? "hover-selected" : "hover"
         },
         ":focus": {
-          backgroundColor: isSelected ? "shade" : "hover"
+          backgroundColor: isSelected ? "hover-selected" : "hover"
         },
         ":focus-visible": {
-          outline: `1px solid var(--${
-            accent === "accent" ? "dimPrimary" : accent
-          })`,
+          outline: `1px solid`,
+          outlineColor: accent === "accent" ? "accent" : alpha("accent", 0.7),
           backgroundColor: isSelected ? "textSelection" : background
         }
       }}

@@ -63,7 +63,7 @@ export function MenuButton(props: MenuButtonProps) {
         disabled={isDisabled}
         onClick={(e) => onClick?.(e.nativeEvent)}
         sx={{
-          bg: isFocused && "hover",
+          bg: isFocused && "background-selected",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between"
