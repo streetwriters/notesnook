@@ -239,7 +239,10 @@ function SyncStatus() {
           color={status.iconColor}
         />
       )}
-      <Text variant="subBody" ml={status.text ? "3px" : 0}>
+      <Text
+        variant="body"
+        sx={{ ml: status.text ? "3px" : 0, fontSize: "subBody" }}
+      >
         {status.text ? (
           <>
             {typeof status.text === "string" ? (

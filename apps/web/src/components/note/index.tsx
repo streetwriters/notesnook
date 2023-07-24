@@ -190,65 +190,53 @@ function Note(props: NoteProps) {
           sx={{
             fontSize: "subBody",
             color: "var(--paragraph-secondary)",
-            alignItems: "center"
+            alignItems: "center",
+            gap: 1
           }}
         >
           {compact ? (
             <>
-              {note.conflicted && (
-                <Alert size={15} sx={{ mr: 1 }} color="var(--icon-error)" />
-              )}
-              {note.locked && (
-                <Lock size={11} sx={{ mr: 1 }} data-test-id={`locked`} />
-              )}
-              {note.favorite && (
-                <Star color={primary} size={15} sx={{ mr: 1 }} />
-              )}
+              {note.conflicted && <Alert size={15} color="var(--icon-error)" />}
+              {note.locked && <Lock size={11} data-test-id={`locked`} />}
+              {note.favorite && <Star color={primary} size={15} />}
               <TimeAgo live={true} datetime={date} locale="short" />
             </>
           ) : (
             <>
-              {note.conflicted && (
-                <Alert size={15} color="error" sx={{ mr: 1 }} />
-              )}
+              {note.conflicted && <Alert size={15} color="error" />}
 
-              {note.localOnly && <SyncOff size={13} sx={{ mr: 1 }} />}
+              {note.localOnly && <SyncOff size={13} />}
 
               <TimeAgo
                 sx={{ flexShrink: 0 }}
                 locale="en_short"
                 live={true}
                 datetime={date}
-                mr={1}
               />
 
               {attachments.length > 0 && (
-                <Flex mr={1}>
+                <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
                   <Attachment size={13} />
-                  <Text ml={"2px"} color="paragraph">
+                  <Text variant="subBody" ml={"2px"}>
                     {attachments.length}
                   </Text>
                 </Flex>
               )}
 
               {failed.length > 0 && (
-                <Flex mr={1} title={`Errors in ${failed.length} attachments.`}>
+                <Flex title={`Errors in ${failed.length} attachments.`}>
                   <AttachmentError size={13} color="var(--icon-error)" />
                   <Text ml={"2px"}>{failed.length}</Text>
                 </Flex>
               )}
 
               {note.pinned && !props.context && (
-                <Pin size={13} color={primary} sx={{ mr: 1 }} />
+                <Pin size={13} color={primary} />
               )}
 
-              {note.locked && (
-                <Lock size={13} sx={{ mr: 1 }} data-test-id={`locked`} />
-              )}
+              {note.locked && <Lock size={13} data-test-id={`locked`} />}
 
-              {note.favorite && (
-                <Star color={primary} size={15} sx={{ mr: 1 }} />
-              )}
+              {note.favorite && <Star color={primary} size={15} />}
 
               {tags?.map((tag) => {
                 return (
@@ -256,7 +244,6 @@ function Note(props: NoteProps) {
                     data-test-id={`tag-item`}
                     key={tag.id}
                     variant="anchor"
-                    mr={1}
                     title={`Go to #${tag.alias}`}
                     onClick={(e) => {
                       e.stopPropagation();
