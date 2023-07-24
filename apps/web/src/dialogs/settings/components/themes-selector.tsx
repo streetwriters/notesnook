@@ -33,6 +33,7 @@ import {
 import { ThemeMetadata } from "@notesnook/themes-server";
 import { showThemeDetails } from "../../../common/dialog-controller";
 import { ThemePreview } from "../../../components/theme-preview";
+import { VirtuosoGrid } from "react-virtuoso";
 
 const ThemesClient = ThemesTRPC.createClient({
   links: [
@@ -131,61 +132,73 @@ function ThemesList() {
           </Button>
         ))}
       </Flex>
-      <Box
-        sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, mt: 2 }}
-      >
-        {themes.data?.pages
-          .flatMap((a) => a.themes)
-          .map((theme) => (
-            <Flex
-              key={theme.id}
+      <VirtuosoGrid
+        style={{ height: 700 }}
+        data={themes.data?.pages.flatMap((a) => a.themes) || []}
+        endReached={() => (themes.hasNextPage ? themes.fetchNextPage() : null)}
+        components={{
+          List: (props) => (
+            <Box
               sx={{
-                flexDirection: "column",
-                flex: 1,
-                cursor: "pointer",
-                p: 2,
-                border: "1px solid transparent",
-                borderRadius: "default",
-                ":hover": {
-                  bg: "background-secondary",
-                  border: "1px solid var(--border)",
-                  ".set-as-button": { opacity: 1 }
-                }
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 4,
+                mt: 2
               }}
-              onClick={async () => {
-                if (await showThemeDetails(theme)) {
-                  await setTheme(theme);
-                }
-              }}
+              {...props}
+            />
+          )
+        }}
+        itemContent={(_index, theme) => (
+          <Flex
+            key={theme.id}
+            sx={{
+              flexDirection: "column",
+              flex: 1,
+              cursor: "pointer",
+              p: 2,
+              border: "1px solid transparent",
+              borderRadius: "default",
+              ":hover": {
+                bg: "background-secondary",
+                border: "1px solid var(--border)",
+                ".set-as-button": { opacity: 1 }
+              }
+            }}
+            onClick={async () => {
+              if (await showThemeDetails(theme)) {
+                await setTheme(theme);
+              }
+            }}
+          >
+            <ThemePreview theme={theme} />
+            <Text variant="title" sx={{ mt: 1 }}>
+              {theme.name}
+            </Text>
+            <Text variant="body">{theme.authors[0].name}</Text>
+            <Flex
+              sx={{ justifyContent: "space-between", alignItems: "center" }}
             >
-              <ThemePreview theme={theme} />
-              <Text variant="title" sx={{ mt: 1 }}>
-                {theme.name}
-              </Text>
-              <Text variant="body">{theme.authors[0].name}</Text>
-              <Flex
-                sx={{ justifyContent: "space-between", alignItems: "center" }}
-              >
-                <Text variant="subBody">{theme.totalInstalls} installs</Text>
-                {isThemeCurrentlyApplied(theme.id) ? (
-                  <CheckCircleOutline color="accent" size={20} />
-                ) : (
-                  <Button
-                    className="set-as-button"
-                    variant="secondary"
-                    sx={{ opacity: 0, bg: "background" }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setTheme(theme);
-                    }}
-                  >
-                    Set as {theme.colorScheme}
-                  </Button>
-                )}
-              </Flex>
+              <Text variant="subBody">{theme.totalInstalls} installs</Text>
+              {isThemeCurrentlyApplied(theme.id) ? (
+                <CheckCircleOutline color="accent" size={20} />
+              ) : (
+                <Button
+                  className="set-as-button"
+                  variant="secondary"
+                  sx={{ opacity: 0, bg: "background" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTheme(theme);
+                  }}
+                >
+                  Set as {theme.colorScheme}
+                </Button>
+              )}
             </Flex>
-          ))}
-      </Box>
+          </Flex>
+        )}
+      ></VirtuosoGrid>
     </>
   );
 }
