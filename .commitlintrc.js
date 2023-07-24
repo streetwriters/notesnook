@@ -22,6 +22,7 @@ const SCOPES = [
   "server",
   "core",
   "fs",
+  "ui",
   "clipper",
   "config",
   "ci",
