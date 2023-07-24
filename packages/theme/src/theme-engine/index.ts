@@ -160,6 +160,12 @@ function buildVariants(
       ...theme.scopes.base.success,
       ...themeScope.success
     },
+    selected: {
+      ...defaultThemeBase.selected,
+      ...defaultThemeScope.selected,
+      ...theme.scopes.base.selected,
+      ...themeScope.selected
+    },
     static: StaticColors
   };
 }

@@ -156,7 +156,7 @@ export type Variants<TRequired extends boolean = false> = {
   primary: TRequired extends true ? Colors : Partial<Colors>;
   secondary: TRequired extends true ? Colors : Partial<Colors>;
   disabled: TRequired extends true ? Colors : Partial<Colors>;
-  // selected: TRequired extends true ? Colors : Partial<Colors>;
+  selected: TRequired extends true ? Colors : Partial<Colors>;
   error: TRequired extends true ? Colors : Partial<Colors>;
   success: TRequired extends true ? Colors : Partial<Colors>;
 };
