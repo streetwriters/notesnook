@@ -31,10 +31,9 @@ export async function exportToPDF(
 ): Promise<boolean> {
   if (!content) return false;
   const { default: printjs } = await import("print-js");
-  const _content = content.replaceAll(/<p [a-z\-="]*><\/p>/gm, "<p>&nbsp;</p>");
   return new Promise((resolve) => {
     printjs({
-      printable: _content,
+      printable: content.replaceAll(/<p [a-z\-="]*><\/p>/gm, "<p>&nbsp;</p>"),
       targetStyles: "*",
       type: "raw-html",
       documentTitle: title,
@@ -62,14 +61,14 @@ export async function exportNotes(
       if (noteIds.length === 1 && db.notes?.note(noteIds[0])?.data.locked) {
         vaultUnlocked = await Vault.unlockVault();
         if (!vaultUnlocked) return false;
-      } else if (noteIds.length > 1 && (await db.vault?.exists()))
+      } else if (noteIds.length > 1 && (await db.vault?.exists())) {
         vaultUnlocked = await Vault.unlockVault();
-
-      if (!vaultUnlocked)
-        showToast(
-          "error",
-          "Failed to unlock vault. Locked notes will be skipped."
-        );
+        if (!vaultUnlocked)
+          showToast(
+            "error",
+            "Failed to unlock vault. Locked notes will be skipped."
+          );
+      }
 
       const files = [];
       let index = 0;
