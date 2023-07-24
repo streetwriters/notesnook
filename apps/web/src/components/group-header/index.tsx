@@ -61,14 +61,16 @@ const groupByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
   key: "groupBy",
   title: "Group by",
   icon: GroupBy.path,
-  items: map(options, [
-    { key: "none", title: "None" },
-    { key: "default", title: "Default" },
-    { key: "year", title: "Year" },
-    { key: "month", title: "Month" },
-    { key: "week", title: "Week" },
-    { key: "abc", title: "A - Z" }
-  ])
+  menu: {
+    items: map(options, [
+      { key: "none", title: "None" },
+      { key: "default", title: "Default" },
+      { key: "year", title: "Year" },
+      { key: "month", title: "Month" },
+      { key: "week", title: "Week" },
+      { key: "abc", title: "A - Z" }
+    ])
+  }
 });
 
 const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
@@ -104,38 +106,40 @@ const sortByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
   key: "sortBy",
   title: "Sort by",
   icon: SortBy.path,
-  items: map(options, [
-    {
-      key: "dateCreated",
-      title: "Date created",
-      isHidden: options.groupingKey === "trash"
-    },
-    {
-      key: "dateEdited",
-      title: "Date edited",
-      isHidden:
-        options.groupingKey === "trash" || options.groupingKey === "tags"
-    },
-    {
-      key: "dateDeleted",
-      title: "Date deleted",
-      isHidden: options.groupingKey !== "trash"
-    },
-    {
-      key: "dateModified",
-      title: "Date modified",
-      isHidden: options.groupingKey !== "tags"
-    },
-    {
-      key: "title",
-      title: "Title",
-      isHidden:
-        !options.isUngrouped &&
-        options.parentKey === "sortBy" &&
-        options.groupOptions.groupBy !== "abc" &&
-        options.groupOptions.groupBy !== "none"
-    }
-  ])
+  menu: {
+    items: map(options, [
+      {
+        key: "dateCreated",
+        title: "Date created",
+        isHidden: options.groupingKey === "trash"
+      },
+      {
+        key: "dateEdited",
+        title: "Date edited",
+        isHidden:
+          options.groupingKey === "trash" || options.groupingKey === "tags"
+      },
+      {
+        key: "dateDeleted",
+        title: "Date deleted",
+        isHidden: options.groupingKey !== "trash"
+      },
+      {
+        key: "dateModified",
+        title: "Date modified",
+        isHidden: options.groupingKey !== "tags"
+      },
+      {
+        key: "title",
+        title: "Title",
+        isHidden:
+          !options.isUngrouped &&
+          options.parentKey === "sortBy" &&
+          options.groupOptions.groupBy !== "abc" &&
+          options.groupOptions.groupBy !== "none"
+      }
+    ])
+  }
 });
 
 export function showSortMenu(groupingKey: GroupingKey, refresh: () => void) {
