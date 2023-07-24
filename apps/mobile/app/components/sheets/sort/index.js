@@ -149,7 +149,7 @@ const Sort = ({ type, screen }) => {
               item === "dateEdited") ? null : (
               <Button
                 key={item}
-                type={groupOptions.sortBy === item ? "grayBg" : "gray"}
+                type={groupOptions.sortBy === item ? "selected" : "gray"}
                 title={SORT[item]}
                 height={40}
                 iconPosition="left"
@@ -160,7 +160,9 @@ const Sort = ({ type, screen }) => {
                 }}
                 buttonType={{
                   text:
-                    groupOptions.sortBy === item ? colors.primary.accent : colors.secondary.paragraph
+                    groupOptions.sortBy === item
+                      ? colors.primary.accent
+                      : colors.secondary.paragraph
                 }}
                 fontSize={SIZE.sm}
                 onPress={async () => {
@@ -205,7 +207,9 @@ const Sort = ({ type, screen }) => {
               <Button
                 key={item}
                 testID={"btn-" + item}
-                type={groupOptions.groupBy === GROUP[item] ? "grayBg" : "gray"}
+                type={
+                  groupOptions.groupBy === GROUP[item] ? "selected" : "gray"
+                }
                 buttonType={{
                   text:
                     groupOptions.groupBy === GROUP[item]

@@ -71,17 +71,16 @@ export const RelationsList = ({
   onAdd
 }: RelationsListProps) => {
   const updater = useRelationStore((state) => state.updater);
-  const [items, setItems] = useState<Reminder[]>([]);
   const { colors } = useThemeColors();
+
+  const items =
+    (db.relations?.[relationType]?.(
+      { id: item?.id, type: item?.type },
+      referenceType
+    ) as any) || [];
+
   const hasNoRelations = !items || items.length === 0;
-  useEffect(() => {
-    setItems(
-      db.relations?.[relationType]?.(
-        { id: item?.id, type: item.type },
-        referenceType
-      ) as any
-    );
-  }, [item?.id, item?.type, referenceType, relationType, updater]);
+
   return (
     <View
       style={{ paddingHorizontal: 12, height: hasNoRelations ? 300 : "100%" }}

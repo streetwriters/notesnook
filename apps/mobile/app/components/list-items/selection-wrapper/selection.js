@@ -17,51 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
+import { useThemeColors } from "@notesnook/theme";
+import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
+import useIsSelected from "../../../hooks/use-selected";
 import { useSelectionStore } from "../../../stores/use-selection-store";
-import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
-import { useSettingStore } from "../../../stores/use-setting-store";
 
 export const SelectionIcon = ({ item }) => {
   const { colors } = useThemeColors();
-
   const selectionMode = useSelectionStore((state) => state.selectionMode);
-  const selectedItemsList = useSelectionStore(
-    (state) => state.selectedItemsList
-  );
-  const [selected, setSelected] = useState(false);
-  const notebooksListMode = useSettingStore(
-    (state) => state.settings.notebooksListMode
-  );
-  const notesListMode = useSettingStore(
-    (state) => state.settings.notesListMode
-  );
-  const listMode = item.type === "notebook" ? notebooksListMode : notesListMode;
+  const [selected] = useIsSelected(item);
 
-  const compactMode =
-    (item.type === "notebook" || item.type === "note") &&
-    listMode === "compact";
-
-  useEffect(() => {
-    if (selectionMode) {
-      let exists = selectedItemsList.filter(
-        (o) => o.dateCreated === item.dateCreated
-      );
-
-      if (exists[0]) {
-        if (!selected) {
-          setSelected(true);
-        }
-      } else {
-        if (selected) {
-          setSelected(false);
-        }
-      }
-    }
-  }, [selectedItemsList, item.id, selectionMode, item.dateCreated, selected]);
+  const compactMode = useIsCompactModeEnabled(item);
 
   return selectionMode ? (
     <View
@@ -80,7 +50,7 @@ export const SelectionIcon = ({ item }) => {
       {selected ? (
         <Icon
           size={compactMode ? SIZE.xl - 2 : SIZE.xl}
-          color={selected ? colors.primary.accent : colors.primary.icon}
+          color={selected ? colors.selected.accent : colors.primary.icon}
           name={"check"}
         />
       ) : null}

@@ -32,6 +32,7 @@ import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { getFormattedDate } from "@notesnook/common";
+import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 
 const showActionSheet = (item) => {
   Properties.present(item);
@@ -50,10 +51,7 @@ export const NotebookItem = ({
   totalNotes
 }) => {
   const { colors } = useThemeColors();
-  const notebooksListMode = useSettingStore(
-    (state) => state.settings.notebooksListMode
-  );
-  const compactMode = notebooksListMode === "compact";
+  const compactMode = useIsCompactModeEnabled(item);
   const topics = item.topics?.slice(0, 3) || [];
 
   return (

@@ -867,7 +867,12 @@ export class VaultDialog extends Component {
                 icon="fingerprint"
                 width="100%"
                 title="Biometric unlocking"
-                type={this.state.biometricUnlock ? "transparent" : "gray"}
+                iconColor={
+                  this.state.biometricUnlock
+                    ? colors.selected.icon
+                    : colors.primary.icon
+                }
+                type={this.state.biometricUnlock ? "transparent" : "selected"}
               />
             ) : null}
           </View>

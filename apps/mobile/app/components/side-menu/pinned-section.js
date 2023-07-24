@@ -108,7 +108,10 @@ export const PinItem = React.memo(
     alias = item?.alias || item?.title;
     const [visible, setVisible] = useState(false);
     const [headerTextState, setHeaderTextState] = useState(null);
-    const color = headerTextState?.id === item.id ? colors.primary.accent : colors.primary.icon;
+    const color =
+      headerTextState?.id === item.id
+        ? colors.primary.accent
+        : colors.primary.icon;
     const fwdRef = useRef();
 
     const onHeaderStateChange = useCallback(
@@ -171,7 +174,7 @@ export const PinItem = React.memo(
           </SheetWrapper>
         )}
         <PressableButton
-          type={headerTextState?.id === item.id ? "grayBg" : "gray"}
+          type={headerTextState?.id === item.id ? "selected" : "gray"}
           onLongPress={() => {
             if (placeholder) return;
             Properties.present(item);
@@ -233,7 +236,11 @@ export const PinItem = React.memo(
                   {alias}
                 </Heading>
               ) : (
-                <Paragraph numberOfLines={1} color={colors.primary.paragraph} size={SIZE.md}>
+                <Paragraph
+                  numberOfLines={1}
+                  color={colors.primary.paragraph}
+                  size={SIZE.md}
+                >
                   {alias}
                 </Paragraph>
               )}

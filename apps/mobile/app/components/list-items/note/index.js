@@ -40,6 +40,7 @@ import { ReminderTime } from "../../ui/reminder-time";
 import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 
 function navigateToTag(item) {
   const tag = db.tags.tag(item.id);
@@ -99,10 +100,7 @@ const NoteItem = ({
   noOpen = false
 }) => {
   const { colors } = useThemeColors();
-  const notesListMode = useSettingStore(
-    (state) => state.settings.notesListMode
-  );
-  const compactMode = notesListMode === "compact";
+  const compactMode = useIsCompactModeEnabled(item);
   const attachmentCount = db.attachments?.ofNote(item.id, "all")?.length || 0;
   const _update = useRelationStore((state) => state.updater);
   // eslint-disable-next-line react-hooks/exhaustive-deps

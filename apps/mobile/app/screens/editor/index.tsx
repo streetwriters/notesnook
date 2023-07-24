@@ -127,8 +127,8 @@ const Editor = React.memo(
       const onError = useCallback(() => {
         renderKey.current =
           renderKey.current === `editor-0` ? `editor-1` : `editor-0`;
-        editor.state.current.ready = false;
-        editor.setLoading(true);
+        // editor.state.current.ready = false;
+        //editor.setLoading(true);
       }, [editor]);
 
       useEffect(() => {

@@ -24,7 +24,6 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import { useThemeColors } from "@notesnook/theme";
-import { formatBytes } from "@notesnook/common";
 import { SIZE } from "../../utils/size";
 import { IconButton } from "../ui/icon-button";
 import { ProgressCircleComponent } from "../ui/svg/lazy";
@@ -49,7 +48,6 @@ export const AttachmentItem = ({
     attachment,
     encryption
   );
-
   const onPress = () => {
     if (!pressable) return;
     Actions.present(attachment, setAttachments, context);

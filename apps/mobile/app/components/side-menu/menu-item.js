@@ -85,7 +85,7 @@ export const MenuItem = React.memo(
         testID={testID}
         key={item.name + index}
         onPress={_onPress}
-        type={!isFocused ? "gray" : "grayBg"}
+        type={isFocused ? "selected" : "gray"}
         customStyle={{
           width: "100%",
           alignSelf: "center",
@@ -115,13 +115,13 @@ export const MenuItem = React.memo(
               item.icon === "crown"
                 ? colors.static.yellow
                 : isFocused
-                ? colors.primary.accent
+                ? colors.selected.icon
                 : colors.secondary.icon
             }
             size={SIZE.lg - 2}
           />
           {isFocused ? (
-            <Heading color={colors.primary.heading} size={SIZE.md}>
+            <Heading color={colors.selected.heading} size={SIZE.md}>
               {item.name}
             </Heading>
           ) : (

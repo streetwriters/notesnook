@@ -44,7 +44,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
   const { colors } = useThemeColors();
   const notes = data;
   const [visible, setVisible] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const onPress = (item) => {
     let ind = notes.findIndex(
@@ -77,7 +77,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
     }
     timeout = setTimeout(() => {
       let index = offsets.findIndex((o, i) => o <= y && offsets[i + 1] > y);
-      setCurrentIndex(index);
+      setCurrentIndex(index || 0);
     }, 200);
   };
 
@@ -113,7 +113,6 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
         offsets.push(offset);
       });
   }, [notes]);
-
   return !visible ? null : (
     <BaseDialog
       onShow={() => {
@@ -157,7 +156,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
                   <PressableButton
                     key={item.title}
                     onPress={() => onPress(item, index)}
-                    type={currentIndex === index ? "accent" : "transparent"}
+                    type={currentIndex === index ? "selected" : "transparent"}
                     customStyle={{
                       minWidth: "20%",
                       width: null,
@@ -172,7 +171,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
                       size={SIZE.sm}
                       color={
                         currentIndex === index
-                          ? colors.static.white
+                          ? colors.selected.accent
                           : colors.primary.accent
                       }
                       style={{

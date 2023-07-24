@@ -487,7 +487,7 @@ const TopicItem = ({
 
   return (
     <PressableButton
-      type={isSelected || isFocused ? "grayBg" : "transparent"}
+      type={isSelected || isFocused ? "selected" : "transparent"}
       onLongPress={() => {
         if (selection.enabled) return;
         selection.setEnabled(true);
@@ -519,7 +519,7 @@ const TopicItem = ({
         {selection.enabled ? (
           <IconButton
             size={SIZE.lg}
-            color={isSelected ? colors.primary.accent : colors.primary.icon}
+            color={isSelected ? colors.selected.icon : colors.primary.icon}
             name={
               isSelected
                 ? "check-circle-outline"
@@ -530,7 +530,7 @@ const TopicItem = ({
         <Paragraph size={SIZE.sm}>
           {item.title}{" "}
           {notesCount ? (
-            <Paragraph size={SIZE.xs} color={colors.primary.icon}>
+            <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
               {notesCount}
             </Paragraph>
           ) : null}

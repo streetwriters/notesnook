@@ -1074,13 +1074,6 @@ export const settingsGroups: SettingSection[] = [
         icon: "bug",
         sections: [
           {
-            id: "debug-mode",
-            type: "switch",
-            name: "Debug mode",
-            description: "Show debug options on items",
-            property: "devMode"
-          },
-          {
             id: "debug-logs",
             type: "screen",
             name: "Debug logs",

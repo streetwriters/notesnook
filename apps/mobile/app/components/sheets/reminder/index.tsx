@@ -299,7 +299,7 @@ export default function ReminderSheet({
               type={
                 reminderMode ===
                 ReminderModes[mode as keyof typeof ReminderModes]
-                  ? "grayAccent"
+                  ? "selected"
                   : "gray"
               }
               onPress={() => {

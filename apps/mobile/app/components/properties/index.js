@@ -137,7 +137,6 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
             }}
           />
           <Synced item={item} close={close} />
-          <DevMode item={item} />
 
           {DDS.isTab ? (
             <View

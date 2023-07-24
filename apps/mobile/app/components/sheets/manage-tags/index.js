@@ -163,12 +163,12 @@ const ManageTagsSheet = (props) => {
               padding: 12
             }}
             onPress={onSubmit}
-            type="accent"
+            type="selected"
           >
-            <Heading size={SIZE.sm} color={colors.static.white}>
+            <Heading size={SIZE.sm} color={colors.selected.heading}>
               Add {'"' + "#" + query + '"'}
             </Heading>
-            <Icon name="plus" color={colors.static.white} size={SIZE.lg} />
+            <Icon name="plus" color={colors.selected.icon} size={SIZE.lg} />
           </PressableButton>
         ) : null}
         {!allTags || allTags.length === 0 ? (
@@ -263,7 +263,7 @@ const TagItem = ({ tag, notes, setNotes }) => {
         }}
         color={
           someNotesTagged || allNotesTagged
-            ? colors.primary.accent
+            ? colors.selected.icon
             : colors.primary.icon
         }
         testID={

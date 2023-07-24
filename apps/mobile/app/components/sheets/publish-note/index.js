@@ -226,7 +226,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
                 if (publishing) return;
                 setIsLocked(!isLocked);
               }}
-              color={isLocked ? colors.primary.accent : colors.primary.icon}
+              color={isLocked ? colors.selected.icon : colors.primary.icon}
               size={SIZE.xl}
               name={
                 isLocked
@@ -265,7 +265,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
               onPress={() => {
                 setSelfDestruct(!selfDestruct);
               }}
-              color={selfDestruct ? colors.primary.accent : colors.primary.icon}
+              color={selfDestruct ? colors.selected.icon : colors.primary.icon}
               size={SIZE.xl}
               name={
                 selfDestruct

@@ -157,7 +157,7 @@ const ColorItem = React.memo(
             />
           </View>
           {headerTextState?.id === item.id ? (
-            <Heading color={colors.primary.heading} size={SIZE.md}>
+            <Heading color={colors.selected.heading} size={SIZE.md}>
               {alias.slice(0, 1).toUpperCase() + alias.slice(1)}
             </Heading>
           ) : (

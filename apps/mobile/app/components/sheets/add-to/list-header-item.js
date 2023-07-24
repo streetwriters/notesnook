@@ -58,7 +58,7 @@ export const ListHeaderInputItem = ({
         }}
         button={{
           icon: inputValue ? "plus" : "magnify",
-          color: focused ? colors.primary.accent : colors.secondary.icon,
+          color: focused ? colors.selected.icon : colors.secondary.icon,
           onPress: async () => {
             const result = await onSubmit(inputValue);
             if (result) {

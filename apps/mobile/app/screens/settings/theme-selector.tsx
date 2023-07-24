@@ -46,7 +46,7 @@ import { SIZE } from "../../utils/size";
 import { getElevationStyle } from "../../utils/elevation";
 import { MenuItemsList } from "../../utils/constants";
 
-const THEME_SERVER_URL = "http://192.168.43.127:9000";
+const THEME_SERVER_URL = "https://themes.notesnook.com";
 //@ts-ignore
 export const themeTrpcClient = createTRPCProxyClient<ThemesRouter>({
   links: [
@@ -349,6 +349,7 @@ export default function ThemeSelectorWithQueryClient() {
     //@ts-ignore
     trpc.createClient({
       links: [
+        //@ts-ignore
         httpBatchLink({
           url: THEME_SERVER_URL
         })

@@ -59,12 +59,13 @@ export const EmotionEditorToolbarTheme = (props: PropsWithChildren<any>) => {
   const theme = useMemo(
     () =>
       ThemeFactory.construct({
-        colors: colors["primary"],
-        colorScheme: isDark ? "dark" : "light"
+        colorScheme: isDark ? "dark" : "light",
+        scope: colors
       }),
     [colors, isDark]
   );
   modifyToolbarTheme(theme);
+  console.log(theme);
   return (
     <EmotionThemeProvider theme={theme}>{props.children}</EmotionThemeProvider>
   );
@@ -75,8 +76,8 @@ export const EmotionEditorTheme = (props: PropsWithChildren<any>) => {
   const theme = useMemo(
     () =>
       ThemeFactory.construct({
-        colors: colors["primary"],
-        colorScheme: isDark ? "dark" : "light"
+        colorScheme: isDark ? "dark" : "light",
+        scope: colors
       }),
     [colors, isDark]
   );

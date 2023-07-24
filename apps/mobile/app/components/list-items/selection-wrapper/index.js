@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useRef } from "react";
-import { useSelectionStore } from "../../../stores/use-selection-store";
-import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
+import React, { useRef } from "react";
+import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
+import { useSelectionStore } from "../../../stores/use-selection-store";
 import { PressableButton } from "../../ui/pressable";
 import { Filler } from "./back-fill";
 import { SelectionIcon } from "./selection";
@@ -29,49 +29,31 @@ const SelectionWrapper = ({
   children,
   item,
   background,
-  onLongPress,
   onPress,
   testID,
   isSheet
 }) => {
   const itemId = useRef(item.id);
   const { colors, isDark } = useThemeColors();
-  const notebooksListMode = useSettingStore(
-    (state) => state.settings.notebooksListMode
-  );
-  const notesListMode = useSettingStore(
-    (state) => state.settings.notesListMode
-  );
-  const listMode =
-    item.type === "notebook" || item.itemType === "notebook"
-      ? notebooksListMode
-      : notesListMode;
-  const compactMode =
-    (item.type === "notebook" ||
-      item.itemType === "notebook" ||
-      item.itemType === "note" ||
-      item.type === "note") &&
-    listMode === "compact";
+  const compactMode = useIsCompactModeEnabled(item);
+
   if (item.id !== itemId.current) {
     itemId.current = item.id;
   }
 
-  const _onLongPress = () => {
+  const onLongPress = () => {
     if (!useSelectionStore.getState().selectionMode) {
       useSelectionStore.getState().setSelectionMode(true);
     }
     useSelectionStore.getState().setSelectedItem(item);
   };
 
-  const _onPress = async () => {
-    await onPress();
-  };
   return (
     <PressableButton
       customColor={isSheet ? colors.primary.hover : "transparent"}
       testID={testID}
-      onLongPress={_onLongPress}
-      onPress={_onPress}
+      onLongPress={onLongPress}
+      onPress={onPress}
       customSelectedColor={colors.primary.hover}
       customAlpha={!isDark ? -0.02 : 0.02}
       customOpacity={1}

@@ -153,12 +153,20 @@ export const MoveNotes = ({
           >
             <Paragraph
               numberOfLines={1}
-              color={item?.id === topic?.id ? colors.primary.accent : colors.primary.paragraph}
+              color={
+                item?.id === topic?.id
+                  ? colors.primary.accent
+                  : colors.primary.paragraph
+              }
             >
               {item.title}
             </Paragraph>
             {item.type == "note" && item.headline ? (
-              <Paragraph numberOfLines={1} color={colors.secondary.paragraph} size={SIZE.xs}>
+              <Paragraph
+                numberOfLines={1}
+                color={colors.secondary.paragraph}
+                size={SIZE.xs}
+              >
                 {item.headline}
               </Paragraph>
             ) : null}
@@ -183,14 +191,22 @@ export const MoveNotes = ({
                 backgroundColor: "transparent"
               }}
               name="check"
-              type="grayAccent"
-              color={colors.primary.accent}
+              type="selected"
+              color={colors.selected.icon}
             />
           ) : null}
         </PressableButton>
       );
     },
-    [colors.primary.accent, colors.secondary.paragraph, colors.primary.paragraph, select, selectedNoteIds, topic]
+    [
+      colors.primary.accent,
+      colors.secondary.paragraph,
+      colors.primary.paragraph,
+      colors.selected.icon,
+      select,
+      selectedNoteIds,
+      topic
+    ]
   );
 
   /**
@@ -241,7 +257,9 @@ export const MoveNotes = ({
               marginTop: 5
             }}
           >
-            <Paragraph color={colors.primary.accent}>in {topic.title}</Paragraph>
+            <Paragraph color={colors.selected.paragraph}>
+              in {topic.title}
+            </Paragraph>
 
             <Paragraph
               style={{

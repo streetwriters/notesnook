@@ -29,12 +29,11 @@ import {
 } from "react-native";
 import Animated from "react-native-reanimated";
 import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/color-scheme/utils";
-import { BUTTON_TYPES } from "../../../utils/constants";
 import { br } from "../../../utils/size";
 export interface PressableButtonProps extends PressableProps {
   customStyle?: ViewStyle;
   noborder?: boolean;
-  type?: keyof typeof BUTTON_TYPES;
+  type?: ButtonTypes;
   accentColor?: string;
   accentText?: string;
   customColor?: ColorValue;
@@ -57,7 +56,8 @@ type ButtonTypes =
   | "white"
   | "error"
   | "errorShade"
-  | "warn";
+  | "warn"
+  | "selected";
 export const useButton = ({
   type,
   accent,
@@ -95,6 +95,11 @@ export const useButton = ({
       primary: colors.secondary.background,
       text: colors.secondary.paragraph,
       selected: colors.secondary.background
+    },
+    selected: {
+      primary: colors.selected.background,
+      text: colors.selected.paragraph,
+      selected: colors.selected.background
     },
     grayAccent: {
       primary: colors.secondary.background,

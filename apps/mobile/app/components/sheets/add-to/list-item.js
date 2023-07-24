@@ -63,7 +63,7 @@ const SelectionIndicator = ({
         isRemoved
           ? colors.static.red
           : isIntermediate || isSelected
-          ? colors.primary.accent
+          ? colors.selected.icon
           : colors.primary.icon
       }
       onPress={() => {

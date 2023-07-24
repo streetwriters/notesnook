@@ -109,6 +109,7 @@ export const withThemeProvider = (Element) => {
         })
         .then((theme) => {
           if (theme) {
+            console.log(theme.version, "theme updated");
             theme.colorScheme === "dark"
               ? useThemeStore.getState().setDarkTheme(theme)
               : useThemeStore.getState().setLightTheme(theme);
