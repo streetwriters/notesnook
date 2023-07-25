@@ -86,7 +86,7 @@ export const Card = ({ color, warning }) => {
               marginRight: 10
             }}
           >
-            <Paragraph color={colors.secondary.icon} size={SIZE.xs}>
+            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
               {messageBoardState.message}
             </Paragraph>
             <Paragraph
