@@ -136,28 +136,3 @@ export async function exportNotes(
     }
   });
 }
-
-function renderMath(content: string) {
-  const katex = require("katex");
-  require("katex/contrib/mhchem");
-
-  const div = document.createElement("div");
-  div.innerHTML = content;
-
-  const mathBlocks = div.querySelectorAll(".math-block.math-node");
-  const mathInlines = div.querySelectorAll(".math-inline.math-node");
-
-  for (const mathBlock of mathBlocks) {
-    const text = mathBlock.textContent;
-    mathBlock.innerHTML = katex.renderToString(text, {
-      displayMode: true,
-      output: "mathml"
-    });
-  }
-  for (const mathInline of mathInlines) {
-    const text = mathInline.textContent;
-    mathInline.innerHTML = katex.renderToString(text, { output: "mathml" });
-  }
-
-  return div.innerHTML;
-}
