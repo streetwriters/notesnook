@@ -11,12 +11,6 @@
   "main": "dist/index.js",
   "devDependencies": {
     "@playwright/test": "^1.27.1",
-    "@types/css": "^0.0.33",
-    "@types/css-tree": "^1.0.7",
-    "@types/dompurify": "^2.3.4",
-    "@types/stylis": "^4.0.2",
-    "esbuild": "^0.15.9",
-    "ts-node": "^10.9.1",
     "slugify": "^1.6.5"
   },
   "publishConfig": {
@@ -36,7 +30,7 @@
   },
   "dependencies": {
     "@mozilla/readability": "^0.4.2",
-    "css-what": "^6.1.0",
+    "css-what": "6.1.0",
     "hyperapp": "^2.0.22",
     "specificity": "^0.4.1"
   }
