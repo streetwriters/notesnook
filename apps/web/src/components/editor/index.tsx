@@ -220,7 +220,8 @@ export default function EditorManager({
             alignSelf: "stretch",
             overflow: "hidden",
             flex: 1,
-            flexDirection: "column"
+            flexDirection: "column",
+            background: "background"
           }}
         >
           {previewSession.current && (
@@ -401,65 +402,63 @@ export function Editor(props: EditorProps) {
 
   return (
     <EditorChrome isLoading={isLoading} {...props}>
-      <ScopedThemeProvider scope="editor" sx={{ flex: 1 }}>
-        <Tiptap
-          isMobile={isMobile}
-          nonce={nonce}
-          readonly={readonly}
-          toolbarContainerId={headless ? undefined : "editorToolbar"}
-          content={content}
-          downloadOptions={{
-            corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
-          }}
-          onLoad={() => {
-            if (onLoadMedia) onLoadMedia();
-            if (nonce && nonce > 0) setIsLoading(false);
-          }}
-          onContentChange={onContentChange}
-          onChange={onEditorChange}
-          onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
-          onPreviewAttachment={async ({ hash, dataurl }) => {
-            const attachment = db.attachments?.attachment(hash);
-            if (attachment && attachment.metadata.type.startsWith("image/")) {
-              const container = document.getElementById("dialogContainer");
-              if (!(container instanceof HTMLElement)) return;
+      <Tiptap
+        isMobile={isMobile}
+        nonce={nonce}
+        readonly={readonly}
+        toolbarContainerId={headless ? undefined : "editorToolbar"}
+        content={content}
+        downloadOptions={{
+          corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
+        }}
+        onLoad={() => {
+          if (onLoadMedia) onLoadMedia();
+          if (nonce && nonce > 0) setIsLoading(false);
+        }}
+        onContentChange={onContentChange}
+        onChange={onEditorChange}
+        onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
+        onPreviewAttachment={async ({ hash, dataurl }) => {
+          const attachment = db.attachments?.attachment(hash);
+          if (attachment && attachment.metadata.type.startsWith("image/")) {
+            const container = document.getElementById("dialogContainer");
+            if (!(container instanceof HTMLElement)) return;
 
-              dataurl = dataurl || (await downloadAttachment(hash, "base64"));
-              if (!dataurl)
-                return showToast("error", "This image cannot be previewed.");
+            dataurl = dataurl || (await downloadAttachment(hash, "base64"));
+            if (!dataurl)
+              return showToast("error", "This image cannot be previewed.");
 
-              ReactDOM.render(
-                <ScopedThemeProvider>
-                  <Lightbox
-                    image={dataurl}
-                    onClose={() => {
-                      ReactDOM.unmountComponentAtNode(container);
-                    }}
-                  />
-                </ScopedThemeProvider>,
-                container
-              );
-            } else if (attachment && onPreviewDocument) {
-              onPreviewDocument({ hash });
-              const blob = await downloadAttachment(hash, "blob");
-              if (!blob) return;
-              onPreviewDocument({ url: URL.createObjectURL(blob), hash });
-            }
-          }}
-          onInsertAttachment={(type) => {
-            const mime = type === "file" ? "*/*" : "image/*";
-            insertAttachment(mime).then((file) => {
-              if (!file) return;
-              editor.current?.attachFile(file);
-            });
-          }}
-          onAttachFile={async (file) => {
-            const result = await attachFile(file);
-            if (!result) return;
-            editor.current?.attachFile(result);
-          }}
-        />
-      </ScopedThemeProvider>
+            ReactDOM.render(
+              <ScopedThemeProvider>
+                <Lightbox
+                  image={dataurl}
+                  onClose={() => {
+                    ReactDOM.unmountComponentAtNode(container);
+                  }}
+                />
+              </ScopedThemeProvider>,
+              container
+            );
+          } else if (attachment && onPreviewDocument) {
+            onPreviewDocument({ hash });
+            const blob = await downloadAttachment(hash, "blob");
+            if (!blob) return;
+            onPreviewDocument({ url: URL.createObjectURL(blob), hash });
+          }
+        }}
+        onInsertAttachment={(type) => {
+          const mime = type === "file" ? "*/*" : "image/*";
+          insertAttachment(mime).then((file) => {
+            if (!file) return;
+            editor.current?.attachFile(file);
+          });
+        }}
+        onAttachFile={async (file) => {
+          const result = await attachFile(file);
+          if (!result) return;
+          editor.current?.attachFile(result);
+        }}
+      />
     </EditorChrome>
   );
 }
