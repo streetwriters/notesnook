@@ -58,7 +58,7 @@ export function EmotionThemeProvider(
 
   return (
     <ThemeProvider theme={themeProperties}>
-      <NNScopedThemeProvider value={themeScope}>
+      <NNScopedThemeProvider value={scope}>
         {injectCssVars ? (
           <Box
             {...restProps}
