@@ -107,7 +107,8 @@ export function Toolbar(props: ToolbarProps) {
                 pr: 2,
                 mr: 2,
                 borderRight: "1px solid var(--border)",
-                ":last-of-type": { mr: 0, pr: 0, borderRight: "none" }
+                ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
+                alignItems: "center"
               }}
             />
           );
