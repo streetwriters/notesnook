@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor, AnyExtension, Extensions } from "@tiptap/core";
-import StarterKit from "@tiptap/starter-kit";
+import StarterKit, { StarterKitOptions } from "@tiptap/starter-kit";
 import { builders, NodeBuilder } from "prosemirror-test-builder";
 import { Schema } from "@tiptap/pm/model";
 
@@ -28,7 +28,7 @@ type Builder<TNodes extends string> = {
 
 type EditorOptions<TNodes extends string> = {
   element?: HTMLElement;
-  extensions: Record<TNodes, AnyExtension>;
+  extensions: Record<TNodes, AnyExtension | false>;
   initialContent?: string;
 };
 
@@ -41,11 +41,13 @@ export function createEditor<TNodes extends string>(
     content: initialContent,
     extensions: [
       StarterKit.configure({
-        bulletList: false,
-        listItem: false,
-        orderedList: false,
-        codeBlock: false,
-        code: false
+        ...Object.entries(extensions).reduce(
+          (prev, [name]) => ({
+            ...prev,
+            [name]: false
+          }),
+          {}
+        )
       }),
       ...(Object.values(extensions) as Extensions)
     ]
