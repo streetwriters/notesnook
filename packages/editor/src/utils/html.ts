@@ -18,16 +18,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export function convertBrToParagraph(html: string) {
-  const doc = new DOMParser().parseFromString(html, "text/html");
+  const doc = new DOMParser().parseFromString(
+    convertNewlinesToBr(html),
+    "text/html"
+  );
   for (const br of doc.querySelectorAll("br")) {
-    const paragraph = br.closest("p");
+    let paragraph = br.closest("p");
+
+    // if no paragraph is found over the br, we add one.
+    if (!paragraph && br.parentElement) {
+      const parent = br.parentElement;
+      const p = document.createElement("p");
+      p.append(...parent.childNodes);
+      parent.append(p);
+      paragraph = p;
+    }
+
     if (paragraph && paragraph.childNodes.length === 1) continue;
     if (paragraph) {
       splitOn(paragraph, br);
       const children = Array.from(paragraph.childNodes.values());
       const newParagraph = doc.createElement("p");
       newParagraph.dataset.spacing = "single";
-      paragraph.dataset.spacing = "single";
       newParagraph.append(...children.slice(children.indexOf(br) + 1));
       paragraph.insertAdjacentElement("afterend", newParagraph);
       br.remove();
@@ -51,4 +63,13 @@ function splitOn(bound: Element, cutElement: Element) {
       grandparent?.insertBefore(cutElement, right);
     }
   }
+}
+
+function convertNewlinesToBr(html: string) {
+  const lines = html.split(/\n/gm);
+  for (let i = 0; i < lines.length; ++i) {
+    if (lines[i].trim().endsWith(">")) continue;
+    lines[i] += "<br>";
+  }
+  return lines.join("");
 }

@@ -21,23 +21,22 @@ import { test } from "vitest";
 import { convertBrToParagraph } from "../html";
 
 const cases = [
+  [`<p>line 1<br>line 2</p>`],
+  [`<p>line <em>1<br>line</em> 2</p>`],
+  [`<p>line <span><em>1<br>line</em></span> 2</p>`],
+  [`<p>line <span><em>1<br data-some="hello">line</em></span> 2</p>`],
+  [`<p><br/></p>`],
   [
-    `<p>line 1<br>line 2</p>`,
-    `<p data-spacing="single">line 1</p><p data-spacing="single">line 2</p>`
+    `
+  <html><body>
+<!--StartFragment-->A troll, they call me, but I have no wish<br>
+to be associated with those dolls<br>
+<br>
+We lack religion, purpose, politics,<br>
+and yet, we somehow manage to get by.<br>
+</body>
+</html>`
   ],
-  [
-    `<p>line <em>1<br>line</em> 2</p>`,
-    `<p data-spacing="single">line <em>1</em></p><p data-spacing="single"><em>line</em> 2</p>`
-  ],
-  [
-    `<p>line <span><em>1<br>line</em></span> 2</p>`,
-    `<p data-spacing="single">line <span><em>1</em></span></p><p data-spacing="single"><span><em>line</em></span> 2</p>`
-  ],
-  [
-    `<p>line <span><em>1<br data-some="hello">line</em></span> 2</p>`,
-    `<p data-spacing="single">line <span><em>1</em></span></p><p data-spacing="single"><span><em>line</em></span> 2</p>`
-  ],
-  [`<p><br/></p>`, `<p><br></p>`],
   [
     `<html><body>
     <!--StartFragment--><p dir="auto">When I try to paste something (e.g. email content) to a note, the styling is kept, which is good, but the newlines are removed.<br>
@@ -50,24 +49,27 @@ const cases = [
     Pro: true<br>
     Logged in: yes</p><!--EndFragment-->
     </body>
-    </html>`,
-    `<!--StartFragment--><p dir="auto" data-spacing="single">When I try to paste something (e.g. email content) to a note, the styling is kept, which is good, but the newlines are removed.</p><p data-spacing="single">
-    Also when I share the selection to Notesnook via the share functionality from Android, I have the same issue.</p>
-    <hr>
-    <p dir="auto" data-spacing="single"><strong>Device information:</strong></p><p data-spacing="single">
-    App version: 2.3.0</p><p data-spacing="single">
-    Platform: android</p><p data-spacing="single">
-    Model: OnePlus-CPH2409-31</p><p data-spacing="single">
-    Pro: true</p><p data-spacing="single">
-    Logged in: yes</p><!--EndFragment-->`
+    </html>`
+  ],
+  [
+    `<html><body>
+    <!--StartFragment--><span class="css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0">Why switch from Gmail? 
+
+    Not sacrificing features for more privacy, prefer using one app, in many public groups and channels (Telegram)
+    
+    LibreOffice Slow &amp; buggy
+    
+    Switched to Brave for the better Android app, more private out of the box &amp; unsure if uBlock Origin closes gap</span><!--EndFragment-->
+    </body>
+    </html>`
   ]
 ];
 
 for (const testCase of cases) {
   const [html, expected] = testCase;
   test(`convert br tags to paragraphs (${testCase})`, (t) => {
-    t.expect(convertBrToParagraph(html).body.innerHTML.trim()).toBe(
-      expected.trim()
-    );
+    t.expect(
+      convertBrToParagraph(html).body.innerHTML.trim()
+    ).toMatchSnapshot();
   });
 }

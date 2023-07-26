@@ -1,0 +1,45 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`convert br tags to paragraphs (
+  <html><body>
+<!--StartFragment-->A troll, they call me, but I have no wish<br>
+to be associated with those dolls<br>
+<br>
+We lack religion, purpose, politics,<br>
+and yet, we somehow manage to get by.<br>
+</body>
+</html>) 1`] = `"<p><!--StartFragment-->A troll, they call me, but I have no wish</p><p data-spacing=\\"single\\">to be associated with those dolls</p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\">We lack religion, purpose, politics,</p><p data-spacing=\\"single\\">and yet, we somehow manage to get by.</p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\">  </p>"`;
+
+exports[`convert br tags to paragraphs (<html><body>
+    <!--StartFragment--><p dir="auto">When I try to paste something (e.g. email content) to a note, the styling is kept, which is good, but the newlines are removed.<br>
+    Also when I share the selection to Notesnook via the share functionality from Android, I have the same issue.</p>
+    <hr>
+    <p dir="auto"><strong>Device information:</strong><br>
+    App version: 2.3.0<br>
+    Platform: android<br>
+    Model: OnePlus-CPH2409-31<br>
+    Pro: true<br>
+    Logged in: yes</p><!--EndFragment-->
+    </body>
+    </html>) 1`] = `"<!--StartFragment--><p dir=\\"auto\\">When I try to paste something (e.g. email content) to a note, the styling is kept, which is good, but the newlines are removed.</p><p data-spacing=\\"single\\">    Also when I share the selection to Notesnook via the share functionality from Android, I have the same issue.</p>    <hr>    <p dir=\\"auto\\"><strong>Device information:</strong></p><p data-spacing=\\"single\\">    App version: 2.3.0</p><p data-spacing=\\"single\\">    Platform: android</p><p data-spacing=\\"single\\">    Model: OnePlus-CPH2409-31</p><p data-spacing=\\"single\\">    Pro: true</p><p data-spacing=\\"single\\">    Logged in: yes</p><!--EndFragment-->"`;
+
+exports[`convert br tags to paragraphs (<html><body>
+    <!--StartFragment--><span class="css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0">Why switch from Gmail? 
+
+    Not sacrificing features for more privacy, prefer using one app, in many public groups and channels (Telegram)
+    
+    LibreOffice Slow &amp; buggy
+    
+    Switched to Brave for the better Android app, more private out of the box &amp; unsure if uBlock Origin closes gap</span><!--EndFragment-->
+    </body>
+    </html>) 1`] = `"<!--StartFragment--><span class=\\"css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0\\"><p>Why switch from Gmail? </p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\">    Not sacrificing features for more privacy, prefer using one app, in many public groups and channels (Telegram)</p><p data-spacing=\\"single\\">    </p><p data-spacing=\\"single\\">    LibreOffice Slow &amp; buggy</p><p data-spacing=\\"single\\">    </p><p data-spacing=\\"single\\">    Switched to Brave for the better Android app, more private out of the box &amp; unsure if uBlock Origin closes gap</p></span><!--EndFragment-->"`;
+
+exports[`convert br tags to paragraphs (<p><br/></p>) 1`] = `"<p><br></p>"`;
+
+exports[`convert br tags to paragraphs (<p>line <em>1<br>line</em> 2</p>) 1`] = `"<p>line <em>1</em></p><p data-spacing=\\"single\\"><em>line</em> 2</p>"`;
+
+exports[`convert br tags to paragraphs (<p>line <span><em>1<br data-some="hello">line</em></span> 2</p>) 1`] = `"<p>line <span><em>1</em></span></p><p data-spacing=\\"single\\"><span><em>line</em></span> 2</p>"`;
+
+exports[`convert br tags to paragraphs (<p>line <span><em>1<br>line</em></span> 2</p>) 1`] = `"<p>line <span><em>1</em></span></p><p data-spacing=\\"single\\"><span><em>line</em></span> 2</p>"`;
+
+exports[`convert br tags to paragraphs (<p>line 1<br>line 2</p>) 1`] = `"<p>line 1</p><p data-spacing=\\"single\\">line 2</p>"`;
