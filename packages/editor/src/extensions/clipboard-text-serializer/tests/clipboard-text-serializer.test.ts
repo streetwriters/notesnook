@@ -21,7 +21,11 @@ import { test } from "vitest";
 import { createEditor, h } from "../../../../test-utils";
 import OrderedList from "../../ordered-list";
 import { ListItem } from "../../list-item";
-import { getTextBetween, transformCopied, DOMSerializer2 } from "../index";
+import {
+  getTextBetween,
+  transformCopied,
+  ClipboardDOMSerializer
+} from "../index";
 import { Paragraph } from "../../paragraph";
 
 test("copied list items shouldn't contain extra newlines", (t) => {
@@ -41,7 +45,9 @@ test("copied list items shouldn't contain extra newlines", (t) => {
     }
   });
 
-  const serializer = DOMSerializer2.fromSchema(editor.view.state.schema);
+  const serializer = ClipboardDOMSerializer.fromSchema(
+    editor.view.state.schema
+  );
   t.expect(
     new XMLSerializer().serializeToString(
       serializer.serializeFragment(
@@ -153,7 +159,9 @@ for (const testCase of paragraphTestCases) {
       }
     });
 
-    const serializer = DOMSerializer2.fromSchema(editor.view.state.schema);
+    const serializer = ClipboardDOMSerializer.fromSchema(
+      editor.view.state.schema
+    );
     t.expect(
       new XMLSerializer().serializeToString(
         serializer.serializeFragment(
