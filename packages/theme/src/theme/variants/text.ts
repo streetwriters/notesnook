@@ -51,13 +51,13 @@ const body: ThemeUIStyleObject = { variant: "text.default", fontSize: "body" };
 const subBody: ThemeUIStyleObject = {
   variant: "text.default",
   fontSize: "subBody",
-  color: "var(--paragraph-secondary)"
+  color: "paragraph-secondary"
 };
 
 const error: ThemeUIStyleObject = {
   variant: "text.default",
   fontSize: "subBody",
-  color: "var(--paragraph-error)"
+  color: "paragraph-error"
 };
 
 export const textVariants = {

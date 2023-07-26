@@ -32,72 +32,72 @@ function EmailConfirmed() {
   }, [userId]);
 
   return (
-    <BaseThemeProvider>
+    <BaseThemeProvider
+      addGlobalStyles
+      sx={{
+        display: "flex",
+        bg: "background",
+        flexDirection: "column",
+        fontSize: [14, 16, 18],
+        height: "100%",
+        overflowY: "auto"
+      }}
+    >
       <Flex
-        bg="background"
         sx={{
+          flex: 1,
           flexDirection: "column",
-          fontSize: [14, 16, 18],
-          height: "100%",
-          overflowY: "auto"
+          alignItems: "center",
+          justifyContent: "center"
         }}
       >
-        <Flex
+        <MailCheck
+          sx={{ bg: "shade", borderRadius: 100, p: 5 }}
+          size={72}
+          color="accent"
+        />
+        <Text
+          variant="heading"
+          mt={5}
           sx={{
-            flex: 1,
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center"
+            fontSize: "2.5em",
+            textAlign: "center",
+            fontWeight: "heading"
           }}
         >
-          <MailCheck
-            sx={{ bg: "shade", borderRadius: 100, p: 5 }}
-            size={72}
-            color="accent"
-          />
-          <Text
-            variant="heading"
-            mt={5}
-            sx={{
-              fontSize: "2.5em",
-              textAlign: "center",
-              fontWeight: "heading"
-            }}
-          >
-            Huzzah!
-          </Text>
-          <Text
-            variant="heading"
-            mt={2}
-            sx={{
-              fontSize: "1.5em",
-              textAlign: "center",
-              fontWeight: "bold",
-              color: "icon"
-            }}
-          >
-            Your email has been confirmed.
-          </Text>
-          <Text
-            variant="body"
-            mt={2}
-            sx={{
-              wordWrap: "break-word",
-              fontSize: "1.2em",
-              textAlign: "center",
-              color: "var(--paragraph-secondary)"
-            }}
-          >
-            Thank you for choosing end-to-end encrypted note taking.
-          </Text>
-        </Flex>
-        <Flex
-          bg="var(--background-secondary)"
-          p={5}
-          sx={{ flexDirection: "column", justifyContent: "center" }}
+          Huzzah!
+        </Text>
+        <Text
+          variant="heading"
+          mt={2}
+          sx={{
+            fontSize: "1.5em",
+            textAlign: "center",
+            fontWeight: "bold",
+            color: "icon"
+          }}
         >
-          <BlogPromoBanner />
-        </Flex>
+          Your email has been confirmed.
+        </Text>
+        <Text
+          variant="body"
+          mt={2}
+          sx={{
+            wordWrap: "break-word",
+            fontSize: "1.2em",
+            textAlign: "center",
+            color: "var(--paragraph-secondary)"
+          }}
+        >
+          Thank you for choosing end-to-end encrypted note taking.
+        </Text>
+      </Flex>
+      <Flex
+        bg="var(--background-secondary)"
+        p={5}
+        sx={{ flexDirection: "column", justifyContent: "center" }}
+      >
+        <BlogPromoBanner />
       </Flex>
     </BaseThemeProvider>
   );

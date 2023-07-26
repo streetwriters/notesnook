@@ -881,10 +881,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
           sx={{
             mt: 5,
             color: "paragraph",
-            textDecoration: "none",
-            ":hover": {
-              color: "hover"
-            }
+            textDecoration: "none"
           }}
           onClick={() => {
             openURL("/notes/");

@@ -51,6 +51,12 @@ export function BaseThemeProvider(
   const cssTheme = useMemo(() => themeToCSS(theme), [theme]);
 
   useEffect(() => {
+    (async () => {
+      await useThemeStore.getState().init();
+    })();
+  }, []);
+
+  useEffect(() => {
     useThemeEngineStore.getState().setTheme(theme);
   }, [theme]);
 
