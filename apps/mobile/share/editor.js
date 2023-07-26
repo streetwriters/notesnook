@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
-import { useThemeColors, useThemeProvider } from "@notesnook/theme";
+import { useThemeColors, useThemeEngineStore } from "@notesnook/theme";
 import React, {
   useCallback,
   useEffect,
@@ -42,7 +42,7 @@ import { eOnLoadNote } from "../app/utils/events";
 const useEditor = () => {
   const ref = useRef();
   const [sessionId] = useState("share-editor-session" + Date.now());
-  const { theme } = useThemeProvider();
+  const theme = useThemeEngineStore((state) => state.theme);
   const commands = useMemo(() => new Commands(ref), [ref]);
   const currentNote = useRef();
   const doubleSpacedLines = useSettingStore(

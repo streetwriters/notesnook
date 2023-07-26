@@ -16,7 +16,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { THEME_COMPATIBILITY_VERSION, ThemeProvider } from "@notesnook/theme";
+import {
+  THEME_COMPATIBILITY_VERSION,
+  useThemeEngineStore
+} from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import "react-native-gesture-handler";
@@ -90,7 +93,7 @@ const App = () => {
   );
 };
 
-export const withThemeProvider = (Element) => {
+export const withTheme = (Element) => {
   return function AppWithThemeProvider() {
     const [colorScheme, darkTheme, lightTheme] = useThemeStore((state) => [
       state.colorScheme,
@@ -119,18 +122,14 @@ export const withThemeProvider = (Element) => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    return (
-      <ThemeProvider
-        value={{
-          theme: colorScheme === "dark" ? darkTheme : lightTheme,
-          //theme: ThemeDracula,
-          setTheme: () => null
-        }}
-      >
-        <Element />
-      </ThemeProvider>
-    );
+    useEffect(() => {
+      useThemeEngineStore
+        .getState()
+        .setTheme(colorScheme === "dark" ? darkTheme : lightTheme);
+    }, [colorScheme, darkTheme, lightTheme]);
+
+    return <Element />;
   };
 };
 
-export default withThemeProvider(withErrorBoundry(App, "App"));
+export default withTheme(withErrorBoundry(App, "App"));

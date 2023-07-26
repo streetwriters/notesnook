@@ -17,32 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  ScopedThemeProvider,
-  ThemeLight,
-  ThemeProvider
-} from "@notesnook/theme";
-import { useState } from "react";
+import { ScopedThemeProvider } from "@notesnook/theme";
 import "./App.css";
 import Tiptap from "./components/editor";
 import { EmotionEditorTheme } from "./theme-factory";
 
 function App(): JSX.Element {
-  const [theme, setTheme] = useState(ThemeLight);
-
   return (
-    <ThemeProvider
-      value={{
-        theme: theme,
-        setTheme: setTheme
-      }}
-    >
-      <ScopedThemeProvider value="base">
-        <EmotionEditorTheme>
-          <Tiptap />
-        </EmotionEditorTheme>
-      </ScopedThemeProvider>
-    </ThemeProvider>
+    <ScopedThemeProvider value="base">
+      <EmotionEditorTheme>
+        <Tiptap />
+      </EmotionEditorTheme>
+    </ScopedThemeProvider>
   );
 }
 

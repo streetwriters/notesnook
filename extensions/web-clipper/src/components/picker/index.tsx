@@ -19,8 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { PropsWithChildren } from "react";
 import Modal from "react-modal";
 import { Button, Flex } from "@theme-ui/components";
-import { ThemeProvider } from "../theme-provider";
-import { useThemeEngineStore } from "@notesnook/theme";
+import { EmotionThemeProvider, useThemeEngineStore } from "@notesnook/theme";
 
 Modal.setAppElement("#root");
 
@@ -62,8 +61,8 @@ export const Picker = (props: PropsWithChildren<PickerProps>) => {
       onRequestClose={onClose}
       isOpen={isOpen}
     >
-      <ThemeProvider
-        theme={theme}
+      <EmotionThemeProvider
+        scope="base"
         injectCssVars
         sx={{
           display: "flex",
@@ -100,7 +99,7 @@ export const Picker = (props: PropsWithChildren<PickerProps>) => {
             </Button>
           </Flex>
         </Flex>
-      </ThemeProvider>
+      </EmotionThemeProvider>
     </Modal>
   );
 };

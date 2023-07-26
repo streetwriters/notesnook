@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { EVENTS } from "@notesnook/core/common";
-import { useThemeProvider } from "@notesnook/theme";
+import { useThemeEngineStore } from "@notesnook/theme";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import WebView from "react-native-webview";
 import { db } from "../../../common/database";
@@ -59,7 +59,7 @@ export const useEditor = (
   readonly?: boolean,
   onChange?: (html: string) => void
 ) => {
-  const { theme } = useThemeProvider();
+  const theme = useThemeEngineStore((state) => state.theme);
 
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>(makeSessionId());
