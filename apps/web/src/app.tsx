@@ -38,6 +38,7 @@ import { FlexScrollContainer } from "./components/scroll-container";
 import CachedRouter from "./components/cached-router";
 import { WebExtensionRelay } from "./utils/web-extension-relay";
 import { usePersistentState } from "./hooks/use-persistent-state";
+import ThemeBuilder from "./components/theme-builder";
 
 new WebExtensionRelay();
 
@@ -212,6 +213,13 @@ function DesktopAppContents({
                 )}
               </ScopedThemeProvider>
             </Flex>
+          </Allotment.Pane>
+          <Allotment.Pane
+            className="pane theme-builder-pane"
+            minSize={50}
+            maxSize={250}
+          >
+            <ThemeBuilder />
           </Allotment.Pane>
         </Allotment>
       </Flex>

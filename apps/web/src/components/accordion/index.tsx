@@ -27,12 +27,24 @@ export type AccordionProps = {
   isClosed: boolean;
   color?: SchemeColors;
   testId?: string;
+  titleSx?: FlexProps["sx"];
+  buttonSx?: FlexProps["sx"];
 };
 
 export default function Accordion(
   props: PropsWithChildren<AccordionProps> & FlexProps
 ) {
-  const { isClosed, title, color, children, testId, sx, ...restProps } = props;
+  const {
+    isClosed,
+    title,
+    color,
+    children,
+    testId,
+    sx,
+    titleSx,
+    buttonSx,
+    ...restProps
+  } = props;
   const [isContentHidden, setIsContentHidden] = useState(false);
 
   useEffect(() => {
@@ -48,14 +60,15 @@ export default function Accordion(
           cursor: "pointer",
           bg: "var(--background-secondary)",
           p: 1,
-          borderRadius: "default"
+          borderRadius: "default",
+          ...buttonSx
         }}
         onClick={() => {
           setIsContentHidden((state) => !state);
         }}
         data-test-id={testId}
       >
-        <Text variant="subtitle" sx={{ color }}>
+        <Text variant="subtitle" sx={{ color, ...titleSx }}>
           {title}
         </Text>
         {isContentHidden ? (
@@ -64,7 +77,15 @@ export default function Accordion(
           <ChevronUp size={16} color={color} />
         )}
       </Flex>
-      {!isContentHidden && children}
+
+      <Flex
+        sx={{
+          display: isContentHidden ? "none" : "flex",
+          flexDirection: "column"
+        }}
+      >
+        {children}
+      </Flex>
     </Flex>
   );
 }
