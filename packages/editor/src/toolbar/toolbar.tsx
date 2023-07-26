@@ -91,8 +91,7 @@ export function Toolbar(props: ToolbarProps) {
           flexWrap: isMobile ? "nowrap" : "wrap",
           overflowX: isMobile ? "auto" : "hidden",
           bg: "background",
-          borderRadius: isMobile ? "0px" : "default",
-          px: 1
+          borderRadius: isMobile ? "0px" : "default"
         }}
         {...flexProps}
       >
@@ -103,11 +102,12 @@ export function Toolbar(props: ToolbarProps) {
               tools={tools}
               editor={editor}
               sx={{
+                gap: "small",
+                px: 1,
+                py: "small",
                 flexShrink: 0,
-                pr: 2,
-                mr: 2,
                 borderRight: "1px solid var(--border)",
-                ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
+                ":last-of-type": { borderRight: "none" },
                 alignItems: "center"
               }}
             />

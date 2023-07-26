@@ -22,6 +22,7 @@ import { Icon } from "@notesnook/ui";
 import { Icons } from "../icons";
 import { PropsWithChildren } from "react";
 import { DesktopOnly, MobileOnly } from "../../components/responsive";
+import { EmotionThemeProvider } from "@notesnook/theme";
 
 type Action = {
   title: string;
@@ -39,7 +40,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
   const { title, onClose, action, children } = props;
 
   return (
-    <>
+    <EmotionThemeProvider scope="editorToolbar">
       <DesktopOnly>
         <Flex
           sx={{
@@ -121,6 +122,6 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
           </Button>
         )}
       </MobileOnly>
-    </>
+    </EmotionThemeProvider>
   );
 }

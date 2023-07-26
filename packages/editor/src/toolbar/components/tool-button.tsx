@@ -55,6 +55,7 @@ export const ToolButton = React.memo(
         tabIndex={-1}
         id={`tool-${id || icon}`}
         sx={{
+          height: "unset",
           flexShrink: 0,
           p: variant === "small" ? "small" : 1,
           borderRadius: variant === "small" ? "small" : "default",

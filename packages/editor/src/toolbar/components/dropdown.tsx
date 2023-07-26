@@ -62,7 +62,6 @@ export function Dropdown(props: DropdownProps) {
           m: 0,
           bg: isPopupOpen ? "hover" : "transparent",
           height: "100%",
-          mr: 1,
           flexShrink: 0,
           display: "flex",
           alignItems: "center",

@@ -18,8 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { Flex } from "@theme-ui/components";
-import { Button } from "../../components/button";
+import { Flex, Text } from "@theme-ui/components";
 import { ToolButton } from "./tool-button";
 
 export type CounterProps = {
@@ -35,12 +34,17 @@ function _Counter(props: CounterProps) {
   return (
     <Flex
       sx={{
-        alignItems: "center",
-        mr: 1,
-        ":last-of-type": {
-          mr: 0
+        alignItems: "stretch",
+        borderRadius: "default",
+        overflow: "hidden",
+        height: "100%",
+        cursor: "pointer",
+        ":hover": {
+          bg: "hover-secondary"
         }
       }}
+      onClick={onReset}
+      title={`Click to reset ${title}`}
     >
       <ToolButton
         toggled={false}
@@ -50,19 +54,17 @@ function _Counter(props: CounterProps) {
         onClick={onDecrease}
       />
 
-      <Button
+      <Text
         sx={{
           color: "paragraph",
-          px: 0,
           fontSize: "subBody",
+          alignSelf: "center",
           mx: 1,
           textAlign: "center"
         }}
-        onClick={onReset}
-        title={`Reset ${title}`}
       >
         {value}
-      </Button>
+      </Text>
 
       <ToolButton
         toggled={false}
