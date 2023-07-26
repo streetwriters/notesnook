@@ -115,16 +115,11 @@ export const ScopedThemeProvider = ThemeScopeContext.Provider;
 export const THEME_COMPATIBILITY_VERSION: ThemeCompatibilityVersion = 1;
 export { ThemeLight, ThemeDark, ThemePitchBlack };
 
-const THEME_SCOPE_CACHE: { [name: string]: VariantsWithStaticColors<true> } =
-  {};
 function buildVariants(
   scope: keyof ThemeScopes,
   theme: ThemeDefinition,
   themeScope: Partial<Variants>
 ): VariantsWithStaticColors<true> {
-  const cacheKey = `${theme.id}-${theme.version}-${scope}`;
-  if (THEME_SCOPE_CACHE[cacheKey]) return THEME_SCOPE_CACHE[cacheKey];
-
   const defaultTheme = theme.colorScheme === "dark" ? ThemeDark : ThemeLight;
   const defaultThemeBase = defaultTheme.scopes.base;
   const defaultThemeScope = (defaultTheme.scopes as any)[scope] || {};
@@ -169,8 +164,6 @@ function buildVariants(
     },
     static: StaticColors
   };
-
-  THEME_SCOPE_CACHE[cacheKey] = variant;
 
   return variant;
 }
