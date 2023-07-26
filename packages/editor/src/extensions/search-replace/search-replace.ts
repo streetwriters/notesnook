@@ -82,7 +82,6 @@ const updateView = (state: EditorState, dispatch: DispatchFn) => {
 const regex = (s: string, settings: SearchSettings): RegExp => {
   const { enableRegex, matchCase, matchWholeWord } = settings;
   const boundary = matchWholeWord ? "\\b" : "";
-  console.log(boundary);
   return RegExp(
     boundary +
       (enableRegex ? s : s.replace(/[/\\^$*+?.()|[\]]/g, "\\$&")) +

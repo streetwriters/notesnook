@@ -119,7 +119,6 @@ export function EditLink(props: ToolProps) {
       let commandChain = editor.current.chain();
 
       if (!isImage) {
-        console.log(from, to);
         commandChain = commandChain.command(({ tr }) => {
           tr.removeMark(from, to, mark.type);
           tr.insertText(

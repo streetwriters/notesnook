@@ -42,7 +42,7 @@ export function WebClipComponent(
   const embedRef = useRef<HTMLIFrameElement>(null);
   const resizeObserverRef = useRef<ResizeObserver>();
   const { src, title, fullscreen, html } = node.attrs;
-  console.log(node.attrs);
+
   useEffect(() => {
     const iframe = embedRef.current;
     if (!iframe || !iframe.contentDocument || !isLoading || !html) return;

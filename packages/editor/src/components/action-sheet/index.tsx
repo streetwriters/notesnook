@@ -67,7 +67,6 @@ function useHistory<T>(initial: T) {
   }, [canGoBack]);
 
   const navigate = useCallback((state: T) => {
-    console.log("NAVI", state);
     setCurrent((prev) => {
       if (prev) stack.current.push(prev);
       return state;
@@ -159,7 +158,6 @@ export function ActionSheetPresenter(
       onRequestClose={() => onBeforeClose()}
       portalClassName={"bottom-sheet-presenter-portal"}
       onAfterOpen={() => {
-        console.log("OPEGN!");
         animation.start({ transition: TRANSITION, y: 0 });
       }}
       overlayElement={(overlayElementProps, contentEl) => {
