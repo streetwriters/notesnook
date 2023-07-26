@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Editor } from "../../types";
 import { MenuButtonItem } from "@notesnook/ui";
 import { ToolButton } from "../components/tool-button";
-import { ToolProps } from "../types";
-import { IconNames } from "../icons";
+import { ToolDefinition, ToolProps } from "../types";
+import { IconNames, Icons } from "../icons";
 
 export function menuButtonToTool(
   constructItem: (editor: Editor) => MenuButtonItem
@@ -37,5 +37,14 @@ export function menuButtonToTool(
         onClick={item.onClick}
       />
     );
+  };
+}
+
+export function toolToMenuButton(tool: ToolDefinition): MenuButtonItem {
+  return {
+    ...tool,
+    type: "button",
+    icon: Icons[tool.icon],
+    key: tool.title
   };
 }
