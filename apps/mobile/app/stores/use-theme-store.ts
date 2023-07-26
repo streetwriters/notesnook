@@ -21,6 +21,7 @@ import { ThemeDefinition } from "@notesnook/theme";
 import { Appearance } from "react-native";
 import create, { State } from "zustand";
 import SettingsService from "../services/settings";
+
 export interface ThemeStore extends State {
   lightTheme: ThemeDefinition;
   darkTheme: ThemeDefinition;

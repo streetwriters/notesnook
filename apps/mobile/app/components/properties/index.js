@@ -31,7 +31,6 @@ import { ReminderTime } from "../ui/reminder-time";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { DateMeta } from "./date-meta";
-import { DevMode } from "./dev-mode";
 import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";

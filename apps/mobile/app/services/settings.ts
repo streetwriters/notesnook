@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Platform } from "react-native";
-import Orientation from "react-native-orientation";
 import { enabled } from "react-native-privacy-snapshot";
 import { MMKV } from "../common/database/mmkv";
 import {
@@ -26,19 +25,14 @@ import {
   defaultSettings,
   useSettingStore
 } from "../stores/use-setting-store";
-
 import { NotesnookModule } from "../utils/notesnook-module";
 import { scale, updateSize } from "../utils/size";
-import { DDS } from "./device-detection";
-import { setAutobackOffMessage } from "./message";
-
 function reset() {
   const settings = get();
   if (settings.reminder !== "off" && settings.reminder !== "useroff") {
     settings.encryptedBackup = false;
     settings.reminder = "useroff";
     set(settings);
-    setTimeout(() => setAutobackOffMessage(), 10000);
   }
 }
 
@@ -159,7 +153,7 @@ function checkOrientation() {
   //});
 }
 
-const SettingsService = {
+export const SettingsService = {
   init,
   set,
   get,
