@@ -6,7 +6,7 @@ title: OneNote
 
 The following steps will help you import your notes from OneNote easily.
 
-1. Go to [Notesnook Importer](https://importer.notesnook.com) and select `OneNote` from list of apps.
+1. Go to [https://importer.notesnook.com/](https://importer.notesnook.com/) and select `OneNote` from list of apps.
    ![](/static/onenote-importer/1.png)
 2. Click on `Start importing`
    ![](/static/onenote-importer/2.png)

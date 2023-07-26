@@ -14,7 +14,7 @@ The following steps will help you import your notes from Zoho notebook easily.
    ![](/static/zoho-importer/3.png)
 4. Wait while your notes are exported. Once export completes, download exported .zip file
    ![](/static/zoho-importer/4.png)
-5. Go to [Notesnook Importer](https://importer.notesnook.com) and select `Zoho notebook` from the list of apps.
+5. Go to [https://importer.notesnook.com/](https://importer.notesnook.com/) and select `Zoho notebook` from the list of apps.
    ![](/static/zoho-importer/5.png)
 6. Drop the .zip backup file(s) you exported earlier in the box or click anywhere to open system file picker to select the backup then click start processing.
    ![](/static/zoho-importer/6.png)
