@@ -171,6 +171,8 @@ export function HighlighterPlugin({
             changedNodes.forEach(({ node, pos }) => {
               tr.setNodeMarkup(pos, node.type, node.attrs);
             });
+            tr.setMeta("preventUpdate", true);
+            tr.setMeta("addToHistory", false);
             view.dispatch(tr);
           }
         }
