@@ -81,7 +81,12 @@ export default defineConfig({
     port: 3000
   },
   worker: {
-    format: "es"
+    format: "es",
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: true
+      }
+    }
   },
   css: {
     postcss: {
