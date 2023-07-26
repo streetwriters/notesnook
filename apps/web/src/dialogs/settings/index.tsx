@@ -219,15 +219,15 @@ function SettingsSideBar(props: SettingsSideBarProps) {
   const [route, setRoute] = useState<SectionKeys>("profile");
 
   return (
-    <ScopedThemeProvider scope="navigationMenu">
-      <FlexScrollContainer
-        id="settings-side-menu"
-        style={{
-          width: 240,
-          overflow: "auto"
-        }}
-        data-test-id="settings-navigation-menu"
-      >
+    <FlexScrollContainer
+      id="settings-side-menu"
+      style={{
+        width: 240,
+        overflow: "auto"
+      }}
+      data-test-id="settings-navigation-menu"
+    >
+      <ScopedThemeProvider scope="navigationMenu">
         <Flex
           sx={{
             flexDirection: "column",
@@ -327,8 +327,8 @@ function SettingsSideBar(props: SettingsSideBarProps) {
             </Flex>
           ))}
         </Flex>
-      </FlexScrollContainer>
-    </ScopedThemeProvider>
+      </ScopedThemeProvider>
+    </FlexScrollContainer>
   );
 }
 
