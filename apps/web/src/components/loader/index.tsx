@@ -20,7 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Flex, Text } from "@theme-ui/components";
 import { Loading } from "../icons";
 
-export default function Loader({ title, text }) {
+type LoaderProps = { title: string; text?: string };
+export function Loader(props: LoaderProps) {
+  const { title, text } = props;
   return (
     <Flex
       sx={{
@@ -35,9 +37,11 @@ export default function Loader({ title, text }) {
       <Text variant="subtitle" mt={4}>
         {title}
       </Text>
-      <Text variant="body" mt={2}>
-        {text}
-      </Text>
+      {text && (
+        <Text variant="body" mt={2}>
+          {text}
+        </Text>
+      )}
     </Flex>
   );
 }

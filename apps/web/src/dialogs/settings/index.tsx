@@ -238,8 +238,7 @@ function SettingsSideBar(props: SettingsSideBarProps) {
                 backgroundColor: alpha("background", 0.6),
                 backdropFilter: "blur(8px)"
               },
-            backgroundColor: "var(--background-secondary)",
-            borderRadius: "dialog"
+            backgroundColor: "var(--background-secondary)"
           }}
         >
           <Input

@@ -20,7 +20,7 @@ import { httpBatchLink } from "@trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
-import { CheckCircleOutline } from "../../../components/icons";
+import { CheckCircleOutline, Loading } from "../../../components/icons";
 import { THEME_COMPATIBILITY_VERSION } from "@notesnook/theme";
 import { debounce } from "@notesnook/common";
 import { useStore as useThemeStore } from "../../../stores/theme-store";
@@ -34,6 +34,8 @@ import { ThemeMetadata } from "@notesnook/themes-server";
 import { showThemeDetails } from "../../../common/dialog-controller";
 import { ThemePreview } from "../../../components/theme-preview";
 import { VirtuosoGrid } from "react-virtuoso";
+import { Loader } from "../../../components/loader";
+import { showToast } from "../../../utils/toast";
 
 const ThemesClient = ThemesTRPC.createClient({
   links: [
@@ -65,6 +67,7 @@ function ThemesList() {
   const [colorScheme, setColorScheme] = useState<"all" | "dark" | "light">(
     "all"
   );
+  const [isApplying, setIsApplying] = useState(false);
   const isThemeCurrentlyApplied = useThemeStore(
     (store) => store.isThemeCurrentlyApplied
   );
@@ -84,21 +87,28 @@ function ThemesList() {
       compatibilityVersion: THEME_COMPATIBILITY_VERSION,
       filters
     },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor
-    }
+    { getNextPageParam: (lastPage) => lastPage.nextCursor }
   );
 
   const setTheme = useCallback(
     async (theme: ThemeMetadata) => {
       if (isThemeCurrentlyApplied(theme.id)) return;
-      const fullTheme = await ThemesRouter.installTheme.query({
-        id: theme.id,
-        compatibilityVersion: THEME_COMPATIBILITY_VERSION,
-        userId: user?.id
-      });
-      if (!fullTheme) return;
-      setCurrentTheme(fullTheme);
+      setIsApplying(true);
+      try {
+        const fullTheme = await ThemesRouter.installTheme.query({
+          id: theme.id,
+          compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+          userId: user?.id
+        });
+        if (!fullTheme) return;
+        setCurrentTheme(fullTheme);
+      } catch (e) {
+        console.error(e);
+        if (e instanceof Error)
+          showToast("error", "Failed to install theme. Error: " + e.message);
+      } finally {
+        setIsApplying(false);
+      }
     },
     [isThemeCurrentlyApplied, setCurrentTheme, user?.id]
   );
@@ -131,6 +141,9 @@ function ThemesList() {
             {filter.title}
           </Button>
         ))}
+        {themes.isLoading && !themes.isInitialLoading ? (
+          <Loading color="accent" />
+        ) : null}
       </Flex>
       <Box
         sx={{
@@ -142,62 +155,71 @@ function ThemesList() {
           mt: 2
         }}
       >
-        <VirtuosoGrid
-          style={{ height: 700 }}
-          data={themes.data?.pages.flatMap((a) => a.themes) || []}
-          endReached={() =>
-            themes.hasNextPage ? themes.fetchNextPage() : null
-          }
-          itemContent={(_index, theme) => (
-            <Flex
-              key={theme.id}
-              sx={{
-                flexDirection: "column",
-                flex: 1,
-                cursor: "pointer",
-                p: 2,
-                border: "1px solid transparent",
-                borderRadius: "default",
-                ":hover": {
-                  bg: "background-secondary",
-                  border: "1px solid var(--border)",
-                  ".set-as-button": { opacity: 1 }
-                }
-              }}
-              onClick={async () => {
-                if (await showThemeDetails(theme)) {
-                  await setTheme(theme);
-                }
-              }}
-            >
-              <ThemePreview theme={theme} />
-              <Text variant="title" sx={{ mt: 1 }}>
-                {theme.name}
-              </Text>
-              <Text variant="body">{theme.authors[0].name}</Text>
+        {themes.isInitialLoading ? (
+          <Loader title={"Loading themes..."} />
+        ) : (
+          <VirtuosoGrid
+            style={{ height: 700 }}
+            data={themes.data?.pages.flatMap((a) => a.themes) || []}
+            endReached={() =>
+              themes.hasNextPage ? themes.fetchNextPage() : null
+            }
+            itemContent={(_index, theme) => (
               <Flex
-                sx={{ justifyContent: "space-between", alignItems: "center" }}
+                key={theme.id}
+                sx={{
+                  flexDirection: "column",
+                  flex: 1,
+                  cursor: "pointer",
+                  p: 2,
+                  border: "1px solid transparent",
+                  borderRadius: "default",
+                  ":hover": {
+                    bg: "background-secondary",
+                    border: "1px solid var(--border)",
+                    ".set-as-button": { visibility: "visible" }
+                  }
+                }}
+                onClick={async () => {
+                  if (await showThemeDetails(theme)) {
+                    await setTheme(theme);
+                  }
+                }}
               >
-                <Text variant="subBody">{theme.totalInstalls} installs</Text>
-                {isThemeCurrentlyApplied(theme.id) ? (
-                  <CheckCircleOutline color="accent" size={20} />
-                ) : (
-                  <Button
-                    className="set-as-button"
-                    variant="secondary"
-                    sx={{ opacity: 0, bg: "background" }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setTheme(theme);
-                    }}
-                  >
-                    Set as {theme.colorScheme}
-                  </Button>
-                )}
+                <ThemePreview theme={theme} />
+                <Text variant="title" sx={{ mt: 1 }}>
+                  {theme.name}
+                </Text>
+                <Text variant="body">{theme.authors[0].name}</Text>
+                <Flex
+                  sx={{ justifyContent: "space-between", alignItems: "center" }}
+                >
+                  <Text variant="subBody">{theme.totalInstalls} installs</Text>
+                  {isThemeCurrentlyApplied(theme.id) ? (
+                    <CheckCircleOutline color="accent" size={20} />
+                  ) : (
+                    <Button
+                      className="set-as-button"
+                      variant="secondary"
+                      sx={{ visibility: "hidden", bg: "background" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTheme(theme);
+                      }}
+                      disabled={isApplying}
+                    >
+                      {isApplying ? (
+                        <Loading color="accent" size={18} />
+                      ) : (
+                        `Set as ${theme.colorScheme}`
+                      )}
+                    </Button>
+                  )}
+                </Flex>
               </Flex>
-            </Flex>
-          )}
-        />
+            )}
+          />
+        )}
       </Box>
     </>
   );
