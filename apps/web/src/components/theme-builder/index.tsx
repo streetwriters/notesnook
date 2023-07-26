@@ -16,22 +16,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { debounce } from "@notesnook/common";
 import {
   ThemeAuthor,
   ThemeDefinition,
-  ThemeScopes,
-  useThemeProvider
+  useThemeEngineStore
 } from "@notesnook/theme";
-import { Button, Flex, IconButton, Input, Text } from "@theme-ui/components";
-import { useRef, useState } from "react";
-import Field from "../field";
-import Accordion from "../accordion";
-import { Close, Download, Reupload } from "../icons";
-import { showToast } from "../../utils/toast";
-import { debounce } from "@notesnook/common";
-import { useStore } from "../../stores/theme-store";
+import { Button, Flex, Input, Text } from "@theme-ui/components";
 import FileSaver from "file-saver";
+import { useRef, useState } from "react";
+import { useStore } from "../../stores/theme-store";
+import { showToast } from "../../utils/toast";
+import Accordion from "../accordion";
 import { showFilePicker } from "../editor/picker";
+import Field from "../field";
+import { Close } from "../icons";
 
 const ThemeInfoTemplate: Omit<
   ThemeDefinition,
@@ -142,7 +141,7 @@ function unflatten(data: any) {
 }
 
 export default function ThemeBuilder() {
-  const { theme: currentTheme } = useThemeProvider();
+  const currentTheme = useThemeEngineStore((state) => state.theme);
   const setTheme = useStore((state) => state.setTheme);
   const [loading, setLoading] = useState(false);
   const currentThemeFlattened = flatten(currentTheme);
