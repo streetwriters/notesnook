@@ -39,7 +39,9 @@ test("codeblocks should get highlighted on init", async () => {
     element: editorElement,
     initialContent: CODEBLOCKS_HTML,
     extensions: {
-      codeblock: CodeBlock
+      codeblock: CodeBlock,
+      codeBlock: false,
+      code: false
     }
   });
 
@@ -53,7 +55,9 @@ test("codeblocks should get highlighted after pasting", async () => {
   const { editor } = createEditor({
     element: editorElement,
     extensions: {
-      codeblock: CodeBlock
+      codeblock: CodeBlock,
+      codeBlock: false,
+      code: false
     }
   });
 
@@ -72,7 +76,9 @@ test("codeblocks should not be updated if other content is changed", async () =>
     element: editorElement,
     initialContent: CODEBLOCKS_HTML,
     extensions: {
-      codeblock: CodeBlock
+      codeblock: CodeBlock,
+      codeBlock: false,
+      code: false
     }
   });
 
@@ -101,7 +107,9 @@ test("pasting code from vscode should automatically create a syntax highlighted 
   const { editor } = createEditor({
     element: editorElement,
     extensions: {
-      codeblock: CodeBlock
+      codeblock: CodeBlock,
+      codeBlock: false,
+      code: false
     }
   });
 
@@ -161,7 +169,9 @@ test("editing code in a highlighted code block should not be too slow", async ()
     element: editorElement,
     initialContent: CODEBLOCKS_HTML,
     extensions: {
-      codeblock: CodeBlock
+      codeblock: CodeBlock,
+      codeBlock: false,
+      code: false
     }
   });
 
@@ -198,7 +208,9 @@ test("Adding a new codeblock & changing the language should apply the new highli
   const { editor } = createEditor({
     element: editorElement,
     extensions: {
-      codeblock: CodeBlock
+      codeblock: CodeBlock,
+      codeBlock: false,
+      code: false
     }
   });
 
@@ -219,7 +231,9 @@ test("Switching codeblock language should register the new language", async () =
     element: editorElement,
     initialContent: CODEBLOCKS_HTML,
     extensions: {
-      codeblock: CodeBlock
+      codeblock: CodeBlock,
+      codeBlock: false,
+      code: false
     }
   });
   editor.commands.updateAttributes(CodeBlock.name, { language: "java" });
