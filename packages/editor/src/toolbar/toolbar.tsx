@@ -102,10 +102,6 @@ export function Toolbar(props: ToolbarProps) {
               tools={tools}
               editor={editor}
               sx={{
-                gap: "small",
-                px: 1,
-                py: "small",
-                flexShrink: 0,
                 borderRight: "1px solid var(--border)",
                 ":last-of-type": { borderRight: "none" },
                 alignItems: "center"
