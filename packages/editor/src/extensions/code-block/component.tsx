@@ -20,27 +20,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Flex, Input, Text } from "@theme-ui/components";
 import { useRef, useState } from "react";
 import { Button } from "../../components/button";
-import { useTheme } from "../../toolbar/stores/toolbar-store";
-
 import { ResponsivePresenter } from "../../components/responsive";
 import { useTimer } from "../../hooks/use-timer";
-import { Icon, ScrollContainer } from "@notesnook/ui";
+import { Icon } from "@notesnook/ui";
 import { Popup } from "../../toolbar/components/popup";
 import { Icons } from "../../toolbar/icons";
 import { ReactNodeViewProps } from "../react/types";
 import { CodeBlockAttributes } from "./code-block";
 import Languages from "./languages.json";
+import { useThemeEngineStore } from "@notesnook/theme";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
 ) {
   const { editor, updateAttributes, node, forwardRef } = props;
   const { language, indentLength, indentType, caretPosition } = node.attrs;
-  const theme = useTheme();
 
-  const [isOpen, setIsOpen] = useState(false);
   // const [caretPosition, setCaretPosition] = useState<CaretPosition>();
+  const [isOpen, setIsOpen] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const theme = useThemeEngineStore((store) => store.theme);
 
   const { enabled, start } = useTimer(1000);
 

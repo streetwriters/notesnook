@@ -31,7 +31,7 @@ import {
 } from "./types";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
 import { __serializeForClipboard, EditorView } from "prosemirror-view";
-import { ThemeProvider } from "../../components/theme-provider";
+import { EmotionThemeProvider } from "@notesnook/theme";
 
 // This is hacky workaround to manually handle serialization when
 // drag/dropping on mobile devices.
@@ -156,7 +156,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     if (!this.options.component) return null;
 
     return (
-      <ThemeProvider injectCssVars={false}>
+      <EmotionThemeProvider scope="editor" injectCssVars={false}>
         <this.options.component
           {...props}
           editor={this.editor}
@@ -173,7 +173,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
             )
           }
         />
-      </ThemeProvider>
+      </EmotionThemeProvider>
     );
   }
 

@@ -18,39 +18,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
-  ThemeProvider,
   EmotionThemeProvider,
-  themeToCSS
+  themeToCSS,
+  ThemeScopes,
+  useThemeEngineStore
 } from "@notesnook/theme";
-import { PropsWithChildren, useMemo } from "react";
+import { PropsWithChildren, useEffect, useMemo } from "react";
 import { BoxProps } from "@theme-ui/components";
 import { Global, css } from "@emotion/react";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 
 export function BaseThemeProvider(
   props: PropsWithChildren<
-    { injectCssVars?: boolean; addGlobalStyles?: boolean } & Omit<
-      BoxProps,
-      "variant"
-    >
+    {
+      injectCssVars?: boolean;
+      addGlobalStyles?: boolean;
+      scope?: keyof ThemeScopes;
+    } & Omit<BoxProps, "variant">
   >
 ) {
-  const { children, addGlobalStyles = false, ...restProps } = props;
+  const {
+    children,
+    addGlobalStyles = false,
+    scope = "base",
+    ...restProps
+  } = props;
 
   const colorScheme = useThemeStore((store) => store.colorScheme);
   const theme = useThemeStore((store) =>
     colorScheme === "dark" ? store.darkTheme : store.lightTheme
   );
-  const setTheme = useThemeStore((store) => store.setTheme);
   const cssTheme = useMemo(() => themeToCSS(theme), [theme]);
 
+  useEffect(() => {
+    useThemeEngineStore.getState().setTheme(theme);
+  }, [theme]);
+
   return (
-    <ThemeProvider
-      value={{
-        theme,
-        setTheme
-      }}
-    >
+    <>
       {addGlobalStyles && (
         <Global
           styles={css`
@@ -59,10 +64,10 @@ export function BaseThemeProvider(
         />
       )}
 
-      <EmotionThemeProvider {...restProps} scope="base">
+      <EmotionThemeProvider {...restProps} scope={scope}>
         {children}
       </EmotionThemeProvider>
-    </ThemeProvider>
+    </>
   );
 }
 

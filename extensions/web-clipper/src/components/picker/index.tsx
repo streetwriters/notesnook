@@ -20,7 +20,7 @@ import { PropsWithChildren } from "react";
 import Modal from "react-modal";
 import { Button, Flex } from "@theme-ui/components";
 import { ThemeProvider } from "../theme-provider";
-import { useThemeProvider } from "@notesnook/theme";
+import { useThemeEngineStore } from "@notesnook/theme";
 
 Modal.setAppElement("#root");
 
@@ -31,7 +31,7 @@ type PickerProps = {
 };
 export const Picker = (props: PropsWithChildren<PickerProps>) => {
   const { children, isOpen, onClose, onDone } = props;
-  const { theme } = useThemeProvider();
+  const theme = useThemeEngineStore((store) => store.theme);
 
   return (
     <Modal

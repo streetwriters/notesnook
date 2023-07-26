@@ -21,7 +21,7 @@ import { ThemeProvider } from "@theme-ui/core";
 import {
   ThemeScopes,
   useThemeColors,
-  useThemeProvider,
+  useThemeEngineStore,
   ScopedThemeProvider as NNScopedThemeProvider,
   ThemeFactory
 } from "../";
@@ -43,7 +43,7 @@ export function EmotionThemeProvider(
     className,
     ...restProps
   } = props;
-  const { theme } = useThemeProvider();
+  const theme = useThemeEngineStore((store) => store.theme);
   const themeScope = useThemeColors(scope);
   const { colors } = themeScope;
 

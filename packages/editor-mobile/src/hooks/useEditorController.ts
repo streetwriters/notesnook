@@ -26,7 +26,7 @@ import {
   useState
 } from "react";
 import { EventTypes, isReactNative, post } from "../utils";
-import { useThemeColors, useThemeProvider } from "@notesnook/theme";
+import { useThemeColors, useThemeEngineStore } from "@notesnook/theme";
 import { injectCss, transform } from "../utils/css";
 
 type Attachment = {
@@ -101,7 +101,7 @@ export type EditorController = {
 };
 
 export function useEditorController(update: () => void): EditorController {
-  const { setTheme } = useThemeProvider();
+  const setTheme = useThemeEngineStore((store) => store.setTheme);
   const { colors } = useThemeColors("editor");
   const [title, setTitle] = useState("");
   const [titlePlaceholder, setTitlePlaceholder] = useState("Note title");

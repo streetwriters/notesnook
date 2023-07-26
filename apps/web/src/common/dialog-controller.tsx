@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ReactDOM from "react-dom";
 import { Dialogs } from "../dialogs";
-import { BaseThemeProvider } from "../components/theme-provider";
 import qclone from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as tagStore } from "../stores/tag-store";
@@ -69,11 +68,9 @@ function showDialog<TId extends DialogIds, TReturnType>(
     };
     const PropDialog = () => render(Dialogs[id], perform);
     ReactDOM.render(
-      <BaseThemeProvider>
-        <Suspense fallback={<div />}>
-          <PropDialog />
-        </Suspense>
-      </BaseThemeProvider>,
+      <Suspense fallback={<div />}>
+        <PropDialog />
+      </Suspense>,
       container,
       () => (openDialogs[id] = true)
     );

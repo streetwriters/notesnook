@@ -21,7 +21,6 @@ import "@notesnook/editor/styles/styles.css";
 import "@notesnook/editor/styles/katex.min.css";
 import "@notesnook/editor/styles/katex-fonts.css";
 import "@notesnook/editor/styles/fonts.css";
-import { ThemeDefinition } from "@notesnook/theme";
 import {
   Toolbar,
   useTiptap,
@@ -78,7 +77,6 @@ type TipTapProps = {
   toolbarContainerId?: string;
   readonly?: boolean;
   nonce?: number;
-  theme: ThemeDefinition;
   isMobile?: boolean;
   downloadOptions?: DownloadOptions;
   fontSize: number;
@@ -126,7 +124,6 @@ function TipTap(props: TipTapProps) {
     editorContainer,
     readonly,
     nonce,
-    theme,
     isMobile,
     downloadOptions,
     fontSize,
@@ -206,6 +203,7 @@ function TipTap(props: TipTapProps) {
         editor.commands.refreshSearch();
       },
       onUpdate: ({ editor, transaction }) => {
+        console.log("UPDATE", transaction);
         onContentChange?.();
 
         const preventSave = transaction?.getMeta("preventSave") as boolean;
@@ -265,7 +263,6 @@ function TipTap(props: TipTapProps) {
           };
         });
       }, 500),
-      theme,
       onOpenAttachmentPicker: (_editor, type) => {
         onInsertAttachment?.(type);
         return true;
@@ -283,7 +280,7 @@ function TipTap(props: TipTapProps) {
         return true;
       }
     };
-  }, [theme, readonly, nonce, doubleSpacedLines, dateFormat, timeFormat]);
+  }, [readonly, nonce, doubleSpacedLines, dateFormat, timeFormat]);
 
   const editor = useTiptap(
     tiptapOptions,
@@ -377,7 +374,6 @@ function TiptapWrapper(
           <TipTap
             {...props}
             editorContainer={editorContainerRef.current}
-            theme={theme}
             fontFamily={editorConfig.fontFamily}
             fontSize={editorConfig.fontSize}
           />

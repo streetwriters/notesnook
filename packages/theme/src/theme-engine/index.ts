@@ -26,6 +26,7 @@ import {
   Variants,
   VariantsWithStaticColors
 } from "./types";
+import { create } from "zustand";
 import { colorsToCss } from "../theme/transformer";
 import _ThemeLight from "./themes/default-light.json";
 import _ThemeDark from "./themes/default-dark.json";
@@ -53,19 +54,20 @@ export const StaticColors = {
   white: "#ffffff"
 };
 
-const ThemeContext = createContext<{
+type ThemeEngineState = {
   theme: ThemeDefinition;
   setTheme: (theme: ThemeDefinition) => void;
-}>({
+};
+const useThemeEngineStore = create<ThemeEngineState>((set) => ({
   theme: ThemeLight,
-  setTheme: () => null
-});
+  setTheme: (theme) => set({ theme })
+}));
 
 const ThemeScopeContext = createContext<keyof ThemeScopes>("base");
 
 export function useThemeColors(scope?: keyof ThemeScopes): ThemeScope {
   const currentScope = useCurrentThemeScope();
-  const { theme } = useThemeProvider();
+  const theme = useThemeEngineStore((store) => store.theme);
   const themeScope = useMemo(
     () => theme.scopes[scope || currentScope] || theme.scopes.base,
     [currentScope, scope, theme.scopes]
@@ -108,12 +110,16 @@ export function themeToCSS(theme: ThemeDefinition) {
   return css.join("\n\n");
 }
 
-export const useThemeProvider = () => useContext(ThemeContext);
 export const useCurrentThemeScope = () => useContext(ThemeScopeContext);
-export const ThemeProvider = ThemeContext.Provider;
 export const ScopedThemeProvider = ThemeScopeContext.Provider;
 export const THEME_COMPATIBILITY_VERSION: ThemeCompatibilityVersion = 1;
-export { ThemeLight, ThemeDark, ThemePitchBlack };
+export {
+  ThemeLight,
+  ThemeDark,
+  ThemePitchBlack,
+  useThemeEngineStore,
+  type ThemeEngineState
+};
 
 function buildVariants(
   scope: keyof ThemeScopes,

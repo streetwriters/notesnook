@@ -32,7 +32,6 @@ import {
 } from "../../toolbar/stores/toolbar-store";
 import React from "react";
 import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive";
-import { ThemeProvider } from "../theme-provider";
 
 export type PopupWrapperProps = UsePopupHandlerOptions & {
   autoCloseOnUnmount?: boolean;
@@ -122,27 +121,25 @@ export function showPopup(options: ShowPopupOptions) {
   }
 
   ReactDOM.render(
-    <ThemeProvider>
-      <ResponsivePresenter
-        isOpen
-        position={{
-          target: getToolbarElement(),
-          isTargetAbsolute: true,
-          location: "below",
-          align: "end",
-          yOffset: 10
-        }}
-        blocking
-        focusOnRender
-        {...props}
-        onClose={() => {
-          hide();
-          props.onClose?.();
-        }}
-      >
-        {popup(hide)}
-      </ResponsivePresenter>
-    </ThemeProvider>,
+    <ResponsivePresenter
+      isOpen
+      position={{
+        target: getToolbarElement(),
+        isTargetAbsolute: true,
+        location: "below",
+        align: "end",
+        yOffset: 10
+      }}
+      blocking
+      focusOnRender
+      {...props}
+      onClose={() => {
+        hide();
+        props.onClose?.();
+      }}
+    >
+      {popup(hide)}
+    </ResponsivePresenter>,
     getPopupContainer()
   );
 

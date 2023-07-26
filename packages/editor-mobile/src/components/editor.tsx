@@ -25,11 +25,7 @@ import {
   usePermissionHandler,
   useTiptap
 } from "@notesnook/editor";
-import {
-  ThemeDefinition,
-  useThemeColors,
-  useThemeProvider
-} from "@notesnook/theme";
+import { useThemeColors } from "@notesnook/theme";
 import {
   forwardRef,
   memo,
@@ -47,13 +43,7 @@ import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
 
-const Tiptap = ({
-  editorTheme,
-  settings
-}: {
-  editorTheme: ThemeDefinition;
-  settings: Settings;
-}) => {
+const Tiptap = ({ settings }: { settings: Settings }) => {
   const [tick, setTick] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -83,7 +73,6 @@ const Tiptap = ({
         global.editorController.previewAttachment(attachment);
         return true;
       },
-      theme: editorTheme,
       element: !layout ? undefined : contentRef.current || undefined,
       editable: !settings.readonly,
       editorProps: {
@@ -294,11 +283,10 @@ const ContentDiv = memo(
 
 const TiptapProvider = (): JSX.Element => {
   const settings = useSettings();
-  const { theme } = useThemeProvider();
 
   return (
     <PortalProvider>
-      <Tiptap editorTheme={theme} settings={settings} />
+      <Tiptap settings={settings} />
     </PortalProvider>
   );
 };
