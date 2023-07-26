@@ -29,7 +29,7 @@ import {
   RGB_Linear_Shade,
   hexToRGBA,
   switchAccentColor
-} from "../../utils/color-scheme/utils";
+} from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 
 export const AccentColorPicker = () => {

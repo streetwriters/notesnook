@@ -29,7 +29,7 @@ import {
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { GROUP } from "../../../utils/constants";
-import { COLORS_NOTE } from "../../../utils/color-scheme";
+import { ColorValues } from "../../../utils/colors";
 import { db } from "../../../common/database";
 import { eOpenJumpToDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
@@ -104,7 +104,7 @@ export const SectionHeader = React.memo(
           }}
         >
           <Heading
-            color={COLORS_NOTE[color?.toLowerCase()] || colors.primary.accent}
+            color={ColorValues[color?.toLowerCase()] || colors.primary.accent}
             size={SIZE.sm}
             style={{
               minWidth: 60,

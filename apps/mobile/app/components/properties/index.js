@@ -24,7 +24,7 @@ import { DDS } from "../../services/device-detection";
 import { presentSheet } from "../../services/event-manager";
 import SearchService from "../../services/search";
 import { useThemeColors } from "@notesnook/theme";
-import { COLORS_NOTE } from "../../utils/color-scheme";
+import { ColorValues } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
 import { ReminderTime } from "../ui/reminder-time";
@@ -53,7 +53,7 @@ const Line = ({ top = 6, bottom = 6 }) => {
 export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   const { colors } = useThemeColors();
   const alias = item.alias || item.title;
-  const isColor = !!COLORS_NOTE[item.title];
+  const isColor = !!ColorValues[item.title];
 
   if (!item || !item.id) {
     return (

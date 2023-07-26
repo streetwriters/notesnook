@@ -29,9 +29,8 @@ import { TaggedNotes } from "../../../screens/notes/tagged";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
 import useNavigationStore from "../../../stores/use-navigation-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
-import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
-import { COLORS_NOTE } from "../../../utils/color-scheme";
+import { ColorValues } from "../../../utils/colors";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { Button } from "../../ui/button";
@@ -107,7 +106,7 @@ const NoteItem = ({
   const notebooks = React.useMemo(() => getNotebook(item), [item, _update]);
   const reminders = db.relations.from(item, "reminder");
   const reminder = getUpcomingReminder(reminders);
-  const noteColor = COLORS_NOTE[item.color?.toLowerCase()];
+  const noteColor = ColorValues[item.color?.toLowerCase()];
   const tags = getTags(item);
   return (
     <>
@@ -180,7 +179,7 @@ const NoteItem = ({
           <Paragraph
             numberOfLines={1}
             color={
-              COLORS_NOTE[item.color?.toLowerCase()] || colors.primary.heading
+              ColorValues[item.color?.toLowerCase()] || colors.primary.heading
             }
             style={{
               flexWrap: "wrap"
@@ -193,7 +192,7 @@ const NoteItem = ({
           <Heading
             numberOfLines={1}
             color={
-              COLORS_NOTE[item.color?.toLowerCase()] || colors.primary.heading
+              ColorValues[item.color?.toLowerCase()] || colors.primary.heading
             }
             style={{
               flexWrap: "wrap"
@@ -283,7 +282,7 @@ const NoteItem = ({
                       marginRight: 6
                     }}
                     color={
-                      COLORS_NOTE[item.color?.toLowerCase()] ||
+                      ColorValues[item.color?.toLowerCase()] ||
                       colors.primary.accent
                     }
                   />

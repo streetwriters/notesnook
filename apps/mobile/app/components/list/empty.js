@@ -24,7 +24,7 @@ import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useTip } from "../../services/tip-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
-import { COLORS_NOTE } from "../../utils/color-scheme";
+import { ColorValues } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 import { Tip } from "../tip";
 import { Button } from "../ui/button";
@@ -69,7 +69,7 @@ export const Empty = React.memo(
           <>
             <Tip
               color={
-                COLORS_NOTE[headerProps.color?.toLowerCase()]
+                ColorValues[headerProps.color?.toLowerCase()]
                   ? headerProps.color
                   : "accent"
               }
@@ -88,7 +88,8 @@ export const Empty = React.memo(
                 icon="arrow-right"
                 onPress={placeholderData.action}
                 buttonType={{
-                  text: colors.static[headerProps.color] || colors.primary.accent
+                  text:
+                    colors.static[headerProps.color] || colors.primary.accent
                 }}
                 style={{
                   alignSelf: "flex-start",
@@ -115,7 +116,8 @@ export const Empty = React.memo(
               <ActivityIndicator
                 size={SIZE.lg}
                 color={
-                  COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.primary.accent
+                  ColorValues[headerProps.color?.toLowerCase()] ||
+                  colors.primary.accent
                 }
               />
             </View>

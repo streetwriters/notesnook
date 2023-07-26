@@ -32,25 +32,8 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import useTimer from "../../hooks/use-timer";
 import { ToastEvent } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
-import { hexToRGBA } from "../../utils/color-scheme/utils";
+import { hexToRGBA } from "../../utils/colors";
 import { sanitizeFilename } from "@notesnook/common";
-
-// function getLevelString(level: number) {
-//   switch (level) {
-//     case LogLevel.Debug:
-//       return 'DEBUG';
-//     case LogLevel.Info:
-//       return 'INFO';
-//     case LogLevel.Log:
-//       return 'LOG';
-//     case LogLevel.Error:
-//       return 'ERROR';
-//     case LogLevel.Warn:
-//       return 'WARN';
-//     case LogLevel.Fatal:
-//       return 'FATAL';
-//   }
-// }
 
 export default function DebugLogs() {
   const { colors } = useThemeColors();
@@ -137,7 +120,9 @@ export default function DebugLogs() {
     [
       colors.secondary.background,
       colors.primary.paragraph,
-      colors.error.paragraph
+      colors.error.paragraph,
+      colors.static.black,
+      colors.static.orange
     ]
   );
 

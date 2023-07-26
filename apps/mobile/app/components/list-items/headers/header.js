@@ -21,7 +21,7 @@ import React from "react";
 import { View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 import { useMessageStore } from "../../../stores/use-message-store";
-import { COLORS_NOTE } from "../../../utils/color-scheme";
+import { ColorValues } from "../../../utils/colors";
 import { Announcement } from "../../announcements/announcement";
 import { Card } from "../../list/card";
 import Paragraph from "../../ui/typography/paragraph";
@@ -55,7 +55,12 @@ export const Header = React.memo(
               alignItems: "center"
             }}
           >
-            <Icon name="sync-alert" size={SIZE.md} color={colors.error.icon} f />
+            <Icon
+              name="sync-alert"
+              size={SIZE.md}
+              color={colors.error.icon}
+              f
+            />
             <Paragraph style={{ marginLeft: 5 }} color={colors.error.icon}>
               {warning.title}
             </Paragraph>
@@ -74,7 +79,9 @@ export const Header = React.memo(
           >
             {messageCard ? (
               <Card
-                color={COLORS_NOTE[color?.toLowerCase()] || colors.primary.accent}
+                color={
+                  ColorValues[color?.toLowerCase()] || colors.primary.accent
+                }
               />
             ) : null}
           </View>

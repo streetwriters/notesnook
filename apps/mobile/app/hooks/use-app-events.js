@@ -70,7 +70,7 @@ import { useMessageStore } from "../stores/use-message-store";
 import { useNoteStore } from "../stores/use-notes-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
-import { updateStatusBarColor } from "../utils/color-scheme";
+import { updateStatusBarColor } from "../utils/colors";
 import {
   eClearEditor,
   eCloseSheet,

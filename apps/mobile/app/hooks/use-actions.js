@@ -51,7 +51,7 @@ import { useTagStore } from "../stores/use-tag-store";
 import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../stores/use-user-store";
 import { convertNoteToText } from "../utils/note-to-text";
-import { toggleDarkMode } from "../utils/color-scheme/utils";
+import { toggleDarkMode } from "../utils/colors";
 import {
   eOnTopicSheetUpdate,
   eOpenAddTopicDialog,

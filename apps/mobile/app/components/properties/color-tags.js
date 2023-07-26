@@ -26,7 +26,7 @@ import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { COLORS_NOTE } from "../../utils/color-scheme";
+import { ColorValues } from "../../utils/colors";
 import { refreshNotesPage } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
@@ -53,7 +53,7 @@ export const ColorTags = ({ item }) => {
   const _renderColor = (c) => {
     const color = {
       name: c,
-      value: COLORS_NOTE[c?.toLowerCase()]
+      value: ColorValues[c?.toLowerCase()]
     };
 
     return (
@@ -92,7 +92,7 @@ export const ColorTags = ({ item }) => {
         justifyContent: isTablet ? "center" : "space-between"
       }}
     >
-      {Object.keys(COLORS_NOTE).map(_renderColor)}
+      {Object.keys(ColorValues).map(_renderColor)}
     </View>
   );
 };

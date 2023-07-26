@@ -22,7 +22,7 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useMessageStore } from "../../stores/use-message-store";
 import { useThemeColors } from "@notesnook/theme";
-import { hexToRGBA } from "../../utils/color-scheme/utils";
+import { hexToRGBA } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";

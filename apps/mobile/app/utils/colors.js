@@ -16,6 +16,31 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Platform, StatusBar } from "react-native";
+import { useThemeStore } from "../stores/use-theme-store";
+
+export const ColorValues = {
+  red: "#f44336",
+  orange: "#FF9800",
+  yellow: "#F9D71C",
+  green: "#4CAF50",
+  blue: "#2196F3",
+  purple: "#673AB7",
+  gray: "#9E9E9E"
+};
+
+export function updateStatusBarColor() {
+  StatusBar.setBarStyle(
+    useThemeStore.getState().colorScheme === "dark"
+      ? "light-content"
+      : "dark-content",
+    true
+  );
+  if (Platform.OS === "android") {
+    StatusBar.setBackgroundColor("transparent", true);
+    StatusBar.setTranslucent(true, true);
+  }
+}
 
 const isValidHex = (hex) => /^#([A-Fa-f0-9]{3,4}){1,2}$/.test(hex);
 const getChunksFromString = (st, chunkSize) =>

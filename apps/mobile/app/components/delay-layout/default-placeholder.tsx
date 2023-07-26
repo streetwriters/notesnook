@@ -21,8 +21,8 @@ import React from "react";
 import { View } from "react-native";
 import { useMessageStore } from "../../stores/use-message-store";
 import { useThemeColors } from "@notesnook/theme";
-import { COLORS_NOTE } from "../../utils/color-scheme";
-import { hexToRGBA } from "../../utils/color-scheme/utils";
+import { ColorValues } from "../../utils/colors";
+import { hexToRGBA } from "../../utils/colors";
 
 export const DefaultPlaceholder = ({ color }: { color: string }) => {
   const { colors } = useThemeColors();
@@ -31,7 +31,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
   const hasAnnoucements = annoucements.length > 0;
   const shadeColor = color
     ? hexToRGBA(
-        COLORS_NOTE[color?.toLowerCase() as keyof typeof COLORS_NOTE],
+        ColorValues[color?.toLowerCase() as keyof typeof ColorValues],
         0.15
       )
     : colors.primary.shade;

@@ -483,8 +483,6 @@ const _TabsHolder = () => {
 };
 export const TabHolder = React.memo(_TabsHolder, () => true);
 
-let layoutTimer = null;
-
 const onChangeTab = async (obj) => {
   if (obj.i === 2) {
     editorState().movedAway = false;

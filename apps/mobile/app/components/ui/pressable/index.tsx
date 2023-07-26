@@ -28,7 +28,7 @@ import {
   ViewStyle
 } from "react-native";
 import Animated from "react-native-reanimated";
-import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/color-scheme/utils";
+import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/colors";
 import { br } from "../../../utils/size";
 export interface PressableButtonProps extends PressableProps {
   customStyle?: ViewStyle;

@@ -24,7 +24,7 @@ import useNavigationStore from "../../stores/use-navigation-store";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useNoteStore } from "../../stores/use-notes-store";
 import { useThemeColors } from "@notesnook/theme";
-import { COLORS_NOTE } from "../../utils/color-scheme";
+import { ColorValues } from "../../utils/colors";
 import { db } from "../../common/database";
 import { normalize, SIZE } from "../../utils/size";
 import { presentDialog } from "../dialog/functions";
@@ -116,7 +116,7 @@ const ColorItem = React.memo(
           headerTextState?.id === item.id ? "rgba(0,0,0,0.04)" : "transparent"
         }
         onLongPress={onLongPress}
-        customSelectedColor={COLORS_NOTE[item.title.toLowerCase()]}
+        customSelectedColor={ColorValues[item.title.toLowerCase()]}
         customAlpha={!isDark ? -0.02 : 0.02}
         customOpacity={0.12}
         onPress={() => onPress(item)}
@@ -149,7 +149,7 @@ const ColorItem = React.memo(
               style={{
                 width: SIZE.lg - 2,
                 height: SIZE.lg - 2,
-                backgroundColor: COLORS_NOTE[item.title.toLowerCase()],
+                backgroundColor: ColorValues[item.title.toLowerCase()],
                 borderRadius: 100,
                 justifyContent: "center",
                 marginRight: 10
