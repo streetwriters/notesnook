@@ -20,7 +20,7 @@ The following steps will help you quickly import your notes from Google Keep int
 
 Once you have the Google Takeout containing your Google Keep notes, its time to import them into Notesnook.
 
-1. Go to [Notesnook Importer](https://importer.notesnook.com) and select `Google Keep` from list of apps.
+1. Go to [https://importer.notesnook.com/](https://importer.notesnook.com/) and select `Google Keep` from list of apps.
    ![](/static/google-keep-importer/4.png)
 2. Drop the .zip backup file(s) you exported earlier from Google Takeout in the box or click anywhere to open system file picker to select the backup.
    ![](/static/google-keep-importer/5.png)
