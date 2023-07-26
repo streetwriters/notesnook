@@ -29,7 +29,7 @@ async function buildHTML(templateData) {
 async function preprocessHTML(templateData) {
   const { content } = templateData;
   const doc = parseHTML(
-    content.replaceAll(/<p(.+?)><\/p>/gm, "<p$1><br/></p>")
+    content.replaceAll(/<p([^>]*)><\/p>/gm, "<p$1><br/></p>")
   );
 
   const mathBlocks = doc.querySelectorAll(".math-block.math-node");
