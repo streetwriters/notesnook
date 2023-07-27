@@ -92,8 +92,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 style={{
                   height: 30,
                   alignSelf: "flex-start",
-                  paddingHorizontal: 0,
-                  marginTop: -6
+                  paddingHorizontal: 0
                 }}
               />
             ))}
@@ -111,7 +110,6 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 style={{
                   alignSelf: "flex-start",
                   paddingHorizontal: 0,
-                  marginTop: -6,
                   marginLeft: 12
                 }}
                 textStyle={{

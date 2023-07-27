@@ -48,24 +48,22 @@ export const Announcement = ({ color }) => {
           paddingBottom: 12
         }}
       >
-        <View>
-          <FlatList
-            style={{
-              width: "100%",
-              marginTop: 12
-            }}
-            data={announcement?.body.filter((item) =>
-              allowedOnPlatform(item.platforms)
-            )}
-            renderItem={({ item, index }) =>
+        <View
+          style={{
+            width: "100%",
+            marginTop: 12
+          }}
+        >
+          {announcement?.body
+            .filter((item) => allowedOnPlatform(item.platforms))
+            .map((item, index) =>
               renderItem({
                 item: item,
                 index: index,
                 color: colors[color],
                 inline: true
               })
-            }
-          />
+            )}
         </View>
       </View>
     </View>
