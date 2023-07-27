@@ -109,7 +109,9 @@ export function HighlighterPlugin({
   name: string;
   defaultLanguage: string | null | undefined;
 }) {
-  const HIGHLIGHTER_PLUGIN_KEY = new PluginKey<HighlighterState>("highlighter");
+  const HIGHLIGHTER_PLUGIN_KEY = new PluginKey<HighlighterState>(
+    `${name}-highlighter`
+  );
   const HIGHLIGHTED_BLOCKS: Set<string> = new Set();
 
   return new Plugin<HighlighterState>({
@@ -293,6 +295,7 @@ function updateSelection(
     }
 
     const position = toCaretPosition(
+      name,
       newState.selection,
       isDocChanged ? toCodeLines(node.textContent, pos) : undefined
     );

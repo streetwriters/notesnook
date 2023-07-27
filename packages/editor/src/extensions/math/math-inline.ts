@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node, mergeAttributes } from "@tiptap/core";
-import { mathPlugin } from "./plugin";
+import { createSelectionBasedNodeView } from "../react";
+import { InlineMathComponent } from "./component";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -28,25 +29,15 @@ declare module "@tiptap/core" {
   }
 }
 // simple input rule for inline math
-const REGEX_INLINE_MATH_DOLLARS = /\$\$(.+)\$\$/; //new RegExp("\$(.+)\$", "i");
-// negative lookbehind regex notation allows for escaped \$ delimiters
-// (requires browser supporting ECMA2018 standard -- currently only Chrome / FF)
-// (see https://javascript.info/regexp-lookahead-lookbehind)
-// const REGEX_INLINE_MATH_DOLLARS_ESCAPED: RegExp = (() => {
-//   // attempt to create regex with negative lookbehind
-//   try {
-//     return new RegExp("(?<!\\\\)\\$(.+)(?<!\\\\)\\$");
-//   } catch (e) {
-//     return REGEX_INLINE_MATH_DOLLARS;
-//   }
-// })();
+const REGEX_INLINE_MATH_DOLLARS = /\$\$(.+)\$\$/;
 
 export const MathInline = Node.create({
   name: "mathInline",
-  group: "inline math",
+  group: "inline",
   content: "text*", // important!
+  marks: "",
   inline: true, // important!
-  atom: true, // important!
+  draggable: false,
   code: true,
 
   parseHTML() {
@@ -79,8 +70,11 @@ export const MathInline = Node.create({
     };
   },
 
-  addProseMirrorPlugins() {
-    return [mathPlugin];
+  addNodeView() {
+    return createSelectionBasedNodeView(InlineMathComponent, {
+      contentDOMFactory: true,
+      wrapperFactory: () => document.createElement("span")
+    });
   },
 
   addInputRules() {

@@ -17,16 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import type katex from "katex";
 import { MathRenderer } from "./types";
 
-async function loadKatex() {
-  const { default: katex } = await import("katex");
-
+let Katex: typeof katex;
+export async function loadKatex() {
+  if (Katex) return Katex;
+  const { default: _katex } = await import("katex");
   // Chemistry formulas support
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore TODO: maybe rewrite this in typescript?
   await import("katex/contrib/mhchem/mhchem");
-  return katex;
+  Katex = _katex;
+  return Katex;
 }
 
 export const KatexRenderer: MathRenderer = {

@@ -126,7 +126,9 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   getContentDOM(): ContentDOM {
     if (!this.options.contentDOMFactory) return;
     if (this.options.contentDOMFactory === true) {
-      const content = document.createElement("div");
+      const content = document.createElement(
+        this.node.isInline ? "span" : "div"
+      );
       content.classList.add(
         `${this.node.type.name.toLowerCase()}-content-wrapper`
       );

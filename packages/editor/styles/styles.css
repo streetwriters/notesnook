@@ -395,41 +395,6 @@ span:focus .fake-cursor {
   display: none;
 }
 
-/* -- Inline Math --------------------------------------- */
-
-.math-inline {
-  display: inline;
-  white-space: nowrap;
-}
-
-.math-inline .math-render {
-  display: inline-block;
-  /* font-size: 0.85em; */
-  cursor: pointer;
-}
-
-.math-inline .math-src .ProseMirror {
-  display: inline;
-  /* Necessary to fix FireFox bug with contenteditable, https://bugzilla.mozilla.org/show_bug.cgi?id=1252108 */
-  border-right: 1px solid transparent;
-  border-left: 1px solid transparent;
-  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
-    Liberation Mono, monospace !important;
-}
-
-.math-inline.ProseMirror-selectednode {
-  background-color: var(--bgSecondary);
-  padding: 3px;
-  border-radius: 5px;
-  border: 1px solid var(--border);
-}
-
-.math-inline .math-src::after,
-.math-inline .math-src::before {
-  content: "$$";
-  color: var(--disabled);
-}
-
 /* -- Block Math ---------------------------------------- */
 
 .math-block {
