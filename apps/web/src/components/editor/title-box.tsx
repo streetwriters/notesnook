@@ -70,6 +70,7 @@ function TitleBox(props: TitleBoxProps) {
     <Input
       ref={inputRef}
       variant="clean"
+      id="editor-title"
       data-test-id="editor-title"
       className="editorTitle"
       placeholder={"Note title"}

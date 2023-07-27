@@ -226,10 +226,11 @@ function Toolbar() {
             zIndex: isTitleVisible ? 1 : -1
           }}
           transition={{ duration: 0.5 }}
-          value={title}
+          defaultValue={title}
           onChange={(e) => {
             const title = e.target.value;
             setTitle(sessionId, title);
+            document.getElementById("editor-title").value = title;
           }}
           sx={{
             flex: 1,
