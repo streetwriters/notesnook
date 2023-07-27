@@ -23,7 +23,6 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
 import { useSelectionStore } from "../../../stores/use-selection-store";
-import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
@@ -110,8 +109,6 @@ export const NotebookItem = ({
                 key={topic.id}
                 height={null}
                 textStyle={{
-                  fontWeight: "normal",
-                  fontFamily: null,
                   marginRight: 0
                 }}
                 type="grayBg"
@@ -147,7 +144,7 @@ export const NotebookItem = ({
             {isTrash ? (
               <>
                 <Paragraph
-                  color={colors.primary.icon}
+                  color={colors.secondary.paragraph}
                   size={SIZE.xs}
                   style={{
                     textAlignVertical: "center",

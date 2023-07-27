@@ -39,6 +39,7 @@ import { editorController, textInput } from "./tiptap/utils";
 
 export const EditorWrapper = ({ width }) => {
   const { colors } = useThemeColors();
+  const { colors: toolBarColors } = useThemeColors("editorToolbar");
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const loading = false;
   const insets = useGlobalSafeAreaInsets();
@@ -71,7 +72,8 @@ export const EditorWrapper = ({ width }) => {
   }, [loading]);
 
   const getMarginBottom = () => {
-    const bottomInsets = Platform.OS === "android" ? 12 : insets.bottom || 14;
+    const bottomInsets =
+      Platform.OS === "android" ? 12 : insets.bottom + 16 || 14;
     if (!keyboard.keyboardShown) return bottomInsets / 1.5;
     if (Platform.isPad && !floating) return bottomInsets;
     if (Platform.OS === "ios") return bottomInsets / 1.5;
@@ -89,7 +91,7 @@ export const EditorWrapper = ({ width }) => {
         width: width[!introCompleted ? "mobile" : deviceMode]?.c,
         height: "100%",
         minHeight: "100%",
-        backgroundColor: colors.primary.background,
+        backgroundColor: toolBarColors.primary.background,
         borderLeftWidth: DDS.isTab ? 1 : 0,
         borderLeftColor: DDS.isTab ? colors.secondary.background : "transparent"
       }}
@@ -99,6 +101,7 @@ export const EditorWrapper = ({ width }) => {
           behavior="padding"
           style={{
             marginBottom: getMarginBottom(),
+            backgroundColor: colors.primary.background,
             flex: 1
           }}
           enabled={!floating}

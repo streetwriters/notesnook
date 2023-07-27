@@ -341,7 +341,7 @@ const NoteItem = ({
             ) : (
               <>
                 <Paragraph
-                  color={colors.secondary.background}
+                  color={colors.secondary.paragraph}
                   size={SIZE.xs}
                   style={{
                     marginRight: 6

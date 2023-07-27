@@ -64,7 +64,7 @@ const usePDFSnapshot = (attachment) => {
 };
 
 const PDFPreview = () => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [pdfSource, setPDFSource] = useState();
   const [loading, setLoading] = useState(false);

@@ -235,9 +235,6 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
           <EmotionEditorToolbarTheme>
             <Toolbar
               sx={{
-                pl: "10px",
-                pt: "5px",
-                minHeight: 50,
                 display: settings.noToolbar ? "none" : "flex"
               }}
               editor={_editor}

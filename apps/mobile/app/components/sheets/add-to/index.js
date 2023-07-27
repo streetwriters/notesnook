@@ -45,7 +45,7 @@ import { useItemSelectionStore } from "./store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 
 const MoveNoteSheet = ({ note, actionSheetRef }) => {
-  const colors = useThemeColors();
+  const { colors } = useThemeColors();
   const notebooks = useNotebookStore((state) =>
     state.notebooks.filter((n) => n?.type === "notebook")
   );
