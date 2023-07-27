@@ -5,7 +5,6 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@flyerhq/react-native-link-preview": "^1.6.0",
-    "@mdi/js": "^6.9.96",
     "absolutify": "^0.1.0",
     "dayjs": "^1.10.4",
     "entities": "^3.0.1",
