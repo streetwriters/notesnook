@@ -22,7 +22,7 @@ import { Button, Flex, Text } from "@theme-ui/components";
 import { makeURL, useQueryParams } from "../navigation";
 import { db } from "../common/db";
 import useDatabase from "../hooks/use-database";
-import Loader from "../components/loader";
+import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { AuthField, SubmitButton } from "./auth";
