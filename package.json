@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^17.1.1",
+    "@types/listr": "^0.14.4",
     "@types/node": "^18.7.13",
     "@typescript-eslint/eslint-plugin": "^5.59.9",
     "@typescript-eslint/parser": "^5.59.9",

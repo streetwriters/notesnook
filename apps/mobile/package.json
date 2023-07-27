@@ -25,7 +25,8 @@
   "devDependencies": {
     "otplib": "12.0.1",
     "patch-package": "7.0.0",
-    "react-refresh": "0.14.0"
+    "react-refresh": "0.14.0",
+    "fonteditor-core": "^2.1.11"
   },
   "dependencies": {
     "@notesnook/common": "file:../../packages/common",
