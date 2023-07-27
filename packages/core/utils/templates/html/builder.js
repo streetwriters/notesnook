@@ -36,27 +36,30 @@ async function preprocessHTML(templateData) {
   const mathInlines = doc.querySelectorAll(".math-inline.math-node");
 
   if (mathBlocks.length || mathInlines.length) {
-    const { default: katex } = require("katex");
-    require("katex/contrib/mhchem");
-
+    const katex = require("katex");
+    require("katex/contrib/mhchem/mhchem.js");
     for (const mathBlock of mathBlocks) {
       const text = mathBlock.textContent;
+      console.log(text);
       mathBlock.innerHTML = katex.renderToString(text, {
         displayMode: true,
-        output: "mathml"
+        throwOnError: false
       });
     }
 
     for (const mathInline of mathInlines) {
       const text = mathInline.textContent;
-      mathInline.innerHTML = katex.renderToString(text, { output: "mathml" });
+      mathInline.innerHTML = katex.renderToString(text, {
+        throwOnError: false,
+        displayMode: false
+      });
     }
     templateData.hasMathBlocks = true;
   }
 
   const codeblocks = doc.querySelectorAll("pre > code");
   if (codeblocks.length) {
-    const { default: prismjs } = require("prismjs");
+    const prismjs = require("prismjs");
     prismjs.register = () => {};
     for (const codeblock of codeblocks) {
       const language = LANGUAGE_REGEX.exec(

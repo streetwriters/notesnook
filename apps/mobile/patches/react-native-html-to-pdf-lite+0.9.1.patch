@@ -1,3 +1,177 @@
+diff --git a/node_modules/react-native-html-to-pdf-lite/android/src/main/java/android/print/PdfConverter.java b/node_modules/react-native-html-to-pdf-lite/android/src/main/java/android/print/PdfConverter.java
+index e2b536b..c0c5945 100644
+--- a/node_modules/react-native-html-to-pdf-lite/android/src/main/java/android/print/PdfConverter.java
++++ b/node_modules/react-native-html-to-pdf-lite/android/src/main/java/android/print/PdfConverter.java
+@@ -8,6 +8,7 @@ package android.print;
+ import android.content.Context;
+ import android.os.Build;
+ import android.os.Handler;
++import android.os.Looper;
+ import android.os.ParcelFileDescriptor;
+ import android.util.Log;
+ import android.webkit.WebView;
+@@ -59,42 +60,55 @@ public class PdfConverter implements Runnable {
+ 
+     @Override
+     public void run() {
++        if (mWebView != null) {
++            destroy();
++        }
+         mWebView = new WebView(mContext);
++        mWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
++        mWebView.getSettings().setJavaScriptEnabled(true);
++        mWebView.getSettings().setAllowContentAccess(true);
++        mWebView.getSettings().setAllowFileAccess(true);
+         mWebView.setWebViewClient(new WebViewClient() {
+             @Override
+             public void onPageFinished(WebView view, String url) {
+-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
+-                    throw new RuntimeException("call requires API level 19");
+-                else {
+-                    PrintDocumentAdapter documentAdapter = mWebView.createPrintDocumentAdapter();
+-                    documentAdapter.onLayout(null, getPdfPrintAttrs(), null, new PrintDocumentAdapter.LayoutResultCallback() {
+-                    }, null);
+-                    documentAdapter.onWrite(new PageRange[]{PageRange.ALL_PAGES}, getOutputFileDescriptor(), null, new PrintDocumentAdapter.WriteResultCallback() {
+-                        @Override
+-                        public void onWriteFinished(PageRange[] pages) {
+-                            try {
+-                                String base64 = "";
+-                                if (mShouldEncode) {
+-                                    base64 = encodeFromFile(mPdfFile);
++                final Handler handler = new Handler(Looper.getMainLooper());
++                handler.postDelayed(() -> {
++                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
++                        throw new RuntimeException("call requires API level 19");
++                    else {
++                        PrintDocumentAdapter documentAdapter = mWebView.createPrintDocumentAdapter();
++                        documentAdapter.onLayout(null, getPdfPrintAttrs(), null, new PrintDocumentAdapter.LayoutResultCallback() {
++                        }, null);
++                        documentAdapter.onWrite(new PageRange[]{PageRange.ALL_PAGES}, getOutputFileDescriptor(), null, new PrintDocumentAdapter.WriteResultCallback() {
++                            @Override
++                            public void onWriteFinished(PageRange[] pages) {
++                                try {
++                                    String base64 = "";
++                                    if (mShouldEncode) {
++                                        base64 = encodeFromFile(mPdfFile);
++                                    }
++
++                                    PDDocument myDocument = PDDocument.load(mPdfFile);
++                                    int pagesToBePrinted = myDocument.getNumberOfPages();
++
++                                    mResultMap.putString("filePath", mPdfFile.getAbsolutePath());
++                                    mResultMap.putString("numberOfPages", String.valueOf(pagesToBePrinted));
++                                    mResultMap.putString("base64", base64);
++                                    mPromise.resolve(mResultMap);
++                                } catch (IOException e) {
++                                    mPromise.reject(e.getMessage());
++                                } finally {
++                                    handler.postDelayed(() -> {
++                                        destroy();
++                                    }, 1000 * 5000);
+                                 }
+-
+-                                PDDocument myDocument = PDDocument.load(mPdfFile);
+-                                int pagesToBePrinted = myDocument.getNumberOfPages();
+-
+-                                mResultMap.putString("filePath", mPdfFile.getAbsolutePath());
+-                                mResultMap.putString("numberOfPages", String.valueOf(pagesToBePrinted));
+-                                mResultMap.putString("base64", base64);
+-                                mPromise.resolve(mResultMap);
+-                            } catch (IOException e) {
+-                                mPromise.reject(e.getMessage());
+-                            } finally {
+-                                destroy();
+                             }
+-                        }
+-                    });
+-                }
++                        });
++                    }
++                }, 1000 * 2);
+             }
+         });
++
+         WebSettings settings = mWebView.getSettings();
+         settings.setDefaultTextEncodingName("utf-8");
+         mWebView.loadDataWithBaseURL(mBaseURL, mHtmlString, "text/HTML", "utf-8", null);
+diff --git a/node_modules/react-native-html-to-pdf-lite/ios/RNHTMLtoPDF/RNHTMLtoPDF.m b/node_modules/react-native-html-to-pdf-lite/ios/RNHTMLtoPDF/RNHTMLtoPDF.m
+index e005f2a..5d12d77 100644
+--- a/node_modules/react-native-html-to-pdf-lite/ios/RNHTMLtoPDF/RNHTMLtoPDF.m
++++ b/node_modules/react-native-html-to-pdf-lite/ios/RNHTMLtoPDF/RNHTMLtoPDF.m
+@@ -74,7 +74,10 @@ + (BOOL)requiresMainQueueSetup
+ - (instancetype)init
+ {
+     if (self = [super init]) {
+-        _webView = [[WKWebView alloc] initWithFrame:self.bounds];
++        
++        WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
++        wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
++        _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration:wkWebViewConfig];
+         _webView.navigationDelegate = self;
+         [self addSubview:_webView];
+         autoHeight = false;
+@@ -186,36 +189,38 @@ -(void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigati
+     if (webView.isLoading)
+     return;
+     
+-    UIPrintPageRenderer *render = [[UIPrintPageRenderer alloc] init];
+-    [render addPrintFormatter:webView.viewPrintFormatter startingAtPageAtIndex:0];
++    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
++        UIPrintPageRenderer *render = [[UIPrintPageRenderer alloc] init];
++        [render addPrintFormatter:webView.viewPrintFormatter startingAtPageAtIndex:0];
+         
+-    // Define the printableRect and paperRect
+-    // If the printableRect defines the printable area of the page
+-    CGRect paperRect = CGRectMake(0, 0, _PDFSize.width, _PDFSize.height);
+-    CGRect printableRect = CGRectMake(_paddingLeft, _paddingTop, _PDFSize.width-(_paddingLeft + _paddingRight), _PDFSize.height-(_paddingBottom + _paddingTop));
++        // Define the printableRect and paperRect
++        // If the printableRect defines the printable area of the page
++        CGRect paperRect = CGRectMake(0, 0, _PDFSize.width, _PDFSize.height);
++        CGRect printableRect = CGRectMake(_paddingLeft, _paddingTop, _PDFSize.width-(_paddingLeft + _paddingRight), _PDFSize.height-(_paddingBottom + _paddingTop));
+         
+         
+-    [render setValue:[NSValue valueWithCGRect:paperRect] forKey:@"paperRect"];
+-    [render setValue:[NSValue valueWithCGRect:printableRect] forKey:@"printableRect"];
++        [render setValue:[NSValue valueWithCGRect:paperRect] forKey:@"paperRect"];
++        [render setValue:[NSValue valueWithCGRect:printableRect] forKey:@"printableRect"];
+         
+-    NSData * pdfData = [render printToPDF:&_numberOfPages backgroundColor:_bgColor ];
++        NSData * pdfData = [render printToPDF:&_numberOfPages backgroundColor:_bgColor ];
+         
+-    if (pdfData) {
+-        NSString *pdfBase64 = @"";
++        if (pdfData) {
++            NSString *pdfBase64 = @"";
+             
+-        [pdfData writeToFile:_filePath atomically:YES];
+-        if (_base64) {
+-            pdfBase64 = [pdfData base64EncodedStringWithOptions:0];
++            [pdfData writeToFile:_filePath atomically:YES];
++            if (_base64) {
++                pdfBase64 = [pdfData base64EncodedStringWithOptions:0];
++            }
++            NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
++                                  pdfBase64, @"base64",
++                                  [NSString stringWithFormat: @"%ld", (long)_numberOfPages], @"numberOfPages",
++                                  _filePath, @"filePath", nil];
++            _resolveBlock(data);
++        } else {
++            NSError *error;
++            _rejectBlock(RCTErrorUnspecified, nil, RCTErrorWithMessage(error.description));
+         }
+-        NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
+-                              pdfBase64, @"base64",
+-                              [NSString stringWithFormat: @"%ld", (long)_numberOfPages], @"numberOfPages",
+-                              _filePath, @"filePath", nil];
+-        _resolveBlock(data);
+-    } else {
+-        NSError *error;
+-        _rejectBlock(RCTErrorUnspecified, nil, RCTErrorWithMessage(error.description));
+-    }
++    });
+ }
+ 
+ @end
 diff --git a/node_modules/react-native-html-to-pdf-lite/react-native-html-to-pdf.podspec b/node_modules/react-native-html-to-pdf-lite/react-native-html-to-pdf-lite.podspec
 similarity index 100%
 rename from node_modules/react-native-html-to-pdf-lite/react-native-html-to-pdf.podspec
