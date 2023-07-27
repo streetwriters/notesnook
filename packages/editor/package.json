@@ -76,6 +76,7 @@
   "scripts": {
     "test": "vitest run",
     "prebuild": "node ./scripts/build.mjs",
+    "postbuild": "node ./scripts/postbuild.mjs",
     "prewatch": "node ./scripts/build.mjs",
     "build": "tsc",
     "watch": "tsc --watch",
