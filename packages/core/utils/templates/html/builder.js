@@ -36,8 +36,12 @@ async function preprocessHTML(templateData) {
   const mathInlines = doc.querySelectorAll(".math-inline.math-node");
 
   if (mathBlocks.length || mathInlines.length) {
-    const katex = require("katex");
-    require("katex/contrib/mhchem/mhchem.js");
+    const katex = hasRequire()
+      ? require("katex")
+      : (await import("katex")).default;
+    hasRequire()
+      ? require("katex/contrib/mhchem/mhchem.js")
+      : await import("katex/contrib/mhchem/mhchem.js");
     for (const mathBlock of mathBlocks) {
       const text = mathBlock.textContent;
       console.log(text);
@@ -59,17 +63,20 @@ async function preprocessHTML(templateData) {
 
   const codeblocks = doc.querySelectorAll("pre > code");
   if (codeblocks.length) {
-    const prismjs = require("prismjs");
+    const prismjs = hasRequire()
+      ? require("prismjs")
+      : (await import("prismjs")).default;
+    const { loadLanguage } = hasRequire()
+      ? require("../../../../editor/languages/index.js")
+      : await import("../../../../editor/languages/index.js");
     prismjs.register = () => {};
     for (const codeblock of codeblocks) {
       const language = LANGUAGE_REGEX.exec(
         codeblock.parentElement.className
       )?.[1];
       if (!language) continue;
-      const {
-        default: grammar
-      } = require(`../../../../editor/languages/${language}.js`);
 
+      const { default: grammar } = await loadLanguage(language);
       grammar(prismjs);
 
       codeblock.innerHTML = prismjs.highlight(
@@ -86,3 +93,7 @@ async function preprocessHTML(templateData) {
 }
 
 export default { buildHTML };
+
+function hasRequire() {
+  return typeof require === "function";
+}
