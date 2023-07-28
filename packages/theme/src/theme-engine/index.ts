@@ -280,7 +280,6 @@ const HEX_COLOR_REGEX_ALPHA =
 
 export function validateTheme(json: ThemeDefinition) {
   const flattenedTheme = flatten(json);
-
   const missingKeys = [];
   for (const key of RequiredKeys) {
     if (!Object.keys(flattenedTheme).includes(key)) {
@@ -294,31 +293,27 @@ export function validateTheme(json: ThemeDefinition) {
       )} are missing from the theme.`
     };
   }
-
   const invalidColors = [];
-
   for (const key in flattenedTheme) {
     if (!key.startsWith("scopes")) continue;
+    const keyPart = key.split(".").pop() as string;
     const value = flattenedTheme[key];
+    const isHexAlphaColor = /hover|shade|backdrop|textSelection/g.test(keyPart);
+    HEX_COLOR_REGEX.lastIndex = 0;
+    HEX_COLOR_REGEX_ALPHA.lastIndex = 0;
 
     if (
-      !/hover|shade|backdrop|textSelection/g.test(key) &&
-      !HEX_COLOR_REGEX.test(value)
+      (!isHexAlphaColor && !HEX_COLOR_REGEX.test(value)) ||
+      (isHexAlphaColor && !HEX_COLOR_REGEX_ALPHA.test(value))
     ) {
-      invalidColors.push(key);
-    } else if (
-      /hover|shade|backdrop|textSelection/g.test(key) &&
-      !HEX_COLOR_REGEX_ALPHA.test(value)
-    ) {
-      invalidColors.push(key);
+      if (!HEX_COLOR_REGEX.test(value)) invalidColors.push(key);
     }
   }
-
   if (invalidColors.length > 0) {
     return {
-      error: `Failed to apply theme, ${missingKeys.join(
+      error: `Failed to apply theme, ${invalidColors.join(
         ","
-      )} are missing from the theme.`
+      )} have invalid values.`
     };
   }
 
