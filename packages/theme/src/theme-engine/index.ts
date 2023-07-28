@@ -54,6 +54,35 @@ export const StaticColors = {
   white: "#ffffff"
 };
 
+export function getPreviewColors(theme: ThemeDefinition) {
+  const { base, navigationMenu, statusBar, list, editor } = theme.scopes;
+  const { primary, success } = base;
+
+  return {
+    navigationMenu: {
+      shade: navigationMenu?.primary?.shade || primary.shade,
+      accent: navigationMenu?.primary?.accent || primary.accent,
+      background: navigationMenu?.primary?.background || primary.background,
+      icon: navigationMenu?.primary?.icon || primary.icon
+    },
+    statusBar: {
+      paragraph: statusBar?.primary?.paragraph || primary.paragraph,
+      background: statusBar?.primary?.background || primary.background,
+      icon: statusBar?.success?.icon || success.icon
+    },
+    editor: editor?.primary?.background || primary.background,
+    list: {
+      heading: list?.primary?.heading || primary.heading,
+      background: list?.primary?.background || primary.background,
+      accent: list?.primary?.accent || primary.accent
+    },
+    border: primary.border,
+    paragraph: primary.paragraph,
+    background: primary.background,
+    accent: primary.accent
+  };
+}
+
 type ThemeEngineState = {
   theme: ThemeDefinition;
   setTheme: (theme: ThemeDefinition) => void;
@@ -172,4 +201,128 @@ function buildVariants(
   };
 
   return variant;
+}
+
+const ColorNames = [
+  "accent",
+  "paragraph",
+  "background",
+  "border",
+  "heading",
+  "icon",
+  "separator",
+  "placeholder",
+  "hover",
+  "shade",
+  "backdrop",
+  "textSelection"
+];
+
+const Variants = [
+  "primary",
+  "secondary",
+  "disabled",
+  "selected",
+  "error",
+  "success"
+];
+const Scopes = [
+  "base",
+  "statusBar",
+  "list",
+  "editor",
+  "editorToolbar",
+  "dialog",
+  "navigationMenu",
+  "contextMenu",
+  "sheet"
+];
+
+const RequiredKeys = [
+  "version",
+  "id",
+  "name",
+  "license",
+  "authors.0.name",
+  "authors.0.email",
+  "authors.0.url",
+  "description",
+  "colorScheme",
+  "compatibilityVersion",
+  "homepage",
+  ...Variants.map((variant) =>
+    ColorNames.map((colorName) => `scopes.base.${variant}.${colorName}`)
+  ).flat()
+];
+
+const flatten = (object: { [name: string]: any }) => {
+  const flattenedObject: { [name: string]: any } = {};
+
+  for (const innerObj in object) {
+    if (typeof object[innerObj] === "object") {
+      if (typeof object[innerObj] === "function") continue;
+
+      const newObject = flatten(object[innerObj]);
+      for (const key in newObject) {
+        flattenedObject[innerObj + "." + key] = newObject[key];
+      }
+    } else {
+      if (typeof object[innerObj] === "function") continue;
+      flattenedObject[innerObj] = object[innerObj];
+    }
+  }
+  return flattenedObject;
+};
+
+const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/g;
+const HEX_COLOR_REGEX_ALPHA =
+  /^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$/g;
+
+export function validateTheme(json: ThemeDefinition) {
+  const flattenedTheme = flatten(json);
+
+  const missingKeys = [];
+  for (const key of RequiredKeys) {
+    if (!Object.keys(flattenedTheme).includes(key)) {
+      missingKeys.push(key);
+    }
+  }
+  if (missingKeys.length > 0) {
+    return {
+      error: `Failed to apply theme, ${missingKeys.join(
+        ","
+      )} are missing from the theme.`
+    };
+  }
+
+  const invalidColors = [];
+
+  for (const key in flattenedTheme) {
+    if (!key.startsWith("scopes")) continue;
+    const value = flattenedTheme[key];
+
+    if (
+      !/hover|shade|backdrop|textSelection/g.test(key) &&
+      !HEX_COLOR_REGEX.test(value)
+    ) {
+      invalidColors.push(key);
+    } else if (
+      /hover|shade|backdrop|textSelection/g.test(key) &&
+      !HEX_COLOR_REGEX_ALPHA.test(value)
+    ) {
+      invalidColors.push(key);
+    }
+  }
+
+  if (invalidColors.length > 0) {
+    return {
+      error: `Failed to apply theme, ${missingKeys.join(
+        ","
+      )} are missing from the theme.`
+    };
+  }
+
+  return {
+    error: undefined
+  };
 }
