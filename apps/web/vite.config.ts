@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Plugin, defineConfig } from "vite";
+import { Plugin, PluginOption, defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import svgrPlugin from "vite-plugin-svgr";
 import envCompatible from "vite-plugin-env-compatible";
@@ -26,6 +26,7 @@ import autoprefixer from "autoprefixer";
 import { WEB_MANIFEST } from "./web-manifest";
 import { execSync } from "child_process";
 import { version } from "./package.json";
+import { visualizer } from "rollup-plugin-visualizer";
 
 const gitHash = (() => {
   try {
@@ -38,6 +39,7 @@ const appVersion = version.replaceAll(".", "");
 const isTesting =
   process.env.TEST === "true" || process.env.NODE_ENV === "development";
 const isDesktop = process.env.PLATFORM === "desktop";
+const isAnalyzing = process.env.ANALYZING === "true";
 
 export default defineConfig({
   envPrefix: "REACT_APP_",
@@ -66,7 +68,14 @@ export default defineConfig({
   },
   logLevel: process.env.NODE_ENV === "production" ? "warn" : "info",
   resolve: {
-    dedupe: ["react", "react-dom", "@mdi/js", "@mdi/react", "@emotion/react"],
+    dedupe: [
+      "react",
+      "react-dom",
+      "@mdi/js",
+      "@mdi/react",
+      "@emotion/react",
+      "katex"
+    ],
 
     alias: [
       {
@@ -94,6 +103,16 @@ export default defineConfig({
     }
   },
   plugins: [
+    ...(isAnalyzing
+      ? [
+          visualizer({
+            gzipSize: true,
+            brotliSize: true,
+            open: true
+          }) as PluginOption
+        ]
+      : []),
+
     requireTransformPlugin(),
     ...(isDesktop && process.env.NODE_ENV === "production"
       ? []

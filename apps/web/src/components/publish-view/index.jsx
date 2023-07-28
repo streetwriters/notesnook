@@ -24,7 +24,7 @@ import { Copy } from "../icons";
 import Toggle from "../toggle";
 import Field from "../field";
 import { db } from "../../common/db";
-import * as clipboard from "clipboard-polyfill/text";
+import { writeText } from "clipboard-polyfill";
 import { ScopedThemeProvider } from "../theme-provider";
 import { showToast } from "../../utils/toast";
 import { EV, EVENTS } from "@notesnook/core/common";
@@ -140,9 +140,7 @@ function PublishView(props) {
                     variant="anchor"
                     className="copyPublishLink"
                     onClick={() => {
-                      clipboard.writeText(
-                        `https://monograph.notesnook.com/${publishId}`
-                      );
+                      writeText(`https://monograph.notesnook.com/${publishId}`);
                     }}
                   >
                     <Copy size={20} color="accent" />

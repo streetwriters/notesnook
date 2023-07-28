@@ -22,7 +22,7 @@ import { Text, Flex, Button } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import { db } from "../common/db";
 import Logo from "../assets/notesnook-logo.png";
-import * as clipboard from "clipboard-polyfill/text";
+import { writeText } from "clipboard-polyfill";
 import { Suspense } from "react";
 import Config from "../utils/config";
 import FileSaver from "file-saver";
@@ -98,8 +98,7 @@ function RecoveryKeyDialog(props) {
                 mt={1}
                 className="copyKey"
                 onClick={async () => {
-                  clipboard
-                    .writeText(key)
+                  writeText(key)
                     .then(() => {
                       setCopyText("Copied!");
                       setTimeout(() => {
