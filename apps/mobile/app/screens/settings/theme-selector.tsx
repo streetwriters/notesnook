@@ -16,12 +16,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { THEME_COMPATIBILITY_VERSION, useThemeColors } from "@notesnook/theme";
+import {
+  THEME_COMPATIBILITY_VERSION,
+  ThemeDefinition,
+  getPreviewColors,
+  useThemeColors,
+  validateTheme
+} from "@notesnook/theme";
 import type {
   CompiledThemeDefinition,
   ThemeMetadata,
   ThemesRouter
 } from "@notesnook/themes-server";
+import DocumentPicker from "react-native-document-picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { MasonryFlashList } from "@shopify/flash-list";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -45,6 +52,7 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { getElevationStyle } from "../../utils/elevation";
 import { MenuItemsList } from "../../utils/constants";
+import { IconButton } from "../../components/ui/icon-button";
 
 const THEME_SERVER_URL = "https://themes.notesnook.com";
 //@ts-ignore
@@ -57,6 +65,11 @@ export const themeTrpcClient = createTRPCProxyClient<ThemesRouter>({
 });
 
 function ThemeSelector() {
+  const [darkTheme, lightTheme] = useThemeStore((state) => [
+    state.darkTheme,
+    state.lightTheme
+  ]);
+
   const { colors } = useThemeColors();
   const themeColors = colors;
   const [searchQuery, setSearchQuery] = useState<string>();
@@ -91,23 +104,32 @@ function ThemeSelector() {
 
   const select = (item: Partial<ThemeMetadata>) => {
     presentSheet({
-      context: item.id,
+      context: "theme-details",
       component: (ref, close) => <ThemeSetter close={close} theme={item} />
     });
   };
-  const renderItem = ({ item }: { item: ThemeMetadata; index: number }) => {
-    const colors = item.previewColors;
+
+  const renderItem = ({
+    item,
+    index
+  }: {
+    item: ThemeMetadata;
+    index: number;
+  }) => {
+    const colors =
+      item.previewColors ||
+      getPreviewColors(item as unknown as ThemeDefinition);
 
     return (
       <>
-        <SheetProvider context={item.id} />
         <TouchableOpacity
           activeOpacity={0.9}
           style={{
             borderRadius: 10,
             padding: 6,
             marginBottom: 10,
-            flexShrink: 1
+            flexShrink: 1,
+            marginHorizontal: 10
           }}
           onPress={() => select(item)}
         >
@@ -218,6 +240,52 @@ function ThemeSelector() {
                 <Icon name="magnify" color={colors.list.heading} size={7} />
               </View>
             </View>
+
+            <View
+              style={{
+                width: "100%",
+                alignItems: "flex-end",
+                justifyContent: "flex-end",
+                marginTop: 6,
+                position: "absolute",
+                bottom: 6,
+                right: 6,
+                flexDirection: "row",
+                gap: 10
+              }}
+            >
+              {darkTheme.id === item.id || lightTheme.id === item.id ? (
+                <IconButton
+                  name="check"
+                  type="gray"
+                  customStyle={{
+                    borderRadius: 100,
+                    paddingHorizontal: 6,
+                    alignSelf: "flex-end",
+                    width: 25,
+                    height: 25
+                  }}
+                  color={colors.accent}
+                  size={16}
+                />
+              ) : null}
+
+              <Button
+                title={item.colorScheme === "dark" ? "Dark" : "Light"}
+                type="grayAccent"
+                height={25}
+                buttonType={{
+                  color: item.colorScheme === "dark" ? "black" : "#f0f0f060",
+                  text: colors.accent
+                }}
+                style={{
+                  borderRadius: 100,
+                  paddingHorizontal: 12,
+                  alignSelf: "flex-end"
+                }}
+                fontSize={SIZE.xxs}
+              />
+            </View>
           </View>
 
           <Heading size={SIZE.md} color={themeColors.primary.heading}>
@@ -234,111 +302,157 @@ function ThemeSelector() {
     );
   };
   let resetTimer: NodeJS.Timeout;
-  //let refetchTimer: NodeJS.Timeout;
   const onSearch = (text: string) => {
     clearTimeout(resetTimer as NodeJS.Timeout);
     resetTimer = setTimeout(() => {
       setSearchQuery(text);
-      // clearTimeout(refetchTimer);
-      // refetchTimer = setTimeout(() => {
-      //   themes.refetch();
-      // }, 300);
     }, 400);
   };
 
   function getThemes(): ThemeMetadata[] {
     const pages = themes.data?.pages;
+
     return (
       pages
         ?.map((page) => {
           return page.themes;
         })
-        .flat() || []
+        .flat()
+        .filter(
+          (theme) =>
+            (!searchQuery || searchQuery === "") &&
+            darkTheme.id !== theme.id &&
+            lightTheme.id !== theme.id
+        ) || []
     );
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        padding: 12
-      }}
-    >
+    <>
+      <SheetProvider context="theme-details" />
       <View
         style={{
-          paddingHorizontal: 4,
-          marginBottom: 12
+          flex: 1
         }}
       >
-        <Input onChangeText={onSearch} placeholder="Search themes" />
-
         <View
           style={{
-            flexDirection: "row",
-            columnGap: 10
+            paddingHorizontal: 12,
+            marginBottom: 12,
+            paddingTop: 12
           }}
         >
-          <Button
-            height={35}
-            style={{ borderRadius: 100 }}
-            type={colorScheme === "" || !colorScheme ? "accent" : "grayBg"}
-            title="All"
-            onPress={() => {
-              setColorScheme("");
-            }}
-          />
-          <Button
-            style={{ borderRadius: 100 }}
-            height={35}
-            type={colorScheme === "dark" ? "accent" : "grayBg"}
-            title="Dark"
-            onPress={() => {
-              setColorScheme("dark");
-            }}
-          />
-          <Button
-            style={{ borderRadius: 100 }}
-            height={35}
-            type={colorScheme === "light" ? "accent" : "grayBg"}
-            title="Light"
-            onPress={() => {
-              setColorScheme("light");
-            }}
-          />
-        </View>
-      </View>
+          <Input onChangeText={onSearch} placeholder="Search themes" />
 
-      <MasonryFlashList
-        numColumns={2}
-        data={getThemes()}
-        ListEmptyComponent={
           <View
             style={{
-              height: 100,
-              width: "100%",
-              justifyContent: "center",
-              alignItems: "center"
+              flexDirection: "row",
+              justifyContent: "space-between"
             }}
           >
-            {themes.isLoading ? (
-              <ActivityIndicator color={colors.primary.accent} />
-            ) : searchQuery ? (
-              <Paragraph color={colors.secondary.paragraph}>
-                No results found for {searchQuery}
-              </Paragraph>
-            ) : (
-              <Paragraph>No themes found.</Paragraph>
-            )}
+            <View
+              style={{
+                flexDirection: "row",
+                columnGap: 10
+              }}
+            >
+              <Button
+                height={30}
+                style={{ borderRadius: 100, minWidth: 60 }}
+                type={colorScheme === "" || !colorScheme ? "accent" : "grayBg"}
+                title="All"
+                fontSize={SIZE.xs}
+                onPress={() => {
+                  setColorScheme("");
+                }}
+              />
+              <Button
+                style={{ borderRadius: 100, minWidth: 60 }}
+                height={30}
+                type={colorScheme === "dark" ? "accent" : "grayBg"}
+                title="Dark"
+                fontSize={SIZE.xs}
+                onPress={() => {
+                  setColorScheme("dark");
+                }}
+              />
+              <Button
+                style={{ borderRadius: 100, minWidth: 60 }}
+                height={30}
+                fontSize={SIZE.xs}
+                type={colorScheme === "light" ? "accent" : "grayBg"}
+                title="Light"
+                onPress={() => {
+                  setColorScheme("light");
+                }}
+              />
+            </View>
+
+            <Button
+              title="Load from file"
+              style={{ borderRadius: 100, minWidth: 60 }}
+              height={30}
+              type={"grayAccent"}
+              icon="folder"
+              fontSize={SIZE.xs}
+              onPress={() => {
+                DocumentPicker.pickSingle().then((r) => {
+                  fetch(r.uri).then(async (response) => {
+                    const json = await response.json();
+                    console.log(json);
+                    const result = validateTheme(json);
+                    if (result.error) {
+                      ToastEvent.error(new Error(result.error));
+                      return;
+                    }
+                    select(json);
+                  });
+                });
+              }}
+            />
           </View>
-        }
-        estimatedItemSize={200}
-        renderItem={renderItem}
-        onEndReachedThreshold={0.1}
-        onEndReached={() => {
-          themes.fetchNextPage();
-        }}
-      />
-    </View>
+        </View>
+
+        <MasonryFlashList
+          numColumns={2}
+          data={[
+            ...(colorScheme === "dark" || (searchQuery && searchQuery !== "")
+              ? []
+              : [lightTheme as unknown as ThemeMetadata]),
+            ...(colorScheme === "light" || (searchQuery && searchQuery !== "")
+              ? []
+              : [darkTheme as unknown as ThemeMetadata]),
+            ...getThemes()
+          ]}
+          ListEmptyComponent={
+            <View
+              style={{
+                height: 100,
+                width: "100%",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              {themes.isLoading ? (
+                <ActivityIndicator color={colors.primary.accent} />
+              ) : searchQuery ? (
+                <Paragraph color={colors.secondary.paragraph}>
+                  No results found for {searchQuery}
+                </Paragraph>
+              ) : (
+                <Paragraph>No themes found.</Paragraph>
+              )}
+            </View>
+          }
+          estimatedItemSize={200}
+          renderItem={renderItem}
+          onEndReachedThreshold={0.1}
+          onEndReached={() => {
+            themes.fetchNextPage();
+          }}
+        />
+      </View>
+    </>
   );
 }
 
@@ -373,9 +487,45 @@ const ThemeSetter = ({
   theme: Partial<CompiledThemeDefinition>;
   close?: (ctx?: string) => void;
 }) => {
+  const [darkTheme, lightTheme] = useThemeStore((state) => [
+    state.darkTheme,
+    state.lightTheme
+  ]);
   const themeColors = useThemeColors();
 
-  const colors = theme?.previewColors;
+  const colors =
+    theme?.previewColors ||
+    getPreviewColors(theme as unknown as ThemeDefinition);
+
+  const applyTheme = async () => {
+    if (!theme.id) return;
+    try {
+      const user = await db.user?.getUser();
+      const fullTheme = theme.scopes
+        ? (theme as ThemeDefinition)
+        : await themeTrpcClient.installTheme.query({
+            compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+            id: theme.id,
+            userId: user?.id
+          });
+
+      if (!fullTheme) return;
+      theme.colorScheme === "dark"
+        ? useThemeStore.getState().setDarkTheme(fullTheme)
+        : useThemeStore.getState().setLightTheme(fullTheme);
+      ToastEvent.show({
+        heading: `${theme.name} applied successfully`,
+        type: "success",
+        context: "global"
+      });
+    } catch (e) {
+      console.log("Error", e);
+    }
+
+    setTimeout(() => {
+      close?.();
+    });
+  };
 
   return (
     <>
@@ -570,44 +720,31 @@ const ThemeSetter = ({
           </View>
         </View>
 
-        <Button
-          style={{
-            width: "100%",
-            marginBottom: 10
-          }}
-          onPress={async () => {
-            if (!theme.id) return;
-            try {
-              const user = await db.user?.getUser();
-              const fullTheme = await themeTrpcClient.installTheme.query({
-                compatibilityVersion: THEME_COMPATIBILITY_VERSION,
-                id: theme.id,
-                userId: user?.id
-              });
-              if (!fullTheme) return;
-              theme.colorScheme === "dark"
-                ? useThemeStore.getState().setDarkTheme(fullTheme)
-                : useThemeStore.getState().setLightTheme(fullTheme);
-              ToastEvent.show({
-                heading: `${theme.name} applied successfully`,
-                type: "success",
-                context: "global"
-              });
-            } catch (e) {
-              console.log("Error", e);
+        {(darkTheme.id === theme.id || lightTheme.id === theme.id) &&
+        !theme.scopes ? (
+          <Button
+            title={
+              darkTheme.id === theme.id
+                ? "Applied as dark theme"
+                : "Applied as light theme"
             }
-
-            setTimeout(() => {
-              close?.();
-            });
-          }}
-          title={
-            theme.colorScheme === "dark"
-              ? "Set as dark theme"
-              : "Set as light theme"
-          }
-          type="grayAccent"
-        />
+            type="accent"
+          />
+        ) : (
+          <Button
+            style={{
+              width: "100%",
+              marginBottom: 10
+            }}
+            onPress={applyTheme}
+            title={
+              theme.colorScheme === "dark"
+                ? "Set as dark theme"
+                : "Set as light theme"
+            }
+            type="grayAccent"
+          />
+        )}
       </View>
     </>
   );

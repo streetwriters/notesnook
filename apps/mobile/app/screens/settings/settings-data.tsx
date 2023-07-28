@@ -432,21 +432,14 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "personalization",
         type: "screen",
-        name: "Theme",
+        name: "Appearance",
         description: "Change app look and feel with color themes",
         icon: "shape",
         sections: [
-          // {
-          //   id: "accent-color-picker",
-          //   type: "component",
-          //   name: "Accent color",
-          //   description: "Pick the color that matches your mood",
-          //   component: "colorpicker"
-          // },
           {
             id: "theme-picker",
             type: "screen",
-            name: "Customize theme",
+            name: "Themes",
             description: "Customize Notesnook to absolute infinity.",
             component: "theme-selector"
           },
@@ -481,25 +474,6 @@ export const settingsGroups: SettingSection[] = [
               useThemeStore.getState().setColorScheme();
             },
             getter: () => useThemeStore.getState().colorScheme === "dark"
-          },
-          {
-            id: "pitch-black",
-            type: "switch",
-            name: "Pitch black",
-            description: "Save battery on device with amoled screen at night.",
-            property: "darkTheme",
-            modifer: () => {
-              useThemeStore
-                .getState()
-                .setDarkTheme(
-                  useThemeStore.getState().darkTheme.id === ThemePitchBlack.id
-                    ? ThemeDark
-                    : ThemePitchBlack
-                );
-            },
-            icon: "brightness-1",
-            getter: () =>
-              useThemeStore.getState().darkTheme.id === ThemePitchBlack.id
           }
         ]
       },
