@@ -45,7 +45,7 @@ import { useTimer } from "../../hooks/use-timer";
 import { phone } from "phone";
 import { db } from "../../common/db";
 import FileSaver from "file-saver";
-import * as clipboard from "clipboard-polyfill/text";
+import { writeText } from "clipboard-polyfill";
 import { ReactComponent as MFA } from "../../assets/mfa.svg";
 import { ReactComponent as Fallback2FA } from "../../assets/fallback2fa.svg";
 import {
@@ -603,7 +603,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
         title: "Copy",
         icon: Copy,
         action: async () => {
-          await clipboard.writeText(codes.join("\n"));
+          await writeText(codes.join("\n"));
           const button = document.getElementById("btn-copy");
           if (!button) return;
 

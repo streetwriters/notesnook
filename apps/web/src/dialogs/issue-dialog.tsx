@@ -25,7 +25,7 @@ import platform from "platform";
 import { useState } from "react";
 import { confirm, Perform } from "../common/dialog-controller";
 import { isUserPremium } from "../hooks/use-is-user-premium";
-import * as clipboard from "clipboard-polyfill/text";
+import { writeText } from "clipboard-polyfill";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
 
@@ -157,7 +157,7 @@ function showIssueReportedDialog({ url }: { url: string }) {
     
     If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support.`
   }).then((result) => {
-    result && clipboard.writeText(url);
+    result && writeText(url);
   });
 }
 
