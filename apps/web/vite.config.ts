@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Plugin, PluginOption, defineConfig } from "vite";
+import { PluginOption, defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import svgrPlugin from "vite-plugin-svgr";
 import envCompatible from "vite-plugin-env-compatible";
@@ -112,8 +112,6 @@ export default defineConfig({
           }) as PluginOption
         ]
       : []),
-
-    requireTransformPlugin(),
     ...(isDesktop && process.env.NODE_ENV === "production"
       ? []
       : [
@@ -140,17 +138,3 @@ export default defineConfig({
     })
   ]
 });
-
-function requireTransformPlugin(): Plugin {
-  return {
-    transform(code, id) {
-      if (/\/node_modules\//g.test(id)) return;
-      if (!/require/.test(code)) return;
-
-      return {
-        code: code.replace(/require\(/gm, "await import(")
-      };
-    },
-    name: "require-transform-plugin"
-  };
-}
