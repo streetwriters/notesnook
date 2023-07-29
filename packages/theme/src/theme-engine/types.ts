@@ -118,47 +118,50 @@ export type ThemeScopes = {
    * bar can be found at the bottom of the side navigation menu which
    * includes the sync status, logged in status etc.
    */
-  statusBar?: Partial<Variants>;
+  statusBar?: PartialVariants;
   /**
    * Scope for the central list view containing your notes, notebooks, tags etc.
    */
-  list?: Partial<Variants>;
+  list?: PartialVariants;
   /**
    * Scope for everything inside the editor excluding the toolbar which has its
    * own scope.
    */
-  editor?: Partial<Variants>;
+  editor?: PartialVariants;
   /**
    * Scope specific to the Editor Toolbar.
    */
-  editorToolbar?: Partial<Variants>;
+  editorToolbar?: PartialVariants;
   /**
    * Scope for all the dialogs in the app.
    */
-  dialog?: Partial<Variants>;
+  dialog?: PartialVariants;
   /**
    * Scope for the side navigation menu.
    */
-  navigationMenu?: Partial<Variants>;
+  navigationMenu?: PartialVariants;
   /**
    * Scope for all the context menus in the app. This is desktop/web only since
    * the mobile clients do not have context menus.
    */
-  contextMenu?: Partial<Variants>;
+  contextMenu?: PartialVariants;
   /**
    * Scope for all the bottom sheets shown in the app. This scope only applies
    * on the mobile clients & the mobile version of the web app.
    */
-  sheet?: Partial<Variants>;
+  sheet?: PartialVariants;
 };
 
+export type PartialVariants = Partial<Variants<false>>;
+export type PartialOrFullColors<TRequired extends boolean = false> =
+  TRequired extends true ? Colors : Partial<Colors>;
 export type Variants<TRequired extends boolean = false> = {
-  primary: TRequired extends true ? Colors : Partial<Colors>;
-  secondary: TRequired extends true ? Colors : Partial<Colors>;
-  disabled: TRequired extends true ? Colors : Partial<Colors>;
-  selected: TRequired extends true ? Colors : Partial<Colors>;
-  error: TRequired extends true ? Colors : Partial<Colors>;
-  success: TRequired extends true ? Colors : Partial<Colors>;
+  primary: PartialOrFullColors<TRequired>;
+  secondary: PartialOrFullColors<TRequired>;
+  disabled: PartialOrFullColors<TRequired>;
+  selected: PartialOrFullColors<TRequired>;
+  error: PartialOrFullColors<TRequired>;
+  success: PartialOrFullColors<TRequired>;
 };
 
 export type Colors = {
@@ -226,20 +229,46 @@ export type Colors = {
 
 export type VariantsWithStaticColors<TRequired extends boolean = false> =
   Variants<TRequired> & {
-    static: {
-      red: string;
-      orange: string;
-      yellow: string;
-      green: string;
-      blue: string;
-      purple: string;
-      gray: string;
-      black: string;
-      white: string;
-    };
+    static: typeof StaticColors;
   };
 
-export const ThemeScopeKeys = [
+export type PreviewColors = {
+  editor: string;
+  navigationMenu: {
+    shade: string;
+    accent: string;
+    background: string;
+    icon: string;
+  };
+  list: {
+    heading: string;
+    accent: string;
+    background: string;
+  };
+  statusBar: {
+    paragraph: string;
+    background: string;
+    icon: string;
+  };
+  border: string;
+  paragraph: string;
+  background: string;
+  accent: string;
+};
+
+export const StaticColors = {
+  red: "#f44336",
+  orange: "#FF9800",
+  yellow: "#FFD600",
+  green: "#4CAF50",
+  blue: "#2196F3",
+  purple: "#673AB7",
+  gray: "#9E9E9E",
+  black: "#000000",
+  white: "#ffffff"
+} as const;
+
+export const ThemeScopeKeys: readonly (keyof ThemeScopes)[] = [
   "base",
   "statusBar",
   "list",
@@ -249,4 +278,35 @@ export const ThemeScopeKeys = [
   "contextMenu",
   "editorToolbar",
   "sheet"
-] as const;
+];
+
+export const COLORS: readonly (keyof Colors)[] = [
+  "accent",
+  "paragraph",
+  "background",
+  "border",
+  "heading",
+  "icon",
+  "separator",
+  "placeholder",
+  "hover",
+  "shade",
+  "backdrop",
+  "textSelection"
+];
+
+export const ALPHA_COLORS: readonly (keyof Colors)[] = [
+  "hover",
+  "shade",
+  "backdrop",
+  "textSelection"
+];
+
+export const Variants: readonly (keyof Variants)[] = [
+  "primary",
+  "secondary",
+  "disabled",
+  "selected",
+  "error",
+  "success"
+];
