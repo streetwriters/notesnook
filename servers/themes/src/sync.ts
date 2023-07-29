@@ -27,33 +27,17 @@ import {
 } from "./constants";
 import { insertMultiple } from "@orama/orama";
 import { initializeDatabase } from "./orama";
-import { ThemeCompatibilityVersion, ThemeDefinition } from "@notesnook/theme";
+import {
+  ThemeCompatibilityVersion,
+  ThemeDefinition,
+  PreviewColors,
+  getPreviewColors
+} from "@notesnook/theme";
 
 export type CompiledThemeDefinition = ThemeDefinition & {
+  sourceURL: string;
   totalInstalls: number;
-  previewColors: {
-    editor: string;
-    navigationMenu: {
-      shade: string;
-      accent: string;
-      background: string;
-      icon: string;
-    };
-    list: {
-      heading: string;
-      accent: string;
-      background: string;
-    };
-    statusBar: {
-      paragraph: string;
-      background: string;
-      icon: string;
-    };
-    border: string;
-    paragraph: string;
-    background: string;
-    accent: string;
-  };
+  previewColors: PreviewColors;
 };
 
 export type ThemeMetadata = Omit<
@@ -108,37 +92,12 @@ async function generateThemesMetadata() {
         "utf-8"
       );
 
-      const { base, navigationMenu, statusBar, list, editor } = theme.scopes;
-      const { primary, success } = base;
-
       themeDefinitions.push({
         ...theme,
+        sourceURL: `https://github.com/streetwriters/notesnook-themes/tree/main/themes/${themeId}/v${version}/`,
         codeBlockCSS,
         totalInstalls: counts[theme.id]?.length || 0,
-        previewColors: {
-          navigationMenu: {
-            shade: navigationMenu?.primary?.shade || primary.shade,
-            accent: navigationMenu?.primary?.accent || primary.accent,
-            background:
-              navigationMenu?.primary?.background || primary.background,
-            icon: navigationMenu?.primary?.icon || primary.icon
-          },
-          statusBar: {
-            paragraph: statusBar?.primary?.paragraph || primary.paragraph,
-            background: statusBar?.primary?.background || primary.background,
-            icon: statusBar?.success?.icon || success.icon
-          },
-          editor: editor?.primary?.background || primary.background,
-          list: {
-            heading: list?.primary?.heading || primary.heading,
-            background: list?.primary?.background || primary.background,
-            accent: list?.primary?.accent || primary.accent
-          },
-          border: primary.border,
-          paragraph: primary.paragraph,
-          background: primary.background,
-          accent: primary.accent
-        }
+        previewColors: getPreviewColors(theme)
       });
     }
   }
