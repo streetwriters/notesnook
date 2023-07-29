@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Modal, Platform } from "react-native";
 import ShareView from "./share";
-import { ScopedThemeProvider, ThemeProvider } from "@notesnook/theme";
-import { useShareStore } from "./store";
+import { ScopedThemeProvider } from "@notesnook/theme";
+import "./store";
 const Wrapper = Platform.OS === "android" ? Modal : Fragment;
 const outerProps =
   Platform.OS === "android"
@@ -31,20 +31,23 @@ const outerProps =
         visible: true
       }
     : {};
+
 const NotesnookShare = ({ quicknote = false }) => {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    setTimeout(() => {
+      setTick((tick) => tick + 1);
+    }, 1);
+  }, []);
+
   return (
-    <ThemeProvider
-      value={{
-        theme: useShareStore.getState().theme,
-        setTheme: () => {}
-      }}
-    >
-      <ScopedThemeProvider value="base">
+    <ScopedThemeProvider value="base">
+      {!tick ? null : (
         <Wrapper {...outerProps}>
           <ShareView quicknote={quicknote} />
         </Wrapper>
-      </ScopedThemeProvider>
-    </ThemeProvider>
+      )}
+    </ScopedThemeProvider>
   );
 };
 

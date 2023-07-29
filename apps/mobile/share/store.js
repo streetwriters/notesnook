@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ThemeDark, ThemeLight } from "@notesnook/theme";
+import { ThemeDark, ThemeLight, useThemeEngineStore } from "@notesnook/theme";
 import { Appearance } from "react-native";
 import create from "zustand";
 import { db } from "../app/common/database";
@@ -44,8 +44,15 @@ if (appSettings) {
 }
 const theme =
   Appearance.getColorScheme() !== "dark"
-    ? appSettings?.darkTheme
+    ? appSettings?.darkThem
     : appSettings?.lightTheme;
+
+useThemeEngineStore
+  .getState()
+  .setTheme(
+    theme || (Appearance.getColorScheme() === "dark" ? ThemeDark : ThemeLight)
+  );
+
 export const useShareStore = create((set) => ({
   theme:
     theme || (Appearance.getColorScheme() === "dark" ? ThemeDark : ThemeLight),
