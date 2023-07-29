@@ -33,16 +33,16 @@ const outerProps =
     : {};
 
 const NotesnookShare = ({ quicknote = false }) => {
-  const [tick, setTick] = useState(0);
+  const [render, setRender] = useState(false);
   useEffect(() => {
     setTimeout(() => {
-      setTick((tick) => tick + 1);
+      setRender(true);
     }, 1);
   }, []);
 
   return (
     <ScopedThemeProvider value="base">
-      {!tick ? null : (
+      {!render ? null : (
         <Wrapper {...outerProps}>
           <ShareView quicknote={quicknote} />
         </Wrapper>
