@@ -25,13 +25,12 @@ import { TaskManager } from "../../common/task-manager";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import fs from "../../interfaces/fs";
 import { showToast } from "../../utils/toast";
+import { showFilePicker } from "../../utils/file-picker";
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
-type MimeType = string; //`${string}/${string}`;
-
-export async function insertAttachment(type: MimeType = "*/*") {
+export async function insertAttachment(type = "*/*") {
   if (!isUserPremium()) {
     await showBuyDialog();
     return;
@@ -58,7 +57,7 @@ export async function attachFile(selectedFile: File) {
 }
 
 export async function reuploadAttachment(
-  type: MimeType,
+  type: string,
   expectedFileHash: string
 ) {
   const selectedFile = await showFilePicker({
@@ -118,25 +117,6 @@ async function getEncryptionKey(): Promise<SerializedKey> {
   const key = await db.attachments?.generateKey();
   if (!key) throw new Error("Could not generate a new encryption key.");
   return key;
-}
-
-type FilePickerOptions = { acceptedFileTypes: MimeType };
-
-export function showFilePicker({
-  acceptedFileTypes
-}: FilePickerOptions): Promise<File | undefined> {
-  return new Promise((resolve) => {
-    const input = document.createElement("input");
-    input.setAttribute("type", "file");
-    input.setAttribute("accept", acceptedFileTypes);
-    input.dispatchEvent(new MouseEvent("click"));
-    input.onchange = async function () {
-      if (!input.files) return resolve(undefined);
-      const file = input.files[0];
-      if (!file) return resolve(undefined);
-      resolve(file);
-    };
-  });
 }
 
 async function toDataURL(file: File): Promise<string> {

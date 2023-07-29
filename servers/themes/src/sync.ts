@@ -35,8 +35,8 @@ import {
 } from "@notesnook/theme";
 
 export type CompiledThemeDefinition = ThemeDefinition & {
-  sourceURL: string;
-  totalInstalls: number;
+  sourceURL?: string;
+  totalInstalls?: number;
   previewColors: PreviewColors;
 };
 

@@ -21,7 +21,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
 import { CheckCircleOutline, Loading } from "../../../components/icons";
-import { THEME_COMPATIBILITY_VERSION } from "@notesnook/theme";
+import {
+  THEME_COMPATIBILITY_VERSION,
+  getPreviewColors,
+  validateTheme
+} from "@notesnook/theme";
 import { debounce } from "@notesnook/common";
 import { useStore as useThemeStore } from "../../../stores/theme-store";
 import { useStore as useUserStore } from "../../../stores/user-store";
@@ -36,6 +40,7 @@ import { ThemePreview } from "../../../components/theme-preview";
 import { VirtuosoGrid } from "react-virtuoso";
 import { Loader } from "../../../components/loader";
 import { showToast } from "../../../utils/toast";
+import { showFilePicker, readFile } from "../../../utils/file-picker";
 
 const ThemesClient = ThemesTRPC.createClient({
   links: [
@@ -67,15 +72,15 @@ function ThemesList() {
   const [colorScheme, setColorScheme] = useState<"all" | "dark" | "light">(
     "all"
   );
+
   const [isApplying, setIsApplying] = useState(false);
+  const setCurrentTheme = useThemeStore((store) => store.setTheme);
+  const user = useUserStore((store) => store.user);
+  const darkTheme = useThemeStore((store) => store.darkTheme);
+  const lightTheme = useThemeStore((store) => store.lightTheme);
   const isThemeCurrentlyApplied = useThemeStore(
     (store) => store.isThemeCurrentlyApplied
   );
-  const setCurrentTheme = useThemeStore((store) => store.setTheme);
-  const user = useUserStore((store) => store.user);
-  useThemeStore((store) => store.darkTheme);
-  useThemeStore((store) => store.lightTheme);
-
   const filters = [];
   if (searchQuery) filters.push({ type: "term" as const, value: searchQuery });
   if (colorScheme !== "all")
@@ -87,7 +92,19 @@ function ThemesList() {
       compatibilityVersion: THEME_COMPATIBILITY_VERSION,
       filters
     },
-    { getNextPageParam: (lastPage) => lastPage.nextCursor }
+    {
+      keepPreviousData: true,
+      select: (themes) => ({
+        pageParams: themes.pageParams,
+        pages: themes.pages.map((page) => ({
+          nextCursor: page.nextCursor,
+          themes: page.themes.filter(
+            (theme) => !isThemeCurrentlyApplied(theme.id)
+          )
+        }))
+      }),
+      getNextPageParam: (lastPage) => lastPage.nextCursor
+    }
   );
 
   const setTheme = useCallback(
@@ -120,31 +137,65 @@ function ThemesList() {
         sx={{ mt: 2 }}
         onChange={debounce((e) => setSearchQuery(e.target.value), 500)}
       />
-      <Flex sx={{ mt: 2, gap: 1 }}>
-        {COLOR_SCHEMES.map((filter) => (
+      <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
+        <Flex sx={{ mt: 2, gap: 1 }}>
+          {COLOR_SCHEMES.map((filter) => (
+            <Button
+              key={filter.id}
+              variant="secondary"
+              onClick={() => {
+                setColorScheme(filter.id);
+              }}
+              sx={{
+                borderRadius: 100,
+                minWidth: 50,
+                py: 1,
+                px: 2,
+                flexShrink: 0,
+                bg: colorScheme === filter.id ? "shade" : "transparent",
+                color: colorScheme === filter.id ? "accent" : "paragraph"
+              }}
+            >
+              {filter.title}
+            </Button>
+          ))}
+          {themes.isLoading && !themes.isInitialLoading ? (
+            <Loading color="accent" />
+          ) : null}
+        </Flex>
+
+        <Flex sx={{ mt: 2, gap: 1 }}>
           <Button
-            key={filter.id}
             variant="secondary"
-            onClick={() => {
-              setColorScheme(filter.id);
+            onClick={async () => {
+              const file = await showFilePicker({
+                acceptedFileTypes: "application/json"
+              });
+              if (!file) return;
+              const theme = JSON.parse(await readFile(file));
+              const { error } = validateTheme(theme);
+              if (error) return showToast("error", error);
+
+              if (
+                await showThemeDetails({
+                  ...theme,
+                  totalInstalls: 0,
+                  previewColors: getPreviewColors(theme)
+                })
+              ) {
+                setTheme(theme);
+              }
             }}
             sx={{
-              borderRadius: 100,
-              minWidth: 50,
-              py: 1,
-              px: 2,
-              flexShrink: 0,
-              bg: colorScheme === filter.id ? "shade" : "transparent",
-              color: colorScheme === filter.id ? "accent" : "paragraph"
+              px: 3,
+              flexShrink: 0
             }}
           >
-            {filter.title}
+            Load from file
           </Button>
-        ))}
-        {themes.isLoading && !themes.isInitialLoading ? (
-          <Loading color="accent" />
-        ) : null}
+        </Flex>
       </Flex>
+
       <Box
         sx={{
           ".virtuoso-grid-list": {
@@ -164,63 +215,109 @@ function ThemesList() {
             endReached={() =>
               themes.hasNextPage ? themes.fetchNextPage() : null
             }
+            components={{
+              Header: () => (
+                <div className="virtuoso-grid-list">
+                  <ThemeItem
+                    theme={{
+                      ...darkTheme,
+                      previewColors: getPreviewColors(darkTheme)
+                    }}
+                    isApplied={true}
+                    isApplying={isApplying}
+                    setTheme={setTheme}
+                  />
+                  <ThemeItem
+                    theme={{
+                      ...lightTheme,
+                      previewColors: getPreviewColors(lightTheme)
+                    }}
+                    isApplied={true}
+                    isApplying={isApplying}
+                    setTheme={setTheme}
+                  />
+                </div>
+              )
+            }}
+            computeItemKey={(_index, item) => item.id}
             itemContent={(_index, theme) => (
-              <Flex
+              <ThemeItem
                 key={theme.id}
-                sx={{
-                  flexDirection: "column",
-                  flex: 1,
-                  cursor: "pointer",
-                  p: 2,
-                  border: "1px solid transparent",
-                  borderRadius: "default",
-                  ":hover": {
-                    bg: "background-secondary",
-                    border: "1px solid var(--border)",
-                    ".set-as-button": { visibility: "visible" }
-                  }
-                }}
-                onClick={async () => {
-                  if (await showThemeDetails(theme)) {
-                    await setTheme(theme);
-                  }
-                }}
-              >
-                <ThemePreview theme={theme} />
-                <Text variant="title" sx={{ mt: 1 }}>
-                  {theme.name}
-                </Text>
-                <Text variant="body">{theme.authors[0].name}</Text>
-                <Flex
-                  sx={{ justifyContent: "space-between", alignItems: "center" }}
-                >
-                  <Text variant="subBody">{theme.totalInstalls} installs</Text>
-                  {isThemeCurrentlyApplied(theme.id) ? (
-                    <CheckCircleOutline color="accent" size={20} />
-                  ) : (
-                    <Button
-                      className="set-as-button"
-                      variant="secondary"
-                      sx={{ visibility: "hidden", bg: "background" }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTheme(theme);
-                      }}
-                      disabled={isApplying}
-                    >
-                      {isApplying ? (
-                        <Loading color="accent" size={18} />
-                      ) : (
-                        `Set as ${theme.colorScheme}`
-                      )}
-                    </Button>
-                  )}
-                </Flex>
-              </Flex>
+                theme={theme}
+                isApplied={false}
+                isApplying={isApplying}
+                setTheme={setTheme}
+              />
             )}
           />
         )}
       </Box>
     </>
+  );
+}
+
+type ThemeItemProps = {
+  theme: ThemeMetadata;
+  isApplied: boolean;
+  isApplying: boolean;
+  setTheme: (theme: ThemeMetadata) => Promise<void>;
+};
+function ThemeItem(props: ThemeItemProps) {
+  const { theme, isApplied, isApplying, setTheme } = props;
+
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        flex: 1,
+        cursor: "pointer",
+        p: 2,
+        border: "1px solid transparent",
+        borderRadius: "default",
+        ":hover": {
+          bg: "background-secondary",
+          border: "1px solid var(--border)",
+          ".set-as-button": { visibility: "visible" }
+        }
+      }}
+      onClick={async () => {
+        if (await showThemeDetails(theme)) {
+          await setTheme(theme);
+        }
+      }}
+    >
+      <ThemePreview theme={theme} />
+      <Text variant="title" sx={{ mt: 1 }}>
+        {theme.name}
+      </Text>
+      <Text variant="body">{theme.authors[0].name}</Text>
+      <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
+        <Text variant="subBody">
+          {theme.colorScheme === "dark" ? "Dark" : "Light"}
+          &nbsp;&nbsp;
+          {theme.totalInstalls ? `${theme.totalInstalls} installs` : ""}
+        </Text>
+        {isApplied ? (
+          <CheckCircleOutline color="accent" size={20} />
+        ) : (
+          <Button
+            className="set-as-button"
+            variant="secondary"
+            sx={{ visibility: "hidden", bg: "background" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setTheme(theme);
+            }}
+            disabled={isApplying}
+          >
+            {isApplying ? (
+              <Loading color="accent" size={18} />
+            ) : (
+              `Set as ${theme.colorScheme}`
+            )}
+          </Button>
+        )}
+      </Flex>
+    </Flex>
   );
 }

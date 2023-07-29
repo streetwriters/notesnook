@@ -63,20 +63,34 @@ function ThemeDetailsDialog(props: ThemeDetailsDialogProps) {
         <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
           {theme.authors.map((author) => author.name).join(", ")}
         </Text>
-        <Text variant="subBody" sx={{ fontSize: "subtitle", mt: 2 }}>
-          {theme.totalInstalls} installs
-        </Text>
+        {theme.totalInstalls && (
+          <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
+            {theme.totalInstalls} installs
+          </Text>
+        )}
         <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
           Licensed under {theme.license}
         </Text>
-        <Link
-          href={theme.homepage}
-          target="_blank"
-          variant="text.subBody"
-          sx={{ fontSize: "subtitle", color: "accent" }}
-        >
-          Website
-        </Link>
+        <Flex sx={{ gap: 1, mt: 1 }}>
+          <Link
+            href={theme.homepage}
+            target="_blank"
+            variant="text.subBody"
+            sx={{ fontSize: "subtitle", color: "accent" }}
+          >
+            Website
+          </Link>
+          {theme.sourceURL && (
+            <Link
+              href={theme.sourceURL}
+              target="_blank"
+              variant="text.subBody"
+              sx={{ fontSize: "subtitle", color: "accent" }}
+            >
+              Source
+            </Link>
+          )}
+        </Flex>
       </Flex>
     </Dialog>
   );
