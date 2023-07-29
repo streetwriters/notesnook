@@ -17,14 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { debounce } from "@notesnook/common";
-import {
-  ThemeAuthor,
-  ThemeDefinition,
-  useThemeEngineStore
-} from "@notesnook/theme";
+import { ThemeAuthor, ThemeDefinition, validateTheme } from "@notesnook/theme";
 import { Button, Flex, Input, Text } from "@theme-ui/components";
 import FileSaver from "file-saver";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useStore } from "../../stores/theme-store";
 import { showToast } from "../../utils/toast";
 import Accordion from "../accordion";
@@ -32,6 +28,8 @@ import { showFilePicker } from "../editor/picker";
 import Field from "../field";
 import { Close } from "../icons";
 
+const JSON_SCHEMA_URL =
+  "https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/schemas/v1.schema.json";
 const ThemeInfoTemplate: Omit<
   ThemeDefinition,
   "authors" | "compatibilityVersion" | "colorScheme" | "codeBlockCSS" | "scopes"
@@ -86,23 +84,6 @@ const Scopes = [
   "sheet"
 ];
 
-const RequiredKeys = [
-  "version",
-  "id",
-  "name",
-  "license",
-  "authors.0.name",
-  "authors.0.email",
-  "authors.0.url",
-  "description",
-  "colorScheme",
-  "compatibilityVersion",
-  "homepage",
-  ...Variants.map((variant) =>
-    ColorNames.map((colorName) => `scopes.base.${variant}.${colorName}`)
-  ).flat()
-];
-
 const flatten = (object: { [name: string]: any }) => {
   const flattenedObject: { [name: string]: any } = {};
 
@@ -141,10 +122,13 @@ function unflatten(data: any) {
 }
 
 export default function ThemeBuilder() {
-  const currentTheme = useThemeEngineStore((state) => state.theme);
+  const currentTheme = useStore((state) =>
+    state.colorScheme === "dark" ? state.darkTheme : state.lightTheme
+  );
   const setTheme = useStore((state) => state.setTheme);
   const [loading, setLoading] = useState(false);
   const currentThemeFlattened = flatten(currentTheme);
+
   const [authors, setAuthors] = useState(
     currentTheme.authors || [
       {
@@ -155,71 +139,38 @@ export default function ThemeBuilder() {
 
   const formRef = useRef(null);
 
-  const onChange: React.FormEventHandler<HTMLDivElement> = debounce(() => {
-    if (!formRef.current) return;
-    const body = new FormData(formRef.current);
-    const flattenedThemeRaw = {
-      ...Object.fromEntries(body.entries()),
-      ...flatten({ authors: [...authors] })
-    };
+  const onChange: React.FormEventHandler<HTMLDivElement> = useCallback(
+    debounce(() => {
+      if (!formRef.current) return;
+      const body = new FormData(formRef.current);
+      const flattenedThemeRaw = {
+        ...Object.fromEntries(body.entries()),
+        ...flatten({ authors: [...authors] })
+      };
 
-    const flattenedTheme: { [name: string]: any } = {};
+      const flattenedTheme: { [name: string]: any } = {};
 
-    for (const key in flattenedThemeRaw) {
-      if (flattenedThemeRaw[key] === "" || !flattenedThemeRaw[key]) continue;
-      flattenedTheme[key] = flattenedThemeRaw[key];
-    }
-
-    const missingKeys = [];
-    for (const key of RequiredKeys) {
-      if (!Object.keys(flattenedTheme).includes(key)) {
-        missingKeys.push(key);
+      for (const key in flattenedThemeRaw) {
+        if (flattenedThemeRaw[key] === "" || !flattenedThemeRaw[key]) continue;
+        if (key === "compatibilityVersion" || key === "version") {
+          flattenedTheme[key] = parseFloat(flattenedThemeRaw[key]);
+        } else {
+          flattenedTheme[key] = flattenedThemeRaw[key];
+        }
       }
-    }
-    if (missingKeys.length > 0) {
-      showToast(
-        "error",
-        `Failed to apply theme, ${missingKeys.join(
-          ","
-        )} are missing from the theme.`
-      );
-      return;
-    }
 
-    const invalidColors = [];
+      const theme = unflatten(flattenedTheme);
+      const result = validateTheme(theme as ThemeDefinition);
 
-    for (const key in flattenedTheme) {
-      if (!key.startsWith("scopes")) continue;
-      const value = flattenedTheme[key];
-
-      const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/g;
-      const HEX_COLOR_REGEX_ALPHA =
-        /^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$/g;
-
-      if (
-        !/hover|shade|backdrop|textSelection/g.test(key) &&
-        !HEX_COLOR_REGEX.test(value)
-      ) {
-        invalidColors.push(key);
-      } else if (
-        /hover|shade|backdrop|textSelection/g.test(key) &&
-        !HEX_COLOR_REGEX_ALPHA.test(value)
-      ) {
-        invalidColors.push(key);
+      if (result.error) {
+        showToast("error", result.error);
+        return;
       }
-    }
 
-    if (invalidColors.length > 0) {
-      showToast(
-        "error",
-        `Failed to apply theme, ${invalidColors.join(",")} are invalid.`
-      );
-      return;
-    }
-
-    const theme = unflatten(flattenedTheme);
-    setTheme({ ...theme } as ThemeDefinition);
-  }, 500);
+      setTheme({ ...theme } as ThemeDefinition);
+    }, 3000),
+    []
+  );
 
   const loadThemeFile = async () => {
     const file = await showFilePicker({
@@ -255,7 +206,11 @@ export default function ThemeBuilder() {
   };
 
   const exportTheme = () => {
-    const json = JSON.stringify(currentTheme);
+    const json = JSON.stringify({
+      ...currentTheme,
+      $schema: JSON_SCHEMA_URL
+    });
+
     FileSaver.saveAs(
       new Blob([json], {
         type: "text/plain"
@@ -542,6 +497,7 @@ export default function ThemeBuilder() {
                         >
                           {colorName}
                         </Text>
+
                         <Input
                           sx={{
                             fontSize: "12px",
