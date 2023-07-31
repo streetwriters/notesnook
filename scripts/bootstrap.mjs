@@ -31,6 +31,7 @@ const IS_CI = process.env.CI;
 const scopes = {
   mobile: "apps/mobile",
   web: "apps/web",
+  vericrypt: "apps/vericrypt",
   desktop: "apps/desktop",
   core: "packages/core",
   editor: "packages/editor"
