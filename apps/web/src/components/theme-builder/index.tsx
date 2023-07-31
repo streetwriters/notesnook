@@ -17,14 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { debounce } from "@notesnook/common";
-import { ThemeAuthor, ThemeDefinition, validateTheme } from "@notesnook/theme";
+import {
+  COLORS,
+  ThemeAuthor,
+  ThemeDefinition,
+  ThemeScopeKeys,
+  Variants,
+  validateTheme
+} from "@notesnook/theme";
 import { Button, Flex, Input, Text } from "@theme-ui/components";
 import FileSaver from "file-saver";
 import { useCallback, useRef, useState } from "react";
 import { useStore } from "../../stores/theme-store";
 import { showToast } from "../../utils/toast";
 import Accordion from "../accordion";
-import { showFilePicker } from "../editor/picker";
+import { showFilePicker } from "../../utils/file-picker";
 import Field from "../field";
 import { Close } from "../icons";
 
@@ -48,41 +55,6 @@ function toTitleCase(value: string) {
     value.slice(1).replace(/([A-Z]+)*([A-Z][a-z])/g, "$1 $2")
   );
 }
-
-const ColorNames = [
-  "accent",
-  "paragraph",
-  "background",
-  "border",
-  "heading",
-  "icon",
-  "separator",
-  "placeholder",
-  "hover",
-  "shade",
-  "backdrop",
-  "textSelection"
-];
-
-const Variants = [
-  "primary",
-  "secondary",
-  "disabled",
-  "selected",
-  "error",
-  "success"
-];
-const Scopes = [
-  "base",
-  "statusBar",
-  "list",
-  "editor",
-  "editorToolbar",
-  "dialog",
-  "navigationMenu",
-  "contextMenu",
-  "sheet"
-];
 
 const flatten = (object: { [name: string]: any }) => {
   const flattenedObject: { [name: string]: any } = {};
@@ -442,7 +414,7 @@ export default function ThemeBuilder() {
           <Text color="accent">Add author</Text>
         </Button>
 
-        {Scopes.map((scopeName) => (
+        {ThemeScopeKeys.map((scopeName) => (
           <>
             <Accordion
               isClosed={false}
@@ -476,7 +448,7 @@ export default function ThemeBuilder() {
                     }}
                     title={toTitleCase(variantName)}
                   >
-                    {ColorNames.map((colorName) => (
+                    {COLORS.map((colorName) => (
                       <Flex
                         key={colorName}
                         sx={{
