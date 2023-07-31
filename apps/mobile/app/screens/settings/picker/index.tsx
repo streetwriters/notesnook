@@ -49,7 +49,7 @@ export function SettingsPicker<T>({
   premium,
   onCheckOptionIsPremium = () => true
 }: PickerOptions<T>) {
-  const { colors } = useThemeColors();
+  const { colors } = useThemeColors("contextMenu");
   const menuRef = useRef<any>();
   const [width, setWidth] = useState(0);
   const [currentValue, setCurrentValue] = useState(getValue());

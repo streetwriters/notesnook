@@ -53,6 +53,7 @@ import { SIZE } from "../../utils/size";
 import { getElevationStyle } from "../../utils/elevation";
 import { MenuItemsList } from "../../utils/constants";
 import { IconButton } from "../../components/ui/icon-button";
+import { PressableButton } from "../../components/ui/pressable";
 
 const THEME_SERVER_URL = "https://themes.notesnook.com";
 //@ts-ignore
@@ -288,7 +289,7 @@ function ThemeSelector() {
             </View>
           </View>
 
-          <Heading size={SIZE.md} color={themeColors.primary.heading}>
+          <Heading size={SIZE.sm} color={themeColors.primary.heading}>
             {item.name}
           </Heading>
           {/* <Paragraph color={themeColors.primary?.paragraph}>
@@ -720,16 +721,21 @@ const ThemeSetter = ({
           </View>
         </View>
 
-        {(darkTheme.id === theme.id || lightTheme.id === theme.id) &&
-        !theme.scopes ? (
-          <Button
-            title={
-              darkTheme.id === theme.id
+        {darkTheme.id === theme.id || lightTheme.id === theme.id ? (
+          <PressableButton
+            onPress={applyTheme}
+            type="grayAccent"
+            customStyle={{
+              paddingVertical: 12
+            }}
+          >
+            <Heading color={colors.accent} size={SIZE.md}>
+              {darkTheme.id === theme.id
                 ? "Applied as dark theme"
-                : "Applied as light theme"
-            }
-            type="accent"
-          />
+                : "Applied as light theme"}
+            </Heading>
+            <Paragraph size={SIZE.xs}>(Tap to apply again)</Paragraph>
+          </PressableButton>
         ) : (
           <Button
             style={{

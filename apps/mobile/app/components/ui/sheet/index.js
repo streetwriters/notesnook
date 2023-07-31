@@ -41,7 +41,7 @@ const SheetWrapper = ({
   enableGesturesInScrollView = false,
   bottomPadding = true
 }) => {
-  const { colors } = useThemeColors();
+  const { colors } = useThemeColors("sheet");
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const sheetKeyboardHandler = useSettingStore(
     (state) => state.sheetKeyboardHandler
@@ -51,7 +51,7 @@ const SheetWrapper = ({
   const dimensions = useSettingStore((state) => state.dimensions);
   const pitchBlack = useSettingStore((state) => state.settings.pitchBlack);
   const insets = useGlobalSafeAreaInsets();
-
+  console.log(colors.primary.background);
   let width = dimensions.width > 600 ? 600 : 500;
 
   const style = React.useMemo(() => {

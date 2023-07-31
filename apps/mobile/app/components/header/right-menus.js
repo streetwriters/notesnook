@@ -33,6 +33,7 @@ import { IconButton } from "../ui/icon-button";
 
 export const RightMenus = () => {
   const { colors } = useThemeColors();
+  const { contextMenuColors } = useThemeColors("contextMenu");
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const rightButtons = useNavigationStore((state) => state.headerRightButtons);
   const currentScreen = useNavigationStore((state) => state.currentScreen.name);
@@ -87,7 +88,7 @@ export const RightMenus = () => {
           animationDuration={200}
           style={{
             borderRadius: 5,
-            backgroundColor: colors.primary.background
+            backgroundColor: contextMenuColors.primary.background
           }}
           onRequestClose={() => {
             menuRef.current?.hide();
