@@ -103,7 +103,7 @@ const SheetWrapper = ({
         keyboardDismissMode="none"
         enableGesturesInScrollView={enableGesturesInScrollView}
         defaultOverlayOpacity={overlayOpacity}
-        overlayColor={pitchBlack ? "#585858" : "#2b2b2b"}
+        overlayColor={colors.primary.backdrop}
         keyboardShouldPersistTaps="always"
         openAnimationConfig={{
           friction: 9

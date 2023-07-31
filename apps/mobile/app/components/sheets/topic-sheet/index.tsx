@@ -263,6 +263,7 @@ export const TopicsSheet = () => {
           index
         );
       }}
+      overlayColor={colors.primary.backdrop}
       closable={!canShow}
       elevation={10}
       indicatorStyle={{
