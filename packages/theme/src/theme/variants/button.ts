@@ -17,16 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Theme, ThemeUIStyleObject } from "@theme-ui/core";
-import { shade, darken, alpha } from "@theme-ui/color";
+import { ThemeUIStyleObject } from "@theme-ui/core";
 import { SchemeColors } from "../../theme-engine/types";
+import { alpha } from "@theme-ui/color";
 
 export const createButtonVariant = (
   background: SchemeColors = "transparent",
   color: SchemeColors = "paragraph",
   states?: {
-    hover: SchemeColors | ((theme: Theme) => string);
-    active: SchemeColors | ((theme: Theme) => string);
+    hover?: ThemeUIStyleObject;
+    active?: ThemeUIStyleObject;
   }
 ): ThemeUIStyleObject => ({
   bg: background,
@@ -44,11 +44,18 @@ export const createButtonVariant = (
   px: 2,
   py: "7.5px",
 
+  transition: "transform 50ms ease-out",
   ":hover:not(:disabled):not(:active)": {
-    bg: states?.hover || shade(background, 0.1)
+    bg: background,
+    filter: "brightness(90%)",
+    ...states?.hover
   },
   ":active": {
-    bg: states?.active || shade(background, 0.2)
+    bg: background,
+    filter: "brightness(90%)",
+    transform: "scale(0.98) !important",
+    ...states?.hover,
+    ...states?.active
   },
   ":focus-visible:not(:active)": {
     outline: `2px solid var(--paragraph)`
@@ -63,28 +70,24 @@ const primary = createButtonVariant();
 
 const secondary: ThemeUIStyleObject = createButtonVariant(
   "background-secondary",
-  "paragraph",
-  {
-    hover: darken("background-secondary", 0.1),
-    active: darken("background-secondary", 0.2)
-  }
+  "paragraph"
 );
 
-const accent = createButtonVariant("accent", "white");
+const accent = createButtonVariant("accent", "white", {
+  hover: { bg: alpha("accent", 0.9) },
+  active: { bg: alpha("accent", 0.8) }
+});
 const accentSecondary = createButtonVariant("shade", "accent", {
-  hover: darken("shade", 0.2),
-  active: alpha("shade", 0.2)
+  hover: { bg: alpha("shade", 0.3) }
 });
 
-const error = createButtonVariant("accent-error", "white");
+const error = createButtonVariant("accent-error", "white", {
+  hover: { bg: alpha("accent-error", 0.9) }
+});
 
 const errorSecondary: ThemeUIStyleObject = createButtonVariant(
   "background-error",
-  "accent-error",
-  {
-    hover: darken("background-error", 0.2),
-    active: darken("background-error", 0.4)
-  }
+  "accent-error"
 );
 
 const dialog: ThemeUIStyleObject = {
@@ -114,10 +117,7 @@ const statusItem: ThemeUIStyleObject = {
 };
 
 const menuItem: ThemeUIStyleObject = {
-  ...createButtonVariant("transparent", "paragraph", {
-    hover: "hover",
-    active: alpha("hover", 0.2)
-  }),
+  ...createButtonVariant("transparent", "paragraph"),
   borderRadius: 0
 };
 

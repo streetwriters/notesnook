@@ -80,8 +80,9 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
           selected ? "background-selected" : "transparent",
           "transparent",
           {
-            hover: selected ? "hover-selected" : "hover",
-            active: selected ? "hover-selected" : "hover"
+            hover: {
+              bg: selected ? "hover-selected" : "hover"
+            }
           }
         ),
         borderRadius: "default",
