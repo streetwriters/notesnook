@@ -229,6 +229,11 @@ task copyEditorBundle(type: Copy) {
     into './src/main/assets'
 }
 
+task copyPlainEditorBundle(type: Copy) {
+    from '../../ios/extension.bundle'
+    into './src/main/assets'
+}
+
 task copyFontFiles(type: Copy) {
     from '../../fonts'
     into './src/main/assets/fonts'
@@ -237,9 +242,8 @@ task copyFontFiles(type: Copy) {
 
 copyEditorBundle.dependsOn(deleteFiles)
 copyFontFiles.dependsOn(copyEditorBundle);
-preBuild.dependsOn(copyFontFiles)
-
-
+copyPlainEditorBundle.dependsOn(copyFontFiles);
+preBuild.dependsOn(copyPlainEditorBundle)
 
 apply from: file("../../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
 
