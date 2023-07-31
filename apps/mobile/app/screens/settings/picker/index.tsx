@@ -92,7 +92,8 @@ export function SettingsPicker<T>({
           borderRadius: 5,
           backgroundColor: colors.primary.background,
           width: width,
-          marginTop: 60
+          marginTop: 60,
+          overflow: "hidden"
         }}
         onRequestClose={() => {
           menuRef.current?.hide();
