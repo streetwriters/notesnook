@@ -459,7 +459,7 @@ const _TabsHolder = () => {
                           width: "100%",
                           height: "100%",
                           zIndex: 999,
-                          backgroundColor: "rgba(0,0,0,0.2)"
+                          backgroundColor: colors.primary.backdrop
                         },
                         animatedStyle
                       ]}
