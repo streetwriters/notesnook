@@ -285,8 +285,6 @@ export const TopicsSheet = () => {
         <PressableButton
           testID={notesnook.buttons.add}
           type="accent"
-          accentColor={"accent"}
-          accentText="light"
           onPress={openEditor}
           customStyle={{
             borderRadius: 100
