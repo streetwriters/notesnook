@@ -36,7 +36,7 @@ import { useShareStore } from "./store";
 
 const EditorMobileSourceUrl =
   Platform.OS === "android"
-    ? "file:///android_asset/index.html"
+    ? "file:///android_asset/plaineditor.html"
     : "extension.bundle/plaineditor.html";
 /**
  * Replace this with dev url when debugging or working on the editor mobile repo.

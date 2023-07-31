@@ -39,9 +39,20 @@ const EXTRA_ICON_NAMES = [
   "bell",
   "bell-off-outline",
   "check",
-  "plus",
   "magnify",
-  "plus"
+  "plus",
+  "view-list-outline",
+  "view-list",
+  "play",
+  "pause",
+  "notebook-outline",
+  "text-short",
+  "radiobox-marked",
+  "radiobox-blank",
+  "sort-descending",
+  "information",
+  "sort-ascending",
+  "alert"
 ];
 
 const __filename = fileURLToPath(import.meta.url);
