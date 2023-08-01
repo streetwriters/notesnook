@@ -159,6 +159,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
   return (
     <Box
       className="menuContainer"
+      data-test-id="menu-container"
       as="ul"
       tabIndex={-1}
       sx={{
@@ -180,6 +181,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
     >
       {title && (
         <Text
+          data-test-id="menu-title"
           sx={{
             fontFamily: "body",
             fontSize: "subtitle",

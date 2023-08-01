@@ -46,7 +46,7 @@ export class ContextMenuModel {
   }
 
   getItem(id: string) {
-    return this.page.locator(getTestId(`menuitem-${id}`));
+    return this.page.locator(getTestId(`menu-button-${id}`));
   }
 
   async hasItem(id: string) {

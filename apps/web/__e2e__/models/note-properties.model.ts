@@ -200,7 +200,7 @@ export class NotePropertiesModel extends BaseProperties {
 export class NoteContextMenuModel extends BaseProperties {
   private readonly menu: ContextMenuModel;
   constructor(page: Page, noteLocator: Locator) {
-    super(page, noteLocator, "menuitem");
+    super(page, noteLocator, "menu-button");
     this.menu = new ContextMenuModel(page);
   }
 
@@ -209,7 +209,7 @@ export class NoteContextMenuModel extends BaseProperties {
     await this.menu.clickOnItem("colors");
     const state = await new ToggleModel(
       this.page,
-      `menuitem-${color}`
+      `menu-button-${color}`
     ).isToggled();
     await this.close();
     return state;
@@ -218,7 +218,7 @@ export class NoteContextMenuModel extends BaseProperties {
   async color(color: string) {
     await this.open();
     await this.menu.clickOnItem("colors");
-    await new ToggleModel(this.page, `menuitem-${color}`).on();
+    await new ToggleModel(this.page, `menu-button-${color}`).on();
     await this.close();
   }
 
