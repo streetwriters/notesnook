@@ -54,7 +54,7 @@ export function MenuButton(props: MenuButtonProps) {
     >
       <Button
         id={`${key}-menu-item`}
-        data-test-id={`MenuButton-${key}`}
+        data-test-id={`menu-button-${key}`}
         key={key}
         ref={itemRef}
         tabIndex={-1}
