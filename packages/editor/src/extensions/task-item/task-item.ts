@@ -92,5 +92,9 @@ export const TaskItemNode = TaskItem.extend({
         return prev.checked !== next.checked;
       }
     });
+  },
+
+  addInputRules() {
+    return [];
   }
 });

@@ -77,6 +77,7 @@ import { DownloadOptions } from "./utils/downloader";
 import { Heading } from "./extensions/heading";
 import Clipboard, { ClipboardOptions } from "./extensions/clipboard";
 import { convertBrToParagraph } from "./utils/html";
+import Blockquote from "./extensions/blockquote";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -183,6 +184,7 @@ const useTiptap = (
           paragraph: false,
           hardBreak: false,
           heading: false,
+          blockquote: false,
           history: {
             depth: 200,
             newGroupDelay: 1000
@@ -211,6 +213,7 @@ const useTiptap = (
             ];
           }
         }),
+        Blockquote,
         CharacterCount,
         Underline,
         Subscript,

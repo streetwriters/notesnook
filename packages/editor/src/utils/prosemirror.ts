@@ -42,6 +42,7 @@ import { OutlineListItem } from "../extensions/outline-list-item";
 import { TaskItemNode } from "../extensions/task-item";
 import { TaskListNode } from "../extensions/task-list";
 import { LIST_NODE_TYPES } from "./node-types";
+import TextStyle from "@tiptap/extension-text-style";
 
 export type NodeWithOffset = {
   node?: ProsemirrorNode;
@@ -176,6 +177,22 @@ export function hasParentNodeOfType(nodeType: NodeType | NodeType[]) {
 
 export function findParentNodeOfType(nodeType: NodeType | NodeType[]) {
   return findParentNode((node) => equalNodeType(nodeType, node));
+}
+
+export function getParentAttributes(
+  editor: Editor,
+  keepMarks = false,
+  keepAttributes = false
+) {
+  const { textAlign, textDirection } =
+    editor.state.selection.$from.parent?.attrs || {};
+  return {
+    ...(keepMarks || keepAttributes
+      ? editor.getAttributes(TextStyle.name)
+      : {}),
+    textAlign,
+    textDirection
+  };
 }
 
 const walkNode = (node: ProsemirrorNode, descend = true) => {
