@@ -598,3 +598,5 @@ blockquote[dir="rtl"] {
 .outline-list[dir="rtl"] li.collapsed > p::before {
   transform: rotate(90deg);
 }
+
+[dir="rtl"] .taskItemTools { right: unset; left: 0 }

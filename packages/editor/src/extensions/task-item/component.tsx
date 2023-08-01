@@ -105,7 +105,7 @@ export function TaskItemComponent(
           alignSelf: "start",
           p: "1px",
           mt: "0.40ch",
-          mr: 1,
+          marginInlineEnd: 1,
           cursor: editor.isEditable ? "pointer" : "unset",
           ":hover": {
             borderColor: "accent"
