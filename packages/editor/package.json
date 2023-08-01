@@ -35,7 +35,7 @@
     "@tiptap/starter-kit": "2.0.3",
     "clipboard-polyfill": "^4.0.0",
     "detect-indent": "^7.0.0",
-    "katex": "^0.16.2",
+    "katex": "0.16.4",
     "nanoid": "^4.0.1",
     "prism-themes": "^1.9.0",
     "prosemirror-codemark": "^0.4.1",
