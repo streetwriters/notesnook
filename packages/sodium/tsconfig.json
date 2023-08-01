@@ -1,13 +1,12 @@
 {
   "extends": "../../tsconfig",
   "compilerOptions": {
-    "outDir": "./dist",
-    "typeRoots": ["src/@types", "node_modules/@types"]
+    "outDir": "./dist"
   },
   "ts-node": {
     "compilerOptions": {
       "module": "CommonJS"
     }
   },
-  "include": ["src/"]
+  "include": ["src/", "src/@types/sodium-native/index.d.ts"]
 }

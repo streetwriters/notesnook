@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import "./@types/sodium-native/index.d.ts";
 import {
   crypto_pwhash as sodium_native_crypto_pwhash,
   crypto_generichash as sodium_native_crypto_generichash,
