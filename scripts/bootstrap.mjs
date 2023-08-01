@@ -22,7 +22,7 @@ import { readFile } from "fs/promises";
 import path from "path";
 import os from "os";
 import parser from "yargs-parser";
-import glob from "fast-glob";
+import { fdir } from "fdir";
 import Listr from "listr";
 
 const THREADS = Math.min(4, process.env.THREADS || os.cpus().length / 2);
@@ -31,6 +31,7 @@ const IS_CI = process.env.CI;
 const scopes = {
   mobile: "apps/mobile",
   web: "apps/web",
+  vericrypt: "apps/vericrypt",
   desktop: "apps/desktop",
   core: "packages/core",
   editor: "packages/editor",
@@ -43,13 +44,14 @@ if (args.scope && !scopes[args.scope])
 const IS_BOOTSTRAP_ALL = !args.scope;
 
 if (IS_BOOTSTRAP_ALL) {
-  const allPackages = await glob(
-    ["packages/**", "apps/**", "extensions/**", "servers/**"],
-    {
-      deep: 1,
-      onlyDirectories: true
-    }
-  );
+  const allPackages = (
+    await new fdir()
+      .onlyDirs()
+      .withMaxDepth(2)
+      .glob("packages/**", "apps/**", "extensions/**", "servers/**")
+      .crawl(".")
+      .withPromise()
+  ).slice(4);
 
   const dependencies = Array.from(
     new Set(

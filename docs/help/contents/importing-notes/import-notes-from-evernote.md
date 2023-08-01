@@ -23,7 +23,7 @@ The following steps will help you quickly import your notes from Evernote into N
 
 Once you have all the .ENEX files containing your Evernote notes, its time to import them into Notesnook.
 
-1. Go to [Notesnook importer](https://importer.notesnook.com) and select Evernote from the list of apps.
+1. Go to [https://importer.notesnook.com/](https://importer.notesnook.com/) and select Evernote from the list of apps.
    ![](/static/evernote-importer/4.png)
 2. Drop (or select) the `.enex` files you exported earlier from Evernote, and click the "Start processing" button.
    ![](/static/evernote-importer/5.png)

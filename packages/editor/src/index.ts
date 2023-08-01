@@ -76,6 +76,7 @@ import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { DownloadOptions } from "./utils/downloader";
 import { Heading } from "./extensions/heading";
 import Clipboard, { ClipboardOptions } from "./extensions/clipboard";
+import { convertBrToParagraph } from "./utils/html";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -122,6 +123,7 @@ const useTiptap = (
     dateFormat,
     timeFormat,
     copyToClipboard,
+    editorProps,
     ...restOptions
   } = options;
   const PortalProviderAPI = usePortalProvider();
@@ -141,143 +143,144 @@ const useTiptap = (
   }, deps);
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(
-    () =>
-      ({
-        enableCoreExtensions: false,
-        extensions: [
-          ...CoreExtensions,
-          ClipboardTextSerializer,
-          NodeViewSelectionNotifier,
-          SearchReplace,
-          TextStyle.extend({
-            parseHTML() {
-              return [
-                {
-                  tag: "span",
-                  getAttrs: (element) => {
-                    if (!hasStyle(element)) {
-                      return false;
-                    }
-                    return {};
+    () => ({
+      enableCoreExtensions: false,
+      editorProps: {
+        ...editorProps,
+        transformPastedHTML(html) {
+          return convertBrToParagraph(html).documentElement.outerHTML;
+        }
+      },
+      extensions: [
+        ...CoreExtensions,
+        ClipboardTextSerializer,
+        NodeViewSelectionNotifier,
+        SearchReplace,
+        TextStyle.extend({
+          parseHTML() {
+            return [
+              {
+                tag: "span",
+                getAttrs: (element) => {
+                  if (!hasStyle(element)) {
+                    return false;
                   }
+                  return {};
                 }
-              ];
-            }
-          }),
-          Paragraph.configure({
-            doubleSpaced: doubleSpacedLines
-          }),
-          StarterKit.configure({
-            code: false,
-            codeBlock: false,
-            listItem: false,
-            orderedList: false,
-            bulletList: false,
-            paragraph: false,
-            hardBreak: false,
-            heading: false,
-            history: {
-              depth: 200,
-              newGroupDelay: 1000
-            },
-            dropcursor: {
-              class: "drop-cursor"
-            },
-            horizontalRule: false
-          }),
-          Heading,
-          HorizontalRule.extend({
-            addInputRules() {
-              return [
-                {
-                  find: /^(?:---|—-|___\s|\*\*\*\s)$/,
-                  handler: ({ state, range, commands }) => {
-                    commands.splitBlock();
+              }
+            ];
+          }
+        }),
+        Paragraph.configure({
+          doubleSpaced: doubleSpacedLines
+        }),
+        StarterKit.configure({
+          code: false,
+          codeBlock: false,
+          listItem: false,
+          orderedList: false,
+          bulletList: false,
+          paragraph: false,
+          hardBreak: false,
+          heading: false,
+          history: {
+            depth: 200,
+            newGroupDelay: 1000
+          },
+          dropcursor: {
+            class: "drop-cursor"
+          },
+          horizontalRule: false
+        }),
+        Heading,
+        HorizontalRule.extend({
+          addInputRules() {
+            return [
+              {
+                find: /^(?:---|—-|___\s|\*\*\*\s)$/,
+                handler: ({ state, range, commands }) => {
+                  commands.splitBlock();
 
-                    const attributes = {};
-                    const { tr } = state;
-                    const start = range.from;
-                    const end = range.to;
-                    tr.replaceWith(
-                      start - 1,
-                      end,
-                      this.type.create(attributes)
-                    );
-                  }
+                  const attributes = {};
+                  const { tr } = state;
+                  const start = range.from;
+                  const end = range.to;
+                  tr.replaceWith(start - 1, end, this.type.create(attributes));
                 }
-              ];
-            }
-          }),
-          CharacterCount,
-          Underline,
-          Subscript,
-          Superscript,
-          FontSize,
-          TextDirection,
-          FontFamily,
-          BulletList.configure({ keepMarks: true, keepAttributes: true }),
-          OrderedList.configure({ keepMarks: true, keepAttributes: true }),
-          TaskItemNode.configure({ nested: true }),
-          TaskListNode,
-          Link.extend({
-            inclusive: true
-          }).configure({
-            openOnClick: !isMobile,
-            autolink: false
-          }),
-          Table.configure({
-            resizable: true,
-            allowTableNodeSelection: true,
-            cellMinWidth: 50
-          }),
-          Clipboard.configure({
-            copyToClipboard
-          }),
-          TableRow,
-          TableCell,
-          TableHeader,
-          Highlight,
-          CodeBlock,
-          Color,
-          TextAlign.configure({
-            types: ["heading", "paragraph"],
-            alignments: ["left", "right", "center", "justify"],
-            defaultAlignment: "left"
-          }),
-          Placeholder.configure({
-            placeholder: "Start writing your note..."
-          }),
-          OpenLink.configure({
-            onOpenLink
-          }),
-          ImageNode.configure({ allowBase64: true }),
-          EmbedNode,
-          AttachmentNode.configure({
-            onDownloadAttachment,
-            onOpenAttachmentPicker,
-            onPreviewAttachment
-          }),
-          OutlineListItem,
-          OutlineList.configure({ keepAttributes: true, keepMarks: true }),
-          ListItem,
-          Code.extend({ excludes: "" }),
-          Codemark,
-          MathInline,
-          MathBlock,
-          KeepInView.configure({
-            scrollIntoViewOnWindowResize: !isMobile
-          }),
-          DateTime.configure({ dateFormat, timeFormat }),
-          KeyMap,
-          WebClipNode
-        ],
-        onBeforeCreate: ({ editor }) => {
-          editor.storage.portalProviderAPI = PortalProviderAPI;
-          if (onBeforeCreate) onBeforeCreate({ editor });
-        },
-        injectCSS: false,
-        parseOptions: { preserveWhitespace: true }
-      } as EditorOptions),
+              }
+            ];
+          }
+        }),
+        CharacterCount,
+        Underline,
+        Subscript,
+        Superscript,
+        FontSize,
+        TextDirection,
+        FontFamily,
+        BulletList.configure({ keepMarks: true, keepAttributes: true }),
+        OrderedList.configure({ keepMarks: true, keepAttributes: true }),
+        TaskItemNode.configure({ nested: true }),
+        TaskListNode,
+        Link.extend({
+          inclusive: true
+        }).configure({
+          openOnClick: !isMobile,
+          autolink: false
+        }),
+        Table.configure({
+          resizable: true,
+          allowTableNodeSelection: true,
+          cellMinWidth: 50
+        }),
+        Clipboard.configure({
+          copyToClipboard
+        }),
+        TableRow,
+        TableCell,
+        TableHeader,
+        Highlight,
+        CodeBlock,
+        Color,
+        TextAlign.configure({
+          types: ["heading", "paragraph"],
+          alignments: ["left", "right", "center", "justify"],
+          defaultAlignment: "left"
+        }),
+        Placeholder.configure({
+          placeholder: "Start writing your note..."
+        }),
+        OpenLink.configure({
+          onOpenLink
+        }),
+        ImageNode.configure({ allowBase64: true }),
+        EmbedNode,
+        AttachmentNode.configure({
+          onDownloadAttachment,
+          onOpenAttachmentPicker,
+          onPreviewAttachment
+        }),
+        OutlineListItem,
+        OutlineList.configure({ keepAttributes: true, keepMarks: true }),
+        ListItem,
+        Code.extend({ excludes: "" }),
+        Codemark,
+        MathInline,
+        MathBlock,
+        KeepInView.configure({
+          scrollIntoViewOnWindowResize: !isMobile
+        }),
+        DateTime.configure({ dateFormat, timeFormat }),
+        KeyMap,
+        WebClipNode
+      ],
+      onBeforeCreate: ({ editor }) => {
+        editor.storage.portalProviderAPI = PortalProviderAPI;
+        if (onBeforeCreate) onBeforeCreate({ editor });
+      },
+      injectCSS: false,
+      parseOptions: { preserveWhitespace: true }
+    }),
     [
       onPreviewAttachment,
       onDownloadAttachment,
@@ -287,6 +290,7 @@ const useTiptap = (
       onOpenLink,
       dateFormat,
       timeFormat,
+      editorProps,
       copyToClipboard
     ]
   );

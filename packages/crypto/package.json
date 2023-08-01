@@ -2,11 +2,12 @@
   "name": "@notesnook/crypto",
   "private": false,
   "description": "An easy to use wrapper around libsodium exposing essential cryptographic methods. Currently only Web is supported.",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc --declaration --outDir ./dist"
+    "build": "tsc --declaration --outDir ./dist",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [],
   "author": "",
