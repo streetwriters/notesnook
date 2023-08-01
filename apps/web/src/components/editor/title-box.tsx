@@ -74,6 +74,7 @@ function TitleBox(props: TitleBoxProps) {
       className="editorTitle"
       placeholder={"Note title"}
       readOnly={readonly}
+      dir="auto"
       sx={{
         p: 0,
         fontFamily: getFontById(editorConfig.fontFamily)?.font || "heading",

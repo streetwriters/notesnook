@@ -112,6 +112,7 @@ function ListItem(props: ListItemProps) {
       py={1}
       mb={isCompact ? 0 : 1}
       tabIndex={-1}
+      dir="auto"
       sx={{
         height: "inherit",
         cursor: "pointer",
