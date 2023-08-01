@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/core",
-  "version": "7.3.6",
+  "version": "7.4.1",
   "main": "./api/index.js",
   "license": "GPL-3.0-or-later",
   "repository": {
@@ -61,9 +61,5 @@
   "np": {
     "releaseDraft": false,
     "message": "chore: bump version to %s"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
   }
 }
