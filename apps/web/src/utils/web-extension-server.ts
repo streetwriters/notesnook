@@ -30,12 +30,13 @@ import { h } from "./html";
 import { sanitizeFilename } from "@notesnook/common";
 import { attachFile } from "../components/editor/picker";
 import { getFormattedDate } from "@notesnook/common";
-import { getTheme } from "../hooks/use-theme";
+import { useStore as useThemeStore } from "../stores/theme-store";
 
 export class WebExtensionServer implements Server {
   async login() {
+    const { colorScheme, darkTheme, lightTheme } = useThemeStore.getState();
     const user = await db.user?.getUser();
-    const theme = getTheme();
+    const theme = colorScheme === "dark" ? darkTheme : lightTheme;
     if (!user) return { pro: false, theme };
     return { email: user.email, pro: isUserPremium(user), theme };
   }
