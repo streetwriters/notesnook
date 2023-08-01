@@ -113,8 +113,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
           <Text
             variant={"error"}
             sx={{
-              bg: "errorBg",
-              color: "error",
+              bg: "var(--background-error)",
               p: 1,
               borderRadius: "default"
             }}

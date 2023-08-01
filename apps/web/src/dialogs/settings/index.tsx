@@ -65,6 +65,8 @@ import {
 import { AppearanceSettings } from "./appearance-settings";
 import { debounce } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
+import { alpha } from "@theme-ui/color";
+import { ScopedThemeProvider } from "../../components/theme-provider";
 
 type SettingsDialogProps = { onClose: Perform };
 
@@ -169,9 +171,8 @@ const SettingsGroups = [
 // can appear independent of others (e.g. as a search result)
 
 export default function SettingsDialog(props: SettingsDialogProps) {
-  const [route, setRoute] = useState<SectionKeys>("profile");
   const [activeSettings, setActiveSettings] = useState<SettingsGroup[]>(
-    SettingsGroups.filter((g) => g.section === route)
+    SettingsGroups.filter((g) => g.section === "profile")
   );
 
   return (
@@ -185,37 +186,75 @@ export default function SettingsDialog(props: SettingsDialogProps) {
       <Flex
         sx={{
           height: "80vw",
-          overflow: "hidden",
-          "& #settings-side-menu": {
-            "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
-              {
-                backgroundColor: "bgTransparent",
-                backdropFilter: "blur(8px)"
-              }
-          }
+          overflow: "hidden"
         }}
       >
+        <SettingsSideBar
+          onNavigate={(settings) => setActiveSettings(settings)}
+        />
         <FlexScrollContainer
-          id="settings-side-menu"
           style={{
             display: "flex",
+            backgroundColor: "var(--background)",
+            flex: 1,
             flexDirection: "column",
-            borderRadius: "10px",
-            width: 240,
-            overflow: "auto",
+            padding: 20,
+            gap: 20,
             minHeight: "min-content",
-            backgroundColor: "bgSecondary"
+            overflow: "auto"
           }}
-          data-test-id="settings-navigation-menu"
+        >
+          {activeSettings.map((group) => (
+            <SettingsGroupComponent item={group} />
+          ))}
+        </FlexScrollContainer>
+      </Flex>
+    </Dialog>
+  );
+}
+
+type SettingsSideBarProps = { onNavigate: (settings: SettingsGroup[]) => void };
+function SettingsSideBar(props: SettingsSideBarProps) {
+  const { onNavigate } = props;
+  const [route, setRoute] = useState<SectionKeys>("profile");
+
+  return (
+    <FlexScrollContainer
+      id="settings-side-menu"
+      style={{
+        width: 240,
+        overflow: "auto"
+      }}
+      data-test-id="settings-navigation-menu"
+    >
+      <ScopedThemeProvider scope="navigationMenu">
+        <Flex
+          sx={{
+            flexDirection: "column",
+            display: "flex",
+            overflow: "hidden",
+            "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
+              {
+                backgroundColor: alpha("background", 0.6),
+                backdropFilter: "blur(8px)"
+              },
+            backgroundColor: "var(--background-secondary)"
+          }}
         >
           <Input
             placeholder="Search"
             data-test-id="settings-search"
-            sx={{ m: 2, mb: 2, width: "auto", bg: "bgSecondary", py: "7px" }}
+            sx={{
+              m: 2,
+              mb: 2,
+              width: "auto",
+              bg: "background",
+              py: "7px"
+            }}
             onChange={(e) => {
               const query = e.target.value.toLowerCase().trim();
               if (!query)
-                return setActiveSettings(
+                return onNavigate(
                   SettingsGroups.filter((g) => g.section === route)
                 );
 
@@ -249,7 +288,7 @@ export default function SettingsDialog(props: SettingsDialogProps) {
                 if (!settings.length) continue;
                 groups.push({ ...group, settings });
               }
-              setActiveSettings(groups);
+              onNavigate(groups);
             }}
           />
           {sectionGroups.map((group) => (
@@ -258,7 +297,7 @@ export default function SettingsDialog(props: SettingsDialogProps) {
                 variant={"subBody"}
                 sx={{
                   fontWeight: "bold",
-                  color: "text",
+                  color: "paragraph",
                   mx: 3,
                   mb: 1
                 }}
@@ -274,7 +313,7 @@ export default function SettingsDialog(props: SettingsDialogProps) {
                       title={section.title}
                       selected={section.key === route}
                       onClick={() => {
-                        setActiveSettings(
+                        onNavigate(
                           SettingsGroups.filter(
                             (g) => g.section === section.key
                           )
@@ -286,25 +325,9 @@ export default function SettingsDialog(props: SettingsDialogProps) {
               )}
             </Flex>
           ))}
-        </FlexScrollContainer>
-        <FlexScrollContainer
-          style={{
-            display: "flex",
-            backgroundColor: "var(--background)",
-            flex: 1,
-            flexDirection: "column",
-            padding: 20,
-            gap: 20,
-            minHeight: "min-content",
-            overflow: "auto"
-          }}
-        >
-          {activeSettings.map((group) => (
-            <SettingsGroupComponent item={group} />
-          ))}
-        </FlexScrollContainer>
-      </Flex>
-    </Dialog>
+        </Flex>
+      </ScopedThemeProvider>
+    </FlexScrollContainer>
   );
 }
 
@@ -333,7 +356,7 @@ function SettingsGroupComponent(props: { item: SettingsGroup }) {
             fontSize: 11,
             fontWeight: "bold",
             letterSpacing: 0.3,
-            color: "primary"
+            color: "accent"
           }}
         >
           {item.header.toUpperCase()}
@@ -384,7 +407,7 @@ function SettingItem(props: { item: Setting }) {
       sx={{
         flexDirection: "column",
         pb: 4,
-        borderBottom: "1px solid var(--border)"
+        borderBottom: "1px solid var(--separator)"
       }}
       data-test-id={`setting-${item.key}`}
     >
@@ -401,7 +424,7 @@ function SettingItem(props: { item: Setting }) {
           {item.description && (
             <Text
               variant={"body"}
-              sx={{ mt: 1, color: "fontTertiary", whiteSpace: "pre-wrap" }}
+              sx={{ mt: 1, color: "paragraph", whiteSpace: "pre-wrap" }}
             >
               {typeof item.description === "function"
                 ? item.description(state)
@@ -439,7 +462,7 @@ function SettingItem(props: { item: Setting }) {
               case "toggle":
                 return (
                   <Switch
-                    sx={{ m: 0 }}
+                    sx={{ m: 0, background: "accent" }}
                     disabled={isWorking}
                     onChange={() => workWithLoading(component.toggle)}
                     checked={component.isToggled()}
@@ -449,11 +472,11 @@ function SettingItem(props: { item: Setting }) {
                 return (
                   <select
                     style={{
-                      backgroundColor: "var(--bgSecondary)",
+                      backgroundColor: "var(--background-secondary)",
                       outline: "none",
-                      border: "1px solid var(--border)",
+                      border: "1px solid var(--border-secondary)",
                       borderRadius: "5px",
-                      color: "var(--text)",
+                      color: "var(--paragraph)",
                       padding: "5px"
                     }}
                     value={component.selectedOption()}

@@ -49,7 +49,7 @@ function Notice() {
       <Flex sx={{ flex: 1, alignItems: "center" }}>
         <NoticeData.icon
           size={18}
-          color="primary"
+          color="accent"
           sx={{ bg: "shade", mr: 2, p: 2, borderRadius: 80 }}
         />
         <Flex variant="columnCenter" sx={{ alignItems: "flex-start" }}>
@@ -77,12 +77,11 @@ function Notice() {
             borderRadius: 50,
             p: 1,
             mr: 1,
-            bg: "transparent",
-            ":hover": { backgroundColor: "shade" }
+            bg: "transparent"
           }}
-          variant="tool"
+          variant="accentSecondary"
         >
-          <Dismiss size={20} color="primary" />
+          <Dismiss size={20} color="accent" />
         </Button>
       )}
     </Flex>

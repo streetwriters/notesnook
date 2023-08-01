@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import {
   Linking,
@@ -27,18 +28,17 @@ import {
 } from "react-native";
 import { SwiperFlatList } from "react-native-swiper-flatlist";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { getElevationStyle } from "../../utils/elevation";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { getElevationStyle } from "../../utils/elevation";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 
 const Intro = ({ navigation }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const isTelemetryEnabled = useSettingStore(
     (state) => state.settings.telemetry
   );
@@ -64,7 +64,7 @@ const Intro = ({ navigation }) => {
             style={{
               width: 100,
               height: 5,
-              backgroundColor: colors.accent,
+              backgroundColor: colors.primary.accent,
               borderRadius: 2,
               marginRight: 7
             }}
@@ -74,7 +74,7 @@ const Intro = ({ navigation }) => {
             style={{
               width: 20,
               height: 5,
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 2
             }}
           />
@@ -117,7 +117,7 @@ const Intro = ({ navigation }) => {
         </View>
       </View>
     ),
-    [colors.accent, colors.nav, deviceMode, width]
+    [colors.primary.accent, colors.secondary.background, deviceMode, width]
   );
 
   return (
@@ -130,13 +130,13 @@ const Intro = ({ navigation }) => {
       <View
         style={{
           width: deviceMode !== "mobile" ? width / 2 : "100%",
-          backgroundColor: colors.nav,
+          backgroundColor: colors.secondary.background,
           marginBottom: 20,
           borderBottomWidth: 1,
-          borderBottomColor: colors.border,
+          borderBottomColor: colors.primary.border,
           alignSelf: deviceMode !== "mobile" ? "center" : undefined,
           borderWidth: deviceMode !== "mobile" ? 1 : null,
-          borderColor: deviceMode !== "mobile" ? colors.border : null,
+          borderColor: deviceMode !== "mobile" ? colors.primary.border : null,
           borderRadius: deviceMode !== "mobile" ? 20 : null,
           marginTop: deviceMode !== "mobile" ? 50 : null,
           paddingTop: insets.top + 10,
@@ -171,14 +171,14 @@ const Intro = ({ navigation }) => {
               user: "@andrewsayer on Twitter"
             }
           ]}
-          paginationActiveColor={colors.accent}
+          paginationActiveColor={colors.primary.accent}
           paginationStyleItem={{
             width: 10,
             height: 5,
             marginRight: 4,
             marginLeft: 4
           }}
-          paginationDefaultColor={colors.border}
+          paginationDefaultColor={colors.primary.border}
           renderItem={renderItem}
         />
       </View>
@@ -229,7 +229,9 @@ const Intro = ({ navigation }) => {
             name={
               isTelemetryEnabled ? "checkbox-marked" : "checkbox-blank-outline"
             }
-            color={isTelemetryEnabled ? colors.accent : colors.icon}
+            color={
+              isTelemetryEnabled ? colors.primary.accent : colors.primary.icon
+            }
           />
 
           <Paragraph

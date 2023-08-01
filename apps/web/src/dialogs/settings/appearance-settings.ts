@@ -20,33 +20,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-
-import { AccentColors } from "./components/accent-colors";
+import { ThemesSelector } from "./components/themes-selector";
 
 export const AppearanceSettings: SettingsGroup[] = [
   {
     key: "theme",
     section: "appearance",
-    header: "Theme",
+    header: "General",
+    isHidden: () => !IS_DESKTOP_APP,
     settings: [
       {
-        key: "accent-color",
-        title: "Accent color",
-        description: "Pick the color that matches your mood.",
+        key: "zoom-factor",
+        title: "Zoom factor",
+        description: "Zoom in or out the app content.",
+        isHidden: () => !IS_DESKTOP_APP,
+        onStateChange: (listener) =>
+          useThemeStore.subscribe(
+            (s) => [s.colorScheme, s.followSystemTheme],
+            listener
+          ),
         components: [
           {
-            type: "custom",
-            component: AccentColors
+            type: "input",
+            inputType: "number",
+            min: 0.5,
+            max: 2.0,
+            defaultValue: () => useSettingStore.getState().zoomFactor,
+            onChange: (value) => useSettingStore.getState().setZoomFactor(value)
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    key: "theme",
+    section: "appearance",
+    header: "Themes",
+    settings: [
       {
-        key: "theme",
-        title: "App theme",
+        key: "color-scheme",
+        title: "Color scheme",
         description: "Dark or light, we won't judge.",
         onStateChange: (listener) =>
           useThemeStore.subscribe(
-            (s) => [s.theme, s.followSystemTheme],
+            (s) => [s.colorScheme, s.followSystemTheme],
             listener
           ),
         components: [
@@ -60,34 +77,19 @@ export const AppearanceSettings: SettingsGroup[] = [
             selectedOption: () =>
               useThemeStore.getState().followSystemTheme
                 ? "auto"
-                : useThemeStore.getState().theme,
+                : useThemeStore.getState().colorScheme,
             onSelectionChanged: (value) => {
               useThemeStore.getState().setFollowSystemTheme(value === "auto");
-              if (value !== "auto") useThemeStore.getState().setTheme(value);
+              if (value !== "auto")
+                useThemeStore.getState().setColorScheme(value);
             }
           }
         ]
       },
       {
-        key: "zoom-factor",
-        title: "Zoom factor",
-        description: "Zoom in or out the app content.",
-        isHidden: () => !IS_DESKTOP_APP,
-        onStateChange: (listener) =>
-          useThemeStore.subscribe(
-            (s) => [s.theme, s.followSystemTheme],
-            listener
-          ),
-        components: [
-          {
-            type: "input",
-            inputType: "number",
-            min: 0.5,
-            max: 2.0,
-            defaultValue: () => useSettingStore.getState().zoomFactor,
-            onChange: (value) => useSettingStore.getState().setZoomFactor(value)
-          }
-        ]
+        key: "themes",
+        title: "Select a theme",
+        components: [{ type: "custom", component: ThemesSelector }]
       }
     ]
   }

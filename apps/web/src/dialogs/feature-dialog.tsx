@@ -136,7 +136,7 @@ function FeatureDialog(props: FeatureDialogProps) {
         text: (
           <Flex>
             {feature.cta.icon && (
-              <feature.cta.icon color="primary" size={16} sx={{ mr: 1 }} />
+              <feature.cta.icon color="accent" size={16} sx={{ mr: 1 }} />
             )}
             {feature.cta.title}
           </Flex>
@@ -152,7 +152,7 @@ function FeatureDialog(props: FeatureDialogProps) {
           <Flex
             key={feature.title}
             mb={2}
-            bg="bgSecondary"
+            bg="var(--background-secondary)"
             p={2}
             sx={{
               borderRadius: "default",
@@ -161,13 +161,13 @@ function FeatureDialog(props: FeatureDialogProps) {
             }}
           >
             <Flex sx={{ alignItems: "center", justifyContent: "start" }}>
-              {feature.icon && <feature.icon size={14} color="primary" />}
+              {feature.icon && <feature.icon size={14} color="accent" />}
               <Text variant="subtitle" ml={1} sx={{ fontWeight: "normal" }}>
                 {feature.title}
               </Text>
             </Flex>
             {feature.subtitle && (
-              <Text variant="body" sx={{ color: "icon" }}>
+              <Text variant="subBody" sx={{ fontSize: "body" }}>
                 {feature.subtitle}
               </Text>
             )}
@@ -186,7 +186,7 @@ export function Code(props: CodeProps) {
       as="code"
       sx={{
         bg: "background",
-        color: "text",
+        color: "paragraph",
         px: 1,
         borderRadius: 5,
         fontFamily: "monospace",

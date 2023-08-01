@@ -38,7 +38,6 @@ import { DatabaseLogger, db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
-import { Update } from "../components/sheets/update";
 import { Walkthrough } from "../components/walkthroughs";
 import {
   clearAppState,
@@ -71,7 +70,7 @@ import { useMessageStore } from "../stores/use-message-store";
 import { useNoteStore } from "../stores/use-notes-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
-import { updateStatusBarColor } from "../utils/color-scheme";
+import { updateStatusBarColor } from "../utils/colors";
 import {
   eClearEditor,
   eCloseSheet,
@@ -84,6 +83,7 @@ import {
 import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
+import { useThemeColors } from "@notesnook/theme";
 
 const onCheckSyncStatus = async (type) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -253,6 +253,7 @@ export const useAppEvents = () => {
   ]);
 
   const syncedOnLaunch = useRef(false);
+  const { isDark } = useThemeColors();
   const refValues = useRef({
     subsriptionSuccessListener: null,
     subsriptionErrorListener: null,

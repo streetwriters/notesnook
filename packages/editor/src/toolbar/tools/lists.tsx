@@ -220,7 +220,8 @@ function ListThumbnail(props: ListThumbnailProps) {
         flexDirection: "column",
         flex: 1,
         p: 0,
-        listStyleType
+        listStyleType,
+        gap: 1
       }}
       onMouseDown={(e) => e.preventDefault()}
     >
@@ -230,9 +231,8 @@ function ListThumbnail(props: ListThumbnailProps) {
           as="li"
           sx={{
             display: "list-item",
-            color: "text",
-            fontSize: 8,
-            mb: "1px"
+            color: "paragraph",
+            fontSize: 8
           }}
         >
           <Flex
@@ -244,8 +244,8 @@ function ListThumbnail(props: ListThumbnailProps) {
               sx={{
                 width: "100%",
                 flexShrink: 0,
-                height: 4,
-                bg: "#cbcbcb",
+                height: 5,
+                bg: "border",
                 borderRadius: "small"
               }}
             />

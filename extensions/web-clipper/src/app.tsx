@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { useEffect } from "react";
-import { ThemeProvider } from "./components/theme-provider";
 import { useAppStore } from "./stores/app-store";
 import { Login } from "./views/login";
 import { Main } from "./views/main";
 import { Settings } from "./views/settings";
+import { EmotionThemeProvider, useThemeEngineStore } from "@notesnook/theme";
 
 export function App() {
   const isLoggedIn = useAppStore((s) => s.isLoggedIn);
@@ -35,8 +35,17 @@ export function App() {
     } else navigate("/");
   }, [isLoggedIn]);
 
+  useEffect(() => {
+    console.log(user);
+    if (user && user.theme) {
+      document.body.style.backgroundColor =
+        user.theme.scopes.base.primary.background;
+      useThemeEngineStore.getState().setTheme(user.theme);
+    }
+  }, [user]);
+
   return (
-    <ThemeProvider accent={user?.accent} theme={user?.theme}>
+    <EmotionThemeProvider scope="base" injectCssVars>
       {(() => {
         switch (route) {
           case "/login":
@@ -48,6 +57,6 @@ export function App() {
             return <Settings />;
         }
       })()}
-    </ThemeProvider>
+    </EmotionThemeProvider>
   );
 }

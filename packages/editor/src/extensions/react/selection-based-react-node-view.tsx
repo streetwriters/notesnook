@@ -33,7 +33,7 @@ import {
 } from "./types";
 import { ReactNodeView } from "./react-node-view";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
-import { ThemeProvider } from "../../components/theme-provider";
+import { EmotionThemeProvider } from "@notesnook/theme";
 
 /**
  * A ReactNodeView that handles React components sensitive
@@ -95,7 +95,7 @@ export class SelectionBasedNodeView<
       this.isSelectedNode(this.editor.view.state.selection);
 
     return (
-      <ThemeProvider>
+      <EmotionThemeProvider scope="editor" injectCssVars={false}>
         <this.options.component
           {...props}
           editor={this.editor}
@@ -113,7 +113,7 @@ export class SelectionBasedNodeView<
             )
           }
         />
-      </ThemeProvider>
+      </EmotionThemeProvider>
     );
   }
 

@@ -25,8 +25,9 @@ import {
   useRef,
   useState
 } from "react";
-import { useEditorThemeStore } from "../state/theme";
 import { EventTypes, isReactNative, post } from "../utils";
+import { useThemeColors, useThemeEngineStore } from "@notesnook/theme";
+import { injectCss, transform } from "../utils/css";
 
 type Attachment = {
   hash: string;
@@ -100,6 +101,8 @@ export type EditorController = {
 };
 
 export function useEditorController(update: () => void): EditorController {
+  const setTheme = useThemeEngineStore((store) => store.setTheme);
+  const { colors } = useThemeColors("editor");
   const [title, setTitle] = useState("");
   const [titlePlaceholder, setTitlePlaceholder] = useState("Note title");
   const htmlContentRef = useRef<string | null>(null);
@@ -125,6 +128,10 @@ export function useEditorController(update: () => void): EditorController {
       console.timeEnd("wordCounter");
     }, ms);
   }, []);
+
+  useEffect(() => {
+    injectCss(transform(colors));
+  }, [colors]);
 
   const contentChange = useCallback(
     (editor: Editor) => {
@@ -182,7 +189,7 @@ export function useEditorController(update: () => void): EditorController {
           countWords();
           break;
         case "native:theme":
-          useEditorThemeStore.getState().setColors(message.value);
+          setTheme(message.value);
           break;
         case "native:title":
           setTitle(value);
@@ -202,7 +209,7 @@ export function useEditorController(update: () => void): EditorController {
       }
       post(type); // Notify that message was delivered successfully.
     },
-    [update, countWords]
+    [update, countWords, setTheme]
   );
 
   useEffect(() => {

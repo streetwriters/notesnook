@@ -23,7 +23,7 @@ import Animated, {
   ComplexAnimationBuilder,
   Layout
 } from "react-native-reanimated";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 interface HeadingProps extends TextProps {
   color?: string;
@@ -52,7 +52,7 @@ const Heading = ({
   extraBold,
   ...restProps
 }: HeadingProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const Component = useMemo(() => (animated ? AnimatedText : Text), [animated]);
 
   return (
@@ -64,7 +64,7 @@ const Heading = ({
       style={[
         {
           fontSize: size || SIZE.xl,
-          color: color || colors.heading
+          color: color || colors.primary.heading
         },
         extraBold ? (extraBoldStyle as ViewStyle) : (boldStyle as ViewStyle),
         style

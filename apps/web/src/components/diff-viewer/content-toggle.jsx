@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Button } from "@theme-ui/components";
+import { Flex, Button, Text } from "@theme-ui/components";
 import { getFormattedDate } from "@notesnook/common";
 
 function ContentToggle(props) {
@@ -36,7 +36,7 @@ function ContentToggle(props) {
       <Flex>
         {isOtherSelected && (
           <Button
-            variant="primary"
+            variant="accent"
             mr={2}
             onClick={() => resolveConflict({ saveCopy: true })}
             p={1}
@@ -46,7 +46,7 @@ function ContentToggle(props) {
           </Button>
         )}
         <Button
-          variant="primary"
+          variant={isOtherSelected ? "error" : "primary"}
           onClick={() => {
             if (isOtherSelected) {
               resolveConflict({ saveCopy: false });
@@ -56,22 +56,13 @@ function ContentToggle(props) {
           }}
           p={1}
           px={2}
-          bg={isOtherSelected ? "error" : "primary"}
         >
           {isSelected ? "Undo" : isOtherSelected ? "Discard" : "Keep"}
         </Button>
       </Flex>
-      <Flex
-        mt={1}
-        sx={{
-          fontSize: "subBody",
-          color: "fontTertiary",
-          alignItems: "center",
-          fontFamily: "body"
-        }}
-      >
+      <Text variant="subBody" mt={1}>
         {label} | {getFormattedDate(dateEdited)}
-      </Flex>
+      </Text>
     </Flex>
   );
 }

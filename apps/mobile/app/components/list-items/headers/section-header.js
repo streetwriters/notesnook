@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useRef, useState } from "react";
 import { TouchableOpacity, useWindowDimensions, View } from "react-native";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import {
   eSendEvent,
@@ -29,7 +29,7 @@ import {
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { GROUP } from "../../../utils/constants";
-import { COLORS_NOTE } from "../../../utils/color-scheme";
+import { ColorValues } from "../../../utils/colors";
 import { db } from "../../../common/database";
 import { eOpenJumpToDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
@@ -41,7 +41,7 @@ import { useCallback } from "react";
 
 export const SectionHeader = React.memo(
   function SectionHeader({ item, index, type, color, screen }) {
-    const colors = useThemeStore((state) => state.colors);
+    const { colors } = useThemeColors();
     const { fontScale } = useWindowDimensions();
     const [groupOptions, setGroupOptions] = useState(
       db.settings?.getGroupOptions(type)
@@ -85,7 +85,7 @@ export const SectionHeader = React.memo(
           justifyContent: "space-between",
           paddingHorizontal: 12,
           height: 35 * fontScale,
-          backgroundColor: colors.nav,
+          backgroundColor: colors.secondary.background,
           alignSelf: "center",
           borderRadius: 5,
           marginVertical: 5
@@ -104,7 +104,7 @@ export const SectionHeader = React.memo(
           }}
         >
           <Heading
-            color={COLORS_NOTE[color?.toLowerCase()] || colors.accent}
+            color={ColorValues[color?.toLowerCase()] || colors.primary.accent}
             size={SIZE.sm}
             style={{
               minWidth: 60,
@@ -168,7 +168,7 @@ export const SectionHeader = React.memo(
                     : "Switch to compact mode"
                 }
                 fwdRef={compactModeRef}
-                color={colors.icon}
+                color={colors.secondary.icon}
                 name={listMode == "compact" ? "view-list" : "view-list-outline"}
                 onPress={() => {
                   let settings = {};

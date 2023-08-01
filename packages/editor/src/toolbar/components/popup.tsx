@@ -18,10 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, Text } from "@theme-ui/components";
-import { Icon } from "./icon";
+import { Icon } from "@notesnook/ui";
 import { Icons } from "../icons";
 import { PropsWithChildren } from "react";
 import { DesktopOnly, MobileOnly } from "../../components/responsive";
+import { EmotionThemeProvider } from "@notesnook/theme";
 
 type Action = {
   title: string;
@@ -39,7 +40,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
   const { title, onClose, action, children } = props;
 
   return (
-    <>
+    <EmotionThemeProvider scope="editorToolbar">
       <DesktopOnly>
         <Flex
           sx={{
@@ -63,7 +64,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
             >
               <Text variant={"title"}>{title}</Text>
               <Button
-                variant={"tool"}
+                variant={"secondary"}
                 sx={{ p: 0, bg: "transparent" }}
                 onClick={onClose}
               >
@@ -75,7 +76,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
           {title && action && (
             <Flex
               sx={{ justifyContent: "end" }}
-              bg="bgSecondary"
+              bg="var(--background-secondary)"
               p={1}
               px={2}
               mt={2}
@@ -102,7 +103,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
 
         {action && (
           <Button
-            variant={"primary"}
+            variant="accent"
             sx={{
               alignSelf: "stretch",
               mb: 1,
@@ -121,6 +122,6 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
           </Button>
         )}
       </MobileOnly>
-    </>
+    </EmotionThemeProvider>
   );
 }

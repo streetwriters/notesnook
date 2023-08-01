@@ -75,7 +75,7 @@ export function TaskListComponent(
         <Flex
           sx={{
             position: "relative",
-            bg: "bgSecondary",
+            bg: "var(--background-secondary)",
             py: "5px",
             borderRadius: "default",
             mb: 2,
@@ -92,7 +92,7 @@ export function TaskListComponent(
               height: "100%",
               width: `${stats.percentage}%`,
               position: "absolute",
-              bg: "border",
+              bg: "shade",
 
               zIndex: 0,
               left: 0,
@@ -104,10 +104,11 @@ export function TaskListComponent(
             value={title || ""}
             variant={"clean"}
             sx={{
+              flex: 1,
               p: 0,
               px: 2,
               zIndex: 1,
-              color: "fontTertiary",
+              color: "var(--paragraph-secondary)",
               fontSize: "inherit",
               fontFamily: "inherit"
             }}
@@ -167,7 +168,7 @@ export function TaskListComponent(
             sx={{
               ml: 1,
               mr: 2,
-              color: "fontTertiary",
+              color: "var(--paragraph-secondary)",
               flexShrink: 0,
               zIndex: 1,
               fontFamily: "inherit"

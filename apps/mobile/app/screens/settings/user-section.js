@@ -24,7 +24,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { TimeSince } from "../../components/ui/time-since";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS_STRINGS } from "../../utils/constants";
 import { SIZE } from "../../utils/size";
@@ -38,7 +38,7 @@ export const getTimeLeft = (t2) => {
 };
 
 const SettingsUserSection = ({ item }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const lastSynced = useUserStore((state) => state.lastSynced);
 
@@ -57,7 +57,7 @@ const SettingsUserSection = ({ item }) => {
                 alignSelf: "center",
                 width: "100%",
                 paddingVertical: 12,
-                backgroundColor: colors.bg,
+                backgroundColor: colors.primary.background,
                 borderRadius: 5
               }}
             >
@@ -87,7 +87,7 @@ const SettingsUserSection = ({ item }) => {
                     >
                       <View
                         style={{
-                          backgroundColor: colors.shade,
+                          backgroundColor: colors.primary.shade,
                           borderRadius: 100,
                           width: 50,
                           height: 50,
@@ -97,7 +97,7 @@ const SettingsUserSection = ({ item }) => {
                       >
                         <Icon
                           size={SIZE.xl}
-                          color={colors.accent}
+                          color={colors.primary.accent}
                           name="account-outline"
                         />
                       </View>
@@ -109,19 +109,19 @@ const SettingsUserSection = ({ item }) => {
                         flexGrow: 1
                       }}
                     >
-                      <Heading color={colors.accent} size={SIZE.xs}>
+                      <Heading color={colors.primary.accent} size={SIZE.xs}>
                         {SUBSCRIPTION_STATUS_STRINGS[
                           user.subscription?.type
                         ]?.toUpperCase() || "Basic"}
                       </Heading>
 
-                      <Paragraph color={colors.heading} size={SIZE.sm}>
+                      <Paragraph color={colors.primary.heading} size={SIZE.sm}>
                         {user?.email}
                       </Paragraph>
-                      <Paragraph color={colors.icon} size={SIZE.xs}>
+                      <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
                         Last synced{" "}
                         <TimeSince
-                          style={{ fontSize: SIZE.xs, color: colors.icon }}
+                          style={{ fontSize: SIZE.xs, color: colors.secondary.paragraph }}
                           time={lastSynced}
                         />
                       </Paragraph>

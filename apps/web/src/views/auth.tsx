@@ -22,7 +22,6 @@ import { Button, Flex, Link, Text } from "@theme-ui/components";
 import {
   CheckCircle,
   Loading,
-  Error as ErrorIcon,
   MfaAuthenticator,
   MfaSms,
   MfaEmail,
@@ -35,7 +34,7 @@ import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
 import Config from "../utils/config";
 import useDatabase from "../hooks/use-database";
-import Loader from "../components/loader";
+import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 
@@ -45,6 +44,7 @@ import {
   showLoadingDialog,
   showLogoutConfirmation
 } from "../common/dialog-controller";
+import { ErrorText } from "../components/error-text";
 
 type EmailFormData = {
   email: string;
@@ -301,7 +301,7 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
             mt={2}
             variant="anchor"
             onClick={() => navigate("recover", { email: formData.email })}
-            sx={{ color: "text", alignSelf: "end" }}
+            sx={{ color: "paragraph", alignSelf: "end" }}
           >
             Forgot password?
           </Button>
@@ -374,7 +374,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
               target="_blank"
               rel="noreferrer"
               href="https://notesnook.com/tos"
-              sx={{ color: "primary" }}
+              sx={{ color: "accent" }}
             >
               Terms of Service
             </Link>{" "}
@@ -382,7 +382,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
             <Link
               rel="noreferrer"
               href="https://notesnook.com/privacy"
-              sx={{ color: "primary" }}
+              sx={{ color: "accent" }}
             >
               Privacy Policy
             </Link>
@@ -417,7 +417,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
       title="Your session has expired"
       subtitle={
         <Flex bg="shade" p={1} sx={{ borderRadius: "default" }}>
-          <Text as="span" sx={{ fontSize: "body", color: "primary" }}>
+          <Text as="span" sx={{ fontSize: "body", color: "accent" }}>
             <b>
               All your local changes are safe and will be synced after you
               login.
@@ -460,22 +460,20 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         mt={2}
         variant="anchor"
         onClick={() => user && navigate("recover", { email: user.email })}
-        sx={{ color: "text", alignSelf: "end" }}
+        sx={{ color: "paragraph", alignSelf: "end" }}
       >
         Forgot password?
       </Button>
       <SubmitButton text="Relogin to your account" />
-
       <Button
         type="button"
         variant="anchor"
         sx={{
           mt: 5,
-          color: "error",
+          color: "var(--paragraph-error)",
           textDecoration: "none",
           ":hover": {
-            color: "error",
-            opacity: 0.8
+            color: "var(--paragraph-error)"
           }
         }}
         onClick={async () => {
@@ -533,8 +531,8 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
       {success ? (
         <>
           <Flex bg="background" p={2} mt={2} sx={{ borderRadius: "default" }}>
-            <CheckCircle size={20} color="primary" />
-            <Text variant="body" ml={2} sx={{ color: "primary" }}>
+            <CheckCircle size={20} color="accent" />
+            <Text variant="body" ml={2} sx={{ color: "accent" }}>
               {success}
             </Text>
           </Flex>
@@ -699,7 +697,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
         mt={4}
         variant={"anchor"}
         onClick={() => navigate("mfa:select", formData)}
-        sx={{ color: "text" }}
+        sx={{ color: "paragraph" }}
       >
         {texts.selector}
       </Button>
@@ -763,7 +761,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
               sx={{
                 ":first-of-type": { mt: 2 },
                 display: "flex",
-                bg: "bgSecondary",
+                bg: "background",
                 alignSelf: "stretch",
                 alignItems: "center",
                 textAlign: "left",
@@ -780,7 +778,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
                   mr: 2
                 }}
                 size={16}
-                color={selected === index ? "primary" : "text"}
+                color={selected === index ? "accent" : "icon"}
               />
               <Text variant={"title"} sx={{ fontWeight: "body" }}>
                 {method.title}
@@ -793,7 +791,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
         disabled={!isAppLoaded}
         loading={!isAppLoaded}
       /> */}
-      {/* <Button type="button" mt={4} variant={"anchor"}  sx={{color: "text"}}>
+      {/* <Button type="button" mt={4} variant={"anchor"}  sx={{color: "paragraph"}}>
         Don't have access to your {mfaMethodToPhrase(formData.primaryMethod)}?
       </Button> */}
     </AuthForm>
@@ -867,7 +865,11 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
         variant="body"
         mt={2}
         mb={35}
-        sx={{ fontSize: "title", textAlign: "center", color: "fontTertiary" }}
+        sx={{
+          fontSize: "title",
+          textAlign: "center",
+          color: "var(--paragraph-secondary)"
+        }}
       >
         {subtitle}
       </Text>
@@ -878,11 +880,8 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
           variant="anchor"
           sx={{
             mt: 5,
-            color: "text",
-            textDecoration: "none",
-            ":hover": {
-              color: "bgSecondaryText"
-            }
+            color: "paragraph",
+            textDecoration: "none"
           }}
           onClick={() => {
             openURL("/notes/");
@@ -892,14 +891,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
         </Button>
       )}
 
-      {error && (
-        <Flex bg="errorBg" p={1} mt={5} sx={{ borderRadius: "default" }}>
-          <ErrorIcon size={15} color="error" />
-          <Text variant="error" ml={1}>
-            {error}
-          </Text>
-        </Flex>
-      )}
+      <ErrorText error={error} mt={5} />
     </Flex>
   );
 }
@@ -920,10 +912,9 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
         variant="anchor"
         sx={{
           textDecoration: "underline",
-          ":hover": { color: "dimPrimary" },
           fontWeight: "bold",
           fontSize: "subtitle",
-          color: "text",
+          color: "paragraph",
           cursor: "pointer"
         }}
         onClick={props.action.onClick}
@@ -995,7 +986,7 @@ export function SubmitButton(props: SubmitButtonProps) {
       data-test-id="submitButton"
       type="submit"
       mt={50}
-      variant="primary"
+      variant="accent"
       px={50}
       sx={{
         borderRadius: 50,
@@ -1006,7 +997,7 @@ export function SubmitButton(props: SubmitButtonProps) {
       }}
       disabled={props.disabled}
     >
-      {props.loading ? <Loading color="static" /> : props.text}
+      {props.loading ? <Loading color="white" /> : props.text}
     </Button>
   );
 }

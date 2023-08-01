@@ -26,6 +26,7 @@ import * as clipboard from "clipboard-polyfill/text";
 import { Suspense } from "react";
 import Config from "../utils/config";
 import FileSaver from "file-saver";
+import { ErrorText } from "../components/error-text";
 
 const QRCode = React.lazy(() => import("../re-exports/react-qrcode-logo"));
 
@@ -57,30 +58,22 @@ function RecoveryKeyDialog(props) {
     >
       <Flex sx={{ overflow: "hidden", flex: 1, flexDirection: "column" }}>
         <Flex sx={{ overflowY: "auto", flexDirection: "column" }}>
-          <Text
-            bg="errorBg"
-            p={2}
-            sx={{
-              borderRadius: "default",
-              fontSize: "subBody",
-              color: "error"
-            }}
-          >
-            In case you forget your password, your recovery key is the only way
-            to recover your data.
-          </Text>
+          <ErrorText
+            error="In case you forget your password, your recovery key is the only way to recover your data."
+            mt={0}
+          />
           <Text
             data-test-id="recovery-key"
             className="selectable"
             mt={2}
-            bg="bgSecondary"
+            bg="var(--background-secondary)"
             p={2}
             sx={{
               borderRadius: "default",
               overflowWrap: "anywhere",
               fontSize: "body",
               fontFamily: "monospace",
-              color: "text"
+              color: "paragraph"
             }}
           >
             {key}

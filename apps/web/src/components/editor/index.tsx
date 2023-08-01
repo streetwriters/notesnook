@@ -50,10 +50,9 @@ import useTablet from "../../hooks/use-tablet";
 import Config from "../../utils/config";
 import { AnimatedFlex } from "../animated";
 import { EditorLoader } from "../loaders/editor-loader";
+import { ScopedThemeProvider } from "../theme-provider";
 import { Lightbox } from "../lightbox";
-import ThemeProviderWrapper from "../theme-provider";
 import { Allotment } from "allotment";
-// import { PdfPreview } from "";
 import { showToast } from "../../utils/toast";
 import { getFormattedDate } from "@notesnook/common";
 
@@ -221,7 +220,8 @@ export default function EditorManager({
             alignSelf: "stretch",
             overflow: "hidden",
             flex: 1,
-            flexDirection: "column"
+            flexDirection: "column",
+            background: "background"
           }}
         >
           {previewSession.current && (
@@ -429,14 +429,14 @@ export function Editor(props: EditorProps) {
               return showToast("error", "This image cannot be previewed.");
 
             ReactDOM.render(
-              <ThemeProviderWrapper>
+              <ScopedThemeProvider>
                 <Lightbox
                   image={dataurl}
                   onClose={() => {
                     ReactDOM.unmountComponentAtNode(container);
                   }}
                 />
-              </ThemeProviderWrapper>,
+              </ScopedThemeProvider>,
               container
             );
           } else if (attachment && onPreviewDocument) {
@@ -527,7 +527,7 @@ function EditorChrome(
             />
           )}
           <Titlebox readonly={readonly || false} />
-          <Header readonly={readonly} />
+          <Header readonly={readonly || false} />
           <AnimatedFlex
             initial={{ opacity: 0 }}
             animate={{ opacity: isLoading ? 0 : 1 }}
@@ -574,7 +574,7 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
 
   return (
     <Flex
-      bg="bgSecondary"
+      bg="var(--background-secondary)"
       p={2}
       sx={{ alignItems: "center", justifyContent: "space-between" }}
       data-test-id="preview-notice"
@@ -597,6 +597,7 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
           Cancel
         </Button>
         <Button
+          variant="accent"
           data-test-id="preview-notice-restore"
           px={4}
           onClick={async () => {

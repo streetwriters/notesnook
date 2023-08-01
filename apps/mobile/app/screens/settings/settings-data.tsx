@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ThemeDark, ThemePitchBlack } from "@notesnook/theme";
 import notifee from "@notifee/react-native";
-
 import dayjs from "dayjs";
 import React from "react";
-import { Linking, Platform } from "react-native";
+import { Appearance, Linking, Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
@@ -51,9 +51,8 @@ import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
 import { clearAllStores } from "../../stores";
-import { useSettingStore } from "../../stores/use-setting-store";
+import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { getColorScheme, toggleDarkMode } from "../../utils/color-scheme/utils";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import {
   eCloseSheet,
@@ -70,7 +69,6 @@ import { useDragState } from "./editor/state";
 import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-
 type User = any;
 
 export const settingsGroups: SettingSection[] = [
@@ -434,16 +432,16 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "personalization",
         type: "screen",
-        name: "Theme",
+        name: "Appearance",
         description: "Change app look and feel with color themes",
         icon: "shape",
         sections: [
           {
-            id: "accent-color-picker",
-            type: "component",
-            name: "Accent color",
-            description: "Pick the color that matches your mood",
-            component: "colorpicker"
+            id: "theme-picker",
+            type: "screen",
+            name: "Themes",
+            description: "Customize Notesnook to absolute infinity.",
+            component: "theme-selector"
           },
           {
             id: "use-system-theme",
@@ -458,7 +456,11 @@ export const settingsGroups: SettingSection[] = [
               SettingsService.set({
                 useSystemTheme: !current
               });
-              getColorScheme();
+              if (!current) {
+                useThemeStore
+                  .getState()
+                  .setColorScheme(Appearance.getColorScheme() as any);
+              }
             }
           },
           {
@@ -466,26 +468,12 @@ export const settingsGroups: SettingSection[] = [
             type: "switch",
             name: "Dark mode",
             description: "Strain your eyes no more at night",
-            property: "theme",
+            property: "colorScheme",
             icon: "brightness-6",
             modifer: () => {
-              toggleDarkMode();
+              useThemeStore.getState().setColorScheme();
             },
-            getter: () => useSettingStore.getState().settings.theme.dark
-          },
-          {
-            id: "pitch-black",
-            type: "switch",
-            name: "Pitch black",
-            description: "Save battery on device with amoled screen at night.",
-            property: "pitchBlack",
-            modifer: () => {
-              SettingsService.set({
-                pitchBlack: !SettingsService.get().pitchBlack
-              });
-              getColorScheme();
-            },
-            icon: "brightness-1"
+            getter: () => useThemeStore.getState().colorScheme === "dark"
           }
         ]
       },
@@ -1059,13 +1047,6 @@ export const settingsGroups: SettingSection[] = [
         type: "screen",
         icon: "bug",
         sections: [
-          {
-            id: "debug-mode",
-            type: "switch",
-            name: "Debug mode",
-            description: "Show debug options on items",
-            property: "devMode"
-          },
           {
             id: "debug-logs",
             type: "screen",

@@ -23,7 +23,7 @@ import {
   ActionSheetPresenter,
   ActionSheetPresenterProps
 } from "../action-sheet";
-import { MenuPresenter, MenuPresenterProps } from "../menu";
+import { MenuPresenter, MenuPresenterProps } from "@notesnook/ui";
 
 type ResponsiveContainerProps = {
   mobile?: JSX.Element;

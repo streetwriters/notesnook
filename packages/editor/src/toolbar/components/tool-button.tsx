@@ -18,17 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Theme } from "@notesnook/theme";
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { SchemeColors } from "@notesnook/theme";
 import React from "react";
 import { ButtonProps } from "@theme-ui/components";
 import { IconNames, Icons } from "../icons";
 import { ToolButtonVariant } from "../types";
 import { Button } from "../../components/button";
-import { Icon } from "./icon";
+import { Icon } from "@notesnook/ui";
 
 export type ToolButtonProps = ButtonProps & {
   icon: IconNames;
-  iconColor?: keyof SchemeColors;
+  iconColor?: SchemeColors;
   iconSize?: keyof Theme["iconSizes"] | number;
   toggled: boolean;
   buttonRef?: React.RefObject<HTMLButtonElement>;
@@ -50,17 +50,18 @@ export const ToolButton = React.memo(
 
     return (
       <Button
+        variant="secondary"
         ref={buttonRef}
         tabIndex={-1}
         id={`tool-${id || icon}`}
         sx={{
+          height: "unset",
           flexShrink: 0,
           p: variant === "small" ? "small" : 1,
           borderRadius: variant === "small" ? "small" : "default",
           m: 0,
-          bg: toggled ? "hover" : "transparent",
+          bg: toggled ? "background-selected" : "transparent",
           mr: variant === "small" ? 0 : 1,
-          ":hover": { bg: "hover" },
           ":last-of-type": {
             mr: 0
           },
@@ -71,7 +72,7 @@ export const ToolButton = React.memo(
       >
         <Icon
           path={Icons[icon]}
-          color={iconColor || "icon"}
+          color={iconColor || (toggled ? "icon-selected" : "icon")}
           size={iconSize || (variant === "small" ? "medium" : "big")}
         />
       </Button>

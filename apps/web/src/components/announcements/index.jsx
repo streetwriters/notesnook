@@ -24,6 +24,8 @@ import AnnouncementBody from "./body";
 import { useStore as useAnnouncementStore } from "../../stores/announcement-store";
 import Notice from "../notice";
 
+import { alpha } from "@theme-ui/color";
+
 function Announcements() {
   const announcements = useAnnouncementStore(
     (store) => store.inlineAnnouncements
@@ -37,7 +39,7 @@ function Announcements() {
       mx={1}
       mb={2}
       py={2}
-      bg="bgSecondary"
+      bg="var(--background-secondary)"
       sx={{
         borderRadius: "default",
         position: "relative",
@@ -45,9 +47,9 @@ function Announcements() {
       }}
     >
       <Text
-        bg="errorBg"
         p="2px"
         sx={{
+          bg: alpha("red", 0.2),
           position: "absolute",
           right: 2,
           top: 2,
@@ -61,7 +63,7 @@ function Announcements() {
           dismiss(announcement.id);
         }}
       >
-        <Cross color="error" size={16} />
+        <Cross size={16} color="red" />
       </Text>
       <AnnouncementBody components={announcement.body} type="inline" />
     </Flex>

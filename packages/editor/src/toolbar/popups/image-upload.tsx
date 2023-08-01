@@ -78,7 +78,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
           <Text
             variant={"error"}
             sx={{
-              bg: "errorBg",
+              bg: "var(--background-error)",
               mt: 1,
               p: 1,
               borderRadius: "default"
@@ -91,7 +91,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
             variant={"subBody"}
             sx={{
               bg: "shade",
-              color: "primary",
+              color: "accent",
               mt: 1,
               p: 1,
               borderRadius: "default"

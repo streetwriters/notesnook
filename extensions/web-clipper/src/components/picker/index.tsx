@@ -19,30 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { PropsWithChildren } from "react";
 import Modal from "react-modal";
 import { Button, Flex } from "@theme-ui/components";
-import { ThemeProvider } from "../theme-provider";
+import { EmotionThemeProvider, useThemeEngineStore } from "@notesnook/theme";
+
 Modal.setAppElement("#root");
-
-const customStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-    boxShadow: "0px 1px 10px #00000055",
-    border: "none",
-    borderRadius: 5,
-    backgroundColor: "var(--background)",
-
-    height: "80vh",
-    width: "85vw",
-    display: "flex",
-    flexDirection: "column",
-    overflow: "hidden",
-    padding: 0
-  } as const
-};
 
 type PickerProps = {
   isOpen: boolean;
@@ -51,19 +30,46 @@ type PickerProps = {
 };
 export const Picker = (props: PropsWithChildren<PickerProps>) => {
   const { children, isOpen, onClose, onDone } = props;
+  const theme = useThemeEngineStore((store) => store.theme);
 
   return (
     <Modal
       style={{
-        content: customStyles.content,
+        content: {
+          top: "50%",
+          left: "50%",
+          right: "auto",
+          bottom: "auto",
+          marginRight: "-50%",
+          transform: "translate(-50%, -50%)",
+          boxShadow: `0px 1px 10px ${theme.scopes.base.primary.border}`,
+          border: "none",
+          borderRadius: 5,
+          backgroundColor: theme.scopes.base.primary.background,
+          padding: "10px",
+
+          height: "80vh",
+          width: "85vw",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden"
+        },
         overlay: {
-          backgroundColor: "var(--overlay)"
+          backgroundColor: theme.scopes.base.primary.backdrop
         }
       }}
       onRequestClose={onClose}
       isOpen={isOpen}
     >
-      <ThemeProvider>
+      <EmotionThemeProvider
+        scope="base"
+        injectCssVars
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden"
+        }}
+      >
         <Flex
           sx={{
             flexDirection: "column",
@@ -81,13 +87,19 @@ export const Picker = (props: PropsWithChildren<PickerProps>) => {
           >
             {children}
           </Flex>
-          <Flex sx={{ bg: "bgSecondary", p: 1, justifyContent: "end" }}>
+          <Flex
+            sx={{
+              bg: "var(--background-secondary)",
+              p: 1,
+              justifyContent: "end"
+            }}
+          >
             <Button variant="dialog" onClick={onDone}>
               Done
             </Button>
           </Flex>
         </Flex>
-      </ThemeProvider>
+      </EmotionThemeProvider>
     </Modal>
   );
 };

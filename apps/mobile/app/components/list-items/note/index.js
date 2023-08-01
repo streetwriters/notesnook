@@ -29,9 +29,8 @@ import { TaggedNotes } from "../../../screens/notes/tagged";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
 import useNavigationStore from "../../../stores/use-navigation-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
-import { useSettingStore } from "../../../stores/use-setting-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
-import { COLORS_NOTE } from "../../../utils/color-scheme";
+import { useThemeColors } from "@notesnook/theme";
+import { ColorValues } from "../../../utils/colors";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { Button } from "../../ui/button";
@@ -40,6 +39,7 @@ import { ReminderTime } from "../../ui/reminder-time";
 import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 
 function navigateToTag(item) {
   const tag = db.tags.tag(item.id);
@@ -98,18 +98,15 @@ const NoteItem = ({
   dateBy = "dateCreated",
   noOpen = false
 }) => {
-  const colors = useThemeStore((state) => state.colors);
-  const notesListMode = useSettingStore(
-    (state) => state.settings.notesListMode
-  );
-  const compactMode = notesListMode === "compact";
+  const { colors } = useThemeColors();
+  const compactMode = useIsCompactModeEnabled(item);
   const attachmentCount = db.attachments?.ofNote(item.id, "all")?.length || 0;
   const _update = useRelationStore((state) => state.updater);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const notebooks = React.useMemo(() => getNotebook(item), [item, _update]);
   const reminders = db.relations.from(item, "reminder");
   const reminder = getUpcomingReminder(reminders);
-  const noteColor = COLORS_NOTE[item.color?.toLowerCase()];
+  const noteColor = ColorValues[item.color?.toLowerCase()];
   const tags = getTags(item);
   return (
     <>
@@ -151,7 +148,7 @@ const NoteItem = ({
                   borderRadius: 5,
                   marginRight: 5,
                   borderWidth: 0.5,
-                  borderColor: colors.icon,
+                  borderColor: colors.primary.border,
                   paddingHorizontal: 6,
                   marginBottom: 5
                 }}
@@ -181,7 +178,9 @@ const NoteItem = ({
         {compactMode ? (
           <Paragraph
             numberOfLines={1}
-            color={COLORS_NOTE[item.color?.toLowerCase()] || colors.heading}
+            color={
+              ColorValues[item.color?.toLowerCase()] || colors.primary.heading
+            }
             style={{
               flexWrap: "wrap"
             }}
@@ -192,7 +191,9 @@ const NoteItem = ({
         ) : (
           <Heading
             numberOfLines={1}
-            color={COLORS_NOTE[item.color?.toLowerCase()] || colors.heading}
+            color={
+              ColorValues[item.color?.toLowerCase()] || colors.primary.heading
+            }
             style={{
               flexWrap: "wrap"
             }}
@@ -235,13 +236,13 @@ const NoteItem = ({
                       marginRight: 6
                     }}
                     size={SIZE.sm}
-                    color={colors.red}
+                    color={colors.error.accent}
                   />
                 ) : null}
                 <TimeSince
                   style={{
                     fontSize: SIZE.xs,
-                    color: colors.icon,
+                    color: colors.secondary.paragraph,
                     marginRight: 6
                   }}
                   time={item[dateBy]}
@@ -261,9 +262,12 @@ const NoteItem = ({
                     <Icon
                       name="attachment"
                       size={SIZE.md}
-                      color={colors.icon}
+                      color={colors.primary.icon}
                     />
-                    <Paragraph color={colors.icon} size={SIZE.xs}>
+                    <Paragraph
+                      color={colors.secondary.paragraph}
+                      size={SIZE.xs}
+                    >
                       {attachmentCount}
                     </Paragraph>
                   </View>
@@ -278,7 +282,8 @@ const NoteItem = ({
                       marginRight: 6
                     }}
                     color={
-                      COLORS_NOTE[item.color?.toLowerCase()] || colors.accent
+                      ColorValues[item.color?.toLowerCase()] ||
+                      colors.primary.accent
                     }
                   />
                 ) : null}
@@ -291,7 +296,7 @@ const NoteItem = ({
                     style={{
                       marginRight: 6
                     }}
-                    color={colors.icon}
+                    color={colors.primary.icon}
                   />
                 ) : null}
 
@@ -336,7 +341,7 @@ const NoteItem = ({
             ) : (
               <>
                 <Paragraph
-                  color={colors.icon}
+                  color={colors.secondary.paragraph}
                   size={SIZE.xs}
                   style={{
                     marginRight: 6
@@ -349,7 +354,7 @@ const NoteItem = ({
                 </Paragraph>
 
                 <Paragraph
-                  color={colors.accent}
+                  color={colors.primary.accent}
                   size={SIZE.xs}
                   style={{
                     marginRight: 6
@@ -377,7 +382,7 @@ const NoteItem = ({
                   marginRight: 6
                 }}
                 size={SIZE.sm}
-                color={colors.red}
+                color={colors.error.accent}
               />
             ) : null}
 
@@ -389,7 +394,7 @@ const NoteItem = ({
                 style={{
                   marginRight: 6
                 }}
-                color={colors.icon}
+                color={colors.secondary.background}
               />
             ) : null}
 
@@ -408,7 +413,7 @@ const NoteItem = ({
             <TimeSince
               style={{
                 fontSize: SIZE.xs,
-                color: colors.icon,
+                color: colors.secondary.paragraph,
                 marginRight: 6
               }}
               time={item[dateBy]}
@@ -419,7 +424,7 @@ const NoteItem = ({
 
         <IconButton
           testID={notesnook.listitem.menu}
-          color={colors.pri}
+          color={colors.primary.paragraph}
           name="dots-horizontal"
           size={SIZE.xl}
           onPress={() => !noOpen && showActionSheet(item, isTrash)}

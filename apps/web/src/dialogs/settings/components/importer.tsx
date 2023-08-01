@@ -66,14 +66,14 @@ export function Importer() {
               alignSelf: "start",
               borderRadius: "default",
               height: "5px",
-              bg: "primary",
+              bg: "accent",
               width: `0%`
             }}
           />
         </>
       ) : isDone ? (
         <>
-          <CheckCircleOutline color="primary" sx={{ mt: 150 }} />
+          <CheckCircleOutline color="accent" sx={{ mt: 150 }} />
           <Text variant="body" my={2} sx={{ textAlign: "center" }}>
             Import successful. {errors.length} errors occured.
           </Text>
@@ -90,13 +90,18 @@ export function Importer() {
             Start over
           </Button>
           {errors.length > 0 && (
-            <Flex my={1} bg="errorBg" p={1} sx={{ flexDirection: "column" }}>
+            <Flex
+              my={1}
+              bg="var(--background-error)"
+              p={1}
+              sx={{ flexDirection: "column" }}
+            >
               {errors.map((error) => (
                 <Text
                   key={error.message}
                   variant="body"
                   sx={{
-                    color: "error"
+                    color: "var(--paragraph-error)"
                   }}
                 >
                   {error.message}
@@ -114,7 +119,10 @@ export function Importer() {
                   ? `${pluralize(files.length, "file")} ready for import`
                   : "Select files to import"}
               </Text>
-              <Text variant={"body"} sx={{ color: "fontTertiary" }}>
+              <Text
+                variant={"body"}
+                sx={{ color: "var(--paragraph-secondary)" }}
+              >
                 Please refer to the{" "}
                 <Link
                   href="https://help.notesnook.com/importing-notes/import-notes-from-evernote"

@@ -32,7 +32,7 @@ import {
   TableProperties
 } from "../../toolbar/tools/table";
 import { getToolDefinition } from "../../toolbar/tool-definitions";
-import { getPosition } from "../../utils/position";
+import { getPosition } from "@notesnook/ui";
 import {
   findSelectedDOMNode,
   hasSameAttributes

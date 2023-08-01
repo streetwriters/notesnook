@@ -57,7 +57,7 @@ export const TaskListNode = TaskList.extend({
     return [
       {
         tag: "ul",
-        getAttrs: (node) => {
+        getAttrs: (node: any) => {
           if (node instanceof Node && node instanceof HTMLElement) {
             return node.classList.contains("checklist") && null;
           }

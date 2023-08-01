@@ -20,18 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { forwardRef, useRef, ForwardedRef } from "react";
 import { useEffect } from "react";
 import { Button as RebassButton, ButtonProps } from "@theme-ui/components";
-import { ThemeUICSSObject } from "@theme-ui/core";
 
 const _Button = (
   props: ButtonProps,
   forwardedRef: ForwardedRef<HTMLButtonElement>
 ) => {
   const { sx, ...buttonProps } = props;
-
-  const hoverBg =
-    (((sx as ThemeUICSSObject)?.[":hover"] as ThemeUICSSObject)
-      ?.bg as string) || "hover";
-  const bg = ((sx as ThemeUICSSObject)?.bg as string) || "unset";
 
   const buttonRef = useRef<HTMLButtonElement>();
 
@@ -58,9 +52,7 @@ const _Button = (
     <RebassButton
       {...buttonProps}
       sx={{
-        ...sx,
-        ":hover": { bg: [bg, hoverBg] },
-        ":active": { bg: hoverBg }
+        ...sx
       }}
       ref={(ref) => {
         buttonRef.current = ref || undefined;

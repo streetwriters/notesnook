@@ -101,11 +101,11 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               p: 1,
               py: 0,
               ":focus-within": {
-                outlineColor: "primary",
+                outlineColor: "accent",
                 outlineWidth: "1.8px"
               },
               ":hover": {
-                outlineColor: "primary"
+                outlineColor: "accent"
               }
             }}
           >
@@ -185,7 +185,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 sx={{
                   flexShrink: 0,
                   borderLeft: "1px solid var(--border)",
-                  color: "fontTertiary",
+                  color: "paragraph",
                   px: 1
                 }}
               >

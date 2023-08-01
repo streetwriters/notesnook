@@ -110,15 +110,13 @@ function Notebook() {
                 sx={{
                   fontSize: "subBody",
                   textDecoration: "none",
-                  color: "fontTertiary"
+                  color: "var(--paragraph-secondary)"
                 }}
                 onClick={crumb.onClick}
               >
                 {crumb.title}
               </Button>
-              {index === array.length - 1 ? null : (
-                <ChevronRight size={18} color="fontTertiary" />
-              )}
+              {index === array.length - 1 ? null : <ChevronRight size={18} />}
             </>
           ))}
         </Flex>
@@ -140,7 +138,7 @@ function Notebook() {
           <Flex variant="columnFill" sx={{ height: "100%" }}>
             <ListContainer
               type="notes"
-              groupType={"notes"}
+              groupingKey={"notes"}
               refresh={refreshContext}
               compact={isCompact}
               context={{ ...context, notes: undefined }}
@@ -215,21 +213,17 @@ function Topics({ selectedNotebook, isCollapsed, onClick }) {
         }}
       >
         <Flex sx={{ alignItems: "center" }}>
-          {isCollapsed ? (
-            <ChevronRight size={16} color="fontTertiary" />
-          ) : (
-            <ChevronDown size={16} color="fontTertiary" />
-          )}
+          {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
           <Text variant="subBody" sx={{ fontSize: 11 }}>
             TOPICS
           </Text>
         </Flex>
         <Flex sx={{ alignItems: "center" }}>
           <Button
-            variant="tool"
+            variant="secondary"
             data-test-id="topics-sort-button"
             sx={{
-              p: "3.5px",
+              p: "small",
               bg: "transparent",
               visibility: isCollapsed ? "collapse" : "visible"
             }}
@@ -241,7 +235,7 @@ function Topics({ selectedNotebook, isCollapsed, onClick }) {
             <SortAsc size={15} />
           </Button>
           <Button
-            variant="tool"
+            variant="secondary"
             sx={{
               p: "1px",
               bg: "transparent",
@@ -292,7 +286,7 @@ function NotebookHeader({ notebook }) {
         <Text variant="heading">{title}</Text>
         <Flex>
           <Button
-            variant="tool"
+            variant="secondary"
             sx={{ borderRadius: 100, width: 30, height: 30 }}
             mr={1}
             p={0}
@@ -306,7 +300,7 @@ function NotebookHeader({ notebook }) {
             )}
           </Button>
           <Button
-            variant="tool"
+            variant="secondary"
             sx={{ borderRadius: 100, width: 30, height: 30 }}
             p={0}
             title="Edit notebook"

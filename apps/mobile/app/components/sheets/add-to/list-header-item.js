@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../../stores/use-theme-store";
 import Input from "../../ui/input";
 import Paragraph from "../../ui/typography/paragraph";
+import { useThemeColors } from "@notesnook/theme";
 
 export const ListHeaderInputItem = ({
   onSubmit,
@@ -30,7 +30,8 @@ export const ListHeaderInputItem = ({
   testID
 }) => {
   const [focused, setFocused] = useState(false);
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors("sheet");
+
   const [inputValue, setInputValue] = useState();
   const inputRef = useRef();
   return (
@@ -57,7 +58,7 @@ export const ListHeaderInputItem = ({
         }}
         button={{
           icon: inputValue ? "plus" : "magnify",
-          color: focused ? colors.accent : colors.icon,
+          color: focused ? colors.selected.icon : colors.secondary.icon,
           onPress: async () => {
             const result = await onSubmit(inputValue);
             if (result) {
@@ -71,13 +72,13 @@ export const ListHeaderInputItem = ({
       {inputValue ? (
         <View
           style={{
-            backgroundColor: colors.shade,
+            backgroundColor: colors.primary.shade,
             padding: 5,
             borderRadius: 5,
             marginBottom: 10
           }}
         >
-          <Paragraph color={colors.accent}>
+          <Paragraph color={colors.primary.accent}>
             Tap on + to add {`"${inputValue}"`}
           </Paragraph>
         </View>

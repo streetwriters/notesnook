@@ -79,7 +79,10 @@ function TitleBox(props: TitleBoxProps) {
         fontFamily: getFontById(editorConfig.fontFamily)?.font || "heading",
         fontSize: ["1.625em", "1.625em", "2.625em"],
         fontWeight: "heading",
-        width: "100%"
+        width: "100%",
+        "::placeholder": {
+          color: "placeholder"
+        }
       }}
       onChange={(e) => {
         const { sessionId, id } = store.get().session;

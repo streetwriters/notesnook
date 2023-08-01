@@ -33,9 +33,10 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../app/common/database";
 import { getElevationStyle } from "../app/utils/elevation";
 import { initDatabase, useShareStore } from "./store";
+import { useThemeColors } from "@notesnook/theme";
 
 const ListItem = ({ item, mode, close }) => {
-  const colors = useShareStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const selectedNotebooks = useShareStore((state) => state.selectedNotebooks);
   const selectedTags = useShareStore((state) => state.selectedTags);
   const isSelected =
@@ -96,7 +97,7 @@ const ListItem = ({ item, mode, close }) => {
       style={{
         flexDirection: "column",
         borderBottomWidth: item.topics?.length > 0 ? 0 : 1,
-        borderBottomColor: colors.nav,
+        borderBottomColor: colors.secondary.background,
         justifyContent: "center",
         paddingVertical: 12
       }}
@@ -119,7 +120,7 @@ const ListItem = ({ item, mode, close }) => {
               marginRight: 10
             }}
             size={20}
-            color={isSelected ? colors.accent : colors.icon}
+            color={isSelected ? colors.primary.accent : colors.secondary.icon}
           />
         ) : null}
 
@@ -131,7 +132,7 @@ const ListItem = ({ item, mode, close }) => {
           <Text
             numberOfLines={1}
             style={{
-              color: colors.pri,
+              color: colors.primary.paragraph,
               fontFamily:
                 item.type === "topic"
                   ? "OpenSans-Regular"
@@ -192,7 +193,7 @@ const SearchLookup = {
 };
 
 export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
-  const colors = useShareStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   const { height } = useWindowDimensions();
   const timer = useRef(null);
@@ -255,7 +256,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
       style={{
         position: "absolute",
         top: Platform.OS === "android" ? 20 : 0,
-        backgroundColor: colors.bg,
+        backgroundColor: colors.secondary.background,
         borderRadius: quicknote ? 0 : 10,
         width: quicknote ? "100%" : "95%",
         minHeight: 250,
@@ -279,7 +280,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
       >
         <Icon
           name="arrow-left"
-          color={colors.pri}
+          color={colors.secondary.icon}
           style={{
             marginRight: 10
           }}
@@ -289,7 +290,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
         <TextInput
           ref={inputRef}
           placeholder="Search for a note"
-          placeholderTextColor={colors.placeholder}
+          placeholderTextColor={colors.primary.placeholder}
           style={{
             fontSize: 15,
             fontFamily: "OpenSans-Regular",
@@ -306,7 +307,12 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
           onSubmitEditing={onSearch}
         />
 
-        <Icon name="magnify" color={colors.pri} size={25} onPress={onSearch} />
+        <Icon
+          name="magnify"
+          color={colors.primary.icon}
+          size={25}
+          onPress={onSearch}
+        />
       </View>
 
       <View
@@ -352,7 +358,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
               <Text
                 style={{
                   fontFamily: "OpenSans-Regular",
-                  color: colors.icon
+                  color: colors.secondary.icon
                 }}
               >
                 {searchKeyword.current

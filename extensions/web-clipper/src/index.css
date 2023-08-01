@@ -4,3 +4,21 @@ body {
   background-color: var(--background);
   overflow: hidden;
 }
+
+.ms-track:hover,
+.ms-track:active {
+  background: var(--border) !important;
+  border-width: 0px !important;
+}
+
+.ms-track {
+  border-width: 0px !important;
+}
+
+.ms-active .ms-thumb {
+  filter: brightness(80%);
+}
+
+.ms-thumb {
+  background: var(--hover) !important;
+}

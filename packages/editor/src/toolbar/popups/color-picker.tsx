@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ButtonProps, Flex } from "@theme-ui/components";
 import { Input } from "@theme-ui/components";
-import { Icon } from "../components/icon";
+import { Icon } from "@notesnook/ui";
 import { Icons } from "../icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import tinycolor from "tinycolor2";
@@ -27,7 +27,7 @@ import { HexColorPicker } from "react-colorful";
 import { Button } from "../../components/button";
 import { debounce } from "../../utils/debounce";
 import { Popup } from "../components/popup";
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { SchemeColors } from "@notesnook/theme";
 
 export const DEFAULT_COLORS = [
   "#e91e63",
@@ -139,7 +139,7 @@ export function ColorPicker(props: ColorPickerProps) {
                   p: 0,
                   borderRadius: 0,
                   fontSize: ["title", "title", "body"],
-                  color: "fontTertiary",
+                  color: "var(--paragraph-secondary)",
                   width: [75, 75, 65],
                   letterSpacing: 1.5,
                   textAlign: "center"
@@ -184,7 +184,6 @@ export function ColorPicker(props: ColorPickerProps) {
             {!deleteMode && (
               <PaletteButton
                 icon={Icons.colorClear}
-                iconColor="text"
                 onClick={onClear}
                 title="Clear color"
                 iconSize={15}
@@ -192,8 +191,8 @@ export function ColorPicker(props: ColorPickerProps) {
             )}
             <PaletteButton
               icon={Icons.delete}
-              iconColor={deleteMode ? "error" : "icon"}
-              bg={deleteMode ? "errorBg" : undefined}
+              iconColor={deleteMode ? "var(--icon-error)" : "icon"}
+              bg={deleteMode ? "var(--background-error)" : "transparent"}
               onClick={() => setDeleteMode((s) => !s)}
               title={
                 deleteMode
@@ -205,7 +204,7 @@ export function ColorPicker(props: ColorPickerProps) {
             {!deleteMode && (
               <PaletteButton
                 icon={Icons.palette}
-                iconColor={tColor.isDark() ? "static" : "icon"}
+                iconColor={tColor.isDark() ? "white" : "icon"}
                 onClick={() => setIsPickerOpen((s) => !s)}
                 title="Choose custom color"
                 iconSize={18}
@@ -218,7 +217,7 @@ export function ColorPicker(props: ColorPickerProps) {
                 title={deleteMode ? "Click to delete this color" : colorItem}
                 bg={colorItem}
                 iconSize={15}
-                iconColor={"static"}
+                iconColor={"white"}
                 icon={
                   deleteMode && colors.includes(colorItem)
                     ? Icons.close
@@ -253,7 +252,7 @@ export function ColorPicker(props: ColorPickerProps) {
 
 type PaletteButtonProps = ButtonProps & {
   icon?: string;
-  iconColor?: keyof SchemeColors;
+  iconColor?: SchemeColors;
   iconSize?: number;
   bg?: string;
 };
@@ -271,7 +270,11 @@ function PaletteButton(props: PaletteButtonProps) {
         p: 0,
         ml: [2, 2, 1],
         bg,
-        ":hover": { bg },
+        ":hover:not(:disabled):not(:active)": {
+          bg: bg?.startsWith("#")
+            ? tinycolor(bg).darken(5).toRgbString()
+            : "hover"
+        },
         ...sx
       }}
       {...restProps}

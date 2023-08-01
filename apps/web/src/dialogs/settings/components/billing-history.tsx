@@ -84,7 +84,13 @@ export function BillingHistory() {
       {isLoading ? (
         <Loading sx={{ mt: 2 }} />
       ) : error ? (
-        <Flex sx={{ bg: "errorBg", p: 1, borderRadius: "default" }}>
+        <Flex
+          sx={{
+            bg: "var(--background-error)",
+            p: 1,
+            borderRadius: "default"
+          }}
+        >
           <Text variant="error" sx={{ whiteSpace: "pre-wrap" }}>
             {error.message}
             <br />
@@ -102,7 +108,7 @@ export function BillingHistory() {
               as="tr"
               sx={{
                 height: 30,
-                th: { borderBottom: "1px solid var(--border)" }
+                th: { borderBottom: "1px solid var(--separator)" }
               }}
             >
               {[
@@ -157,7 +163,7 @@ export function BillingHistory() {
                     target="_blank"
                     rel="noreferer nofollow"
                     variant="text.subBody"
-                    sx={{ color: "primary" }}
+                    sx={{ color: "accent" }}
                   >
                     View receipt
                   </Link>

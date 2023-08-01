@@ -29,6 +29,8 @@ import * as clipboard from "clipboard-polyfill/text";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
 
+import { ErrorText } from "../components/error-text";
+
 const PLACEHOLDERS = {
   title: "Briefly describe what happened",
   body: `Tell us more about the issue you are facing.
@@ -119,10 +121,10 @@ function IssueDialog(props: IssueDialogProps) {
         />
         <Text
           variant="error"
-          bg={"warnBg"}
+          bg={"var(--background-error)"}
           mt={1}
           p={1}
-          sx={{ borderRadius: "default", color: "warn" }}
+          sx={{ borderRadius: "default" }}
         >
           Your bug report is public. Do NOT include sensitive information
           (email, passwords etc) in the issue title or description.
@@ -137,11 +139,7 @@ function IssueDialog(props: IssueDialogProps) {
               </>
             ))}
         </Text>
-        {error && (
-          <Text bg="errorBg" variant="error" mt={1} px={1}>
-            Error: {error}
-          </Text>
-        )}
+        <ErrorText error={error} />
       </Flex>
     </Dialog>
   );

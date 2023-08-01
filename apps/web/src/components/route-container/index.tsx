@@ -69,7 +69,6 @@ function Header(props: RouteContainerProps) {
               size={24}
               {...buttons.back}
               sx={{ flexShrink: 0, mr: 2, cursor: "pointer" }}
-              color="text"
               data-test-id="go-back"
             />
           ) : (
@@ -86,7 +85,7 @@ function Header(props: RouteContainerProps) {
             />
           )}
           {title && (
-            <Text variant="heading" data-test-id="routeHeader" color="text">
+            <Text variant="heading" data-test-id="routeHeader" color="heading">
               {title}
             </Text>
           )}
@@ -103,14 +102,15 @@ function Header(props: RouteContainerProps) {
           {!isMobile && buttons?.create && (
             <Plus
               data-test-id={`${type}-action-button`}
-              color="static"
+              color="white"
               size={18}
               sx={{
-                bg: "primary",
+                bg: "accent",
                 ml: 2,
                 borderRadius: 100,
                 size: 28,
-                ":hover": { boxShadow: "0px 0px 5px 0px var(--dimPrimary)" }
+                cursor: "pointer",
+                ":hover": { boxShadow: "0px 0px 5px 0px var(--accent)" }
               }}
               {...buttons.create}
             />

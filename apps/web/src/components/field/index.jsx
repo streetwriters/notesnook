@@ -93,7 +93,7 @@ function Field(props) {
           fontSize: "subtitle",
           fontWeight: "bold",
           fontFamily: "body",
-          color: "icon",
+          color: "paragraph",
           flexDirection: "column",
           ...styles.label
         }}
@@ -101,11 +101,10 @@ function Field(props) {
         {label}{" "}
         {helpText && (
           <Text
+            variant="subBody"
             as="span"
             sx={{
-              fontSize: "subBody",
               fontWeight: "normal",
-              color: "fontTertiary",
               ...styles.helpText
             }}
           >
@@ -134,9 +133,10 @@ function Field(props) {
           min={min}
           value={value}
           sx={{
+            flex: 1,
             ...styles.input,
             ":disabled": {
-              bg: "bgSecondary"
+              bg: "var(--background-secondary)"
             }
           }}
           onChange={(e) => {
@@ -211,7 +211,7 @@ function Field(props) {
               ) : (
                 <Cross color="error" size={14} />
               )}
-              <Text ml={1} sx={{ fontSize: "body", color: "text" }}>
+              <Text ml={1} sx={{ fontSize: "body", color: "paragraph" }}>
                 {rule.title}
               </Text>
             </Flex>

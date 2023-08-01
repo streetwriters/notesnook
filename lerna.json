@@ -2,5 +2,5 @@
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "useNx": true,
   "version": "independent",
-  "packages": ["packages/*", "apps/*", "extensions/*"]
+  "packages": ["packages/*", "apps/*", "extensions/*", "servers/*"]
 }

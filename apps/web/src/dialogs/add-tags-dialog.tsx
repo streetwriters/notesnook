@@ -179,10 +179,9 @@ function TagItem(props: {
         cursor: "pointer",
         justifyContent: "space-between",
         alignItems: "center",
-        bg: "bgSecondary",
+        bg: "var(--background-secondary)",
         borderRadius: "default",
-        p: 1,
-        background: "bgSecondary"
+        p: 1
       }}
       onClick={onSelect}
     >
@@ -192,7 +191,7 @@ function TagItem(props: {
           className="title"
           data-test-id="notebook-title"
           variant="subtitle"
-          sx={{ fontWeight: "body", color: "text" }}
+          sx={{ fontWeight: "body", color: "paragraph" }}
         >
           #{tag.title}
         </Text>
@@ -211,7 +210,7 @@ function SelectedCheck({
   size?: number;
 }) {
   return selected === "add" ? (
-    <CheckCircleOutline size={size} sx={{ mr: 1 }} color="primary" />
+    <CheckCircleOutline size={size} sx={{ mr: 1 }} color="accent" />
   ) : selected === "remove" ? (
     <CheckRemove size={size} sx={{ mr: 1 }} color="error" />
   ) : (

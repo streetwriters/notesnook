@@ -16,7 +16,44 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { SchemeColors, SchemeColorsAsCSSVariables } from "./theme-engine/types";
 
-export * from "./theme/accents";
-export * from "./themeprovider";
 export * from "./theme";
+export * from "./theme-engine";
+export * from "./theme-engine/types";
+export * from "./emotion";
+
+declare module "csstype" {
+  interface Properties {
+    backgroundColor?:
+      | Property.BackgroundColor
+      | SchemeColors
+      | SchemeColorsAsCSSVariables;
+    color?: Property.Color | SchemeColors | SchemeColorsAsCSSVariables;
+    accentColor?:
+      | Property.AccentColor
+      | SchemeColors
+      | SchemeColorsAsCSSVariables;
+
+    borderColor?:
+      | Property.BorderColor
+      | SchemeColors
+      | SchemeColorsAsCSSVariables;
+    borderBottomColor?:
+      | Property.BorderBottomColor
+      | SchemeColors
+      | SchemeColorsAsCSSVariables;
+    borderTopColor?:
+      | Property.BorderTopColor
+      | SchemeColors
+      | SchemeColorsAsCSSVariables;
+    borderLeftColor?:
+      | Property.BorderLeftColor
+      | SchemeColors
+      | SchemeColorsAsCSSVariables;
+    borderRightColor?:
+      | Property.BorderRightColor
+      | SchemeColors
+      | SchemeColorsAsCSSVariables;
+  }
+}

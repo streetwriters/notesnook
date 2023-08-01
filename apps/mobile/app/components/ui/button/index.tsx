@@ -17,22 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import {
   ActivityIndicator,
   ColorValue,
+  DimensionValue,
   TextStyle,
   View,
   ViewStyle
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { ColorKey, useThemeStore } from "../../../stores/use-theme-store";
 import { useUserStore } from "../../../stores/use-user-store";
-import { BUTTON_TYPES } from "../../../utils/constants";
 import { SIZE } from "../../../utils/size";
 import NativeTooltip from "../../../utils/tooltip";
 import { ProTag } from "../../premium/pro-tag";
-import { PressableButton, PressableButtonProps } from "../pressable";
+import { PressableButton, PressableButtonProps, useButton } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
 export interface ButtonProps extends PressableButtonProps {
@@ -69,8 +69,8 @@ export const Button = ({
   type = "transparent",
   iconSize = SIZE.md,
   style = {},
-  accentColor = "accent",
-  accentText = "light",
+  accentColor,
+  accentText = "#ffffff",
   onLongPress,
   tooltipText,
   textStyle,
@@ -79,19 +79,19 @@ export const Button = ({
   bold,
   iconColor,
   fwdRef,
-  iconStyle,
   proTag,
+  iconStyle,
   ...restProps
 }: ButtonProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const premium = useUserStore((state) => state.premium);
-  const textColor = buttonType?.text
-    ? buttonType.text
-    : (colors[
-        type === "accent"
-          ? (BUTTON_TYPES[type](accentColor, accentText).text as ColorKey)
-          : (BUTTON_TYPES[type].text as ColorKey)
-      ] as ColorValue);
+  const { text } = useButton({
+    type,
+    accent: accentColor,
+    text: accentText
+  });
+  const textColor = buttonType?.text ? buttonType.text : text;
+
   const Component = bold ? Heading : Paragraph;
 
   return (
@@ -118,7 +118,7 @@ export const Button = ({
       customAlpha={buttonType?.alpha}
       customStyle={{
         height: height,
-        width: width || undefined,
+        width: (width as DimensionValue) || undefined,
         paddingHorizontal: 12,
         borderRadius: 5,
         alignSelf: "center",
@@ -134,7 +134,7 @@ export const Button = ({
       {icon && !loading && iconPosition === "left" ? (
         <Icon
           name={icon}
-          style={[{ marginRight: 0 }, iconStyle]}
+          style={[{ marginRight: 0 }, iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
         />
@@ -163,14 +163,14 @@ export const Button = ({
             marginLeft: 10
           }}
         >
-          <ProTag size={10} width={40} background={colors.shade} />
+          <ProTag size={10} width={40} background={colors.primary.shade} />
         </View>
       ) : null}
 
       {icon && !loading && iconPosition === "right" ? (
         <Icon
           name={icon}
-          style={[{ marginLeft: 0 }, iconStyle]}
+          style={[{ marginLeft: 0 }, iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
         />

@@ -34,7 +34,8 @@ const scopes = {
   vericrypt: "apps/vericrypt",
   desktop: "apps/desktop",
   core: "packages/core",
-  editor: "packages/editor"
+  editor: "packages/editor",
+  themes: "servers/themes"
 };
 
 if (args.scope && !scopes[args.scope])
@@ -47,10 +48,10 @@ if (IS_BOOTSTRAP_ALL) {
     await new fdir()
       .onlyDirs()
       .withMaxDepth(2)
-      .glob("packages/**", "apps/**", "extensions/**")
+      .glob("packages/**", "apps/**", "extensions/**", "servers/**")
       .crawl(".")
       .withPromise()
-  ).slice(3);
+  ).slice(4);
 
   const dependencies = Array.from(
     new Set(

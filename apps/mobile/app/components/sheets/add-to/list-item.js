@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../../common/database";
 import { useSelectionStore } from "../../../stores/use-selection-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
 import { IconButton } from "../../ui/icon-button";
 import { PressableButton } from "../../ui/pressable";
@@ -44,7 +44,7 @@ const SelectionIndicator = ({
   const isSelected = itemState === "selected";
   const isIntermediate = itemState === "intermediate";
   const isRemoved = !isSelected && hasNotes;
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors("sheet");
 
   useEffect(() => {
     onChange?.();
@@ -61,10 +61,10 @@ const SelectionIndicator = ({
       }}
       color={
         isRemoved
-          ? colors.red
+          ? colors.static.red
           : isIntermediate || isSelected
-          ? colors.accent
-          : colors.icon
+          ? colors.selected.icon
+          : colors.primary.icon
       }
       onPress={() => {
         if (multiSelect) return selectItem();
@@ -119,7 +119,7 @@ export const ListItem = ({
   const { toggleSelection } = useSelectionContext();
   const multiSelect = useItemSelectionStore((state) => state.multiSelect);
   const [showSelectedIndicator, setShowSelectedIndicator] = useState(false);
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors("sheet");
   const [expanded, setExpanded] = useState(false);
 
   function selectItem() {
@@ -209,7 +209,7 @@ export const ListItem = ({
               )}
 
               {infoText ? (
-                <Paragraph size={SIZE.xs} color={colors.icon}>
+                <Paragraph size={SIZE.xs} color={colors.primary.icon}>
                   {infoText}
                 </Paragraph>
               ) : null}
@@ -225,7 +225,7 @@ export const ListItem = ({
             {showSelectedIndicator ? (
               <View
                 style={{
-                  backgroundColor: colors.accent,
+                  backgroundColor: colors.primary.accent,
                   width: 7,
                   height: 7,
                   borderRadius: 100,
@@ -238,7 +238,7 @@ export const ListItem = ({
               <IconButton
                 name={"plus"}
                 testID="add-item-icon"
-                color={colors.pri}
+                color={colors.primary.paragraph}
                 size={SIZE.xl}
                 onPress={() => {
                   onAddSublistItem(item);

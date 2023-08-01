@@ -23,12 +23,12 @@ import { DDS } from "../../services/device-detection";
 import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { tabBarRef } from "../../utils/global-refs";
 import { IconButton } from "../ui/icon-button";
 
 export const LeftMenus = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const canGoBack = useNavigationStore((state) => state.canGoBack);
   const isTablet = deviceMode === "tablet";
@@ -61,17 +61,17 @@ export const LeftMenus = () => {
         width: 40,
         borderRadius: 100,
         marginLeft: -5,
-        marginRight: DDS.isLargeTablet() ? 10 : 25
+        marginRight: DDS.isLargeTablet() ? 10 : 7
       }}
       left={40}
       top={40}
-      right={DDS.isLargeTablet() ? 10 : 25}
+      right={DDS.isLargeTablet() ? 10 : 10}
       onPress={onLeftButtonPress}
       onLongPress={() => {
         Navigation.popToTop();
       }}
       name={canGoBack ? "arrow-left" : "menu"}
-      color={colors.pri}
+      color={colors.primary.paragraph}
       iconStyle={{
         marginLeft: canGoBack ? -5 : 0
       }}

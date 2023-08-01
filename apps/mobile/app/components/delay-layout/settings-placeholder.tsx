@@ -19,10 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 
 export const SettingsPlaceholder = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   return (
     <View>
@@ -30,7 +30,7 @@ export const SettingsPlaceholder = () => {
         style={{
           width: 100,
           height: 12,
-          backgroundColor: colors.shade,
+          backgroundColor: colors.primary.shade,
           borderRadius: 5,
           marginLeft: 12,
           marginBottom: 12
@@ -51,7 +51,7 @@ export const SettingsPlaceholder = () => {
           style={{
             width: 40,
             height: 40,
-            backgroundColor: colors.transGray,
+            backgroundColor: colors.primary.hover,
             borderRadius: 100,
             marginRight: 20
           }}
@@ -61,7 +61,7 @@ export const SettingsPlaceholder = () => {
             style={{
               width: 150,
               height: 12,
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginBottom: 10
             }}
@@ -70,7 +70,7 @@ export const SettingsPlaceholder = () => {
             style={{
               width: 250,
               height: 16,
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5
             }}
           />
@@ -93,7 +93,7 @@ export const SettingsPlaceholder = () => {
           style={{
             width: 40,
             height: 40,
-            backgroundColor: colors.shade,
+            backgroundColor: colors.primary.shade,
             borderRadius: 100,
             marginRight: 20
           }}
@@ -103,7 +103,7 @@ export const SettingsPlaceholder = () => {
             style={{
               width: 150,
               height: 12,
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginBottom: 10
             }}
@@ -112,7 +112,7 @@ export const SettingsPlaceholder = () => {
             style={{
               width: 250,
               height: 16,
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5
             }}
           />
@@ -122,7 +122,7 @@ export const SettingsPlaceholder = () => {
           style={{
             width: 40,
             height: 20,
-            backgroundColor: colors.nav,
+            backgroundColor: colors.secondary.background,
             borderRadius: 100,
             marginLeft: 15,
             alignItems: "flex-end",
@@ -134,7 +134,7 @@ export const SettingsPlaceholder = () => {
             style={{
               width: 15,
               height: 15,
-              backgroundColor: colors.shade,
+              backgroundColor: colors.primary.shade,
               borderRadius: 100,
               marginLeft: 15
             }}

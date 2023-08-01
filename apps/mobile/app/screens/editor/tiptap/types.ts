@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEditor } from "./use-editor";
 import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
-import { ThemeStore } from "../../../stores/use-theme-store";
 import { NoteType } from "../../../utils/types";
+import { useEditor } from "./use-editor";
 export type useEditorType = ReturnType<typeof useEditor>;
 
 export type EditorState = {
@@ -63,7 +62,6 @@ export type EditorProps = {
   editorId?: string;
   onLoad?: () => void;
   onChange?: (html: string) => void;
-  theme?: ThemeStore["colors"];
 };
 
 export type EditorMessage = {

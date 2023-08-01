@@ -59,7 +59,7 @@ import {
 } from "../services/event-manager";
 import { useEditorStore } from "../stores/use-editor-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { useThemeStore } from "../stores/use-theme-store";
+import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -71,7 +71,7 @@ import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
 
 const _TabsHolder = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors, isDark } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const setFullscreen = useSettingStore((state) => state.setFullscreen);
   const fullscreen = useSettingStore((state) => state.fullscreen);
@@ -384,8 +384,8 @@ const _TabsHolder = () => {
   }, []);
 
   useEffect(() => {
-    changeNavigationBarColor(colors.bg, !colors.night, true);
-  }, [colors.night, colors.bg]);
+    changeNavigationBarColor(colors.primary.background, isDark, true);
+  }, [colors.primary.background, isDark]);
 
   return (
     <View
@@ -394,7 +394,7 @@ const _TabsHolder = () => {
       style={{
         height: "100%",
         width: "100%",
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         paddingBottom: Platform.OS === "android" ? insets?.bottom : 0,
         marginRight:
           orientation === "LANDSCAPE-RIGHT" && Platform.OS === "ios"
@@ -407,7 +407,7 @@ const _TabsHolder = () => {
       }}
     >
       <StatusBar
-        barStyle={colors.night ? "light-content" : "dark-content"}
+        barStyle={isDark ? "light-content" : "dark-content"}
         translucent={true}
         backgroundColor="transparent"
       />
@@ -433,7 +433,9 @@ const _TabsHolder = () => {
                   width: fullscreen ? 0 : widths[deviceMode]?.a
                 }}
               >
-                <SideMenu />
+                <ScopedThemeProvider value="navigationMenu">
+                  <SideMenu />
+                </ScopedThemeProvider>
               </View>
 
               <View
@@ -443,31 +445,35 @@ const _TabsHolder = () => {
                   width: fullscreen ? 0 : widths[deviceMode]?.b
                 }}
               >
-                {deviceMode === "mobile" ? (
-                  <Animated.View
-                    onTouchEnd={() => {
-                      tabBarRef.current?.closeDrawer();
-                      animatedOpacity.value = withTiming(0);
-                      animatedTranslateY.value = withTiming(-9999);
-                    }}
-                    style={[
-                      {
-                        position: "absolute",
-                        width: "100%",
-                        height: "100%",
-                        zIndex: 999,
-                        backgroundColor: "rgba(0,0,0,0.2)"
-                      },
-                      animatedStyle
-                    ]}
-                    ref={overlayRef}
-                  />
-                ) : null}
+                <ScopedThemeProvider value="list">
+                  {deviceMode === "mobile" ? (
+                    <Animated.View
+                      onTouchEnd={() => {
+                        tabBarRef.current?.closeDrawer();
+                        animatedOpacity.value = withTiming(0);
+                        animatedTranslateY.value = withTiming(-9999);
+                      }}
+                      style={[
+                        {
+                          position: "absolute",
+                          width: "100%",
+                          height: "100%",
+                          zIndex: 999,
+                          backgroundColor: colors.primary.backdrop
+                        },
+                        animatedStyle
+                      ]}
+                      ref={overlayRef}
+                    />
+                  ) : null}
 
-                <NavigationStack />
+                  <NavigationStack />
+                </ScopedThemeProvider>
               </View>
 
-              <EditorWrapper key="3" width={widths} dimensions={dimensions} />
+              <ScopedThemeProvider value="editor">
+                <EditorWrapper key="3" width={widths} dimensions={dimensions} />
+              </ScopedThemeProvider>
             </FluidTabs>
           ) : null}
         </>
@@ -476,8 +482,6 @@ const _TabsHolder = () => {
   );
 };
 export const TabHolder = React.memo(_TabsHolder, () => true);
-
-let layoutTimer = null;
 
 const onChangeTab = async (obj) => {
   if (obj.i === 2) {

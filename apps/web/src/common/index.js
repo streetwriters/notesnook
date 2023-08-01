@@ -27,12 +27,11 @@ import Config from "../utils/config";
 import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
 import { sanitizeFilename } from "@notesnook/common";
-
 import { store as userstore } from "../stores/user-store";
 import FileSaver from "file-saver";
 import { showToast } from "../utils/toast";
 import { SUBSCRIPTION_STATUS } from "./constants";
-import { showFilePicker } from "../components/editor/picker";
+import { showFilePicker } from "../utils/file-picker";
 import { logger } from "../utils/logger";
 import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";

@@ -22,13 +22,13 @@ import Input from "../../components/ui/input";
 import React from "react";
 import { TextInput } from "react-native";
 import Paragraph from "../../components/ui/typography/paragraph";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 
 export const TitleFormat = () => {
   const [titleFormat] = useState(db.settings?.getTitleFormat());
   const inputRef = useRef<TextInput>();
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   return (
     <>
@@ -48,7 +48,11 @@ export const TitleFormat = () => {
         defaultValue={titleFormat}
       />
 
-      <Paragraph style={{ marginTop: 2 }} color={colors.icon} size={SIZE.xs}>
+      <Paragraph
+        style={{ marginTop: 2 }}
+        color={colors.secondary.paragraph}
+        size={SIZE.xs}
+      >
         Use the following key to format the title:{"\n"}
         {"\n"}
         $date$: Current date.{"\n"}

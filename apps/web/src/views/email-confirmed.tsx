@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "../app.css";
 import { useEffect } from "react";
 import { Flex, Text } from "@theme-ui/components";
-import ThemeProvider from "../components/theme-provider";
+import { BaseThemeProvider } from "../components/theme-provider";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { useQueryParams } from "../navigation";
 import { MailCheck, Discord, Twitter, Reddit } from "../components/icons";
@@ -32,74 +32,74 @@ function EmailConfirmed() {
   }, [userId]);
 
   return (
-    <ThemeProvider>
+    <BaseThemeProvider
+      addGlobalStyles
+      sx={{
+        display: "flex",
+        bg: "background",
+        flexDirection: "column",
+        fontSize: [14, 16, 18],
+        height: "100%",
+        overflowY: "auto"
+      }}
+    >
       <Flex
-        bg="background"
         sx={{
+          flex: 1,
           flexDirection: "column",
-          fontSize: [14, 16, 18],
-          height: "100%",
-          overflowY: "auto"
+          alignItems: "center",
+          justifyContent: "center"
         }}
       >
-        <Flex
+        <MailCheck
+          sx={{ bg: "shade", borderRadius: 100, p: 5 }}
+          size={72}
+          color="accent"
+        />
+        <Text
+          variant="heading"
+          mt={5}
           sx={{
-            flex: 1,
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center"
+            fontSize: "2.5em",
+            textAlign: "center",
+            fontWeight: "heading"
           }}
         >
-          <MailCheck
-            sx={{ bg: "shade", borderRadius: 100, p: 5 }}
-            size={72}
-            color="primary"
-          />
-          <Text
-            variant="heading"
-            mt={5}
-            sx={{
-              fontSize: "2.5em",
-              textAlign: "center",
-              fontWeight: "heading"
-            }}
-          >
-            Huzzah!
-          </Text>
-          <Text
-            variant="heading"
-            mt={2}
-            sx={{
-              fontSize: "1.5em",
-              textAlign: "center",
-              fontWeight: "bold",
-              color: "icon"
-            }}
-          >
-            Your email has been confirmed.
-          </Text>
-          <Text
-            variant="body"
-            mt={2}
-            sx={{
-              wordWrap: "break-word",
-              fontSize: "1.2em",
-              textAlign: "center",
-              color: "fontTertiary"
-            }}
-          >
-            Thank you for choosing end-to-end encrypted note taking.
-          </Text>
-        </Flex>
-        <Flex
-          bg="bgSecondary"
-          p={5}
-          sx={{ flexDirection: "column", justifyContent: "center" }}
+          Huzzah!
+        </Text>
+        <Text
+          variant="heading"
+          mt={2}
+          sx={{
+            fontSize: "1.5em",
+            textAlign: "center",
+            fontWeight: "bold",
+            color: "icon"
+          }}
         >
-          <BlogPromoBanner />
-        </Flex>
+          Your email has been confirmed.
+        </Text>
+        <Text
+          variant="body"
+          mt={2}
+          sx={{
+            wordWrap: "break-word",
+            fontSize: "1.2em",
+            textAlign: "center",
+            color: "var(--paragraph-secondary)"
+          }}
+        >
+          Thank you for choosing end-to-end encrypted note taking.
+        </Text>
       </Flex>
-    </ThemeProvider>
+      <Flex
+        bg="var(--background-secondary)"
+        p={5}
+        sx={{ flexDirection: "column", justifyContent: "center" }}
+      >
+        <BlogPromoBanner />
+      </Flex>
+    </BaseThemeProvider>
   );
 }
 export default EmailConfirmed;
@@ -143,7 +143,7 @@ function BlogPromoBanner() {
           wordWrap: "break-word",
           fontSize: "1em",
           textAlign: "center",
-          color: "fontTertiary"
+          color: "paragraph"
         }}
       >
         {`Because where's the fun in nookin' alone?`}
@@ -168,11 +168,11 @@ function BlogPromoBanner() {
         sx={{
           wordWrap: "break-word",
           textAlign: "center",
-          color: "fontTertiary"
+          color: "paragraph"
         }}
       >
         Use{" "}
-        <Text as="span" sx={{ fontWeight: "bold", color: "primary" }}>
+        <Text as="span" sx={{ fontWeight: "bold", color: "accent" }}>
           #notesnook
         </Text>{" "}
         and get a chance to win free promo codes.

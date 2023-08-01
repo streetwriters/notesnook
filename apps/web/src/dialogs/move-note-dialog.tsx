@@ -266,7 +266,7 @@ function NotebookItem(props: {
             cursor: "pointer",
             justifyContent: "space-between",
             alignItems: "center",
-            bg: "bgSecondary",
+            bg: "var(--background-secondary)",
             borderRadius: "default",
             p: 1,
             height: "40px"
@@ -306,7 +306,7 @@ function NotebookItem(props: {
           <Flex data-test-id="notebook-tools" sx={{ alignItems: "center" }}>
             <TopicSelectionIndicator notebook={notebook} />
             <Button
-              variant="tool"
+              variant="secondary"
               className="create-topic"
               data-test-id="create-topic"
               sx={{ display: "none", p: 1 }}
@@ -354,7 +354,7 @@ function NotebookItem(props: {
                 data-test-id={`new-topic-input`}
                 autoFocus
                 sx={{
-                  bg: "bgSecondary",
+                  bg: "var(--background-secondary)",
                   p: "small",
                   border: "1px solid var(--border)"
                 }}
@@ -387,7 +387,7 @@ function TopicSelectionIndicator({ notebook }: { notebook: Notebook }) {
   );
 
   if (!hasSelectedTopics) return null;
-  return <Circle size={8} color="primary" sx={{ mr: 1 }} />;
+  return <Circle size={8} color="accent" sx={{ mr: 1 }} />;
 }
 
 function TopicItem(props: { topic: Topic }) {
@@ -447,9 +447,13 @@ function SelectedCheck({
     selectedItem?.op === "remove" ? "remove" : selectedItem?.op === "add";
 
   return selected === true ? (
-    <CheckCircleOutline size={size} sx={{ mr: 1 }} color="primary" />
+    <CheckCircleOutline size={size} sx={{ mr: 1 }} color="accent" />
   ) : selected === null ? (
-    <CheckIntermediate size={size} sx={{ mr: 1 }} color="dimPrimary" />
+    <CheckIntermediate
+      size={size}
+      sx={{ mr: 1 }}
+      color="var(--accent-secondary)"
+    />
   ) : selected === "remove" ? (
     <CheckRemove size={size} sx={{ mr: 1 }} color="error" />
   ) : (

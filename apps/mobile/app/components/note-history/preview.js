@@ -27,7 +27,7 @@ import { eSendEvent, ToastEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useEditorStore } from "../../stores/use-editor-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useTrashStore } from "../../stores/use-trash-store";
 import { eCloseSheet, eOnLoadNote } from "../../utils/events";
 import { sleep } from "../../utils/time";
@@ -38,7 +38,7 @@ import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
 
 export default function NotePreview({ session, content, note }) {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const editorId = ":noteHistory";
 
   async function restore() {
@@ -137,7 +137,7 @@ export default function NotePreview({ session, content, note }) {
             alignItems: "center"
           }}
         >
-          <Paragraph color={colors.icon}>
+          <Paragraph color={colors.secondary.paragraph}>
             Preview not available, content is encrypted.
           </Paragraph>
         </View>

@@ -249,7 +249,7 @@ export function Main() {
           >
             <Flex>
               <Icon path={item.icon} color="icon" size={16} />
-              <Text variant="text" sx={{ ml: 1 }}>
+              <Text variant="body" sx={{ ml: 1 }}>
                 {item.name}
               </Text>
             </Flex>
@@ -257,7 +257,6 @@ export function Main() {
             {clipArea === item.id && (
               <Icon
                 path={isClipping ? Icons.loading : Icons.check}
-                color="text"
                 size={16}
                 rotate={isClipping}
               />
@@ -292,7 +291,7 @@ export function Main() {
           >
             <Flex>
               <Icon path={item.icon} color="icon" size={16} />
-              <Text variant="text" sx={{ ml: 1 }}>
+              <Text variant="body" sx={{ ml: 1 }}>
                 {item.name}
               </Text>
             </Flex>
@@ -300,7 +299,6 @@ export function Main() {
             {clipMode === item.id && (
               <Icon
                 path={isClipping ? Icons.loading : Icons.check}
-                color="text"
                 size={16}
                 rotate={isClipping}
               />
@@ -314,9 +312,9 @@ export function Main() {
             sx={{
               mt: 1,
               bg: "shade",
-              color: "primary",
+              color: "accent",
               p: 1,
-              border: "1px solid var(--primary)",
+              border: "1px solid var(--accent)",
               borderRadius: "default",
               cursor: "pointer",
               ":hover": {
@@ -342,10 +340,10 @@ export function Main() {
             variant="body"
             sx={{
               mt: 1,
-              bg: "errorBg",
-              color: "error",
+              bg: "var(--background-error)",
+              color: "var(--paragraph-error)",
               p: 1,
-              border: "1px solid var(--error)",
+              border: "1px solid var(--border-error)",
               borderRadius: "default",
               cursor: "pointer",
               ":hover": {
@@ -358,9 +356,7 @@ export function Main() {
           >
             {ERROR_MAP[error] || error}
             <br />
-            <Text sx={{ fontSize: 11, color: "error" }}>
-              Click here to try again.
-            </Text>
+            Click here to retry.
           </Text>
         )}
 
@@ -396,6 +392,7 @@ export function Main() {
           </>
         )}
         <Button
+          variant="accent"
           sx={{ mt: 1 }}
           disabled={!clipData}
           onClick={async () => {
@@ -431,7 +428,7 @@ export function Main() {
             window.close();
           }}
         >
-          <Text variant="text">Save clip</Text>
+          <Text variant="body">Save clip</Text>
         </Button>
 
         <Flex
@@ -449,7 +446,7 @@ export function Main() {
               navigate("/settings");
             }}
           >
-            <Icon path={Icons.settings} color="text" size={16} />
+            <Icon path={Icons.settings} size={16} />
           </Button>
         </Flex>
       </Flex>

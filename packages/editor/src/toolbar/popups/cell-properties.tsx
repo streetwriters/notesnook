@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Editor } from "../../types";
 import { Box } from "@theme-ui/components";
 import { Tab, Tabs } from "../../components/tabs";
-import { Icon } from "../components/icon";
+import { Icon } from "@notesnook/ui";
 // import { MenuPresenter } from "../../components/menu/menu";
 import { Popup } from "../components/popup";
 import { Icons } from "../icons";

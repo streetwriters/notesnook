@@ -26,12 +26,12 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { ProgressBarComponent } from "../ui/svg/lazy";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { FlatList } from "react-native-actions-sheet";
 import { AttachmentItem } from "./attachment-item";
 
 const DownloadAttachments = ({ close, attachments, isNote, update }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [downloading, setDownloading] = useState(false);
   const [progress, setProgress] = useState({
     value: 0,
@@ -158,8 +158,8 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
             animated={true}
             useNativeDriver
             progress={progress.value ? progress.value / attachments.length : 0}
-            unfilledColor={colors.nav}
-            color={colors.accent}
+            unfilledColor={colors.secondary.background}
+            color={colors.primary.accent}
             borderWidth={0}
           />
         </View>
@@ -170,7 +170,7 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
           maxHeight: 300,
           width: "100%",
           minHeight: 60,
-          backgroundColor: colors.nav,
+          backgroundColor: colors.secondary.background,
           borderRadius: 5,
           marginVertical: 12
         }}
@@ -184,7 +184,9 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
               height: 60
             }}
           >
-            <Paragraph color={colors.icon}>No downloads in progress.</Paragraph>
+            <Paragraph color={colors.secondary.paragraph}>
+              No downloads in progress.
+            </Paragraph>
           </View>
         }
         keyExtractor={(item) => item.id}

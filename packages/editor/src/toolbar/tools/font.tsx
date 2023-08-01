@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ToolProps } from "../types";
 import { Editor } from "../../types";
 import { Dropdown } from "../components/dropdown";
-import { MenuItem } from "../../components/menu/types";
+import { MenuItem } from "@notesnook/ui";
 import { useCallback, useMemo } from "react";
 import { Counter } from "../components/counter";
 import { useRefValue } from "../../hooks/use-ref-value";
@@ -108,7 +108,9 @@ function toMenuItems(editor: Editor, currentFontFamily: string): MenuItem[] {
       onClick: () =>
         editor.current?.chain().focus().setFontFamily(font.id).run(),
       styles: {
-        fontFamily: font.font
+        title: {
+          fontFamily: font.font
+        }
       }
     });
   }

@@ -32,19 +32,27 @@ export function CheckListItem(props: CheckListItemProps) {
   const { title, onSelected, isSelected, indentLevel = 0 } = props;
   return (
     <Button
-      variant="list"
       onClick={onSelected}
       sx={{
         display: "flex",
         alignItems: "center",
         py: 1,
         px: 1,
-        ml: indentLevel * 2
+        ml: indentLevel * 2,
+
+        color: "paragraph",
+        bg: "transparent",
+        borderBottom: "1px solid",
+        borderBottomColor: "border",
+        borderRadius: 0,
+        ":hover:not(:disabled)": {
+          borderBottomColor: "accent"
+        }
       }}
     >
       <Icon
         path={isSelected ? Icons.checkCircle : Icons.circle}
-        color={isSelected ? "primary" : "text"}
+        color={isSelected ? "accent" : "paragraph"}
         size={16}
       />
       <Text
@@ -52,7 +60,7 @@ export function CheckListItem(props: CheckListItemProps) {
           fontSize: "13px",
           ml: 1,
           fontWeight: 400,
-          color: "text"
+          color: "paragraph"
         }}
       >
         {title}

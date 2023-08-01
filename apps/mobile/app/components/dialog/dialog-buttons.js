@@ -21,7 +21,7 @@ import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
@@ -35,14 +35,14 @@ const DialogButtons = ({
   doneText,
   positiveType
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   return (
     <View
       style={[
         styles.container,
         {
-          backgroundColor: colors.nav,
+          backgroundColor: colors.secondary.background,
           height: 60,
           borderBottomRightRadius: 10,
           borderBottomLeftRadius: 10,
@@ -51,7 +51,7 @@ const DialogButtons = ({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={colors.accent} size={SIZE.lg} />
+        <ActivityIndicator color={colors.primary.accent} size={SIZE.lg} />
       ) : doneText ? (
         <View
           style={{
@@ -60,11 +60,11 @@ const DialogButtons = ({
           }}
         >
           <Icon
-            color={colors.accent}
+            color={colors.primary.accent}
             name="check-circle-outline"
             size={SIZE.md}
           />
-          <Paragraph color={colors.accent}>{" " + doneText}</Paragraph>
+          <Paragraph color={colors.primary.accent}>{" " + doneText}</Paragraph>
         </View>
       ) : (
         <View />

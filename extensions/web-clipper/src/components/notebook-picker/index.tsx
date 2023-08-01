@@ -82,7 +82,7 @@ export const NotebookPicker = (props: NotebookPickerProps) => {
         <InlineTag
           title={selectedItems.length ? "Add more" : "Add to notebook"}
           icon={Icons.plus}
-          iconColor="primary"
+          iconColor="accent"
           onClick={open}
         />
       </Flex>

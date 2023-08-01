@@ -71,7 +71,7 @@ class PremiumDialog extends React.Component {
       <BaseDialog
         animation="slide"
         bounce={false}
-        background={this.props.colors.bg}
+        background={this.props.colors.primary.background}
         onRequestClose={this.onClose}
       >
         <Component

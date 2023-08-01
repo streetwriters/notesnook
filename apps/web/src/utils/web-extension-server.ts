@@ -25,19 +25,19 @@ import {
   Clip
 } from "@notesnook/web-clipper/dist/common/bridge";
 import { isUserPremium } from "../hooks/use-is-user-premium";
-import { store as themestore } from "../stores/theme-store";
 import { store as appstore } from "../stores/app-store";
 import { h } from "./html";
 import { sanitizeFilename } from "@notesnook/common";
 import { attachFile } from "../components/editor/picker";
 import { getFormattedDate } from "@notesnook/common";
+import { getTheme } from "../hooks/use-theme";
 
 export class WebExtensionServer implements Server {
   async login() {
     const user = await db.user?.getUser();
-    const { theme, accent } = themestore.get();
-    if (!user) return { pro: false, theme, accent };
-    return { email: user.email, pro: isUserPremium(user), theme, accent };
+    const theme = getTheme();
+    if (!user) return { pro: false, theme };
+    return { email: user.email, pro: isUserPremium(user), theme };
   }
 
   async getNotes(): Promise<ItemReference[] | undefined> {

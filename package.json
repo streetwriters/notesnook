@@ -26,6 +26,8 @@
     "start:metro": "nx start @notesnook/mobile",
     "start:repack": "nx repack @notesnook/mobile",
     "start:editor-mobile": "nx start @notesnook/editor-mobile",
+    "start:editor": "nx start @notesnook/editor",
+    "start:server:themes": "nx start @notesnook/themes-server",
     "prettier": "npx prettier . --write",
     "lint": "npx eslint ./apps/ ./packages/",
     "linc": "npx eslint ./apps/ ./packages/ --cache"
@@ -57,7 +59,7 @@
     "nx": "^16.3.2",
     "patch-package": "^7.0.0",
     "rxjs": "^7.8.1",
-    "typescript": "^5.1.3",
+    "typescript": "5.1.3",
     "yargs-parser": "^21.1.1"
   },
   "license": "GPL-3.0-or-later",

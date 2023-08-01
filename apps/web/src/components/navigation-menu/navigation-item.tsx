@@ -22,13 +22,14 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { Menu } from "../../hooks/use-menu";
 import useMobile from "../../hooks/use-mobile";
 import { PropsWithChildren } from "react";
-import { Theme } from "@notesnook/theme";
 import { Icon, Shortcut } from "../icons";
 import { AnimatedFlex } from "../animated";
+import { SchemeColors, createButtonVariant } from "@notesnook/theme";
+import { MenuItem } from "@notesnook/ui";
 
 type NavigationItemProps = {
   icon: Icon;
-  color?: keyof Theme["colors"];
+  color?: SchemeColors;
   title: string;
   isTablet?: boolean;
   isLoading?: boolean;
@@ -39,8 +40,7 @@ type NavigationItemProps = {
   count?: number;
   animate?: boolean;
   index?: number;
-  // TODO: add proper typings here
-  menuItems?: any[];
+  menuItems?: MenuItem[];
 };
 
 function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
@@ -75,24 +75,32 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
         x: 0
       }}
       transition={{ duration: 0.1, delay: index * 0.05, ease: "easeIn" }}
-      bg={selected ? "bgSecondaryHover" : "transparent"}
       sx={{
+        ...createButtonVariant(
+          selected ? "background-selected" : "transparent",
+          "transparent",
+          {
+            hover: {
+              bg: selected ? "hover-selected" : "hover"
+            }
+          }
+        ),
         borderRadius: "default",
         mx: 1,
+        p: 0,
         mt: isTablet ? 1 : "3px",
         alignItems: "center",
         position: "relative",
         ":first-of-type": { mt: 1 },
-        ":last-of-type": { mb: 1 },
-        ":hover:not(:disabled)": {
-          bg: "bgSecondaryHover",
-          filter: "brightness(100%)"
-        }
+        ":last-of-type": { mb: 1 }
+        // ":hover:not(:disabled)": {
+        //   bg: "hover",
+        //   filter: "brightness(100%)"
+        // }
       }}
     >
       <Button
         data-test-id={`navigation-item`}
-        bg={"transparent"}
         sx={{
           px: 2,
           flex: 1,
@@ -113,7 +121,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
       >
         <Icon
           size={isTablet ? 16 : 15}
-          color={color || (selected ? "primary" : "icon")}
+          color={color || (selected ? "icon-selected" : "icon")}
           rotate={isLoading}
         />
         {isShortcut && (
@@ -132,6 +140,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
             overflow: "hidden",
             textOverflow: "ellipsis",
             fontWeight: selected ? "bold" : "normal",
+            color: selected ? "paragraph-selected" : "paragraph",
             fontSize: "subtitle",
             display: isTablet ? "none" : "block"
           }}
@@ -144,6 +153,8 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
               variant="subBody"
               as="span"
               sx={{
+                bg: "accent",
+                color: "white",
                 ml: 1,
                 px: "small",
                 borderRadius: "default"

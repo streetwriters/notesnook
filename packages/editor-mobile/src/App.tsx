@@ -17,11 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ScopedThemeProvider } from "@notesnook/theme";
 import "./App.css";
 import Tiptap from "./components/editor";
+import { EmotionEditorTheme } from "./theme-factory";
 
 function App(): JSX.Element {
-  return <Tiptap />;
+  return (
+    <ScopedThemeProvider value="base">
+      <EmotionEditorTheme>
+        <Tiptap />
+      </EmotionEditorTheme>
+    </ScopedThemeProvider>
+  );
 }
 
 export default App;

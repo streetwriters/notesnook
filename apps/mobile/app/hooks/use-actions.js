@@ -48,10 +48,10 @@ import useNavigationStore from "../stores/use-navigation-store";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useTagStore } from "../stores/use-tag-store";
-import { useThemeStore } from "../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../stores/use-user-store";
 import { convertNoteToText } from "../utils/note-to-text";
-import { toggleDarkMode } from "../utils/color-scheme/utils";
+import { toggleDarkMode } from "../utils/colors";
 import {
   eOnTopicSheetUpdate,
   eOpenAddTopicDialog,
@@ -61,7 +61,7 @@ import { deleteItems } from "../utils/functions";
 import { sleep } from "../utils/time";
 
 export const useActions = ({ close = () => null, item }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors, isDark } = useThemeColors();
   const clearSelection = useSelectionStore((state) => state.clearSelection);
   const setSelectedItem = useSelectionStore((state) => state.setSelectedItem);
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
@@ -751,7 +751,7 @@ export const useActions = ({ close = () => null, item }) => {
       icon: "theme-light-dark",
       func: switchTheme,
       switch: true,
-      on: colors.night ? true : false,
+      on: isDark ? true : false,
       close: false,
       pro: true
     },

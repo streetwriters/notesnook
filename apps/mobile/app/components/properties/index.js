@@ -23,26 +23,25 @@ import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { presentSheet } from "../../services/event-manager";
 import SearchService from "../../services/search";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { COLORS_NOTE } from "../../utils/color-scheme";
+import { useThemeColors } from "@notesnook/theme";
+import { ColorValues } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
 import { ReminderTime } from "../ui/reminder-time";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { DateMeta } from "./date-meta";
-import { DevMode } from "./dev-mode";
 import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { Tags, TagStrip } from "./tags";
 const Line = ({ top = 6, bottom = 6 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   return (
     <View
       style={{
         height: 1,
-        backgroundColor: colors.nav,
+        backgroundColor: colors.primary.border,
         width: "100%",
         marginTop: top,
         marginBottom: bottom
@@ -52,9 +51,9 @@ const Line = ({ top = 6, bottom = 6 }) => {
 };
 
 export const Properties = ({ close = () => {}, item, buttons = [] }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const alias = item.alias || item.title;
-  const isColor = !!COLORS_NOTE[item.title];
+  const isColor = !!ColorValues[item.title];
 
   if (!item || !item.id) {
     return (
@@ -68,7 +67,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
       keyboardShouldPersistTaps="always"
       keyboardDismissMode="none"
       style={{
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
         maxHeight: "100%"
@@ -81,12 +80,13 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
             style={{
               paddingHorizontal: 12,
               marginTop: 5,
-              zIndex: 10
+              zIndex: 10,
+              marginBottom: 6
             }}
           >
             <Heading size={SIZE.lg}>
               {item.type === "tag" && !isColor ? (
-                <Heading size={SIZE.xl} color={colors.accent}>
+                <Heading size={SIZE.xl} color={colors.primary.accent}>
                   #
                 </Heading>
               ) : null}
@@ -112,7 +112,6 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
               />
             ) : null}
           </View>
-          <Line top={12} />
 
           <DateMeta item={item} />
           <Line bottom={0} />
@@ -137,7 +136,6 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
             }}
           />
           <Synced item={item} close={close} />
-          <DevMode item={item} />
 
           {DDS.isTab ? (
             <View

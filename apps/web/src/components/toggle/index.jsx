@@ -60,8 +60,8 @@ function Toggle(props) {
         opacity: disabled ? 0.7 : 1,
         cursor: "pointer",
         borderBottom: "1px solid",
-        borderBottomColor: "border",
-        ":hover": { borderBottomColor: "primary" },
+        borderBottomColor: "separator",
+        ":hover": { borderBottomColor: "accent" },
         alignItems: "center",
         justifyContent: "space-between",
 
@@ -73,9 +73,9 @@ function Toggle(props) {
         <Loading size={18} />
       ) : (
         <Switch
-          sx={{ m: 0 }}
           onClick={disabled ? null : onClick}
           checked={isToggled}
+          sx={{ m: 0, bg: isToggled ? "accent" : "icon" }}
         />
       )}
     </Flex>

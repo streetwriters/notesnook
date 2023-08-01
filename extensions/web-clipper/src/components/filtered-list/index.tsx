@@ -91,7 +91,7 @@ export function FilteredList<T>({
             width: "auto",
             fontSize: "body",
             py: "7px",
-            color: "text"
+            color: "paragraph"
           }}
           ref={inputRef}
           autoFocus

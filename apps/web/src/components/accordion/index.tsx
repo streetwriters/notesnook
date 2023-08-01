@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { SchemeColors } from "@notesnook/theme";
 import { Flex, FlexProps, Text } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "../icons";
@@ -25,7 +25,7 @@ import { ChevronDown, ChevronUp } from "../icons";
 export type AccordionProps = {
   title: string;
   isClosed: boolean;
-  color?: keyof SchemeColors;
+  color?: SchemeColors;
   testId?: string;
 };
 
@@ -46,7 +46,7 @@ export default function Accordion(
           justifyContent: "space-between",
           alignItems: "center",
           cursor: "pointer",
-          bg: "bgSecondary",
+          bg: "var(--background-secondary)",
           p: 1,
           borderRadius: "default"
         }}

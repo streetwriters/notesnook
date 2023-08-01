@@ -34,12 +34,12 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { eClearEditor } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { editorState } from "./tiptap/utils";
 const EditorOverlay = ({ editorId = "", editor }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [error, setError] = useState(false);
   const opacity = useSharedValue(1);
   const translateValue = useSharedValue(0);
@@ -129,7 +129,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
           position: "absolute",
           width: "100%",
           height: "100%",
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           justifyContent: "center",
           alignItems: "center",
           zIndex: 100
@@ -140,7 +140,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
       <View
         style={{
           width: "100%",
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           borderRadius: 5,
           height: "100%",
           alignItems: "flex-start",
@@ -169,7 +169,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
                   translateValue.value = 6000;
                 }}
                 name="arrow-left"
-                color={colors.pri}
+                color={colors.primary.paragraph}
               />
             )}
 
@@ -180,7 +180,10 @@ const EditorOverlay = ({ editorId = "", editor }) => {
                 alignItems: "center"
               }}
             >
-              <IconButton name="dots-horizontal" color={colors.pri} />
+              <IconButton
+                name="dots-horizontal"
+                color={colors.primary.paragraph}
+              />
             </View>
           </View>
         ) : null}
@@ -196,7 +199,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
             <View
               style={{
                 height: 30,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 borderRadius: 100,
                 marginBottom: 10,
                 justifyContent: "flex-start",
@@ -205,10 +208,10 @@ const EditorOverlay = ({ editorId = "", editor }) => {
                 paddingHorizontal: 10,
                 marginTop: 5,
                 borderWidth: 1,
-                borderColor: colors.border
+                borderColor: colors.primary.border
               }}
             >
-              <Paragraph color={colors.icon} size={13}>
+              <Paragraph color={colors.secondary.paragraph} size={13}>
                 Add a tag
               </Paragraph>
               <IconButton
@@ -218,7 +221,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
                   height: 26
                 }}
                 name="plus"
-                color={colors.accent}
+                color={colors.primary.accent}
               />
             </View>
           ) : null}
@@ -227,7 +230,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
             style={{
               height: 25,
               width: "100%",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5
             }}
           />
@@ -244,7 +247,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               style={{
                 height: 12,
                 width: 60,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 borderRadius: 5,
                 marginRight: 10
               }}
@@ -253,7 +256,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               style={{
                 height: 12,
                 width: 60,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 borderRadius: 5,
                 marginRight: 10
               }}
@@ -262,7 +265,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               style={{
                 height: 12,
                 width: 60,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 borderRadius: 5,
                 marginRight: 10
               }}
@@ -273,7 +276,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
             style={{
               height: 16,
               width: "100%",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginTop: 10
             }}
@@ -283,7 +286,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
             style={{
               height: 16,
               width: "100%",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginTop: 10
             }}
@@ -293,7 +296,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
             style={{
               height: 16,
               width: 200,
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginTop: 10
             }}
@@ -319,7 +322,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               <Paragraph
                 textBreakStrategy="balanced"
                 size={SIZE.xs}
-                color={colors.icon}
+                color={colors.secondary.paragraph}
                 style={{
                   maxWidth: "100%",
                   marginTop: 5

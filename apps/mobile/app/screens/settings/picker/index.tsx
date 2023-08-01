@@ -24,7 +24,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { PressableButton } from "../../../components/ui/pressable";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 
@@ -49,7 +49,7 @@ export function SettingsPicker<T>({
   premium,
   onCheckOptionIsPremium = () => true
 }: PickerOptions<T>) {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors("contextMenu");
   const menuRef = useRef<any>();
   const [width, setWidth] = useState(0);
   const [currentValue, setCurrentValue] = useState(getValue());
@@ -90,9 +90,10 @@ export function SettingsPicker<T>({
         animationDuration={200}
         style={{
           borderRadius: 5,
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           width: width,
-          marginTop: 60
+          marginTop: 60,
+          overflow: "hidden"
         }}
         onRequestClose={() => {
           menuRef.current?.hide();
@@ -113,7 +114,7 @@ export function SettingsPicker<T>({
             }}
           >
             <Paragraph>{formatValue(currentValue)}</Paragraph>
-            <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
+            <Icon color={colors.primary.icon} name="menu-down" size={SIZE.md} />
           </PressableButton>
         }
       >
@@ -125,7 +126,7 @@ export function SettingsPicker<T>({
             }}
             style={{
               backgroundColor: compareValue(currentValue, item)
-                ? colors.nav
+                ? colors.secondary.background
                 : "transparent",
               width: "100%",
               maxWidth: width
@@ -133,8 +134,8 @@ export function SettingsPicker<T>({
             textStyle={{
               fontSize: SIZE.md,
               color: compareValue(currentValue, item)
-                ? colors.accent
-                : colors.pri
+                ? colors.primary.accent
+                : colors.primary.paragraph
             }}
           >
             {formatValue(item)}

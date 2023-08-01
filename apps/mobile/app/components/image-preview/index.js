@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import Sodium from "@ammarahmed/react-native-sodium";
+import dataurl from "@notesnook/core/utils/dataurl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
 import ImageViewer from "react-native-image-zoom-viewer";
@@ -26,15 +29,13 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
 import BaseDialog from "../dialog/base-dialog";
 import { IconButton } from "../ui/icon-button";
 import { ProgressBarComponent } from "../ui/svg/lazy";
-import Sodium from "@ammarahmed/react-native-sodium";
-import dataurl from "@notesnook/core/utils/dataurl";
 
 const ImagePreview = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors("dialog");
+
   const [visible, setVisible] = useState(false);
   const [image, setImage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -97,7 +98,7 @@ const ImagePreview = () => {
             >
               <ProgressBarComponent
                 indeterminate
-                color={colors.accent}
+                color={colors.primary.accent}
                 borderColor="transparent"
               />
             </View>

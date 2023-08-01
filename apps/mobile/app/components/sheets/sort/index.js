@@ -22,7 +22,7 @@ import { View } from "react-native";
 import { db } from "../../../common/database";
 import { eSendEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { GROUP, SORT } from "../../../utils/constants";
 import { refreshNotesPage } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
@@ -30,8 +30,8 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 const Sort = ({ type, screen }) => {
-  const colors = useThemeStore((state) => state.colors);
   const isTopicSheet = screen === "TopicSheet";
+  const { colors } = useThemeColors();
   const [groupOptions, setGroupOptions] = useState(
     db.settings.getGroupOptions(type)
   );
@@ -61,7 +61,7 @@ const Sort = ({ type, screen }) => {
     <View
       style={{
         width: "100%",
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         justifyContent: "space-between"
       }}
     >
@@ -104,7 +104,7 @@ const Sort = ({ type, screen }) => {
           fontSize={SIZE.sm - 1}
           type="transparent"
           buttonType={{
-            text: colors.accent
+            text: colors.primary.accent
           }}
           style={{
             borderRadius: 100,
@@ -122,7 +122,7 @@ const Sort = ({ type, screen }) => {
           justifyContent: "flex-start",
           flexWrap: "wrap",
           borderBottomWidth: isTopicSheet ? 0 : 1,
-          borderBottomColor: colors.nav,
+          borderBottomColor: colors.secondary.background,
           marginBottom: 12,
           paddingHorizontal: 12,
           paddingBottom: 12,
@@ -136,7 +136,7 @@ const Sort = ({ type, screen }) => {
             height={40}
             iconPosition="left"
             icon={"check"}
-            buttonType={{ text: colors.accent }}
+            buttonType={{ text: colors.primary.accent }}
             fontSize={SIZE.sm}
             iconSize={SIZE.md}
           />
@@ -149,7 +149,7 @@ const Sort = ({ type, screen }) => {
               item === "dateEdited") ? null : (
               <Button
                 key={item}
-                type={groupOptions.sortBy === item ? "grayBg" : "gray"}
+                type={groupOptions.sortBy === item ? "selected" : "gray"}
                 title={SORT[item]}
                 height={40}
                 iconPosition="left"
@@ -160,7 +160,9 @@ const Sort = ({ type, screen }) => {
                 }}
                 buttonType={{
                   text:
-                    groupOptions.sortBy === item ? colors.accent : colors.icon
+                    groupOptions.sortBy === item
+                      ? colors.primary.accent
+                      : colors.secondary.paragraph
                 }}
                 fontSize={SIZE.sm}
                 onPress={async () => {
@@ -205,12 +207,14 @@ const Sort = ({ type, screen }) => {
               <Button
                 key={item}
                 testID={"btn-" + item}
-                type={groupOptions.groupBy === GROUP[item] ? "grayBg" : "gray"}
+                type={
+                  groupOptions.groupBy === GROUP[item] ? "selected" : "gray"
+                }
                 buttonType={{
                   text:
                     groupOptions.groupBy === GROUP[item]
-                      ? colors.accent
-                      : colors.icon
+                      ? colors.primary.accent
+                      : colors.secondary.paragraph
                 }}
                 onPress={async () => {
                   let _groupOptions = {

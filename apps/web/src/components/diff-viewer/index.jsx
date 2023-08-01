@@ -144,7 +144,7 @@ function DiffViewer(props) {
       </Text>
       <Flex mt={1} sx={{ alignSelf: "center", justifySelf: "center" }}>
         <Button
-          variant="tool"
+          variant="secondary"
           onClick={async () => {
             setIsDownloadingImages(true);
             try {

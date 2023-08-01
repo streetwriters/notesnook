@@ -208,18 +208,18 @@ function Properties(props) {
                 py={2}
                 px={2}
                 sx={{
-                  borderBottom: "1px solid var(--border)",
+                  borderBottom: "1px solid var(--separator)",
                   alignItems: "center",
                   justifyContent: "space-between"
                 }}
               >
-                <Text variant="body" sx={{ color: "fontTertiary" }}>
+                <Text variant="subBody" sx={{ fontSize: "body" }}>
                   {item.label}
                 </Text>
                 <Text
                   className="selectable"
-                  variant="body"
-                  sx={{ color: "fontTertiary" }}
+                  variant="subBody"
+                  sx={{ fontSize: "body" }}
                 >
                   {item.value(session[item.key])}
                 </Text>
@@ -258,7 +258,7 @@ function Properties(props) {
                       />
                       {label.toLowerCase() === color?.toLowerCase() && (
                         <Checkmark
-                          color="static"
+                          color="white"
                           size={18}
                           sx={{ position: "absolute", left: "8px" }}
                         />
@@ -335,9 +335,9 @@ function Properties(props) {
                   px={2}
                   sx={{
                     cursor: "pointer",
-                    bg: isSelected ? "bgSecondary" : "transparent",
+                    bg: isSelected ? "background-selected" : "transparent",
                     ":hover": {
-                      bg: "hover"
+                      bg: isSelected ? "hover-selected" : "hover"
                     },
                     alignItems: "center",
                     justifyContent: "space-between"
@@ -374,7 +374,12 @@ function Properties(props) {
                   <Text variant={"body"} data-test-id="title">
                     {label}
                   </Text>
-                  <Flex sx={{ fontSize: "subBody", color: "fontTertiary" }}>
+                  <Flex
+                    sx={{
+                      fontSize: "subBody",
+                      color: "paragraph-secondary"
+                    }}
+                  >
                     {session.locked && <Lock size={14} data-test-id="locked" />}
                     <TimeAgo
                       live

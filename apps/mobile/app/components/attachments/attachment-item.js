@@ -23,7 +23,7 @@ import { TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { IconButton } from "../ui/icon-button";
 import { ProgressCircleComponent } from "../ui/svg/lazy";
@@ -43,12 +43,11 @@ export const AttachmentItem = ({
   hideWhenNotDownloading,
   context
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [currentProgress, setCurrentProgress] = useAttachmentProgress(
     attachment,
     encryption
   );
-
   const onPress = () => {
     if (!pressable) return;
     Actions.present(attachment, setAttachments, context);
@@ -66,7 +65,7 @@ export const AttachmentItem = ({
         padding: 12,
         paddingVertical: 6,
         borderRadius: 5,
-        backgroundColor: colors.nav
+        backgroundColor: colors.secondary.background
       }}
       type="grayBg"
     >
@@ -84,12 +83,12 @@ export const AttachmentItem = ({
             marginLeft: -5
           }}
         >
-          <Icon name="file" size={SIZE.xxxl} color={colors.icon} />
+          <Icon name="file" size={SIZE.xxxl} color={colors.primary.icon} />
 
           <Paragraph
             adjustsFontSizeToFit
             size={6}
-            color={colors.light}
+            color={colors.static.white}
             style={{
               position: "absolute"
             }}
@@ -112,13 +111,13 @@ export const AttachmentItem = ({
             }}
             numberOfLines={1}
             lineBreakMode="middle"
-            color={colors.pri}
+            color={colors.primary.paragraph}
           >
             {attachment.metadata.filename}
           </Paragraph>
 
           {!hideWhenNotDownloading ? (
-            <Paragraph color={colors.icon} size={SIZE.xs}>
+            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
               {formatBytes(attachment.length)}{" "}
               {currentProgress?.type
                 ? "(" + currentProgress.type + "ing - tap to cancel)"
@@ -150,7 +149,7 @@ export const AttachmentItem = ({
             textStyle={{
               fontSize: 10
             }}
-            color={colors.accent}
+            color={colors.primary.accent}
             formatText={(progress) => (progress * 100).toFixed(0)}
             borderWidth={0}
             thickness={2}
@@ -162,7 +161,7 @@ export const AttachmentItem = ({
             <IconButton
               onPress={onPress}
               name="alert-circle-outline"
-              color={colors.errorText}
+              color={colors.error.paragraph}
             />
           ) : null}
         </>

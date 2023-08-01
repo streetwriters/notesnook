@@ -35,11 +35,9 @@ import {
   showAnnouncementDialog,
   showBuyDialog,
   showFeatureDialog,
-  showInvalidSystemTimeDialog,
   showOnboardingDialog
 } from "./common/dialog-controller";
 import useSystemTheme from "./hooks/use-system-theme";
-
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";
 import { interruptedOnboarding } from "./dialogs/onboarding-dialog";
@@ -57,7 +55,7 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
   const initStore = useStore((store) => store.init);
   const initAttachments = useAttachmentStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
-  const setTheme = useThemeStore((store) => store.setTheme);
+  const setColorScheme = useThemeStore((store) => store.setColorScheme);
   const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
   const initEditorStore = useEditorStore((store) => store.init);
   const dialogAnnouncements = useAnnouncementStore(
@@ -207,8 +205,8 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
 
   useEffect(() => {
     if (!followSystemTheme) return;
-    setTheme(isSystemThemeDark ? "dark" : "light");
-  }, [isSystemThemeDark, followSystemTheme, setTheme]);
+    setColorScheme(isSystemThemeDark ? "dark" : "light");
+  }, [isSystemThemeDark, followSystemTheme, setColorScheme]);
 
   useEffect(() => {
     const { unsubscribe } =

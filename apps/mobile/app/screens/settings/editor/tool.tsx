@@ -25,7 +25,7 @@ import { presentDialog } from "../../../components/dialog/functions";
 import { IconButton } from "../../../components/ui/icon-button";
 import { SvgView } from "../../../components/ui/svg";
 import Paragraph from "../../../components/ui/typography/paragraph";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../../utils/elevation";
 import { SIZE } from "../../../utils/size";
 import { renderGroup } from "./common";
@@ -50,7 +50,7 @@ export const Tool = ({
   ]);
   const [_recieving, setRecieving] = React.useState(false);
   const [recievePosition, setRecievePosition] = React.useState("above");
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const isSubgroup = typeof item === "object";
   const isDragged = !dragged
     ? false
@@ -65,7 +65,9 @@ export const Tool = ({
   const tool =
     isSubgroup || item === "dummy" ? null : findToolById(item as ToolId);
   const iconSvgString =
-    isSubgroup || !tool ? null : getToolIcon(tool.icon as ToolId);
+    isSubgroup || !tool
+      ? null
+      : getToolIcon(tool.icon as ToolId, colors.secondary.icon);
 
   const buttons = React.useCallback(() => {
     const btns = isSubgroup
@@ -120,7 +122,7 @@ export const Tool = ({
               const _data = useDragState.getState().data.slice();
               if (typeof parentIndex !== "number") {
                 const index = _data[groupIndex]?.findIndex(
-                  (tool: ToolId) => tool === item
+                  (tool: any) => tool === item
                 );
                 _data[groupIndex]?.splice(index, 1);
               } else {
@@ -172,9 +174,11 @@ export const Tool = ({
             if (!isDragged) dimensions.current = event.nativeEvent.layout;
           }}
           style={{
-            backgroundColor: isSubgroup ? colors.bg : colors.nav,
+            backgroundColor: isSubgroup
+              ? colors.primary.background
+              : colors.secondary.background,
             borderWidth: isSubgroup ? 0 : 1,
-            borderColor: isSubgroup ? undefined : colors.nav,
+            borderColor: isSubgroup ? undefined : colors.secondary.background,
             marginBottom: 10,
             width: isDragged ? dimensions.current.width : "100%",
             paddingTop: isSubgroup ? 15 : 0,
@@ -203,14 +207,18 @@ export const Tool = ({
                 style={{ marginRight: 5 }}
                 size={SIZE.md}
                 name="drag"
-                color={colors.icon}
+                color={colors.primary.icon}
               />
             )}
             <Paragraph
               style={{
                 marginLeft: iconSvgString ? 10 : 0
               }}
-              color={isSubgroup ? colors.icon : colors.pri}
+              color={
+                isSubgroup
+                  ? colors.secondary.paragraph
+                  : colors.primary.paragraph
+              }
               size={isSubgroup ? SIZE.xs : SIZE.sm - 1}
             >
               {isSubgroup ? "COLLAPSED" : tool?.title}
@@ -235,7 +243,7 @@ export const Tool = ({
                   marginLeft: 10
                 }}
                 name={btn.name}
-                color={colors.icon}
+                color={colors.primary.icon}
                 size={SIZE.lg}
               />
             ))}
@@ -255,10 +263,11 @@ export const Tool = ({
     ),
     [
       buttons,
-      colors.bg,
-      colors.icon,
-      colors.nav,
-      colors.pri,
+      colors.primary.background,
+      colors.primary.icon,
+      colors.secondary.background,
+      colors.primary.paragraph,
+      colors.secondary.paragraph,
       groupIndex,
       iconSvgString,
       index,
@@ -356,7 +365,9 @@ export const Tool = ({
           paddingBottom: recievePosition === "below" ? 50 : 0,
           paddingTop: recievePosition === "above" ? 50 : 0,
           backgroundColor:
-            dragged?.type === "subgroup" ? colors.nav : undefined,
+            dragged?.type === "subgroup"
+              ? colors.secondary.background
+              : undefined,
           marginTop: recievePosition === "above" ? 5 : 0,
           marginBottom: recievePosition === "below" ? 5 : 0,
           borderRadius: 10

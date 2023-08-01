@@ -19,12 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex, Text } from "@theme-ui/components";
 import { Icon } from "../icons/icon";
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { SchemeColors } from "@notesnook/theme";
 
 export function InlineTag(props: {
   title: string;
   icon: string;
-  iconColor?: keyof SchemeColors;
+  iconColor?: SchemeColors;
   onClick: () => void;
 }) {
   const { title, icon, onClick, iconColor = "icon" } = props;
@@ -35,7 +35,7 @@ export function InlineTag(props: {
       sx={{
         alignItems: "center",
         justifyContent: "center",
-        bg: "bgSecondary",
+        bg: "var(--background-secondary)",
         border: "1px solid var(--border)",
         borderRadius: "small",
         p: "3px",
@@ -47,7 +47,7 @@ export function InlineTag(props: {
       }}
     >
       <Icon path={icon} color={iconColor} size={14} />
-      <Text variant="subBody" sx={{ color: "icon", ml: 1 }}>
+      <Text variant="subBody" sx={{ ml: 1 }}>
         {title}
       </Text>
     </Flex>

@@ -26,7 +26,7 @@ type CompletedUpdateStatus = { type: "completed"; version: string };
 type DownloadingUpdateStatus = { type: "downloading"; progress: number };
 type AvailableUpdateStatus = { type: "available"; version: string };
 type GenericUpdateStatus = { type: "checking" | "updated" };
-type UpdateStatus =
+export type UpdateStatus =
   | AvailableUpdateStatus
   | CompletedUpdateStatus
   | DownloadingUpdateStatus

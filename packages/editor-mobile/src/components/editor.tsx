@@ -25,7 +25,7 @@ import {
   usePermissionHandler,
   useTiptap
 } from "@notesnook/editor";
-import { Theme, useTheme } from "@notesnook/theme";
+import { useThemeColors } from "@notesnook/theme";
 import {
   forwardRef,
   memo,
@@ -36,22 +36,14 @@ import {
 } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
-import { useEditorThemeStore } from "../state/theme";
+import { EmotionEditorToolbarTheme } from "../theme-factory";
 import { EventTypes, Settings } from "../utils";
 import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
 
-const Tiptap = ({
-  editorTheme,
-  toolbarTheme,
-  settings
-}: {
-  editorTheme: Theme;
-  toolbarTheme: Theme;
-  settings: Settings;
-}) => {
+const Tiptap = ({ settings }: { settings: Settings }) => {
   const [tick, setTick] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -81,7 +73,6 @@ const Tiptap = ({
         global.editorController.previewAttachment(attachment);
         return true;
       },
-      theme: editorTheme,
       element: !layout ? undefined : contentRef.current || undefined,
       editable: !settings.readonly,
       editorProps: {
@@ -188,8 +179,7 @@ const Tiptap = ({
           display: "flex",
           flex: 1,
           flexDirection: "column",
-          maxWidth: "100vw",
-          marginBottom: "5px"
+          maxWidth: "100vw"
         }}
         id="editorroot"
         onDoubleClick={onClickEmptyArea}
@@ -242,20 +232,18 @@ const Tiptap = ({
         </div>
 
         {!layout ? null : (
-          <Toolbar
-            sx={{
-              pl: "10px",
-              pt: "5px",
-              minHeight: 45,
-              display: settings.noToolbar ? "none" : "flex"
-            }}
-            theme={toolbarTheme}
-            editor={_editor}
-            location="bottom"
-            tools={[...settings.tools]}
-            defaultFontFamily={settings.fontFamily}
-            defaultFontSize={settings.fontSize}
-          />
+          <EmotionEditorToolbarTheme>
+            <Toolbar
+              sx={{
+                display: settings.noToolbar ? "none" : "flex"
+              }}
+              editor={_editor}
+              location="bottom"
+              tools={[...settings.tools]}
+              defaultFontFamily={settings.fontFamily}
+              defaultFontSize={settings.fontSize}
+            />
+          </EmotionEditorToolbarTheme>
         )}
       </div>
     </>
@@ -267,16 +255,16 @@ const ContentDiv = memo(
     HTMLDivElement,
     { padding: number; fontSize: number; fontFamily: string }
   >((props, ref) => {
-    const theme = useEditorThemeStore((state) => state.colors);
+    const { colors } = useThemeColors("editor");
     return (
       <div
         ref={ref}
         style={{
           padding: 12,
           paddingTop: props.padding,
-          color: theme.pri,
+          color: colors.primary.paragraph,
           marginTop: -12,
-          caretColor: theme.accent,
+          caretColor: colors.primary.accent,
           fontSize: props.fontSize,
           fontFamily: getFontById(props.fontFamily)?.font
         }}
@@ -290,64 +278,12 @@ const ContentDiv = memo(
   }
 );
 
-const modifyToolbarTheme = (toolbarTheme: Theme) => {
-  toolbarTheme.space = [0, 10, 12, 18];
-  toolbarTheme.space.small = "10px";
-
-  toolbarTheme.buttons.menuitem = {
-    ...toolbarTheme.buttons.menuitem,
-    height: "50px",
-    paddingX: "20px",
-    borderBottomWidth: 0
-  };
-
-  toolbarTheme.iconSizes = {
-    big: 20,
-    medium: 18,
-    small: 18
-  };
-  toolbarTheme.fontSizes = {
-    ...toolbarTheme.fontSizes,
-    subBody: "0.8rem",
-    body: "0.9rem"
-  };
-
-  toolbarTheme.radii = {
-    ...toolbarTheme.radii,
-    small: 5
-  };
-
-  toolbarTheme.buttons.menuitem = {
-    ...toolbarTheme.buttons.menuitem,
-    px: 5,
-    height: "45px"
-  };
-};
-
 const TiptapProvider = (): JSX.Element => {
   const settings = useSettings();
-  const theme = useEditorThemeStore((state) => state.colors);
-  const toolbarTheme = useTheme({
-    //todo
-    accent: theme?.accent,
-    theme: theme?.night ? "dark" : "light"
-  });
-  modifyToolbarTheme(toolbarTheme);
-  const editorTheme = useTheme({
-    //todo
-    accent: theme?.accent,
-    theme: theme?.night ? "dark" : "light"
-  });
-  editorTheme.colors.background = theme?.bg || "#f0f0f0";
-  editorTheme.space = [0, 10, 12, 20];
 
   return (
     <PortalProvider>
-      <Tiptap
-        editorTheme={editorTheme}
-        toolbarTheme={toolbarTheme}
-        settings={settings}
-      />
+      <Tiptap settings={settings} />
     </PortalProvider>
   );
 };

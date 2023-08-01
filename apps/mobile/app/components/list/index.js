@@ -24,7 +24,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { notesnook } from "../../../e2e/test.ids";
 import { eSendEvent } from "../../services/event-manager";
 import Sync from "../../services/sync";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { db } from "../../common/database";
 import { eScrollEvent } from "../../utils/events";
 import { tabBarRef } from "../../utils/global-refs";
@@ -93,7 +93,7 @@ const List = ({
   handlers,
   ScrollComponent
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const scrollRef = useRef();
   const [notesListMode, notebooksListMode] = useSettingStore((state) => [
     state.settings.notesListMode,
@@ -188,9 +188,9 @@ const List = ({
           keyboardDismissMode="interactive"
           refreshControl={
             <RefreshControl
-              tintColor={colors.accent}
-              colors={[colors.accent]}
-              progressBackgroundColor={colors.nav}
+              tintColor={colors.primary.accent}
+              colors={[colors.primary.accent]}
+              progressBackgroundColor={colors.secondary.background}
               onRefresh={_onRefresh}
               refreshing={false}
             />

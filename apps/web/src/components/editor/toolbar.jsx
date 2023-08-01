@@ -59,8 +59,8 @@ function Toolbar() {
   const editorMargins = useStore((store) => store.editorMargins);
   const clearSession = useStore((store) => store.clearSession);
   const title = useStore((store) => store.session.title);
-  const theme = useThemeStore((store) => store.theme);
-  const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
+  const theme = useThemeStore((store) => store.colorScheme);
+  const toggleNightMode = useThemeStore((store) => store.toggleColorScheme);
   const [isTitleVisible, setIsTitleVisible] = useState(false);
 
   const monographs = useMonographStore((store) => store.monographs);
@@ -232,42 +232,42 @@ function Toolbar() {
             setTitle(sessionId, title);
           }}
           sx={{
+            flex: 1,
             fontWeight: "heading",
             fontSize: "heading",
-            color: "text",
+            color: "paragraph",
             p: 0,
             borderWidth: 0,
             borderRadius: "default",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            overflow: "hidden",
-            ":focus": { bg: "bgSecondary" }
+            overflow: "hidden"
           }}
         />
       </Flex>
+
       <Flex>
         {tools.map((tool) => (
           <Button
+            key={tool.title}
+            variant="secondary"
             data-test-id={tool.title}
             disabled={!tool.enabled}
-            variant="tool"
             title={tool.title}
-            key={tool.title}
             mr={1}
             sx={{
               display: [
                 tool.hideOnMobile ? "none" : "flex",
                 tool.hidden ? "none" : "flex"
               ],
-              color: tool.enabled ? "text" : "disabled",
-              cursor: tool.enabled ? "pointer" : "not-allowed",
+              color: "paragraph",
               flexDirection: "row",
               flexShrink: 0,
               alignItems: "center"
             }}
             onClick={tool.onClick}
           >
-            <tool.icon size={18} color={tool.enabled ? "text" : "disabled"} />
+            <tool.icon size={18} />
             <Text
               variant="body"
               ml={1}
@@ -278,7 +278,7 @@ function Toolbar() {
           </Button>
         ))}
         <Flex
-          bg="bgSecondary"
+          bg="background"
           sx={{
             borderRadius: "default",
             overflow: "hidden",
@@ -290,41 +290,20 @@ function Toolbar() {
             <Button
               data-test-id={tool.title}
               disabled={!tool.enabled}
-              variant="tool"
-              bg="transparent"
+              variant="secondary"
               title={tool.title}
               key={tool.title}
               sx={{
-                borderRadius: 0,
                 display: [
                   tool.hideOnMobile ? "none" : "flex",
                   tool.hidden ? "none" : "flex"
                 ],
-                color: tool.enabled ? "text" : "disabled",
-                cursor: tool.enabled ? "pointer" : "not-allowed",
-                flexDirection: "row",
-                flexShrink: 0,
-                alignItems: "center"
+                borderRadius: 0,
+                flexShrink: 0
               }}
               onClick={tool.onClick}
             >
-              <tool.icon size={18} color={tool.enabled ? "text" : "disabled"} />
-              {tool.new && (
-                <Text
-                  variant="subBody"
-                  ml={1}
-                  bg="primary"
-                  px={"3px"}
-                  py="1px"
-                  sx={{
-                    borderRadius: "default",
-                    fontSize: 10,
-                    color: "static"
-                  }}
-                >
-                  NEW
-                </Text>
-              )}
+              <tool.icon size={18} />
             </Button>
           ))}
         </Flex>
