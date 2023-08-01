@@ -77,7 +77,7 @@ function Field(props) {
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [rules, setRules] = useState(passwordValidationRules);
-  const theme = useThemeStore((state) => state.theme);
+  const colorScheme = useThemeStore((state) => state.colorScheme);
 
   return (
     <Flex
@@ -140,7 +140,7 @@ function Field(props) {
             ":disabled": {
               bg: "background-disabled"
             },
-            colorScheme: theme
+            colorScheme
           }}
           onChange={(e) => {
             if (validatePassword) {
