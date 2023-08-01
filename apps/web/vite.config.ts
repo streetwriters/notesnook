@@ -27,6 +27,7 @@ import { WEB_MANIFEST } from "./web-manifest";
 import { execSync } from "child_process";
 import { version } from "./package.json";
 import { visualizer } from "rollup-plugin-visualizer";
+import { OutputPlugin } from "rollup";
 
 const gitHash = (() => {
   try {
@@ -40,9 +41,10 @@ const isTesting =
   process.env.TEST === "true" || process.env.NODE_ENV === "development";
 const isDesktop = process.env.PLATFORM === "desktop";
 const isAnalyzing = process.env.ANALYZING === "true";
+process.env.NN_BUILD_TIMESTAMP = `${Date.now()}`;
 
 export default defineConfig({
-  envPrefix: "REACT_APP_",
+  envPrefix: "NN_",
   build: {
     target: isDesktop ? "esnext" : "modules",
     outDir: "build",
@@ -52,6 +54,7 @@ export default defineConfig({
     sourcemap: isTesting,
     rollupOptions: {
       output: {
+        plugins: [emitEditorStyles()],
         assetFileNames: "assets/[name]-[hash:12][extname]",
         chunkFileNames: "assets/[name]-[hash:12].js"
       }
@@ -124,7 +127,10 @@ export default defineConfig({
         ? undefined
         : [["swc-plugin-react-remove-properties", {}]]
     }),
-    envCompatible(),
+    envCompatible({
+      prefix: "NN_",
+      mountedPath: "process.env"
+    }),
     svgrPlugin({
       svgrOptions: {
         icon: true
@@ -133,3 +139,28 @@ export default defineConfig({
     })
   ]
 });
+
+function emitEditorStyles(): OutputPlugin {
+  return {
+    name: "rollup-plugin-emit-editor-styles",
+    generateBundle(options, bundle) {
+      for (const file in bundle) {
+        const chunk = bundle[file];
+        if (
+          chunk.type === "asset" &&
+          chunk.fileName.endsWith(".css") &&
+          typeof chunk.source === "string" &&
+          (chunk.source.includes("KaTeX_Fraktur-Bold-") ||
+            chunk.source.includes("Hack typeface"))
+        ) {
+          this.emitFile({
+            type: "asset",
+            fileName: "assets/editor-styles.css",
+            name: "editor-styles.css",
+            source: chunk.source
+          });
+        }
+      }
+    }
+  };
+}
