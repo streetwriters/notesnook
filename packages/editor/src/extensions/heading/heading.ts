@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { textblockTypeInputRule } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
 
+const HEADING_REGEX = /^(#{1,6})\s$/;
 export const Heading = TiptapHeading.extend({
   addCommands() {
     return {
@@ -56,16 +57,17 @@ export const Heading = TiptapHeading.extend({
   },
 
   addInputRules() {
-    return this.options.levels.map((level) => {
-      return textblockTypeInputRule({
-        find: new RegExp(`^(#{1,${level}})\\s$`),
+    return [
+      textblockTypeInputRule({
+        find: HEADING_REGEX,
         type: this.type,
-        getAttributes: () => {
+        getAttributes: (match) => {
           const { textAlign, textDirection } =
-            this.editor.state.selection.$from.parent.attrs;
+            this.editor.state.selection.$from.parent?.attrs || {};
+          const level = match[1].length;
           return { level, textAlign, textDirection };
         }
-      });
-    });
+      })
+    ];
   }
 });
