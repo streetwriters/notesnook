@@ -21,6 +21,7 @@ import { useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { Input, Label } from "@theme-ui/components";
 import { PasswordVisible, PasswordInvisible, Check, Cross } from "../icons";
+import { useStore as useThemeStore } from "../../stores/theme-store";
 
 const passwordValidationRules = [
   {
@@ -76,6 +77,7 @@ function Field(props) {
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [rules, setRules] = useState(passwordValidationRules);
+  const colorScheme = useThemeStore((state) => state.colorScheme);
 
   return (
     <Flex
@@ -136,8 +138,9 @@ function Field(props) {
             flex: 1,
             ...styles.input,
             ":disabled": {
-              bg: "var(--background-secondary)"
-            }
+              bg: "background-disabled"
+            },
+            colorScheme
           }}
           onChange={(e) => {
             if (validatePassword) {
