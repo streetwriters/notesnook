@@ -4,8 +4,8 @@
   "description": "A really simple logger with a pluggable interface.",
   "main": "dist/index.js",
   "scripts": {
-    "pub": "tsc && np",
-    "build": "tsc"
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -23,10 +23,6 @@
     "tests": false,
     "releaseDraft": false,
     "message": "chore: bump version to %s"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
   },
   "devDependencies": {}
 }
