@@ -52,7 +52,9 @@ const EXTRA_ICON_NAMES = [
   "sort-descending",
   "information",
   "sort-ascending",
-  "alert"
+  "alert",
+  "arrow-right",
+  "bookmark-outline"
 ];
 
 const __filename = fileURLToPath(import.meta.url);
