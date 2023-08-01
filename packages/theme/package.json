@@ -20,7 +20,8 @@
     "@types/react": "17.0.2",
     "@types/tinycolor2": "^1.4.3",
     "isomorphic-fetch": "^3.0.0",
-    "ts-json-schema-generator": "^1.2.0"
+    "ts-json-schema-generator": "^1.2.0",
+    "react": "17.0.2"
   },
   "peerDependencies": {
     "react": "17.0.2"
