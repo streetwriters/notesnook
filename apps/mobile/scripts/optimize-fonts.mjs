@@ -57,7 +57,10 @@ const EXTRA_ICON_NAMES = [
   "bookmark-outline",
   "checkbox-marked",
   "checkbox-blank-outline",
-  "unfold-less-horizontal"
+  "unfold-less-horizontal",
+  "minus-circle",
+  "vibrate",
+  "volume-high"
 ];
 
 const __filename = fileURLToPath(import.meta.url);
