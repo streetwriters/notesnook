@@ -70,7 +70,7 @@ export function useMenuTrigger() {
 }
 
 export const Menu = {
-  openMenu: (items: MenuItem[], options?: MenuOptions) =>
+  openMenu: (items: MenuItem[], options: MenuOptions = {}) =>
     useMenuStore.getState().open(items, options),
   closeMenu: () => useMenuStore.getState().close(),
   isOpen: () => useMenuStore.getState().isOpen,
