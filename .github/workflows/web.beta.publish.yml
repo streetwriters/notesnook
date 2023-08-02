@@ -5,6 +5,14 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - "apps/mobile/**"
+      - "packages/editor-mobile/**"
+      - "apps/desktop/**"
+      - "apps/vericrypt/**"
+      - "servers/**"
+      - "packages/clipper/**"
+      - "extensions/web-clipper/**"
   pull_request:
     types:
       - closed
@@ -12,6 +20,14 @@ on:
       - reopened
     branches:
       - master
+    paths-ignore:
+      - "apps/mobile/**"
+      - "packages/editor-mobile/**"
+      - "apps/desktop/**"
+      - "apps/vericrypt/**"
+      - "servers/**"
+      - "packages/clipper/**"
+      - "extensions/web-clipper/**"
 jobs:
   build:
     name: Build
