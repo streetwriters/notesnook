@@ -19,6 +19,7 @@ on:
       - ready_for_review
       - reopened
       - opened
+      - synchronize
     branches:
       - master
     paths-ignore:
