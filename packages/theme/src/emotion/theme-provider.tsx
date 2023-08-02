@@ -25,16 +25,17 @@ import {
   ScopedThemeProvider as NNScopedThemeProvider,
   ThemeFactory
 } from "../";
-import { PropsWithChildren, useMemo } from "react";
+import React, { ForwardedRef, PropsWithChildren, useMemo } from "react";
 import { Box, BoxProps } from "@theme-ui/components";
 
 export type EmotionThemeProviderProps = {
   scope?: keyof ThemeScopes;
   injectCssVars?: boolean;
-} & Omit<BoxProps, "variant">;
+} & Omit<BoxProps, "variant" | "ref">;
 
-export function EmotionThemeProvider(
-  props: PropsWithChildren<EmotionThemeProviderProps>
+function _EmotionThemeProvider(
+  props: PropsWithChildren<EmotionThemeProviderProps>,
+  forwardedRef: ForwardedRef<HTMLDivElement>
 ) {
   const {
     children,
@@ -62,6 +63,7 @@ export function EmotionThemeProvider(
         {injectCssVars ? (
           <Box
             {...restProps}
+            ref={forwardedRef}
             className={`${
               className ? className + " " : ""
             }theme-scope-${scope}`}
@@ -75,3 +77,8 @@ export function EmotionThemeProvider(
     </ThemeProvider>
   );
 }
+
+export const EmotionThemeProvider = React.forwardRef<
+  HTMLDivElement,
+  EmotionThemeProviderProps
+>(_EmotionThemeProvider);
