@@ -202,15 +202,13 @@ function DesktopAppContents({
                 bg: "background"
               }}
             >
-              <ScopedThemeProvider scope="editor" sx={{ flex: 1 }}>
-                {isAppLoaded && (
-                  <SuspenseLoader
-                    fallback={<EditorLoader />}
-                    component={HashRouter}
-                    condition={isAppLoaded}
-                  />
-                )}
-              </ScopedThemeProvider>
+              {isAppLoaded && (
+                <SuspenseLoader
+                  fallback={<EditorLoader />}
+                  component={HashRouter}
+                  condition={isAppLoaded}
+                />
+              )}
             </Flex>
           </Allotment.Pane>
         </Allotment>

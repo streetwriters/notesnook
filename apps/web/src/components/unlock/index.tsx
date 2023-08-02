@@ -27,17 +27,20 @@ import Field from "../field";
 import { showToast } from "../../utils/toast";
 import { ErrorText } from "../error-text";
 
-function Unlock(props) {
+type UnlockProps = {
+  noteId: string;
+};
+function Unlock(props: UnlockProps) {
   const { noteId } = props;
 
   const [isWrong, setIsWrong] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const passwordRef = useRef();
+  const passwordRef = useRef<HTMLInputElement>();
 
   const note = useMemo(
-    () => !isLoading && db.notes.note(noteId)?.data,
+    () => !isLoading && db.notes?.note(noteId)?.data,
     [noteId, isLoading]
   );
   const openLockedSession = useEditorStore((store) => store.openLockedSession);
@@ -45,14 +48,18 @@ function Unlock(props) {
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
 
   const submit = useCallback(async () => {
+    if (!passwordRef.current) return;
     setIsUnlocking(true);
     const password = passwordRef.current.value;
     try {
       if (!password) return;
-      const note = await db.vault.open(noteId, password);
+      const note = await db.vault?.open(noteId, password);
       openLockedSession(note);
     } catch (e) {
-      if (e.message.includes("ciphertext cannot be decrypted using that key")) {
+      if (
+        e instanceof Error &&
+        e.message.includes("ciphertext cannot be decrypted using that key")
+      ) {
         setIsWrong(true);
       } else {
         showToast("error", "Cannot unlock note: " + e);
@@ -122,7 +129,7 @@ function Unlock(props) {
         sx={{ width: ["95%", "95%", "30%"] }}
         placeholder="Enter password"
         type="password"
-        onKeyUp={async (e) => {
+        onKeyUp={async (e: KeyboardEvent) => {
           if (e.key === "Enter") {
             await submit();
           } else if (isWrong) {
