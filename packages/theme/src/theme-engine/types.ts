@@ -133,6 +133,10 @@ export type ThemeScopes = {
    */
   editorToolbar?: PartialVariants;
   /**
+   * Scope for all the Editor side bars include note properties, attachment previews etc.
+   */
+  editorSidebar?: PartialVariants;
+  /**
    * Scope for all the dialogs in the app.
    */
   dialog?: PartialVariants;
@@ -268,15 +272,16 @@ export const StaticColors = {
   white: "#ffffff"
 } as const;
 
-export const ThemeScopeKeys: readonly (keyof ThemeScopes)[] = [
+export const THEME_SCOPES: readonly (keyof ThemeScopes)[] = [
   "base",
   "statusBar",
   "list",
   "editor",
+  "editorToolbar",
+  "editorSidebar",
   "dialog",
   "navigationMenu",
   "contextMenu",
-  "editorToolbar",
   "sheet"
 ];
 

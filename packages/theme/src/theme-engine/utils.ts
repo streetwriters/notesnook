@@ -22,7 +22,7 @@ import {
   PreviewColors,
   StaticColors,
   ThemeDefinition,
-  ThemeScopeKeys,
+  THEME_SCOPES,
   ThemeScopes,
   Variants,
   VariantsWithStaticColors
@@ -64,7 +64,7 @@ export function getPreviewColors(theme: ThemeDefinition): PreviewColors {
 
 export function themeToCSS(theme: ThemeDefinition) {
   const css: string[] = [];
-  for (const scopeKey of ThemeScopeKeys) {
+  for (const scopeKey of THEME_SCOPES) {
     const scope = theme.scopes[scopeKey] || {};
     const variants = buildVariants(scopeKey, theme, scope);
 
