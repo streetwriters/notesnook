@@ -455,7 +455,7 @@ function SelectedCheck({
       color="var(--accent-secondary)"
     />
   ) : selected === "remove" ? (
-    <CheckRemove size={size} sx={{ mr: 1 }} color="error" />
+    <CheckRemove size={size} sx={{ mr: 1 }} color="icon-error" />
   ) : (
     <CircleEmpty size={size} sx={{ mr: 1, opacity: 0.4 }} />
   );

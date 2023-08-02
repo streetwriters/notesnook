@@ -194,7 +194,7 @@ function Note(props: NoteProps) {
             </>
           ) : (
             <>
-              {note.conflicted && <Alert size={15} color="error" />}
+              {note.conflicted && <Alert size={15} color="icon-error" />}
 
               {note.localOnly && <SyncOff size={13} />}
 

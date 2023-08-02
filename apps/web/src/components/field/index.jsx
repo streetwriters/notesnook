@@ -210,9 +210,9 @@ function Field(props) {
           {rules.map((rule) => (
             <Flex key={rule.title}>
               {rule.isValid ? (
-                <Check color="success" size={14} />
+                <Check color="icon-success" size={14} />
               ) : (
-                <Cross color="error" size={14} />
+                <Cross color="icon-error" size={14} />
               )}
               <Text ml={1} sx={{ fontSize: "body", color: "paragraph" }}>
                 {rule.title}
