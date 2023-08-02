@@ -145,10 +145,7 @@ async function findDependencies(scope) {
 function filterDependencies(basePath, dependencies) {
   if (!dependencies) return [];
   return Object.entries(dependencies)
-    .filter(
-      ([key, value]) =>
-        key.startsWith("@notesnook/") || value.startsWith("file:")
-    )
+    .filter(([key, value]) => value.startsWith("file:"))
     .map(([_, value]) =>
       path.resolve(path.join(basePath, value.replace("file:", "")))
     );
