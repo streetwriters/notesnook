@@ -36,10 +36,10 @@ import {
   toBlobURL,
   toDataURL
 } from "../../utils/downloader";
-import { m, LazyMotion, domAnimation } from "framer-motion";
+import { motion } from "framer-motion";
 
 const IMAGE_SOURCE_CACHE: Record<string, string | undefined> = {};
-export const AnimatedImage = m(Image);
+export const AnimatedImage = motion(Image);
 
 export function ImageComponent(
   props: SelectionBasedReactNodeViewProps<
@@ -124,164 +124,162 @@ export function ImageComponent(
           }
         }}
       >
-        <LazyMotion features={domAnimation}>
-          {!source || error ? (
-            <Flex
+        {!source || error ? (
+          <Flex
+            sx={{
+              width: width || "100%",
+              height: height || relativeHeight || "100%",
+              maxWidth: "100%",
+              minWidth: 135,
+              bg: "background",
+              border: selected
+                ? "2px solid var(--accent)"
+                : "2px solid transparent",
+              borderRadius: "default",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              mt: 1,
+              py: 50
+            }}
+          >
+            <Icon
+              path={
+                error
+                  ? Icons.imageFailed
+                  : isDownloadable(source, src)
+                  ? Icons.imageDownload
+                  : Icons.image
+              }
+              size={width ? width * 0.2 : 72}
+              color="gray"
+            />
+
+            <Text
+              as="span"
+              variant={"subBody"}
               sx={{
-                width: width || "100%",
-                height: height || relativeHeight || "100%",
-                maxWidth: "100%",
-                minWidth: 135,
-                bg: "background",
+                display: "inline-block",
+                textDecoration: "none",
+                textAlign: "center",
+                mx: 2,
+                mt: 2
+              }}
+            >
+              {error
+                ? `There was an error loading the image: ${error}`
+                : isDownloadable(source, src)
+                ? `Downloading image from ${getHostname(src)}`
+                : ""}
+            </Text>
+            {error ? (
+              <Button
+                variant="secondary"
+                sx={{ mt: 1 }}
+                onClick={() => {
+                  setSource(src);
+                  setError(undefined);
+                }}
+              >
+                Skip downloading (unsafe)
+              </Button>
+            ) : null}
+          </Flex>
+        ) : (
+          <Resizer
+            style={{ marginTop: 5 }}
+            editor={editor}
+            selected={selected}
+            width={width}
+            onResize={(width, height) => {
+              editor.commands.setImageSize({ width, height });
+            }}
+          >
+            <DesktopOnly>
+              {selected && (
+                <Flex
+                  sx={{
+                    position: "absolute",
+                    top: -40,
+                    right: 0,
+                    mb: 2,
+                    alignItems: "end"
+                  }}
+                >
+                  <ToolbarGroup
+                    editor={editor}
+                    tools={
+                      isReadonly
+                        ? [
+                            hash ? "previewAttachment" : "none",
+                            hash ? "downloadAttachment" : "none"
+                          ]
+                        : [
+                            hash ? "previewAttachment" : "none",
+                            hash ? "downloadAttachment" : "none",
+                            "imageAlignLeft",
+                            float ? "none" : "imageAlignCenter",
+                            "imageAlignRight",
+                            "imageProperties"
+                          ]
+                    }
+                    sx={{
+                      boxShadow: "menu",
+                      borderRadius: "default",
+                      bg: "background"
+                    }}
+                  />
+                </Flex>
+              )}
+            </DesktopOnly>
+            {!isReadonly && selected && (
+              <Icon
+                className="drag-handle"
+                data-drag-handle
+                draggable
+                path={Icons.dragHandle}
+                color="black"
+                sx={{
+                  cursor: "grab",
+                  position: "absolute",
+                  top: 1,
+                  left: 1,
+                  zIndex: 999
+                }}
+              />
+            )}
+            <AnimatedImage
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeIn" }}
+              data-drag-image
+              ref={imageRef}
+              alt={alt}
+              src={source}
+              title={title}
+              sx={{
+                width: editor.isEditable ? "100%" : width,
+                height: editor.isEditable ? "100%" : height,
                 border: selected
                   ? "2px solid var(--accent)"
                   : "2px solid transparent",
-                borderRadius: "default",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                mt: 1,
-                py: 50
+                borderRadius: "default"
               }}
-            >
-              <Icon
-                path={
-                  error
-                    ? Icons.imageFailed
-                    : isDownloadable(source, src)
-                    ? Icons.imageDownload
-                    : Icons.image
+              onDoubleClick={() =>
+                editor.current?.commands.previewAttachment(node.attrs)
+              }
+              onLoad={(e) => {
+                const { clientHeight, clientWidth } = e.currentTarget;
+                if (!height && !width && !aspectRatio) {
+                  editor.current?.commands.updateImage(
+                    { src, hash },
+                    { aspectRatio: clientWidth / clientHeight }
+                  );
                 }
-                size={width ? width * 0.2 : 72}
-                color="gray"
-              />
-
-              <Text
-                as="span"
-                variant={"subBody"}
-                sx={{
-                  display: "inline-block",
-                  textDecoration: "none",
-                  textAlign: "center",
-                  mx: 2,
-                  mt: 2
-                }}
-              >
-                {error
-                  ? `There was an error loading the image: ${error}`
-                  : isDownloadable(source, src)
-                  ? `Downloading image from ${getHostname(src)}`
-                  : ""}
-              </Text>
-              {error ? (
-                <Button
-                  variant="secondary"
-                  sx={{ mt: 1 }}
-                  onClick={() => {
-                    setSource(src);
-                    setError(undefined);
-                  }}
-                >
-                  Skip downloading (unsafe)
-                </Button>
-              ) : null}
-            </Flex>
-          ) : (
-            <Resizer
-              style={{ marginTop: 5 }}
-              editor={editor}
-              selected={selected}
-              width={width}
-              onResize={(width, height) => {
-                editor.commands.setImageSize({ width, height });
               }}
-            >
-              <DesktopOnly>
-                {selected && (
-                  <Flex
-                    sx={{
-                      position: "absolute",
-                      top: -40,
-                      right: 0,
-                      mb: 2,
-                      alignItems: "end"
-                    }}
-                  >
-                    <ToolbarGroup
-                      editor={editor}
-                      tools={
-                        isReadonly
-                          ? [
-                              hash ? "previewAttachment" : "none",
-                              hash ? "downloadAttachment" : "none"
-                            ]
-                          : [
-                              hash ? "previewAttachment" : "none",
-                              hash ? "downloadAttachment" : "none",
-                              "imageAlignLeft",
-                              float ? "none" : "imageAlignCenter",
-                              "imageAlignRight",
-                              "imageProperties"
-                            ]
-                      }
-                      sx={{
-                        boxShadow: "menu",
-                        borderRadius: "default",
-                        bg: "background"
-                      }}
-                    />
-                  </Flex>
-                )}
-              </DesktopOnly>
-              {!isReadonly && selected && (
-                <Icon
-                  className="drag-handle"
-                  data-drag-handle
-                  draggable
-                  path={Icons.dragHandle}
-                  color="black"
-                  sx={{
-                    cursor: "grab",
-                    position: "absolute",
-                    top: 1,
-                    left: 1,
-                    zIndex: 999
-                  }}
-                />
-              )}
-              <AnimatedImage
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, ease: "easeIn" }}
-                data-drag-image
-                ref={imageRef}
-                alt={alt}
-                src={source}
-                title={title}
-                sx={{
-                  width: editor.isEditable ? "100%" : width,
-                  height: editor.isEditable ? "100%" : height,
-                  border: selected
-                    ? "2px solid var(--accent)"
-                    : "2px solid transparent",
-                  borderRadius: "default"
-                }}
-                onDoubleClick={() =>
-                  editor.current?.commands.previewAttachment(node.attrs)
-                }
-                onLoad={(e) => {
-                  const { clientHeight, clientWidth } = e.currentTarget;
-                  if (!height && !width && !aspectRatio) {
-                    editor.current?.commands.updateImage(
-                      { src, hash },
-                      { aspectRatio: clientWidth / clientHeight }
-                    );
-                  }
-                }}
-              />
-            </Resizer>
-          )}
-        </LazyMotion>
+            />
+          </Resizer>
+        )}
       </Box>
     </>
   );

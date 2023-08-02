@@ -29,16 +29,16 @@ import { Box, Button, Flex, Text, FlexProps } from "@theme-ui/components";
 import { Icons } from "../../toolbar/icons";
 import Modal from "react-modal";
 import {
-  m,
+  motion,
   PanInfo,
   useMotionValue,
   useTransform,
   useAnimation
 } from "framer-motion";
 import { useTheme } from "@emotion/react";
-import { Theme } from "@notesnook/theme";
+import { EmotionThemeProvider, Theme } from "@notesnook/theme";
 
-const AnimatedFlex = m(
+const AnimatedFlex = motion(
   Flex as React.FunctionComponent<Omit<FlexProps, "onDrag" | "onDragEnd">>
 );
 
@@ -162,8 +162,9 @@ export function ActionSheetPresenter(
       }}
       overlayElement={(overlayElementProps, contentEl) => {
         return (
-          <Box
+          <EmotionThemeProvider
             {...overlayElementProps}
+            scope="sheet"
             style={{
               ...overlayElementProps.style,
               position: blocking ? "fixed" : "sticky",
@@ -173,7 +174,7 @@ export function ActionSheetPresenter(
             tabIndex={-1}
           >
             {blocking && (
-              <m.div
+              <motion.div
                 id="action-sheet-overlay"
                 style={{
                   height: "100%",
@@ -186,7 +187,7 @@ export function ActionSheetPresenter(
               />
             )}
             {contentEl}
-          </Box>
+          </EmotionThemeProvider>
         );
       }}
       contentElement={(props, children) => (
@@ -239,7 +240,9 @@ export function ActionSheetPresenter(
                 onClose?.();
                 return;
               }
-              const sheetEl = contentRef.current as HTMLDivElement;
+              const sheetEl = contentRef.current;
+              if (!sheetEl) return;
+
               const contentHeight = sheetEl.offsetHeight;
               const threshold = 30;
               const closingHeight = (contentHeight * threshold) / 100;
@@ -263,7 +266,7 @@ export function ActionSheetPresenter(
             <Box
               id="pill"
               sx={{
-                backgroundColor: "hover",
+                bg: "background-secondary",
                 width: 60,
                 height: 8,
                 borderRadius: 100
