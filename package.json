@@ -9,6 +9,7 @@
     "build:web": "nx build @notesnook/web",
     "build:vericrypt": "nx build @notesnook/vericrypt",
     "build:test:web": "nx build:test @notesnook/web",
+    "build:beta:web": "nx build:beta @notesnook/web",
     "start:web": "nx start @notesnook/web",
     "start:vericrypt": "nx start @notesnook/vericrypt",
     "start:desktop": "nx start @notesnook/desktop",

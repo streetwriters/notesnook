@@ -25,6 +25,10 @@
       "dependsOn": ["^build"],
       "outputs": ["{projectRoot}/build"]
     },
+    "build:beta": {
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/build"]
+    },
     "build:desktop": {
       "dependsOn": ["^build"],
       "outputs": ["{projectRoot}/build"]
