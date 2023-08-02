@@ -37,6 +37,7 @@ import { toBlob } from "@notesnook-importer/core/dist/src/utils/stream";
 import { Cipher, OutputFormat, SerializedKey } from "@notesnook/crypto";
 import { IDataType } from "hash-wasm/dist/lib/util";
 import { IndexedDBKVStore } from "./key-value";
+import FileHandle from "@notesnook/streamable-fs/dist/src/filehandle";
 
 const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
@@ -229,11 +230,16 @@ async function uploadFile(filename: string, requestOptions: RequestOptions) {
         }
       )
       .catch((e) => {
-        throw new S3Error("Could not initiate multi-part upload.", e);
+        throw new WrappedError("Could not initiate multi-part upload.", e);
       });
 
     uploadId = initiateMultiPartUpload.data.uploadId;
     const { parts } = initiateMultiPartUpload.data;
+
+    if (!parts)
+      throw new Error(
+        "Could not initiate multi-part upload: invalid response."
+      );
 
     await fileHandle.addAdditionalData("uploadId", uploadId);
 
@@ -267,7 +273,7 @@ async function uploadFile(filename: string, requestOptions: RequestOptions) {
           onUploadProgress
         })
         .catch((e) => {
-          throw new S3Error(`Failed to upload part at offset ${i}`, e);
+          throw new WrappedError(`Failed to upload part at offset ${i}`, e);
         });
 
       if (!response.headers.etag || typeof response.headers.etag !== "string")
@@ -297,8 +303,9 @@ async function uploadFile(filename: string, requestOptions: RequestOptions) {
           signal
         }
       )
-      .catch((e) => {
-        throw new S3Error("Could not complete multi-part upload.", e);
+      .catch(async (e) => {
+        await resetUpload(fileHandle);
+        throw new WrappedError("Could not complete multi-part upload.", e);
       });
 
     await fileHandle.addAdditionalData("uploaded", true);
@@ -310,11 +317,30 @@ async function uploadFile(filename: string, requestOptions: RequestOptions) {
     return true;
   } catch (e) {
     reportProgress(undefined, { type: "upload", hash: filename });
-    if (e instanceof S3Error) e.handle();
-    else handleS3Error(e);
-
+    const error = toS3Error(e);
+    if (
+      [
+        "NoSuchKey",
+        "NoSuchUpload",
+        "IncompleteBody",
+        "InternalError",
+        "InvalidObjectState",
+        "InvalidPart",
+        "InvalidPartOrder",
+        "SignatureDoesNotMatch"
+      ].includes(error.Code)
+    )
+      await resetUpload(fileHandle);
+    showError(error);
     return false;
   }
+}
+
+async function resetUpload(fileHandle: FileHandle) {
+  await fileHandle.addAdditionalData("uploadId", undefined);
+  await fileHandle.addAdditionalData("uploadedChunks", undefined);
+  await fileHandle.addAdditionalData("uploadedBytes", undefined);
+  await fileHandle.addAdditionalData("uploaded", false);
 }
 
 async function checkUpload(filename: string) {
@@ -418,7 +444,7 @@ async function downloadFile(filename: string, requestOptions: RequestOptions) {
 
     return true;
   } catch (e) {
-    handleS3Error(e, "Could not download file");
+    showError(toS3Error(e), "Could not download file");
     reportProgress(undefined, { type: "download", hash: filename });
     return false;
   }
@@ -477,7 +503,7 @@ async function deleteFile(filename: string, requestOptions: RequestOptions) {
     if (result) await streamablefs.deleteFile(filename);
     return result;
   } catch (e) {
-    handleS3Error(e, "Could not delete file");
+    showError(toS3Error(e), "Could not delete file");
     return false;
   }
 }
@@ -544,46 +570,62 @@ function cancellable(
     };
   };
 }
+
 function parseS3Error(data: ArrayBuffer | unknown) {
-  if (!(data instanceof ArrayBuffer)) {
-    return {
-      Code: "UNKNOWN",
-      Message: typeof data === "object" ? JSON.stringify(data) : data
-    };
-  }
-  const xml = new TextDecoder().decode(data);
-  const doc = new DOMParser().parseFromString(xml, "text/xml");
+  const xml =
+    data instanceof ArrayBuffer
+      ? new TextDecoder().decode(data)
+      : typeof data === "string"
+      ? data
+      : null;
 
-  const ErrorElement = doc.getElementsByTagName("Error")[0];
-  if (!ErrorElement)
-    return { Code: "Unknown", Message: "An unknown error occured." };
+  const error = {
+    Code: "UNKNOWN",
+    Message: xml || JSON.stringify(data)
+  };
+  try {
+    if (!xml) return error;
+    const doc = new DOMParser().parseFromString(xml, "text/xml");
 
-  const error: Record<string, string> = {};
-  for (const child of ErrorElement.children) {
-    if (child.textContent) error[child.tagName] = child.textContent;
+    const ErrorElement = doc.getElementsByTagName("Error")[0];
+    if (!ErrorElement) return error;
+
+    for (const child of ErrorElement.children) {
+      if (
+        child.textContent &&
+        (child.tagName === "Code" || child.tagName === "Message")
+      )
+        error[child.tagName] = child.textContent;
+    }
+    return error;
+  } catch (e) {
+    return error;
   }
-  return error;
 }
 
-function handleS3Error(e: unknown, message?: unknown) {
-  if (axios.isAxiosError(e) && e.response?.data) {
-    const error = parseS3Error(e.response.data);
-    showToast("error", `${message}: [${error.Code}] ${error.Message}`);
-  } else if (message && e instanceof Error) {
-    showToast("error", `${message}: ${e.message}`);
+type S3Error = { Code: string; Message: string };
+function toS3Error(e: unknown): S3Error {
+  if (e instanceof WrappedError) {
+    const s3Error = toS3Error(e.error);
+    return { ...s3Error, Message: `${e.message} ${s3Error.Message}` };
+  } else if (axios.isAxiosError(e) && e.response?.data) {
+    return parseS3Error(e.response.data);
   } else if (e instanceof Error) {
-    showToast("error", e.message);
+    return { Code: "Unknown", Message: e.message };
   } else {
-    showToast("error", JSON.stringify(e));
+    return { Code: "Unknown", Message: JSON.stringify(e) };
   }
 }
 
-class S3Error extends Error {
-  constructor(message: string, readonly error: Error) {
-    super(message);
-  }
+function showError(error: S3Error, message?: string) {
+  showToast(
+    "error",
+    `[${error.Code}] ${message ? message + " " : ""}${error.Message}`
+  );
+}
 
-  handle() {
-    handleS3Error(this.error, this.message);
+class WrappedError extends Error {
+  constructor(readonly message: string, readonly error: unknown) {
+    super(message);
   }
 }
