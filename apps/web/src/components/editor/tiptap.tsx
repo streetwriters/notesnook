@@ -410,7 +410,10 @@ function Portal(props: PropsWithChildren<{ containerId?: string }>) {
 
 function toIEditor(editor: Editor): IEditor {
   return {
-    focus: () => editor.current?.commands.focus("start"),
+    focus: ({ position, scrollIntoView } = {}) =>
+      editor.current?.commands.focus(position, {
+        scrollIntoView
+      }),
     undo: () => editor.current?.commands.undo(),
     redo: () => editor.current?.commands.redo(),
     getMediaHashes: () => {

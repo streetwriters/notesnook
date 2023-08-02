@@ -27,7 +27,10 @@ export type NoteStatistics = {
 };
 
 export interface IEditor {
-  focus: () => void;
+  focus: (options?: {
+    position?: "start" | "end";
+    scrollIntoView?: boolean;
+  }) => void;
   undo: () => void;
   redo: () => void;
   getMediaHashes: () => string[];
