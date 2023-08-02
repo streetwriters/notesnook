@@ -66,6 +66,7 @@ export const Reminders = ({
       });
 
       SearchService.prepareSearch = prepareSearch;
+      useNavigationStore.getState().setButtonAction(PLACEHOLDER_DATA.action);
       return !prev?.current;
     },
     onBlur: () => false,
