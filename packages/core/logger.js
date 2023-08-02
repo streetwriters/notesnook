@@ -18,21 +18,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  LogLevel,
   Logger,
+  NoopLogger,
   combineReporters,
   consoleReporter,
-  format,
-  LogLevel,
-  NoopLogger
+  format
 } from "@notesnook/logger";
+
+const WEEK = 86400000 * 7;
 
 // Database logger reporter:
 // 1. Log to new key on every instance
 // 2. Each key contains logs of a session
-// 3. Keep 14 days of logs
+// 3. Keep 7 days of logs
 // 4. Implement functions for log retrieval & filtering
-
-const MAX_RETENTION_LENGTH = 14;
 
 class DatabaseLogReporter {
   /**
@@ -60,45 +60,47 @@ class DatabaseLogWriter {
   constructor(storage) {
     this.storage = storage;
     this.key = new Date().toLocaleDateString();
-    this.queue = [];
-
+    this.queue = {};
+    this.hasCleared = false;
     setInterval(() => {
-      setTimeout(() => this.flush());
+      setTimeout(() => {
+        if (!this.hasCleared) {
+          this.hasCleared = true;
+          this.rotate();
+        }
+        this.flush();
+      });
     }, 2000);
   }
 
   push(message) {
-    this.queue.push(message);
+    this.queue[`${this.key}:${message.timestamp}`] = message;
   }
 
   async read() {
-    return await this.storage.read(this.key, true);
+    const logKeys = await this.storage.getAllKeys();
+    const logs = [];
+    for (let key of logKeys) {
+      if (key.startsWith(this.key)) logs.push(await this.storage.read(key));
+    }
+    return logs;
   }
 
   async flush() {
-    if (this.queue.length <= 0) return;
-    const queueCopy = this.queue.slice();
-    this.queue = [];
+    if (Object.keys(this.queue).length === 0) return;
+    const queueCopy = { ...this.queue };
+    this.queue = {};
 
-    let logs = await this.read();
-    if (!logs) {
-      await this.rotate();
-      logs = await this.read();
+    for (let key in queueCopy) {
+      await this.storage.write(key, queueCopy[key]);
     }
-
-    logs.push(...queueCopy);
-    await this.storage.write(this.key, logs);
   }
 
   async rotate() {
-    await this.storage.write(this.key, []);
     const logKeys = (await this.storage.getAllKeys()).sort();
-
-    if (logKeys.length > MAX_RETENTION_LENGTH) {
-      for (const key of logKeys.slice(
-        0,
-        logKeys.length - MAX_RETENTION_LENGTH
-      )) {
+    for (let key of logKeys) {
+      const keyParts = key.split(":");
+      if (keyParts.length === 1 || parseInt(keyParts[1]) < Date.now() - WEEK) {
         await this.storage.remove(key);
       }
     }
@@ -116,12 +118,20 @@ class DatabaseLogManager {
 
   async get() {
     const logKeys = await this.storage.getAllKeys();
-    const logs = [];
-    for (const key of logKeys) {
-      const log = await this.storage.read(key, true);
-      logs.push({ key, logs: log });
+    const logs = {};
+
+    for (const logKey of logKeys) {
+      const keyParts = logKey.split(":");
+      if (keyParts.length === 1) continue;
+      const key = keyParts[0];
+
+      const log = await this.storage.read(logKey, true);
+
+      if (!logs[key]) logs[key] = [];
+      logs[key].push(log);
     }
-    return logs;
+
+    return Object.keys(logs).map((key) => ({ key: key, logs: logs[key] }));
   }
 
   async clear() {
@@ -132,7 +142,15 @@ class DatabaseLogManager {
   }
 
   async delete(key) {
-    await this.storage.remove(key);
+    const logKeys = await this.storage.getAllKeys();
+    for (const logKey of logKeys) {
+      const keyParts = logKey.split(":");
+      if (keyParts.length === 1) continue;
+      const currKey = keyParts[0];
+      if (currKey === key) {
+        await this.storage.remove(logKey);
+      }
+    }
   }
 }
 
@@ -159,4 +177,4 @@ var logger = new NoopLogger();
  */
 var logManager;
 
-export { logger, logManager, initalize, format, LogLevel };
+export { LogLevel, format, initalize, logManager, logger };
