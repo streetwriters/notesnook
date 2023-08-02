@@ -39,7 +39,6 @@ export const RightMenus = () => {
   const currentScreen = useNavigationStore((state) => state.currentScreen.name);
   const buttonAction = useNavigationStore((state) => state.buttonAction);
   const menuRef = useRef();
-  console.log(rightButtons.length);
 
   return (
     <View style={styles.rightBtnContainer}>
