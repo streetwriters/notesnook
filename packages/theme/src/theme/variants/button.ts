@@ -52,7 +52,7 @@ export const createButtonVariant = (
   },
   ":active": {
     bg: background,
-    filter: "brightness(90%)",
+    filter: "brightness(85%)",
     transform: "scale(0.98) !important",
     ...states?.hover,
     ...states?.active
@@ -117,7 +117,9 @@ const statusItem: ThemeUIStyleObject = {
 };
 
 const menuItem: ThemeUIStyleObject = {
-  ...createButtonVariant("transparent", "paragraph"),
+  ...createButtonVariant("transparent", "paragraph", {
+    hover: { bg: "hover" }
+  }),
   borderRadius: 0
 };
 
