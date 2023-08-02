@@ -205,90 +205,97 @@ export default function EditorManager({
   }, [noteId]);
 
   return (
-    <Allotment
-      proportionalLayout={true}
-      onDragEnd={(sizes) => {
-        Config.set("editor:panesize", sizes[1]);
-      }}
-    >
-      <Allotment.Pane className="editor-pane">
-        <Flex
-          ref={dropRef}
-          id="editorContainer"
-          sx={{
-            position: "relative",
-            alignSelf: "stretch",
-            overflow: "hidden",
-            flex: 1,
-            flexDirection: "column",
-            background: "background"
-          }}
-        >
-          {previewSession.current && (
-            <PreviewModeNotice
-              {...previewSession.current}
-              onDiscard={() => openSession(noteId)}
-            />
-          )}
-          <Editor
-            nonce={timestamp}
-            content={() =>
-              previewSession.current?.content?.data ||
-              editorstore.get().session?.content?.data
-            }
-            onPreviewDocument={(url) => setDocPreview(url)}
-            onContentChange={() => (lastSavedTime.current = Date.now())}
-            options={{
-              readonly: isReadonly || isPreviewSession,
-              onRequestFocus: () => toggleProperties(false),
-              onLoadMedia: loadMedia,
-              focusMode: isFocusMode,
-              isMobile: isMobile || isTablet
+    <ScopedThemeProvider scope="editor" sx={{ flex: 1 }}>
+      <Allotment
+        proportionalLayout={true}
+        onDragEnd={(sizes) => {
+          Config.set("editor:panesize", sizes[1]);
+        }}
+      >
+        <Allotment.Pane className="editor-pane">
+          <Flex
+            ref={dropRef}
+            id="editorContainer"
+            sx={{
+              position: "relative",
+              alignSelf: "stretch",
+              overflow: "hidden",
+              flex: 1,
+              flexDirection: "column",
+              background: "background"
             }}
-          />
-
-          {arePropertiesVisible && (
-            <Properties
-              onOpenPreviewSession={async (session: PreviewSession) => {
-                previewSession.current = session;
-                setTimestamp(Date.now());
+          >
+            {previewSession.current && (
+              <PreviewModeNotice
+                {...previewSession.current}
+                onDiscard={() => openSession(noteId)}
+              />
+            )}
+            <Editor
+              nonce={timestamp}
+              content={() =>
+                previewSession.current?.content?.data ||
+                editorstore.get().session?.content?.data
+              }
+              onPreviewDocument={(url) => setDocPreview(url)}
+              onContentChange={() => (lastSavedTime.current = Date.now())}
+              options={{
+                readonly: isReadonly || isPreviewSession,
+                onRequestFocus: () => toggleProperties(false),
+                onLoadMedia: loadMedia,
+                focusMode: isFocusMode,
+                isMobile: isMobile || isTablet
               }}
             />
-          )}
-          <DropZone overlayRef={overlayRef} />
-        </Flex>
-      </Allotment.Pane>
-      {docPreview && (
-        <Allotment.Pane
-          minSize={450}
-          preferredSize={Config.get("editor:panesize", 500)}
-        >
-          {docPreview.url ? (
-            <Flex
+
+            {arePropertiesVisible && (
+              <Properties
+                onOpenPreviewSession={async (session: PreviewSession) => {
+                  previewSession.current = session;
+                  setTimestamp(Date.now());
+                }}
+              />
+            )}
+            <DropZone overlayRef={overlayRef} />
+          </Flex>
+        </Allotment.Pane>
+        {docPreview && (
+          <Allotment.Pane
+            minSize={450}
+            preferredSize={Config.get("editor:panesize", 500)}
+          >
+            <ScopedThemeProvider
+              scope="editorSidebar"
               id="editorSidebar"
               sx={{
+                display: "flex",
                 flexDirection: "column",
                 overflow: "hidden",
                 borderLeft: "1px solid var(--border)",
-                height: "100%"
+                height: "100%",
+                bg: "background"
               }}
             >
-              <Suspense
-                fallback={<DownloadAttachmentProgress hash={docPreview.hash} />}
-              >
-                <PDFPreview
-                  fileUrl={docPreview.url}
-                  hash={docPreview.hash}
-                  onClose={() => setDocPreview(undefined)}
-                />
-              </Suspense>
-            </Flex>
-          ) : (
-            <DownloadAttachmentProgress hash={docPreview.hash} />
-          )}
-        </Allotment.Pane>
-      )}
-    </Allotment>
+              {docPreview.url ? (
+                <Suspense
+                  fallback={
+                    <DownloadAttachmentProgress hash={docPreview.hash} />
+                  }
+                >
+                  <PDFPreview
+                    fileUrl={docPreview.url}
+                    hash={docPreview.hash}
+                    onClose={() => setDocPreview(undefined)}
+                  />
+                </Suspense>
+              ) : (
+                <DownloadAttachmentProgress hash={docPreview.hash} />
+              )}
+            </ScopedThemeProvider>
+          </Allotment.Pane>
+        )}
+      </Allotment>
+    </ScopedThemeProvider>
   );
 }
 
@@ -317,7 +324,7 @@ function DownloadAttachmentProgress(props: DownloadAttachmentProgressProps) {
   return (
     <Flex
       sx={{
-        height: "100%",
+        flex: 1,
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "column"

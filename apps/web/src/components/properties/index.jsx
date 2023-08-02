@@ -48,6 +48,7 @@ import Notebook from "../notebook";
 import { getTotalNotes } from "@notesnook/common";
 import Reminder from "../reminder";
 import { getFormattedDate } from "@notesnook/common";
+import { ScopedThemeProvider } from "../theme-provider";
 
 const tools = [
   { key: "pin", property: "pinned", icon: Pin, label: "Pin" },
@@ -149,33 +150,38 @@ function Properties(props) {
 
   if (isFocusMode || !sessionId) return null;
   return (
-    <>
-      <AnimatedFlex
-        animate={{
-          x: 0
-        }}
-        transition={{
-          duration: 0.1,
-          bounceDamping: 1,
-          bounceStiffness: 1,
-          ease: "easeOut"
-        }}
-        initial={{ x: 600 }}
+    <AnimatedFlex
+      animate={{
+        x: 0
+      }}
+      transition={{
+        duration: 0.1,
+        bounceDamping: 1,
+        bounceStiffness: 1,
+        ease: "easeOut"
+      }}
+      initial={{ x: 600 }}
+      sx={{
+        display: "flex",
+        position: "absolute",
+        right: 0,
+        zIndex: 3,
+        height: "100%",
+        width: "300px",
+        borderLeft: "1px solid",
+        borderLeftColor: "border"
+      }}
+    >
+      <ScopedThemeProvider
+        scope="editorSidebar"
         sx={{
+          flex: 1,
           display: "flex",
-          position: "absolute",
-          right: 0,
-          zIndex: 3,
-          height: "100%",
-          width: "300px",
-          borderLeft: "1px solid",
-          borderLeftColor: "border",
+          bg: "background",
           overflowY: "hidden",
           overflowX: "hidden",
           flexDirection: "column"
         }}
-        bg="background"
-        // px={2}
       >
         <ScrollContainer>
           <Card
@@ -392,8 +398,8 @@ function Properties(props) {
             })}
           </Card>
         </ScrollContainer>
-      </AnimatedFlex>
-    </>
+      </ScopedThemeProvider>
+    </AnimatedFlex>
   );
 }
 export default React.memo(Properties);
