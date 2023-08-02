@@ -5,7 +5,6 @@ artifacts/
 .DS_Store
 
 native/android/app/src/main/assets/
-native/fonts
 *Issues.md
 build_cache/
 #
