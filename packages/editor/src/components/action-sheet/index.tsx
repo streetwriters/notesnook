@@ -29,7 +29,7 @@ import { Box, Button, Flex, Text, FlexProps } from "@theme-ui/components";
 import { Icons } from "../../toolbar/icons";
 import Modal from "react-modal";
 import {
-  motion,
+  m,
   PanInfo,
   useMotionValue,
   useTransform,
@@ -38,7 +38,7 @@ import {
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
 
-const AnimatedFlex = motion(
+const AnimatedFlex = m(
   Flex as React.FunctionComponent<Omit<FlexProps, "onDrag" | "onDragEnd">>
 );
 
@@ -173,7 +173,7 @@ export function ActionSheetPresenter(
             tabIndex={-1}
           >
             {blocking && (
-              <motion.div
+              <m.div
                 id="action-sheet-overlay"
                 style={{
                   height: "100%",
