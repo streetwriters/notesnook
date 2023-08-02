@@ -262,6 +262,7 @@ const ShareView = ({ quicknote = false }) => {
       defaultNote.content.data = null;
       setNote({ ...defaultNote });
       const data = await ShareExtension.data();
+
       if (!data || data.length === 0) {
         setRawData({
           value: ""
@@ -299,8 +300,9 @@ const ShareView = ({ quicknote = false }) => {
           }
         }
       }
-      setNote({ ...note });
       onLoad();
+
+      setNote({ ...note });
     } catch (e) {
       console.error(e);
     }
@@ -479,8 +481,7 @@ const ShareView = ({ quicknote = false }) => {
           <Text
             style={{
               color: colors.primary.paragraph,
-              fontSize: 17,
-              fontFamily: "OpenSans-Regular"
+              fontSize: 17
             }}
           >
             Quick note
@@ -580,7 +581,7 @@ const ShareView = ({ quicknote = false }) => {
                 <Text
                   style={{
                     fontSize: 18,
-                    fontFamily: "OpenSans-SemiBold",
+                    fontWeight: "bold",
                     color: colors.primary.heading
                   }}
                 >
@@ -728,7 +729,6 @@ const ShareView = ({ quicknote = false }) => {
                   style={{
                     fontSize: 12,
                     color: colors.secondary.paragraph,
-                    fontFamily: "OpenSans-Regular",
                     paddingHorizontal: 12,
                     marginBottom: 10,
                     flexWrap: "wrap"
@@ -738,7 +738,7 @@ const ShareView = ({ quicknote = false }) => {
                   <Text
                     style={{
                       color: colors.primary.accent,
-                      fontFamily: "OpenSans-SemiBold"
+                      fontWeight: "bold"
                     }}
                   >
                     {`"${appendNote.title}"`}
@@ -1191,7 +1191,6 @@ const Button = ({
           style={[
             {
               fontSize: fontSize || 18,
-              fontFamily: "OpenSans-Regular",
               color: textColor,
               marginLeft: loading ? 10 : 5
             },

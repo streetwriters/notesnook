@@ -100,49 +100,6 @@ export const SUBSCRIPTION_PROVIDER = {
   }
 };
 
-export const MenuItemsList = [
-  {
-    name: "Notes",
-    icon: "home-variant-outline",
-    close: true
-  },
-  {
-    name: "Notebooks",
-    icon: "book-outline",
-    close: true
-  },
-  {
-    name: "Favorites",
-    icon: "star-outline",
-    close: true
-  },
-  {
-    name: "Tags",
-    icon: "pound",
-    close: true
-  },
-  {
-    name: "Reminders",
-    icon: "bell",
-    close: true,
-    isBeta: true
-  },
-  {
-    name: "Monographs",
-    icon: "text-box-multiple-outline",
-    close: true,
-    func: () => {
-      const Monographs = require("../screens/notes/monographs").Monographs;
-      Monographs.navigate();
-    }
-  },
-  {
-    name: "Trash",
-    icon: "delete-outline",
-    close: true
-  }
-];
-
 export const BUTTON_TYPES = {
   transparent: {
     primary: "transparent",

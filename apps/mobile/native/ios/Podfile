@@ -57,17 +57,41 @@ target 'Notesnook' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  # for share extension
-  target 'Make Note' do
-    inherit! :complete
-  end
-  
   target 'NotesnookTests' do
    
     # Pods for testing
   end
 end
 
+# for share extension
+target 'Make Note' do
+
+  use_react_native!(
+    :path => "../../node_modules/react-native",
+    # Hermes is now enabled by default. Disable by setting this flag to false.
+    # Upcoming versions of React Native may rely on get_default_flags(), but
+    # we make it explicit here to aid in the React Native upgrade process.
+    :hermes_enabled => false,
+    :fabric_enabled => false,
+    # Enables Flipper.
+    #
+    # Note that if you have use_frameworks! enabled, Flipper will not work and
+    # you should disable the next line.
+    # :flipper_configuration => flipper_config,
+    # An absolute path to your application root.
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+  # Link only required libraries in share extension manually
+  pod 'react-native-blob-util', :path => '../../node_modules/react-native-blob-util'
+  pod 'react-native-share-extension', :path => '../../node_modules/@ammarahmed/react-native-share-extension'
+  pod 'react-native-sodium', :path => '../../node_modules/@ammarahmed/react-native-sodium'
+  pod 'react-native-gzip', :path => '../../node_modules/react-native-gzip'
+  pod 'react-native-mmkv-storage', :path => '../../node_modules/react-native-mmkv-storage'
+  pod 'react-native-webview', :path => '../../node_modules/react-native-webview'
+  pod 'RNKeychain' , :path => '../../node_modules/react-native-keychain'
+  pod 'react-native-netinfo', :path => '../../node_modules/@react-native-community/netinfo'
+  pod 'react-native-safe-area-context', :path => '../../node_modules/react-native-safe-area-context'
+end
 
 
 target 'Notesnook-tvOS' do

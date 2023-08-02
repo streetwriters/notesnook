@@ -10,6 +10,7 @@ const config = {
 };
 
 if (!config.dependencies) config.dependencies = {};
+
 config.dependencies['react-native-vector-icons'] = {
   platforms: {
     ios: null,

@@ -224,20 +224,26 @@ task deleteFiles(type: Delete) {
   delete './src/main/assets/static'
 }
 
-task copyFiles(type: Copy) {
+task copyEditorBundle(type: Copy) {
     from '../../../../../packages/editor-mobile/build.bundle'
     into './src/main/assets'
 }
-copyFiles.dependsOn(deleteFiles)
-preBuild.dependsOn(copyFiles)
+
+task copyPlainEditorBundle(type: Copy) {
+    from '../../ios/extension.bundle'
+    into './src/main/assets'
+}
+
+task copyFontFiles(type: Copy) {
+    from '../../fonts'
+    into './src/main/assets/fonts'
+}
 
 
-project.ext.vectoricons = [
-    iconFontNames: ['MaterialCommunityIcons.ttf' ],
-    iconFontsDir: "../../../node_modules/react-native-vector-icons/Fonts"
-]
-
-apply from: "../../../node_modules/react-native-vector-icons/fonts.gradle"
+copyEditorBundle.dependsOn(deleteFiles)
+copyFontFiles.dependsOn(copyEditorBundle);
+copyPlainEditorBundle.dependsOn(copyFontFiles);
+preBuild.dependsOn(copyPlainEditorBundle)
 
 apply from: file("../../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
 

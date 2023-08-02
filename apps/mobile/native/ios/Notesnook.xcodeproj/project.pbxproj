@@ -15,16 +15,12 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* NotesnookTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* NotesnookTests.m */; };
 		6510626F27042891009661C3 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6552012F27019F7700A43C51 /* OpenSans-Regular.ttf */; };
-		6510627527042893009661C3 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6552012F27019F7700A43C51 /* OpenSans-Regular.ttf */; };
 		6510627627042895009661C3 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6552012E27019F6E00A43C51 /* OpenSans-SemiBold.ttf */; };
-		6510627727042896009661C3 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6552012E27019F6E00A43C51 /* OpenSans-SemiBold.ttf */; };
 		6510E6D72877215700DACAA9 /* build.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6510E6D62877215700DACAA9 /* build.bundle */; };
-		6510E6D82877215700DACAA9 /* build.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6510E6D62877215700DACAA9 /* build.bundle */; };
 		6515C42F2580AA3000E83E39 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6515C42E2580AA2F00E83E39 /* StoreKit.framework */; };
 		6529A13E279BC4C70048D4A8 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */; };
 		6593E4A3281C345400492C50 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6593E4A2281C345400492C50 /* AppDelegate.mm */; };
 		659670B22A2754FD00C5D2AF /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 659670B12A2754FD00C5D2AF /* OpenSans-Bold.ttf */; };
-		659670B32A2754FD00C5D2AF /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 659670B12A2754FD00C5D2AF /* OpenSans-Bold.ttf */; };
 		659BE46725E11A5100E05671 /* notesnook-text.png in Resources */ = {isa = PBXBuildFile; fileRef = 659BE46625E11A5100E05671 /* notesnook-text.png */; };
 		65AA857925E6DDEC00772A01 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65AA857825E6DDEC00772A01 /* WidgetKit.framework */; };
 		65AA857B25E6DDEC00772A01 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65AA857A25E6DDEC00772A01 /* SwiftUI.framework */; };
@@ -35,12 +31,12 @@
 		65B5014725A672B200E2D264 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65B5014525A672B200E2D264 /* MainInterface.storyboard */; };
 		65B5014B25A672B200E2D264 /* Make Note.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 65B5014025A672B200E2D264 /* Make Note.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		65B5020325A6756700E2D264 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B5020225A6756700E2D264 /* File.swift */; };
+		65C149872A61151B005C40F1 /* extension.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 65C149862A61151B005C40F1 /* extension.bundle */; };
 		65D145C529DC30470056FE7D /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65D145C429DC30470056FE7D /* MaterialCommunityIcons.ttf */; };
-		65D145C629DC30470056FE7D /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65D145C429DC30470056FE7D /* MaterialCommunityIcons.ttf */; };
 		65E0340B257B9FF100793428 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E0340A257B9FF100793428 /* File.swift */; };
-		7C72B5EA418785B334F3B5EB /* libPods-Notesnook-Make Note.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35547D7C07E83F889159A73D /* libPods-Notesnook-Make Note.a */; };
 		87CE5B71DC72F3D95B7B1AA5 /* libPods-Notesnook-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A03E3F5851D27269540E147C /* libPods-Notesnook-tvOSTests.a */; };
 		A79A93DC9D0CAE8703462151 /* libPods-Notesnook-NotesnookTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 068FA9BDFA207A50B0A9E597 /* libPods-Notesnook-NotesnookTests.a */; };
+		C619D096A9DE2070DBEAC70F /* libPods-Make Note.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C4AF691C324D95337F2FB0A /* libPods-Make Note.a */; };
 		F50BF8BC21F8B58EB2B5A31A /* libPods-Notesnook-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 16C0296DE7A2B4102817F5C1 /* libPods-Notesnook-tvOS.a */; };
 /* End PBXBuildFile section */
 
@@ -107,10 +103,10 @@
 		279A4325E1D27BD3E720F35B /* Pods-Notesnook-Make Note.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-Make Note.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-Make Note/Pods-Notesnook-Make Note.debug.xcconfig"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* Notesnook-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Notesnook-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* Notesnook-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Notesnook-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		35547D7C07E83F889159A73D /* libPods-Notesnook-Make Note.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-Make Note.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		41D57E9831C724F59F18FBAE /* libPods-Notesnook-Add to Notes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-Add to Notes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		47AE097A087A651BD60CAD7B /* Pods-Notesnook-Make Note.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-Make Note.release.xcconfig"; path = "Target Support Files/Pods-Notesnook-Make Note/Pods-Notesnook-Make Note.release.xcconfig"; sourceTree = "<group>"; };
 		4BD34AE0C0FD2416E48803B8 /* libPods-Notesnook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C4AF691C324D95337F2FB0A /* libPods-Make Note.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Make Note.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6510E6D62877215700DACAA9 /* build.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = build.bundle; path = "../../../../packages/editor-mobile/build.bundle"; sourceTree = "<group>"; };
 		6515C42E2580AA2F00E83E39 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = Notesnook/BootSplash.storyboard; sourceTree = "<group>"; };
@@ -134,6 +130,7 @@
 		65B501AA25A6733400E2D264 /* Make Note.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Make Note.entitlements"; sourceTree = "<group>"; };
 		65B5020125A6756700E2D264 /* Make Note-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Make Note-Bridging-Header.h"; sourceTree = "<group>"; };
 		65B5020225A6756700E2D264 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
+		65C149862A61151B005C40F1 /* extension.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = extension.bundle; sourceTree = "<group>"; };
 		65D145C429DC30470056FE7D /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialCommunityIcons.ttf; path = "../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		65E03409257B9FF100793428 /* Notesnook-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Notesnook-Bridging-Header.h"; sourceTree = "<group>"; };
 		65E0340A257B9FF100793428 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
@@ -200,7 +197,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C72B5EA418785B334F3B5EB /* libPods-Notesnook-Make Note.a in Frameworks */,
+				C619D096A9DE2070DBEAC70F /* libPods-Make Note.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,9 +251,9 @@
 				16C0296DE7A2B4102817F5C1 /* libPods-Notesnook-tvOS.a */,
 				A03E3F5851D27269540E147C /* libPods-Notesnook-tvOSTests.a */,
 				41D57E9831C724F59F18FBAE /* libPods-Notesnook-Add to Notes.a */,
-				35547D7C07E83F889159A73D /* libPods-Notesnook-Make Note.a */,
 				65AA857825E6DDEC00772A01 /* WidgetKit.framework */,
 				65AA857A25E6DDEC00772A01 /* SwiftUI.framework */,
+				4C4AF691C324D95337F2FB0A /* libPods-Make Note.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -294,6 +291,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				65C149862A61151B005C40F1 /* extension.bundle */,
 				6510E6D62877215700DACAA9 /* build.bundle */,
 				65EC5B71272A7EE200FB3748 /* NotesWidgetExtensionDebug.entitlements */,
 				6552012F27019F7700A43C51 /* OpenSans-Regular.ttf */,
@@ -578,11 +576,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6510E6D82877215700DACAA9 /* build.bundle in Resources */,
-				65D145C629DC30470056FE7D /* MaterialCommunityIcons.ttf in Resources */,
-				659670B32A2754FD00C5D2AF /* OpenSans-Bold.ttf in Resources */,
-				6510627727042896009661C3 /* OpenSans-SemiBold.ttf in Resources */,
-				6510627527042893009661C3 /* OpenSans-Regular.ttf in Resources */,
+				65C149872A61151B005C40F1 /* extension.bundle in Resources */,
 				65B5014725A672B200E2D264 /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -776,7 +770,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Notesnook-Make Note-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Make Note-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -789,7 +783,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Notesnook-Make Note/Pods-Notesnook-Make Note-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-Make Note/Pods-Make Note-resources.sh",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -798,7 +792,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Notesnook-Make Note/Pods-Notesnook-Make Note-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Make Note/Pods-Make Note-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -1403,7 +1397,7 @@
 		};
 		65B5014D25A672B200E2D264 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 279A4325E1D27BD3E720F35B /* Pods-Notesnook-Make Note.debug.xcconfig */;
+			baseConfigurationReference = 88211800FA8BF60638327ADE /* Pods-Make Note.debug.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1506,7 +1500,7 @@
 		};
 		65B5014E25A672B200E2D264 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 47AE097A087A651BD60CAD7B /* Pods-Notesnook-Make Note.release.xcconfig */;
+			baseConfigurationReference = A84F3F0D50641D1CD4569B0E /* Pods-Make Note.release.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ANALYZER_NONNULL = YES;

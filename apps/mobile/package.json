@@ -8,7 +8,7 @@
     "app/"
   ],
   "scripts": {
-    "postinstall": "patch-package",
+    "postinstall": "patch-package && node ./scripts/optimize-fonts.mjs",
     "run-android": "cd native && react-native run-android --active-arch-only",
     "run-ios": "cd native && react-native run-ios",
     "start": "cd native && react-native start",
@@ -23,6 +23,7 @@
     "release-android-bundle": "cd native/android && ./gradlew bundleRelease --no-daemon"
   },
   "devDependencies": {
+    "fonteditor-core": "^2.1.11",
     "otplib": "12.0.1",
     "patch-package": "7.0.0",
     "react-refresh": "0.14.0"

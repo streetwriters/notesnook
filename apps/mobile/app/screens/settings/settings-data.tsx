@@ -972,7 +972,7 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
-            id: "reminder-sound",
+            id: "reminder-sound-ios",
             type: "screen",
             name: "Change notification sound",
             description:
@@ -984,7 +984,7 @@ export const settingsGroups: SettingSection[] = [
               (Platform.OS === "android" && Platform.Version > 25)
           },
           {
-            id: "reminder-sound",
+            id: "reminder-sound-android",
             name: "Change notification sound",
             description:
               "Set the notification sound for reminder notifications",

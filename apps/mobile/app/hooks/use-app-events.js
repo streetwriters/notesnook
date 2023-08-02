@@ -631,6 +631,7 @@ const doAppLoadActions = async () => {
   await useMessageStore.getState().setAnnouncement();
   if (NewFeature.present()) return;
   if (await checkAppUpdateAvailable()) return;
+
   if (!(await db.user.getUser())) {
     setLoginMessage();
     return;

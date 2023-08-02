@@ -102,7 +102,11 @@ const SheetProvider = ({ context = "global" }) => {
         setData(null);
       }}
       bottomPadding={!data.noBottomPadding}
-      enableGesturesInScrollView={data.enableGesturesInScrollView}
+      enableGesturesInScrollView={
+        typeof data.enableGesturesInScrollView === "undefined"
+          ? true
+          : data.enableGesturesInScrollView
+      }
     >
       <View
         style={{
