@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useRef, useState } from "react";
 import { Platform, TextInput, View } from "react-native";
 import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
@@ -25,7 +26,6 @@ import {
   ToastEvent,
   presentSheet
 } from "../../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
@@ -601,7 +601,7 @@ ReminderSheet.present = (
 ) => {
   presentSheet({
     context: isSheet ? "local" : undefined,
-    enableGesturesInScrollView: true,
+    enableGesturesInScrollView: false,
     noBottomPadding: true,
     component: (ref, close, update) => (
       <ReminderSheet
