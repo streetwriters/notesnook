@@ -247,7 +247,7 @@ export default function ReminderSheet({
         />
       </View>
       <Dialog context="local" />
-      <ScrollView>
+      <ScrollView bounces={false}>
         <Input
           fwdRef={titleRef}
           defaultValue={reminder?.title || referencedItem?.title}
