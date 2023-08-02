@@ -162,7 +162,7 @@ export function Attachment({
             )
           ) : attachment.failed ? (
             <AttachmentError
-              color={"error"}
+              color={"icon-error"}
               size={16}
               title={attachment.failed}
             />
