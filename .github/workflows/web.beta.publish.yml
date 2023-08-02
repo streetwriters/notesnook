@@ -4,8 +4,14 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - "master"
-
+      - master
+  pull_request:
+    types:
+      - closed
+      - ready_for_review
+      - reopened
+    branches:
+      - master
 jobs:
   build:
     name: Build
@@ -31,5 +37,13 @@ jobs:
       - name: Generate beta build
         run: npm run build:beta:web
 
-      - name: Publish on Cloudflare Pages
-        run: npx --yes wrangler pages deploy --branch master --project-name=notesnook-beta-app ./apps/web/build/
+      - name: Publish to Cloudflare Pages
+        uses: unlike-ltd/github-actions-cloudflare-pages@v0.1.1
+        id: pages
+        with:
+          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          cloudflare-account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          cloudflare-project-name: notesnook-beta-app
+          directory: ./apps/web/build
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-environment: ${{ (github.ref == 'refs/heads/master' && 'beta') || 'preview' }}
