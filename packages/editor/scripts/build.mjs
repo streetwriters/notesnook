@@ -28,8 +28,7 @@ const ROOT_DIR = path.resolve(path.join(__dirname, ".."));
 
 const pathsToCopy = {
   "katex.min.css": "node_modules/katex/dist/katex.min.css",
-  "fonts/": "node_modules/katex/dist/fonts/",
-  "prism-theme.css": "node_modules/prism-themes/themes/prism-dracula.min.css"
+  "fonts/": "node_modules/katex/dist/fonts/"
 };
 
 for (const name in pathsToCopy) {
