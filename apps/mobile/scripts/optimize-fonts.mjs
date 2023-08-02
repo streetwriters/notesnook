@@ -60,7 +60,9 @@ const EXTRA_ICON_NAMES = [
   "unfold-less-horizontal",
   "minus-circle",
   "vibrate",
-  "volume-high"
+  "volume-high",
+  "checkbox-blank-circle-outline",
+  "check-circle-outline"
 ];
 
 const __filename = fileURLToPath(import.meta.url);
