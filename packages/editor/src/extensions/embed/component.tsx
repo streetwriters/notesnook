@@ -23,7 +23,8 @@ import { EmbedAlignmentOptions, EmbedAttributes } from "./embed";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { DesktopOnly } from "../../components/responsive";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
-import { Icon, Icons } from "../../toolbar";
+import { Icons } from "../../toolbar";
+import { Icon } from "@notesnook/ui";
 import { Resizer } from "../../components/resizer";
 
 export function EmbedComponent(
@@ -48,7 +49,7 @@ export function EmbedComponent(
       }}
     >
       <Resizer
-        handleColor="primary"
+        handleColor="accent"
         editor={editor}
         selected={selected}
         width={width}
@@ -70,10 +71,12 @@ export function EmbedComponent(
             top: -24,
             justifyContent: "end",
             p: "small",
-            bg: editor.isEditable ? "bgSecondary" : "transparent",
+            bg: editor.isEditable
+              ? "var(--background-secondary)"
+              : "transparent",
             borderTopLeftRadius: "default",
             borderTopRightRadius: "default",
-            borderColor: selected ? "border" : "bgSecondary",
+            borderColor: selected ? "border" : "var(--border-secondary)",
             cursor: "pointer",
             ":hover": {
               borderColor: "border"
@@ -117,9 +120,9 @@ export function EmbedComponent(
           width={"100%"}
           height={"100%"}
           sx={{
-            bg: "bgSecondary",
+            bg: "var(--background-secondary)",
             border: selected
-              ? "2px solid var(--primary)"
+              ? "2px solid var(--accent)"
               : "2px solid transparent",
             borderRadius: "default"
           }}
@@ -137,7 +140,7 @@ export function EmbedComponent(
               justifyContent: "center"
             }}
           >
-            <Icon path={Icons.loading} rotate size={32} color="disabled" />
+            <Icon path={Icons.loading} rotate size={32} color="icon" />
           </Flex>
         )}
       </Resizer>

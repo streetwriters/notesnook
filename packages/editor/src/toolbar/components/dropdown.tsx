@@ -19,12 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef, useState } from "react";
 import { Text } from "@theme-ui/components";
-import { Icon } from "./icon";
+import { Icon, MenuItem, MenuPresenter } from "@notesnook/ui";
 import { Icons } from "../icons";
-// import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
-import { MenuItem } from "../../components/menu/types";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
-import { MenuPresenter } from "../../components/menu";
 import { getToolbarElement } from "../utils/dom";
 import { Button } from "../../components/button";
 import { usePopupHandler } from "../../components/popup-presenter";
@@ -55,6 +52,7 @@ export function Dropdown(props: DropdownProps) {
   return (
     <>
       <Button
+        variant="secondary"
         ref={(ref) => {
           internalRef.current = ref || undefined;
           if (buttonRef) buttonRef.current = ref || undefined;
@@ -63,11 +61,10 @@ export function Dropdown(props: DropdownProps) {
           p: 1,
           m: 0,
           bg: isPopupOpen ? "hover" : "transparent",
-          mr: 1,
+          height: "100%",
           flexShrink: 0,
           display: "flex",
           alignItems: "center",
-          ":hover": { bg: "hover" },
           ":last-of-type": {
             mr: 0
           }
@@ -77,7 +74,12 @@ export function Dropdown(props: DropdownProps) {
       >
         {typeof selectedItem === "string" ? (
           <Text
-            sx={{ fontSize: "subBody", mr: 1, color: "text", flexShrink: 0 }}
+            sx={{
+              fontSize: "subBody",
+              mr: 1,
+              color: "paragraph",
+              flexShrink: 0
+            }}
           >
             {selectedItem}
           </Text>
@@ -95,7 +97,6 @@ export function Dropdown(props: DropdownProps) {
               : Icons.chevronDown
           }
           size={"small"}
-          color={"text"}
         />
       </Button>
 

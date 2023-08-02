@@ -48,7 +48,7 @@ export default function DropdownButton(props) {
           }}
           onClick={() => openMenu(options.slice(1), { title })}
         >
-          <ChevronDown color="static" size={18} />
+          <ChevronDown color="white" size={18} />
         </Button>
       )}
     </Flex>

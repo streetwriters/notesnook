@@ -21,7 +21,7 @@ import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { eSendEvent } from "../../../services/event-manager";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import {
   eCloseSheet,
   eCloseResultDialog,
@@ -31,7 +31,7 @@ import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import Paragraph from "../../ui/typography/paragraph";
 export const ProFeatures = ({ count = 6 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   return (
     <>
@@ -73,7 +73,7 @@ export const ProFeatures = ({ count = 6 }) => {
               justifyContent: "flex-start"
             }}
           >
-            <Icon size={SIZE.lg} color={colors.accent} name="check" />
+            <Icon size={SIZE.lg} color={colors.primary.accent} name="check" />
             <Paragraph style={{ marginLeft: 5, flexShrink: 1 }}>
               {item.content}
             </Paragraph>
@@ -89,7 +89,7 @@ export const ProFeatures = ({ count = 6 }) => {
         size={SIZE.xs}
         style={{
           textDecorationLine: "underline",
-          color: colors.icon
+          color: colors.secondary.paragraph
         }}
       >
         See all features included in Notesnook Pro

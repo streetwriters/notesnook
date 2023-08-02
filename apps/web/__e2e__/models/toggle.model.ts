@@ -50,7 +50,7 @@ export class ToggleModel {
   }
 
   private async waitUntilToggleState(locator: Locator, state: TOGGLE_STATES) {
-    if (this.id.startsWith("menuitem")) await this.page.waitForTimeout(200);
+    if (this.id.startsWith("menu-button")) await this.page.waitForTimeout(200);
     else
       await this.getToggleState(locator, state).waitFor({ state: "visible" });
   }

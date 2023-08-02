@@ -67,8 +67,7 @@ export class TaskManager {
           updateStatus({
             key: statusTask.id,
             status: progress.text,
-            progress: percentage,
-            icon: null
+            progress: percentage
           });
         });
         removeStatus(statusTask.id);

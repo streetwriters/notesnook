@@ -42,11 +42,15 @@ export default function Button({
         width: 40,
         height: 40,
         borderWidth: 0,
-        background: active ? "var(--nn_transGray)" : "var(--nn_nav)",
+        background: active
+          ? "var(--nn_secondary_hover)"
+          : "var(--nn_secondary_background)",
         borderRadius: 5,
         fontWeight: "bold",
         userSelect: "none",
-        color: active ? "var(--nn_accent)" : "var(--nn_pri)",
+        color: active
+          ? "var(--nn_primary_paragraphmary_accent)"
+          : "var(--nn_primary_paragraph)",
         marginRight: marginRight,
         fontSize: 18
       }}

@@ -22,7 +22,7 @@ import { FlatList, Linking, Platform } from "react-native";
 import { PressableButton } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
 import { SIZE } from "../../utils/size";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import Paragraph from "../../components/ui/typography/paragraph";
 
 type LicenseEntry = {
@@ -33,7 +33,7 @@ type LicenseEntry = {
 };
 
 export const Licenses = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors("base");
   const items =
     Platform.OS === "ios"
       ? LICENSES.filter((l) => l.name.indexOf("android") === -1)
@@ -49,7 +49,7 @@ export const Licenses = () => {
           alignSelf: "flex-start",
           padding: 12,
           borderBottomWidth: 1,
-          borderBottomColor: colors.nav,
+          borderBottomColor: colors.secondary.background,
           borderRadius: 0
         }}
         onPress={() => {
@@ -63,7 +63,7 @@ export const Licenses = () => {
         </Paragraph>
       </PressableButton>
     ),
-    [colors.nav]
+    [colors.secondary.background]
   );
   return (
     <FlatList

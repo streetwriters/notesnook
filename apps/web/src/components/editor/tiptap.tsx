@@ -21,9 +21,6 @@ import "@notesnook/editor/styles/styles.css";
 import "@notesnook/editor/styles/katex.min.css";
 import "@notesnook/editor/styles/katex-fonts.css";
 import "@notesnook/editor/styles/fonts.css";
-import "@notesnook/editor/styles/prism-theme.css";
-import { Theme } from "@notesnook/theme";
-import { useTheme } from "@emotion/react";
 import {
   Toolbar,
   useTiptap,
@@ -57,7 +54,9 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce, debounceWithId } from "@notesnook/common";
 import { store as editorstore } from "../../stores/editor-store";
+import { ScopedThemeProvider } from "../theme-provider";
 import { writeText } from "clipboard-polyfill";
+import { useStore as useThemeStore } from "../../stores/theme-store";
 
 type OnChangeHandler = (
   id: string | undefined,
@@ -78,7 +77,6 @@ type TipTapProps = {
   toolbarContainerId?: string;
   readonly?: boolean;
   nonce?: number;
-  theme: Theme;
   isMobile?: boolean;
   downloadOptions?: DownloadOptions;
   fontSize: number;
@@ -126,7 +124,6 @@ function TipTap(props: TipTapProps) {
     editorContainer,
     readonly,
     nonce,
-    theme,
     isMobile,
     downloadOptions,
     fontSize,
@@ -206,6 +203,7 @@ function TipTap(props: TipTapProps) {
         editor.commands.refreshSearch();
       },
       onUpdate: ({ editor, transaction }) => {
+        console.log("UPDATE", transaction);
         onContentChange?.();
 
         const preventSave = transaction?.getMeta("preventSave") as boolean;
@@ -265,7 +263,6 @@ function TipTap(props: TipTapProps) {
           };
         });
       }, 500),
-      theme,
       onOpenAttachmentPicker: (_editor, type) => {
         onInsertAttachment?.(type);
         return true;
@@ -283,7 +280,7 @@ function TipTap(props: TipTapProps) {
         return true;
       }
     };
-  }, [theme, readonly, nonce, doubleSpacedLines, dateFormat, timeFormat]);
+  }, [readonly, nonce, doubleSpacedLines, dateFormat, timeFormat]);
 
   const editor = useTiptap(
     tiptapOptions,
@@ -339,14 +336,15 @@ function TipTap(props: TipTapProps) {
   return (
     <>
       <Portal containerId={toolbarContainerId}>
-        <Toolbar
-          editor={editor}
-          theme={theme}
-          location={isMobile ? "bottom" : "top"}
-          tools={toolbarConfig}
-          defaultFontFamily={fontFamily}
-          defaultFontSize={fontSize}
-        />
+        <ScopedThemeProvider scope="editorToolbar">
+          <Toolbar
+            editor={editor}
+            location={isMobile ? "bottom" : "top"}
+            tools={toolbarConfig}
+            defaultFontFamily={fontFamily}
+            defaultFontSize={fontSize}
+          />
+        </ScopedThemeProvider>
       </Portal>
     </>
   );
@@ -358,7 +356,10 @@ function TiptapWrapper(
     "editorContainer" | "theme" | "fontSize" | "fontFamily"
   >
 ) {
-  const theme = useTheme() as Theme;
+  const colorScheme = useThemeStore((store) => store.colorScheme);
+  const theme = useThemeStore((store) =>
+    colorScheme === "dark" ? store.darkTheme : store.lightTheme
+  );
   const [isReady, setIsReady] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const { editorConfig } = useEditorConfig();
@@ -373,7 +374,6 @@ function TiptapWrapper(
           <TipTap
             {...props}
             editorContainer={editorContainerRef.current}
-            theme={theme}
             fontFamily={editorConfig.fontFamily}
             fontSize={editorConfig.fontSize}
           />
@@ -384,7 +384,9 @@ function TiptapWrapper(
           style={{
             flex: 1,
             cursor: "text",
-            color: theme.colors.text, // TODO!
+            color:
+              theme.scopes.editor?.primary?.paragraph ||
+              theme.scopes.base.primary.paragraph, // TODO!
             paddingBottom: 150,
             fontSize: editorConfig.fontSize,
             fontFamily: getFontById(editorConfig.fontFamily)?.font

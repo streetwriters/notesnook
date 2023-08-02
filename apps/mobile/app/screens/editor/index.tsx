@@ -80,12 +80,11 @@ const Editor = React.memo(
         withController = true,
         editorId = "",
         onLoad,
-        onChange,
-        theme
+        onChange
       },
       ref
     ) => {
-      const editor = useEditor(editorId || "", readonly, onChange, theme);
+      const editor = useEditor(editorId || "", readonly, onChange);
       const onMessage = useEditorEvents(editor, {
         readonly,
         noToolbar,
@@ -128,8 +127,8 @@ const Editor = React.memo(
       const onError = useCallback(() => {
         renderKey.current =
           renderKey.current === `editor-0` ? `editor-1` : `editor-0`;
-        editor.state.current.ready = false;
-        editor.setLoading(true);
+        // editor.state.current.ready = false;
+        //editor.setLoading(true);
       }, [editor]);
 
       useEffect(() => {

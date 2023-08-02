@@ -30,7 +30,7 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import Notifications from "../../services/notifications";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 
 const SoundItem = ({
@@ -46,7 +46,7 @@ const SoundItem = ({
   index: number;
   setPlaying: (sound: Sound | undefined) => void;
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const isPlaying = playingSoundId === item.soundID;
   return (
     <PressableButton
@@ -57,7 +57,7 @@ const SoundItem = ({
         height: 60,
         borderBottomWidth: 1,
         borderRadius: 0,
-        borderBottomColor: colors.border,
+        borderBottomColor: colors.primary.border,
         paddingHorizontal: 12
       }}
       onPress={async () => {
@@ -99,7 +99,7 @@ const SoundItem = ({
           type={isPlaying ? "grayAccent" : "gray"}
           size={22}
           name={isPlaying ? "pause" : "play"}
-          color={isPlaying ? colors.accent : colors.gray}
+          color={isPlaying ? colors.primary.accent : colors.primary.icon}
           onPress={() => {
             if (isPlaying) {
               stopSampleSound();

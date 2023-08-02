@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { defineConfig } from "vite";
+import { PluginOption, defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import svgrPlugin from "vite-plugin-svgr";
 import envCompatible from "vite-plugin-env-compatible";
@@ -26,6 +26,8 @@ import autoprefixer from "autoprefixer";
 import { WEB_MANIFEST } from "./web-manifest";
 import { execSync } from "child_process";
 import { version } from "./package.json";
+import { visualizer } from "rollup-plugin-visualizer";
+import { OutputPlugin } from "rollup";
 
 const gitHash = (() => {
   try {
@@ -38,9 +40,11 @@ const appVersion = version.replaceAll(".", "");
 const isTesting =
   process.env.TEST === "true" || process.env.NODE_ENV === "development";
 const isDesktop = process.env.PLATFORM === "desktop";
+const isAnalyzing = process.env.ANALYZING === "true";
+process.env.NN_BUILD_TIMESTAMP = `${Date.now()}`;
 
 export default defineConfig({
-  envPrefix: "REACT_APP_",
+  envPrefix: "NN_",
   build: {
     target: isDesktop ? "esnext" : "modules",
     outDir: "build",
@@ -50,6 +54,7 @@ export default defineConfig({
     sourcemap: isTesting,
     rollupOptions: {
       output: {
+        plugins: [emitEditorStyles()],
         assetFileNames: "assets/[name]-[hash:12][extname]",
         chunkFileNames: "assets/[name]-[hash:12].js"
       }
@@ -66,7 +71,14 @@ export default defineConfig({
   },
   logLevel: process.env.NODE_ENV === "production" ? "warn" : "info",
   resolve: {
-    dedupe: ["react", "react-dom", "@mdi/js", "@mdi/react", "@emotion/react"],
+    dedupe: [
+      "react",
+      "react-dom",
+      "@mdi/js",
+      "@mdi/react",
+      "@emotion/react",
+      "katex"
+    ],
 
     alias: [
       {
@@ -81,7 +93,12 @@ export default defineConfig({
     port: 3000
   },
   worker: {
-    format: "es"
+    format: "es",
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: true
+      }
+    }
   },
   css: {
     postcss: {
@@ -89,6 +106,15 @@ export default defineConfig({
     }
   },
   plugins: [
+    ...(isAnalyzing
+      ? [
+          visualizer({
+            gzipSize: true,
+            brotliSize: true,
+            open: true
+          }) as PluginOption
+        ]
+      : []),
     ...(isDesktop && process.env.NODE_ENV === "production"
       ? []
       : [
@@ -106,7 +132,10 @@ export default defineConfig({
         ? undefined
         : [["swc-plugin-react-remove-properties", {}]]
     }),
-    envCompatible(),
+    envCompatible({
+      prefix: "NN_",
+      mountedPath: "process.env"
+    }),
     svgrPlugin({
       svgrOptions: {
         icon: true
@@ -115,3 +144,28 @@ export default defineConfig({
     })
   ]
 });
+
+function emitEditorStyles(): OutputPlugin {
+  return {
+    name: "rollup-plugin-emit-editor-styles",
+    generateBundle(options, bundle) {
+      for (const file in bundle) {
+        const chunk = bundle[file];
+        if (
+          chunk.type === "asset" &&
+          chunk.fileName.endsWith(".css") &&
+          typeof chunk.source === "string" &&
+          (chunk.source.includes("KaTeX_Fraktur-Bold-") ||
+            chunk.source.includes("Hack typeface"))
+        ) {
+          this.emitFile({
+            type: "asset",
+            fileName: "assets/editor-styles.css",
+            name: "editor-styles.css",
+            source: chunk.source
+          });
+        }
+      }
+    }
+  };
+}

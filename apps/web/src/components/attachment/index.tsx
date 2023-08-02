@@ -58,6 +58,7 @@ import {
 import { useEffect, useState } from "react";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { getFormattedDate } from "@notesnook/common";
+import { MenuItem } from "@notesnook/ui";
 
 const FILE_ICONS: Record<string, Icon> = {
   "image/": FileImage,
@@ -120,17 +121,14 @@ export function Attachment({
     };
   }, [attachment.metadata.hash]);
 
-  const Icon = getFileIcon(attachment.metadata.type);
+  const FileIcon = getFileIcon(attachment.metadata.type);
   return (
     <Box
       as="tr"
       sx={{ height: 30, ":hover": { bg: "hover" } }}
       onContextMenu={(e) => {
         e.preventDefault();
-        Menu.openMenu(AttachmentMenuItems, {
-          attachment,
-          status
-        });
+        Menu.openMenu(AttachmentMenuItems(attachment, status));
       }}
       onClick={onSelected}
     >
@@ -138,7 +136,11 @@ export function Attachment({
         <td>
           <Label>
             <Checkbox
-              sx={{ width: 18, height: 18 }}
+              sx={{
+                width: 18,
+                height: 18,
+                color: isSelected ? "accent" : "icon"
+              }}
               checked={isSelected}
               onChange={onSelected}
             />
@@ -154,9 +156,9 @@ export function Attachment({
         >
           {status ? (
             status.type === "download" ? (
-              <Download size={16} color="primary" />
+              <Download size={16} color="accent" />
             ) : (
-              <Uploading size={16} color="primary" />
+              <Uploading size={16} color="accent" />
             )
           ) : attachment.failed ? (
             <AttachmentError
@@ -167,7 +169,7 @@ export function Attachment({
           ) : attachment.working ? (
             <Loading size={16} />
           ) : (
-            <Icon size={16} />
+            <FileIcon size={16} />
           )}
           <Text
             variant="body"
@@ -188,20 +190,23 @@ export function Attachment({
         ) : attachment.dateUploaded ? (
           <DoubleCheckmark
             sx={{ flexShrink: 0 }}
-            color={"primary"}
+            color={"accent"}
             size={16}
             title={"Uploaded"}
           />
         ) : (
           <Checkmark
             sx={{ flexShrink: 0 }}
-            color={"icon"}
             size={16}
             title={"Waiting for upload"}
           />
         )}
       </Text>
-      <Text as="td" variant="body" sx={{ color: status ? "primary" : "text" }}>
+      <Text
+        as="td"
+        variant="body"
+        sx={{ color: status ? "accent" : "paragraph" }}
+      >
         {status ? (
           <>
             {formatBytes(status.loaded, 1)}/{formatBytes(status.total, 1)}
@@ -221,110 +226,101 @@ export function Attachment({
   );
 }
 
-type MenuActionParams = {
-  attachment: any;
-  status: AttachmentProgressStatus;
+const AttachmentMenuItems: (
+  attachment: any,
+  status?: AttachmentProgressStatus
+) => MenuItem[] = (attachment, status) => {
+  return [
+    {
+      type: "button",
+      key: "notes",
+      title: "Notes",
+      icon: References.path,
+      menu: {
+        items: (attachment.noteIds as string[]).reduce((prev, curr) => {
+          const note = db.notes?.note(curr);
+          if (!note)
+            prev.push({
+              type: "button",
+              key: curr,
+              title: `Note with id ${curr}`,
+              onClick: () => showToast("error", "This note does not exist.")
+            });
+          else
+            prev.push({
+              type: "button",
+              key: note.id,
+              title: note.title,
+              onClick: () => {
+                hashNavigate(`/notes/${curr}/edit`);
+                closeOpenedDialog();
+              }
+            });
+          return prev;
+        }, [] as MenuItem[])
+      }
+    },
+    {
+      type: "button",
+      key: "recheck",
+      title: "Recheck",
+      icon: DoubleCheckmark.path,
+      isDisabled: !attachment.dateUploaded,
+      onClick: async () => {
+        await store.recheck([attachment.metadata.hash]);
+      }
+    },
+    {
+      type: "button",
+      key: "rename",
+      title: "Rename",
+      icon: Rename.path,
+      onClick: async () => {
+        const newName = await showPromptDialog({
+          title: "Rename attachment",
+          description: attachment.metadata.filename,
+          defaultValue: attachment.metadata.filename
+        });
+        if (!newName) return;
+        await store.rename(attachment.metadata.hash, newName);
+      }
+    },
+    {
+      type: "button",
+      key: "download",
+      title: status?.type === "download" ? "Cancel download" : "Download",
+      icon: Download.path,
+      isDisabled: !attachment.dateUploaded,
+      onClick: async () => {
+        const isDownloading = status?.type === "download";
+        if (isDownloading) {
+          await db.fs?.cancel(attachment.metadata.hash, "download");
+        } else await saveAttachment(attachment.metadata.hash);
+      }
+    },
+    {
+      type: "button",
+      key: "reupload",
+      title: status?.type === "upload" ? "Cancel upload" : "Reupload",
+      icon: Reupload.path,
+      onClick: async () => {
+        const isDownloading = status?.type === "upload";
+        if (isDownloading) {
+          await db.fs?.cancel(attachment.metadata.hash, "upload");
+        } else
+          await reuploadAttachment(
+            attachment.metadata.type,
+            attachment.metadata.hash
+          );
+      }
+    },
+    {
+      type: "button",
+      key: "permanent-delete",
+      styles: { icon: { color: "red" }, text: { color: "red" } },
+      title: "Delete permanently",
+      icon: DeleteForver.path,
+      onClick: () => Multiselect.deleteAttachments([attachment])
+    }
+  ];
 };
-
-type MenuItemValue<T> = T | ((options: MenuActionParams) => T);
-type MenuItem = {
-  type?: "separator";
-  key: string;
-  title?: MenuItemValue<string>;
-  icon?: MenuItemValue<Icon>;
-  onClick?: (options: MenuActionParams) => void;
-  disabled?: MenuItemValue<boolean | string>;
-  color?: MenuItemValue<string>;
-  iconColor?: MenuItemValue<string>;
-  multiSelect?: boolean;
-  items?: MenuItemValue<MenuItem[]>;
-};
-const AttachmentMenuItems: MenuItem[] = [
-  {
-    key: "notes",
-    title: "Notes",
-    icon: References,
-    items: ({ attachment }) =>
-      (attachment.noteIds as string[]).reduce((prev, curr) => {
-        const note = db.notes?.note(curr);
-        if (!note)
-          prev.push({
-            key: curr,
-            title: `Note with id ${curr}`,
-            onClick: () => showToast("error", "This note does not exist.")
-          });
-        else
-          prev.push({
-            key: note.id,
-            title: note.title,
-            onClick: () => {
-              hashNavigate(`/notes/${curr}/edit`);
-              closeOpenedDialog();
-            }
-          });
-        return prev;
-      }, [] as MenuItem[])
-  },
-  {
-    key: "recheck",
-    title: () => "Recheck",
-    icon: DoubleCheckmark,
-    disabled: ({ attachment }) =>
-      !attachment.dateUploaded ? "This attachment is not uploaded yet." : false,
-    onClick: async ({ attachment }) => {
-      await store.recheck([attachment.metadata.hash]);
-    }
-  },
-  {
-    key: "rename",
-    title: () => "Rename",
-    icon: Rename,
-    onClick: async ({ attachment }) => {
-      const newName = await showPromptDialog({
-        title: "Rename attachment",
-        description: attachment.metadata.filename,
-        defaultValue: attachment.metadata.filename
-      });
-      if (!newName) return;
-      await store.rename(attachment.metadata.hash, newName);
-    }
-  },
-  {
-    key: "download",
-    title: ({ status }) =>
-      status?.type === "download" ? "Cancel download" : "Download",
-    icon: Download,
-    disabled: ({ attachment }) =>
-      !attachment.dateUploaded ? "This attachment is not uploaded yet." : false,
-    onClick: async ({ attachment, status }) => {
-      const isDownloading = status?.type === "download";
-      if (isDownloading) {
-        await db.fs?.cancel(attachment.metadata.hash, "download");
-      } else await saveAttachment(attachment.metadata.hash);
-    }
-  },
-  {
-    key: "reupload",
-    title: ({ status }) =>
-      status?.type === "upload" ? "Cancel upload" : "Reupload",
-    icon: Reupload,
-    onClick: async ({ attachment, status }) => {
-      const isDownloading = status?.type === "upload";
-      if (isDownloading) {
-        await db.fs?.cancel(attachment.metadata.hash, "upload");
-      } else
-        await reuploadAttachment(
-          attachment.metadata.type,
-          attachment.metadata.hash
-        );
-    }
-  },
-  {
-    key: "permanent-delete",
-    color: "error",
-    iconColor: "error",
-    title: () => "Delete permanently",
-    icon: DeleteForver,
-    onClick: ({ attachment }) => Multiselect.deleteAttachments([attachment])
-  }
-];

@@ -21,6 +21,7 @@ import { useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { Input, Label } from "@theme-ui/components";
 import { PasswordVisible, PasswordInvisible, Check, Cross } from "../icons";
+import { useStore as useThemeStore } from "../../stores/theme-store";
 
 const passwordValidationRules = [
   {
@@ -76,6 +77,7 @@ function Field(props) {
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [rules, setRules] = useState(passwordValidationRules);
+  const colorScheme = useThemeStore((state) => state.colorScheme);
 
   return (
     <Flex
@@ -93,7 +95,7 @@ function Field(props) {
           fontSize: "subtitle",
           fontWeight: "bold",
           fontFamily: "body",
-          color: "icon",
+          color: "paragraph",
           flexDirection: "column",
           ...styles.label
         }}
@@ -101,11 +103,10 @@ function Field(props) {
         {label}{" "}
         {helpText && (
           <Text
+            variant="subBody"
             as="span"
             sx={{
-              fontSize: "subBody",
               fontWeight: "normal",
-              color: "fontTertiary",
               ...styles.helpText
             }}
           >
@@ -134,10 +135,12 @@ function Field(props) {
           min={min}
           value={value}
           sx={{
+            flex: 1,
             ...styles.input,
             ":disabled": {
-              bg: "bgSecondary"
-            }
+              bg: "background-disabled"
+            },
+            colorScheme
           }}
           onChange={(e) => {
             if (validatePassword) {
@@ -211,7 +214,7 @@ function Field(props) {
               ) : (
                 <Cross color="error" size={14} />
               )}
-              <Text ml={1} sx={{ fontSize: "body", color: "text" }}>
+              <Text ml={1} sx={{ fontSize: "body", color: "paragraph" }}>
                 {rule.title}
               </Text>
             </Flex>

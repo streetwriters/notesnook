@@ -28,7 +28,7 @@ import {
   ToastEvent
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import {
   eClosePremiumDialog,
@@ -66,7 +66,7 @@ export const PricingPlans = ({
   heading = true,
   compact = false
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const [product, setProduct] = useState(null);
   const [buying, setBuying] = useState(false);
@@ -176,7 +176,7 @@ export const PricingPlans = ({
         height: 100
       }}
     >
-      <ActivityIndicator color={colors.accent} size={25} />
+      <ActivityIndicator color={colors.primary.accent} size={25} />
     </View>
   ) : (
     <View
@@ -251,7 +251,7 @@ export const PricingPlans = ({
               <Paragraph
                 style={{
                   textDecorationLine: "line-through",
-                  color: colors.icon
+                  color: colors.secondary.paragraph
                 }}
                 size={SIZE.sm}
               >
@@ -273,7 +273,7 @@ export const PricingPlans = ({
                         marginBottom: 20
                       }}
                     >
-                      <Heading color={colors.accent}>
+                      <Heading color={colors.primary.accent}>
                         Get {monthlyPlan?.info?.discount}% off in{" "}
                         {monthlyPlan?.info?.country}
                       </Heading>
@@ -455,7 +455,7 @@ export const PricingPlans = ({
 
       {!user || !upgrade ? (
         <Paragraph
-          color={colors.icon}
+          color={colors.secondary.paragraph}
           size={SIZE.xs}
           style={{
             alignSelf: "center",
@@ -479,7 +479,7 @@ export const PricingPlans = ({
             <Paragraph
               textBreakStrategy="balanced"
               size={SIZE.xs}
-              color={colors.icon}
+              color={colors.secondary.paragraph}
               style={{
                 alignSelf: "center",
                 marginTop: 10,
@@ -493,7 +493,7 @@ export const PricingPlans = ({
           ) : (
             <Paragraph
               size={SIZE.xs}
-              color={colors.icon}
+              color={colors.secondary.paragraph}
               style={{
                 alignSelf: "center",
                 marginTop: 10,
@@ -513,7 +513,7 @@ export const PricingPlans = ({
           >
             <Paragraph
               size={SIZE.xs}
-              color={colors.icon}
+              color={colors.secondary.paragraph}
               style={{
                 maxWidth: "100%",
                 textAlign: "center"
@@ -530,7 +530,7 @@ export const PricingPlans = ({
                 style={{
                   textDecorationLine: "underline"
                 }}
-                color={colors.accent}
+                color={colors.primary.accent}
               >
                 Terms of Service{" "}
               </Paragraph>
@@ -545,7 +545,7 @@ export const PricingPlans = ({
                 style={{
                   textDecorationLine: "underline"
                 }}
-                color={colors.accent}
+                color={colors.primary.accent}
               >
                 Privacy Policy.
               </Paragraph>

@@ -33,10 +33,19 @@ export type ToolbarGroupProps = FlexProps & {
   selectedNode?: NodeWithOffset;
 };
 export function ToolbarGroup(props: ToolbarGroupProps) {
-  const { tools, editor, force, selectedNode, ...flexProps } = props;
+  const { tools, editor, force, selectedNode, sx, ...flexProps } = props;
 
   return (
-    <Flex className="toolbar-group" {...flexProps}>
+    <Flex
+      className="toolbar-group"
+      sx={{
+        gap: "small",
+        p: "small",
+        flexShrink: 0,
+        ...sx
+      }}
+      {...flexProps}
+    >
       {tools.map((toolId) => {
         if (Array.isArray(toolId)) {
           return (

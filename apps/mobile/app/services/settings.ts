@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Platform } from "react-native";
-import Orientation from "react-native-orientation";
 import { enabled } from "react-native-privacy-snapshot";
 import { MMKV } from "../common/database/mmkv";
 import {
@@ -26,19 +25,14 @@ import {
   defaultSettings,
   useSettingStore
 } from "../stores/use-setting-store";
-import { getColorScheme } from "../utils/color-scheme/utils";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { scale, updateSize } from "../utils/size";
-import { DDS } from "./device-detection";
-import { setAutobackOffMessage } from "./message";
-
 function reset() {
   const settings = get();
   if (settings.reminder !== "off" && settings.reminder !== "useroff") {
     settings.encryptedBackup = false;
     settings.reminder = "useroff";
     set(settings);
-    setTimeout(() => setAutobackOffMessage(), 10000);
   }
 }
 
@@ -69,7 +63,6 @@ function init() {
   setTimeout(() => setPrivacyScreen(settings), 1);
   updateSize();
   useSettingStore.getState().setSettings({ ...settings });
-  getColorScheme();
 }
 
 function setPrivacyScreen(settings: SettingStore["settings"]) {
@@ -112,8 +105,23 @@ function toggle(id: keyof SettingStore["settings"]) {
   MMKV.setString("appSettings", JSON.stringify(settings));
 }
 
-function get() {
+function get(): SettingStore["settings"] {
   return { ...useSettingStore.getState().settings };
+}
+
+function getProperty<K extends keyof SettingStore["settings"]>(
+  property: K
+): SettingStore["settings"][K] {
+  return useSettingStore.getState().settings[property];
+}
+
+function setProperty<K extends keyof SettingStore["settings"]>(
+  property: K,
+  value: SettingStore["settings"][K]
+): void {
+  SettingsService.set({
+    [property]: value
+  });
 }
 
 function onFirstLaunch() {
@@ -127,25 +135,25 @@ function onFirstLaunch() {
 }
 
 function checkOrientation() {
-  Orientation.getOrientation((e: Error, orientation: string) => {
-    DDS.checkSmallTab(orientation);
-    useSettingStore.getState().setDimensions({
-      width: DDS.width as number,
-      height: DDS.height as number
-    });
-    useSettingStore
-      .getState()
-      .setDeviceMode(
-        DDS.isLargeTablet()
-          ? "tablet"
-          : DDS.isSmallTab
-          ? "smallTablet"
-          : "mobile"
-      );
-  });
+  //Orientation.getOrientation((e: Error, orientation: string) => {
+  // DDS.checkSmallTab(orientation);
+  // useSettingStore.getState().setDimensions({
+  //   width: DDS.width as number,
+  //   height: DDS.height as number
+  // });
+  // useSettingStore
+  //   .getState()
+  //   .setDeviceMode(
+  //     DDS.isLargeTablet()
+  //       ? "tablet"
+  //       : DDS.isSmallTab
+  //       ? "smallTablet"
+  //       : "mobile"
+  //   );
+  //});
 }
 
-const SettingsService = {
+export const SettingsService = {
   init,
   set,
   get,
@@ -153,6 +161,8 @@ const SettingsService = {
   onFirstLaunch,
   checkOrientation,
   reset,
+  getProperty,
+  setProperty,
   resetSettings
 };
 

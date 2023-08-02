@@ -24,9 +24,7 @@ import { store as appStore } from "./app-store";
 import { store as selectionStore } from "./selection-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
-import { EV, EVENTS } from "@notesnook/core/common";
 import Config from "../utils/config";
-import { hashNavigate } from "../navigation";
 import { groupArray } from "@notesnook/core/utils/grouping";
 
 /**
@@ -35,10 +33,10 @@ import { groupArray } from "@notesnook/core/utils/grouping";
 class NoteStore extends BaseStore {
   notes = [];
   /**
-   * @type {{ type: "tag" | "color" | "notebook" | "topic" | "favorite" | "monographs", notes: any[] } | undefined}
+   * @type {import("../components/list-container/types").Context | undefined}
    */
   context = undefined;
-  selectedNote = 0;
+  selectedNote = "";
   nonce = 0;
   viewMode = Config.get("notes:viewMode", "detailed");
 

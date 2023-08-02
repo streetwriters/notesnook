@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ReactDOM from "react-dom";
 import { Dialogs } from "../dialogs";
-import ThemeProvider from "../components/theme-provider";
 import qclone from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as tagStore } from "../stores/tag-store";
@@ -39,7 +38,8 @@ import { Suspense } from "react";
 import { Reminder } from "@notesnook/core/collections/reminders";
 import { ConfirmDialogProps } from "../dialogs/confirm";
 import { getFormattedDate } from "@notesnook/common";
-import { downloadUpdate, installUpdate } from "../utils/updater";
+import { downloadUpdate } from "../utils/updater";
+import { ThemeMetadata } from "@notesnook/themes-server";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -68,11 +68,9 @@ function showDialog<TId extends DialogIds, TReturnType>(
     };
     const PropDialog = () => render(Dialogs[id], perform);
     ReactDOM.render(
-      <ThemeProvider>
-        <Suspense fallback={<div />}>
-          <PropDialog />
-        </Suspense>
-      </ThemeProvider>,
+      <Suspense fallback={<div />}>
+        <PropDialog />
+      </Suspense>,
       container,
       () => (openDialogs[id] = true)
     );
@@ -316,6 +314,12 @@ export function showProgressDialog<T>(dialogData: ProgressDialogProps) {
   );
 }
 
+export function showThemeDetails(theme: ThemeMetadata) {
+  return showDialog("ThemeDetailsDialog", (Dialog, perform) => (
+    <Dialog theme={theme} onClose={(res: boolean) => perform(res)} />
+  ));
+}
+
 export function showMoveNoteDialog(noteIds: string[]) {
   return showDialog("MoveDialog", (Dialog, perform) => (
     <Dialog noteIds={noteIds} onClose={(res: boolean) => perform(res)} />
@@ -390,7 +394,13 @@ function getDialogData(type: string) {
         subtitle: (
           <>
             All your data will be re-encrypted and synced with the new password.
-            <Text as="div" mt={1} p={1} bg="errorBg" sx={{ color: "error" }}>
+            <Text
+              as="div"
+              mt={1}
+              p={1}
+              bg="var(--background-error)"
+              sx={{ color: "var(--paragraph-error)" }}
+            >
               <Text as="p" my={0} sx={{ color: "inherit" }}>
                 It is recommended that you <b>log out from all other devices</b>{" "}
                 before continuing.
@@ -416,7 +426,7 @@ function getDialogData(type: string) {
       return {
         title: "Delete your account",
         subtitle: (
-          <Text as="span" sx={{ color: "error" }}>
+          <Text as="span" sx={{ color: "var(--paragraph-error)" }}>
             All your data will be permanently deleted with{" "}
             <b>no way of recovery</b>. Proceed with caution.
           </Text>

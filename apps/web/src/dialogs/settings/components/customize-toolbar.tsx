@@ -21,7 +21,6 @@ import { Button, Flex, FlexProps, Text } from "@theme-ui/components";
 import {
   getAllTools,
   getToolDefinition,
-  Icon,
   Icons,
   ToolbarDefinition,
   ToolbarGroupDefinition,
@@ -62,6 +61,8 @@ import {
 import { showToast } from "../../../utils/toast";
 import { isUserPremium } from "../../../hooks/use-is-user-premium";
 import { Pro } from "../../../components/icons";
+
+import { Icon } from "@notesnook/ui";
 
 export function CustomizeToolbar() {
   const sensors = useSensors(
@@ -117,7 +118,7 @@ export function CustomizeToolbar() {
                 checked={preset.id === currentPreset.id}
                 defaultChecked={preset.id === currentPreset.id}
                 disabled={preset.id === "custom" && !isUserPremium()}
-                style={{ accentColor: "var(--primary)" }}
+                style={{ accentColor: "var(--accent)" }}
                 onChange={async (e) => {
                   const { value } = e.target;
                   if (preset.id === "custom" && !isUserPremium()) {
@@ -133,7 +134,7 @@ export function CustomizeToolbar() {
               />
               <span style={{ marginLeft: 5 }}>{preset.title}</span>
               {preset.id === "custom" && !isUserPremium() ? (
-                <Pro color="primary" size={18} sx={{ ml: 1 }} />
+                <Pro color="accent" size={18} sx={{ ml: 1 }} />
               ) : null}
             </Label>
           ))}
@@ -153,7 +154,7 @@ export function CustomizeToolbar() {
               showToast("success", "Group added successfully");
             }}
           >
-            <Icon path={Icons.plus} color="text" size={18} />
+            <Icon path={Icons.plus} color="paragraph" size={18} />
           </Button>
         )}
       </Flex>
@@ -284,8 +285,7 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         onRemove={onRemoveGroup}
         onAdd={isGroup(item) ? onAddSubGroup : undefined}
         sx={{
-          bg: "background",
-          border: "1px solid var(--border)",
+          bg: "var(--background-secondary)",
           borderRadius: "default",
           p: 1,
           mb: 1,
@@ -294,9 +294,9 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         }}
       >
         {isDraggable ? (
-          <Icon path={Icons.dragHandle} size={18} color="icon" />
+          <Icon path={Icons.dragHandle} size={18} color="accent" />
         ) : null}
-        <Text variant={"body"} sx={{ ml: 1 }}>
+        <Text variant={"body"} sx={{ ml: 1, color: "accent" }}>
           {item.title}
         </Text>
       </SortableWrapper>
@@ -313,7 +313,7 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         p: 1,
         alignItems: "center",
         justifyContent: "space-between",
-        bg: "bgSecondary",
+        bg: "var(--background-secondary)",
         borderRadius: "default",
         mb: 1,
         ml: item.depth * 15,
@@ -381,7 +381,7 @@ function SortableWrapper(props: SortableWrapperProps) {
         {onAdd && (
           <Button
             id="add-item"
-            variant={"tool"}
+            variant={"secondary"}
             sx={{ p: "small", opacity: 0, mr: 1 }}
             onClick={() => onAdd()}
           >
@@ -391,7 +391,7 @@ function SortableWrapper(props: SortableWrapperProps) {
         {onRemove && (
           <Button
             id="remove-item"
-            variant={"tool"}
+            variant={"secondary"}
             sx={{ p: "small", opacity: 0 }}
             onClick={() => onRemove(item)}
           >

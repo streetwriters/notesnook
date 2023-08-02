@@ -29,7 +29,7 @@ function Tags() {
   return (
     <ListContainer
       type="tags"
-      groupType="tags"
+      groupingKey="tags"
       refresh={refresh}
       items={tags}
       placeholder={<Placeholder context="tags" />}

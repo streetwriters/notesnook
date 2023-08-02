@@ -20,11 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import { DDS } from "../../services/device-detection";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../utils/elevation";
 
 const DialogContainer = ({ width, height, ...restProps }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   return (
     <View
@@ -34,7 +34,7 @@ const DialogContainer = ({ width, height, ...restProps }) => {
         width: width || DDS.isTab ? 500 : "85%",
         maxHeight: height || 450,
         borderRadius: 10,
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         paddingTop: 12
       }}
     />

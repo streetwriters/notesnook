@@ -119,7 +119,7 @@ export const AboutSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
-            action: () => void window.open("https://t.me/notesnook", "_blank"),
+            action: () => void window.open("https://fosstodon.org/@notesnook", "_blank"),
             title: "Follow",
             variant: "secondary"
           }

@@ -34,7 +34,12 @@
     "@notesnook/editor": "file:../../packages/editor",
     "@notesnook/editor-mobile": "file:../../packages/editor-mobile",
     "@notesnook/logger": "file:../../packages/logger",
+    "@notesnook/themes-server": "file:../../servers/themes",
     "react": "18.2.0",
-    "react-native": "0.72.0"
+    "react-native": "0.72.0",
+    "@trpc/client": "10.31.0",
+    "@trpc/react-query": "10.31.0",
+    "@trpc/server": "^10.31.0",
+    "@tanstack/react-query": "^4.29.19"
   }
 }

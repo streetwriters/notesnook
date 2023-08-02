@@ -24,12 +24,9 @@ import React, {
   useState,
   useEffect
 } from "react";
-import { MenuItem } from "../menu/types";
+import { MenuItem, Icon, MenuButton, MenuSeparator } from "@notesnook/ui";
 import { Box, Button, Flex, Text, FlexProps } from "@theme-ui/components";
-import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { MenuButton } from "../menu/menu-button";
-import { MenuSeparator } from "../menu/menu-separator";
 import Modal from "react-modal";
 import {
   motion,
@@ -38,7 +35,8 @@ import {
   useTransform,
   useAnimation
 } from "framer-motion";
-import { useTheme } from "../../toolbar/stores/toolbar-store";
+import { useTheme } from "@emotion/react";
+import { Theme } from "@notesnook/theme";
 
 const AnimatedFlex = motion(
   Flex as React.FunctionComponent<Omit<FlexProps, "onDrag" | "onDragEnd">>
@@ -69,7 +67,6 @@ function useHistory<T>(initial: T) {
   }, [canGoBack]);
 
   const navigate = useCallback((state: T) => {
-    console.log("NAVI", state);
     setCurrent((prev) => {
       if (prev) stack.current.push(prev);
       return state;
@@ -104,7 +101,7 @@ export function ActionSheetPresenter(
     draggable = true,
     children
   } = props;
-  const theme = useTheme();
+  const theme = useTheme() as Theme;
   const contentRef = useRef<HTMLDivElement>();
 
   const y = useMotionValue(0);
@@ -161,7 +158,6 @@ export function ActionSheetPresenter(
       onRequestClose={() => onBeforeClose()}
       portalClassName={"bottom-sheet-presenter-portal"}
       onAfterOpen={() => {
-        console.log("OPEGN!");
         animation.start({ transition: TRANSITION, y: 0 });
       }}
       overlayElement={(overlayElementProps, contentEl) => {
@@ -184,7 +180,7 @@ export function ActionSheetPresenter(
                   width: "100%",
                   opacity,
                   position: "absolute",
-                  backgroundColor: "var(--overlay)"
+                  backgroundColor: "var(--backdrop)"
                 }}
                 tabIndex={-1}
               />
@@ -219,6 +215,8 @@ export function ActionSheetPresenter(
     >
       <AnimatedFlex
         animate={animation}
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         style={{ y }}
         initial={{ y: 1000 }}
         sx={{

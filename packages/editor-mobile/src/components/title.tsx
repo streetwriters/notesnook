@@ -63,8 +63,8 @@ function Title({
         fontWeight: 600,
         fontFamily: getFontById(fontFamily)?.font || "Open Sans",
         backgroundColor: "transparent",
-        color: "var(--nn_heading)",
-        caretColor: "var(--nn_accent)",
+        color: "var(--nn_primary_heading)",
+        caretColor: "var(--nn_primary_accent)",
         borderRadius: 0
       }}
       maxLength={150}

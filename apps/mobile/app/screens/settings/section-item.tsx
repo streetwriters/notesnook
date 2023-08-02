@@ -33,14 +33,14 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
 import { IconButton } from "../../components/ui/icon-button";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const settings = useSettingStore((state) => state.settings);
   const navigation = useNavigation<NavigationProp<RouteParams>>();
   const current = item.useHook && item.useHook(item);
@@ -66,7 +66,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   const styles =
     item.type === "danger"
       ? {
-          backgroundColor: colors.errorBg
+          backgroundColor: colors.error.background
         }
       : {};
 
@@ -109,7 +109,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             navigation.dispatch(StackActions.push("SettingsGroup", item));
             useNavigationStore.getState().update(
               {
-                name: "SettingsGroup",
+                name: "SettingsGroup" as never,
                 title:
                   typeof item.name === "function"
                     ? item.name(current)
@@ -141,13 +141,19 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             alignItems: "center",
             marginRight: 12,
             backgroundColor:
-              item.component === "colorpicker" ? colors.accent : undefined,
+              item.component === "colorpicker"
+                ? colors.primary.accent
+                : undefined,
             borderRadius: 100
           }}
         >
           {!!item.icon && (
             <Icon
-              color={item.type === "danger" ? colors.errorText : colors.icon}
+              color={
+                item.type === "danger"
+                  ? colors.error.icon
+                  : colors.secondary.icon
+              }
               name={item.icon}
               size={30}
             />
@@ -161,14 +167,22 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           }}
         >
           <Paragraph
-            color={item.type === "danger" ? colors.errorText : colors.heading}
+            color={
+              item.type === "danger"
+                ? colors.error.paragraph
+                : colors.primary.heading
+            }
             size={SIZE.md + 1}
           >
             {typeof item.name === "function" ? item.name(current) : item.name}
           </Paragraph>
           {!!item.description && (
             <Paragraph
-              color={item.type === "danger" ? colors.errorText : colors.pri}
+              color={
+                item.type === "danger"
+                  ? colors.error.paragraph
+                  : colors.primary.paragraph
+              }
               size={SIZE.sm}
             >
               {typeof item.description === "function"
@@ -227,7 +241,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             >
               <IconButton
                 name="minus"
-                color={colors.pri}
+                color={colors.primary.icon}
                 onPress={() => {
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]
@@ -274,7 +288,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               />
               <IconButton
                 name="plus"
-                color={colors.pri}
+                color={colors.primary.icon}
                 onPress={() => {
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]
@@ -304,8 +318,8 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               ? item.getter(item.property || current)
               : settings[item?.property as never]
           }
-          onColor={colors.accent}
-          offColor={colors.icon}
+          onColor={colors.primary.accent}
+          offColor={colors.secondary.icon}
           size="small"
           animationSpeed={150}
           onToggle={onChangeSettings}
@@ -313,7 +327,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       )}
 
       {loading ? (
-        <ActivityIndicator size={SIZE.xxl} color={colors.accent} />
+        <ActivityIndicator size={SIZE.xxl} color={colors.primary.accent} />
       ) : null}
     </PressableButton>
   );

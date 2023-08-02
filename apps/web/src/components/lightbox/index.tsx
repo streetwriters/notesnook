@@ -332,7 +332,7 @@ export class Lightbox extends React.Component<LightboxProps> {
           }}
         >
           <Flex
-            bg="bgSecondary"
+            bg="var(--background-secondary)"
             sx={{
               borderRadius: "0px 0px 0px 5px",
               overflow: "hidden",
@@ -342,19 +342,18 @@ export class Lightbox extends React.Component<LightboxProps> {
           >
             {tools.map((tool) => (
               <Button
+                key={tool.title}
                 data-test-id={tool.title}
                 disabled={!tool.enabled}
-                variant="tool"
+                variant="secondary"
                 bg="transparent"
                 title={tool.title}
-                key={tool.title}
                 sx={{
                   borderRadius: 0,
                   display: [
                     tool.hideOnMobile ? "none" : "flex",
                     tool.hidden ? "none" : "flex"
                   ],
-                  color: tool.enabled ? "text" : "disabled",
                   cursor: tool.enabled ? "pointer" : "not-allowed",
                   flexDirection: "row",
                   flexShrink: 0,
@@ -362,10 +361,7 @@ export class Lightbox extends React.Component<LightboxProps> {
                 }}
                 onClick={tool.onClick}
               >
-                <tool.icon
-                  size={18}
-                  color={tool.enabled ? "text" : "disabled"}
-                />
+                <tool.icon size={18} color={"icon"} />
               </Button>
             ))}
           </Flex>

@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Text } from "@theme-ui/components";
 import { Perform } from "../../common/dialog-controller";
 import Dialog from "../../components/dialog";
 import {
@@ -30,6 +29,7 @@ import {
   steps
 } from "./steps";
 import { Authenticator, AuthenticatorType, OnNextFunction } from "./types";
+import { ErrorText } from "../../components/error-text";
 
 type MultifactorDialogProps = {
   onClose: Perform;
@@ -88,11 +88,7 @@ export default function MultifactorDialog(props: MultifactorDialogProps) {
           onClose={onClose}
         />
       )}
-      {error && (
-        <Text variant={"error"} bg="errorBg" p={1} mt={2}>
-          {error}
-        </Text>
-      )}
+      <ErrorText error={error} />
     </Dialog>
   );
 }

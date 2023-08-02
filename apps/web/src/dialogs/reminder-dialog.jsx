@@ -50,7 +50,7 @@ const reminders = {
       title: (
         <>
           Subscribe now to{" "}
-          <Text as="span" sx={{ fontWeight: "bold", color: "primary" }}>
+          <Text as="span" sx={{ fontWeight: "bold", color: "accent" }}>
             get 30% off
           </Text>
           *
@@ -61,7 +61,7 @@ const reminders = {
     features,
     // footer: (
     //   <Flex bg="bgSecondary" pb={2}  sx={{justifyContent: "center"}}>
-    //     <Button variant="anchor"  sx={{color: "text"}}>
+    //     <Button variant="anchor"  sx={{color: "paragraph"}}>
     //       Can't decide yet? Extend your trial!
     //     </Button>
     //   </Flex>

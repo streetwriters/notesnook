@@ -1,10 +1,18 @@
 :root {
-  --focus-border: var(--primary);
-  --separator-border: var(--border);
   --sash-size: 10px;
   --sash-hover-size: 4px;
 }
 
+.sash-module_sash__K-9lB.sash-module_hover__80W6I:before,
+.sash-module_sash__K-9lB.sash-module_active__bJspD:before {
+  background: var(--accent);
+}
+
+.allotment-module_splitView__L-yRc.allotment-module_separatorBorder__x-rDS
+  > .allotment-module_splitViewContainer__rQnVa
+  > .allotment-module_splitViewView__MGZ6O:not(:first-child)::before {
+  background-color: var(--border);
+}
 /* open-sans-regular - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
 @font-face {
   font-family: "Open Sans";
@@ -158,13 +166,13 @@ textarea,
 
 ::-moz-selection {
   /* Code for Firefox */
-  background-color: var(--dimPrimary);
-  color: var(--text);
+  background-color: var(--textSelection);
+  color: var(--paragraph);
 }
 
 ::selection {
-  background-color: var(--dimPrimary);
-  color: var(--text);
+  background-color: var(--textSelection);
+  color: var(--paragraph);
 }
 
 .middle-pane {
@@ -192,8 +200,8 @@ textarea,
 
 .ms-track:hover,
 .ms-track:active {
-  background: var(--bgSecondary) !important;
-  border-width: 0px !important;
+  background: var(--background-secondary) !important;
+  border-left: 1px solid var(--border-secondary) !important;
 }
 
 .ms-track {
@@ -205,5 +213,5 @@ textarea,
 }
 
 .ms-thumb {
-  background: var(--bgSecondaryText) !important;
+  background: var(--paragraph-secondary) !important;
 }

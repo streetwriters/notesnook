@@ -17,21 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { Flex, Text, Button } from "@theme-ui/components";
-import { Copy, Loading } from "../icons";
+import { Copy } from "../icons";
 import Toggle from "../toggle";
 import Field from "../field";
 import { db } from "../../common/db";
-import * as clipboard from "clipboard-polyfill/text";
-import ThemeProvider from "../theme-provider";
+import { writeText } from "clipboard-polyfill";
+import { ScopedThemeProvider } from "../theme-provider";
 import { showToast } from "../../utils/toast";
 import { EV, EVENTS } from "@notesnook/core/common";
 import { useStore } from "../../stores/monograph-store";
+import ReactModal from "react-modal";
+import { DialogButton } from "../dialog";
 
 function PublishView(props) {
-  const { noteId, position, onClose } = props;
+  const { noteId, onClose } = props;
   const [publishId, setPublishId] = useState();
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [selfDestruct, setSelfDestruct] = useState(false);
@@ -45,28 +47,6 @@ function PublishView(props) {
   useEffect(() => {
     setPublishId(db.monographs.monograph(noteId));
   }, [noteId]);
-
-  const onKeyDown = useCallback(
-    (event) => {
-      if (event.keyCode === 27);
-      onClose(false);
-    },
-    [onClose]
-  );
-
-  const onWindowClick = useCallback(() => onClose(false), [onClose]);
-
-  useEffect(() => {
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("click", onWindowClick);
-    window.addEventListener("blur", onWindowClick);
-
-    return () => {
-      window.removeEventListener("click", onWindowClick);
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("blur", onWindowClick);
-    };
-  }, [onKeyDown, onWindowClick]);
 
   useEffect(() => {
     const attachmentsLoadingEvent = EV.subscribe(
@@ -84,29 +64,23 @@ function PublishView(props) {
   }, [noteId]);
 
   return (
-    <Flex
+    <ScopedThemeProvider
+      scope="dialog"
+      injectCssVars
       sx={{
-        position: "absolute",
-        zIndex: 999,
         width: ["100%", 350, 350],
         border: "1px solid",
         borderColor: "border",
-        borderRadius: "default",
-        boxShadow: "0px 0px 15px 0px #00000011",
-        ...position,
-        flexDirection: "column"
+        borderRadius: "dialog",
+        flexDirection: "column",
+        overflow: "hidden"
       }}
       bg="background"
-      // p={2}
-
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
     >
       <Flex p={2} sx={{ flexDirection: "column" }}>
         <Text
           variant="body"
-          sx={{ fontSize: "title", fontWeight: "bold", color: "primary" }}
+          sx={{ fontSize: "title", fontWeight: "bold", color: "accent" }}
         >
           {noteTitle}
         </Text>
@@ -133,13 +107,13 @@ function PublishView(props) {
               <Flex mt={1} sx={{ flexDirection: "column", overflow: "hidden" }}>
                 <Text
                   variant="body"
-                  sx={{ fontWeight: "bold", color: "fontTertiary" }}
+                  sx={{ fontWeight: "bold", color: "paragraph" }}
                 >
                   Published at
                 </Text>
                 <Flex
                   sx={{
-                    bg: "bgSecondary",
+                    bg: "var(--background-secondary)",
                     mt: 1,
                     p: 1,
                     borderRadius: "default",
@@ -166,21 +140,17 @@ function PublishView(props) {
                     variant="anchor"
                     className="copyPublishLink"
                     onClick={() => {
-                      clipboard.writeText(
-                        `https://monograph.notesnook.com/${publishId}`
-                      );
+                      writeText(`https://monograph.notesnook.com/${publishId}`);
                     }}
                   >
-                    <Copy size={20} color="primary" />
+                    <Copy size={20} color="accent" />
                   </Button>
                 </Flex>
               </Flex>
             ) : (
-              <>
-                <Text variant="body" sx={{ color: "fontTertiary" }}>
-                  This note will be published to a public URL.
-                </Text>
-              </>
+              <Text variant="body" sx={{ color: "paragraph" }}>
+                This note will be published to a public URL.
+              </Text>
             )}
             <Toggle
               title="Self destruct?"
@@ -210,19 +180,13 @@ function PublishView(props) {
       </Flex>
 
       <Flex
-        bg="bgSecondary"
+        bg="var(--background-secondary)"
         p={1}
         px={2}
         sx={{ alignItems: "center", justifyContent: "end" }}
       >
-        <Button
-          variant="primary"
-          bg={"transparent"}
-          sx={{
-            ":hover": { bg: "bgSecondary" },
-            fontWeight: "bold",
-            color: "primary"
-          }}
+        <DialogButton
+          color="accent"
           onClick={async () => {
             try {
               setIsPublishing(true);
@@ -242,26 +206,12 @@ function PublishView(props) {
               setIsPublishing(false);
             }
           }}
-        >
-          {isPublishing ? (
-            <>
-              <Loading color="static" />
-            </>
-          ) : publishId ? (
-            "Update"
-          ) : (
-            "Publish"
-          )}
-        </Button>
+          loading={isPublishing}
+          text={publishId ? "Update" : "Publish"}
+        />
         {publishId && (
-          <Button
-            variant="primary"
-            bg={"transparent"}
-            sx={{
-              ":hover": { bg: "bgSecondary" },
-              fontWeight: "bold",
-              color: "error"
-            }}
+          <DialogButton
+            color="red"
             onClick={async () => {
               try {
                 setIsPublishing(true);
@@ -279,28 +229,20 @@ function PublishView(props) {
                 setIsPublishing(false);
               }
             }}
-          >
-            Unpublish
-          </Button>
+            text={"Unpublish"}
+          />
         )}
 
-        <Button
-          variant="primary"
+        <DialogButton
           data-test-id="dialog-no"
-          bg={"transparent"}
-          sx={{
-            ":hover": { bg: "bgSecondary" },
-            fontWeight: "bold",
-            color: "text"
-          }}
           onClick={() => {
             onClose(false);
           }}
-        >
-          Cancel
-        </Button>
+          color="paragraph"
+          text="Cancel"
+        />
       </Flex>
-    </Flex>
+    </ScopedThemeProvider>
   );
 }
 
@@ -317,18 +259,31 @@ export function showPublishView(noteId, location = "top") {
         resolve(result);
       };
       ReactDOM.render(
-        <ThemeProvider>
-          <PublishView
-            noteId={noteId}
-            position={{
-              top: location === "top" ? [0, 50, 60] : undefined,
-              right: location === "top" ? [0, 20, 10] : undefined,
+        <ReactModal
+          isOpen
+          onRequestClose={perform}
+          preventScroll={false}
+          shouldCloseOnOverlayClick
+          shouldCloseOnEsc
+          shouldFocusAfterRender
+          shouldReturnFocusAfterClose
+          style={{
+            overlay: { backgroundColor: "transparent", zIndex: 999 },
+            content: {
+              padding: 0,
+              top: location === "top" ? 60 : undefined,
+              right: location === "top" ? 10 : undefined,
               bottom: location === "bottom" ? 0 : undefined,
-              left: location === "bottom" ? 0 : undefined
-            }}
-            onClose={perform}
-          />
-        </ThemeProvider>,
+              left: location === "bottom" ? 0 : undefined,
+              background: "transparent",
+              border: "none",
+              borderRadius: 0,
+              boxShadow: "0px 0px 15px 0px #00000011"
+            }
+          }}
+        >
+          <PublishView noteId={noteId} onClose={perform} />
+        </ReactModal>,
         root
       );
     });

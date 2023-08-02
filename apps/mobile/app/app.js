@@ -16,6 +16,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import {
+  THEME_COMPATIBILITY_VERSION,
+  useThemeEngineStore
+} from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import "react-native-gesture-handler";
@@ -29,7 +33,9 @@ import { ApplicationHolder } from "./navigation";
 import Notifications from "./services/notifications";
 import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
+import { useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
+import { themeTrpcClient } from "./screens/settings/theme-selector";
 
 SettingsService.init();
 SettingsService.checkOrientation();
@@ -87,4 +93,43 @@ const App = () => {
   );
 };
 
-export default withErrorBoundry(App, "App");
+export const withTheme = (Element) => {
+  return function AppWithThemeProvider() {
+    const [colorScheme, darkTheme, lightTheme] = useThemeStore((state) => [
+      state.colorScheme,
+      state.darkTheme,
+      state.lightTheme
+    ]);
+
+    useEffect(() => {
+      const currentTheme = colorScheme === "dark" ? darkTheme : lightTheme;
+      if (!currentTheme) return;
+      themeTrpcClient.updateTheme
+        .query({
+          version: currentTheme.version,
+          compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+          id: currentTheme.id
+        })
+        .then((theme) => {
+          if (theme) {
+            console.log(theme.version, "theme updated");
+            theme.colorScheme === "dark"
+              ? useThemeStore.getState().setDarkTheme(theme)
+              : useThemeStore.getState().setLightTheme(theme);
+          }
+        })
+        .catch(console.log);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+      useThemeEngineStore
+        .getState()
+        .setTheme(colorScheme === "dark" ? darkTheme : lightTheme);
+    }, [colorScheme, darkTheme, lightTheme]);
+
+    return <Element />;
+  };
+};
+
+export default withTheme(withErrorBoundry(App, "App"));

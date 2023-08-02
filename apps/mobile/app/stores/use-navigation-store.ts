@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import create, { State } from "zustand";
-import { COLORS_NOTE } from "../utils/color-scheme";
+import { ColorValues } from "../utils/colors";
 import {
   ColorType,
   MonographType,
@@ -115,8 +115,8 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
   canGoBack: false,
   update: (currentScreen, canGoBack, headerRightButtons) => {
     const color =
-      COLORS_NOTE[
-        currentScreen.color?.toLowerCase() as keyof typeof COLORS_NOTE
+      ColorValues[
+        currentScreen.color?.toLowerCase() as keyof typeof ColorValues
       ];
     if (
       JSON.stringify(currentScreen) === JSON.stringify(get().currentScreenRaw)

@@ -24,7 +24,7 @@ import { DDS } from "../../services/device-detection";
 import { ToastEvent } from "../../services/event-manager";
 import { clearMessage, setEmailVerifyMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
@@ -37,7 +37,7 @@ import { hideAuth } from "./common";
 import { useSettingStore } from "../../stores/use-setting-store";
 
 export const Signup = ({ changeMode, trial }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const email = useRef();
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -98,7 +98,7 @@ export const Signup = ({ changeMode, trial }) => {
       <View
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           zIndex: 10,
           width: "100%",
           alignSelf: "center"
@@ -108,13 +108,13 @@ export const Signup = ({ changeMode, trial }) => {
           style={{
             justifyContent: "flex-end",
             paddingHorizontal: 20,
-            backgroundColor: colors.nav,
+            backgroundColor: colors.secondary.background,
             marginBottom: 20,
             borderBottomWidth: 1,
-            borderBottomColor: colors.border,
+            borderBottomColor: colors.primary.border,
             alignSelf: deviceMode !== "mobile" ? "center" : undefined,
             borderWidth: deviceMode !== "mobile" ? 1 : null,
-            borderColor: deviceMode !== "mobile" ? colors.border : null,
+            borderColor: deviceMode !== "mobile" ? colors.primary.border : null,
             borderRadius: deviceMode !== "mobile" ? 20 : null,
             marginTop: deviceMode !== "mobile" ? 50 : null,
             width: deviceMode === "mobile" ? null : "50%",
@@ -130,7 +130,7 @@ export const Signup = ({ changeMode, trial }) => {
               style={{
                 width: 100,
                 height: 5,
-                backgroundColor: colors.accent,
+                backgroundColor: colors.primary.accent,
                 borderRadius: 2,
                 marginRight: 7
               }}
@@ -140,7 +140,7 @@ export const Signup = ({ changeMode, trial }) => {
               style={{
                 width: 20,
                 height: 5,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 borderRadius: 2
               }}
             />
@@ -161,7 +161,7 @@ export const Signup = ({ changeMode, trial }) => {
           style={{
             width: DDS.isTab ? "50%" : "100%",
             paddingHorizontal: 20,
-            backgroundColor: colors.bg,
+            backgroundColor: colors.primary.background,
             alignSelf: "center"
           }}
         >
@@ -230,7 +230,7 @@ export const Signup = ({ changeMode, trial }) => {
               marginBottom: 25
             }}
             size={SIZE.xs}
-            color={colors.icon}
+            color={colors.secondary.paragraph}
           >
             By signing up, you agree to our{" "}
             <Paragraph
@@ -241,7 +241,7 @@ export const Signup = ({ changeMode, trial }) => {
               style={{
                 textDecorationLine: "underline"
               }}
-              color={colors.accent}
+              color={colors.primary.accent}
             >
               Terms of Service{" "}
             </Paragraph>
@@ -254,7 +254,7 @@ export const Signup = ({ changeMode, trial }) => {
               style={{
                 textDecorationLine: "underline"
               }}
-              color={colors.accent}
+              color={colors.primary.accent}
             >
               Privacy Policy.
             </Paragraph>{" "}
@@ -287,9 +287,12 @@ export const Signup = ({ changeMode, trial }) => {
               paddingVertical: 12
             }}
           >
-            <Paragraph size={SIZE.xs + 1} color={colors.icon}>
+            <Paragraph size={SIZE.xs + 1} color={colors.secondary.paragraph}>
               Already have an account?{" "}
-              <Paragraph size={SIZE.xs + 1} style={{ color: colors.accent }}>
+              <Paragraph
+                size={SIZE.xs + 1}
+                style={{ color: colors.primary.accent }}
+              >
                 Login
               </Paragraph>
             </Paragraph>

@@ -33,7 +33,7 @@ import {
 } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import Sync from "../../services/sync";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -49,7 +49,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { getFormattedDate } from "@notesnook/common";
 
 const MergeConflicts = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [keep, setKeep] = useState(null);
   const [copy, setCopy] = useState(null);
@@ -152,16 +152,20 @@ const MergeConflicts = () => {
           }}
         >
           {back && (
-            <IconButton onPress={close} color={colors.pri} name="arrow-left" />
+            <IconButton
+              onPress={close}
+              color={colors.primary.paragraph}
+              name="arrow-left"
+            />
           )}
           <Paragraph
             style={{ flexWrap: "wrap" }}
-            color={colors.icon}
+            color={colors.secondary.paragraph}
             size={SIZE.xs}
           >
             <Text
               style={{
-                color: isCurrent ? colors.accent : colors.red,
+                color: isCurrent ? colors.primary.accent : colors.static.red,
                 fontWeight: "bold"
               }}
             >
@@ -200,15 +204,17 @@ const MergeConflicts = () => {
             <Button
               title="Discard"
               type="accent"
-              accentColor="red"
+              buttonType={{
+                color: colors.static.red,
+                text: colors.static.white
+              }}
               height={30}
               style={{
                 borderRadius: 100,
                 paddingHorizontal: 12
               }}
               fontSize={SIZE.xs}
-              accentText="light"
-              color={colors.errorText}
+              color={colors.error.paragraph}
               onPress={() => {
                 setDialogVisible(true);
               }}
@@ -257,7 +263,7 @@ const MergeConflicts = () => {
     >
       <SafeAreaView
         style={{
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           paddingTop: insets.top
         }}
       >
@@ -299,9 +305,9 @@ const MergeConflicts = () => {
           <Animated.View
             style={{
               height: height / 2 - (50 + insets.top / 2),
-              backgroundColor: colors.bg,
+              backgroundColor: colors.primary.background,
               borderBottomWidth: 1,
-              borderBottomColor: colors.nav
+              borderBottomColor: colors.secondary.background
             }}
           >
             <Editor
@@ -335,7 +341,7 @@ const MergeConflicts = () => {
           <Animated.View
             style={{
               height: height / 2 - (50 + insets.top / 2),
-              backgroundColor: colors.bg,
+              backgroundColor: colors.primary.background,
               borderRadius: 10
             }}
           >

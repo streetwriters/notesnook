@@ -74,12 +74,16 @@ function TitleBox(props: TitleBoxProps) {
       className="editorTitle"
       placeholder={"Note title"}
       readOnly={readonly}
+      dir="auto"
       sx={{
         p: 0,
         fontFamily: getFontById(editorConfig.fontFamily)?.font || "heading",
         fontSize: ["1.625em", "1.625em", "2.625em"],
         fontWeight: "heading",
-        width: "100%"
+        width: "100%",
+        "::placeholder": {
+          color: "placeholder"
+        }
       }}
       onChange={(e) => {
         const { sessionId, id } = store.get().session;

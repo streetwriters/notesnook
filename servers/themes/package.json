@@ -1,0 +1,27 @@
+{
+  "name": "@notesnook/themes-server",
+  "version": "1.0.0",
+  "description": "A simple rest api for notesnook themes",
+  "private": "true",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "vite-node -w src/server.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@orama/orama": "^1.0.8",
+    "@trpc/server": "10.31.0",
+    "async-mutex": "^0.4.0",
+    "cors": "^2.8.5",
+    "util": "^0.12.5",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@notesnook/theme": "file:../../packages/theme",
+    "@types/cors": "^2.8.13",
+    "@vitejs/plugin-react": "^4.0.3",
+    "react": "17.0.2",
+    "vite-node": "^0.33.0"
+  }
+}

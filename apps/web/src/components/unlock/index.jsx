@@ -19,12 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
-import { Lock, Alert } from "../icons";
+import { Lock } from "../icons";
 import { db } from "../../common/db";
 import { useStore as useEditorStore } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import Field from "../field";
 import { showToast } from "../../utils/toast";
+import { ErrorText } from "../error-text";
 
 function Unlock(props) {
   const { noteId } = props;
@@ -108,7 +109,7 @@ function Unlock(props) {
         sx={{
           textAlign: "center",
           fontSize: "title",
-          color: "fontTertiary"
+          color: "var(--paragraph-secondary)"
         }}
       >
         Please enter the password to unlock this note.
@@ -129,25 +130,10 @@ function Unlock(props) {
           }
         }}
       />
-      {isWrong && (
-        <Flex
-          mt={2}
-          sx={{
-            alignItems: "center",
-            justifyContent: "center",
-            color: "error",
-            alignSelf: "flex-center"
-          }}
-        >
-          <Alert color="error" size={12} />
-          <Text ml={1} sx={{ fontSize: "body" }}>
-            Wrong password
-          </Text>
-        </Flex>
-      )}
+      {isWrong && <ErrorText error="Wrong password" />}
       <Button
         mt={3}
-        variant="primary"
+        variant="accent"
         data-test-id="unlock-note-submit"
         disabled={isUnlocking}
         sx={{ borderRadius: 100, px: 30 }}

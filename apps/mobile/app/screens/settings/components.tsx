@@ -33,6 +33,7 @@ import {
   TrashIntervalPicker,
   BackupReminderPicker
 } from "./picker/pickers";
+import ThemeSelector from "./theme-selector";
 
 export const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker />,
@@ -47,5 +48,6 @@ export const components: { [name: string]: ReactElement } = {
   "font-selector": <FontPicker />,
   "title-format": <TitleFormat />,
   "date-format-selector": <DateFormatPicker />,
-  "time-format-selector": <TimeFormatPicker />
+  "time-format-selector": <TimeFormatPicker />,
+  "theme-selector": <ThemeSelector />
 };

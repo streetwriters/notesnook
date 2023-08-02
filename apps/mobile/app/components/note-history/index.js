@@ -23,7 +23,7 @@ import { FlatList } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { presentSheet } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
 import DialogHeader from "../dialog/dialog-header";
@@ -37,7 +37,7 @@ import { getFormattedDate, getTimeAgo } from "@notesnook/common";
 export default function NoteHistory({ note, fwdRef }) {
   const [history, setHistory] = useState([]);
   const [_loading, setLoading] = useState(true);
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   useEffect(() => {
     (async () => {
@@ -89,12 +89,12 @@ export default function NoteHistory({ note, fwdRef }) {
         }}
       >
         <Paragraph>{getDate(item.dateCreated, item.dateModified)}</Paragraph>
-        <Paragraph color={colors.icon} size={SIZE.xs}>
+        <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
           {getTimeAgo(item.dateModified)}
         </Paragraph>
       </PressableButton>
     ),
-    [colors.icon, preview]
+    [colors.secondary.paragraph, preview]
   );
 
   return (
@@ -128,8 +128,8 @@ export default function NoteHistory({ note, fwdRef }) {
               height: 200
             }}
           >
-            <Icon name="history" size={60} color={colors.icon} />
-            <Paragraph color={colors.icon}>
+            <Icon name="history" size={60} color={colors.primary.icon} />
+            <Paragraph color={colors.secondary.paragraph}>
               No note history found on this device.
             </Paragraph>
           </View>
@@ -138,7 +138,7 @@ export default function NoteHistory({ note, fwdRef }) {
       />
       <Paragraph
         size={SIZE.xs}
-        color={colors.icon}
+        color={colors.secondary.paragraph}
         style={{
           alignSelf: "center"
         }}
@@ -151,7 +151,10 @@ export default function NoteHistory({ note, fwdRef }) {
               colors
             );
           }}
-          style={{ color: colors.accent, textDecorationLine: "underline" }}
+          style={{
+            color: colors.primary.accent,
+            textDecorationLine: "underline"
+          }}
         >
           Learn how this works.
         </Text>

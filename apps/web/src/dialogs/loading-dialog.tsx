@@ -49,7 +49,7 @@ function LoadingDialog<T>(props: LoadingDialogProps<T>) {
         <Text as="span" variant="body">
           {message}
         </Text>
-        <Loading rotate sx={{ my: 2 }} color="primary" />
+        <Loading sx={{ my: 2 }} color="accent" />
       </Box>
     </Dialog>
   );

@@ -558,8 +558,9 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
   addNodeView() {
     return createNodeView(CodeblockComponent, {
       contentDOMFactory: () => {
-        const content = document.createElement("div");
+        const content = document.createElement("pre");
         content.classList.add("node-content-wrapper");
+        content.classList.add("language-xyz");
         content.style.whiteSpace = "pre";
         // caret is not visible if content element width is 0px
         content.style.minWidth = "20px";

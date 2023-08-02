@@ -42,6 +42,7 @@ import {
 import { store as appStore } from "../../stores/app-store";
 import { createBackup } from "../../common";
 import { allowedPlatforms } from "../../stores/announcement-store";
+import { alpha } from "@theme-ui/color";
 
 var margins = [0, 2];
 var HORIZONTAL_MARGIN = 3;
@@ -195,7 +196,7 @@ function Description({ item, fontSize, color }) {
         ...mapStyle(style),
         fontSize: fontSize,
         fontWeight: "normal",
-        color: color || "fontTertiary"
+        color: color || "paragraph"
       }}
     />
   );
@@ -273,8 +274,8 @@ function InlineCalltoActions({ item, dismissAnnouncement }) {
               textDecoration: "underline",
               textDecorationLine: "underline",
               textDecorationColor:
-                index === 0 ? "var(--dimPrimary)" : "var(--bgSecondary)",
-              color: index === 0 ? "primary" : "fontTertiary",
+                index === 0 ? alpha("accent", 0.7) : "border",
+              color: index === 0 ? "accent" : "paragraph",
               fontWeight: "bold",
               ":first-of-type": {
                 mr: 1

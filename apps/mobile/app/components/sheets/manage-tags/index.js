@@ -25,7 +25,7 @@ import { db } from "../../../common/database";
 import { ToastEvent, presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useTagStore } from "../../../stores/use-tag-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import Input from "../../ui/input";
 import { PressableButton } from "../../ui/pressable";
@@ -33,7 +33,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { IconButton } from "../../ui/icon-button";
 const ManageTagsSheet = (props) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [notes, setNotes] = useState(props.notes || []);
   const allTags = useTagStore((state) => state.tags);
   const [tags, setTags] = useState([]);
@@ -128,7 +128,7 @@ const ManageTagsSheet = (props) => {
       <Input
         button={{
           icon: "magnify",
-          color: colors.accent,
+          color: colors.primary.accent,
           size: SIZE.lg
         }}
         testID="tag-input"
@@ -163,12 +163,12 @@ const ManageTagsSheet = (props) => {
               padding: 12
             }}
             onPress={onSubmit}
-            type="accent"
+            type="selected"
           >
-            <Heading size={SIZE.sm} color={colors.light}>
+            <Heading size={SIZE.sm} color={colors.selected.heading}>
               Add {'"' + "#" + query + '"'}
             </Heading>
-            <Icon name="plus" color={colors.light} size={SIZE.lg} />
+            <Icon name="plus" color={colors.selected.icon} size={SIZE.lg} />
           </PressableButton>
         ) : null}
         {!allTags || allTags.length === 0 ? (
@@ -180,10 +180,13 @@ const ManageTagsSheet = (props) => {
               alignItems: "center"
             }}
           >
-            <Heading size={50} color={colors.icon}>
+            <Heading size={50} color={colors.secondary.heading}>
               #
             </Heading>
-            <Paragraph textBreakStrategy="balanced" color={colors.icon}>
+            <Paragraph
+              textBreakStrategy="balanced"
+              color={colors.secondary.paragraph}
+            >
               You do not have any tags.
             </Paragraph>
           </View>
@@ -213,7 +216,7 @@ ManageTagsSheet.present = (notes) => {
 export default ManageTagsSheet;
 
 const TagItem = ({ tag, notes, setNotes }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const someNotesTagged = notes.some(
     (note) => note.tags?.indexOf(tag.title) !== -1
   );
@@ -258,7 +261,11 @@ const TagItem = ({ tag, notes, setNotes }) => {
           width: 23,
           height: 23
         }}
-        color={someNotesTagged || allNotesTagged ? colors.accent : colors.icon}
+        color={
+          someNotesTagged || allNotesTagged
+            ? colors.selected.icon
+            : colors.primary.icon
+        }
         testID={
           allNotesTagged
             ? "check-circle-outline"

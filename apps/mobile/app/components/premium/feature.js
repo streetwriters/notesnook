@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { Text, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import Paragraph from "../ui/typography/paragraph";
 import { ProTag } from "./pro-tag";
@@ -33,7 +33,7 @@ export const FeatureBlock = ({
   pro,
   proTagBg
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   return vertical ? (
     <View
@@ -42,7 +42,7 @@ export const FeatureBlock = ({
         alignItems: "center",
         paddingHorizontal: 12,
         marginBottom: 10,
-        backgroundColor: colors.nav,
+        backgroundColor: colors.secondary.background,
         borderRadius: 10,
         paddingVertical: 12
       }}
@@ -69,9 +69,9 @@ export const FeatureBlock = ({
         minWidth: 100
       }}
     >
-      <Icon color={colors.icon} name={icon} size={SIZE.xl} />
+      <Icon color={colors.primary.icon} name={icon} size={SIZE.xl} />
       <Paragraph size={SIZE.md}>
-        <Text style={{ color: colors.accent }}>{highlight}</Text>
+        <Text style={{ color: colors.primary.accent }}>{highlight}</Text>
         {content ? "\n" + content : null}
       </Paragraph>
 
@@ -87,7 +87,7 @@ export const FeatureBlock = ({
             height: 3,
             marginTop: 10,
             borderRadius: 100,
-            backgroundColor: colors.accent
+            backgroundColor: colors.primary.accent
           }}
         />
       )}

@@ -27,7 +27,7 @@ import {
   PresentSheetOptions
 } from "../../../services/event-manager";
 import Notifications, { Reminder } from "../../../services/notifications";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { ItemReference } from "../../../utils/types";
 import List from "../../list";
@@ -47,7 +47,7 @@ export default function ReminderNotify({
   update,
   reminder
 }: ReminderSheetProps) {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const references = db.relations?.to(reminder as ItemReference, "note") || [];
 
   const QuickActions = [
@@ -101,7 +101,7 @@ export default function ReminderNotify({
           alignItems: "center"
         }}
       >
-        <Icon name="bell" size={20} color={colors.accent} />
+        <Icon name="bell" size={20} color={colors.primary.accent} />
         <Paragraph style={{ marginLeft: 5 }}>
           {dayjs(reminder?.date).format("ddd, YYYY-MM-DD hh:mm A")}
         </Paragraph>
@@ -142,14 +142,14 @@ export default function ReminderNotify({
             height:
               160 * references?.length < 500 ? 160 * references?.length : 500,
             borderTopWidth: 1,
-            borderTopColor: colors.nav,
+            borderTopColor: colors.secondary.background,
             marginTop: 5,
             paddingTop: 5
           }}
         >
           <Paragraph
             style={{
-              color: colors.icon,
+              color: colors.secondary.paragraph,
               fontSize: SIZE.xs,
               marginBottom: 10
             }}

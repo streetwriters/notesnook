@@ -57,6 +57,8 @@ import { CustomScrollbarsVirtualList } from "../components/list-container";
 import { Attachment } from "../components/attachment";
 import { isDocument, isImage, isVideo } from "@notesnook/core/utils/filename";
 
+import { alpha } from "@theme-ui/color";
+
 type ToolbarAction = {
   title: string;
   icon: Icon;
@@ -181,7 +183,7 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
             <Flex sx={{ gap: 1 }}>
               {TOOLBAR_ACTIONS.map((tool) => (
                 <Button
-                  variant="tool"
+                  variant="secondary"
                   key={tool.title}
                   title={tool.title}
                   onClick={() =>
@@ -245,7 +247,7 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
                 as="tr"
                 sx={{
                   height: 40,
-                  th: { borderBottom: "1px solid var(--border)" },
+                  th: { borderBottom: "1px solid var(--separator)" },
                   bg: "background"
                 }}
               >
@@ -392,18 +394,18 @@ const Sidebar = memo(
           flexDirection: "column",
           justifyContent: "space-between",
           width: 240,
-          bg: "bgSecondary",
           "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
             {
-              bg: "bgTransparent",
+              backgroundColor: alpha("background", 0.6),
               backdropFilter: "blur(8px)"
-            }
+            },
+          backgroundColor: "var(--background-secondary)"
         }}
       >
         <Flex sx={{ flexDirection: "column" }}>
           <Input
             placeholder="Search"
-            sx={{ m: 2, mb: 0, width: "auto", bg: "bgSecondary", py: "7px" }}
+            sx={{ m: 2, mb: 0, width: "auto", bg: "background", py: "7px" }}
             onChange={(e) => {
               setRoute(e.target.value ? "none" : "all");
               if (e.target.value) filter(e.target.value);
@@ -430,7 +432,7 @@ const Sidebar = memo(
               <Text variant="subBody">{formatBytes(totalSize)}</Text>
             </Flex>
             <Button
-              variant="tool"
+              variant="secondary"
               sx={{
                 bg: "transparent",
                 borderRadius: 100,

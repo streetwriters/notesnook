@@ -30,19 +30,31 @@ export async function exportToPDF(
   content: string
 ): Promise<boolean> {
   if (!content) return false;
-  const { default: printjs } = await import("print-js");
-  return new Promise((resolve) => {
-    printjs({
-      printable: content,
-      type: "raw-html",
-      documentTitle: title,
-      header: '<h3 class="custom-h3">My custom header</h3>',
-      onPrintDialogClose: () => {
-        resolve(false);
-      },
-      onError: () => resolve(false)
-    });
-    resolve(true);
+
+  return new Promise<boolean>((resolve) => {
+    const iframe = document.createElement("iframe");
+    iframe.srcdoc = content.replaceAll(/<p(.+?)><\/p>/gm, "<p$1><br/></p>");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+
+    iframe.onload = () => {
+      if (!iframe.contentWindow) return;
+      if (iframe.contentDocument) iframe.contentDocument.title = title;
+      iframe.contentWindow.onbeforeunload = () => closePrint(false);
+      iframe.contentWindow.onafterprint = () => closePrint(true);
+      iframe.contentWindow.print();
+    };
+
+    function closePrint(result: boolean) {
+      document.body.removeChild(iframe);
+      resolve(result);
+    }
+
+    document.body.appendChild(iframe);
   });
 }
 
@@ -60,14 +72,14 @@ export async function exportNotes(
       if (noteIds.length === 1 && db.notes?.note(noteIds[0])?.data.locked) {
         vaultUnlocked = await Vault.unlockVault();
         if (!vaultUnlocked) return false;
-      } else if (noteIds.length > 1 && (await db.vault?.exists()))
+      } else if (noteIds.length > 1 && (await db.vault?.exists())) {
         vaultUnlocked = await Vault.unlockVault();
-
-      if (!vaultUnlocked)
-        showToast(
-          "error",
-          "Failed to unlock vault. Locked notes will be skipped."
-        );
+        if (!vaultUnlocked)
+          showToast(
+            "error",
+            "Failed to unlock vault. Locked notes will be skipped."
+          );
+      }
 
       const files = [];
       let index = 0;

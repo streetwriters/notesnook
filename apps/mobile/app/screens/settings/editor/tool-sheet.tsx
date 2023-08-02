@@ -24,7 +24,7 @@ import { PressableButton } from "../../../components/ui/pressable";
 import { SvgView } from "../../../components/ui/svg";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import { presentSheet } from "../../../services/event-manager";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { DraggableItem, useDragState } from "./state";
 import {
@@ -41,14 +41,16 @@ export default function ToolSheet({
   group: DraggableItem;
   fwdRef: RefObject<ActionSheetRef>;
 }) {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const data = useDragState((state) => state.data);
   const ungrouped = getUngroupedTools(data) as ToolId[];
 
   const renderTool = React.useCallback(
     (item: ToolId) => {
       const tool = findToolById(item);
-      const iconSvgString = tool ? getToolIcon(tool.icon as ToolId) : null;
+      const iconSvgString = tool
+        ? getToolIcon(tool.icon as ToolId, colors.secondary.icon)
+        : null;
       if (item === "none") return;
       return (
         <PressableButton
@@ -90,7 +92,7 @@ export default function ToolSheet({
               style={{
                 marginLeft: iconSvgString ? 10 : 0
               }}
-              color={colors.pri}
+              color={colors.primary.paragraph}
               size={SIZE.sm}
             >
               {tool?.title}
@@ -99,7 +101,12 @@ export default function ToolSheet({
         </PressableButton>
       );
     },
-    [colors.pri, group.groupIndex, group.index]
+    [
+      colors.primary.paragraph,
+      colors.secondary.icon,
+      group.groupIndex,
+      group.index
+    ]
   );
 
   return (
@@ -115,7 +122,7 @@ export default function ToolSheet({
             style={{
               alignSelf: "center"
             }}
-            color={colors.icon}
+            color={colors.secondary.paragraph}
           >
             You have grouped all the tools.
           </Paragraph>

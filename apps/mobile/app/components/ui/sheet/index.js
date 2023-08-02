@@ -22,7 +22,7 @@ import { Platform, View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import { PremiumToast } from "../../premium/premium-toast";
 import { Toast } from "../../toast";
 import { BouncingView } from "../transitions/bouncing-view";
@@ -41,7 +41,7 @@ const SheetWrapper = ({
   enableGesturesInScrollView = false,
   bottomPadding = true
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors("sheet");
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const sheetKeyboardHandler = useSettingStore(
     (state) => state.sheetKeyboardHandler
@@ -51,13 +51,12 @@ const SheetWrapper = ({
   const dimensions = useSettingStore((state) => state.dimensions);
   const pitchBlack = useSettingStore((state) => state.settings.pitchBlack);
   const insets = useGlobalSafeAreaInsets();
-
   let width = dimensions.width > 600 ? 600 : 500;
 
   const style = React.useMemo(() => {
     return {
       width: largeTablet || smallTablet ? width : "100%",
-      backgroundColor: colors.bg,
+      backgroundColor: colors.primary.background,
       zIndex: 10,
       paddingTop: 5,
       paddingBottom: 0,
@@ -67,7 +66,7 @@ const SheetWrapper = ({
       borderBottomRightRadius: 0,
       borderBottomLeftRadius: 0
     };
-  }, [colors.bg, largeTablet, smallTablet, width]);
+  }, [colors.primary.background, largeTablet, smallTablet, width]);
 
   const _onOpen = () => {
     onOpen && onOpen();
@@ -80,61 +79,63 @@ const SheetWrapper = ({
   };
 
   return (
-    <ActionSheet
-      ref={fwdRef}
-      testIDs={{
-        backdrop: "sheet-backdrop"
-      }}
-      indicatorStyle={{
-        width: 100,
-        backgroundColor: colors.nav
-      }}
-      drawUnderStatusBar={false}
-      containerStyle={style}
-      gestureEnabled={gestureEnabled}
-      initialOffsetFromBottom={1}
-      onPositionChanged={onHasReachedTop}
-      closeOnTouchBackdrop={closeOnTouchBackdrop}
-      keyboardMode={keyboardMode}
-      keyboardHandlerEnabled={sheetKeyboardHandler}
-      closeOnPressBack={closeOnTouchBackdrop}
-      indicatorColor={colors.nav}
-      onOpen={_onOpen}
-      keyboardDismissMode="none"
-      enableGesturesInScrollView={enableGesturesInScrollView}
-      defaultOverlayOpacity={overlayOpacity}
-      overlayColor={pitchBlack ? "#585858" : "#2b2b2b"}
-      keyboardShouldPersistTaps="always"
-      openAnimationConfig={{
-        friction: 9
-      }}
-      ExtraOverlayComponent={
-        <>
-          {overlay}
-          <PremiumToast
-            context="sheet"
-            close={() => fwdRef?.current?.hide()}
-            offset={50}
-          />
-          <Toast context="local" />
-        </>
-      }
-      onClose={_onClose}
-    >
-      <BouncingView>
-        {children}
-        {bottomPadding ? (
-          <View
-            style={{
-              height:
-                Platform.OS === "ios" && insets.bottom !== 0
-                  ? insets.bottom + 5
-                  : 20
-            }}
-          />
-        ) : null}
-      </BouncingView>
-    </ActionSheet>
+    <ScopedThemeProvider value="sheet">
+      <ActionSheet
+        ref={fwdRef}
+        testIDs={{
+          backdrop: "sheet-backdrop"
+        }}
+        indicatorStyle={{
+          width: 100,
+          backgroundColor: colors.secondary.background
+        }}
+        drawUnderStatusBar={false}
+        containerStyle={style}
+        gestureEnabled={gestureEnabled}
+        initialOffsetFromBottom={1}
+        onPositionChanged={onHasReachedTop}
+        closeOnTouchBackdrop={closeOnTouchBackdrop}
+        keyboardMode={keyboardMode}
+        keyboardHandlerEnabled={sheetKeyboardHandler}
+        closeOnPressBack={closeOnTouchBackdrop}
+        indicatorColor={colors.secondary.background}
+        onOpen={_onOpen}
+        keyboardDismissMode="none"
+        enableGesturesInScrollView={enableGesturesInScrollView}
+        defaultOverlayOpacity={overlayOpacity}
+        overlayColor={colors.primary.backdrop}
+        keyboardShouldPersistTaps="always"
+        openAnimationConfig={{
+          friction: 9
+        }}
+        ExtraOverlayComponent={
+          <>
+            {overlay}
+            <PremiumToast
+              context="sheet"
+              close={() => fwdRef?.current?.hide()}
+              offset={50}
+            />
+            <Toast context="local" />
+          </>
+        }
+        onClose={_onClose}
+      >
+        <BouncingView>
+          {children}
+          {bottomPadding ? (
+            <View
+              style={{
+                height:
+                  Platform.OS === "ios" && insets.bottom !== 0
+                    ? insets.bottom + 5
+                    : 20
+              }}
+            />
+          ) : null}
+        </BouncingView>
+      </ActionSheet>
+    </ScopedThemeProvider>
   );
 };
 

@@ -20,16 +20,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import { useSelectionStore } from "../../stores/use-selection-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 
 export const ContainerHeader = ({ children }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const selectionMode = useSelectionStore((state) => state.selectionMode);
 
   return !selectionMode ? (
     <View
       style={{
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         width: "100%",
         overflow: "hidden"
       }}

@@ -22,25 +22,24 @@ import { useRef, useState } from "react";
 import { Button } from "../../components/button";
 import { ResponsivePresenter } from "../../components/responsive";
 import { useTimer } from "../../hooks/use-timer";
-import { Icon } from "../../toolbar/components/icon";
+import { Icon } from "@notesnook/ui";
 import { Popup } from "../../toolbar/components/popup";
 import { Icons } from "../../toolbar/icons";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 import { ReactNodeViewProps } from "../react/types";
 import { CodeBlockAttributes } from "./code-block";
 import Languages from "./languages.json";
+import { useThemeEngineStore } from "@notesnook/theme";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
 ) {
-  const isMobile = useIsMobile();
   const { editor, updateAttributes, node, forwardRef } = props;
-  const { language, indentLength, indentType, caretPosition, lines } =
-    node.attrs;
+  const { language, indentLength, indentType, caretPosition } = node.attrs;
 
-  const [isOpen, setIsOpen] = useState(false);
   // const [caretPosition, setCaretPosition] = useState<CaretPosition>();
+  const [isOpen, setIsOpen] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const theme = useThemeEngineStore((store) => store.theme);
 
   const { enabled, start } = useTimer(1000);
 
@@ -59,27 +58,38 @@ export function CodeblockComponent(
       >
         <Text
           ref={forwardRef}
-          as="pre"
           autoCorrect="off"
           autoCapitalize="none"
-          css={{}}
+          css={theme.codeBlockCSS}
           sx={{
-            "div, span.token, span.line-number-widget, span.line-number::before":
-              {
-                fontFamily: "monospace",
-                fontSize: "code",
-                whiteSpace: "pre", // TODO !important
-                tabSize: 1
+            pre: {
+              fontFamily: "inherit !important",
+              tabSize: "inherit !important",
+              // background: "transparent !important",
+              padding: "10px !important",
+              margin: "0px !important",
+              width: "100%",
+              borderRadius: `0px !important`,
+
+              "::selection,*::selection": {
+                bg: "textSelection",
+                color: "currentColor"
               },
+              "::-moz-selection,*::-moz-selection": {
+                bg: "textSelection",
+                color: "currentColor"
+              }
+            },
+            fontFamily: "monospace",
+            fontSize: "code",
+            whiteSpace: "pre", // TODO !important
+            tabSize: 1,
             position: "relative",
             lineHeight: "20px",
-            bg: "codeBg",
-            color: "static",
-            overflowX: "auto",
-            display: "flex",
-            px: 2,
-            pt: 2,
-            pb: 2
+            // bg: "var(--background-secondary)",
+            color: "white",
+            overflowX: "hidden",
+            display: "flex"
           }}
           spellCheck={false}
         />
@@ -87,14 +97,14 @@ export function CodeblockComponent(
           ref={toolbarRef}
           contentEditable={false}
           sx={{
-            bg: "codeBg",
+            bg: "var(--background-secondary)",
             alignItems: "center",
             justifyContent: "flex-end",
-            borderTop: "1px solid var(--codeBorder)"
+            borderTop: "1px solid var(--border-secondary)"
           }}
         >
           {caretPosition ? (
-            <Text variant={"subBody"} sx={{ mr: 1, color: "codeFg" }}>
+            <Text variant={"subBody"} sx={{ mr: 1, mt: "2px" }}>
               Line {caretPosition.line}, Column {caretPosition.column}{" "}
               {caretPosition.selected
                 ? `(${caretPosition.selected} selected)`
@@ -106,8 +116,7 @@ export function CodeblockComponent(
             variant={"icon"}
             sx={{
               p: 1,
-              opacity: "1 !important",
-              ":hover": { bg: "codeSelection" }
+              opacity: "1 !important"
             }}
             title="Toggle indentation mode"
             disabled={!editor.isEditable}
@@ -119,7 +128,7 @@ export function CodeblockComponent(
               });
             }}
           >
-            <Text variant={"subBody"} sx={{ color: "codeFg" }}>
+            <Text variant={"subBody"}>
               {indentType === "space" ? "Spaces" : "Tabs"}: {indentLength}
             </Text>
           </Button>
@@ -129,8 +138,8 @@ export function CodeblockComponent(
             sx={{
               opacity: "1 !important",
               p: 1,
-              bg: isOpen ? "codeSelection" : "transparent",
-              ":hover": { bg: "codeSelection" }
+              mr: 1,
+              bg: isOpen ? "textSelection" : "transparent"
             }}
             disabled={!editor.isEditable}
             onClick={() => {
@@ -140,11 +149,7 @@ export function CodeblockComponent(
             }}
             title="Change language"
           >
-            <Text
-              variant={"subBody"}
-              spellCheck={false}
-              sx={{ color: "codeFg" }}
-            >
+            <Text variant={"subBody"} spellCheck={false}>
               {languageDefinition?.title || "Plaintext"}
             </Text>
           </Button>
@@ -156,10 +161,8 @@ export function CodeblockComponent(
                 opacity: "1 !important",
                 p: 1,
                 mr: 1,
-                bg: "transparent",
-                ":hover": { bg: "codeSelection" }
+                bg: "transparent"
               }}
-              disabled={!editor.isEditable}
               onClick={() => {
                 editor.commands.copyToClipboard(node.textContent);
                 start();
@@ -171,7 +174,7 @@ export function CodeblockComponent(
                 spellCheck={false}
                 sx={{ color: "codeFg" }}
               >
-                Copy
+                {enabled ? "Copied!" : "Copy"}
               </Text>
             </Button>
           ) : null}
@@ -238,9 +241,6 @@ function LanguageSelector(props: LanguageSelectorProps) {
         }}
       >
         <Input
-          onFocus={() => {
-            console.log("EHLLO!");
-          }}
           autoFocus
           placeholder="Search languages"
           sx={{

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { Text, View, ViewStyle } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import { PressableButtonProps } from "../ui/pressable";
@@ -54,7 +54,7 @@ const DialogHeader = ({
   titlePart,
   style
 }: DialogHeaderProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   return (
     <>
@@ -86,7 +86,7 @@ const DialogHeader = ({
             >
               {title}{" "}
               {titlePart ? (
-                <Text style={{ color: colors.accent }}>{titlePart}</Text>
+                <Text style={{ color: colors.primary.accent }}>{titlePart}</Text>
               ) : null}
             </Heading>
 
@@ -114,7 +114,7 @@ const DialogHeader = ({
                 maxWidth: centered ? "90%" : "100%",
                 alignSelf: centered ? "center" : "flex-start"
               }}
-              color={paragraphColor || colors.icon}
+              color={paragraphColor || colors.secondary.paragraph}
             >
               {paragraph}
             </Paragraph>

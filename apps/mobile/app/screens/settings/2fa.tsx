@@ -46,7 +46,7 @@ import {
   presentSheet,
   ToastEvent
 } from "../../services/event-manager";
-import { ThemeStore, useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors, VariantsWithStaticColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
@@ -94,7 +94,7 @@ type MFAStepProps = {
   isSetup?: boolean;
 };
 export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
 
   const getMethods = () => {
@@ -135,7 +135,9 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
                 marginRight: 10
               }}
               size={20}
-              color={item.recommended ? colors.accent : colors.icon}
+              color={
+                item.recommended ? colors.primary.accent : colors.primary.icon
+              }
               name={item.icon}
             />
           )}
@@ -159,7 +161,7 @@ export const MFASetup = ({
   setStep,
   recovery
 }: MFAStepProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const [authenticatorDetails, setAuthenticatorDetails] = useState({
     sharedKey: null,
@@ -284,7 +286,7 @@ export const MFASetup = ({
             }}
           >
             <ActivityIndicator
-              color={colors.accent}
+              color={colors.primary.accent}
               style={{
                 height: 50
               }}
@@ -399,7 +401,7 @@ export const MFARecoveryCodes = ({
   onSuccess,
   isSetup = true
 }: MFAStepProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [codes, setCodes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -443,7 +445,7 @@ export const MFARecoveryCodes = ({
           }}
         >
           <ActivityIndicator
-            color={colors.accent}
+            color={colors.primary.accent}
             style={{
               height: 50
             }}
@@ -568,16 +570,16 @@ MFARecoveryCodes.present = (methodId: MFAMethod["id"]) => {
 };
 
 const mfaSvg = (
-  colors: ThemeStore["colors"]
+  colors: VariantsWithStaticColors
 ) => `<svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 382.94 405.93">
-<path fill="${colors.pri}" d="M192.58 405.92a75.19 75.19 0 0 1-18.64-2.41l-1.2-.33-1.12-.56c-40.24-20.18-74.19-46.83-100.9-79.21a299.86 299.86 0 0 1-50.95-90.47A348.21 348.21 0 0 1 .07 110.27l.04-2.02c0-20.29 11.26-38.09 28.7-45.35C42.13 57.34 163.24 7.6 172 4c16.48-8.26 34.06-1.36 36.87-.16 6.31 2.58 118.28 48.38 142.47 59.9 24.94 11.87 31.6 33.2 31.6 43.93 0 48.6-8.43 94-25.02 134.97a312.52 312.52 0 0 1-56.16 90.51c-45.85 51.6-91.7 69.89-92.15 70.05a50.11 50.11 0 0 1-17.04 2.72zm-10.79-26.71c3.98.89 13.13 2.22 19.1.05 7.58-2.77 45.96-22.67 81.83-63.03 49.55-55.77 74.7-125.88 74.74-208.38-.1-1.67-1.28-13.59-17.07-21.1-23.72-11.3-140.1-58.89-141.27-59.37l-.32-.14c-2.44-1.02-10.2-3.17-15.55-.37l-1.08.5c-1.3.54-129.86 53.34-143.57 59.05-9.6 4-13 13.9-13 21.83 0 .58-.02 1.43-.05 2.52-1.1 56.44 11.97 195.34 156.24 268.44z"/>
-<path fill="${colors.nav}" d="M177.33 15.59S47.61 68.87 33.71 74.66c-13.9 5.79-20.85 19.7-20.85 33.6 0 13.9-10.45 195.26 164.47 282.96 0 0 15.88 4.39 27.92 0 12.04-4.39 164.96-78.52 164.96-283.55 0 0 0-20.85-24.33-32.43C321.55 63.66 203.94 15.6 203.94 15.6s-14.44-6.37-26.6 0z"/>
+<path fill="${colors.primary.paragraph}" d="M192.58 405.92a75.19 75.19 0 0 1-18.64-2.41l-1.2-.33-1.12-.56c-40.24-20.18-74.19-46.83-100.9-79.21a299.86 299.86 0 0 1-50.95-90.47A348.21 348.21 0 0 1 .07 110.27l.04-2.02c0-20.29 11.26-38.09 28.7-45.35C42.13 57.34 163.24 7.6 172 4c16.48-8.26 34.06-1.36 36.87-.16 6.31 2.58 118.28 48.38 142.47 59.9 24.94 11.87 31.6 33.2 31.6 43.93 0 48.6-8.43 94-25.02 134.97a312.52 312.52 0 0 1-56.16 90.51c-45.85 51.6-91.7 69.89-92.15 70.05a50.11 50.11 0 0 1-17.04 2.72zm-10.79-26.71c3.98.89 13.13 2.22 19.1.05 7.58-2.77 45.96-22.67 81.83-63.03 49.55-55.77 74.7-125.88 74.74-208.38-.1-1.67-1.28-13.59-17.07-21.1-23.72-11.3-140.1-58.89-141.27-59.37l-.32-.14c-2.44-1.02-10.2-3.17-15.55-.37l-1.08.5c-1.3.54-129.86 53.34-143.57 59.05-9.6 4-13 13.9-13 21.83 0 .58-.02 1.43-.05 2.52-1.1 56.44 11.97 195.34 156.24 268.44z"/>
+<path fill="${colors.secondary.background}" d="M177.33 15.59S47.61 68.87 33.71 74.66c-13.9 5.79-20.85 19.7-20.85 33.6 0 13.9-10.45 195.26 164.47 282.96 0 0 15.88 4.39 27.92 0 12.04-4.39 164.96-78.52 164.96-283.55 0 0 0-20.85-24.33-32.43C321.55 63.66 203.94 15.6 203.94 15.6s-14.44-6.37-26.6 0z"/>
 <path d="M191.23 57.29v284.25S60.34 278.53 61.51 112.89z" opacity=".2"/>
-<path fill="${colors.icon}" d="m192.94 261.58-41.69-53.61 24.24-18.86 19.75 25.38 66.7-70.4 22.3 21.13z"/>
+<path fill="${colors.primary.icon}" d="m192.94 261.58-41.69-53.61 24.24-18.86 19.75 25.38 66.7-70.4 22.3 21.13z"/>
 </svg>`;
 
 const MFASuccess = ({ recovery }: MFAStepProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   return (
     <View
       style={{

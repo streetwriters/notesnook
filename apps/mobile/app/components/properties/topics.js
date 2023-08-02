@@ -34,7 +34,7 @@ export const Topics = ({ item, close }) => {
       title={topic.title}
       type="grayBg"
       // buttonType={{
-      //   text: colors.accent
+      //   text: colors.primary.accent
       // }}
       height={30}
       onPress={() => open(topic)}

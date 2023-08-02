@@ -26,16 +26,12 @@ import {
   store as selectionStore
 } from "../../stores/selection-store";
 import GroupHeader from "../group-header";
-import {
-  Context,
-  DEFAULT_ITEM_HEIGHT,
-  Item,
-  ListProfiles
-} from "./list-profiles";
+import { DEFAULT_ITEM_HEIGHT, ListProfiles } from "./list-profiles";
 import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
 import ScrollContainer from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
+import { Context, Item } from "./types";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
@@ -55,7 +51,7 @@ export const CustomScrollbarsVirtualList = forwardRef<
 type ListContainerProps = {
   type: keyof typeof ListProfiles;
   items: Item[];
-  groupType?: string;
+  groupingKey?: GroupingKey;
   compact?: boolean;
   context?: Context;
   refresh: () => void;
@@ -68,8 +64,16 @@ type ListContainerProps = {
 };
 
 function ListContainer(props: ListContainerProps) {
-  const { type, groupType, items, context, refresh, header, button, compact } =
-    props;
+  const {
+    type,
+    groupingKey,
+    items,
+    context,
+    refresh,
+    header,
+    button,
+    compact
+  } = props;
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
@@ -174,10 +178,10 @@ function ListContainer(props: ListContainerProps) {
 
                 switch (item.type) {
                   case "header":
-                    if (!groupType) return null;
+                    if (!groupingKey) return null;
                     return (
                       <GroupHeader
-                        type={groupType}
+                        groupingKey={groupingKey}
                         refresh={refresh}
                         title={item.title}
                         isFocused={index === focusedGroupIndex}
@@ -218,7 +222,6 @@ function ListContainer(props: ListContainerProps) {
                       <Component
                         item={item}
                         context={context}
-                        index={index}
                         type={type}
                         compact={compact}
                       />
@@ -231,7 +234,7 @@ function ListContainer(props: ListContainerProps) {
       )}
       {button && (
         <Button
-          variant="primary"
+          variant="accent"
           data-test-id={`${props.type}-action-button`}
           onClick={button.onClick}
           sx={{

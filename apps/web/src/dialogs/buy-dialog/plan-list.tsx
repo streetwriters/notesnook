@@ -62,7 +62,7 @@ export function PlansList(props: PlansListProps) {
               key={metadata.title}
               disabled={isLoading}
               data-test-id={`checkout-plan`}
-              variant="tool"
+              variant="secondary"
               mt={1}
               bg="transparent"
               // sx={
@@ -90,7 +90,10 @@ export function PlansList(props: PlansListProps) {
                 <br />
                 <Text
                   variant="body"
-                  sx={{ fontWeight: "normal", color: "fontTertiary" }}
+                  sx={{
+                    fontWeight: "normal",
+                    color: "var(--paragraph-secondary)"
+                  }}
                 >
                   {metadata.subtitle}
                 </Text>
@@ -119,7 +122,7 @@ function RecurringPricing(props: RecurringPricingProps) {
           sx={{
             textDecorationLine: "line-through",
             fontSize: "body",
-            color: "fontTertiary"
+            color: "var(--paragraph-secondary)"
           }}
         >
           {getCurrencySymbol(plan.currency)}

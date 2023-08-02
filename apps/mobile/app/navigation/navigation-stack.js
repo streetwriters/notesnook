@@ -47,7 +47,7 @@ import useNavigationStore from "../stores/use-navigation-store";
 import { useNoteStore } from "../stores/use-notes-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { useThemeStore } from "../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { rootNavigatorRef } from "../utils/global-refs";
 import Auth from "../components/auth";
 const NativeStack = createNativeStackNavigator();
@@ -63,7 +63,7 @@ const IntroStack = createNativeStackNavigator();
  */
 
 const IntroStackNavigator = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const height = useSettingStore((state) => state.dimensions.height);
   return (
     <IntroStack.Navigator
@@ -72,7 +72,7 @@ const IntroStackNavigator = () => {
         lazy: false,
         animation: "none",
         contentStyle: {
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           minHeight: height
         }
       }}
@@ -86,7 +86,7 @@ const IntroStackNavigator = () => {
 };
 
 const _Tabs = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const homepage = SettingsService.get().homepage;
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
@@ -106,7 +106,7 @@ const _Tabs = () => {
       <SafeAreaView
         style={{
           flex: 1,
-          backgroundColor: colors.bg
+          backgroundColor: colors.primary.background
         }}
       >
         <DelayLayout animated={false} wait={loading} />
@@ -122,7 +122,7 @@ const _Tabs = () => {
         lazy: false,
         animation: "none",
         contentStyle: {
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           minHeight: !introCompleted ? undefined : screenHeight
         }
       }}

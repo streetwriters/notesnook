@@ -17,8 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { textblockTypeInputRule } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
 
+const HEADING_REGEX = /^(#{1,6})\s$/;
 export const Heading = TiptapHeading.extend({
   addCommands() {
     return {
@@ -40,5 +42,32 @@ export const Heading = TiptapHeading.extend({
           });
         }
     };
+  },
+
+  addKeyboardShortcuts() {
+    return this.options.levels.reduce(
+      (items, level) => ({
+        ...items,
+        ...{
+          [`Mod-Alt-${level}`]: () => this.editor.commands.setHeading({ level })
+        }
+      }),
+      {}
+    );
+  },
+
+  addInputRules() {
+    return [
+      textblockTypeInputRule({
+        find: HEADING_REGEX,
+        type: this.type,
+        getAttributes: (match) => {
+          const { textAlign, textDirection } =
+            this.editor.state.selection.$from.parent?.attrs || {};
+          const level = match[1].length;
+          return { level, textAlign, textDirection };
+        }
+      })
+    ];
   }
 });

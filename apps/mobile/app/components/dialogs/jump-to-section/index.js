@@ -25,7 +25,7 @@ import {
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import { useMessageStore } from "../../../stores/use-message-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../../utils/elevation";
 import {
   eCloseJumpToDialog,
@@ -41,10 +41,10 @@ import { useCallback } from "react";
 const offsets = [];
 let timeout = null;
 const JumpToSectionDialog = ({ scrollRef, data, type }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const notes = data;
   const [visible, setVisible] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const onPress = (item) => {
     let ind = notes.findIndex(
@@ -77,7 +77,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
     }
     timeout = setTimeout(() => {
       let index = offsets.findIndex((o, i) => o <= y && offsets[i + 1] > y);
-      setCurrentIndex(index);
+      setCurrentIndex(index || 0);
     }, 200);
   };
 
@@ -113,7 +113,6 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
         offsets.push(offset);
       });
   }, [notes]);
-
   return !visible ? null : (
     <BaseDialog
       onShow={() => {
@@ -126,7 +125,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
         style={{
           ...getElevationStyle(5),
           width: DDS.isTab ? 500 : "85%",
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           zIndex: 100,
           bottom: 20,
           maxHeight: "65%",
@@ -157,7 +156,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
                   <PressableButton
                     key={item.title}
                     onPress={() => onPress(item, index)}
-                    type={currentIndex === index ? "accent" : "transparent"}
+                    type={currentIndex === index ? "selected" : "transparent"}
                     customStyle={{
                       minWidth: "20%",
                       width: null,
@@ -171,7 +170,9 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
                     <Paragraph
                       size={SIZE.sm}
                       color={
-                        currentIndex === index ? colors.light : colors.accent
+                        currentIndex === index
+                          ? colors.selected.accent
+                          : colors.primary.accent
                       }
                       style={{
                         textAlign: "center"

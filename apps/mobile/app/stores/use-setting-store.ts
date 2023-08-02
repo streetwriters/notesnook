@@ -24,7 +24,7 @@ import { initialWindowMetrics } from "react-native-safe-area-context";
 import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
 import { Reminder } from "../services/notifications";
-import { ACCENT } from "../utils/color-scheme";
+import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
 
 export type Settings = {
   showToolbarOnTop?: boolean;
@@ -54,10 +54,6 @@ export type Settings = {
   lastBackupDate?: number | undefined;
   userEmailConfirmed?: boolean;
   recoveryKeySaved?: boolean;
-  theme: {
-    accent: string;
-    dark: boolean;
-  };
   backupDirectoryAndroid?: FileType | null;
   showBackupCompleteSheet: boolean;
   lastRecoveryEmailTime?: number;
@@ -75,6 +71,9 @@ export type Settings = {
   notificationSound?: Sound & { platform: PlatformOSType };
   defaultFontSize: string;
   defaultFontFamily: string;
+  colorScheme: "dark" | "light";
+  lighTheme: ThemeDefinition;
+  darkTheme: ThemeDefinition;
 };
 
 type DimensionsType = {
@@ -140,10 +139,6 @@ export const defaultSettings: SettingStore["settings"] = {
   lastBackupDate: undefined,
   userEmailConfirmed: false,
   recoveryKeySaved: false,
-  theme: {
-    accent: ACCENT?.color,
-    dark: false
-  },
   showBackupCompleteSheet: true,
   sessionExpired: false,
   version: null,
@@ -154,7 +149,10 @@ export const defaultSettings: SettingStore["settings"] = {
   reminderNotificationMode: "urgent",
   notificationSound: undefined,
   defaultFontFamily: "sans-serif",
-  defaultFontSize: "16"
+  defaultFontSize: "16",
+  colorScheme: "light",
+  lighTheme: ThemeLight,
+  darkTheme: ThemeDark
 };
 
 export const useSettingStore = create<SettingStore>((set) => ({

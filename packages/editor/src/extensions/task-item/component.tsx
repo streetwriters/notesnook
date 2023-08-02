@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Box, Flex } from "@theme-ui/components";
 import { ReactNodeViewProps } from "../react";
-import { Icon } from "../../toolbar/components/icon";
+import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Transaction } from "prosemirror-state";
@@ -85,10 +85,8 @@ export function TaskItemComponent(
             opacity: [1, 1, 0],
             alignSelf: "start",
             bg: "transparent",
+            mt: "0.36ch",
             cursor: "grab",
-            ".icon:hover path": {
-              fill: "var(--checked) !important"
-            },
             mx: 1,
             fontFamily: "inherit"
           }}
@@ -102,17 +100,15 @@ export function TaskItemComponent(
         tabIndex={1}
         sx={{
           border: "2px solid",
-          borderColor: checked ? "checked" : "icon",
+          borderColor: checked ? "accent" : "icon",
           borderRadius: "default",
           alignSelf: "start",
           p: "1px",
-          mr: 1,
+          mt: "0.40ch",
+          marginInlineEnd: 1,
           cursor: editor.isEditable ? "pointer" : "unset",
           ":hover": {
-            borderColor: "checked"
-          },
-          ":hover .icon path": {
-            fill: "var(--checked) !important"
+            borderColor: "accent"
           },
           fontFamily: "inherit"
         }}
@@ -128,7 +124,7 @@ export function TaskItemComponent(
             toggle();
           }
         }}
-        color={checked ? "checked" : "icon"}
+        color={checked ? "accent" : "icon"}
         size={isMobile ? "1.66ch" : "1.46ch"}
       />
 

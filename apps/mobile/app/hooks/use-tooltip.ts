@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { RefObject, useEffect, useRef } from "react";
 import { Platform } from "react-native";
 import RNTooltips from "react-native-tooltips";
-import { useThemeStore } from "../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -51,7 +51,7 @@ export const hideAllTooltips = async () => {
  * @returns
  */
 const useTooltip = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors, isDark } = useThemeColors();
   const parent = useRef();
   const keyboard = useKeyboard();
 
@@ -79,7 +79,7 @@ const useTooltip = () => {
       //TipManager.markPopupUsed(popup.id);
       RNTooltips.Show(target.current, parent.current, {
         text: popup.text,
-        tintColor: colors.night ? colors.nav : "#404040",
+        tintColor: isDark ? colors.secondary.background : "#404040",
         corner: Platform.OS === "ios" ? 5 : 50,
         textSize: 15,
         position: positions[position],

@@ -47,7 +47,7 @@ export class DeviceDetectionService {
   }
 
   setSize(size, orientation) {
-    windowSize = size;
+    windowSize = size || windowSize;
     this.width = windowSize.width;
     this.height = windowSize.height;
     this.adjustedWidth = this.width * this.pixelDensity;

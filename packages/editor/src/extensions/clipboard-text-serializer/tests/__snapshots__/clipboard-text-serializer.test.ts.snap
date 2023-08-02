@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`copying a single list item shouldn't copy the list metadata 1`] = `
+{
+  "content": [
+    {
+      "content": [
+        {
+          "text": "Hello",
+          "type": "text",
+        },
+      ],
+      "type": "paragraph",
+    },
+  ],
+}
+`;

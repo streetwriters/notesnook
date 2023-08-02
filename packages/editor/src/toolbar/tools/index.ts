@@ -81,7 +81,14 @@ import {
   EmbedProperties,
   EmbedSettings
 } from "./embed";
-import { AddLink, EditLink, RemoveLink, LinkSettings, OpenLink } from "./link";
+import {
+  AddLink,
+  EditLink,
+  RemoveLink,
+  LinkSettings,
+  OpenLink,
+  CopyLink
+} from "./link";
 import {
   WebClipFullScreen,
   WebClipSettings,
@@ -103,6 +110,7 @@ const tools = {
   addLink: AddLink,
   editLink: EditLink,
   removeLink: RemoveLink,
+  copyLink: CopyLink,
   linkSettings: LinkSettings,
   openLink: OpenLink,
   insertBlock: InsertBlock,

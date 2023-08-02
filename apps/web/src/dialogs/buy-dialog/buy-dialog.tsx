@@ -44,6 +44,8 @@ import { isMacStoreApp } from "../../utils/platform";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
 
+import { alpha } from "@theme-ui/color";
+
 type BuyDialogProps = {
   couponCode?: string;
   plan?: "monthly" | "yearly";
@@ -108,7 +110,7 @@ export function BuyDialog(props: BuyDialogProps) {
         },
         overlay: {
           zIndex: 999,
-          background: theme.colors.overlay
+          background: theme.colors.backdrop
         }
       }}
     >
@@ -131,10 +133,10 @@ export function BuyDialog(props: BuyDialogProps) {
             borderTopLeftRadius: "dialog",
             borderBottomLeftRadius: [0, 0, "dialog"],
             overflow: "hidden",
-            bg: "bgSecondary",
+            bg: "var(--background-secondary)",
             "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
               {
-                bg: "bgTransparent",
+                bg: alpha("background", 0.6),
                 backdropFilter: "blur(8px)"
               },
             flexDirection: "column",
@@ -242,7 +244,7 @@ function Details() {
   const setIsApplyingCoupon = useCheckoutStore(
     (store) => store.setIsApplyingCoupon
   );
-  const theme = useThemeStore((store) => store.theme);
+  const theme = useThemeStore((store) => store.colorScheme);
 
   if (isCheckoutCompleted) return null;
 
@@ -312,7 +314,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
       ) : user ? (
         <>
           <Button
-            variant="primary"
+            variant="accent"
             mt={2}
             sx={{ borderRadius: 100, px: 6 }}
             onClick={onShowPlans}
@@ -334,7 +336,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
       ) : (
         <>
           <Button
-            variant="primary"
+            variant="accent"
             mt={4}
             sx={{ borderRadius: 100, px: 6 }}
             onClick={() => hardNavigate("/signup")}
@@ -354,7 +356,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
           bg="shade"
           mt={4}
           p={1}
-          sx={{ borderRadius: "default", color: "primary" }}
+          sx={{ borderRadius: "default", color: "accent" }}
         >
           {user
             ? "Please select a plan to use your coupon:"
@@ -389,7 +391,7 @@ function AlreadyPremium(props: AlreadyPremiumProps) {
             subscription.
           </Text>
           <Button
-            variant="primary"
+            variant="accent"
             mt={2}
             sx={{ borderRadius: 100, px: 6 }}
             onClick={onShowPlans}
@@ -420,7 +422,7 @@ function CheckoutCompleted(props: { onClose: () => void }) {
         You have successfully subscribed to Notesnook Pro.
       </Text>
       <Button
-        variant="primary"
+        variant="accent"
         mt={2}
         sx={{ borderRadius: 100, px: 6 }}
         onClick={onClose}
@@ -563,13 +565,13 @@ function CheckoutPricing(props: CheckoutPricingProps) {
     {
       key: "tax",
       label: "Sales tax",
-      color: "error",
+      color: "red",
       value: formatPrice(currency, price.tax.toFixed(2), null)
     },
     {
       key: "discount",
       label: "Discount",
-      color: "primary",
+      color: "accent",
       value: formatPrice(
         currency,
         discount.amount.toFixed(2),
@@ -609,7 +611,7 @@ function CheckoutPricing(props: CheckoutPricingProps) {
           <Text
             data-test-id={`value`}
             variant="body"
-            sx={{ fontSize: "subtitle", color: field.color || "text" }}
+            sx={{ fontSize: "subtitle", color: field.color || "paragraph" }}
           >
             {field.value}
           </Text>
@@ -630,11 +632,11 @@ function CheckoutPricing(props: CheckoutPricingProps) {
         <Text as="div" variant="body" sx={{ textAlign: "end" }}>
           <Text
             data-test-id={`value`}
-            sx={{ fontSize: "heading", color: "text" }}
+            sx={{ fontSize: "heading", color: "paragraph" }}
           >
             {currentTotal}
           </Text>
-          <Text as="div" sx={{ fontSize: "body", color: "text" }}>
+          <Text as="div" sx={{ fontSize: "body", color: "paragraph" }}>
             {isDiscounted
               ? "forever"
               : `first ${getFullPeriod(period)} then ${recurringTotal}`}

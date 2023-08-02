@@ -56,7 +56,7 @@ function ProgressDialog(props) {
               sx={{
                 alignSelf: "start",
                 my: 1,
-                bg: "primary",
+                bg: "accent",
                 height: "2px",
                 width: `${(current / total) * 100}%`
               }}

@@ -682,7 +682,7 @@ export class VaultDialog extends Component {
             ...getElevationStyle(5),
             width: DDS.isTab ? 350 : "85%",
             borderRadius: 10,
-            backgroundColor: colors.bg,
+            backgroundColor: colors.primary.background,
             paddingTop: 12
           }}
         >
@@ -867,7 +867,12 @@ export class VaultDialog extends Component {
                 icon="fingerprint"
                 width="100%"
                 title="Biometric unlocking"
-                type={this.state.biometricUnlock ? "transparent" : "gray"}
+                iconColor={
+                  this.state.biometricUnlock
+                    ? colors.selected.icon
+                    : colors.primary.icon
+                }
+                type={this.state.biometricUnlock ? "transparent" : "selected"}
               />
             ) : null}
           </View>

@@ -33,7 +33,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../../services/event-manager";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import BaseDialog from "../../dialog/base-dialog";
@@ -64,7 +64,7 @@ const usePDFSnapshot = (attachment) => {
 };
 
 const PDFPreview = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [pdfSource, setPDFSource] = useState();
   const [loading, setLoading] = useState(false);
@@ -172,7 +172,7 @@ const PDFPreview = () => {
             >
               <ProgressBarComponent
                 indeterminate={!progress}
-                color={colors.accent}
+                color={colors.primary.accent}
                 borderColor="transparent"
                 progress={parseInt(progress?.value || "100") / 100}
               />
@@ -180,7 +180,7 @@ const PDFPreview = () => {
                 style={{
                   marginTop: 10
                 }}
-                color={colors.light}
+                color={colors.static.white}
               >
                 Loading {`${progress?.percent ? `(${progress?.percent})` : ""}`}
                 ... Please wait
@@ -205,7 +205,7 @@ const PDFPreview = () => {
                   }}
                 >
                   <IconButton
-                    color={colors.light}
+                    color={colors.static.white}
                     name="arrow-left"
                     onPress={close}
                     customStyle={{
@@ -226,7 +226,7 @@ const PDFPreview = () => {
                     ref={inputRef}
                     defaultValue={currentPage + ""}
                     style={{
-                      color: colors.pri,
+                      color: colors.primary.paragraph,
                       padding: 0,
                       paddingTop: 0,
                       paddingBottom: 0,
@@ -234,7 +234,7 @@ const PDFPreview = () => {
                       marginBottom: 0,
                       paddingVertical: 0,
                       height: 25,
-                      backgroundColor: colors.nav,
+                      backgroundColor: colors.secondary.background,
                       width: 40,
                       textAlign: "center",
                       marginRight: 4,
@@ -249,7 +249,7 @@ const PDFPreview = () => {
                     }}
                     blurOnSubmit
                   />
-                  <Paragraph color={colors.light}>/{numPages}</Paragraph>
+                  <Paragraph color={colors.static.white}>/{numPages}</Paragraph>
                 </View>
 
                 <View
@@ -258,7 +258,7 @@ const PDFPreview = () => {
                   }}
                 >
                   <IconButton
-                    color={colors.light}
+                    color={colors.static.white}
                     name="download"
                     onPress={() => {
                       downloadAttachment(attachment.metadata.hash, false);

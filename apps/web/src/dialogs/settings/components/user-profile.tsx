@@ -58,7 +58,7 @@ export function UserProfile() {
         sx={{
           borderRadius: "default",
           alignItems: "center",
-          bg: "bgSecondary",
+          bg: "var(--background-secondary)",
           p: 2,
           mb: 4
         }}
@@ -66,13 +66,13 @@ export function UserProfile() {
         <Flex
           variant="columnCenter"
           sx={{
-            bg: "border",
+            bg: "shade",
             mr: 2,
             size: 60,
             borderRadius: 80
           }}
         >
-          <User size={30} color="icon" />
+          <User size={30} />
         </Flex>
         <Flex sx={{ flexDirection: "column" }}>
           <Text variant={"title"}>You are not logged in</Text>
@@ -88,7 +88,7 @@ export function UserProfile() {
       sx={{
         borderRadius: "default",
         alignItems: "center",
-        bg: "bgSecondary",
+        bg: "var(--background-secondary)",
         p: 2,
         mb: 4
       }}
@@ -96,19 +96,19 @@ export function UserProfile() {
       <Flex
         variant="columnCenter"
         sx={{
-          bg: "border",
+          bg: "shade",
           mr: 2,
           size: 60,
           borderRadius: 80
         }}
       >
-        <User size={30} color="icon" />
+        <User size={30} />
       </Flex>
       <Flex sx={{ flexDirection: "column" }}>
         <Text
           variant="subBody"
           sx={{
-            color: "primary"
+            color: "accent"
           }}
         >
           {remainingDays > 0 && (isPro || isProCancelled)

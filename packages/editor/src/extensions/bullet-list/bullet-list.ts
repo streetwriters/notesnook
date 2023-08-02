@@ -18,7 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import TiptapBulletList from "@tiptap/extension-bullet-list";
+import { wrappingInputRule } from "@tiptap/core";
+import { getParentAttributes } from "../../utils/prosemirror";
 
+export const inputRegex = /^\s*([-+*])\s$/;
 export const BulletList = TiptapBulletList.extend({
   addAttributes() {
     return {
@@ -37,5 +40,43 @@ export const BulletList = TiptapBulletList.extend({
         }
       }
     };
+  },
+  addCommands() {
+    return {
+      toggleBulletList:
+        () =>
+        ({ chain }) => {
+          return chain()
+            .toggleList(
+              this.name,
+              this.options.itemTypeName,
+              this.options.keepMarks,
+              getParentAttributes(
+                this.editor,
+                this.options.keepMarks,
+                this.options.keepAttributes
+              )
+            )
+            .run();
+        }
+    };
+  },
+  addInputRules() {
+    return [
+      wrappingInputRule({
+        find: inputRegex,
+        type: this.type,
+        keepMarks: this.options.keepMarks,
+        keepAttributes: this.options.keepAttributes,
+        editor: this.editor,
+        getAttributes: () => {
+          return getParentAttributes(
+            this.editor,
+            this.options.keepMarks,
+            this.options.keepAttributes
+          );
+        }
+      })
+    ];
   }
 });

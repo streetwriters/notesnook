@@ -17,16 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { mergeAttributes } from "@tiptap/core";
+import { mergeAttributes, wrappingInputRule } from "@tiptap/core";
 import { TaskList } from "@tiptap/extension-task-list";
 import { createNodeView } from "../react";
 import { TaskListComponent } from "./component";
 import { Plugin, PluginKey, NodeSelection } from "prosemirror-state";
-import TaskItem from "@tiptap/extension-task-item";
+import TaskItem, { inputRegex } from "@tiptap/extension-task-item";
 import { dropPoint } from "prosemirror-transform";
-import { findChildrenByType, hasSameAttributes } from "../../utils/prosemirror";
+import {
+  findChildrenByType,
+  getParentAttributes,
+  hasSameAttributes
+} from "../../utils/prosemirror";
 import { countCheckedItems } from "./utils";
-import TextStyle from "@tiptap/extension-text-style";
 
 export type TaskListAttributes = {
   title: string;
@@ -89,11 +92,8 @@ export const TaskListNode = TaskList.extend({
             .toggleList(
               this.name,
               this.options.itemTypeName,
-              true // TODO
-            )
-            .updateAttributes(
-              this.options.itemTypeName,
-              this.editor.getAttributes(TextStyle.name)
+              true,
+              getParentAttributes(this.editor, true, true)
             )
             .run();
 
@@ -195,6 +195,25 @@ export const TaskListNode = TaskList.extend({
         }
       })
     ];
+  },
+
+  addInputRules() {
+    const inputRule = wrappingInputRule({
+      find: inputRegex,
+      type: this.type,
+      getAttributes: () => {
+        return getParentAttributes(this.editor, true, true);
+      }
+    });
+    const oldHandler = inputRule.handler;
+    inputRule.handler = ({ state, range, match, chain, can, commands }) => {
+      oldHandler({ state, range, match, chain, can, commands });
+
+      state.tr.setNodeMarkup(state.tr.selection.to - 2, undefined, {
+        checked: match[match.length - 1] === "x"
+      });
+    };
+    return [inputRule];
   }
 });
 

@@ -24,7 +24,7 @@ import { db } from "../../common/database";
 import { useAppState } from "../../hooks/use-app-state";
 import BiometricService from "../../services/biometrics";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { SIZE } from "../../utils/size";
@@ -36,7 +36,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
 const AppLockedOverlay = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const appLocked = useUserStore((state) => state.appLocked);
   const lockApp = useUserStore((state) => state.lockApp);
@@ -134,10 +134,10 @@ const AppLockedOverlay = () => {
               marginTop: user ? 0 : 50
             }}
             onPress={onUnlockAppRequested}
-            color={colors.border}
+            color={colors.primary.border}
           />
           <Heading
-            color={colors.heading}
+            color={colors.primary.heading}
             style={{
               alignSelf: "center",
               textAlign: "center"

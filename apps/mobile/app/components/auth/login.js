@@ -22,7 +22,7 @@ import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import SheetProvider from "../sheet-provider";
@@ -46,7 +46,7 @@ const LoginSteps = {
 };
 
 export const Login = ({ changeMode }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [focused, setFocused] = useState(false);
   const {
     step,
@@ -92,7 +92,7 @@ export const Login = ({ changeMode }) => {
       <View
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           zIndex: 10,
           width: "100%",
           alignSelf: "center"
@@ -102,13 +102,13 @@ export const Login = ({ changeMode }) => {
           style={{
             justifyContent: "flex-end",
             paddingHorizontal: 20,
-            backgroundColor: colors.nav,
+            backgroundColor: colors.secondary.background,
             borderBottomWidth: 1,
             marginBottom: 12,
-            borderBottomColor: colors.border,
+            borderBottomColor: colors.primary.border,
             alignSelf: deviceMode !== "mobile" ? "center" : undefined,
             borderWidth: deviceMode !== "mobile" ? 1 : null,
-            borderColor: deviceMode !== "mobile" ? colors.border : null,
+            borderColor: deviceMode !== "mobile" ? colors.primary.border : null,
             borderRadius: deviceMode !== "mobile" ? 20 : null,
             marginTop: deviceMode !== "mobile" ? 50 : null,
             width: deviceMode === "mobile" ? null : "50%",
@@ -124,7 +124,7 @@ export const Login = ({ changeMode }) => {
               style={{
                 width: 100,
                 height: 5,
-                backgroundColor: colors.accent,
+                backgroundColor: colors.primary.accent,
                 borderRadius: 2,
                 marginRight: 7
               }}
@@ -134,7 +134,7 @@ export const Login = ({ changeMode }) => {
               style={{
                 width: 20,
                 height: 5,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 borderRadius: 2
               }}
             />
@@ -160,7 +160,7 @@ export const Login = ({ changeMode }) => {
               : focused
               ? "100%"
               : "99.9%",
-            backgroundColor: colors.bg,
+            backgroundColor: colors.primary.background,
             alignSelf: "center",
             paddingHorizontal: 20
           }}
@@ -281,11 +281,14 @@ export const Login = ({ changeMode }) => {
                   paddingVertical: 12
                 }}
               >
-                <Paragraph size={SIZE.xs + 1} color={colors.icon}>
+                <Paragraph
+                  size={SIZE.xs + 1}
+                  color={colors.secondary.paragraph}
+                >
                   Don't have an account?{" "}
                   <Paragraph
                     size={SIZE.xs + 1}
-                    style={{ color: colors.accent }}
+                    style={{ color: colors.primary.accent }}
                   >
                     Sign up
                   </Paragraph>

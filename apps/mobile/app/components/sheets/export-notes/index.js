@@ -27,7 +27,7 @@ import { db } from "../../../common/database";
 import { presentSheet, ToastEvent } from "../../../services/event-manager";
 import Exporter from "../../../services/exporter";
 import PremiumService from "../../../services/premium";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../../stores/use-user-store";
 import { getElevationStyle } from "../../../utils/elevation";
 import { ph, pv, SIZE } from "../../../utils/size";
@@ -45,7 +45,7 @@ import { eCloseSheet } from "../../../utils/events";
 import { requestInAppReview } from "../../../services/app-review";
 
 const ExportNotesSheet = ({ notes, update }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [exporting, setExporting] = useState(false);
   const [complete, setComplete] = useState(false);
   const [result, setResult] = useState({});
@@ -168,7 +168,7 @@ const ExportNotesSheet = ({ notes, update }) => {
               >
                 <View
                   style={{
-                    backgroundColor: colors.shade,
+                    backgroundColor: colors.primary.shade,
                     borderRadius: 5,
                     height: 60,
                     width: 60,
@@ -178,7 +178,7 @@ const ExportNotesSheet = ({ notes, update }) => {
                 >
                   <Icon
                     name={item.icon}
-                    color={item.pro ? colors.accent : colors.icon}
+                    color={item.pro ? colors.primary.accent : colors.primary.icon}
                     size={SIZE.xxxl + 10}
                   />
                 </View>
@@ -194,7 +194,7 @@ const ExportNotesSheet = ({ notes, update }) => {
                   <Paragraph
                     style={{ marginLeft: 10 }}
                     size={SIZE.sm}
-                    color={colors.icon}
+                    color={colors.secondary.paragraph}
                   >
                     {item.desc}
                   </Paragraph>
@@ -228,7 +228,7 @@ const ExportNotesSheet = ({ notes, update }) => {
               <>
                 <IconButton
                   name="export"
-                  color={colors.icon}
+                  color={colors.primary.icon}
                   size={50}
                   customStyle={{
                     width: 70,
@@ -240,7 +240,7 @@ const ExportNotesSheet = ({ notes, update }) => {
                     textAlign: "center",
                     marginTop: 10
                   }}
-                  color={colors.icon}
+                  color={colors.secondary.heading}
                 >
                   {notes.length > 1
                     ? `${notes.length} Notes exported`

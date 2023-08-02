@@ -19,7 +19,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Extension, TextSerializer } from "@tiptap/core";
 import { Plugin, PluginKey } from "prosemirror-state";
-import { Schema, Slice } from "prosemirror-model";
+import { Fragment, Schema, Slice } from "prosemirror-model";
+import { ListItem } from "../list-item";
+import { LIST_NODE_TYPES } from "../../utils/node-types";
+import { DOMSerializer } from "@tiptap/pm/model";
+
+export class ClipboardDOMSerializer extends DOMSerializer {
+  static fromSchema(schema: Schema): ClipboardDOMSerializer {
+    return (
+      schema.cached.domSerializer2 ||
+      (schema.cached.domSerializer2 = new ClipboardDOMSerializer(
+        this.nodesFromSchema(schema),
+        this.marksFromSchema(schema)
+      ))
+    );
+  }
+
+  serializeFragment(
+    fragment: Fragment,
+    options?: { document?: Document | undefined } | undefined,
+    target?: HTMLElement | DocumentFragment | undefined
+  ): HTMLElement | DocumentFragment {
+    const dom = super.serializeFragment(fragment, options, target);
+    for (const p of dom.querySelectorAll("li > p")) {
+      if (p.parentElement && p.parentElement.childElementCount > 1) continue;
+      p.parentElement?.append(...p.childNodes);
+      p.remove();
+    }
+
+    for (const p of dom.querySelectorAll('p[data-spacing="single"]')) {
+      if (!p.previousElementSibling || p.previousElementSibling.tagName !== "P")
+        continue;
+      if (p.previousElementSibling.childNodes.length > 0)
+        p.previousElementSibling.appendChild(document.createElement("br"));
+      p.previousElementSibling.append(...p.childNodes);
+      p.remove();
+    }
+
+    return dom;
+  }
+}
 
 export const ClipboardTextSerializer = Extension.create({
   name: "clipboardTextSerializer",
@@ -29,8 +68,12 @@ export const ClipboardTextSerializer = Extension.create({
       new Plugin({
         key: new PluginKey("clipboardTextSerializer"),
         props: {
-          clipboardTextSerializer: (content) => {
-            return getTextBetween(content, this.editor.schema);
+          transformCopied,
+          clipboardSerializer: ClipboardDOMSerializer.fromSchema(
+            this.editor.view.state.schema
+          ),
+          clipboardTextSerializer: (content, view) => {
+            return getTextBetween(content, view.state.schema);
           }
         }
       })
@@ -38,7 +81,22 @@ export const ClipboardTextSerializer = Extension.create({
   }
 });
 
-function getTextBetween(slice: Slice, schema: Schema): string {
+export function transformCopied(slice: Slice) {
+  // when copying a single list item, we shouldn't retain the
+  // list formatting but copy it as a paragraph.
+  const maybeList = slice.content.firstChild;
+  if (
+    maybeList &&
+    LIST_NODE_TYPES.includes(maybeList.type.name) &&
+    maybeList.childCount === 1 &&
+    maybeList.firstChild
+  ) {
+    return new Slice(maybeList.firstChild.content, 0, 0);
+  }
+  return slice;
+}
+
+export function getTextBetween(slice: Slice, schema: Schema): string {
   const range = { from: 0, to: slice.size };
   const separator = "\n";
   let text = "";
@@ -50,7 +108,6 @@ function getTextBetween(slice: Slice, schema: Schema): string {
 
     if (textSerializer) {
       if (node.isBlock && !separated) {
-        console.log("ADDING separator");
         text += separator;
         separated = true;
       }
@@ -68,7 +125,12 @@ function getTextBetween(slice: Slice, schema: Schema): string {
       text += node?.text;
       separated = false;
     } else if (node.isBlock && !!text) {
+      // we don't want double spaced list items when pasting
+      if (index === 0 && parent?.type.name === ListItem.name) return;
+
       text += separator;
+      if (node.attrs.spacing === "double" && node.childCount > 0)
+        text += separator;
       separated = true;
     }
   });

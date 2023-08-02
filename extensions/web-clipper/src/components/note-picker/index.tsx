@@ -45,7 +45,7 @@ export const NotePicker = (props: NotePickerProps) => {
     <>
       <Flex sx={{ alignItems: "center" }}>
         <Button
-          variant="tool"
+          variant="secondary"
           onClick={open}
           sx={{
             display: "flex",
@@ -63,7 +63,7 @@ export const NotePicker = (props: NotePickerProps) => {
           }
         >
           <Text
-            variant="text"
+            variant="body"
             sx={{
               whiteSpace: "nowrap",
               textOverflow: "ellipsis",
@@ -74,11 +74,11 @@ export const NotePicker = (props: NotePickerProps) => {
               ? `Append to "${selectedNote?.title}"`
               : `Select a note to append to`}
           </Text>
-          <Icon path={Icons.chevronDown} color="text" size={18} />
+          <Icon path={Icons.chevronDown} size={18} />
         </Button>
         {selectedNote && (
           <Button
-            variant="tool"
+            variant="secondary"
             onClick={() => onSelected(undefined)}
             sx={{
               display: "flex",
@@ -91,7 +91,7 @@ export const NotePicker = (props: NotePickerProps) => {
             }}
             title={"Clear selection"}
           >
-            <Icon path={Icons.close} color="text" size={16} />
+            <Icon path={Icons.close} size={16} />
           </Button>
         )}
       </Flex>

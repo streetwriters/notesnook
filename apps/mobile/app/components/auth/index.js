@@ -65,7 +65,7 @@ const Auth = ({ navigation, route }) => {
           onPress={() => {
             hideAuth();
           }}
-          color={colors.pri}
+          color={colors.primary.paragraph}
           customStyle={{
             position: 'absolute',
             zIndex: 999,

@@ -24,7 +24,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { eCloseLoginDialog, eOpenLoginDialog } from "../../utils/events";
 import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
@@ -44,7 +44,7 @@ export const AuthMode = {
 };
 
 const AuthModal = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [currentAuthMode, setCurrentAuthMode] = useState(AuthMode.login);
   const actionSheetRef = useRef();
@@ -82,7 +82,7 @@ const AuthModal = () => {
       onClose={close}
       useSafeArea={false}
       bounce={false}
-      background={colors.bg}
+      background={colors.primary.background}
       transparent={false}
       animated={false}
     >
@@ -112,7 +112,7 @@ const AuthModal = () => {
           paddingTop: Platform.OS === "android" ? 0 : insets.top,
           top: 0,
           zIndex: 999,
-          backgroundColor: colors.nav,
+          backgroundColor: colors.secondary.background,
           width: "100%"
         }}
       >
@@ -135,7 +135,7 @@ const AuthModal = () => {
               onPress={() => {
                 hideAuth();
               }}
-              color={colors.pri}
+              color={colors.primary.paragraph}
             />
           )}
 

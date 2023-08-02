@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { ActivityIndicator, ColorValue, ViewStyle } from "react-native";
+import { ActivityIndicator, DimensionValue, ViewStyle } from "react-native";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -26,12 +26,10 @@ import Animated, {
   LightSpeedInLeft
 } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { ColorKey, useThemeStore } from "../../../stores/use-theme-store";
-import { BUTTON_TYPES } from "../../../utils/constants";
 import { SIZE } from "../../../utils/size";
 import NativeTooltip from "../../../utils/tooltip";
 import { ButtonProps } from "../button";
-import { PressableButton } from "../pressable";
+import { PressableButton, useButton } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
@@ -59,15 +57,12 @@ export const AnimatedButton = ({
   fwdRef,
   ...restProps
 }: ButtonProps) => {
-  const colors = useThemeStore((state) => state.colors);
-
-  const textColor = buttonType?.text
-    ? buttonType.text
-    : (colors[
-        type === "accent"
-          ? (BUTTON_TYPES[type](accentColor, accentText).text as ColorKey)
-          : (BUTTON_TYPES[type].text as ColorKey)
-      ] as ColorValue);
+  const { text } = useButton({
+    type,
+    accent: accentColor,
+    text: accentText
+  });
+  const textColor = buttonType?.text ? buttonType.text : text;
   const Component = bold ? Heading : Paragraph;
 
   return (
@@ -99,7 +94,7 @@ export const AnimatedButton = ({
         customAlpha={buttonType?.alpha}
         customStyle={{
           height: height,
-          width: width || undefined,
+          width: (width as DimensionValue) || undefined,
           paddingHorizontal: 12,
           borderRadius: 5,
           alignSelf: "center",

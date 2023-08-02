@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { useThemeColors } from "@notesnook/theme";
 import React, {
   useCallback,
   useEffect,
@@ -32,7 +33,6 @@ import {
   eUnSubscribeEvent
 } from "../app/services/event-manager";
 import { eOnLoadNote } from "../app/utils/events";
-import { useShareStore } from "./store";
 
 const EditorMobileSourceUrl =
   Platform.OS === "android"
@@ -56,8 +56,7 @@ export async function post(ref, type, value = null) {
 
 const useEditor = () => {
   const ref = useRef();
-  const colors = useShareStore((state) => state.colors);
-  const accent = useShareStore((state) => state.accent);
+  const { colors } = useThemeColors("editor");
   const commands = useMemo(() => new Commands(ref), [ref]);
   const currentNote = useRef();
 
@@ -87,7 +86,7 @@ const useEditor = () => {
         "theme",
         `
           body * {
-            color: ${colors.pri};
+            color: ${colors.primary.paragraph};
           }
   
           h1,
@@ -96,11 +95,11 @@ const useEditor = () => {
           h4,
           h5,
           h6 {
-            color: ${colors.heading};
+            color: ${colors.primary.heading};
           }
   
           a {
-            color: ${accent};
+            color: ${colors.primary.accent};
           }
         `
       );
@@ -117,7 +116,6 @@ const useEditorEvents = (editor, onChange) => {
 
     switch (editorMessage.type) {
       case "content":
-        console.log("[WEBVIEW LOG]", "EditorTypes.content");
         onChange(editorMessage.value);
         break;
     }
@@ -144,7 +142,7 @@ const style = {
 };
 
 export const Editor = ({ onChange, onLoad }) => {
-  const colors = useShareStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const editor = useEditor();
   const onMessage = useEditorEvents(editor, onChange);
   const [loading, setLoading] = useState(true);
@@ -202,7 +200,7 @@ export const Editor = ({ onChange, onLoad }) => {
             position: "absolute",
             width: "100%",
             height: "100%",
-            backgroundColor: colors.bg,
+            backgroundColor: colors.primary.background,
             alignItems: "flex-start",
             zIndex: 999,
             paddingHorizontal: 12
@@ -212,7 +210,7 @@ export const Editor = ({ onChange, onLoad }) => {
             style={{
               height: 16,
               width: "100%",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginTop: 10
             }}
@@ -222,7 +220,7 @@ export const Editor = ({ onChange, onLoad }) => {
             style={{
               height: 16,
               width: "100%",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginTop: 10
             }}
@@ -232,7 +230,7 @@ export const Editor = ({ onChange, onLoad }) => {
             style={{
               height: 16,
               width: "60%",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginTop: 10
             }}

@@ -24,16 +24,16 @@ import { PressableButton } from "../../components/ui/pressable";
 import { DDS } from "../../services/device-detection";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import {
   RGB_Linear_Shade,
   hexToRGBA,
   switchAccentColor
-} from "../../utils/color-scheme/utils";
+} from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 
 export const AccentColorPicker = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors, isDark } = useThemeColors();
   function changeAccentColor(color) {
     switchAccentColor(color);
   }
@@ -64,12 +64,12 @@ export const AccentColorPicker = () => {
         <PressableButton
           key={item}
           customColor={
-            colors.accent === item
-              ? RGB_Linear_Shade(!colors.night ? -0.2 : 0.2, hexToRGBA(item, 1))
+            colors.primary.accent === item
+              ? RGB_Linear_Shade(!isDark ? -0.2 : 0.2, hexToRGBA(item, 1))
               : item
           }
           customSelectedColor={item}
-          alpha={!colors.night ? -0.1 : 0.1}
+          alpha={!isDark ? -0.1 : 0.1}
           opacity={1}
           onPress={async () => {
             await PremiumService.verify(async () => {
@@ -93,7 +93,7 @@ export const AccentColorPicker = () => {
             borderRadius: 100
           }}
         >
-          {colors.accent === item ? (
+          {colors.primary.accent === item ? (
             <Icon
               size={DDS.isLargeTablet() ? SIZE.lg : SIZE.xxl}
               color="white"

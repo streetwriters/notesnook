@@ -24,7 +24,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
 import { presentSheet } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
 import { IconButton } from "../ui/icon-button";
@@ -45,7 +45,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 
 export const AttachmentDialog = ({ note }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const { height } = useSettingStore((state) => state.dimensions);
   const [attachments, setAttachments] = useState(
     note
@@ -201,7 +201,7 @@ export const AttachmentDialog = ({ note }) => {
                 width: 40,
                 marginRight: 10
               }}
-              color={colors.pri}
+              color={colors.primary.paragraph}
               size={SIZE.lg}
               onPress={onCheck}
             />
@@ -213,7 +213,7 @@ export const AttachmentDialog = ({ note }) => {
               height: 40,
               width: 40
             }}
-            color={colors.pri}
+            color={colors.primary.paragraph}
             onPress={() => {
               DownloadAttachments.present(
                 "attachments-list",
@@ -264,7 +264,7 @@ export const AttachmentDialog = ({ note }) => {
                 borderBottomColor:
                   currentFilter !== item.filterBy
                     ? "transparent"
-                    : colors.accent
+                    : colors.primary.accent
               }}
               onPress={() => {
                 setCurrentFilter(item.filterBy);
@@ -285,7 +285,7 @@ export const AttachmentDialog = ({ note }) => {
               alignItems: "center"
             }}
           >
-            <Icon name="attachment" size={60} color={colors.icon} />
+            <Icon name="attachment" size={60} color={colors.secondary.icon} />
             <Paragraph>
               {note ? "No attachments on this note" : "No attachments"}
             </Paragraph>
@@ -304,14 +304,18 @@ export const AttachmentDialog = ({ note }) => {
       />
 
       <Paragraph
-        color={colors.icon}
+        color={colors.secondary.paragraph}
         size={SIZE.xs}
         style={{
           textAlign: "center",
           marginTop: 10
         }}
       >
-        <Icon name="shield-key-outline" size={SIZE.xs} color={colors.icon} />
+        <Icon
+          name="shield-key-outline"
+          size={SIZE.xs}
+          color={colors.primary.icon}
+        />
         {"  "}All attachments are end-to-end encrypted.
       </Paragraph>
     </View>

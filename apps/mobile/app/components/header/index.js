@@ -27,14 +27,14 @@ import {
 } from "../../services/event-manager";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { eScrollEvent } from "../../utils/events";
 import { LeftMenus } from "./left-menus";
 import { RightMenus } from "./right-menus";
 import { Title } from "./title";
 
 const _Header = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const insets = useGlobalSafeAreaInsets();
   const [hide, setHide] = useState(true);
   const selectionMode = useSelectionStore((state) => state.selectionMode);
@@ -69,10 +69,12 @@ const _Header = () => {
           styles.container,
           {
             marginTop: Platform.OS === "android" ? insets.top : null,
-            backgroundColor: colors.bg,
+            backgroundColor: colors.primary.background,
             overflow: "hidden",
             borderBottomWidth: 1,
-            borderBottomColor: hide ? "transparent" : colors.nav,
+            borderBottomColor: hide
+              ? "transparent"
+              : colors.secondary.background,
             justifyContent: "space-between"
           }
         ]}

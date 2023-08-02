@@ -21,12 +21,14 @@ import React from "react";
 import DialogProvider from "../components/dialog-provider";
 import { Toast } from "../components/toast";
 import { TabHolder } from "./tabs-holder";
-
+import { ScopedThemeProvider } from "@notesnook/theme";
 const _ApplicationHolder = () => {
   return (
     <>
       <TabHolder />
-      <Toast />
+      <ScopedThemeProvider value="dialog">
+        <Toast />
+      </ScopedThemeProvider>
       <DialogProvider />
     </>
   );

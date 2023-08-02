@@ -26,9 +26,8 @@ import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useNoteStore } from "../../stores/use-notes-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
-import { toggleDarkMode } from "../../utils/color-scheme/utils";
 import { MenuItemsList } from "../../utils/menu-items";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
@@ -36,11 +35,11 @@ import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
 import { TagsSection } from "./pinned-section";
 import { UserStatus } from "./user-status";
+import { useThemeStore } from "../../stores/use-theme-store";
 
 export const SideMenu = React.memo(
   function SideMenu() {
-    const colors = useThemeStore((state) => state.colors);
-    const deviceMode = useSettingStore((state) => state.deviceMode);
+    const { colors, isDark } = useThemeColors();
     const insets = useGlobalSafeAreaInsets();
     const subscriptionType = useUserStore(
       (state) => state.user?.subscription?.type
@@ -52,11 +51,13 @@ export const SideMenu = React.memo(
     const noTextMode = false;
     const BottomItemsList = [
       {
-        name: colors.night ? "Day" : "Night",
+        name: isDark ? "Day" : "Night",
         icon: "theme-light-dark",
-        func: toggleDarkMode,
+        func: () => {
+          useThemeStore.getState().setColorScheme();
+        },
         switch: true,
-        on: !!colors.night,
+        on: !!isDark,
         close: false
       },
       {
@@ -103,16 +104,18 @@ export const SideMenu = React.memo(
         style={{
           height: "100%",
           width: "100%",
-          backgroundColor: colors.nav
+          backgroundColor: colors.primary.background
         }}
       >
         <View
           style={{
             height: "100%",
             width: "100%",
-            backgroundColor: deviceMode !== "mobile" ? colors.nav : colors.bg,
+            backgroundColor: colors.primary.background,
             paddingTop: insets.top,
-            borderRadius: 10
+            borderRadius: 10,
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0
           }}
         >
           <FlatList

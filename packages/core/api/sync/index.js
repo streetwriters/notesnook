@@ -137,18 +137,10 @@ class Sync {
             switch (level) {
               case signalr.LogLevel.Critical:
                 return scopedLogger.fatal(new Error(message));
-              case signalr.LogLevel.Debug:
-                return scopedLogger.debug(message);
               case signalr.LogLevel.Error: {
                 db.eventManager.publish(EVENTS.syncAborted, message);
                 return scopedLogger.error(new Error(message));
               }
-              case signalr.LogLevel.Information:
-                return scopedLogger.info(message);
-              case signalr.LogLevel.None:
-                return scopedLogger.log(message);
-              case signalr.LogLevel.Trace:
-                return scopedLogger.log(message);
               case signalr.LogLevel.Warning:
                 return scopedLogger.warn(message);
             }

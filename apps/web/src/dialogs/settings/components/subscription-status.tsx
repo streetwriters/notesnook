@@ -93,7 +93,7 @@ export function SubscriptionStatus() {
           borderRadius: "default",
           justifyContent: "center",
           alignItems: "start",
-          bg: "bgSecondary",
+          bg: "var(--background-secondary)",
           p: 2,
           mb: isBasic ? 0 : 4
         }}
@@ -104,7 +104,7 @@ export function SubscriptionStatus() {
             fontSize: 11,
             fontWeight: "bold",
             letterSpacing: 0.3,
-            color: "primary"
+            color: "accent"
           }}
         >
           CURRENT PLAN
@@ -199,7 +199,7 @@ export function SubscriptionStatus() {
           ) : isBasic ? (
             <>
               <Button
-                variant="primary"
+                variant="accent"
                 onClick={async () => {
                   showBuyDialog();
                 }}
@@ -217,7 +217,7 @@ export function SubscriptionStatus() {
           ) : isTrial ? (
             <>
               <Button
-                variant="primary"
+                variant="accent"
                 onClick={async () => {
                   showBuyDialog();
                 }}

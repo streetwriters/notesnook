@@ -256,6 +256,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
               defaultChecked={m.id === Modes.ONCE}
               checked={m.id === mode}
               disabled={m.premium && !isUserPremium}
+              sx={{ color: m.id === mode ? "accent" : "icon" }}
               onChange={() => {
                 if (m.premium && !isUserPremium) return;
                 setMode(m.id);
@@ -265,7 +266,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             />
             {m.title}
             {m.premium && !isUserPremium && (
-              <Pro size={18} color="primary" sx={{ ml: 1 }} />
+              <Pro size={18} color="accent" sx={{ ml: 1 }} />
             )}
           </Label>
         ))}
@@ -274,7 +275,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
         <Flex
           sx={{
             mt: 2,
-            bg: "bgSecondary",
+            bg: "var(--background-secondary)",
             borderRadius: "default",
             p: 1,
             flexDirection: "column"
@@ -284,7 +285,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             {recurringModes.map((mode) => (
               <Button
                 key={mode.id}
-                variant="tool"
+                variant="secondary"
                 data-test-id={`recurring-mode-${mode.id}`}
                 onClick={() => {
                   setRecurringMode(mode.id);
@@ -295,7 +296,14 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                   py: 1,
                   px: 2,
                   flexShrink: 0,
-                  color: mode.id === recurringMode ? "primary" : "text"
+                  bg:
+                    mode.id === recurringMode
+                      ? "background-selected"
+                      : "transparent",
+                  color:
+                    mode.id === recurringMode
+                      ? "paragraph-selected"
+                      : "paragraph"
                 }}
               >
                 {mode.title}
@@ -321,7 +329,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                 {mode.options.map((day, i) => (
                   <Button
                     key={day}
-                    variant="tool"
+                    variant="secondary"
                     data-test-id={`day-${day}`}
                     onClick={() => {
                       setSelectedDays((days) => {
@@ -338,8 +346,12 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                       px: 2,
                       flexShrink: 0,
                       textAlign: "left",
-                      bg: selectedDays.includes(day) ? "shade" : "bgSecondary",
-                      color: selectedDays.includes(day) ? "primary" : "text"
+                      bg: selectedDays.includes(day)
+                        ? "background-selected"
+                        : "transparent",
+                      color: selectedDays.includes(day)
+                        ? "paragraph-selected"
+                        : "paragraph"
                     }}
                   >
                     {mode.id === "week" ? WEEK_DAYS[i] : day}
@@ -396,6 +408,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             <Radio
               id="priority"
               name="priority"
+              sx={{ color: p.id === priority ? "accent" : "icon" }}
               defaultChecked={p.id === Priorities.VIBRATE}
               checked={p.id === priority}
               onChange={() => setPriority(p.id)}

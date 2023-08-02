@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Box, Flex, Text } from "@theme-ui/components";
 import { useEffect, useRef, useState } from "react";
 import { SelectionBasedReactNodeViewProps } from "../react";
-import { Icon, Icons } from "../../toolbar";
+import { Icons } from "../../toolbar";
+import { Icon } from "@notesnook/ui";
 import { WebClipAttributes } from "./web-clip";
 import { DesktopOnly } from "../../components/responsive";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
@@ -41,7 +42,7 @@ export function WebClipComponent(
   const embedRef = useRef<HTMLIFrameElement>(null);
   const resizeObserverRef = useRef<ResizeObserver>();
   const { src, title, fullscreen, html } = node.attrs;
-  console.log(node.attrs);
+
   useEffect(() => {
     const iframe = embedRef.current;
     if (!iframe || !iframe.contentDocument || !isLoading || !html) return;
@@ -96,7 +97,7 @@ export function WebClipComponent(
           flexDirection: "column",
           position: "relative",
           border: selected
-            ? "2px solid var(--primary)"
+            ? "2px solid var(--accent)"
             : "2px solid var(--border)",
           borderRadius: "default"
         }}
@@ -105,7 +106,7 @@ export function WebClipComponent(
           sx={{
             width: "100%",
             p: 1,
-            bg: "bgSecondary",
+            bg: "var(--background-secondary)",
             borderTopLeftRadius: "default",
             borderTopRightRadius: "default",
             cursor: "pointer",
@@ -124,7 +125,6 @@ export function WebClipComponent(
             <Text
               variant="subBody"
               sx={{
-                color: "icon",
                 ml: 1,
                 whiteSpace: "nowrap",
                 overflow: "hidden",
@@ -196,7 +196,7 @@ export function WebClipComponent(
               justifyContent: "center"
             }}
           >
-            <Icon path={Icons.loading} rotate size={32} color="disabled" />
+            <Icon path={Icons.loading} rotate size={32} />
           </Flex>
         )}
       </Box>

@@ -26,7 +26,7 @@ import { ColorPicker, DEFAULT_COLORS } from "../popups/color-picker";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { ToolProps } from "../types";
 import { getToolbarElement } from "../utils/dom";
-import { PositionOptions } from "../../utils/position";
+import { PositionOptions } from "@notesnook/ui";
 
 type ColorToolProps = ToolProps & {
   onColorChange: (color?: string) => void;
@@ -67,11 +67,11 @@ export function ColorTool(props: ColorToolProps) {
   return (
     <SplitButton
       {...toolProps}
-      iconColor={activeColor && tColor.isDark() ? "static" : "icon"}
+      iconColor={activeColor && tColor.isDark() ? "white" : "icon"}
       sx={{
         mr: 0,
         bg: activeColor || "transparent",
-        ":hover": {
+        ":hover:not(:disabled):not(:active)": {
           bg: activeColor ? tColor.darken(5).toRgbString() : "transparent"
         }
       }}

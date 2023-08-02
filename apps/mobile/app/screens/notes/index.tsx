@@ -228,7 +228,7 @@ const NotesPage = ({
             flexDirection: "row",
             alignItems: "center"
             // borderBottomWidth: 1,
-            // borderBottomColor: colors.nav
+            // borderBottomColor: colors.secondary.background
           }}
         >
           <Paragraph

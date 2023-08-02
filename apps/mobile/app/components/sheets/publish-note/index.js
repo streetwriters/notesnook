@@ -25,7 +25,7 @@ import { db } from "../../../common/database";
 import { presentSheet, ToastEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useAttachmentStore } from "../../../stores/use-attachment-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { SIZE } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
@@ -38,7 +38,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import { requestInAppReview } from "../../../services/app-review";
 
 const PublishNoteSheet = ({ note: item, update }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const actionSheetRef = useRef();
   const loading = useAttachmentStore((state) => state.loading);
   const [selfDestruct, setSelfDestruct] = useState(false);
@@ -130,7 +130,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
             width: "100%"
           }}
         >
-          <ActivityIndicator size={25} color={colors.accent} />
+          <ActivityIndicator size={25} color={colors.primary.accent} />
           <Paragraph
             style={{
               textAlign: "center"
@@ -152,7 +152,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
                 flexDirection: "row",
                 alignItems: "center",
                 marginTop: 10,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 padding: 12,
                 borderRadius: 5
               }}
@@ -170,7 +170,10 @@ const PublishNoteSheet = ({ note: item, update }) => {
                 <Paragraph
                   onPress={async () => {
                     try {
-                      await openLinkInBrowser(publishUrl, colors.accent);
+                      await openLinkInBrowser(
+                        publishUrl,
+                        colors.primary.accent
+                      );
                     } catch (e) {
                       console.error(e);
                     }
@@ -178,11 +181,11 @@ const PublishNoteSheet = ({ note: item, update }) => {
                   size={SIZE.xs}
                   style={{
                     marginTop: 5,
-                    color: colors.pri
+                    color: colors.primary.paragraph
                   }}
                 >
-                  <Icon color={colors.accent} name="open-in-new" /> Open in
-                  browser
+                  <Icon color={colors.primary.accent} name="open-in-new" /> Open
+                  in browser
                 </Paragraph>
               </View>
 
@@ -195,7 +198,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
                     context: "local"
                   });
                 }}
-                color={colors.accent}
+                color={colors.primary.accent}
                 size={SIZE.lg}
                 name="content-copy"
               />
@@ -212,7 +215,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
               flexDirection: "row",
               alignItems: "center",
               marginBottom: 10,
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               paddingVertical: 12,
               borderRadius: 5,
               marginTop: 10
@@ -223,7 +226,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
                 if (publishing) return;
                 setIsLocked(!isLocked);
               }}
-              color={isLocked ? colors.accent : colors.icon}
+              color={isLocked ? colors.selected.icon : colors.primary.icon}
               size={SIZE.xl}
               name={
                 isLocked
@@ -253,7 +256,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               paddingVertical: 12,
               borderRadius: 5
             }}
@@ -262,7 +265,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
               onPress={() => {
                 setSelfDestruct(!selfDestruct);
               }}
-              color={selfDestruct ? colors.accent : colors.icon}
+              color={selfDestruct ? colors.selected.icon : colors.primary.icon}
               size={SIZE.xl}
               name={
                 selfDestruct
@@ -343,7 +346,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
       )}
 
       <Paragraph
-        color={colors.icon}
+        color={colors.secondary.paragraph}
         size={SIZE.xs}
         style={{
           textAlign: "center",
@@ -354,7 +357,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
           try {
             await openLinkInBrowser(
               "https://docs.notesnook.com/monographs/",
-              colors.accent
+              colors.primary.accent
             );
           } catch (e) {
             console.error(e);

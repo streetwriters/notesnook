@@ -1,14 +1,15 @@
 {
   "name": "@notesnook/sodium",
-  "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "./dist/node.js",
   "types": "./dist/node.d.ts",
   "scripts": {
     "test": "vitest run",
     "bench": "ts-node benches/bench.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "postbuild": "node scripts/postbuild.mjs",
+    "prepublishOnly": "npm run build && npm run test"
   },
   "author": "",
   "license": "GPL-3.0-or-later",

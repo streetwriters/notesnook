@@ -178,6 +178,11 @@ module.exports = (env) => {
             /node_modules(.*[/\\])+react-native-fingerprint-scanner/,
             /node_modules(.*[/\\])+@notesnook[/\\]logger/,
             /node_modules(.*[/\\])+@ammarahmed[/\\]notifee-react-native/,
+            /node_modules(.*[/\\])+@trpc[/\\]client/,
+            /node_modules(.*[/\\])+@trpc[/\\]server/,
+            /node_modules(.*[/\\])+@tanstack[/\\]query-core/,
+            /node_modules(.*[/\\])+@tanstack[/\\]react-query/,
+            /node_modules(.*[/\\])+@trpc[/\\]react-query/,
           ],
           use: {
             loader: "babel-loader",

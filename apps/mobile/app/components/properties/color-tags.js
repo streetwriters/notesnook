@@ -26,11 +26,14 @@ import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { COLORS_NOTE } from "../../utils/color-scheme";
+import { ColorValues } from "../../utils/colors";
 import { refreshNotesPage } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
+import { useThemeColors } from "@notesnook/theme";
+
 export const ColorTags = ({ item }) => {
+  const { colors } = useThemeColors();
   const [note, setNote] = useState(item);
   const setColorNotes = useMenuStore((state) => state.setColorNotes);
   const isTablet = useSettingStore((state) => state.deviceMode) !== "mobile";
@@ -50,13 +53,14 @@ export const ColorTags = ({ item }) => {
   const _renderColor = (c) => {
     const color = {
       name: c,
-      value: COLORS_NOTE[c?.toLowerCase()]
+      value: ColorValues[c?.toLowerCase()]
     };
 
     return (
       <PressableButton
         type="accent"
-        accentColor={color.name.toLowerCase()}
+        accentColor={colors.static[color.name?.toLowerCase()]}
+        accentText={colors.static.white}
         testID={notesnook.ids.dialogs.actionsheet.color(c)}
         key={color.value}
         onPress={() => changeColor(color)}
@@ -88,7 +92,7 @@ export const ColorTags = ({ item }) => {
         justifyContent: isTablet ? "center" : "space-between"
       }}
     >
-      {Object.keys(COLORS_NOTE).map(_renderColor)}
+      {Object.keys(ColorValues).map(_renderColor)}
     </View>
   );
 };

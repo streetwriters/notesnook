@@ -262,7 +262,7 @@ test("export note to html", () =>
 test("export note to md", () =>
   noteTest().then(async ({ db, id }) => {
     const md = await db.notes.note(id).export("md");
-    expect(md.includes(`Hello  \nThis is colorful\n`)).toBeTruthy();
+    expect(md.includes(`Hello This is colorful\n`)).toBeTruthy();
   }));
 
 test("export note to txt", () =>

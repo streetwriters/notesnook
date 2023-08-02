@@ -45,7 +45,7 @@ import { useTimer } from "../../hooks/use-timer";
 import { phone } from "phone";
 import { db } from "../../common/db";
 import FileSaver from "file-saver";
-import * as clipboard from "clipboard-polyfill/text";
+import { writeText } from "clipboard-polyfill";
 import { ReactComponent as MFA } from "../../assets/mfa.svg";
 import { ReactComponent as Fallback2FA } from "../../assets/fallback2fa.svg";
 import {
@@ -57,6 +57,8 @@ import {
   OnNextFunction
 } from "./types";
 import { showMultifactorDialog } from "../../common/dialog-controller";
+import { ErrorText } from "../../components/error-text";
+
 const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
 
 export type Steps = typeof steps;
@@ -271,14 +273,14 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
           <auth.icon
             className="2fa-icon"
             sx={{
-              bg: selected === index ? "shade" : "bgSecondary",
+              bg: selected === index ? "shade" : "var(--background-secondary)",
               borderRadius: 100,
               width: 35,
               height: 35,
               mr: 2
             }}
             size={16}
-            color={selected === index ? "primary" : "text"}
+            color={selected === index ? "accent" : "icon"}
           />
           <Text variant={"title"} sx={{ fontWeight: "body" }}>
             {auth.title}{" "}
@@ -288,7 +290,7 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
                 variant={"subBody"}
                 bg="shade"
                 px={1}
-                sx={{ borderRadius: "default", color: "primary" }}
+                sx={{ borderRadius: "default", color: "accent" }}
               >
                 Recommended
               </Text>
@@ -372,7 +374,7 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
         don't matter):`}
       </Text>
       <Flex
-        bg="bgSecondary"
+        bg="var(--background-secondary)"
         mt={2}
         sx={{ borderRadius: "default", alignItems: "center" }}
         p={1}
@@ -383,7 +385,7 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
           sx={{
             flex: 1,
             overflowWrap: "anywhere",
-            color: "text",
+            color: "paragraph",
             fontSize: "body",
             fontFamily: "monospace"
           }}
@@ -438,7 +440,7 @@ function SetupEmail(props: SetupAuthenticatorProps) {
     >
       <Flex
         mt={2}
-        bg="bgSecondary"
+        bg="var(--background-secondary)"
         sx={{
           borderRadius: "default",
           overflowWrap: "anywhere",
@@ -479,17 +481,7 @@ function SetupEmail(props: SetupAuthenticatorProps) {
           )}
         </Button>
       </Flex>
-      {error ? (
-        <Text
-          variant={"error"}
-          bg="errorBg"
-          p={1}
-          sx={{ borderRadius: "default" }}
-          mt={1}
-        >
-          {error}
-        </Text>
-      ) : null}
+      <ErrorText error={error} />
     </VerifyAuthenticatorForm>
   );
 }
@@ -568,17 +560,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
           }
         }}
       />
-      {error ? (
-        <Text
-          variant={"error"}
-          bg="errorBg"
-          p={1}
-          sx={{ borderRadius: "default" }}
-          mt={1}
-        >
-          {error}
-        </Text>
-      ) : null}
+      <ErrorText error={error} />
     </VerifyAuthenticatorForm>
   );
 }
@@ -621,7 +603,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
         title: "Copy",
         icon: Copy,
         action: async () => {
-          await clipboard.writeText(codes.join("\n"));
+          await writeText(codes.join("\n"));
           const button = document.getElementById("btn-copy");
           if (!button) return;
 
@@ -665,7 +647,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
         sx={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr 1fr 1fr",
-          bg: "bgSecondary",
+          bg: "var(--background-secondary)",
           p: 2,
           gap: 1,
           columnGap: 2,
@@ -682,7 +664,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
               fontFamily: "monospace",
               textAlign: "center",
               fontWeight: "body",
-              color: "text"
+              color: "paragraph"
             }}
           >
             {code}
@@ -734,7 +716,7 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
       <Text
         variant={"body"}
         mt={1}
-        sx={{ textAlign: "center", color: "fontTertiary" }}
+        sx={{ textAlign: "center", color: "var(--paragraph-secondary)" }}
       >
         Your account is now 100% secure against unauthorized logins.
       </Text>
@@ -788,7 +770,7 @@ function Fallback2FAEnabled(props: Fallback2FAEnabledProps) {
       <Text
         variant={"body"}
         mt={1}
-        sx={{ textAlign: "center", color: "fontTertiary" }}
+        sx={{ textAlign: "center", color: "var(--paragraph-secondary)" }}
       >
         You will now receive your 2FA codes on your{" "}
         {mfaMethodToPhrase(fallbackMethod)} in case you lose access to your{" "}

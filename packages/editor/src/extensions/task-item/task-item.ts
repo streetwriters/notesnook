@@ -57,7 +57,7 @@ export const TaskItemNode = TaskItem.extend({
     return [
       {
         tag: "li",
-        getAttrs: (node) => {
+        getAttrs: (node: any) => {
           if (node instanceof Node && node instanceof HTMLElement) {
             return node.classList.contains("checklist--item") ||
               node.parentElement?.classList.contains("checklist")
@@ -92,5 +92,9 @@ export const TaskItemNode = TaskItem.extend({
         return prev.checked !== next.checked;
       }
     });
+  },
+
+  addInputRules() {
+    return [];
   }
 });

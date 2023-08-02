@@ -22,7 +22,7 @@ import { Editor } from "../../types";
 import { ToolButton } from "../components/tool-button";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
-import { MenuButton, MenuItem } from "../../components/menu/types";
+import { MenuButtonItem, MenuItem } from "@notesnook/ui";
 import {
   moveColumnLeft as moveColumnLeftAction,
   moveColumnRight as moveColumnRightAction,
@@ -30,7 +30,7 @@ import {
   moveRowUp as moveRowUpAction
 } from "../../extensions/table/actions";
 import { MoreTools } from "../components/more-tools";
-import { menuButtonToTool } from "./utils";
+import { menuButtonToTool, toolToMenuButton } from "./utils";
 import { getToolDefinition } from "../tool-definitions";
 import { CellProperties as CellPropertiesPopup } from "../popups/cell-properties";
 import { ColorTool } from "./colors";
@@ -314,102 +314,72 @@ export function CellBorderWidth(props: ToolProps) {
   );
 }
 
-const insertColumnLeft = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("insertColumnLeft"),
-  key: "addColumnLeft",
-  type: "button",
+const insertColumnLeft = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("insertColumnLeft")),
   onClick: () => editor.current?.chain().focus().addColumnBefore().run()
 });
 
-const insertColumnRight = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("insertColumnRight"),
-  key: "addColumnRight",
-  type: "button",
-  title: "Add column right",
-  onClick: () => editor.current?.chain().focus().addColumnAfter().run(),
-  icon: "insertColumnRight"
+const insertColumnRight = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("insertColumnRight")),
+  onClick: () => editor.current?.chain().focus().addColumnAfter().run()
 });
 
-const moveColumnLeft = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("moveColumnLeft"),
-  key: "moveColumnLeft",
-  type: "button",
+const moveColumnLeft = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("moveColumnLeft")),
   onClick: () => moveColumnLeftAction(editor)
 });
 
-const moveColumnRight = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("moveColumnRight"),
-  key: "moveColumnRight",
-  type: "button",
+const moveColumnRight = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("moveColumnRight")),
   onClick: () => moveColumnRightAction(editor)
 });
 
-const deleteColumn = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("deleteColumn"),
-  key: "deleteColumn",
-  type: "button",
+const deleteColumn = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("deleteColumn")),
   onClick: () => editor.current?.chain().focus().deleteColumn().run()
 });
 
-const splitCells = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("splitCells"),
-  key: "splitCells",
-  type: "button",
+const splitCells = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("splitCells")),
   onClick: () => editor.current?.chain().focus().splitCell().run()
 });
 
-const mergeCells = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("mergeCells"),
-  key: "mergeCells",
-  type: "button",
+const mergeCells = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("mergeCells")),
   onClick: () => editor.current?.chain().focus().mergeCells().run()
 });
 
-const insertRowAbove = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("insertRowAbove"),
-  key: "insertRowAbove",
-  type: "button",
+const insertRowAbove = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("insertRowAbove")),
   onClick: () => editor.current?.chain().focus().addRowBefore().run()
 });
 
-const insertRowBelow = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("insertRowBelow"),
-  key: "insertRowBelow",
-  type: "button",
+const insertRowBelow = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("insertRowBelow")),
   onClick: () => editor.current?.chain().focus().addRowAfter().run()
 });
 
-const moveRowUp = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("moveRowUp"),
-  key: "moveRowUp",
-  type: "button",
+const moveRowUp = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("moveRowUp")),
   onClick: () => moveRowUpAction(editor)
 });
-const moveRowDown = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("moveRowDown"),
-  key: "moveRowDown",
-  type: "button",
+const moveRowDown = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("moveRowDown")),
   onClick: () => moveRowDownAction(editor)
 });
 
-const deleteRow = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("deleteRow"),
-  key: "deleteRow",
-  type: "button",
+const deleteRow = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("deleteRow")),
   onClick: () => editor.current?.chain().focus().deleteRow().run()
 });
 
-const deleteTable = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("deleteTable"),
-  key: "deleteTable",
-  type: "button",
+const deleteTable = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("deleteTable")),
   onClick: () => editor.current?.chain().focus().deleteTable().run()
 });
 
-const cellProperties = (editor: Editor): MenuButton => ({
-  ...getToolDefinition("cellProperties"),
-  key: "cellProperties",
-  type: "button",
+const cellProperties = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("cellProperties")),
   onClick: () => {
     showPopup({
       popup: (hide) => <CellPropertiesPopup onClose={hide} editor={editor} />

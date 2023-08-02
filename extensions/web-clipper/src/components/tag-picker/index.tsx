@@ -78,7 +78,7 @@ export const TagPicker = (props: TagPickerProps) => {
         <InlineTag
           icon={Icons.plus}
           title={"Assign a tag"}
-          iconColor="primary"
+          iconColor="accent"
           onClick={open}
         />
       </Flex>

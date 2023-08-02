@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Theme } from "@notesnook/theme";
 import { Flex, Text } from "@theme-ui/components";
 import { ThemeUICSSObject } from "@theme-ui/core";
 import { Icon } from "../icons";
@@ -28,7 +27,7 @@ type IconTagProps = {
   icon: Icon;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   styles?: {
-    icon?: ThemeUICSSObject & { color: keyof Theme["colors"] };
+    icon?: ThemeUICSSObject;
     container?: ThemeUICSSObject;
     text?: ThemeUICSSObject;
   };
@@ -70,12 +69,12 @@ function IconTag(props: IconTagProps) {
         alignItems: "center",
         justifyContent: "center"
       }}
-      bg="bgSecondary"
+      bg="var(--background-secondary)"
       py="2px"
     >
       <Icon
         size={11}
-        color={styles?.icon?.color || (highlight ? "primary" : "icon")}
+        // color={styles?.icon?.color || (highlight ? "primary" : "icon")}
         sx={{ ...styles?.icon, flexShrink: 0 }}
       />
       <Text
@@ -87,7 +86,7 @@ function IconTag(props: IconTagProps) {
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
           overflow: "hidden",
-          color: highlight ? "primary" : "text",
+          color: highlight ? "accent" : "paragraph",
           ...styles?.text
         }}
       >

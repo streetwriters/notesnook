@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Embed, Flex } from "@theme-ui/components";
-import Loader from "../../components/loader";
+import { Loader } from "../../components/loader";
 import {
   CheckoutData,
   CheckoutDataResponse,

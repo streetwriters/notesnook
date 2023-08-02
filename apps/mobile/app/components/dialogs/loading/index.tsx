@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import BaseDialog from "../../dialog/base-dialog";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import { useEffect } from "react";
@@ -30,7 +30,7 @@ import { useState } from "react";
 import { eCloseLoading, eOpenLoading } from "../../../utils/events";
 
 export const LoadingDialog = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export const LoadingDialog = () => {
         style={{
           width: "100%",
           height: "100%",
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           justifyContent: "center",
           alignItems: "center"
         }}
@@ -77,8 +77,8 @@ export const LoadingDialog = () => {
             useNativeDriver
             indeterminate
             indeterminateAnimationDuration={2000}
-            unfilledColor={colors.nav}
-            color={colors.accent}
+            unfilledColor={colors.secondary.background}
+            color={colors.primary.accent}
             borderWidth={0}
           />
         </View>

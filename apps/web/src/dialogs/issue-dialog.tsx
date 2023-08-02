@@ -25,9 +25,11 @@ import platform from "platform";
 import { useState } from "react";
 import { confirm, Perform } from "../common/dialog-controller";
 import { isUserPremium } from "../hooks/use-is-user-premium";
-import * as clipboard from "clipboard-polyfill/text";
+import { writeText } from "clipboard-polyfill";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
+
+import { ErrorText } from "../components/error-text";
 
 const PLACEHOLDERS = {
   title: "Briefly describe what happened",
@@ -119,10 +121,10 @@ function IssueDialog(props: IssueDialogProps) {
         />
         <Text
           variant="error"
-          bg={"warnBg"}
+          bg={"var(--background-error)"}
           mt={1}
           p={1}
-          sx={{ borderRadius: "default", color: "warn" }}
+          sx={{ borderRadius: "default" }}
         >
           Your bug report is public. Do NOT include sensitive information
           (email, passwords etc) in the issue title or description.
@@ -137,11 +139,7 @@ function IssueDialog(props: IssueDialogProps) {
               </>
             ))}
         </Text>
-        {error && (
-          <Text bg="errorBg" variant="error" mt={1} px={1}>
-            Error: {error}
-          </Text>
-        )}
+        <ErrorText error={error} />
       </Flex>
     </Dialog>
   );
@@ -159,7 +157,7 @@ function showIssueReportedDialog({ url }: { url: string }) {
     
     If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support.`
   }).then((result) => {
-    result && clipboard.writeText(url);
+    result && writeText(url);
   });
 }
 

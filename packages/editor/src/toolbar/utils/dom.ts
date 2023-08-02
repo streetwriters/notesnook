@@ -25,7 +25,7 @@ export function getToolbarElement() {
 
 export function getPopupContainer() {
   return (
-    (document.getElementById("popup-container") as HTMLElement) || undefined
+    (document.getElementById("dialogContainer") as HTMLElement) || undefined
   );
 }
 

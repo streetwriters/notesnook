@@ -450,14 +450,14 @@ export function Features() {
           <Flex key={section.title} px={6} sx={{ flexDirection: "column" }}>
             {section.pro && (
               <Flex
-                bg="bgSecondary"
+                bg="var(--background-secondary)"
                 px={2}
                 py="2px"
                 sx={{ borderRadius: 50, alignSelf: "start" }}
                 mb={1}
               >
-                <Pro color="primary" size={16} />
-                <Text variant="body" ml={"2px"} sx={{ color: "primary" }}>
+                <Pro color="accent" size={16} />
+                <Text variant="body" ml={"2px"} sx={{ color: "accent" }}>
                   Pro
                 </Text>
               </Flex>
@@ -468,7 +468,7 @@ export function Features() {
             <Text
               variant="body"
               mt={1}
-              sx={{ fontSize: "title", color: "fontTertiary" }}
+              sx={{ fontSize: "title", color: "paragraph" }}
             >
               {section.detail}
             </Text>
@@ -488,18 +488,16 @@ export function Features() {
                     key={feature.id}
                     sx={{ flexDirection: "column", alignItems: "start" }}
                   >
-                    {feature.icon && (
-                      <feature.icon size={20} color="text" sx={{ mb: 1 }} />
-                    )}
+                    {feature.icon && <feature.icon size={20} sx={{ mb: 1 }} />}
                     {feature.pro && (
                       <Flex
                         sx={{ alignItems: "center", justifyContent: "center" }}
                       >
-                        <Pro color="primary" size={14} />
+                        <Pro color="accent" size={14} />
                         <Text
                           variant="subBody"
                           ml={"2px"}
-                          sx={{ color: "primary" }}
+                          sx={{ color: "accent" }}
                         >
                           Pro
                         </Text>
