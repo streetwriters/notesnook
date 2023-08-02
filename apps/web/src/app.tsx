@@ -25,7 +25,6 @@ import {
 } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
-import { LazyMotion, domAnimation } from "framer-motion";
 import useDatabase from "./hooks/use-database";
 import { Allotment, AllotmentHandle, LayoutPriority } from "allotment";
 import { useStore } from "./stores/app-store";
@@ -54,41 +53,39 @@ function App() {
   const [isAppLoaded] = useDatabase();
 
   return (
-    <LazyMotion features={domAnimation} strict>
-      <BaseThemeProvider sx={{ height: "100%" }} addGlobalStyles>
-        {isAppLoaded && (
-          <Suspense fallback={<div style={{ display: "none" }} />}>
-            <div id="menu-wrapper">
-              <GlobalMenuWrapper />
-            </div>
-            <AppEffects setShow={setShow} />
-            {isMobile && (
-              <MobileAppEffects
-                sliderId="slider"
-                overlayId="overlay"
-                setShow={setShow}
-              />
-            )}
-          </Suspense>
-        )}
-        <Flex
-          id="app"
-          bg="background"
-          sx={{ overflow: "hidden", flexDirection: "column", height: "100%" }}
-        >
-          {isMobile ? (
-            <MobileAppContents isAppLoaded={isAppLoaded} />
-          ) : (
-            <DesktopAppContents
-              isAppLoaded={isAppLoaded}
+    <BaseThemeProvider sx={{ height: "100%" }} addGlobalStyles>
+      {isAppLoaded && (
+        <Suspense fallback={<div style={{ display: "none" }} />}>
+          <div id="menu-wrapper">
+            <GlobalMenuWrapper />
+          </div>
+          <AppEffects setShow={setShow} />
+          {isMobile && (
+            <MobileAppEffects
+              sliderId="slider"
+              overlayId="overlay"
               setShow={setShow}
-              show={show}
             />
           )}
-          <Toaster containerClassName="toasts-container" />
-        </Flex>
-      </BaseThemeProvider>
-    </LazyMotion>
+        </Suspense>
+      )}
+      <Flex
+        id="app"
+        bg="background"
+        sx={{ overflow: "hidden", flexDirection: "column", height: "100%" }}
+      >
+        {isMobile ? (
+          <MobileAppContents isAppLoaded={isAppLoaded} />
+        ) : (
+          <DesktopAppContents
+            isAppLoaded={isAppLoaded}
+            setShow={setShow}
+            show={show}
+          />
+        )}
+        <Toaster containerClassName="toasts-container" />
+      </Flex>
+    </BaseThemeProvider>
   );
 }
 

@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { m } from "framer-motion";
+import { motion } from "framer-motion";
 import { Flex, Box, Image, Text } from "@theme-ui/components";
 import { Input } from "@theme-ui/components";
 
-export const AnimatedFlex = m(Flex);
-export const AnimatedBox = m(Box);
-export const AnimatedImage = m(Image);
-export const AnimatedText = m(Text);
-export const AnimatedInput = m(Input);
+export const AnimatedFlex = motion(Flex);
+export const AnimatedBox = motion(Box);
+export const AnimatedImage = motion(Image);
+export const AnimatedText = motion(Text);
+export const AnimatedInput = motion(Input);
