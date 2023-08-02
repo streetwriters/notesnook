@@ -18,6 +18,7 @@ on:
       - closed
       - ready_for_review
       - reopened
+      - opened
     branches:
       - master
     paths-ignore:
