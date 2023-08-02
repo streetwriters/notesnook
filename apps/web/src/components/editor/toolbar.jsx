@@ -44,6 +44,8 @@ import { AnimatedInput } from "../animated";
 import { showPublishView } from "../publish-view";
 import { db } from "../../common/db";
 import { useEditorInstance, useHistory, useSearch } from "./context";
+import { debounceWithId } from "@notesnook/common";
+import { onTitleChange } from "./title-box";
 
 // TODO: this needs to be cleaned up!
 function Toolbar() {
@@ -228,9 +230,8 @@ function Toolbar() {
           transition={{ duration: 0.5 }}
           defaultValue={title}
           onChange={(e) => {
-            const title = e.target.value;
-            setTitle(sessionId, title);
-            document.getElementById("editor-title").value = title;
+            const { sessionId, id } = store.get().session;
+            debouncedOnTitleChange(sessionId, id, e.target.value);
           }}
           sx={{
             flex: 1,
@@ -348,3 +349,5 @@ function exitFullscreen(elem) {
     elem.msExitFullscreen();
   }
 }
+
+const debouncedOnTitleChange = debounceWithId(onTitleChange, 100);

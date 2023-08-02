@@ -61,10 +61,13 @@ function TitleBox(props: TitleBoxProps) {
   }, [id, updateFontSize]);
 
   useEffect(() => {
-    if (inputRef.current && inputRef.current.value !== title) {
-      inputRef.current.placeholder = title || "Note title";
+    if (!inputRef.current) return;
+    if (inputRef.current.value && title !== inputRef.current.value) {
+      inputRef.current.placeholder = "Note title";
+      inputRef.current.value = title;
+      updateFontSize(title.length);
     }
-  }, [title]);
+  }, [title, updateFontSize]);
 
   return (
     <Input
@@ -99,7 +102,7 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
   return prevProps.readonly === nextProps.readonly;
 });
 
-function onTitleChange(noteId: string | undefined, title: string) {
+export function onTitleChange(noteId: string | undefined, title: string) {
   store.get().setTitle(noteId, title);
 }
 
