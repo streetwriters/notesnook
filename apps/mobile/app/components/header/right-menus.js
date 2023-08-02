@@ -39,6 +39,7 @@ export const RightMenus = () => {
   const currentScreen = useNavigationStore((state) => state.currentScreen.name);
   const buttonAction = useNavigationStore((state) => state.buttonAction);
   const menuRef = useRef();
+  console.log(rightButtons.length);
 
   return (
     <View style={styles.rightBtnContainer}>
@@ -93,7 +94,7 @@ export const RightMenus = () => {
           onRequestClose={() => {
             menuRef.current?.hide();
           }}
-          button={
+          anchor={
             <IconButton
               onPress={() => {
                 menuRef.current?.show();
@@ -113,7 +114,7 @@ export const RightMenus = () => {
               }}
               type="gray"
               buttonType={{
-                text: colors.primary.paragraph
+                text: contextMenuColors.primary.paragraph
               }}
               key={item.title}
               title={item.title}
