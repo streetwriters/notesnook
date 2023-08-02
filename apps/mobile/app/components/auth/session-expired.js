@@ -17,18 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { Modal, View } from "react-native";
 import { db } from "../../common/database";
+import { MMKV } from "../../common/database/mmkv";
 import BiometricService from "../../services/biometrics";
 import {
   ToastEvent,
   eSendEvent,
   eSubscribeEvent
 } from "../../services/event-manager";
+import { setLoginMessage } from "../../services/message";
 import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
-import { useThemeColors } from "@notesnook/theme";
+import { clearAllStores } from "../../stores";
+import { useUserStore } from "../../stores/use-user-store";
 import { eLoginSessionExpired, eUserLoggedIn } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -71,9 +75,12 @@ export const SessionExpired = () => {
     try {
       await db.user.logout();
       await BiometricService.resetCredentials();
-      SettingsService.set({
-        introCompleted: true
-      });
+      setLoginMessage();
+      SettingsService.resetSettings();
+      useUserStore.getState().setUser(null);
+      useUserStore.getState().setSyncing(false);
+      MMKV.clearStore();
+      clearAllStores();
       setVisible(false);
     } catch (e) {
       ToastEvent.show({
