@@ -51,11 +51,11 @@ import { ToastEvent, presentSheet } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { getElevationStyle } from "../../utils/elevation";
-import { MenuItemsList } from "../../utils/constants";
+import { MenuItemsList } from "../../utils/menu-items";
 import { IconButton } from "../../components/ui/icon-button";
 import { PressableButton } from "../../components/ui/pressable";
 
-const THEME_SERVER_URL = "https://themes.notesnook.com";
+const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 //@ts-ignore
 export const themeTrpcClient = createTRPCProxyClient<ThemesRouter>({
   links: [
