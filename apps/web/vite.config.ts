@@ -41,7 +41,7 @@ const isTesting =
   process.env.TEST === "true" || process.env.NODE_ENV === "development";
 const isDesktop = process.env.PLATFORM === "desktop";
 const isAnalyzing = process.env.ANALYZING === "true";
-process.env.NN_BUILD_TIMESTAMP = `${Date.now()}`;
+process.env.NN_BUILD_TIMESTAMP = isTesting ? "0" : `${Date.now()}`;
 
 export default defineConfig({
   envPrefix: "NN_",

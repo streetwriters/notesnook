@@ -203,7 +203,6 @@ function TipTap(props: TipTapProps) {
         editor.commands.refreshSearch();
       },
       onUpdate: ({ editor, transaction }) => {
-        console.log("UPDATE", transaction);
         onContentChange?.();
 
         const preventSave = transaction?.getMeta("preventSave") as boolean;

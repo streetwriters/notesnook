@@ -91,7 +91,10 @@ export function MenuButton(props: MenuButtonProps) {
           </Text>
         </Flex>
         {isChecked || menu || modifier ? (
-          <Flex sx={{ ml: 4 }}>
+          <Flex
+            sx={{ ml: 4 }}
+            data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
+          >
             {isChecked && <Icon path={mdiCheck} size={"small"} />}
             {menu && <Icon path={mdiChevronRight} size={"small"} />}
             {modifier && (

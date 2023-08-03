@@ -229,7 +229,7 @@ test("add tags to note", async ({ page }) => {
 });
 
 for (const format of ["html", "txt", "md"] as const) {
-  test.only(`export note as ${format}`, async ({ page }) => {
+  test(`export note as ${format}`, async ({ page }) => {
     const app = new AppModel(page);
     await app.goto();
     const notes = await app.goToNotes();
