@@ -78,7 +78,7 @@ export function ImageComponent(
           if (IMAGE_SOURCE_CACHE[hash]) setSource(IMAGE_SOURCE_CACHE[hash]);
           else if (dataurl) setSource(await toBlobURL(dataurl));
           else if (isDataUrl(src)) setSource(await toBlobURL(src));
-          else {
+          else if (canParse(src)) {
             const { url, size, blob, type } = await downloadImage(
               src,
               downloadOptions
@@ -88,6 +88,8 @@ export function ImageComponent(
               { src },
               { src: await toDataURL(blob), size, mime: type }
             );
+          } else {
+            setError("Failed to parse source url.");
           }
         } catch (e) {
           console.error(e);
@@ -169,7 +171,7 @@ export function ImageComponent(
               {error
                 ? `There was an error loading the image: ${error}`
                 : isDownloadable(source, src)
-                ? `Downloading image from ${getHostname(src)}`
+                ? `Downloading image`
                 : ""}
             </Text>
             {error ? (
@@ -285,12 +287,14 @@ export function ImageComponent(
   );
 }
 
-function getHostname(src?: string) {
-  if (!src) return null;
-
-  return new URL(src).hostname;
-}
-
 function isDownloadable(source?: string, src?: string) {
   return !source && src && !isDataUrl(src);
+}
+
+function canParse(src: string) {
+  try {
+    return !!new URL(src);
+  } catch {
+    return false;
+  }
 }
