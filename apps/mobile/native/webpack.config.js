@@ -98,7 +98,8 @@ module.exports = (env) => {
         "@selderee/plugin-htmlparser2": path.join(__dirname, "../node_modules/@selderee/plugin-htmlparser2"),
         "peberminta": path.join(__dirname, "../node_modules/peberminta"),
         "react-native-blob-util": path.join(__dirname, "../node_modules/react-native-blob-util"),
-        "@mdi/js": path.join(__dirname, "../node_modules/@mdi/js/mdi.js")
+        "@mdi/js": path.join(__dirname, "../node_modules/@mdi/js/mdi.js"),
+        "katex": path.join(__dirname, "../node_modules/katex"),
       },
     },
     /**
@@ -183,6 +184,7 @@ module.exports = (env) => {
             /node_modules(.*[/\\])+@tanstack[/\\]query-core/,
             /node_modules(.*[/\\])+@tanstack[/\\]react-query/,
             /node_modules(.*[/\\])+@trpc[/\\]react-query/,
+            /node_modules(.*[/\\])+katex/,
           ],
           use: {
             loader: "babel-loader",
