@@ -103,7 +103,7 @@ const useEditor = () => {
           }
         `
       );
-    }, 300);
+    }, 1);
   };
 
   return { ref, onLoad, currentNote, commands };
@@ -150,13 +150,6 @@ export const Editor = ({ onChange, onLoad }) => {
     onLoad?.();
   }, [onLoad]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      onLoad?.();
-      setTimeout(() => setLoading(false));
-    }, 1000);
-  }, [onLoad]);
-
   return (
     <View
       style={{
@@ -165,7 +158,13 @@ export const Editor = ({ onChange, onLoad }) => {
     >
       <WebView
         ref={editor.ref}
-        onLoad={editor.onLoad}
+        onLoad={() => {
+          editor.onLoad();
+          setTimeout(() => {
+            setLoading(false);
+            onLoad?.();
+          }, 1);
+        }}
         nestedScrollEnabled
         javaScriptEnabled={true}
         focusable={true}
