@@ -238,7 +238,12 @@ export function ColorPicker(props: ColorPickerProps) {
           {onClose && (
             <Button
               variant={"icon"}
-              sx={{ display: ["block", "none"], px: 2 }}
+              sx={{
+                display: ["block", "none"],
+                px: 2,
+                width: "50px",
+                alignSelf: "center"
+              }}
               onClick={onClose}
             >
               <Icon path={Icons.close} size="big" />

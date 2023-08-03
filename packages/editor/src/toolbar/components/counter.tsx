@@ -37,7 +37,6 @@ function _Counter(props: CounterProps) {
         alignItems: "stretch",
         borderRadius: "default",
         overflow: "hidden",
-        height: "100%",
         cursor: "pointer",
         ":hover": {
           bg: "hover-secondary"
@@ -51,7 +50,10 @@ function _Counter(props: CounterProps) {
         title={`Decrease ${title}`}
         icon="minus"
         variant={"small"}
-        onClick={onDecrease}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDecrease();
+        }}
       />
 
       <Text
@@ -71,7 +73,10 @@ function _Counter(props: CounterProps) {
         title={`Increase ${title}`}
         icon="plus"
         variant={"small"}
-        onClick={onIncrease}
+        onClick={(e) => {
+          e.stopPropagation();
+          onIncrease();
+        }}
       />
     </Flex>
   );

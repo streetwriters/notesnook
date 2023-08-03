@@ -39,8 +39,8 @@ export function ToolbarGroup(props: ToolbarGroupProps) {
     <Flex
       className="toolbar-group"
       sx={{
-        gap: "small",
-        p: "small",
+        gap: [0, 0, "small"],
+        p: ["4px", "4px", "small"],
         flexShrink: 0,
         ...sx
       }}

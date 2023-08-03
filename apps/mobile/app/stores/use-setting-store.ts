@@ -69,7 +69,7 @@ export type Settings = {
   corsProxy: string;
   disableRealtimeSync?: boolean;
   notificationSound?: Sound & { platform: PlatformOSType };
-  defaultFontSize: string;
+  defaultFontSize: number;
   defaultFontFamily: string;
   colorScheme: "dark" | "light";
   lighTheme: ThemeDefinition;
@@ -149,7 +149,7 @@ export const defaultSettings: SettingStore["settings"] = {
   reminderNotificationMode: "urgent",
   notificationSound: undefined,
   defaultFontFamily: "sans-serif",
-  defaultFontSize: "16",
+  defaultFontSize: 16,
   colorScheme: "light",
   lighTheme: ThemeLight,
   darkTheme: ThemeDark
