@@ -241,7 +241,7 @@ export const AttachmentDialog = ({ note }) => {
             width: "100%",
             height: 50,
             flexDirection: "row",
-            backgroundColor: colors.bg
+            backgroundColor: colors.primary.background
           }}
           contentContainerStyle={{
             minWidth: "100%",

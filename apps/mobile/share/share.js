@@ -845,7 +845,7 @@ const ShareView = ({ quicknote = false }) => {
             />
 
             <Button
-              color={colors.bg}
+              color={colors.primary.bg}
               onPress={() => {
                 setSearchMode("appendNote");
               }}

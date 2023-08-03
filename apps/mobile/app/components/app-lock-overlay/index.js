@@ -100,7 +100,7 @@ const AppLockedOverlay = () => {
     appLocked && (
       <View
         style={{
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           width: "100%",
           height: "100%",
           position: "absolute",
@@ -160,7 +160,7 @@ const AppLockedOverlay = () => {
             style={{
               width: "100%",
               padding: 12,
-              backgroundColor: colors.bg
+              backgroundColor: colors.primary.background
             }}
           >
             {user ? (
