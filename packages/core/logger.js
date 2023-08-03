@@ -70,7 +70,7 @@ class DatabaseLogWriter {
         }
         this.flush();
       });
-    }, 2000);
+    }, 10000);
   }
 
   push(message) {
