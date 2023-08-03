@@ -158,7 +158,7 @@ export function ActionSheetPresenter(
       onRequestClose={() => onBeforeClose()}
       portalClassName={"bottom-sheet-presenter-portal"}
       onAfterOpen={() => {
-        animation.start({ transition: TRANSITION, y: 0 });
+        setTimeout(() => animation.start({ transition: TRANSITION, y: 0 }));
       }}
       overlayElement={(overlayElementProps, contentEl) => {
         return (
@@ -250,7 +250,9 @@ export function ActionSheetPresenter(
               if (y.get() >= closingHeight) {
                 onBeforeClose();
               } else {
-                animation.start({ transition: TRANSITION, y: 0 });
+                setTimeout(() =>
+                  animation.start({ transition: TRANSITION, y: 0 })
+                );
               }
             }}
             dragConstraints={{ top: 0, bottom: 0 }}
