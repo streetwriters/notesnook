@@ -18,11 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { httpBatchLink } from "@trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
 import { CheckCircleOutline, Loading } from "../../../components/icons";
 import {
   THEME_COMPATIBILITY_VERSION,
+  ThemeDefinition,
   getPreviewColors,
   validateTheme
 } from "@notesnook/theme";
@@ -74,6 +75,7 @@ function ThemesList() {
   );
 
   const [isApplying, setIsApplying] = useState(false);
+  const parentScrollRef = useRef<HTMLElement>();
   const setCurrentTheme = useThemeStore((store) => store.setTheme);
   const user = useUserStore((store) => store.user);
   const darkTheme = useThemeStore((store) => store.darkTheme);
@@ -197,6 +199,11 @@ function ThemesList() {
       </Flex>
 
       <Box
+        ref={(ref) => {
+          if (ref && ref instanceof HTMLElement)
+            parentScrollRef.current =
+              (ref.closest(".ms-container") as HTMLElement) || undefined;
+        }}
         sx={{
           ".virtuoso-grid-list": {
             display: "grid",
@@ -210,35 +217,15 @@ function ThemesList() {
           <Loader title={"Loading themes..."} />
         ) : (
           <VirtuosoGrid
-            style={{ height: 700 }}
+            customScrollParent={parentScrollRef.current || undefined}
             data={themes.data?.pages.flatMap((a) => a.themes) || []}
             endReached={() =>
               themes.hasNextPage ? themes.fetchNextPage() : null
             }
             components={{
-              Header: () => (
-                <div className="virtuoso-grid-list">
-                  <ThemeItem
-                    theme={{
-                      ...darkTheme,
-                      previewColors: getPreviewColors(darkTheme)
-                    }}
-                    isApplied={true}
-                    isApplying={isApplying}
-                    setTheme={setTheme}
-                  />
-                  <ThemeItem
-                    theme={{
-                      ...lightTheme,
-                      previewColors: getPreviewColors(lightTheme)
-                    }}
-                    isApplied={true}
-                    isApplying={isApplying}
-                    setTheme={setTheme}
-                  />
-                </div>
-              )
+              Header: GridHeader
             }}
+            context={{ darkTheme, lightTheme, setTheme }}
             computeItemKey={(_index, item) => item.id}
             itemContent={(_index, theme) => (
               <ThemeItem
@@ -255,6 +242,39 @@ function ThemesList() {
     </>
   );
 }
+
+const GridHeader = (props: {
+  context?: {
+    darkTheme: ThemeDefinition;
+    lightTheme: ThemeDefinition;
+    setTheme: (theme: ThemeMetadata) => Promise<void>;
+  };
+}) => {
+  const { darkTheme, lightTheme, setTheme } = props.context || {};
+  if (!darkTheme || !lightTheme || !setTheme) return null;
+  return (
+    <div className="virtuoso-grid-list">
+      <ThemeItem
+        theme={{
+          ...darkTheme,
+          previewColors: getPreviewColors(darkTheme)
+        }}
+        isApplied={true}
+        isApplying={false}
+        setTheme={setTheme}
+      />
+      <ThemeItem
+        theme={{
+          ...lightTheme,
+          previewColors: getPreviewColors(lightTheme)
+        }}
+        isApplied={true}
+        isApplying={false}
+        setTheme={setTheme}
+      />
+    </div>
+  );
+};
 
 type ThemeItemProps = {
   theme: ThemeMetadata;
