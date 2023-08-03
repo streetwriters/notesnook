@@ -234,6 +234,7 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
         {!layout ? null : (
           <EmotionEditorToolbarTheme>
             <Toolbar
+              className="theme-scope-editorToolbar"
               sx={{
                 display: settings.noToolbar ? "none" : "flex"
               }}
@@ -259,6 +260,7 @@ const ContentDiv = memo(
     return (
       <div
         ref={ref}
+        className="theme-scope-editor"
         style={{
           padding: 12,
           paddingTop: props.padding,
