@@ -26,6 +26,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Dimensions,
   Image,
   Keyboard,
   Platform,
@@ -220,9 +221,9 @@ const ShareView = ({ quicknote = false }) => {
   const [kh, setKh] = useState(0);
   globalThis["IS_SHARE_EXTENSION"] = true;
   const onKeyboardDidShow = (event) => {
-    let kHeight = event.endCoordinates.height;
-    keyboardHeight.current = kHeight;
-    setKh(kHeight);
+    let height = Dimensions.get("window").height - event.endCoordinates.screenY;
+    keyboardHeight.current = height;
+    setKh(height);
   };
 
   const onKeyboardDidHide = () => {
