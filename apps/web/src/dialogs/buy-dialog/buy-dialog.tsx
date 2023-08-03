@@ -22,7 +22,6 @@ import { Text, Flex, Button } from "@theme-ui/components";
 import { Cross, Check, Loading } from "../../components/icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import Modal from "react-modal";
 import { useTheme } from "@emotion/react";
 import { ReactComponent as Rocket } from "../../assets/rocket.svg";
 import { ReactComponent as WorkAnywhere } from "../../assets/workanywhere.svg";
@@ -45,6 +44,8 @@ import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
 
 import { alpha } from "@theme-ui/color";
+import BaseDialog from "../../components/dialog";
+import { ScopedThemeProvider } from "../../components/theme-provider";
 
 type BuyDialogProps = {
   couponCode?: string;
@@ -70,89 +71,52 @@ export function BuyDialog(props: BuyDialogProps) {
   }, [couponCode, onApplyCoupon]);
 
   return (
-    <Modal
+    <BaseDialog
       isOpen={true}
-      onRequestClose={props.onClose}
-      shouldCloseOnEsc
-      shouldReturnFocusAfterClose
-      shouldFocusAfterRender
-      onAfterOpen={(e) => {
-        if (!e || !onClose) return;
-        // we need this work around because ReactModal content spreads over the overlay
-        const child = e.contentEl.firstElementChild;
-        if (!child || !(child instanceof HTMLElement)) return;
-
-        e.contentEl.onmousedown = function (e) {
-          if (!e.screenX && !e.screenY) return;
-          if (
-            e.x < child.offsetLeft ||
-            e.x > child.offsetLeft + child.clientWidth ||
-            e.y < child.offsetTop ||
-            e.y > child.offsetTop + child.clientHeight
-          ) {
-            onClose();
-          }
-        };
-      }}
-      style={{
-        content: {
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: "flex",
-          justifyContent: "center",
-          backgroundColor: undefined,
-          padding: 0,
-          overflowY: "hidden",
-          border: 0,
-          zIndex: 0
-        },
-        overlay: {
-          zIndex: 999,
-          background: theme.colors.backdrop
-        }
+      width={"968px"}
+      onClose={() => props.onClose()}
+      noScroll
+      sx={{
+        bg: "transparent",
+        width: ["95%", "80%", isCheckoutCompleted ? "400px" : "60%"]
       }}
     >
       <Flex
         bg="transparent"
         sx={{
-          position: "relative",
+          height: "80vw",
           overflow: "hidden",
-          boxShadow: "4px 5px 18px 2px #00000038",
-          borderRadius: "dialog",
+          position: "relative",
           flexDirection: ["column", "column", "row"],
-          width: ["95%", "80%", isCheckoutCompleted ? "400px" : "60%"],
-          maxHeight: ["95%", "80%", "80%"],
           alignSelf: "center",
           overflowY: ["scroll", "scroll", "hidden"]
         }}
       >
-        <Flex
+        <ScopedThemeProvider
+          scope="navigationMenu"
           sx={{
-            borderTopLeftRadius: "dialog",
-            borderBottomLeftRadius: [0, 0, "dialog"],
-            overflow: "hidden",
-            bg: "var(--background-secondary)",
+            display: "flex",
+            overflow: ["hidden", "hidden", "auto"],
+            flexDirection: "column",
             "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
               {
-                bg: alpha("background", 0.6),
+                backgroundColor: alpha("background", 0.6),
                 backdropFilter: "blur(8px)"
               },
-            flexDirection: "column",
+            backgroundColor: "var(--background-secondary)",
             flexShrink: 0,
             alignItems: "center",
             justifyContent: "center",
-            width: ["100%", "100%", isCheckoutCompleted ? "100%" : 350]
+            width: ["100%", "100%", isCheckoutCompleted ? "100%" : 350],
+            p: 4,
+            py: 50
           }}
-          p={4}
-          py={50}
         >
           <SideBar onClose={onClose} initialPlan={plan} />
-        </Flex>
+        </ScopedThemeProvider>
         <Details />
       </Flex>
-    </Modal>
+    </BaseDialog>
   );
 }
 

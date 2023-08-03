@@ -437,8 +437,9 @@ export function Features() {
         flex: 1,
         flexDirection: "column",
         flexShrink: 0,
-        overflowY: ["hidden", "hidden", "auto"],
-        gap: 50
+        overflowY: ["unset", "unset", "auto"],
+        gap: 50,
+        paddingBottom: [50, 50, 0]
       }}
       pt={4}
       bg="background"

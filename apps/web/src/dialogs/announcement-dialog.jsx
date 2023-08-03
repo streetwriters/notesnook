@@ -72,7 +72,7 @@ function AnnouncementDialog(props) {
         },
         overlay: {
           zIndex: 999,
-          background: theme.colors.overlay
+          background: "var(--backdrop)"
         }
       }}
     >

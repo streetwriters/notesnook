@@ -206,7 +206,11 @@ export function SubscriptionStatus() {
               >
                 Upgrade to Pro
               </Button>
-              <Button variant="secondary" onClick={activateTrial}>
+              <Button
+                variant="secondary"
+                onClick={activateTrial}
+                sx={{ bg: "background" }}
+              >
                 {isActivatingTrial ? (
                   <Loading size={16} />
                 ) : (

@@ -56,8 +56,8 @@ import { Multiselect } from "../common/multi-select";
 import { CustomScrollbarsVirtualList } from "../components/list-container";
 import { Attachment } from "../components/attachment";
 import { isDocument, isImage, isVideo } from "@notesnook/core/utils/filename";
-
 import { alpha } from "@theme-ui/color";
+import { ScopedThemeProvider } from "../components/theme-provider";
 
 type ToolbarAction = {
   title: string;
@@ -389,83 +389,88 @@ const Sidebar = memo(
     const download = useStore((store) => store.download);
 
     return (
-      <Flex
-        sx={{
-          flexDirection: "column",
-          justifyContent: "space-between",
-          width: 240,
-          "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
-            {
-              backgroundColor: alpha("background", 0.6),
-              backdropFilter: "blur(8px)"
-            },
-          backgroundColor: "var(--background-secondary)"
-        }}
-      >
-        <Flex sx={{ flexDirection: "column" }}>
-          <Input
-            placeholder="Search"
-            sx={{ m: 2, mb: 0, width: "auto", bg: "background", py: "7px" }}
-            onChange={(e) => {
-              setRoute(e.target.value ? "none" : "all");
-              if (e.target.value) filter(e.target.value);
-            }}
-          />
-          {routes.map((item) => (
-            <NavigationItem
-              key={item.id}
-              icon={item.icon}
-              title={item.title}
-              count={counts[item.id]}
-              onClick={() => {
-                onRouteChange(item.id);
-                setRoute(item.id);
+      <ScopedThemeProvider scope="navigationMenu" injectCssVars={false}>
+        <Flex
+          className="theme-scope-navigationMenu"
+          sx={{
+            flexDirection: "column",
+            justifyContent: "space-between",
+            width: 240,
+            "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
+              {
+                backgroundColor: alpha("background", 0.6),
+                backdropFilter: "blur(8px)"
+              },
+            backgroundColor: "var(--background-secondary)"
+          }}
+        >
+          <Flex sx={{ flexDirection: "column" }}>
+            <Input
+              placeholder="Search"
+              sx={{ m: 2, mb: 0, width: "auto", bg: "background", py: "7px" }}
+              onChange={(e) => {
+                setRoute(e.target.value ? "none" : "all");
+                if (e.target.value) filter(e.target.value);
               }}
-              selected={route === item.id}
             />
-          ))}
-        </Flex>
-        <Flex sx={{ flexDirection: "column" }}>
-          <Flex sx={{ pl: 2, m: 2, mt: 1, justifyContent: "space-between" }}>
-            <Flex sx={{ flexDirection: "column" }}>
-              <Text variant="body">{pluralize(counts.all, "file")}</Text>
-              <Text variant="subBody">{formatBytes(totalSize)}</Text>
+            {routes.map((item) => (
+              <NavigationItem
+                key={item.id}
+                icon={item.icon}
+                title={item.title}
+                count={counts[item.id]}
+                onClick={() => {
+                  onRouteChange(item.id);
+                  setRoute(item.id);
+                }}
+                selected={route === item.id}
+              />
+            ))}
+          </Flex>
+          <Flex sx={{ flexDirection: "column" }}>
+            <Flex sx={{ pl: 2, m: 2, mt: 1, justifyContent: "space-between" }}>
+              <Flex sx={{ flexDirection: "column" }}>
+                <Text variant="body">{pluralize(counts.all, "file")}</Text>
+                <Text variant="subBody">{formatBytes(totalSize)}</Text>
+              </Flex>
+              <Button
+                variant="secondary"
+                sx={{
+                  bg: "transparent",
+                  borderRadius: 100,
+                  position: "relative",
+                  width: 38,
+                  height: 38
+                }}
+                title="Download all attachments"
+                onClick={async () => {
+                  if (downloadStatus) {
+                    await cancelDownload();
+                  } else {
+                    await download(db.attachments?.all);
+                  }
+                }}
+              >
+                {downloadStatus ? <Close size={18} /> : <Download size={18} />}
+                {downloadStatus ? (
+                  <Donut
+                    value={
+                      (downloadStatus.current / downloadStatus.total) * 100
+                    }
+                    max={100}
+                    size={38}
+                    sx={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0
+                    }}
+                  />
+                ) : null}
+              </Button>
             </Flex>
-            <Button
-              variant="secondary"
-              sx={{
-                bg: "transparent",
-                borderRadius: 100,
-                position: "relative",
-                width: 38,
-                height: 38
-              }}
-              title="Download all attachments"
-              onClick={async () => {
-                if (downloadStatus) {
-                  await cancelDownload();
-                } else {
-                  await download(db.attachments?.all);
-                }
-              }}
-            >
-              {downloadStatus ? <Close size={18} /> : <Download size={18} />}
-              {downloadStatus ? (
-                <Donut
-                  value={(downloadStatus.current / downloadStatus.total) * 100}
-                  max={100}
-                  size={38}
-                  sx={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0
-                  }}
-                />
-              ) : null}
-            </Button>
           </Flex>
         </Flex>
-      </Flex>
+      </ScopedThemeProvider>
     );
   },
   (prev, next) =>

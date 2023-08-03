@@ -188,6 +188,7 @@ function OnboardingDialog({ onClose: _onClose, type }) {
         {Component && <Component onClose={onClose} onNext={onNext} />}
         {buttonText && (
           <Button
+            variant="accent"
             sx={{ borderRadius: 50, px: 30, mb: 4, mt: Component ? 0 : 4 }}
             onClick={onNext}
           >
@@ -452,6 +453,7 @@ function TrialOffer({ onClose }) {
 
       <Flex mt={2} sx={{ justifyContent: "center", width: "100%" }}>
         <Button
+          variant="accent"
           sx={{ borderRadius: 50, alignSelf: "center", mr: 2, width: "40%" }}
           onClick={() => {
             onClose();
