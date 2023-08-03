@@ -81,7 +81,6 @@ export const EmotionEditorTheme = (props: PropsWithChildren<any>) => {
       }),
     [colors, isDark]
   );
-  theme.colors.background = colors.primary.background || "#f0f0f0";
   theme.space = [0, 10, 12, 20];
   return (
     <EmotionThemeProvider theme={theme}>{props.children}</EmotionThemeProvider>
