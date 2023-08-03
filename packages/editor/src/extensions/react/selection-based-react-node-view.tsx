@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { DecorationSet } from "prosemirror-view";
 import { Node as PMNode } from "prosemirror-model";
-import { Selection, NodeSelection } from "prosemirror-state";
+import { Selection, NodeSelection, TextSelection } from "prosemirror-state";
 import {
   stateKey as SelectionChangePluginKey,
   ReactNodeViewState
@@ -231,6 +231,22 @@ export class SelectionBasedNodeView<
       if (
         (newNodeSelection && !oldNodeSelection) ||
         (oldNodeSelection && !newNodeSelection)
+      ) {
+        return true;
+      }
+    } else {
+      const newTextSelection = this.isSelectionInsideNode(
+        selection.from,
+        selection.to
+      );
+      const oldTextSelection = this.isSelectionInsideNode(
+        oldSelection.from,
+        oldSelection.to
+      );
+
+      if (
+        (newTextSelection && !oldTextSelection) ||
+        (oldTextSelection && !newTextSelection)
       ) {
         return true;
       }
