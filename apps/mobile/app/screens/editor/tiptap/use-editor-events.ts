@@ -189,7 +189,10 @@ export const useEditorEvents = (
       noToolbar: readonly || editorPropReadonly || noToolbar,
       doubleSpacedLines: doubleSpacedLines,
       corsProxy: corsProxy,
-      fontSize: defaultFontSize,
+      fontSize:
+        typeof defaultFontSize === "string"
+          ? parseInt(defaultFontSize)
+          : defaultFontSize,
       fontFamily: SettingsService.get().defaultFontFamily,
       dateFormat: db.settings?.getDateFormat(),
       timeFormat: db.settings?.getTimeFormat()
