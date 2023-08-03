@@ -57,7 +57,6 @@ export const FontSize = Extension.create<FontSizeOptions>({
               if (!attributes.fontSize) {
                 return {};
               }
-
               return {
                 style: `font-size: ${attributes.fontSize}`
               };

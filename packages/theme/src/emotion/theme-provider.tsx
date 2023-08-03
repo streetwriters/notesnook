@@ -27,6 +27,7 @@ import {
 } from "../";
 import React, { ForwardedRef, PropsWithChildren, useMemo } from "react";
 import { Box, BoxProps } from "@theme-ui/components";
+import { useTheme } from "@emotion/react";
 
 export type EmotionThemeProviderProps = {
   scope?: keyof ThemeScopes;
@@ -44,6 +45,7 @@ function _EmotionThemeProvider(
     className,
     ...restProps
   } = props;
+  const emotionTheme = useTheme();
   const theme = useThemeEngineStore((store) => store.theme);
   const themeScope = useThemeColors(scope);
   const { colors } = themeScope;
@@ -58,7 +60,12 @@ function _EmotionThemeProvider(
   );
 
   return (
-    <ThemeProvider theme={themeProperties}>
+    <ThemeProvider
+      theme={{
+        ...(emotionTheme || themeProperties),
+        colors: themeProperties.colors
+      }}
+    >
       <NNScopedThemeProvider value={scope}>
         {injectCssVars ? (
           <Box

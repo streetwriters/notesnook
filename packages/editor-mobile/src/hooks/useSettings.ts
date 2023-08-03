@@ -32,7 +32,7 @@ const initialState = {
   readonly: globalThis.readonly,
   doubleSpacedLines: true,
   fontFamily: "sans-serif",
-  fontSize: "16px",
+  fontSize: 16,
   timeFormat: "12-hour",
   dateFormat: "DD-MM-YYYY"
 };

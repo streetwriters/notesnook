@@ -52,6 +52,7 @@ export function MoreTools(props: MoreToolsProps) {
       />
       <PopupWrapper
         isOpen={isOpen}
+        scope="editorToolbar"
         group={group || "toolbarGroup"}
         id={popupId}
         onClosed={onClosed}

@@ -48,7 +48,7 @@ export type Settings = {
   keyboardShown?: boolean;
   doubleSpacedLines?: boolean;
   corsProxy: string;
-  fontSize: string;
+  fontSize: number;
   fontFamily: string;
   dateFormat: string;
   timeFormat: string;
