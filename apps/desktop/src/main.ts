@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { app, BrowserWindow, nativeTheme, session, shell } from "electron";
+import { app, BrowserWindow, nativeTheme, shell } from "electron";
 import { isDevelopment } from "./utils";
 import { registerProtocol, PROTOCOL_URL } from "./utils/protocol";
 import { configureAutoUpdater } from "./utils/autoupdater";
@@ -91,7 +91,7 @@ async function createWindow() {
   mainWindow.setOpacity(1);
 
   if (config.privacyMode) {
-    await api.integration.setPrivacyMode(config.privacyMode);
+    await api.integration.setPrivacyMode({ enabled: config.privacyMode });
   }
 
   await AssetManager.loadIcons();

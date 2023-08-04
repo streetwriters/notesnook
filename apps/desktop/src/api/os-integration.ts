@@ -52,21 +52,21 @@ export const osIntegrationRouter = t.router({
 
   privacyMode: t.procedure.query(() => config.privacyMode),
   setPrivacyMode: t.procedure
-    .input(z.boolean().optional())
-    .mutation(({ input: privacyMode }) => {
+    .input(z.object({ enabled: z.boolean() }))
+    .mutation(({ input: { enabled } }) => {
       if (!globalThis.window || !["win32", "darwin"].includes(process.platform))
         return;
 
-      globalThis.window.setContentProtection(!!privacyMode);
+      globalThis.window.setContentProtection(enabled);
 
       if (process.platform === "win32") {
         globalThis.window.setThumbnailClip(
-          privacyMode
+          enabled
             ? { x: 0, y: 0, width: 1, height: 1 }
             : { x: 0, y: 0, width: 0, height: 0 }
         );
       }
-      config.privacyMode = !!privacyMode;
+      config.privacyMode = enabled;
     }),
 
   desktopIntegration: t.procedure.query(() => config.desktopSettings),

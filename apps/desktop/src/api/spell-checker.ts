@@ -114,9 +114,9 @@ export const spellCheckerRouter = t.router({
       globalThis.window?.webContents.session.setSpellCheckerLanguages(languages)
     ),
   toggle: t.procedure
-    .input(z.boolean().optional())
-    .mutation(({ input: enabled }) => {
-      globalThis.window?.webContents.session.setSpellCheckerEnabled(!!enabled);
-      config.isSpellCheckerEnabled = !!enabled;
+    .input(z.object({ enabled: z.boolean() }))
+    .mutation(({ input: { enabled } }) => {
+      globalThis.window?.webContents.session.setSpellCheckerEnabled(enabled);
+      config.isSpellCheckerEnabled = enabled;
     })
 });

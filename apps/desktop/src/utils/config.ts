@@ -38,8 +38,8 @@ export const config = {
     closeToSystemTray: false
   },
   privacyMode: false,
-  isSpellCheckerEnabled: false,
-  zoomFactor: 0,
+  isSpellCheckerEnabled: true,
+  zoomFactor: 1,
   theme: nativeTheme.themeSource,
   automaticUpdates: true
 };
