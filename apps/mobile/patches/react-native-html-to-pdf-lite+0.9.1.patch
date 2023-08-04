@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-html-to-pdf-lite/android/src/main/java/android/print/PdfConverter.java b/node_modules/react-native-html-to-pdf-lite/android/src/main/java/android/print/PdfConverter.java
-index e2b536b..c0c5945 100644
+index e2b536b..a85f24a 100644
 --- a/node_modules/react-native-html-to-pdf-lite/android/src/main/java/android/print/PdfConverter.java
 +++ b/node_modules/react-native-html-to-pdf-lite/android/src/main/java/android/print/PdfConverter.java
 @@ -8,6 +8,7 @@ package android.print;
@@ -10,13 +10,11 @@ index e2b536b..c0c5945 100644
  import android.os.ParcelFileDescriptor;
  import android.util.Log;
  import android.webkit.WebView;
-@@ -59,42 +60,55 @@ public class PdfConverter implements Runnable {
+@@ -59,42 +60,51 @@ public class PdfConverter implements Runnable {
  
      @Override
      public void run() {
-+        if (mWebView != null) {
-+            destroy();
-+        }
++       
          mWebView = new WebView(mContext);
 +        mWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
 +        mWebView.getSettings().setJavaScriptEnabled(true);
@@ -65,9 +63,7 @@ index e2b536b..c0c5945 100644
 +                                } catch (IOException e) {
 +                                    mPromise.reject(e.getMessage());
 +                                } finally {
-+                                    handler.postDelayed(() -> {
-+                                        destroy();
-+                                    }, 1000 * 5000);
++                                    destroy();
                                  }
 -
 -                                PDDocument myDocument = PDDocument.load(mPdfFile);
@@ -87,7 +83,7 @@ index e2b536b..c0c5945 100644
 -                }
 +                        });
 +                    }
-+                }, 1000 * 2);
++                }, 1000 * 3);
              }
          });
 +
@@ -95,7 +91,7 @@ index e2b536b..c0c5945 100644
          settings.setDefaultTextEncodingName("utf-8");
          mWebView.loadDataWithBaseURL(mBaseURL, mHtmlString, "text/HTML", "utf-8", null);
 diff --git a/node_modules/react-native-html-to-pdf-lite/ios/RNHTMLtoPDF/RNHTMLtoPDF.m b/node_modules/react-native-html-to-pdf-lite/ios/RNHTMLtoPDF/RNHTMLtoPDF.m
-index e005f2a..5d12d77 100644
+index e005f2a..17a60c5 100644
 --- a/node_modules/react-native-html-to-pdf-lite/ios/RNHTMLtoPDF/RNHTMLtoPDF.m
 +++ b/node_modules/react-native-html-to-pdf-lite/ios/RNHTMLtoPDF/RNHTMLtoPDF.m
 @@ -74,7 +74,10 @@ + (BOOL)requiresMainQueueSetup
@@ -116,10 +112,10 @@ index e005f2a..5d12d77 100644
      
 -    UIPrintPageRenderer *render = [[UIPrintPageRenderer alloc] init];
 -    [render addPrintFormatter:webView.viewPrintFormatter startingAtPageAtIndex:0];
-+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
++    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
 +        UIPrintPageRenderer *render = [[UIPrintPageRenderer alloc] init];
 +        [render addPrintFormatter:webView.viewPrintFormatter startingAtPageAtIndex:0];
-         
+     
 -    // Define the printableRect and paperRect
 -    // If the printableRect defines the printable area of the page
 -    CGRect paperRect = CGRectMake(0, 0, _PDFSize.width, _PDFSize.height);
@@ -128,21 +124,21 @@ index e005f2a..5d12d77 100644
 +        // If the printableRect defines the printable area of the page
 +        CGRect paperRect = CGRectMake(0, 0, _PDFSize.width, _PDFSize.height);
 +        CGRect printableRect = CGRectMake(_paddingLeft, _paddingTop, _PDFSize.width-(_paddingLeft + _paddingRight), _PDFSize.height-(_paddingBottom + _paddingTop));
-         
-         
+     
+     
 -    [render setValue:[NSValue valueWithCGRect:paperRect] forKey:@"paperRect"];
 -    [render setValue:[NSValue valueWithCGRect:printableRect] forKey:@"printableRect"];
 +        [render setValue:[NSValue valueWithCGRect:paperRect] forKey:@"paperRect"];
 +        [render setValue:[NSValue valueWithCGRect:printableRect] forKey:@"printableRect"];
-         
+     
 -    NSData * pdfData = [render printToPDF:&_numberOfPages backgroundColor:_bgColor ];
 +        NSData * pdfData = [render printToPDF:&_numberOfPages backgroundColor:_bgColor ];
-         
+     
 -    if (pdfData) {
 -        NSString *pdfBase64 = @"";
 +        if (pdfData) {
 +            NSString *pdfBase64 = @"";
-             
+         
 -        [pdfData writeToFile:_filePath atomically:YES];
 -        if (_base64) {
 -            pdfBase64 = [pdfData base64EncodedStringWithOptions:0];
