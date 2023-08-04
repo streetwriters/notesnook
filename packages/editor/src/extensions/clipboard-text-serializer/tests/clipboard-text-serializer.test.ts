@@ -84,6 +84,29 @@ test("copying a single list item shouldn't copy the list metadata", (t) => {
   ).toMatchSnapshot();
 });
 
+test("copying a single nested list item shouldn't copy the list metadata", (t) => {
+  const { editor } = createEditor({
+    initialContent: h("div", [
+      h("ol", [
+        h("li", [
+          h("p", ["Hello"]),
+          h("ol", [h("li", [h("p", ["Nested list item"])])])
+        ])
+      ])
+    ]).innerHTML,
+    extensions: {
+      orderedList: OrderedList,
+      listItem: ListItem
+    }
+  });
+
+  t.expect(
+    transformCopied(
+      editor.state.doc.slice(12, editor.state.doc.nodeSize - 2)
+    ).toJSON()
+  ).toMatchSnapshot();
+});
+
 const createParagraphs = (spacing: "double" | "single") => [
   h("p", ["I am paragraph 1."], { "data-spacing": spacing }),
   h("p", ["I am paragraph 2."], { "data-spacing": spacing }),

@@ -91,7 +91,7 @@ export function transformCopied(slice: Slice) {
     maybeList.childCount === 1 &&
     maybeList.firstChild
   ) {
-    return new Slice(maybeList.firstChild.content, 0, 0);
+    return transformCopied(new Slice(maybeList.firstChild.content, 0, 0));
   }
   return slice;
 }
