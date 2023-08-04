@@ -497,11 +497,11 @@ p > *::selection {
 .outline-list li.collapsed .outline-list {
   display: none;
 }
-.outline-list li > p {
+.outline-list li > p:first-child {
   position: relative;
 }
 
-.outline-list li > p::before {
+.outline-list li > p:first-child::before {
   position: absolute;
   top: 4px;
   cursor: pointer;
@@ -521,16 +521,15 @@ p > *::selection {
   left: -22px;
 }
 
-.outline-list li:not(.nested) > p::before {
+.outline-list li:not(.nested) > p:first-child::before {
   mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik0xMiAyQTEwIDEwIDAgMCAwIDIgMTJhMTAgMTAgMCAwIDAgMTAgMTBhMTAgMTAgMCAwIDAgMTAtMTBBMTAgMTAgMCAwIDAgMTIgMloiLz48L3N2Zz4=)
     no-repeat 50% 50%;
   scale: 0.4;
 }
 
-.outline-list li.collapsed > p::before {
+.outline-list li.collapsed > p:first-child::before {
   transform: rotate(-90deg);
 }
-
 
 .outline-list li .outline-list::before {
   content: " ";
