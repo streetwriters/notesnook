@@ -131,7 +131,7 @@ const SheetProvider = ({ context = "global" }) => {
 
         {data?.icon ? (
           <Icon
-            color={colors[dialogData.iconColor] || colors.primary.accent}
+            color={colors[data.iconColor] || colors.primary.accent}
             name={data.icon}
             size={50}
           />
