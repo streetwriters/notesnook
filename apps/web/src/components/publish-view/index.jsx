@@ -169,6 +169,7 @@ function PublishView(props) {
             {isPasswordProtected && (
               <Field
                 autoFocus
+                type="password"
                 id="publishPassword"
                 placeholder="Enter password to encrypt this note"
                 required
