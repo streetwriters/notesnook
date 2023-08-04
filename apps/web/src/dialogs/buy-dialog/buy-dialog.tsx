@@ -73,7 +73,7 @@ export function BuyDialog(props: BuyDialogProps) {
   return (
     <BaseDialog
       isOpen={true}
-      width={"968px"}
+      width={"868px"}
       onClose={() => props.onClose()}
       noScroll
       sx={{
@@ -84,7 +84,8 @@ export function BuyDialog(props: BuyDialogProps) {
       <Flex
         bg="transparent"
         sx={{
-          height: "80vw",
+          height: ["auto", "auto", "80vw"],
+          width: "100%",
           overflow: "hidden",
           position: "relative",
           flexDirection: ["column", "column", "row"],
@@ -100,7 +101,7 @@ export function BuyDialog(props: BuyDialogProps) {
             flexDirection: "column",
             "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
               {
-                backgroundColor: alpha("background", 0.6),
+                backgroundColor: alpha("background", 0.8),
                 backdropFilter: "blur(8px)"
               },
             backgroundColor: "var(--background-secondary)",

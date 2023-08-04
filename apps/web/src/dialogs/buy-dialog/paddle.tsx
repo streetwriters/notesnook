@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Embed, Flex } from "@theme-ui/components";
+import { Flex } from "@theme-ui/components";
 import { Loader } from "../../components/loader";
 import {
   CheckoutData,
@@ -30,6 +30,8 @@ import {
   Price,
   PricingInfo
 } from "./types";
+import { ScrollContainer } from "@notesnook/ui";
+import useMobile from "../../hooks/use-mobile";
 
 // const isDev = false; // import.meta.env.DEV;
 // const VENDOR_ID = isDev ? 1506 : 128190;
@@ -67,6 +69,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
   const [checkoutId, setCheckoutId] = useState<string>();
   const appliedCouponCode = useRef<string>();
   const checkoutRef = useRef<HTMLIFrameElement>(null);
+  const isMobile = useMobile();
 
   const reloadCheckout = useCallback(() => {
     if (!checkoutRef.current) return;
@@ -155,33 +158,46 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
   ]);
 
   return (
-    <Flex
-      className="checkout-container"
-      sx={{ bg: "background", flex: 1, overflowY: "auto" }}
+    <ScrollContainer
+      style={{ flex: isMobile ? "unset" : 1, flexShrink: 0 }}
+      suppressScrollX={isMobile}
+      suppressScrollY={isMobile}
     >
       {isLoading ? (
-        <Loader
-          text={""}
-          title={
-            coupon
-              ? "Applying coupon code..."
-              : "Loading checkout. Please wait..."
-          }
-        />
+        <Flex
+          sx={{ background: "background", overflow: "hidden", height: "100%" }}
+        >
+          <Loader
+            title={
+              coupon
+                ? "Applying coupon code..."
+                : "Loading checkout. Please wait..."
+            }
+          />
+        </Flex>
       ) : null}
-      <Embed
-        ref={checkoutRef}
-        src={sourceUrl}
-        sx={{
-          m: 6,
-          display: isLoading ? "none" : "block",
-          flex: 1,
-          outline: "none",
-          border: "none",
-          minHeight: 500
-        }}
-      />
-    </Flex>
+      <Flex
+        className="checkout-container"
+        sx={{ background: "background", overflow: "hidden", px: 30 }}
+      >
+        <iframe
+          scrolling="no"
+          frameBorder={"0"}
+          ref={checkoutRef}
+          src={sourceUrl}
+          style={{
+            //   padding: "0px 30px",
+            height: "1000px",
+            width: "100%",
+            display: isLoading ? "none" : "block",
+            flex: 1,
+            outline: "none",
+            border: "none"
+            // minHeight: 500
+          }}
+        />
+      </Flex>
+    </ScrollContainer>
   );
 }
 
