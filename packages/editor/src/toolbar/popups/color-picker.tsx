@@ -122,6 +122,11 @@ export function ColorPicker(props: ColorPickerProps) {
               onChange={(color) => {
                 setCurrentColor(color);
                 onColorChange(color);
+                (
+                  document.getElementById(
+                    "color-picker-input"
+                  ) as HTMLInputElement
+                ).value = color.toUpperCase();
               }}
               onTouchEnd={() => onChange(currentColor)}
               onMouseUp={() => onChange(currentColor)}
@@ -137,6 +142,7 @@ export function ColorPicker(props: ColorPickerProps) {
                 variant={"clean"}
                 placeholder="#000000"
                 spellCheck={false}
+                id="color-picker-input"
                 sx={{
                   my: 2,
                   p: 0,
@@ -147,10 +153,15 @@ export function ColorPicker(props: ColorPickerProps) {
                   letterSpacing: 1.5,
                   textAlign: "center"
                 }}
-                value={currentColor.toUpperCase()}
+                defaultValue={currentColor.toUpperCase()}
                 maxLength={7}
                 onChange={(e) => {
                   const { value } = e.target;
+                  console.log(
+                    "onChange",
+                    value,
+                    tinycolor(value, { format: "hex" }).isValid()
+                  );
                   if (!value) return;
                   if (tinycolor(value, { format: "hex" }).isValid()) {
                     setCurrentColor(value);
