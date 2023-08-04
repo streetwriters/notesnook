@@ -47,7 +47,7 @@ function Toggle(props) {
         {label}
       </Text>
       <Switch
-        sx={{ m: 0, bg: isOn ? "accent" : "icon" }}
+        sx={{ m: 0, bg: isOn ? "accent" : "icon-secondary" }}
         onClick={() => onToggle(!isOn)}
         checked={isOn}
       />

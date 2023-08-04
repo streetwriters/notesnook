@@ -462,7 +462,12 @@ function SettingItem(props: { item: Setting }) {
               case "toggle":
                 return (
                   <Switch
-                    sx={{ m: 0, background: "accent" }}
+                    sx={{
+                      m: 0,
+                      background: component.isToggled()
+                        ? "accent"
+                        : "icon-secondary"
+                    }}
                     disabled={isWorking}
                     onChange={() => workWithLoading(component.toggle)}
                     checked={component.isToggled()}
