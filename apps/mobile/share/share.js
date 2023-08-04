@@ -1020,7 +1020,7 @@ const AddTags = ({ onPress }) => {
       activeOpacity={0.7}
       style={{
         paddingHorizontal: 12,
-        height: 45,
+        minHeight: 45,
         width: "100%",
         marginRight: 0,
         borderWidth: 1,
