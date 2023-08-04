@@ -41,10 +41,9 @@ export const updaterRouter = t.router({
   }),
 
   toggleAutoUpdates: t.procedure
-    .input(z.boolean().optional())
-    .mutation(({ input }) => {
-      config.automaticUpdates =
-        input === undefined ? !config.automaticUpdates : input;
+    .input(z.object({ enabled: z.boolean() }))
+    .mutation(({ input: { enabled } }) => {
+      config.automaticUpdates = enabled;
     }),
 
   onChecking: createSubscription("checking-for-update"),

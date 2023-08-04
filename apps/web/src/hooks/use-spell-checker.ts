@@ -30,9 +30,9 @@ class SpellCheckerStore extends BaseStore<SpellCheckerStore> {
 
   toggleSpellChecker = async () => {
     const enabled = this.get().enabled;
-    await desktop?.spellChecker.toggle.mutate(!enabled);
+    await desktop?.spellChecker.toggle.mutate({ enabled: !enabled });
     this.set({
-      enabled: await desktop?.spellChecker.isEnabled.query()
+      enabled: !enabled
     });
   };
 
@@ -44,11 +44,12 @@ class SpellCheckerStore extends BaseStore<SpellCheckerStore> {
   };
 
   refresh = async () => {
+    console.log("SPELL CHECK", await desktop?.spellChecker.isEnabled.query());
     this.set({
       enabledLanguages:
         (await desktop?.spellChecker.enabledLanguages.query()) || [],
       languages: (await desktop?.spellChecker.languages.query()) || [],
-      enabled: (await desktop?.spellChecker.isEnabled.query()) || true
+      enabled: await desktop?.spellChecker.isEnabled.query()
     });
   };
 }

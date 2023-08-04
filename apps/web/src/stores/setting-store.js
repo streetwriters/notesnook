@@ -160,13 +160,13 @@ class SettingStore extends BaseStore {
   togglePrivacyMode = async () => {
     const privacyMode = this.get().privacyMode;
     this.set({ privacyMode: !privacyMode });
-    await desktop?.integration.setPrivacyMode.mutate(!privacyMode);
+    await desktop?.integration.setPrivacyMode.mutate({ enabled: !privacyMode });
   };
 
   toggleAutoUpdates = async () => {
     const autoUpdates = this.get().autoUpdates;
     this.set({ autoUpdates: !autoUpdates });
-    await desktop?.updater.toggleAutoUpdates.mutate(!autoUpdates);
+    await desktop?.updater.toggleAutoUpdates.mutate({ enabled: !autoUpdates });
   };
 }
 
