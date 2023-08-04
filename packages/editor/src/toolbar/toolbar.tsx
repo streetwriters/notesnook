@@ -50,6 +50,7 @@ export function Toolbar(props: ToolbarProps) {
     defaultFontFamily,
     defaultFontSize,
     sx,
+    className = "",
     ...flexProps
   } = props;
   const isMobile = useIsMobile();
@@ -85,7 +86,7 @@ export function Toolbar(props: ToolbarProps) {
   return (
     <>
       <Flex
-        className="editor-toolbar"
+        className={["editor-toolbar", className].join(" ")}
         sx={{
           ...sx,
           flexWrap: isMobile ? "nowrap" : "wrap",
