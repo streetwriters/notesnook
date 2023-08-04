@@ -35,7 +35,7 @@ export function EmbedComponent(
   const { editor, updateAttributes, selected, node } = props;
   const [isLoading, setIsLoading] = useState(true);
   const embedRef = useRef<HTMLIFrameElement>(null);
-  const { src, width, height, textDirection } = node.attrs;
+  const { src, width, textDirection } = node.attrs;
 
   let align = node.attrs.align;
   if (!align) align = textDirection ? "right" : "left";
