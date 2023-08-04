@@ -27,6 +27,12 @@ import Tiptap from "./components/editor";
 import { EmotionEditorTheme } from "./theme-factory";
 import { Global, css } from "@emotion/react";
 import { useMemo } from "react";
+import { getTheme } from "./utils";
+
+const currentTheme = getTheme();
+if (currentTheme) {
+  useThemeEngineStore.getState().setTheme(currentTheme);
+}
 
 function App(): JSX.Element {
   return (

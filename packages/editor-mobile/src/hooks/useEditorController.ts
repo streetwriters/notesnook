@@ -19,14 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Editor } from "@notesnook/editor";
 import {
+  ThemeDefinition,
+  useThemeColors,
+  useThemeEngineStore
+} from "@notesnook/theme";
+import {
   MutableRefObject,
   useCallback,
   useEffect,
   useRef,
   useState
 } from "react";
-import { EventTypes, isReactNative, post } from "../utils";
-import { useThemeColors, useThemeEngineStore } from "@notesnook/theme";
+import { EventTypes, isReactNative, post, saveTheme } from "../utils";
 import { injectCss, transform } from "../utils/css";
 
 type Attachment = {
@@ -190,6 +194,9 @@ export function useEditorController(update: () => void): EditorController {
           break;
         case "native:theme":
           setTheme(message.value);
+          setTimeout(() => {
+            saveTheme(message.value as ThemeDefinition);
+          });
           break;
         case "native:title":
           setTitle(value);

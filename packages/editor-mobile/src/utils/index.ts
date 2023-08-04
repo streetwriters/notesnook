@@ -21,6 +21,7 @@ import { ToolbarGroupDefinition } from "@notesnook/editor";
 import { Editor } from "@notesnook/editor";
 import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
 import { useEditorController } from "../hooks/useEditorController";
+import { ThemeDefinition } from "@notesnook/theme";
 
 export type SafeAreaType = {
   top: number;
@@ -191,3 +192,15 @@ export function post<T extends keyof typeof EventTypes>(
 
 globalThis.logger = logger;
 globalThis.post = post;
+
+export function saveTheme(theme: ThemeDefinition) {
+  localStorage.setItem("editor-theme", JSON.stringify(theme));
+}
+
+export function getTheme() {
+  const json = localStorage.getItem("editor-theme");
+  if (json) {
+    return JSON.parse(json) as ThemeDefinition;
+  }
+  return undefined;
+}
