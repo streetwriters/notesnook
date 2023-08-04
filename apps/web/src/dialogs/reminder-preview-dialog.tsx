@@ -21,13 +21,11 @@ import { Perform } from "../common/dialog-controller";
 import Dialog from "../components/dialog";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { db } from "../common/db";
-import {
-  formatReminderTime,
-  Reminder
-} from "@notesnook/core/collections/reminders";
+import { Reminder } from "@notesnook/core/collections/reminders";
 import IconTag from "../components/icon-tag";
 import { Clock, Refresh } from "../components/icons";
 import Note from "../components/note";
+import { getFormattedReminderTime } from "@notesnook/common";
 
 export type ReminderPreviewDialogProps = {
   onClose: Perform;
@@ -87,7 +85,7 @@ export default function ReminderPreviewDialog(
             text={RECURRING_MODE_MAP[reminder.recurringMode]}
           />
         )}
-        <IconTag icon={Clock} text={formatReminderTime(reminder)} />
+        <IconTag icon={Clock} text={getFormattedReminderTime(reminder)} />
       </Flex>
 
       <Text variant="body">Remind me in:</Text>
@@ -125,9 +123,9 @@ export default function ReminderPreviewDialog(
           {referencedNotes.map((item, index) => (
             <Note
               key={item.id}
-              index={index}
               item={item}
               date={item.dateCreated}
+              tags={[]}
               compact
             />
           ))}

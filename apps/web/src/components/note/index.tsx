@@ -74,11 +74,10 @@ import { Multiselect } from "../../common/multi-select";
 import { store as selectionStore } from "../../stores/selection-store";
 import {
   Reminder as ReminderType,
-  formatReminderTime,
   isReminderActive,
   isReminderToday
 } from "@notesnook/core/collections/reminders";
-
+import { getFormattedReminderTime } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import {
   Context,
@@ -162,7 +161,7 @@ function Note(props: NoteProps) {
           {reminder && isReminderActive(reminder) && (
             <IconTag
               icon={Reminder}
-              text={formatReminderTime(reminder, true)}
+              text={getFormattedReminderTime(reminder, true)}
               title={reminder.title}
               styles={
                 isReminderToday(reminder)
