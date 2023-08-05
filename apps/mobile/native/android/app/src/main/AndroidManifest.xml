@@ -56,6 +56,7 @@
         android:theme="@style/BootTheme"
         android:largeHeap="true"
         android:supportsRtl="false"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:replace="android:supportsRtl">
     
         <receiver android:exported="false" android:name=".NoteWidget">

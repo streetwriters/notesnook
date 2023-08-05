@@ -34,7 +34,7 @@ import { sleep } from "./utils";
 
 async function lockNote() {
   await tapById(notesnook.listitem.menu);
-  await tapById("icon-Vault");
+  await tapById("icon-lock-unlock");
   await sleep(1000);
   await visibleByText("Lock");
   await elementById(notesnook.ids.dialogs.vault.pwd).typeText("1234");
@@ -46,7 +46,7 @@ async function lockNote() {
 
 async function removeFromVault() {
   await tapById(notesnook.listitem.menu);
-  await tapById("icon-Vault");
+  await tapById("icon-lock-unlock");
   await sleep(1000);
   await elementById(notesnook.ids.dialogs.vault.pwd).typeText("1234");
   await tapByText("Unlock");
@@ -127,7 +127,7 @@ describe("VAULT", () => {
     await notVisibleById(notesnook.listitem.menu);
   });
 
-  it.only("Add a note to vault", async () => {
+  it("Add a note to vault", async () => {
     await prepare();
     await createNote();
     await lockNote();
