@@ -431,7 +431,7 @@ function toIEditor(editor: Editor): IEditor {
           tr.setMeta("preventSave", true);
           return true;
         })
-        .setContent(content, true, { preserveWhitespace: true })
+        .setContent(content, false, { preserveWhitespace: true })
         .setTextSelection({
           from,
           to

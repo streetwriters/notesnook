@@ -50,10 +50,10 @@ const NOTE = {
   title: "Real-time sync test note 1"
 };
 
-test("edits in a note opened on 2 devices should sync in real-time", async ({
+test(`edits in a note opened on 2 devices should sync in real-time`, async ({
   browser
 }, info) => {
-  info.setTimeout(60 * 1000);
+  info.setTimeout(70 * 1000);
   const newContent = makeid(24).repeat(2);
 
   const [deviceA, deviceB] = await Promise.all([
@@ -69,16 +69,15 @@ test("edits in a note opened on 2 devices should sync in real-time", async ({
   const noteA = await notesA.findNote(NOTE);
   await Promise.all([noteA, noteB].map((note) => note?.openNote()));
 
-  await notesB.editor.clear();
+  await actAndSync([deviceA, deviceB], notesB.editor.clear());
+  expect(await notesA.editor.getContent("text")).toBe("");
+  expect(await notesB.editor.getContent("text")).toBe("");
   await actAndSync([deviceA, deviceB], notesB.editor.setContent(newContent));
 
-  const [afterContentA, afterContentB] = await Promise.all(
-    [notesA, notesB].map((notes) => notes?.editor.getContent("text"))
-  );
   expect(noteA).toBeDefined();
   expect(noteB).toBeDefined();
-  expect(afterContentA).toBe(newContent);
-  expect(afterContentB).toBe(newContent);
+  expect(await notesA.editor.getContent("text")).toBe(newContent);
+  expect(await notesB.editor.getContent("text")).toBe(newContent);
 });
 
 function makeid(length: number) {

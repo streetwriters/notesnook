@@ -1,0 +1,4 @@
+Subtotal: $100
+Sales tax: $0
+Discount: $0
+Total: $100/mo

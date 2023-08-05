@@ -41,9 +41,7 @@ export class NoteItemModel extends BaseItemModel {
   async openNote() {
     await this.click();
     const title = await this.getTitle();
-    const description = await this.getDescription();
-
-    await this.editor.waitForLoading(title, description);
+    await this.editor.waitForLoading(title);
   }
 
   async openLockedNote(password: string) {

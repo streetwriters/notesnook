@@ -1,0 +1,4 @@
+Subtotal: $200
+Sales tax: $0
+Discount: $0
+Total: $200/yr
