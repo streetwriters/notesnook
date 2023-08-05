@@ -163,7 +163,7 @@ function DesktopAppContents({
               toggleNavigationContainer={(state) => {
                 setShow(state || !show);
               }}
-              isTablet={isTablet || isNarrow}
+              isTablet={isNarrow}
             />
           </Allotment.Pane>
           <Allotment.Pane
