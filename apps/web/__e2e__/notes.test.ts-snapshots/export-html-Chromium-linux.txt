@@ -11,7 +11,7 @@
     <meta name="created-on" content="xxx" />
     <meta name="last-edited-on" content="xxx" />
     
-    <link rel="stylesheet" href="https://app.notesnook.com/assets/editor-styles.css?d=1690898057761">
+    <link rel="stylesheet" href="https://app.notesnook.com/assets/editor-styles.css?d=0">
 
     <style>
     img {
