@@ -28,8 +28,6 @@ import { initalizeLogger, logger } from "./utils/logger";
 import { AuthProps } from "./views/auth";
 import { loadDatabase } from "./hooks/use-database";
 
-initalizeLogger();
-
 type Route<TProps = null> = {
   component: () => Promise<{
     default: TProps extends null
@@ -150,6 +148,7 @@ function isSessionExpired(path: Routes): RouteWithPath<AuthProps> | null {
 renderApp();
 
 async function renderApp() {
+  await initalizeLogger();
   const {
     path,
     route: { component, props }

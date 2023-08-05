@@ -28,8 +28,8 @@ import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { zip } from "./zip";
 
 let logger: typeof _logger;
-function initalizeLogger(persistence: DatabasePersistence = "db") {
-  initalize(new NNStorage("Logs", persistence));
+async function initalizeLogger(persistence: DatabasePersistence = "db") {
+  initalize(await NNStorage.createInstance("Logs", persistence));
   logger = _logger.scope("notesnook-web");
 }
 

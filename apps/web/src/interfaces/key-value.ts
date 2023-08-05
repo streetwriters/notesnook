@@ -174,29 +174,25 @@ export type UseStore = <T>(
 export class IndexedDBKVStore implements IKVStore {
   store: UseStore;
 
-  static isIndexedDBSupported(): boolean {
-    return "indexedDB" in window;
+  static async isIndexedDBSupported(): Promise<boolean> {
+    if (!("indexedDB" in window)) return false;
+    try {
+      await promisifyIDBRequest(indexedDB.open("checkIDBSupport"));
+      return true;
+    } catch {
+      console.error("IndexedDB is not supported in this browser.");
+      return false;
+    }
   }
 
   constructor(databaseName: string, storeName: string) {
     this.store = this.createStore(databaseName, storeName);
   }
 
-  private promisifyRequest<T = undefined>(
-    request: IDBRequest<T> | IDBTransaction
-  ): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-      // @ts-ignore - file size hacks
-      request.oncomplete = request.onsuccess = () => resolve(request.result);
-      // @ts-ignore - file size hacks
-      request.onabort = request.onerror = () => reject(request.error);
-    });
-  }
-
   private createStore(dbName: string, storeName: string): UseStore {
     const request = indexedDB.open(dbName);
     request.onupgradeneeded = () => request.result.createObjectStore(storeName);
-    const dbp = this.promisifyRequest(request);
+    const dbp = promisifyIDBRequest(request);
 
     return (txMode, callback) =>
       dbp.then((db) =>
@@ -213,26 +209,26 @@ export class IndexedDBKVStore implements IKVStore {
       callback(this.result);
       this.result.continue();
     };
-    return this.promisifyRequest(store.transaction);
+    return promisifyIDBRequest(store.transaction);
   }
 
   get<T>(key: string): Promise<T | undefined> {
     return this.store("readonly", (store) =>
-      this.promisifyRequest(store.get(key))
+      promisifyIDBRequest(store.get(key))
     );
   }
 
   set(key: string, value: any): Promise<void> {
     return this.store("readwrite", (store) => {
       store.put(value, key);
-      return this.promisifyRequest(store.transaction);
+      return promisifyIDBRequest(store.transaction);
     });
   }
 
   setMany(entries: [string, any][]): Promise<void> {
     return this.store("readwrite", (store) => {
       entries.forEach((entry) => store.put(entry[1], entry[0]));
-      return this.promisifyRequest(store.transaction);
+      return promisifyIDBRequest(store.transaction);
     });
   }
 
@@ -241,7 +237,7 @@ export class IndexedDBKVStore implements IKVStore {
       Promise.all(
         keys.map(async (key) => [
           key,
-          await this.promisifyRequest(store.get(key))
+          await promisifyIDBRequest(store.get(key))
         ])
       )
     );
@@ -250,21 +246,21 @@ export class IndexedDBKVStore implements IKVStore {
   delete(key: string): Promise<void> {
     return this.store("readwrite", (store) => {
       store.delete(key);
-      return this.promisifyRequest(store.transaction);
+      return promisifyIDBRequest(store.transaction);
     });
   }
 
   deleteMany(keys: string[]): Promise<void> {
     return this.store("readwrite", (store: IDBObjectStore) => {
       keys.forEach((key: IDBValidKey) => store.delete(key));
-      return this.promisifyRequest(store.transaction);
+      return promisifyIDBRequest(store.transaction);
     });
   }
 
   clear(): Promise<void> {
     return this.store("readwrite", (store) => {
       store.clear();
-      return this.promisifyRequest(store.transaction);
+      return promisifyIDBRequest(store.transaction);
     });
   }
 
@@ -272,7 +268,7 @@ export class IndexedDBKVStore implements IKVStore {
     return this.store("readonly", (store) => {
       // Fast path for modern browsers
       if (store.getAllKeys) {
-        return this.promisifyRequest(
+        return promisifyIDBRequest(
           store.getAllKeys() as unknown as IDBRequest<KeyType[]>
         );
       }
@@ -289,7 +285,7 @@ export class IndexedDBKVStore implements IKVStore {
     return this.store("readonly", (store) => {
       // Fast path for modern browsers
       if (store.getAll) {
-        return this.promisifyRequest(store.getAll() as IDBRequest<T[]>);
+        return promisifyIDBRequest(store.getAll() as IDBRequest<T[]>);
       }
 
       const items: T[] = [];
@@ -308,10 +304,10 @@ export class IndexedDBKVStore implements IKVStore {
       // (although, hopefully we'll get a simpler path some day)
       if (store.getAll && store.getAllKeys) {
         return Promise.all([
-          this.promisifyRequest(
+          promisifyIDBRequest(
             store.getAllKeys() as unknown as IDBRequest<KeyType[]>
           ),
-          this.promisifyRequest(store.getAll() as IDBRequest<ValueType[]>)
+          promisifyIDBRequest(store.getAll() as IDBRequest<ValueType[]>)
         ]).then(([keys, values]) => keys.map((key, i) => [key, values[i]]));
       }
 
@@ -324,4 +320,17 @@ export class IndexedDBKVStore implements IKVStore {
       );
     });
   }
+}
+
+function promisifyIDBRequest<T = undefined>(
+  request: IDBRequest<T> | IDBTransaction
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - file size hacks
+    request.oncomplete = request.onsuccess = () => resolve(request.result);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - file size hacks
+    request.onabort = request.onerror = () => reject(request.error);
+  });
 }

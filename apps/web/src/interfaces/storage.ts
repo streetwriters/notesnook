@@ -31,17 +31,21 @@ export type DatabasePersistence = "memory" | "db";
 
 const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
 
-
 export class NNStorage {
-  database: IKVStore;
+  database!: IKVStore;
 
-  constructor(name: string, persistence: DatabasePersistence = "db") {
-    this.database =
+  static async createInstance(
+    name: string,
+    persistence: DatabasePersistence = "db"
+  ) {
+    const storage = new NNStorage();
+    storage.database =
       persistence === "memory"
         ? new MemoryKVStore()
-        : IndexedDBKVStore.isIndexedDBSupported()
+        : (await IndexedDBKVStore.isIndexedDBSupported())
         ? new IndexedDBKVStore(name, "keyvaluepairs")
         : new LocalStorageKVStore();
+    return storage;
   }
 
   read<T>(key: string): Promise<T | undefined> {
@@ -78,7 +82,7 @@ export class NNStorage {
     const keyData = await crypto.exportKey(password, salt);
 
     if (
-      IndexedDBKVStore.isIndexedDBSupported() &&
+      (await IndexedDBKVStore.isIndexedDBSupported()) &&
       window?.crypto?.subtle &&
       keyData.key
     ) {
@@ -94,7 +98,10 @@ export class NNStorage {
   }
 
   async getCryptoKey(name: string): Promise<string | undefined> {
-    if (IndexedDBKVStore.isIndexedDBSupported() && window?.crypto?.subtle) {
+    if (
+      (await IndexedDBKVStore.isIndexedDBSupported()) &&
+      window?.crypto?.subtle
+    ) {
       const pbkdfKey = await this.read<CryptoKey>(name);
       const cipheredKey = await this.read<EncryptedKey | string>(`${name}@_k`);
       if (typeof cipheredKey === "string") return cipheredKey;

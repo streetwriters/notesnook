@@ -42,7 +42,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   });
 
   database.setup(
-    new NNStorage("Notesnook", persistence),
+    await NNStorage.createInstance("Notesnook", persistence),
     EventSource,
     FS,
     new Compressor()
