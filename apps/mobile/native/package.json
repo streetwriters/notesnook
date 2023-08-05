@@ -32,7 +32,7 @@
     "react-native-date-picker": "4.2.6",
     "react-native-device-info": "^8.4.1",
     "react-native-document-picker": "^7.1.1",
-    "react-native-eventsource": "github:ammarahm-ed/react-native-eventsource",
+    "@ammarahmed/react-native-eventsource": "1.1.0",
     "react-native-exit-app": "https://github.com/ammarahm-ed/react-native-exit-app.git",
     "react-native-file-viewer": "^2.1.1",
     "react-native-fingerprint-scanner": "https://github.com/ammarahm-ed/react-native-fingerprint-scanner.git",
