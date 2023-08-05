@@ -109,7 +109,6 @@ export default function NotePreview({ session, content, note }) {
             flex: 1
           }}
         >
-          <EditorOverlay editorId={editorId} />
           <Editor
             noHeader
             noToolbar
@@ -117,7 +116,6 @@ export default function NotePreview({ session, content, note }) {
             editorId={editorId}
             onLoad={async () => {
               const _note = note || db.notes.note(session?.noteId)?.data;
-              await sleep(1000);
               eSendEvent(eOnLoadNote + editorId, {
                 ..._note,
                 content: {

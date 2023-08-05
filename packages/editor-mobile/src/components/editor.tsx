@@ -236,7 +236,9 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
             <Toolbar
               className="theme-scope-editorToolbar"
               sx={{
-                display: settings.noToolbar ? "none" : "flex"
+                display: settings.noToolbar ? "none" : "flex",
+                overflowY: "hidden",
+                minHeight: "50px"
               }}
               editor={_editor}
               location="bottom"

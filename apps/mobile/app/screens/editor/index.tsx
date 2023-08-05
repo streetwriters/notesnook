@@ -24,29 +24,27 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
-  useRef,
-  useState
+  useLayoutEffect,
+  useRef
 } from "react";
 import { Platform, ViewStyle } from "react-native";
 import WebView from "react-native-webview";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from "../../services/event-manager";
+import { IconButton } from "../../components/ui/icon-button";
+import useKeyboard from "../../hooks/use-keyboard";
+import { eSubscribeEvent } from "../../services/event-manager";
 import { useEditorStore } from "../../stores/use-editor-store";
 import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
 import { NoteType } from "../../utils/types";
+import EditorOverlay from "./loading";
 import { EDITOR_URI } from "./source";
 import { EditorProps, useEditorType } from "./tiptap/types";
 import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { editorController } from "./tiptap/utils";
-import { useLayoutEffect } from "react";
-import useKeyboard from "../../hooks/use-keyboard";
 
 const style: ViewStyle = {
   height: "100%",
@@ -129,19 +127,25 @@ const Editor = React.memo(
           renderKey.current === `editor-0` ? `editor-1` : `editor-0`;
         editor.state.current.ready = false;
         editor.setLoading(true);
+        console.log("ERROR ERROR", Date.now());
       }, [editor]);
 
       useEffect(() => {
-        eSubscribeEvent("webview_reset", onError);
-        EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
+        const sub = [
+          eSubscribeEvent("webview_reset", onError),
+          EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded)
+        ];
+
         return () => {
-          eUnSubscribeEvent("webview_reset", onError);
+          sub.forEach((s) => s.unsubscribe());
           EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
         };
       }, [onError, onMediaDownloaded]);
 
       useLayoutEffect(() => {
-        onLoad && onLoad();
+        setImmediate(() => {
+          onLoad && onLoad();
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [onLoad]);
 
@@ -193,9 +197,8 @@ const Editor = React.memo(
             autoManageStatusBarEnabled={false}
             onMessage={onMessage || undefined}
           />
-          {editorId === "shareEditor" ? null : (
-            <AppSection editor={editor} editorId={editorId} />
-          )}
+          <EditorOverlay editorId={editorId || ""} editor={editor} />
+          <ReadonlyButton editor={editor} />
         </>
       );
     }
@@ -204,32 +207,6 @@ const Editor = React.memo(
 );
 
 export default Editor;
-
-let EditorOverlay: React.ElementType;
-let IconButton: React.ElementType;
-const AppSection = ({
-  editor,
-  editorId
-}: {
-  editor: useEditorType;
-  editorId: string;
-}) => {
-  const [loaded, setLoaded] = useState(false);
-  useEffect(() => {
-    EditorOverlay = require("./loading.js").default;
-    IconButton =
-      require("../../components/ui/icon-button/index.tsx").IconButton;
-    setLoaded(true);
-  }, []);
-  return loaded ? (
-    <>
-      {EditorOverlay ? (
-        <EditorOverlay editorId={editorId || ""} editor={editor} />
-      ) : null}
-      {editorId === "" ? <ReadonlyButton editor={editor} /> : null}
-    </>
-  ) : null;
-};
 
 const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
   const readonly = useEditorStore((state) => state.readonly);
@@ -244,7 +221,7 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
     }
   };
 
-  return readonly && IconButton && !keyboard.keyboardShown ? (
+  return readonly && !keyboard.keyboardShown ? (
     <IconButton
       name="pencil-lock"
       type="grayBg"

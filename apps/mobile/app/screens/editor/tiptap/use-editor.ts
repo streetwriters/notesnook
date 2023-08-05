@@ -80,6 +80,7 @@ export const useEditor = (
   const lock = useRef(false);
   const loadedImages = useRef<{ [name: string]: boolean }>({});
   const lockedSessionId = useRef<string>();
+  const loadingState = useRef<string>();
 
   const postMessage = useCallback(
     async <T>(type: string, data: T, waitFor = 300) =>
@@ -117,9 +118,8 @@ export const useEditor = (
 
   useEffect(() => {
     if (loading) {
-      setLoading(false);
-    } else {
       state.current.ready = false;
+      setLoading(false);
     }
   }, [loading]);
 
@@ -363,6 +363,9 @@ export const useEditor = (
         isDefaultEditor && editorState.setCurrentlyEditingNote(item.id);
         currentNote.current && (await reset(false, false));
         await loadContent(item as NoteType);
+        if (loadingState.current === currentContent.current?.data) {
+          return;
+        }
         if (
           !currentContent.current?.data ||
           currentContent.current?.data.length < 50000
@@ -385,11 +388,13 @@ export const useEditor = (
         currentNote.current = item as NoteType;
         await commands.setStatus(getFormattedDate(item.dateEdited), "Saved");
         await postMessage(EditorEvents.title, item.title);
+        loadingState.current = currentContent.current?.data;
         await postMessage(
           EditorEvents.html,
           currentContent.current?.data,
           10000
         );
+        loadingState.current = undefined;
         useEditorStore.getState().setReadonly(item.readonly);
         await commands.setTags(currentNote.current);
         commands.setSettings();
@@ -601,9 +606,11 @@ export const useEditor = (
 
   const onReady = useCallback(async () => {
     if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
-      eSendEvent("webview_reset");
+      eSendEvent("webview_reset", "onReady");
+      return false;
     } else {
       isDefaultEditor && restoreEditorState();
+      return true;
     }
   }, [isDefaultEditor, restoreEditorState]);
 
@@ -616,15 +623,18 @@ export const useEditor = (
         isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
       );
       await commands.setSessionId(sessionIdRef.current);
-      await onReady();
-      state.current.ready = true;
       await commands.setSettings();
-      if (currentNote.current) {
-        loadNote({ ...currentNote.current, forced: true });
-      } else {
-        await commands.setPlaceholder(placeholderTip.current);
-      }
-    }, 1000);
+      timers.current["editor:loaded"] = setTimeout(async () => {
+        if (!state.current.ready && (await onReady())) {
+          state.current.ready = true;
+        }
+        if (currentNote.current) {
+          loadNote({ ...currentNote.current, forced: true });
+        } else {
+          await commands.setPlaceholder(placeholderTip.current);
+        }
+      });
+    });
   }, [
     onReady,
     postMessage,
