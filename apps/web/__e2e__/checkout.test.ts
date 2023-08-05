@@ -46,10 +46,13 @@ test.afterEach(async () => {
 function roundOffPrices(prices: PriceItem[]) {
   return prices
     .map((p) => {
-      const price = p.value.replace(/(\d+).(\d+)/gm, (_, whole, decimal) => {
-        const decimalDigits = "0".repeat(decimal.length);
-        const wholeDigits = "0".repeat(whole.length - 1);
-        return `${whole[0]}${wholeDigits}.${decimalDigits}`;
+      const price = p.value.replace(/(\d+)\.(\d+)/gm, (_, whole, decimal) => {
+        const stabalizePrice =
+          Math.max(
+            0,
+            Math.ceil(Math.log10(parseFloat(`${whole}.${decimal}`)))
+          ) * 100;
+        return `${stabalizePrice}`;
       });
       return `${p.label}: ${price}`;
     })
