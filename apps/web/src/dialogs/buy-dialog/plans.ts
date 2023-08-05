@@ -32,7 +32,7 @@ export const DEFAULT_PLANS: Plan[] = [
     country: "PK",
     currency: "USD",
     discount: 0,
-    id: import.meta.env.DEV ? "9822" : "648884",
+    id: import.meta.env.DEV || IS_TESTING ? "9822" : "648884",
     price: { gross: 4.49, net: 0, tax: 0 }
   },
   {
@@ -40,7 +40,7 @@ export const DEFAULT_PLANS: Plan[] = [
     country: "PK",
     currency: "USD",
     discount: 0,
-    id: import.meta.env.DEV ? "50305" : "658759",
+    id: import.meta.env.DEV || IS_TESTING ? "50305" : "658759",
     price: { gross: 49.99, net: 0, tax: 0 }
   }
 ];

@@ -35,15 +35,18 @@ import useMobile from "../../hooks/use-mobile";
 
 // const isDev = false; // import.meta.env.DEV;
 // const VENDOR_ID = isDev ? 1506 : 128190;
-const PADDLE_ORIGIN = import.meta.env.DEV
-  ? "https://sandbox-buy.paddle.com"
-  : "https://buy.paddle.com";
-const CHECKOUT_CREATE_ORIGIN = import.meta.env.DEV
-  ? "https://sandbox-create-checkout.paddle.com"
-  : "https://create-checkout.paddle.com";
-const CHECKOUT_SERVICE_ORIGIN = import.meta.env.DEV
-  ? "https://sandbox-checkout-service.paddle.com"
-  : "https://checkout-service.paddle.com";
+const PADDLE_ORIGIN =
+  import.meta.env.DEV || IS_TESTING
+    ? "https://sandbox-buy.paddle.com"
+    : "https://buy.paddle.com";
+const CHECKOUT_CREATE_ORIGIN =
+  import.meta.env.DEV || IS_TESTING
+    ? "https://sandbox-create-checkout.paddle.com"
+    : "https://create-checkout.paddle.com";
+const CHECKOUT_SERVICE_ORIGIN =
+  import.meta.env.DEV || IS_TESTING
+    ? "https://sandbox-checkout-service.paddle.com"
+    : "https://checkout-service.paddle.com";
 
 const SUBSCRIBED_EVENTS: PaddleEvents[] = [
   PaddleEvents["Checkout.Loaded"],
