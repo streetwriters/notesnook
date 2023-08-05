@@ -33,6 +33,13 @@ import { createIPCHandler } from "electron-trpc/main";
 import { router, api } from "./api";
 import { config } from "./utils/config";
 import path from "path";
+import { bringToFront } from "./utils/bring-to-front";
+
+// only run a single instance
+if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
+  console.log("Another instance is already running!");
+  app.exit();
+}
 
 if (process.platform == "win32" && process.env.PORTABLE_EXECUTABLE_DIR) {
   console.log("Portable app: true");
@@ -40,11 +47,6 @@ if (process.platform == "win32" && process.env.PORTABLE_EXECUTABLE_DIR) {
   app.setPath("appData", path.join(root, "AppData"));
   app.setPath("documents", path.join(root, "Documents"));
   app.setPath("userData", path.join(root, "UserData"));
-}
-
-// only run a single instance
-if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
-  app.exit();
 }
 
 if (process.platform === "win32") {
@@ -135,6 +137,11 @@ app.once("window-all-closed", () => {
   if (process.platform !== "darwin" || MAC_APP_STORE) {
     app.quit();
   }
+});
+
+app.on("second-instance", () => {
+  if (!globalThis.window) return;
+  bringToFront();
 });
 
 app.on("activate", () => {
