@@ -138,34 +138,37 @@ export async function importBackup() {
 }
 
 export async function restoreBackupFile(backup) {
-  console.log("[restore]", backup);
   if (backup.data.iv && backup.data.salt) {
     await showPasswordDialog("ask_backup_password", async ({ password }) => {
-      const error = await restore(backup, password);
+      const error = await restoreWithProgress(backup, password);
       return !error;
     });
   } else {
-    await TaskManager.startTask({
-      title: "Restoring backup",
-      subtitle: "This might take a while",
-      type: "modal",
-      action: (report) => {
-        db.eventManager.subscribe(
-          EVENTS.migrationProgress,
-          ({ collection, total, current }) => {
-            report({
-              text: `Restoring ${collection}...`,
-              current,
-              total
-            });
-          }
-        );
-
-        report({ text: `Restoring...` });
-        return restore(backup);
-      }
-    });
+    await restoreWithProgress(backup);
   }
+}
+
+async function restoreWithProgress(backup, password) {
+  await TaskManager.startTask({
+    title: "Restoring backup",
+    subtitle: "This might take a while",
+    type: "modal",
+    action: (report) => {
+      db.eventManager.subscribe(
+        EVENTS.migrationProgress,
+        ({ collection, total, current }) => {
+          report({
+            text: `Restoring ${collection}...`,
+            current,
+            total
+          });
+        }
+      );
+
+      report({ text: `Restoring...` });
+      return restore(backup, password);
+    }
+  });
 }
 
 export async function verifyAccount() {
