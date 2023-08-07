@@ -317,7 +317,7 @@ const AttachmentMenuItems: (
     {
       type: "button",
       key: "permanent-delete",
-      styles: { icon: { color: "red" }, text: { color: "red" } },
+      variant: "dangerous",
       title: "Delete permanently",
       icon: DeleteForver.path,
       onClick: () => Multiselect.deleteAttachments([attachment])

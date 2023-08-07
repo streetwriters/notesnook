@@ -89,7 +89,7 @@ const menuItems: (tag: any, items?: any[]) => MenuItem[] = (
     {
       type: "button",
       key: "delete",
-      styles: { icon: { color: "red" }, text: { color: "red" } },
+      variant: "dangerous",
       title: "Delete",
       icon: DeleteForver.path,
       onClick: async () => {

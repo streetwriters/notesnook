@@ -104,7 +104,7 @@ const menuItems: (topic: any, items?: any[]) => MenuItem[] = (
       key: "delete",
       title: "Delete",
       icon: Trash.path,
-      styles: { icon: { color: "red" }, text: { color: "red" } },
+      variant: "dangerous",
       onClick: async () => {
         const result = await confirm({
           title: `Delete ${pluralize(items.length, "topic")}?`,

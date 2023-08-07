@@ -45,10 +45,10 @@ export type MenuButtonItem = BaseMenuItem<"button"> & {
   isChecked?: boolean;
   modifier?: string;
   menu?: { title?: string; items: MenuItem[] };
+  variant?: "dangerous" | "normal";
 
   styles?: {
     title?: ThemeUICSSObject;
-    icon?: ThemeUICSSObject;
   };
 };
 

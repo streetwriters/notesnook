@@ -501,7 +501,7 @@ const menuItems: (note: any, items?: any[]) => MenuItem[] = (
       type: "button",
       key: "movetotrash",
       title: "Move to trash",
-      styles: { icon: { color: "red" }, text: { color: "red" } },
+      variant: "dangerous",
       icon: Trash.path,
       isDisabled:
         items.length === 1

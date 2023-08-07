@@ -87,7 +87,7 @@ const menuItems: (item: any, items?: any[]) => MenuItem[] = (
       key: "delete",
       title: "Delete",
       icon: DeleteForver.path,
-      styles: { icon: { color: "red" }, text: { color: "red" } },
+      variant: "dangerous",
       onClick: async () => {
         if (!(await showMultiPermanentDeleteConfirmation(items.length))) return;
         const ids = items.map((i) => i.id);

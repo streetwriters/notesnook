@@ -144,7 +144,7 @@ const menuItems: (
       type: "button",
       key: "delete",
       title: "Delete",
-      styles: { icon: { color: "red" }, text: { color: "red" } },
+      variant: "dangerous",
       icon: Trash.path,
       onClick: async () => {
         confirm({

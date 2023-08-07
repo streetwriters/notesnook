@@ -190,7 +190,7 @@ const menuItems: (notebook: any, items?: any[]) => MenuItem[] = (
       type: "button",
       key: "movetotrash",
       title: "Move to trash",
-      styles: { icon: { color: "red" }, text: { color: "red" } },
+      variant: "dangerous",
       icon: Trash.path,
       onClick: async () => {
         const result = await confirm({

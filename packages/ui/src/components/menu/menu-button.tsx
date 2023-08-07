@@ -41,7 +41,8 @@ export function MenuButton(props: MenuButtonProps) {
     isChecked,
     menu,
     modifier,
-    styles
+    styles,
+    variant = "normal"
   } = item;
   const itemRef = useRef<HTMLButtonElement>(null);
 
@@ -74,8 +75,8 @@ export function MenuButton(props: MenuButtonProps) {
             <Icon
               path={icon}
               size={"medium"}
-              sx={{ mr: 2, ...styles?.icon }}
-              color={styles?.icon?.color as string}
+              sx={{ mr: 2 }}
+              color={variant === "dangerous" ? "icon-error" : "icon"}
             />
           )}
           <Text
@@ -84,6 +85,7 @@ export function MenuButton(props: MenuButtonProps) {
             sx={{
               fontSize: "inherit",
               fontFamily: "inherit",
+              color: variant === "dangerous" ? "paragraph-error" : "paragraph",
               ...styles?.title
             }}
           >
@@ -95,15 +97,27 @@ export function MenuButton(props: MenuButtonProps) {
             sx={{ ml: 4 }}
             data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
           >
-            {isChecked && <Icon path={mdiCheck} size={"small"} />}
-            {menu && <Icon path={mdiChevronRight} size={"small"} />}
+            {isChecked && (
+              <Icon
+                path={mdiCheck}
+                size={"small"}
+                color={variant === "dangerous" ? "icon-error" : "icon"}
+              />
+            )}
+            {menu && (
+              <Icon
+                path={mdiChevronRight}
+                size={"small"}
+                color={variant === "dangerous" ? "icon-error" : "icon"}
+              />
+            )}
             {modifier && (
               <Text
                 as="span"
                 sx={{
                   fontFamily: "body",
                   fontSize: "menu",
-                  color: "paragraph"
+                  color: "paragraph-secondary"
                 }}
               >
                 {modifier}
