@@ -48,7 +48,9 @@ test("restore a backup", async ({ page }) => {
   expect(await tags.isEmpty()).toBeFalsy();
 });
 
-test("create an encrypted backup", async ({ page }) => {
+test("create an encrypted backup", async ({ page }, info) => {
+  info.setTimeout(60 * 1000);
+
   const app = new AppModel(page);
   await app.auth.goto();
   await app.auth.login(USER.CURRENT);

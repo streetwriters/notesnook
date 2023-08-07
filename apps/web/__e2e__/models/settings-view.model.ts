@@ -19,7 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Page } from "@playwright/test";
 import { downloadAndReadFile, getTestId, uploadFile } from "../utils";
-import { confirmDialog, fillPasswordDialog, waitToHaveText } from "./utils";
+import {
+  confirmDialog,
+  fillPasswordDialog,
+  waitForDialog,
+  waitToHaveText
+} from "./utils";
 import { NavigationMenuModel } from "./navigation-menu.model";
 
 export class SettingsViewModel {
@@ -112,5 +117,7 @@ export class SettingsViewModel {
 
     await uploadFile(this.page, restoreBackup, filename);
     if (password) await fillPasswordDialog(this.page, password);
+
+    await waitForDialog(this.page, "Restoring backup");
   }
 }

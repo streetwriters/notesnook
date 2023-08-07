@@ -140,6 +140,14 @@ export async function denyDialog(page: Page) {
   // await dialogConfirm.waitFor({ state: "detached" });
 }
 
+export async function waitForDialog(page: Page, title: string) {
+  const dialogTitle = page
+    .locator(getTestId("dialog-title"))
+    .filter({ hasText: title });
+  await dialogTitle.waitFor({ state: "attached" });
+  await dialogTitle.waitFor({ state: "detached" });
+}
+
 export async function waitToHaveText(page: Page, id: string) {
   await page.waitForFunction(
     ({ id }) => {

@@ -130,6 +130,7 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
             {props.title && (
               <Text
                 variant="heading"
+                data-test-id="dialog-title"
                 sx={{
                   fontSize: "subheading",
                   textAlign: props.textAlignment || "left",

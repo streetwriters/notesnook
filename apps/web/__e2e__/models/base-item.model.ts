@@ -40,7 +40,8 @@ export class BaseItemModel {
   }
 
   async click() {
-    await this.locator.scrollIntoViewIfNeeded();
+    if (!(await this.locator.isVisible()))
+      await this.locator.scrollIntoViewIfNeeded();
     await this.locator.click();
   }
 
