@@ -324,12 +324,11 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
           renderItem={renderItem}
           ListHeaderComponent={
             mode === "selectTags" &&
-            (searchResults.length === 0 ||
-              (searchKeyword.current &&
-                searchKeyword.current.length > 0 &&
-                !searchResults.find(
-                  (item) => item.title === searchKeyword.current
-                ))) ? (
+            searchKeyword.current &&
+            searchKeyword.current.length > 0 &&
+            !searchResults.find(
+              (item) => item.title === searchKeyword.current
+            ) ? (
               <ListItem
                 item={{
                   type: "tag",

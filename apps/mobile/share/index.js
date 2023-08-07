@@ -39,7 +39,6 @@ const NotesnookShare = ({ quicknote = false }) => {
       setRender(true);
     }, 1);
   }, []);
-
   return (
     <ScopedThemeProvider value="base">
       {!render ? null : (
