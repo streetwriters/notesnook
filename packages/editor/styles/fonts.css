@@ -6,6 +6,7 @@
  * -------------------------- */
 @font-face {
   font-family: "Hack";
+  font-display: swap;
   src: url("fonts/hack-regular.woff2") format("woff2"),
     url("fonts/hack-regular.woff") format("woff"),
     url("fonts/hack-regular.ttf") format("truetype");
@@ -15,6 +16,7 @@
 
 @font-face {
   font-family: "Hack";
+  font-display: swap;
   src: url("fonts/hack-bold.woff2") format("woff2"),
     url("fonts/hack-bold.woff") format("woff"),
     url("fonts/hack-bold.ttf") format("truetype");
@@ -24,6 +26,7 @@
 
 @font-face {
   font-family: "Hack";
+  font-display: swap;
   src: url("fonts/hack-italic.woff2") format("woff2"),
     url("fonts/hack-italic.woff") format("woff"),
     url("fonts/hack-italic.ttf") format("truetype");
@@ -33,6 +36,7 @@
 
 @font-face {
   font-family: "Hack";
+  font-display: swap;
   src: url("fonts/hack-bolditalic.woff2") format("woff2"),
     url("fonts/hack-bolditalic.woff") format("woff"),
     url("fonts/hack-bolditalic.ttf") format("truetype");

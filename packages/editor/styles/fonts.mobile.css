@@ -6,6 +6,7 @@
  * -------------------------- */
 @font-face {
   font-family: "Hack";
+  font-display: swap;
   src: url("fonts/hack-regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
@@ -13,6 +14,7 @@
 
 @font-face {
   font-family: "Hack";
+  font-display: swap;
   src: url("fonts/hack-bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
@@ -20,6 +22,7 @@
 
 @font-face {
   font-family: "Hack";
+  font-display: swap;
   src: url("fonts/hack-italic.ttf") format("truetype");
   font-weight: 400;
   font-style: italic;
@@ -27,6 +30,7 @@
 
 @font-face {
   font-family: "Hack";
+  font-display: swap;
   src: url("fonts/hack-bolditalic.ttf") format("truetype");
   font-weight: 700;
   font-style: italic;
@@ -37,6 +41,7 @@
 @font-face {
   font-family: "Noto Serif";
   font-style: normal;
+  font-display: swap;
   font-weight: 400;
   src: local(""),
        url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-regular.ttf") format("truetype"),
@@ -46,6 +51,7 @@
 @font-face {
   font-family: "Noto Serif";
   font-style: italic;
+  font-display: swap;
   font-weight: 400;
   src: local(""),
        url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-italic.ttf") format("truetype"),
@@ -55,6 +61,7 @@
 @font-face {
   font-family: "Noto Serif";
   font-style: normal;
+  font-display: swap;
   font-weight: 700;
   src: local(""),
        url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-700.ttf") format("truetype"),
@@ -64,6 +71,7 @@
 @font-face {
   font-family: "Noto Serif";
   font-style: italic;
+  font-display: swap;
   font-weight: 700;
   src: local(""),
        url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-700italic.ttf") format("truetype"),
