@@ -232,7 +232,7 @@ module.exports = (env) => {
                   : [
                       "react-native-reanimated/plugin",
                       `@babel/plugin-transform-named-capturing-groups-regex`,
-                      //"transform-remove-console",
+                      "transform-remove-console",
                     ],
             },
           },
