@@ -16,8 +16,8 @@
   pointer-events: none;
 }
 
-.ProseMirror code:not(pre code) {
-  background-color: var(--bgSecondary);
+.ProseMirror p code {
+  background-color: var(--background-secondary);
 }
 
 .ProseMirror:first-child {
@@ -49,7 +49,7 @@
   border: 2px solid var(--accent);
 }
 
-.ProseMirror code:not(pre code) {
+.ProseMirror p code {
   background-color: var(--background);
   border: 1px solid var(--border);
   border-radius: 5px;
@@ -166,7 +166,7 @@ img.ProseMirror-separator {
   position: absolute;
   top: -2px;
   width: 20px;
-  border-top: 1px solid var(--text);
+  border-top: 1px solid var(--paragraph);
   animation: ProseMirror-cursor-blink 1.1s steps(2, start) infinite;
 }
 @keyframes ProseMirror-cursor-blink {
@@ -176,11 +176,11 @@ img.ProseMirror-separator {
 }
 .ProseMirror-hideselection *::selection {
   background: transparent;
-  color: var(--text);
+  color: var(--paragraph);
 }
 .ProseMirror-hideselection *::-moz-selection {
   background: transparent;
-  color: var(--text);
+  color: var(--paragraph);
 }
 .ProseMirror-hideselection * {
   caret-color: transparent;
@@ -265,18 +265,18 @@ img.ProseMirror-separator {
 }
 
 .drop-cursor {
-  background-color: var(--text) !important;
+  background-color: var(--paragraph) !important;
 }
 
 .search-result.selected {
-  background-color: var(--dimPrimary) !important;
+  background-color: var(--accent-secondary) !important;
 }
 
 .search-result {
-  background-color: var(--disabled);
+  background-color: var(--background-secondary);
 }
 
-.line-number-widget,
+/* .line-number-widget,
 .line-number::before {
   color: var(--codeFg);
   pointer-events: none;
@@ -302,7 +302,7 @@ img.ProseMirror-separator {
   left: 0;
   pointer-events: none;
   background-color: var(--backdrop);
-}
+} */
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
@@ -378,7 +378,7 @@ span:focus .fake-cursor {
 
 .math-node .math-src {
   display: none;
-  color: var(--text);
+  color: var(--paragraph);
   tab-size: 4;
 }
 
@@ -412,7 +412,7 @@ span:focus .fake-cursor {
 }
 
 .math-inline.ProseMirror-selectednode {
-  background-color: var(--bgSecondary);
+  background-color: var(--background-secondary);
   padding: 3px;
   border-radius: 5px;
   border: 1px solid var(--border);
@@ -421,7 +421,7 @@ span:focus .fake-cursor {
 .math-inline .math-src::after,
 .math-inline .math-src::before {
   content: "$$";
-  color: var(--disabled);
+  color: var(--paragraph-secondary);
 }
 
 /* -- Block Math ---------------------------------------- */
@@ -435,7 +435,7 @@ span:focus .fake-cursor {
 }
 
 .math-block.ProseMirror-selectednode {
-  background-color: var(--bgSecondary);
+  background-color: var(--background-secondary);
   padding: 10px;
   border-radius: 5px;
   border: 1px solid var(--border);
@@ -453,7 +453,7 @@ span:focus .fake-cursor {
 .math-block .math-src::before {
   content: "Math";
   text-align: left;
-  color: var(--disabled);
+  color: var(--paragraph-secondary);
   margin-bottom: 10px;
 }
 
@@ -589,7 +589,7 @@ blockquote[dir="rtl"] {
 }
 
 .outline-list[dir="rtl"] li .outline-list:hover:before {
-  border-right: 1px solid var(--bgSecondaryHover);
+  border-right: 1px solid var(--hover);
   border-left: unset;
 }
 
