@@ -103,10 +103,12 @@ function ThemeSelector() {
     }
   );
 
-  const select = (item: Partial<ThemeMetadata>) => {
+  const select = (item: Partial<ThemeMetadata>, fromFile?: boolean) => {
     presentSheet({
       context: "theme-details",
-      component: (ref, close) => <ThemeSetter close={close} theme={item} />
+      component: (ref, close) => (
+        <ThemeSetter close={close} theme={item} fromFile={fromFile} />
+      )
     });
   };
 
@@ -327,7 +329,6 @@ function ThemeSelector() {
         ) || []
     );
   }
-
   return (
     <>
       <SheetProvider context="theme-details" />
@@ -397,16 +398,17 @@ function ThemeSelector() {
               icon="folder"
               fontSize={SIZE.xs}
               onPress={() => {
-                DocumentPicker.pickSingle().then((r) => {
+                DocumentPicker.pickSingle({
+                  allowMultiSelection: false
+                }).then((r) => {
                   fetch(r.uri).then(async (response) => {
                     const json = await response.json();
-                    console.log(json);
                     const result = validateTheme(json);
                     if (result.error) {
                       ToastEvent.error(new Error(result.error));
                       return;
                     }
-                    select(json);
+                    select(json, true);
                   });
                 });
               }}
@@ -444,6 +446,22 @@ function ThemeSelector() {
                 <Paragraph>No themes found.</Paragraph>
               )}
             </View>
+          }
+          ListFooterComponent={
+            themes.isError ? (
+              <View
+                style={{
+                  height: 100,
+                  width: "100%",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <Paragraph color={colors.error.paragraph}>
+                  Error loading themes. {themes.error.message}.
+                </Paragraph>
+              </View>
+            ) : null
           }
           estimatedItemSize={200}
           renderItem={renderItem}
@@ -483,10 +501,12 @@ export default function ThemeSelectorWithQueryClient() {
 
 const ThemeSetter = ({
   theme,
-  close
+  close,
+  fromFile
 }: {
   theme: Partial<CompiledThemeDefinition>;
   close?: (ctx?: string) => void;
+  fromFile?: boolean;
 }) => {
   const [darkTheme, lightTheme] = useThemeStore((state) => [
     state.darkTheme,
@@ -502,14 +522,13 @@ const ThemeSetter = ({
     if (!theme.id) return;
     try {
       const user = await db.user?.getUser();
-      const fullTheme = theme.scopes
+      const fullTheme = fromFile
         ? (theme as ThemeDefinition)
         : await themeTrpcClient.installTheme.query({
             compatibilityVersion: THEME_COMPATIBILITY_VERSION,
             id: theme.id,
             userId: user?.id
           });
-
       if (!fullTheme) return;
       theme.colorScheme === "dark"
         ? useThemeStore.getState().setDarkTheme(fullTheme)
