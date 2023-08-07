@@ -17,8 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useRef, useEffect, PropsWithChildren } from "react";
-import { Box, Flex, FlexProps, Text } from "@theme-ui/components";
+import React, {
+  useCallback,
+  useRef,
+  useEffect,
+  PropsWithChildren
+} from "react";
+import { Box, FlexProps, Text } from "@theme-ui/components";
 import { getPosition } from "../../utils/position";
 import { MenuButtonItem, MenuItem } from "./types";
 import { useFocus } from "./use-focus";
@@ -136,15 +141,16 @@ export function Menu(props: MenuProps) {
         })}
       </MenuContainer>
       {focusedItem?.type === "button" && focusedItem?.menu && isSubmenuOpen && (
-        <Flex
-          ref={subMenuRef}
-          style={{ visibility: "hidden" }}
+        <Menu
+          menuRef={subMenuRef}
           sx={{
-            position: "absolute"
+            position: "absolute",
+            width: "max-content",
+            visibility: "hidden"
           }}
-        >
-          <Menu items={focusedItem.menu.items} onClose={onClose} />
-        </Flex>
+          items={focusedItem.menu.items}
+          onClose={onClose}
+        />
       )}
     </>
   );
@@ -152,12 +158,14 @@ export function Menu(props: MenuProps) {
 
 type MenuContainerProps = FlexProps & {
   title?: string;
+  menuRef?: React.Ref<HTMLDivElement>;
 };
 function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
-  const { children, title, sx, ...flexProps } = props;
+  const { children, title, sx, menuRef, ...flexProps } = props;
 
   return (
     <Box
+      ref={menuRef}
       className="menuContainer"
       data-test-id="menu-container"
       as="ul"
@@ -196,7 +204,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
           {title}
         </Text>
       )}
-      <ScrollContainer>{children}</ScrollContainer>
+      <ScrollContainer suppressScrollX>{children}</ScrollContainer>
       {/* <FlexScrollContainer>{children}</FlexScrollContainer> */}
     </Box>
   );
