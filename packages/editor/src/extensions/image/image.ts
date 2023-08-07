@@ -283,5 +283,11 @@ export const ImageNode = Node.create<ImageOptions>({
         }
       })
     ];
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      "Mod-Shift-I": () => this.editor.commands.openAttachmentPicker("image")
+    };
   }
 });

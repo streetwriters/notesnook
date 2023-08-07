@@ -62,6 +62,7 @@ function toMenuItems(
     key: `heading-${level}`,
     title: toolbarLocation === "bottom" ? `H${level}` : `Heading ${level}`,
     isChecked: level === currentHeadingLevel,
+    modifier: `Mod-Alt-${level}`,
     onClick: () =>
       editor.current
         ?.chain()
@@ -75,6 +76,7 @@ function toMenuItems(
     type: "button",
     title: "Paragraph",
     isChecked: !currentHeadingLevel,
+    modifier: `Mod-Alt-0`,
     onClick: () => editor.current?.chain().focus().setParagraph().run()
   };
   return [paragraph, ...menuItems];

@@ -282,7 +282,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-Alt-c": () => this.editor.commands.toggleCodeBlock(),
+      "Mod-Shift-C": () => this.editor.commands.toggleCodeBlock(),
       "Mod-a": ({ editor }) => {
         const { $anchor } = this.editor.state.selection;
         if ($anchor.parent.type.name !== this.name) {

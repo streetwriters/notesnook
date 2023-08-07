@@ -64,6 +64,12 @@ export const MathBlock = Node.create({
     };
   },
 
+  addKeyboardShortcuts() {
+    return {
+      "Mod-Shift-M": () => this.editor.commands.insertMathBlock()
+    };
+  },
+
   addInputRules() {
     return [
       {

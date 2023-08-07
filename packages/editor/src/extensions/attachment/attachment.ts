@@ -182,6 +182,12 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
           return this.options.onPreviewAttachment(editor, attachment);
         }
     };
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      "Mod-Shift-A": () => this.editor.commands.openAttachmentPicker("file")
+    };
   }
 
   //   addInputRules() {

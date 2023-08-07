@@ -214,6 +214,12 @@ export const TaskListNode = TaskList.extend({
       });
     };
     return [inputRule];
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      "Mod-Shift-T": () => this.editor.commands.toggleTaskList()
+    };
   }
 });
 

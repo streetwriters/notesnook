@@ -103,6 +103,7 @@ export const OutlineList = Node.create<OutlineListOptions>({
       "Mod-Shift-O": () => this.editor.commands.toggleOutlineList()
     };
   },
+
   addInputRules() {
     return [
       wrappingInputRule({
