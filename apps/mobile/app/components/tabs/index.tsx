@@ -214,6 +214,10 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
           return;
         }
         translateX.value = animated ? withTiming(homePosition) : homePosition;
+        if (!animated) {
+          translateX.value = 299;
+          translateX.value = 300;
+        }
         onDrawerStateChange(false);
         isDrawerOpen.value = false;
       },

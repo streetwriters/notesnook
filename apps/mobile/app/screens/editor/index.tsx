@@ -127,7 +127,6 @@ const Editor = React.memo(
           renderKey.current === `editor-0` ? `editor-1` : `editor-0`;
         editor.state.current.ready = false;
         editor.setLoading(true);
-        console.log("ERROR ERROR", Date.now());
       }, [editor]);
 
       useEffect(() => {

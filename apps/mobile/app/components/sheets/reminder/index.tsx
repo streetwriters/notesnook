@@ -223,7 +223,7 @@ export default function ReminderSheet({
     <View
       style={{
         paddingHorizontal: 12,
-        maxHeight: DDS.isTab ? "90%" : "99.99%"
+        maxHeight: DDS.isTab ? "99.99%" : "99.99%"
       }}
     >
       <View
@@ -247,7 +247,12 @@ export default function ReminderSheet({
         />
       </View>
       <Dialog context="local" />
-      <ScrollView bounces={false}>
+      <ScrollView
+        bounces={false}
+        style={{
+          marginBottom: DDS.isTab ? 25 : undefined
+        }}
+      >
         <Input
           fwdRef={titleRef}
           defaultValue={reminder?.title || referencedItem?.title}
