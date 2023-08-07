@@ -19,9 +19,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FeatureType } from "./components/sheets/new-feature";
 
-export const features: FeatureType[] = [
-  {
-    title: "Custom themes",
-    body: "We have redesigned the Notesnook theme engine to add support for user specified custom themes. That means you, me, or anyone else can now easily change how Notesnook looks!"
-  }
-];
+export const features: FeatureType[] = [];
