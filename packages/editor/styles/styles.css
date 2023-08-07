@@ -363,12 +363,12 @@ span:focus .fake-cursor {
 
 .math-node.empty-math .math-render::before {
   content: "(empty)";
-  color: red;
+  color: var(--paragraph-error);
 }
 
 .math-node .math-render.parse-error::before {
   content: "(math error)";
-  color: red;
+  color: var(--paragraph-error);
   cursor: help;
 }
 
