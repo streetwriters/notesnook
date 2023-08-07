@@ -151,7 +151,7 @@ export async function getThemes(query: (typeof ThemeQuerySchema)["_type"]) {
     .map((hit) => {
       return {
         ...(hit.document as CompiledThemeDefinition),
-        scope: undefined,
+        scopes: undefined,
         codeBlockCSS: undefined
       } as ThemeMetadata;
     })
