@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import useMediaQuery from "./use-media-query";
+import useMediaQuery, { matchMediaQuery } from "./use-media-query";
 
-const useTablet = () =>
-  useMediaQuery("(min-width: 480px) and (max-width: 1000px)");
+const TABLET_MEDIA_QUERY = "(min-width: 480px) and (max-width: 1000px)";
+export const useTablet = () => useMediaQuery(TABLET_MEDIA_QUERY);
+export const isTablet = () => matchMediaQuery(TABLET_MEDIA_QUERY);
 export default useTablet;

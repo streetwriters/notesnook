@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import useMediaQuery from "./use-media-query";
+import useMediaQuery, { matchMediaQuery } from "./use-media-query";
 
-const useMobile = () => useMediaQuery("(max-width: 480px)");
+const MOBILE_MEDIA_QUERY = "(max-width: 480px)";
+export const useMobile = () => useMediaQuery(MOBILE_MEDIA_QUERY);
+export const isMobile = () => matchMediaQuery(MOBILE_MEDIA_QUERY);
 export default useMobile;

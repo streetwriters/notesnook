@@ -39,13 +39,11 @@ const useMediaQuery = (mediaQuery: string) => {
     return false;
   }
 
-  const [isVerified, setIsVerified] = useState(
-    !!window.matchMedia(mediaQuery).matches
-  );
+  const [isMatch, setIsMatch] = useState(matchMediaQuery(mediaQuery));
 
   useEffect(() => {
     const mediaQueryList = window.matchMedia(mediaQuery);
-    const documentChangeHandler = () => setIsVerified(!!mediaQueryList.matches);
+    const documentChangeHandler = () => setIsMatch(!!mediaQueryList.matches);
 
     if (mediaQueryList.addEventListener)
       mediaQueryList.addEventListener("change", documentChangeHandler);
@@ -59,7 +57,10 @@ const useMediaQuery = (mediaQuery: string) => {
     };
   }, [mediaQuery]);
 
-  return isVerified;
+  return isMatch;
 };
 
 export default useMediaQuery;
+
+export const matchMediaQuery = (mediaQuery: string) =>
+  !!window.matchMedia(mediaQuery).matches;
