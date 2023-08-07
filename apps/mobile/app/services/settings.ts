@@ -166,4 +166,5 @@ export const SettingsService = {
   resetSettings
 };
 
+init();
 export default SettingsService;

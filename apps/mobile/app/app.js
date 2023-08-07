@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import SettingsService from "./services/settings";
 import {
   THEME_COMPATIBILITY_VERSION,
   useThemeEngineStore
@@ -31,13 +32,11 @@ import GlobalSafeAreaProvider from "./components/globalsafearea";
 import { useAppEvents } from "./hooks/use-app-events";
 import { ApplicationHolder } from "./navigation";
 import Notifications from "./services/notifications";
-import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
 import { useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
 import { themeTrpcClient } from "./screens/settings/theme-selector";
 
-SettingsService.init();
 SettingsService.checkOrientation();
 const App = () => {
   const init = useAppEvents();
@@ -102,23 +101,25 @@ export const withTheme = (Element) => {
     ]);
 
     useEffect(() => {
-      const currentTheme = colorScheme === "dark" ? darkTheme : lightTheme;
-      if (!currentTheme) return;
-      themeTrpcClient.updateTheme
-        .query({
-          version: currentTheme.version,
-          compatibilityVersion: THEME_COMPATIBILITY_VERSION,
-          id: currentTheme.id
-        })
-        .then((theme) => {
-          if (theme) {
-            console.log(theme.version, "theme updated");
-            theme.colorScheme === "dark"
-              ? useThemeStore.getState().setDarkTheme(theme)
-              : useThemeStore.getState().setLightTheme(theme);
-          }
-        })
-        .catch(console.log);
+      setTimeout(() => {
+        const currentTheme = colorScheme === "dark" ? darkTheme : lightTheme;
+        if (!currentTheme) return;
+        themeTrpcClient.updateTheme
+          .query({
+            version: currentTheme.version,
+            compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+            id: currentTheme.id
+          })
+          .then((theme) => {
+            if (theme) {
+              console.log(theme.version, "theme updated");
+              theme.colorScheme === "dark"
+                ? useThemeStore.getState().setDarkTheme(theme)
+                : useThemeStore.getState().setLightTheme(theme);
+            }
+          })
+          .catch(console.log);
+      }, 1000);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
