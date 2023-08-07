@@ -522,7 +522,8 @@ function EditorChrome(
             maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
             width: "100%"
           }}
-          px={6}
+          pl={6}
+          pr={2}
           onClick={onRequestFocus}
         >
           {!isMobile && (

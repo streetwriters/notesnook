@@ -239,6 +239,7 @@ function Toolbar() {
             fontSize: "heading",
             color: "paragraph",
             p: 0,
+            pl: 4,
             borderWidth: 0,
             borderRadius: "default",
             textOverflow: "ellipsis",
@@ -248,7 +249,7 @@ function Toolbar() {
         />
       </Flex>
 
-      <Flex>
+      <Flex sx={{ gap: 1 }}>
         {tools.map((tool) => (
           <Button
             key={tool.title}
@@ -256,7 +257,6 @@ function Toolbar() {
             data-test-id={tool.title}
             disabled={!tool.enabled}
             title={tool.title}
-            mr={1}
             sx={{
               display: [
                 tool.hideOnMobile ? "none" : "flex",

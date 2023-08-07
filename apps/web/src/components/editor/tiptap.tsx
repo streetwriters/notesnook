@@ -335,7 +335,7 @@ function TipTap(props: TipTapProps) {
   return (
     <>
       <Portal containerId={toolbarContainerId}>
-        <ScopedThemeProvider scope="editorToolbar">
+        <ScopedThemeProvider scope="editorToolbar" sx={{ width: "100%" }}>
           <Toolbar
             editor={editor}
             location={isMobile ? "bottom" : "top"}
