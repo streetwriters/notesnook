@@ -38,6 +38,7 @@ function _Counter(props: CounterProps) {
         borderRadius: "default",
         overflow: "hidden",
         cursor: "pointer",
+        height: "100%",
         ":hover": {
           bg: "hover-secondary"
         }
