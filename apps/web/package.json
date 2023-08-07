@@ -74,7 +74,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
-    "@playwright/test": "^1.35.0",
+    "@playwright/test": "^1.36.2",
     "@trpc/server": "10.31.0",
     "@types/babel__core": "^7.20.1",
     "@types/file-saver": "^2.0.5",
