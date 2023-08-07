@@ -46,7 +46,7 @@ function ContentToggle(props) {
           </Button>
         )}
         <Button
-          variant={isOtherSelected ? "error" : "primary"}
+          variant={isOtherSelected ? "error" : "accent"}
           onClick={() => {
             if (isOtherSelected) {
               resolveConflict({ saveCopy: false });

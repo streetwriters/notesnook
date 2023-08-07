@@ -638,7 +638,7 @@ function DropZone(props: DropZoneProps) {
         position: "absolute",
         width: "100%",
         height: "100%",
-        bg: "overlay",
+        bg: "backdrop",
         zIndex: 3,
         alignItems: "center",
         justifyContent: "center",
