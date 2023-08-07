@@ -138,14 +138,25 @@ textarea,
 }
 
 .rpv-core__text-layer-text::selection {
-  background-color: var(--dimPrimary) !important;
+  background-color: var(--textSelection) !important;
   color: transparent;
 }
 
 .rpv-core__text-layer-text::-moz-selection {
   /* Code for Firefox */
-  background-color: var(--dimPrimary) !important;
+  background-color: var(--textSelection) !important;
   color: transparent;
+}
+
+::-moz-selection {
+  /* Code for Firefox */
+  background-color: var(--textSelection);
+  color: var(--paragraph);
+}
+
+::selection {
+  background-color: var(--textSelection);
+  color: var(--paragraph);
 }
 
 *::-moz-focus-inner {
@@ -162,17 +173,6 @@ textarea,
   flex-direction: column;
   flex: 1;
   opacity: 1;
-}
-
-::-moz-selection {
-  /* Code for Firefox */
-  background-color: var(--textSelection);
-  color: var(--paragraph);
-}
-
-::selection {
-  background-color: var(--textSelection);
-  color: var(--paragraph);
 }
 
 .middle-pane {

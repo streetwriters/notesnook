@@ -69,7 +69,7 @@ export function PlansList(props: PlansListProps) {
               //   {
               //     // bg: selectedPlan?.key === plan.key ? "border" : "transparent",
               //     // border:
-              //     //   selectedPlan?.key === plan.key ? "1px solid var(--primary)" : "none",
+              //     //   selectedPlan?.key === plan.key ? "1px solid var(--accent)" : "none",
               //   }
               // }
               onClick={() => onPlanSelected(plan)}

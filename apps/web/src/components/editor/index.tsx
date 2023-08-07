@@ -657,7 +657,7 @@ function DropZone(props: DropZoneProps) {
     >
       <Flex
         sx={{
-          border: "2px dashed var(--fontTertiary)",
+          border: "2px dashed var(--border)",
           borderRadius: "default",
           p: 70,
           flexDirection: "column",

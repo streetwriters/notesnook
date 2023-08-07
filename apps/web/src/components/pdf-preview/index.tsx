@@ -109,7 +109,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                         outline: "2px solid var(--accent)"
                       },
                       ":hover:not(:focus)": {
-                        outline: "1.5px solid var(--dimPrimary)"
+                        outline: "1.5px solid var(--accent)"
                       }
                     }
                   }}
