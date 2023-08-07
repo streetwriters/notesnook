@@ -45,9 +45,11 @@ process.env.NN_BUILD_TIMESTAMP = isTesting ? "0" : `${Date.now()}`;
 
 export default defineConfig({
   envPrefix: "NN_",
+  root: "src/",
+  publicDir: "../public",
   build: {
     target: isDesktop ? "esnext" : "modules",
-    outDir: "build",
+    outDir: "../build",
     minify: "esbuild",
     cssMinify: true,
     emptyOutDir: true,
@@ -123,7 +125,7 @@ export default defineConfig({
             minify: true,
             manifest: WEB_MANIFEST,
             injectRegister: null,
-            srcDir: "src",
+            srcDir: "",
             filename: "service-worker.ts"
           })
         ]),
