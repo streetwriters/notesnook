@@ -23,7 +23,6 @@ import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
 import { CheckCircleOutline, Loading } from "../../../components/icons";
 import {
   THEME_COMPATIBILITY_VERSION,
-  ThemeDefinition,
   getPreviewColors,
   validateTheme
 } from "@notesnook/theme";
@@ -218,13 +217,20 @@ function ThemesList() {
         ) : (
           <VirtuosoGrid
             customScrollParent={parentScrollRef.current || undefined}
-            data={themes.data?.pages.flatMap((a) => a.themes) || []}
+            data={[
+              {
+                ...darkTheme,
+                previewColors: getPreviewColors(darkTheme)
+              },
+              {
+                ...lightTheme,
+                previewColors: getPreviewColors(lightTheme)
+              },
+              ...(themes.data?.pages.flatMap((a) => a.themes) || [])
+            ]}
             endReached={() =>
               themes.hasNextPage ? themes.fetchNextPage() : null
             }
-            components={{
-              Header: GridHeader
-            }}
             context={{ darkTheme, lightTheme, setTheme }}
             computeItemKey={(_index, item) => item.id}
             itemContent={(_index, theme) => (
@@ -242,39 +248,6 @@ function ThemesList() {
     </>
   );
 }
-
-const GridHeader = (props: {
-  context?: {
-    darkTheme: ThemeDefinition;
-    lightTheme: ThemeDefinition;
-    setTheme: (theme: ThemeMetadata) => Promise<void>;
-  };
-}) => {
-  const { darkTheme, lightTheme, setTheme } = props.context || {};
-  if (!darkTheme || !lightTheme || !setTheme) return null;
-  return (
-    <div className="virtuoso-grid-list">
-      <ThemeItem
-        theme={{
-          ...darkTheme,
-          previewColors: getPreviewColors(darkTheme)
-        }}
-        isApplied={true}
-        isApplying={false}
-        setTheme={setTheme}
-      />
-      <ThemeItem
-        theme={{
-          ...lightTheme,
-          previewColors: getPreviewColors(lightTheme)
-        }}
-        isApplied={true}
-        isApplying={false}
-        setTheme={setTheme}
-      />
-    </div>
-  );
-};
 
 type ThemeItemProps = {
   theme: ThemeMetadata;
