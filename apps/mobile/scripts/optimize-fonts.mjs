@@ -64,7 +64,8 @@ const EXTRA_ICON_NAMES = [
   "checkbox-blank-circle-outline",
   "check-circle-outline",
   "chevron-up",
-  "chevron-down"
+  "chevron-down",
+  "calendar"
 ];
 
 const __filename = fileURLToPath(import.meta.url);
