@@ -25,6 +25,7 @@ import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
 import { useEditorConfig } from "./context";
 import { getFontById } from "@notesnook/editor";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 type TitleBoxProps = {
   readonly: boolean;
@@ -33,41 +34,60 @@ type TitleBoxProps = {
 function TitleBox(props: TitleBoxProps) {
   const { readonly } = props;
   const inputRef = useRef<HTMLInputElement>(null);
-  const title = useStore((store) => store.session.title);
   const id = useStore((store) => store.session.id);
   const isMobile = useMobile();
   const isTablet = useTablet();
   const { editorConfig } = useEditorConfig();
-
-  const MAX_FONT_SIZE = useMemo(() => {
-    return isMobile || isTablet ? 1.625 : 2.625;
-  }, [isMobile, isTablet]);
+  const fontFamily = useMemo(
+    () => getFontById(editorConfig.fontFamily)?.font || "heading",
+    [editorConfig.fontFamily]
+  );
 
   const updateFontSize = useCallback(
     (length) => {
       if (!inputRef.current) return;
-      const fontSize = textLengthToFontSize(length, MAX_FONT_SIZE);
+      const fontSize = textLengthToFontSize(
+        length,
+        isMobile || isTablet ? 1.625 : 2.625
+      );
       inputRef.current.style.fontSize = `${fontSize}em`;
     },
-    [MAX_FONT_SIZE]
+    [isMobile, isTablet]
   );
 
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.placeholder = "Note title";
-      inputRef.current.value = title;
-      updateFontSize(title.length);
-    }
+    if (!inputRef.current) return;
+    const { title } = useStore.getState().session;
+    inputRef.current.value = title;
+    updateFontSize(title.length);
   }, [id, updateFontSize]);
 
   useEffect(() => {
     if (!inputRef.current) return;
-    if (inputRef.current.value && title !== inputRef.current.value) {
-      inputRef.current.placeholder = "Note title";
-      inputRef.current.value = title;
-      updateFontSize(title.length);
-    }
-  }, [title, updateFontSize]);
+    updateFontSize(inputRef.current.value.length);
+  }, [isTablet, isMobile, updateFontSize]);
+
+  useEffect(() => {
+    const { unsubscribe } = AppEventManager.subscribe(
+      AppEvents.changeNoteTitle,
+      ({ preventSave, title }: { title: string; preventSave: boolean }) => {
+        if (!inputRef.current) return;
+        withSelectionPersist(
+          inputRef.current,
+          (input) => (input.value = title)
+        );
+        updateFontSize(title.length);
+        if (!preventSave) {
+          const { sessionId, id } = store.get().session;
+          debouncedOnTitleChange(sessionId, id, title);
+        }
+      }
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <Input
@@ -81,7 +101,7 @@ function TitleBox(props: TitleBoxProps) {
       dir="auto"
       sx={{
         p: 0,
-        fontFamily: getFontById(editorConfig.fontFamily)?.font || "heading",
+        fontFamily,
         fontSize: ["1.625em", "1.625em", "2.625em"],
         fontWeight: "heading",
         width: "100%",
@@ -102,7 +122,7 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
   return prevProps.readonly === nextProps.readonly;
 });
 
-export function onTitleChange(noteId: string | undefined, title: string) {
+function onTitleChange(noteId: string | undefined, title: string) {
   store.get().setTitle(noteId, title);
 }
 
@@ -113,4 +133,21 @@ function textLengthToFontSize(length: number, max: number) {
   const decreaseStep = 0.5;
   const steps = length / stepLength;
   return Math.max(1.2, Math.min(max, max - steps * decreaseStep));
+}
+
+function withSelectionPersist(
+  input: HTMLInputElement,
+  action: (input: HTMLInputElement) => void
+) {
+  const selection = {
+    start: input.selectionStart,
+    end: input.selectionEnd,
+    direction: input.selectionDirection
+  };
+  action(input);
+  input.setSelectionRange(
+    selection.start,
+    selection.end,
+    selection.direction || undefined
+  );
 }

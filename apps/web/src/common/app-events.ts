@@ -33,5 +33,7 @@ export const AppEvents = {
   updateError: "updateError",
   themeChanged: "themeChanged",
   notificationClicked: "notificationClicked",
-  createItem: "createItem"
+  createItem: "createItem",
+
+  changeNoteTitle: "changeNoteTitle"
 };

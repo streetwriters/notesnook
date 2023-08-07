@@ -44,8 +44,7 @@ import { AnimatedInput } from "../animated";
 import { showPublishView } from "../publish-view";
 import { db } from "../../common/db";
 import { useEditorInstance, useHistory, useSearch } from "./context";
-import { debounceWithId } from "@notesnook/common";
-import { onTitleChange } from "./title-box";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 // TODO: this needs to be cleaned up!
 function Toolbar() {
@@ -55,7 +54,6 @@ function Toolbar() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const toggleFocusMode = useAppStore((store) => store.toggleFocusMode);
-  const setTitle = useStore((store) => store.setTitle);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const toggleEditorMargins = useStore((store) => store.toggleEditorMargins);
   const editorMargins = useStore((store) => store.editorMargins);
@@ -230,8 +228,10 @@ function Toolbar() {
           transition={{ duration: 0.5 }}
           defaultValue={title}
           onChange={(e) => {
-            const { sessionId, id } = store.get().session;
-            debouncedOnTitleChange(sessionId, id, e.target.value);
+            AppEventManager.publish(AppEvents.changeNoteTitle, {
+              title: e.target.value,
+              preventSave: false
+            });
           }}
           sx={{
             flex: 1,
@@ -349,5 +349,3 @@ function exitFullscreen(elem) {
     elem.msExitFullscreen();
   }
 }
-
-const debouncedOnTitleChange = debounceWithId(onTitleChange, 100);

@@ -159,6 +159,11 @@ export default function EditorManager({
           if (!locked && item.locked) return EV.publish(EVENTS.vaultLocked);
 
           editorstore.get().updateSession(item);
+          if (item.title)
+            AppEventManager.publish(AppEvents.changeNoteTitle, {
+              title: item.title,
+              preventSave: true
+            });
         }
       }
     );
