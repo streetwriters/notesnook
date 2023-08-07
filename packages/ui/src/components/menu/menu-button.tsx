@@ -70,7 +70,9 @@ export function MenuButton(props: MenuButtonProps) {
           justifyContent: "space-between"
         }}
       >
-        <Flex sx={{ fontSize: "inherit", fontFamily: "inherit" }}>
+        <Flex
+          sx={{ fontSize: "inherit", fontFamily: "inherit", flexShrink: 0 }}
+        >
           {icon && (
             <Icon
               path={icon}
@@ -86,6 +88,8 @@ export function MenuButton(props: MenuButtonProps) {
               fontSize: "inherit",
               fontFamily: "inherit",
               color: variant === "dangerous" ? "paragraph-error" : "paragraph",
+              textAlign: "left",
+              flexShrink: 0,
               ...styles?.title
             }}
           >
@@ -94,9 +98,22 @@ export function MenuButton(props: MenuButtonProps) {
         </Flex>
         {isChecked || menu || modifier ? (
           <Flex
-            sx={{ ml: 4 }}
+            sx={{ ml: 4, flexShrink: 0 }}
             data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
           >
+            {modifier && (
+              <Text
+                as="span"
+                sx={{
+                  fontFamily: "body",
+                  fontSize: "subBody",
+                  color: "paragraph-secondary",
+                  mr: isChecked || menu ? 1 : 19
+                }}
+              >
+                {translateModifier(modifier)}
+              </Text>
+            )}
             {isChecked && (
               <Icon
                 path={mdiCheck}
@@ -111,21 +128,41 @@ export function MenuButton(props: MenuButtonProps) {
                 color={variant === "dangerous" ? "icon-error" : "icon"}
               />
             )}
-            {modifier && (
-              <Text
-                as="span"
-                sx={{
-                  fontFamily: "body",
-                  fontSize: "menu",
-                  color: "paragraph-secondary"
-                }}
-              >
-                {modifier}
-              </Text>
-            )}
           </Flex>
         ) : null}
       </Button>
     </Flex>
   );
+}
+
+const platform = getPlatform();
+function translateModifier(modifier: string) {
+  if (platform === "Android" || platform === "iOS") return "";
+  const parts = modifier.split("-");
+  return parts
+    .map((p) => (p === "Mod" ? (platform === "macOS" ? "Cmd" : "Ctrl") : p))
+    .join("+");
+}
+
+function getPlatform() {
+  const userAgent = window.navigator.userAgent,
+    platform = window.navigator.platform,
+    macosPlatforms = ["Macintosh", "MacIntel", "MacPPC", "Mac68K"],
+    windowsPlatforms = ["Win32", "Win64", "Windows", "WinCE"],
+    iosPlatforms = ["iPhone", "iPad", "iPod"],
+    os = null;
+
+  if (macosPlatforms.indexOf(platform) !== -1) {
+    return "macOS";
+  } else if (iosPlatforms.indexOf(platform) !== -1) {
+    return "iOS";
+  } else if (windowsPlatforms.indexOf(platform) !== -1) {
+    return "Windows";
+  } else if (/Android/.test(userAgent)) {
+    return "Android";
+  } else if (!os && /Linux/.test(platform)) {
+    return "Linux";
+  }
+
+  return os;
 }
