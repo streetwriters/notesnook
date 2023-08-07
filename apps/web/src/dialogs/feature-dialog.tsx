@@ -89,7 +89,23 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [],
+      : [
+          {
+            title: "Custom themes",
+            subtitle:
+              "You can now customize how each part of Notesnook looks to your hearts desire. To access all available themes just go to Settings > Appearance."
+          },
+          {
+            title: "Improved copy/pasting formatting",
+            subtitle:
+              "The copy/pasting has been significantly improved and should now cause much less frustration due to bad formatting. Give it a try!"
+          },
+          {
+            title: "More reliable attachment uploads",
+            subtitle:
+              "No more sudden and unexpected error popups due to broken attachment uploads. We have fixed lots of bugs in this release to make upload of attachment as smooth as possible."
+          }
+        ],
     cta: {
       title: "Got it",
       icon: Checkmark,
