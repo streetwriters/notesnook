@@ -168,7 +168,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             );
 
           const permissionResult = await Notification.requestPermission();
-          if (permissionResult !== "granted") {
+          if (!IS_TESTING && permissionResult !== "granted") {
             showToast(
               "error",
               "Please grant notifications permission to add new reminders."
