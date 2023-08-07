@@ -220,7 +220,8 @@ function CalltoActions({ item, dismissAnnouncement }) {
       sx={{
         ...mapStyle(style),
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        gap: 1
       }}
     >
       {actions
@@ -234,15 +235,7 @@ function CalltoActions({ item, dismissAnnouncement }) {
             key={index}
             action={action}
             index={index}
-            variant={
-              index === 0
-                ? "primary"
-                : index === 1
-                ? "secondary"
-                : index === 2
-                ? "tertiary"
-                : "shade"
-            }
+            variant={index === 0 ? "accent" : "secondary"}
             sx={{
               ":first-of-type": {
                 mr: 1
@@ -276,10 +269,7 @@ function InlineCalltoActions({ item, dismissAnnouncement }) {
               textDecorationColor:
                 index === 0 ? alpha("accent", 0.7) : "border",
               color: index === 0 ? "accent" : "paragraph",
-              fontWeight: "bold",
-              ":first-of-type": {
-                mr: 1
-              }
+              fontWeight: "bold"
             }}
             dismissAnnouncement={dismissAnnouncement}
           />

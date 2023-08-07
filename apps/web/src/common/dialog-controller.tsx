@@ -621,7 +621,7 @@ export function showEditReminderDialog(reminderId: string) {
   ));
 }
 
-export function showAnnouncementDialog(announcement: { id: string }) {
+export function showAnnouncementDialog(announcement: any) {
   return showDialog("AnnouncementDialog", (Dialog, perform) => (
     <Dialog
       announcement={announcement}
