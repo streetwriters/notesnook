@@ -237,7 +237,7 @@ function ThemesList() {
               <ThemeItem
                 key={theme.id}
                 theme={theme}
-                isApplied={false}
+                isApplied={isThemeCurrentlyApplied(theme.id)}
                 isApplying={isApplying}
                 setTheme={setTheme}
               />
