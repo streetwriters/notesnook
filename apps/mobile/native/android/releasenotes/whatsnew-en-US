@@ -1,3 +1,41 @@
-- Bug fixes and performance improvements
+- Added support for custom themes
+- Support math & codeblocks in PDF exports
+- Improved copy/pasting to and from Notesnook
+-  
+
 
 Thank you for using Notesnook!
+
+
+## What's Changed
+* Update other-settings.ts by @absolutez3 in https://github.com/streetwriters/notesnook/pull/2943
+* web: fix entering password closes publish dialog by @ammarahm-ed in https://github.com/streetwriters/notesnook/pull/2969
+* editor: fix copy button is disabled in readonly mode by @ammarahm-ed in https://github.com/streetwriters/notesnook/pull/2970
+* mobile: fix sorting favorites by @ammarahm-ed in https://github.com/streetwriters/notesnook/pull/2967
+* Fix tablet mode by @ammarahm-ed in https://github.com/streetwriters/notesnook/pull/2965
+* Fix color picker height with bottom toolbar on desktop by @ammarahm-ed in https://github.com/streetwriters/notesnook/pull/2976
+* Feat: add support for copying link & link text in editor menu & desktop context menu by @ammarahm-ed in https://github.com/streetwriters/notesnook/pull/2986
+* Move focus to editor on Tab press in note title by @alihamuh in https://github.com/streetwriters/notesnook/pull/2983
+* web: added regex to replace tag for pdf formatting by @alihamuh in https://github.com/streetwriters/notesnook/pull/3001
+* Fix math render export by @alihamuh in https://github.com/streetwriters/notesnook/pull/2094
+* Replace <br> tags with paragraphs when pasting HTML by @alihamuh in https://github.com/streetwriters/notesnook/pull/1853
+* Make first step for importing notes clear as: go to importer.notesnook.com by @thecodrr in https://github.com/streetwriters/notesnook/pull/3018
+* Open source Vericrypt again by @thecodrr in https://github.com/streetwriters/notesnook/pull/3049
+* Theme engine by @ammarahm-ed in https://github.com/streetwriters/notesnook/pull/2196
+* web: added colorScheme to Field by @alihamuh in https://github.com/streetwriters/notesnook/pull/3039
+* Prevent unintentional note saving on open by @thecodrr in https://github.com/streetwriters/notesnook/pull/3021
+* Respect text direction when adding nodes by @alihamuh in https://github.com/streetwriters/notesnook/pull/3014
+* Fix "Dynamic module import is disabled" error on Firefox ESR & Tor Browser by @thecodrr in https://github.com/streetwriters/notesnook/pull/3017
+* Render math and code blocks during HTML/PDF export by @thecodrr in https://github.com/streetwriters/notesnook/pull/3031
+* Improve copy/pasting in editor to preserve formatting by @thecodrr in https://github.com/streetwriters/notesnook/pull/3016
+* Use unlike-ltd/github-actions-cloudflare-pages for deployments by @thecodrr in https://github.com/streetwriters/notesnook/pull/3071
+* Prevent scroll jump when toggling focus mode by @thecodrr in https://github.com/streetwriters/notesnook/pull/3073
+* Fix cursor jumps when editing sticky title by @alihamuh in https://github.com/streetwriters/notesnook/pull/3028
+* Reduce app size by @ammarahm-ed in https://github.com/streetwriters/notesnook/pull/3068
+* core: fix logger performance by @ammarahm-ed in https://github.com/streetwriters/notesnook/pull/3074
+
+## New Contributors
+* @absolutez3 made their first contribution in https://github.com/streetwriters/notesnook/pull/2943
+
+**Full Changelog**: https://github.com/streetwriters/notesnook/compare/2.5.6-android...2.6.0-android
+
