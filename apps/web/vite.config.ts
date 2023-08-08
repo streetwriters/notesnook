@@ -28,6 +28,7 @@ import { execSync } from "child_process";
 import { version } from "./package.json";
 import { visualizer } from "rollup-plugin-visualizer";
 import { OutputPlugin } from "rollup";
+import path from "path";
 
 const gitHash = (() => {
   try {
@@ -40,13 +41,14 @@ const appVersion = version.replaceAll(".", "");
 const isTesting =
   process.env.TEST === "true" || process.env.NODE_ENV === "development";
 const isDesktop = process.env.PLATFORM === "desktop";
+const isThemeBuilder = process.env.THEME_BUILDER === "true";
 const isAnalyzing = process.env.ANALYZING === "true";
 process.env.NN_BUILD_TIMESTAMP = isTesting ? "0" : `${Date.now()}`;
 
 export default defineConfig({
   envPrefix: "NN_",
   root: "src/",
-  publicDir: "../public",
+  publicDir: isThemeBuilder ? path.join(__dirname, "public") : "../public",
   build: {
     target: isDesktop ? "esnext" : "modules",
     outDir: "../build",
@@ -116,7 +118,7 @@ export default defineConfig({
           }) as PluginOption
         ]
       : []),
-    ...(isDesktop && process.env.NODE_ENV === "production"
+    ...((isThemeBuilder || isDesktop) && process.env.NODE_ENV === "production"
       ? []
       : [
           VitePWA({
