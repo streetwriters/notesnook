@@ -111,25 +111,31 @@ export default function ThemeBuilder() {
 
   const formRef = useRef(null);
 
+  function getThemeFromFormData() {
+    if (!formRef.current) return;
+    const body = new FormData(formRef.current);
+    const flattenedThemeRaw = {
+      ...Object.fromEntries(body.entries()),
+      ...flatten({ authors: [...authors] })
+    };
+
+    const flattenedTheme: { [name: string]: any } = {};
+
+    for (const key in flattenedThemeRaw) {
+      if (flattenedThemeRaw[key] === "" || !flattenedThemeRaw[key]) continue;
+      if (key === "compatibilityVersion" || key === "version") {
+        flattenedTheme[key] = parseFloat(flattenedThemeRaw[key]);
+      } else {
+        flattenedTheme[key] = flattenedThemeRaw[key];
+      }
+    }
+    return flattenedTheme;
+  }
+
   const onChange: React.FormEventHandler<HTMLDivElement> = useCallback(
     debounce(() => {
-      if (!formRef.current) return;
-      const body = new FormData(formRef.current);
-      const flattenedThemeRaw = {
-        ...Object.fromEntries(body.entries()),
-        ...flatten({ authors: [...authors] })
-      };
-
-      const flattenedTheme: { [name: string]: any } = {};
-
-      for (const key in flattenedThemeRaw) {
-        if (flattenedThemeRaw[key] === "" || !flattenedThemeRaw[key]) continue;
-        if (key === "compatibilityVersion" || key === "version") {
-          flattenedTheme[key] = parseFloat(flattenedThemeRaw[key]);
-        } else {
-          flattenedTheme[key] = flattenedThemeRaw[key];
-        }
-      }
+      const flattenedTheme = getThemeFromFormData();
+      if (!flattenedTheme) return;
 
       const theme = unflatten(flattenedTheme);
       const result = validateTheme(theme as ThemeDefinition);
@@ -201,6 +207,40 @@ export default function ThemeBuilder() {
     }
   };
 
+  const applySearchReplace = () => {
+    const term = (
+      document.getElementById("theme-search-term") as HTMLInputElement
+    )?.value;
+    const replace = (
+      document.getElementById("theme-replace-with") as HTMLInputElement
+    )?.value;
+
+    const flattenedTheme = getThemeFromFormData();
+    if (!flattenedTheme) return;
+
+    for (const key in flattenedTheme) {
+      if (
+        typeof flattenedTheme[key] === "string" &&
+        flattenedTheme[key].includes(term)
+      ) {
+        flattenedTheme[key] = flattenedTheme[key].replace(term, replace);
+      }
+    }
+    const theme = unflatten(flattenedTheme);
+    const result = validateTheme(theme as ThemeDefinition);
+
+    if (result.error) {
+      showToast("error", result.error);
+      return;
+    }
+    // rerender to input values are updated.
+    setLoading(true);
+    setTheme({ ...theme } as ThemeDefinition);
+    setTimeout(() => {
+      setLoading(false);
+    });
+  };
+
   return loading ? null : (
     <Flex
       sx={{
@@ -210,14 +250,15 @@ export default function ThemeBuilder() {
         flexDirection: "column",
         height: "100%",
         overflowY: "scroll",
-        padding: "10px 10px",
+        padding: "10px 0px",
         rowGap: "10px"
       }}
     >
       <Flex
         sx={{
           justifyContent: "space-between",
-          alignItems: "center"
+          alignItems: "center",
+          paddingX: "10px"
         }}
       >
         <Text
@@ -230,24 +271,89 @@ export default function ThemeBuilder() {
         </Text>
       </Flex>
 
-      <Button sx={{ py: "7px" }} variant="secondary" onClick={exportTheme}>
-        <Text
-          sx={{
-            fontSize: "12px"
+      <Flex
+        sx={{
+          flexDirection: "column",
+          rowGap: "10px",
+          borderTop: "1px solid var(--border)",
+          borderBottom: "1px solid var(--border)",
+          paddingBottom: "10px",
+          paddingX: "10px",
+          paddingTop: "10px"
+        }}
+      >
+        <Button sx={{ py: "7px" }} variant="secondary" onClick={exportTheme}>
+          <Text
+            sx={{
+              fontSize: "12px"
+            }}
+          >
+            Export theme
+          </Text>
+        </Button>
+        <Button sx={{ py: "7px" }} variant="secondary" onClick={loadThemeFile}>
+          <Text
+            sx={{
+              fontSize: "12px"
+            }}
+          >
+            Load theme file
+          </Text>
+        </Button>
+
+        <Field
+          label="Search & Replace"
+          name="Search"
+          id="theme-search-term"
+          styles={{
+            label: {
+              fontSize: "12px",
+              fontWeight: "normal",
+              color: "paragraph-secondary"
+            },
+            input: {
+              marginLeft: "0px",
+              marginRight: "0px",
+              height: "30px",
+              fontSize: "12px"
+            }
           }}
-        >
-          Export theme
-        </Text>
-      </Button>
-      <Button sx={{ py: "7px" }} variant="secondary" onClick={loadThemeFile}>
-        <Text
-          sx={{
-            fontSize: "12px"
+          placeholder="Search"
+        />
+
+        <Field
+          name="Replace"
+          id="theme-replace-with"
+          styles={{
+            label: {
+              fontSize: "12px",
+              fontWeight: "normal",
+              color: "paragraph-secondary"
+            },
+            input: {
+              marginLeft: "0px",
+              marginRight: "0px",
+              height: "30px",
+              fontSize: "12px"
+            }
           }}
+          placeholder="Replace with"
+        />
+
+        <Button
+          sx={{ py: "7px" }}
+          variant="secondary"
+          onClick={applySearchReplace}
         >
-          Load theme file
-        </Text>
-      </Button>
+          <Text
+            sx={{
+              fontSize: "12px"
+            }}
+          >
+            Replace
+          </Text>
+        </Button>
+      </Flex>
 
       <Flex
         as="form"
@@ -259,7 +365,8 @@ export default function ThemeBuilder() {
         }}
         sx={{
           flexDirection: "column",
-          rowGap: "0.5rem"
+          rowGap: "0.5rem",
+          paddingX: "10px"
         }}
       >
         {Object.keys(ThemeInfoTemplate).map((key) => {
