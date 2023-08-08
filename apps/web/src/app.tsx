@@ -19,10 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState, Suspense, useRef } from "react";
 import { Box, Flex } from "@theme-ui/components";
-import {
-  BaseThemeProvider,
-  ScopedThemeProvider
-} from "./components/theme-provider";
+import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
 import useDatabase from "./hooks/use-database";
@@ -53,7 +50,7 @@ function App() {
   const [isAppLoaded] = useDatabase();
 
   return (
-    <BaseThemeProvider sx={{ height: "100%" }} addGlobalStyles>
+    <>
       {isAppLoaded && (
         <Suspense fallback={<div style={{ display: "none" }} />}>
           <div id="menu-wrapper">
@@ -85,7 +82,7 @@ function App() {
         )}
         <Toaster containerClassName="toasts-container" />
       </Flex>
-    </BaseThemeProvider>
+    </>
   );
 }
 

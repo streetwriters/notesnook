@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "../app.css";
 import { useEffect } from "react";
 import { Flex, Text } from "@theme-ui/components";
-import { BaseThemeProvider } from "../components/theme-provider";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { useQueryParams } from "../navigation";
 import { MailCheck, Discord, Twitter, Reddit } from "../components/icons";
@@ -32,10 +31,8 @@ function EmailConfirmed() {
   }, [userId]);
 
   return (
-    <BaseThemeProvider
-      addGlobalStyles
+    <Flex
       sx={{
-        display: "flex",
         bg: "background",
         flexDirection: "column",
         fontSize: [14, 16, 18],
@@ -99,7 +96,7 @@ function EmailConfirmed() {
       >
         <BlogPromoBanner />
       </Flex>
-    </BaseThemeProvider>
+    </Flex>
   );
 }
 export default EmailConfirmed;

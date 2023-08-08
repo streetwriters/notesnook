@@ -17,151 +17,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import "./polyfills";
-import "@notesnook/core/types";
-import { AppEventManager, AppEvents } from "./common/app-events";
 import { render } from "react-dom";
-import { getCurrentHash, getCurrentPath, makeURL } from "./navigation";
-import Config from "./utils/config";
-
-import { initalizeLogger, logger } from "./utils/logger";
-import { AuthProps } from "./views/auth";
+import { Routes, init } from "./bootstrap";
+import { logger } from "./utils/logger";
 import { loadDatabase } from "./hooks/use-database";
-
-type Route<TProps = null> = {
-  component: () => Promise<{
-    default: TProps extends null
-      ? () => JSX.Element
-      : (props: TProps) => JSX.Element;
-  }>;
-  props: TProps | null;
-};
-
-type RouteWithPath<T = null> = {
-  route: Route<T>;
-  path: Routes;
-};
-
-type Routes = keyof typeof routes;
-// | "/account/recovery"
-// | "/account/verified"
-// | "/signup"
-// | "/login"
-// | "/sessionexpired"
-// | "/recover"
-// | "/mfa/code"
-// | "/mfa/select"
-// | "default";
-
-const routes = {
-  "/account/recovery": {
-    component: () => import("./views/recovery"),
-    props: { route: "methods" }
-  },
-  "/account/verified": {
-    component: () => import("./views/email-confirmed"),
-    props: {}
-  },
-  "/signup": {
-    component: () => import("./views/auth"),
-    props: { route: "signup" }
-  },
-  "/sessionexpired": {
-    component: () => import("./views/auth"),
-    props: { route: "sessionExpiry" }
-  },
-  "/login": {
-    component: () => import("./views/auth"),
-    props: { route: "login:email" }
-  },
-  "/login/password": {
-    component: () => import("./views/auth"),
-    props: { route: "login:email" }
-  },
-  "/recover": {
-    component: () => import("./views/auth"),
-    props: { route: "recover" }
-  },
-  "/login/mfa/code": {
-    component: () => import("./views/auth"),
-    props: { route: "login:email" }
-  },
-  "/login/mfa/select": {
-    component: () => import("./views/auth"),
-    props: { route: "login:email" }
-  },
-  default: { component: () => import("./app"), props: null }
-} as const;
-
-const sessionExpiryExceptions: Routes[] = [
-  "/recover",
-  "/account/recovery",
-  "/sessionexpired",
-  "/login/mfa/code",
-  "/login/mfa/select",
-  "/login/password"
-];
-
-const serviceWorkerWhitelist: Routes[] = ["default"];
-
-function getRoute(): RouteWithPath<AuthProps> | RouteWithPath {
-  const path = getCurrentPath() as Routes;
-  logger.info(`Getting route for path: ${path}`);
-
-  const signup = redirectToRegistration(path);
-  const sessionExpired = isSessionExpired(path);
-  const fallback = fallbackRoute();
-  const route = (
-    routes[path] ? { route: routes[path], path } : null
-  ) as RouteWithPath<AuthProps> | null;
-
-  return signup || sessionExpired || route || fallback;
-}
-
-function fallbackRoute(): RouteWithPath {
-  return { route: routes.default, path: "default" };
-}
-
-function redirectToRegistration(path: Routes): RouteWithPath<AuthProps> | null {
-  if (!IS_TESTING && !shouldSkipInitiation() && !routes[path]) {
-    window.history.replaceState({}, "", makeURL("/signup", getCurrentHash()));
-    return { route: routes["/signup"], path: "/signup" };
-  }
-  return null;
-}
-
-function isSessionExpired(path: Routes): RouteWithPath<AuthProps> | null {
-  const isSessionExpired = Config.get("sessionExpired", false);
-  if (isSessionExpired && !sessionExpiryExceptions.includes(path)) {
-    logger.info(`User session has expired. Routing to /sessionexpired`);
-
-    window.history.replaceState(
-      {},
-      "",
-      makeURL("/sessionexpired", getCurrentHash())
-    );
-    return { route: routes["/sessionexpired"], path: "/sessionexpired" };
-  }
-  return null;
-}
+import { AppEventManager, AppEvents } from "./common/app-events";
+import { BaseThemeProvider } from "./components/theme-provider";
 
 renderApp();
 
 async function renderApp() {
-  await initalizeLogger();
-  const {
-    path,
-    route: { component, props }
-  } = getRoute();
+  const { component, props, path } = await init();
 
   if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
   if (IS_DESKTOP_APP) await loadDatabase("db");
 
-  logger.measure("app render");
-
   const { default: Component } = await component();
+  logger.measure("app render");
   render(
-    <Component route={props?.route || "login:email"} />,
+    <BaseThemeProvider
+      addGlobalStyles
+      sx={{ height: path === "default" ? "100%" : "unset" }}
+    >
+      <Component route={props?.route || "login:email"} />
+    </BaseThemeProvider>,
     document.getElementById("root"),
     () => {
       logger.measure("app render");
@@ -171,6 +50,7 @@ async function renderApp() {
   );
 }
 
+const serviceWorkerWhitelist: Routes[] = ["default"];
 async function initializeServiceWorker() {
   if (!IS_DESKTOP_APP) {
     logger.info("Initializing service worker...");
@@ -193,8 +73,4 @@ async function initializeServiceWorker() {
     });
     // window.addEventListener("beforeinstallprompt", () => showInstallNotice());
   }
-}
-
-function shouldSkipInitiation() {
-  return localStorage.getItem("skipInitiation") || false;
 }
