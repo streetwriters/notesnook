@@ -251,6 +251,7 @@ export default function ThemeBuilder() {
 
       <Flex
         as="form"
+        key={currentTheme.id}
         id="theme-form"
         ref={formRef}
         onChange={onThemeChanged}
