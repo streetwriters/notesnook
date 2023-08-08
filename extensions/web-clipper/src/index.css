@@ -6,9 +6,44 @@ body {
 }
 
 .ms-track:hover,
+.selectable,
+.selectable *,
+input,
+textarea {
+  -webkit-touch-callout: initial;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: initial;
+  user-select: text;
+}
+
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::-moz-selection {
+  /* Code for Firefox */
+  background-color: var(--textSelection);
+  color: var(--paragraph);
+}
+
+::selection {
+  background-color: var(--textSelection);
+  color: var(--paragraph);
+}
+
+.ms-track:hover,
 .ms-track:active {
-  background: var(--border) !important;
-  border-width: 0px !important;
+  background: var(--background-secondary) !important;
+  border-left: 1px solid var(--border-secondary) !important;
 }
 
 .ms-track {
@@ -20,5 +55,5 @@ body {
 }
 
 .ms-thumb {
-  background: var(--hover) !important;
+  background: var(--paragraph-secondary) !important;
 }

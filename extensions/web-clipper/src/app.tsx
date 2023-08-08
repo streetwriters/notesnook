@@ -16,18 +16,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useAppStore } from "./stores/app-store";
 import { Login } from "./views/login";
 import { Main } from "./views/main";
 import { Settings } from "./views/settings";
-import { EmotionThemeProvider, useThemeEngineStore } from "@notesnook/theme";
+import {
+  EmotionThemeProvider,
+  themeToCSS,
+  useThemeEngineStore
+} from "@notesnook/theme";
+import { Global, css } from "@emotion/react";
 
 export function App() {
   const isLoggedIn = useAppStore((s) => s.isLoggedIn);
   const user = useAppStore((s) => s.user);
   const route = useAppStore((s) => s.route);
   const navigate = useAppStore((s) => s.navigate);
+  const theme = useThemeEngineStore((store) => store.theme);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -36,27 +42,34 @@ export function App() {
   }, [isLoggedIn]);
 
   useEffect(() => {
-    console.log(user);
     if (user && user.theme) {
       document.body.style.backgroundColor =
         user.theme.scopes.base.primary.background;
       useThemeEngineStore.getState().setTheme(user.theme);
     }
   }, [user]);
+  const cssTheme = useMemo(() => themeToCSS(theme), [theme]);
 
   return (
-    <EmotionThemeProvider scope="base" injectCssVars>
-      {(() => {
-        switch (route) {
-          case "/login":
-            return <Login />;
-          default:
-          case "/":
-            return <Main />;
-          case "/settings":
-            return <Settings />;
-        }
-      })()}
-    </EmotionThemeProvider>
+    <>
+      <Global
+        styles={css`
+          ${cssTheme}
+        `}
+      />
+      <EmotionThemeProvider scope="base" injectCssVars>
+        {(() => {
+          switch (route) {
+            case "/login":
+              return <Login />;
+            default:
+            case "/":
+              return <Main />;
+            case "/settings":
+              return <Settings />;
+          }
+        })()}
+      </EmotionThemeProvider>
+    </>
   );
 }

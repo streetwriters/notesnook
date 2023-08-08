@@ -42,11 +42,13 @@ export const Picker = (props: PropsWithChildren<PickerProps>) => {
           bottom: "auto",
           marginRight: "-50%",
           transform: "translate(-50%, -50%)",
-          boxShadow: `0px 1px 10px ${theme.scopes.base.primary.border}`,
+          boxShadow: `0px 0px 25px 5px ${
+            theme.colorScheme === "dark" ? "#000000aa" : "#0000004e"
+          }`,
           border: "none",
           borderRadius: 5,
           backgroundColor: theme.scopes.base.primary.background,
-          padding: "10px",
+          padding: "0px",
 
           height: "80vh",
           width: "85vw",
@@ -62,7 +64,7 @@ export const Picker = (props: PropsWithChildren<PickerProps>) => {
       isOpen={isOpen}
     >
       <EmotionThemeProvider
-        scope="base"
+        scope="dialog"
         injectCssVars
         sx={{
           display: "flex",
@@ -89,7 +91,7 @@ export const Picker = (props: PropsWithChildren<PickerProps>) => {
           </Flex>
           <Flex
             sx={{
-              bg: "var(--background-secondary)",
+              bg: "background-secondary",
               p: 1,
               justifyContent: "end"
             }}

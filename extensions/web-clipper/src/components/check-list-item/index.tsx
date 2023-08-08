@@ -60,7 +60,8 @@ export function CheckListItem(props: CheckListItemProps) {
           fontSize: "13px",
           ml: 1,
           fontWeight: 400,
-          color: "paragraph"
+          color: "paragraph",
+          textAlign: "left"
         }}
       >
         {title}

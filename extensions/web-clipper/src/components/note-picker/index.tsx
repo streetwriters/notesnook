@@ -96,7 +96,7 @@ export const NotePicker = (props: NotePickerProps) => {
         )}
       </Flex>
 
-      <Picker onClose={close} onDone={() => {}} isOpen={modalVisible}>
+      <Picker onClose={close} onDone={close} isOpen={modalVisible}>
         <FilteredList
           getAll={() => notes}
           filter={(items, query) =>
