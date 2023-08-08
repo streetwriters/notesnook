@@ -18,6 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export const setDocumentTitle = (title?: string) => {
-  if (!title) document.title = "Notesnook";
-  else document.title = `${title} - Notesnook`;
+  if (!title) document.title = APP_TITLE;
+  else document.title = `${title} - ${APP_TITLE}`;
 };

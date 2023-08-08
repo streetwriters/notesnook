@@ -29,6 +29,7 @@ declare global {
   var IS_TESTING: boolean;
   var PLATFORM: "web" | "desktop";
   var IS_BETA: boolean;
+  var APP_TITLE: string;
 
   interface Window {
     os?: () => NodeJS.Platform | "mas";
