@@ -67,7 +67,14 @@ export default function Accordion(
           <ChevronUp size={16} color={color} />
         )}
       </Flex>
-      {!isContentHidden && children}
+      <Flex
+        sx={{
+          display: isContentHidden ? "none" : "flex",
+          flexDirection: "column"
+        }}
+      >
+        {children}
+      </Flex>
     </Flex>
   );
 }
