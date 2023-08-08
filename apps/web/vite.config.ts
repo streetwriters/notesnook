@@ -64,6 +64,7 @@ export default defineConfig({
     }
   },
   define: {
+    APP_TITLE: `"${isThemeBuilder ? "Notesnook Theme Builder" : "Notesnook"}"`,
     GIT_HASH: `"${gitHash}"`,
     APP_VERSION: `"${appVersion}"`,
     PUBLIC_URL: `"${process.env.PUBLIC_URL || ""}"`,
