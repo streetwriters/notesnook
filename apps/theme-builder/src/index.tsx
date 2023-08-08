@@ -34,7 +34,8 @@ async function renderApp() {
       sx={{
         display: "flex",
         "#app": { flex: 1, height: "unset" },
-        height: path === "default" ? "100%" : "unset"
+        "& > :first-child": { flex: 1 },
+        height: "100%"
       }}
     >
       <Component route={props?.route || "login:email"} />

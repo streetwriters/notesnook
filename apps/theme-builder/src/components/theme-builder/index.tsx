@@ -123,14 +123,17 @@ export default function ThemeBuilder() {
   return loading ? null : (
     <Flex
       sx={{
-        width: 300,
+        width: 260,
+        flexShrink: 0,
         bg: "background",
         display: "flex",
         overflow: "hidden",
         flexDirection: "column",
         overflowY: "scroll",
-        padding: "10px 0px",
-        rowGap: "10px"
+        pt: 2,
+        rowGap: 2,
+        borderLeft: "1px solid var(--border)",
+        zIndex: 999
       }}
     >
       <Flex

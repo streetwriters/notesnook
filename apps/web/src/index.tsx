@@ -35,10 +35,7 @@ async function renderApp() {
   const { default: Component } = await component();
   logger.measure("app render");
   render(
-    <BaseThemeProvider
-      addGlobalStyles
-      sx={{ height: path === "default" ? "100%" : "unset" }}
-    >
+    <BaseThemeProvider addGlobalStyles sx={{ height: "100%" }}>
       <Component route={props?.route || "login:email"} />
     </BaseThemeProvider>,
     document.getElementById("root"),
