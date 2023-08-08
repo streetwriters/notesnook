@@ -8,5 +8,5 @@
     "noEmit": true,
     "downlevelIteration": true
   },
-  "include": ["src", "global.d.ts"]
+  "include": ["src"]
 }
