@@ -34,7 +34,7 @@ async function renderApp() {
       sx={{
         display: "flex",
         "#app": { flex: 1, height: "unset" },
-        "& > :first-child": { flex: 1 },
+        "& > :first-child:not(#menu-wrapper)": { flex: 1 },
         height: "100%"
       }}
     >
