@@ -16,7 +16,7 @@ jobs:
       - name: Install packages
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=web
+          npm run bootstrap -- --scope=themebuilder
 
       - name: Setup environment
         run: |

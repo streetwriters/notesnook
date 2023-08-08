@@ -35,7 +35,8 @@ const scopes = {
   desktop: "apps/desktop",
   core: "packages/core",
   editor: "packages/editor",
-  themes: "servers/themes"
+  themes: "servers/themes",
+  themebuilder: "apps/theme-builder"
 };
 
 if (args.scope && !scopes[args.scope])
