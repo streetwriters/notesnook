@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/web-clipper",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "private": true,
   "main": "./dist/index.js",
   "dependencies": {
@@ -14,9 +14,9 @@
     "@theme-ui/core": "^0.14.7",
     "comlink": "^4.3.1",
     "hyperapp": "^2.0.22",
-    "mac-scrollbar": "^0.10.3",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "mac-scrollbar": "0.10.3",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
     "react-frame-component": "^5.2.1",
     "react-hot-loader": "^4.13.0",
     "react-modal": "3.13.1",
@@ -26,10 +26,10 @@
     "zustand": "4.3.9"
   },
   "scripts": {
-    "build:firefox": "MANIFEST_VERSION=2 node build-utils/build.js",
-    "build:chrome": "MANIFEST_VERSION=3 node build-utils/build.js",
-    "dev:chrome": "MANIFEST_VERSION=3 node build-utils/dev.js",
-    "dev:firefox": "MANIFEST_VERSION=2 node build-utils/dev.js",
+    "build:firefox": "cross-env MANIFEST_VERSION=2 node build-utils/build.js",
+    "build:chrome": "cross-env MANIFEST_VERSION=3 node build-utils/build.js",
+    "dev:chrome": "cross-env MANIFEST_VERSION=3 node build-utils/dev.js",
+    "dev:firefox": "cross-env MANIFEST_VERSION=2 node build-utils/dev.js",
     "build": "tsc"
   },
   "browserslist": {
@@ -54,8 +54,8 @@
     "@types/inline-css": "^3.0.1",
     "@types/jest": "^26.0.14",
     "@types/postlight__mercury-parser": "^2.2.4",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.2",
+    "@types/react": "17.0.2",
+    "@types/react-dom": "17.0.2",
     "@types/react-modal": "3.13.1",
     "@types/sanitize-html": "^2.6.2",
     "@types/webextension-polyfill": "^0.8.3",
@@ -64,6 +64,7 @@
     "babel-preset-react-app": "^10.0.1",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^7.0.0",
+    "cross-env": "^7.0.3",
     "css-loader": "^6.6.0",
     "eslint": "^8.8.0",
     "eslint-config-react-app": "^7.0.0",
@@ -86,15 +87,6 @@
     "webpack": "^5.68.0",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.4"
-  },
-  "watch": {
-    "build": {
-      "patterns": [
-        "./src/**/**/**/*",
-        "./public/**/*"
-      ],
-      "extensions": "ts,js,json,tsx,jsx"
-    }
   },
   "license": "GPL-3.0-or-later",
   "author": {

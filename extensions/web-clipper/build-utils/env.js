@@ -18,5 +18,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 module.exports = {
   NODE_ENV: process.env.NODE_ENV || "development",
-  PORT: process.env.PORT || 3000
+  PORT: process.env.PORT || 3333
 };
