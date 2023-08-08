@@ -27,13 +27,14 @@ import {
 } from "@notesnook/theme";
 import { Button, Flex, Input, Text } from "@theme-ui/components";
 import FileSaver from "file-saver";
-import { useCallback, useRef, useState } from "react";
+import { FormEventHandler, useCallback, useRef, useState } from "react";
 import { useStore } from "@notesnook/web/src/stores/theme-store";
 import { showToast } from "@notesnook/web/src/utils/toast";
 import Accordion from "@notesnook/web/src/components/accordion";
-import { showFilePicker } from "@notesnook/web/src/utils/file-picker";
+import { showFilePicker, readFile } from "@notesnook/web/src/utils/file-picker";
 import Field from "@notesnook/web/src/components/field";
 import { Close } from "@notesnook/web/src/components/icons";
+import { flatten, unflatten } from "../../utils/object";
 
 const JSON_SCHEMA_URL =
   "https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/schemas/v1.schema.json";
@@ -49,55 +50,11 @@ const ThemeInfoTemplate: Omit<
   description: ""
 };
 
-function toTitleCase(value: string) {
-  return (
-    value.slice(0, 1).toUpperCase() +
-    value.slice(1).replace(/([A-Z]+)*([A-Z][a-z])/g, "$1 $2")
-  );
-}
-
-const flatten = (object: { [name: string]: any }) => {
-  const flattenedObject: { [name: string]: any } = {};
-
-  for (const innerObj in object) {
-    if (typeof object[innerObj] === "object") {
-      if (typeof object[innerObj] === "function") continue;
-
-      const newObject = flatten(object[innerObj]);
-      for (const key in newObject) {
-        flattenedObject[innerObj + "." + key] = newObject[key];
-      }
-    } else {
-      if (typeof object[innerObj] === "function") continue;
-      flattenedObject[innerObj] = object[innerObj];
-    }
-  }
-  return flattenedObject;
-};
-
-function unflatten(data: any) {
-  const result = {};
-  for (const i in data) {
-    const keys = i.split(".");
-    keys.reduce(function (r: any, e, j) {
-      return (
-        r[e] ||
-        (r[e] = isNaN(Number(keys[j + 1]))
-          ? keys.length - 1 == j
-            ? data[i]
-            : {}
-          : [])
-      );
-    }, result);
-  }
-  return result;
-}
-
 export default function ThemeBuilder() {
-  const currentTheme = useStore((state: any) =>
+  const currentTheme = useStore((state) =>
     state.colorScheme === "dark" ? state.darkTheme : state.lightTheme
   );
-  const setTheme = useStore((state: any) => state.setTheme);
+  const setTheme = useStore((state) => state.setTheme);
   const [loading, setLoading] = useState(false);
   const currentThemeFlattened = flatten(currentTheme);
 
@@ -109,32 +66,11 @@ export default function ThemeBuilder() {
     ]
   );
 
-  const formRef = useRef(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  function getThemeFromFormData() {
-    if (!formRef.current) return;
-    const body = new FormData(formRef.current);
-    const flattenedThemeRaw = {
-      ...Object.fromEntries(body.entries()),
-      ...flatten({ authors: [...authors] })
-    };
-
-    const flattenedTheme: { [name: string]: any } = {};
-
-    for (const key in flattenedThemeRaw) {
-      if (flattenedThemeRaw[key] === "" || !flattenedThemeRaw[key]) continue;
-      if (key === "compatibilityVersion" || key === "version") {
-        flattenedTheme[key] = parseFloat(flattenedThemeRaw[key]);
-      } else {
-        flattenedTheme[key] = flattenedThemeRaw[key];
-      }
-    }
-    return flattenedTheme;
-  }
-
-  const onChange: React.FormEventHandler<HTMLDivElement> = useCallback(
+  const onThemeChanged: FormEventHandler<HTMLDivElement> = useCallback(
     debounce(() => {
-      const flattenedTheme = getThemeFromFormData();
+      const flattenedTheme = getThemeFromFormData(formRef.current, authors);
       if (!flattenedTheme) return;
 
       const theme = unflatten(flattenedTheme);
@@ -146,68 +82,11 @@ export default function ThemeBuilder() {
       }
 
       setTheme({ ...theme } as ThemeDefinition);
-    }, 3000),
-    []
+    }, 1000),
+    [authors]
   );
 
-  const loadThemeFile = async () => {
-    const file = await showFilePicker({
-      acceptedFileTypes: ".nnbackup,application/json,.json"
-    });
-    if (!file) return;
-    const reader = new FileReader();
-    const theme = (await new Promise((resolve) => {
-      reader.addEventListener("load", (event) => {
-        const text = event.target?.result;
-        try {
-          resolve(JSON.parse(text as string));
-        } catch (e) {
-          alert(
-            "Error: Could not read the backup file provided. Either it's corrupted or invalid."
-          );
-          resolve(undefined);
-        }
-      });
-      reader.readAsText(file);
-    })) as ThemeDefinition | undefined;
-    if (
-      !theme ||
-      !theme.scopes ||
-      !theme.compatibilityVersion ||
-      !theme.id ||
-      !theme.version
-    )
-      return;
-    setLoading(true);
-    setTheme(theme);
-    setLoading(false);
-  };
-
-  const exportTheme = () => {
-    const json = JSON.stringify({
-      ...currentTheme,
-      $schema: JSON_SCHEMA_URL
-    });
-
-    FileSaver.saveAs(
-      new Blob([json], {
-        type: "text/plain"
-      }),
-      `${currentTheme.id}.json`
-    );
-  };
-
-  const onChangeColor = (
-    target: HTMLInputElement,
-    sibling: HTMLInputElement
-  ) => {
-    const value = target.value;
-    if ((sibling as HTMLInputElement).value !== value) {
-      (sibling as HTMLInputElement).value = target.value;
-    }
-  };
-
-  const applySearchReplace = () => {
+  const applySearchReplace = useCallback(() => {
     const term = (
       document.getElementById("theme-search-term") as HTMLInputElement
     )?.value;
@@ -215,7 +94,7 @@ export default function ThemeBuilder() {
       document.getElementById("theme-replace-with") as HTMLInputElement
     )?.value;
 
-    const flattenedTheme = getThemeFromFormData();
+    const flattenedTheme = getThemeFromFormData(formRef.current, authors);
     if (!flattenedTheme) return;
 
     for (const key in flattenedTheme) {
@@ -239,16 +118,16 @@ export default function ThemeBuilder() {
     setTimeout(() => {
       setLoading(false);
     });
-  };
+  }, [authors, setTheme]);
 
   return loading ? null : (
     <Flex
       sx={{
+        width: 300,
+        bg: "background",
         display: "flex",
         overflow: "hidden",
-        flex: 1,
         flexDirection: "column",
-        height: "100%",
         overflowY: "scroll",
         padding: "10px 0px",
         rowGap: "10px"
@@ -261,14 +140,7 @@ export default function ThemeBuilder() {
           paddingX: "10px"
         }}
       >
-        <Text
-          sx={{
-            fontSize: "12px"
-          }}
-          variant="heading"
-        >
-          Theme Builder 1.0
-        </Text>
+        <Text variant="title">Theme Builder 1.0</Text>
       </Flex>
 
       <Flex
@@ -282,7 +154,11 @@ export default function ThemeBuilder() {
           paddingTop: "10px"
         }}
       >
-        <Button sx={{ py: "7px" }} variant="secondary" onClick={exportTheme}>
+        <Button
+          sx={{ py: "7px" }}
+          variant="secondary"
+          onClick={() => exportTheme(currentTheme)}
+        >
           <Text
             sx={{
               fontSize: "12px"
@@ -291,7 +167,25 @@ export default function ThemeBuilder() {
             Export theme
           </Text>
         </Button>
-        <Button sx={{ py: "7px" }} variant="secondary" onClick={loadThemeFile}>
+        <Button
+          sx={{ py: "7px" }}
+          variant="secondary"
+          onClick={async () => {
+            const file = await showFilePicker({
+              acceptedFileTypes: "application/json"
+            });
+            if (!file) return;
+            try {
+              setLoading(true);
+              const theme = JSON.parse(await readFile(file)) as ThemeDefinition;
+              const { error } = validateTheme(theme);
+              if (error) return showToast("error", error);
+              setTheme(theme);
+            } finally {
+              setLoading(false);
+            }
+          }}
+        >
           <Text
             sx={{
               fontSize: "12px"
@@ -359,7 +253,7 @@ export default function ThemeBuilder() {
         as="form"
         id="theme-form"
         ref={formRef}
-        onChange={onChange}
+        onChange={onThemeChanged}
         onSubmit={(event) => {
           event?.preventDefault();
         }}
@@ -422,7 +316,7 @@ export default function ThemeBuilder() {
           key="compatibilityVersion"
         />
 
-        {authors.map((author: any, index: number) => (
+        {authors.map((author, index) => (
           <Flex
             key={author.name}
             sx={{
@@ -458,7 +352,7 @@ export default function ThemeBuilder() {
                       console.log("Theme must have at least one author");
                       return;
                     }
-                    setAuthors((current: any) => {
+                    setAuthors((current) => {
                       const authors = [...current];
                       authors.splice(index, 1);
                       return authors;
@@ -507,7 +401,7 @@ export default function ThemeBuilder() {
 
         <Button
           onClick={() => {
-            setAuthors((current: any) => {
+            setAuthors((current) => {
               const authors = [...current];
               authors.push({
                 name: ""
@@ -628,11 +522,11 @@ export default function ThemeBuilder() {
                               ? `Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)`
                               : `Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)`
                           }
-                          defaultValue={
+                          defaultValue={convertColor(
                             currentThemeFlattened[
                               `scopes.${scopeName}.${variantName}.${colorName}`
                             ]
-                          }
+                          )}
                           sx={{
                             borderRadius: 0,
                             borderBottom: "1px solid var(--border)",
@@ -656,8 +550,8 @@ export default function ThemeBuilder() {
 }
 
 function SelectItem(props: {
-  options: { title: string; value: any }[];
-  defaultValue: any;
+  options: { title: string; value: string | number }[];
+  defaultValue: string | number;
   onChange?: (value: string) => void;
   label: string;
   name: string;
@@ -702,5 +596,63 @@ function SelectItem(props: {
         ))}
       </select>
     </Flex>
+  );
+}
+
+function exportTheme(theme: ThemeDefinition) {
+  const json = JSON.stringify({
+    ...theme,
+    $schema: JSON_SCHEMA_URL
+  });
+
+  FileSaver.saveAs(
+    new Blob([json], {
+      type: "text/plain"
+    }),
+    `${theme.id}.json`
+  );
+}
+
+const onChangeColor = (target: HTMLInputElement, sibling: HTMLInputElement) => {
+  const value = target.value;
+  if ((sibling as HTMLInputElement).value !== value) {
+    (sibling as HTMLInputElement).value = convertColor(target.value);
+  }
+};
+
+function convertColor(color: string) {
+  return color && color.length === 4
+    ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
+    : color;
+}
+
+function getThemeFromFormData(
+  form: HTMLFormElement | undefined | null,
+  authors: ThemeAuthor[]
+) {
+  if (!form) return;
+  const body = new FormData(form);
+  const flattenedThemeRaw = {
+    ...Object.fromEntries(body.entries()),
+    ...flatten({ authors: [...authors] })
+  };
+
+  const flattenedTheme: { [name: string]: any } = {};
+
+  for (const key in flattenedThemeRaw) {
+    if (flattenedThemeRaw[key] === "" || !flattenedThemeRaw[key]) continue;
+    if (key === "compatibilityVersion" || key === "version") {
+      flattenedTheme[key] = parseFloat(flattenedThemeRaw[key]);
+    } else {
+      flattenedTheme[key] = flattenedThemeRaw[key];
+    }
+  }
+  return flattenedTheme;
+}
+
+function toTitleCase(value: string) {
+  return (
+    value.slice(0, 1).toUpperCase() +
+    value.slice(1).replace(/([A-Z]+)*([A-Z][a-z])/g, "$1 $2")
   );
 }
