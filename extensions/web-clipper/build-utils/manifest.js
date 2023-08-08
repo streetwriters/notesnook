@@ -16,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+const { version } = require("../package.json");
+
 const ICONS = {
   16: "16x16.png",
   32: "32x32.png",
@@ -38,7 +40,7 @@ const nnHost =
 const corsHost = "https://cors.notesnook.com/*";
 const common = {
   name: "Notesnook Web Clipper",
-  version: "0.2.2",
+  version,
   description:
     "Clip web pages & save interesting things you find on the web directly into Notesnook in a private & secure way.",
   permissions: ["activeTab", "tabs", "storage", "notifications"],

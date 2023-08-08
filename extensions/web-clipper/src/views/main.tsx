@@ -428,7 +428,7 @@ export function Main() {
             window.close();
           }}
         >
-          <Text variant="body">Save clip</Text>
+          Save clip
         </Button>
 
         <Flex
