@@ -33,7 +33,8 @@ const SCOPES = [
   "misc",
   "common",
   "global",
-  "docs"
+  "docs",
+  "theme-builder"
 ];
 
 module.exports = {

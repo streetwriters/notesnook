@@ -27,6 +27,8 @@ export type AccordionProps = {
   isClosed: boolean;
   color?: SchemeColors;
   testId?: string;
+  buttonSx?: FlexProps["sx"];
+  titleSx?: FlexProps["sx"];
 };
 
 export default function Accordion(
@@ -48,14 +50,15 @@ export default function Accordion(
           cursor: "pointer",
           bg: "var(--background-secondary)",
           p: 1,
-          borderRadius: "default"
+          borderRadius: "default",
+          ...props.buttonSx
         }}
         onClick={() => {
           setIsContentHidden((state) => !state);
         }}
         data-test-id={testId}
       >
-        <Text variant="subtitle" sx={{ color }}>
+        <Text variant="subtitle" sx={{ color, ...props.titleSx }}>
           {title}
         </Text>
         {isContentHidden ? (

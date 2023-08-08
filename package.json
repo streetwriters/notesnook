@@ -11,6 +11,8 @@
     "build:test:web": "nx build:test @notesnook/web",
     "build:beta:web": "nx build:beta @notesnook/web",
     "start:web": "nx start @notesnook/web",
+    "start:theme-builder": "nx start @notesnook/theme-builder",
+    "build:theme-builder": "nx build @notesnook/theme-builder",
     "start:vericrypt": "nx start @notesnook/vericrypt",
     "start:desktop": "nx start @notesnook/desktop",
     "test:web": "nx test @notesnook/web",
