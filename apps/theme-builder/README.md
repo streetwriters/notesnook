@@ -1,5 +1,5 @@
 <p align="center">
-<img style="align:center;" src="/resources/screenshots/web.png" alt="Notesnook theme builder screenshot" width="600" />
+<img style="align:center;" src="/resources/screenshots/theme-builder.png" alt="Notesnook theme builder screenshot" width="600" />
 </p>
 
 <h1 align="center">Notesnook Theme Builder</h1>
