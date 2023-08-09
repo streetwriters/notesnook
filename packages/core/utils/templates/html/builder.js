@@ -95,5 +95,5 @@ async function preprocessHTML(templateData) {
 export default { buildHTML };
 
 function hasRequire() {
-  return typeof require === "function";
+  return typeof require === "function" && !("IS_DESKTOP_APP" in globalThis);
 }
