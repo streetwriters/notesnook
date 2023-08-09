@@ -42,14 +42,18 @@ for (const name in pathsToCopy) {
 }
 
 const languagesList = await langen(ROOT_DIR, path.join(ROOT_DIR, "languages"));
-const languageIndex = `export async function loadLanguage(language) {
+const languageIndex = `function hasRequire() {
+  return typeof require === "function" && !("IS_DESKTOP_APP" in globalThis);
+}
+
+export async function loadLanguage(language) {
   switch (language) {
     ${languagesList
       .map(({ filename, alias }) => {
         return [
           ...(alias || []).map((a) => `case "${a}":`),
           `case "${filename}":`,
-          `return typeof require === "function" ? require("./${filename}.js") : await import("./${filename}.js");`
+          `return hasRequire() ? require("./${filename}.js") : await import("./${filename}.js");`
         ].join("\n");
       })
       .join("\n\n")}
