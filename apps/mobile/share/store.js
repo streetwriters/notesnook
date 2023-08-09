@@ -42,20 +42,23 @@ let appSettings = MMKV.getString(StorageKeys.appSettings);
 if (appSettings) {
   appSettings = JSON.parse(appSettings);
 }
-const theme =
-  Appearance.getColorScheme() !== "dark"
-    ? appSettings?.darkThem
-    : appSettings?.lightTheme;
 
-useThemeEngineStore
-  .getState()
-  .setTheme(
-    theme || (Appearance.getColorScheme() === "dark" ? ThemeDark : ThemeLight)
-  );
+const systemColorScheme = Appearance.getColorScheme();
+const appColorScheme = appSettings.colorScheme;
+const useSystemTheme = appSettings.useSystemTheme;
+const currentColorScheme = useSystemTheme ? systemColorScheme : appColorScheme;
+
+const theme = currentColorScheme
+  ? appSettings?.darkTheme
+  : appSettings?.lightTheme;
+
+const currentTheme =
+  theme || (currentColorScheme === "dark" ? ThemeDark : ThemeLight);
+
+useThemeEngineStore.getState().setTheme(currentTheme);
 
 export const useShareStore = create((set) => ({
-  theme:
-    theme || (Appearance.getColorScheme() === "dark" ? ThemeDark : ThemeLight),
+  theme: currentTheme,
   appendNote: null,
   setAppendNote: (note) => {
     MMKV.setItem(StorageKeys.appendNote, JSON.stringify(note));
