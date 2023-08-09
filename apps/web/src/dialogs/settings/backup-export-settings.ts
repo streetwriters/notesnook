@@ -46,7 +46,10 @@ export const BackupExportSettings: SettingsGroup[] = [
             action: async () => {
               if (!isUserPremium() && useSettingStore.getState().encryptBackups)
                 useSettingStore.getState().toggleEncryptBackups();
-              if (await verifyAccount()) await createBackup();
+              const verified =
+                useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (verified) await createBackup();
             },
             variant: "secondary"
           }
@@ -89,10 +92,15 @@ export const BackupExportSettings: SettingsGroup[] = [
             ],
             selectedOption: () =>
               useSettingStore.getState().backupReminderOffset.toString(),
-            onSelectionChanged: (value) =>
-              useSettingStore
-                .getState()
-                .setBackupReminderOffset(parseInt(value))
+            onSelectionChanged: async (value) => {
+              const verified =
+                useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (verified)
+                useSettingStore
+                  .getState()
+                  .setBackupReminderOffset(parseInt(value));
+            }
           }
         ]
       },
@@ -111,7 +119,12 @@ export const BackupExportSettings: SettingsGroup[] = [
             isToggled: () =>
               !!useUserStore.getState().isLoggedIn &&
               useSettingStore.getState().encryptBackups,
-            toggle: () => useSettingStore.getState().toggleEncryptBackups()
+            toggle: async () => {
+              const verified =
+                !useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (verified) useSettingStore.getState().toggleEncryptBackups();
+            }
           }
         ]
       },
@@ -125,6 +138,11 @@ export const BackupExportSettings: SettingsGroup[] = [
             type: "button",
             title: "Select directory",
             action: async () => {
+              const verified =
+                useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (!verified) return;
+
               const backupStorageLocation =
                 useSettingStore.getState().backupStorageLocation ||
                 PATHS.backupsDirectory;
@@ -164,11 +182,11 @@ export const BackupExportSettings: SettingsGroup[] = [
             selectedOption: () => "-",
             onSelectionChanged: async (value) => {
               if (!db.notes || value === "-") return;
-
-              await exportNotes(
-                value as "txt" | "md" | "html",
-                db.notes.all.map((n) => n.id)
-              );
+              if (await verifyAccount())
+                await exportNotes(
+                  value as "txt" | "md" | "html",
+                  db.notes.all.map((n) => n.id)
+                );
             }
           }
         ]
