@@ -73,3 +73,6 @@ navigation:
       - path: desktop-integration/jumplist-and-dock-menu.md
       - path: desktop-integration/spell-checker.md
       - path: desktop-integration/system-tray-menu.md
+  - path: themes
+    children:
+      - path: themes/creating-themes-with-theme-builder.md
