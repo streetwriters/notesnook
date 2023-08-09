@@ -44,13 +44,14 @@ if (appSettings) {
 }
 
 const systemColorScheme = Appearance.getColorScheme();
-const appColorScheme = appSettings.colorScheme;
-const useSystemTheme = appSettings.useSystemTheme;
+const appColorScheme = appSettings?.colorScheme;
+const useSystemTheme = appSettings?.useSystemTheme;
 const currentColorScheme = useSystemTheme ? systemColorScheme : appColorScheme;
 
-const theme = currentColorScheme
-  ? appSettings?.darkTheme
-  : appSettings?.lightTheme;
+const theme =
+  currentColorScheme === "dark"
+    ? appSettings?.darkTheme
+    : appSettings?.lightTheme;
 
 const currentTheme =
   theme || (currentColorScheme === "dark" ? ThemeDark : ThemeLight);
