@@ -26,6 +26,7 @@ import { createSettingsPicker } from ".";
 import { getFontById, getFonts } from "@notesnook/editor/dist/utils/font";
 import { DATE_FORMATS, TIME_FORMATS } from "@notesnook/core/dist/common";
 import dayjs from "dayjs";
+import { useUserStore } from "../../../stores/use-user-store";
 
 export const FontPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
@@ -127,6 +128,12 @@ export const BackupReminderPicker = createSettingsPicker({
   options: ["useroff", "daily", "weekly", "monthly"],
   compareValue: (current, item) => current === item,
   premium: true,
+  requiresVerification: () => {
+    return (
+      !useSettingStore.getState().settings.encryptedBackup &&
+      useUserStore.getState().user
+    );
+  },
   onCheckOptionIsPremium: (item) => {
     return item !== "useroff";
   }

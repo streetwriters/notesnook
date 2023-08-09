@@ -27,6 +27,8 @@ import PremiumService from "../../../services/premium";
 import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
+import { verifyUser } from "../functions";
+import { Dialog } from "../../../components/dialog";
 
 interface PickerOptions<T> {
   getValue: () => T;
@@ -37,6 +39,7 @@ interface PickerOptions<T> {
   options: T[];
   premium?: boolean;
   onCheckOptionIsPremium?: (item: T) => boolean;
+  requiresVerification?: () => boolean;
 }
 
 export function SettingsPicker<T>({
@@ -47,7 +50,8 @@ export function SettingsPicker<T>({
   options,
   getItemKey,
   premium,
-  onCheckOptionIsPremium = () => true
+  onCheckOptionIsPremium = () => true,
+  requiresVerification = () => false
 }: PickerOptions<T>) {
   const { colors } = useThemeColors("contextMenu");
   const menuRef = useRef<any>();
@@ -118,11 +122,18 @@ export function SettingsPicker<T>({
           </PressableButton>
         }
       >
+        <Dialog context="local" />
         {options.map((item) => (
           <MenuItem
             key={getItemKey(item)}
             onPress={async () => {
-              onChange(item);
+              if (requiresVerification?.()) {
+                verifyUser("local", () => {
+                  onChange(item);
+                });
+              } else {
+                onChange(item);
+              }
             }}
             style={{
               backgroundColor: compareValue(currentValue, item)
