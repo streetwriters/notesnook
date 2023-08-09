@@ -110,7 +110,7 @@ To publish your theme on Notesnook you will need a [GitHub](https://github.com) 
 
 ![Toolbar](/publish-theme-8.png)
 
-10. Click on "Create pull request"
+10. On the next screen, click on "Create pull request" again
 
 ![Toolbar](/publish-theme-9.png)
 
@@ -119,3 +119,35 @@ You are all done. We will review your submission and publish it in the Notesnook
 ![Toolbar](/publish-theme-10.png)
 
 ## Managing updates
+
+Once your theme is published in the Notesnook app, and you need to push a new update for your theme, you will load your {theme-id}.json file in the theme builder app again and make changes to your theme.
+
+Once you have finished making changes, make sure you update the version for your theme.
+
+Finally export it from theme builder and submit a pull request in the same way as you did while publishing.
+
+1. Go to your fork on github, mine is at https://github.com/ammarahm-ed/notesnook-themes.
+
+2. Click on Sync fork and then click Update branch.
+
+![Toolbar](/update-theme-1.png)
+
+3. Go to `themes/your-theme-id/v1`, open the theme.json file and click on the edit button
+
+![Toolbar](/update-theme-2.png)
+
+4. Paste your updated theme and click on Commit changes. Enter title of your commit as `update {theme-id} theme`
+
+![Toolbar](/update-theme-3.png)
+
+5. Now go to the homepage of your fork and click on "Contribute" and then click on "Open pull request" in the popup.
+
+![Toolbar](/update-theme-4.png)
+
+6. Click on "Create pull request"
+
+![Toolbar](/update-theme-5.png)
+
+You are all done. We will review your submission and publish it in the Notesnook app.
+
+![Toolbar](/update-theme-6.png)
