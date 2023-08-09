@@ -29,7 +29,7 @@ import { RootContent } from "hast";
 import { ReplaceAroundStep, ReplaceStep } from "prosemirror-transform";
 import { toCaretPosition, toCodeLines } from "./code-block";
 import Languages from "./languages.json";
-import { loadLanguage } from "./loader";
+import { isLanguageLoaded, loadLanguage } from "./loader";
 import { getChangedNodes } from "../../utils/prosemirror";
 
 export type ReplaceMergedStep = ReplaceAroundStep | ReplaceStep;
@@ -139,7 +139,10 @@ export function HighlighterPlugin({
             );
             if (!languageDefinition) continue;
 
-            if (refractor.registered(language)) {
+            if (
+              isLanguageLoaded(languageDefinition.filename) ||
+              refractor.registered(languageDefinition.filename)
+            ) {
               if (!HIGHLIGHTED_BLOCKS.has(blockKey)) {
                 HIGHLIGHTED_BLOCKS.add(blockKey);
                 changedBlocks.add(blockKey);
@@ -152,7 +155,12 @@ export function HighlighterPlugin({
 
             try {
               const syntax = await loadLanguage(languageDefinition.filename);
-              if (!syntax) continue;
+              if (!syntax) {
+                throw new Error(
+                  "Failed to load language definition for " +
+                    languageDefinition.filename
+                );
+              }
 
               refractor.register(syntax);
             } catch (err) {
