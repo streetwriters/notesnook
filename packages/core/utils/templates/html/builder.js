@@ -69,7 +69,9 @@ async function preprocessHTML(templateData) {
     const { loadLanguage } = hasRequire()
       ? require("../../../../editor/languages/index.js")
       : await import("../../../../editor/languages/index.js");
-    prismjs.register = () => {};
+    prismjs.register = (syntax) => {
+      if (typeof arg === "function") syntax(prismjs);
+    };
     for (const codeblock of codeblocks) {
       const language = LANGUAGE_REGEX.exec(
         codeblock.parentElement.className
@@ -78,6 +80,7 @@ async function preprocessHTML(templateData) {
 
       const { default: grammar } = await loadLanguage(language);
       grammar(prismjs);
+      if (!prismjs.languages[language]) continue;
 
       codeblock.innerHTML = prismjs.highlight(
         codeblock.textContent,
