@@ -63,11 +63,11 @@ function ThemeDetailsDialog(props: ThemeDetailsDialogProps) {
         <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
           {theme.authors.map((author) => author.name).join(", ")}
         </Text>
-        {theme.totalInstalls && (
+        {theme.totalInstalls && theme.totalInstalls > 0 ? (
           <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
             {theme.totalInstalls} installs
           </Text>
-        )}
+        ) : null}
         <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
           Licensed under {theme.license}
         </Text>
