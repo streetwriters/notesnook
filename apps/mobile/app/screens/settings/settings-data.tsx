@@ -783,10 +783,11 @@ export const settingsGroups: SettingSection[] = [
             description: "Create a backup of your data",
             modifer: async () => {
               const user = useUserStore.getState().user;
-              if (!user) {
+              if (!user || SettingsService.getProperty("encryptedBackup")) {
                 await BackupService.run(true);
                 return;
               }
+
               verifyUser(null, () => BackupService.run(true));
             }
           },
@@ -870,9 +871,17 @@ export const settingsGroups: SettingSection[] = [
                 });
                 return;
               }
-              SettingsService.set({
-                encryptedBackup: !settings.encryptedBackup
-              });
+              if (settings.encryptedBackup) {
+                await verifyUser(null, () => {
+                  SettingsService.set({
+                    encryptedBackup: false
+                  });
+                });
+              } else {
+                SettingsService.set({
+                  encryptedBackup: true
+                });
+              }
             }
           }
         ]
@@ -902,7 +911,9 @@ export const settingsGroups: SettingSection[] = [
         description:
           "Export all notes as pdf, markdown, html or text in a single zip file",
         modifer: () => {
-          ExportNotesSheet.present(undefined, true);
+          verifyUser(null, () => {
+            ExportNotesSheet.present(undefined, true);
+          });
         }
       }
     ]
