@@ -16,7 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 import fs from "fs/promises";
 import fsSync from "fs";
 import path from "path";
@@ -24,6 +23,7 @@ import { spawnSync } from "child_process";
 import { fileURLToPath } from "url";
 
 async function move(from, to) {
+  if (!fsSync.existsSync(from) || fsSync.existsSync(to)) return;
   try {
     await fs.rename(from, to);
   } catch {
@@ -102,6 +102,19 @@ for (const lockfile of lockfiles) {
 }
 
 console.log("writing sources");
+
+for (const source of allSources) {
+  for (let key in source) {
+    const value = source[key];
+    if (typeof value === "string" && value.includes("\\"))
+      source[key] = source[key].replace(/\\/gm, "/");
+    else if (Array.isArray(value)) {
+      value.forEach((elem, index) => {
+        value[index] = elem.replace(/\\/gm, "/");
+      });
+    }
+  }
+}
 
 await fs.writeFile(
   "generated-sources.json",
