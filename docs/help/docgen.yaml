@@ -73,6 +73,9 @@ navigation:
       - path: desktop-integration/jumplist-and-dock-menu.md
       - path: desktop-integration/spell-checker.md
       - path: desktop-integration/system-tray-menu.md
-  - path: themes
+  - path: custom-themes
     children:
-      - path: themes/creating-themes-with-theme-builder.md
+      - path: custom-themes/introduction.md
+      - path: custom-themes/create-a-theme-with-theme-builder.md
+      - path: custom-themes/install-a-theme-from-file.md
+      - path: custom-themes/publish-a-theme.md

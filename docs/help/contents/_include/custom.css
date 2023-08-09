@@ -159,8 +159,11 @@ html.dark {
   --input-border: #383838;
   --input-bg: #151515;
 }
+nav li {
+  line-height: 24px;
+}
 
-nav li:not(li.nested):hover {
+nav li li:not(li.nested):hover {
   background-color: var(--hover-bg);
 }
 
