@@ -184,7 +184,7 @@ function ThemesList() {
                   previewColors: getPreviewColors(theme)
                 })
               ) {
-                setTheme(theme);
+                setCurrentTheme(theme);
               }
             }}
             sx={{
