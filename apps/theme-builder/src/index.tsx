@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { init } from "@notesnook/web/src/bootstrap";
 import { render } from "react-dom";
-import ThemeBuilder from "./components/theme-builder";
 import { BaseThemeProvider } from "@notesnook/web/src/components/theme-provider";
+import { App } from "./app";
 
 renderApp();
 
@@ -39,7 +39,7 @@ async function renderApp() {
       }}
     >
       <Component route={props?.route || "login:email"} />
-      <ThemeBuilder />
+      <App />
     </BaseThemeProvider>,
     document.getElementById("root"),
     () => {
