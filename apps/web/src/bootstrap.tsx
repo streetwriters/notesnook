@@ -147,5 +147,5 @@ export async function init() {
 }
 
 function shouldSkipInitiation() {
-  return localStorage.getItem("skipInitiation") || false;
+  return IS_THEME_BUILDER || localStorage.getItem("skipInitiation") || false;
 }

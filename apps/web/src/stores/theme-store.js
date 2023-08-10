@@ -51,7 +51,7 @@ class ThemeStore extends BaseStore {
   /**
    * @param {import("@notesnook/theme").ThemeDefinition} theme
    */
-  setTheme = async (theme) => {
+  setTheme = (theme) => {
     Config.set(`theme:${theme.colorScheme}`, theme);
     this.set({
       [getKey(theme)]: theme,

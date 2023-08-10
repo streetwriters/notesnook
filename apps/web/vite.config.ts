@@ -71,7 +71,8 @@ export default defineConfig({
     IS_DESKTOP_APP: isDesktop,
     PLATFORM: `"${process.env.PLATFORM}"`,
     IS_TESTING: process.env.TEST === "true",
-    IS_BETA: process.env.BETA === "true"
+    IS_BETA: process.env.BETA === "true",
+    IS_THEME_BUILDER: isThemeBuilder
   },
   logLevel: process.env.NODE_ENV === "production" ? "warn" : "info",
   resolve: {
