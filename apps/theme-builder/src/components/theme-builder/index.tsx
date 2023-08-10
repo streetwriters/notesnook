@@ -35,6 +35,10 @@ import { showFilePicker, readFile } from "@notesnook/web/src/utils/file-picker";
 import Field from "@notesnook/web/src/components/field";
 import { Close } from "@notesnook/web/src/components/icons";
 import { flatten, unflatten } from "../../utils/object";
+import { version } from "../../../package.json";
+import { writeText } from "clipboard-polyfill";
+import { tryParse } from "@notesnook/web/src/utils/parse";
+import { loadThemeFromJSON } from "../../utils/theme-loader";
 
 const JSON_SCHEMA_URL =
   "https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/schemas/v1.schema.json";
@@ -121,21 +125,7 @@ export default function ThemeBuilder() {
   }, [authors, setTheme]);
 
   return loading ? null : (
-    <Flex
-      sx={{
-        width: 260,
-        flexShrink: 0,
-        bg: "background",
-        display: "flex",
-        overflow: "hidden",
-        flexDirection: "column",
-        overflowY: "scroll",
-        pt: 2,
-        rowGap: 2,
-        borderLeft: "1px solid var(--border)",
-        zIndex: 999
-      }}
-    >
+    <>
       <Flex
         sx={{
           justifyContent: "space-between",
@@ -143,7 +133,7 @@ export default function ThemeBuilder() {
           paddingX: "10px"
         }}
       >
-        <Text variant="title">Theme Builder 1.0</Text>
+        <Text variant="title">Theme Builder {version}</Text>
       </Flex>
 
       <Flex
@@ -173,6 +163,23 @@ export default function ThemeBuilder() {
         <Button
           sx={{ py: "7px" }}
           variant="secondary"
+          onClick={() =>
+            writeText(themeToJSON(currentTheme)).then(() =>
+              showToast("success", "Copied!")
+            )
+          }
+        >
+          <Text
+            sx={{
+              fontSize: "12px"
+            }}
+          >
+            Copy to clipboard
+          </Text>
+        </Button>
+        <Button
+          sx={{ py: "7px" }}
+          variant="secondary"
           onClick={async () => {
             const file = await showFilePicker({
               acceptedFileTypes: "application/json"
@@ -195,6 +202,34 @@ export default function ThemeBuilder() {
             }}
           >
             Load theme file
+          </Text>
+        </Button>
+
+        <Button
+          sx={{ py: "7px" }}
+          variant="secondary"
+          onClick={async () => {
+            try {
+              setLoading(true);
+              const text = window.prompt("Paste your JSON here");
+              if (!text) return null;
+              const theme = loadThemeFromJSON(tryParse(text));
+              if (!theme) {
+                showToast("error", "Please copy a valid JSON theme.");
+                return;
+              }
+              setTheme(theme);
+            } finally {
+              setLoading(false);
+            }
+          }}
+        >
+          <Text
+            sx={{
+              fontSize: "12px"
+            }}
+          >
+            Load from JSON
           </Text>
         </Button>
 
@@ -254,7 +289,7 @@ export default function ThemeBuilder() {
 
       <Flex
         as="form"
-        key={currentTheme.id}
+        key={getThemeKey(currentTheme)}
         id="theme-form"
         ref={formRef}
         onChange={onThemeChanged}
@@ -270,7 +305,7 @@ export default function ThemeBuilder() {
         {Object.keys(ThemeInfoTemplate).map((key) => {
           return (
             <Field
-              key={key}
+              key={`${getThemeKey(currentTheme)}-${key}`}
               label={toTitleCase(key)}
               name={key}
               defaultValue={currentThemeFlattened[key]}
@@ -322,7 +357,7 @@ export default function ThemeBuilder() {
 
         {authors.map((author, index) => (
           <Flex
-            key={author.name}
+            key={`${getThemeKey(currentTheme)}-${author.name}`}
             sx={{
               flexDirection: "column"
             }}
@@ -549,7 +584,7 @@ export default function ThemeBuilder() {
           </>
         ))}
       </Flex>
-    </Flex>
+    </>
   );
 }
 
@@ -604,16 +639,22 @@ function SelectItem(props: {
 }
 
 function exportTheme(theme: ThemeDefinition) {
-  const json = JSON.stringify({
-    ...theme,
-    $schema: JSON_SCHEMA_URL
-  });
-
   FileSaver.saveAs(
-    new Blob([json], {
+    new Blob([themeToJSON(theme)], {
       type: "text/plain"
     }),
     `${theme.id}.json`
+  );
+}
+
+function themeToJSON(theme: ThemeDefinition) {
+  return JSON.stringify(
+    {
+      $schema: JSON_SCHEMA_URL,
+      ...theme
+    },
+    undefined,
+    2
   );
 }
 
@@ -659,4 +700,8 @@ function toTitleCase(value: string) {
     value.slice(0, 1).toUpperCase() +
     value.slice(1).replace(/([A-Z]+)*([A-Z][a-z])/g, "$1 $2")
   );
+}
+
+function getThemeKey(theme: ThemeDefinition) {
+  return `${theme.id}-${theme.version}-${theme.compatibilityVersion}`;
 }
