@@ -72,14 +72,16 @@ function ThemeDetailsDialog(props: ThemeDetailsDialogProps) {
           Licensed under {theme.license}
         </Text>
         <Flex sx={{ gap: 1, mt: 1 }}>
-          <Link
-            href={theme.homepage}
-            target="_blank"
-            variant="text.subBody"
-            sx={{ fontSize: "subtitle", color: "accent" }}
-          >
-            Website
-          </Link>
+          {theme.homepage && (
+            <Link
+              href={theme.homepage}
+              target="_blank"
+              variant="text.subBody"
+              sx={{ fontSize: "subtitle", color: "accent" }}
+            >
+              Website
+            </Link>
+          )}
           {theme.sourceURL && (
             <Link
               href={theme.sourceURL}
