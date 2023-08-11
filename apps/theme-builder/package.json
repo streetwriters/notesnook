@@ -1,7 +1,7 @@
 {
   "name": "@notesnook/theme-builder",
   "description": "Your private note taking space",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "main": "./src/app.js",
   "homepage": "https://notesnook.com/",
