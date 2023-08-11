@@ -1606,7 +1606,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.share;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Notesnook Share Distrubution 2023";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Notesnook Share Distribution 2023";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Make Note/Make Note-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

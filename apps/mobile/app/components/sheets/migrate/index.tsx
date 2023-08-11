@@ -177,7 +177,7 @@ export default function Migrate() {
               textAlign: "center"
             }}
           >
-            An error occured while migrating your data. You can logout of your
+            An error occurred while migrating your data. You can logout of your
             account and try to relogin. However this is not recommended as it
             may result in some data loss if your data was not synced.
           </Paragraph>

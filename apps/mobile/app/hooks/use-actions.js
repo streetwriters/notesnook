@@ -520,7 +520,7 @@ export const useActions = ({ close = () => null, item }) => {
     await sleep(300);
     presentDialog({
       title: "Permanent delete",
-      paragraph: `Are you sure you want to delete this ${item.itemType} permanantly from trash?`,
+      paragraph: `Are you sure you want to delete this ${item.itemType} permanently from trash?`,
       positiveText: "Delete",
       negativeText: "Cancel",
       positivePress: async () => {
@@ -529,7 +529,7 @@ export const useActions = ({ close = () => null, item }) => {
           Navigation.queueRoutesForUpdate();
           useSelectionStore.getState().setSelectionMode(false);
           ToastEvent.show({
-            heading: "Permanantly deleted items",
+            heading: "Permanently deleted items",
             type: "success",
             context: "local"
           });

@@ -467,7 +467,7 @@ export const useAppEvents = () => {
           });
         }
       } catch (e) {
-        ToastEvent.error(e, "An error occured", "global");
+        ToastEvent.error(e, "An error occurred", "global");
       }
 
       user = await db.user.getUser();

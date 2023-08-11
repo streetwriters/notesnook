@@ -2087,7 +2087,7 @@ function getEscaper(regex, map) {
       if (lastIdx !== match.index) {
         result += data.substring(lastIdx, match.index);
       }
-      // We know that this chararcter will be in the map.
+      // We know that this character will be in the map.
       result += map.get(match[0].charCodeAt(0));
       // Every match will be of length 1
       lastIdx = match.index + 1;
@@ -2996,7 +2996,7 @@ function removeSubsets$1(nodes) {
     /*
      * Remove the node if it is not unique.
      * We are going through the array from the end, so we only
-     * have to check nodes that preceed the node under consideration in the array.
+     * have to check nodes that precede the node under consideration in the array.
      */
     if (idx > 0 && nodes.lastIndexOf(node, idx - 1) >= 0) {
       nodes.splice(idx, 1);
@@ -9883,7 +9883,7 @@ CSSOM$2.CSSValueExpression.prototype._findMatchedIdx = function (token, idx, sep
     }
   }
 
-  // boundary must be in the same line(js sting or regexp)
+  // boundary must be in the same line(js string or regexp)
   var nextNewLineIdx = token.indexOf('\n', idx + 1);
   if (nextNewLineIdx < endIdx) {
     endIdx = NOT_FOUND;

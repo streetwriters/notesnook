@@ -98,7 +98,7 @@ export const features = [
         icon: "bell"
       },
       {
-        highlight: "Daily, weekly & montly",
+        highlight: "Daily, weekly & monthly",
         content: "reminders",
         icon: "refresh",
         pro: true
@@ -194,7 +194,7 @@ export const features = [
       "Having the right tool at the right time is crucial for note taking. Lists, tables, codeblocks — you name it, we have it.",
     features: [
       {
-        highlight: "Basic formating",
+        highlight: "Basic formatting",
         content: "and lists",
         icon: "format-bold"
       },

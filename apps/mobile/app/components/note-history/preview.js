@@ -84,7 +84,7 @@ export default function NotePreview({ session, content, note }) {
         useTrashStore.getState().setTrash();
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
-          heading: "Permanantly deleted items",
+          heading: "Permanently deleted items",
           type: "success",
           context: "local"
         });

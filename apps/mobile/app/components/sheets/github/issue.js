@@ -111,7 +111,7 @@ Logged in: ${user ? "yes" : "no"}`,
     } catch (e) {
       setLoading(false);
       ToastEvent.show({
-        heading: "An error occured",
+        heading: "An error occurred",
         message: e.message,
         type: "error"
       });

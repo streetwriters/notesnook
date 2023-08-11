@@ -362,7 +362,7 @@ const features_list = [
     content: "Instantly sync to unlimited devices"
   },
   {
-    content: "A private vault to keep everything imporant always locked"
+    content: "A private vault to keep everything important always locked"
   },
   {
     content:
@@ -382,7 +382,7 @@ const sheet = (context, promo, trial) => {
           centered
           title="Upgrade to Notesnook"
           titlePart="Pro"
-          paragraph="Manage your work on another level, enjoy seemless sync and keep all notes in one place."
+          paragraph="Manage your work on another level, enjoy seamless sync and keep all notes in one place."
           padding={12}
         />
         <Seperator />

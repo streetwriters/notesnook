@@ -71,7 +71,7 @@ export const SearchBar = () => {
       } catch (e) {
         console.log(e);
         ToastEvent.show({
-          heading: "Error occured while searching",
+          heading: "Error occurred while searching",
           message: e.message,
           type: "error"
         });

@@ -56,7 +56,7 @@ export const CompactFeatures = ({
           icon: "shield"
         },
         {
-          highlight: "Daily, weekly & montly",
+          highlight: "Daily, weekly & monthly",
           content: "recurring reminders",
           icon: "bell"
         },
