@@ -39,9 +39,9 @@ class ExceptionHandler extends React.Component<{
     error: Error | null;
     hasError: boolean;
   } = {
-    hasError: false,
-    error: null
-  };
+      hasError: false,
+      error: null
+    };
   static getDerivedStateFromError(error: Error) {
     return { hasError: true, error: error };
   }
@@ -69,7 +69,7 @@ class ExceptionHandler extends React.Component<{
               this.props.component
             )}
             defaultTitle={this.state.error?.message}
-            issueTitle="An exception occured"
+            issueTitle="An exception occurred"
           />
           <Dialog />
         </SafeAreaView>

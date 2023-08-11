@@ -77,7 +77,7 @@ export const openNotebookTopic = (item) => {
         useTrashStore.getState().setTrash();
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
-          heading: "Permanantly deleted items",
+          heading: "Permanently deleted items",
           type: "success",
           context: "local"
         });

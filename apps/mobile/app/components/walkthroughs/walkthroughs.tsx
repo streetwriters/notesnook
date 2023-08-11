@@ -70,8 +70,8 @@ const NotebookWelcome = () => {
       count: 5
     },
     {
-      title: "Recipies",
-      description: "I love cooking and collecting recipies",
+      title: "Recipes",
+      description: "I love cooking and collecting recipes",
       count: 10
     }
   ]);
@@ -195,7 +195,7 @@ const notebooks: { id: string; steps: TStep[] } = {
           >
             <Paragraph size={SIZE.xs}>
               <Icon color={colors.primary.icon} size={SIZE.sm} name="note" />{" "}
-              Feburary 2022 Week 2
+              February 2022 Week 2
             </Paragraph>
           </View>
           <View
@@ -211,7 +211,7 @@ const notebooks: { id: string; steps: TStep[] } = {
           >
             <Paragraph size={SIZE.xs}>
               <Icon color={colors.primary.icon} size={SIZE.sm} name="note" />{" "}
-              Feburary 2022 Week 1
+              February 2022 Week 1
             </Paragraph>
           </View>
           <View
@@ -257,7 +257,7 @@ const notebooks: { id: string; steps: TStep[] } = {
               title: "Tasks",
               type: "topic"
             }}
-            onPress={() => {}}
+            onPress={() => { }}
           />
 
           <PinItem
@@ -267,7 +267,7 @@ const notebooks: { id: string; steps: TStep[] } = {
               title: "Work and office",
               type: "notebook"
             }}
-            onPress={() => {}}
+            onPress={() => { }}
           />
         </View>
       ),

@@ -543,7 +543,7 @@ export class VaultDialog extends Component {
       .remove(this.state.note.id, this.password)
       .then(() => {
         ToastEvent.show({
-          heading: "Note permanantly unlocked.",
+          heading: "Note permanently unlocked.",
           type: "success",
           context: "global"
         });

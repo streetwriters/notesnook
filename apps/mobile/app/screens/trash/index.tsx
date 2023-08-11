@@ -52,7 +52,7 @@ const onPressFloatingButton = () => {
       ToastEvent.show({
         heading: "Trash cleared",
         message:
-          "All notes and notebooks in the trash have been removed permanantly.",
+          "All notes and notebooks in the trash have been removed permanently.",
         type: "success",
         context: "local"
       });

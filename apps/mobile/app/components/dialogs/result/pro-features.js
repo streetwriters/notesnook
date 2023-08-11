@@ -48,7 +48,7 @@ export const ProFeatures = ({ count = 6 }) => {
           content: "Instantly sync to unlimited devices"
         },
         {
-          content: "A private vault to keep everything imporant always locked"
+          content: "A private vault to keep everything important always locked"
         },
         {
           content:

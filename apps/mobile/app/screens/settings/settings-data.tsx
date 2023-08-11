@@ -89,8 +89,8 @@ export const settingsGroups: SettingSection[] = [
           return isBasic || !user.subscription?.type
             ? "Subscribe to Pro"
             : isTrial
-            ? "Your free trial has started"
-            : "Subscription details";
+              ? "Your free trial has started"
+              : "Subscription details";
         },
         type: "component",
         component: "subscription",
@@ -112,16 +112,16 @@ export const settingsGroups: SettingSection[] = [
           return user.subscription?.type === 2
             ? "You signed up on " + startDate
             : user.subscription?.type === 1
-            ? "Your free trial will end on " + expiryDate
-            : user.subscription?.type === 6
-            ? subscriptionDaysLeft.time < -3
-              ? "Your subscription has ended"
-              : "Your account will be downgraded to Basic in 3 days"
-            : user.subscription?.type === 7
-            ? `Your subscription will end on ${expiryDate}.`
-            : user.subscription?.type === 5
-            ? `Your subscription will renew on ${expiryDate}.`
-            : "Never hesitate to choose privacy";
+              ? "Your free trial will end on " + expiryDate
+              : user.subscription?.type === 6
+                ? subscriptionDaysLeft.time < -3
+                  ? "Your subscription has ended"
+                  : "Your account will be downgraded to Basic in 3 days"
+                : user.subscription?.type === 7
+                  ? `Your subscription will end on ${expiryDate}.`
+                  : user.subscription?.type === 5
+                    ? `Your subscription will renew on ${expiryDate}.`
+                    : "Never hesitate to choose privacy";
         }
       },
       {
@@ -321,13 +321,13 @@ export const settingsGroups: SettingSection[] = [
             name: "Delete account",
             icon: "alert",
             description:
-              "All your data will be removed permanantly. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.",
+              "All your data will be removed permanently. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.",
             modifer: () => {
               presentDialog({
                 title: "Delete account",
                 paragraphColor: "red",
                 paragraph:
-                  "All your data will be removed permanantly. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.",
+                  "All your data will be removed permanently. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.",
                 positiveType: "errorShade",
                 input: true,
                 inputPlaceholder: "Enter account password",
