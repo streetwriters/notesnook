@@ -34,7 +34,6 @@ const RequiredKeys = [
   "description",
   "colorScheme",
   "compatibilityVersion",
-  "homepage",
   ...Variants.map((variant) =>
     COLORS.map((colorName) => `scopes.base.${variant}.${colorName}`)
   ).flat()

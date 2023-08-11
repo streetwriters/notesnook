@@ -37,6 +37,9 @@ export type ThemeCompatibilityVersion = 1;
  * @description This is a schema for validation of Notesnook themes.
  */
 export type ThemeDefinition = {
+  // we need to allow this to make linters happy.
+  $schema: "https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/schemas/v1.schema.json";
+
   /**
    * Name of the theme
    */
@@ -69,7 +72,7 @@ export type ThemeDefinition = {
    *
    * @format uri
    */
-  homepage: string;
+  homepage?: string;
   /**
    * A short description of the theme.
    */
@@ -180,8 +183,8 @@ export type Colors = {
    */
   paragraph: string;
   /**
-   * Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)
-   * @pattern ^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$
+   * Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)
+   * @pattern ^#(?:[0-9a-fA-F]{3}){1,2}$
    */
   background: string;
   /**
