@@ -37,6 +37,7 @@ export function App() {
     (async () => {
       try {
         setIsLoading(true);
+        await useStore.getState().init();
         const theme = from_pr
           ? await loadThemeFromPullRequest(from_pr)
           : from_url
