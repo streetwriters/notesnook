@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Quick & dirty script to download & transform all language details from
  * the PrismJS repo.
  */
-import "isomorphic-fetch";
+
 import fs from "fs";
 import path from "path";
 
