@@ -32,11 +32,11 @@ import { store as settingStore } from "./setting-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetNotices } from "../common/notices";
-import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/common";
+import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/dist/common";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
-import {@notesnook/core/dist/from "../utils/network-check";
+import { NetworkCheck } from "../utils/network-check";
 
 const networkCheck = new NetworkCheck();
 var syncStatusTimeout = 0;

@@ -55,11 +55,15 @@ import { Perform } from "../common/dialog-controller";
 import { Multiselect } from "../common/multi-select";
 import { CustomScrollbarsVirtualList } from "../components/list-container";
 import { Attachment } from "../components/attachment";
-import { isDocument, isImage, isVideo } from "@notesnook/core/utils/filename";
+import {
+  isDocument,
+  isImage,
+  isVideo
+} from "@notesnook/core/dist/utils/filename";
 import { alpha } from "@theme-ui/color";
 import { ScopedThemeProvider } from "../components/theme-provider";
 
-type Too@notesnook/core/dist/
+type ToolbarAction = {
   title: string;
   icon: Icon;
   onClick: ({ selected }: { selected: any[] }) => void;
