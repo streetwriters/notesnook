@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { databaseTest, StorageInterface } from "./utils";
+import { beforeEach, test, expect } from "vitest";
 
 beforeEach(() => {
   StorageInterface.clear();

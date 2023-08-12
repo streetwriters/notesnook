@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import StorageInterface from "../__mocks__/storage.mock";
-import Storage from "../database/storage";
+import Storage from "../src/database/storage";
+import { test, expect } from "vitest";
 
 const storage = new Storage(StorageInterface);
 test("add a value", async () => {

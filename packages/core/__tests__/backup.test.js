@@ -27,6 +27,7 @@ import v52Backup from "./__fixtures__/backup.v5.2.json";
 import v52BackupCopy from "./__fixtures__/backup.v5.2.copy.json";
 import v56BackupCopy from "./__fixtures__/backup.v5.6.json";
 import qclone from "qclone";
+import { beforeEach, test, expect, describe } from "vitest";
 
 beforeEach(() => {
   StorageInterface.clear();

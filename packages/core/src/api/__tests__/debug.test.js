@@ -18,8 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Debug from "../debug";
-import { noteTest, notebookTest, databaseTest } from "../../__tests__/utils";
-import { enableFetchMocks, disableFetchMocks } from "jest-fetch-mock";
+import { noteTest, notebookTest, databaseTest } from "../../../__tests__/utils";
+import createFetchMock from "vitest-fetch-mock";
+import { vi, test, expect } from "vitest";
+const fetchMocker = createFetchMock(vi);
 
 test("strip empty item shouldn't throw", () => {
   const debug = new Debug();
@@ -96,7 +98,7 @@ const SUCCESS_REPORT_RESPONSE = {
 };
 
 test("reporting issue should return issue url", async () => {
-  enableFetchMocks();
+  fetchMocker.enableMocks();
 
   const debug = new Debug();
 
@@ -112,11 +114,11 @@ test("reporting issue should return issue url", async () => {
     })
   ).toBe(SUCCESS_REPORT_RESPONSE.url);
 
-  disableFetchMocks();
+  fetchMocker.disableMocks();
 });
 
 test("reporting invalid issue should return undefined", async () => {
-  enableFetchMocks();
+  fetchMocker.enableMocks();
 
   const debug = new Debug();
 
@@ -129,7 +131,7 @@ test("reporting invalid issue should return undefined", async () => {
 
   expect(await debug.report({})).toBeUndefined();
 
-  disableFetchMocks();
+  fetchMocker.disableMocks();
 });
 
 function normalizeItem(item) {

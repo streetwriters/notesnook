@@ -46,6 +46,7 @@ export type ThemeDefinition = {
   name: string;
   /**
    * ID of the theme. Must be unique across all other themes.
+   * @pattern ^[a-z0-9_-]+$
    */
   id: string;
   /**

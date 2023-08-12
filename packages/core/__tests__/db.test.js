@@ -17,9 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import DB from "../api";
-import Constants from "../utils/constants";
+import DB from "../src/api";
+import Constants from "../src/utils/constants";
 import StorageInterface from "../__mocks__/storage.mock";
+import { test, expect } from "vitest";
 
 test("db.host should change HOST", () => {
   const db = new DB();

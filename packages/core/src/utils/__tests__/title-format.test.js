@@ -17,4 +17,36 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-test.todo("skipped test");
+import { formatTitle } from "../title-format";
+import MockDate from "mockdate";
+import { test, expect, describe, beforeAll, afterAll } from "vitest";
+
+const templates = {
+  $time$: "11:25",
+  $date$: "DD-MM-YYYY",
+  $timestamp$: "DDMMYYYY1125",
+  $count$: "1",
+  $headline$: "HEADLINE"
+};
+
+const cases = [
+  ...Object.entries(templates).map(([key, value]) => {
+    return [`Note ${key}`, `Note ${value}`];
+  })
+];
+
+beforeAll(() => {
+  MockDate.set("2000-11-22 11:25");
+});
+
+afterAll(() => {
+  MockDate.reset();
+});
+
+describe("pairs should be equal", () => {
+  test.each(cases)("%s", (one, two) => {
+    expect(formatTitle(one, "[DD-MM-YYYY]", "[hh:mm]", "HEADLINE", 0)).toBe(
+      two
+    );
+  });
+});

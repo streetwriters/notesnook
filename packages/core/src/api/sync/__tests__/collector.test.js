@@ -22,8 +22,9 @@ import {
   TEST_NOTE,
   delay,
   StorageInterface
-} from "../../../__tests__/utils";
+} from "../../../../__tests__/utils";
 import Collector from "../collector";
+import { test, beforeEach, expect } from "vitest";
 
 beforeEach(async () => {
   StorageInterface.clear();

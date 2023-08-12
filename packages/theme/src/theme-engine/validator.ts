@@ -42,6 +42,7 @@ const RequiredKeys = [
 const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
 const HEX_COLOR_REGEX_ALPHA =
   /^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$/;
+const ID_REGEX = /^[a-z0-9_-]+$/;
 
 export function validateTheme(json: Partial<ThemeDefinition>): {
   error: string | undefined;
@@ -60,6 +61,13 @@ export function validateTheme(json: Partial<ThemeDefinition>): {
       )} are missing from the theme.`
     };
   }
+
+  if (!json.id || !ID_REGEX.test(json.id)) {
+    return {
+      error: `Invalid theme. ID of theme must contain only alphanumeric characters, - & _.`
+    };
+  }
+
   const invalidColors = [];
   for (const key in flattenedTheme) {
     if (!key.startsWith("scopes")) continue;

@@ -18,12 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Database from "../../index";
-import { NodeStorageInterface } from "../../../__mocks__/node-storage.mock";
-import FS from "../../../__mocks__/fs.mock";
-import Compressor from "../../../__mocks__/compressor.mock";
+import { NodeStorageInterface } from "../../../../__mocks__/node-storage.mock";
+import FS from "../../../../__mocks__/fs.mock";
+import Compressor from "../../../../__mocks__/compressor.mock";
 import { CHECK_IDS, EV, EVENTS } from "../../../common";
 import EventSource from "eventsource";
-import { delay } from "../../../__tests__/utils";
+import { delay } from "../../../../__tests__/utils";
 
 jest.setTimeout(100 * 1000);
 

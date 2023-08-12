@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import DB from "../../api";
+import DB from "../../src/api";
 import StorageInterface from "../../__mocks__/storage.mock";
 import dayjs from "dayjs";
-import { groupArray } from "../../utils/grouping";
+import { groupArray } from "../../src/utils/grouping";
 import FS from "../../__mocks__/fs.mock";
 import Compressor from "../../__mocks__/compressor.mock";
+import { expect } from "vitest";
 
 const TEST_NOTEBOOK = {
   title: "Test Notebook",

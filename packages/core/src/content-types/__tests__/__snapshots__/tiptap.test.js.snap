@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`convert HTML to markdown with codeblock2: html-to-md-codeblock2.md 1`] = `
+exports[`convert HTML to markdown with codeblock2 > html-to-md-codeblock2.md 1`] = `
 "\`\`\`
 hello
 \`\`\`
@@ -8,8 +8,8 @@ hello
 "
 `;
 
-exports[`convert HTML to markdown with codeblocks: html-to-md-codeblocks.md 1`] = `
-"Typescript is one of those languages that appear to be very simple. It's often described as \\"Javascript with types\\" and it fits that name very well. However, what many don't realize starting out with Typescript is that Typescript*is *a language and like all other languages it has it's own \\"secrets\\", it's own set of quirks.
+exports[`convert HTML to markdown with codeblocks > html-to-md-codeblocks.md 1`] = `
+"Typescript is one of those languages that appear to be very simple. It's often described as \\"Javascript with types\\" and it fits that name very well. However, what many don't realize starting out with Typescript is that Typescript *is *a language and like all other languages it has it's own \\"secrets\\", it's own set of quirks.
 
 When I started out with Typescript a few years back, I absolutely hated it. It was unnecessary, a box of clutter, making me write code that would never actually run. I hated defining interfaces, typing out all my functions, and thinking in terms I was not used to as a Javascript developer. Before Javascript, I had coded in C# and I had never really liked C# (I still don't) mostly for the huge amounts of boilerplate and magic involved. Typescript is heavily inspired by C# and seeing that contaminate the Javascript ecosystem irked me no end.
 
@@ -126,7 +126,7 @@ But this post was supposed to be about the \\"Secrets\\" of Typescript Generics,
 "
 `;
 
-exports[`convert HTML to markdown with outlinelists: html-to-md-outlinelists.md 1`] = `
+exports[`convert HTML to markdown with outlinelists > html-to-md-outlinelists.md 1`] = `
 "Testing outline list:
 
 - My outline list
@@ -135,22 +135,26 @@ exports[`convert HTML to markdown with outlinelists: html-to-md-outlinelists.md 
 
 - but sometimes
 
-    - It doesn't
+- It doesn't
 
-    - what do I do?
+- what do I do?
 
-    - I need to do something!
+- I need to do something!
 
-- Makes no sense!
+<li data-type=\\"outlineListItem\\"><p>Makes no sense!</p></li>
 
-- Yes it doesn't!
+<li data-type=\\"outlineListItem\\"><p>Yes it doesn't!</p></li>
 
 "
 `;
 
-exports[`convert HTML to markdown with tables: html-to-md-tables.md 1`] = `
+exports[`convert HTML to markdown with tables > html-to-md-tables.md 1`] = `
 "| Goal                                                                                                          | To introduce various features of the app to the user and to convert a user on trial or basic plan to upgrade. |
 | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Frequency                                                                                                     | 1/week or 2/week                                                                                              |
+| Types                                                                                                         | Feature intro, upgrade promo, one time emails                                                                 |
+|                                                                                                               |                                                                                                               |
+| Goal                                                                                                          | To introduce various features of the app to the user and to convert a user on trial or basic plan to upgrade. |
 | Frequency                                                                                                     | 1/week or 2/week                                                                                              |
 | Types                                                                                                         | Feature intro, upgrade promo, one time emails                                                                 |
 |                                                                                                               |                                                                                                               |
@@ -188,7 +192,7 @@ Features:
 "
 `;
 
-exports[`convert HTML to markdown with tables2: html-to-md-tables2.md 1`] = `
+exports[`convert HTML to markdown with tables2 > html-to-md-tables2.md 1`] = `
 "# Note 8/6/22, 10:48 AM
 
 hell
@@ -199,11 +203,14 @@ what
 | -------------- | -------------- | -------------- |
 | dsvsajkdb      | dskajvbsadj    | kjdasvbkj      |
 | daskvbkdsa     | kdsajvbsajkd   | kjdsavbdsa     |
+| sdsdavav       | daskvjbdsva    | vsadjkvsadbvjk |
+| dsvsajkdb      | dskajvbsadj    | kjdasvbkj      |
+| daskvbkdsa     | kdsajvbsajkd   | kjdsavbdsa     |
 
 "
 `;
 
-exports[`convert HTML to markdown with tasklists: html-to-md-tasklists.md 1`] = `
+exports[`convert HTML to markdown with tasklists > html-to-md-tasklists.md 1`] = `
 "Hello
 
 - [x] Task item 1
@@ -214,11 +221,11 @@ exports[`convert HTML to markdown with tasklists: html-to-md-tasklists.md 1`] = 
 
 - [ ] Task item 4
 
-    - [ ] Sub task item 1
+- [ ] Sub task item 1
 
-    - [ ] Sub task item 2
+- [ ] Sub task item 2
 
-- [ ] Task Item 5
+<li class=\\"checklist--item\\"><p>Task Item 5</p></li>
 
 Nene
 
@@ -233,12 +240,12 @@ Nene
 "
 `;
 
-exports[`convert HTML to text with codeblock2: html-to-txt-codeblock2.txt 1`] = `
+exports[`convert HTML to text with codeblock2 > html-to-txt-codeblock2.txt 1`] = `
 "hello
 "
 `;
 
-exports[`convert HTML to text with codeblocks: html-to-txt-codeblocks.txt 1`] = `
+exports[`convert HTML to text with codeblocks > html-to-txt-codeblocks.txt 1`] = `
 "Typescript is one of those languages that appear to be very simple. It's often
 described as \\"Javascript with types\\" and it fits that name very well. However,
 what many don't realize starting out with Typescript is that Typescript is a
@@ -382,7 +389,7 @@ right? Well, let's get into that.
 4. TYPE INFERENCE USING INTERFACE PROPERTIES"
 `;
 
-exports[`convert HTML to text with outlinelists: html-to-txt-outlinelists.txt 1`] = `
+exports[`convert HTML to text with outlinelists > html-to-txt-outlinelists.txt 1`] = `
 "Testing outline list:
  * My outline list
  * works
@@ -394,7 +401,7 @@ exports[`convert HTML to text with outlinelists: html-to-txt-outlinelists.txt 1`
  * Yes it doesn't!"
 `;
 
-exports[`convert HTML to text with tables: html-to-txt-tables.txt 1`] = `
+exports[`convert HTML to text with tables > html-to-txt-tables.txt 1`] = `
 "Goal        To introduce various features of the app to the user and to
             convert a user on trial or basic plan to upgrade.
 Frequency   1/week or 2/week
@@ -435,7 +442,7 @@ ONE TIME
  4. Join the community"
 `;
 
-exports[`convert HTML to text with tables2: html-to-txt-tables2.txt 1`] = `
+exports[`convert HTML to text with tables2 > html-to-txt-tables2.txt 1`] = `
 "NOTE 8/6/22, 10:48 AM
 
 
@@ -448,7 +455,7 @@ dsvsajkdb    dskajvbsadj    kjdasvbkj
 daskvbkdsa   kdsajvbsajkd   kjdsavbdsa"
 `;
 
-exports[`convert HTML to text with tasklists: html-to-txt-tasklists.txt 1`] = `
+exports[`convert HTML to text with tasklists > html-to-txt-tasklists.txt 1`] = `
 "Hello
  ✅ Task item 1
  ✅ Task item 2

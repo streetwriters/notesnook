@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Set from "../set";
+import { test, expect } from "vitest";
 
 test("union", () => {
   expect(Set.union([1, 2, 2], [2, 3])).toStrictEqual([1, 2, 3]);

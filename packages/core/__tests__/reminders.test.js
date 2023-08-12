@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatReminderTime } from "../collections/reminders";
+import { formatReminderTime } from "../src/collections/reminders";
 import MockDate from "mockdate";
+import { describe, afterAll, beforeAll, test, expect } from "vitest";
 
 describe("format reminder time", () => {
   afterAll(() => {
