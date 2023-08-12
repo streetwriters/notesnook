@@ -1,41 +1,32 @@
 {
   "name": "@notesnook/core",
   "version": "7.4.1",
-  "main": "./api/index.js",
+  "main": "dist/api/index.js",
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "git://github.com/streetwriters/notesnook-core.git"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.9",
-    "@babel/plugin-transform-runtime": "^7.18.9",
-    "@babel/preset-env": "^7.18.9",
-    "@babel/runtime": "^7.18.9",
     "@notesnook/crypto": "file:../crypto",
     "@types/html-to-text": "^9.0.0",
-    "@types/jest": "^28.1.6",
     "@types/katex": "^0.16.1",
+    "@types/node-fetch": "^2.6.4",
     "@types/prismjs": "^1.26.0",
     "@types/showdown": "^2.0.0",
     "abortcontroller-polyfill": "^1.7.3",
-    "analyze-es6-modules": "^0.6.2",
-    "babel-jest": "^28.1.3",
-    "babel-plugin-syntax-object-rest-spread": "^6.13.0",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.0.1",
-    "env-cmd": "^10.1.0",
     "eventsource": "^2.0.2",
-    "jest": "^28.1.3",
-    "jest-fetch-mock": "^3.0.3",
-    "jsdom": "^20.0.0",
+    "happy-dom": "^10.9.0",
     "mockdate": "^3.0.5",
-    "otplib": "^12.0.1"
+    "otplib": "^12.0.1",
+    "vitest": "^0.34.1",
+    "vitest-fetch-mock": "^0.2.2"
   },
   "scripts": {
-    "test:e2e": "env-cmd -e e2e jest --forceExit",
-    "test": "jest --forceExit"
+    "test:e2e": "cross-env IS_E2E=true vitest run",
+    "test": "vitest run"
   },
   "dependencies": {
     "@microsoft/signalr": "^6.0.7",
@@ -57,9 +48,5 @@
   },
   "overrides": {
     "htmlparser2": "^8.0.1"
-  },
-  "np": {
-    "releaseDraft": false,
-    "message": "chore: bump version to %s"
   }
 }

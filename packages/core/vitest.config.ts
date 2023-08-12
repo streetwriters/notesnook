@@ -17,22 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import hosts from "../src/utils/constants";
-import Offers from "../src/api/offers";
-import { test, expect } from "vitest";
+import { defineConfig } from "vitest/config";
 
-test("get offer code", async () => {
-  const offers = new Offers();
-  hosts.SUBSCRIPTIONS_HOST = "https://subscriptions.streetwriters.co";
-  expect(await offers.getCode("TESTOFFER", "android")).toMatchSnapshot(
-    "offer-code"
-  );
-});
+const IS_E2E = process.env.IS_E2E === "true";
 
-test("get invalid offer code", async () => {
-  const offers = new Offers();
-  hosts.SUBSCRIPTIONS_HOST = "https://subscriptions.streetwriters.co";
-  await expect(() => offers.getCode("INVALIDOFFER", "android")).rejects.toThrow(
-    /Not found/i
-  );
+export default defineConfig({
+  test: {
+    environment: "happy-dom",
+    setupFiles: ["./globals.setup.js"],
+    include: [
+      ...(IS_E2E ? ["__e2e__/**/*.test.js"] : []),
+      "__tests__/**/*.test.js",
+      "src/**/*.test.js"
+    ]
+  }
 });

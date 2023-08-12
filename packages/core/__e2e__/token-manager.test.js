@@ -17,9 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import DB from "../api";
+import DB from "../src/api";
 import StorageInterface from "../__mocks__/storage.mock";
 import { login } from "./utils";
+import { test, expect } from "vitest";
 
 test("refresh token concurrently", async () => {
   const db = new DB();

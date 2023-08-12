@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { noteTest, TEST_NOTE, StorageInterface } from "./utils";
+import { beforeEach, test, expect, describe } from "vitest";
 
 beforeEach(async () => {
   StorageInterface.clear();

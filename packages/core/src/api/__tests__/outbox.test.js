@@ -17,18 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var nodeCrypto = require("crypto");
-var dotenv = require("dotenv");
-const fetch = require("node-fetch");
-const linkedom = require("linkedom");
-// const { initalize } = require("./logger");
-// const StorageInterface = require("./__mocks__/storage.mock");
-// initalize(StorageInterface);
+import { test } from "vitest";
 
-globalThis.DOMParser = linkedom.DOMParser;
-globalThis.fetch = fetch;
-require("abortcontroller-polyfill/dist/polyfill-patch-fetch");
-
-dotenv.config();
-
-global.crypto = nodeCrypto;
+test.todo("skipped test");

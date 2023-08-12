@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { groupArray } from "../utils/grouping";
+import { groupArray } from "../src/utils/grouping";
+import { test, expect } from "vitest";
 
 test("group alphabetically", () => {
   const sortedAlphabet = "abcdefghijlmnopqrstuvwxyz"

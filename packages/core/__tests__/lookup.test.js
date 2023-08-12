@@ -24,6 +24,7 @@ import {
   notebookTest,
   TEST_NOTEBOOK2
 } from "./utils";
+import { beforeEach, test, expect } from "vitest";
 
 beforeEach(async () => {
   StorageInterface.clear();

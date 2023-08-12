@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { databaseTest } from "../__tests__/utils";
 import { login, user } from "./utils";
+import { test, expect } from "vitest";
 
 // test("signup user and check for token", async () => {
 //   const db = new DB(StorageInterface);

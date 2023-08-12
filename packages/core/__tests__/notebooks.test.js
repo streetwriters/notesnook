@@ -24,7 +24,8 @@ import {
   TEST_NOTE,
   delay
 } from "./utils";
-import { makeTopic } from "../collections/topics";
+import { makeTopic } from "../src/collections/topics";
+import { beforeEach, test, expect } from "vitest";
 
 beforeEach(async () => {
   StorageInterface.clear();

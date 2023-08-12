@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { groupArray } from "../utils/grouping";
+import { groupArray } from "../src/utils/grouping";
 import {
   StorageInterface,
   databaseTest,
@@ -27,6 +27,7 @@ import {
   TEST_NOTEBOOK,
   IMG_CONTENT
 } from "./utils";
+import { beforeEach, test, expect } from "vitest";
 
 beforeEach(async () => {
   StorageInterface.clear();
