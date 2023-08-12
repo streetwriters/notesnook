@@ -29,12 +29,14 @@ const allPackages = await glob(["packages/**", "apps/**", "extensions/**"], {
 
 const tasks = new Listr({ concurrent: 4, exitOnError: false });
 for (const pkg of allPackages) {
-  const node_modules = path.join(pkg, "node_modules");
-  if (!existsSync(node_modules)) continue;
-  tasks.add({
-    title: "Cleaning " + node_modules,
-    task: () => fs.rm(node_modules, { recursive: true, force: true })
-  });
+  for (const dirname of ["node_modules", "dist", "build", "out"]) {
+    const dir = path.join(pkg, dirname);
+    if (existsSync(dir))
+      tasks.add({
+        title: "Cleaning " + dir,
+        task: () => fs.rm(dir, { recursive: true, force: true })
+      });
+  }
 }
 
 console.time("Took");
