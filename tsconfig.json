@@ -11,7 +11,6 @@
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "downlevelIteration": true,
     "declaration": true,
     "removeComments": false
   }

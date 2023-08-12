@@ -6,7 +6,6 @@
     "baseUrl": "./",
     "jsx": "react-native",
     "noEmit": true,
-    "maxNodeModuleJsDepth": 5,
     "types": ["node", "jest", "detox"],
     "paths": {
       "@notesnook/*": ["../../packages"],

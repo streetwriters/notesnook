@@ -4,7 +4,6 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "jsx": "react-jsx",
-    "maxNodeModuleJsDepth": 5,
     "noEmit": true
   },
   "include": ["src", "global.d.ts", "__tests__", "__e2e__"]

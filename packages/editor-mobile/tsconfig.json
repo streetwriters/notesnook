@@ -5,8 +5,6 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "jsx": "react-jsx",
     "noEmit": true,
-    "downlevelIteration": true,
-    "maxNodeModuleJsDepth": 5,
     "allowJs": true
   },
   "include": ["src/"]
