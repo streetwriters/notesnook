@@ -67,8 +67,8 @@ async function preprocessHTML(templateData) {
       ? require("prismjs")
       : (await import("prismjs")).default;
     const { loadLanguage } = hasRequire()
-      ? require("../../../../languages/index.js")
-      : await import("../../../../languages/index.js");
+      ? require("./languages/index.js")
+      : await import("./languages/index.js");
     prismjs.register = (syntax) => {
       if (typeof arg === "function") syntax(prismjs);
     };
