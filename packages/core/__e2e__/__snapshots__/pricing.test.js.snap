@@ -18,24 +18,6 @@ exports[`get android pricing tier > get yearly android tier > yearly-android-pri
 }
 `;
 
-exports[`get android pricing tier get monthly android tier: monthly-android-pricing 1`] = `
-Object {
-  "country": Any<String>,
-  "countryCode": Any<String>,
-  "discount": Any<Number>,
-  "sku": Any<String>,
-}
-`;
-
-exports[`get android pricing tier get yearly android tier: yearly-android-pricing 1`] = `
-Object {
-  "country": Any<String>,
-  "countryCode": Any<String>,
-  "discount": Any<Number>,
-  "sku": Any<String>,
-}
-`;
-
 exports[`get ios pricing tier > get monthly ios tier > monthly-ios-pricing 1`] = `
 {
   "country": Any<String>,
@@ -54,24 +36,6 @@ exports[`get ios pricing tier > get yearly ios tier > yearly-ios-pricing 1`] = `
 }
 `;
 
-exports[`get ios pricing tier get monthly ios tier: monthly-ios-pricing 1`] = `
-Object {
-  "country": Any<String>,
-  "countryCode": Any<String>,
-  "discount": Any<Number>,
-  "sku": Any<String>,
-}
-`;
-
-exports[`get ios pricing tier get yearly ios tier: yearly-ios-pricing 1`] = `
-Object {
-  "country": Any<String>,
-  "countryCode": Any<String>,
-  "discount": Any<Number>,
-  "sku": Any<String>,
-}
-`;
-
 exports[`get monthly price > monthly-pricing 1`] = `
 {
   "country": Any<String>,
@@ -81,26 +45,8 @@ exports[`get monthly price > monthly-pricing 1`] = `
 }
 `;
 
-exports[`get monthly price: monthly-pricing 1`] = `
-Object {
-  "country": Any<String>,
-  "countryCode": Any<String>,
-  "discount": Any<Number>,
-  "price": Any<Number>,
-}
-`;
-
 exports[`get undefined price > monthly-pricing 1`] = `
 {
-  "country": Any<String>,
-  "countryCode": Any<String>,
-  "discount": Any<Number>,
-  "price": Any<Number>,
-}
-`;
-
-exports[`get undefined price: monthly-pricing 1`] = `
-Object {
   "country": Any<String>,
   "countryCode": Any<String>,
   "discount": Any<Number>,
@@ -126,35 +72,8 @@ exports[`get web pricing tier > get yearly web tier > yearly-web-pricing 1`] = `
 }
 `;
 
-exports[`get web pricing tier get monthly web tier: monthly-web-pricing 1`] = `
-Object {
-  "country": Any<String>,
-  "countryCode": Any<String>,
-  "discount": Any<Number>,
-  "sku": Any<String>,
-}
-`;
-
-exports[`get web pricing tier get yearly web tier: yearly-web-pricing 1`] = `
-Object {
-  "country": Any<String>,
-  "countryCode": Any<String>,
-  "discount": Any<Number>,
-  "sku": Any<String>,
-}
-`;
-
 exports[`get yearly price > yearly-pricing 1`] = `
 {
-  "country": Any<String>,
-  "countryCode": Any<String>,
-  "discount": Any<Number>,
-  "price": Any<Number>,
-}
-`;
-
-exports[`get yearly price: yearly-pricing 1`] = `
-Object {
   "country": Any<String>,
   "countryCode": Any<String>,
   "discount": Any<Number>,

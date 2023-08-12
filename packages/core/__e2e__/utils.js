@@ -25,7 +25,6 @@ export const user = {
   hashed: process.env.USER_HASHED_PASSWORD,
   totpSecret: process.env.USER_TOTP_SECRET
 };
-console.log(user);
 
 export async function login(db) {
   await db.user.authenticateEmail(user.email);

@@ -21,7 +21,7 @@ import { databaseTest, noteTest, StorageInterface } from "../__tests__/utils";
 import { login } from "./utils";
 import { test, expect, beforeEach, afterAll } from "vitest";
 
-const TEST_TIMEOUT = 15 * 1000;
+const TEST_TIMEOUT = 30 * 1000;
 
 beforeEach(() => {
   StorageInterface.clear();
@@ -36,7 +36,7 @@ afterAll(async () => {
   }
 
   StorageInterface.clear();
-});
+}, TEST_TIMEOUT);
 
 // test("get monographs", () =>
 //   databaseTest().then(async (db) => {
