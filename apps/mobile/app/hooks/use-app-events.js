@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/common";
+import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/dist/common";
 import notifee from "@notifee/react-native";
 import NetInfo from "@react-native-community/netinfo";
 import React, { useCallback, useEffect, useRef } from "react";

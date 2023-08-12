@@ -21,7 +21,7 @@ import {
   initalize,
   logger as _logger,
   logManager
-} from "@notesnook/core/logger";
+} from "@notesnook/core/dist/logger";
 import { LogMessage } from "@notesnook/logger";
 import FileSaver from "file-saver";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";

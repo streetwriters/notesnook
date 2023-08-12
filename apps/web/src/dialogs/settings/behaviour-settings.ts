@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DATE_FORMATS } from "@notesnook/core/common";
+import { DATE_FORMATS } from "@notesnook/core/dist/common";
 import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import dayjs from "dayjs";

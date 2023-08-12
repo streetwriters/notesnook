@@ -76,7 +76,7 @@ import {
   Reminder as ReminderType,
   isReminderActive,
   isReminderToday
-} from "@notesnook/core/collections/reminders";
+} from "@notesnook/core/dist/collections/reminders";
 import { getFormattedReminderTime } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import {

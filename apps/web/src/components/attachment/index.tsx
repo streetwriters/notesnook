@@ -54,7 +54,7 @@ import {
   DocumentMimeTypes,
   WebClipMimeType,
   PDFMimeType
-} from "@notesnook/core/utils/filename";
+} from "@notesnook/core/dist/utils/filename";
 import { useEffect, useState } from "react";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { getFormattedDate } from "@notesnook/common";

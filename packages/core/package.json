@@ -25,6 +25,7 @@
     "vitest-fetch-mock": "^0.2.2"
   },
   "scripts": {
+    "build": "tsc",
     "test:e2e": "cross-env IS_E2E=true vitest run",
     "test": "vitest run"
   },

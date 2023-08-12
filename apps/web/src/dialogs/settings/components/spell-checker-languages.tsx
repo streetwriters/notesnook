@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Language, useSpellChecker } from "../../../hooks/use-spell-checker";
 import { Input, Label } from "@theme-ui/components";
 import { useCallback, useEffect, useState } from "react";
-import { deleteItem } from "@notesnook/core/utils/array";
+import { deleteItem } from "@notesnook/core/dist/utils/array";
 import { FlexScrollContainer } from "../../../components/scroll-container";
 
 export function SpellCheckerLanguages() {

@@ -59,7 +59,7 @@ import { isDocument, isImage, isVideo } from "@notesnook/core/utils/filename";
 import { alpha } from "@theme-ui/color";
 import { ScopedThemeProvider } from "../components/theme-provider";
 
-type ToolbarAction = {
+type Too@notesnook/core/dist/
   title: string;
   icon: Icon;
   onClick: ({ selected }: { selected: any[] }) => void;

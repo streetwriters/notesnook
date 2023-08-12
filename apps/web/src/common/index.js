@@ -35,7 +35,7 @@ import { showFilePicker } from "../utils/file-picker";
 import { logger } from "../utils/logger";
 import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
-import { EVENTS } from "@notesnook/core/common";
+import { EVENTS } from "@notesnook/core/dist/common";
 import { getFormattedDate } from "@notesnook/common";
 import { desktop } from "./desktop-bridge";
 

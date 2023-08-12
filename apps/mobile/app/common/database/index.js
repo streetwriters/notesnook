@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { database } from "@notesnook/common";
-import { initalize, logger as dbLogger } from "@notesnook/core/logger";
+import { initalize, logger as dbLogger } from "@notesnook/core/dist/logger";
 import { Platform } from "react-native";
 import { MMKVLoader } from "react-native-mmkv-storage";
 import filesystem from "../filesystem";

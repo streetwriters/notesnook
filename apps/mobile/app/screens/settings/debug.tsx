@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Clipboard from "@react-native-clipboard/clipboard";
 import { LogMessage } from "@notesnook/logger";
-import { format, LogLevel, logManager } from "@notesnook/core/logger";
+import { format, LogLevel, logManager } from "@notesnook/core/dist/logger";
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Platform, TouchableOpacity, View } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";

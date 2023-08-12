@@ -70,7 +70,7 @@ export function getTimeFormat(format) {
 /**
  *
  * @param {string | number | Date | null | undefined} date
- * @param {{dateFormat: string, timeFormat: string, type: "date-time" | "time" | "date"}} options
+ * @param {{dateFormat: string, timeFormat?: string, type: "date-time" | "time" | "date"}} options
  * @returns
  */
 export function formatDate(

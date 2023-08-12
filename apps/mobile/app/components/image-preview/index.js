@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Sodium from "@ammarahmed/react-native-sodium";
-import dataurl from "@notesnook/core/utils/dataurl";
+import dataurl from "@notesnook/core/dist/utils/dataurl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { Platform, View } from "react-native";

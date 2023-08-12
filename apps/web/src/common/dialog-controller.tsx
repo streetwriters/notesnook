@@ -35,7 +35,7 @@ import { Period } from "../dialogs/buy-dialog/types";
 import { FeatureKeys } from "../dialogs/feature-dialog";
 import { AuthenticatorType } from "../dialogs/mfa/types";
 import { Suspense } from "react";
-import { Reminder } from "@notesnook/core/collections/reminders";
+import { Reminder } from "@notesnook/core/dist/collections/reminders";
 import { ConfirmDialogProps } from "../dialogs/confirm";
 import { getFormattedDate } from "@notesnook/common";
 import { downloadUpdate } from "../utils/updater";

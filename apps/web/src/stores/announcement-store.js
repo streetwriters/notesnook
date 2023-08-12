@@ -24,7 +24,7 @@ import Config from "../utils/config";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { appVersion } from "../utils/version";
-import { findItemAndDelete } from "@notesnook/core/utils/array";
+import { findItemAndDelete } from "@notesnook/core/dist/utils/array";
 
 /**
  * @extends {BaseStore<AnnouncementStore>}

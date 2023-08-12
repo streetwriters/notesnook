@@ -22,7 +22,7 @@ import {
   getFileNameWithExtension,
   isImage,
   isDocument
-} from "@notesnook/core/utils/filename";
+} from "@notesnook/core/dist/utils/filename";
 import React from "react";
 import { Platform } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";

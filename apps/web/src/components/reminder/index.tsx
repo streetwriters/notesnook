@@ -35,7 +35,7 @@ import IconTag from "../icon-tag";
 import {
   Reminder as ReminderType,
   isReminderToday
-} from "@notesnook/core/collections/reminders";
+} from "@notesnook/core/dist/collections/reminders";
 import { hashNavigate } from "../../navigation";
 import { Multiselect } from "../../common/multi-select";
 import { store } from "../../stores/reminder-store";

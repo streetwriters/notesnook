@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import hosts from "@notesnook/core/utils/constants";
+import hosts from "@notesnook/core/dist/utils/constants";
 import NetInfo from "@react-native-community/netinfo";
 import RNFetchBlob from "react-native-blob-util";
 import { ToastEvent } from "../../services/event-manager";

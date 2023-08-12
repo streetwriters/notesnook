@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import EventManager from "@notesnook/core/utils/event-manager";
+import EventManager from "@notesnook/core/dist/utils/event-manager";
 import Config from "../utils/config";
 import { HashRoute } from "./hash-routes";
 import { ReplaceParametersInPath } from "./types";
