@@ -82,21 +82,25 @@ async function getPath(type) {
  */
 async function save(path, data, fileName, extension) {
   let uri;
-  if (Platform.OS === "android") {
-    uri = await ScopedStorage.writeFile(
-      path,
-      data,
-      `${fileName}.${extension}`,
-      MIMETypes[extension],
-      extension === "pdf" ? "base64" : "utf8",
-      false
-    );
-    await releasePermissions(path);
-  } else {
-    path = path + fileName + `.${extension}`;
-    await RNFetchBlob.fs.writeFile(path, data, "utf8");
+  try {
+    if (Platform.OS === "android") {
+      uri = await ScopedStorage.writeFile(
+        path,
+        data,
+        `${fileName}.${extension}`,
+        MIMETypes[extension],
+        extension === "pdf" ? "base64" : "utf8",
+        false
+      );
+      await releasePermissions(path);
+    } else {
+      path = path + fileName + `.${extension}`;
+      await RNFetchBlob.fs.writeFile(path, data, "utf8");
+    }
+    return uri || path;
+  } catch (e) {
+    return undefined;
   }
-  return uri || path;
 }
 
 async function makeHtml(note) {
@@ -175,6 +179,8 @@ async function exportNote(note, type) {
   } else {
     path = await save(path, result, fileName, type);
   }
+
+  if (!path) return null;
 
   return {
     filePath: path,
