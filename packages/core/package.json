@@ -21,10 +21,14 @@
     "happy-dom": "^10.9.0",
     "mockdate": "^3.0.5",
     "otplib": "^12.0.1",
+    "refractor": "^4.8.1",
     "vitest": "^0.34.1",
     "vitest-fetch-mock": "^0.2.2"
   },
   "scripts": {
+    "prebuild": "node scripts/prebuild.mjs",
+    "pretest": "node scripts/prebuild.mjs",
+    "pretest:e2e": "node scripts/prebuild.mjs",
     "build": "tsc",
     "test:e2e": "cross-env IS_E2E=true vitest run",
     "test": "vitest run"

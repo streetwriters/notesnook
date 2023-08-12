@@ -18,32 +18,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import path from "path";
-import fs from "fs";
-import { langen } from "./langen.mjs";
+import fs from "fs/promises";
+import { langen } from "../../editor/scripts/langen.mjs";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(path.join(__dirname, ".."));
 
-const pathsToCopy = {
-  "katex.min.css": "node_modules/katex/dist/katex.min.css",
-  "fonts/": "node_modules/katex/dist/fonts/"
-};
-
-for (const name in pathsToCopy) {
-  const src = pathsToCopy[name];
-  const fullPath = path.join(ROOT_DIR, src);
-  fs.cpSync(fullPath, path.join(ROOT_DIR, "styles", name), {
-    force: true,
-    recursive: true,
-    errorOnExist: false
-  });
+const languagesList = await langen(ROOT_DIR, path.join(ROOT_DIR, "languages"));
+const languageIndex = `function hasRequire() {
+  return typeof require === "function" && !("IS_DESKTOP_APP" in globalThis);
 }
 
-const languagesList = await langen(ROOT_DIR, path.join(ROOT_DIR, "languages"));
+export async function loadLanguage(language) {
+  switch (language) {
+    ${languagesList
+      .map(({ filename, alias }) => {
+        return [
+          ...(alias || []).map((a) => `case "${a}":`),
+          `case "${filename}":`,
+          `return hasRequire() ? require("./${filename}.js") : await import("./${filename}.js");`
+        ].join("\n");
+      })
+      .join("\n\n")}
+  }
+}`;
 
-fs.writeFileSync(
-  path.join(ROOT_DIR, "src", "extensions", "code-block", "languages.json"),
-  JSON.stringify(languagesList)
-);
+await fs.writeFile(path.join(ROOT_DIR, "languages", "index.js"), languageIndex);

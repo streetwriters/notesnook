@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { afterAll } from "vitest";
+
 import crypto from "crypto";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
@@ -25,8 +25,3 @@ globalThis.fetch = fetch;
 require("abortcontroller-polyfill/dist/polyfill-patch-fetch");
 globalThis.crypto = crypto;
 dotenv.config();
-
-afterAll(() => {
-  globalThis.crypto = null;
-  globalThis.fetch = null;
-});
