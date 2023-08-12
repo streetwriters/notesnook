@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Reminder } from "@notesnook/core/collections/reminders";
+import { Reminder } from "@notesnook/core/dist/collections/reminders";
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 

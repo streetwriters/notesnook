@@ -42,7 +42,7 @@ import { Attachment } from "../icons";
 import { useEditorInstance } from "./context";
 import { attachFile, AttachmentProgress, insertAttachment } from "./picker";
 import { saveAttachment, downloadAttachment } from "../../common/attachments";
-import { EV, EVENTS } from "@notesnook/core/common";
+import { EV, EVENTS } from "@notesnook/core/dist/common";
 import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
 import Titlebox from "./title-box";

@@ -28,7 +28,7 @@ import { resetNotices, scheduleBackups } from "./common/notices";
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
-import { EV, EVENTS } from "@notesnook/core/common";
+import { EV, EVENTS } from "@notesnook/core/dist/common";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 import {

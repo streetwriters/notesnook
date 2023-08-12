@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Flex, Text } from "@theme-ui/components";
 import { User } from "../../../components/icons";
 import { useStore as useUserStore } from "../../../stores/user-store";
-import ObjectID from "@notesnook/core/utils/object-id";
+import ObjectID from "@notesnook/core/dist/utils/object-id";
 import { getFormattedDate } from "@notesnook/common";
 import { SUBSCRIPTION_STATUS } from "../../../common/constants";
 import dayjs from "dayjs";

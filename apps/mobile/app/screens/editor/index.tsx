@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { EV, EVENTS } from "@notesnook/core/common";
+import { EV, EVENTS } from "@notesnook/core/dist/common";
 import React, {
   forwardRef,
   useCallback,

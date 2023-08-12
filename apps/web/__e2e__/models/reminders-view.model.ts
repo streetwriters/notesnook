@@ -21,7 +21,7 @@ import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { BaseViewModel } from "./base-view.model";
 import { ReminderItemModel } from "./reminder-item.model";
-import { Reminder } from "@notesnook/core/collections/reminders";
+import { Reminder } from "@notesnook/core/dist/collections/reminders";
 import { fillReminderDialog } from "./utils";
 
 export class RemindersViewModel extends BaseViewModel {

@@ -19,6 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
-import Database from "@notesnook/core/api/index";
+import Database from "@notesnook/core/dist/api/index";
 
 export const database = new Database();

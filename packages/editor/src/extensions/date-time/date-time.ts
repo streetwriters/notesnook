@@ -25,7 +25,7 @@ import {
 } from "@tiptap/core";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { formatDate } from "@notesnook/core/utils/date";
+import { formatDate } from "@notesnook/core/dist/utils/date";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {

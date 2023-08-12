@@ -21,7 +21,7 @@ import { useEffect } from "react";
 import ListContainer from "../components/list-container";
 import { useStore as useNotesStore } from "../stores/note-store";
 import { hashNavigate, navigate } from "../navigation";
-import { groupArray } from "@notesnook/core/utils/grouping";
+import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import { db } from "../common/db";
 import Placeholder from "../components/placeholders";
 

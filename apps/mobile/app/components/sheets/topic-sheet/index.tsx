@@ -54,7 +54,7 @@ import {
 import { normalize, SIZE } from "../../../utils/size";
 import { GroupHeader, NotebookType, TopicType } from "../../../utils/types";
 
-import { groupArray } from "@notesnook/core/utils/grouping";
+import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import Config from "react-native-config";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";

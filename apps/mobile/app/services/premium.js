@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { CHECK_IDS } from "@notesnook/core/common";
+import { CHECK_IDS } from "@notesnook/core/dist/common";
 import React from "react";
 import { Platform } from "react-native";
 import Config from "react-native-config";

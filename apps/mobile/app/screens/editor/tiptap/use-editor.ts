@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EVENTS } from "@notesnook/core/common";
+import { EVENTS } from "@notesnook/core/dist/common";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import WebView from "react-native-webview";

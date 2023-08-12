@@ -25,7 +25,7 @@ import { store as selectionStore } from "./selection-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
 import Config from "../utils/config";
-import { groupArray } from "@notesnook/core/utils/grouping";
+import { groupArray } from "@notesnook/core/dist/utils/grouping";
 
 /**
  * @extends {BaseStore<NoteStore>}

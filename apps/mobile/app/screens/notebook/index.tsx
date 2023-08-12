@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { groupArray } from "@notesnook/core/utils/grouping";
+import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
 import DelayLayout from "../../components/delay-layout";

@@ -39,7 +39,7 @@ import { useStore as useNotesStore } from "../stores/note-store";
 import Placeholder from "../components/placeholders";
 import { showSortMenu } from "../components/group-header";
 import { db } from "../common/db";
-import { groupArray } from "@notesnook/core/utils/grouping";
+import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import { getFormattedDate } from "@notesnook/common";
 
 function Notebook() {

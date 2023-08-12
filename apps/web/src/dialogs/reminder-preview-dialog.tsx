@@ -21,7 +21,7 @@ import { Perform } from "../common/dialog-controller";
 import Dialog from "../components/dialog";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { db } from "../common/db";
-import { Reminder } from "@notesnook/core/collections/reminders";
+import { Reminder } from "@notesnook/core/dist/collections/reminders";
 import IconTag from "../components/icon-tag";
 import { Clock, Refresh } from "../components/icons";
 import Note from "../components/note";

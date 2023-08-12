@@ -46,7 +46,7 @@ import {
 import { useEffect, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import { createPortal } from "react-dom";
-import { getId } from "@notesnook/core/utils/id";
+import { getId } from "@notesnook/core/dist/utils/id";
 import { Label } from "@theme-ui/components";
 import { db } from "../../../common/db";
 import { useToolbarConfig } from "../../../components/editor/context";

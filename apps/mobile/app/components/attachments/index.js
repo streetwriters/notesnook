@@ -40,7 +40,7 @@ import {
   isDocument,
   isImage,
   isVideo
-} from "@notesnook/core/utils/filename";
+} from "@notesnook/core/dist/utils/filename";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 

@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatDate } from "@notesnook/core/utils/date";
+import { formatDate } from "@notesnook/core/dist/utils/date";
 import { database } from "../database";
-import { formatReminderTime } from "@notesnook/core/collections/reminders";
+import { formatReminderTime } from "@notesnook/core/dist/collections/reminders";
 
 export function getFormattedDate(
   date: string | number | Date,

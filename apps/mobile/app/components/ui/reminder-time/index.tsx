@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { isReminderActive } from "@notesnook/core/collections/reminders";
+import { isReminderActive } from "@notesnook/core/dist/collections/reminders";
 import React from "react";
 import { ViewStyle } from "react-native";
 

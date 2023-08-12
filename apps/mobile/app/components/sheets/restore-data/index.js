@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EVENTS } from "@notesnook/core/common";
+import { EVENTS } from "@notesnook/core/dist/common";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
@@ -377,7 +377,10 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
                     height: 100
                   }}
                 >
-                  <ActivityIndicator color={colors.primary.accent} size={SIZE.lg} />
+                  <ActivityIndicator
+                    color={colors.primary.accent}
+                    size={SIZE.lg}
+                  />
                 </View>
               ) : (
                 <View
@@ -434,7 +437,9 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
                       </Paragraph>
                     </>
                   ) : (
-                    <Paragraph color={colors.secondary.paragraph}>No backups found</Paragraph>
+                    <Paragraph color={colors.secondary.paragraph}>
+                      No backups found
+                    </Paragraph>
                   )}
                 </View>
               )

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Sodium from "@ammarahmed/react-native-sodium";
-import { isImage } from "@notesnook/core/utils/filename";
+import { isImage } from "@notesnook/core/dist/utils/filename";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import DocumentPicker from "react-native-document-picker";

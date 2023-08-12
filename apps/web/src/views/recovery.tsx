@@ -29,7 +29,7 @@ import { AuthField, SubmitButton } from "./auth";
 import { createBackup, restoreBackupFile, selectBackupFile } from "../common";
 import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import Config from "../utils/config";
-import { EVENTS } from "@notesnook/core/common";
+import { EVENTS } from "@notesnook/core/dist/common";
 import { ErrorText } from "../components/error-text";
 
 type RecoveryMethodType = "key" | "backup" | "reset";

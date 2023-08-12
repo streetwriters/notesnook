@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import "./polyfills";
-import "@notesnook/core/types";
+import "@notesnook/core/dist/types";
 import { getCurrentHash, getCurrentPath, makeURL } from "./navigation";
 import Config from "./utils/config";
 

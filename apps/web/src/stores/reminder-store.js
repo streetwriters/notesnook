@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
-import { groupReminders } from "@notesnook/core/utils/grouping";
+import { groupReminders } from "@notesnook/core/dist/utils/grouping";
 import { TaskScheduler } from "../utils/task-scheduler";
 import { showReminderPreviewDialog } from "../common/dialog-controller";
 import dayjs from "dayjs";
@@ -85,7 +85,7 @@ async function resetReminders(reminders) {
 /**
  *
  * @param {string} id
- * @param {import("@notesnook/core/collections/reminders").Reminder} reminder
+ * @param {import("@notesnook/core/dist/collections/reminders").Reminder} reminder
  * @param {string} cron
  * @returns
  */

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
-import type Database from "@notesnook/core/api";
+import type Database from "@notesnook/core/dist/api";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
