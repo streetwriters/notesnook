@@ -2,9 +2,6 @@
   "extends": "../../tsconfig",
   "compilerOptions": {
     "outDir": "./dist",
-    "maxNodeModuleJsDepth": 10,
-    "downlevelIteration": true,
-    "allowJs": true,
     "jsx": "react-jsx"
   },
   "include": ["src/"]
