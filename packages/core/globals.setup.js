@@ -17,11 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import "isomorphic-fetch";
 import crypto from "crypto";
 import dotenv from "dotenv";
-import fetch from "node-fetch";
 
-globalThis.fetch = fetch;
 require("abortcontroller-polyfill/dist/polyfill-patch-fetch");
 globalThis.crypto = crypto;
 dotenv.config();
