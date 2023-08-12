@@ -27,7 +27,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(path.join(__dirname, ".."));
 
-const languagesList = await langen(ROOT_DIR, path.join(ROOT_DIR, "languages"));
+const languagesList = await langen(
+  ROOT_DIR,
+  path.join(ROOT_DIR, "src", "utils", "templates", "html", "languages")
+);
 const languageIndex = `function hasRequire() {
   return typeof require === "function" && !("IS_DESKTOP_APP" in globalThis);
 }
@@ -46,4 +49,15 @@ export async function loadLanguage(language) {
   }
 }`;
 
-await fs.writeFile(path.join(ROOT_DIR, "languages", "index.js"), languageIndex);
+await fs.writeFile(
+  path.join(
+    ROOT_DIR,
+    "src",
+    "utils",
+    "templates",
+    "html",
+    "languages",
+    "index.js"
+  ),
+  languageIndex
+);
