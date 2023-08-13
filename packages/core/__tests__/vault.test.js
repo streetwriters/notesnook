@@ -17,12 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { StorageInterface, databaseTest, noteTest, TEST_NOTE } from "./utils";
-import { beforeEach, test, expect } from "vitest";
-
-beforeEach(async () => {
-  StorageInterface.clear();
-});
+import { databaseTest, noteTest, TEST_NOTE } from "./utils";
+import { test, expect } from "vitest";
 
 test("create vault", () =>
   databaseTest().then(async (db) => {
@@ -113,11 +109,9 @@ test("save a locked note", () =>
     await db.vault.save(note);
 
     const content = await db.content.raw(note.contentId);
-    const contentData = JSON.parse(content.data.cipher);
 
-    expect(contentData.iv).toBeUndefined();
-    expect(contentData.cipher).toBeUndefined();
-    expect(contentData.key).toBeUndefined();
+    expect(content.data.cipher).toBeTypeOf("string");
+    expect(() => JSON.parse()).toThrow();
   }));
 
 test("save an edited locked note", () =>
@@ -132,11 +126,9 @@ test("save an edited locked note", () =>
     });
 
     const content = await db.content.raw(note.contentId);
-    const contentData = JSON.parse(content.data.cipher);
 
-    expect(contentData.iv).toBeUndefined();
-    expect(contentData.cipher).toBeUndefined();
-    expect(contentData.key).toBeUndefined();
+    expect(content.data.cipher).toBeTypeOf("string");
+    expect(() => JSON.parse(content.data.cipher)).toThrow();
   }));
 
 test("change vault password", () =>

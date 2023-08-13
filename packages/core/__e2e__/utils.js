@@ -34,3 +34,7 @@ export async function login(db) {
 
   await db.user.authenticatePassword(user.email, user.password, user.hashed);
 }
+
+export async function logout(db) {
+  await db.user.logout(true);
+}

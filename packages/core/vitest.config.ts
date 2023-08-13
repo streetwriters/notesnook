@@ -25,6 +25,9 @@ export default defineConfig({
   test: {
     environment: "happy-dom",
     setupFiles: ["./globals.setup.js"],
+    coverage: {
+      reporter: ["text", "html"]
+    },
     include: [
       ...(IS_E2E ? ["__e2e__/**/*.test.js"] : []),
       "__tests__/**/*.test.js",

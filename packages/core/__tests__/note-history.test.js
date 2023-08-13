@@ -17,12 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { delay, noteTest, StorageInterface, TEST_NOTE } from "./utils";
-import { beforeEach, test, expect } from "vitest";
-
-beforeEach(async () => {
-  StorageInterface.clear();
-});
+import { delay, noteTest, TEST_NOTE } from "./utils";
+import { test, expect } from "vitest";
 
 // async function sessionTest(db, noteId) {
 //   let note = await db.notes.note(noteId).data;

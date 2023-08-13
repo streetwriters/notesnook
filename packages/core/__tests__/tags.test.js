@@ -17,12 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { noteTest, TEST_NOTE, StorageInterface } from "./utils";
-import { beforeEach, test, expect, describe } from "vitest";
-
-beforeEach(async () => {
-  StorageInterface.clear();
-});
+import { noteTest, TEST_NOTE } from "./utils";
+import { test, expect, describe } from "vitest";
 
 function checkColorValue(note, value) {
   expect(note.data.color).toBe(value);

@@ -17,12 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { databaseTest, StorageInterface } from "./utils";
-import { beforeEach, test, expect } from "vitest";
-
-beforeEach(() => {
-  StorageInterface.clear();
-});
+import { databaseTest } from "./utils";
+import { test, expect } from "vitest";
 
 test("settings' dateModified should not update on init", () =>
   databaseTest().then(async (db) => {

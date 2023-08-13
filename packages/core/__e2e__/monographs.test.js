@@ -17,25 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { databaseTest, noteTest, StorageInterface } from "../__tests__/utils";
-import { login } from "./utils";
-import { test, expect, beforeEach, afterAll } from "vitest";
+import { databaseTest, noteTest } from "../__tests__/utils";
+import { login, logout } from "./utils";
+import { test, expect, afterAll } from "vitest";
 
 const TEST_TIMEOUT = 30 * 1000;
 
-beforeEach(() => {
-  StorageInterface.clear();
-});
-
 afterAll(async () => {
   const db = await databaseTest();
+  await login(db);
   await db.monographs.init();
 
   for (const id of db.monographs.monographs) {
     await db.monographs.unpublish(id);
   }
 
-  StorageInterface.clear();
+  await logout(db);
 }, TEST_TIMEOUT);
 
 // test("get monographs", () =>
@@ -62,6 +59,8 @@ test(
       const note = db.notes.note(id);
       expect(monograph.id).toBe(monographId);
       expect(monograph.title).toBe(note.title);
+
+      await logout(db);
     }),
   TEST_TIMEOUT
 );
@@ -83,6 +82,8 @@ test(
       await db.monographs.publish(id);
       monograph = await db.monographs.get(monographId);
       expect(monograph.title).toBe(editedTitle);
+
+      await logout(db);
     }),
   TEST_TIMEOUT
 );
@@ -99,6 +100,8 @@ test(
 
       await db.monographs.unpublish(id);
       expect(db.monographs.all.find((m) => m.id === id)).toBeUndefined();
+
+      await logout(db);
     }),
   TEST_TIMEOUT
 );

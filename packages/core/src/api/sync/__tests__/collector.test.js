@@ -17,18 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  databaseTest,
-  TEST_NOTE,
-  delay,
-  StorageInterface
-} from "../../../../__tests__/utils";
+import { databaseTest, TEST_NOTE, delay } from "../../../../__tests__/utils";
 import Collector from "../collector";
-import { test, beforeEach, expect } from "vitest";
-
-beforeEach(async () => {
-  StorageInterface.clear();
-});
+import { test, expect } from "vitest";
 
 test("newly created note should get included in collector", () =>
   databaseTest().then(async (db) => {
