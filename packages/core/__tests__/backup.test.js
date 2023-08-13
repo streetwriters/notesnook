@@ -18,8 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
-  StorageInterface,
+  TEST_NOTE,
   databaseTest,
+  loginFakeUser,
   noteTest,
   notebookTest
 } from "./utils";
@@ -27,11 +28,7 @@ import v52Backup from "./__fixtures__/backup.v5.2.json";
 import v52BackupCopy from "./__fixtures__/backup.v5.2.copy.json";
 import v56BackupCopy from "./__fixtures__/backup.v5.6.json";
 import qclone from "qclone";
-import { beforeEach, test, expect, describe } from "vitest";
-
-beforeEach(() => {
-  StorageInterface.clear();
-});
+import { test, expect, describe } from "vitest";
 
 test("export backup", () =>
   noteTest().then(() =>
@@ -44,46 +41,44 @@ test("export backup", () =>
   ));
 
 test("export encrypted backup", () =>
-  noteTest().then(() =>
-    notebookTest().then(async ({ db }) => {
-      const exp = await db.backup.export("node", true);
-      let backup = JSON.parse(exp);
-      expect(backup.type).toBe("node");
-      expect(backup.date).toBeGreaterThan(0);
-      expect(backup.data.iv).toBe("some iv");
-    })
-  ));
+  notebookTest().then(async ({ db }) => {
+    await loginFakeUser(db);
+    await db.notes.add(TEST_NOTE);
+    const exp = await db.backup.export("node", true);
+    let backup = JSON.parse(exp);
+    expect(backup.type).toBe("node");
+    expect(backup.date).toBeGreaterThan(0);
+    expect(backup.data.iv).not.toBeUndefined();
+  }));
 
 test("import backup", () =>
-  noteTest().then(() =>
-    notebookTest().then(async ({ db, id }) => {
-      const exp = await db.backup.export("node");
-      StorageInterface.clear();
-      await db.backup.import(JSON.parse(exp));
-      expect(db.notebooks.notebook(id).data.id).toBe(id);
-    })
-  ));
+  notebookTest().then(async ({ db, id }) => {
+    await db.notes.add(TEST_NOTE);
+    const exp = await db.backup.export("node");
+    await db.storage.clear();
+    await db.backup.import(JSON.parse(exp));
+    expect(db.notebooks.notebook(id).data.id).toBe(id);
+  }));
 
 test("import encrypted backup", () =>
-  noteTest().then(() =>
-    notebookTest().then(async ({ db, id }) => {
-      const exp = await db.backup.export("node", true);
-      StorageInterface.clear();
-      await db.backup.import(JSON.parse(exp), "password");
-      expect(db.notebooks.notebook(id).data.id).toBe(id);
-    })
-  ));
+  notebookTest().then(async ({ db, id }) => {
+    await loginFakeUser(db);
+    await db.notes.add(TEST_NOTE);
+    const exp = await db.backup.export("node", true);
+    await db.storage.clear();
+    await db.backup.import(JSON.parse(exp), "password");
+    expect(db.notebooks.notebook(id).data.id).toBe(id);
+  }));
 
 test("import tempered backup", () =>
-  noteTest().then(() =>
-    notebookTest().then(async ({ db }) => {
-      const exp = await db.backup.export("node");
-      StorageInterface.clear();
-      const backup = JSON.parse(exp);
-      backup.data.hello = "world";
-      await expect(db.backup.import(backup)).rejects.toThrow(/tempered/);
-    })
-  ));
+  notebookTest().then(async ({ db }) => {
+    await db.notes.add(TEST_NOTE);
+    const exp = await db.backup.export("node");
+    await db.storage.clear();
+    const backup = JSON.parse(exp);
+    backup.data.hello = "world";
+    await expect(db.backup.import(backup)).rejects.toThrow(/tempered/);
+  }));
 
 describe.each([
   ["v5.2", v52Backup],

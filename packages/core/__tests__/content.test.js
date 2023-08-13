@@ -17,12 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { StorageInterface, databaseTest } from "./utils";
-import { beforeEach, test, expect } from "vitest";
-
-beforeEach(() => {
-  StorageInterface.clear();
-});
+import { databaseTest } from "./utils";
+import { test, expect } from "vitest";
 
 test("adding a deleted content should not throw", () =>
   databaseTest().then(async (db) => {

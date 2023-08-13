@@ -17,19 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  StorageInterface,
-  notebookTest,
-  TEST_NOTEBOOK,
-  TEST_NOTE,
-  delay
-} from "./utils";
+import { notebookTest, TEST_NOTEBOOK, TEST_NOTE, delay } from "./utils";
 import { makeTopic } from "../src/collections/topics";
-import { beforeEach, test, expect } from "vitest";
-
-beforeEach(async () => {
-  StorageInterface.clear();
-});
+import { test, expect } from "vitest";
 
 test("add a notebook", () =>
   notebookTest().then(({ db, id }) => {
@@ -153,7 +143,7 @@ test("merge notebook with topic removed that is edited in the local notebook", (
     const newNotebook = { ...notebook.data, remote: true };
     newNotebook.topics.splice(0, 1); // remove hello topic
 
-    await StorageInterface.write("lastSynced", Date.now());
+    await db.storage.write("lastSynced", Date.now());
 
     await delay(500);
 

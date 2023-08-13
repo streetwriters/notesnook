@@ -19,19 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { groupArray } from "../src/utils/grouping";
 import {
-  StorageInterface,
   databaseTest,
   noteTest,
   groupedTest,
   TEST_NOTE,
   TEST_NOTEBOOK,
-  IMG_CONTENT
+  IMG_CONTENT,
+  loginFakeUser
 } from "./utils";
-import { beforeEach, test, expect } from "vitest";
-
-beforeEach(async () => {
-  StorageInterface.clear();
-});
+import { test, expect } from "vitest";
 
 test("add invalid note", () =>
   databaseTest().then(async (db) => {
@@ -314,40 +310,12 @@ test("grouping items where item.title is empty or undefined shouldn't throw", ()
 
 test("note content should not contain image base64 data after save", () =>
   noteTest().then(async ({ db, id }) => {
-    StorageInterface.write(`_uk_@email@email.com`, {
-      key: { password: "password" }
-    });
-
-    await db.user.setUser({
-      email: "email@email.com",
-      attachmentsKey: {
-        cipher: "{}",
-        iv: "iv",
-        salt: "salt",
-        length: 100,
-        key: { password: "password" }
-      }
-    });
-
-    await db.attachments.add(
-      {
-        iv: "iv",
-        length: 100,
-        alg: "xha-stream",
-        hash: "d3eab72e94e3cd35",
-        hashType: "xxh64",
-        type: "image/jpeg",
-        chunkSize: 512,
-        filename: "hello",
-        key: {},
-        salt: "hellowrold"
-      },
-      id
-    );
+    await loginFakeUser(db);
 
     await db.notes.add({ id, content: { type: "tiptap", data: IMG_CONTENT } });
     const note = db.notes.note(id);
     const content = await note.content();
+
     expect(content).not.toContain(`src="data:image/png;`);
     expect(content).not.toContain(`src=`);
   }));

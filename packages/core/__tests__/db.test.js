@@ -17,14 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import DB from "../src/api";
 import Constants from "../src/utils/constants";
-import StorageInterface from "../__mocks__/storage.mock";
 import { test, expect } from "vitest";
+import { databaseTest } from "./utils";
 
-test("db.host should change HOST", () => {
-  const db = new DB();
-  db.setup(StorageInterface);
-  db.host({ API_HOST: "hello world" });
-  expect(Constants.API_HOST).toBe("hello world");
-});
+test("db.host should change HOST", () =>
+  databaseTest().then((db) => {
+    db.host({ API_HOST: "hello world" });
+    expect(Constants.API_HOST).toBe("hello world");
+  }));

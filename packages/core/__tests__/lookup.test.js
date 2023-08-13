@@ -17,18 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  StorageInterface,
-  noteTest,
-  TEST_NOTE,
-  notebookTest,
-  TEST_NOTEBOOK2
-} from "./utils";
-import { beforeEach, test, expect } from "vitest";
-
-beforeEach(async () => {
-  StorageInterface.clear();
-});
+import { noteTest, TEST_NOTE, notebookTest, TEST_NOTEBOOK2 } from "./utils";
+import { test, expect } from "vitest";
 
 const content = {
   ...TEST_NOTE.content,

@@ -18,12 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import DB from "../../src/api";
-import StorageInterface from "../../__mocks__/storage.mock";
+import { NodeStorageInterface } from "../../__mocks__/node-storage.mock";
 import dayjs from "dayjs";
 import { groupArray } from "../../src/utils/grouping";
 import FS from "../../__mocks__/fs.mock";
 import Compressor from "../../__mocks__/compressor.mock";
 import { expect } from "vitest";
+import EventSource from "eventsource";
+import { randomBytes } from "../../src/utils/random";
 
 const TEST_NOTEBOOK = {
   title: "Test Notebook",
@@ -39,7 +41,7 @@ const TEST_NOTEBOOK2 = {
 
 function databaseTest() {
   let db = new DB();
-  db.setup(StorageInterface, null, FS, Compressor);
+  db.setup(new NodeStorageInterface(), EventSource, FS, Compressor);
   return db.init().then(() => db);
 }
 
@@ -94,6 +96,29 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function loginFakeUser(db) {
+  const email = "johndoe@example.com";
+  const userSalt = randomBytes(16).toString("base64");
+  await db.storage.deriveCryptoKey(`_uk_@${email}`, {
+    password: "password",
+    salt: userSalt
+  });
+
+  const userEncryptionKey = await db.storage.getCryptoKey(`_uk_@${email}`);
+
+  const key = await db.storage.generateRandomKey();
+  const attachmentsKey = await db.storage.encrypt(
+    { password: userEncryptionKey },
+    JSON.stringify(key)
+  );
+
+  await db.user.setUser({
+    email,
+    salt: userSalt,
+    attachmentsKey: attachmentsKey
+  });
+}
+
 export {
   databaseTest,
   notebookTest,
@@ -101,10 +126,10 @@ export {
   groupedTest,
   IMG_CONTENT,
   IMG_CONTENT_WITHOUT_HASH,
-  StorageInterface,
   TEST_NOTEBOOK,
   TEST_NOTEBOOK2,
   TEST_NOTE,
   LONG_TEXT,
-  delay
+  delay,
+  loginFakeUser
 };

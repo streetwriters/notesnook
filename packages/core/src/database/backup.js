@@ -49,6 +49,8 @@ export default class Backup {
   async export(type, encrypt = false) {
     if (!validTypes.some((t) => t === type))
       throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
+    if (encrypt && !(await this._db.user.getUser()))
+      throw new Error("Please login to create encrypted backups.");
 
     let keys = await this._db.storage.getAllKeys();
     let data = filterData(
