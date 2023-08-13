@@ -35,7 +35,7 @@ import {
   crypto_secretstream_xchacha20poly1305_STATEBYTES,
   crypto_secretstream_xchacha20poly1305_TAGBYTES
 } from "sodium-native";
-import { Buffer } from "buffer";
+import { Buffer } from "node:buffer";
 
 export type Uint8ArrayOutputFormat = "uint8array";
 export type StringOutputFormat = "text" | "hex" | "base64";
