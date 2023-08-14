@@ -23,6 +23,7 @@ import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { DatabaseLogger, db } from "../common/database";
 import { IOS_APPGROUPID } from "./constants";
+import { compressToFile } from "../common/filesystem/compress";
 
 const santizeUri = (uri) => {
   uri = decodeURI(uri);
@@ -92,10 +93,22 @@ async function createNotes(bundle) {
       );
     }
   }
+  const compress = bundle.compress;
 
   for (const file of bundle.files) {
-    const uri =
-      Platform.OS === "ios" ? santizeUri(file.value) : `${file.value}`;
+    let uri = Platform.OS === "ios" ? santizeUri(file.value) : `${file.value}`;
+
+    const isPng = /(png)/g.test(file.type);
+    const isJpeg = /(jpeg|jpg)/g.test(file.type);
+
+    if ((isPng || isJpeg) && compress) {
+      console.log(uri, "before compressed");
+      uri = await compressToFile("file://" + uri, isPng ? "PNG" : "JPEG");
+
+      uri = `${uri.replace("file://", "")}`;
+    }
+    console.log(uri, "after compressed");
+
     const hash = await Sodium.hashFile({
       uri: uri,
       type: "cache"

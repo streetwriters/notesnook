@@ -48,3 +48,22 @@ export async function compressToBase64(path, type) {
   RNFetchBlob.fs.unlink(response.uri.replace("file://", "")).catch(console.log);
   return base64;
 }
+
+export async function compressToFile(path, type) {
+  const response = await ImageResizer.createResizedImage(
+    path,
+    1080,
+    9999,
+    type,
+    85,
+    0,
+    undefined,
+    true,
+    {
+      mode: "contain",
+      onlyScaleDown: true
+    }
+  );
+  RNFetchBlob.fs.unlink(path.replace("file://", "")).catch(console.log);
+  return response.uri;
+}

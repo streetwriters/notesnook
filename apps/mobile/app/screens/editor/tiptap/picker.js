@@ -24,7 +24,11 @@ import RNFetchBlob from "react-native-blob-util";
 import DocumentPicker from "react-native-document-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { db } from "../../../common/database";
-import { compressToBase64 } from "../../../common/filesystem/compress";
+import {
+  compressToBase64,
+  compressToFile
+} from "../../../common/filesystem/compress";
+import AttachImage from "../../../components/dialogs/attach-image-dialog";
 import {
   ToastManager,
   eSendEvent,
@@ -215,6 +219,21 @@ const handleImageResponse = async (response, options) => {
   }
 
   let image = response.assets[0];
+
+  const compress = await AttachImage.present(response);
+
+  const isPng = /(png)/g.test(image.type);
+  const isJpeg = /(jpeg|jpg)/g.test(image.type);
+
+  if (compress && (isPng || isJpeg)) {
+    image.uri = await compressToFile(
+      Platform.OS === "ios" ? "file://" + image.uri : image.uri,
+      isPng ? "PNG" : "JPEG"
+    );
+    const stat = await RNFetchBlob.fs.stat(image.uri.replace("file://", ""));
+    image.fileSize = stat.size;
+  }
+
   if (image.fileSize > IMAGE_SIZE_LIMIT) {
     ToastManager.show({
       title: "File too large",
@@ -242,8 +261,7 @@ const handleImageResponse = async (response, options) => {
   });
 
   if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
-  const isPng = /(png)/g.test(image.type);
-  const isJpeg = /(jpeg|jpg)/g.test(image.type);
+
   if (isPng || isJpeg) {
     b64 =
       `data:${image.type};base64, ` +
