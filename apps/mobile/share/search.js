@@ -34,6 +34,7 @@ import { db } from "../app/common/database";
 import { getElevationStyle } from "../app/utils/elevation";
 import { initDatabase, useShareStore } from "./store";
 import { useThemeColors } from "@notesnook/theme";
+import { groupArray } from "@notesnook/core/dist/utils/grouping";
 
 const ListItem = ({ item, mode, close }) => {
   const { colors } = useThemeColors();
@@ -97,7 +98,7 @@ const ListItem = ({ item, mode, close }) => {
       style={{
         flexDirection: "column",
         borderBottomWidth: item.topics?.length > 0 ? 0 : 1,
-        borderBottomColor: colors.secondary.background,
+        borderBottomColor: colors.primary.border,
         justifyContent: "center",
         paddingVertical: 12
       }}
@@ -160,8 +161,15 @@ const ListItem = ({ item, mode, close }) => {
 };
 
 const SearchGetters = {
-  appendNote: () => db.notes.all,
-  selectNotebooks: () => db.notebooks.all,
+  appendNote: () =>
+    groupArray([...db.notes.all], db.settings.getGroupOptions("notes")).filter(
+      (item) => item.type === "note"
+    ),
+  selectNotebooks: () =>
+    groupArray(
+      [...db.notebooks.all],
+      db.settings.getGroupOptions("notebooks")
+    ).filter((item) => item.type === "notebook"),
   selectTags: () => {
     const selected = useShareStore.getState().selectedTags;
     const tags = [];
@@ -179,14 +187,30 @@ const SearchGetters = {
       if (index > -1) continue;
       tags.push(tag);
     }
-    return tags;
+    return groupArray([...tags], {
+      groupBy: "none",
+      sortDirection: "asc",
+      sortBy: "title"
+    }).filter((item) => item.type === "tag");
   }
 };
 
 const SearchLookup = {
-  appendNote: (items, kwd) => db.lookup.notes(items, kwd),
-  selectNotebooks: (items, kwd) => db.lookup.notebooks(items, kwd),
-  selectTags: (items, kwd) => db.lookup.tags(items, kwd)
+  appendNote: (items, kwd) => {
+    return db.lookup.notes(items, kwd);
+  },
+  selectNotebooks: (items, kwd) => {
+    return db.lookup.notebooks(items, kwd);
+  },
+  selectTags: (items, kwd) => {
+    return db.lookup.tags(items, kwd);
+  }
+};
+
+const SearchPlaceholder = {
+  appendNote: "Search for a note",
+  selectNotebooks: "Search for a notebook",
+  selectTags: "Search for a tag"
 };
 
 export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
@@ -286,7 +310,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote, mode }) => {
         />
         <TextInput
           ref={inputRef}
-          placeholder="Search for a note"
+          placeholder={SearchPlaceholder[mode]}
           placeholderTextColor={colors.primary.placeholder}
           style={{
             fontSize: 15,
