@@ -169,7 +169,7 @@ const gallery = async (options) => {
       {
         includeBase64: true,
         mediaType: "photo",
-        selectionLimit: 1
+        selectionLimit: 10
       },
       (response) => handleImageResponse(response, options)
     );
@@ -218,60 +218,62 @@ const handleImageResponse = async (response, options) => {
     return;
   }
 
-  let image = response.assets[0];
+  const result = await AttachImage.present(response);
 
-  const compress = await AttachImage.present(response);
+  if (!result) return;
+  const compress = result.compress;
 
-  const isPng = /(png)/g.test(image.type);
-  const isJpeg = /(jpeg|jpg)/g.test(image.type);
+  for (let image of response.assets) {
+    const isPng = /(png)/g.test(image.type);
+    const isJpeg = /(jpeg|jpg)/g.test(image.type);
 
-  if (compress && (isPng || isJpeg)) {
-    image.uri = await compressToFile(
-      Platform.OS === "ios" ? "file://" + image.uri : image.uri,
-      isPng ? "PNG" : "JPEG"
-    );
-    const stat = await RNFetchBlob.fs.stat(image.uri.replace("file://", ""));
-    image.fileSize = stat.size;
-  }
-
-  if (image.fileSize > IMAGE_SIZE_LIMIT) {
-    ToastManager.show({
-      title: "File too large",
-      message: "The maximum allowed size per image is 50 MB",
-      type: "error"
-    });
-    return;
-  }
-  let b64 = `data:${image.type};base64, ` + image.base64;
-  const uri = decodeURI(image.uri);
-  const hash = await Sodium.hashFile({
-    uri: uri,
-    type: "url"
-  });
-
-  let fileName = image.originalFileName || image.fileName;
-
-  editorController.current?.commands.insertImage({
-    hash: hash,
-    mime: image.type,
-    title: fileName,
-    dataurl: b64,
-    size: image.fileSize,
-    filename: fileName
-  });
-
-  if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
-
-  if (isPng || isJpeg) {
-    b64 =
-      `data:${image.type};base64, ` +
-      (await compressToBase64(
+    if (compress && (isPng || isJpeg)) {
+      image.uri = await compressToFile(
         Platform.OS === "ios" ? "file://" + image.uri : image.uri,
         isPng ? "PNG" : "JPEG"
-      ));
-  }
+      );
+      const stat = await RNFetchBlob.fs.stat(image.uri.replace("file://", ""));
+      image.fileSize = stat.size;
+    }
 
-  if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
+    if (image.fileSize > IMAGE_SIZE_LIMIT) {
+      ToastEvent.show({
+        title: "File too large",
+        message: "The maximum allowed size per image is 50 MB",
+        type: "error"
+      });
+      return;
+    }
+    let b64 = `data:${image.type};base64, ` + image.base64;
+    const uri = decodeURI(image.uri);
+    const hash = await Sodium.hashFile({
+      uri: uri,
+      type: "url"
+    });
+
+    let fileName = image.originalFileName || image.fileName;
+    if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
+
+    if (isPng || isJpeg) {
+      b64 =
+        `data:${image.type};base64, ` +
+        (await compressToBase64(
+          Platform.OS === "ios" ? "file://" + image.uri : image.uri,
+          isPng ? "PNG" : "JPEG"
+        ));
+    }
+
+    if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
+
+    editorController.current?.commands.insertImage({
+      hash: hash,
+      mime: image.type,
+      title: fileName,
+      dataurl: b64,
+      size: image.fileSize,
+      filename: fileName
+    });
+  }
 };
 
 export async function attachFile(uri, hash, type, filename, options) {

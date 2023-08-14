@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React, { useState } from "react";
-import { Image, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, TouchableOpacity, View } from "react-native";
 import { ImagePickerResponse } from "react-native-image-picker";
 import { useThemeColors } from "../../../../../../packages/theme/dist";
 import { presentSheet } from "../../../services/event-manager";
@@ -38,10 +38,6 @@ export default function AttachImage({
 }) {
   const { colors } = useThemeColors();
   const [compress, setCompress] = useState(true);
-  const image = response.assets?.[0];
-  const width = image?.width || 0;
-  const height = image?.height || 0;
-  const ratio = width / height;
 
   return (
     <View
@@ -50,30 +46,40 @@ export default function AttachImage({
         paddingHorizontal: 12
       }}
     >
-      {image ? (
-        <View
-          style={{
-            width: "100%",
-            borderRadius: 10,
-            backgroundColor: "black",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 10
-          }}
-        >
-          <Image
-            source={{
-              uri: image.uri
-            }}
-            resizeMode="contain"
-            style={{
-              width: 300 * ratio,
-              height: (300 * ratio) / ratio,
-              backgroundColor: "black"
-            }}
-          />
-        </View>
-      ) : null}
+      <View
+        style={{
+          backgroundColor: colors.secondary.background,
+          marginBottom: 12,
+          height: 140,
+          width: "100%",
+          borderRadius: 10,
+          padding: 5,
+          paddingHorizontal: 12
+        }}
+      >
+        <Paragraph style={{ color: colors.primary.paragraph, marginBottom: 6 }}>
+          Attaching {response.assets?.length} image(s):
+        </Paragraph>
+        <ScrollView horizontal>
+          {response.assets?.map((item) => (
+            <TouchableOpacity key={item.fileName} activeOpacity={0.9}>
+              <Image
+                source={{
+                  uri: item.uri
+                }}
+                style={{
+                  width: 100,
+                  height: 100,
+                  borderRadius: 5,
+                  backgroundColor: "black",
+                  marginRight: 6
+                }}
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
       <TouchableOpacity
         activeOpacity={1}
@@ -135,7 +141,7 @@ export default function AttachImage({
       )}
 
       <Button
-        title="Add image"
+        title="Add images to note"
         type="accent"
         width="100%"
         onPress={() => {
