@@ -33,6 +33,7 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
+  Text,
   TouchableOpacity,
   View,
   useWindowDimensions
@@ -137,6 +138,7 @@ const ShareView = () => {
   const [rawFiles, setRawFiles] = useState([]);
 
   const [kh, setKh] = useState(0);
+  const [compress, setCompress] = useState(true);
   globalThis["IS_SHARE_EXTENSION"] = true;
   const onKeyboardDidShow = (event) => {
     let height = Dimensions.get("window").height - event.endCoordinates.screenY;
@@ -294,7 +296,8 @@ const ShareView = () => {
       files: rawFiles,
       note: _note,
       notebooks: useShareStore.getState().selectedNotebooks,
-      tags: useShareStore.getState().selectedTags
+      tags: useShareStore.getState().selectedTags,
+      compress
     });
 
     try {
@@ -551,6 +554,39 @@ const ShareView = () => {
                   >
                     Tap to remove an attachment.
                   </Paragraph>
+                  <TouchableOpacity
+                    activeOpacity={1}
+                    style={{
+                      flexDirection: "row",
+                      alignSelf: "center",
+                      alignItems: "center",
+                      width: "100%",
+                      marginTop: 6
+                    }}
+                    onPress={() => {
+                      setCompress(!compress);
+                    }}
+                  >
+                    <Icon
+                      size={20}
+                      name={
+                        compress ? "checkbox-marked" : "checkbox-blank-outline"
+                      }
+                      color={
+                        compress ? colors.primary.accent : colors.primary.icon
+                      }
+                    />
+
+                    <Text
+                      style={{
+                        flexShrink: 1,
+                        marginLeft: 3,
+                        fontSize: 12
+                      }}
+                    >
+                      Compress image (recommended)
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               ) : null}
               <View
