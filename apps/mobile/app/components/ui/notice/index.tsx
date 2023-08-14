@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { View } from "react-native";
 import { getContainerBorder } from "../../../utils/colors";
+import { View, ViewStyle } from "react-native";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
@@ -30,13 +30,15 @@ export interface NoticeProps {
   text: string;
   size?: "small" | "large";
   selectable?: boolean;
+  style?: ViewStyle;
 }
 
 export const Notice = ({
   type = "alert",
   text,
   size = "large",
-  selectable
+  selectable,
+  style
 }: NoticeProps) => {
   const { colors } = useThemeColors();
   const isSmall = size === "small";
@@ -49,7 +51,8 @@ export const Notice = ({
         backgroundColor: colors.secondary.background,
         borderRadius: isSmall ? 5 : 10,
         alignItems: "flex-start",
-        ...getContainerBorder(colors.secondary.background)
+        ...getContainerBorder(colors.secondary.background),
+        ...style
       }}
     >
       <IconButton
