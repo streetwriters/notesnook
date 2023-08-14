@@ -133,7 +133,7 @@ export const useEditor = (
 
   const reset = useCallback(
     async (resetState = true, resetContent = true) => {
-      currentNote.current?.id && db.fs?.cancel(currentNote.current.id);
+      currentNote.current?.id && db.fs?.cancel(currentNote.current.id, null);
       currentNote.current = null;
       loadedImages.current = {};
       currentContent.current = null;
