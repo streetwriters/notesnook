@@ -32,3 +32,15 @@ test("adding a deleted content should not throw", () =>
       })
     ).resolves.toBeUndefined();
   }));
+
+test("tagging an empty note should not create an invalid content item", () =>
+  databaseTest().then(async (db) => {
+    const id = await db.notes.add({ title: "Hello" });
+    const contentId = await db.notes.note(id)._note.contentId;
+    expect(contentId).toBeUndefined();
+    expect(await db.content.all()).toHaveLength(0);
+
+    await db.notes.note(id).tag("tag1");
+
+    expect(await db.content.all()).toHaveLength(0);
+  }));
