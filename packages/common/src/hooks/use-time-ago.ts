@@ -74,6 +74,10 @@ export function useTimeAgo(
 
   useEffect(() => {
     if (!live) return;
+    const value = getTimeAgo(datetime, locale);
+    onUpdate?.(value);
+    setTimeAgo(value);
+
     const reset = setInterval(() => {
       const value = getTimeAgo(datetime, locale);
       onUpdate?.(value);

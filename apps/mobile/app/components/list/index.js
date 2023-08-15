@@ -53,15 +53,10 @@ const renderItems = {
 const RenderItem = ({ item, index, type, ...restArgs }) => {
   if (!item) return <View />;
   const Item = renderItems[item.itemType || item.type] || View;
-  const groupOptions = db.settings?.getGroupOptions(type);
-  const dateBy =
-    groupOptions.sortBy !== "title" ? groupOptions.sortBy : "dateEdited";
   const totalNotes = getTotalNotes(item);
-
   return (
     <Item
       item={item}
-      dateBy={dateBy}
       index={index}
       type={type}
       totalNotes={totalNotes}
@@ -103,6 +98,12 @@ const List = ({
     (type === "notes" && notesListMode === "compact") ||
     type === "notebooks" ||
     notebooksListMode === "compact";
+  const groupType =
+    screen === "Notes" ? "home" : screen === "Favorites" ? "favorites" : type;
+
+  const groupOptions = db.settings?.getGroupOptions(groupType);
+  const dateBy =
+    groupOptions.sortBy !== "title" ? groupOptions.sortBy : "dateEdited";
 
   const renderItem = React.useCallback(
     ({ item, index }) => (
@@ -111,6 +112,7 @@ const List = ({
         index={index}
         color={headerProps?.color}
         title={headerProps?.heading}
+        dateBy={dateBy}
         type={
           screen === "Notes"
             ? "home"
@@ -122,7 +124,7 @@ const List = ({
         isSheet={isSheet}
       />
     ),
-    [headerProps?.color, headerProps?.heading, screen, type, isSheet]
+    [headerProps?.color, headerProps?.heading, screen, type, isSheet, dateBy]
   );
 
   const _onRefresh = async () => {
