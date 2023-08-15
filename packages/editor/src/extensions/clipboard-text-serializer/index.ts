@@ -81,7 +81,7 @@ export const ClipboardTextSerializer = Extension.create({
   }
 });
 
-export function transformCopied(slice: Slice) {
+export function transformCopied(slice: Slice): Slice {
   // when copying a single list item, we shouldn't retain the
   // list formatting but copy it as a paragraph.
   const maybeList = slice.content.firstChild;

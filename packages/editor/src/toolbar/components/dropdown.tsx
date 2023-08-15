@@ -48,7 +48,8 @@ export function Dropdown(props: DropdownProps) {
     isOpen,
     onClosed: () => setIsOpen(false)
   });
-
+  //@ts-ignore
+  logger("info", isPopupOpen, "isOpen");
   return (
     <>
       <Button
@@ -67,7 +68,12 @@ export function Dropdown(props: DropdownProps) {
           alignItems: "center",
           ":last-of-type": {
             mr: 0
-          }
+          },
+          ":hover:not(:disabled):not(:active)": !isMobile
+            ? undefined
+            : {
+                bg: "transparent"
+              }
         }}
         onClick={() => setIsOpen((s) => !s)}
         onMouseDown={(e) => e.preventDefault()}
@@ -77,7 +83,7 @@ export function Dropdown(props: DropdownProps) {
             sx={{
               fontSize: "subBody",
               mr: 1,
-              color: "paragraph",
+              color: isPopupOpen ? "accent" : "paragraph",
               flexShrink: 0
             }}
           >
@@ -96,6 +102,7 @@ export function Dropdown(props: DropdownProps) {
               ? Icons.chevronUp
               : Icons.chevronDown
           }
+          color={isPopupOpen ? "accent" : "paragraph"}
           size={"small"}
         />
       </Button>
