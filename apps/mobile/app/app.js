@@ -94,6 +94,12 @@ const App = () => {
   );
 };
 
+let currTheme =
+  useThemeStore.getState().colorScheme === "dark"
+    ? SettingsService.getProperty("darkTheme")
+    : SettingsService.getProperty("lightTheme");
+useThemeEngineStore.getState().setTheme(currTheme);
+
 export const withTheme = (Element) => {
   return function AppWithThemeProvider() {
     const [colorScheme, darkTheme, lightTheme] = useThemeStore((state) => [
@@ -125,11 +131,13 @@ export const withTheme = (Element) => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
+    const nextTheme = colorScheme === "dark" ? darkTheme : lightTheme;
+    if (JSON.stringify(nextTheme) !== JSON.stringify(currTheme)) {
       useThemeEngineStore
         .getState()
         .setTheme(colorScheme === "dark" ? darkTheme : lightTheme);
-    }, [colorScheme, darkTheme, lightTheme]);
+      currTheme = nextTheme;
+    }
 
     return <Element />;
   };
