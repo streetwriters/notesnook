@@ -28,6 +28,7 @@ export type BaseMenuItem<TType extends MenuItemTypes> = {
   type: TType;
   key: string;
   isHidden?: boolean;
+  multiSelect?: boolean;
 };
 
 export type MenuSeperatorItem = BaseMenuItem<"separator">;
