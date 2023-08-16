@@ -114,7 +114,7 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         <FloatingButton
           title="Clear all trash"
           onPress={onPressFloatingButton}
-          shouldShow={true}
+          alwaysVisible={true}
         />
       ) : null}
     </DelayLayout>

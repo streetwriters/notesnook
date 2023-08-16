@@ -6,6 +6,7 @@ const configs = {
       plugins: [
         '@babel/plugin-transform-named-capturing-groups-regex',
         'react-native-reanimated/plugin',
+        "@babel/plugin-transform-export-namespace-from"
       ]
     },
     test: {
@@ -22,6 +23,7 @@ const configs = {
         'transform-remove-console',
         '@babel/plugin-transform-named-capturing-groups-regex',
         'react-native-reanimated/plugin',
+        "@babel/plugin-transform-export-namespace-from"
       ]
     }
   }

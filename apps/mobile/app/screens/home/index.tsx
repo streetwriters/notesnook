@@ -29,6 +29,7 @@ import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
 import { openEditor } from "../notes/common";
+
 const prepareSearch = () => {
   SearchService.update({
     placeholder: "Type a keyword to search in notes",

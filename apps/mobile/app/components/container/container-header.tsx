@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import { View } from "react-native";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useThemeColors } from "@notesnook/theme";
 
-export const ContainerHeader = ({ children }) => {
+export const ContainerHeader = (props: PropsWithChildren) => {
   const { colors } = useThemeColors();
   const selectionMode = useSelectionStore((state) => state.selectionMode);
 
@@ -34,7 +34,7 @@ export const ContainerHeader = ({ children }) => {
         overflow: "hidden"
       }}
     >
-      {children}
+      {props.children}
     </View>
   ) : null;
 };
