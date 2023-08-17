@@ -49,6 +49,7 @@ export type MenuButtonItem = BaseMenuItem<"button"> & {
 
   styles?: {
     title?: ThemeUICSSObject;
+    icon?: ThemeUICSSObject;
   };
 };
 

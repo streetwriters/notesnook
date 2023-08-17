@@ -46,6 +46,12 @@ export function MenuButton(props: MenuButtonProps) {
   } = item;
   const itemRef = useRef<HTMLButtonElement>(null);
 
+  const iconColor = () => {
+    if (variant === "dangerous") return "icon-error";
+    else if (styles?.icon?.color) return styles.icon.color as string;
+    else return "icon";
+  };
+
   return (
     <Flex
       as="li"
@@ -78,7 +84,7 @@ export function MenuButton(props: MenuButtonProps) {
               path={icon}
               size={"medium"}
               sx={{ mr: 2 }}
-              color={variant === "dangerous" ? "icon-error" : "icon"}
+              color={iconColor()}
             />
           )}
           <Text
