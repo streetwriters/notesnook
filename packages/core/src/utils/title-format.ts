@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatDate } from "./date";
+import { TimeFormat, formatDate } from "./date";
 
 export const NEWLINE_STRIP_REGEX = /[\r\n\t\v]+/gm;
 
@@ -29,20 +29,18 @@ const TIMESTAMP_REGEX = /\$timestamp\$/g;
 const DATE_TIME_STRIP_REGEX = /[\\\-: ]/g;
 
 export function formatTitle(
-  titleFormat,
-  dateFormat,
-  timeFormat,
-  headline,
-  totalNotes
+  titleFormat: string,
+  dateFormat: string,
+  timeFormat: TimeFormat,
+  headline = "",
+  totalNotes = 0
 ) {
   const date = formatDate(Date.now(), {
     dateFormat,
-    timeFormat,
     type: "date"
   });
 
   const time = formatDate(Date.now(), {
-    dateFormat,
     timeFormat,
     type: "time"
   });
@@ -54,5 +52,5 @@ export function formatTitle(
     .replace(TIME_REGEX, time)
     .replace(HEADLINE_REGEX, headline || "")
     .replace(TIMESTAMP_REGEX, timestamp)
-    .replace(COUNT_REGEX, totalNotes + 1);
+    .replace(COUNT_REGEX, `${totalNotes + 1}`);
 }
