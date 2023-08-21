@@ -75,6 +75,7 @@ export type GroupableItem = ValueOf<
     | "relation"
     | "tiny"
     | "tiptap"
+    | "content"
     | "session"
     | "sessioncontent"
     | "settings"
@@ -289,13 +290,16 @@ export type DefaultNotebook = { id: string; topic?: string };
 export interface SettingsItem extends BaseItem<"settings"> {
   groupOptions?: Partial<Record<GroupingKey, GroupOptions>>;
   toolbarConfig?: Record<string, ToolbarConfig>;
-  aliases?: Record<string, string>;
   trashCleanupInterval?: TrashCleanupInterval;
   titleFormat?: string;
   timeFormat?: TimeFormat;
   dateFormat?: string;
   defaultNotebook?: DefaultNotebook;
 
+  /**
+   * @deprecated only kept here for migration purposes.
+   */
+  aliases?: Record<string, string>;
   /**
    * @deprecated only kept here for migration purposes.
    */
