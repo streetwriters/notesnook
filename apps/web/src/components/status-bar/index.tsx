@@ -44,6 +44,7 @@ import useStatus, { statusToString } from "../../hooks/use-status";
 import { ScopedThemeProvider } from "../theme-provider";
 import { checkForUpdate, installUpdate } from "../../utils/updater";
 import { toTitleCase } from "@notesnook/common";
+import { User } from "@notesnook/core/dist/api/user-manager";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -84,12 +85,7 @@ function StatusBar() {
                   }}
                 >
                   <Circle size={7} color={"var(--icon-error)"} />
-                  <Text
-                    className="selectable"
-                    variant="subBody"
-                    ml={1}
-                    sx={{ color: "paragraph" }}
-                  >
+                  <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
                     Email not confirmed
                   </Text>
                 </Button>

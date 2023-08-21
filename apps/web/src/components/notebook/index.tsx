@@ -25,7 +25,7 @@ import { store as appStore } from "../../stores/app-store";
 import { showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common/db";
 import {
-  Topic,
+  Topic as TopicIcon,
   PinFilled,
   NotebookEdit,
   Notebook as NotebookIcon,
@@ -42,10 +42,10 @@ import { pluralize } from "@notesnook/common";
 import { confirm } from "../../common/dialog-controller";
 import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
-import { Item } from "../list-container/types";
+import { Note, Notebook } from "@notesnook/core/dist/types";
 
 type NotebookProps = {
-  item: Item;
+  item: Notebook;
   totalNotes: number;
   date: number;
   simplified?: boolean;
@@ -76,11 +76,11 @@ function Notebook(props: NotebookProps) {
             <>
               {notebook?.topics && (
                 <Flex mb={1} sx={{ gap: 1 }}>
-                  {(notebook?.topics as Item[]).slice(0, 3).map((topic) => (
+                  {notebook.topics.slice(0, 3).map((topic) => (
                     <IconTag
                       key={topic.id}
                       text={topic.title}
-                      icon={Topic}
+                      icon={TopicIcon}
                       onClick={() => {
                         navigate(`/notebooks/${notebook.id}/${topic.id}`);
                       }}
@@ -128,7 +128,7 @@ export default React.memo(Notebook, (prev, next) => {
   );
 });
 
-const pin = (notebook: Item) => {
+const pin = (notebook: Notebook) => {
   return store
     .pin(notebook.id)
     .then(() => {
@@ -137,11 +137,11 @@ const pin = (notebook: Item) => {
     .catch((error) => showToast("error", error.message));
 };
 
-const menuItems: (notebook: any, items?: any[]) => MenuItem[] = (
+const menuItems: (notebook: Notebook, items?: Notebook[]) => MenuItem[] = (
   notebook,
   items = []
 ) => {
-  const defaultNotebook = db.settings?.getDefaultNotebook();
+  const defaultNotebook = db.settings.getDefaultNotebook();
 
   return [
     {
@@ -158,10 +158,10 @@ const menuItems: (notebook: any, items?: any[]) => MenuItem[] = (
       isChecked: defaultNotebook?.id === notebook.id && !defaultNotebook?.topic,
       icon: NotebookIcon.path,
       onClick: async () => {
-        const defaultNotebook = db.settings?.getDefaultNotebook();
+        const defaultNotebook = db.settings.getDefaultNotebook();
         const isDefault =
           defaultNotebook?.id === notebook.id && !defaultNotebook?.topic;
-        await db.settings?.setDefaultNotebook(
+        await db.settings.setDefaultNotebook(
           isDefault ? undefined : { id: notebook.id }
         );
       }
@@ -177,10 +177,10 @@ const menuItems: (notebook: any, items?: any[]) => MenuItem[] = (
     {
       type: "button",
       key: "shortcut",
-      icon: db.shortcuts?.exists(notebook.id)
+      icon: db.shortcuts.exists(notebook.id)
         ? RemoveShortcutLink.path
         : Shortcut.path,
-      title: db.shortcuts?.exists(notebook.id)
+      title: db.shortcuts.exists(notebook.id)
         ? "Remove shortcut"
         : "Create shortcut",
       onClick: () => appStore.addToShortcuts(notebook)
@@ -208,13 +208,13 @@ const menuItems: (notebook: any, items?: any[]) => MenuItem[] = (
 
         if (result) {
           if (result.deleteContainingNotes) {
-            const notes = [];
+            const notes: Note[] = [];
             for (const item of items) {
-              notes.push(...(db.relations?.from(item, "note") || []));
-              const topics = db.notebooks?.notebook(item.id).topics;
+              notes.push(...(db.relations.from(item, "note").resolved() || []));
+              const topics = db.notebooks.topics(item.id);
               if (!topics) return;
               for (const topic of topics.all) {
-                notes.push(...topics.topic(topic.id).all);
+                notes.push(...(topics.topic(topic.id)?.all || []));
               }
             }
             await Multiselect.moveNotesToTrash(notes, false);

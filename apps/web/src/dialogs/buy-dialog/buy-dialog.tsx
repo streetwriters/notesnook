@@ -46,6 +46,7 @@ import { SUBSCRIPTION_STATUS } from "../../common/constants";
 import { alpha } from "@theme-ui/color";
 import BaseDialog from "../../components/dialog";
 import { ScopedThemeProvider } from "../../components/theme-provider";
+import { User } from "@notesnook/core/dist/api/user-manager";
 
 type BuyDialogProps = {
   couponCode?: string;
@@ -178,7 +179,7 @@ function SideBar(props: SideBarProps) {
               report({
                 text: "Activating trial"
               });
-              return db.user?.activateTrial();
+              return db.user.activateTrial();
             }
           });
           if (result) onClose();

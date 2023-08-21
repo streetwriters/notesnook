@@ -25,9 +25,9 @@ import {
 import { useMenuTrigger } from "../../hooks/use-menu";
 import React, { useRef } from "react";
 import { SchemeColors } from "@notesnook/theme";
-import { Item } from "../list-container/types";
 import { MenuItem } from "@notesnook/ui";
 import { alpha } from "@theme-ui/color";
+import { Item } from "@notesnook/core/dist/types";
 
 type ListItemProps = {
   colors?: {

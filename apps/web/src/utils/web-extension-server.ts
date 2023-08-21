@@ -31,24 +31,25 @@ import { sanitizeFilename } from "@notesnook/common";
 import { attachFile } from "../components/editor/picker";
 import { getFormattedDate } from "@notesnook/common";
 import { useStore as useThemeStore } from "../stores/theme-store";
+import { isCipher } from "@notesnook/core/dist/database/crypto";
 
 export class WebExtensionServer implements Server {
   async login() {
     const { colorScheme, darkTheme, lightTheme } = useThemeStore.getState();
-    const user = await db.user?.getUser();
+    const user = await db.user.getUser();
     const theme = colorScheme === "dark" ? darkTheme : lightTheme;
     if (!user) return { pro: false, theme };
     return { email: user.email, pro: isUserPremium(user), theme };
   }
 
   async getNotes(): Promise<ItemReference[] | undefined> {
-    return db.notes?.all
+    return db.notes.all
       .filter((n) => !n.locked)
       .map((note) => ({ id: note.id, title: note.title }));
   }
 
   async getNotebooks(): Promise<NotebookReference[] | undefined> {
-    return db.notebooks?.all.map((nb) => ({
+    return db.notebooks.all.map((nb) => ({
       id: nb.id,
       title: nb.title,
       topics: nb.topics.map((topic: ItemReference) => ({
@@ -59,7 +60,7 @@ export class WebExtensionServer implements Server {
   }
 
   async getTags(): Promise<ItemReference[] | undefined> {
-    return db.tags?.all.map((tag) => ({
+    return db.tags.all.map((tag) => ({
       id: tag.id,
       title: tag.title
     }));
@@ -93,9 +94,11 @@ export class WebExtensionServer implements Server {
       }).outerHTML;
     }
 
-    const note = clip.note?.id ? db.notes?.note(clip.note?.id) : null;
+    const note = clip.note?.id ? db.notes.note(clip.note?.id) : null;
 
     let content = (await note?.content()) || "";
+    if (isCipher(content)) return;
+
     content += clipContent;
     content += h("div", [
       h("hr"),
@@ -103,21 +106,30 @@ export class WebExtensionServer implements Server {
       h("p", [`Date clipped: ${getFormattedDate(Date.now())}`])
     ]).innerHTML;
 
-    const id = await db.notes?.add({
+    const id = await db.notes.add({
       id: note?.id,
       title: note ? note.title : clip.title,
-      content: { type: "tiptap", data: content },
-      tags: note ? note.tags : clip.tags
+      content: { type: "tiptap", data: content }
     });
+
+    if (id && clip.tags) {
+      for (const title of clip.tags) {
+        const tagId = db.tags.tag(title)?.id || (await db.tags.add({ title }));
+        await db.relations.add(
+          { id: tagId, type: "tag" },
+          { id, type: "note" }
+        );
+      }
+    }
 
     if (clip.refs && id && !clip.note) {
       for (const ref of clip.refs) {
         switch (ref.type) {
           case "notebook":
-            await db.notes?.addToNotebook({ id: ref.id }, id);
+            await db.notes.addToNotebook({ id: ref.id }, id);
             break;
           case "topic":
-            await db.notes?.addToNotebook(
+            await db.notes.addToNotebook(
               { id: ref.parentId, topic: ref.id },
               id
             );

@@ -39,6 +39,7 @@ import { pluralize } from "@notesnook/common";
 import { isMac } from "../utils/platform";
 import { create } from "zustand";
 import { FilteredList } from "../components/filtered-list";
+import { Topic, Notebook, GroupHeader } from "@notesnook/core/dist/types";
 
 type MoveDialogProps = { onClose: Perform; noteIds: string[] };
 type NotebookReference = {
@@ -47,17 +48,7 @@ type NotebookReference = {
   new: boolean;
   op: "add" | "remove";
 };
-type Item = {
-  id: string;
-  type: "topic" | "notebook" | "header";
-  title: string;
-};
-type Topic = Item & { notebookId: string };
-type Notebook = Item & {
-  topics: Topic[];
-  dateCreated: number;
-  dateModified: number;
-};
+type Item = Topic | Notebook | GroupHeader;
 
 interface ISelectionStore {
   selected: NotebookReference[];
@@ -81,9 +72,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
   const notebooks = useStore((store) => store.notebooks);
   const getAllNotebooks = useCallback(() => {
     refreshNotebooks();
-    return (store.get().notebooks as Notebook[]).filter(
-      (a) => a.type !== "header"
-    );
+    return store.get().notebooks.filter((a) => a.type !== "header");
   }, [refreshNotebooks]);
 
   useEffect(() => {
@@ -92,7 +81,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
     const selected: NotebookReference[] = useSelectionStore
       .getState()
       .selected.slice();
-    for (const notebook of notebooks as Notebook[]) {
+    for (const notebook of notebooks) {
       if (notebook.type === "header") continue;
       for (const topic of notebook.topics) {
         const isSelected =
@@ -111,7 +100,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
     }
 
     for (const notebook of noteIds
-      .map((id) => db.relations?.to({ id, type: "note" }, "notebook"))
+      .map((id) => db.relations.to({ id, type: "note" }, "notebook"))
       .flat()) {
       const isSelected =
         notebook && selected.findIndex((item) => item.id === notebook.id) > -1;
@@ -153,9 +142,9 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
           for (const item of selected) {
             try {
               if (item.op === "remove") {
-                await db.notes?.removeFromNotebook(item, ...noteIds);
+                await db.notes.removeFromNotebook(item, ...noteIds);
               } else if (item.op === "add") {
-                await db.notes?.addToNotebook(item, ...noteIds);
+                await db.notes.addToNotebook(item, ...noteIds);
               }
             } catch (e) {
               if (e instanceof Error) showToast("error", e.message);
@@ -209,20 +198,20 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
           }}
           items={getAllNotebooks}
           filter={(notebooks, query) =>
-            db.lookup?.notebooks(notebooks, query) || []
+            db.lookup.notebooks(notebooks, query) || []
           }
-          onCreateNewItem={async (title) =>
-            await db.notebooks?.add({
+          onCreateNewItem={async (title) => {
+            await db.notebooks.add({
               title
-            })
-          }
+            });
+          }}
           renderItem={(notebook, _index, refresh, isSearching) => (
             <NotebookItem
               key={notebook.id}
               notebook={notebook}
               isSearching={isSearching}
               onCreateItem={async (title) => {
-                await db.notebooks?.notebook(notebook.id).topics.add(title);
+                await db.notebooks.topics(notebook.id).add({ title });
                 refresh();
               }}
             />
@@ -482,7 +471,7 @@ function findSelectionIndex(
 }
 
 function topicHasNotes(topic: Item, noteIds: string[]) {
-  const notes: string[] = db.notes?.topicReferences.get(topic.id) || [];
+  const notes: string[] = db.notes.topicReferences.get(topic.id) || [];
   return noteIds.some((id) => notes.indexOf(id) > -1);
 }
 
@@ -549,7 +538,7 @@ function stringifySelected(suggestion: NotebookReference[]) {
 }
 
 function resolveReference(ref: NotebookReference): string | undefined {
-  const notebook = db.notebooks?.notebook(ref.id);
+  const notebook = db.notebooks.notebook(ref.id);
   if (!notebook) return undefined;
 
   if (ref.topic) {

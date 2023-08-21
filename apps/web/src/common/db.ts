@@ -30,7 +30,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   logger.measure("Database initialization");
 
   const { database } = await import("@notesnook/common");
-  const { default: FS } = await import("../interfaces/fs");
+  const { FileStorage } = await import("../interfaces/fs");
   const { Compressor } = await import("../utils/compressor");
   db = database;
 
@@ -42,12 +42,12 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co"
   });
 
-  database.setup(
-    await NNStorage.createInstance("Notesnook", persistence),
-    EventSource,
-    FS,
-    new Compressor()
-  );
+  database.setup({
+    storage: await NNStorage.createInstance("Notesnook", persistence),
+    eventsource: EventSource,
+    fs: FileStorage,
+    compressor: new Compressor()
+  });
   // if (IS_TESTING) {
 
   // } else {

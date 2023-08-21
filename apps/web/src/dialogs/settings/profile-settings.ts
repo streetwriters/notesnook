@@ -103,7 +103,7 @@ export const ProfileSettings: SettingsGroup[] = [
             title: "Delete account",
             action: async () =>
               showPasswordDialog("delete_account", async ({ password }) => {
-                await db.user?.deleteUser(password);
+                await db.user.deleteUser(password);
                 return true;
               })
           }
@@ -132,7 +132,7 @@ export const ProfileSettings: SettingsGroup[] = [
                 await showLoadingDialog({
                   title: "You are being logged out",
                   subtitle: "Please wait...",
-                  action: () => db.user?.logout(true)
+                  action: () => db.user.logout(true)
                 });
                 showToast("success", "You have been logged out.");
               }
@@ -153,7 +153,7 @@ export const ProfileSettings: SettingsGroup[] = [
             action: async () => {
               if (!(await showClearSessionsConfirmation())) return;
 
-              await db.user?.clearSessions();
+              await db.user.clearSessions();
               showToast(
                 "success",
                 "You have been logged out from all other devices."

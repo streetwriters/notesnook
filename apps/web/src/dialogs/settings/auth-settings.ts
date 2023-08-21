@@ -50,11 +50,12 @@ export const AuthenticationSettings: SettingsGroup[] = [
               const result = await showPasswordDialog(
                 "change_account_password",
                 async (data) => {
+                  await db.user.clearSessions();
                   return (
-                    (await db.user?.changePassword(
+                    db.user.changePassword(
                       data.oldPassword,
                       data.newPassword
-                    )) || false
+                    ) || false
                   );
                 }
               );

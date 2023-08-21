@@ -39,11 +39,11 @@ const presets: Record<PresetId, Preset> = {
 };
 
 export function getCurrentPreset() {
-  const preset = db.settings?.getToolbarConfig("desktop");
+  const preset = db.settings.getToolbarConfig("desktop");
   if (!preset) return presets.default;
   switch (preset.preset as PresetId) {
     case "custom":
-      presets.custom.tools = preset.config;
+      presets.custom.tools = preset.config || [];
       return presets.custom;
     case "minimal":
       return presets.minimal;

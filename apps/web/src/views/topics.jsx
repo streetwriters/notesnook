@@ -137,8 +137,7 @@ function Notebook() {
         <Allotment.Pane>
           <Flex variant="columnFill" sx={{ height: "100%" }}>
             <ListContainer
-              type="notes"
-              groupingKey={"notes"}
+              group="notes"
               refresh={refreshContext}
               compact={isCompact}
               context={{ ...context, notes: undefined }}
@@ -252,7 +251,7 @@ function Topics({ selectedNotebook, isCollapsed, onClick }) {
       </Flex>
 
       <ListContainer
-        type="topics"
+        group="topics"
         items={topics}
         context={{
           notebookId: selectedNotebook.id

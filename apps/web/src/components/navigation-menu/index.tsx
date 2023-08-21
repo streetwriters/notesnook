@@ -207,7 +207,7 @@ function NavigationMenu(props: NavigationMenuProps) {
                 index={index}
                 isTablet={isTablet}
                 key={color.id}
-                title={db.colors?.alias(color.id)}
+                title={color.title}
                 icon={Circle}
                 selected={location === `/colors/${color.id}`}
                 color={color.title.toLowerCase()}
@@ -237,16 +237,14 @@ function NavigationMenu(props: NavigationMenuProps) {
                 index={colors.length - 1 + index}
                 isTablet={isTablet}
                 key={item.id}
-                title={
-                  item.type === "tag" ? db.tags?.alias(item.id) : item.title
-                }
+                title={item.title}
                 menuItems={[
                   {
                     type: "button",
                     key: "removeshortcut",
                     title: "Remove shortcut",
                     onClick: async () => {
-                      await db.shortcuts?.remove(item.id);
+                      await db.shortcuts.remove(item.id);
                       refreshNavItems();
                     }
                   }

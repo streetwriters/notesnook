@@ -156,7 +156,7 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
           totalSize={totalSize}
           filter={(query) => {
             setAttachments(
-              db.lookup?.attachments(db.attachments?.all || [], query) || []
+              db.lookup?.attachments(db.attachments.all || [], query) || []
             );
           }}
           counts={getCounts(allAttachments)}
@@ -446,7 +446,7 @@ const Sidebar = memo(
                   if (downloadStatus) {
                     await cancelDownload();
                   } else {
-                    await download(db.attachments?.all);
+                    await download(db.attachments.all);
                   }
                 }}
               >

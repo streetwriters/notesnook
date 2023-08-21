@@ -28,8 +28,9 @@ import {
   Step,
   steps
 } from "./steps";
-import { Authenticator, AuthenticatorType, OnNextFunction } from "./types";
+import { Authenticator, OnNextFunction } from "./types";
 import { ErrorText } from "../../components/error-text";
+import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
 
 type MultifactorDialogProps = {
   onClose: Perform;

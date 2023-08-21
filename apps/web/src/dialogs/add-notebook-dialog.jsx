@@ -110,10 +110,7 @@ class AddNotebookDialog extends React.Component {
     const notebook = {
       title: this.title,
       description: this.description,
-      topics: this.state.topics.map((topic) => {
-        if (topic.id) return topic;
-        return topic.title;
-      }),
+      topics: this.state.topics,
       id: this.id
     };
     this.props.onDone(notebook, this.deletedTopics);

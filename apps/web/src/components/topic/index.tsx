@@ -22,21 +22,21 @@ import ListItem from "../list-item";
 import { db } from "../../common/db";
 import { store as appStore } from "../../stores/app-store";
 import { hashNavigate, navigate } from "../../navigation";
-import { Flex, Text } from "@theme-ui/components";
+import { Text } from "@theme-ui/components";
 import { Edit, Topic as TopicIcon, Shortcut, Trash } from "../icons";
 import { Multiselect } from "../../common/multi-select";
 import { confirm } from "../../common/dialog-controller";
 import { useStore as useNotesStore } from "../../stores/note-store";
 import { pluralize } from "@notesnook/common";
 import { getTotalNotes } from "@notesnook/common";
-import { Item } from "../list-container/types";
 import { MenuItem } from "@notesnook/ui";
+import { Note, Topic } from "@notesnook/core/dist/types";
 
-type TopicProps = { item: Item };
+type TopicProps = { item: Topic };
 function Topic(props: TopicProps) {
   const { item: topic } = props;
   const isOpened = useNotesStore(
-    (store) => (store.context?.value as any)?.topic === topic.id
+    (store) => store.context?.value?.topic === topic.id
   );
 
   return (
@@ -56,11 +56,11 @@ export default React.memo(Topic, (prev, next) => {
   return prev?.item?.title === next?.item?.title;
 });
 
-const menuItems: (topic: any, items?: any[]) => MenuItem[] = (
+const menuItems: (topic: Topic, items?: Topic[]) => MenuItem[] = (
   topic,
   items = []
 ) => {
-  const defaultNotebook = db.settings?.getDefaultNotebook();
+  const defaultNotebook = db.settings.getDefaultNotebook();
   return [
     {
       type: "button",
@@ -79,12 +79,12 @@ const menuItems: (topic: any, items?: any[]) => MenuItem[] = (
         defaultNotebook?.topic === topic.id,
       icon: TopicIcon.path,
       onClick: async () => {
-        const defaultNotebook = db.settings?.getDefaultNotebook();
+        const defaultNotebook = db.settings.getDefaultNotebook();
         const isDefault =
           defaultNotebook?.id === topic.notebookId &&
           defaultNotebook?.topic === topic.id;
 
-        await db.settings?.setDefaultNotebook(
+        await db.settings.setDefaultNotebook(
           isDefault ? undefined : { id: topic.notebookId, topic: topic.id }
         );
       }
@@ -92,7 +92,7 @@ const menuItems: (topic: any, items?: any[]) => MenuItem[] = (
     {
       type: "button",
       key: "shortcut",
-      title: db.shortcuts?.exists(topic.id)
+      title: db.shortcuts.exists(topic.id)
         ? "Remove shortcut"
         : "Create shortcut",
       icon: Shortcut.path,
@@ -121,11 +121,9 @@ const menuItems: (topic: any, items?: any[]) => MenuItem[] = (
 
         if (result) {
           if (result.deleteContainingNotes) {
-            const notes = [];
+            const notes: Note[] = [];
             for (const item of items) {
-              const topic = db.notebooks
-                ?.notebook(item.notebookId)
-                .topics.topic(item.id);
+              const topic = db.notebooks.topics(item.notebookId).topic(item.id);
               if (!topic) continue;
               notes.push(...topic.all);
             }

@@ -31,8 +31,7 @@ function Notebooks() {
   return (
     <>
       <ListContainer
-        type="notebooks"
-        groupingKey="notebooks"
+        group="notebooks"
         refresh={refresh}
         items={notebooks}
         placeholder={<Placeholder context="notebooks" />}

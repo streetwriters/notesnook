@@ -67,7 +67,7 @@ class NotebookStore extends BaseStore {
 
   setSelectedNotebook = (id) => {
     if (!id) return;
-    const notebook = db.notebooks?.notebook(id)?.data;
+    const notebook = db.notebooks.notebook(id)?.data;
     if (!notebook) return;
 
     this.set((state) => {

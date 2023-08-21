@@ -50,7 +50,6 @@ import { ReactComponent as MFA } from "../../assets/mfa.svg";
 import { ReactComponent as Fallback2FA } from "../../assets/fallback2fa.svg";
 import {
   Authenticator,
-  AuthenticatorType,
   StepComponent,
   SubmitCodeFunction,
   StepComponentProps,
@@ -58,6 +57,7 @@ import {
 } from "./types";
 import { showMultifactorDialog } from "../../common/dialog-controller";
 import { ErrorText } from "../../components/error-text";
+import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
 
 const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
 
@@ -312,8 +312,8 @@ function AuthenticatorSelector(props: AuthenticatorSelectorProps) {
   const onSubmitCode: SubmitCodeFunction = useCallback(
     async (code) => {
       try {
-        if (isFallback) await db.mfa?.enableFallback(authenticator, code);
-        else await db.mfa?.enable(authenticator, code);
+        if (isFallback) await db.mfa.enableFallback(authenticator, code);
+        else await db.mfa.enable(authenticator, code);
         onNext(authenticator);
       } catch (e) {
         const error = e as Error;
@@ -342,7 +342,7 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
 
   useEffect(() => {
     (async function () {
-      setAuthenticatorDetails(await db.mfa?.setup("app"));
+      setAuthenticatorDetails(await db.mfa.setup("app"));
     })();
   }, []);
 
@@ -426,7 +426,7 @@ function SetupEmail(props: SetupAuthenticatorProps) {
   useEffect(() => {
     (async () => {
       if (!db.user) return;
-      const { email } = await db.user.getUser();
+      const { email } = (await db.user.getUser()) || {};
       setEmail(email);
     })();
   }, []);
@@ -461,7 +461,7 @@ function SetupEmail(props: SetupAuthenticatorProps) {
           onClick={async () => {
             setIsSending(true);
             try {
-              await db.mfa?.setup("email");
+              await db.mfa.setup("email");
               setEnabled(false);
             } catch (e) {
               const error = e as Error;
@@ -548,7 +548,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
 
             setIsSending(true);
             try {
-              await db.mfa?.setup("sms", phoneNumber);
+              await db.mfa.setup("sms", phoneNumber);
               setEnabled(false);
             } catch (e) {
               const error = e as Error;
@@ -572,7 +572,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
   const generate = useCallback(async () => {
     onError && onError("");
     try {
-      const codes = await db.mfa?.codes();
+      const codes = await db.mfa.codes();
       if (codes) setCodes(codes);
     } catch (e) {
       const error = e as Error;

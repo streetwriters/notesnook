@@ -18,13 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export const COLORS = [
-  "red",
-  "orange",
-  "yellow",
-  "green",
-  "blue",
-  "purple",
-  "gray"
+  { key: "red", title: "Red" },
+  { key: "orange", title: "Orange" },
+  { key: "yellow", title: "Yellow" },
+  { key: "green", title: "Green" },
+  { key: "blue", title: "Blue" },
+  { key: "purple", title: "Purple" },
+  { key: "gray", title: "Gray" }
 ] as const;
 
 export const SUBSCRIPTION_STATUS = {

@@ -95,7 +95,7 @@ async function shouldShowAnnouncement(announcement) {
   if (!show) return false;
 
   const user = await db.user.getUser();
-  const subStatus = user?.subscription?.type;
+  const subStatus = user.subscription?.type;
   show = announcement.userTypes.some((userType) => {
     switch (userType) {
       case "pro":

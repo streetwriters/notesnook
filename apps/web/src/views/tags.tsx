@@ -28,8 +28,7 @@ function Tags() {
   const refresh = useStore((store) => store.refresh);
   return (
     <ListContainer
-      type="tags"
-      groupingKey="tags"
+      group="tags"
       refresh={refresh}
       items={tags}
       placeholder={<Placeholder context="tags" />}

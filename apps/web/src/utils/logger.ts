@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
-  initalize,
+  initialize,
   logger as _logger,
   logManager
 } from "@notesnook/core/dist/logger";
@@ -29,8 +29,8 @@ import { createWriteStream } from "./stream-saver";
 import { sanitizeFilename } from "@notesnook/common";
 
 let logger: typeof _logger;
-async function initalizeLogger(persistence: DatabasePersistence = "db") {
-  initalize(await NNStorage.createInstance("Logs", persistence), false);
+async function initializeLogger(persistence: DatabasePersistence = "db") {
+  initialize(await NNStorage.createInstance("Logs", persistence), false);
   logger = _logger.scope("notesnook-web");
 }
 
@@ -66,4 +66,4 @@ async function clearLogs() {
   await logManager.clear();
 }
 
-export { initalizeLogger, logger, downloadLogs, clearLogs };
+export { initializeLogger, logger, downloadLogs, clearLogs };

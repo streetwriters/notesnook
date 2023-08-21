@@ -120,7 +120,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
 
   useEffect(() => {
     if (!reminderId) return;
-    const reminder = db.reminders?.reminder(reminderId);
+    const reminder = db.reminders.reminder(reminderId);
     if (!reminder) return;
 
     setSelectedDays(reminder.selectedDays || []);
@@ -135,7 +135,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
 
   useEffect(() => {
     if (!noteId) return;
-    const note = db.notes?.note(noteId);
+    const note = db.notes.note(noteId);
     if (!note) return;
 
     setTitle(note.title);
@@ -186,7 +186,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             return;
           }
 
-          const id = await db.reminders?.add({
+          const id = await db.reminders.add({
             id: reminderId,
             recurringMode,
             mode,
@@ -200,7 +200,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
           });
 
           if (id && noteId) {
-            await db.relations?.add(
+            await db.relations.add(
               { id: noteId, type: "note" },
               { id, type: "reminder" }
             );

@@ -40,7 +40,7 @@ class UserStore extends BaseStore {
   isLoggingIn = false;
   isSigningIn = false;
   /**
-   * @type {User | undefined}
+   * @type {import("@notesnook/core/dist/api/user-manager").User | undefined}
    */
   user = undefined;
   counter = 0;

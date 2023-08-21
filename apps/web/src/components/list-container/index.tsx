@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { Flex, Button } from "@theme-ui/components";
 import { Plus } from "../icons";
 import { ScrollerProps, Virtuoso, VirtuosoHandle } from "react-virtuoso";
@@ -26,12 +26,19 @@ import {
   store as selectionStore
 } from "../../stores/selection-store";
 import GroupHeader from "../group-header";
-import { DEFAULT_ITEM_HEIGHT, ListProfiles } from "./list-profiles";
+import { DEFAULT_ITEM_HEIGHT, ListItemWrapper } from "./list-profiles";
 import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
 import ScrollContainer from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
-import { Context, Item } from "./types";
+import { Context } from "./types";
+import {
+  GroupHeader as GroupHeaderType,
+  GroupedItems,
+  GroupingKey,
+  Item,
+  isGroupHeader
+} from "@notesnook/core/dist/types";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
@@ -49,9 +56,8 @@ export const CustomScrollbarsVirtualList = forwardRef<
 });
 
 type ListContainerProps = {
-  type: keyof typeof ListProfiles;
-  items: Item[];
-  groupingKey?: GroupingKey;
+  group?: GroupingKey;
+  items: GroupedItems<Item>;
   compact?: boolean;
   context?: Context;
   refresh: () => void;
@@ -64,16 +70,7 @@ type ListContainerProps = {
 };
 
 function ListContainer(props: ListContainerProps) {
-  const {
-    type,
-    groupingKey,
-    items,
-    context,
-    refresh,
-    header,
-    button,
-    compact
-  } = props;
+  const { group, items, context, refresh, header, button, compact } = props;
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
@@ -87,11 +84,6 @@ function ListContainer(props: ListContainerProps) {
 
   const listRef = useRef<VirtuosoHandle>(null);
   const listContainerRef = useRef(null);
-
-  const groups = useMemo(
-    () => props.items.filter((v) => v.type === "header"),
-    [props.items]
-  );
 
   useEffect(() => {
     return () => {
@@ -127,8 +119,6 @@ function ListContainer(props: ListContainerProps) {
     }
   });
 
-  const Component = ListProfiles[type];
-
   return (
     <Flex variant="columnFill">
       {!props.items.length && props.placeholder ? (
@@ -147,12 +137,12 @@ function ListContainer(props: ListContainerProps) {
           <Flex
             ref={listContainerRef}
             variant="columnFill"
-            data-test-id={`${type}-list`}
+            data-test-id={`${group}-list`}
           >
             <Virtuoso
               ref={listRef}
               data={items}
-              computeItemKey={(index) => items[index].id || items[index].title}
+              computeItemKey={(index) => items[index].id}
               defaultItemHeight={DEFAULT_ITEM_HEIGHT}
               totalCount={items.length}
               onBlur={() => setFocusedGroupIndex(-1)}
@@ -177,10 +167,10 @@ function ListContainer(props: ListContainerProps) {
 
                 switch (item.type) {
                   case "header":
-                    if (!groupingKey) return null;
+                    if (!group) return null;
                     return (
                       <GroupHeader
-                        groupingKey={groupingKey}
+                        groupingKey={group}
                         refresh={refresh}
                         title={item.title}
                         isFocused={index === focusedGroupIndex}
@@ -201,10 +191,14 @@ function ListContainer(props: ListContainerProps) {
                             )
                           ]);
                         }}
-                        groups={groups}
+                        groups={
+                          props.items.filter((v) =>
+                            isGroupHeader(v)
+                          ) as GroupHeaderType[]
+                        }
                         onJump={(title: string) => {
                           const index = props.items.findIndex(
-                            (v) => v.title === title
+                            (v) => isGroupHeader(v) && v.title === title
                           );
                           if (index < 0) return;
                           listRef.current?.scrollToIndex({
@@ -218,10 +212,10 @@ function ListContainer(props: ListContainerProps) {
                     );
                   default:
                     return (
-                      <Component
+                      <ListItemWrapper
                         item={item}
                         context={context}
-                        type={type}
+                        group={group}
                         compact={compact}
                       />
                     );
@@ -234,7 +228,7 @@ function ListContainer(props: ListContainerProps) {
       {button && (
         <Button
           variant="accent"
-          data-test-id={`${props.type}-action-button`}
+          data-test-id={`${group}-action-button`}
           onClick={button.onClick}
           sx={{
             position: "absolute",
