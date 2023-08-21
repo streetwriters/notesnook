@@ -208,10 +208,12 @@ export default async function downloadAttachment(
       attachment.metadata.hash,
       options.groupId
     );
-    await db.fs.downloadFile(
-      options.groupId || attachment.metadata.hash,
-      attachment.metadata.hash
-    );
+    await db
+      .fs()
+      .downloadFile(
+        options.groupId || attachment.metadata.hash,
+        attachment.metadata.hash
+      );
     if (
       !(await RNFetchBlob.fs.exists(`${cacheDir}/${attachment.metadata.hash}`))
     )

@@ -45,7 +45,7 @@ export const ColoredNotes = ({
 ColoredNotes.get = (params: NotesScreenParams, grouped = true) => {
   const notes = db.notes?.colored(params.item.id) || [];
   return grouped
-    ? groupArray(notes, db.settings?.getGroupOptions("notes"))
+    ? groupArray(notes, db.settings.getGroupOptions("notes"))
     : notes;
 };
 

@@ -208,7 +208,7 @@ export const useEditor = (
           id = await db.notes?.add(noteData);
           if (!note && id) {
             currentNote.current = db.notes?.note(id).data as NoteType;
-            const defaultNotebook = db.settings?.getDefaultNotebook();
+            const defaultNotebook = db.settings.getDefaultNotebook();
             if (!state.current.onNoteCreated && defaultNotebook) {
               onNoteCreated(id, {
                 type: defaultNotebook.topic ? "topic" : "notebook",

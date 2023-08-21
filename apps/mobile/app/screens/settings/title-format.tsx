@@ -26,7 +26,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 
 export const TitleFormat = () => {
-  const [titleFormat] = useState(db.settings?.getTitleFormat());
+  const [titleFormat] = useState(db.settings.getTitleFormat());
   const inputRef = useRef<TextInput>();
   const { colors } = useThemeColors();
 
@@ -34,10 +34,10 @@ export const TitleFormat = () => {
     <>
       <Input
         onSubmit={(e) => {
-          db.settings?.setTitleFormat(e.nativeEvent.text);
+          db.settings.setTitleFormat(e.nativeEvent.text);
         }}
         onChangeText={(text) => {
-          db.settings?.setTitleFormat(text);
+          db.settings.setTitleFormat(text);
         }}
         containerStyle={{ marginTop: 6 }}
         onLayout={() => {

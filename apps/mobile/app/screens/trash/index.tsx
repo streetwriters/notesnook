@@ -98,7 +98,7 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         screen="Trash"
         loading={!isFocused}
         placeholderData={PLACEHOLDER_DATA(
-          db.settings?.getTrashCleanupInterval()
+          db.settings.getTrashCleanupInterval()
         )}
         headerProps={{
           heading: "Trash",
