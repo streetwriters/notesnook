@@ -92,7 +92,7 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
           showUpgradeReminderDialogs();
         }
         await resetNotices();
-        setIsVaultCreated(await db.vault?.exists());
+        setIsVaultCreated(await db.vault.exists());
 
         await showOnboardingDialog(interruptedOnboarding());
         await showFeatureDialog("highlights");

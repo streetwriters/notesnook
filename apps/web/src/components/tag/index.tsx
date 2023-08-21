@@ -28,13 +28,14 @@ import { db } from "../../common/db";
 import { Edit, Shortcut, DeleteForver } from "../icons";
 import { showToast } from "../../utils/toast";
 import { pluralize } from "@notesnook/common";
-import { Item } from "../list-container/types";
 import { MenuItem } from "@notesnook/ui";
+import { Tag } from "@notesnook/core/dist/types";
 
-type TagProps = { item: Item };
+type TagProps = { item: Tag };
 function Tag(props: TagProps) {
   const { item } = props;
-  const { id, noteIds, alias } = item;
+  const { id, title } = item;
+  const totalNotes = db.relations.to(item, "note").length;
 
   return (
     <ListItem
@@ -45,12 +46,12 @@ function Tag(props: TagProps) {
           <Text as="span" sx={{ color: "accent" }}>
             {"#"}
           </Text>
-          {alias}
+          {title}
         </Text>
       }
       footer={
         <Text mt={1} variant="subBody">
-          {(noteIds as string[]).length}
+          {totalNotes}
         </Text>
       }
       menuItems={menuItems}
@@ -62,7 +63,7 @@ function Tag(props: TagProps) {
 }
 export default Tag;
 
-const menuItems: (tag: any, items?: any[]) => MenuItem[] = (
+const menuItems: (tag: Tag, items?: Tag[]) => MenuItem[] = (
   tag,
   items = []
 ) => {
@@ -79,7 +80,7 @@ const menuItems: (tag: any, items?: any[]) => MenuItem[] = (
     {
       type: "button",
       key: "shortcut",
-      title: db.shortcuts?.exists(tag.id)
+      title: db.shortcuts.exists(tag.id)
         ? "Remove shortcut"
         : "Create shortcut",
       icon: Shortcut.path,
@@ -94,11 +95,10 @@ const menuItems: (tag: any, items?: any[]) => MenuItem[] = (
       icon: DeleteForver.path,
       onClick: async () => {
         for (const tag of items) {
-          if (tag.noteIds.includes(editorStore.get().session.id))
-            await editorStore.clearSession();
-          await db.tags?.remove(tag.id);
+          await db.tags.remove(tag.id);
         }
         showToast("success", `${pluralize(items.length, "tag")} deleted`);
+        editorStore.refreshTags();
         tagStore.refresh();
         noteStore.refresh();
       },

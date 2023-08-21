@@ -39,7 +39,7 @@ export function SubscriptionStatus() {
   const user = useUserStore((store) => store.user);
 
   const [activateTrial, isActivatingTrial] = useAction(async () => {
-    await db.user?.activateTrial();
+    await db.user.activateTrial();
   });
 
   const provider = PROVIDER_MAP[user?.subscription?.provider || 0];
@@ -151,7 +151,7 @@ export function SubscriptionStatus() {
                         type: "modal",
                         title: "Cancelling your subscription",
                         subtitle: "Please wait...",
-                        action: () => db.subscriptions?.cancel()
+                        action: () => db.subscriptions.cancel()
                       })
                         .catch((e) => showToast("error", e.message))
                         .then(() =>
@@ -181,7 +181,7 @@ export function SubscriptionStatus() {
                       type: "modal",
                       title: "Requesting refund for your subscription",
                       subtitle: "Please wait...",
-                      action: () => db.subscriptions?.refund()
+                      action: () => db.subscriptions.refund()
                     })
                       .catch((e) => showToast("error", e.message))
                       .then(() =>

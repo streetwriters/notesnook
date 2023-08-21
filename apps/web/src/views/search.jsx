@@ -133,7 +133,7 @@ function Search({ type }) {
           case "monographs":
             return "all monographs";
           case "color": {
-            const color = db.colors.all.find((tag) => tag.id === context.value);
+            const color = db.colors.find(context.value);
             return `notes in color ${color.title}`;
           }
           default:
@@ -197,7 +197,7 @@ function Search({ type }) {
       ) : (
         <ListContainer
           context={context}
-          type={type}
+          group={type}
           items={results}
           placeholder={() => (
             <Placeholder

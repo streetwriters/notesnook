@@ -31,8 +31,7 @@ function Reminders() {
   return (
     <>
       <ListContainer
-        type="reminders"
-        groupingKey="reminders"
+        group="reminders"
         refresh={refresh}
         items={reminders}
         placeholder={<Placeholder context="reminders" />}
