@@ -35,10 +35,14 @@ import { presentDialog } from "../../dialog/functions";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
+import { useStoredRef } from "../../../hooks/use-stored-ref";
+
 export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
   const { colors } = useThemeColors();
-  const body = useRef(defaultBody);
-  const title = useRef(defaultTitle);
+
+  const body = useStoredRef("issueBody", defaultBody);
+  const title = useStoredRef("issueTitle", defaultTitle);
+
   const user = useUserStore((state) => state.user);
   const [loading, setLoading] = useState(false);
   const bodyRef = useRef();
@@ -70,6 +74,8 @@ Logged in: ${user ? "yes" : "no"}`,
       });
       setLoading(false);
       eSendEvent(eCloseSheet);
+      body.reset();
+      title.reset();
       await sleep(300);
       presentDialog({
         title: "Issue reported",
