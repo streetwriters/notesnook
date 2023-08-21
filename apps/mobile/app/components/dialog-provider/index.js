@@ -39,7 +39,7 @@ import RestoreDataSheet from "../sheets/restore-data";
 import PDFPreview from "../dialogs/pdf-preview";
 
 const DialogProvider = () => {
-  const { colors } = useThemeColors();
+  const { colors } = useThemeColors("dialog");
   const loading = useNoteStore((state) => state.loading);
 
   return (

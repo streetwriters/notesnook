@@ -24,7 +24,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../utils/elevation";
 
 const DialogContainer = ({ width, height, ...restProps }) => {
-  const { colors } = useThemeColors();
+  const { colors } = useThemeColors("dialog");
 
   return (
     <View

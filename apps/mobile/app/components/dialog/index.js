@@ -38,7 +38,7 @@ import { useCallback } from "react";
 import { Button } from "../ui/button";
 
 export const Dialog = ({ context = "global" }) => {
-  const { colors } = useThemeColors();
+  const { colors } = useThemeColors("dialog");
   const [visible, setVisible] = useState(false);
   const [inputValue, setInputValue] = useState(null);
   const inputRef = useRef();

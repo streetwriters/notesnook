@@ -72,6 +72,8 @@ import { NavigationStack } from "./navigation-stack";
 
 const _TabsHolder = () => {
   const { colors, isDark } = useThemeColors();
+  const { colors: editorToolbarColors } = useThemeColors("editorToolbar");
+  const { colors: listColors } = useThemeColors("list");
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const setFullscreen = useSettingStore((state) => state.setFullscreen);
   const fullscreen = useSettingStore((state) => state.fullscreen);
@@ -383,9 +385,58 @@ const _TabsHolder = () => {
     };
   }, []);
 
+  const onChangeTab = useCallback(
+    async (obj) => {
+      if (obj.i === 2) {
+        editorState().movedAway = false;
+        editorState().isFocused = true;
+        activateKeepAwake();
+        if (!editorState().currentlyEditing) {
+          eSendEvent(eOnLoadNote, { type: "new" });
+        }
+        console.log("TO", editorToolbarColors.primary.background);
+        changeNavigationBarColor(
+          editorToolbarColors.primary.background,
+          isDark,
+          true
+        );
+      } else {
+        if (obj.from === 2) {
+          deactivateKeepAwake();
+          editorState().movedAway = true;
+          editorState().isFocused = false;
+          eSendEvent(eClearEditor, "removeHandler");
+          setTimeout(
+            () => useEditorStore.getState().setSearchReplace(false),
+            1
+          );
+          let id = useEditorStore.getState().currentEditingNote;
+          let note = db.notes.note(id);
+          if (note?.locked) {
+            eSendEvent(eClearEditor);
+          }
+          changeNavigationBarColor(listColors.primary.background, isDark, true);
+        }
+      }
+    },
+    [editorToolbarColors, listColors, isDark]
+  );
+
   useEffect(() => {
-    changeNavigationBarColor(colors.primary.background, isDark, true);
-  }, [colors.primary.background, isDark]);
+    if (editorState().movedAway) {
+      changeNavigationBarColor(listColors.primary.background, isDark, true);
+    } else {
+      changeNavigationBarColor(
+        editorToolbarColors.primary.background,
+        isDark,
+        true
+      );
+    }
+  }, [
+    listColors.primary.background,
+    editorToolbarColors.primary.background,
+    isDark
+  ]);
 
   return (
     <View
@@ -482,27 +533,3 @@ const _TabsHolder = () => {
   );
 };
 export const TabHolder = React.memo(_TabsHolder, () => true);
-
-const onChangeTab = async (obj) => {
-  if (obj.i === 2) {
-    editorState().movedAway = false;
-    editorState().isFocused = true;
-    activateKeepAwake();
-    if (!editorState().currentlyEditing) {
-      eSendEvent(eOnLoadNote, { type: "new" });
-    }
-  } else {
-    if (obj.from === 2) {
-      deactivateKeepAwake();
-      editorState().movedAway = true;
-      editorState().isFocused = false;
-      eSendEvent(eClearEditor, "removeHandler");
-      setTimeout(() => useEditorStore.getState().setSearchReplace(false), 1);
-      let id = useEditorStore.getState().currentEditingNote;
-      let note = db.notes.note(id);
-      if (note?.locked) {
-        eSendEvent(eClearEditor);
-      }
-    }
-  }
-};
