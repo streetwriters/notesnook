@@ -81,7 +81,7 @@ TopicNotes.get = (params: NotesScreenParams, grouped = true) => {
   }
   const notes = topic?.all || [];
   return grouped
-    ? groupArray(notes, db.settings?.getGroupOptions("notes"))
+    ? groupArray(notes, db.settings.getGroupOptions("notes"))
     : notes;
 };
 

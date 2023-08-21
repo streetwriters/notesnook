@@ -34,7 +34,7 @@ export const useNotebookStore = create<NotebookStore>((set, get) => ({
       set({
         notebooks: groupArray(
           (db?.notebooks?.all as NotebookType[]) || [],
-          db.settings?.getGroupOptions("notebooks")
+          db.settings.getGroupOptions("notebooks")
         )
       });
       return;

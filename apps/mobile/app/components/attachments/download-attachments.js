@@ -68,7 +68,7 @@ const DownloadAttachments = ({ close, attachments, isNote, update }) => {
     });
     canceled.current = true;
     console.log(groupId.current, "canceling groupId downloads");
-    await db.fs.cancel(groupId.current);
+    await db.fs().cancel(groupId.current);
     setDownloading(false);
     groupId.current = null;
   };

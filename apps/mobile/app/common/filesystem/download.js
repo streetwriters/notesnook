@@ -98,7 +98,7 @@ export async function downloadFile(filename, data, cancelToken) {
 export async function getUploadedFileSize(hash) {
   try {
     const url = `${hosts.API_HOST}/s3?name=${hash}`;
-    const token = await db.user.tokenManager.getAccessToken();
+    const token = await db.tokenManager.getAccessToken();
 
     const attachmentInfo = await fetch(url, {
       method: "HEAD",

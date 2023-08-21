@@ -70,7 +70,7 @@ export const useDragState = create<DragState>(
         const _data = clone(data);
 
         presets["custom"] = _data;
-        db.settings?.setToolbarConfig(
+        db.settings.setToolbarConfig(
           useSettingStore.getState().deviceMode || "mobile",
           {
             preset: "custom",
@@ -80,7 +80,7 @@ export const useDragState = create<DragState>(
         set({ data: _data, preset: "custom", customPresetData: _data });
       },
       setPreset: (preset) => {
-        db.settings?.setToolbarConfig(
+        db.settings.setToolbarConfig(
           useSettingStore.getState().deviceMode || "mobile",
           {
             preset,
@@ -98,7 +98,7 @@ export const useDragState = create<DragState>(
       init: async () => {
         const user = await db.user?.getUser();
         if (!user) return;
-        const toolbarConfig = db.settings?.getToolbarConfig(
+        const toolbarConfig = db.settings.getToolbarConfig(
           useSettingStore.getState().deviceMode || "mobile"
         );
         if (!toolbarConfig) {

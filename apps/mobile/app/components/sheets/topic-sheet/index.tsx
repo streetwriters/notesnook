@@ -103,14 +103,14 @@ export const TopicsSheet = () => {
   const [topics, setTopics] = useState(
     notebook
       ? qclone(
-          groupArray(notebook.topics, db.settings?.getGroupOptions("topics"))
+          groupArray(notebook.topics, db.settings.getGroupOptions("topics"))
         )
       : []
   );
   const currentItem = useRef<string>();
   const { fontScale } = useWindowDimensions();
   const [groupOptions, setGroupOptions] = useState(
-    db.settings?.getGroupOptions("topics")
+    db.settings.getGroupOptions("topics")
   );
 
   const onRequestUpdate = React.useCallback(
@@ -124,7 +124,7 @@ export const TopicsSheet = () => {
 
         setTopics(
           qclone(
-            groupArray(_notebook.topics, db.settings?.getGroupOptions("topics"))
+            groupArray(_notebook.topics, db.settings.getGroupOptions("topics"))
           )
         );
       }
@@ -133,7 +133,7 @@ export const TopicsSheet = () => {
   );
 
   const onUpdate = useCallback(() => {
-    setGroupOptions({ ...(db.settings?.getGroupOptions("topics") as any) });
+    setGroupOptions({ ...(db.settings.getGroupOptions("topics") as any) });
     onRequestUpdate();
   }, [onRequestUpdate]);
 

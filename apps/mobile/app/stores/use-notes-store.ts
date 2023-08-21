@@ -40,7 +40,7 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
       set({
         notes: groupArray(
           (db.notes?.all as NoteType[]) || [],
-          db.settings?.getGroupOptions("home")
+          db.settings.getGroupOptions("home")
         )
       });
       return;

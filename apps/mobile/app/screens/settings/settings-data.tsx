@@ -516,9 +516,9 @@ export const settingsGroups: SettingSection[] = [
             name: "Clear default notebook/topic",
             description: "Clear the default notebook/topic for new notes",
             modifer: () => {
-              db.settings?.setDefaultNotebook(undefined);
+              db.settings.setDefaultNotebook(undefined);
             },
-            hidden: () => !db.settings?.getDefaultNotebook()
+            hidden: () => !db.settings.getDefaultNotebook()
           }
         ]
       },
