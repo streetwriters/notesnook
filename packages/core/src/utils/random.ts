@@ -17,15 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/**
- *
- * @param {number} size
- * @returns {Buffer}
- */
-export function randomBytes(size) {
+export function randomBytes(size: number) {
   if (!globalThis.crypto || !crypto)
     throw new Error("Crypto is not supported on this platform.");
-  if (crypto.randomBytes) return crypto.randomBytes(size);
+  if ("randomBytes" in crypto && typeof crypto.randomBytes === "function")
+    return crypto.randomBytes(size);
 
   if (!crypto.getRandomValues)
     throw new Error(
@@ -39,7 +35,7 @@ export function randomBytes(size) {
 
 export function randomInt() {
   const randomBuffer = randomBytes(1);
-  let randomNumber = randomBuffer[0] / 0xff; // / (0xffffffff + 1);
+  const randomNumber = randomBuffer[0] / 0xff; // / (0xffffffff + 1);
 
   return Math.floor(randomNumber * 0xffffff);
 }

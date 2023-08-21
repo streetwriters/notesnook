@@ -21,6 +21,7 @@ import { filter, parse } from "liqe";
 import Database from ".";
 import {
   Attachment,
+  GroupedItems,
   Note,
   Notebook,
   Reminder,
@@ -66,7 +67,7 @@ export default class Lookup {
     return this.byTitle(array, query);
   }
 
-  tags(array: Tag[], query: string) {
+  tags(array: GroupedItems<Tag>, query: string) {
     return this.byTitle(array, query);
   }
 

@@ -148,7 +148,7 @@ export default class Backup {
   constructor(private readonly db: Database) {}
 
   lastBackupTime() {
-    return this.db.storage().read("lastBackupTime");
+    return this.db.storage().read<number>("lastBackupTime");
   }
 
   async updateBackupTime() {

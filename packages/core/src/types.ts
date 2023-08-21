@@ -26,6 +26,8 @@ export type GroupOptions = {
   sortDirection: "desc" | "asc";
 };
 
+export type GroupedItems<T> = (T | GroupHeader)[];
+
 export type GroupingKey =
   | "home"
   | "notes"
@@ -40,6 +42,7 @@ export type ValueOf<T> = T[keyof T];
 
 export type GroupHeader = {
   type: "header";
+  id: string;
   title: string;
 };
 
@@ -342,4 +345,8 @@ export function isTrashItem(
   item: MaybeDeletedItem<TrashOrItem<BaseItem<"note" | "notebook">>>
 ): item is TrashItem {
   return !isDeleted(item) && item.type === "trash";
+}
+
+export function isGroupHeader(item: GroupHeader | Item): item is GroupHeader {
+  return item.type === "header";
 }

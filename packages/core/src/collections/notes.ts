@@ -29,7 +29,6 @@ import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { buildFromTemplate } from "../utils/templates";
 import {
   Note,
-  UnencryptedContentItem,
   TrashOrItem,
   isTrashItem,
   MaybeDeletedItem,
@@ -43,7 +42,7 @@ import { NoteContent } from "./session-content";
 type NotebookReference = { id: string; topic?: string; rebuildCache?: boolean };
 type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
-  contentItem?: UnencryptedContentItem;
+  contentItem?: NoteContent<false>;
   rawContent?: string;
 };
 

@@ -38,7 +38,7 @@ class Monographs {
   async init() {
     try {
       const user = await this._db.user.getUser();
-      const token = await this._db.user.tokenManager.getAccessToken();
+      const token = await this._db.tokenManager.getAccessToken();
       if (!user || !token || !user.isEmailConfirmed) return;
       let monographs = await this._db.storage().read("monographs", true);
       monographs = await http.get(`${Constants.API_HOST}/monographs`, token);
@@ -82,7 +82,7 @@ class Monographs {
     let update = !!this.isPublished(noteId);
 
     const user = await this._db.user.getUser();
-    const token = await this._db.user.tokenManager.getAccessToken();
+    const token = await this._db.tokenManager.getAccessToken();
     if (!user || !token) throw new Error("Please login to publish a note.");
 
     const note = this._db.notes.note(noteId);
@@ -136,7 +136,7 @@ class Monographs {
     if (!this.monographs) await this.init();
 
     const user = await this._db.user.getUser();
-    const token = await this._db.user.tokenManager.getAccessToken();
+    const token = await this._db.tokenManager.getAccessToken();
     if (!user || !token) throw new Error("Please login to publish a note.");
 
     // const note = this._db.notes.note(noteId);

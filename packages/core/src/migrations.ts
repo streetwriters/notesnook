@@ -188,7 +188,7 @@ const migrations: Migration[] = [
     version: 5.9,
     items: {
       tag: async (item, db) => {
-        const alias = db.settings?.getAlias(item.id);
+        const alias = db.settings.getAlias(item.id);
         item.title = alias || item.title;
         item.id = getId(item.dateCreated);
 
