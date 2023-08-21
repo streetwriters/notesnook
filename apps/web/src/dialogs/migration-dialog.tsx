@@ -64,7 +64,7 @@ export default function MigrationDialog(props: MigrationDialogProps) {
         );
         task({ text: `Processing...` });
         try {
-          await db.migrations?.migrate();
+          await db.migrations.migrate();
 
           props.onClose(true);
         } catch (e) {

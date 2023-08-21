@@ -28,8 +28,10 @@ import { db } from "../common/db";
 import Dialog from "../components/dialog";
 import { useStore, store } from "../stores/tag-store";
 import { store as notestore } from "../stores/note-store";
+import { store as editorstore } from "../stores/editor-store";
 import { Perform } from "../common/dialog-controller";
 import { FilteredList } from "../components/filtered-list";
+import { ItemReference, Tag } from "@notesnook/core/dist/types";
 
 type SelectedReference = {
   id: string;
@@ -42,7 +44,6 @@ type Item = {
   type: "tag" | "header";
   title: string;
 };
-type Tag = Item & { noteIds: string[] };
 
 export type AddTagsDialogProps = {
   onClose: Perform;
@@ -63,7 +64,7 @@ function AddTagsDialog(props: AddTagsDialogProps) {
 
   const getAllTags = useCallback(() => {
     refreshTags();
-    return (store.get().tags as Item[]).filter((a) => a.type !== "header");
+    return store.get().tags.filter((a) => a.type !== "header");
   }, [refreshTags]);
 
   useEffect(() => {
@@ -71,7 +72,7 @@ function AddTagsDialog(props: AddTagsDialogProps) {
 
     setSelected((s) => {
       const selected = s.slice();
-      for (const tag of tags as Tag[]) {
+      for (const tag of tags) {
         if (tag.type === "header") continue;
         if (selected.findIndex((a) => a.id === tag.id) > -1) continue;
         if (tagHasNotes(tag, noteIds)) {
@@ -98,11 +99,15 @@ function AddTagsDialog(props: AddTagsDialogProps) {
         onClick: async () => {
           for (const id of noteIds) {
             for (const item of selected) {
-              if (item.op === "add") await db.notes?.note(id).tag(item.id);
-              else await db.notes?.note(id).untag(item.id);
+              const tagRef: ItemReference = { type: "tag", id: item.id };
+              const noteRef: ItemReference = { id, type: "note" };
+              if (item.op === "add") await db.relations.add(tagRef, noteRef);
+              else await db.relations.unlink(tagRef, noteRef);
             }
           }
-          notestore.refresh();
+          editorstore.get().refreshTags();
+          store.get().refresh();
+          notestore.get().refresh();
           onClose(true);
         }
       }}
@@ -122,12 +127,13 @@ function AddTagsDialog(props: AddTagsDialogProps) {
             empty: "Add a new tag",
             filter: "Search or add a new tag"
           }}
-          filter={(tags, query) => db.lookup?.tags(tags, query) || []}
+          filter={(tags, query) => db.lookup.tags(tags, query) || []}
           onCreateNewItem={async (title) => {
-            const tag = await db.tags?.add(title);
+            const tagId = await db.tags.add({ title });
+            if (!tagId) return;
             setSelected((selected) => [
               ...selected,
-              { id: tag.id, new: true, op: "add" }
+              { id: tagId, new: true, op: "add" }
             ]);
           }}
           renderItem={(tag, _index) => {
@@ -219,5 +225,7 @@ function SelectedCheck({
 }
 
 function tagHasNotes(tag: Tag, noteIds: string[]) {
-  return tag.noteIds.some((id) => noteIds.indexOf(id) > -1);
+  return db.relations
+    ?.from(tag, "note")
+    ?.some((r) => noteIds.indexOf(r.to.id) > -1);
 }

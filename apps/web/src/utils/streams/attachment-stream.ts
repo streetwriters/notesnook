@@ -34,7 +34,7 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
     const counters: Record<string, number> = {};
     if (signal)
       signal.onabort = async () => {
-        await db.fs?.cancel(GROUP_ID, "download");
+        await db.fs().cancel(GROUP_ID, "download");
       };
 
     super({
@@ -48,14 +48,18 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
         onProgress && onProgress(index);
         const attachment = attachments[index++];
 
-        await db.fs?.downloadFile(
-          GROUP_ID,
-          attachment.metadata.hash,
-          attachment.chunkSize,
-          attachment.metadata
-        );
+        await db
+          .fs()
+          .downloadFile(
+            GROUP_ID,
+            attachment.metadata.hash,
+            attachment.chunkSize,
+            attachment.metadata
+          );
 
-        const key = await db.attachments?.decryptKey(attachment.key);
+        const key = await db.attachments.decryptKey(attachment.key);
+        if (!key) return;
+
         const file = await lazify(
           import("../../interfaces/fs"),
           ({ decryptFile }) =>

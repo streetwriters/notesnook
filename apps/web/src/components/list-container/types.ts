@@ -17,33 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ListProfiles } from "./list-profiles";
+import { Note } from "@notesnook/core/dist/types";
 
-export type Item = {
-  id: string;
+export type Context = {
   type: string;
-  title: string;
-
-  dateEdited: number;
-  dateModified: number;
-  dateDeleted: number;
-  dateCreated: number;
+  notes?: Note[];
+  value?: { topic?: string };
 } & Record<string, unknown>;
-
-export type NotebookReference = Item & { topics: string[] };
-export type NotebookType = Item & { topics: Item[] };
-
-export type Context = { type: string } & Record<string, unknown>;
-export type ItemWrapperProps<TItem = Item> = {
-  item: TItem;
-  type: keyof typeof ListProfiles;
-  context?: Context;
-  compact?: boolean;
-};
-
-export type ItemWrapper<TItem = Item> = (
-  props: ItemWrapperProps<TItem>
-) => JSX.Element | null;
 
 export type Reference = {
   type: "topic" | "notebook";

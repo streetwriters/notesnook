@@ -22,8 +22,9 @@ import type { Compressor as CompressorWorkerType } from "./compressor.worker";
 import { wrap, Remote } from "comlink";
 
 import { desktop } from "../common/desktop-bridge";
+import { ICompressor } from "@notesnook/core/dist/interfaces";
 
-export class Compressor {
+export class Compressor implements ICompressor {
   private worker!: globalThis.Worker;
   private compressor!: Remote<CompressorWorkerType>;
 
@@ -35,14 +36,15 @@ export class Compressor {
   }
 
   async compress(data: string) {
-    if (IS_DESKTOP_APP)
-      return await desktop?.compress.gzip.query({ data, level: 6 });
+    if (IS_DESKTOP_APP && desktop)
+      return await desktop.compress.gzip.query({ data, level: 6 });
 
     return await this.compressor.gzip({ data, level: 6 });
   }
 
   async decompress(data: string) {
-    if (IS_DESKTOP_APP) return await desktop?.compress.gunzip.query(data);
+    if (IS_DESKTOP_APP && desktop)
+      return await desktop.compress.gunzip.query(data);
 
     return await this.compressor.gunzip({ data });
   }

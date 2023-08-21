@@ -21,8 +21,8 @@ import { useState } from "react";
 import { Perform } from "../../common/dialog-controller";
 import Dialog from "../../components/dialog";
 import { steps } from "./steps";
-import { AuthenticatorType } from "./types";
 import { ErrorText } from "../../components/error-text";
+import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
 
 type RecoveryCodesDialogProps = {
   onClose: Perform;
