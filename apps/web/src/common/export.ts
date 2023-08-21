@@ -24,6 +24,11 @@ import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
 import { sanitizeFilename } from "@notesnook/common";
 import Vault from "./vault";
+import { isDeleted } from "@notesnook/core/dist/types";
+import {
+  isEncryptedContent,
+  isUnencryptedContent
+} from "@notesnook/core/dist/collections/content";
 
 const FORMAT_TO_EXT = {
   pdf: "pdf",
@@ -87,10 +92,10 @@ export async function exportNotes(
     action: async (report) => {
       let vaultUnlocked = false;
 
-      if (noteIds.length === 1 && db.notes?.note(noteIds[0])?.data.locked) {
+      if (noteIds.length === 1 && db.notes.note(noteIds[0])?.data.locked) {
         vaultUnlocked = await Vault.unlockVault();
         if (!vaultUnlocked) return false;
-      } else if (noteIds.length > 1 && (await db.vault?.exists())) {
+      } else if (noteIds.length > 1 && (await db.vault.exists())) {
         vaultUnlocked = await Vault.unlockVault();
         if (!vaultUnlocked)
           showToast(
@@ -102,7 +107,7 @@ export async function exportNotes(
       const files = [];
       let index = 0;
       for (const noteId of noteIds) {
-        const note = db.notes?.note(noteId);
+        const note = db.notes.note(noteId);
         if (!note) continue;
         if (!vaultUnlocked && note.data.locked) continue;
 
@@ -112,13 +117,23 @@ export async function exportNotes(
           text: `Exporting "${note.title}"...`
         });
 
-        const rawContent = await db.content?.raw(note.data.contentId);
-        const content = note.data.locked
-          ? await db.vault?.decryptContent(rawContent)
-          : rawContent;
+        const rawContent = note.data.contentId
+          ? await db.content.raw(note.data.contentId)
+          : null;
+        const content =
+          !rawContent || isDeleted(rawContent)
+            ? undefined
+            : isEncryptedContent(rawContent)
+            ? await db.vault.decryptContent(rawContent)
+            : isUnencryptedContent(rawContent)
+            ? rawContent
+            : undefined;
 
-        const exported = await note
-          .export(format === "pdf" ? "html" : format, content)
+        const exported = await db.notes
+          .export(noteId, {
+            format: format === "pdf" ? "html" : format,
+            contentItem: content
+          })
           .catch((e: Error) => {
             console.error(note.data, e);
             showToast(

@@ -113,7 +113,7 @@ async function pickImage(selectedImage: File, options?: AddAttachmentOptions) {
 }
 
 async function getEncryptionKey(): Promise<SerializedKey> {
-  const key = await db.attachments?.generateKey();
+  const key = await db.attachments.generateKey();
   if (!key) throw new Error("Could not generate a new encryption key.");
   return key;
 }
@@ -176,13 +176,15 @@ async function addAttachment(
       const output = await FS.writeEncryptedFile(file, key, hash);
       if (!output) throw new Error("Could not encrypt file.");
 
-      if (forceWrite && exists) await db.attachments?.reset(hash);
-      await db.attachments?.add({
+      if (forceWrite && exists) await db.attachments.reset(hash);
+      await db.attachments.add({
         ...output,
-        hash,
-        hashType,
-        filename: file.name,
-        type: file.type,
+        metadata: {
+          hash,
+          hashType,
+          filename: file.name,
+          type: file.type
+        },
         key
       });
     }

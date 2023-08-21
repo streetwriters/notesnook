@@ -21,7 +21,7 @@ import { Perform } from "../common/dialog-controller";
 import Dialog from "../components/dialog";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { db } from "../common/db";
-import { Reminder } from "@notesnook/core/dist/collections/reminders";
+import { Reminder } from "@notesnook/core/dist/types";
 import IconTag from "../components/icon-tag";
 import { Clock, Refresh } from "../components/icons";
 import Note from "../components/note";
@@ -57,10 +57,9 @@ export default function ReminderPreviewDialog(
   props: ReminderPreviewDialogProps
 ) {
   const { reminder } = props;
-  const referencedNotes = db.relations?.to(
-    { id: reminder.id, type: "reminder" },
-    "note"
-  );
+  const referencedNotes = db.relations
+    .to({ id: reminder.id, type: "reminder" }, "note")
+    .resolved();
 
   return (
     <Dialog
@@ -101,7 +100,7 @@ export default function ReminderPreviewDialog(
             key={time.id}
             variant="secondary"
             onClick={() => {
-              db.reminders?.add({
+              db.reminders.add({
                 id: reminder.id,
                 snoozeUntil: Date.now() + time.interval
               });

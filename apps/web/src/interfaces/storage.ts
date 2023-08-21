@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { IStorage } from "@notesnook/core/dist/interfaces";
 import {
   IndexedDBKVStore,
   LocalStorageKVStore,
@@ -31,7 +32,7 @@ export type DatabasePersistence = "memory" | "db";
 
 const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
 
-export class NNStorage {
+export class NNStorage implements IStorage {
   database!: IKVStore;
 
   static async createInstance(
@@ -53,8 +54,8 @@ export class NNStorage {
     return this.database.get(key);
   }
 
-  readMulti(keys: string[]) {
-    if (keys.length <= 0) return [];
+  readMulti<T>(keys: string[]): Promise<[string, T][]> {
+    if (keys.length <= 0) return Promise.resolve([]);
     return this.database.getMany(keys.sort());
   }
 

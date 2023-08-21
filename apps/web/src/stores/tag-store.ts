@@ -21,18 +21,16 @@ import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 import { groupArray } from "@notesnook/core/dist/utils/grouping";
+import { GroupedItems, Tag } from "@notesnook/core/dist/types";
 
-/**
- * @extends {BaseStore<TagStore>}
- */
-class TagStore extends BaseStore {
-  tags = [];
+class TagStore extends BaseStore<TagStore> {
+  tags: GroupedItems<Tag> = [];
 
   refresh = () => {
     this.set(
       (state) =>
         (state.tags = groupArray(
-          db.tags.all,
+          db.tags.all || [],
           db.settings.getGroupOptions("tags")
         ))
     );

@@ -275,8 +275,8 @@ export async function showUpgradeReminderDialogs() {
   if (!user || !user.subscription || user.subscription?.expiry === 0) return;
 
   const consumed = totalSubscriptionConsumed(user);
-  const isTrial = user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
-  const isBasic = user?.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
+  const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
+  const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
   if (isBasic && consumed >= 100) {
     await showReminderDialog("trialexpired");
   } else if (isTrial && consumed >= 75) {

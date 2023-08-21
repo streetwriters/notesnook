@@ -66,7 +66,7 @@ What data is collected & when?`,
             type: "toggle",
             isToggled: () => !!useUserStore.getState().user?.marketingConsent,
             toggle: async () => {
-              await db.user?.changeMarketingConsent(
+              await db.user.changeMarketingConsent(
                 !useUserStore.getState().user?.marketingConsent
               );
               await useUserStore.getState().refreshUser();

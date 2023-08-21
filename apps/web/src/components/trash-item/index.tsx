@@ -28,10 +28,10 @@ import { showUndoableToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 import { hashNavigate } from "../../navigation";
 import { useStore } from "../../stores/note-store";
-import { Item } from "../list-container/types";
 import { MenuItem } from "@notesnook/ui";
+import { TrashItem } from "@notesnook/core/dist/types";
 
-type TrashItemProps = { item: Item; date: number };
+type TrashItemProps = { item: TrashItem; date: number };
 function TrashItem(props: TrashItemProps) {
   const { item, date } = props;
   const isOpened = useStore((store) => store.selectedNote === item.id);
@@ -41,7 +41,7 @@ function TrashItem(props: TrashItemProps) {
       isFocused={isOpened}
       item={item}
       title={item.title}
-      body={(item.headline || item.description) as string}
+      body={item.itemType === "note" ? item.headline : item.description}
       footer={
         <Flex
           mt={1}
@@ -66,7 +66,7 @@ function TrashItem(props: TrashItemProps) {
 }
 export default TrashItem;
 
-const menuItems: (item: any, items?: any[]) => MenuItem[] = (
+const menuItems: (item: TrashItem, items?: TrashItem[]) => MenuItem[] = (
   item,
   items = []
 ) => {

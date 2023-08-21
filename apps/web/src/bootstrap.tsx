@@ -22,7 +22,7 @@ import "@notesnook/core/dist/types";
 import { getCurrentHash, getCurrentPath, makeURL } from "./navigation";
 import Config from "./utils/config";
 
-import { initalizeLogger, logger } from "./utils/logger";
+import { initializeLogger, logger } from "./utils/logger";
 import { AuthProps } from "./views/auth";
 import { initializeFeatureChecks } from "./utils/feature-check";
 
@@ -142,7 +142,7 @@ function isSessionExpired(path: Routes): RouteWithPath<AuthProps> | null {
 }
 
 export async function init() {
-  await initalizeLogger();
+  await initializeLogger();
   await initializeFeatureChecks();
 
   const { path, route } = getRoute();

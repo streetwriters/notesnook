@@ -32,10 +32,7 @@ import {
   Trash
 } from "../icons";
 import IconTag from "../icon-tag";
-import {
-  Reminder as ReminderType,
-  isReminderToday
-} from "@notesnook/core/dist/collections/reminders";
+import { isReminderToday } from "@notesnook/core/dist/collections/reminders";
 import { hashNavigate } from "../../navigation";
 import { Multiselect } from "../../common/multi-select";
 import { store } from "../../stores/reminder-store";
@@ -46,8 +43,8 @@ import {
 } from "../../common/dialog-controller";
 import { pluralize } from "@notesnook/common";
 import { getFormattedReminderTime } from "@notesnook/common";
-import { Item } from "../list-container/types";
 import { MenuItem } from "@notesnook/ui";
+import { Reminder as ReminderType } from "@notesnook/core/dist/types";
 
 const RECURRING_MODE_MAP = {
   week: "Weekly",
@@ -62,7 +59,7 @@ const PRIORITY_ICON_MAP = {
 } as const;
 
 type ReminderProps = {
-  item: Item;
+  item: ReminderType;
   simplified?: boolean;
 };
 
@@ -132,7 +129,7 @@ const menuItems: (
       title: reminder.disabled ? "Activate" : "Deactivate",
       icon: reminder.disabled ? Reminders.path : ReminderOff.path,
       onClick: async () => {
-        await db.reminders?.add({
+        await db.reminders.add({
           id: reminder.id,
           disabled: !reminder.disabled
         });

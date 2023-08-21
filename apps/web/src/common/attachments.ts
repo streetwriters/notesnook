@@ -18,20 +18,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { lazify } from "../utils/lazify";
+import { Attachment } from "@notesnook/core";
 import { db } from "./db";
 
 async function download(hash: string) {
-  const attachment = db.attachments?.attachment(hash);
+  const attachment = db.attachments.attachment(hash);
   if (!attachment) return;
-  const downloadResult = await db.fs?.downloadFile(
-    attachment.metadata.hash,
-    attachment.metadata.hash,
-    attachment.chunkSize,
-    attachment.metadata
-  );
+  const downloadResult = await db
+    .fs()
+    .downloadFile(
+      attachment.metadata.hash,
+      attachment.metadata.hash,
+      attachment.chunkSize,
+      attachment.metadata
+    );
   if (!downloadResult) throw new Error("Failed to download file.");
 
-  const key = await db.attachments?.decryptKey(attachment.key);
+  const key = await db.attachments.decryptKey(attachment.key);
   if (!key) throw new Error("Invalid key for attachment.");
 
   return { key, attachment };
@@ -67,7 +70,7 @@ export async function downloadAttachment<
   const { attachment, key } = response;
 
   if (type === "base64" || type === "text")
-    return (await db.attachments?.read(hash, type)) as TOutputType;
+    return (await db.attachments.read(hash, type)) as TOutputType;
 
   const blob = await lazify(import("../interfaces/fs"), ({ default: FS }) =>
     FS.decryptFile(attachment.metadata.hash, {
@@ -84,7 +87,7 @@ export async function downloadAttachment<
 }
 
 export async function checkAttachment(hash: string) {
-  const attachment = db.attachments?.attachment(hash);
+  const attachment = db.attachments.attachment(hash);
   if (!attachment) return { failed: "Attachment not found." };
 
   try {
@@ -99,7 +102,7 @@ export async function checkAttachment(hash: string) {
 }
 
 const ABYTES = 17;
-export function getTotalSize(attachments: any[]) {
+export function getTotalSize(attachments: Attachment[]) {
   let size = 0;
   for (const attachment of attachments) {
     size += attachment.length + ABYTES;
