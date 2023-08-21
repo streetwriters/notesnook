@@ -40,7 +40,7 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState(
     groupArray(
       db.relations?.from(route.params.item, "note") || [],
-      db.settings?.getGroupOptions("notes")
+      db.settings.getGroupOptions("notes")
     )
   );
   const params = useRef<NotebookScreenParams>(route?.params);
@@ -86,7 +86,7 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
           params.current.item = notebook;
           const notes = db.relations?.from(notebook, "note");
           setNotes(
-            groupArray(notes || [], db.settings?.getGroupOptions("notes"))
+            groupArray(notes || [], db.settings.getGroupOptions("notes"))
           );
           syncWithNavigation();
         }

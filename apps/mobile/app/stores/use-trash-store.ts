@@ -35,7 +35,7 @@ export const useTrashStore = create<TrashStore>((set, get) => ({
       set({
         trash: groupArray(
           db?.trash?.all || [],
-          db.settings?.getGroupOptions("trash")
+          db.settings.getGroupOptions("trash")
         )
       });
       return;

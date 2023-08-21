@@ -64,7 +64,7 @@ const Actions = ({ attachment, setAttachments, fwdRef, close }) => {
       name: "Download",
       onPress: async () => {
         if (currentProgress) {
-          await db.fs.cancel(attachment.metadata.hash);
+          await db.fs().cancel(attachment.metadata.hash);
           useAttachmentStore.getState().remove(attachment.metadata.hash);
         }
         downloadAttachment(attachment.metadata.hash, false);
