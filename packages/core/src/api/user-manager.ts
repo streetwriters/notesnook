@@ -26,16 +26,18 @@ import { HealthCheck } from "./healthcheck";
 import Database from ".";
 import { Cipher, SerializedKey } from "@notesnook/crypto";
 
+export type AuthenticatorType = "app" | "sms" | "email";
 export type User = {
   id: string;
   email: string;
   isEmailConfirmed: boolean;
   salt: string;
   attachmentsKey?: Cipher;
+  marketingConsent?: boolean;
   mfa: {
     isEnabled: boolean;
-    primaryMethod: string;
-    secondaryMethod: string;
+    primaryMethod: AuthenticatorType;
+    secondaryMethod?: AuthenticatorType;
     remainingValidCodes: number;
   };
   subscription: {

@@ -18,13 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { isReminderActive } from "../collections/reminders";
-import { GroupHeader, GroupOptions, GroupableItem, Reminder } from "../types";
+import {
+  GroupedItems,
+  GroupOptions,
+  GroupableItem,
+  Item,
+  Reminder
+} from "../types";
 import { getWeekGroupFromTimestamp, MONTHS_FULL } from "./date";
 
 type EvaluateKeyFunction<T> = (item: T) => string;
-type GroupedItems<T> = (T | GroupHeader)[];
 
-const getSortValue = <T extends GroupableItem>(
+export const getSortValue = <T extends Item>(
   options: GroupOptions,
   item: T
 ) => {
@@ -121,11 +126,14 @@ export function groupArray<T extends GroupableItem>(
     }
     const groups: GroupedItems<T> = [];
     if (conflicted.length > 0)
-      groups.push({ title: "Conflicted", type: "header" }, ...conflicted);
+      groups.push(
+        { title: "Conflicted", type: "header", id: "conflicted" },
+        ...conflicted
+      );
     if (pinned.length > 0)
-      groups.push({ title: "Pinned", type: "header" }, ...pinned);
+      groups.push({ title: "Pinned", type: "header", id: "pinned" }, ...pinned);
     if (others.length > 0)
-      groups.push({ title: "All", type: "header" }, ...others);
+      groups.push({ title: "All", type: "header", id: "all" }, ...others);
     return groups;
   }
 
@@ -181,6 +189,7 @@ function flattenGroups<T extends GroupableItem>(groups: Map<string, T[]>) {
     if (groupItems.length <= 0) return;
     items.push({
       title: groupTitle,
+      id: groupTitle.toLowerCase(),
       type: "header"
     });
     groupItems.forEach((item) => items.push(item));
