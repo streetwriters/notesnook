@@ -36,7 +36,7 @@ export const useTagStore = create<TagStore>((set, get) => ({
       set({
         tags: groupArray(
           (db?.tags?.all as TagType[]) || [],
-          db.settings?.getGroupOptions("tags")
+          db.settings.getGroupOptions("tags")
         )
       });
       return;
