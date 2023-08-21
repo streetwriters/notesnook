@@ -23,7 +23,7 @@ import { test, expect } from "vitest";
 test("create vault", () =>
   databaseTest().then(async (db) => {
     await expect(db.vault.create("password")).resolves.toBe(true);
-    const vaultKey = await db.storage.read("vaultKey");
+    const vaultKey = await db.storage().read("vaultKey");
     expect(vaultKey).toBeDefined();
     expect(vaultKey.iv).toBeDefined();
     expect(vaultKey.cipher).toBeDefined();
