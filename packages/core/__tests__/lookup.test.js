@@ -67,7 +67,7 @@ test("search notebooks", () =>
 
 test("search topics", () =>
   notebookTest().then(async ({ db, id }) => {
-    const topics = db.notebooks.notebook(id).topics.all;
+    const topics = db.notebooks.topics(id).all;
     let filtered = db.lookup.topics(topics, "hello");
     expect(filtered).toHaveLength(1);
   }));

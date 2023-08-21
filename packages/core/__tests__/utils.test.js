@@ -32,6 +32,7 @@ test("group alphabetically", () => {
     sortDirection: "asc",
     sortBy: "title"
   }).filter((v) => !v.item);
+
   expect(
     sortedAlphabet.every((alpha, index) => {
       return ret[index].title === alpha.title.toUpperCase();

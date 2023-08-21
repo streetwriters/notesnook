@@ -27,9 +27,9 @@ import { test, expect } from "vitest";
 test("img src is empty after extract attachments", async () => {
   const tiptap = new Tiptap(IMG_CONTENT_WITHOUT_HASH);
   const result = await tiptap.extractAttachments(async () => {
-    return { key: "hello", metadata: { hash: "helloworld" } };
+    return "helloworld";
   });
-  expect(result.attachments).toHaveLength(1);
+  expect(result.hashes).toHaveLength(1);
   expect(result.data).not.toContain(`src="data:image/png;`);
   expect(result.data).not.toContain(`src=""`);
   expect(result.data).toContain(`data-hash="helloworld"`);

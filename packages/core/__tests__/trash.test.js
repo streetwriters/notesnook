@@ -46,7 +46,7 @@ test("permanently delete a note", () =>
     await db.trash.delete(db.trash.all[0].id);
     expect(db.trash.all).toHaveLength(0);
     const content = await db.content.raw(note.data.contentId);
-    expect(content.deleted).toBe(true);
+    expect(content).toBeUndefined();
 
     sessions = await db.noteHistory.get(noteId);
     expect(sessions).toHaveLength(0);
@@ -175,12 +175,14 @@ test("permanently delete items older than 7 days", () =>
     await db.notebooks.delete(notebookId);
     await db.notes.delete(noteId);
 
-    await db.notes._collection.updateItem({
+    await db.notes.collection.update({
+      type: "trash",
       id: noteId,
       dateDeleted: sevenDaysEarlier
     });
 
-    await db.notebooks._collection.updateItem({
+    await db.notebooks.collection.update({
+      type: "trash",
       id: notebookId,
       dateDeleted: sevenDaysEarlier
     });
@@ -228,7 +230,7 @@ test("clear trash should delete note content", () =>
     expect(db.trash.all).toHaveLength(0);
 
     const content = await db.content.raw(note.contentId);
-    expect(content.deleted).toBe(true);
+    expect(content).toBeUndefined();
 
     sessions = await db.noteHistory.get(note.id);
     expect(sessions).toHaveLength(0);

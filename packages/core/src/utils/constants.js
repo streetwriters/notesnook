@@ -25,7 +25,7 @@ function isProduction() {
   );
 }
 
-const hosts = {
+export const hosts = {
   API_HOST: isProduction()
     ? "https://api.notesnook.com"
     : "http://localhost:5264",

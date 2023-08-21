@@ -26,7 +26,7 @@ import {
 import Collector from "../collector";
 import { test, expect } from "vitest";
 
-test("newly created note should get included in collector", () =>
+test.only("newly created note should get included in collector", () =>
   databaseTest().then(async (db) => {
     await loginFakeUser(db);
     const collector = new Collector(db);

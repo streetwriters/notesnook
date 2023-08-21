@@ -20,7 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "isomorphic-fetch";
 import dotenv from "dotenv";
 import { DOMParser } from "linkedom";
+import WebSocket from "ws";
 
 globalThis.DOMParser = DOMParser;
+globalThis.WebSocket = WebSocket;
 require("abortcontroller-polyfill/dist/polyfill-patch-fetch");
 dotenv.config();
