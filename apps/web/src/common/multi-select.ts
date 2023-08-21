@@ -58,7 +58,6 @@ async function moveNotesToTrash(notes: Item[], confirm = true) {
 }
 
 async function moveNotebooksToTrash(notebooks: Item[]) {
-  const item = notebooks[0];
   const isMultiselect = notebooks.length > 1;
   if (isMultiselect) {
     if (!(await showMultiDeleteConfirmation(notebooks.length))) return;
@@ -89,9 +88,7 @@ async function deleteTopics(notebookId: string, topics: Item[]) {
       report({
         text: `Deleting ${pluralize(topics.length, "topic")}...`
       });
-      await db.notebooks
-        ?.notebook(notebookId)
-        .topics.delete(...topics.map((t) => t.id));
+      await db.notebooks.topics(notebookId).delete(...topics.map((t) => t.id));
       notebookStore.setSelectedNotebook(notebookId);
       noteStore.refresh();
     }

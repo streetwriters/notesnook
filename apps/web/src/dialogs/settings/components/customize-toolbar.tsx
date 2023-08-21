@@ -89,7 +89,7 @@ export function CustomizeToolbar() {
     (async () => {
       const tools = unflatten(items).slice(0, -1);
 
-      await db.settings?.setToolbarConfig("desktop", {
+      await db.settings.setToolbarConfig("desktop", {
         preset: currentPreset.id,
         config: currentPreset.id === "custom" ? tools : undefined
       });

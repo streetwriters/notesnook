@@ -74,7 +74,7 @@ const routes = defineRoutes({
       }
     }),
   "/notebooks/:notebookId": ({ notebookId }) => {
-    const notebook = db.notebooks?.notebook(notebookId);
+    const notebook = db.notebooks.notebook(notebookId);
     if (!notebook) return false;
     nbstore.setSelectedNotebook(notebookId);
     notestore.setContext({
@@ -99,7 +99,7 @@ const routes = defineRoutes({
     });
   },
   "/notebooks/:notebookId/:topicId": ({ notebookId, topicId }) => {
-    const notebook = db.notebooks?.notebook(notebookId);
+    const notebook = db.notebooks.notebook(notebookId);
     const topic = notebook?.topics?.topic(topicId)?._topic;
     if (!topic) return false;
     nbstore.setSelectedNotebook(notebookId);
@@ -178,11 +178,10 @@ const routes = defineRoutes({
       }
     }),
   "/tags/:tagId": ({ tagId }) => {
-    const tag = db.tags?.tag(tagId);
+    const tag = db.tags.tag(tagId);
     if (!tag) return false;
-    const { id } = tag;
+    const { id, title } = tag;
     notestore.setContext({ type: "tag", value: id });
-    const title = db.tags?.alias(id);
     return defineRoute({
       key: "notes",
       type: "notes",
@@ -201,13 +200,12 @@ const routes = defineRoutes({
     });
   },
   "/colors/:colorId": ({ colorId }) => {
-    const color = db.colors?.tag(colorId);
+    const color = db.colors.color(colorId);
     if (!color) {
       navigate("/");
       return false;
     }
-    const { id } = color;
-    const title = db.colors?.alias(id);
+    const { id, title } = color;
     notestore.setContext({ type: "color", value: id });
     return defineRoute({
       key: "notes",

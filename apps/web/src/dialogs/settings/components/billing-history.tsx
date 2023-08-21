@@ -22,35 +22,12 @@ import { Loading } from "../../../components/icons";
 import { Box, Flex, Link, Text } from "@theme-ui/components";
 import { getFormattedDate } from "@notesnook/common";
 import { db } from "../../../common/db";
+import {
+  Transaction,
+  TransactionStatus
+} from "@notesnook/core/dist/api/subscriptions";
 
-type Transaction = {
-  order_id: string;
-  checkout_id: string;
-  amount: string;
-  currency: string;
-  status: keyof typeof TransactionStatusToText;
-  created_at: string;
-  passthrough: null;
-  product_id: number;
-  is_subscription: boolean;
-  is_one_off: boolean;
-  subscription: Subscription;
-  user: User;
-  receipt_url: string;
-};
-
-type Subscription = {
-  subscription_id: number;
-  status: string;
-};
-
-type User = {
-  user_id: number;
-  email: string;
-  marketing_consent: boolean;
-};
-
-const TransactionStatusToText = {
+const TransactionStatusToText: Record<TransactionStatus, string> = {
   completed: "Completed",
   refunded: "Refunded",
   partially_refunded: "Partially refunded",
@@ -68,7 +45,7 @@ export function BillingHistory() {
         setError(undefined);
         setIsLoading(true);
 
-        const transactions = await db.subscriptions?.transactions();
+        const transactions = await db.subscriptions.transactions();
         if (!transactions) return;
         setTransactions(transactions);
       } catch (e) {

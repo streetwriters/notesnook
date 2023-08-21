@@ -55,11 +55,21 @@ import { Lightbox } from "../lightbox";
 import { Allotment } from "allotment";
 import { showToast } from "../../utils/toast";
 import { getFormattedDate } from "@notesnook/common";
+import {
+  ContentType,
+  Item,
+  MaybeDeletedItem,
+  isDeleted
+} from "@notesnook/core/dist/types";
+import {
+  isEncryptedContent,
+  isUnencryptedContent
+} from "@notesnook/core/dist/collections/content";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
 type PreviewSession = {
-  content: { data: string; type: string };
+  content: { data: string; type: ContentType };
   dateCreated: number;
   dateEdited: number;
 };
@@ -117,9 +127,11 @@ export default function EditorManager({
   useEffect(() => {
     const event = db.eventManager.subscribe(
       EVENTS.syncItemMerged,
-      async (item?: Record<string, string | number>) => {
+      async (item?: MaybeDeletedItem<Item>) => {
         if (
           !item ||
+          isDeleted(item) ||
+          (item.type !== "tiptap" && item.type !== "note") ||
           lastSavedTime.current >= (item.dateEdited as number) ||
           isPreviewSession ||
           !appstore.get().isRealtimeSyncEnabled
@@ -130,10 +142,13 @@ export default function EditorManager({
         const isContent = item.type === "tiptap" && item.id === contentId;
         const isNote = item.type === "note" && item.id === id;
 
-        if (isContent && editorInstance.current) {
-          if (locked) {
-            const result = await db.vault?.decryptContent(item).catch(() => {});
-            if (result) item.data = result.data;
+        if (id && isContent && editorInstance.current) {
+          let content: string | null = null;
+          if (locked && isEncryptedContent(item)) {
+            const result = await db.vault
+              .decryptContent(item)
+              .catch(() => undefined);
+            if (result) content = result.data;
             else EV.publish(EVENTS.vaultLocked);
           }
           editorInstance.current.updateContent(item.data as string);
@@ -210,7 +225,7 @@ export default function EditorManager({
               id={noteId}
               nonce={timestamp}
               content={() =>
-                previewSession.current?.content?.data ||
+                previewSession.current?.content.data ||
                 editorstore.get().session?.content?.data
               }
               onPreviewDocument={(url) => setDocPreview(url)}
@@ -378,7 +393,7 @@ export function Editor(props: EditorProps) {
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
         onPreviewAttachment={async (data) => {
           const { hash } = data;
-          const attachment = db.attachments?.attachment(hash);
+          const attachment = db.attachments.attachment(hash);
           if (attachment && attachment.metadata.type.startsWith("image/")) {
             const container = document.getElementById("dialogContainer");
             if (!(container instanceof HTMLElement)) return;
