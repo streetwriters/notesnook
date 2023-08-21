@@ -26,7 +26,8 @@ import {
   GroupingKey,
   SettingsItem,
   ToolbarConfig,
-  TrashCleanupInterval
+  TrashCleanupInterval,
+  isDeleted
 } from "../types";
 import { ICollection } from "./collection";
 import { TimeFormat } from "../utils/date";
@@ -58,18 +59,25 @@ class Settings implements ICollection {
 
   async merge(remoteItem: SettingsItem, lastSynced: number) {
     if (this.settings.dateModified > lastSynced) {
-      this.settings.id = remoteItem.id;
-      this.settings.groupOptions = {
-        ...this.settings.groupOptions,
-        ...remoteItem.groupOptions
-      };
-      this.settings.toolbarConfig = {
-        ...this.settings.toolbarConfig,
-        ...remoteItem.toolbarConfig
-      };
-      this.settings.aliases = {
-        ...this.settings.aliases,
-        ...remoteItem.aliases
+      this.settings = {
+        ...this.settings,
+        ...(isDeleted(remoteItem)
+          ? {}
+          : {
+              ...remoteItem,
+              groupOptions: {
+                ...this.settings.groupOptions,
+                ...remoteItem.groupOptions
+              },
+              toolbarConfig: {
+                ...this.settings.toolbarConfig,
+                ...remoteItem.toolbarConfig
+              },
+              aliases: {
+                ...this.settings.aliases,
+                ...remoteItem.aliases
+              }
+            })
       };
       this.settings.dateModified = Date.now();
     } else {
