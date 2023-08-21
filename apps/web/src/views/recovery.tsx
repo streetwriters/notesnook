@@ -31,6 +31,7 @@ import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { EVENTS } from "@notesnook/core/dist/common";
 import { ErrorText } from "../components/error-text";
+import { User } from "@notesnook/core/dist/api/user-manager";
 
 type RecoveryMethodType = "key" | "backup" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;
@@ -131,14 +132,14 @@ function useAuthenticateUser({
       try {
         await db.init();
 
-        const accessToken = await db.user?.tokenManager.getAccessToken();
+        const accessToken = await db.tokenManager.getAccessToken();
         if (!accessToken) {
-          await db.user?.tokenManager.getAccessTokenFromAuthorizationCode(
+          await db.tokenManager.getAccessTokenFromAuthorizationCode(
             userId,
             code.replace(/ /gm, "+")
           );
         }
-        const user = await db.user?.fetchUser();
+        const user = await db.user.fetchUser();
         setUser(user);
       } catch (e) {
         showToast("error", "Failed to authenticate. Please try again.");
@@ -355,9 +356,9 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       onSubmit={async (form) => {
         setProgress(0);
 
-        const user = await db.user?.getUser();
+        const user = await db.user.getUser();
         if (!user) throw new Error("User not authenticated");
-        await db.storage?.write(`_uk_@${user.email}@_k`, form.recoveryKey);
+        await db.storage().write(`_uk_@${user.email}@_k`, form.recoveryKey);
         await db.sync(true, true);
         navigate("backup");
       }}
@@ -499,10 +500,10 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
         if (form.password !== form.confirmPassword)
           throw new Error("Passwords do not match.");
 
-        if (formData?.userResetRequired && !(await db.user?.resetUser()))
+        if (formData?.userResetRequired && !(await db.user.resetUser()))
           throw new Error("Failed to reset user.");
 
-        if (!(await db.user?.resetPassword(form.password)))
+        if (!(await db.user.resetPassword(form.password)))
           throw new Error("Could not reset account password.");
 
         if (formData?.backupFile) {
@@ -543,8 +544,8 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
     async function finalize() {
       await showRecoveryKeyDialog();
       if (!isSessionExpired()) {
-        await db.user?.logout(true, "Password changed.");
-        await db.user?.clearSessions(true);
+        await db.user.logout(true, "Password changed.");
+        await db.user.clearSessions(true);
       }
       setIsReady(true);
     }

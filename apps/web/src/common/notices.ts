@@ -76,9 +76,9 @@ export async function shouldAddBackupNotice() {
   const backupInterval = Config.get("backupReminderOffset", 0);
   if (!backupInterval) return false;
 
-  const lastBackupTime = await db.backup?.lastBackupTime();
+  const lastBackupTime = await db.backup.lastBackupTime();
   if (!lastBackupTime) {
-    await db.backup?.updateBackupTime();
+    await db.backup.updateBackupTime();
     return false;
   }
 
@@ -96,13 +96,13 @@ export async function shouldAddRecoveryKeyBackupNotice() {
 }
 
 export async function shouldAddLoginNotice() {
-  const user = await db.user?.getUser();
+  const user = await db.user.getUser();
   if (!user) return true;
 }
 
 export async function shouldAddConfirmEmailNotice() {
-  const user = await db.user?.getUser();
-  return !user?.isEmailConfirmed;
+  const user = await db.user.getUser();
+  return !user || user.isEmailConfirmed;
 }
 
 type NoticeData = {
@@ -187,7 +187,7 @@ async function saveBackup() {
         {
           text: "Later",
           onClick: async () => {
-            await db.backup?.updateBackupTime();
+            await db.backup.updateBackupTime();
             openedToast?.hide();
             openedToast = null;
           },

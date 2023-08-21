@@ -153,10 +153,17 @@ class NoteStore extends BaseStore {
     try {
       let note = db.notes.note(id);
       if (!note) return;
-      if (note.data.color === color) await db.notes.note(id).uncolor();
-      else await db.notes.note(id).color(color);
+      const colorId =
+        db.tags.find(color)?.id || (await db.colors.add({ title: color }));
+      const isColored =
+        db.relations.from({ type: "color", id: colorId }, "note").length > 0;
+
+      if (isColored)
+        await db.relations.unlink({ type: "color", id: colorId }, note._note);
+      else await db.relations.add({ type: "color", id: colorId }, note._note);
+
       appStore.refreshNavItems();
-      this._syncEditor(note.id, "color", db.notes.note(id).data.color);
+      this._syncEditor(note.id, "color", color);
       this.refreshItem(id);
     } catch (e) {
       console.error(e);
@@ -190,15 +197,15 @@ function notesFromContext(context) {
   let notes = [];
   switch (context.type) {
     case "tag":
-      notes = db.notes.tagged(context.value);
-      break;
     case "color":
-      notes = db.notes.colored(context.value);
+      notes = db.relations
+        .from({ type: context.type, id: context.value }, "note")
+        .resolved();
       break;
     case "notebook": {
       const notebook = db.notebooks.notebook(context?.value?.id);
       if (!notebook) break;
-      notes = db.relations.from(notebook.data, "note");
+      notes = db.relations.from(notebook.data, "note").resolved();
       break;
     }
     case "topic": {

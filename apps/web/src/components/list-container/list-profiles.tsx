@@ -25,76 +25,71 @@ import TrashItem from "../trash-item";
 import { db } from "../../common/db";
 import { getTotalNotes } from "@notesnook/common";
 import Reminder from "../reminder";
-import { useMemo } from "react";
+import { ReferencesWithDateEdited, Reference, Context } from "./types";
 import {
-  ReferencesWithDateEdited,
-  ItemWrapper,
+  GroupingKey,
   Item,
-  NotebookReference,
-  NotebookType,
-  Reference
-} from "./types";
+  NotebookReference
+} from "@notesnook/core/dist/types";
+import { getSortValue } from "@notesnook/core/dist/utils/grouping";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
   (document.getElementById("p")?.clientHeight || 16) - 1;
 export const DEFAULT_ITEM_HEIGHT = SINGLE_LINE_HEIGHT * 2 * DEFAULT_LINE_HEIGHT;
 
-const NotesProfile: ItemWrapper = ({ item, type, context, compact }) => {
-  const references = useMemo(
-    () => getReferences(item.id, item.notebooks as Item[], context?.type),
-    [item, context]
-  );
-
-  return (
-    <Note
-      compact={compact}
-      item={item}
-      tags={getTags(item)}
-      references={references}
-      reminder={getReminder(item.id)}
-      date={getDate(item, type)}
-      context={context}
-    />
-  );
+type ListItemWrapperProps<TItem = Item> = {
+  group?: GroupingKey;
+  item: TItem;
+  context?: Context;
+  compact?: boolean;
 };
+export function ListItemWrapper(props: ListItemWrapperProps) {
+  const { item, group, compact, context } = props;
+  const { type } = item;
 
-const NotebooksProfile: ItemWrapper = ({ item, type }) => (
-  <Notebook
-    item={item}
-    totalNotes={getTotalNotes(item)}
-    date={getDate(item, type)}
-  />
-);
-
-const TrashProfile: ItemWrapper = ({ item, type }) => (
-  <TrashItem item={item} date={getDate(item, type)} />
-);
-
-export const ListProfiles = {
-  home: NotesProfile,
-  notebooks: NotebooksProfile,
-  notes: NotesProfile,
-  reminders: Reminder,
-  tags: Tag,
-  topics: Topic,
-  trash: TrashProfile
-} as const;
-
-function getTags(item: Item) {
-  let tags = item.tags as Item[];
-  if (tags)
-    tags = tags.slice(0, 3).reduce((prev, curr) => {
-      const tag = db.tags?.tag(curr);
-      if (tag) prev.push(tag);
-      return prev;
-    }, [] as Item[]);
-  return tags || [];
+  switch (type) {
+    case "note": {
+      const tags = db.relations.to(item, "tag").resolved(3) || [];
+      const color = db.relations.to(item, "color").resolved(1)?.[0];
+      const references = getReferences(item.id, item.notebooks, context?.type);
+      return (
+        <Note
+          compact={compact}
+          item={item}
+          tags={tags}
+          color={color}
+          references={references}
+          reminder={getReminder(item.id)}
+          date={getDate(item, group)}
+          context={context}
+        />
+      );
+    }
+    case "notebook":
+      return (
+        <Notebook
+          item={item}
+          totalNotes={getTotalNotes(item)}
+          date={getDate(item, group)}
+        />
+      );
+    case "trash":
+      return <TrashItem item={item} date={getDate(item, type)} />;
+    case "reminder":
+      return <Reminder item={item} />;
+    case "topic":
+      return <Topic item={item} />;
+    case "tag":
+      return <Tag item={item} />;
+    default:
+      return null;
+  }
 }
 
 function getReferences(
   noteId: string,
-  notebooks: Item[],
+  notebooks?: NotebookReference[],
   contextType?: string
 ): ReferencesWithDateEdited | undefined {
   if (["topic", "notebook"].includes(contextType || "")) return;
@@ -104,12 +99,13 @@ function getReferences(
 
   db.relations
     ?.to({ id: noteId, type: "note" }, "notebook")
-    ?.forEach((notebook: any) => {
+    ?.resolved()
+    .forEach((notebook) => {
       references.push({
         type: "notebook",
         url: `/notebooks/${notebook.id}`,
         title: notebook.title
-      } as Reference);
+      });
 
       if (latestDateEdited < notebook.dateEdited)
         latestDateEdited = notebook.dateEdited;
@@ -117,10 +113,10 @@ function getReferences(
 
   notebooks?.forEach((curr) => {
     const topicId = (curr as NotebookReference).topics[0];
-    const notebook = db.notebooks?.notebook(curr.id)?.data as NotebookType;
+    const notebook = db.notebooks.notebook(curr.id)?.data;
     if (!notebook) return;
 
-    const topic = notebook.topics.find((t: Item) => t.id === topicId);
+    const topic = notebook.topics.find((t) => t.id === topicId);
     if (!topic) return;
 
     references.push({
@@ -136,21 +132,20 @@ function getReferences(
 }
 
 function getReminder(noteId: string) {
-  return db.relations?.from({ id: noteId, type: "note" }, "reminder")[0];
+  return db.relations
+    ?.from({ id: noteId, type: "note" }, "reminder")
+    .resolved(1)[0];
 }
 
-function getDate(item: Item, groupType: keyof typeof ListProfiles): number {
-  const sortBy = db.settings?.getGroupOptions(groupType).sortBy;
-  switch (sortBy) {
-    case "dateEdited":
-      return item.dateEdited;
-    case "dateCreated":
-      return item.dateCreated;
-    case "dateModified":
-      return item.dateModified;
-    case "dateDeleted":
-      return item.dateDeleted;
-    default:
-      return item.dateCreated;
-  }
+function getDate(item: Item, groupType?: GroupingKey): number {
+  return getSortValue(
+    groupType
+      ? db.settings.getGroupOptions(groupType)
+      : {
+          groupBy: "default",
+          sortBy: "dateEdited",
+          sortDirection: "desc"
+        },
+    item
+  );
 }

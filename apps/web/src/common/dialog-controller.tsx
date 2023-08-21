@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ReactDOM from "react-dom";
 import { Dialogs } from "../dialogs";
-import qclone from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as tagStore } from "../stores/tag-store";
 import { store as appStore } from "../stores/app-store";
@@ -28,18 +27,19 @@ import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
 import { Text } from "@theme-ui/components";
-import { Topic } from "../components/icons";
+import { Topic as TopicIcon } from "../components/icons";
 import Config from "../utils/config";
 import { AppVersion, getChangelog } from "../utils/version";
 import { Period } from "../dialogs/buy-dialog/types";
 import { FeatureKeys } from "../dialogs/feature-dialog";
-import { AuthenticatorType } from "../dialogs/mfa/types";
 import { Suspense } from "react";
-import { Reminder } from "@notesnook/core/dist/collections/reminders";
 import { ConfirmDialogProps } from "../dialogs/confirm";
 import { getFormattedDate } from "@notesnook/common";
 import { downloadUpdate } from "../utils/updater";
 import { ThemeMetadata } from "@notesnook/themes-server";
+import { clone } from "@notesnook/core/dist/utils/clone";
+import { Notebook, Reminder } from "@notesnook/core/dist/types";
+import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -87,7 +87,7 @@ export function closeOpenedDialog() {
 
 export function showAddTagsDialog(noteIds: string[]) {
   return showDialog("AddTagsDialog", (Dialog, perform) => (
-    <Dialog onClose={(res) => perform(res)} noteIds={noteIds} />
+    <Dialog onClose={(res: any) => perform(res)} noteIds={noteIds} />
   ));
 }
 
@@ -97,7 +97,7 @@ export function showAddNotebookDialog() {
       isOpen={true}
       onDone={async (nb: Record<string, unknown>) => {
         // add the notebook to db
-        const notebook = await db.notebooks?.add({ ...nb });
+        const notebook = await db.notebooks.add({ ...nb });
         if (!notebook) return perform(false);
 
         notebookStore.refresh();
@@ -113,23 +113,23 @@ export function showAddNotebookDialog() {
 }
 
 export function showEditNotebookDialog(notebookId: string) {
-  const notebook = db.notebooks?.notebook(notebookId)?.data;
+  const notebook = db.notebooks.notebook(notebookId)?.data;
   if (!notebook) return;
   return showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog
       isOpen={true}
       notebook={notebook}
       edit={true}
-      onDone={async (nb: Record<string, unknown>, deletedTopics: string[]) => {
+      onDone={async (nb: Notebook, deletedTopics: string[]) => {
         // we remove the topics from notebook
         // beforehand so we can add them manually, later
-        const topics = qclone(nb.topics);
+        const topics = clone(nb.topics);
         nb.topics = [];
 
-        const notebookId = await db.notebooks?.add(nb);
+        const notebookId = await db.notebooks.add(nb);
 
         // add or delete topics as required
-        const notebookTopics = db.notebooks?.notebook(notebookId).topics;
+        const notebookTopics = notebookId && db.notebooks.topics(notebookId);
         if (notebookTopics) {
           await notebookTopics.add(...topics);
           await notebookTopics.delete(...deletedTopics);
@@ -200,7 +200,7 @@ export function showMultiDeleteConfirmation(length: number) {
   return confirm({
     title: `Delete ${length} items?`,
     message: `These items will be **kept in your Trash for ${
-      db.settings?.getTrashCleanupInterval() || 7
+      db.settings.getTrashCleanupInterval() || 7
     } days** after which they will be permanently deleted.`,
     positiveButtonText: "Yes",
     negativeButtonText: "No"
@@ -481,7 +481,7 @@ export function showCreateTopicDialog() {
         if (!topic) return;
         const notebook = notebookStore.get().selectedNotebook;
         if (!notebook) return;
-        await db.notebooks?.notebook(notebook.id).topics.add(topic);
+        await db.notebooks.topics(notebook.id).add(topic);
         notebookStore.setSelectedNotebook(notebook.id);
         showToast("success", "Topic created!");
         perform(true);
@@ -491,21 +491,19 @@ export function showCreateTopicDialog() {
 }
 
 export function showEditTopicDialog(notebookId: string, topicId: string) {
-  const topic = db.notebooks?.notebook(notebookId)?.topics?.topic(topicId)
-    ?._topic as Record<string, unknown> | undefined;
+  const topic = db.notebooks.topics(notebookId).topic(topicId)?._topic;
   if (!topic) return;
+
   return showDialog("ItemDialog", (Dialog, perform) => (
     <Dialog
       title={"Edit topic"}
       subtitle={`You are editing "${topic.title}" topic.`}
       defaultValue={topic.title}
-      icon={Topic}
+      icon={TopicIcon}
       item={topic}
       onClose={() => perform(false)}
       onAction={async (t: string) => {
-        await db.notebooks
-          ?.notebook(topic.notebookId as string)
-          .topics.add({ ...topic, title: t });
+        await db.notebooks.topics(topic.notebookId).add({ ...topic, title: t });
         notebookStore.setSelectedNotebook(topic.notebookId);
         appStore.refreshNavItems();
         showToast("success", "Topic edited!");
@@ -526,7 +524,7 @@ export function showCreateTagDialog() {
       onAction={async (title: string) => {
         if (!title) return showToast("error", "Tag title cannot be empty.");
         try {
-          await db.tags?.add(title);
+          await db.tags.add({ title });
           showToast("success", "Tag created!");
           tagStore.refresh();
           perform(true);
@@ -539,18 +537,18 @@ export function showCreateTagDialog() {
 }
 
 export function showEditTagDialog(tagId: string) {
-  const tag = db.tags?.tag(tagId);
+  const tag = db.tags.tag(tagId);
   if (!tag) return;
   return showDialog("ItemDialog", (Dialog, perform) => (
     <Dialog
       title={"Edit tag"}
-      subtitle={`You are editing #${db.tags?.alias(tag.id)}.`}
-      defaultValue={db.tags?.alias(tag.id)}
+      subtitle={`You are editing #${tag.title}.`}
+      defaultValue={tag.title}
       item={tag}
       onClose={() => perform(false)}
       onAction={async (title: string) => {
         if (!title) return;
-        await db.tags?.rename(tagId, title);
+        await db.tags.add({ id: tagId, title });
         showToast("success", "Tag edited!");
         tagStore.refresh();
         editorStore.refreshTags();
@@ -563,18 +561,18 @@ export function showEditTagDialog(tagId: string) {
 }
 
 export function showRenameColorDialog(colorId: string) {
-  const color = db.colors?.tag(colorId);
+  const color = db.colors.color(colorId);
   if (!color) return;
   return showDialog("ItemDialog", (Dialog, perform) => (
     <Dialog
       title={"Rename color"}
-      subtitle={`You are renaming color ${db.colors?.alias(color.id)}.`}
+      subtitle={`You are renaming color ${color.title}.`}
       item={color}
-      defaultValue={db.colors?.alias(color.id)}
+      defaultValue={color.title}
       onClose={() => perform(false)}
       onAction={async (title: string) => {
         if (!title) return;
-        await db.colors?.rename(colorId, title);
+        await db.tags.add({ id: colorId, title });
         showToast("success", "Color renamed!");
         appStore.refreshNavItems();
         perform(true);

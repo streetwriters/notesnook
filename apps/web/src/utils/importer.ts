@@ -18,24 +18,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { db } from "../common/db";
+
 import type { Note, Notebook } from "@notesnook-importer/core";
 import {
   ATTACHMENTS_DIRECTORY_NAME,
   NOTE_DATA_FILENAME
 } from "@notesnook-importer/core/dist/src/utils/note-stream";
-import { Cipher } from "@notesnook/crypto/dist/src/types";
+import { SerializedKey } from "@notesnook/crypto/dist/src/types";
 import { Reader, Entry } from "./zip-reader";
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
+import { FileEncryptionMetadata } from "@notesnook/core/dist/interfaces";
 
 export async function* importFiles(zipFiles: File[]) {
-  const { default: FS } = await import("../interfaces/fs");
+  const { hashBuffer, writeEncryptedFile } = await import("../interfaces/fs");
   for (const zip of zipFiles) {
     let count = 0;
     let filesRead = 0;
 
     const attachments: Record<
       string,
-      Omit<Cipher, "cipher" | "format"> & { key: any; chunkSize: number }
+      FileEncryptionMetadata & {
+        key: SerializedKey;
+      }
     > = {};
     const { read, totalFiles } = await Reader(zip);
 
@@ -49,11 +53,10 @@ export async function* importFiles(zipFiles: File[]) {
 
       if (isAttachment) {
         const name = path.basename(entry.name);
-        if (!name || attachments[name] || db.attachments?.exists(name))
-          continue;
+        if (!name || attachments[name] || db.attachments.exists(name)) continue;
 
         const data = await entry.arrayBuffer();
-        const { hash } = await FS.hashBuffer(new Uint8Array(data));
+        const { hash } = await hashBuffer(new Uint8Array(data));
         if (hash !== name) {
           throw new Error(`integrity check failed: ${name} !== ${hash}`);
         }
@@ -61,21 +64,23 @@ export async function* importFiles(zipFiles: File[]) {
         const file = new File([data], name, {
           type: "application/octet-stream"
         });
-        const key = await db.attachments?.generateKey();
-        const cipherData = await FS.writeEncryptedFile(file, key, name);
+        const key = await db.attachments.generateKey();
+        const cipherData = await writeEncryptedFile(file, key, name);
         attachments[name] = { ...cipherData, key };
       } else if (isNote) {
         const note = await fileToJson<Note>(entry);
         for (const attachment of note.attachments || []) {
           const cipherData = attachments[attachment.hash];
-          if (!cipherData || db.attachments?.exists(attachment.hash)) continue;
+          if (!cipherData || db.attachments.exists(attachment.hash)) continue;
 
-          await db.attachments?.add({
+          await db.attachments.add({
             ...cipherData,
-            hash: attachment.hash,
-            hashType: attachment.hashType,
-            filename: attachment.filename,
-            type: attachment.mime
+            metadata: {
+              hash: attachment.hash,
+              hashType: attachment.hashType,
+              filename: attachment.filename,
+              type: attachment.mime
+            }
           });
         }
         await importNote(note);
@@ -98,12 +103,17 @@ async function importNote(note: Note) {
 
   const notebooks = note.notebooks?.slice() || [];
   note.notebooks = [];
-  const noteId = await db.notes?.add(note);
+  const noteId = await db.notes.add({
+    ...note,
+    content: { type: "tiptap", data: note.content?.data },
+    notebooks: []
+  });
+  if (!noteId) return;
 
   for (const nb of notebooks) {
     const notebook = await importNotebook(nb);
     if (!notebook.id) continue;
-    await db.notes?.addToNotebook(
+    await db.notes.addToNotebook(
       { id: notebook.id, topic: notebook.topic },
       noteId
     );
@@ -120,15 +130,16 @@ async function importNotebook(
 ): Promise<{ id?: string; topic?: string }> {
   if (!notebook) return {};
 
-  let nb = db.notebooks?.all.find((nb) => nb.title === notebook.notebook);
+  let nb = db.notebooks.all.find((nb) => nb.title === notebook.notebook);
   if (!nb) {
-    const nbId = await db.notebooks?.add({
-      title: notebook.notebook,
-      topics: notebook.topic ? [notebook.topic] : []
+    const nbId = await db.notebooks.add({
+      title: notebook.notebook
     });
-    nb = db.notebooks?.notebook(nbId).data;
+    if (!nbId) return {};
+    db.notebooks.topics(nbId).add({ title: notebook.topic });
+    nb = db.notebooks.notebook(nbId)?.data;
   }
-  const topic = nb?.topics.find((t: any) => t.title === notebook.topic);
+  const topic = nb?.topics.find((t) => t.title === notebook.topic);
 
   return { id: nb ? nb.id : undefined, topic: topic ? topic.id : undefined };
 }

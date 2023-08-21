@@ -40,7 +40,7 @@ function Unlock(props: UnlockProps) {
   const passwordRef = useRef<HTMLInputElement>();
 
   const note = useMemo(
-    () => !isLoading && db.notes?.note(noteId)?.data,
+    () => (!isLoading ? db.notes.note(noteId)?.data : undefined),
     [noteId, isLoading]
   );
   const openLockedSession = useEditorStore((store) => store.openLockedSession);
@@ -53,7 +53,7 @@ function Unlock(props: UnlockProps) {
     const password = passwordRef.current.value;
     try {
       if (!password) return;
-      const note = await db.vault?.open(noteId, password);
+      const note = await db.vault.open(noteId, password);
       openLockedSession(note);
     } catch (e) {
       if (

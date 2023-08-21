@@ -49,7 +49,7 @@ export default function EmailChangeDialog(props: EmailChangeDialogProps) {
     async (emailChangeState: EmailChangeState) => {
       setIsSending(true);
       try {
-        await db.user?.sendVerificationEmail(emailChangeState.newEmail);
+        await db.user.sendVerificationEmail(emailChangeState.newEmail);
 
         setEnabled(false);
       } catch (e) {
@@ -98,7 +98,7 @@ export default function EmailChangeDialog(props: EmailChangeDialogProps) {
                 return;
               }
 
-              await db.user?.changeEmail(
+              await db.user.changeEmail(
                 emailChangeState.newEmail,
                 emailChangeState.password,
                 code
@@ -109,12 +109,12 @@ export default function EmailChangeDialog(props: EmailChangeDialogProps) {
 
             if (!newEmail.trim() || !password.trim()) return;
 
-            if (!password || !(await db.user?.verifyPassword(password))) {
+            if (!password || !(await db.user.verifyPassword(password))) {
               setError("Password is not correct.");
               return;
             }
 
-            await db.user?.sendVerificationEmail(newEmail);
+            await db.user.sendVerificationEmail(newEmail);
             setEmailChangeState({ newEmail, password });
           } catch (e) {
             if (e instanceof Error) setError(e.message);

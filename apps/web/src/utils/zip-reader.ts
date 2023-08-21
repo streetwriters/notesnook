@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Inflate } from "fflate";
 
-const ERR_BAD_FORMAT = "File format is not recognized.";
+const ERR_BAD_FORMAT = "Invalid or incomplete zip archive.";
 const ZIP_COMMENT_MAX = 65536;
 const EOCDR_MIN = 22;
 const EOCDR_MAX = EOCDR_MIN + ZIP_COMMENT_MAX;
@@ -42,7 +42,7 @@ export class Entry {
   private _extraFields: Record<string, DataView>;
   constructor(dataView: DataView, fileLike: File) {
     if (dataView.getUint32(0) !== 0x504b0102) {
-      throw new Error("ERR_BAD_FORMAT");
+      throw new Error(ERR_BAD_FORMAT);
     }
 
     const dv = dataView;
