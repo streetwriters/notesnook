@@ -48,8 +48,7 @@ function Home() {
 
   return (
     <ListContainer
-      type="home"
-      groupingKey="home"
+      group="home"
       compact={isCompact}
       refresh={refresh}
       items={notes}

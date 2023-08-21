@@ -32,7 +32,11 @@ function Notes() {
   const isCompact = useNotesStore((store) => store.viewMode === "compact");
 
   useEffect(() => {
-    if (context?.type === "color" && context?.notes?.length <= 0) {
+    if (
+      context?.type === "color" &&
+      context.notes &&
+      context.notes.length <= 0
+    ) {
       navigate("/", true);
     }
   }, [context]);
@@ -40,12 +44,15 @@ function Notes() {
   if (!context) return null;
   return (
     <ListContainer
-      type="notes"
-      groupingKey={type}
+      group={type}
       refresh={refreshContext}
       compact={isCompact}
       context={{ ...context, notes: undefined }}
-      items={groupArray(context.notes, db.settings?.getGroupOptions(type))}
+      items={
+        context.notes
+          ? groupArray(context.notes, db.settings.getGroupOptions(type))
+          : []
+      }
       placeholder={
         <Placeholder
           context={

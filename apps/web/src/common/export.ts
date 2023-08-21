@@ -24,8 +24,12 @@ import { createWriteStream } from "../utils/stream-saver";
 import { showToast } from "../utils/toast";
 import Vault from "./vault";
 import { db } from "./db";
-import Note from "@notesnook/core/dist/models/note";
 import { sanitizeFilename } from "@notesnook/common";
+import { Note, isDeleted } from "@notesnook/core/dist/types";
+import {
+  isEncryptedContent,
+  isUnencryptedContent
+} from "@notesnook/core/dist/collections/content";
 
 export async function exportToPDF(
   title: string,
@@ -113,7 +117,7 @@ function createNoteStream(noteIds: string[]) {
     async pull(controller) {
       const noteId = noteIds[i++];
       if (!noteId) controller.close();
-      else controller.enqueue(db.notes?.note(noteId));
+      else controller.enqueue(db.notes?.note(noteId)?.data);
     },
     async cancel(reason) {
       throw new Error(reason);
@@ -134,26 +138,31 @@ export async function exportNote(
   format: keyof typeof FORMAT_TO_EXT,
   disableTemplate = false
 ) {
-  if (!db.vault?.unlocked && note.data.locked && !(await Vault.unlockVault())) {
+  if (!db.vault?.unlocked && note.locked && !(await Vault.unlockVault())) {
     showToast("error", `Skipping note "${note.title}" as it is locked.`);
     return false;
   }
 
-  const rawContent = note.data.contentId
-    ? await db.content?.raw(note.data.contentId)
-    : undefined;
+  const rawContent = note.contentId
+    ? await db.content.raw(note.contentId)
+    : null;
 
   const content =
-    rawContent &&
-    !rawContent.deleted &&
-    (typeof rawContent.data === "object"
-      ? await db.vault?.decryptContent(rawContent)
-      : rawContent);
+    !rawContent || isDeleted(rawContent)
+      ? undefined
+      : isEncryptedContent(rawContent)
+      ? await db.vault.decryptContent(rawContent)
+      : isUnencryptedContent(rawContent)
+      ? rawContent
+      : undefined;
 
-  const exported = await note
-    .export(format === "pdf" ? "html" : format, content, !disableTemplate)
+  const exported = await db.notes
+    .export(note.id, {
+      format: format === "pdf" ? "html" : format,
+      contentItem: content
+    })
     .catch((e: Error) => {
-      console.error(note.data, e);
+      console.error(note, e);
       showToast("error", `Failed to export note "${note.title}": ${e.message}`);
       return false as const;
     });

@@ -27,9 +27,9 @@ import { confirm, Perform } from "../common/dialog-controller";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { writeText } from "clipboard-polyfill";
 import { store as userstore } from "../stores/user-store";
-import { db } from "../common/db";
 
 import { ErrorText } from "../components/error-text";
+import { Debug } from "@notesnook/core/dist/api/debug";
 
 const PLACEHOLDERS = {
   title: "Briefly describe what happened",
@@ -79,7 +79,7 @@ function IssueDialog(props: IssueDialogProps) {
 
             if (!requestData.title.trim() || !requestData.body.trim()) return;
             requestData.body = BODY_TEMPLATE(requestData.body);
-            const url = await db.debug?.report({
+            const url = await Debug.report({
               title: requestData.title,
               body: requestData.body,
               userId: userstore.get().user?.id

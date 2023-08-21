@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
 import { Perform } from "../../common/dialog-controller";
 import { Icon } from "../../components/icons";
-
-export type AuthenticatorType = "app" | "sms" | "email";
 
 export type Authenticator = {
   type: AuthenticatorType;
