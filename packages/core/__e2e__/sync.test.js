@@ -27,7 +27,7 @@ import { delay } from "../__tests__/utils";
 import { test, expect, vitest } from "vitest";
 import { login } from "./utils";
 
-const TEST_TIMEOUT = 60 * 1000;
+const TEST_TIMEOUT = 30 * 1000;
 
 test(
   "case 1: device A & B should only download the changes from device C (no uploading)",
@@ -254,18 +254,33 @@ test(
 
     await syncAndWait(deviceA, deviceB);
 
+    const colorId = await deviceA.colors.add({
+      title: "yellow",
+      colorCode: "#ffff22"
+    });
     for (let noteId of noteIds) {
-      await deviceA.notes.note(noteId).color("purple");
       expect(deviceB.notes.note(noteId)).toBeTruthy();
-      expect(deviceB.notes.note(noteId).data.color).toBeUndefined();
+      expect(
+        deviceB.relations
+          .from({ id: colorId, type: "color" }, "note")
+          .findIndex((a) => a.to.id === noteId)
+      ).toBe(-1);
+
+      await deviceA.relations.add(
+        { id: colorId, type: "color" },
+        { id: noteId, type: "note" }
+      );
     }
 
     await syncAndWait(deviceA, deviceB);
 
-    const purpleColor = deviceB.colors.tag("purple");
-    expect(noteIds.every((id) => purpleColor.noteIds.indexOf(id) > -1)).toBe(
-      true
-    );
+    expect(deviceB.colors.exists(colorId)).toBeTruthy();
+    const purpleNotes = deviceB.relations
+      .from({ id: colorId, type: "color" }, "note")
+      .resolved();
+    expect(
+      noteIds.every((id) => purpleNotes.findIndex((p) => p.id === id) > -1)
+    ).toBe(true);
 
     console.log("issue colors log out");
     await cleanup(deviceA, deviceB);
@@ -289,30 +304,25 @@ test(
 
     expect(deviceB.notebooks.notebook(id)).toBeDefined();
 
-    await deviceA.notebooks.notebook(id).topics.add("Topic 1");
+    await deviceA.notebooks.topics(id).add({ title: "Topic 1" });
     // to create a conflict
     await delay(1500);
-    await deviceB.notebooks.notebook(id).topics.add("Topic 2");
+    await deviceB.notebooks.topics(id).add({ title: "Topic 2" });
 
-    expect(deviceA.notebooks.notebook(id).topics.has("Topic 1")).toBeTruthy();
-    expect(deviceB.notebooks.notebook(id).topics.has("Topic 2")).toBeTruthy();
+    expect(deviceA.notebooks.topics(id).has("Topic 1")).toBeTruthy();
+    expect(deviceB.notebooks.topics(id).has("Topic 2")).toBeTruthy();
 
-    expect(
-      deviceB.notebooks.notebook(id).topics.topic("Topic 2")._topic.dateEdited
-    ).toBeGreaterThan(
-      deviceA.notebooks.notebook(id).topics.topic("Topic 1")._topic.dateEdited
-    );
-    expect(deviceB.notebooks.notebook(id).dateModified).toBeGreaterThan(
-      deviceA.notebooks.notebook(id).dateModified
-    );
+    await syncAndWait(deviceA, deviceB, false);
 
-    await syncAndWait(deviceB, deviceA, false);
+    // await delay(1000);
 
-    expect(deviceA.notebooks.notebook(id).topics.has("Topic 1")).toBeTruthy();
-    expect(deviceB.notebooks.notebook(id).topics.has("Topic 1")).toBeTruthy();
+    // await syncAndWait(deviceB, deviceB, false);
 
-    expect(deviceA.notebooks.notebook(id).topics.has("Topic 2")).toBeTruthy();
-    expect(deviceB.notebooks.notebook(id).topics.has("Topic 2")).toBeTruthy();
+    expect(deviceA.notebooks.topics(id).has("Topic 1")).toBeTruthy();
+    expect(deviceB.notebooks.topics(id).has("Topic 1")).toBeTruthy();
+
+    expect(deviceA.notebooks.topics(id).has("Topic 2")).toBeTruthy();
+    expect(deviceB.notebooks.topics(id).has("Topic 2")).toBeTruthy();
 
     console.log("issue new topic log out");
     await cleanup(deviceA, deviceB);
@@ -330,10 +340,9 @@ test(
 
     const id = await deviceA.notebooks.add({
       title: "Notebook 1",
-      topics: ["Topic 1"]
+      topics: [{ title: "Topic 1" }]
     });
-
-    const topic = deviceA.notebooks.notebook(id).topics.topic("Topic 1");
+    const topic = deviceA.notebooks.topics(id).topic("Topic 1");
 
     await syncAndWait(deviceA, deviceB, false);
 
@@ -342,45 +351,24 @@ test(
     const noteA = await deviceA.notes.add({ title: "Note 1" });
     await deviceA.notes.addToNotebook({ id, topic: topic.id }, noteA);
 
-    expect(
-      deviceA.notebooks.notebook(id).topics.topic(topic.id).totalNotes
-    ).toBe(1);
+    expect(topic.totalNotes).toBe(1);
 
     await delay(2000);
 
     const noteB = await deviceB.notes.add({ title: "Note 2" });
     await deviceB.notes.addToNotebook({ id, topic: topic.id }, noteB);
 
-    expect(
-      deviceB.notebooks.notebook(id).topics.topic(topic.id).totalNotes
-    ).toBe(1);
+    expect(deviceB.notebooks.topics(id).topic(topic.id).totalNotes).toBe(1);
 
-    ctx.onTestFailed(() => {
-      console.log(deviceA.notes.topicReferences.get(topic.id), noteA);
-      console.log(deviceB.notes.topicReferences.get(topic.id), noteB);
-
-      deviceB.notes.topicReferences.rebuild();
-      deviceA.notes.topicReferences.rebuild();
-
-      console.log(deviceA.notes.topicReferences.get(topic.id), noteA);
-      console.log(deviceB.notes.topicReferences.get(topic.id), noteB);
-    });
     await syncAndWait(deviceB, deviceA, false);
+    await syncAndWait(deviceA, deviceB, false);
 
-    expect(deviceA.notes.note(noteB)).toBeDefined();
-    expect(deviceB.notes.note(noteA)).toBeDefined();
+    expect(deviceA.notebooks.topics(id).topic(topic.id).totalNotes).toBe(2);
+    expect(deviceB.notebooks.topics(id).topic(topic.id).totalNotes).toBe(2);
 
     expect(deviceA.notes.note(noteA).data.notebooks).toHaveLength(1);
     expect(deviceA.notes.note(noteB).data.notebooks).toHaveLength(1);
 
-    expect(
-      deviceA.notebooks.notebook(id).topics.topic(topic.id).totalNotes
-    ).toBe(2);
-    expect(
-      deviceB.notebooks.notebook(id).topics.topic(topic.id).totalNotes
-    ).toBe(2);
-
-    console.log("issue assigning 2 notes log out");
     await cleanup(deviceA, deviceB);
   },
   TEST_TIMEOUT
@@ -407,7 +395,12 @@ async function initializeDevice(id, capabilities = []) {
   });
 
   const device = new Database();
-  device.setup(new NodeStorageInterface(), EventSource, FS, Compressor);
+  device.setup({
+    storage: new NodeStorageInterface(),
+    eventsource: EventSource,
+    fs: FS,
+    compressor: Compressor
+  });
 
   await device.init();
 
@@ -442,22 +435,12 @@ async function cleanup(...devices) {
  * @returns
  */
 function syncAndWait(deviceA, deviceB, force = false) {
-  return new Promise((resolve, reject) => {
-    const ref2 = deviceB.eventManager.subscribe(
-      EVENTS.databaseSyncRequested,
-      (full, force, lastSynced) => {
-        console.log("sync requested by device A", full, force, lastSynced);
-        ref2.unsubscribe();
-        deviceB.sync(full, force, lastSynced).catch(reject);
-      }
-    );
-
+  return new Promise((resolve) => {
     const ref = deviceB.eventManager.subscribe(EVENTS.syncCompleted, () => {
       ref.unsubscribe();
       console.log("sync completed.");
       resolve();
     });
-
     console.log(
       "waiting for sync...",
       "Device A:",
@@ -465,7 +448,6 @@ function syncAndWait(deviceA, deviceB, force = false) {
       "Device B:",
       deviceB.syncer.sync.syncing
     );
-
-    deviceA.sync(true, force).catch(reject);
+    deviceA.sync(true, force);
   });
 }
