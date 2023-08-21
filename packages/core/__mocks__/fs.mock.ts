@@ -18,6 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { DataFormat, SerializedKey } from "@notesnook/crypto";
+import {
+  FileEncryptionMetadataWithOutputType,
+  IFileStorage,
+  RequestOptions
+} from "../src/interfaces";
 import { xxhash64 } from "hash-wasm";
 import { IDataType } from "hash-wasm/dist/lib/util";
 
@@ -64,7 +69,7 @@ export async function hashBuffer(data: IDataType) {
 async function readEncrypted<TOutputFormat extends DataFormat>(
   filename: string,
   _key: SerializedKey,
-  _cipherData: any
+  _cipherData: FileEncryptionMetadataWithOutputType<TOutputFormat>
 ) {
   const cipher = fs[filename];
   if (!cipher) {
@@ -74,17 +79,17 @@ async function readEncrypted<TOutputFormat extends DataFormat>(
   return cipher.data;
 }
 
-async function uploadFile(filename: string, _requestOptions: any) {
+async function uploadFile(filename: string, _requestOptions: RequestOptions) {
   const cipher = fs[filename];
   if (!cipher) throw new Error(`File not found. Filename: ${filename}`);
   return true;
 }
 
-async function downloadFile(filename: string, _requestOptions: any) {
+async function downloadFile(filename: string, _requestOptions: RequestOptions) {
   return hasItem(filename);
 }
 
-async function deleteFile(filename: string, _requestOptions: any) {
+async function deleteFile(filename: string, _requestOptions: RequestOptions) {
   if (!hasItem(filename)) return true;
   delete fs[filename];
   return true;
@@ -98,7 +103,7 @@ async function clearFileStorage() {
   fs = {};
 }
 
-export const FS = {
+export const FS: IFileStorage = {
   writeEncryptedBase64,
   readEncrypted,
   uploadFile: cancellable(uploadFile),
@@ -110,9 +115,9 @@ export const FS = {
 };
 
 function cancellable<T>(
-  operation: (filename: string, requestOptions: any) => Promise<T>
+  operation: (filename: string, requestOptions: RequestOptions) => Promise<T>
 ) {
-  return function (filename: string, requestOptions: any) {
+  return function (filename: string, requestOptions: RequestOptions) {
     const abortController = new AbortController();
     return {
       execute: () => operation(filename, requestOptions),

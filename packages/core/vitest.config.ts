@@ -28,9 +28,9 @@ export default defineConfig({
       reporter: ["text", "html"]
     },
     include: [
-      ...(IS_E2E ? ["__e2e__/**/*.test.js"] : []),
-      "__tests__/**/*.test.js",
-      "src/**/*.test.js"
+      ...(IS_E2E ? ["__e2e__/**/*.test.{js,ts}"] : []),
+      "__tests__/**/*.test.{js,ts}",
+      "src/**/*.test.{js,ts}"
     ]
   }
 });
