@@ -35,7 +35,7 @@ export const useFavoriteStore = create<FavoriteStore>((set, get) => ({
       set({
         favorites: groupArray(
           db?.notes?.favorites || [],
-          db.settings?.getGroupOptions("favorites")
+          db.settings.getGroupOptions("favorites")
         )
       });
       return;

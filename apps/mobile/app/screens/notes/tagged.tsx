@@ -45,7 +45,7 @@ export const TaggedNotes = ({
 TaggedNotes.get = (params: NotesScreenParams, grouped = true) => {
   const notes = db.notes?.tagged((params.item as unknown as NoteType).id) || [];
   return grouped
-    ? groupArray(notes, db.settings?.getGroupOptions("notes"))
+    ? groupArray(notes, db.settings.getGroupOptions("notes"))
     : notes;
 };
 
