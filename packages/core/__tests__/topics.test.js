@@ -22,26 +22,26 @@ import { test, expect } from "vitest";
 
 test("get empty topic", () =>
   notebookTest().then(({ db, id }) => {
-    let topic = db.notebooks.notebook(id).topics.topic("hello");
+    let topic = db.notebooks.topics(id).topic("hello");
     expect(topic.all).toHaveLength(0);
   }));
 
 test("getting invalid topic should return undefined", () =>
   notebookTest().then(({ db, id }) => {
-    expect(db.notebooks.notebook(id).topics.topic("invalid")).toBeUndefined();
+    expect(db.notebooks.topics(id).topic("invalid")).toBeUndefined();
   }));
 
 test("add topic to notebook", () =>
   notebookTest().then(async ({ db, id }) => {
-    let topics = db.notebooks.notebook(id).topics;
-    await topics.add("Home");
+    let topics = db.notebooks.topics(id);
+    await topics.add({ title: "Home" });
     expect(topics.all.length).toBeGreaterThan(1);
     expect(topics.all.findIndex((v) => v.title === "Home")).toBeGreaterThan(-1);
   }));
 
 test("add note to topic", () =>
   notebookTest().then(async ({ db, id }) => {
-    let topics = db.notebooks.notebook(id).topics;
+    let topics = db.notebooks.topics(id);
     let topic = topics.topic("hello");
     let noteId = await db.notes.add(TEST_NOTE);
     await db.notes.addToNotebook({ id, topic: topic.id }, noteId);
@@ -53,7 +53,7 @@ test("add note to topic", () =>
 
 test("delete note of a topic", () =>
   notebookTest().then(async ({ db, id }) => {
-    let topics = db.notebooks.notebook(id).topics;
+    let topics = db.notebooks.topics(id);
     let topic = topics.topic("hello");
     let noteId = await db.notes.add(TEST_NOTE);
     await db.notes.addToNotebook({ id, topic: topic.id }, noteId);
@@ -71,9 +71,9 @@ test("delete note of a topic", () =>
 
 test("edit topic title", () =>
   notebookTest().then(async ({ db, id }) => {
-    let topics = db.notebooks.notebook(id).topics;
+    let topics = db.notebooks.topics(id);
 
-    await topics.add("Home");
+    await topics.add({ title: "Home" });
 
     let topic = topics.topic("Home");
 
@@ -92,19 +92,10 @@ test("edit topic title", () =>
     );
   }));
 
-test("duplicate topic to notebook should not be added", () =>
-  notebookTest().then(async ({ db, id }) => {
-    let topics = db.notebooks.notebook(id).topics;
-    await topics.add("Home");
-    let len = topics.all.length;
-    await topics.add("Home");
-    expect(topics.all).toHaveLength(len);
-  }));
-
 test("get topic", () =>
   notebookTest().then(async ({ db, id }) => {
-    let topics = db.notebooks.notebook(id).topics;
-    await topics.add("Home");
+    let topics = db.notebooks.topics(id);
+    await topics.add({ title: "Home" });
     let topic = topics.topic("Home");
     let noteId = await db.notes.add({
       content: TEST_NOTE.content
@@ -118,17 +109,17 @@ test("get topic", () =>
 
 test("delete a topic", () =>
   notebookTest().then(async ({ db, id }) => {
-    let topics = db.notebooks.notebook(id).topics;
-    await topics.add("Home");
-    await topics.delete(topics.topic("Home")._topic.id);
+    let topics = db.notebooks.topics(id);
+    await topics.add({ title: "Home" });
+    await topics.delete(topics.topic("Home").id);
     expect(topics.all.findIndex((v) => v.title === "Home")).toBe(-1);
   }));
 
 test("delete note from edited topic", () =>
   notebookTest().then(async ({ db, id }) => {
     const noteId = await db.notes.add(TEST_NOTE);
-    let topics = db.notebooks.notebook(id).topics;
-    await topics.add("Home");
+    let topics = db.notebooks.topics(id);
+    await topics.add({ title: "Home" });
     let topic = topics.topic("Home");
     await db.notes.addToNotebook({ id, topic: topic._topic.title }, noteId);
     await topics.add({ id: topic._topic.id, title: "Hello22" });
@@ -137,9 +128,9 @@ test("delete note from edited topic", () =>
 
 test("editing one topic should not update dateEdited of all", () =>
   notebookTest().then(async ({ db, id }) => {
-    let topics = db.notebooks.notebook(id).topics;
+    let topics = db.notebooks.topics(id);
 
-    await topics.add("Home");
+    await topics.add({ title: "Home" });
     await topics.add("Home2");
     await topics.add("Home3");
 

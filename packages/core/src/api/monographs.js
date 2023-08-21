@@ -32,7 +32,7 @@ class Monographs {
 
   async deinit() {
     this.monographs = undefined;
-    await this._db.storage.write("monographs", this.monographs);
+    await this._db.storage().write("monographs", this.monographs);
   }
 
   async init() {
@@ -40,9 +40,9 @@ class Monographs {
       const user = await this._db.user.getUser();
       const token = await this._db.user.tokenManager.getAccessToken();
       if (!user || !token || !user.isEmailConfirmed) return;
-      let monographs = await this._db.storage.read("monographs", true);
+      let monographs = await this._db.storage().read("monographs", true);
       monographs = await http.get(`${Constants.API_HOST}/monographs`, token);
-      await this._db.storage.write("monographs", monographs);
+      await this._db.storage().write("monographs", monographs);
 
       if (monographs) this.monographs = monographs;
     } catch (e) {
@@ -103,10 +103,12 @@ class Monographs {
     };
 
     if (opts.password) {
-      monograph.encryptedContent = await this._db.storage.encrypt(
-        { password: opts.password },
-        JSON.stringify({ type: content.type, data: content.data })
-      );
+      monograph.encryptedContent = await this._db
+        .storage()
+        .encrypt(
+          { password: opts.password },
+          JSON.stringify({ type: content.type, data: content.data })
+        );
     } else {
       monograph.content = JSON.stringify({
         type: content.type,
