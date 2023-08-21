@@ -65,7 +65,7 @@ test("merge notebook with new topics", () =>
 
     const newNotebook = db.notebooks.merge(notebook.data, {
       ...notebook.data,
-      topics: [...notebook.data.topics, makeTopic("Home", id)],
+      topics: [...notebook.data.topics, makeTopic({ title: "Home" }, id)],
       remote: true
     });
 
@@ -83,7 +83,7 @@ test("merge notebook with topics removed", () =>
 
     const newNotebook = db.notebooks.merge(notebook.data, {
       ...notebook.data,
-      topics: [makeTopic("Home", id)],
+      topics: [makeTopic({ title: "Home" }, id)],
       remote: true
     });
 
