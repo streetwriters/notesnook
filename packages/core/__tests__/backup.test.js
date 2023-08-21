@@ -17,37 +17,37 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  TEST_NOTE,
-  databaseTest,
-  loginFakeUser,
-  noteTest,
-  notebookTest
-} from "./utils";
+import { TEST_NOTE, databaseTest, loginFakeUser, notebookTest } from "./utils";
 import v52Backup from "./__fixtures__/backup.v5.2.json";
 import v52BackupCopy from "./__fixtures__/backup.v5.2.copy.json";
 import v56BackupCopy from "./__fixtures__/backup.v5.6.json";
+import v58BackupCopy from "./__fixtures__/backup.v5.8.json";
 import qclone from "qclone";
 import { test, expect, describe } from "vitest";
+import { makeId } from "../src/utils/id";
 
 test("export backup", () =>
-  noteTest().then(() =>
-    notebookTest().then(async ({ db }) => {
-      const exp = [];
-      for await (const file of db.backup.export("node", false)) {
-        exp.push(file);
-      }
+  notebookTest().then(async ({ db }) => {
+    const id = await db.notes.add(TEST_NOTE);
+    const exp = [];
+    for await (const file of db.backup.export("node", false)) {
+      exp.push(file);
+    }
 
-      let backup = JSON.parse(exp[1].data);
-      expect(exp.length).toBe(2);
-      expect(exp[0].path).toBe(".nnbackup");
-      expect(backup.type).toBe("node");
-      expect(backup.date).toBeGreaterThan(0);
-      expect(backup.data).toBeTypeOf("string");
-      expect(backup.compressed).toBe(true);
-      expect(backup.encrypted).toBe(false);
-    })
-  ));
+    let backup = JSON.parse(exp[1].data);
+    expect(exp.length).toBe(2);
+    expect(exp[0].path).toBe(".nnbackup");
+    expect(backup.type).toBe("node");
+    expect(backup.date).toBeGreaterThan(0);
+    expect(backup.data).toBeTypeOf("string");
+    expect(backup.compressed).toBe(true);
+    expect(backup.encrypted).toBe(false);
+    expect(
+      JSON.parse(await db.compressor().decompress(backup.data)).find(
+        (i) => i.id === id
+      )
+    ).toBeDefined();
+  }));
 
 test("export encrypted backup", () =>
   notebookTest().then(async ({ db }) => {
@@ -117,7 +117,8 @@ test("import tempered backup", () =>
 describe.each([
   ["v5.2", v52Backup],
   ["v5.2 copy", v52BackupCopy],
-  ["v5.6", v56BackupCopy]
+  ["v5.6", v56BackupCopy],
+  ["v5.8", v58BackupCopy]
 ])("testing backup version: %s", (version, data) => {
   test(`import ${version} backup`, () => {
     return databaseTest().then(async (db) => {
@@ -131,12 +132,17 @@ describe.each([
       expect(
         db.notes.all.every((v) => {
           const doesNotHaveContent = !v.content;
-          const doesNotHaveColors = !v.colors && (!v.color || v.color.length);
+          const doesNotHaveColors = !v.colors; // && (!v.color || v.color.length);
           const hasTopicsInAllNotebooks =
             !v.notebooks ||
             v.notebooks.every((nb) => !!nb.id && !!nb.topics && !nb.topic);
           const hasDateModified = v.dateModified > 0;
+          const doesNotHaveTags = !v.tags;
+          const doesNotHaveColor = !v.color;
+          if (!doesNotHaveTags) console.log(v);
           return (
+            doesNotHaveTags &&
+            doesNotHaveColor &&
             doesNotHaveContent &&
             !v.notebook &&
             hasTopicsInAllNotebooks &&
@@ -144,6 +150,16 @@ describe.each([
             hasDateModified
           );
         })
+      ).toBeTruthy();
+
+      expect(
+        db.tags.all.every((t) => makeId(t.title) !== t.id && !t.noteIds)
+      ).toBeTruthy();
+
+      expect(
+        db.colors.all.every(
+          (t) => makeId(t.title) !== t.id && !t.noteIds && !!t.colorCode
+        )
       ).toBeTruthy();
 
       expect(
@@ -158,7 +174,8 @@ describe.each([
         db.attachments.all.every((v) => v.dateModified > 0 && !v.dateEdited)
       ).toBeTruthy();
 
-      expect(db.shortcuts.all).toHaveLength(data.data.settings.pins.length);
+      if (data.data.settings.pins)
+        expect(db.shortcuts.all).toHaveLength(data.data.settings.pins.length);
 
       const allContent = await db.content.all();
       expect(

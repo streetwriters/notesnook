@@ -108,20 +108,6 @@ test("date created of session should not change on edit", () =>
     expect(newDateModified).toBeGreaterThan(dateModified);
   }));
 
-test("serialized session data should get deserialized", () =>
-  noteTest({ ...TEST_NOTE, sessionId: "session" }).then(async ({ db, id }) => {
-    let json = await db.noteHistory.serialize();
-
-    await db.noteHistory.clearSessions(id);
-    await db.noteHistory.deserialize(json);
-
-    let history = await db.noteHistory.get(id);
-    expect(history).toHaveLength(1);
-
-    let content = await db.noteHistory.content(history[0].id);
-    expect(content).toMatchObject(TEST_NOTE.content);
-  }));
-
 test("clear a note's sessions", () =>
   noteTest({ ...TEST_NOTE, sessionId: "session" }).then(async ({ db, id }) => {
     await db.noteHistory.clearSessions(id);
@@ -147,12 +133,6 @@ test("return empty array if no history available", () =>
     expect(history).toHaveLength(0);
   }));
 
-test("session should not be added to history if values are null or undefined", () =>
-  noteTest().then(async ({ db }) => {
-    let history = await db.noteHistory.add();
-    expect(history).toBeUndefined();
-  }));
-
 test("auto clear sessions if they exceed the limit", () =>
   noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
     let editedContent = {
@@ -169,7 +149,7 @@ test("auto clear sessions if they exceed the limit", () =>
     let sessions = await db.noteHistory.get(id);
     expect(sessions).toHaveLength(2);
 
-    await db.noteHistory._cleanup(id, 1);
+    await db.noteHistory.cleanup(id, 1);
 
     sessions = await db.noteHistory.get(id);
     expect(await db.noteHistory.get(id)).toHaveLength(1);
