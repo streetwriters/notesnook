@@ -49,7 +49,8 @@ import {
   AddToNotebook,
   RemoveShortcutLink,
   Plus,
-  Tag
+  Tag,
+  Copy
 } from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
@@ -456,6 +457,14 @@ const menuItems: (note: any, items?: any[]) => MenuItem[] = (
     },
     {
       type: "button",
+      key: "copy",
+      title: "Copy",
+      icon: Copy.path,
+      isDisabled: note.locked,
+      menu: { items: copyMenuItem(note) }
+    },
+    {
+      type: "button",
       key: "duplicate",
       title: "Duplicate",
       isDisabled: !isSynced || note.locked,
@@ -526,6 +535,36 @@ function colorsToMenuItems(note: any): MenuItem[] {
       onClick: () => store.setColor(note.id, lowercase)
     };
   });
+}
+
+function copyMenuItem(note: any): MenuItem[] {
+  const menuItems: MenuItem[] = [];
+
+  menuItems.push({
+    type: "button",
+    key: "copy-text",
+    title: "Copy as Text",
+    icon: Plaintext.path,
+    onClick: async () => {
+      const copied = await getNoteContent("txt", note.id);
+      if (typeof copied === "string") navigator.clipboard.writeText(copied);
+      else return;
+    }
+  });
+
+  menuItems.push({
+    type: "button",
+    key: "copy-markdown",
+    title: "Copy as Markdown",
+    icon: Markdown.path,
+    onClick: async () => {
+      const copied = await getNoteContent("md", note.id);
+      if (typeof copied === "string") navigator.clipboard.writeText(copied);
+      else return;
+    }
+  });
+
+  return menuItems;
 }
 
 function notebooksMenuItems(items: any[]): MenuItem[] {
@@ -666,4 +705,18 @@ function tagsMenuItems(items: any[]): MenuItem[] {
   }
 
   return menuItems;
+}
+
+async function getNoteContent(type: string, id: any) {
+  const note = db.notes?.note(id);
+  if (!note) return;
+
+  const content = await db.content?.raw(note.data.contentId);
+
+  const copied = await note.export(type, content).catch((e: Error) => {
+    console.error(note.data, e);
+    showToast("error", `Failed to copy note "${note.title}": ${e.message}`);
+  });
+
+  return copied;
 }
