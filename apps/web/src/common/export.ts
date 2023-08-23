@@ -33,7 +33,25 @@ export async function exportToPDF(
 
   return new Promise<boolean>((resolve) => {
     const iframe = document.createElement("iframe");
-    iframe.srcdoc = content.replaceAll(/<p(.+?)><\/p>/gm, "<p$1><br/></p>");
+
+    const replaceableAttributes = {
+      'data-align="right"':
+        'style="margin-left:auto;margin-right:0;display: block;"',
+      'data-align="center"':
+        'style="margin-left:auto;margin-right:auto;display: block;"',
+      'data-float="true" data-align="right"': 'align="right"',
+      'data-float="true" data-align="left"': 'align="left"'
+    };
+    const re = new RegExp(Object.keys(replaceableAttributes).join("|"), "gi");
+
+    let html = content.replaceAll(/<p(.+?)><\/p>/gm, "<p$1><br/></p>");
+    html = content.replaceAll(re, function (matched) {
+      return replaceableAttributes[
+        matched as keyof typeof replaceableAttributes
+      ];
+    });
+
+    iframe.srcdoc = html;
     iframe.style.position = "fixed";
     iframe.style.right = "0";
     iframe.style.bottom = "0";
@@ -85,6 +103,7 @@ export async function exportNotes(
       let index = 0;
       for (const noteId of noteIds) {
         const note = db.notes?.note(noteId);
+
         if (!note) continue;
         if (!vaultUnlocked && note.data.locked) continue;
 
