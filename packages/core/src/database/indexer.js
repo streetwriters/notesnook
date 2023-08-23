@@ -56,6 +56,7 @@ export default class Indexer extends Storage {
   }
 
   read(key, isArray = false) {
+    if (!this.exists(key)) return;
     return super.read(this.makeId(key), isArray);
   }
 
@@ -68,11 +69,29 @@ export default class Indexer extends Storage {
   }
 
   async readMulti(keys) {
-    const entries = await super.readMulti(keys.map(this.makeId));
+    const entries = await super.readMulti(
+      keys.filter(this.exists, this).map(this.makeId, this)
+    );
     entries.forEach((entry) => {
       entry[0] = entry[0].replace(`_${this.type}`, "");
     });
     return entries;
+  }
+
+  /**
+   *
+   * @param {any[]} items
+   * @returns
+   */
+  async writeMulti(items) {
+    const entries = items.reduce((array, item) => {
+      if (!item) return array;
+      if (!this.indices.includes(item.id)) this.indices.push(item.id);
+      array.push([this.makeId(item.id), item]);
+      return array;
+    }, []);
+    await super.writeMulti(entries);
+    await super.write(this.type, this.indices);
   }
 
   async migrateIndices() {

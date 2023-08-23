@@ -32,6 +32,10 @@ export default class Storage {
     return this.storage.readMulti(keys);
   }
 
+  writeMulti(entries) {
+    return this.storage.writeMulti(entries);
+  }
+
   read(key, isArray = false) {
     return this.storage.read(key, isArray);
   }
@@ -54,6 +58,10 @@ export default class Storage {
 
   decrypt(password, cipher) {
     return this.storage.decrypt(password, cipher);
+  }
+
+  decryptMulti(password, items) {
+    return this.storage.decryptMulti(password, items);
   }
 
   deriveCryptoKey(name, data) {

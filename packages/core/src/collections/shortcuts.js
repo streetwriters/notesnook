@@ -41,7 +41,7 @@ const ALLOWED_SHORTCUT_TYPES = ["notebook", "topic", "tag"];
 export default class Shortcuts extends Collection {
   async merge(shortcut) {
     if (!shortcut) return;
-    await this._collection.addItem(shortcut);
+    return shortcut;
   }
 
   /**

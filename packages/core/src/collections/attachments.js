@@ -37,8 +37,7 @@ export default class Attachments extends Collection {
   }
 
   merge(remoteAttachment) {
-    if (remoteAttachment.deleted)
-      return this._collection.addItem(remoteAttachment);
+    if (remoteAttachment.deleted) return remoteAttachment;
 
     const id = remoteAttachment.id;
     let localAttachment = this._collection.getItem(id);
@@ -50,7 +49,7 @@ export default class Attachments extends Collection {
       );
     }
 
-    return this._collection.addItem(remoteAttachment);
+    return remoteAttachment;
   }
 
   /**

@@ -54,7 +54,7 @@ dayjs.extend(isToday);
 export default class Reminders extends Collection {
   async merge(reminder) {
     if (!reminder) return;
-    await this._collection.addItem(reminder);
+    return reminder;
   }
 
   /**

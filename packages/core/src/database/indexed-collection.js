@@ -107,6 +107,10 @@ export default class IndexedCollection {
     return Object.fromEntries(data);
   }
 
+  setItems(items) {
+    return this.indexer.writeMulti(items);
+  }
+
   async getEncryptionKey() {
     if (!this.encryptionKeyFactory) return;
     if (this.encryptionKey) return this.encryptionKey;

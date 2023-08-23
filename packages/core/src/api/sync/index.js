@@ -36,15 +36,14 @@ import { toChunks } from "../../utils/array";
 import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
 import { logger } from "../../logger";
 import { Mutex } from "async-mutex";
+import { migrateItem } from "../../migrations";
 
 /**
  * @typedef {{
- *  item: string,
- *  itemType: string,
+ *  items: any[],
+ *  type: string,
  *  lastSynced: number,
- *  current: number,
- *  total: number,
- *  synced?: boolean
+ *  total: number
  * }} SyncTransferItem
  */
 
@@ -192,6 +191,7 @@ class Sync {
     this.logger.info("Starting sync", { full, force, serverLastSynced });
 
     this.connection.onclose((error) => {
+      console.error(error);
       this.logger.error(error || new Error("Connection closed."));
       throw new Error("Connection closed.");
     });
@@ -243,36 +243,69 @@ class Sync {
   async fetch(lastSynced) {
     await this.checkConnection();
 
-    const serverResponse = await new Promise((resolve, reject) => {
-      let counter = { count: 0, queue: null };
-      this.connection.stream("FetchItems", lastSynced).subscribe({
-        next: (/** @type {SyncTransferItem} */ syncStatus) => {
-          const { total, item, synced, lastSynced } = syncStatus;
-          if (synced) {
-            resolve({ synced, lastSynced });
-            return;
-          }
-          if (!item) return;
-          if (counter.queue === null) counter.queue = total;
+    const typeToCollection = {
+      note: this.db.notes,
+      notebook: this.db.notebooks,
+      content: this.db.content,
+      attachment: this.db.attachments,
+      relation: this.db.relations,
+      reminder: this.db.reminders,
+      shortcut: this.db.shortcuts
+    };
 
-          this.onSyncItem(syncStatus)
-            .then(() => {
-              sendSyncProgressEvent(
-                this.db.eventManager,
-                `download`,
-                total,
-                ++counter.count
-              );
-            })
-            .catch(reject)
-            .finally(() => {
-              if (--counter.queue <= 0) resolve({ synced, lastSynced });
-            });
-        },
-        complete: () => {},
-        error: reject
-      });
+    const key = await this.db.user.getEncryptionKey();
+    if (!key || !key.key || !key.salt) {
+      EV.publish(EVENTS.userSessionExpired);
+      throw new Error("User encryption key not generated. Please relogin.");
+    }
+
+    const dbLastSynced = await this.db.lastSynced();
+    console.time("fetch");
+    let count = 0;
+    this.connection.off("SyncItems");
+    this.connection.on("SyncItems", async (chunk) => {
+      const decrypted = await this.db.storage.decryptMulti(key, chunk.items);
+
+      const deserialized = await Promise.all(
+        decrypted.map(async (item, index) => {
+          const deserialized = JSON.parse(item);
+          deserialized.remote = true;
+          deserialized.synced = true;
+          // if (!migrate) return deserialized;
+
+          // it is a locked note, bail out.
+          if (deserialized.alg && deserialized.cipher) return deserialized;
+
+          const version = chunk.items[index].v;
+          await migrateItem(deserialized, version, deserialized.type, this._db);
+          return deserialized;
+        })
+      );
+
+      const items = await Promise.all(
+        deserialized.map((item) =>
+          this.merger.mergeItem(chunk.type, item, dbLastSynced)
+        )
+      );
+
+      const collection = typeToCollection[chunk.type];
+      if (collection) await collection._collection.setItems(items);
+
+      count += chunk.items.length;
+      sendSyncProgressEvent(
+        this.db.eventManager,
+        `download`,
+        chunk.total,
+        count
+      );
+      return true;
     });
+    const serverResponse = await this.connection.invoke(
+      "RequestFetch",
+      lastSynced
+    );
+    console.timeEnd("fetch");
+    this.connection.off("SyncItems");
 
     if (await this.conflicts.check()) {
       this.conflicts.throw();
@@ -386,14 +419,10 @@ class Sync {
   }
 
   /**
-   * @param {SyncTransferItem} syncStatus
    * @private
    */
-  async onSyncItem(syncStatus) {
-    const { item: itemJSON, itemType } = syncStatus;
-    const item = JSON.parse(itemJSON);
-
-    const remoteItem = await this.merger.mergeItem(itemType, item);
+  async onSyncItem(item, type) {
+    const remoteItem = await this.merger.mergeItem(type, item);
     if (remoteItem)
       this.db.eventManager.publish(EVENTS.syncItemMerged, remoteItem);
   }

@@ -17,11 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { migrateItem } from "../../migrations";
 import setManipulator from "../../utils/set";
 import { logger } from "../../logger";
 import { isHTMLEqual } from "../../utils/html-diff";
-import { EV, EVENTS } from "../../common";
 
 class Merger {
   /**
@@ -40,7 +38,7 @@ class Merger {
         conflict: (_local, remote) => this._db.settings.merge(remote)
       },
       note: {
-        get: (id) => this._db.notes.note(id),
+        get: (id) => this._db.notes._collection.getItem(id),
         set: (item) => this._db.notes.merge(item)
       },
       shortcut: {
@@ -57,7 +55,7 @@ class Merger {
       },
       notebook: {
         threshold: 1000,
-        get: (id) => this._db.notebooks.notebook(id),
+        get: (id) => this._db.notebooks._collection.getItem(id),
         set: (item) => this._db.notebooks.merge(item),
         conflict: (_local, remote) => this._db.notebooks.merge(remote)
       },
@@ -95,11 +93,9 @@ class Merger {
         }
       },
       attachment: {
-        set: async (item) => {
-          const remoteAttachment = await this._deserialize(item);
+        set: async (remoteAttachment) => {
           if (remoteAttachment.deleted) {
-            await this._db.attachments.merge(remoteAttachment);
-            return;
+            return await this._db.attachments.merge(remoteAttachment);
           }
 
           const localAttachment = this._db.attachments.attachment(
@@ -123,43 +119,19 @@ class Merger {
               noteIds
             );
           }
-          await this._db.attachments.merge(remoteAttachment);
+          return await this._db.attachments.merge(remoteAttachment);
         }
       },
       vaultKey: {
-        set: async (vaultKey) =>
-          this._db.vault._setKey(await this._deserialize(vaultKey, false))
+        set: async (vaultKey) => this._db.vault._setKey(vaultKey)
       }
     };
   }
 
-  async _migrate(deserialized, version) {
-    // it is a locked note, bail out.
-    if (deserialized.alg && deserialized.cipher) return deserialized;
-
-    return migrateItem(deserialized, version, deserialized.type, this._db);
-  }
-
-  async _deserialize(item, migrate = true) {
-    const decrypted = await this._db.storage.decrypt(this.key, item);
-    if (!decrypted) {
-      throw new Error("Decrypted item cannot be undefined.");
-    }
-
-    const deserialized = JSON.parse(decrypted);
-    deserialized.remote = true;
-    deserialized.synced = true;
-    if (!migrate) return deserialized;
-    await this._migrate(deserialized, item.v);
-    return deserialized;
-  }
-
   async _mergeItem(remoteItem, get, add) {
-    remoteItem = await this._deserialize(remoteItem);
     let localItem = await get(remoteItem.id);
     if (!localItem || remoteItem.dateModified > localItem.dateModified) {
-      await add(remoteItem);
-      return remoteItem;
+      return await add(remoteItem);
     }
   }
 
@@ -170,12 +142,10 @@ class Merger {
     markAsConflicted,
     threshold
   ) {
-    remoteItem = await this._deserialize(remoteItem);
     let localItem = await get(remoteItem.id);
 
     if (!localItem) {
-      await add(remoteItem);
-      return remoteItem;
+      return await add(remoteItem);
     } else {
       const isResolved = localItem.dateResolved === remoteItem.dateModified;
       const isModified =
@@ -195,8 +165,7 @@ class Merger {
 
         if (timeDiff < threshold) {
           if (remoteItem.dateModified > localItem.dateModified) {
-            await add(remoteItem);
-            return remoteItem;
+            return await add(remoteItem);
           }
           return;
         }
@@ -213,23 +182,16 @@ class Merger {
 
         await markAsConflicted(localItem, remoteItem);
       } else if (!isResolved) {
-        await add(remoteItem);
-        return remoteItem;
+        return await add(remoteItem);
       }
     }
   }
 
-  async mergeItem(type, item) {
-    this._lastSynced = await this._db.lastSynced();
+  async mergeItem(type, item, lastSynced) {
+    this._lastSynced = lastSynced;
 
     const definition = this._mergeDefinition[type];
     if (!type || !item || !definition) return;
-
-    if (!this.key) this.key = await this._db.user.getEncryptionKey();
-    if (!this.key || !this.key.key || !this.key.salt) {
-      EV.publish(EVENTS.userSessionExpired);
-      throw new Error("User encryption key not generated. Please relogin.");
-    }
 
     if (definition.conflict) {
       return await this._mergeItemWithConflicts(
@@ -242,7 +204,7 @@ class Merger {
     } else if (definition.get && definition.set) {
       return await this._mergeItem(item, definition.get, definition.set);
     } else if (!definition.get && definition.set) {
-      await definition.set(item);
+      return await definition.set(item);
     }
   }
 }
