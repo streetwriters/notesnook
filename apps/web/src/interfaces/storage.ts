@@ -58,6 +58,10 @@ export class NNStorage {
     return this.database.getMany(keys.sort());
   }
 
+  writeMulti<T>(entries: [string, T][]) {
+    return this.database.setMany(entries);
+  }
+
   write<T>(key: string, data: T) {
     return this.database.set(key, data);
   }
@@ -144,8 +148,17 @@ export class NNStorage {
   ): Promise<string | undefined> {
     const crypto = await getNNCrypto();
     cipherData.format = "base64";
-    const result = await crypto.decrypt(key, cipherData);
-    if (typeof result.data === "string") return result.data;
+    return await crypto.decrypt(key, cipherData, "text");
+  }
+
+  async decryptMulti(
+    key: SerializedKey,
+    items: Cipher[]
+  ): Promise<string[] | undefined> {
+    const crypto = await getNNCrypto();
+
+    items.forEach((c) => (c.format = "base64"));
+    return await crypto.decryptMulti(key, items, "text");
   }
 }
 
