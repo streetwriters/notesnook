@@ -23,7 +23,8 @@ import {
   OutputFormat,
   Cipher,
   EncryptionKey,
-  INNCrypto
+  INNCrypto,
+  Output
 } from "@notesnook/crypto";
 import { NNCryptoWorkerModule } from "./src/worker";
 import { wrap } from "comlink";
@@ -38,6 +39,8 @@ export class NNCryptoWorker implements INNCrypto {
     if (!this.worker) throw new Error("worker cannot be undefined.");
     if (this.isReady) return;
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     this.workermodule = wrap<NNCryptoWorkerModule>(this.worker);
     // this.workermodule = await spawn<NNCryptoWorkerModule>(this.worker);
     this.isReady = true;
@@ -45,7 +48,7 @@ export class NNCryptoWorker implements INNCrypto {
 
   async encrypt(
     key: SerializedKey,
-    plaintext: Plaintext,
+    plaintext: Plaintext<OutputFormat>,
     outputFormat: OutputFormat = "uint8array"
   ): Promise<Cipher> {
     await this.init();
@@ -54,15 +57,26 @@ export class NNCryptoWorker implements INNCrypto {
     return this.workermodule.encrypt(key, plaintext, outputFormat);
   }
 
-  async decrypt(
+  async decrypt<TOutputFormat extends OutputFormat>(
     key: SerializedKey,
     cipherData: Cipher,
-    outputFormat: OutputFormat = "text"
-  ): Promise<Plaintext> {
+    outputFormat: TOutputFormat = "text" as TOutputFormat
+  ): Promise<Output<TOutputFormat>> {
     await this.init();
     if (!this.workermodule) throw new Error("Worker module is not ready.");
 
     return this.workermodule.decrypt(key, cipherData, outputFormat);
+  }
+
+  async decryptMulti<TOutputFormat extends OutputFormat>(
+    key: SerializedKey,
+    items: Cipher[],
+    outputFormat: TOutputFormat = "text" as TOutputFormat
+  ): Promise<Output<TOutputFormat>[]> {
+    await this.init();
+    if (!this.workermodule) throw new Error("Worker module is not ready.");
+
+    return this.workermodule.decryptMulti(key, items, outputFormat);
   }
 
   async hash(password: string, salt: string): Promise<string> {

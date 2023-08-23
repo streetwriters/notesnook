@@ -23,7 +23,8 @@ import {
   OutputFormat,
   Plaintext,
   SerializedKey,
-  Chunk
+  Chunk,
+  Output
 } from "./types";
 
 export interface IStreamable {
@@ -34,15 +35,21 @@ export interface IStreamable {
 export interface INNCrypto {
   encrypt(
     key: SerializedKey,
-    plaintext: Plaintext,
+    plaintext: Plaintext<OutputFormat>,
     outputFormat?: OutputFormat
   ): Promise<Cipher>;
 
-  decrypt(
+  decrypt<TOutputFormat extends OutputFormat>(
     key: SerializedKey,
     cipherData: Cipher,
-    outputFormat?: OutputFormat
-  ): Promise<Plaintext>;
+    outputFormat?: TOutputFormat
+  ): Promise<Output<TOutputFormat>>;
+
+  decryptMulti<TOutputFormat extends OutputFormat>(
+    key: SerializedKey,
+    cipherData: Cipher[],
+    outputFormat?: TOutputFormat
+  ): Promise<Output<TOutputFormat>[]>;
 
   hash(password: string, salt: string): Promise<string>;
 
