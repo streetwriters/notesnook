@@ -34,7 +34,9 @@ import { Chunk, Cipher, OutputFormat, Plaintext, SerializedKey } from "./types";
 
 const encoder = new TextEncoder();
 export default class Encryption {
-  private static transformInput(plaintext: Plaintext): Uint8Array {
+  private static transformInput(
+    plaintext: Plaintext<OutputFormat>
+  ): Uint8Array {
     let data: Uint8Array | null = null;
     if (typeof plaintext.data === "string" && plaintext.format === "base64") {
       data = from_base64(plaintext.data, base64_variants.ORIGINAL);
@@ -49,7 +51,7 @@ export default class Encryption {
 
   static encrypt(
     key: SerializedKey,
-    plaintext: Plaintext,
+    plaintext: Plaintext<OutputFormat>,
     outputFormat: OutputFormat = "uint8array"
   ): Cipher {
     const encryptionKey = KeyUtils.transform(key);

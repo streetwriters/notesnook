@@ -24,13 +24,21 @@ import {
   SerializedKey
 } from "@notesnook/crypto/dist/src/types";
 import { expose, transfer } from "comlink";
-import { NNCrypto } from "@notesnook/crypto";
+import type { Decryption, NNCrypto, Output } from "@notesnook/crypto";
 
 let crypto: NNCrypto | null = null;
+let decryption: typeof Decryption | null = null;
+
 async function loadNNCrypto(): Promise<NNCrypto> {
   if (crypto) return crypto;
   const { NNCrypto } = await import("@notesnook/crypto");
   return (crypto = new NNCrypto());
+}
+
+async function loadDecryptionModule(): Promise<typeof Decryption> {
+  if (decryption) return decryption;
+  const { Decryption } = await import("@notesnook/crypto");
+  return (decryption = Decryption);
 }
 
 const module = {
@@ -48,19 +56,31 @@ const module = {
   },
   encrypt: async function (
     key: SerializedKey,
-    plaintext: Plaintext,
+    plaintext: Plaintext<OutputFormat>,
     outputFormat?: OutputFormat
   ) {
     const crypto = await loadNNCrypto();
     return crypto.encrypt(key, plaintext, outputFormat);
   },
-  decrypt: async function (
+  decrypt: async function <TOutputFormat extends OutputFormat>(
     key: SerializedKey,
     cipherData: Cipher,
-    outputFormat?: OutputFormat
+    outputFormat: TOutputFormat = "text" as TOutputFormat
   ) {
-    const crypto = await loadNNCrypto();
-    return crypto.decrypt(key, cipherData, outputFormat);
+    const decryption = await loadDecryptionModule();
+    return decryption.decrypt(key, cipherData, outputFormat);
+  },
+  decryptMulti: async function <TOutputFormat extends OutputFormat>(
+    key: SerializedKey,
+    items: Cipher[],
+    outputFormat: TOutputFormat = "text" as TOutputFormat
+  ) {
+    const decryption = await loadDecryptionModule();
+    const decryptedItems: Output<TOutputFormat>[] = [];
+    for (const cipherData of items) {
+      decryptedItems.push(decryption.decrypt(key, cipherData, outputFormat));
+    }
+    return decryptedItems;
   },
   createEncryptionStream: async function (key: SerializedKey) {
     const crypto = await loadNNCrypto();

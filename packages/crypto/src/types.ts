@@ -30,10 +30,12 @@ export type Cipher = {
   length: number;
 };
 
-export type Plaintext = {
-  format: OutputFormat;
-  data: string | Uint8Array;
+export type Plaintext<TFormat extends OutputFormat> = {
+  format: TFormat;
+  data: TFormat extends StringOutputFormat ? string : Uint8Array;
 };
+export type Output<TFormat extends OutputFormat> =
+  TFormat extends StringOutputFormat ? string : Uint8Array;
 
 export type SerializedKey = {
   password?: string;
