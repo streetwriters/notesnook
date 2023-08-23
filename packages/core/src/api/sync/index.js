@@ -304,6 +304,15 @@ class Sync {
       "RequestFetch",
       lastSynced
     );
+
+    if (serverResponse.vaultKey) {
+      await this.merger.mergeItem(
+        "vaultKey",
+        serverResponse.vaultKey,
+        serverResponse.lastSynced
+      );
+    }
+
     console.timeEnd("fetch");
     this.connection.off("SyncItems");
 
@@ -311,7 +320,7 @@ class Sync {
       this.conflicts.throw();
     }
 
-    return serverResponse;
+    return { lastSynced: serverResponse.lastSynced };
   }
 
   async collect(lastSynced, force) {
