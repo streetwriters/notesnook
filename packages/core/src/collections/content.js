@@ -36,9 +36,7 @@ export default class Content extends Collection {
     }
 
     if (content.remote || content.deleted)
-      return await this._collection.addItem(
-        await this.extractAttachments(content)
-      );
+      return await this.extractAttachments(content);
 
     const oldContent = await this.raw(content.id);
     if (content.id && oldContent) {

@@ -39,7 +39,7 @@ import Collection from "./collection";
 export default class Relations extends Collection {
   async merge(relation) {
     if (!relation) return;
-    await this._collection.addItem(relation);
+    return relation;
   }
 
   /**

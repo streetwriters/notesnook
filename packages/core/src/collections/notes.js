@@ -62,11 +62,11 @@ export default class Notes extends Collection {
       remoteNote.deleteReason !== "localOnly" &&
       (!localNote || !localNote.localOnly)
     )
-      return await this._collection.addItem(remoteNote);
+      return remoteNote;
 
     await this._resolveColorAndTags(remoteNote);
 
-    return await this._collection.addItem(remoteNote);
+    return remoteNote;
   }
 
   async add(noteArg) {
