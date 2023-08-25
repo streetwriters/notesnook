@@ -282,11 +282,27 @@ class Sync {
         })
       );
 
-      const items = await Promise.all(
-        deserialized.map((item) =>
-          this.merger.mergeItem(chunk.type, item, dbLastSynced)
-        )
-      );
+      let items = [];
+      if (this.merger.isSyncCollection(chunk.type)) {
+        items = deserialized.map((item) =>
+          this.merger.mergeItemSync(item, chunk.type, dbLastSynced)
+        );
+      } else if (chunk.type === "content") {
+        const localItems = await this.db.content.multi(
+          chunk.items.map((i) => i.id)
+        );
+        items = await Promise.all(
+          deserialized.map((item) =>
+            this.merger.mergeContent(item, localItems, dbLastSynced)
+          )
+        );
+      } else {
+        items = await Promise.all(
+          deserialized.map((item) =>
+            this.merger.mergeItem(item, chunk.type, dbLastSynced)
+          )
+        );
+      }
 
       const collection = typeToCollection[chunk.type];
       if (collection) await collection._collection.setItems(items);
