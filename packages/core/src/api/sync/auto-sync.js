@@ -59,7 +59,11 @@ export class AutoSync {
    * @private
    */
   schedule(id, item) {
-    if (item && (item.remote || item.localOnly || item.failed)) return;
+    if (
+      item &&
+      (item.remote || item.localOnly || item.failed || !!item.dateUploaded)
+    )
+      return;
 
     clearTimeout(this.timeout);
     // auto sync interval must not be 0 to avoid issues
