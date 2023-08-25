@@ -265,9 +265,11 @@ async function singlePartUploadFile(
     url: uploadUrl,
     method: "PUT",
     headers: {
-      "Content-Type": "application/octet-stream"
+      "Content-Type": ""
     },
-    data: await fileHandle.toBlob(),
+    data: IS_DESKTOP_APP
+      ? await (await fileHandle.toBlob()).arrayBuffer()
+      : await fileHandle.toBlob(),
     signal,
     onUploadProgress: (ev) =>
       reportProgress(
