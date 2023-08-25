@@ -26,17 +26,17 @@ export default class Content extends Collection {
   async add(content) {
     if (!content) return;
 
-    if (typeof content.data === "object") {
-      if (typeof content.data.data === "string")
+    if (
+      !!content.data &&
+      (!!content.data.data || (!content.data.iv && !content.data.cipher))
+    ) {
+      if (content.data.data && content.data.data.length)
         content.data = content.data.data;
       else if (!content.data.iv && !content.data.cipher)
         content.data = `<p>Content is invalid: ${JSON.stringify(
           content.data
         )}</p>`;
     }
-
-    if (content.remote || content.deleted)
-      return await this.extractAttachments(content);
 
     const oldContent = await this.raw(content.id);
     if (content.id && oldContent) {
