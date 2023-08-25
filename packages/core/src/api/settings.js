@@ -217,7 +217,7 @@ class Settings {
     await this._db.storage.write("settings", this._settings);
     this._db.eventManager.publish(
       EVENTS.databaseUpdated,
-      this._settings.id,
+      "settings",
       this._settings
     );
   }
