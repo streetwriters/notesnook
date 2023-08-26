@@ -153,5 +153,7 @@
 	</array>
 	<key>appGroupId</key>
 	<string>group.org.streetwriters.notesnook</string>
+	<key>disableMMKVBackup</key>
+	<true/>
 </dict>
 </plist>
