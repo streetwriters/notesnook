@@ -64,20 +64,20 @@ export function getTimeFormat(format: TimeFormat) {
   return format === "12-hour" ? "hh:mm A" : "HH:mm";
 }
 
-type TimeOptions = {
+export type TimeOptions = {
   type: "time";
   timeFormat: TimeFormat;
 };
-type DateOptions = {
+export type DateOptions = {
   type: "date";
   dateFormat: string;
 };
-type DateTimeOptions = {
+export type DateTimeOptions = {
   type: "date-time";
   dateFormat: string;
   timeFormat: TimeFormat;
 };
-type FormatDateOptions = TimeOptions | DateOptions | DateTimeOptions;
+export type FormatDateOptions = TimeOptions | DateOptions | DateTimeOptions;
 
 export function formatDate(
   date: string | number | Date | null | undefined,
