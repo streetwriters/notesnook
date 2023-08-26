@@ -17,11 +17,32 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { encodeNonAsciiHTML } from "entities";
+import {
+  DOMParser as ProsemirrorDOMParser,
+  ParseOptions
+} from "@tiptap/pm/model";
+import { Schema, Slice } from "prosemirror-model";
 
-export function convertBrToParagraph(html: string) {
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  for (const br of doc.querySelectorAll("br")) {
+export class ClipboardDOMParser extends ProsemirrorDOMParser {
+  static fromSchema(schema: Schema): ClipboardDOMParser {
+    return (
+      (schema.cached.clipboardDomParser as ClipboardDOMParser) ||
+      (schema.cached.clipboardDomParser = new ClipboardDOMParser(
+        schema,
+        (ProsemirrorDOMParser as any).schemaRules(schema)
+      ))
+    );
+  }
+
+  parseSlice(dom: Node, options?: ParseOptions | undefined): Slice {
+    convertBrToSingleSpacedParagraphs(dom);
+    return super.parseSlice(dom, options);
+  }
+}
+
+export function convertBrToSingleSpacedParagraphs(dom: Node) {
+  if (!(dom instanceof HTMLElement)) return;
+  for (const br of dom.querySelectorAll("br")) {
     let paragraph = br.closest("p");
 
     // if no paragraph is found over the br, we add one.
@@ -37,14 +58,13 @@ export function convertBrToParagraph(html: string) {
     if (paragraph) {
       splitOn(paragraph, br);
       const children = Array.from(paragraph.childNodes.values());
-      const newParagraph = doc.createElement("p");
+      const newParagraph = document.createElement("p");
       newParagraph.dataset.spacing = "single";
       newParagraph.append(...children.slice(children.indexOf(br) + 1));
       paragraph.insertAdjacentElement("afterend", newParagraph);
       br.remove();
     }
   }
-  return doc;
 }
 
 function splitOn(bound: Element, cutElement: Element) {
@@ -62,26 +82,4 @@ function splitOn(bound: Element, cutElement: Element) {
       grandparent?.insertBefore(cutElement, right);
     }
   }
-}
-
-export function convertTextToHTML(src: string) {
-  return src
-    .split(/[\r\n]/)
-    .map((line) =>
-      line
-        ? `<p data-spacing="single">${encodeLine(line)}</p>`
-        : `<p data-spacing="single"></p>`
-    )
-    .join("");
-}
-
-function encodeLine(line: string) {
-  line = encodeNonAsciiHTML(line);
-  line = line.replace(/(^ +)|( {2,})/g, (sub, ...args) => {
-    const [starting, inline] = args;
-    if (starting) return "&nbsp;".repeat(starting.length);
-    if (inline) return "&nbsp;".repeat(inline.length);
-    return sub;
-  });
-  return line;
 }

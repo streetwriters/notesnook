@@ -122,7 +122,10 @@ test("pasting code from vscode should automatically create a syntax highlighted 
   (clipboardEvent as unknown as any)["clipboardData"] = {
     getData: (type: string) =>
       type === "text/plain"
-        ? "function hello() { }"
+        ? `function hello()
+{
+  const world = "hello";
+}`
         : type === "vscode-editor-data"
         ? JSON.stringify({ mode: "javascript" })
         : undefined

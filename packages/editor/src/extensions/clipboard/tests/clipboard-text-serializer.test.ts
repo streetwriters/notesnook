@@ -21,12 +21,10 @@ import { test } from "vitest";
 import { createEditor, h } from "../../../../test-utils";
 import OrderedList from "../../ordered-list";
 import { ListItem } from "../../list-item";
-import {
-  getTextBetween,
-  transformCopied,
-  ClipboardDOMSerializer
-} from "../index";
+import { transformCopied } from "../index";
 import { Paragraph } from "../../paragraph";
+import { ClipboardDOMSerializer } from "../clipboard-dom-serializer";
+import { clipboardTextSerializer } from "../clipboard-text-serializer";
 
 test("copied list items shouldn't contain extra newlines", (t) => {
   const { editor } = createEditor({
@@ -59,9 +57,9 @@ test("copied list items shouldn't contain extra newlines", (t) => {
   );
 
   t.expect(
-    getTextBetween(
+    clipboardTextSerializer(
       editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
-      editor.schema
+      editor.view
     )
   ).toBe(`This is line: number 1.
 And this is line number 2.
@@ -194,9 +192,9 @@ for (const testCase of paragraphTestCases) {
     ).toBe(testCase.expectedHtml);
 
     t.expect(
-      getTextBetween(
+      clipboardTextSerializer(
         editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
-        editor.schema
+        editor.view
       )
     ).toBe(testCase.expectedText);
   });
