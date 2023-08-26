@@ -503,7 +503,7 @@ p > *::selection {
 
 .outline-list li > :first-child::before {
   position: absolute;
-  top: calc(50% - 7.5px);
+  top: 3px;
   cursor: pointer;
   content: "";
   background-size: 18px;
