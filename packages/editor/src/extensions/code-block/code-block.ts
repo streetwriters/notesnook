@@ -787,8 +787,8 @@ function detectCodeBlock(dataTransfer: DataTransfer) {
   const isVSCode =
     vscode ||
     (document.body.firstElementChild instanceof HTMLDivElement &&
-      document.body.firstElementChild.style.fontFamily ===
-        `'Droid Sans Mono', 'monospace', monospace`);
+      document.body.firstElementChild.style.fontFamily.includes("monospace") &&
+      document.body.firstElementChild.style.whiteSpace.includes("pre"));
 
   const language =
     vscodeData?.mode ||
