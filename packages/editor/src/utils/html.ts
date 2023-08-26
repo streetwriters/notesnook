@@ -64,11 +64,24 @@ function splitOn(bound: Element, cutElement: Element) {
   }
 }
 
-function convertNewlinesToBr(html: string) {
-  const lines = html.split(/\n/gm);
-  for (let i = 0; i < lines.length; ++i) {
-    if (lines[i].trim().endsWith(">")) continue;
-    lines[i] += "<br>";
-  }
-  return lines.join("");
+export function convertTextToHTML(src: string) {
+  return src
+    .split(/[\r\n]/)
+    .map((line) =>
+      line
+        ? `<p data-spacing="single">${encodeLine(line)}</p>`
+        : `<p data-spacing="single"></p>`
+    )
+    .join("");
+}
+
+function encodeLine(line: string) {
+  line = encodeNonAsciiHTML(line);
+  line = line.replace(/(^ +)|( {2,})/g, (sub, ...args) => {
+    const [starting, inline] = args;
+    if (starting) return "&nbsp;".repeat(starting.length);
+    if (inline) return "&nbsp;".repeat(inline.length);
+    return sub;
+  });
+  return line;
 }

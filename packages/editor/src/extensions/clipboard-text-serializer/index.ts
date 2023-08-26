@@ -22,7 +22,11 @@ import { Plugin, PluginKey } from "prosemirror-state";
 import { Fragment, Schema, Slice } from "prosemirror-model";
 import { ListItem } from "../list-item";
 import { LIST_NODE_TYPES } from "../../utils/node-types";
-import { DOMSerializer } from "@tiptap/pm/model";
+import {
+  DOMSerializer,
+  DOMParser as ProsemirrorDOMParser
+} from "@tiptap/pm/model";
+import { convertTextToHTML } from "../../utils/html";
 
 export class ClipboardDOMSerializer extends DOMSerializer {
   static fromSchema(schema: Schema): ClipboardDOMSerializer {
@@ -72,6 +76,15 @@ export const ClipboardTextSerializer = Extension.create({
           clipboardSerializer: ClipboardDOMSerializer.fromSchema(
             this.editor.view.state.schema
           ),
+          clipboardTextParser: (text) => {
+            const doc = new DOMParser().parseFromString(
+              convertTextToHTML(text),
+              "text/html"
+            );
+            return ProsemirrorDOMParser.fromSchema(
+              this.editor.view.state.schema
+            ).parseSlice(doc, { preserveWhitespace: "full" });
+          },
           clipboardTextSerializer: (content, view) => {
             return getTextBetween(content, view.state.schema);
           }
