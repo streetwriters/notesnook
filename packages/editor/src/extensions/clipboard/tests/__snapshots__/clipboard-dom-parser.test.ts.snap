@@ -1,0 +1,69 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`convert br tags to paragraphs (
+  <html><body>
+<!--StartFragment-->A troll, they call me, but I have no wish<br>
+to be associated with those dolls<br>
+<br>
+We lack religion, purpose, politics,<br>
+and yet, we somehow manage to get by.<br>
+</body>
+</html>) 1`] = `
+"<!--StartFragment-->A troll, they call me, but I have no wish<br>
+to be associated with those dolls<br>
+<br>
+We lack religion, purpose, politics,<br>
+and yet, we somehow manage to get by.<br>"
+`;
+
+exports[`convert br tags to paragraphs (<html><body>
+    <!--StartFragment--><p dir="auto">When I try to paste something (e.g. email content) to a note, the styling is kept, which is good, but the newlines are removed.<br>
+    Also when I share the selection to Notesnook via the share functionality from Android, I have the same issue.</p>
+    <hr>
+    <p dir="auto"><strong>Device information:</strong><br>
+    App version: 2.3.0<br>
+    Platform: android<br>
+    Model: OnePlus-CPH2409-31<br>
+    Pro: true<br>
+    Logged in: yes</p><!--EndFragment-->
+    </body>
+    </html>) 1`] = `
+"<!--StartFragment--><p dir=\\"auto\\">When I try to paste something (e.g. email content) to a note, the styling is kept, which is good, but the newlines are removed.<br>
+    Also when I share the selection to Notesnook via the share functionality from Android, I have the same issue.</p>
+    <hr>
+    <p dir=\\"auto\\"><strong>Device information:</strong><br>
+    App version: 2.3.0<br>
+    Platform: android<br>
+    Model: OnePlus-CPH2409-31<br>
+    Pro: true<br>
+    Logged in: yes</p><!--EndFragment-->"
+`;
+
+exports[`convert br tags to paragraphs (<html><body>
+    <!--StartFragment--><span class="css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0">Why switch from Gmail? 
+
+    Not sacrificing features for more privacy, prefer using one app, in many public groups and channels (Telegram)
+    
+    LibreOffice Slow &amp; buggy
+    
+    Switched to Brave for the better Android app, more private out of the box &amp; unsure if uBlock Origin closes gap</span><!--EndFragment-->
+    </body>
+    </html>) 1`] = `
+"<!--StartFragment--><span class=\\"css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0\\">Why switch from Gmail? 
+
+    Not sacrificing features for more privacy, prefer using one app, in many public groups and channels (Telegram)
+    
+    LibreOffice Slow &amp; buggy
+    
+    Switched to Brave for the better Android app, more private out of the box &amp; unsure if uBlock Origin closes gap</span><!--EndFragment-->"
+`;
+
+exports[`convert br tags to paragraphs (<p><br/></p>) 1`] = `"<p><br></p>"`;
+
+exports[`convert br tags to paragraphs (<p>line <em>1<br>line</em> 2</p>) 1`] = `"<p>line <em>1<br>line</em> 2</p>"`;
+
+exports[`convert br tags to paragraphs (<p>line <span><em>1<br data-some="hello">line</em></span> 2</p>) 1`] = `"<p>line <span><em>1<br data-some=\\"hello\\">line</em></span> 2</p>"`;
+
+exports[`convert br tags to paragraphs (<p>line <span><em>1<br>line</em></span> 2</p>) 1`] = `"<p>line <span><em>1<br>line</em></span> 2</p>"`;
+
+exports[`convert br tags to paragraphs (<p>line 1<br>line 2</p>) 1`] = `"<p>line 1<br>line 2</p>"`;

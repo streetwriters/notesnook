@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { test } from "vitest";
-import { convertBrToParagraph } from "../html";
+import { convertBrToSingleSpacedParagraphs } from "../clipboard-dom-parser";
 
 const cases = [
   [`<p>line 1<br>line 2</p>`],
@@ -68,8 +68,8 @@ and yet, we somehow manage to get by.<br>
 for (const testCase of cases) {
   const [html, expected] = testCase;
   test(`convert br tags to paragraphs (${testCase})`, (t) => {
-    t.expect(
-      convertBrToParagraph(html).body.innerHTML.trim()
-    ).toMatchSnapshot();
+    const element = new DOMParser().parseFromString(html, "text/html");
+    convertBrToSingleSpacedParagraphs(element);
+    t.expect(element.body.innerHTML.trim()).toMatchSnapshot();
   });
 }
