@@ -17,11 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { encodeNonAsciiHTML } from "entities";
+
 export function convertBrToParagraph(html: string) {
-  const doc = new DOMParser().parseFromString(
-    convertNewlinesToBr(html),
-    "text/html"
-  );
+  const doc = new DOMParser().parseFromString(html, "text/html");
   for (const br of doc.querySelectorAll("br")) {
     let paragraph = br.closest("p");
 
