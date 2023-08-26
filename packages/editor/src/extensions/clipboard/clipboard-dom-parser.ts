@@ -65,6 +65,14 @@ export function convertBrToSingleSpacedParagraphs(dom: Node) {
       br.remove();
     }
   }
+
+  for (const code of dom.querySelectorAll("div > code")) {
+    if (code.parentElement) {
+      const pre = document.createElement("pre");
+      pre.append(code);
+      code.parentElement.replaceWith(pre);
+    }
+  }
 }
 
 function splitOn(bound: Element, cutElement: Element) {
