@@ -63,7 +63,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
     };
   },
 
-  content: "heading* paragraph block*",
+  content: "paragraph+ list?",
 
   defining: true,
 
