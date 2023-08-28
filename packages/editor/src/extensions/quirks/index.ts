@@ -17,22 +17,5 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ListItem as TiptapListItem } from "@tiptap/extension-list-item";
-
-export const ListItem = TiptapListItem.extend({
-  addKeyboardShortcuts() {
-    return {
-      ...this.parent?.(),
-      Tab: (props) => {
-        const { editor } = props;
-        const { state } = editor;
-        const { selection } = state;
-        const { $from } = selection;
-
-        if ($from.parent.type.name === "codeblock") return false;
-
-        return this.parent?.()?.Tab(props) || false;
-      }
-    };
-  }
-});
+export * from "./quirks";
+export { Quirks as default } from "./quirks";

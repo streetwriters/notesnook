@@ -299,43 +299,6 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           to: codeblock.pos + codeblock.node.nodeSize - 1
         });
       },
-      // remove code block when at start of document or code block is empty
-      Backspace: ({ editor }) => {
-        const { empty, $anchor } = editor.state.selection;
-
-        const currentNode = $anchor.parent;
-        const nextNode = editor.state.doc.nodeAt($anchor.pos + 1);
-        const isCodeBlock = (node: ProsemirrorNode | null) =>
-          node && node.type.name === this.name;
-        const isAtStart = $anchor.pos === 1;
-
-        if (!empty) {
-          return false;
-        }
-
-        if (
-          isAtStart ||
-          (isCodeBlock(currentNode) && !currentNode.textContent.length)
-        ) {
-          return this.editor.commands.deleteNode(this.type);
-        }
-        // on android due to composition issues with various keyboards,
-        // sometimes backspace is detected one node behind. We need to
-        // manually handle this case.
-        else if (
-          nextNode &&
-          isCodeBlock(nextNode) &&
-          !nextNode.textContent.length
-        ) {
-          return this.editor.commands.command(({ tr }) => {
-            tr.delete($anchor.pos + 1, $anchor.pos + 1 + nextNode.nodeSize);
-            return true;
-          });
-        }
-
-        return false;
-      },
-
       // exit node on triple enter
       Enter: ({ editor }) => {
         const { state } = editor;
@@ -353,28 +316,6 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
         if (indentation) return indentOnEnter(editor, $from, indentation);
         return false;
-      },
-
-      // exit node on arrow up
-      ArrowUp: ({ editor }) => {
-        if (!this.options.exitOnArrowUp) {
-          return false;
-        }
-
-        const { state } = editor;
-        const { selection } = state;
-        const { $anchor, empty } = selection;
-
-        if (!empty || $anchor.parent.type !== this.type) {
-          return false;
-        }
-
-        const isAtStart = $anchor.pos === 1;
-        if (!isAtStart) {
-          return false;
-        }
-
-        return editor.commands.insertContentAt(0, "<p></p>");
       },
       // exit node on arrow down
       ArrowDown: ({ editor }) => {

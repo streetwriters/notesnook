@@ -77,6 +77,8 @@ import { DownloadOptions } from "./utils/downloader";
 import { Heading } from "./extensions/heading";
 import Clipboard, { ClipboardOptions } from "./extensions/clipboard";
 import Blockquote from "./extensions/blockquote";
+import { Quirks } from "./extensions/quirks";
+import { LIST_NODE_TYPES } from "./utils/node-types";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -220,22 +222,6 @@ const useTiptap = (
         OrderedList.configure({ keepMarks: true, keepAttributes: true }),
         TaskItemNode.configure({ nested: true }),
         TaskListNode,
-        ListKeymap.configure({
-          listTypes: [
-            {
-              itemName: ListItem.name,
-              wrapperNames: [BulletList.name, OrderedList.name]
-            },
-            {
-              itemName: TaskItemNode.name,
-              wrapperNames: [TaskListNode.name]
-            },
-            {
-              itemName: OutlineListItem.name,
-              wrapperNames: [OutlineList.name]
-            }
-          ]
-        }),
         Link.extend({
           inclusive: true
         }).configure({
@@ -286,7 +272,38 @@ const useTiptap = (
         }),
         DateTime.configure({ dateFormat, timeFormat }),
         KeyMap,
-        WebClipNode
+        WebClipNode,
+
+        // Quirks handlers
+        Quirks.configure({
+          irremovableNodesOnBackspace: [
+            CodeBlock.name,
+            TaskListNode.name,
+            Table.name
+          ],
+          escapableNodesIfAtDocumentStart: [
+            CodeBlock.name,
+            Table.name,
+            Blockquote.name,
+            ...LIST_NODE_TYPES
+          ]
+        }),
+        ListKeymap.configure({
+          listTypes: [
+            {
+              itemName: ListItem.name,
+              wrapperNames: [BulletList.name, OrderedList.name]
+            },
+            {
+              itemName: TaskItemNode.name,
+              wrapperNames: [TaskListNode.name]
+            },
+            {
+              itemName: OutlineListItem.name,
+              wrapperNames: [OutlineList.name]
+            }
+          ]
+        })
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.portalProviderAPI = PortalProviderAPI;

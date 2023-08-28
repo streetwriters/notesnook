@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { mergeAttributes } from "@tiptap/core";
-import { onArrowUpPressed } from "../list-item/commands";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { TaskItemComponent } from "./component";
 import { createNodeView } from "../react";
@@ -73,8 +72,7 @@ export const TaskItemNode = TaskItem.extend({
 
   addKeyboardShortcuts() {
     return {
-      ...this.parent?.(),
-      ArrowUp: ({ editor }) => onArrowUpPressed(editor, this.name, this.type)
+      ...this.parent?.()
     };
   },
 
