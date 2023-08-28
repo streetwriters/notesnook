@@ -309,9 +309,17 @@ img.ProseMirror-separator {
 }
 
 .ProseMirror blockquote {
-  border-left: 5px solid var(--border);
-  padding-left: 15px;
+  border-inline-start: 5px solid var(--border);
+  padding-inline-start: 15px;
 }
+
+@media screen and (max-width: 480px) {
+  .ProseMirror blockquote {
+    margin-inline: 5px;
+    padding-inline-start: 10px;
+}
+}
+
 
 /****************************************************************/
 /* Styles taken from https://github.com/curvenote/prosemirror-codemark/blob/main/src/codemark.css */
@@ -567,14 +575,6 @@ p > *::selection {
 [dir="rtl"] ul {
   margin-left: 0px !important;
 }
-
-blockquote[dir="rtl"] {
-  border-left: none;
-  padding-left: 0px;
-  border-right: 5px solid var(--border);
-  padding-right: 15px;
-}
-
 
 .outline-list[dir="rtl"] li > p::before {
   right: -22px;
