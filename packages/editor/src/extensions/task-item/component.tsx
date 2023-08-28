@@ -85,7 +85,7 @@ export function TaskItemComponent(
             opacity: [1, 1, 0],
             alignSelf: "start",
             bg: "transparent",
-            mt: "0.36ch",
+            mt: isMobile ? "0.20ch" : "0.36ch",
             cursor: "grab",
             mx: 1,
             fontFamily: "inherit"
@@ -104,7 +104,7 @@ export function TaskItemComponent(
           borderRadius: "default",
           alignSelf: "start",
           p: "1px",
-          mt: "0.40ch",
+          mt: isMobile ? "0.20ch" : "0.36ch",
           marginInlineEnd: 1,
           cursor: editor.isEditable ? "pointer" : "unset",
           ":hover": isMobile
@@ -137,13 +137,6 @@ export function TaskItemComponent(
             textDecorationLine: checked ? "line-through" : "none",
             opacity: checked ? 0.8 : 1
           },
-          // FIXME: this is quite fragile and will break if the structure
-          // changes. We should probably find a better & more robust
-          // solution for this.
-          "> .taskitem-content-wrapper > p:hover ~ div > div.task-list-tools .toggleSublist":
-            {
-              opacity: 1
-            },
           flex: 1,
           mt: ["3px", "3px", 0],
           ml: ["2px", "2px", 0]

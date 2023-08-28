@@ -32,15 +32,18 @@ export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
 ) {
   // const isMobile = useIsMobile();
-  const { editor, getPos, node, updateAttributes, forwardRef } = props;
+  const { editor, getPos, node, updateAttributes, forwardRef, pos } = props;
   const taskItemType = getNodeType(TaskItemNode.name, editor.schema);
   const { title, textDirection } = node.attrs;
   const [stats, setStats] = useState({ checked: 0, total: 0, percentage: 0 });
 
   const getParent = useCallback(() => {
-    const pos = editor.state.doc.resolve(getPos());
-    return findParentNodeOfTypeClosestToPos(pos, taskItemType);
-  }, [editor.state.doc, getPos, taskItemType]);
+    if (pos === undefined) return;
+    return findParentNodeOfTypeClosestToPos(
+      editor.state.doc.resolve(pos),
+      taskItemType
+    );
+  }, [editor.state.doc, pos, taskItemType]);
 
   const isNested = useMemo(() => {
     return !!getParent();

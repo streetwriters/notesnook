@@ -44,6 +44,7 @@ export type ContentDOM =
   | undefined;
 
 export type ReactNodeViewProps<TAttributes = Attrs> = {
+  pos: number | undefined;
   getPos: GetPosNode;
   node: NodeWithAttrs<TAttributes>;
   editor: Editor;
