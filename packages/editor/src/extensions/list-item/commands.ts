@@ -20,56 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EditorState } from "prosemirror-state";
 import { NodeType } from "prosemirror-model";
 import { Editor } from "@tiptap/core";
-import {
-  findParentNodeOfType,
-  hasParentNodeOfType
-} from "../../utils/prosemirror";
-
-// WORKAROUND: if we're at the start of a list item, we need to either
-// backspace directly to an empty list item above, or outdent this node
-export function onBackspacePressed(
-  editor: Editor,
-  name: string,
-  type: NodeType
-) {
-  const { selection } = editor.state;
-  const { empty, $from } = selection;
-
-  if (
-    !empty ||
-    !isInside(name, type, editor.state) ||
-    $from.parentOffset !== 0 ||
-    !isFirstChildOfParent(editor.state) ||
-    !editor.can().liftListItem(type)
-  )
-    return false;
-
-  const isEmpty = isListItemEmpty(type, editor.state);
-
-  if (isEmpty) {
-    if (isFirstOfType(type, editor.state)) {
-      const parentList = getListFromListItem(type, editor.state);
-      if (!parentList) return false;
-      if (parentList.childCount > 1) {
-        return editor.commands.liftListItem(type);
-      }
-    }
-
-    return editor.chain().joinBackward().joinBackward().run();
-  } else if (isFirstOfType(type, editor.state)) {
-    return editor.commands.liftListItem(type);
-  } else {
-    const block = findParentNodeOfType(type)(selection);
-    if (block && block.start === $from.pos - 1) {
-      // we have to run join backward twice because on the first join
-      // the two list items are joined i.e., the editor just puts their
-      // paragraphs next to each other. The next join merges the paragraphs
-      // like it should be.
-      return editor.chain().joinBackward().joinBackward().run();
-    }
-  }
-  return false;
-}
+import { findParentNodeOfType } from "../../utils/prosemirror";
 
 export function onArrowUpPressed(editor: Editor, name: string, type: NodeType) {
   const { selection } = editor.state;
@@ -80,25 +31,6 @@ export function onArrowUpPressed(editor: Editor, name: string, type: NodeType) {
   if (editor.state.doc.firstChild === parentList)
     return editor.commands.insertContentAt(0, "<p></p>");
   return false;
-}
-
-function isInside(name: string, type: NodeType, state: EditorState) {
-  const { $from } = state.selection;
-
-  const node = type || state.schema.nodes[name];
-  const { paragraph } = state.schema.nodes;
-
-  return (
-    hasParentNodeOfType(node)(state.selection) &&
-    $from.parent.type === paragraph
-  );
-}
-
-function isFirstChildOfParent(state: EditorState): boolean {
-  const { $from } = state.selection;
-  return $from.depth > 1
-    ? $from.parentOffset === 0 || $from.index($from.depth - 1) === 0
-    : true;
 }
 
 const isFirstOfType = (type: NodeType, state: EditorState) => {
@@ -122,10 +54,3 @@ const getListFromListItem = (type: NodeType, state: EditorState) => {
 
   return resolved.parent;
 };
-
-function isListItemEmpty(type: NodeType, state: EditorState) {
-  const block = findParentNodeOfType(type)(state.selection);
-  if (!block) return false;
-  const { node } = block;
-  return !node.textContent.length;
-}

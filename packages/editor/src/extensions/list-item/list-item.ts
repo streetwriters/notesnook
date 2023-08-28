@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ListItem as TiptapListItem } from "@tiptap/extension-list-item";
-import { onArrowUpPressed, onBackspacePressed } from "./commands";
+import { onArrowUpPressed } from "./commands";
 
 export const ListItem = TiptapListItem.extend({
   addKeyboardShortcuts() {
@@ -34,8 +34,6 @@ export const ListItem = TiptapListItem.extend({
 
         return this.parent?.()?.Tab(props) || false;
       },
-      Backspace: ({ editor }) =>
-        onBackspacePressed(editor, this.name, this.type),
       ArrowUp: ({ editor }) => onArrowUpPressed(editor, this.name, this.type)
     };
   }
