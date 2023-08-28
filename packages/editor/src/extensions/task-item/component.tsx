@@ -121,7 +121,7 @@ export function TaskItemComponent(
           toggle();
         }}
         onTouchEnd={(e) => {
-          if (globalThis["keyboardShown"] || isiOS()) {
+          if (globalThis["keyboardShown"] || isiOS) {
             e.preventDefault();
             toggle();
           }

@@ -17,17 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export function isiOS(): boolean {
-  return (
-    [
-      "iPad Simulator",
-      "iPhone Simulator",
-      "iPod Simulator",
-      "iPad",
-      "iPhone",
-      "iPod"
-    ].includes(navigator.platform) ||
-    // iPad on iOS 13 detection
-    (navigator.userAgent.includes("Mac") && "ontouchend" in document)
-  );
-}
+export const isiOS =
+  [
+    "iPad Simulator",
+    "iPhone Simulator",
+    "iPod Simulator",
+    "iPad",
+    "iPhone",
+    "iPod"
+  ].includes(navigator.platform) ||
+  // iPad on iOS 13 detection
+  (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+
+export const isAndroid =
+  navigator.userAgent.toLowerCase().indexOf("android") > -1;
