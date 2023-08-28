@@ -59,7 +59,7 @@ export function createMathView(inline: boolean) {
   return (
     node: ProseNode,
     view: EditorView,
-    getPos: boolean | (() => number)
+    getPos: boolean | (() => number | undefined)
   ): MathView => {
     /** @todo is this necessary?
      * Docs says that for any function proprs, the current plugin instance
