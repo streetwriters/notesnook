@@ -36,6 +36,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import TextStyle from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
+import ListKeymap from "@tiptap/extension-list-keymap";
 import { useEffect, useMemo } from "react";
 import "./extensions";
 import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
@@ -219,6 +220,22 @@ const useTiptap = (
         OrderedList.configure({ keepMarks: true, keepAttributes: true }),
         TaskItemNode.configure({ nested: true }),
         TaskListNode,
+        ListKeymap.configure({
+          listTypes: [
+            {
+              itemName: ListItem.name,
+              wrapperNames: [BulletList.name, OrderedList.name]
+            },
+            {
+              itemName: TaskItemNode.name,
+              wrapperNames: [TaskListNode.name]
+            },
+            {
+              itemName: OutlineListItem.name,
+              wrapperNames: [OutlineList.name]
+            }
+          ]
+        }),
         Link.extend({
           inclusive: true
         }).configure({

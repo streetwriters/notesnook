@@ -26,7 +26,7 @@ import {
 } from "@tiptap/core";
 import { NodeType } from "prosemirror-model";
 import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
-import { onArrowUpPressed, onBackspacePressed } from "../list-item/commands";
+import { onArrowUpPressed } from "../list-item/commands";
 import { OutlineList } from "../outline-list/outline-list";
 
 export interface ListItemOptions {
@@ -111,8 +111,6 @@ export const OutlineListItem = Node.create<ListItemOptions>({
       },
       Tab: () => this.editor.commands.sinkListItem(this.name),
       "Shift-Tab": () => this.editor.commands.liftListItem(this.name),
-      Backspace: ({ editor }) =>
-        onBackspacePressed(editor, this.name, this.type),
       ArrowUp: ({ editor }) => onArrowUpPressed(editor, this.name, this.type)
     };
   },
