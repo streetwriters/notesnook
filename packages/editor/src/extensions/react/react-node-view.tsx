@@ -159,6 +159,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
       <EmotionThemeProvider scope="editor" injectCssVars={false}>
         <this.options.component
           {...props}
+          pos={this.getPos()}
           editor={this.editor}
           getPos={this.getPos}
           node={this.node}
