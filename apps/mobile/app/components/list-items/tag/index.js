@@ -66,7 +66,7 @@ const TagItem = React.memo(
             >
               #
             </Heading>
-            {item.alias}
+            {item.title}
           </Heading>
           <Paragraph
             color={colors.secondary.paragraph}

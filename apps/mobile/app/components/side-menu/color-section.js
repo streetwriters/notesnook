@@ -17,22 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
-import { View } from "react-native";
-import Navigation from "../../services/navigation";
-import useNavigationStore from "../../stores/use-navigation-store";
-import { useMenuStore } from "../../stores/use-menu-store";
-import { useNoteStore } from "../../stores/use-notes-store";
 import { useThemeColors } from "@notesnook/theme";
-import { ColorValues } from "../../utils/colors";
+import React, { useCallback, useEffect, useState } from "react";
+import { View } from "react-native";
 import { db } from "../../common/database";
-import { normalize, SIZE } from "../../utils/size";
+import { ColoredNotes } from "../../screens/notes/colored";
+import Navigation from "../../services/navigation";
+import { useMenuStore } from "../../stores/use-menu-store";
+import useNavigationStore from "../../stores/use-navigation-store";
+import { useNoteStore } from "../../stores/use-notes-store";
+import { SIZE, normalize } from "../../utils/size";
 import { presentDialog } from "../dialog/functions";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { ColoredNotes } from "../../screens/notes/colored";
-import { useCallback } from "react";
 
 export const ColorSection = React.memo(
   function ColorSection() {
@@ -47,21 +45,18 @@ export const ColorSection = React.memo(
     }, [loading, setColorNotes]);
 
     return colorNotes.map((item, index) => {
-      let alias = db.colors.alias(item.id);
-      return (
-        <ColorItem key={item.id} alias={alias} item={item} index={index} />
-      );
+      return <ColorItem key={item.id} item={item} index={index} />;
     });
   },
   () => true
 );
 
 const ColorItem = React.memo(
-  function ColorItem({ item, alias }) {
+  function ColorItem({ item }) {
     const { colors, isDark } = useThemeColors();
     const setColorNotes = useMenuStore((state) => state.setColorNotes);
     const [headerTextState, setHeaderTextState] = useState(null);
-    alias = db.colors.alias(item.id) || "";
+    const isFocused = headerTextState?.id === item.id;
 
     const onHeaderStateChange = useCallback(
       (state) => {
@@ -99,11 +94,14 @@ const ColorItem = React.memo(
         title: "Rename color",
         input: true,
         inputPlaceholder: "Enter name for this color",
-        defaultValue: alias,
+        defaultValue: item.title,
         paragraph: "You are renaming the color " + item.title,
         positivePress: async (value) => {
           if (!value || value.trim().length === 0) return;
-          await db.colors.rename(item.id, value);
+          await db.colors.add({
+            id: item.id,
+            title: value
+          });
           setColorNotes();
         },
         positiveText: "Rename"
@@ -112,11 +110,9 @@ const ColorItem = React.memo(
 
     return (
       <PressableButton
-        customColor={
-          headerTextState?.id === item.id ? "rgba(0,0,0,0.04)" : "transparent"
-        }
+        customColor={isFocused ? "rgba(0,0,0,0.04)" : "transparent"}
         onLongPress={onLongPress}
-        customSelectedColor={ColorValues[item.title.toLowerCase()]}
+        customSelectedColor={item.colorCode}
         customAlpha={!isDark ? -0.02 : 0.02}
         customOpacity={0.12}
         onPress={() => onPress(item)}
@@ -149,20 +145,20 @@ const ColorItem = React.memo(
               style={{
                 width: SIZE.lg - 2,
                 height: SIZE.lg - 2,
-                backgroundColor: ColorValues[item.title.toLowerCase()],
+                backgroundColor: item.colorCode,
                 borderRadius: 100,
                 justifyContent: "center",
                 marginRight: 10
               }}
             />
           </View>
-          {headerTextState?.id === item.id ? (
+          {isFocused ? (
             <Heading color={colors.selected.heading} size={SIZE.md}>
-              {alias.slice(0, 1).toUpperCase() + alias.slice(1)}
+              {item.title?.slice(0, 1).toUpperCase() + item.title.slice(1)}
             </Heading>
           ) : (
             <Paragraph color={colors.primary.paragraph} size={SIZE.md}>
-              {alias.slice(0, 1).toUpperCase() + alias.slice(1)}
+              {item.title?.slice(0, 1).toUpperCase() + item.title.slice(1)}
             </Paragraph>
           )}
         </View>
@@ -171,8 +167,8 @@ const ColorItem = React.memo(
   },
   (prev, next) => {
     if (!next.item) return false;
+    if (prev.item?.title !== next.item.title) return false;
     if (prev.item?.dateModified !== next.item?.dateModified) return false;
-    if (prev.alias !== next.alias) return false;
     if (prev.item?.id !== next.item?.id) return false;
 
     return true;

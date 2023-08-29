@@ -177,17 +177,37 @@ export const Items = ({ item, buttons, close }) => {
     "export",
     "lock-unlock"
   ];
+
   if (!shouldShrink) {
     topBarItemsList.push("publish");
   }
 
-  const topBarItems = data.filter(
-    (item) => topBarItemsList.indexOf(item.id) > -1
-  );
+  const topBarItems = data
+    .filter((item) => topBarItemsList.indexOf(item.id) > -1)
+    .sort((a, b) =>
+      topBarItemsList.indexOf(a.id) > topBarItemsList.indexOf(b.id) ? 1 : -1
+    );
 
-  const bottomGridItems = data.filter(
-    (item) => topBarItemsList.indexOf(item.id) === -1
-  );
+  const bottomBarItemsList = [
+    "notebooks",
+    "add-reminder",
+    "pin-to-notifications",
+    "duplicate",
+    "read-only",
+    "local-only",
+    "history",
+    "reminders",
+    "attachments",
+    "trash"
+  ];
+
+  const bottomGridItems = data
+    .filter((item) => bottomBarItemsList.indexOf(item.id) > -1)
+    .sort((a, b) =>
+      bottomBarItemsList.indexOf(a.id) > bottomBarItemsList.indexOf(b.id)
+        ? 1
+        : -1
+    );
 
   const topBarItemWidth =
     (width - (topBarItems.length * 10 + 14)) / topBarItems.length;

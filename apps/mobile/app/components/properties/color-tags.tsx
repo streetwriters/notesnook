@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState } from "react";
+import { DefaultColors } from "@notesnook/core/dist/collections/colors";
+import { Note } from "@notesnook/core/dist/types";
+import { useThemeColors } from "@notesnook/theme";
+import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
@@ -25,45 +28,77 @@ import { db } from "../../common/database";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
+import { useRelationStore } from "../../stores/use-relation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { ColorValues } from "../../utils/colors";
 import { refreshNotesPage } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
-import { useThemeColors } from "@notesnook/theme";
 
-export const ColorTags = ({ item }) => {
+export const ColorTags = ({ item }: { item: Note }) => {
   const { colors } = useThemeColors();
-  const [note, setNote] = useState(item);
   const setColorNotes = useMenuStore((state) => state.setColorNotes);
   const isTablet = useSettingStore((state) => state.deviceMode) !== "mobile";
-  const changeColor = async (color) => {
-    if (note.color === color.name) {
-      await db.notes.note(note.id).uncolor();
-    } else {
-      await db.notes.note(note.id).color(color.name);
+  const updater = useRelationStore((state) => state.updater);
+
+  const getColorInfo = (colorCode: string) => {
+    const dbColor = db.colors.all.find((v) => v.colorCode === colorCode);
+    let isLinked = false;
+
+    if (dbColor) {
+      const note = db.relations
+        .from(dbColor, "note")
+        .find((relation) => relation.to.id === item.id);
+
+      if (note) {
+        isLinked = true;
+      }
     }
-    let _note = db.notes.note(note.id).data;
-    setNote({ ..._note });
+
+    return {
+      linked: isLinked,
+      item: dbColor
+    };
+  };
+
+  const changeColor = async (color: string) => {
+    const colorInfo = getColorInfo(DefaultColors[color]);
+
+    if (colorInfo.item) {
+      if (colorInfo.linked) {
+        await db.relations.unlink(colorInfo.item, item);
+      } else {
+        await db.relations.add(colorInfo.item, item);
+      }
+    } else {
+      const colorId = await db.colors.add({
+        title: color,
+        colorCode: DefaultColors[color]
+      });
+
+      const dbColor = db.colors.color(colorId);
+      if (dbColor) {
+        await db.relations.add(dbColor, item);
+      }
+    }
+
+    useRelationStore.getState().update();
     setColorNotes();
     Navigation.queueRoutesForUpdate();
     eSendEvent(refreshNotesPage);
   };
 
-  const _renderColor = (c) => {
-    const color = {
-      name: c,
-      value: ColorValues[c?.toLowerCase()]
-    };
+  const _renderColor = (name: keyof typeof DefaultColors) => {
+    const color = DefaultColors[name];
+    const colorInfo = getColorInfo(color);
 
     return (
       <PressableButton
         type="accent"
-        accentColor={colors.static[color.name?.toLowerCase()]}
+        accentColor={color}
         accentText={colors.static.white}
-        testID={notesnook.ids.dialogs.actionsheet.color(c)}
-        key={color.value}
-        onPress={() => changeColor(color)}
+        testID={notesnook.ids.dialogs.actionsheet.color(name)}
+        key={color}
+        onPress={() => changeColor(name)}
         customStyle={{
           width: 30,
           height: 30,
@@ -73,7 +108,7 @@ export const ColorTags = ({ item }) => {
           marginRight: isTablet ? 10 : undefined
         }}
       >
-        {note.color?.toLowerCase() === color.name ? (
+        {colorInfo.linked ? (
           <Icon testID="icon-check" name="check" color="white" size={SIZE.lg} />
         ) : null}
       </PressableButton>
@@ -92,7 +127,7 @@ export const ColorTags = ({ item }) => {
         justifyContent: isTablet ? "center" : "space-between"
       }}
     >
-      {Object.keys(ColorValues).map(_renderColor)}
+      {Object.keys(DefaultColors).map(_renderColor)}
     </View>
   );
 };

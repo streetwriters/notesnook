@@ -23,7 +23,7 @@ import { db } from "../../common/database";
 import {
   eSendEvent,
   presentSheet,
-  ToastEvent
+  ToastManager
 } from "../../services/event-manager";
 import { useUserStore } from "../../stores/use-user-store";
 import { eCloseSheet, eOpenRecoveryKeyDialog } from "../../utils/events";
@@ -48,7 +48,7 @@ export const ChangePassword = () => {
 
   const changePassword = async () => {
     if (!user?.isEmailConfirmed) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Email not confirmed",
         message: "Please confirm your email to change account password",
         type: "error",
@@ -57,7 +57,7 @@ export const ChangePassword = () => {
       return;
     }
     if (error || !oldPassword.current || !password.current) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "All fields required",
         message: "Fill all the fields and try again.",
         type: "error",
@@ -72,7 +72,7 @@ export const ChangePassword = () => {
 
       await db.user.clearSessions();
       await db.user.changePassword(oldPassword.current, password.current);
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Account password updated",
         type: "success",
         context: "global"
@@ -83,7 +83,7 @@ export const ChangePassword = () => {
       eSendEvent(eOpenRecoveryKeyDialog);
     } catch (e) {
       setLoading(false);
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Failed to change password",
         message: e.message,
         type: "error",

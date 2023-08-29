@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { NotebookType, NoteType, TopicType } from "app/utils/types";
+import { Note, Notebook, Topic } from "@notesnook/core/dist/types";
+import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useState } from "react";
 import { Platform, useWindowDimensions, View } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
@@ -26,11 +27,10 @@ import { db } from "../../../common/database";
 import {
   eSendEvent,
   presentSheet,
-  ToastEvent
+  ToastManager
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SearchService from "../../../services/search";
-import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { Dialog } from "../../dialog";
@@ -43,27 +43,19 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
-type CommonItemType = {
-  id: string;
-  title: string;
-  headline?: string;
-  type: string;
-  notes?: string[];
-};
-
 export const MoveNotes = ({
   notebook,
   selectedTopic,
   fwdRef
 }: {
-  notebook: NotebookType;
-  selectedTopic?: TopicType;
+  notebook: Notebook;
+  selectedTopic?: Topic;
   fwdRef: RefObject<ActionSheetRef>;
 }) => {
   const { colors } = useThemeColors();
   const [currentNotebook, setCurrentNotebook] = useState(notebook);
   const { height } = useWindowDimensions();
-  let notes = db.notes?.all as NoteType[];
+  let notes = db.notes?.all;
 
   const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
   const [topic, setTopic] = useState(selectedTopic);
@@ -110,30 +102,34 @@ export const MoveNotes = ({
 
   const addNewTopic = async (value: string) => {
     if (!value || value.trim().length === 0) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Topic title is required",
         type: "error",
         context: "local"
       });
       return false;
     }
-    await db.notebooks?.notebook(currentNotebook.id).topics.add(value);
-    setCurrentNotebook(
-      db.notebooks?.notebook(currentNotebook.id).data as NotebookType
-    );
+    await db.notebooks?.notebook(currentNotebook.id)?.topics.add({
+      title: value
+    });
+
+    const notebook = db.notebooks?.notebook(currentNotebook.id);
+    if (notebook) {
+      setCurrentNotebook(notebook.data);
+    }
 
     Navigation.queueRoutesForUpdate();
     return true;
   };
 
   const renderItem = React.useCallback(
-    ({ item }: { item: CommonItemType }) => {
+    ({ item }: { item: Topic | Note }) => {
       return (
         <PressableButton
           testID="listitem.select"
           onPress={() => {
             if (item.type == "topic") {
-              setTopic(topic || (item as TopicType));
+              setTopic(topic || item);
             } else {
               select(item.id);
             }
@@ -337,7 +333,7 @@ export const MoveNotes = ({
   );
 };
 
-MoveNotes.present = (notebook: NotebookType, topic: TopicType) => {
+MoveNotes.present = (notebook: Notebook, topic: Topic) => {
   presentSheet({
     component: (ref: RefObject<ActionSheetRef>) => (
       <MoveNotes fwdRef={ref} notebook={notebook} selectedTopic={topic} />

@@ -22,7 +22,7 @@ import { View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
-import { ToastEvent } from "../../services/event-manager";
+import { ToastManager } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { useThemeColors } from "@notesnook/theme";
 import DialogHeader from "../dialog/dialog-header";
@@ -43,7 +43,7 @@ export const ForgotPassword = () => {
 
   const sendRecoveryEmail = async () => {
     if (!email.current || error) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Account email is required.",
         type: "error",
         context: "local"
@@ -63,7 +63,7 @@ export const ForgotPassword = () => {
       SettingsService.set({
         lastRecoveryEmailTime: Date.now()
       });
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Check your email to reset password",
         message: `Recovery email has been sent to ${email.current.toLowerCase()}`,
         type: "success",
@@ -74,7 +74,7 @@ export const ForgotPassword = () => {
       setSent(true);
     } catch (e) {
       setLoading(false);
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Recovery email not sent",
         message: e.message,
         type: "error",

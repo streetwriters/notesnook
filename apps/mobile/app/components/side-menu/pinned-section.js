@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import Notebook from "../../screens/notebook";
+import NotebookScreen from "../../screens/notebook";
 import { TaggedNotes } from "../../screens/notes/tagged";
 import { TopicNotes } from "../../screens/notes/topic-notes";
 import Navigation from "../../services/navigation";
@@ -54,7 +54,7 @@ export const TagsSection = React.memo(
 
     const onPress = (item) => {
       if (item.type === "notebook") {
-        Notebook.navigate(item);
+        NotebookScreen.navigate(item);
       } else if (item.type === "tag") {
         TaggedNotes.navigate(item);
       } else {
@@ -65,10 +65,7 @@ export const TagsSection = React.memo(
       });
     };
     const renderItem = ({ item, index }) => {
-      let alias = item.alias || item.title;
-      return (
-        <PinItem item={item} index={index} alias={alias} onPress={onPress} />
-      );
+      return <PinItem item={item} index={index} onPress={onPress} />;
     };
 
     return (
@@ -102,15 +99,16 @@ export const TagsSection = React.memo(
 );
 
 export const PinItem = React.memo(
-  function PinItem({ item, onPress, placeholder, alias }) {
+  function PinItem({ item, onPress, placeholder }) {
     const { colors } = useThemeColors();
     const setMenuPins = useMenuStore((state) => state.setMenuPins);
-    alias = item?.alias || item?.title;
+
     const [visible, setVisible] = useState(false);
     const [headerTextState, setHeaderTextState] = useState(null);
     const primaryColors =
       headerTextState?.id === item.id ? colors.selected : colors.primary;
 
+    const isFocused = headerTextState?.id === item.id;
     const color =
       headerTextState?.id === item.id
         ? colors.selected.accent
@@ -177,7 +175,7 @@ export const PinItem = React.memo(
           </SheetWrapper>
         )}
         <PressableButton
-          type={headerTextState?.id === item.id ? "selected" : "gray"}
+          type={isFocused ? "selected" : "gray"}
           onLongPress={() => {
             if (placeholder) return;
             Properties.present(item);
@@ -234,7 +232,7 @@ export const PinItem = React.memo(
                 flex: 1
               }}
             >
-              {headerTextState?.id === item.id ? (
+              {isFocused ? (
                 <Heading
                   style={{
                     flexWrap: "wrap"
@@ -242,7 +240,7 @@ export const PinItem = React.memo(
                   color={primaryColors.heading}
                   size={SIZE.md}
                 >
-                  {alias}
+                  {item.title}
                 </Heading>
               ) : (
                 <Paragraph
@@ -250,7 +248,7 @@ export const PinItem = React.memo(
                   color={primaryColors.paragraph}
                   size={SIZE.md}
                 >
-                  {alias}
+                  {item.title}
                 </Paragraph>
               )}
             </View>
@@ -261,7 +259,7 @@ export const PinItem = React.memo(
   },
   (prev, next) => {
     if (!next.item) return false;
-    if (prev.alias !== next.alias) return false;
+    if (prev.item.title !== next.item.title) return false;
     if (prev.item?.dateModified !== next.item?.dateModified) return false;
     if (prev.item?.id !== next.item?.id) return false;
     return true;

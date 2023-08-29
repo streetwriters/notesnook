@@ -23,8 +23,8 @@ import NotesPage, { PLACEHOLDER_DATA } from ".";
 import { db } from "../../common/database";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { NotesScreenParams } from "../../stores/use-navigation-store";
-import { NoteType, TagType } from "../../utils/types";
-import { getAlias, openEditor } from "./common";
+import { openEditor } from "./common";
+import { Tag } from "@notesnook/core/dist/types";
 export const TaggedNotes = ({
   navigation,
   route
@@ -43,19 +43,17 @@ export const TaggedNotes = ({
 };
 
 TaggedNotes.get = (params: NotesScreenParams, grouped = true) => {
-  const notes = db.notes?.tagged((params.item as unknown as NoteType).id) || [];
+  const notes = db.relations.from(params.item, "note").resolved();
   return grouped
     ? groupArray(notes, db.settings.getGroupOptions("notes"))
     : notes;
 };
 
-TaggedNotes.navigate = (item: TagType, canGoBack: boolean) => {
+TaggedNotes.navigate = (item: Tag, canGoBack?: boolean) => {
   if (!item) return;
-  const alias = getAlias({ item: item });
   Navigation.navigate<"TaggedNotes">(
     {
       name: "TaggedNotes",
-      alias: alias,
       title: item.title,
       id: item.id,
       type: "tag"
@@ -63,7 +61,7 @@ TaggedNotes.navigate = (item: TagType, canGoBack: boolean) => {
     {
       item: item,
       canGoBack,
-      title: alias
+      title: item.title
     }
   );
 };

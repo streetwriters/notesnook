@@ -24,7 +24,7 @@ import { db } from "../../../common/database";
 import {
   eSendEvent,
   presentSheet,
-  ToastEvent
+  ToastManager
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SearchService from "../../../services/search";
@@ -59,7 +59,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
 
   const onAddNotebook = async (title) => {
     if (!title || title.trim().length === 0) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Notebook title is required",
         type: "error",
         context: "local"
@@ -94,7 +94,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
   const onAddTopic = useCallback(
     async (value, item) => {
       if (!value || value.trim().length === 0) {
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Topic title is required",
           type: "error",
           context: "local"

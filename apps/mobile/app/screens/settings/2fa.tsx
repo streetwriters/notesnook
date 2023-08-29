@@ -44,7 +44,7 @@ import useTimer from "../../hooks/use-timer";
 import {
   eSendEvent,
   presentSheet,
-  ToastEvent
+  ToastManager
 } from "../../services/event-manager";
 import { useThemeColors, VariantsWithStaticColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
@@ -198,18 +198,18 @@ export const MFASetup = ({
       if (!method) return;
       setEnabling(true);
       if (recovery) {
-        await db.mfa?.enableFallback(method.id, code.current);
+        await db.mfa.enableFallback(method.id, code.current);
       } else {
-        await db.mfa?.enable(method.id, code.current);
+        await db.mfa.enable(method.id, code.current);
       }
 
-      const user = await db.user?.fetchUser();
+      const user = await db.user.fetchUser();
       useUserStore.getState().setUser(user);
       onSuccess && onSuccess(method);
       setEnabling(false);
     } catch (e) {
       const error = e as Error;
-      ToastEvent.error(error, "Error submitting 2fa code");
+      ToastManager.error(error, "Error submitting 2fa code");
       setEnabling(false);
     }
   };
@@ -225,7 +225,7 @@ export const MFASetup = ({
         );
       }
 
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Code copied!",
         type: "success",
         context: "local"
@@ -239,7 +239,7 @@ export const MFASetup = ({
       if (method.id === "sms" && !phoneNumber.current)
         throw new Error("Phone number not entered");
       setSending(true);
-      await db.mfa?.setup(method?.id, phoneNumber.current);
+      await db.mfa.setup(method?.id, phoneNumber.current);
 
       if (method.id === "sms") {
         setId(method.id + phoneNumber.current);
@@ -250,7 +250,7 @@ export const MFASetup = ({
         method.id === "sms" ? method.id + phoneNumber.current : method.id
       );
       setSending(false);
-      ToastEvent.show({
+      ToastManager.show({
         heading: `2FA code sent via ${method.id}.`,
         type: "success",
         context: "local"
@@ -258,7 +258,7 @@ export const MFASetup = ({
     } catch (e) {
       setSending(false);
       const error = e as Error;
-      ToastEvent.error(error, "Error sending 2FA code");
+      ToastManager.error(error, "Error sending 2FA code");
     }
   };
 
@@ -408,12 +408,12 @@ export const MFARecoveryCodes = ({
   useEffect(() => {
     (async () => {
       try {
-        const codes = await db.mfa?.codes();
+        const codes = await db.mfa.codes();
         if (codes) setCodes(codes);
         setLoading(false);
       } catch (e) {
         const error = e as Error;
-        ToastEvent.error(error, "Error getting codes", "local");
+        ToastManager.error(error, "Error getting codes", "local");
         setLoading(false);
       }
     })();
@@ -488,7 +488,7 @@ export const MFARecoveryCodes = ({
               onPress={() => {
                 const codeString = codes.join("\n");
                 Clipboard.setString(codeString);
-                ToastEvent.show({
+                ToastManager.show({
                   heading: "Recovery codes copied!",
                   type: "success",
                   context: "global"
@@ -528,7 +528,7 @@ export const MFARecoveryCodes = ({
                     path = path + fileName;
                   }
 
-                  ToastEvent.show({
+                  ToastManager.show({
                     heading: "Recovery codes saved to text file",
                     type: "success",
                     context: "local"

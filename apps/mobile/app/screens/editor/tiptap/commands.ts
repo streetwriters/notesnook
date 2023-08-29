@@ -25,9 +25,9 @@ import { EdgeInsets } from "react-native-safe-area-context";
 import WebView from "react-native-webview";
 import { db } from "../../../common/database";
 import { sleep } from "../../../utils/time";
-import { NoteType } from "../../../utils/types";
 import { Settings } from "./types";
 import { getResponse, randId, textInput } from "./utils";
+import { Note } from "@notesnook/core/dist/types";
 
 type Action = { job: string; id: string };
 
@@ -166,20 +166,19 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     `);
   };
 
-  setTags = async (note: NoteType | null | undefined) => {
+  setTags = async (note: Note | null | undefined) => {
     if (!note) return;
-    const tags = !note.tags
-      ? []
-      : note.tags
-          .map((t: string) =>
-            db.tags?.tag(t)
-              ? { title: db.tags.tag(t).title, alias: db.tags.tag(t).alias }
-              : null
-          )
-          .filter((t) => t !== null);
+    const tags = db.relations.to(note, "tag").resolved();
     await this.doAsync(`
     if (typeof editorTags !== "undefined" && editorTags.current) {
-      editorTags.current.setTags(${JSON.stringify(tags)});
+      editorTags.current.setTags(${JSON.stringify(
+        tags.map((tag) => ({
+          title: tag.title,
+          alias: tag.title,
+          id: tag.id,
+          type: tag.type
+        }))
+      )});
     }
   `);
   };

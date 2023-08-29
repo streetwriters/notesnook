@@ -35,6 +35,7 @@ import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { PressableButtonProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
+import { ItemReference, ItemType } from "@notesnook/core/dist/types";
 
 type RelationsListProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -73,10 +74,10 @@ export const RelationsList = ({
   const { colors } = useThemeColors();
 
   const items =
-    (db.relations?.[relationType]?.(
-      { id: item?.id, type: item?.type },
-      referenceType
-    ) as any) || [];
+    db.relations?.[relationType]?.(
+      { id: item?.id, type: item?.type } as ItemReference,
+      referenceType as ItemType
+    ) || [];
 
   const hasNoRelations = !items || items.length === 0;
 

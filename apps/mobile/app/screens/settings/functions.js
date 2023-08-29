@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { presentDialog } from "../../components/dialog/functions";
-import { ToastEvent } from "../../services/event-manager";
+import { ToastManager } from "../../services/event-manager";
 import { db } from "../../common/database";
 import { sleep } from "../../utils/time";
 
@@ -49,7 +49,7 @@ export async function verifyUser(
             await onsuccess();
           });
         } else {
-          ToastEvent.show({
+          ToastManager.show({
             heading: "Incorrect password",
             message: "The account password you entered is incorrect",
             type: "error",
@@ -58,7 +58,7 @@ export async function verifyUser(
           return false;
         }
       } catch (e) {
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Failed to verify",
           message: e.message,
           type: "error",

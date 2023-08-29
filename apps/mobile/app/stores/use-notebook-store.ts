@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import create, { State } from "zustand";
 import { db } from "../common/database";
-import { NotebookType } from "../utils/types";
+import { GroupedItems, Notebook } from "@notesnook/core/dist/types";
+
 export interface NotebookStore extends State {
-  notebooks: NotebookType[];
-  setNotebooks: (items?: NotebookType[]) => void;
+  notebooks: GroupedItems<Notebook>;
+  setNotebooks: (items?: Notebook[]) => void;
   clearNotebooks: () => void;
 }
 
@@ -33,7 +34,7 @@ export const useNotebookStore = create<NotebookStore>((set, get) => ({
     if (!items) {
       set({
         notebooks: groupArray(
-          (db?.notebooks?.all as NotebookType[]) || [],
+          db.notebooks.all || [],
           db.settings.getGroupOptions("notebooks")
         )
       });

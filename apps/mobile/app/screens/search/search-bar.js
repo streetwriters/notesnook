@@ -21,7 +21,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { IconButton } from "../../components/ui/icon-button";
-import { ToastEvent } from "../../services/event-manager";
+import { ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import SearchService from "../../services/search";
 import { useSearchStore } from "../../stores/use-search-store";
@@ -70,8 +70,8 @@ export const SearchBar = () => {
         }
       } catch (e) {
         console.log(e);
-        ToastEvent.show({
-          heading: "Error occurred while searching",
+        ToastManager.show({
+          heading: "Error occured while searching",
           message: e.message,
           type: "error"
         });

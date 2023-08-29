@@ -16,17 +16,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { NoteContent } from "@notesnook/core/dist/collections/session-content";
+import { Note } from "@notesnook/core/dist/types";
 import { db } from "../common/database";
-import { NoteType } from "./types";
 
-export async function convertNoteToText(note: NoteType, template = true) {
-  let text;
+export async function convertNoteToText(note: Note, disableTemplate?: boolean) {
   if (note.locked) {
-    text = await db.notes
-      ?.note(note.id)
-      .export("txt", note.content as unknown as string, template);
-  } else {
-    text = await db.notes?.note(note.id).export("txt", undefined, template);
+    return await db.notes.export(note.id, {
+      contentItem: (note as Note & { content: NoteContent<false> }).content,
+      disableTemplate,
+      format: "txt"
+    });
   }
-  return text;
+
+  return await db.notes.export(note.id, {
+    disableTemplate,
+    format: "txt"
+  });
 }

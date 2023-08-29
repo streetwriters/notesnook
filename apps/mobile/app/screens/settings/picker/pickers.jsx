@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { db } from "../../../common/database";
-import { ToastEvent } from "../../../services/event-manager";
+import { ToastManager } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { MenuItemsList } from "../../../utils/menu-items";
@@ -48,7 +48,7 @@ export const HomePicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.homepage,
   updateValue: (item) => {
     SettingsService.set({ homepage: item.name });
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Homepage set to " + item.name,
       message: "Restart the app for changes to take effect.",
       type: "success"

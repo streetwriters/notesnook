@@ -27,6 +27,7 @@ import {
   MaybeDeletedItem,
   Notebook,
   Topic,
+  TrashItem,
   TrashOrItem,
   isDeleted,
   isTrashItem
@@ -165,7 +166,9 @@ export class Notebooks implements ICollection {
   }
 
   get trashed() {
-    return this.raw.filter((item) => isTrashItem(item));
+    return this.raw.filter((item) =>
+      isTrashItem(item)
+    ) as TrashOrItem<Notebook>[];
   }
 
   async pin(...ids: string[]) {

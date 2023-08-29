@@ -34,7 +34,7 @@ let NotesnookShare;
 let QuickNoteIOS;
 
 const AppProvider = () => {
-  const App = require('../app/app.js').default;
+  const App = require('../app/app').default;
   return <App />;
 };
 

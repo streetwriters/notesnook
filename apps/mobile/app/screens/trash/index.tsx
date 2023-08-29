@@ -24,7 +24,7 @@ import DelayLayout from "../../components/delay-layout";
 import { presentDialog } from "../../components/dialog/functions";
 import List from "../../components/list";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import { ToastEvent } from "../../services/event-manager";
+import { ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import SearchService from "../../services/search";
 import useNavigationStore from "../../stores/use-navigation-store";
@@ -49,7 +49,7 @@ const onPressFloatingButton = () => {
       await db.trash?.clear();
       useTrashStore.getState().setTrash();
       useSelectionStore.getState().clearSelection();
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Trash cleared",
         message:
           "All notes and notebooks in the trash have been removed permanently.",

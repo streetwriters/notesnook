@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef, useState } from "react";
 import { db } from "../../common/database";
-import { eSendEvent, ToastEvent } from "../../services/event-manager";
+import { eSendEvent, ToastManager } from "../../services/event-manager";
 import { clearMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
@@ -48,7 +48,7 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
       (!password.current && step === LoginSteps.passwordAuth) ||
       (!email.current && step === LoginSteps.emailAuth)
     ) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "All fields required",
         message: "Fill all the fields and try again",
         type: "error",
@@ -121,7 +121,7 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
   const finishWithError = async (e) => {
     if (e.message === "invalid_grant") setStep(LoginSteps.emailAuth);
     setLoading(false);
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Login failed",
       message: e.message,
       type: "error",
@@ -135,7 +135,7 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
     PremiumService.setPremiumStatus();
     setUser(user);
     clearMessage();
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Login successful",
       message: `Logged in as ${user.email}`,
       type: "success",

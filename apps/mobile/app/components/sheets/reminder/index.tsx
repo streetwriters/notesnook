@@ -23,7 +23,7 @@ import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {
   PresentSheetOptions,
-  ToastEvent,
+  ToastManager,
   presentSheet
 } from "../../../services/event-manager";
 import { SIZE } from "../../../utils/size";
@@ -39,18 +39,18 @@ import Notifications, { Reminder } from "../../../services/notifications";
 import PremiumService from "../../../services/premium";
 import SettingsService from "../../../services/settings";
 import { useRelationStore } from "../../../stores/use-relation-store";
-import { NoteType } from "../../../utils/types";
 import { Dialog } from "../../dialog";
 import { ReminderTime } from "../../ui/reminder-time";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { ItemReference } from "@notesnook/core/dist/types";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
   close?: (ctx?: string) => void;
   update?: (options: PresentSheetOptions) => void;
   reminder?: Reminder;
-  reference?: { id: string; type: string };
+  reference?: ItemReference;
 };
 
 const ReminderModes =
@@ -113,9 +113,8 @@ export default function ReminderSheet({
   >(reminder?.priority || SettingsService.get().reminderNotificationMode);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [repeatFrequency, setRepeatFrequency] = useState(1);
-  const referencedItem = reference
-    ? (db.notes?.note(reference.id)?.data as NoteType)
-    : null;
+  const referencedItem = reference ? db.notes?.note(reference.id)?.data : null;
+
   const title = useRef<string | undefined>(
     reminder?.title || referencedItem?.title
   );
@@ -195,19 +194,19 @@ export default function ReminderSheet({
           date?.getTime() > Date.now() ? undefined : reminder?.snoozeUntil,
         disabled: false
       });
-
+      if (!reminderId) return;
       const _reminder = db.reminders?.reminder(reminderId);
 
       if (!_reminder) {
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Failed to add a new reminder",
           context: "local"
         });
       }
-      if (reference) {
+      if (reference && _reminder) {
         await db.relations?.add(reference, {
           id: _reminder?.id as string,
-          type: _reminder?.type as string
+          type: _reminder?.type
         });
       }
       Notifications.scheduleNotification(_reminder as Reminder);
@@ -215,7 +214,7 @@ export default function ReminderSheet({
       useRelationStore.getState().update();
       close?.();
     } catch (e) {
-      ToastEvent.error(e as Error, undefined, "local");
+      ToastManager.error(e as Error, undefined, "local");
     }
   }
 
@@ -614,7 +613,7 @@ export default function ReminderSheet({
 
 ReminderSheet.present = (
   reminder?: Reminder,
-  reference?: { id: string; type: string },
+  reference?: ItemReference,
   isSheet?: boolean
 ) => {
   presentSheet({

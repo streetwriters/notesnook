@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import "./logger";
 import { database } from "@notesnook/common";
 import { logger as dbLogger } from "@notesnook/core/dist/logger";
 import { Platform } from "react-native";
@@ -23,7 +24,7 @@ import * as Gzip from "react-native-gzip";
 import EventSource from "../../utils/sse/even-source-ios";
 import AndroidEventSource from "../../utils/sse/event-source";
 import filesystem from "../filesystem";
-import "./logger";
+
 import Storage from "./storage";
 
 database.host(
@@ -49,15 +50,15 @@ database.host(
       }
 );
 
-database.setup(
-  Storage,
-  Platform.OS === "ios" ? EventSource : AndroidEventSource,
-  filesystem,
-  {
+database.setup({
+  storage: Storage,
+  eventsource: Platform.OS === "ios" ? EventSource : AndroidEventSource,
+  filesystem: filesystem,
+  compressor: {
     compress: Gzip.deflate,
     decompress: Gzip.inflate
   }
-);
+});
 
 export const db = database;
 export const DatabaseLogger = dbLogger;

@@ -47,7 +47,7 @@ import { Button } from "../../components/ui/button";
 import Input from "../../components/ui/input";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
-import { ToastEvent, presentSheet } from "../../services/event-manager";
+import { ToastManager, presentSheet } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { getElevationStyle } from "../../utils/elevation";
@@ -405,7 +405,7 @@ function ThemeSelector() {
                     const json = await response.json();
                     const result = validateTheme(json);
                     if (result.error) {
-                      ToastEvent.error(new Error(result.error));
+                      ToastManager.error(new Error(result.error));
                       return;
                     }
                     select(json, true);
@@ -533,7 +533,7 @@ const ThemeSetter = ({
       theme.colorScheme === "dark"
         ? useThemeStore.getState().setDarkTheme(fullTheme)
         : useThemeStore.getState().setLightTheme(fullTheme);
-      ToastEvent.show({
+      ToastManager.show({
         heading: `${theme.name} applied successfully`,
         type: "success",
         context: "global"

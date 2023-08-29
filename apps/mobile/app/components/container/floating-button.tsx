@@ -36,10 +36,11 @@ import { SIZE, normalize } from "../../utils/size";
 import NativeTooltip from "../../utils/tooltip";
 import { PressableButton } from "../ui/pressable";
 
-interface FloatingButton {
-  title?: string;
+interface FloatingButtonProps {
+  title: string;
   onPress: () => void;
   color?: string;
+  shouldShow?: boolean;
   alwaysVisible?: boolean;
 }
 
@@ -48,7 +49,7 @@ const FloatingButton = ({
   onPress,
   color,
   alwaysVisible = false
-}: FloatingButton) => {
+}: FloatingButtonProps) => {
   const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const selectionMode = useSelectionStore((state) => state.selectionMode);

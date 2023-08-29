@@ -22,23 +22,16 @@ import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
-import { NotesScreenParams } from "../../stores/use-navigation-store";
+import { useRelationStore } from "../../stores/use-relation-store";
 import { useTagStore } from "../../stores/use-tag-store";
 import { eOnLoadNote, eOnTopicSheetUpdate } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
 import { tabBarRef } from "../../utils/global-refs";
-import { TopicType } from "../../utils/types";
 import { editorController, editorState } from "../editor/tiptap/utils";
 
 export function toCamelCase(title: string) {
   if (!title) return "";
   return title.slice(0, 1).toUpperCase() + title.slice(1);
-}
-
-export function getAlias(params: Partial<NotesScreenParams>) {
-  if (!params) return "";
-  const { item } = params;
-  return (item as TopicType)?.alias || item?.title || "";
 }
 
 export function openMonographsWebpage() {
@@ -52,13 +45,13 @@ export function openMonographsWebpage() {
 export function openEditor() {
   if (!DDS.isTab) {
     if (editorController.current?.note) {
-      eSendEvent(eOnLoadNote, { type: "new" });
+      eSendEvent(eOnLoadNote, { newNote: true });
       editorState().currentlyEditing = true;
       editorState().movedAway = false;
     }
     tabBarRef.current?.goToPage(1);
   } else {
-    eSendEvent(eOnLoadNote, { type: "new" });
+    eSendEvent(eOnLoadNote, { newNote: true });
   }
 }
 
@@ -66,7 +59,6 @@ type FirstSaveData = {
   type: string;
   id: string;
   notebook?: string;
-  color?: string;
 };
 
 export const setOnFirstSave = (
@@ -74,7 +66,6 @@ export const setOnFirstSave = (
     type: string;
     id: string;
     notebook?: string;
-    color?: string;
   } | null
 ) => {
   if (!data) {
@@ -82,44 +73,57 @@ export const setOnFirstSave = (
     return;
   }
   setTimeout(() => {
-    editorState().onNoteCreated = (id) => onNoteCreated(id, data);
+    editorState().onNoteCreated = (noteId) => onNoteCreated(noteId, data);
   }, 0);
 };
 
-export async function onNoteCreated(id: string, params: FirstSaveData) {
-  if (!params) return;
-  switch (params.type) {
+export async function onNoteCreated(noteId: string, data: FirstSaveData) {
+  if (!data) return;
+  switch (data.type) {
     case "notebook": {
       await db.relations?.add(
-        { type: "notebook", id: params.id },
-        { type: "note", id: id }
+        { type: "notebook", id: data.id },
+        { type: "note", id: noteId }
       );
       editorState().onNoteCreated = null;
+      useRelationStore.getState().update();
       break;
     }
     case "topic": {
-      if (!params.notebook) break;
+      if (!data.notebook) break;
       await db.notes?.addToNotebook(
         {
-          topic: params.id,
-          id: params.notebook
+          topic: data.id,
+          id: data.notebook
         },
-        id
+        noteId
       );
       editorState().onNoteCreated = null;
       eSendEvent(eOnTopicSheetUpdate);
       break;
     }
     case "tag": {
-      await db.notes?.note(id).tag(params.id);
+      const note = db.notes.note(noteId)?.data;
+      const tag = db.tags.tag(data.id);
+
+      if (tag && note) {
+        await db.relations.add(tag, note);
+      }
+
       editorState().onNoteCreated = null;
       useTagStore.getState().setTags();
+      useRelationStore.getState().update();
       break;
     }
     case "color": {
-      await db.notes?.note(id).color(params.color);
+      const note = db.notes.note(noteId)?.data;
+      const color = db.colors.color(data.id);
+      if (note && color) {
+        await db.relations.add(color, note);
+      }
       editorState().onNoteCreated = null;
       useMenuStore.getState().setColorNotes();
+      useRelationStore.getState().update();
       break;
     }
     default: {

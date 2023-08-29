@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { User } from "@notesnook/core/dist/api/user-manager";
 import create, { State } from "zustand";
 
 export enum SyncStatus {
@@ -28,13 +29,13 @@ export enum SyncStatus {
 export interface UserStore extends State {
   user: User | null | undefined;
   premium: boolean;
-  lastSynced: string;
+  lastSynced: string | number;
   syncing: boolean;
   lastSyncStatus: SyncStatus;
   setUser: (user: User | null | undefined) => void;
   setPremium: (premium: boolean) => void;
   setSyncing: (syncing: boolean, status?: SyncStatus) => void;
-  setLastSynced: (lastSynced: string) => void;
+  setLastSynced: (lastSynced: number | "Never") => void;
   appLocked: boolean;
   lockApp: (verified: boolean) => void;
   disableAppLockRequests: boolean;

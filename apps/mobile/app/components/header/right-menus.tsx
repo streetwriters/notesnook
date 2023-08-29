@@ -39,10 +39,7 @@ export const RightMenus = () => {
   const buttons = useNavigationStore((state) => state.headerRightButtons);
   const currentScreen = useNavigationStore((state) => state.currentScreen.name);
   const buttonAction = useNavigationStore((state) => state.buttonAction);
-  const menuRef = useRef<{
-    show: () => void;
-    hide: () => void;
-  }>();
+  const menuRef = useRef<Menu>(null);
 
   return (
     <View style={styles.rightBtnContainer}>

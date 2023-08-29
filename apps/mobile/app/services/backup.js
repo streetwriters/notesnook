@@ -27,7 +27,7 @@ import storage from "../common/database/storage";
 import { presentDialog } from "../components/dialog/functions";
 import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
-import { ToastEvent, eSendEvent, presentSheet } from "./event-manager";
+import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
 import { cacheDir, copyFileAsync } from "../common/filesystem/utils";
 import { zip } from "react-native-zip-archive";

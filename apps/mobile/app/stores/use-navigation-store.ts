@@ -17,39 +17,41 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import {
+  Color,
+  Note,
+  Notebook,
+  Reminder,
+  Tag,
+  Topic,
+  TrashItem
+} from "@notesnook/core/dist/types";
 import create, { State } from "zustand";
 import { ColorValues } from "../utils/colors";
-import {
-  ColorType,
-  MonographType,
-  NotebookType,
-  TagType,
-  TopicType
-} from "../utils/types";
 
 export type GenericRouteParam = { [name: string]: unknown };
 
 export type NotebookScreenParams = {
-  item: NotebookType;
+  item: Notebook;
   title: string;
-  canGoBack: boolean;
+  canGoBack?: boolean;
 };
 
 export type NotesScreenParams = {
-  item: TopicType | TagType | ColorType | MonographType;
+  item: Note | Notebook | Topic | Tag | Color | TrashItem | Reminder;
   title: string;
-  canGoBack: boolean;
+  canGoBack?: boolean;
 };
 
 export type AppLockRouteParams = {
   welcome: boolean;
-  canGoBack: boolean;
+  canGoBack?: boolean;
 };
 
 export type AuthParams = {
   mode: number;
   title: string;
-  canGoBack: boolean;
+  canGoBack?: boolean;
 };
 
 export type RouteParams = {
@@ -76,11 +78,10 @@ export type RouteName = keyof RouteParams;
 
 export type CurrentScreen = {
   name: RouteName;
-  id?: string;
+  id: string;
   title?: string;
   type?: string;
   color?: string | null;
-  alias?: string;
   notebookId?: string;
   beta?: boolean;
 };
@@ -92,10 +93,12 @@ export type HeaderRightButton = {
 
 interface NavigationStore extends State {
   currentScreen: CurrentScreen;
-  currentScreenRaw: CurrentScreen;
-  canGoBack: boolean | undefined;
+  currentScreenRaw: Partial<CurrentScreen>;
+  canGoBack?: boolean;
   update: (
-    currentScreen: CurrentScreen,
+    currentScreen: Omit<Partial<CurrentScreen>, "name"> & {
+      name: keyof RouteParams;
+    },
     canGoBack?: boolean,
     headerRightButtons?: HeaderRightButton[]
   ) => void;
@@ -127,7 +130,7 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
         name: currentScreen.name,
         id:
           currentScreen.id || currentScreen.name.toLowerCase() + "_navigation",
-        title: currentScreen.alias || currentScreen.title || currentScreen.name,
+        title: currentScreen.title || currentScreen.name,
         type: currentScreen.type,
         color: color,
         notebookId: currentScreen.notebookId,

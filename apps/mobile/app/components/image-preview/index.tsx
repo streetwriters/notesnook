@@ -32,12 +32,12 @@ import {
 import BaseDialog from "../dialog/base-dialog";
 import { IconButton } from "../ui/icon-button";
 import { ProgressBarComponent } from "../ui/svg/lazy";
-
+import type { ImageAttributes } from "@notesnook/editor/dist/extensions/image/index";
 const ImagePreview = () => {
   const { colors } = useThemeColors("dialog");
 
   const [visible, setVisible] = useState(false);
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState<string>();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const ImagePreview = () => {
     };
   }, []);
 
-  const open = async (image) => {
+  const open = async (image: ImageAttributes) => {
     setVisible(true);
     setLoading(true);
     setTimeout(async () => {
@@ -63,6 +63,7 @@ const ImagePreview = () => {
         });
       }
       if (!hash) return;
+      //@ts-ignore // FIX ME
       const uri = await downloadAttachment(hash, false, {
         silent: true,
         cache: true
@@ -74,7 +75,7 @@ const ImagePreview = () => {
   };
 
   const close = () => {
-    setImage(null);
+    setImage(undefined);
     setVisible(false);
   };
 
@@ -88,7 +89,7 @@ const ImagePreview = () => {
             backgroundColor: "black"
           }}
         >
-          {loading ? (
+          {loading || !image ? (
             <View
               style={{
                 flex: 1,

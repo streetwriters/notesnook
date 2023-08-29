@@ -30,7 +30,7 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastManager
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SearchService from "../../../services/search";
@@ -199,7 +199,7 @@ export class VaultDialog extends Component {
 
   close = () => {
     if (this.state.loading) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: this.state.title,
         message: "Please wait and do not close the app.",
         type: "success",
@@ -236,7 +236,7 @@ export class VaultDialog extends Component {
     if (this.state.loading) return;
 
     if (!this.password) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Password not entered",
         message: "Enter a password for the vault and try again.",
         type: "error",
@@ -245,7 +245,7 @@ export class VaultDialog extends Component {
       return;
     }
     if (this.password && this.password.length < 3) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Password too short",
         message: "Password must be longer than 3 characters.",
         type: "error",
@@ -257,7 +257,7 @@ export class VaultDialog extends Component {
 
     if (!this.state.novault) {
       if (this.password !== this.confirmPassword) {
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Passwords do not match",
           type: "error",
           context: "local"
@@ -283,7 +283,7 @@ export class VaultDialog extends Component {
           if (this.state.biometricUnlock) {
             this._enrollFingerprint(this.newPassword);
           }
-          ToastEvent.show({
+          ToastManager.show({
             heading: "Vault password updated successfully",
             type: "success",
             context: "global"
@@ -295,7 +295,7 @@ export class VaultDialog extends Component {
             loading: false
           });
           if (e.message === db.vault.ERRORS.wrongPassword) {
-            ToastEvent.show({
+            ToastManager.show({
               heading: "Incorrect password",
               message: "Please enter the correct password and try again",
               type: "error",
@@ -305,7 +305,7 @@ export class VaultDialog extends Component {
         });
     } else if (this.state.locked) {
       if (!this.password || this.password.trim() === 0) {
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Incorrect password",
           message: "Please enter the correct password and try again",
           type: "error",
@@ -355,7 +355,7 @@ export class VaultDialog extends Component {
         });
         this.close();
       } else {
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Account password incorrect",
           message: "Please enter correct password for your account.",
           type: "error",
@@ -382,7 +382,7 @@ export class VaultDialog extends Component {
       this.close();
       eSendEvent("vaultUpdated");
     } catch (e) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Vault password incorrect",
         message: "Please enter correct password to clear vault.",
         type: "error",
@@ -396,7 +396,7 @@ export class VaultDialog extends Component {
 
   async _lockNote() {
     if (!this.password || this.password.trim() === 0) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Incorrect password",
         type: "error",
         context: "local"
@@ -408,7 +408,7 @@ export class VaultDialog extends Component {
         eSendEvent(eClearEditor);
       }
       this.close();
-      ToastEvent.show({
+      ToastManager.show({
         message: "Note locked successfully",
         type: "error",
         context: "local"
@@ -421,7 +421,7 @@ export class VaultDialog extends Component {
 
   async _unlockNote() {
     if (!this.password || this.password.trim() === 0) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Incorrect password",
         message: "Please enter the correct password and try again",
         type: "error",
@@ -479,7 +479,7 @@ export class VaultDialog extends Component {
             loading: false
           });
           eSendEvent("vaultUpdated");
-          ToastEvent.show({
+          ToastManager.show({
             heading: "Biometric unlocking enabled!",
             message: "Now you can unlock notes in vault with biometrics.",
             type: "success",
@@ -488,7 +488,7 @@ export class VaultDialog extends Component {
           this.close();
         } catch (e) {
           this.close();
-          ToastEvent.show({
+          ToastManager.show({
             heading: "Incorrect password",
             message:
               "Please enter the correct vault password to enable biometrics.",
@@ -517,7 +517,7 @@ export class VaultDialog extends Component {
       this.setState({
         loading: false
       });
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Note added to vault",
         type: "success",
         context: "global"
@@ -525,7 +525,7 @@ export class VaultDialog extends Component {
       this.close();
     } else {
       eSendEvent("vaultUpdated");
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Vault created successfully",
         type: "success",
         context: "global"
@@ -538,7 +538,7 @@ export class VaultDialog extends Component {
     db.vault
       .remove(this.state.note.id, this.password)
       .then(() => {
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Note permanently unlocked.",
           type: "success",
           context: "global"
@@ -553,7 +553,9 @@ export class VaultDialog extends Component {
   _openInEditor(note) {
     this.close();
     InteractionManager.runAfterInteractions(async () => {
-      eSendEvent(eOnLoadNote, note);
+      eSendEvent(eOnLoadNote, {
+        item: note
+      });
       if (!DDS.isTab) {
         tabBarRef.current?.goToPage(1);
       }
@@ -562,7 +564,7 @@ export class VaultDialog extends Component {
 
   async _copyNote(note) {
     Clipboard.setString(await convertNoteToText(note));
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Note copied",
       type: "success",
       message: "Note has been copied to clipboard!",
@@ -594,7 +596,7 @@ export class VaultDialog extends Component {
         visible: true
       });
       setTimeout(() => {
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Incorrect password",
           type: "error",
           context: "local"
@@ -609,13 +611,13 @@ export class VaultDialog extends Component {
     try {
       await BiometricService.resetCredentials();
       eSendEvent("vaultUpdated");
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Biometric unlocking disabled!",
         type: "success",
         context: "global"
       });
     } catch (e) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Failed to disable Biometric unlocking.",
         message: e.message,
         type: "success",

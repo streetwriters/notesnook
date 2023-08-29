@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useCallback, useEffect, useRef } from "react";
-import { Platform, View } from "react-native";
+import { Platform, TextInput, View } from "react-native";
+//@ts-ignore
 import { enabled } from "react-native-privacy-snapshot";
 import { db } from "../../common/database";
 import { useAppState } from "../../hooks/use-app-state";
@@ -41,8 +42,8 @@ const AppLockedOverlay = () => {
   const appLocked = useUserStore((state) => state.appLocked);
   const lockApp = useUserStore((state) => state.lockApp);
   const deviceMode = useSettingStore((state) => state.deviceMode);
-  const passwordInputRef = useRef();
-  const password = useRef();
+  const passwordInputRef = useRef<TextInput>(null);
+  const password = useRef<string>();
   const appState = useAppState();
 
   const biometricUnlockAwaitingUserInput = useRef(false);
@@ -55,14 +56,14 @@ const AppLockedOverlay = () => {
     }
     useSettingStore.getState().setRequestBiometrics(true);
 
-    let unlocked = await BiometricService.validateUser(
+    const unlocked = await BiometricService.validateUser(
       "Unlock to access your notes",
       ""
     );
     if (unlocked) {
       lockApp(false);
       enabled(false);
-      password.current = null;
+      password.current = undefined;
     }
     setTimeout(() => {
       biometricUnlockAwaitingUserInput.current = false;
@@ -73,11 +74,11 @@ const AppLockedOverlay = () => {
   const onSubmit = async () => {
     if (!password.current) return;
     try {
-      let unlocked = await db.user.verifyPassword(password.current);
+      const unlocked = await db.user.verifyPassword(password.current);
       if (unlocked) {
         lockApp(false);
         enabled(false);
-        password.current = null;
+        password.current = undefined;
       }
     } catch (e) {
       console.error(e);
@@ -170,7 +171,9 @@ const AppLockedOverlay = () => {
                   secureTextEntry
                   placeholder="Enter account password"
                   onChangeText={(v) => (password.current = v)}
-                  onSubmit={onSubmit}
+                  onSubmit={() => {
+                    onSubmit();
+                  }}
                 />
               </>
             ) : null}

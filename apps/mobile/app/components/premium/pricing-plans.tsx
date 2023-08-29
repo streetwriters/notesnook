@@ -25,7 +25,7 @@ import { usePricing } from "../../hooks/use-pricing";
 import {
   eSendEvent,
   presentSheet,
-  ToastEvent
+  ToastManager
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
 import { useThemeColors } from "@notesnook/theme";
@@ -517,7 +517,7 @@ export const PricingPlans = ({
                         try {
                           if (!(await getPromo(value as string)))
                             throw new Error("Error applying promo code");
-                          ToastEvent.show({
+                          ToastManager.show({
                             heading: "Discount applied!",
                             type: "success",
                             context: "local"
@@ -525,7 +525,7 @@ export const PricingPlans = ({
                           setBuying(false);
                         } catch (e) {
                           setBuying(false);
-                          ToastEvent.show({
+                          ToastManager.show({
                             heading: "Promo code invalid or expired",
                             message: (e as Error).message,
                             type: "error",

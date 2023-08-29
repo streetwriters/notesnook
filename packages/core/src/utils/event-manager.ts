@@ -17,7 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+export type EventManagerSubscription = {
+  unsubscribe: () => boolean;
+};
+
+export type EventHandler = (...args: any[]) => any;
+
+export type EventProperties = {
+  name: string;
+  once?: boolean;
+};
+
 class EventManager {
+  public _registry: Map<EventHandler, EventProperties>;
   constructor() {
     this._registry = new Map();
   }
@@ -26,17 +38,17 @@ class EventManager {
     this._registry.clear();
   }
 
-  subscribeMulti(names, handler, thisArg) {
+  subscribeMulti(names: string[], handler: EventHandler, thisArg: any) {
     return names.map((name) => this.subscribe(name, handler.bind(thisArg)));
   }
 
-  subscribe(name, handler, once = false) {
+  subscribe(name: string, handler: EventHandler, once = false) {
     if (!name || !handler) throw new Error("name and handler are required.");
     this._registry.set(handler, { name, once });
     return { unsubscribe: () => this.unsubscribe(name, handler) };
   }
 
-  subscribeSingle(name, handler) {
+  subscribeSingle(name: string, handler: EventHandler) {
     if (!name || !handler) throw new Error("name and handler are required.");
     this._registry.forEach((props, handler) => {
       if (props.name === name) this._registry.delete(handler);
@@ -45,11 +57,11 @@ class EventManager {
     return { unsubscribe: () => this.unsubscribe(name, handler) };
   }
 
-  unsubscribe(_name, handler) {
+  unsubscribe(_name: string, handler: EventHandler) {
     return this._registry.delete(handler);
   }
 
-  publish(name, ...args) {
+  publish(name: string, ...args: any[]) {
     this._registry.forEach((props, handler) => {
       if (props.name === name) {
         handler(...args);
@@ -58,8 +70,11 @@ class EventManager {
     });
   }
 
-  async publishWithResult(name, ...args) {
-    const handlers = [];
+  async publishWithResult<T = unknown>(
+    name: string,
+    ...args: any[]
+  ): Promise<T[] | boolean> {
+    const handlers: EventHandler[] = [];
     this._registry.forEach((props, handler) => {
       if (props.name === name) {
         handlers.push(handler);
@@ -71,7 +86,7 @@ class EventManager {
     return await Promise.all(handlers.map((handler) => handler(...args)));
   }
 
-  remove(...names) {
+  remove(...names: string[]) {
     this._registry.forEach((props, handler) => {
       if (names.includes(props.name)) this._registry.delete(handler);
     });

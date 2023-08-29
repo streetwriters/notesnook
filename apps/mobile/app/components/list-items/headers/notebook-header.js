@@ -22,7 +22,7 @@ import React from "react";
 import { View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 import { useMenuStore } from "../../../stores/use-menu-store";
-import { ToastEvent } from "../../../services/event-manager";
+import { ToastManager } from "../../../services/event-manager";
 import { getTotalNotes } from "@notesnook/common";
 import { db } from "../../../common/database";
 import { SIZE } from "../../../utils/size";
@@ -50,7 +50,7 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
             type: "notebook"
           }
         });
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Shortcut created",
           type: "success"
         });

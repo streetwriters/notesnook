@@ -16,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+import { Monographs } from "../screens/notes/monographs";
 export const MenuItemsList = [
   {
     name: "Notes",
@@ -48,7 +50,6 @@ export const MenuItemsList = [
     icon: "text-box-multiple-outline",
     close: true,
     func: () => {
-      const Monographs = require("../screens/notes/monographs").Monographs;
       Monographs.navigate();
     }
   },

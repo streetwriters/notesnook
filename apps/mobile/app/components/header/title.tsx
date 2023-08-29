@@ -21,7 +21,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { db } from "../../common/database";
-import Notebook from "../../screens/notebook";
+import NotebookScreen from "../../screens/notebook";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
@@ -32,7 +32,7 @@ import { SIZE } from "../../utils/size";
 import Tag from "../ui/tag";
 import Heading from "../ui/typography/heading";
 
-const titleState: { [name: string]: boolean } = {};
+const titleState: { [id: string]: boolean } = {};
 
 export const Title = () => {
   const { colors } = useThemeColors();
@@ -76,8 +76,8 @@ export const Title = () => {
   useEffect(() => {
     if (currentScreen.name === "Notebook") {
       const value =
-        typeof titleState[currentScreen.id as string] === "boolean"
-          ? titleState[currentScreen.id as string]
+        typeof titleState[currentScreen.id] === "boolean"
+          ? titleState[currentScreen.id]
           : true;
       setHide(value);
     } else {
@@ -94,7 +94,9 @@ export const Title = () => {
 
   function navigateToNotebook() {
     if (!isTopic) return;
-    Notebook.navigate(notebook, true);
+    if (notebook) {
+      NotebookScreen.navigate(notebook, true);
+    }
   }
   return (
     <>

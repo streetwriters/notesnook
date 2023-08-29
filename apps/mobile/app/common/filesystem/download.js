@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import hosts from "@notesnook/core/dist/utils/constants";
 import NetInfo from "@react-native-community/netinfo";
 import RNFetchBlob from "react-native-blob-util";
-import { ToastEvent } from "../../services/event-manager";
+import { ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import { cacheDir, fileCheck } from "./utils";
@@ -74,13 +74,13 @@ export async function downloadFile(filename, data, cancelToken) {
     return status >= 200 && status < 300;
   } catch (e) {
     if (e.message !== "canceled") {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Error downloading file",
         message: e.message,
         type: "error",
         context: "global"
       });
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Error downloading file",
         message: e.message,
         type: "error",

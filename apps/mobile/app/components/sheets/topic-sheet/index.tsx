@@ -52,7 +52,6 @@ import {
   eOpenAddTopicDialog
 } from "../../../utils/events";
 import { normalize, SIZE } from "../../../utils/size";
-import { GroupHeader, NotebookType, TopicType } from "../../../utils/types";
 
 import { getTotalNotes } from "@notesnook/common";
 import { groupArray } from "@notesnook/core/dist/utils/grouping";
@@ -65,6 +64,7 @@ import { useSelectionStore } from "../../../stores/use-selection-store";
 import { deleteItems } from "../../../utils/functions";
 import { Properties } from "../../properties";
 import Sort from "../sort";
+import { GroupedItems, GroupHeader, Topic } from "@notesnook/core/dist/types";
 
 type ConfigItem = { id: string; type: string };
 class TopicSheetConfig {
@@ -95,12 +95,12 @@ export const TopicsSheet = () => {
         )?.data
       : null
   );
-  const [selection, setSelection] = useState<TopicType[]>([]);
+  const [selection, setSelection] = useState<Topic[]>([]);
   const [enabled, setEnabled] = useState(false);
   const { colors } = useThemeColors("sheet");
   const ref = useRef<ActionSheetRef>(null);
   const isTopic = currentScreen.name === "TopicNotes";
-  const [topics, setTopics] = useState(
+  const [topics, setTopics] = useState<GroupedItems<Topic>>(
     notebook
       ? qclone(
           groupArray(notebook.topics, db.settings.getGroupOptions("topics"))
@@ -117,11 +117,10 @@ export const TopicsSheet = () => {
     (data?: NotebookScreenParams) => {
       if (!canShow) return;
       if (!data) data = { item: notebook } as NotebookScreenParams;
-      const _notebook = db.notebooks?.notebook(data.item?.id)
-        ?.data as NotebookType;
+      const _notebook = db.notebooks?.notebook(data.item?.id)?.data;
+
       if (_notebook) {
         setNotebook(_notebook);
-
         setTopics(
           qclone(
             groupArray(_notebook.topics, db.settings.getGroupOptions("topics"))
@@ -163,6 +162,7 @@ export const TopicsSheet = () => {
     paragraph: "You have not added any topics yet.",
     button: "Add first topic",
     action: () => {
+      if (!notebook) return;
       eSendEvent(eOpenAddTopicDialog, { notebookId: notebook.id });
     },
     loading: "Loading notebook topics"
@@ -172,18 +172,18 @@ export const TopicsSheet = () => {
     item,
     index
   }: {
-    item: TopicType | GroupHeader;
+    item: Topic | GroupHeader;
     index: number;
   }) =>
     (item as GroupHeader).type === "header" ? null : (
-      <TopicItem sheetRef={ref} item={item as TopicType} index={index} />
+      <TopicItem sheetRef={ref} item={item as Topic} index={index} />
     );
 
   const selectionContext = {
     selection: selection,
     enabled,
     setEnabled,
-    toggleSelection: (item: TopicType) => {
+    toggleSelection: (item: Topic) => {
       setSelection((state) => {
         const selection = [...state];
         const index = selection.findIndex(
@@ -428,7 +428,7 @@ export const TopicsSheet = () => {
                 progressBackgroundColor={colors.primary.background}
               />
             }
-            keyExtractor={(item) => (item as TopicType).id}
+            keyExtractor={(item) => (item as Topic).id}
             renderItem={renderTopic}
             ListEmptyComponent={
               <View
@@ -451,15 +451,15 @@ export const TopicsSheet = () => {
 };
 
 const SelectionContext = createContext<{
-  selection: TopicType[];
+  selection: Topic[];
   enabled: boolean;
   setEnabled: (value: boolean) => void;
-  toggleSelection: (item: TopicType) => void;
+  toggleSelection: (item: Topic) => void;
 }>({
   selection: [],
   enabled: false,
   setEnabled: (_value: boolean) => {},
-  toggleSelection: (_item: TopicType) => {}
+  toggleSelection: (_item: Topic) => {}
 });
 const useSelection = () => useContext(SelectionContext);
 
@@ -468,7 +468,7 @@ const TopicItem = ({
   index,
   sheetRef
 }: {
-  item: TopicType;
+  item: Topic;
   index: number;
   sheetRef: RefObject<ActionSheetRef>;
 }) => {

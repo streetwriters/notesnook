@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Linking } from "react-native";
 import { db } from "../common/database";
 import { presentDialog } from "../components/dialog/functions";
-import { eSendEvent, ToastEvent } from "../services/event-manager";
+import { eSendEvent, ToastManager } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import SearchService from "../services/search";
 import { useMenuStore } from "../stores/use-menu-store";
@@ -59,7 +59,7 @@ function confirmDeleteAllNotes(items, type, context) {
 
 export const deleteItems = async (item, context) => {
   if (item && db.monographs.isPublished(item.id)) {
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Can not delete note",
       message: "Unpublish note to delete it",
       type: "error",
@@ -87,7 +87,7 @@ export const deleteItems = async (item, context) => {
   if (notes?.length > 0) {
     for (const note of notes) {
       if (db.monographs.isPublished(note.id)) {
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Some notes are published",
           message: "Unpublish published notes to delete them",
           type: "error",
@@ -153,7 +153,7 @@ export const deleteItems = async (item, context) => {
     reminders.length === 0 &&
     (notes.length > 0 || notebooks.length > 0)
   ) {
-    ToastEvent.show({
+    ToastManager.show({
       heading: message,
       type: "success",
       func: async () => {
@@ -168,7 +168,7 @@ export const deleteItems = async (item, context) => {
         Navigation.queueRoutesForUpdate();
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
-        ToastEvent.hide();
+        ToastManager.hide();
       },
       actionText: "Undo"
     });
