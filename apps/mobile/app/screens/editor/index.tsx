@@ -38,7 +38,6 @@ import { eSubscribeEvent } from "../../services/event-manager";
 import { useEditorStore } from "../../stores/use-editor-store";
 import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
-import { NoteType } from "../../utils/types";
 import EditorOverlay from "./loading";
 import { EDITOR_URI } from "./source";
 import { EditorProps, useEditorType } from "./tiptap/types";
@@ -181,9 +180,9 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
 
   const onPress = async () => {
     if (editor.note.current) {
-      await db.notes?.note(editor.note.current.id).readonly();
-      editor.note.current = db.notes?.note(editor.note.current.id)
-        .data as NoteType;
+      await db.notes.note(editor.note.current.id)?.readonly();
+      editor.note.current = db.notes?.note(editor.note.current.id)?.data;
+
       useEditorStore.getState().setReadonly(false);
     }
   };

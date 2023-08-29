@@ -29,7 +29,7 @@ import picker from "../../screens/editor/tiptap/picker";
 import {
   eSendEvent,
   presentSheet,
-  ToastEvent
+  ToastManager
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
@@ -76,7 +76,7 @@ const Actions = ({ attachment, setAttachments, fwdRef, close }) => {
       name: "Reupload",
       onPress: async () => {
         if (!PremiumService.get()) {
-          ToastEvent.show({
+          ToastManager.show({
             heading: "Upgrade to pro",
             type: "error",
             context: "local"
@@ -102,7 +102,7 @@ const Actions = ({ attachment, setAttachments, fwdRef, close }) => {
         if (res.failed) {
           db.attachments.markAsFailed(attachment.id, res.failed);
           setFailed(res.failed);
-          ToastEvent.show({
+          ToastManager.show({
             heading: "File check failed with error: " + res.failed,
             type: "error",
             context: "local"
@@ -110,7 +110,7 @@ const Actions = ({ attachment, setAttachments, fwdRef, close }) => {
         } else {
           setFailed(null);
           db.attachments.markAsFailed(attachment.id, null);
-          ToastEvent.show({
+          ToastManager.show({
             heading: "File check passed",
             type: "success",
             context: "local"
@@ -248,7 +248,7 @@ const Actions = ({ attachment, setAttachments, fwdRef, close }) => {
           <Paragraph
             onPress={() => {
               Clipboard.setString(attachment.metadata.hash);
-              ToastEvent.show({
+              ToastManager.show({
                 type: "success",
                 heading: "Attachment hash copied",
                 context: "local"
@@ -287,7 +287,7 @@ const Actions = ({ attachment, setAttachments, fwdRef, close }) => {
               <PressableButton
                 onPress={async () => {
                   if (item.type === "notfound") {
-                    ToastEvent.show({
+                    ToastManager.show({
                       heading: "Note not found",
                       message:
                         "A note with the given id was not found. Maybe you have deleted the note or moved it to trash already.",

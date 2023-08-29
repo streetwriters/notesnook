@@ -17,23 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { groupReminders } from "@notesnook/core/dist/utils/grouping";
-import create, { State } from "zustand";
-import { db } from "../common/database";
-import { GroupedItems, Reminder } from "@notesnook/core/dist/types";
+const Errors = {
+  export: (type: string) => `Failed to export note to ${type}`
+};
 
-export interface ReminderStore extends State {
-  reminders: GroupedItems<Reminder>;
-  setReminders: (items?: Reminder[]) => void;
-  cleareReminders: () => void;
-}
-
-export const useReminderStore = create<ReminderStore>((set) => ({
-  reminders: [],
-  setReminders: () => {
-    set({
-      reminders: groupReminders((db.reminders?.all as Reminder[]) || [])
-    });
-  },
-  cleareReminders: () => set({ reminders: [] })
-}));
+export default Errors;

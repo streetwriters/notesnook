@@ -20,11 +20,11 @@ import { isReminderActive } from "@notesnook/core/dist/collections/reminders";
 import React from "react";
 import { ViewStyle } from "react-native";
 
-import { Reminder } from "../../../services/notifications";
 import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { Button, ButtonProps } from "../button";
 import { getFormattedReminderTime } from "@notesnook/common";
+import { Reminder } from "@notesnook/core/dist/types";
 
 export const ReminderTime = ({
   checkIsActive = true,

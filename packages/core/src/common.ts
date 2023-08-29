@@ -24,17 +24,35 @@ export const EV = new EventManager();
 export async function checkIsUserPremium(type: string) {
   // if (process.env.NODE_ENV === "test") return true;
 
-  const results = await EV.publishWithResult(EVENTS.userCheckStatus, type);
+  const results = await EV.publishWithResult<{ type: string; result: boolean }>(
+    EVENTS.userCheckStatus,
+    type
+  );
   if (typeof results === "boolean") return results;
   return results.some((r) => r.type === type && r.result === true);
 }
 
+export const SYNC_CHECK_IDS = {
+  autoSync: "autoSync",
+  sync: "sync"
+};
+
+export type SyncStatusEvent = keyof typeof SYNC_CHECK_IDS;
+
 export async function checkSyncStatus(type: string) {
-  const results = await EV.publishWithResult(EVENTS.syncCheckStatus, type);
+  const results = await EV.publishWithResult<{ type: string; result: boolean }>(
+    EVENTS.syncCheckStatus,
+    type
+  );
   if (typeof results === "boolean") return results;
   else if (typeof results === "undefined") return true;
   return results.some((r) => r.type === type && r.result === true);
 }
+
+export type SyncProgressEvent = {
+  type: "upload" | "download";
+  current: number;
+};
 
 export function sendSyncProgressEvent(
   EV: EventManager,
@@ -44,7 +62,7 @@ export function sendSyncProgressEvent(
   EV.publish(EVENTS.syncProgress, {
     type,
     current
-  });
+  } as SyncProgressEvent);
 }
 
 export function sendMigrationProgressEvent(
@@ -69,11 +87,6 @@ export const CHECK_IDS = {
   vaultAdd: "vault:add",
   notebookAdd: "notebook:add",
   backupEncrypt: "backup:encrypt"
-};
-
-export const SYNC_CHECK_IDS = {
-  autoSync: "autoSync",
-  sync: "sync"
 };
 
 export const EVENTS = {

@@ -21,11 +21,11 @@ import "@notesnook/core/dist/types";
 import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import create, { State } from "zustand";
 import { db } from "../common/database";
-import { TagType } from "../utils/types";
+import { GroupedItems, Tag } from "@notesnook/core/dist/types";
 
 export interface TagStore extends State {
-  tags: TagType[];
-  setTags: (items?: TagType[]) => void;
+  tags: GroupedItems<Tag>;
+  setTags: (items?: Tag[]) => void;
   clearTags: () => void;
 }
 
@@ -34,10 +34,7 @@ export const useTagStore = create<TagStore>((set, get) => ({
   setTags: (items) => {
     if (!items) {
       set({
-        tags: groupArray(
-          (db?.tags?.all as TagType[]) || [],
-          db.settings.getGroupOptions("tags")
-        )
+        tags: groupArray(db.tags.all || [], db.settings.getGroupOptions("tags"))
       });
       return;
     }

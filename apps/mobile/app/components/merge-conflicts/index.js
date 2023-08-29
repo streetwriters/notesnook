@@ -91,7 +91,7 @@ const MergeConflicts = () => {
     if (editorController.current?.note?.id === note.id) {
       // reload the note in editor
       eSendEvent(eOnLoadNote, {
-        ...editorController.current?.note,
+        item: editorController.current?.note,
         forced: true
       });
     }
@@ -324,10 +324,12 @@ const MergeConflicts = () => {
                 if (!note) return;
                 await sleep(300);
                 eSendEvent(eOnLoadNote + ":conflictPrimary", {
-                  ...note,
-                  content: {
-                    ...content.current,
-                    isPreview: true
+                  item: {
+                    ...note,
+                    content: {
+                      ...content.current,
+                      isPreview: true
+                    }
                   }
                 });
               }}
@@ -359,8 +361,10 @@ const MergeConflicts = () => {
                 if (!note) return;
                 await sleep(300);
                 eSendEvent(eOnLoadNote + ":conflictSecondary", {
-                  ...note,
-                  content: { ...content.current.conflicted, isPreview: true }
+                  item: {
+                    ...note,
+                    content: { ...content.current.conflicted, isPreview: true }
+                  }
                 });
               }}
             />

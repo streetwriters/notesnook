@@ -30,7 +30,7 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import BiometicService from "../../services/biometrics";
 import { DDS } from "../../services/device-detection";
 import {
-  ToastEvent,
+  ToastManager,
   eSendEvent,
   presentSheet
 } from "../../services/event-manager";
@@ -212,7 +212,7 @@ const AppLock = ({ route }) => {
                     !useUserStore.getState().user &&
                     item.value !== modes[0].value
                   ) {
-                    ToastEvent.show({
+                    ToastManager.show({
                       heading: "Biometrics not enrolled",
                       type: "error",
                       message:

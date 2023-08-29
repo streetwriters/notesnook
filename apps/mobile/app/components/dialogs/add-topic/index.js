@@ -25,7 +25,7 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastManager
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { db } from "../../../common/database";
@@ -63,7 +63,7 @@ export class AddTopicDialog extends React.Component {
   addNewTopic = async () => {
     try {
       if (!this.title || this.title?.trim() === "") {
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Topic title is required",
           type: "error",
           context: "local"

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { NotebookItem } from ".";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
-import { ToastEvent } from "../../../services/event-manager";
+import { ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useTrashStore } from "../../../stores/use-trash-store";
@@ -67,7 +67,7 @@ export const openNotebookTopic = (item) => {
         await db.trash.restore(item.id);
         Navigation.queueRoutesForUpdate();
         useSelectionStore.getState().setSelectionMode(false);
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Restore successful",
           type: "success"
         });
@@ -76,7 +76,7 @@ export const openNotebookTopic = (item) => {
         await db.trash.delete(item.id);
         useTrashStore.getState().setTrash();
         useSelectionStore.getState().setSelectionMode(false);
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Permanently deleted items",
           type: "success",
           context: "local"
