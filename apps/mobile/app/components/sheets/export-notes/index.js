@@ -24,7 +24,7 @@ import Share from "react-native-share";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { db } from "../../../common/database";
-import { presentSheet, ToastEvent } from "../../../services/event-manager";
+import { presentSheet, ToastManager } from "../../../services/event-manager";
 import Exporter from "../../../services/exporter";
 import PremiumService from "../../../services/premium";
 import { useThemeColors } from "@notesnook/theme";
@@ -283,7 +283,7 @@ const ExportNotesSheet = ({ notes, update }) => {
                       showAppsSuggestions: true
                     }).catch((e) => {
                       console.log(e);
-                      ToastEvent.show({
+                      ToastManager.show({
                         heading: "Cannot open",
                         message: `No application found to open ${result.name} file.`,
                         type: "success",

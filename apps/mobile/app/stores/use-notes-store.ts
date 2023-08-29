@@ -20,13 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import create, { State } from "zustand";
 import { db } from "../common/database";
-import { NoteType } from "../utils/types";
+import { GroupedItems, Note } from "@notesnook/core/dist/types";
 
 export interface NoteStore extends State {
-  notes: NoteType[];
+  notes: GroupedItems<Note>;
   loading: boolean;
   setLoading: (loading: boolean) => void;
-  setNotes: (items?: NoteType[]) => void;
+  setNotes: (items?: Note[]) => void;
   clearNotes: () => void;
 }
 
@@ -39,7 +39,7 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
     if (!items) {
       set({
         notes: groupArray(
-          (db.notes?.all as NoteType[]) || [],
+          db.notes.all || [],
           db.settings.getGroupOptions("home")
         )
       });

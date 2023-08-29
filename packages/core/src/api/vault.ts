@@ -30,11 +30,12 @@ import {
 } from "../collections/content";
 import { NoteContent } from "../collections/session-content";
 
-const ERRORS = {
+export const VAULT_ERRORS = {
   noVault: "ERR_NO_VAULT",
   vaultLocked: "ERR_VAULT_LOCKED",
   wrongPassword: "ERR_WRONG_PASSWORD"
 };
+
 const ERASE_TIME = 1000 * 60 * 30;
 export default class Vault {
   vaultPassword?: string;
@@ -84,11 +85,11 @@ export default class Vault {
   async unlock(password: string) {
     const vaultKey = await this.getKey();
     if (!vaultKey || !(await this.exists(vaultKey)))
-      throw new Error(ERRORS.noVault);
+      throw new Error(VAULT_ERRORS.noVault);
     try {
       await this.db.storage().decrypt({ password }, vaultKey);
     } catch (e) {
-      throw new Error(ERRORS.wrongPassword);
+      throw new Error(VAULT_ERRORS.wrongPassword);
     }
     this.password = password;
     return true;
@@ -213,11 +214,11 @@ export default class Vault {
 
   private async getVaultPassword() {
     if (!(await this.exists())) {
-      throw new Error(ERRORS.noVault);
+      throw new Error(VAULT_ERRORS.noVault);
     }
 
     if (!this.password || !this.password.length) {
-      throw new Error(ERRORS.vaultLocked);
+      throw new Error(VAULT_ERRORS.vaultLocked);
     }
 
     return this.password;

@@ -42,14 +42,14 @@ export const Monographs = ({
   );
 };
 
-Monographs.get = (params: NotesScreenParams, grouped = true) => {
+Monographs.get = (params?: NotesScreenParams, grouped = true) => {
   const notes = db.monographs?.all || [];
   return grouped
     ? groupArray(notes, db.settings.getGroupOptions("notes"))
     : notes;
 };
 
-Monographs.navigate = (item: MonographType, canGoBack: boolean) => {
+Monographs.navigate = (item?: MonographType, canGoBack?: boolean) => {
   Navigation.navigate<"Monographs">(
     {
       name: "Monographs",
@@ -57,7 +57,7 @@ Monographs.navigate = (item: MonographType, canGoBack: boolean) => {
     },
     {
       item: { type: "monograph" } as any,
-      canGoBack,
+      canGoBack: canGoBack as boolean,
       title: "Monographs"
     }
   );

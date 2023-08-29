@@ -64,6 +64,7 @@ interface InputProps extends TextInputProps {
     color: ColorValue;
     onPress: () => void;
     testID?: string;
+    size?: number;
   };
   buttons?: React.ReactNode;
   onBlurInput?: () => void;

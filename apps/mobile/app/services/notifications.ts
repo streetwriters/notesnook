@@ -48,23 +48,24 @@ import { presentDialog } from "../components/dialog/functions";
 import NetInfo from "@react-native-community/netinfo";
 import { encodeNonAsciiHTML } from "entities";
 import { convertNoteToText } from "../utils/note-to-text";
+import { Reminder } from "@notesnook/core/dist/types";
 
-export type Reminder = {
-  id: string;
-  type: string;
-  title: string;
-  description?: string;
-  priority: "silent" | "vibrate" | "urgent";
-  date: number;
-  mode: "repeat" | "once" | "permanent";
-  recurringMode?: "week" | "month" | "day";
-  selectedDays?: number[];
-  dateCreated: number;
-  dateModified: number;
-  localOnly?: boolean;
-  snoozeUntil?: number;
-  disabled?: boolean;
-};
+// export type Reminder = {
+//   id: string;
+//   type: string;
+//   title: string;
+//   description?: string;
+//   priority: "silent" | "vibrate" | "urgent";
+//   date: number;
+//   mode: "repeat" | "once" | "permanent";
+//   recurringMode?: "week" | "month" | "day";
+//   selectedDays?: number[];
+//   dateCreated: number;
+//   dateModified: number;
+//   localOnly?: boolean;
+//   snoozeUntil?: number;
+//   disabled?: boolean;
+// };
 
 let pinned: DisplayedNotification[] = [];
 
@@ -122,11 +123,15 @@ async function initDatabase(notes = true) {
 const onEvent = async ({ type, detail }: Event) => {
   const { notification, pressAction, input } = detail;
   if (type === EventType.DELIVERED && Platform.OS === "android") {
-    const reminder = db.reminders?.reminder(notification?.id?.split("_")[0]);
-    if (reminder && reminder.recurringMode === "month") {
-      await initDatabase();
-      await scheduleNotification(reminder);
+    if (notification?.id) {
+      const reminder = db.reminders?.reminder(notification?.id?.split("_")[0]);
+
+      if (reminder && reminder.recurringMode === "month") {
+        await initDatabase();
+        await scheduleNotification(reminder);
+      }
     }
+
     return;
   }
   if (type === EventType.PRESS) {
@@ -134,7 +139,7 @@ const onEvent = async ({ type, detail }: Event) => {
     if (notification?.data?.type === "quickNote") return;
     MMKV.removeItem("appState");
     await initDatabase();
-    if (notification?.data?.type === "reminder") {
+    if (notification?.data?.type === "reminder" && notification?.id) {
       const reminder = db.reminders?.reminder(notification.id?.split("_")[0]);
       if (!reminder) return;
       await sleep(1000);
@@ -166,9 +171,12 @@ const onEvent = async ({ type, detail }: Event) => {
     switch (pressAction?.id) {
       case "REMINDER_SNOOZE": {
         await initDatabase();
+        if (!notification?.id) break;
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
         );
+        if (!reminder) break;
+
         const reminderTime = parseInt(
           SettingsService.get().defaultSnoozeTime || "5"
         );
@@ -185,6 +193,7 @@ const onEvent = async ({ type, detail }: Event) => {
       }
       case "REMINDER_DISABLE": {
         await initDatabase();
+        if (!notification?.id) break;
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
         );
@@ -192,6 +201,7 @@ const onEvent = async ({ type, detail }: Event) => {
           ...reminder,
           disabled: true
         });
+        if (!reminder?.id) break;
         await Notifications.scheduleNotification(
           db.reminders?.reminder(reminder?.id)
         );
@@ -201,6 +211,7 @@ const onEvent = async ({ type, detail }: Event) => {
       }
       case "UNPIN": {
         await initDatabase();
+        if (!notification?.id) break;
         remove(notification?.id as string);
         const reminder = db.reminders?.reminder(
           notification?.id?.split("_")[0]
@@ -439,7 +450,9 @@ function loadNote(id: string, jump: boolean) {
   }
   eSendEvent("loadingNote", note);
   setTimeout(() => {
-    eSendEvent(eOnLoadNote, note);
+    eSendEvent(eOnLoadNote, {
+      item: note
+    });
     if (!jump && !DDS.isTab) {
       tabBarRef.current?.goToPage(1);
     }
@@ -904,7 +917,7 @@ async function pinNote(id: string) {
     const note = db.notes?.note(id as string) as any;
     let text = await convertNoteToText(note as any, false);
     if (!text) text = "";
-    let html = text.replace(/\n/g, "<br />");
+    const html = text.replace(/\n/g, "<br />");
     Notifications.displayNotification({
       title: note.title,
       message: note.headline || text,
@@ -918,6 +931,9 @@ async function pinNote(id: string) {
     console.log(e);
   }
 }
+const Events = {
+  onUpdate: "onUpdate"
+};
 
 const Notifications = {
   init,
@@ -936,7 +952,8 @@ const Notifications = {
   setupReminders,
   getChannelId,
   isNotePinned,
-  pinNote
+  pinNote,
+  Events
 };
 
 export default Notifications;

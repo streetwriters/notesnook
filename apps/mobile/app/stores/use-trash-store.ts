@@ -20,11 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import create, { State } from "zustand";
 import { db } from "../common/database";
-import { TrashType } from "../utils/types";
+import { GroupedItems, TrashItem } from "@notesnook/core/dist/types";
 
 export interface TrashStore extends State {
-  trash: Array<TrashType>;
-  setTrash: (items?: Array<TrashType>) => void;
+  trash: GroupedItems<TrashItem>;
+  setTrash: (items?: GroupedItems<TrashItem>) => void;
   clearTrash: () => void;
 }
 
@@ -34,7 +34,7 @@ export const useTrashStore = create<TrashStore>((set, get) => ({
     if (!items) {
       set({
         trash: groupArray(
-          db?.trash?.all || [],
+          (db.trash.all as TrashItem[]) || [],
           db.settings.getGroupOptions("trash")
         )
       });

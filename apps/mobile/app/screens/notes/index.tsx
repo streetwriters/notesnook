@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Color, GroupedItems, Item, Topic } from "@notesnook/core/dist/types";
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
@@ -39,10 +40,9 @@ import useNavigationStore, {
 } from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
 import { SIZE } from "../../utils/size";
-import { NoteType, TopicType } from "../../utils/types";
-import Notebook from "../notebook/index";
+
+import NotebookScreen from "../notebook/index";
 import {
-  getAlias,
   openEditor,
   openMonographsWebpage,
   setOnFirstSave,
@@ -71,7 +71,7 @@ export const MONOGRAPH_PLACEHOLDER_DATA = {
 };
 
 export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
-  get: (params: NotesScreenParams, grouped?: boolean) => NoteType[];
+  get: (params: NotesScreenParams, grouped?: boolean) => GroupedItems<Item>;
   placeholderData: unknown;
   onPressFloatingButton: () => void;
   focusControl?: boolean;
@@ -99,16 +99,18 @@ const NotesPage = ({
   "NotesPage" | "TaggedNotes" | "Monographs" | "ColoredNotes" | "TopicNotes"
 >) => {
   const params = useRef<NotesScreenParams>(route?.params);
-  const [notes, setNotes] = useState<NoteType[]>(get(route.params, true));
+  const [notes, setNotes] = useState(get(route.params, true));
   const loading = useNoteStore((state) => state.loading);
   const [loadingNotes, setLoadingNotes] = useState(false);
-  const alias = getAlias(params.current);
   const isMonograph = route.name === "Monographs";
+
   const notebook =
-    route.name === "TopicNotes" && (params.current.item as TopicType).notebookId
-      ? db.notebooks?.notebook((params.current.item as TopicType).notebookId)
-          ?.data
+    route.name === "TopicNotes" &&
+    params.current.item.type === "topic" &&
+    params.current.item.notebookId
+      ? db.notebooks?.notebook((params.current.item as Topic).notebookId)?.data
       : null;
+
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
       Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
@@ -126,29 +128,32 @@ const NotesPage = ({
   const prepareSearch = React.useCallback(() => {
     const { item } = params.current;
     SearchService.update({
-      placeholder: `Search in ${alias}`,
+      placeholder: `Search in ${item.title}`,
       type: "notes",
-      title: item.type === "tag" ? "#" + alias : toCamelCase(item.title),
+      title:
+        item.type === "tag"
+          ? "#" + item.title
+          : toCamelCase((item as Color).title),
       get: () => {
         return get(params.current, false);
       }
     });
-  }, [alias, get]);
+  }, [get]);
 
   const syncWithNavigation = React.useCallback(() => {
     const { item, title } = params.current;
-    const alias = getAlias(params.current);
     useNavigationStore.getState().update(
       {
         name: route.name,
-        title: alias || title,
+        title:
+          route.name === "ColoredNotes" ? toCamelCase(title as string) : title,
         id: item?.id,
         type: "notes",
-        notebookId: (item as TopicType).notebookId,
-        alias:
-          route.name === "ColoredNotes" ? toCamelCase(alias as string) : alias,
+        notebookId: item.type === "topic" ? item.notebookId : undefined,
         color:
-          route.name === "ColoredNotes" ? item.title?.toLowerCase() : undefined
+          item.type === "color" && route.name === "ColoredNotes"
+            ? item.title?.toLowerCase()
+            : undefined
       },
       params.current.canGoBack,
       rightButtons && rightButtons(params.current)
@@ -160,8 +165,7 @@ const NotesPage = ({
       setOnFirstSave({
         type: getItemType(route.name),
         id: item.id,
-        color: item.title,
-        notebook: (item as TopicType).notebookId
+        notebook: item.type === "topic" ? item.notebookId : undefined
       });
   }, [
     isMonograph,
@@ -175,11 +179,13 @@ const NotesPage = ({
     (data?: NotesScreenParams) => {
       const isNew = data && data?.item?.id !== params.current?.item?.id;
       if (data) params.current = data;
-      params.current.title = params.current.title || params.current.item.title;
+      params.current.title =
+        params.current.title ||
+        (params.current.item as Item & { title: string }).title;
       const { item } = params.current;
       try {
         if (isNew) setLoadingNotes(true);
-        const notes = get(params.current, true) as NoteType[];
+        const notes = get(params.current, true);
         if (
           ((item.type === "tag" || item.type === "color") &&
             (!notes || notes.length === 0)) ||
@@ -215,7 +221,7 @@ const NotesPage = ({
     <DelayLayout
       color={
         route.name === "ColoredNotes"
-          ? params.current?.item.title.toLowerCase()
+          ? (params.current?.item as Color).title.toLowerCase()
           : undefined
       }
       wait={loading || loadingNotes}
@@ -233,12 +239,10 @@ const NotesPage = ({
         >
           <Paragraph
             onPress={() => {
-              Navigation.navigate(
-                {
-                  name: "Notebooks"
-                },
-                {}
-              );
+              Navigation.navigate({
+                name: "Notebooks",
+                title: "Notebooks"
+              });
             }}
             size={SIZE.xs}
           >
@@ -253,7 +257,7 @@ const NotesPage = ({
               />
               <Paragraph
                 onPress={() => {
-                  Notebook.navigate(notebook, true);
+                  NotebookScreen.navigate(notebook, true);
                 }}
                 size={SIZE.xs}
               >
@@ -273,7 +277,7 @@ const NotesPage = ({
           heading: params.current.title,
           color:
             route.name === "ColoredNotes"
-              ? params.current?.item.title.toLowerCase()
+              ? (params.current?.item as Color).title.toLowerCase()
               : null
         }}
         placeholderData={placeholderData}

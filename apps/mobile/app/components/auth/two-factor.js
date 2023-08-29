@@ -24,7 +24,7 @@ import useTimer from "../../hooks/use-timer";
 import {
   eSendEvent,
   presentSheet,
-  ToastEvent
+  ToastManager
 } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../utils/events";
@@ -138,7 +138,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
       setSending(false);
     } catch (e) {
       setSending(false);
-      ToastEvent.error(e, "Error sending 2FA Code", "local");
+      ToastManager.error(e, "Error sending 2FA Code", "local");
     }
   }, [currentMethod.method, mfaInfo.token, seconds, sending, start]);
 

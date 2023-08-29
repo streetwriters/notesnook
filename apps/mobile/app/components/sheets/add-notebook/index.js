@@ -29,7 +29,7 @@ import { FlatList } from "react-native-actions-sheet";
 import { notesnook } from "../../../../e2e/test.ids";
 import { db } from "../../../common/database";
 import { DDS } from "../../../services/device-detection";
-import { ToastEvent, presentSheet } from "../../../services/event-manager";
+import { ToastManager, presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useMenuStore } from "../../../stores/use-menu-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
@@ -129,7 +129,7 @@ export class AddNotebookSheet extends React.Component {
     let { topics, notebook } = this.state;
 
     if (!this.title || this.title?.trim().length === 0) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Notebook title is required",
         type: "error",
         context: "local"

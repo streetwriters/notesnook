@@ -29,7 +29,7 @@ import * as ScopedStorage from "react-native-scoped-storage";
 import { db } from "../../../common/database";
 import storage from "../../../common/database/storage";
 import {
-  ToastEvent,
+  ToastManager,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../../services/event-manager";
@@ -81,7 +81,7 @@ const RestoreDataSheet = () => {
   }, [restoring]);
 
   const showIsWorking = () => {
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Restoring Backup",
       message: "Your backup data is being restored. please wait.",
       type: "error",

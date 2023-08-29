@@ -38,7 +38,7 @@ import { RelationsList } from "../../../components/sheets/relations-list";
 import ReminderSheet from "../../../components/sheets/reminder";
 import { DDS } from "../../../services/device-detection";
 import {
-  ToastEvent,
+  ToastManager,
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
@@ -59,18 +59,19 @@ import {
 } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { tabBarRef } from "../../../utils/global-refs";
-import { NoteType } from "../../../utils/types";
 import { useDragState } from "../../settings/editor/state";
 import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { EditorEvents, editorState } from "./utils";
 import { useNoteStore } from "../../../stores/use-notes-store";
 import SettingsService from "../../../services/settings";
+import { ItemReference } from "@notesnook/core/dist/types";
+import { useRelationStore } from "../../../stores/use-relation-store";
 
 const publishNote = async (editor: useEditorType) => {
   const user = useUserStore.getState().user;
   if (!user) {
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Login required",
       message: "Login to publish",
       context: "global",
@@ -83,7 +84,7 @@ const publishNote = async (editor: useEditorType) => {
   }
 
   if (!user?.isEmailConfirmed) {
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Email not verified",
       message: "Please verify your email first.",
       context: "global"
@@ -92,9 +93,9 @@ const publishNote = async (editor: useEditorType) => {
   }
   const currentNote = editor?.note?.current;
   if (currentNote?.id) {
-    const note = db.notes?.note(currentNote.id)?.data as NoteType;
+    const note = db.notes?.note(currentNote.id)?.data;
     if (note?.locked) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Locked notes cannot be published",
         type: "error",
         context: "global"
@@ -111,7 +112,7 @@ const publishNote = async (editor: useEditorType) => {
 const showActionsheet = async (editor: useEditorType) => {
   const currentNote = editor?.note?.current;
   if (currentNote?.id) {
-    const note = db.notes?.note(currentNote.id)?.data as NoteType;
+    const note = db.notes?.note(currentNote.id)?.data;
 
     if (editorState().isFocused || editorState().isFocused) {
       editorState().isFocused = true;
@@ -119,7 +120,7 @@ const showActionsheet = async (editor: useEditorType) => {
     const { Properties } = require("../../../components/properties/index.js");
     Properties.present(note, ["Dark Mode"]);
   } else {
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Start writing to create a new note",
       type: "success",
       context: "global"
@@ -363,7 +364,7 @@ export const useEditorEvents = (
           break;
         case EventTypes.reminders:
           if (!editor.note.current) {
-            ToastEvent.show({
+            ToastManager.show({
               heading: "Create a note first to add a reminder",
               type: "success"
             });
@@ -380,7 +381,7 @@ export const useEditorEvents = (
           break;
         case EventTypes.newtag:
           if (!editor.note.current) {
-            ToastEvent.show({
+            ToastManager.show({
               heading: "Create a note first to add a tag",
               type: "success"
             });
@@ -391,11 +392,11 @@ export const useEditorEvents = (
         case EventTypes.tag:
           if (editorMessage.value) {
             if (!editor.note.current) return;
-            db.notes
-              ?.note(editor.note.current?.id)
-              .untag(editorMessage.value)
+            db.relations
+              .unlink(editorMessage.value as ItemReference, editor.note.current)
               .then(async () => {
                 useTagStore.getState().setTags();
+                useRelationStore.getState().update();
                 await editor.commands.setTags(editor.note.current);
                 Navigation.queueRoutesForUpdate();
               });

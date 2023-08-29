@@ -38,7 +38,7 @@ import { VaultStatusType, useVaultStatus } from "../../hooks/use-vault-status";
 import BackupService from "../../services/backup";
 import BiometicService from "../../services/biometrics";
 import {
-  ToastEvent,
+  ToastManager,
   eSendEvent,
   openVault,
   presentSheet
@@ -307,7 +307,7 @@ export const settingsGroups: SettingSection[] = [
                       }, 2000);
                     }, 300);
                   } catch (e) {
-                    ToastEvent.error(e as Error, "Error logging out");
+                    ToastManager.error(e as Error, "Error logging out");
                     eSendEvent("settings-loading", false);
                   }
                 }
@@ -342,7 +342,7 @@ export const settingsGroups: SettingSection[] = [
                         introCompleted: true
                       });
                     } else {
-                      ToastEvent.show({
+                      ToastManager.show({
                         heading: "Incorrect password",
                         message:
                           "The account password you entered is incorrect",
@@ -355,7 +355,7 @@ export const settingsGroups: SettingSection[] = [
                   } catch (e) {
                     eSendEvent("settings-loading", false);
                     console.log(e);
-                    ToastEvent.error(
+                    ToastManager.error(
                       e as Error,
                       "Failed to delete account",
                       "global"
@@ -553,7 +553,7 @@ export const settingsGroups: SettingSection[] = [
             property: "doubleSpacedLines",
             icon: "format-line-spacing",
             onChange: () => {
-              ToastEvent.show({
+              ToastManager.show({
                 heading: "Line spacing changed",
                 type: "success"
               });
@@ -615,7 +615,7 @@ export const settingsGroups: SettingSection[] = [
             );
             useUserStore.getState().setUser(await db.user?.fetchUser());
           } catch (e) {
-            ToastEvent.error(e as Error);
+            ToastManager.error(e as Error);
           }
         },
         getter: (current: any) => current?.marketingConsent,
@@ -817,7 +817,7 @@ export const settingsGroups: SettingSection[] = [
                 console.error(e);
               } finally {
                 if (!dir) {
-                  ToastEvent.show({
+                  ToastManager.show({
                     heading: "No directory selected",
                     type: "error"
                   });
@@ -843,7 +843,7 @@ export const settingsGroups: SettingSection[] = [
                 console.error(e);
               } finally {
                 if (!dir) {
-                  ToastEvent.show({
+                  ToastManager.show({
                     heading: "No directory selected",
                     type: "error"
                   });
@@ -862,7 +862,7 @@ export const settingsGroups: SettingSection[] = [
               const user = useUserStore.getState().user;
               const settings = SettingsService.get();
               if (!user) {
-                ToastEvent.show({
+                ToastManager.show({
                   heading: "Login required to enable encryption",
                   type: "error",
                   func: () => {

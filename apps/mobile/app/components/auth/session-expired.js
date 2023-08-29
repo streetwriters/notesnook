@@ -24,7 +24,7 @@ import { db } from "../../common/database";
 import { MMKV } from "../../common/database/mmkv";
 import BiometricService from "../../services/biometrics";
 import {
-  ToastEvent,
+  ToastManager,
   eSendEvent,
   eSubscribeEvent
 } from "../../services/event-manager";
@@ -85,7 +85,7 @@ export const SessionExpired = () => {
       clearAllStores();
       setVisible(false);
     } catch (e) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: e.message,
         type: "error",
         context: "local"

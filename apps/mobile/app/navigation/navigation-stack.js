@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
@@ -29,7 +30,7 @@ import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import Favorites from "../screens/favorites";
 import Home from "../screens/home";
-import Notebook from "../screens/notebook";
+import NotebookScreen from "../screens/notebook";
 import Notebooks from "../screens/notebooks";
 import { ColoredNotes } from "../screens/notes/colored";
 import { Monographs } from "../screens/notes/monographs";
@@ -47,20 +48,10 @@ import useNavigationStore from "../stores/use-navigation-store";
 import { useNoteStore } from "../stores/use-notes-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
 import { rootNavigatorRef } from "../utils/global-refs";
-import Auth from "../components/auth";
+
 const NativeStack = createNativeStackNavigator();
 const IntroStack = createNativeStackNavigator();
-
-/**
- * Intro Stack:
- *
- * Welcome Page
- * Select Privacy Mode Page
- * Login/Signup Page
- *
- */
 
 const IntroStackNavigator = () => {
   const { colors } = useThemeColors();
@@ -79,7 +70,6 @@ const IntroStackNavigator = () => {
       initialRouteName={"Intro"}
     >
       <NativeStack.Screen name="Intro" component={Intro} />
-      <NativeStack.Screen name="Auth" component={Auth} />
       <NativeStack.Screen name="AppLock" component={AppLock} />
     </IntroStack.Navigator>
   );
@@ -179,7 +169,7 @@ const _Tabs = () => {
       <NativeStack.Screen
         options={{ lazy: true }}
         name="Notebook"
-        component={Notebook}
+        component={NotebookScreen}
       />
       <NativeStack.Screen
         options={{ lazy: true }}

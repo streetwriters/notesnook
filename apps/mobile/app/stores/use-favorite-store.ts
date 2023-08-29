@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { GroupedItems, Note } from "@notesnook/core/dist/types";
 import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import create, { State } from "zustand";
 import { db } from "../common/database";
-import { NoteType } from "../utils/types";
 
 export interface FavoriteStore extends State {
-  favorites: NoteType[];
-  setFavorites: (items?: NoteType[]) => void;
+  favorites: GroupedItems<Note>;
+  setFavorites: (items?: Note[]) => void;
   clearFavorites: () => void;
 }
 
@@ -34,7 +34,7 @@ export const useFavoriteStore = create<FavoriteStore>((set, get) => ({
     if (!items) {
       set({
         favorites: groupArray(
-          db?.notes?.favorites || [],
+          db.notes.favorites || [],
           db.settings.getGroupOptions("favorites")
         )
       });

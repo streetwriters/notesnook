@@ -22,7 +22,7 @@ import React, { useRef, useState } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
-import { presentSheet, ToastEvent } from "../../../services/event-manager";
+import { presentSheet, ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useAttachmentStore } from "../../../stores/use-attachment-store";
 import { useThemeColors } from "@notesnook/theme";
@@ -49,8 +49,8 @@ const PublishNoteSheet = ({ note: item, update }) => {
   const [publishing, setPublishing] = useState(false);
   const publishUrl =
     note &&
-    `https://monograph.notesnook.com/${db?.monographs.monograph(note?.id)}`;
-  const isPublished = note && db?.monographs.isPublished(note?.id);
+    `https://monograph.notesnook.com/${db.monographs.monograph(note?.id)}`;
+  const isPublished = note && db.monographs.isPublished(note?.id);
   const pwdInput = useRef();
   const passwordValue = useRef();
 
@@ -71,7 +71,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
       }
       requestInAppReview();
     } catch (e) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Could not publish note",
         message: e.message,
         type: "error",
@@ -97,7 +97,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
         setPublishLoading(false);
       }
     } catch (e) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Could not unpublish note",
         message: e.message,
         type: "error",
@@ -194,7 +194,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
               <IconButton
                 onPress={() => {
                   Clipboard.setString(publishUrl);
-                  ToastEvent.show({
+                  ToastManager.show({
                     heading: "Note publish url copied",
                     type: "success",
                     context: "local"

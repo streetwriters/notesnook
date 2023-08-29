@@ -100,7 +100,9 @@ async function save(path, data, fileName, extension) {
 }
 
 async function makeHtml(note) {
-  let html = await db.notes.note(note.id).export("html");
+  let html = await db.notes.export(note.id, {
+    format: "html"
+  });
   html = decode(html, {
     level: EntityLevel.HTML
   });
@@ -120,7 +122,9 @@ async function exportAs(type, note, bulk) {
       }
       break;
     case "md":
-      data = await db.notes.note(note.id).export("md");
+      data = await db.notes.export(note.id, {
+        format: "md"
+      });
       break;
     case "md-frontmatter":
       data = await db.notes.note(note.id).export("md-frontmatter");
