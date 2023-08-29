@@ -186,7 +186,7 @@ export function post<T extends keyof typeof EventTypes>(
       })
     );
   } else {
-    console.log(type, value);
+    // console.log(type, value);
   }
 }
 
