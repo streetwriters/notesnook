@@ -16,19 +16,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React, { RefObject, useEffect, useState } from "react";
+import { useThemeColors } from "@notesnook/theme";
+import React, { RefObject } from "react";
 import { View } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
 import {
-  presentSheet,
-  PresentSheetOptions
+  PresentSheetOptions,
+  presentSheet
 } from "../../../services/event-manager";
-import { Reminder } from "../../../services/notifications";
 import { useRelationStore } from "../../../stores/use-relation-store";
-import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
 import List from "../../list";
@@ -36,6 +35,7 @@ import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { PressableButtonProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
+import { ItemReference, ItemType } from "@notesnook/core/dist/types";
 
 type RelationsListProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -74,10 +74,10 @@ export const RelationsList = ({
   const { colors } = useThemeColors();
 
   const items =
-    (db.relations?.[relationType]?.(
-      { id: item?.id, type: item?.type },
-      referenceType
-    ) as any) || [];
+    db.relations?.[relationType]?.(
+      { id: item?.id, type: item?.type } as ItemReference,
+      referenceType as ItemType
+    ) || [];
 
   const hasNoRelations = !items || items.length === 0;
 

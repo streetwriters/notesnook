@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Color } from "@notesnook/core/dist/types";
 import create, { State } from "zustand";
 import { db } from "../common/database";
-import { ColorType } from "../utils/types";
 
 export interface MenuStore extends State {
   menuPins: [];
-  colorNotes: ColorType[];
+  colorNotes: Color[];
   setMenuPins: () => void;
   setColorNotes: () => void;
   clearAll: () => void;
@@ -45,7 +45,6 @@ export const useMenuStore = create<MenuStore>((set) => ({
       }, 1000);
     }
   },
-  setColorNotes: () =>
-    set({ colorNotes: (db.colors?.all as ColorType[]) || [] }),
+  setColorNotes: () => set({ colorNotes: db.colors?.all || [] }),
   clearAll: () => set({ menuPins: [], colorNotes: [] })
 }));

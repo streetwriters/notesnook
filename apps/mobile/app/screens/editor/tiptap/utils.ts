@@ -25,7 +25,6 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../../services/event-manager";
-import { NoteType } from "../../../utils/types";
 import { AppState, EditorState, useEditorType } from "./types";
 export const textInput = createRef<TextInput>();
 export const editorController =
@@ -59,8 +58,8 @@ export function randId(prefix: string) {
     .replace("0.", prefix || "");
 }
 
-export function makeSessionId(item?: NoteType) {
-  return item?.id ? item.id + randId("_session_") : randId("session_");
+export function makeSessionId(id?: string) {
+  return id ? id + randId("_session_") : randId("session_");
 }
 
 export async function isEditorLoaded(

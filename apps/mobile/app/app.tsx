@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import "@azure/core-asynciterator-polyfill";
+import "react-native-gesture-handler";
 import SettingsService from "./services/settings";
 import {
   THEME_COMPATIBILITY_VERSION,
@@ -24,7 +25,6 @@ import {
 } from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { View } from "react-native";
-import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AppLockedOverlay from "./components/app-lock-overlay";
@@ -38,11 +38,10 @@ import { useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
 import { themeTrpcClient } from "./screens/settings/theme-selector";
 
-SettingsService.checkOrientation();
 const App = () => {
   const init = useAppEvents();
   useEffect(() => {
-    let { appLockMode } = SettingsService.get();
+    const { appLockMode } = SettingsService.get();
     if (appLockMode && appLockMode !== "none") {
       useUserStore.getState().lockApp(true);
     }
@@ -97,10 +96,10 @@ const App = () => {
 let currTheme =
   useThemeStore.getState().colorScheme === "dark"
     ? SettingsService.getProperty("darkTheme")
-    : SettingsService.getProperty("lightTheme");
+    : SettingsService.getProperty("lighTheme");
 useThemeEngineStore.getState().setTheme(currTheme);
 
-export const withTheme = (Element) => {
+export const withTheme = (Element: () => JSX.Element) => {
   return function AppWithThemeProvider() {
     const [colorScheme, darkTheme, lightTheme] = useThemeStore((state) => [
       state.colorScheme,

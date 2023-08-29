@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
-import { NoteType } from "../../../utils/types";
 import { useEditor } from "./use-editor";
+import { Note } from "@notesnook/core/dist/types";
 export type useEditorType = ReturnType<typeof useEditor>;
 
 export type EditorState = {
@@ -71,36 +71,17 @@ export type EditorMessage = {
   type: string;
 };
 
-export type Note = {
-  [name: string]: unknown;
-  id: string | null;
-  type: string;
-  contentId: string;
-  title: string;
-  locked: boolean;
-  conflicted: boolean;
-  dateEdited: number;
-  headline: string;
-};
-
-export type Content = {
-  data?: string;
-  type: string;
-  noteId: string;
-  id?: string;
-};
-
 export type SavePayload = {
   title?: string;
-  id?: string | null;
-  data?: Content["data"];
-  type?: Content["type"];
+  id?: string;
+  data?: string;
+  type?: "tiptap";
   sessionId?: string | null;
   sessionHistoryId?: number;
 };
 
 export type AppState = {
-  note?: NoteType;
+  note?: Note;
   editing: boolean;
   movedAway: boolean;
   timestamp: number;

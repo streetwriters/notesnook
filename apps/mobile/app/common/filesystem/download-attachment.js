@@ -29,7 +29,7 @@ import * as ScopedStorage from "react-native-scoped-storage";
 import { subscribe, zip } from "react-native-zip-archive";
 import RNFetchBlob from "react-native-blob-util";
 import { ShareComponent } from "../../components/sheets/export-notes/share";
-import { ToastEvent, presentSheet } from "../../services/event-manager";
+import { ToastManager, presentSheet } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import Storage from "../database/storage";
@@ -245,7 +245,7 @@ export default async function downloadAttachment(
     );
 
     if (!options.silent) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Download successful",
         message: filename + " downloaded",
         type: "success"

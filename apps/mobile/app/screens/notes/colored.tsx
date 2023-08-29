@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Color } from "@notesnook/core/dist/types";
 import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
 import { db } from "../../common/database";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { NotesScreenParams } from "../../stores/use-navigation-store";
-import { ColorType } from "../../utils/types";
-import { getAlias, openEditor, toCamelCase } from "./common";
+import { openEditor, toCamelCase } from "./common";
 export const ColoredNotes = ({
   navigation,
   route
@@ -43,19 +43,17 @@ export const ColoredNotes = ({
 };
 
 ColoredNotes.get = (params: NotesScreenParams, grouped = true) => {
-  const notes = db.notes?.colored(params.item.id) || [];
+  const notes = db.relations.from(params.item, "note").resolved();
   return grouped
     ? groupArray(notes, db.settings.getGroupOptions("notes"))
     : notes;
 };
 
-ColoredNotes.navigate = (item: ColorType, canGoBack: boolean) => {
+ColoredNotes.navigate = (item: Color, canGoBack: boolean) => {
   if (!item) return;
-  const alias = getAlias({ item: item });
   Navigation.navigate<"ColoredNotes">(
     {
       name: "ColoredNotes",
-      alias: toCamelCase(alias as string),
       title: toCamelCase(item.title),
       id: item.id,
       type: "color",
@@ -64,7 +62,7 @@ ColoredNotes.navigate = (item: ColorType, canGoBack: boolean) => {
     {
       item: item,
       canGoBack,
-      title: toCamelCase(alias as string)
+      title: toCamelCase(item.title)
     }
   );
 };
