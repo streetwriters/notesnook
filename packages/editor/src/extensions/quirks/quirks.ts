@@ -51,15 +51,15 @@ export const Quirks = Extension.create<QuirksOptions>({
       ArrowUp: ({ editor }) =>
         escapeNode(editor, this.options.escapableNodesIfAtDocumentStart),
       ArrowLeft: ({ editor }) =>
-        escapeNode(editor, this.options.escapableNodesIfAtDocumentStart),
+        escapeNode(editor, this.options.escapableNodesIfAtDocumentStart, "ltr"),
       ArrowRight: ({ editor }) =>
-        escapeNode(editor, this.options.escapableNodesIfAtDocumentStart),
+        escapeNode(editor, this.options.escapableNodesIfAtDocumentStart, "rtl"),
 
       Backspace: ({ editor }) => {
         const { empty, $anchor } = editor.state.selection;
 
         const nextNode = editor.state.doc.nodeAt($anchor.pos + 1);
-        const node = findFromParentNodes(
+        const node = findFromParentNode(
           editor.state,
           this.options.irremovableNodesOnBackspace
         );
@@ -94,22 +94,34 @@ export const Quirks = Extension.create<QuirksOptions>({
   }
 });
 
-const findFromParentNodes = (state: EditorState, types: string[]) => {
+const findFromParentNode = (state: EditorState, types: string[]) => {
   return findParentNode((node) => types.includes(node.type.name))(
     state.selection
   );
 };
 
-function escapeNode(editor: Editor, escapableNodes: string[]) {
+function escapeNode(
+  editor: Editor,
+  escapableNodes: string[],
+  mode?: "ltr" | "rtl"
+) {
   const { state } = editor;
   const { selection } = state;
   const { $anchor, empty } = selection;
   const documentStartPos = Selection.atStart(editor.state.doc).$head.pos;
+  const node = findFromParentNode(state, escapableNodes);
+
   const isAtStart = $anchor.pos === documentStartPos;
-  console.log(isAtStart);
-  if (!empty || !isAtStart || !findFromParentNodes(state, escapableNodes)) {
+
+  if (!empty || !isAtStart || !node) {
     return false;
   }
+  const textDirection = node.node.attrs.textDirection;
+  if (mode === "ltr" && !!textDirection) return false;
+  if (mode === "rtl" && textDirection !== "rtl") return false;
 
-  return editor.commands.insertContentAt(0, "<p></p>");
+  return editor.commands.insertContentAt(
+    0,
+    `<p ${textDirection ? `dir="${textDirection}"` : ""}></p>`
+  );
 }
