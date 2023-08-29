@@ -21,7 +21,7 @@ import React, { useCallback, useEffect } from "react";
 import { BackHandler, Platform, View } from "react-native";
 import { db } from "../../common/database";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import { ToastEvent } from "../../services/event-manager";
+import { ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import SearchService from "../../services/search";
 import useNavigationStore from "../../stores/use-navigation-store";
@@ -80,7 +80,7 @@ export const SelectionHeader = React.memo(() => {
       Navigation.queueRoutesForUpdate();
 
       clearSelection();
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Restore successful",
         type: "success"
       });

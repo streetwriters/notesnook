@@ -44,6 +44,7 @@ type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
   contentItem?: NoteContent<false>;
   rawContent?: string;
+  disableTemplate?: boolean;
 };
 
 export class Notes implements ICollection {
@@ -176,7 +177,7 @@ export class Notes implements ICollection {
   }
 
   get trashed() {
-    return this.raw.filter((item) => isTrashItem(item));
+    return this.raw.filter((item) => isTrashItem(item)) as TrashOrItem<Note>[];
   }
 
   get pinned() {
@@ -240,16 +241,20 @@ export class Notes implements ICollection {
 
     const content = getContentFromData(type, data);
 
-    return buildFromTemplate(format, {
-      ...note.data,
-      content:
-        rawContent ||
-        (format === "html"
-          ? content.toHTML()
-          : format === "md"
-          ? content.toMD()
-          : content.toTXT())
-    });
+    const contentString =
+      rawContent ||
+      (format === "html"
+        ? content.toHTML()
+        : format === "md"
+        ? content.toMD()
+        : content.toTXT());
+
+    return options?.disableTemplate
+      ? contentString
+      : buildFromTemplate(format, {
+          ...note.data,
+          content: contentString
+        });
   }
 
   async duplicate(...ids: string[]) {

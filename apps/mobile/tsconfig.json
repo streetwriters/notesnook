@@ -13,7 +13,8 @@
         "./node_modules/@ammarahmed/notifee-react-native"
       ],
       "@notesnook/theme": ["../../packages/theme"],
-      "@types/react": ["./node_modules/@types/react"]
+      "@types/react": ["./node_modules/@types/react"],
+      "react": ["./node_modules/react"]
     },
     "incremental": true,
     "maxNodeModuleJsDepth": 5,

@@ -23,8 +23,8 @@ import { Sound } from "react-native-notification-sounds";
 import { initialWindowMetrics } from "react-native-safe-area-context";
 import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
-import { Reminder } from "../services/notifications";
 import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
+import { Reminder } from "@notesnook/core/dist/types";
 
 export type Settings = {
   showToolbarOnTop?: boolean;

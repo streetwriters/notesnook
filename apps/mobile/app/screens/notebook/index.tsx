@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Note, Notebook, Topic } from "@notesnook/core/dist/types";
 import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
@@ -34,12 +35,12 @@ import useNavigationStore, {
   NotebookScreenParams
 } from "../../stores/use-navigation-store";
 import { eOnNewTopicAdded } from "../../utils/events";
-import { NoteType, NotebookType, TopicType } from "../../utils/types";
 import { openEditor, setOnFirstSave } from "../notes/common";
-const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
+
+const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState(
     groupArray(
-      db.relations?.from(route.params.item, "note") || [],
+      db.relations?.from(route.params.item, "note").resolved(),
       db.settings.getGroupOptions("notes")
     )
   );
@@ -80,11 +81,12 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
       if (data) params.current = data;
       params.current.title = params.current.item.title;
       try {
-        const notebook = db.notebooks?.notebook(params?.current?.item?.id)
-          ?.data as NotebookType;
+        const notebook = db.notebooks?.notebook(
+          params?.current?.item?.id
+        )?.data;
         if (notebook) {
           params.current.item = notebook;
-          const notes = db.relations?.from(notebook, "note");
+          const notes = db.relations?.from(notebook, "note").resolved();
           setNotes(
             groupArray(notes || [], db.settings.getGroupOptions("notes"))
           );
@@ -116,25 +118,26 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
       type: "notes",
       title: params.current.title,
       get: () => {
-        const notebook = db.notebooks?.notebook(params?.current?.item?.id)
-          ?.data as NotebookType;
+        const notebook = db.notebooks?.notebook(
+          params?.current?.item?.id
+        )?.data;
         if (!notebook) return [];
 
         const notes = db.relations?.from(notebook, "note") || [];
         const topicNotes = db.notebooks
-          ?.notebook(notebook.id)
-          .topics.all.map((topic: TopicType) => {
+          .notebook(notebook.id)
+          ?.topics.all.map((topic: Topic) => {
             return db.notes?.topicReferences
               .get(topic.id)
               .map((id: string) => db.notes?.note(id)?.data);
           })
           .flat()
           .filter(
-            (topicNote: NoteType) =>
+            (topicNote) =>
               notes.findIndex((note) => note?.id !== topicNote?.id) === -1
-          );
+          ) as Note[];
 
-        return [...(notes as []), ...(topicNotes as [])];
+        return [...notes, ...topicNotes];
       }
     });
   };
@@ -176,7 +179,7 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
   );
 };
 
-Notebook.navigate = (item: NotebookType, canGoBack: boolean) => {
+NotebookScreen.navigate = (item: Notebook, canGoBack: boolean) => {
   if (!item) return;
   Navigation.navigate<"Notebook">(
     {
@@ -193,4 +196,4 @@ Notebook.navigate = (item: NotebookType, canGoBack: boolean) => {
   );
 };
 
-export default Notebook;
+export default NotebookScreen;

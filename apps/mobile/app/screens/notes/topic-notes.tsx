@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Topic } from "@notesnook/core/dist/types";
 import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
@@ -26,8 +27,8 @@ import { eSendEvent } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { NotesScreenParams } from "../../stores/use-navigation-store";
 import { eOpenAddTopicDialog } from "../../utils/events";
-import { NotebookType, TopicType } from "../../utils/types";
 import { openEditor } from "./common";
+
 const headerRightButtons = (params: NotesScreenParams) => [
   {
     title: "Edit topic",
@@ -45,10 +46,10 @@ const headerRightButtons = (params: NotesScreenParams) => [
     onPress: () => {
       const { item } = params;
       if (item?.type !== "topic") return;
-      MoveNotes.present(
-        db.notebooks?.notebook(item.notebookId).data as NotebookType,
-        item
-      );
+      const notebook = db.notebooks?.notebook(item.notebookId);
+      if (notebook) {
+        MoveNotes.present(notebook.data, item);
+      }
     }
   }
 ];
@@ -74,10 +75,10 @@ export const TopicNotes = ({
 };
 
 TopicNotes.get = (params: NotesScreenParams, grouped = true) => {
-  const { id, notebookId } = params.item as TopicType;
+  const { id, notebookId } = params.item as Topic;
   const topic = db.notebooks?.notebook(notebookId)?.topics.topic(id);
   if (!topic) {
-    return null;
+    return [];
   }
   const notes = topic?.all || [];
   return grouped
@@ -85,7 +86,7 @@ TopicNotes.get = (params: NotesScreenParams, grouped = true) => {
     : notes;
 };
 
-TopicNotes.navigate = (item: TopicType, canGoBack: boolean) => {
+TopicNotes.navigate = (item: Topic, canGoBack: boolean) => {
   if (!item) return;
   Navigation.navigate<"TopicNotes">(
     {
