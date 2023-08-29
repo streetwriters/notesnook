@@ -65,7 +65,6 @@ export const EmotionEditorToolbarTheme = (props: PropsWithChildren<any>) => {
     [colors, isDark]
   );
   modifyToolbarTheme(theme);
-  console.log(theme);
   return (
     <EmotionThemeProvider theme={theme}>{props.children}</EmotionThemeProvider>
   );
