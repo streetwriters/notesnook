@@ -28,6 +28,7 @@ import { IconButton } from "../../ui/icon-button";
 import { PressableButton } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { db } from "../../../common/database";
 
 const TagItem = React.memo(
   ({ item, index }) => {
@@ -35,6 +36,7 @@ const TagItem = React.memo(
     const onPress = () => {
       TaggedNotes.navigate(item, true);
     };
+    const relations = db.relations.from(item, "note");
 
     return (
       <PressableButton
@@ -75,10 +77,10 @@ const TagItem = React.memo(
               marginTop: 5
             }}
           >
-            {item && item.noteIds.length && item.noteIds.length > 1
-              ? item.noteIds.length + " notes"
-              : item.noteIds.length === 1
-              ? item.noteIds.length + " note"
+            {relations.length && relations.length > 1
+              ? relations.length + " notes"
+              : relations.length === 1
+              ? relations.length + " note"
               : null}
           </Paragraph>
         </View>
