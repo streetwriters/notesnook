@@ -17,68 +17,89 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View } from "react-native";
-import { ScrollView } from "react-native-actions-sheet";
+import { Tags } from "@notesnook/core/dist/collections/tags";
+import { GroupedItems, Note, Tag } from "@notesnook/core/dist/types";
+import { useThemeColors } from "@notesnook/theme";
+import React, {
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
+import { TextInput, View } from "react-native";
+import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
-import { ToastEvent, presentSheet } from "../../../services/event-manager";
+import { ToastManager, presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
+import { useRelationStore } from "../../../stores/use-relation-store";
 import { useTagStore } from "../../../stores/use-tag-store";
-import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
+import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
 import { PressableButton } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { IconButton } from "../../ui/icon-button";
-const ManageTagsSheet = (props) => {
+
+function ungroup(items: GroupedItems<Tag>) {
+  return items.filter((item) => item.type !== "header") as Tag[];
+}
+
+const ManageTagsSheet = (props: {
+  notes?: Note[];
+  actionSheetRef: RefObject<ActionSheetRef>;
+}) => {
   const { colors } = useThemeColors();
-  const [notes, setNotes] = useState(props.notes || []);
-  const allTags = useTagStore((state) => state.tags);
-  const [tags, setTags] = useState([]);
-  const [query, setQuery] = useState(null);
-  const inputRef = useRef();
+  const notes = useMemo(() => props.notes || [], [props.notes]);
+  const allTags = useTagStore((state) => ungroup(state.tags));
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [query, setQuery] = useState<string>();
+  const inputRef = useRef<TextInput>(null);
   const [focus, setFocus] = useState(false);
 
-  useEffect(() => {
-    sortTags();
-  }, [allTags, notes, query, sortTags]);
-
   const sortTags = useCallback(() => {
-    let _tags = [...allTags];
-    _tags = _tags.filter((t) => t.type === "tag");
+    let _tags = db.tags.all;
+
     _tags = _tags.sort((a, b) => a.title.localeCompare(b.title));
     if (query) {
-      _tags = db.lookup.tags(_tags, query);
+      _tags = db.lookup.tags(_tags, query) as Tag[];
     }
-    const tagsMerged = [...notes.map((note) => note.tags || []).flat()];
+    let tagsMerged = notes
+      .map((note) => db.relations.to(note, "tag").resolved())
+      .flat();
+    // Get unique tags and remove duplicates
+    tagsMerged = [
+      ...new Map(tagsMerged.map((item) => [item.id, item])).values()
+    ];
 
     if (!tagsMerged || !tagsMerged.length) {
       setTags(_tags);
       return;
     }
+
     let noteTags = [];
-    for (let tag of tagsMerged) {
-      let index = _tags.findIndex((t) => t.title === tag);
+    for (const tag of tagsMerged) {
+      const index = _tags.findIndex((t) => t.id === tag.id);
       if (index !== -1) {
         noteTags.push(_tags[index]);
         _tags.splice(index, 1);
       }
     }
     noteTags = noteTags.sort((a, b) => a.title.localeCompare(b.title));
-    let combinedTags = [...noteTags, ..._tags];
-    setTags(combinedTags);
-  }, [allTags, notes, query]);
+    const combinedTags = [...noteTags, ..._tags];
 
-  useEffect(() => {
-    useTagStore.getState().setTags();
-  }, []);
+    setTags(combinedTags);
+  }, [notes, query]);
+
+  // useEffect(() => {
+  //   sortTags();
+  // }, [allTags.length]);
 
   const onSubmit = async () => {
-    let _query = query;
-    if (!_query || _query === "" || _query.trimStart().length == 0) {
-      ToastEvent.show({
+    if (!query || query === "" || query.trimStart().length == 0) {
+      ToastManager.show({
         heading: "Tag field is empty",
         type: "error",
         context: "local"
@@ -86,29 +107,36 @@ const ManageTagsSheet = (props) => {
       return;
     }
 
-    let tag = _query;
-    setNotes(
-      notes.map((note) => ({
-        ...note,
-        tags: note.tags ? [...note.tags, tag] : [tag]
-      }))
-    );
+    const tag = query;
+    setQuery(undefined);
 
-    setQuery(null);
     inputRef.current?.setNativeProps({
       text: ""
     });
     try {
-      for (let note of notes) {
-        await db.notes.note(note.id).tag(tag);
+      const exists = db.tags.all.filter((t: Tag) => t.title === tag);
+      const id = exists.length
+        ? exists[0]?.id
+        : await db.tags.add({
+            title: tag
+          });
+
+      const createdTag = db.tags.tag(id);
+      if (createdTag) {
+        for (const note of notes) {
+          await db.relations.add(createdTag, note);
+        }
       }
+      useRelationStore.getState().update();
       useTagStore.getState().setTags();
-      setNotes(notes.map((note) => db.notes.note(note.id).data));
+      setTimeout(() => {
+        sortTags();
+      });
     } catch (e) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Cannot add tag",
         type: "error",
-        message: e.message,
+        message: (e as Error).message,
         context: "local"
       });
     }
@@ -129,13 +157,17 @@ const ManageTagsSheet = (props) => {
         button={{
           icon: "magnify",
           color: colors.primary.accent,
-          size: SIZE.lg
+          size: SIZE.lg,
+          onPress: () => {}
         }}
         testID="tag-input"
         fwdRef={inputRef}
         autoCapitalize="none"
         onChangeText={(v) => {
-          setQuery(db.tags.sanitize(v));
+          setQuery(Tags.sanitize(v));
+          setTimeout(() => {
+            sortTags();
+          });
         }}
         onFocusInput={() => {
           setFocus(true);
@@ -143,7 +175,9 @@ const ManageTagsSheet = (props) => {
         onBlurInput={() => {
           setFocus(false);
         }}
-        onSubmit={onSubmit}
+        onSubmit={() => {
+          onSubmit();
+        }}
         placeholder="Search or add a tag"
       />
 
@@ -193,19 +227,14 @@ const ManageTagsSheet = (props) => {
         ) : null}
 
         {tags.map((item) => (
-          <TagItem
-            key={item.title}
-            tag={item}
-            notes={notes}
-            setNotes={setNotes}
-          />
+          <TagItem key={item.id} tag={item} notes={notes} />
         ))}
       </ScrollView>
     </View>
   );
 };
 
-ManageTagsSheet.present = (notes) => {
+ManageTagsSheet.present = (notes?: Note[]) => {
   presentSheet({
     component: (ref) => {
       return <ManageTagsSheet actionSheetRef={ref} notes={notes} />;
@@ -215,30 +244,34 @@ ManageTagsSheet.present = (notes) => {
 
 export default ManageTagsSheet;
 
-const TagItem = ({ tag, notes, setNotes }) => {
+const TagItem = ({ tag, notes }: { tag: Tag; notes: Note[] }) => {
   const { colors } = useThemeColors();
-  const someNotesTagged = notes.some(
-    (note) => note.tags?.indexOf(tag.title) !== -1
-  );
-  const allNotesTagged = notes.every(
-    (note) => note.tags?.indexOf(tag.title) !== -1
-  );
+  const update = useRelationStore((state) => state.updater);
+
+  const someNotesTagged = notes.some((note) => {
+    const relations = db.relations.from(tag, "note");
+    return relations.findIndex((relation) => relation.to.id === note.id) > -1;
+  });
+
+  const allNotesTagged = notes.every((note) => {
+    const relations = db.relations.from(tag, "note");
+    return relations.findIndex((relation) => relation.to.id === note.id) > -1;
+  });
+
   const onPress = async () => {
-    for (let note of notes) {
+    for (const note of notes) {
       try {
         if (someNotesTagged) {
-          await db.notes
-            .note(note.id)
-            .untag(note.tags[note.tags.indexOf(tag.title)]);
+          await db.relations.unlink(tag, note);
         } else {
-          await db.notes.note(note.id).tag(tag.title);
+          await db.relations.add(tag, note);
         }
       } catch (e) {
         console.error(e);
       }
     }
     useTagStore.getState().setTags();
-    setNotes(notes.map((note) => db.notes.note(note.id).data));
+    useRelationStore.getState().update();
     setTimeout(() => {
       Navigation.queueRoutesForUpdate();
     }, 1);
@@ -281,7 +314,7 @@ const TagItem = ({ tag, notes, setNotes }) => {
             : "checkbox-blank-circle-outline"
         }
       />
-      <Paragraph size={SIZE.sm}>{"#" + tag.alias}</Paragraph>
+      <Paragraph size={SIZE.sm}>{"#" + tag.title}</Paragraph>
     </PressableButton>
   );
 };

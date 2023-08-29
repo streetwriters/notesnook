@@ -93,7 +93,9 @@ export const openNote = async (item, isTrash, setSelectedItem, isSheet) => {
     });
   } else {
     useEditorStore.getState().setReadonly(_note?.readonly);
-    eSendEvent(eOnLoadNote, _note);
+    eSendEvent(eOnLoadNote, {
+      item: _note
+    });
     if (!DDS.isTab) {
       tabBarRef.current?.goToPage(1);
     }

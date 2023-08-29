@@ -24,6 +24,16 @@ import Database from "../api";
 import { CachedCollection } from "../database/cached-collection";
 import { Tags } from "./tags";
 
+export const DefaultColors: Record<string, string> = {
+  red: "#f44336",
+  orange: "#FF9800",
+  yellow: "#FFD600",
+  green: "#4CAF50",
+  blue: "#2196F3",
+  purple: "#673AB7",
+  gray: "#9E9E9E"
+};
+
 export class Colors implements ICollection {
   name = "colors";
   private readonly collection: CachedCollection<"colors", Color>;

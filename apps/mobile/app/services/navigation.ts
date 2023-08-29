@@ -125,13 +125,18 @@ function queueRoutesForUpdate(...routesToUpdate: RouteName[]) {
 }
 
 function navigate<T extends RouteName>(
-  screen: CurrentScreen,
-  params: RouteParams[T]
+  screen: Omit<Partial<CurrentScreen>, "name"> & {
+    name: keyof RouteParams;
+  },
+  params?: RouteParams[T]
 ) {
-  useNavigationStore.getState().update(screen, !!params?.canGoBack);
-  if (screen.name === "Notebook") routeUpdateFunctions["Notebook"](params);
-  if (screen.name.endsWith("Notes") && screen.name !== "Notes")
-    routeUpdateFunctions[screen.name]?.(params);
+  useNavigationStore
+    .getState()
+    .update(screen as CurrentScreen, !!params?.canGoBack);
+  if (screen.name === "Notebook")
+    routeUpdateFunctions["Notebook"](params || {});
+  if (screen.name?.endsWith("Notes") && screen.name !== "Notes")
+    routeUpdateFunctions[screen.name]?.(params || {});
   //@ts-ignore Not sure how to fix this for now ignore it.
   rootNavigatorRef.current?.navigate<RouteName>(screen.name, params);
 }

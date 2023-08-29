@@ -22,7 +22,7 @@ import React, { useRef, useState } from "react";
 import { Linking, Platform, Text, TextInput, View } from "react-native";
 import { getVersion } from "react-native-device-info";
 import { db } from "../../../common/database";
-import { eSendEvent, ToastEvent } from "../../../services/event-manager";
+import { eSendEvent, ToastManager } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../../stores/use-user-store";
@@ -100,7 +100,7 @@ Logged in: ${user ? "yes" : "no"}`,
         positiveText: "Copy link",
         positivePress: () => {
           Clipboard.setString(issue_url);
-          ToastEvent.show({
+          ToastManager.show({
             heading: "Issue url copied!",
             type: "success",
             context: "global"
@@ -110,8 +110,8 @@ Logged in: ${user ? "yes" : "no"}`,
       });
     } catch (e) {
       setLoading(false);
-      ToastEvent.show({
-        heading: "An error occurred",
+      ToastManager.show({
+        heading: "An error occured",
         message: e.message,
         type: "error"
       });

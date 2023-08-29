@@ -126,17 +126,17 @@ export function hideSheet() {
   eSendEvent(eCloseSheet);
 }
 
-export type ShowToastEvent = {
+export type ToastOptions = {
   heading?: string;
   message?: string;
   context?: "global" | "local";
-  type?: "error" | "success";
+  type?: "error" | "success" | "info";
   duration?: number;
   func?: () => void;
   actionText?: string;
 };
 
-export const ToastEvent = {
+export const ToastManager = {
   show: ({
     heading,
     message,
@@ -144,7 +144,7 @@ export const ToastEvent = {
     context = "global",
     func,
     actionText
-  }: ShowToastEvent) => {
+  }: ToastOptions) => {
     if (Config.isTesting) return;
     eSendEvent(eShowToast, {
       heading: heading,
@@ -158,7 +158,7 @@ export const ToastEvent = {
   },
   hide: () => eSendEvent(eHideToast),
   error: (e: Error, title?: string, context?: "global" | "local") => {
-    ToastEvent.show({
+    ToastManager.show({
       heading: title,
       message: e?.message || "",
       type: "error",
@@ -167,7 +167,7 @@ export const ToastEvent = {
       duration: 6000,
       func: () => {
         Clipboard.setString(e?.stack || "");
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Logs copied!",
           type: "success",
           context: "global",
@@ -177,7 +177,3 @@ export const ToastEvent = {
     });
   }
 };
-
-/*
-
-*/
