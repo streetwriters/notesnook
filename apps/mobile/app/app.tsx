@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import "@azure/core-asynciterator-polyfill";
+import "react-native-gesture-handler";
 import {
   THEME_COMPATIBILITY_VERSION,
   useThemeEngineStore
@@ -42,11 +43,10 @@ I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 I18nManager.swapLeftAndRightInRTL(false);
 
-SettingsService.checkOrientation();
 const App = () => {
   const init = useAppEvents();
   useEffect(() => {
-    let { appLockMode } = SettingsService.get();
+    const { appLockMode } = SettingsService.get();
     if (appLockMode && appLockMode !== "none") {
       useUserStore.getState().lockApp(true);
     }
@@ -101,10 +101,10 @@ const App = () => {
 let currTheme =
   useThemeStore.getState().colorScheme === "dark"
     ? SettingsService.getProperty("darkTheme")
-    : SettingsService.getProperty("lightTheme");
+    : SettingsService.getProperty("lighTheme");
 useThemeEngineStore.getState().setTheme(currTheme);
 
-export const withTheme = (Element) => {
+export const withTheme = (Element: () => JSX.Element) => {
   return function AppWithThemeProvider() {
     const [colorScheme, darkTheme, lightTheme] = useThemeStore((state) => [
       state.colorScheme,

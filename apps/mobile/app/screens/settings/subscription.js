@@ -24,7 +24,7 @@ import { usePricing } from "../../hooks/use-pricing";
 import {
   eSendEvent,
   presentSheet,
-  ToastEvent
+  ToastManager
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
 import { useUserStore } from "../../stores/use-user-store";
@@ -68,7 +68,7 @@ export const Subscription = () => {
 
     if (hasCancelledPremium && Platform.OS === "android") {
       if (user.subscription?.provider === 3) {
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Subscribed on web",
           message: "Open your web browser to manage your subscription.",
           type: "success"

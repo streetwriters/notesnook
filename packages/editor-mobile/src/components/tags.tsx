@@ -22,7 +22,9 @@ import { EventTypes, Settings } from "../utils";
 import styles from "./styles.module.css";
 
 function Tags(props: { settings: Settings }): JSX.Element {
-  const [tags, setTags] = useState<{ title: string; alias: string }[]>([]);
+  const [tags, setTags] = useState<
+    { title: string; alias: string; id: string; type: "tag" }[]
+  >([]);
   const editorTags = useRef({
     setTags: setTags
   });
@@ -114,7 +116,7 @@ function Tags(props: { settings: Settings }): JSX.Element {
           }}
           onClick={(e) => {
             e.preventDefault();
-            post(EventTypes.tag, tag.title);
+            post(EventTypes.tag, tag);
           }}
         >
           #{tag.alias}

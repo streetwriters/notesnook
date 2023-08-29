@@ -24,7 +24,7 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { db } from "../../../common/database";
-import Notebook from "../../../screens/notebook";
+import NotebookScreen from "../../../screens/notebook";
 import { TaggedNotes } from "../../../screens/notes/tagged";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
 import useNavigationStore from "../../../stores/use-navigation-store";
@@ -83,14 +83,8 @@ function getNotebook(item) {
 }
 
 function getTags(item) {
-  const noteTags = item.tags?.slice(0, 3) || [];
-  const tags = [];
-  for (const tagName of noteTags) {
-    const tag = db.tags.tag(tagName);
-    if (!tag) continue;
-    tags.push(tag);
-  }
-  return tags;
+  const noteTags = db.relations.to(item, "tag").resolved();
+  return noteTags;
 }
 
 const NoteItem = ({
@@ -162,7 +156,7 @@ const NoteItem = ({
                   if (item.type === "topic") {
                     TopicNotes.navigate(item, true);
                   } else {
-                    Notebook.navigate(item);
+                    NotebookScreen.navigate(item);
                   }
                 }}
               />
@@ -323,7 +317,7 @@ const NoteItem = ({
                   ? tags.map((item) =>
                       item.id ? (
                         <Button
-                          title={"#" + item.alias}
+                          title={"#" + item.title}
                           key={item.id}
                           height={23}
                           type="gray"

@@ -23,7 +23,7 @@ import { View } from "react-native";
 import { db } from "../../common/database";
 import Editor from "../../screens/editor";
 import { editorController } from "../../screens/editor/tiptap/utils";
-import { eSendEvent, ToastEvent } from "../../services/event-manager";
+import { eSendEvent, ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useEditorStore } from "../../stores/use-editor-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
@@ -44,7 +44,7 @@ export default function NotePreview({ session, content, note }) {
       await db.trash.restore(note.id);
       Navigation.queueRoutesForUpdate();
       useSelectionStore.getState().setSelectionMode(false);
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Restore successful",
         type: "success"
       });
@@ -55,7 +55,7 @@ export default function NotePreview({ session, content, note }) {
     if (useEditorStore.getState()?.currentEditingNote === session?.noteId) {
       if (editorController.current?.note) {
         eSendEvent(eOnLoadNote, {
-          ...editorController.current?.note,
+          item: editorController.current?.note,
           forced: true
         });
       }
@@ -64,7 +64,7 @@ export default function NotePreview({ session, content, note }) {
     eSendEvent(eCloseSheet);
     Navigation.queueRoutesForUpdate();
 
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Note restored successfully",
       type: "success"
     });
@@ -81,7 +81,7 @@ export default function NotePreview({ session, content, note }) {
         await db.trash.delete(note.id);
         useTrashStore.getState().setTrash();
         useSelectionStore.getState().setSelectionMode(false);
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Permanently deleted items",
           type: "success",
           context: "local"
@@ -115,10 +115,12 @@ export default function NotePreview({ session, content, note }) {
             onLoad={async () => {
               const _note = note || db.notes.note(session?.noteId)?.data;
               eSendEvent(eOnLoadNote + editorId, {
-                ..._note,
-                content: {
-                  ...content,
-                  isPreview: true
+                item: {
+                  ..._note,
+                  content: {
+                    ...content,
+                    isPreview: true
+                  }
                 }
               });
             }}

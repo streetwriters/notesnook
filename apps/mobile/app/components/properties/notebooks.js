@@ -21,12 +21,12 @@ import React from "react";
 import { ScrollView, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
-import Notebook from "../../screens/notebook";
+import NotebookScreen from "../../screens/notebook";
 import { TopicNotes } from "../../screens/notes/topic-notes";
 import {
   eSendEvent,
   presentSheet,
-  ToastEvent
+  ToastManager
 } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useNotebookStore } from "../../stores/use-notebook-store";
@@ -75,7 +75,7 @@ export default function Notebooks({ note, close, full }) {
   const navigateNotebook = (id) => {
     let item = db.notebooks.notebook(id)?.data;
     if (!item) return;
-    Notebook.navigate(item, true);
+    NotebookScreen.navigate(item, true);
   };
 
   const navigateTopic = (id, notebookId) => {
@@ -153,7 +153,7 @@ export default function Notebooks({ note, close, full }) {
               );
               useNotebookStore.getState().setNotebooks();
               Navigation.queueRoutesForUpdate();
-              ToastEvent.show({
+              ToastManager.show({
                 heading: "Note removed from topic",
                 context: "local",
                 type: "success"

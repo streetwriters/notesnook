@@ -99,12 +99,12 @@ const _TabsHolder = () => {
         clearAppState();
         if (!tabBarRef.current) {
           await sleep(3000);
-          eSendEvent(eOnLoadNote, { type: "new" });
+          eSendEvent(eOnLoadNote, { newNote: true });
           editorState().movedAway = false;
           tabBarRef.current?.goToPage(1, false);
           return;
         }
-        eSendEvent(eOnLoadNote, { type: "new" });
+        eSendEvent(eOnLoadNote, { newNote: true });
         editorState().movedAway = false;
         tabBarRef.current?.goToPage(1, false);
       }
@@ -494,7 +494,9 @@ const onChangeTab = async (obj) => {
     editorState().isFocused = true;
     activateKeepAwake();
     if (!editorState().currentlyEditing) {
-      eSendEvent(eOnLoadNote, { type: "new" });
+      eSendEvent(eOnLoadNote, {
+        newNote: true
+      });
     }
   } else {
     if (obj.from === 2) {

@@ -118,7 +118,9 @@ declare global {
    */
   var editorTags: MutableRefObject<{
     setTags: React.Dispatch<
-      React.SetStateAction<{ title: string; alias: string }[]>
+      React.SetStateAction<
+        { title: string; alias: string; id: string; type: "tag" }[]
+      >
     >;
   }>;
 
