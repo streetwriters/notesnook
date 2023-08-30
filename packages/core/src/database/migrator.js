@@ -66,10 +66,14 @@ class Migrator {
         );
 
         if (migrated || restore) {
-          if (collection.dbCollection.merge) {
+          if (collection.type === "settings") {
             await collection.dbCollection.merge(item);
-          } else if (collection.dbCollection.add) {
-            await collection.dbCollection.add(item);
+          } else if (collection.dbCollection._collection) {
+            await collection.dbCollection._collection?.addItem(item);
+          } else {
+            throw new Error(
+              `No idea how to handle this kind of item: ${item.type}.`
+            );
           }
 
           // if id changed after migration, we need to delete the old one.

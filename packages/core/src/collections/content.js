@@ -26,11 +26,14 @@ export default class Content extends Collection {
   async add(content) {
     if (!content) return;
 
-    if (
-      !!content.data &&
-      (!!content.data.data || (!content.data.iv && !content.data.cipher))
-    ) {
-      if (content.data.data && content.data.data.length)
+    if (content.remote)
+      throw new Error(
+        "Please do not use this method for merging. Instead add the item directly to database."
+      );
+    if (content.deleted) return await this._collection.addItem(content);
+
+    if (typeof content.data === "object") {
+      if (typeof content.data.data === "string")
         content.data = content.data.data;
       else if (!content.data.iv && !content.data.cipher)
         content.data = `<p>Content is invalid: ${JSON.stringify(
