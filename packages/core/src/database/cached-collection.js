@@ -102,6 +102,18 @@ export default class CachedCollection extends IndexedCollection {
     return this.items;
   }
 
+  async setItems(items) {
+    console.log("items", items);
+    await super.setItems(items);
+    for (let item of items) {
+      if (item) {
+        this.map.set(item.id, item);
+      }
+    }
+
+    this.invalidateCache();
+  }
+
   invalidateCache() {
     this.items = undefined;
   }
