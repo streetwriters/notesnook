@@ -57,6 +57,7 @@ export class KV {
       key,
       typeof data === "string" ? data : JSON.stringify(data)
     );
+
     return true;
   }
 
@@ -67,7 +68,7 @@ export class KV {
       try {
         let data = await this.storage.getMultipleItemsAsync(
           keys.slice(),
-          "object"
+          "string"
         );
         return data.map(([key, value]) => {
           let obj;
@@ -76,7 +77,6 @@ export class KV {
           } catch (e) {
             obj = value;
           }
-
           return [key, obj];
         });
       } catch (e) {
@@ -86,11 +86,11 @@ export class KV {
   }
 
   async remove(key) {
-    return await this.storage.removeItem(key);
+    return this.storage.removeItem(key);
   }
 
   async clear() {
-    return await this.storage.clearStore();
+    return this.storage.clearStore();
   }
 
   async getAllKeys() {
