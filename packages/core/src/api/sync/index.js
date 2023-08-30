@@ -260,7 +260,6 @@ class Sync {
     }
 
     const dbLastSynced = await this.db.lastSynced();
-    console.time("fetch");
     let count = 0;
     this.connection.off("SyncItems");
     this.connection.on("SyncItems", async (chunk) => {
@@ -329,7 +328,6 @@ class Sync {
       );
     }
 
-    console.timeEnd("fetch");
     this.connection.off("SyncItems");
 
     if (await this.conflicts.check()) {
