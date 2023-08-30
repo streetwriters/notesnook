@@ -58,6 +58,14 @@ function Tag(props: TagProps) {
       onClick={() => {
         navigate(`/tags/${id}`);
       }}
+      onDragEnter={(e) => {
+        e?.currentTarget.focus();
+      }}
+      onDrop={async (e) => {
+        const noteId = e?.dataTransfer.getData("note-id");
+        if (noteId) await db.notes?.note(noteId).tag(id);
+        navigate(`/tags/${id}`);
+      }}
     />
   );
 }

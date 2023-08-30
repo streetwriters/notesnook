@@ -65,6 +65,14 @@ function Notebook(props: NotebookProps) {
           .setContext({ type: "notebook", id: notebook.id, item, totalNotes });
         navigate(`/notebooks/${notebook.id}`);
       }}
+      onDragEnter={(e) => {
+        e?.currentTarget.focus();
+      }}
+      onDrop={async (e) => {
+        const noteId = e?.dataTransfer.getData("note-id");
+        await db.notes?.addToNotebook(notebook, noteId);
+        navigate(`/notebooks/${notebook.id}`);
+      }}
       title={notebook.title}
       body={notebook.description as string}
       menuItems={notebookMenuItems}

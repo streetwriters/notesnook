@@ -38,9 +38,8 @@ type NavigationItemProps = {
   tag?: string;
   selected?: boolean;
   onClick?: () => void;
+  onDragEnter?: React.DragEventHandler<HTMLElement>;
   count?: number;
-  animate?: boolean;
-  index?: number;
   menuItems?: MenuItem[];
 };
 
@@ -64,6 +63,7 @@ function NavigationItem(
     count,
     sx,
     containerRef,
+    onDragEnter,
     ...restProps
   } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
@@ -117,6 +117,7 @@ function NavigationItem(
           if (isMobile) toggleSideMenu(false);
           if (onClick) onClick();
         }}
+        onDragEnter={onDragEnter}
       >
         <Icon
           size={isTablet ? 16 : 15}

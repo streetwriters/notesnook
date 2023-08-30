@@ -41,10 +41,15 @@ type ListItemProps<TItem extends Item, TContext> = {
   isDisabled?: boolean;
   isSimple?: boolean;
   item: TItem;
+  draggable?: boolean;
 
   onKeyPress?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   onClick?: () => void;
   onSelect?: () => void;
+  onDragEnter?: (e?: React.DragEvent<HTMLDivElement>) => void;
+  onDrop?: (e?: React.DragEvent<HTMLDivElement>) => void;
+  onDragStart?: (e?: React.DragEvent<HTMLDivElement>) => void;
+
   title: string | JSX.Element;
   header?: JSX.Element;
   body?: JSX.Element | string;
@@ -71,7 +76,10 @@ function ListItem<TItem extends Item, TContext>(
     isSimple,
     item,
     sx,
-    context
+    context,
+    onDragEnter,
+    onDrop,
+    onDragStart
   } = props;
 
   const listItemRef = useRef<HTMLDivElement>(null);
@@ -91,6 +99,10 @@ function ListItem<TItem extends Item, TContext>(
       id={`id_${item.id}`}
       className={isSelected ? "selected" : ""}
       ref={listItemRef}
+      onDragEnter={onDragEnter}
+      onDrop={onDrop}
+      onDragOver={(e) => e.preventDefault()}
+      onDragStart={onDragStart}
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -116,6 +128,7 @@ function ListItem<TItem extends Item, TContext>(
         });
       }}
       tabIndex={-1}
+      draggable={props.draggable}
       sx={{
         pl: 1,
         pr: 2,

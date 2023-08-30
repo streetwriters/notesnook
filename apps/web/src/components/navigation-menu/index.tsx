@@ -261,6 +261,13 @@ function NavigationMenu(props: NavigationMenuProps) {
                   title={item.title}
                   icon={item.icon}
                   tag={item.tag}
+                  onDragEnter={() => {
+                    if (
+                      item.title !== "Monographs" &&
+                      item.title !== "Reminders"
+                    )
+                      _navigate(item.path);
+                  }}
                   selected={
                     item.path === "/"
                       ? location === item.path

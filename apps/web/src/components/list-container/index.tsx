@@ -24,13 +24,13 @@ import {
   useStore as useSelectionStore,
   store as selectionStore
 } from "../../stores/selection-store";
+import { useStore as useNoteStore } from "../../stores/note-store";
 import GroupHeader from "../group-header";
 import { DEFAULT_ITEM_HEIGHT, ListItemWrapper } from "./list-profiles";
 import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
 import ScrollContainer from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
-import { Context } from "./types";
 import { VirtualizedGrouping, GroupingKey, Item } from "@notesnook/core";
 import {
   ItemProps,
@@ -40,6 +40,7 @@ import {
 } from "react-virtuoso";
 import Skeleton from "react-loading-skeleton";
 import { useResolvedItem } from "@notesnook/common";
+import { Context } from "./types";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
@@ -135,7 +136,21 @@ function ListContainer(props: ListContainerProps) {
   });
 
   return (
-    <Flex variant="columnFill" sx={{ overflow: "hidden" }}>
+    <Flex
+      variant="columnFill"
+      sx={{ overflow: "hidden" }}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={async (e) => {
+        const noteId = e?.dataTransfer.getData("note-id");
+        const { favorite, delete: deleteNote } = useNoteStore.getState();
+
+        if (group === "favorites") {
+          await favorite(true, noteId);
+        } else if (group === "trash") {
+          await deleteNote(noteId);
+        }
+      }}
+    >
       {!props.items.length && props.placeholder ? (
         <>
           {header}
