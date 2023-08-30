@@ -70,6 +70,7 @@ function Notebook(props: NotebookProps) {
       }}
       onDrop={async (e) => {
         const noteId = e?.dataTransfer.getData("note-id");
+        if (!noteId) return;
         await db.notes?.addToNotebook(notebook, noteId);
         navigate(`/notebooks/${notebook.id}`);
       }}

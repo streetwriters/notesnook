@@ -63,7 +63,8 @@ function Tag(props: TagProps) {
       }}
       onDrop={async (e) => {
         const noteId = e?.dataTransfer.getData("note-id");
-        if (noteId) await db.notes?.note(noteId).tag(id);
+        if (!noteId) return;
+        await db.notes?.note(noteId).tag(id);
         navigate(`/tags/${id}`);
       }}
     />

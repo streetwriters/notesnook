@@ -142,6 +142,8 @@ function ListContainer(props: ListContainerProps) {
       onDragOver={(e) => e.preventDefault()}
       onDrop={async (e) => {
         const noteId = e?.dataTransfer.getData("note-id");
+        if (!noteId) return;
+
         const { favorite, delete: deleteNote } = useNoteStore.getState();
 
         if (group === "favorites") {
