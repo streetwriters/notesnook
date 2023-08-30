@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Platform } from "react-native";
-import MMKVStorage, { ProcessingModes } from "react-native-mmkv-storage";
+import { ProcessingModes, MMKVLoader } from "react-native-mmkv-storage";
 
-export const MMKV = new MMKVStorage.Loader()
+export const MMKV = new MMKVLoader()
   .setProcessingMode(
     Platform.OS === "ios"
       ? ProcessingModes.MULTI_PROCESS
