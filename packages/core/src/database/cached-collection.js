@@ -103,7 +103,6 @@ export default class CachedCollection extends IndexedCollection {
   }
 
   async setItems(items) {
-    console.log("items", items);
     await super.setItems(items);
     for (let item of items) {
       if (item) {
