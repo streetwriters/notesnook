@@ -59,6 +59,7 @@ export type SelectionBasedReactNodeViewProps<TAttributes = Attrs> =
 export type ReactNodeViewOptions<P> = {
   props?: P;
   component?: React.ComponentType<P>;
+  componentKey?: (node: PMNode) => string;
   shouldUpdate?: ShouldUpdate;
   contentDOMFactory?: (() => ContentDOM) | boolean;
   wrapperFactory?: () => HTMLElement;
