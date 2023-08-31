@@ -62,8 +62,7 @@ export class NodeStorageInterface {
 
   async decrypt(key, cipherData) {
     cipherData.format = "base64";
-    const result = await this.crypto.decrypt(key, cipherData);
-    if (typeof result.data === "string") return result.data;
+    return await this.crypto.decrypt(key, cipherData, "text");
   }
 
   async deriveCryptoKey(name, { password, salt }) {
