@@ -53,7 +53,7 @@ database.host(
 database.setup({
   storage: Storage,
   eventsource: Platform.OS === "ios" ? EventSource : AndroidEventSource,
-  filesystem: filesystem,
+  fs: filesystem,
   compressor: {
     compress: Gzip.deflate,
     decompress: Gzip.inflate
