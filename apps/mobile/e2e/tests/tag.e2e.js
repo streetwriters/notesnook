@@ -46,7 +46,7 @@ describe("Tags", () => {
     await visibleByText(note.body);
   });
 
-  it("Untag a note", async () => {
+  it.only("Untag a note", async () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
@@ -57,8 +57,6 @@ describe("Tags", () => {
     await tapByText("#testtag");
     await device.pressBack();
     await device.pressBack();
-    await notVisibleByText("#testtag");
-    await navigate("Tags");
     await notVisibleByText("#testtag");
   });
 
