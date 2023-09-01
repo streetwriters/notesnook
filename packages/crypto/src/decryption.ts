@@ -29,10 +29,10 @@ import {
   from_hex
 } from "@notesnook/sodium";
 import KeyUtils from "./keyutils";
-import { Cipher, Output, OutputFormat, SerializedKey } from "./types";
+import { Cipher, Output, DataFormat, SerializedKey } from "./types";
 
 export default class Decryption {
-  private static transformInput(cipherData: Cipher): Uint8Array {
+  private static transformInput(cipherData: Cipher<DataFormat>): Uint8Array {
     let input: Uint8Array | null = null;
     if (
       typeof cipherData.cipher === "string" &&
@@ -54,9 +54,9 @@ export default class Decryption {
     return input;
   }
 
-  static decrypt<TOutputFormat extends OutputFormat>(
+  static decrypt<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    cipherData: Cipher,
+    cipherData: Cipher<DataFormat>,
     outputFormat: TOutputFormat = "text" as TOutputFormat
   ): Output<TOutputFormat> {
     if (!key.salt && cipherData.salt) key.salt = cipherData.salt;

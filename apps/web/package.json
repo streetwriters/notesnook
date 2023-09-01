@@ -20,7 +20,6 @@
     "@notesnook/common": "file:../../packages/common",
     "@notesnook/core": "file:../../packages/core",
     "@notesnook/crypto": "file:../../packages/crypto",
-    "@notesnook/crypto-worker": "file:../../packages/crypto-worker",
     "@notesnook/desktop": "file:../desktop",
     "@notesnook/editor": "file:../../packages/editor",
     "@notesnook/logger": "file:../../packages/logger",
