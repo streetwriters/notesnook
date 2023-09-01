@@ -22,7 +22,7 @@ import { xxhash64, createXXHash64 } from "hash-wasm";
 import axios, { AxiosProgressEvent } from "axios";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import { StreamableFS } from "@notesnook/streamable-fs";
-import { getNNCrypto } from "./nncrypto.stub";
+import { NNCrypto } from "./nncrypto";
 import hosts from "@notesnook/core/dist/utils/constants";
 import { sendAttachmentsProgressEvent } from "@notesnook/core/dist/common";
 import { saveAs } from "file-saver";
@@ -34,7 +34,7 @@ import { ProgressStream } from "../utils/streams/progress-stream";
 import { consumeReadableStream } from "../utils/stream";
 import { Base64DecoderStream } from "../utils/streams/base64-decoder-stream";
 import { toBlob } from "@notesnook-importer/core/dist/src/utils/stream";
-import { Cipher, OutputFormat, SerializedKey } from "@notesnook/crypto";
+import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
 import { IDataType } from "hash-wasm/dist/lib/util";
 import { IndexedDBKVStore } from "./key-value";
 import FileHandle from "@notesnook/streamable-fs/dist/src/filehandle";
@@ -53,8 +53,6 @@ async function writeEncryptedFile(
   key: SerializedKey,
   hash: string
 ) {
-  const crypto = await getNNCrypto();
-
   if (!IndexedDBKVStore.isIndexedDBSupported())
     throw new Error("This browser does not support IndexedDB.");
 
@@ -65,7 +63,7 @@ async function writeEncryptedFile(
   const fileHandle = await streamablefs.createFile(hash, file.size, file.type);
   sendAttachmentsProgressEvent("encrypt", hash, 1, 0);
 
-  const { iv, stream } = await crypto.createEncryptionStream(key);
+  const { iv, stream } = await NNCrypto.createEncryptionStream(key);
   await file
     .stream()
     .pipeThrough(new ChunkedStream(CHUNK_SIZE))
@@ -84,7 +82,7 @@ async function writeEncryptedFile(
     )
     .pipeTo(fileHandle.writeable);
 
-  sendAttachmentsProgressEvent("encrypt", hash, 1);
+  sendAttachmentsProgressEvent("encrypt", hash, 1, 1);
 
   return {
     chunkSize: CHUNK_SIZE,
@@ -155,15 +153,14 @@ async function hashStream(reader: ReadableStreamDefaultReader<Uint8Array>) {
 async function readEncrypted(
   filename: string,
   key: SerializedKey,
-  cipherData: Cipher & { outputType: OutputFormat }
+  cipherData: Cipher<DataFormat> & { outputType: DataFormat }
 ) {
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle) {
     console.error(`File not found. (File hash: ${filename})`);
     return null;
   }
-  const crypto = await getNNCrypto();
-  const decryptionStream = await crypto.createDecryptionStream(
+  const decryptionStream = await NNCrypto.createDecryptionStream(
     key,
     cipherData.iv
   );
@@ -527,8 +524,7 @@ export async function decryptFile(
 
   const { key, iv } = fileMetadata;
 
-  const crypto = await getNNCrypto();
-  const decryptionStream = await crypto.createDecryptionStream(key, iv);
+  const decryptionStream = await NNCrypto.createDecryptionStream(key, iv);
   return await toBlob(fileHandle.readable.pipeThrough(decryptionStream));
 }
 

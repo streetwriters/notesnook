@@ -26,9 +26,9 @@ import Password from "./src/password";
 import {
   Cipher,
   EncryptionKey,
+  Input,
   Output,
-  OutputFormat,
-  Plaintext,
+  DataFormat,
   SerializedKey
 } from "./src/types";
 
@@ -41,27 +41,45 @@ export class NNCrypto implements INNCrypto {
     this.isReady = true;
   }
 
-  async encrypt<TFormat extends OutputFormat>(
+  async encrypt<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    plaintext: Plaintext<TFormat>,
-    outputFormat: OutputFormat = "uint8array"
-  ): Promise<Cipher> {
+    input: Input<DataFormat>,
+    format: DataFormat,
+    outputFormat: TOutputFormat = "uint8array" as TOutputFormat
+  ): Promise<Cipher<TOutputFormat>> {
     await this.init();
-    return Encryption.encrypt(key, plaintext, outputFormat);
+    return Encryption.encrypt(
+      key,
+      input,
+      format,
+      outputFormat
+    ) as Cipher<TOutputFormat>;
   }
 
-  async decrypt<TOutputFormat extends OutputFormat>(
+  async encryptMulti<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    cipherData: Cipher,
+    items: Input<DataFormat>[],
+    format: DataFormat,
+    outputFormat = "uint8array" as TOutputFormat
+  ): Promise<Cipher<TOutputFormat>[]> {
+    await this.init();
+    return items.map((data) =>
+      Encryption.encrypt(key, data, format, outputFormat)
+    );
+  }
+
+  async decrypt<TOutputFormat extends DataFormat>(
+    key: SerializedKey,
+    cipherData: Cipher<DataFormat>,
     outputFormat: TOutputFormat = "text" as TOutputFormat
   ): Promise<Output<TOutputFormat>> {
     await this.init();
     return Decryption.decrypt(key, cipherData, outputFormat);
   }
 
-  async decryptMulti<TOutputFormat extends OutputFormat>(
+  async decryptMulti<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    items: Cipher[],
+    items: Cipher<DataFormat>[],
     outputFormat: TOutputFormat = "text" as TOutputFormat
   ): Promise<Output<TOutputFormat>[]> {
     await this.init();

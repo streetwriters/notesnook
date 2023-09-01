@@ -1,8 +1,0 @@
-{
-  "extends": "../../tsconfig",
-  "compilerOptions": {
-    "lib": ["DOM", "WebWorker", "ES2015"],
-    "outDir": "./dist"
-  },
-  "include": ["./index.ts", "./src/"]
-}

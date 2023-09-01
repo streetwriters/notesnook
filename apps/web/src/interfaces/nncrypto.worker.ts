@@ -17,35 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { StringOutputFormat, Uint8ArrayOutputFormat } from "@notesnook/sodium";
+import { NNCrypto, Chunk, SerializedKey } from "@notesnook/crypto";
+import { expose, transfer } from "comlink";
 
-export type DataFormat = Uint8ArrayOutputFormat | StringOutputFormat;
+class NNCryptoWorker extends NNCrypto {
+  override async createDecryptionStream(
+    key: SerializedKey,
+    iv: string
+  ): Promise<TransformStream<Uint8Array, Uint8Array>> {
+    const stream = await super.createDecryptionStream(key, iv);
+    return transfer(stream, [stream]);
+  }
 
-export type Cipher<TFormat extends DataFormat> = {
-  format: TFormat;
-  alg: string;
-  cipher: Output<TFormat>;
-  iv: string;
-  salt: string;
-  length: number;
-};
+  override async createEncryptionStream(
+    key: SerializedKey
+  ): Promise<{ iv: string; stream: TransformStream<Chunk, Uint8Array> }> {
+    const result = await super.createEncryptionStream(key);
+    return transfer(result, [result.stream]);
+  }
+}
 
-export type Output<TFormat extends DataFormat> =
-  TFormat extends StringOutputFormat ? string : Uint8Array;
-export type Input<TFormat extends DataFormat> = Output<TFormat>;
-
-export type SerializedKey = {
-  password?: string;
-  key?: string;
-  salt?: string;
-};
-
-export type EncryptionKey = {
-  key: Uint8Array;
-  salt: string;
-};
-
-export type Chunk = {
-  data: Uint8Array;
-  final: boolean;
-};
+expose(new NNCryptoWorker());
