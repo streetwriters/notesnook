@@ -181,13 +181,20 @@ export class AddNotebookSheet extends React.Component {
         }
       });
 
-      await db.notebooks.notebook(toEdit.id).topics.add(...nextTopics);
+      await db.notebooks.topics(toEdit.id).add(
+        ...nextTopics.map((topic) => ({
+          title: topic
+        }))
+      );
+
       this.close();
     } else {
       newNotebookId = await db.notebooks.add({
         title: this.title,
         description: this.description,
-        topics: prevTopics,
+        topics: prevTopics.map((topic) => ({
+          title: topic
+        })),
         id: null
       });
     }

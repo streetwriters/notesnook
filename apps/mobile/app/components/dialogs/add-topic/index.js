@@ -72,12 +72,16 @@ export class AddTopicDialog extends React.Component {
       }
 
       if (!this.toEdit) {
-        await db.notebooks.notebook(this.notebook.id).topics.add(this.title);
+        await db.notebooks.topics(this.notebook.id).add({
+          title: this.title
+        });
       } else {
         let topic = this.toEdit;
         topic.title = this.title;
-
-        await db.notebooks.notebook(topic.notebookId).topics.add(topic);
+        await db.notebooks.topics(topic.notebookId).add({
+          id: topic.id,
+          title: topic.title
+        });
       }
       this.close();
       setTimeout(() => {

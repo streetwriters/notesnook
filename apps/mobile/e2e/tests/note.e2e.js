@@ -90,13 +90,13 @@ describe("NOTE TESTS", () => {
     await visibleByText("Pin to notifications");
   });
 
-  // it("Copy note", async () => {
-  //   await prepare();
-  //   await createNote();
-  //   await tapById(notesnook.listitem.menu);
-  //   await tapById("icon-Copy");
-  //   await visibleByText("Note copied to clipboard");
-  // });
+  it("Copy note", async () => {
+    await prepare();
+    await createNote();
+    await tapById(notesnook.listitem.menu);
+    await tapById("icon-Copy");
+    await visibleByText("Note copied to clipboard");
+  });
 
   it("Export note dialog should show", async () => {
     await prepare();

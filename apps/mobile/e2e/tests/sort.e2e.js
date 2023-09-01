@@ -41,6 +41,7 @@ describe("Sort & filter", () => {
     await prepare();
     let webview = web(by.id(notesnook.editor.id));
     await createNote("Note 1", "Note 1");
+    await sleep(300);
     await createNote("Note 2", "Note 2");
     await sleep(300);
     await tapByText("Note 1");

@@ -109,7 +109,7 @@ export const MoveNotes = ({
       });
       return false;
     }
-    await db.notebooks?.notebook(currentNotebook.id)?.topics.add({
+    await db.notebooks?.topics(currentNotebook.id).add({
       title: value
     });
 

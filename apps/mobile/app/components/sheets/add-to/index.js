@@ -102,7 +102,9 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
         return false;
       }
 
-      await db.notebooks.notebook(item.id).topics.add(value);
+      await db.notebooks.topics(item.id).add({
+        title: value
+      });
       setNotebooks();
       return true;
     },
