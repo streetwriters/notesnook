@@ -166,3 +166,24 @@ export async function encrypt(password, data) {
     alg: getAlgorithm(7)
   };
 }
+
+export async function encryptMulti(password, data) {
+  if (!password.password && !password.key) return undefined;
+  if (password.password && password.password === "" && !password.key)
+    return undefined;
+
+  let results = await Sodium.encryptMulti(
+    password,
+    data.map((item) => ({
+      type: "plain",
+      data: item
+    }))
+  );
+
+  return !results
+    ? []
+    : results.map((result) => ({
+        ...result,
+        alg: getAlgorithm(7)
+      }));
+}
