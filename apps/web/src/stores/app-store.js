@@ -78,27 +78,17 @@ class AppStore extends BaseStore {
     reminderStore.refresh();
     announcementStore.refresh();
 
-    let count = 0;
     EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
 
-    db.eventManager.subscribe(
-      EVENTS.syncProgress,
-      ({ type, total, current }) => {
-        if (total === current) return;
-        this.set((state) => {
-          state.syncStatus = {
-            key: "syncing",
-            progress: ((current / total) * 100).toFixed(),
-            type
-          };
-        });
-
-        if (type === "download" && ++count >= BATCH_SIZE) {
-          count = 0;
-          this.refresh();
-        }
-      }
-    );
+    db.eventManager.subscribe(EVENTS.syncProgress, ({ type, current }) => {
+      this.set((state) => {
+        state.syncStatus = {
+          key: "syncing",
+          progress: current,
+          type
+        };
+      });
+    });
 
     EV.subscribe(EVENTS.syncCheckStatus, async (type) => {
       const { isAutoSyncEnabled, isSyncEnabled } = this.get();
@@ -128,7 +118,6 @@ class AppStore extends BaseStore {
     db.eventManager.subscribe(EVENTS.syncCompleted, async () => {
       await this.updateLastSynced();
       this.updateSyncStatus("completed", true);
-      count = 0;
       this.refresh();
     });
 
