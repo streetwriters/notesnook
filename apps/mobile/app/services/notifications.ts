@@ -46,6 +46,7 @@ import { useRelationStore } from "../stores/use-relation-store";
 import { useReminderStore } from "../stores/use-reminder-store";
 import { presentDialog } from "../components/dialog/functions";
 import NetInfo from "@react-native-community/netinfo";
+import { convertNoteToText } from "../utils/note-to-text";
 
 export type Reminder = {
   id: string;
@@ -757,6 +758,11 @@ function getPinnedNotes(): DisplayedNotification[] {
   return pinned;
 }
 
+function isNotePinned(id: string) {
+  if (Platform.OS !== "android") return false;
+  return pinned.findIndex((notification) => notification.id === id) > -1;
+}
+
 function get(): Promise<DisplayedNotification[]> {
   return new Promise((resolve) => {
     if (Platform.OS === "ios") resolve([]);
@@ -844,6 +850,26 @@ async function setupReminders(checkNeedsScheduling = false) {
   );
 }
 
+async function pinNote(id: string) {
+  try {
+    const note = db.notes?.note(id as string) as any;
+    let text = await convertNoteToText(note as any, false);
+    if (!text) text = "";
+    let html = text.replace(/\n/g, "<br />");
+    Notifications.displayNotification({
+      title: note.title,
+      message: note.headline || text,
+      subtitle: note.headline || text,
+      bigText: html,
+      ongoing: true,
+      actions: ["UNPIN"],
+      id: note.id
+    });
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 const Notifications = {
   init,
   displayNotification,
@@ -859,7 +885,9 @@ const Notifications = {
   checkAndRequestPermissions,
   clearAllTriggers,
   setupReminders,
-  getChannelId
+  getChannelId,
+  isNotePinned,
+  pinNote
 };
 
 export default Notifications;
