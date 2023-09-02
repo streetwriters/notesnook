@@ -300,7 +300,7 @@ class Sync {
       }
     }
     if (!isSyncInitialized) return;
-    await this.connection.invoke("SyncCompleted", newLastSynced);
+    await this.connection.send("SyncCompleted", newLastSynced);
     return true;
   }
 
