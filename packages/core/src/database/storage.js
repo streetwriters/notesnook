@@ -56,6 +56,10 @@ export default class Storage {
     return this.storage.encrypt(password, data);
   }
 
+  encryptMulti(password, data) {
+    return this.storage.encryptMulti(password, data);
+  }
+
   decrypt(password, cipher) {
     return this.storage.decrypt(password, cipher);
   }

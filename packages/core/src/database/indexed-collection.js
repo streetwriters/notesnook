@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { EVENTS } from "../common";
+import { toChunks } from "../utils/array";
 import Indexer from "./indexer";
 
 export default class IndexedCollection {
@@ -116,5 +117,12 @@ export default class IndexedCollection {
     if (this.encryptionKey) return this.encryptionKey;
     this.encryptionKey = await this.encryptionKeyFactory();
     return this.encryptionKey;
+  }
+
+  async *iterate(chunkSize) {
+    const chunks = toChunks(this.indexer.indices, chunkSize);
+    for (const chunk of chunks) {
+      yield await this.indexer.readMulti(chunk);
+    }
   }
 }

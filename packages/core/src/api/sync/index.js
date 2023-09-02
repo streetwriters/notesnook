@@ -32,7 +32,6 @@ import * as signalr from "@microsoft/signalr";
 import Merger from "./merger";
 import Conflicts from "./conflicts";
 import { AutoSync } from "./auto-sync";
-import { toChunks } from "../../utils/array";
 import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
 import { logger } from "../../logger";
 import { Mutex } from "async-mutex";
@@ -42,19 +41,7 @@ import { migrateItem } from "../../migrations";
  * @typedef {{
  *  items: any[],
  *  type: string,
- *  lastSynced: number,
- *  total: number
  * }} SyncTransferItem
- */
-
-/**
- * @typedef {{
- *  items:  string[],
- *  types: string[],
- *  lastSynced: number,
- *  current: number,
- *  total: number,
- * }} BatchedSyncTransferItem
  */
 
 export default class SyncManager {
@@ -163,42 +150,20 @@ class Sync {
       this.autoSync.stop();
     });
 
-    this.connection.on("SyncItem", async (payload) => {
-      clearTimeout(remoteSyncTimeout);
-      remoteSyncTimeout = setTimeout(() => {
-        db.eventManager.publish(EVENTS.syncAborted);
-      }, 15000);
-
+    let count = 0;
+    this.connection.on("PushItems", async (chunk) => {
       const key = await this.db.user.getEncryptionKey();
-      const item = JSON.parse(payload.item);
-      const decryptedItem = await this.db.storage.decrypt(key, item);
+      const dbLastSynced = await this.db.lastSynced();
+      await this.processChunk(chunk, key, dbLastSynced, true);
 
-      const deserialized = await deserializeItem(
-        decryptedItem,
-        item.v,
-        this.db
-      );
-
-      const mergedItem = await this.onSyncItem(deserialized, payload.itemType);
-
-      const collectionType = this.itemTypeToCollection[payload.itemType];
-      if (collectionType && this.db[collectionType])
-        await this.db[collectionType]._collection.addItem(mergedItem);
-
-      if (payload.itemType === "content" || payload.itemType === "note") {
-        this.db.eventManager.publish(EVENTS.syncItemMerged, mergedItem);
-      }
-      sendSyncProgressEvent(
-        this.db.eventManager,
-        "download",
-        payload.total,
-        payload.current
-      );
+      count += chunk.items.length;
+      sendSyncProgressEvent(this.db.eventManager, "download", count);
     });
 
-    this.connection.on("RemoteSyncCompleted", (lastSynced) => {
+    this.connection.on("PushCompleted", (lastSynced) => {
+      count = 0;
       clearTimeout(remoteSyncTimeout);
-      this.onRemoteSyncCompleted(lastSynced);
+      this.onPushCompleted(lastSynced);
     });
   }
 
@@ -226,17 +191,12 @@ class Sync {
     const { lastSynced, oldLastSynced } = await this.init(force);
     this.logger.info("Initialized sync", { lastSynced, oldLastSynced });
 
-    const { newLastSynced, data } = await this.collect(lastSynced, force);
-    this.logger.info("Data collected for sync", {
-      newLastSynced,
-      length: data.items.length,
-      isEmpty: data.items.length <= 0
-    });
+    const newLastSynced = Date.now();
 
     const serverResponse = full ? await this.fetch(lastSynced) : null;
     this.logger.info("Data fetched", serverResponse);
 
-    if (await this.send(data, newLastSynced)) {
+    if (await this.send(lastSynced, force, newLastSynced)) {
       this.logger.info("New data sent");
       await this.stop(newLastSynced);
     } else if (serverResponse) {
@@ -278,49 +238,12 @@ class Sync {
 
     const dbLastSynced = await this.db.lastSynced();
     let count = 0;
-    this.connection.off("SyncItems");
-    this.connection.on("SyncItems", async (chunk) => {
-      const decrypted = await this.db.storage.decryptMulti(key, chunk.items);
-
-      const deserialized = await Promise.all(
-        decrypted.map((item, index) =>
-          deserializeItem(item, chunk.items[index].v, this.db)
-        )
-      );
-
-      let items = [];
-      if (this.merger.isSyncCollection(chunk.type)) {
-        items = deserialized.map((item) =>
-          this.merger.mergeItemSync(item, chunk.type, dbLastSynced)
-        );
-      } else if (chunk.type === "content") {
-        const localItems = await this.db.content.multi(
-          chunk.items.map((i) => i.id)
-        );
-        items = await Promise.all(
-          deserialized.map((item) =>
-            this.merger.mergeContent(item, localItems[item.id], dbLastSynced)
-          )
-        );
-      } else {
-        items = await Promise.all(
-          deserialized.map((item) =>
-            this.merger.mergeItem(item, chunk.type, dbLastSynced)
-          )
-        );
-      }
-
-      const collectionType = this.itemTypeToCollection[chunk.type];
-      if (collectionType && this.db[collectionType])
-        await this.db[collectionType]._collection.setItems(items);
+    this.connection.off("SendItems");
+    this.connection.on("SendItems", async (chunk) => {
+      await this.processChunk(chunk, key, dbLastSynced);
 
       count += chunk.items.length;
-      sendSyncProgressEvent(
-        this.db.eventManager,
-        `download`,
-        chunk.total,
-        count
-      );
+      sendSyncProgressEvent(this.db.eventManager, `download`, count);
       return true;
     });
     const serverResponse = await this.connection.invoke(
@@ -336,7 +259,7 @@ class Sync {
       );
     }
 
-    this.connection.off("SyncItems");
+    this.connection.off("SendItems");
 
     if (await this.conflicts.check()) {
       this.conflicts.throw();
@@ -345,57 +268,40 @@ class Sync {
     return { lastSynced: serverResponse.lastSynced };
   }
 
-  async collect(lastSynced, force) {
-    const newLastSynced = Date.now();
-    const data = await this.collector.collect(lastSynced, force);
-    return { newLastSynced, data };
-  }
-
-  /**
-   *
-   * @param {{ items: any[]; vaultKey: any; types: string[]; }} data
-   * @param {number} lastSynced
-   * @returns {Promise<boolean>}
-   */
-  async send(data, lastSynced) {
+  async send(oldLastSynced, isForceSync, newLastSynced) {
     await this.uploadAttachments();
 
-    if (data.types.length === 1 && data.types[0] === "vaultKey") return false;
-    if (data.items.length <= 0) return false;
-
-    let total = data.items.length;
-
-    const types = toChunks(data.types, 30);
-    const items = toChunks(data.items, 30);
-
+    let isSyncInitialized = false;
     let done = 0;
-    for (let i = 0; i < items.length; ++i) {
-      this.logger.info(`Sending batch ${done}/${total}`);
+    for await (const item of this.collector.collect(
+      100,
+      oldLastSynced,
+      isForceSync
+    )) {
+      if (!isSyncInitialized) {
+        const vaultKey = await this.db.vault._getKey();
+        newLastSynced = await this.connection.invoke("InitializePush", {
+          vaultKey,
+          lastSynced: newLastSynced
+        });
+        isSyncInitialized = true;
+      }
 
-      const encryptedItems = (await this.collector.encrypt(items[i])).map(
-        (item) => JSON.stringify(item)
-      );
-
-      const result = await this.sendBatchToServer({
-        lastSynced,
-        current: i,
-        total,
-        items: encryptedItems,
-        types: types[i]
-      });
-
+      const result = await this.pushItem(item, newLastSynced);
       if (result) {
-        done += encryptedItems.length;
-        sendSyncProgressEvent(this.db.eventManager, "upload", total, done);
+        done += item.items.length;
+        sendSyncProgressEvent(this.db.eventManager, "upload", done);
 
-        this.logger.info(`Batch sent (${done}/${total})`);
+        this.logger.info(`Batch sent (${done})`);
       } else {
         this.logger.error(
           new Error(`Failed to send batch. Server returned falsy response.`)
         );
       }
     }
-    return await this.connection.invoke("SyncCompleted", lastSynced);
+    if (!isSyncInitialized) return;
+    await this.connection.invoke("SyncCompleted", newLastSynced);
+    return true;
   }
 
   async stop(lastSynced) {
@@ -440,7 +346,7 @@ class Sync {
   /**
    * @private
    */
-  async onRemoteSyncCompleted(lastSynced) {
+  async onPushCompleted(lastSynced) {
     // refresh monographs on sync completed
     await this.db.monographs.init();
     // refresh topic references
@@ -449,32 +355,62 @@ class Sync {
     await this.start(false, false, lastSynced);
   }
 
-  /**
-   * @private
-   */
-  async onSyncItem(item, type, lastSynced) {
-    if (this.merger.isSyncCollection(type)) {
-      return this.merger.mergeItemSync(item, type, lastSynced);
-    } else if (type === "content") {
-      const localItem = await this.db.content.raw(item.id);
-      return await this.merger.mergeContent(item, localItem, lastSynced);
+  async processChunk(chunk, key, dbLastSynced, notify = false) {
+    const decrypted = await this.db.storage.decryptMulti(key, chunk.items);
+
+    const deserialized = await Promise.all(
+      decrypted.map((item, index) =>
+        deserializeItem(item, chunk.items[index].v, this.db)
+      )
+    );
+
+    let items = [];
+    if (this.merger.isSyncCollection(chunk.type)) {
+      items = deserialized.map((item) =>
+        this.merger.mergeItemSync(item, chunk.type, dbLastSynced)
+      );
+    } else if (chunk.type === "content") {
+      const localItems = await this.db.content.multi(
+        chunk.items.map((i) => i.id)
+      );
+      items = await Promise.all(
+        deserialized.map((item) =>
+          this.merger.mergeContent(item, localItems[item.id], dbLastSynced)
+        )
+      );
     } else {
-      return await this.merger.mergeItem(item, type, lastSynced);
+      items = await Promise.all(
+        deserialized.map((item) =>
+          this.merger.mergeItem(item, chunk.type, dbLastSynced)
+        )
+      );
     }
+
+    if (
+      notify &&
+      (chunk.type === "content" || chunk.type === "note") &&
+      items.length > 0
+    ) {
+      items.forEach((item) =>
+        this.db.eventManager.publish(EVENTS.syncItemMerged, item)
+      );
+    }
+
+    const collectionType = this.itemTypeToCollection[chunk.type];
+    if (collectionType && this.db[collectionType])
+      await this.db[collectionType]._collection.setItems(items);
   }
 
   /**
    *
-   * @param {BatchedSyncTransferItem} batch
+   * @param {SyncTransferItem} item
    * @returns {Promise<boolean>}
    * @private
    */
-  async sendBatchToServer(batch) {
-    if (!batch) return false;
+  async pushItem(item, newLastSynced) {
     await this.checkConnection();
-
-    const result = await this.connection.invoke("SyncItem", batch);
-    return result === 1;
+    await this.connection.send("PushItems", item, newLastSynced);
+    return true; // () === 1;
   }
 
   async checkConnection() {

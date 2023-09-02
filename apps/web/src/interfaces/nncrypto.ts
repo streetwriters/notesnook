@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { INNCrypto } from "@notesnook/crypto";
-import CryptoWorker from "./crypto.worker?worker";
+import CryptoWorker from "./nncrypto.worker?worker";
 import { wrap } from "comlink";
 
 export const NNCrypto = wrap<INNCrypto>(new CryptoWorker()) as INNCrypto;
