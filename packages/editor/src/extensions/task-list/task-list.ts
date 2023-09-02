@@ -207,6 +207,74 @@ export const TaskListNode = TaskList.extend({
             return false;
           }
         }
+      }),
+      new Plugin({
+        /**
+         * What is state
+         * whats is transaction
+         * what is append transaction
+         */
+        key: new PluginKey("task-list-drag-drop"),
+        appendTransaction(transactions, oldState, newState) {
+          const { from: _from, to: _to, $from: _$from } = oldState.selection;
+          const { from, to, $from } = newState.selection;
+
+          const _isTaskItem =
+            newState.doc.slice(_from, _to).content.firstChild?.type.name ===
+            TaskItem.name;
+
+          const isTaskItem =
+            newState.doc.slice(from, to).content.firstChild?.type.name ===
+            TaskItem.name;
+
+          if (_isTaskItem && isTaskItem) {
+            const taskLists = findChildrenByType(newState.doc, thisType, false);
+
+            for (const taskList of taskLists) {
+              const range = {
+                start: taskList.pos,
+                end: taskList.pos + taskList.node.nodeSize
+              };
+
+              const _isWithInList = range.start < _from && range.end > _to;
+              const isWithInList = range.start < from && range.end > to;
+
+              if (_isWithInList && isWithInList && from < _from) {
+                const _itemIndex = _$from.index(_$from.depth - 2) + 1;
+                const _itemSubList = $from.parent.child(_itemIndex).lastChild;
+                const _isItemSubList =
+                  _itemSubList?.type.name === TaskList.name;
+
+                if (!_isItemSubList) return newState.tr;
+
+                const _itemPosition = $from.posAtIndex(
+                  _itemIndex,
+                  _$from.depth - 2
+                );
+
+                let isChecked = true;
+
+                for (let index = 0; index < _itemSubList.childCount; index++) {
+                  if (!_itemSubList.child(index).attrs.checked)
+                    isChecked = false;
+                }
+
+                if (isChecked) {
+                  const transaction = newState.tr.setNodeMarkup(
+                    _itemPosition,
+                    undefined,
+                    {
+                      checked: true
+                    }
+                  );
+
+                  return transaction;
+                }
+              }
+            }
+          }
+          return newState.tr;
+        }
       })
     ];
   },
