@@ -31,8 +31,8 @@ import { alpha } from "@theme-ui/color";
 
 type ListItemProps = {
   colors?: {
+    heading: SchemeColors;
     accent: SchemeColors;
-    paragraph: SchemeColors;
     background: SchemeColors;
   };
   isFocused?: boolean;
@@ -53,9 +53,9 @@ type ListItemProps = {
 
 function ListItem(props: ListItemProps) {
   const {
-    colors: { paragraph, background, accent } = {
+    colors: { heading, background, accent } = {
+      heading: "heading",
       accent: "accent",
-      paragraph: "paragraph",
       background: "background"
     },
     isFocused,
@@ -172,7 +172,7 @@ function ListItem(props: ListItemProps) {
           overflow: "hidden",
           textOverflow: "ellipsis",
           fontWeight: isCompact || isSimple ? "body" : "bold",
-          color: paragraph,
+          color: heading,
           display: "block"
         }}
       >

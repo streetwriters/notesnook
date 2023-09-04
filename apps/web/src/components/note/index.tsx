@@ -131,7 +131,7 @@ function Note(props: NoteProps) {
       }}
       colors={{
         accent: primary,
-        paragraph: note.color ? primary : "heading",
+        heading: note.color ? primary : "heading",
         background: "background"
       }}
       menuItems={menuItems}
