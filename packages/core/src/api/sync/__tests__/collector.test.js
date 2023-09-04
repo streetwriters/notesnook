@@ -17,30 +17,39 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { databaseTest, TEST_NOTE, delay } from "../../../../__tests__/utils";
+import {
+  databaseTest,
+  TEST_NOTE,
+  delay,
+  loginFakeUser
+} from "../../../../__tests__/utils";
 import Collector from "../collector";
 import { test, expect } from "vitest";
 
 test("newly created note should get included in collector", () =>
   databaseTest().then(async (db) => {
+    await loginFakeUser(db);
     const collector = new Collector(db);
 
     const lastSyncedTime = Date.now() - 10000;
 
     const noteId = await db.notes.add(TEST_NOTE);
 
-    const data = await collector.collect(lastSyncedTime);
+    const items = [];
+    for await (const item of collector.collect(100, lastSyncedTime, false)) {
+      items.push(item);
+    }
 
-    expect(data.items).toHaveLength(2);
-    expect(data.items[0].type).toBe("note");
-    expect(data.items[0].id).toBe(noteId);
-    expect(data.types[0]).toBe("note");
-    expect(data.types[1]).toBe("content");
-    expect(data.items[1].type).toBe("tiptap");
+    expect(items).toHaveLength(2);
+    expect(items[0].items[0].id).toBe(noteId);
+    expect(items[0].type).toBe("note");
+    expect(items[1].type).toBe("content");
+    expect(items[1].items[0].id).toBe(db.notes.note(noteId).data.contentId);
   }));
 
 test("edited note after last synced time should get included in collector", () =>
   databaseTest().then(async (db) => {
+    await loginFakeUser(db);
     const collector = new Collector(db);
     const noteId = await db.notes.add(TEST_NOTE);
 
@@ -50,14 +59,18 @@ test("edited note after last synced time should get included in collector", () =
 
     await db.notes.add({ id: noteId, pinned: true });
 
-    const data = await collector.collect(lastSyncedTime);
+    const items = [];
+    for await (const item of collector.collect(100, lastSyncedTime, false)) {
+      items.push(item);
+    }
 
-    expect(data.items).toHaveLength(1);
-    expect(data.items[0].id).toBe(noteId);
+    expect(items).toHaveLength(1);
+    expect(items[0].items[0].id).toBe(noteId);
   }));
 
 test("note edited before last synced time should not get included in collector", () =>
   databaseTest().then(async (db) => {
+    await loginFakeUser(db);
     const collector = new Collector(db);
     const noteId = await db.notes.add(TEST_NOTE);
 
@@ -67,21 +80,29 @@ test("note edited before last synced time should not get included in collector",
 
     const lastSyncedTime = Date.now();
 
-    const data = await collector.collect(lastSyncedTime);
-    const notes = data.items.filter((i) => i.collectionId === "note");
+    const items = [];
+    for await (const item of collector.collect(100, lastSyncedTime, false)) {
+      items.push(item);
+    }
 
-    expect(notes).toHaveLength(0);
+    expect(items).toHaveLength(0);
   }));
 
 test("localOnly note should get included as a deleted item in collector", () =>
   databaseTest().then(async (db) => {
+    await loginFakeUser(db);
     const collector = new Collector(db);
     await db.notes.add({ ...TEST_NOTE, localOnly: true });
 
-    const data = await collector.collect(0);
-    expect(data.items).toHaveLength(2);
-    expect(data.items[0].deleted).toBe(true);
-    expect(data.items[1].deleted).toBe(true);
-    expect(data.types[0]).toBe("note");
-    expect(data.types[1]).toBe("content");
+    const items = [];
+    for await (const item of collector.collect(100, 0, false)) {
+      items.push(item);
+    }
+
+    expect(items).toHaveLength(2);
+
+    expect(items[0].items[0].length).toBe(104);
+    expect(items[1].items[0].length).toBe(104);
+    expect(items[0].type).toBe("note");
+    expect(items[1].type).toBe("content");
   }));
