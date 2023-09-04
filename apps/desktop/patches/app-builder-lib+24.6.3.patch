@@ -1,8 +1,8 @@
 diff --git a/node_modules/app-builder-lib/out/targets/LinuxTargetHelper.js b/node_modules/app-builder-lib/out/targets/LinuxTargetHelper.js
-index 3ba5d6a..cf8e147 100644
+index fcb7f54..cb1c7f7 100644
 --- a/node_modules/app-builder-lib/out/targets/LinuxTargetHelper.js
 +++ b/node_modules/app-builder-lib/out/targets/LinuxTargetHelper.js
-@@ -105,6 +105,7 @@ class LinuxTargetHelper {
+@@ -116,6 +116,7 @@ class LinuxTargetHelper {
              StartupWMClass: appInfo.productName,
              ...extra,
              ...targetSpecificOptions.desktop,
@@ -10,7 +10,7 @@ index 3ba5d6a..cf8e147 100644
          };
          const description = this.getDescription(targetSpecificOptions);
          if (!(0, builder_util_1.isEmptyOrSpaces)(description)) {
-@@ -148,6 +149,23 @@ class LinuxTargetHelper {
+@@ -159,6 +160,23 @@ class LinuxTargetHelper {
              data += `\n${name}=${desktopMeta[name]}`;
          }
          data += "\n";
