@@ -53,7 +53,9 @@ export function getPreviewColors(theme: ThemeDefinition): PreviewColors {
     list: {
       heading: list?.primary?.heading || primary.heading,
       background: list?.primary?.background || primary.background,
-      accent: list?.primary?.accent || primary.accent
+      accent: list?.primary?.accent || primary.accent,
+      accentForeground:
+        list?.primary?.accentForeground || primary.accentForeground
     },
     border: primary.border,
     paragraph: primary.paragraph,
