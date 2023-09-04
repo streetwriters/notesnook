@@ -114,7 +114,15 @@ export const Title = () => {
               #
             </Heading>
           ) : null}
-          {title} <Tag visible={currentScreen.beta} text="BETA" />
+          {title}{" "}
+          <Tag
+            visible={currentScreen.beta}
+            text="BETA"
+            style={{
+              backgroundColor: "transparent"
+            }}
+            textColor={colors.primary.accent}
+          />
         </Heading>
       ) : null}
     </>
