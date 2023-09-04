@@ -7,7 +7,7 @@
   "dependencies": {
     "@ammarahmed/notifee-react-native": "7.4.4",
     "@ammarahmed/react-native-share-extension": "^2.5.5",
-    "@ammarahmed/react-native-sodium": "1.5.1",
+    "@ammarahmed/react-native-sodium": "1.5.2",
     "@bam.tech/react-native-image-resizer": "3.0.5",
     "@callstack/repack": "^3.2.0",
     "@react-native-clipboard/clipboard": "^1.9.0",
@@ -44,7 +44,7 @@
     "react-native-image-picker": "4.1.2",
     "react-native-in-app-review": "4.3.3",
     "react-native-keychain": "4.0.5",
-    "react-native-mmkv-storage": "^0.10.0-alpha.6",
+    "react-native-mmkv-storage": "^0.10.0-alpha.7",
     "react-native-modal-datetime-picker": "14.0.0",
     "react-native-navigation-bar-color": "2.0.2",
     "react-native-notification-sounds": "0.5.5",
