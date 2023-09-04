@@ -181,7 +181,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
         margin: 0,
         borderRadius: "default",
         boxShadow: "menu",
-        border: "1px solid var(--separator)",
+        border: "1px solid var(--border)",
         minWidth: 220,
         ...sx
       }}
