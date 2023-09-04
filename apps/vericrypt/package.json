@@ -16,7 +16,6 @@
     "@emotion/react": "^11.10.0",
     "@microsoft/signalr-protocol-msgpack": "^7.0.9",
     "@notesnook/crypto": "file:../../packages/crypto",
-    "@notesnook/crypto-worker": "file:../../packages/crypto-worker",
     "@notesnook/theme": "1.2.0",
     "@theme-ui/components": "^0.14.7",
     "@theme-ui/core": "^0.14.7",
