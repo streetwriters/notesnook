@@ -101,6 +101,8 @@ class Merger {
   }
 
   async mergeContent(remoteItem, localItem, lastSynced) {
+    if (localItem && localItem.localOnly) return;
+
     const THRESHOLD = process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000;
     const conflicted =
       localItem &&
