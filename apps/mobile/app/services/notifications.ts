@@ -46,7 +46,9 @@ import { useRelationStore } from "../stores/use-relation-store";
 import { useReminderStore } from "../stores/use-reminder-store";
 import { presentDialog } from "../components/dialog/functions";
 import NetInfo from "@react-native-community/netinfo";
+import { encodeNonAsciiHTML } from "entities";
 import { convertNoteToText } from "../utils/note-to-text";
+
 
 export type Reminder = {
   id: string;
@@ -85,6 +87,28 @@ async function getNextMonthlyReminderDate(
     }
   }
   return await getNextMonthlyReminderDate(reminder, dayjs().year() + 1);
+}
+
+export function textToHTML(src: string) {
+  return src
+    .split(/[\r\n]/)
+    .map((line) =>
+      line
+        ? `<p data-spacing="single">${encodeLine(line)}</p>`
+        : `<p data-spacing="single"></p>`
+    )
+    .join("");
+}
+
+function encodeLine(line: string) {
+  line = encodeNonAsciiHTML(line);
+  line = line.replace(/(^ +)|( {2,})/g, (sub, ...args) => {
+    const [starting, inline] = args;
+    if (starting) return "&nbsp;".repeat(starting.length);
+    if (inline) return "&nbsp;".repeat(inline.length);
+    return sub;
+  });
+  return line;
 }
 
 async function initDatabase(notes = true) {
@@ -207,16 +231,41 @@ const onEvent = async ({ type, detail }: Event) => {
         });
         if (!db.isInitialized) await db.init();
         await db.notes?.init();
-        await db.notes?.add({
+
+        const id = await db.notes?.add({
           content: {
             type: "tiptap",
-            data: `<p>${input} </p>`
+            data: textToHTML(input as string)
           }
         });
+
+        const defaultNotebook = db.settings?.getDefaultNotebook();
+
+        if (defaultNotebook) {
+          if (!defaultNotebook.topic) {
+            await db.relations?.add(
+              { type: "notebook", id: defaultNotebook.id },
+              { type: "note", id: id }
+            );
+          } else {
+            await db.notes?.addToNotebook(
+              {
+                topic: defaultNotebook.topic,
+                id: defaultNotebook?.id
+              },
+              id
+            );
+          }
+        }
+
         const status = await NetInfo.fetch();
         if (status.isInternetReachable) {
           try {
-            await db.sync(false, false);
+            if (!globalThis["IS_MAIN_APP_RUNNING" as never]) {
+              await db.sync(false, false);
+            } else {
+              console.log("main app running, skipping sync");
+            }
           } catch (e) {
             console.log(e, (e as Error).stack);
           }

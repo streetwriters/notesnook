@@ -46,6 +46,7 @@ const App = () => {
     if (appLockMode && appLockMode !== "none") {
       useUserStore.getState().lockApp(true);
     }
+    globalThis["IS_MAIN_APP_RUNNING"] = true;
     init();
     setTimeout(async () => {
       SettingsService.onFirstLaunch();
