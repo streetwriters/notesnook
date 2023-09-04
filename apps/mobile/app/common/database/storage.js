@@ -28,7 +28,8 @@ import {
   getRandomBytes,
   hash,
   removeCryptoKey,
-  decryptMulti
+  decryptMulti,
+  encryptMulti
 } from "./encryption";
 import { MMKV } from "./mmkv";
 
@@ -154,5 +155,6 @@ export default {
   getCryptoKey,
   removeCryptoKey,
   hash,
-  generateCryptoKey
+  generateCryptoKey,
+  encryptMulti
 };
