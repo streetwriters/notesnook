@@ -219,7 +219,7 @@ function NavigationMenu(props: NavigationMenuProps) {
               />
             ))}
             <Box
-              bg="border"
+              bg="separator"
               my={1}
               sx={{ width: "85%", height: "0.8px", alignSelf: "center" }}
             />
@@ -302,7 +302,7 @@ function NavigationMenu(props: NavigationMenuProps) {
               <Button
                 variant={"icon"}
                 title="Toggle dark/light mode"
-                sx={{ borderLeft: "1px solid var(--border)" }}
+                sx={{ borderLeft: "1px solid var(--separator)" }}
                 onClick={() => {
                   setFollowSystemTheme(false);
                   toggleNightMode();
