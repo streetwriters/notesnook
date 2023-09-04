@@ -46,7 +46,6 @@ Notesnook is built using the following technologies:
 | `@notesnook/editor-mobile` | [/packages/editor-mobile](/packages/editor-mobile) | A very thin wrapper around `@notesnook/editor` for mobile clients    |
 | `@notesnook/logger`        | [/packages/logger](/packages/logger)               | Simple & pluggable logger                                            |
 | `@notesnook/sodium`        | [/packages/sodium](/packages/sodium)               | Wrapper around libsodium to support Node.js & Browser                |
-| `@notesnook/crypto-worker` | [/packages/crypto-worker](/packages/crypto-worker) | Helpers to use `@notesnook/crypto` from a Worker                     |
 | `@notesnook/streamable-fs` | [/packages/streamable-fs](/packages/streamable-fs) | Streaming interface around an IndexedDB based file system            |
 | `@notesnook/theme`         | [/packages/theme](/packages/theme)                 | The core theme used in web & desktop clients                         |
 

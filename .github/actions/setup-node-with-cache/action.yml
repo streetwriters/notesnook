@@ -19,7 +19,6 @@ runs:
           packages/crypto/package-lock.json
           packages/sodium/package-lock.json
           packages/clipper/package-lock.json
-          packages/crypto-worker/package-lock.json
           packages/editor-mobile/package-lock.json
           packages/editor/package-lock.json
           packages/logger/package-lock.json

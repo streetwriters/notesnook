@@ -103,7 +103,7 @@ All commits must include valid scopes in the commit message. **Valid commit scop
 
 **Packages:**
 
-1. `crypto`: changes related to the cryptographic core (including `@notesnook/crypto-worker`)
+1. `crypto`: changes related to the cryptographic core
 2. `editor`: changes related to the editor (including `@notesnook/editor-mobile`)
 3. `logger`: changes related to the logger
 4. `theme`: changes related to the theme
