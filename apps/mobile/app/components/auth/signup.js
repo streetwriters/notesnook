@@ -67,6 +67,7 @@ export const Signup = ({ changeMode, trial }) => {
 
   const signup = async () => {
     if (!validateInfo() || error) return;
+    if (loading) return;
     setLoading(true);
     try {
       await db.user.signup(email.current.toLowerCase(), password.current);

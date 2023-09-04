@@ -64,6 +64,7 @@ export const useLogin = (onFinishLogin) => {
   const login = async () => {
     if (!validateInfo() || error) return;
     try {
+      if (loading) return;
       setLoading(true);
       switch (step) {
         case LoginSteps.emailAuth: {
