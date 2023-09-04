@@ -161,7 +161,8 @@ function NavigationMenu(props: NavigationMenuProps) {
           overflow: "hidden",
           flexDirection: "column",
           justifyContent: "space-between",
-          bg: "background"
+          bg: "background",
+          borderRight: "1px solid var(--border)"
         }}
         px={0}
       >

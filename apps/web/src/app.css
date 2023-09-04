@@ -11,7 +11,7 @@
 .allotment-module_splitView__L-yRc.allotment-module_separatorBorder__x-rDS
   > .allotment-module_splitViewContainer__rQnVa
   > .allotment-module_splitViewView__MGZ6O:not(:first-child)::before {
-  background-color: var(--border);
+  background-color: transparent;
 }
 /* open-sans-regular - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
 @font-face {
