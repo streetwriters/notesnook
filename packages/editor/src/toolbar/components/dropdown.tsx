@@ -48,8 +48,7 @@ export function Dropdown(props: DropdownProps) {
     isOpen,
     onClosed: () => setIsOpen(false)
   });
-  //@ts-ignore
-  logger("info", isPopupOpen, "isOpen");
+
   return (
     <>
       <Button
