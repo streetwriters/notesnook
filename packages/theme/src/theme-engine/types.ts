@@ -182,6 +182,11 @@ export type Colors = {
    * Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)
    * @pattern ^#(?:[0-9a-fA-F]{3}){1,2}$
    */
+  accentForeground: string;
+  /**
+   * Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)
+   * @pattern ^#(?:[0-9a-fA-F]{3}){1,2}$
+   */
   paragraph: string;
   /**
    * Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)
@@ -251,6 +256,7 @@ export type PreviewColors = {
   list: {
     heading: string;
     accent: string;
+    accentForeground: string;
     background: string;
   };
   statusBar: {
