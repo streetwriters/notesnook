@@ -152,12 +152,20 @@ class Sync {
 
     let count = 0;
     this.connection.on("PushItems", async (chunk) => {
-      const key = await this.db.user.getEncryptionKey();
-      const dbLastSynced = await this.db.lastSynced();
-      await this.processChunk(chunk, key, dbLastSynced, true);
+      if (this.connection.state !== signalr.HubConnectionState.Connected)
+        return;
 
       count += chunk.items.length;
       sendSyncProgressEvent(this.db.eventManager, "download", count);
+
+      clearTimeout(remoteSyncTimeout);
+      remoteSyncTimeout = setTimeout(() => {
+        this.db.eventManager.publish(EVENTS.syncAborted);
+      }, 15000);
+
+      const key = await this.db.user.getEncryptionKey();
+      const dbLastSynced = await this.db.lastSynced();
+      await this.processChunk(chunk, key, dbLastSynced, true);
     });
 
     this.connection.on("PushCompleted", (lastSynced) => {
@@ -183,6 +191,7 @@ class Sync {
     this.logger.info("Starting sync", { full, force, serverLastSynced });
 
     this.connection.onclose((error) => {
+      this.db.eventManager.publish(EVENTS.syncAborted);
       console.error(error);
       this.logger.error(error || new Error("Connection closed."));
       throw new Error("Connection closed.");
@@ -240,10 +249,14 @@ class Sync {
     let count = 0;
     this.connection.off("SendItems");
     this.connection.on("SendItems", async (chunk) => {
-      await this.processChunk(chunk, key, dbLastSynced);
+      if (this.connection.state !== signalr.HubConnectionState.Connected)
+        return;
 
       count += chunk.items.length;
       sendSyncProgressEvent(this.db.eventManager, `download`, count);
+
+      await this.processChunk(chunk, key, dbLastSynced);
+
       return true;
     });
     const serverResponse = await this.connection.invoke(
