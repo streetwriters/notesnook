@@ -185,6 +185,8 @@ module.exports = (env) => {
             /node_modules(.*[/\\])+@tanstack[/\\]react-query/,
             /node_modules(.*[/\\])+@trpc[/\\]react-query/,
             /node_modules(.*[/\\])+katex/,
+            /node_modules(.*[/\\])+@notesnook[/\\]core/,
+
           ],
           use: {
             loader: "babel-loader",

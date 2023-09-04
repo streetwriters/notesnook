@@ -44,12 +44,12 @@ export default class Notes extends Collection {
     return this.raw.find((item) => item.dateDeleted > 0 && item.id === id);
   }
 
-  async merge(remoteNote) {
-    if (!remoteNote) return;
-
+  async merge(localNote, remoteNote) {
     const id = remoteNote.id;
-    const localNote = this._collection.getItem(id);
+
     if (localNote) {
+      if (localNote.localOnly) return;
+
       if (localNote.color) await this._db.colors.untag(localNote.color, id);
 
       for (let tag of localNote.tags || []) {
@@ -57,16 +57,9 @@ export default class Notes extends Collection {
       }
     }
 
-    if (
-      remoteNote.deleted &&
-      remoteNote.deleteReason !== "localOnly" &&
-      (!localNote || !localNote.localOnly)
-    )
-      return await this._collection.addItem(remoteNote);
-
     await this._resolveColorAndTags(remoteNote);
 
-    return await this._collection.addItem(remoteNote);
+    return remoteNote;
   }
 
   async add(noteArg) {

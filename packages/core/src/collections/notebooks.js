@@ -24,15 +24,9 @@ import { CHECK_IDS, checkIsUserPremium } from "../common";
 import qclone from "qclone";
 
 export default class Notebooks extends Collection {
-  async merge(remoteNotebook) {
-    if (remoteNotebook.deleted)
-      return await this._collection.addItem(remoteNotebook);
-
-    const id = remoteNotebook.id || id();
-    let localNotebook = this._collection.getItem(id);
-
+  merge(localNotebook, remoteNotebook, lastSyncedTimestamp) {
+    if (remoteNotebook.deleted) return remoteNotebook;
     if (localNotebook && localNotebook.topics?.length) {
-      const lastSyncedTimestamp = await this._db.lastSynced();
       let isChanged = false;
       // merge new and old topics
       for (let oldTopic of localNotebook.topics) {
@@ -65,7 +59,7 @@ export default class Notebooks extends Collection {
       }
       remoteNotebook.remote = !isChanged;
     }
-    return await this._collection.addItem(remoteNotebook);
+    return remoteNotebook;
   }
 
   async add(notebookArg) {

@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { notebookTest, TEST_NOTEBOOK, TEST_NOTE, delay } from "./utils";
 import { makeTopic } from "../src/collections/topics";
 import { test, expect } from "vitest";
+import qclone from "qclone";
 
 test("add a notebook", () =>
   notebookTest().then(({ db, id }) => {
@@ -62,47 +63,61 @@ test("merge notebook with new topics", () =>
   notebookTest().then(async ({ db, id }) => {
     let notebook = db.notebooks.notebook(id);
 
-    const newNotebook = { ...notebook.data, remote: true };
-    newNotebook.topics.push(makeTopic("Home", id));
+    const newNotebook = db.notebooks.merge(notebook.data, {
+      ...notebook.data,
+      topics: [...notebook.data.topics, makeTopic("Home", id)],
+      remote: true
+    });
 
-    await expect(db.notebooks.merge(newNotebook)).resolves.not.toThrow();
-
-    expect(notebook.topics.has("Home")).toBe(true);
-    expect(notebook.topics.has("hello")).toBe(true);
+    expect(
+      newNotebook.topics.findIndex((t) => t.title === "Home")
+    ).toBeGreaterThanOrEqual(0);
+    expect(
+      newNotebook.topics.findIndex((t) => t.title === "hello")
+    ).toBeGreaterThanOrEqual(0);
   }));
 
 test("merge notebook with topics removed", () =>
   notebookTest().then(async ({ db, id }) => {
     let notebook = db.notebooks.notebook(id);
 
-    const newNotebook = { ...notebook.data, remote: true };
-    newNotebook.topics.splice(0, 1); // remove hello topic
-    newNotebook.topics.push(makeTopic("Home", id));
+    const newNotebook = db.notebooks.merge(notebook.data, {
+      ...notebook.data,
+      topics: [makeTopic("Home", id)],
+      remote: true
+    });
 
-    await expect(db.notebooks.merge(newNotebook)).resolves.not.toThrow();
-
-    expect(notebook.topics.has("Home")).toBe(true);
-    expect(notebook.topics.has("hello")).toBe(false);
+    expect(
+      newNotebook.topics.findIndex((t) => t.title === "Home")
+    ).toBeGreaterThanOrEqual(0);
+    expect(
+      newNotebook.topics.findIndex((t) => t.title === "hello")
+    ).toBeLessThan(0);
   }));
 
 test("merge notebook with topic edited", () =>
   notebookTest().then(async ({ db, id }) => {
     let notebook = db.notebooks.notebook(id);
 
-    const newNotebook = { ...notebook.data, remote: true };
-    newNotebook.topics[0].title = "hello (edited)";
+    const newNotebook = db.notebooks.merge(notebook.data, {
+      ...notebook.data,
+      topics: [{ ...notebook.data.topics[0], title: "hello (edited)" }],
+      remote: true
+    });
 
-    await expect(db.notebooks.merge(newNotebook)).resolves.not.toThrow();
-
-    expect(notebook.topics.has("hello (edited)")).toBe(true);
-    expect(notebook.topics.has("hello")).toBe(false);
+    expect(
+      newNotebook.topics.findIndex((t) => t.title === "hello (edited)")
+    ).toBeGreaterThanOrEqual(0);
+    expect(
+      newNotebook.topics.findIndex((t) => t.title === "hello")
+    ).toBeLessThan(0);
   }));
 
 test("merge notebook when local notebook is also edited", () =>
   notebookTest().then(async ({ db, id }) => {
     let notebook = db.notebooks.notebook(id);
 
-    const newNotebook = { ...notebook.data, remote: true };
+    let newNotebook = { ...qclone(notebook.data), remote: true };
     newNotebook.topics[0].title = "hello (edited)";
 
     await delay(500);
@@ -112,11 +127,20 @@ test("merge notebook when local notebook is also edited", () =>
       title: "hello (edited too)"
     });
 
-    await expect(db.notebooks.merge(newNotebook)).resolves.not.toThrow();
-
-    expect(notebook.topics.has("hello (edited too)")).toBe(true);
-    expect(notebook.topics.has("hello (edited)")).toBe(false);
-    expect(notebook.topics.has("hello")).toBe(false);
+    newNotebook = db.notebooks.merge(
+      db.notebooks.notebook(id).data,
+      newNotebook,
+      0
+    );
+    expect(
+      newNotebook.topics.findIndex((t) => t.title === "hello (edited too)")
+    ).toBeGreaterThanOrEqual(0);
+    expect(
+      newNotebook.topics.findIndex((t) => t.title === "hello (edited)")
+    ).toBeLessThan(0);
+    expect(
+      newNotebook.topics.findIndex((t) => t.title === "hello")
+    ).toBeLessThan(0);
   }));
 
 test("merging notebook when local notebook is not edited should not update remote notebook dateEdited", () =>
@@ -129,9 +153,10 @@ test("merging notebook when local notebook is not edited should not update remot
       note
     );
 
-    const newNotebook = { ...notebook.data, remote: true };
-
-    await expect(db.notebooks.merge(newNotebook)).resolves.not.toThrow();
+    const newNotebook = db.notebooks.merge(notebook.data, {
+      ...notebook.data,
+      remote: true
+    });
 
     expect(db.notebooks.notebook(id).dateEdited).toBe(newNotebook.dateEdited);
   }));
@@ -140,10 +165,10 @@ test("merge notebook with topic removed that is edited in the local notebook", (
   notebookTest().then(async ({ db, id }) => {
     let notebook = db.notebooks.notebook(id);
 
-    const newNotebook = { ...notebook.data, remote: true };
+    let newNotebook = { ...qclone(notebook.data), remote: true };
     newNotebook.topics.splice(0, 1); // remove hello topic
 
-    await db.storage.write("lastSynced", Date.now());
+    const lastSynced = Date.now();
 
     await delay(500);
 
@@ -152,8 +177,16 @@ test("merge notebook with topic removed that is edited in the local notebook", (
       title: "hello (i exist)"
     });
 
-    await expect(db.notebooks.merge(newNotebook)).resolves.not.toThrow();
+    newNotebook = db.notebooks.merge(
+      db.notebooks.notebook(id).data,
+      newNotebook,
+      lastSynced
+    );
 
-    expect(notebook.topics.has("hello (i exist)")).toBe(true);
-    expect(notebook.topics.has("hello")).toBe(false);
+    expect(
+      newNotebook.topics.findIndex((t) => t.title === "hello (i exist)")
+    ).toBeGreaterThanOrEqual(0);
+    expect(
+      newNotebook.topics.findIndex((t) => t.title === "hello")
+    ).toBeLessThan(0);
   }));

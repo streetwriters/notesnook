@@ -17,44 +17,40 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { KeyboardAvoidingView, Platform, View } from "react-native";
+import React, { PropsWithChildren } from "react";
+import { KeyboardAvoidingView, Platform } from "react-native";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { Header } from "../header";
 import SelectionHeader from "../selection-header";
-export const Container = ({ children }) => {
+
+export const Container = ({ children }: PropsWithChildren) => {
   const floating = useIsFloatingKeyboard();
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
   const insets = useGlobalSafeAreaInsets();
+
   return (
     <KeyboardAvoidingView
       behavior="padding"
       enabled={Platform.OS === "ios" && !floating}
       style={{
-        flex: 1
+        flex: 1,
+        overflow: "hidden",
+        paddingTop: Platform.OS === "android" ? 0 : insets.top,
+        paddingBottom: Platform.OS === "android" ? 0 : insets.bottom
       }}
     >
-      <View
-        style={{
-          flex: 1,
-          overflow: "hidden",
-          paddingTop: Platform.OS === "android" ? 0 : insets.top,
-          paddingBottom: Platform.OS === "android" ? 0 : insets.bottom
-        }}
-      >
-        {!introCompleted ? null : (
-          <>
-            <SelectionHeader />
-            <Header title="Header" screen="Header" />
-          </>
-        )}
+      {!introCompleted ? null : (
+        <>
+          <SelectionHeader />
+          <Header />
+        </>
+      )}
 
-        {children}
-      </View>
+      {children}
     </KeyboardAvoidingView>
   );
 };

@@ -29,10 +29,10 @@ import {
   from_hex
 } from "@notesnook/sodium";
 import KeyUtils from "./keyutils";
-import { Cipher, OutputFormat, Plaintext, SerializedKey } from "./types";
+import { Cipher, Output, DataFormat, SerializedKey } from "./types";
 
 export default class Decryption {
-  private static transformInput(cipherData: Cipher): Uint8Array {
+  private static transformInput(cipherData: Cipher<DataFormat>): Uint8Array {
     let input: Uint8Array | null = null;
     if (
       typeof cipherData.cipher === "string" &&
@@ -54,11 +54,11 @@ export default class Decryption {
     return input;
   }
 
-  static decrypt(
+  static decrypt<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    cipherData: Cipher,
-    outputFormat: OutputFormat = "text"
-  ): Plaintext {
+    cipherData: Cipher<DataFormat>,
+    outputFormat: TOutputFormat = "text" as TOutputFormat
+  ): Output<TOutputFormat> {
     if (!key.salt && cipherData.salt) key.salt = cipherData.salt;
     const encryptionKey = KeyUtils.transform(key);
 
@@ -71,15 +71,13 @@ export default class Decryption {
       encryptionKey.key
     );
 
-    return {
-      format: outputFormat,
-      data:
-        outputFormat === "base64"
-          ? to_base64(plaintext, base64_variants.ORIGINAL)
-          : outputFormat === "text"
-          ? to_string(plaintext)
-          : plaintext
-    };
+    return (
+      outputFormat === "base64"
+        ? to_base64(plaintext, base64_variants.ORIGINAL)
+        : outputFormat === "text"
+        ? to_string(plaintext)
+        : plaintext
+    ) as Output<TOutputFormat>;
   }
 
   static createStream(

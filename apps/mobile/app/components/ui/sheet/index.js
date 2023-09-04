@@ -49,7 +49,6 @@ const SheetWrapper = ({
   const largeTablet = deviceMode === "tablet";
   const smallTablet = deviceMode === "smallTablet";
   const dimensions = useSettingStore((state) => state.dimensions);
-  const pitchBlack = useSettingStore((state) => state.settings.pitchBlack);
   const insets = useGlobalSafeAreaInsets();
   let width = dimensions.width > 600 ? 600 : 500;
 
@@ -121,19 +120,17 @@ const SheetWrapper = ({
         }
         onClose={_onClose}
       >
-        <BouncingView>
-          {children}
-          {bottomPadding ? (
-            <View
-              style={{
-                height:
-                  Platform.OS === "ios" && insets.bottom !== 0
-                    ? insets.bottom + 5
-                    : 20
-              }}
-            />
-          ) : null}
-        </BouncingView>
+        {children}
+        {bottomPadding ? (
+          <View
+            style={{
+              height:
+                Platform.OS === "ios" && insets.bottom !== 0
+                  ? insets.bottom + 5
+                  : 20
+            }}
+          />
+        ) : null}
       </ActionSheet>
     </ScopedThemeProvider>
   );

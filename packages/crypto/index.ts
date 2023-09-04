@@ -26,8 +26,9 @@ import Password from "./src/password";
 import {
   Cipher,
   EncryptionKey,
-  OutputFormat,
-  Plaintext,
+  Input,
+  Output,
+  DataFormat,
   SerializedKey
 } from "./src/types";
 
@@ -40,22 +41,53 @@ export class NNCrypto implements INNCrypto {
     this.isReady = true;
   }
 
-  async encrypt(
+  async encrypt<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    plaintext: Plaintext,
-    outputFormat: OutputFormat = "uint8array"
-  ): Promise<Cipher> {
+    input: Input<DataFormat>,
+    format: DataFormat,
+    outputFormat: TOutputFormat = "uint8array" as TOutputFormat
+  ): Promise<Cipher<TOutputFormat>> {
     await this.init();
-    return Encryption.encrypt(key, plaintext, outputFormat);
+    return Encryption.encrypt(
+      key,
+      input,
+      format,
+      outputFormat
+    ) as Cipher<TOutputFormat>;
   }
 
-  async decrypt(
+  async encryptMulti<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    cipherData: Cipher,
-    outputFormat: OutputFormat = "text"
-  ): Promise<Plaintext> {
+    items: Input<DataFormat>[],
+    format: DataFormat,
+    outputFormat = "uint8array" as TOutputFormat
+  ): Promise<Cipher<TOutputFormat>[]> {
+    await this.init();
+    return items.map((data) =>
+      Encryption.encrypt(key, data, format, outputFormat)
+    );
+  }
+
+  async decrypt<TOutputFormat extends DataFormat>(
+    key: SerializedKey,
+    cipherData: Cipher<DataFormat>,
+    outputFormat: TOutputFormat = "text" as TOutputFormat
+  ): Promise<Output<TOutputFormat>> {
     await this.init();
     return Decryption.decrypt(key, cipherData, outputFormat);
+  }
+
+  async decryptMulti<TOutputFormat extends DataFormat>(
+    key: SerializedKey,
+    items: Cipher<DataFormat>[],
+    outputFormat: TOutputFormat = "text" as TOutputFormat
+  ): Promise<Output<TOutputFormat>[]> {
+    await this.init();
+    const decryptedItems: Output<TOutputFormat>[] = [];
+    for (const cipherData of items) {
+      decryptedItems.push(Decryption.decrypt(key, cipherData, outputFormat));
+    }
+    return decryptedItems;
   }
 
   async hash(password: string, salt: string): Promise<string> {
@@ -139,3 +171,4 @@ export class NNCrypto implements INNCrypto {
 
 export * from "./src/types";
 export * from "./src/interfaces";
+export { Decryption };

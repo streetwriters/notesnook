@@ -28,6 +28,7 @@ export type BaseMenuItem<TType extends MenuItemTypes> = {
   type: TType;
   key: string;
   isHidden?: boolean;
+  multiSelect?: boolean;
 };
 
 export type MenuSeperatorItem = BaseMenuItem<"separator">;
@@ -49,6 +50,7 @@ export type MenuButtonItem = BaseMenuItem<"button"> & {
 
   styles?: {
     title?: ThemeUICSSObject;
+    icon?: ThemeUICSSObject;
   };
 };
 

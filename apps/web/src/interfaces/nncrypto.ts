@@ -17,24 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { View } from "react-native";
-import { useSelectionStore } from "../../stores/use-selection-store";
-import { useThemeColors } from "@notesnook/theme";
+import { INNCrypto } from "@notesnook/crypto";
+import CryptoWorker from "./nncrypto.worker?worker";
+import { wrap } from "comlink";
 
-export const ContainerHeader = ({ children }) => {
-  const { colors } = useThemeColors();
-  const selectionMode = useSelectionStore((state) => state.selectionMode);
-
-  return !selectionMode ? (
-    <View
-      style={{
-        backgroundColor: colors.primary.background,
-        width: "100%",
-        overflow: "hidden"
-      }}
-    >
-      {children}
-    </View>
-  ) : null;
-};
+export const NNCrypto = wrap<INNCrypto>(new CryptoWorker()) as INNCrypto;

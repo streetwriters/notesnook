@@ -190,9 +190,14 @@ export default function SettingsDialog(props: SettingsDialogProps) {
         }}
       >
         <SettingsSideBar
-          onNavigate={(settings) => setActiveSettings(settings)}
+          onNavigate={(settings) => {
+            const scrollbar = document.getElementById("settings-scrollbar");
+            if (scrollbar !== null) scrollbar.scrollTop = 0;
+            setActiveSettings(settings);
+          }}
         />
         <FlexScrollContainer
+          id="settings-scrollbar"
           style={{
             display: "flex",
             backgroundColor: "var(--background)",

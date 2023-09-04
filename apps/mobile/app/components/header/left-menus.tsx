@@ -43,12 +43,6 @@ export const LeftMenus = () => {
       return;
     }
     Navigation.goBack();
-    if (
-      useNavigationStore.getState().currentScreen.name === "Signup" ||
-      useNavigationStore.getState().currentScreen.name === "Login"
-    ) {
-      tabBarRef.current.unlock();
-    }
   };
 
   return isTablet && !canGoBack ? null : (

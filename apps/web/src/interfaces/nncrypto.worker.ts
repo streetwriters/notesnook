@@ -17,13 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Platform } from "react-native";
-import { ProcessingModes, MMKVLoader } from "react-native-mmkv-storage";
+import { NNCrypto, Chunk, SerializedKey } from "@notesnook/crypto";
+import { expose, transfer } from "comlink";
 
-export const MMKV = new MMKVLoader()
-  .setProcessingMode(
-    Platform.OS === "ios"
-      ? ProcessingModes.MULTI_PROCESS
-      : ProcessingModes.SINGLE_PROCESS
-  )
-  .initialize();
+class NNCryptoWorker extends NNCrypto {
+  override async createDecryptionStream(
+    key: SerializedKey,
+    iv: string
+  ): Promise<TransformStream<Uint8Array, Uint8Array>> {
+    const stream = await super.createDecryptionStream(key, iv);
+    return transfer(stream, [stream]);
+  }
+
+  override async createEncryptionStream(
+    key: SerializedKey
+  ): Promise<{ iv: string; stream: TransformStream<Chunk, Uint8Array> }> {
+    const result = await super.createEncryptionStream(key);
+    return transfer(result, [result.stream]);
+  }
+}
+
+expose(new NNCryptoWorker());

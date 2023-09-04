@@ -40,7 +40,6 @@ import { useEffect, useMemo } from "react";
 import "./extensions";
 import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
 import BulletList from "./extensions/bullet-list";
-import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer";
 import { CodeBlock } from "./extensions/code-block";
 import { Codemark } from "./extensions/code-mark";
 import { DateTime, DateTimeOptions } from "./extensions/date-time";
@@ -76,7 +75,6 @@ import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { DownloadOptions } from "./utils/downloader";
 import { Heading } from "./extensions/heading";
 import Clipboard, { ClipboardOptions } from "./extensions/clipboard";
-import { convertBrToParagraph } from "./utils/html";
 import Blockquote from "./extensions/blockquote";
 
 declare global {
@@ -147,14 +145,10 @@ const useTiptap = (
     () => ({
       enableCoreExtensions: false,
       editorProps: {
-        ...editorProps,
-        transformPastedHTML(html) {
-          return convertBrToParagraph(html).documentElement.outerHTML;
-        }
+        ...editorProps
       },
       extensions: [
         ...CoreExtensions,
-        ClipboardTextSerializer,
         NodeViewSelectionNotifier,
         SearchReplace,
         TextStyle.extend({

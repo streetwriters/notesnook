@@ -30,30 +30,34 @@ import {
   base64_variants
 } from "@notesnook/sodium";
 import KeyUtils from "./keyutils";
-import { Chunk, Cipher, OutputFormat, Plaintext, SerializedKey } from "./types";
+import { Chunk, Cipher, Input, DataFormat, SerializedKey } from "./types";
 
 const encoder = new TextEncoder();
 export default class Encryption {
-  private static transformInput(plaintext: Plaintext): Uint8Array {
+  private static transformInput(
+    input: Input<DataFormat>,
+    format: DataFormat
+  ): Uint8Array {
     let data: Uint8Array | null = null;
-    if (typeof plaintext.data === "string" && plaintext.format === "base64") {
-      data = from_base64(plaintext.data, base64_variants.ORIGINAL);
-    } else if (typeof plaintext.data === "string") {
-      data = encoder.encode(plaintext.data);
-    } else if (plaintext.data instanceof Uint8Array) {
-      data = plaintext.data;
+    if (typeof input === "string" && format === "base64") {
+      data = from_base64(input, base64_variants.ORIGINAL);
+    } else if (typeof input === "string") {
+      data = encoder.encode(input);
+    } else if (input instanceof Uint8Array) {
+      data = input;
     }
     if (!data) throw new Error("Data cannot be null.");
     return data;
   }
 
-  static encrypt(
+  static encrypt<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    plaintext: Plaintext,
-    outputFormat: OutputFormat = "uint8array"
-  ): Cipher {
+    input: Input<DataFormat>,
+    format: DataFormat,
+    outputFormat: TOutputFormat = "uint8array" as TOutputFormat
+  ): Cipher<TOutputFormat> {
     const encryptionKey = KeyUtils.transform(key);
-    const data = this.transformInput(plaintext);
+    const data = this.transformInput(input, format);
 
     const nonce = randombytes_buf(crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
 
@@ -79,7 +83,7 @@ export default class Encryption {
       iv,
       salt: encryptionKey.salt,
       length: data.length
-    };
+    } as Cipher<TOutputFormat>;
   }
 
   static createStream(key: SerializedKey): {

@@ -96,11 +96,13 @@ function ListItem(props: ListItemProps) {
           selectedItems.push(item);
         }
 
+        let menuItems = props.menuItems?.(item, selectedItems);
+
         if (selectedItems.length > 1) {
           title = `${selectedItems.length} items selected`;
+          menuItems = menuItems?.filter((i) => i.multiSelect === true);
         }
 
-        const menuItems = props.menuItems?.(item, selectedItems);
         if (!menuItems) return;
 
         openMenu(menuItems, {

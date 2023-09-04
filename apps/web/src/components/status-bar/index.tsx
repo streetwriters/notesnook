@@ -231,7 +231,7 @@ function SyncStatus() {
       data-test-id={`sync-status-${status.key}`}
     >
       {syncStatus.progress ? (
-        <Text variant={"subBody"}>{syncStatus.progress}%</Text>
+        <Text variant={"subBody"}>{syncStatus.progress}</Text>
       ) : (
         <status.icon
           size={12}

@@ -164,15 +164,11 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
         const percent = Math.round((loaded / total) * 100);
         const text = getStatus(key)?.status || `${status} attachment`;
 
-        if (loaded === total) {
-          removeStatus(key);
-        } else {
-          updateStatus({
-            key,
-            status: text,
-            progress: loaded === total ? 100 : percent
-          });
-        }
+        updateStatus({
+          key,
+          status: text,
+          progress: loaded === total ? 100 : percent
+        });
       }
     );
 

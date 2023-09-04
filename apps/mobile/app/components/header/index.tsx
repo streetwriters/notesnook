@@ -43,7 +43,7 @@ const _Header = () => {
   );
 
   const onScroll = useCallback(
-    (data) => {
+    (data: { x: number; y: number }) => {
       if (data.y > 150) {
         if (!hide) return;
         setHide(false);

@@ -45,11 +45,10 @@ export function sendAttachmentsProgressEvent(type, groupId, total, current) {
   });
 }
 
-export function sendSyncProgressEvent(EV, type, total, current) {
+export function sendSyncProgressEvent(EV, type, current) {
   EV.publish(EVENTS.syncProgress, {
     type,
-    total,
-    current: current === undefined ? total : current
+    current
   });
 }
 

@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect } from "react";
-import { Keyboard, Platform, View } from "react-native";
+import { Keyboard, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -34,14 +35,20 @@ import { getElevationStyle } from "../../utils/elevation";
 import { SIZE, normalize } from "../../utils/size";
 import NativeTooltip from "../../utils/tooltip";
 import { PressableButton } from "../ui/pressable";
-import { useThemeColors } from "@notesnook/theme";
 
-export const FloatingButton = ({
+interface FloatingButton {
+  title?: string;
+  onPress: () => void;
+  color?: string;
+  alwaysVisible?: boolean;
+}
+
+const FloatingButton = ({
   title,
   onPress,
   color,
-  shouldShow = false
-}) => {
+  alwaysVisible = false
+}: FloatingButton) => {
   const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const selectionMode = useSelectionStore((state) => state.selectionMode);
@@ -60,12 +67,8 @@ export const FloatingButton = ({
     };
   });
 
-  useEffect(() => {
-    animate(selectionMode ? 150 : 0);
-  }, [animate, selectionMode]);
-
   const animate = useCallback(
-    (toValue) => {
+    (toValue: number) => {
       translate.value = withTiming(toValue, {
         duration: 250,
         easing: Easing.elastic(1)
@@ -74,39 +77,39 @@ export const FloatingButton = ({
     [translate]
   );
 
-  const onKeyboardHide = useCallback(async () => {
-    editorState().keyboardState = false;
-    if (deviceMode !== "mobile") return;
-    animate(0);
-  }, [animate, deviceMode]);
-
-  const onKeyboardShow = useCallback(async () => {
-    editorState().keyboardState = true;
-    if (deviceMode !== "mobile") return;
-    animate(150);
-  }, [animate, deviceMode]);
+  useEffect(() => {
+    animate(selectionMode ? 150 : 0);
+  }, [animate, selectionMode]);
 
   useEffect(() => {
-    let sub1 = Keyboard.addListener("keyboardDidShow", onKeyboardShow);
-    let sub2 = Keyboard.addListener("keyboardDidHide", onKeyboardHide);
-    return () => {
-      sub1?.remove();
-      sub2?.remove();
+    const onKeyboardHide = () => {
+      editorState().keyboardState = false;
+      if (deviceMode !== "mobile") return;
+      animate(0);
     };
-  }, [deviceMode, onKeyboardHide, onKeyboardShow]);
-  const paddings = {
-    ios: 20,
-    android: 20,
-    iPad: 20
-  };
 
-  return deviceMode !== "mobile" && !shouldShow ? null : (
+    const onKeyboardShow = () => {
+      editorState().keyboardState = true;
+      if (deviceMode !== "mobile") return;
+      animate(150);
+    };
+
+    const sub = [
+      Keyboard.addListener("keyboardDidShow", onKeyboardShow),
+      Keyboard.addListener("keyboardDidHide", onKeyboardHide)
+    ];
+    return () => {
+      sub.forEach((sub) => sub?.remove?.());
+    };
+  }, [deviceMode, animate]);
+
+  return deviceMode !== "mobile" && !alwaysVisible ? null : (
     <Animated.View
       style={[
         {
           position: "absolute",
           right: 12,
-          bottom: paddings[Platform.isPad ? "iPad" : Platform.OS],
+          bottom: 20,
           zIndex: 10
         },
         animatedStyle
@@ -115,16 +118,15 @@ export const FloatingButton = ({
       <PressableButton
         testID={notesnook.buttons.add}
         type="accent"
-        buttonType={{
-          color: colors.static[color],
-          text: colors.static.white
-        }}
+        accentColor={colors.static[color as keyof typeof colors.static]}
         customStyle={{
           ...getElevationStyle(5),
           borderRadius: 100
         }}
         onLongPress={(event) => {
-          NativeTooltip.show(event, title, NativeTooltip.POSITIONS.LEFT);
+          if (title) {
+            NativeTooltip.show(event, title, NativeTooltip.POSITIONS.LEFT);
+          }
         }}
         onPress={onPress}
       >
@@ -146,3 +148,5 @@ export const FloatingButton = ({
     </Animated.View>
   );
 };
+
+export { FloatingButton };

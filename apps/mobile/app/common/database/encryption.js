@@ -126,6 +126,18 @@ export async function decrypt(password, data) {
   return await Sodium.decrypt(password, _data);
 }
 
+export async function decryptMulti(password, data) {
+  if (!password.password && !password.key) return undefined;
+  if (password.password && password.password === "" && !password.key)
+    return undefined;
+
+  data = data.map((d) => {
+    d.output = "plain";
+    return d;
+  });
+  return await Sodium.decryptMulti(password, data);
+}
+
 export function parseAlgorithm(alg) {
   if (!alg) return {};
   const [enc, kdf, compressed, compressionAlg, base64variant] = alg.split("-");
@@ -153,4 +165,25 @@ export async function encrypt(password, data) {
     ...result,
     alg: getAlgorithm(7)
   };
+}
+
+export async function encryptMulti(password, data) {
+  if (!password.password && !password.key) return undefined;
+  if (password.password && password.password === "" && !password.key)
+    return undefined;
+
+  let results = await Sodium.encryptMulti(
+    password,
+    data.map((item) => ({
+      type: "plain",
+      data: item
+    }))
+  );
+
+  return !results
+    ? []
+    : results.map((result) => ({
+        ...result,
+        alg: getAlgorithm(7)
+      }));
 }

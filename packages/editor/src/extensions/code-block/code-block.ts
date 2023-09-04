@@ -26,7 +26,7 @@ import {
   Transaction,
   Selection
 } from "prosemirror-state";
-import { ResolvedPos, Node as ProsemirrorNode } from "prosemirror-model";
+import { ResolvedPos, Node as ProsemirrorNode, Slice } from "prosemirror-model";
 import { CodeblockComponent } from "./component";
 import { HighlighterPlugin } from "./highlighter";
 import { createNodeView } from "../react";
@@ -508,13 +508,18 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             if (!event.clipboardData) {
               return false;
             }
-            const text = event.clipboardData.getData("text/plain");
             const { isCode, language } = detectCodeBlock(event.clipboardData);
 
             const isInsideCodeBlock = this.editor.isActive(this.type.name);
             if (!isInsideCodeBlock && !isCode) {
               return false;
             }
+
+            const text = event.clipboardData
+              .getData("text/plain")
+              // strip carriage return chars from text pasted as code
+              // see: https://github.com/ProseMirror/prosemirror-view/commit/a50a6bcceb4ce52ac8fcc6162488d8875613aacd
+              .replace(/\r\n?/g, "\n");
 
             const indent = fixIndentation(
               text,
@@ -523,22 +528,36 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
             const { tr } = view.state;
 
-            // create an empty code block if not already within one
-            if (isCode && !isInsideCodeBlock) {
-              tr.replaceSelectionWith(
-                this.type.create({
-                  id: createCodeblockId(),
-                  language,
-                  indentType: indent.type,
-                  indentLength: indent.amount
+            const isInlineCode =
+              indent.code.length < 80 &&
+              indent.code.split(/[\r\n]/).length === 1;
+            if (isInlineCode && !isInsideCodeBlock) {
+              tr.replaceSelection(
+                Slice.fromJSON(this.editor.view.state.schema, {
+                  content: [
+                    {
+                      type: "text",
+                      text: indent.code,
+                      marks: [{ type: "code" }]
+                    }
+                  ]
                 })
               );
-            }
+            } else {
+              // create an empty code block if not already within one
+              if (!isInsideCodeBlock)
+                tr.replaceSelectionWith(
+                  this.type.create({
+                    id: createCodeblockId(),
+                    language,
+                    indentType: indent.type,
+                    indentLength: indent.amount
+                  })
+                );
 
-            // add text to code block
-            // strip carriage return chars from text pasted as code
-            // see: https://github.com/ProseMirror/prosemirror-view/commit/a50a6bcceb4ce52ac8fcc6162488d8875613aacd
-            tr.insertText(indent.code.replace(/\r\n?/g, "\n"));
+              // add text to code block
+              tr.insertText(indent.code);
+            }
 
             // store meta information
             // this is useful for other plugins that depends on the paste event
@@ -787,8 +806,8 @@ function detectCodeBlock(dataTransfer: DataTransfer) {
   const isVSCode =
     vscode ||
     (document.body.firstElementChild instanceof HTMLDivElement &&
-      document.body.firstElementChild.style.fontFamily ===
-        `'Droid Sans Mono', 'monospace', monospace`);
+      document.body.firstElementChild.style.fontFamily.includes("monospace") &&
+      document.body.firstElementChild.style.whiteSpace.includes("pre"));
 
   const language =
     vscodeData?.mode ||

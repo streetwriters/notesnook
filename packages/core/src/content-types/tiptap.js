@@ -148,6 +148,15 @@ export class Tiptap {
   }
 
   async extractAttachments(store) {
+    if (
+      !this.data.includes(ATTRIBUTES.src) &&
+      !this.data.includes(ATTRIBUTES.hash)
+    )
+      return {
+        data: this.data,
+        attachments: []
+      };
+
     let sources = [];
     new HTMLParser({
       ontag: (name, attr, pos) => {

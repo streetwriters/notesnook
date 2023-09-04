@@ -17,12 +17,51 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export function convertBrToParagraph(html: string) {
-  const doc = new DOMParser().parseFromString(
-    convertNewlinesToBr(html),
-    "text/html"
-  );
-  for (const br of doc.querySelectorAll("br")) {
+import {
+  DOMParser as ProsemirrorDOMParser,
+  ParseOptions
+} from "@tiptap/pm/model";
+import { encodeNonAsciiHTML } from "entities";
+import { Schema, Slice } from "prosemirror-model";
+import { inferLanguage } from "../code-block";
+
+export class ClipboardDOMParser extends ProsemirrorDOMParser {
+  static fromSchema(schema: Schema): ClipboardDOMParser {
+    return (
+      (schema.cached.clipboardDomParser as ClipboardDOMParser) ||
+      (schema.cached.clipboardDomParser = new ClipboardDOMParser(
+        schema,
+        (ProsemirrorDOMParser as any).schemaRules(schema)
+      ))
+    );
+  }
+
+  parseSlice(dom: Node, options?: ParseOptions | undefined): Slice {
+    if (dom instanceof HTMLElement) {
+      formatCodeblocks(dom);
+      convertBrToSingleSpacedParagraphs(dom);
+    }
+    return super.parseSlice(dom, options);
+  }
+}
+
+export function formatCodeblocks(dom: HTMLElement | Document) {
+  for (const pre of dom.querySelectorAll("pre")) {
+    const codeAsText = pre.textContent;
+    const languageElement = pre.querySelector(
+      '[class*="language-"],[class*="lang-"]'
+    );
+    const language = inferLanguage(languageElement || pre);
+    if (language) pre.classList.add(`language-${language}`);
+
+    const code = document.createElement("code");
+    code.innerHTML = encodeNonAsciiHTML(codeAsText || "");
+    pre.replaceChildren(code);
+  }
+}
+
+export function convertBrToSingleSpacedParagraphs(dom: HTMLElement | Document) {
+  for (const br of dom.querySelectorAll("br")) {
     let paragraph = br.closest("p");
 
     // if no paragraph is found over the br, we add one.
@@ -38,14 +77,13 @@ export function convertBrToParagraph(html: string) {
     if (paragraph) {
       splitOn(paragraph, br);
       const children = Array.from(paragraph.childNodes.values());
-      const newParagraph = doc.createElement("p");
+      const newParagraph = document.createElement("p");
       newParagraph.dataset.spacing = "single";
       newParagraph.append(...children.slice(children.indexOf(br) + 1));
       paragraph.insertAdjacentElement("afterend", newParagraph);
       br.remove();
     }
   }
-  return doc;
 }
 
 function splitOn(bound: Element, cutElement: Element) {
@@ -63,13 +101,4 @@ function splitOn(bound: Element, cutElement: Element) {
       grandparent?.insertBefore(cutElement, right);
     }
   }
-}
-
-function convertNewlinesToBr(html: string) {
-  const lines = html.split(/\n/gm);
-  for (let i = 0; i < lines.length; ++i) {
-    if (lines[i].trim().endsWith(">")) continue;
-    lines[i] += "<br>";
-  }
-  return lines.join("");
 }

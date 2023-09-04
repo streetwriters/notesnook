@@ -27,11 +27,16 @@ import {
   getCryptoKey,
   getRandomBytes,
   hash,
-  removeCryptoKey
+  removeCryptoKey,
+  decryptMulti,
+  encryptMulti
 } from "./encryption";
 import { MMKV } from "./mmkv";
 
 export class KV {
+  /**
+   * @type {typeof MMKV}
+   */
   storage = null;
   constructor(storage) {
     this.storage = storage;
@@ -53,6 +58,7 @@ export class KV {
       key,
       typeof data === "string" ? data : JSON.stringify(data)
     );
+
     return true;
   }
 
@@ -60,27 +66,32 @@ export class KV {
     if (keys.length <= 0) {
       return [];
     } else {
-      let data = await this.storage.getMultipleItemsAsync(keys.slice());
-
-      return data.map(([key, value]) => {
-        let obj;
-        try {
-          obj = JSON.parse(value);
-        } catch (e) {
-          obj = value;
-        }
-
-        return [key, obj];
-      });
+      try {
+        let data = await this.storage.getMultipleItemsAsync(
+          keys.slice(),
+          "string"
+        );
+        return data.map(([key, value]) => {
+          let obj;
+          try {
+            obj = JSON.parse(value);
+          } catch (e) {
+            obj = value;
+          }
+          return [key, obj];
+        });
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 
   async remove(key) {
-    return await this.storage.removeItem(key);
+    return this.storage.removeItem(key);
   }
 
   async clear() {
-    return await this.storage.clearStore();
+    return this.storage.clearStore();
   }
 
   async getAllKeys() {
@@ -95,6 +106,10 @@ export class KV {
         k !== this.storage.instanceID
     );
     return keys;
+  }
+
+  async writeMulti(items) {
+    return this.storage.setMultipleItemsAsync(items, "object");
   }
 }
 
@@ -129,8 +144,10 @@ export default {
   remove: (key) => DefaultStorage.remove(key),
   clear: () => DefaultStorage.clear(),
   getAllKeys: () => DefaultStorage.getAllKeys(),
+  writeMulti: (items) => DefaultStorage.writeMulti(items),
   encrypt,
   decrypt,
+  decryptMulti,
   getRandomBytes,
   checkAndCreateDir,
   requestPermission,
@@ -138,5 +155,6 @@ export default {
   getCryptoKey,
   removeCryptoKey,
   hash,
-  generateCryptoKey
+  generateCryptoKey,
+  encryptMulti
 };

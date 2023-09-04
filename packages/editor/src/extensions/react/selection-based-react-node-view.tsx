@@ -95,7 +95,11 @@ export class SelectionBasedNodeView<
       this.isSelectedNode(this.editor.view.state.selection);
 
     return (
-      <EmotionThemeProvider scope="editor" injectCssVars={false}>
+      <EmotionThemeProvider
+        key={this.options.componentKey?.(this.node)}
+        scope="editor"
+        injectCssVars={false}
+      >
         <this.options.component
           {...props}
           editor={this.editor}

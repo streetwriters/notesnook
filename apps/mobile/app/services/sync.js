@@ -41,6 +41,11 @@ const run = async (
   full = true,
   onCompleted
 ) => {
+  if (useUserStore.getState().syncing) {
+    DatabaseLogger.log("Sync in progress");
+    console.log("Sync in progress");
+    return;
+  }
   clearTimeout(syncTimer);
   syncTimer = setTimeout(async () => {
     const status = await NetInfo.fetch();

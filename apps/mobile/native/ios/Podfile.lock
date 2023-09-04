@@ -19,9 +19,9 @@ PODS:
   - glog (0.3.5)
   - GZIP (1.3.0)
   - JWTDecode (3.0.1)
-  - MMKV (1.2.13):
-    - MMKVCore (~> 1.2.13)
-  - MMKVCore (1.2.13)
+  - MMKV (1.3.1):
+    - MMKVCore (~> 1.3.1)
+  - MMKVCore (1.3.1)
   - pop (1.0.12)
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -313,7 +313,7 @@ PODS:
     - React-Core
   - react-native-get-random-values (1.9.0):
     - React-Core
-  - react-native-gzip (1.0.0):
+  - react-native-gzip (1.1.0):
     - Base64
     - GZIP
     - React-Core
@@ -327,8 +327,9 @@ PODS:
     - React-Core
   - react-native-keep-awake (1.2.0):
     - React-Core
-  - react-native-mmkv-storage (0.9.1):
-    - MMKV (= 1.2.13)
+  - react-native-mmkv-storage (0.10.0-alpha.6):
+    - MMKV (~> 1.3.1)
+    - React
     - React-Core
   - react-native-netinfo (9.3.10):
     - React-Core
@@ -346,7 +347,7 @@ PODS:
     - ReactCommon/turbomodule/core
   - react-native-share-extension (2.5.6):
     - React
-  - react-native-sodium (1.4.1):
+  - react-native-sodium (1.5.1):
     - React
   - react-native-webview (11.26.1):
     - React-Core
@@ -841,8 +842,8 @@ SPEC CHECKSUMS:
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   GZIP: 416858efbe66b41b206895ac6dfd5493200d95b3
   JWTDecode: 2eed97c2fa46ccaf3049a787004eedf0be474a87
-  MMKV: aac95d817a100479445633f2b3ed8961b4ac5043
-  MMKVCore: 3388952ded307e41b3ed8a05892736a236ed1b8e
+  MMKV: 5a07930c70c70b86cd87761a42c8f3836fb681d7
+  MMKVCore: e50135dbd33235b6ab390635991bab437ab873c0
   pop: d582054913807fd11fd50bfe6a539d91c7e1a55a
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: 656ef0536dd60a9740961ade6a64ba0cb0572d2b
@@ -868,20 +869,20 @@ SPEC CHECKSUMS:
   react-native-document-picker: ec07866a30707f23660c0f3ae591d669d3e89096
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-get-random-values: dee677497c6a740b71e5612e8dbd83e7539ed5bb
-  react-native-gzip: 02f9968afa759e189f0414d41f8f4a951a86b4f1
+  react-native-gzip: c5e87ee9e359f02350e3a2ee52eb35eddc398868
   react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
   react-native-image-picker: 9c8a2687b69300ad9e95cec5d38f35ab9d32467d
   react-native-image-resizer: 00ceb0e05586c7aadf061eea676957a6c2ec60fa
   react-native-in-app-review: db8bb167a5f238e7ceca5c242d6b36ce8c4404a4
   react-native-keep-awake: caee3ff89eaa21dfe29010f0d143566874a04441
-  react-native-mmkv-storage: cfb6854594cfdc5f7383a9e464bb025417d1721c
+  react-native-mmkv-storage: a38beae34b1f7906a2f5e715f54216f9ddab14c0
   react-native-netinfo: ccbe1085dffd16592791d550189772e13bf479e2
   react-native-notification-sounds: da78c828fe1bcbb92d8b505d5261890ed315ff39
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-pdf: 33c622cbdf776a649929e8b9d1ce2d313347c4fa
   react-native-safe-area-context: 36cc67648134e89465663b8172336a19eeda493d
   react-native-share-extension: df66a2ee48a62277d79898375e2142bde0782063
-  react-native-sodium: f4e3986ddcb73482f8679e534b448a0675d0cf13
+  react-native-sodium: 08d459dfcb5d246363a30712d816acea56ab8f1c
   react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
   React-NativeModulesApple: 1d81d927ef1a67a3545a01e14c2e98500bf9b199
   React-perflogger: 684a11499a0589cc42135d6d5cc04d0e4e0e261a
@@ -930,4 +931,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: b0cadd188aa428b98d1eaa0b84b3b6208e714119
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

@@ -33,7 +33,7 @@ export interface IKVStore {
    * @param key
    * @param value
    */
-  set(key: string, value: any): Promise<void>;
+  set<T>(key: string, value: T): Promise<void>;
 
   /**
    * Set multiple values at once. This is faster than calling set() multiple times.
@@ -41,7 +41,7 @@ export interface IKVStore {
    *
    * @param entries Array of entries, where each entry is an array of `[key, value]`.
    */
-  setMany(entries: [string, any][]): Promise<void>;
+  setMany<T>(entries: [string, T][]): Promise<void>;
 
   /**
    * Get multiple values by their keys

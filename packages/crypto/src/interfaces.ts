@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   Cipher,
   EncryptionKey,
-  OutputFormat,
-  Plaintext,
+  DataFormat,
   SerializedKey,
-  Chunk
+  Chunk,
+  Output,
+  Input
 } from "./types";
 
 export interface IStreamable {
@@ -32,17 +33,31 @@ export interface IStreamable {
 }
 
 export interface INNCrypto {
-  encrypt(
+  encrypt<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    plaintext: Plaintext,
-    outputFormat?: OutputFormat
-  ): Promise<Cipher>;
+    data: Input<DataFormat>,
+    format: DataFormat,
+    outputFormat?: TOutputFormat
+  ): Promise<Cipher<TOutputFormat>>;
 
-  decrypt(
+  encryptMulti<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    cipherData: Cipher,
-    outputFormat?: OutputFormat
-  ): Promise<Plaintext>;
+    data: Input<DataFormat>[],
+    format: DataFormat,
+    outputFormat?: TOutputFormat
+  ): Promise<Cipher<TOutputFormat>[]>;
+
+  decrypt<TOutputFormat extends DataFormat>(
+    key: SerializedKey,
+    cipherData: Cipher<DataFormat>,
+    outputFormat?: TOutputFormat
+  ): Promise<Output<TOutputFormat>>;
+
+  decryptMulti<TOutputFormat extends DataFormat>(
+    key: SerializedKey,
+    cipherData: Cipher<DataFormat>[],
+    outputFormat?: TOutputFormat
+  ): Promise<Output<TOutputFormat>[]>;
 
   hash(password: string, salt: string): Promise<string>;
 

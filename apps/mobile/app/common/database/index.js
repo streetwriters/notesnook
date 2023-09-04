@@ -38,11 +38,11 @@ database.host(
         SSE_HOST: "https://events.streetwriters.co",
         SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
         ISSUES_HOST: "https://issues.streetwriters.co"
-        // API_HOST: "http://192.168.8.101:5264",
-        // AUTH_HOST: "http://192.168.8.101:8264",
-        // SSE_HOST: "http://192.168.8.101:7264",
-        // SUBSCRIPTIONS_HOST: "http://192.168.8.101:9264",
-        // ISSUES_HOST: "http://192.168.8.101:2624"
+        // API_HOST: "http://192.168.43.108:5264",
+        // AUTH_HOST: "http://192.168.43.108:8264",
+        // SSE_HOST: "http://192.168.43.108:7264",
+        // SUBSCRIPTIONS_HOST: "http://192.168.43.108:9264",
+        // ISSUES_HOST: "http://192.168.43.108:2624"
       }
     : {
         API_HOST: "https://api.notesnook.com",
@@ -63,7 +63,7 @@ database.setup(
   }
 );
 
-initalize(new KV(LoggerStorage), true);
+initalize(new KV(LoggerStorage));
 
 export const db = database;
 export const DatabaseLogger = dbLogger;

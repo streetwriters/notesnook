@@ -45,24 +45,24 @@ class Settings {
     return this._settings;
   }
 
-  async merge(item) {
-    if (this._settings.dateModified > (await this._db.lastSynced())) {
-      this._settings.id = item.id;
+  async merge(remoteItem, lastSynced) {
+    if (this._settings.dateModified > lastSynced) {
+      this._settings.id = remoteItem.id;
       this._settings.groupOptions = {
         ...this._settings.groupOptions,
-        ...item.groupOptions
+        ...remoteItem.groupOptions
       };
       this._settings.toolbarConfig = {
         ...this._settings.toolbarConfig,
-        ...item.toolbarConfig
+        ...remoteItem.toolbarConfig
       };
       this._settings.aliases = {
         ...this._settings.aliases,
-        ...item.aliases
+        ...remoteItem.aliases
       };
       this._settings.dateModified = Date.now();
     } else {
-      this._initSettings(item);
+      this._initSettings(remoteItem);
     }
     await this._saveSettings(false);
   }
@@ -215,7 +215,11 @@ class Settings {
     }
 
     await this._db.storage.write("settings", this._settings);
-    this._db.eventManager.publish(EVENTS.databaseUpdated, this._settings);
+    this._db.eventManager.publish(
+      EVENTS.databaseUpdated,
+      "settings",
+      this._settings
+    );
   }
 }
 export default Settings;

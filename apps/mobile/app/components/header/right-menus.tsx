@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
+//@ts-ignore
 import Menu from "react-native-reanimated-material-menu";
 import { notesnook } from "../../../e2e/test.ids";
 import Navigation from "../../services/navigation";
@@ -35,10 +36,13 @@ export const RightMenus = () => {
   const { colors } = useThemeColors();
   const { colors: contextMenuColors } = useThemeColors("contextMenu");
   const deviceMode = useSettingStore((state) => state.deviceMode);
-  const rightButtons = useNavigationStore((state) => state.headerRightButtons);
+  const buttons = useNavigationStore((state) => state.headerRightButtons);
   const currentScreen = useNavigationStore((state) => state.currentScreen.name);
   const buttonAction = useNavigationStore((state) => state.buttonAction);
-  const menuRef = useRef();
+  const menuRef = useRef<{
+    show: () => void;
+    hide: () => void;
+  }>();
 
   return (
     <View style={styles.rightBtnContainer}>
@@ -46,9 +50,12 @@ export const RightMenus = () => {
         <IconButton
           onPress={async () => {
             SearchService.prepareSearch();
-            Navigation.navigate({
-              name: "Search"
-            });
+            Navigation.navigate(
+              {
+                name: "Search"
+              },
+              {}
+            );
           }}
           testID="icon-search"
           name="magnify"
@@ -82,7 +89,7 @@ export const RightMenus = () => {
         />
       ) : null}
 
-      {rightButtons && rightButtons.length > 0 ? (
+      {buttons && buttons.length > 0 ? (
         <Menu
           ref={menuRef}
           animationDuration={200}
@@ -104,7 +111,7 @@ export const RightMenus = () => {
             />
           }
         >
-          {rightButtons.map((item) => (
+          {buttons.map((item) => (
             <Button
               style={{
                 width: 150,

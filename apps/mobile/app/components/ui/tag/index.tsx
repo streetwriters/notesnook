@@ -37,7 +37,7 @@ export default function Tag({
 }) {
   const { colors } = useThemeColors();
   return !visible ? null : (
-    <View
+    <Paragraph
       style={{
         backgroundColor: background || colors.primary.accent,
         borderRadius: 100,
@@ -46,13 +46,14 @@ export default function Tag({
         marginLeft: 2,
         marginTop: -10,
         height: 20,
-        justifyContent: "center",
+        textAlignVertical: "center",
+        textAlign: "center",
         ...style
       }}
+      color={textColor || colors.static.white}
+      size={SIZE.xxs}
     >
-      <Paragraph color={textColor || colors.static.white} size={SIZE.xxs}>
-        {text}
-      </Paragraph>
-    </View>
+      {text}
+    </Paragraph>
   );
 }

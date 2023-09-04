@@ -26,6 +26,12 @@ export default class Content extends Collection {
   async add(content) {
     if (!content) return;
 
+    if (content.remote)
+      throw new Error(
+        "Please do not use this method for merging. Instead add the item directly to database."
+      );
+    if (content.deleted) return await this._collection.addItem(content);
+
     if (typeof content.data === "object") {
       if (typeof content.data.data === "string")
         content.data = content.data.data;
@@ -34,11 +40,6 @@ export default class Content extends Collection {
           content.data
         )}</p>`;
     }
-
-    if (content.remote || content.deleted)
-      return await this._collection.addItem(
-        await this.extractAttachments(content)
-      );
 
     const oldContent = await this.raw(content.id);
     if (content.id && oldContent) {

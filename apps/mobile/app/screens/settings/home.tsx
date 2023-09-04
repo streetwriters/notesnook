@@ -87,12 +87,6 @@ const Home = ({
               alignItems: "center"
             }}
           >
-            <Heading color={colors.primary.heading} size={SIZE.lg}>
-              Logging out
-            </Heading>
-            <Paragraph color={colors.secondary.icon}>
-              Please wait while we log out and clear app data.
-            </Paragraph>
             <View
               style={{
                 width: "100%",

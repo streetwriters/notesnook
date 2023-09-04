@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
-import { Platform, View } from "react-native";
+import { useThemeColors } from "@notesnook/theme";
+import React, { useCallback, useEffect, useState } from "react";
+import { Platform } from "react-native";
 import { db } from "../../common/database";
 import Notebook from "../../screens/notebook";
 import {
@@ -26,14 +27,12 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useThemeColors } from "@notesnook/theme";
 import { eScrollEvent } from "../../utils/events";
 import { SIZE } from "../../utils/size";
-import Heading from "../ui/typography/heading";
-import { useCallback } from "react";
 import Tag from "../ui/tag";
+import Heading from "../ui/typography/heading";
 
-const titleState = {};
+const titleState: { [name: string]: boolean } = {};
 
 export const Title = () => {
   const { colors } = useThemeColors();
@@ -42,12 +41,12 @@ export const Title = () => {
   const isTopic = currentScreen?.name === "TopicNotes";
   const [hide, setHide] = useState(
     isNotebook
-      ? typeof titleState[currentScreen.id] === "boolean"
-        ? titleState[currentScreen.id]
+      ? typeof titleState[currentScreen.id as string] === "boolean"
+        ? titleState[currentScreen.id as string]
         : true
       : false
   );
-  const isHidden = titleState[currentScreen.id];
+  const isHidden = titleState[currentScreen.id as string];
   const notebook =
     isTopic && currentScreen.notebookId
       ? db.notebooks?.notebook(currentScreen.notebookId)?.data
@@ -56,18 +55,18 @@ export const Title = () => {
   const isTag = currentScreen?.name === "TaggedNotes";
 
   const onScroll = useCallback(
-    (data) => {
+    (data: { x: number; y: number }) => {
       if (currentScreen.name !== "Notebook") {
         setHide(false);
         return;
       }
       if (data.y > 150) {
         if (!hide) return;
-        titleState[currentScreen.id] = false;
+        titleState[currentScreen.id as string] = false;
         setHide(false);
       } else {
         if (hide) return;
-        titleState[currentScreen.id] = true;
+        titleState[currentScreen.id as string] = true;
         setHide(true);
       }
     },
@@ -76,13 +75,13 @@ export const Title = () => {
 
   useEffect(() => {
     if (currentScreen.name === "Notebook") {
-      let value =
-        typeof titleState[currentScreen.id] === "boolean"
-          ? titleState[currentScreen.id]
+      const value =
+        typeof titleState[currentScreen.id as string] === "boolean"
+          ? titleState[currentScreen.id as string]
           : true;
       setHide(value);
     } else {
-      setHide(titleState[currentScreen.id]);
+      setHide(titleState[currentScreen.id as string]);
     }
   }, [currentScreen.id, currentScreen.name]);
 
@@ -98,14 +97,7 @@ export const Title = () => {
     Notebook.navigate(notebook, true);
   }
   return (
-    <View
-      style={{
-        opacity: 1,
-        flexShrink: 1,
-        flexDirection: "row",
-        alignItems: "center"
-      }}
-    >
+    <>
       {!hide && !isHidden ? (
         <Heading
           onPress={navigateToNotebook}
@@ -122,10 +114,9 @@ export const Title = () => {
               #
             </Heading>
           ) : null}
-          {title}
+          {title} <Tag visible={currentScreen.beta} text="BETA" />
         </Heading>
       ) : null}
-      <Tag visible={currentScreen.beta} text="BETA" />
-    </View>
+    </>
   );
 };

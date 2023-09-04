@@ -30,10 +30,10 @@ test("settings' dateModified should not update on init", () =>
 
 test("settings' dateModified should update after merge conflict resolve", () =>
   databaseTest().then(async (db) => {
-    await db.storage.write("lastSynced", 0);
-    const beforeDateModified = (db.settings._settings.dateModified = 1);
-    await db.settings.merge({ groupOptions: {}, aliases: {} });
-    const afterDateModified = db.settings._settings.dateModified;
+    // await db.storage.write("lastSynced", 0);
+    const beforeDateModified = (db.settings.raw.dateModified = 1);
+    await db.settings.merge({ groupOptions: {}, aliases: {} }, 0);
+    const afterDateModified = db.settings.raw.dateModified;
     expect(afterDateModified).toBeGreaterThan(beforeDateModified);
   }));
 

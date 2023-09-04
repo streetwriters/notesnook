@@ -17,13 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Platform } from "react-native";
-import { ProcessingModes, MMKVLoader } from "react-native-mmkv-storage";
+import React, { PropsWithChildren } from "react";
+import { View } from "react-native";
+import { useSelectionStore } from "../../stores/use-selection-store";
+import { useThemeColors } from "@notesnook/theme";
 
-export const MMKV = new MMKVLoader()
-  .setProcessingMode(
-    Platform.OS === "ios"
-      ? ProcessingModes.MULTI_PROCESS
-      : ProcessingModes.SINGLE_PROCESS
-  )
-  .initialize();
+export const ContainerHeader = (props: PropsWithChildren) => {
+  const { colors } = useThemeColors();
+  const selectionMode = useSelectionStore((state) => state.selectionMode);
+
+  return !selectionMode ? (
+    <View
+      style={{
+        backgroundColor: colors.primary.background,
+        width: "100%",
+        overflow: "hidden"
+      }}
+    >
+      {props.children}
+    </View>
+  ) : null;
+};

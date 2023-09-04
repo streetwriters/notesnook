@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ThemeDark, ThemePitchBlack } from "@notesnook/theme";
 import notifee from "@notifee/react-native";
 import dayjs from "dayjs";
 import React from "react";
@@ -288,9 +287,9 @@ export const settingsGroups: SettingSection[] = [
                 positiveText: "Logout",
                 positivePress: async () => {
                   try {
-                    eSendEvent("settings-loading", true);
-                    setImmediate(async () => {
-                      eSendEvent(eCloseSimpleDialog);
+                    eSendEvent(eCloseSimpleDialog);
+                    setTimeout(async () => {
+                      eSendEvent("settings-loading", true);
                       Navigation.popToTop();
                       await db.user?.logout();
                       setLoginMessage();
@@ -306,7 +305,7 @@ export const settingsGroups: SettingSection[] = [
                       setTimeout(() => {
                         eSendEvent("settings-loading", false);
                       }, 2000);
-                    });
+                    }, 300);
                   } catch (e) {
                     ToastEvent.error(e as Error, "Error logging out");
                     eSendEvent("settings-loading", false);

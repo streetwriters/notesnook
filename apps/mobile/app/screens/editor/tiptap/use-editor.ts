@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getFormattedDate } from "@notesnook/common";
 import { EVENTS } from "@notesnook/core/dist/common";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -31,6 +32,7 @@ import {
   openVault
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
+import Notifications from "../../../services/notifications";
 import SettingsService from "../../../services/settings";
 import { TipManager } from "../../../services/tip-manager";
 import { useEditorStore } from "../../../stores/use-editor-store";
@@ -52,7 +54,6 @@ import {
   makeSessionId,
   post
 } from "./utils";
-import { getFormattedDate } from "@notesnook/common";
 
 export const useEditor = (
   editorId = "",
@@ -233,6 +234,10 @@ export const useEditor = (
                 return;
               id && useEditorStore.getState().setCurrentlyEditingNote(id);
             });
+          }
+
+          if (Notifications.isNotePinned(id as string)) {
+            Notifications.pinNote(id as string);
           }
         } else {
           noteData.contentId = note?.contentId;

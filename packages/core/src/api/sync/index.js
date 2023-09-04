@@ -32,30 +32,16 @@ import * as signalr from "@microsoft/signalr";
 import Merger from "./merger";
 import Conflicts from "./conflicts";
 import { AutoSync } from "./auto-sync";
-import { toChunks } from "../../utils/array";
 import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
 import { logger } from "../../logger";
 import { Mutex } from "async-mutex";
+import { migrateItem } from "../../migrations";
 
 /**
  * @typedef {{
- *  item: string,
- *  itemType: string,
- *  lastSynced: number,
- *  current: number,
- *  total: number,
- *  synced?: boolean
+ *  items: any[],
+ *  type: string,
  * }} SyncTransferItem
- */
-
-/**
- * @typedef {{
- *  items:  string[],
- *  types: string[],
- *  lastSynced: number,
- *  current: number,
- *  total: number,
- * }} BatchedSyncTransferItem
  */
 
 export default class SyncManager {
@@ -123,6 +109,15 @@ class Sync {
     this.autoSync = new AutoSync(db, 1000);
     this.logger = logger.scope("Sync");
     this.syncConnectionMutex = new Mutex();
+    this.itemTypeToCollection = {
+      note: "notes",
+      notebook: "notebooks",
+      content: "content",
+      attachment: "attachments",
+      relation: "relations",
+      reminder: "reminders",
+      shortcut: "shortcuts"
+    };
     let remoteSyncTimeout = 0;
 
     const tokenManager = new TokenManager(db.storage);
@@ -149,30 +144,34 @@ class Sync {
       })
       .withHubProtocol(new MessagePackHubProtocol({ ignoreUndefined: true }))
       .build();
-
+    this.connection.serverTimeoutInMilliseconds = 60 * 1000 * 5;
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.connection.stop();
       this.autoSync.stop();
     });
 
-    this.connection.on("SyncItem", async (payload) => {
+    let count = 0;
+    this.connection.on("PushItems", async (chunk) => {
+      if (this.connection.state !== signalr.HubConnectionState.Connected)
+        return;
+
+      count += chunk.items.length;
+      sendSyncProgressEvent(this.db.eventManager, "download", count);
+
       clearTimeout(remoteSyncTimeout);
       remoteSyncTimeout = setTimeout(() => {
-        db.eventManager.publish(EVENTS.syncAborted);
+        this.db.eventManager.publish(EVENTS.syncAborted);
       }, 15000);
 
-      await this.onSyncItem(payload);
-      sendSyncProgressEvent(
-        this.db.eventManager,
-        "download",
-        payload.total,
-        payload.current
-      );
+      const key = await this.db.user.getEncryptionKey();
+      const dbLastSynced = await this.db.lastSynced();
+      await this.processChunk(chunk, key, dbLastSynced, true);
     });
 
-    this.connection.on("RemoteSyncCompleted", (lastSynced) => {
+    this.connection.on("PushCompleted", (lastSynced) => {
+      count = 0;
       clearTimeout(remoteSyncTimeout);
-      this.onRemoteSyncCompleted(lastSynced);
+      this.onPushCompleted(lastSynced);
     });
   }
 
@@ -192,6 +191,8 @@ class Sync {
     this.logger.info("Starting sync", { full, force, serverLastSynced });
 
     this.connection.onclose((error) => {
+      this.db.eventManager.publish(EVENTS.syncAborted);
+      console.error(error);
       this.logger.error(error || new Error("Connection closed."));
       throw new Error("Connection closed.");
     });
@@ -199,17 +200,12 @@ class Sync {
     const { lastSynced, oldLastSynced } = await this.init(force);
     this.logger.info("Initialized sync", { lastSynced, oldLastSynced });
 
-    const { newLastSynced, data } = await this.collect(lastSynced, force);
-    this.logger.info("Data collected for sync", {
-      newLastSynced,
-      length: data.items.length,
-      isEmpty: data.items.length <= 0
-    });
+    const newLastSynced = Date.now();
 
     const serverResponse = full ? await this.fetch(lastSynced) : null;
     this.logger.info("Data fetched", serverResponse);
 
-    if (await this.send(data, newLastSynced)) {
+    if (await this.send(lastSynced, force, newLastSynced)) {
       this.logger.info("New data sent");
       await this.stop(newLastSynced);
     } else if (serverResponse) {
@@ -243,95 +239,82 @@ class Sync {
   async fetch(lastSynced) {
     await this.checkConnection();
 
-    const serverResponse = await new Promise((resolve, reject) => {
-      let counter = { count: 0, queue: null };
-      this.connection.stream("FetchItems", lastSynced).subscribe({
-        next: (/** @type {SyncTransferItem} */ syncStatus) => {
-          const { total, item, synced, lastSynced } = syncStatus;
-          if (synced) {
-            resolve({ synced, lastSynced });
-            return;
-          }
-          if (!item) return;
-          if (counter.queue === null) counter.queue = total;
+    const key = await this.db.user.getEncryptionKey();
+    if (!key || !key.key || !key.salt) {
+      EV.publish(EVENTS.userSessionExpired);
+      throw new Error("User encryption key not generated. Please relogin.");
+    }
 
-          this.onSyncItem(syncStatus)
-            .then(() => {
-              sendSyncProgressEvent(
-                this.db.eventManager,
-                `download`,
-                total,
-                ++counter.count
-              );
-            })
-            .catch(reject)
-            .finally(() => {
-              if (--counter.queue <= 0) resolve({ synced, lastSynced });
-            });
-        },
-        complete: () => {},
-        error: reject
-      });
+    const dbLastSynced = await this.db.lastSynced();
+    let count = 0;
+    this.connection.off("SendItems");
+    this.connection.on("SendItems", async (chunk) => {
+      if (this.connection.state !== signalr.HubConnectionState.Connected)
+        return;
+
+      count += chunk.items.length;
+      sendSyncProgressEvent(this.db.eventManager, `download`, count);
+
+      await this.processChunk(chunk, key, dbLastSynced);
+
+      return true;
     });
+    const serverResponse = await this.connection.invoke(
+      "RequestFetch",
+      lastSynced
+    );
+
+    if (serverResponse.vaultKey) {
+      await this.merger.mergeItem(
+        "vaultKey",
+        serverResponse.vaultKey,
+        serverResponse.lastSynced
+      );
+    }
+
+    this.connection.off("SendItems");
 
     if (await this.conflicts.check()) {
       this.conflicts.throw();
     }
 
-    return serverResponse;
+    return { lastSynced: serverResponse.lastSynced };
   }
 
-  async collect(lastSynced, force) {
-    const newLastSynced = Date.now();
-    const data = await this.collector.collect(lastSynced, force);
-    return { newLastSynced, data };
-  }
-
-  /**
-   *
-   * @param {{ items: any[]; vaultKey: any; types: string[]; }} data
-   * @param {number} lastSynced
-   * @returns {Promise<boolean>}
-   */
-  async send(data, lastSynced) {
+  async send(oldLastSynced, isForceSync, newLastSynced) {
     await this.uploadAttachments();
 
-    if (data.types.length === 1 && data.types[0] === "vaultKey") return false;
-    if (data.items.length <= 0) return false;
-
-    let total = data.items.length;
-
-    const types = toChunks(data.types, 30);
-    const items = toChunks(data.items, 30);
-
+    let isSyncInitialized = false;
     let done = 0;
-    for (let i = 0; i < items.length; ++i) {
-      this.logger.info(`Sending batch ${done}/${total}`);
+    for await (const item of this.collector.collect(
+      100,
+      oldLastSynced,
+      isForceSync
+    )) {
+      if (!isSyncInitialized) {
+        const vaultKey = await this.db.vault._getKey();
+        newLastSynced = await this.connection.invoke("InitializePush", {
+          vaultKey,
+          lastSynced: newLastSynced
+        });
+        isSyncInitialized = true;
+      }
 
-      const encryptedItems = (await this.collector.encrypt(items[i])).map(
-        (item) => JSON.stringify(item)
-      );
-
-      const result = await this.sendBatchToServer({
-        lastSynced,
-        current: i,
-        total,
-        items: encryptedItems,
-        types: types[i]
-      });
-
+      const result = await this.pushItem(item, newLastSynced);
       if (result) {
-        done += encryptedItems.length;
-        sendSyncProgressEvent(this.db.eventManager, "upload", total, done);
+        done += item.items.length;
+        sendSyncProgressEvent(this.db.eventManager, "upload", done);
 
-        this.logger.info(`Batch sent (${done}/${total})`);
+        this.logger.info(`Batch sent (${done})`);
       } else {
         this.logger.error(
           new Error(`Failed to send batch. Server returned falsy response.`)
         );
       }
     }
-    return await this.connection.invoke("SyncCompleted", lastSynced);
+    if (!isSyncInitialized) return;
+    await this.connection.send("SyncCompleted", newLastSynced);
+    return true;
   }
 
   async stop(lastSynced) {
@@ -376,7 +359,7 @@ class Sync {
   /**
    * @private
    */
-  async onRemoteSyncCompleted(lastSynced) {
+  async onPushCompleted(lastSynced) {
     // refresh monographs on sync completed
     await this.db.monographs.init();
     // refresh topic references
@@ -385,31 +368,62 @@ class Sync {
     await this.start(false, false, lastSynced);
   }
 
-  /**
-   * @param {SyncTransferItem} syncStatus
-   * @private
-   */
-  async onSyncItem(syncStatus) {
-    const { item: itemJSON, itemType } = syncStatus;
-    const item = JSON.parse(itemJSON);
+  async processChunk(chunk, key, dbLastSynced, notify = false) {
+    const decrypted = await this.db.storage.decryptMulti(key, chunk.items);
 
-    const remoteItem = await this.merger.mergeItem(itemType, item);
-    if (remoteItem)
-      this.db.eventManager.publish(EVENTS.syncItemMerged, remoteItem);
+    const deserialized = await Promise.all(
+      decrypted.map((item, index) =>
+        deserializeItem(item, chunk.items[index].v, this.db)
+      )
+    );
+
+    let items = [];
+    if (this.merger.isSyncCollection(chunk.type)) {
+      items = deserialized.map((item) =>
+        this.merger.mergeItemSync(item, chunk.type, dbLastSynced)
+      );
+    } else if (chunk.type === "content") {
+      const localItems = await this.db.content.multi(
+        chunk.items.map((i) => i.id)
+      );
+      items = await Promise.all(
+        deserialized.map((item) =>
+          this.merger.mergeContent(item, localItems[item.id], dbLastSynced)
+        )
+      );
+    } else {
+      items = await Promise.all(
+        deserialized.map((item) =>
+          this.merger.mergeItem(item, chunk.type, dbLastSynced)
+        )
+      );
+    }
+
+    if (
+      notify &&
+      (chunk.type === "content" || chunk.type === "note") &&
+      items.length > 0
+    ) {
+      items.forEach((item) =>
+        this.db.eventManager.publish(EVENTS.syncItemMerged, item)
+      );
+    }
+
+    const collectionType = this.itemTypeToCollection[chunk.type];
+    if (collectionType && this.db[collectionType])
+      await this.db[collectionType]._collection.setItems(items);
   }
 
   /**
    *
-   * @param {BatchedSyncTransferItem} batch
+   * @param {SyncTransferItem} item
    * @returns {Promise<boolean>}
    * @private
    */
-  async sendBatchToServer(batch) {
-    if (!batch) return false;
+  async pushItem(item, newLastSynced) {
     await this.checkConnection();
-
-    const result = await this.connection.invoke("SyncItem", batch);
-    return result === 1;
+    await this.connection.send("PushItems", item, newLastSynced);
+    return true; // () === 1;
   }
 
   async checkConnection() {
@@ -444,4 +458,15 @@ function promiseTimeout(ms, promise) {
   });
   // Returns a race between our timeout and the passed in promise
   return Promise.race([promise, timeout]);
+}
+
+async function deserializeItem(decryptedItem, version, database) {
+  const deserialized = JSON.parse(decryptedItem);
+  deserialized.remote = true;
+  deserialized.synced = true;
+
+  if (!deserialized.alg && !deserialized.cipher) {
+    await migrateItem(deserialized, version, deserialized.type, database);
+  }
+  return deserialized;
 }

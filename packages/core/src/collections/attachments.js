@@ -36,12 +36,8 @@ export default class Attachments extends Collection {
     this.key = null;
   }
 
-  merge(remoteAttachment) {
-    if (remoteAttachment.deleted)
-      return this._collection.addItem(remoteAttachment);
-
-    const id = remoteAttachment.id;
-    let localAttachment = this._collection.getItem(id);
+  merge(localAttachment, remoteAttachment) {
+    if (remoteAttachment.deleted) return remoteAttachment;
 
     if (localAttachment && localAttachment.noteIds) {
       remoteAttachment.noteIds = setManipulator.union(
@@ -50,7 +46,7 @@ export default class Attachments extends Collection {
       );
     }
 
-    return this._collection.addItem(remoteAttachment);
+    return remoteAttachment;
   }
 
   /**

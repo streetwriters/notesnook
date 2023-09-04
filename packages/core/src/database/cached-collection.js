@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import IndexedCollection from "./indexed-collection";
 import MapStub from "../utils/map";
+import { toChunks } from "../utils/array";
 
 export default class CachedCollection extends IndexedCollection {
   constructor(context, type, eventManager) {
@@ -100,6 +101,24 @@ export default class CachedCollection extends IndexedCollection {
     });
     this.items.sort((a, b) => b.dateCreated - a.dateCreated);
     return this.items;
+  }
+
+  async setItems(items) {
+    await super.setItems(items);
+    for (let item of items) {
+      if (item) {
+        this.map.set(item.id, item);
+      }
+    }
+
+    this.invalidateCache();
+  }
+
+  *iterateSync(chunkSize) {
+    const chunks = toChunks(Array.from(this.map.values()), chunkSize);
+    for (const chunk of chunks) {
+      yield chunk;
+    }
   }
 
   invalidateCache() {

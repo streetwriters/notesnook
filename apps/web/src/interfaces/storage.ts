@@ -23,7 +23,7 @@ import {
   MemoryKVStore,
   IKVStore
 } from "./key-value";
-import { getNNCrypto } from "./nncrypto.stub";
+import { NNCrypto } from "./nncrypto";
 import type { Cipher, SerializedKey } from "@notesnook/crypto/dist/src/types";
 
 type EncryptedKey = { iv: Uint8Array; cipher: BufferSource };
@@ -58,6 +58,10 @@ export class NNStorage {
     return this.database.getMany(keys.sort());
   }
 
+  writeMulti<T>(entries: [string, T][]) {
+    return this.database.setMany(entries);
+  }
+
   write<T>(key: string, data: T) {
     return this.database.set(key, data);
   }
@@ -78,8 +82,7 @@ export class NNStorage {
     const { password, salt } = credentials;
     if (!password) throw new Error("Invalid data provided to deriveCryptoKey.");
 
-    const crypto = await getNNCrypto();
-    const keyData = await crypto.exportKey(password, salt);
+    const keyData = await NNCrypto.exportKey(password, salt);
 
     if (
       (await IndexedDBKVStore.isIndexedDBSupported()) &&
@@ -120,32 +123,39 @@ export class NNStorage {
   ): Promise<SerializedKey> {
     if (!password)
       throw new Error("Invalid data provided to generateCryptoKey.");
-    const crypto = await getNNCrypto();
-    return await crypto.exportKey(password, salt);
+
+    return await NNCrypto.exportKey(password, salt);
   }
 
   async hash(password: string, email: string): Promise<string> {
-    const crypto = await getNNCrypto();
-    return await crypto.hash(password, `${APP_SALT}${email}`);
+    return await NNCrypto.hash(password, `${APP_SALT}${email}`);
   }
 
-  async encrypt(key: SerializedKey, plainText: string): Promise<Cipher> {
-    const crypto = await getNNCrypto();
-    return await crypto.encrypt(
-      key,
-      { format: "text", data: plainText },
-      "base64"
-    );
+  encrypt(key: SerializedKey, plainText: string): Promise<Cipher<"base64">> {
+    return NNCrypto.encrypt(key, plainText, "text", "base64");
   }
 
-  async decrypt(
+  encryptMulti(
     key: SerializedKey,
-    cipherData: Cipher
+    items: string[]
+  ): Promise<Cipher<"base64">[]> {
+    return NNCrypto.encryptMulti(key, items, "text", "base64");
+  }
+
+  decrypt(
+    key: SerializedKey,
+    cipherData: Cipher<"base64">
   ): Promise<string | undefined> {
-    const crypto = await getNNCrypto();
     cipherData.format = "base64";
-    const result = await crypto.decrypt(key, cipherData);
-    if (typeof result.data === "string") return result.data;
+    return NNCrypto.decrypt(key, cipherData, "text");
+  }
+
+  decryptMulti(
+    key: SerializedKey,
+    items: Cipher<"base64">[]
+  ): Promise<string[] | undefined> {
+    items.forEach((c) => (c.format = "base64"));
+    return NNCrypto.decryptMulti(key, items, "text");
   }
 }
 
@@ -213,23 +223,3 @@ async function aesDecrypt(
   );
   return dec.decode(plainText);
 }
-
-// async function main() {
-//   const nncrypto = await getNNCrypto();
-//   const electronNNCrypto = new NNCryptoElectron();
-
-//   console.time("nncrypto");
-//   for (let i = 0; i < 100; ++i) {
-//     await nncrypto.hash("mypassword", APP_SALT);
-//   }
-//   console.timeEnd("nncrypto");
-
-//   console.time("electron");
-//   for (let i = 0; i < 100; ++i) {
-//     await electronNNCrypto.hash("mypassword", APP_SALT);
-//   }
-//   console.timeEnd("electron");
-// }
-
-// main();
-// setTimeout(main, 10000);
