@@ -327,7 +327,7 @@ PODS:
     - React-Core
   - react-native-keep-awake (1.2.0):
     - React-Core
-  - react-native-mmkv-storage (0.10.0-alpha.6):
+  - react-native-mmkv-storage (0.10.0-alpha.7):
     - MMKV (~> 1.3.1)
     - React
     - React-Core
@@ -347,7 +347,7 @@ PODS:
     - ReactCommon/turbomodule/core
   - react-native-share-extension (2.5.6):
     - React
-  - react-native-sodium (1.5.1):
+  - react-native-sodium (1.5.2):
     - React
   - react-native-webview (11.26.1):
     - React-Core
@@ -875,14 +875,14 @@ SPEC CHECKSUMS:
   react-native-image-resizer: 00ceb0e05586c7aadf061eea676957a6c2ec60fa
   react-native-in-app-review: db8bb167a5f238e7ceca5c242d6b36ce8c4404a4
   react-native-keep-awake: caee3ff89eaa21dfe29010f0d143566874a04441
-  react-native-mmkv-storage: a38beae34b1f7906a2f5e715f54216f9ddab14c0
+  react-native-mmkv-storage: ec32fd68168716755e1b30f09b476c236c6c68a8
   react-native-netinfo: ccbe1085dffd16592791d550189772e13bf479e2
   react-native-notification-sounds: da78c828fe1bcbb92d8b505d5261890ed315ff39
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-pdf: 33c622cbdf776a649929e8b9d1ce2d313347c4fa
   react-native-safe-area-context: 36cc67648134e89465663b8172336a19eeda493d
   react-native-share-extension: df66a2ee48a62277d79898375e2142bde0782063
-  react-native-sodium: 08d459dfcb5d246363a30712d816acea56ab8f1c
+  react-native-sodium: 7d2bbb9ca840dc58d63f661b2ff733a38170fec5
   react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
   React-NativeModulesApple: 1d81d927ef1a67a3545a01e14c2e98500bf9b199
   React-perflogger: 684a11499a0589cc42135d6d5cc04d0e4e0e261a

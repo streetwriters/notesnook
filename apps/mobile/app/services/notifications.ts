@@ -49,7 +49,6 @@ import NetInfo from "@react-native-community/netinfo";
 import { encodeNonAsciiHTML } from "entities";
 import { convertNoteToText } from "../utils/note-to-text";
 
-
 export type Reminder = {
   id: string;
   type: string;
@@ -142,6 +141,7 @@ const onEvent = async ({ type, detail }: Event) => {
       const ReminderNotify =
         require("../components/sheets/reminder-notify").default;
       ReminderNotify.present(reminder);
+      useRelationStore.getState().update();
       return;
     }
     editorState().movedAway = false;
