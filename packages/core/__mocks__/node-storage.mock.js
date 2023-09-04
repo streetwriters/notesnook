@@ -53,11 +53,11 @@ export class NodeStorageInterface {
   }
 
   async encrypt(password, data) {
-    return await this.crypto.encrypt(
-      password,
-      { format: "text", data },
-      "base64"
-    );
+    return await this.crypto.encrypt(password, data, "text", "base64");
+  }
+
+  async encryptMulti(password, items) {
+    return await this.crypto.encryptMulti(password, items, "text", "base64");
   }
 
   async decrypt(key, cipherData) {
