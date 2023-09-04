@@ -39,6 +39,9 @@ const defaultVariant: ThemeUIStyleObject = {
   },
   ":hover:not(:focus)": {
     outline: "1.5px solid var(--accent)"
+  },
+  "::placeholder": {
+    color: "placeholder"
   }
 };
 
