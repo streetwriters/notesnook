@@ -999,7 +999,7 @@ export function SubmitButton(props: SubmitButtonProps) {
       }}
       disabled={props.disabled}
     >
-      {props.loading ? <Loading color="white" /> : props.text}
+      {props.loading ? <Loading color="accentForeground" /> : props.text}
     </Button>
   );
 }

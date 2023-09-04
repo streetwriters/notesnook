@@ -127,7 +127,7 @@ export function ThemePreview(props: ThemePreviewProps) {
               Notes
             </Text>
             <Plus
-              color="white"
+              color={theme.previewColors.list.accentForeground}
               size={8}
               sx={{
                 bg: theme.previewColors.list.accent,

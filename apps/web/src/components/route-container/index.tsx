@@ -102,7 +102,7 @@ function Header(props: RouteContainerProps) {
           {!isMobile && buttons?.create && (
             <Plus
               data-test-id={`${type}-action-button`}
-              color="white"
+              color="accentForeground"
               size={18}
               sx={{
                 bg: "accent",

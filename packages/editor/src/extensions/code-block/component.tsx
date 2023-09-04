@@ -87,7 +87,7 @@ export function CodeblockComponent(
             position: "relative",
             lineHeight: "20px",
             // bg: "var(--background-secondary)",
-            color: "white",
+            // color: "white",
             overflowX: "hidden",
             display: "flex"
           }}
