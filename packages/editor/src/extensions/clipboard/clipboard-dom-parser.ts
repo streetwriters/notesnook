@@ -21,7 +21,9 @@ import {
   DOMParser as ProsemirrorDOMParser,
   ParseOptions
 } from "@tiptap/pm/model";
+import { encodeNonAsciiHTML } from "entities";
 import { Schema, Slice } from "prosemirror-model";
+import { inferLanguage } from "../code-block";
 
 export class ClipboardDOMParser extends ProsemirrorDOMParser {
   static fromSchema(schema: Schema): ClipboardDOMParser {
@@ -35,13 +37,30 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
   }
 
   parseSlice(dom: Node, options?: ParseOptions | undefined): Slice {
-    convertBrToSingleSpacedParagraphs(dom);
+    if (dom instanceof HTMLElement) {
+      formatCodeblocks(dom);
+      convertBrToSingleSpacedParagraphs(dom);
+    }
     return super.parseSlice(dom, options);
   }
 }
 
-export function convertBrToSingleSpacedParagraphs(dom: Node) {
-  if (!(dom instanceof HTMLElement)) return;
+export function formatCodeblocks(dom: HTMLElement | Document) {
+  for (const pre of dom.querySelectorAll("pre")) {
+    const codeAsText = pre.textContent;
+    const languageElement = pre.querySelector(
+      '[class*="language-"],[class*="lang-"]'
+    );
+    const language = inferLanguage(languageElement || pre);
+    if (language) pre.classList.add(`language-${language}`);
+
+    const code = document.createElement("code");
+    code.innerHTML = encodeNonAsciiHTML(codeAsText || "");
+    pre.replaceChildren(code);
+  }
+}
+
+export function convertBrToSingleSpacedParagraphs(dom: HTMLElement | Document) {
   for (const br of dom.querySelectorAll("br")) {
     let paragraph = br.closest("p");
 
