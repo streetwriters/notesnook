@@ -144,7 +144,7 @@ class Sync {
       })
       .withHubProtocol(new MessagePackHubProtocol({ ignoreUndefined: true }))
       .build();
-
+    this.connection.serverTimeoutInMilliseconds = 60 * 1000 * 5;
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.connection.stop();
       this.autoSync.stop();
