@@ -103,7 +103,7 @@ export function Toolbar(props: ToolbarProps) {
               tools={tools}
               editor={editor}
               sx={{
-                borderRight: "1px solid var(--border)",
+                borderRight: "1px solid var(--separator)",
                 ":last-of-type": { borderRight: "none" },
                 alignItems: "center"
               }}
