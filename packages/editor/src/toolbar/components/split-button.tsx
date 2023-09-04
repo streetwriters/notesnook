@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { PropsWithChildren, useRef } from "react";
 import { Flex } from "@theme-ui/components";
 import { ToolButton, ToolButtonProps } from "./tool-button";
-import { useToolbarLocation } from "../stores/toolbar-store";
+import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
 import React from "react";
 
 export type SplitButtonProps = ToolButtonProps & {
@@ -31,6 +31,7 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
 
   const ref = useRef<HTMLDivElement>(null);
   const toolbarLocation = useToolbarLocation();
+  const isMobile = useIsMobile();
 
   return (
     <>
@@ -42,7 +43,7 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
           borderRadius: "default",
           overflow: "hidden",
           ":hover": {
-            bg: "hover-secondary"
+            bg: isMobile ? "transparent" : "hover-secondary"
           }
         }}
       >

@@ -25,6 +25,7 @@ import { IconNames, Icons } from "../icons";
 import { ToolButtonVariant } from "../types";
 import { Button } from "../../components/button";
 import { Icon } from "@notesnook/ui";
+import { useIsMobile } from "../stores/toolbar-store";
 
 export type ToolButtonProps = ButtonProps & {
   icon: IconNames;
@@ -47,6 +48,7 @@ export const ToolButton = React.memo(
       variant = "normal",
       ...buttonProps
     } = props;
+    const isMobile = useIsMobile();
 
     return (
       <Button
@@ -65,6 +67,11 @@ export const ToolButton = React.memo(
           ":last-of-type": {
             mr: 0
           },
+          ":hover:not(:disabled):not(:active)": !isMobile
+            ? undefined
+            : {
+                bg: "transparent"
+              },
           ...sx
         }}
         onMouseDown={(e) => e.preventDefault()}

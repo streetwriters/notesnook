@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { Flex, Text } from "@theme-ui/components";
 import { ToolButton } from "./tool-button";
+import { useIsMobile } from "../stores/toolbar-store";
 
 export type CounterProps = {
   title: string;
@@ -30,6 +31,7 @@ export type CounterProps = {
 };
 function _Counter(props: CounterProps) {
   const { title, onDecrease, onIncrease, onReset, value } = props;
+  const isMobile = useIsMobile();
 
   return (
     <Flex
@@ -40,7 +42,7 @@ function _Counter(props: CounterProps) {
         cursor: "pointer",
         height: "100%",
         ":hover": {
-          bg: "hover-secondary"
+          bg: isMobile ? "transparent" : "hover-secondary"
         }
       }}
       onClick={onReset}

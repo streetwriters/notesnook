@@ -107,9 +107,11 @@ export function TaskItemComponent(
           mt: "0.40ch",
           marginInlineEnd: 1,
           cursor: editor.isEditable ? "pointer" : "unset",
-          ":hover": {
-            borderColor: "accent"
-          },
+          ":hover": isMobile
+            ? undefined
+            : {
+                borderColor: "accent"
+              },
           fontFamily: "inherit"
         }}
         onMouseDown={(e) => {
@@ -125,7 +127,7 @@ export function TaskItemComponent(
           }
         }}
         color={checked ? "accent" : "icon"}
-        size={isMobile ? "1.66ch" : "1.46ch"}
+        size={isMobile ? "1.70ch" : "1.46ch"}
       />
 
       <Box
@@ -143,7 +145,8 @@ export function TaskItemComponent(
               opacity: 1
             },
           flex: 1,
-          mt: "1px"
+          mt: ["3px", "3px", 0],
+          ml: ["2px", "2px", 0]
         }}
       />
       <DesktopOnly>
