@@ -73,7 +73,7 @@ const secondary: ThemeUIStyleObject = createButtonVariant(
   "paragraph"
 );
 
-const accent = createButtonVariant("accent", "white", {
+const accent = createButtonVariant("accent", "accentForeground", {
   hover: { bg: alpha("accent", 0.9) },
   active: { bg: alpha("accent", 0.8) }
 });
@@ -81,7 +81,7 @@ const accentSecondary = createButtonVariant("shade", "accent", {
   hover: { bg: alpha("shade", 0.3) }
 });
 
-const error = createButtonVariant("accent-error", "white", {
+const error = createButtonVariant("accent-error", "accentForeground-error", {
   hover: { bg: alpha("accent-error", 0.9) }
 });
 
