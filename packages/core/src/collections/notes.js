@@ -44,25 +44,18 @@ export default class Notes extends Collection {
     return this.raw.find((item) => item.dateDeleted > 0 && item.id === id);
   }
 
-  async merge(remoteNote) {
-    if (!remoteNote) return;
-
+  async merge(localNote, remoteNote) {
     const id = remoteNote.id;
-    const localNote = this._collection.getItem(id);
+
     if (localNote) {
+      if (localNote.localOnly) return;
+
       if (localNote.color) await this._db.colors.untag(localNote.color, id);
 
       for (let tag of localNote.tags || []) {
         await this._db.tags.untag(tag, id);
       }
     }
-
-    if (
-      remoteNote.deleted &&
-      remoteNote.deleteReason !== "localOnly" &&
-      (!localNote || !localNote.localOnly)
-    )
-      return remoteNote;
 
     await this._resolveColorAndTags(remoteNote);
 
