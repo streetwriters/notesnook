@@ -31,7 +31,6 @@ class Merger {
     this.logger = logger.scope("Merger");
 
     this.syncCollectionMap = {
-      note: "notes",
       shortcut: "shortcuts",
       reminder: "reminders",
       relation: "relations",
@@ -76,7 +75,6 @@ class Merger {
 
   mergeItemSync(remoteItem, type, lastSynced) {
     switch (type) {
-      case "note":
       case "shortcut":
       case "reminder":
       case "relation": {
@@ -144,6 +142,13 @@ class Merger {
 
   async mergeItem(remoteItem, type, lastSynced) {
     switch (type) {
+      case "note": {
+        const localItem = this._db.notes._collection.getItem(remoteItem.id);
+        if (!localItem || remoteItem.dateModified > localItem.dateModified) {
+          return await this._db.notes.merge(localItem, remoteItem);
+        }
+        break;
+      }
       case "settings": {
         const localItem = this._db.settings.raw;
         if (
