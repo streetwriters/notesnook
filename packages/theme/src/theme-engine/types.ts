@@ -319,3 +319,5 @@ export const Variants: readonly (keyof Variants)[] = [
   "error",
   "success"
 ];
+
+export const DEPRECATED_COLORS = ["shade", "textSelection"];

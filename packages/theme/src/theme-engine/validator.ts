@@ -21,6 +21,7 @@ import {
   ALPHA_COLORS,
   COLORS,
   Colors,
+  DEPRECATED_COLORS,
   ThemeDefinition,
   Variants
 } from "./types";
@@ -72,7 +73,10 @@ export function validateTheme(json: Partial<ThemeDefinition>): {
   for (const key in flattenedTheme) {
     if (!key.startsWith("scopes")) continue;
     const keyPart = key.split(".").pop() as keyof Colors | undefined;
-    if (!keyPart || !COLORS.includes(keyPart))
+    if (
+      !keyPart ||
+      (!COLORS.includes(keyPart) && !DEPRECATED_COLORS.includes(keyPart))
+    )
       return {
         error: `Invalid theme. Found unknown key: ${key}.`
       };
