@@ -148,6 +148,7 @@ function NavigationMenu(props: NavigationMenuProps) {
         zIndex: 1,
         position: "relative",
         flex: 1,
+        flexDirection: "column",
         height: "100%",
         overflow: "hidden",
         bg: "background",
