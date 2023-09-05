@@ -748,7 +748,7 @@ const ThemeSetter = ({
               paddingVertical: 12
             }}
           >
-            <Heading color={colors.accent} size={SIZE.md}>
+            <Heading color={colors.accentForeground} size={SIZE.md}>
               {darkTheme.id === theme.id
                 ? "Applied as dark theme"
                 : "Applied as light theme"}

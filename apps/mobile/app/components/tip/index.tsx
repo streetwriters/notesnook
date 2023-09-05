@@ -77,7 +77,9 @@ export const Tip = ({
             alignSelf: "flex-start",
             borderRadius: 100,
             borderWidth: 1,
-            borderColor: colors.static[color as never] || colors.primary[color as never] as string
+            borderColor:
+              colors.static[color as never] ||
+              (colors.primary[color as never] as string)
           }}
         />
 
@@ -139,7 +141,7 @@ export const Tip = ({
           icon={tip.button.icon}
           buttonType={{
             color: colors.static[color as never],
-            text: colors.static.white
+            text: colors.primary.accentForeground
           }}
           style={{
             marginTop: 10

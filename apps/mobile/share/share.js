@@ -602,8 +602,9 @@ const ShareView = ({ quicknote = false }) => {
                     marginBottom: 0
                   }}
                   loading={loading}
-                  iconColor={colors.static.white}
+                  iconColor={colors.primary.accentForeground}
                   onPress={onPress}
+                  textColor={colors.primary.accentForeground}
                   textStyle={{
                     fontSize: 16,
                     marginLeft: 0

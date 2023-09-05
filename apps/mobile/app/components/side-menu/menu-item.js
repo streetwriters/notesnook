@@ -17,20 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
+import { useThemeColors } from "@notesnook/theme";
+import React, { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ToggleSwitch from "toggle-switch-react-native";
 import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useThemeColors } from "@notesnook/theme";
-import { normalize, SIZE } from "../../utils/size";
+import { SIZE, normalize } from "../../utils/size";
 import { Button } from "../ui/button";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useCallback } from "react";
-import Tag from "../ui/tag";
 
 export const MenuItem = React.memo(
   function MenuItem({ item, index, testID, rightBtn }) {
@@ -40,6 +38,7 @@ export const MenuItem = React.memo(
     );
     const screenId = item.name.toLowerCase() + "_navigation";
     let isFocused = headerTextState?.id === screenId;
+    const primaryColors = isFocused ? colors.selected : colors.primary;
 
     const _onPress = () => {
       if (item.func) {
@@ -132,13 +131,13 @@ export const MenuItem = React.memo(
             <View
               style={{
                 borderRadius: 100,
-                backgroundColor: colors.primary.accent,
+                backgroundColor: primaryColors.accent,
                 paddingHorizontal: 4,
                 marginLeft: 5,
                 paddingVertical: 2
               }}
             >
-              <Paragraph color={colors.static.white} size={SIZE.xxs}>
+              <Paragraph color={primaryColors.accentForeground} size={SIZE.xxs}>
                 BETA
               </Paragraph>
             </View>
@@ -148,8 +147,8 @@ export const MenuItem = React.memo(
         {item.switch ? (
           <ToggleSwitch
             isOn={item.on}
-            onColor={colors.primary.accent}
-            offColor={colors.primary.icon}
+            onColor={primaryColors.accent}
+            offColor={primaryColors.icon}
             size="small"
             animationSpeed={150}
             onToggle={_onPress}

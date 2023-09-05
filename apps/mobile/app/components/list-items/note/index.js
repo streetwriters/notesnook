@@ -40,6 +40,7 @@ import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
+import { useEditorStore } from "../../../stores/use-editor-store";
 
 function navigateToTag(item) {
   const tag = db.tags.tag(item.id);
@@ -98,6 +99,9 @@ const NoteItem = ({
   dateBy = "dateCreated",
   noOpen = false
 }) => {
+  const currentEditingNote = useEditorStore(
+    (state) => state.currentEditingNote
+  );
   const { colors } = useThemeColors();
   const compactMode = useIsCompactModeEnabled(item);
   const attachmentCount = db.attachments?.ofNote(item.id, "all")?.length || 0;
@@ -108,6 +112,9 @@ const NoteItem = ({
   const reminder = getUpcomingReminder(reminders);
   const noteColor = ColorValues[item.color?.toLowerCase()];
   const tags = getTags(item);
+  const primaryColors =
+    currentEditingNote === item.id ? colors.selected : colors.primary;
+
   return (
     <>
       <View
@@ -148,7 +155,7 @@ const NoteItem = ({
                   borderRadius: 5,
                   marginRight: 5,
                   borderWidth: 0.5,
-                  borderColor: colors.primary.border,
+                  borderColor: primaryColors.border,
                   paddingHorizontal: 6,
                   marginBottom: 5
                 }}
@@ -179,7 +186,7 @@ const NoteItem = ({
           <Paragraph
             numberOfLines={1}
             color={
-              ColorValues[item.color?.toLowerCase()] || colors.primary.heading
+              ColorValues[item.color?.toLowerCase()] || primaryColors.heading
             }
             style={{
               flexWrap: "wrap"
@@ -192,7 +199,7 @@ const NoteItem = ({
           <Heading
             numberOfLines={1}
             color={
-              ColorValues[item.color?.toLowerCase()] || colors.primary.heading
+              ColorValues[item.color?.toLowerCase()] || primaryColors.heading
             }
             style={{
               flexWrap: "wrap"
@@ -208,6 +215,7 @@ const NoteItem = ({
             style={{
               flexWrap: "wrap"
             }}
+            color={primaryColors.paragraph}
             numberOfLines={2}
           >
             {decode(item.headline, {
@@ -262,7 +270,7 @@ const NoteItem = ({
                     <Icon
                       name="attachment"
                       size={SIZE.md}
-                      color={colors.primary.icon}
+                      color={primaryColors.icon}
                     />
                     <Paragraph
                       color={colors.secondary.paragraph}
@@ -283,7 +291,7 @@ const NoteItem = ({
                     }}
                     color={
                       ColorValues[item.color?.toLowerCase()] ||
-                      colors.primary.accent
+                      primaryColors.accent
                     }
                   />
                 ) : null}
@@ -296,7 +304,7 @@ const NoteItem = ({
                     style={{
                       marginRight: 6
                     }}
-                    color={colors.primary.icon}
+                    color={primaryColors.icon}
                   />
                 ) : null}
 
@@ -354,7 +362,7 @@ const NoteItem = ({
                 </Paragraph>
 
                 <Paragraph
-                  color={colors.primary.accent}
+                  color={primaryColors.accent}
                   size={SIZE.xs}
                   style={{
                     marginRight: 6
@@ -424,7 +432,7 @@ const NoteItem = ({
 
         <IconButton
           testID={notesnook.listitem.menu}
-          color={colors.primary.paragraph}
+          color={primaryColors.paragraph}
           name="dots-horizontal"
           size={SIZE.xl}
           onPress={() => !noOpen && showActionSheet(item, isTrash)}
