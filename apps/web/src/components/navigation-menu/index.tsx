@@ -141,7 +141,19 @@ function NavigationMenu(props: NavigationMenuProps) {
   }, [location, previousLocation, state]);
 
   return (
-    <ScopedThemeProvider scope="navigationMenu" injectCssVars={false}>
+    <ScopedThemeProvider
+      scope="navigationMenu"
+      sx={{
+        display: "flex",
+        zIndex: 1,
+        position: "relative",
+        flex: 1,
+        height: "100%",
+        overflow: "hidden",
+        bg: "background",
+        borderRight: "1px solid var(--separator)"
+      }}
+    >
       <AnimatedFlex
         id="navigation-menu"
         data-test-id="navigation-menu"
@@ -154,15 +166,9 @@ function NavigationMenu(props: NavigationMenuProps) {
         }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
         sx={{
-          zIndex: 1,
-          position: "relative",
-          flex: 1,
-          height: "100%",
           overflow: "hidden",
           flexDirection: "column",
-          justifyContent: "space-between",
-          bg: "background",
-          borderRight: "1px solid var(--border)"
+          justifyContent: "space-between"
         }}
         px={0}
       >

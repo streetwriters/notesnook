@@ -76,6 +76,7 @@ function ListItem(props: ListItemProps) {
       ? store.selectedItems.length > 1 && isInSelection
       : isInSelection;
   });
+  const selected = isSelected || isMenuTarget || isFocused;
 
   return (
     <Flex
@@ -112,7 +113,7 @@ function ListItem(props: ListItemProps) {
       pl={1}
       pr={2}
       py={1}
-      mb={isCompact ? 0 : 1}
+      mb={isCompact ? 0 : 0}
       tabIndex={-1}
       dir="auto"
       sx={{
@@ -130,24 +131,20 @@ function ListItem(props: ListItemProps) {
 
         borderLeft: "5px solid",
         borderLeftColor: isFocused ? accent : "transparent",
-        ml: "2px",
-        mr: "1px",
 
-        backgroundColor:
-          isSelected || isMenuTarget || isFocused
-            ? "background-selected"
-            : background,
+        backgroundColor: selected ? "background-selected" : background,
 
         ":hover": {
-          backgroundColor: isSelected ? "hover-selected" : "hover"
+          backgroundColor: selected ? "hover-selected" : "hover"
         },
         ":focus": {
-          backgroundColor: isSelected ? "hover-selected" : "hover"
+          backgroundColor: selected ? "hover-selected" : "hover"
         },
         ":focus-visible": {
           outline: `1px solid`,
           outlineColor: accent === "accent" ? "accent" : alpha("accent", 0.7),
-          backgroundColor: isSelected ? "background-selected" : background
+          backgroundColor:
+            isSelected || isFocused ? "background-selected" : background
         }
       }}
       onKeyPress={(e) => {
@@ -172,7 +169,8 @@ function ListItem(props: ListItemProps) {
           overflow: "hidden",
           textOverflow: "ellipsis",
           fontWeight: isCompact || isSimple ? "body" : "bold",
-          color: heading,
+          color:
+            selected && heading === "heading" ? `${heading}-selected` : heading,
           display: "block"
         }}
       >
@@ -185,6 +183,7 @@ function ListItem(props: ListItemProps) {
           variant="body"
           data-test-id={`description`}
           sx={{
+            color: selected ? "paragraph-selected" : "paragraph",
             lineHeight: `1.2rem`,
             overflow: "hidden",
             textOverflow: "ellipsis",

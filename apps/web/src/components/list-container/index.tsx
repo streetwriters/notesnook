@@ -159,10 +159,9 @@ function ListContainer(props: ListContainerProps) {
               onKeyDown={(e) => onKeyDown(e.nativeEvent)}
               components={{
                 Scroller: CustomScrollbarsVirtualList,
-                Item: (props) => (
+                Item: ({ item: _item, ...props }) => (
                   <div
                     {...props}
-                    style={{ paddingBottom: 1 }}
                     onFocus={() => onFocus(props["data-item-index"])}
                     onMouseDown={(e) =>
                       onMouseDown(e.nativeEvent, props["data-item-index"])
