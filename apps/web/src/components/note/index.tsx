@@ -179,7 +179,7 @@ function Note(props: NoteProps) {
         <Flex
           sx={{
             fontSize: "subBody",
-            color: "var(--paragraph-secondary)",
+            color: "paragraph-secondary",
             alignItems: "center",
             gap: 1
           }}

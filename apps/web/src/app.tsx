@@ -178,7 +178,7 @@ function DesktopAppContents({
                 flexDirection: "column",
                 flex: 1,
                 bg: "background",
-                borderRight: "1px solid var(--border)"
+                borderRight: "1px solid var(--separator)"
               }}
             >
               {isAppLoaded && <CachedRouter />}

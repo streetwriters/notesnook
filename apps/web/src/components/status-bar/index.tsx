@@ -56,7 +56,7 @@ function StatusBar() {
       bg="background"
       sx={{
         borderTop: "1px solid",
-        borderTopColor: "border",
+        borderTopColor: "separator",
         justifyContent: "space-between",
         display: ["none", "none", "flex"]
       }}
