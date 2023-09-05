@@ -31,13 +31,13 @@ textarea {
 
 ::-moz-selection {
   /* Code for Firefox */
-  background-color: var(--textSelection);
-  color: var(--paragraph);
+  background-color: var(--background-selected);
+  color: var(--paragraph-selected);
 }
 
 ::selection {
-  background-color: var(--textSelection);
-  color: var(--paragraph);
+  background-color: var(--background-selected);
+  color: var(--paragraph-selected);
 }
 
 .ms-track:hover,

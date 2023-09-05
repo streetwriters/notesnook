@@ -138,25 +138,25 @@ textarea,
 }
 
 .rpv-core__text-layer-text::selection {
-  background-color: var(--textSelection) !important;
+  background-color: var(--background-selected) !important;
   color: transparent;
 }
 
 .rpv-core__text-layer-text::-moz-selection {
   /* Code for Firefox */
-  background-color: var(--textSelection) !important;
+  background-color: var(--background-selected) !important;
   color: transparent;
 }
 
 ::-moz-selection {
   /* Code for Firefox */
-  background-color: var(--textSelection);
-  color: var(--paragraph);
+  background-color: var(--background-selected);
+  color: var(--paragraph-selected);
 }
 
 ::selection {
-  background-color: var(--textSelection);
-  color: var(--paragraph);
+  background-color: var(--background-selected);
+  color: var(--paragraph-selected);
 }
 
 *::-moz-focus-inner {

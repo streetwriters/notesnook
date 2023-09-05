@@ -147,7 +147,7 @@ function ListItem(props: ListItemProps) {
         ":focus-visible": {
           outline: `1px solid`,
           outlineColor: accent === "accent" ? "accent" : alpha("accent", 0.7),
-          backgroundColor: isSelected ? "textSelection" : background
+          backgroundColor: isSelected ? "background-selected" : background
         }
       }}
       onKeyPress={(e) => {

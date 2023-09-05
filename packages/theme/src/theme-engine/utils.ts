@@ -28,6 +28,7 @@ import {
   VariantsWithStaticColors
 } from "./types";
 import _ThemeLight from "./themes/default-light.json";
+import tc from "tinycolor2";
 import _ThemeDark from "./themes/default-dark.json";
 
 const ThemeLight = _ThemeLight as ThemeDefinition;
@@ -97,44 +98,60 @@ export function buildVariants(
   const defaultTheme = theme.colorScheme === "dark" ? ThemeDark : ThemeLight;
   const defaultThemeBase = defaultTheme.scopes.base;
   const defaultThemeScope = defaultTheme.scopes[scope] || {};
-  const variant = {
+
+  function getColor(variant: keyof Variants, color: keyof Colors) {
+    return tc(
+      themeScope[variant]?.[color] ||
+        theme.scopes.base[variant]?.[color] ||
+        defaultThemeScope[variant]?.[color] ||
+        defaultThemeBase[variant]?.[color]
+    );
+  }
+
+  const variant: VariantsWithStaticColors<true> = {
     ...defaultThemeBase,
     ...defaultThemeScope,
     primary: {
       ...defaultThemeBase.primary,
       ...defaultThemeScope.primary,
       ...theme.scopes.base.primary,
-      ...themeScope.primary
+      ...themeScope.primary,
+      shade: deriveShadeColor(getColor("primary", "accent"))
     },
     secondary: {
       ...defaultThemeBase.secondary,
       ...defaultThemeScope.secondary,
       ...theme.scopes.base.secondary,
-      ...themeScope.secondary
+      ...themeScope.secondary,
+      shade: deriveShadeColor(getColor("secondary", "accent"))
     },
     disabled: {
       ...defaultThemeBase.disabled,
       ...defaultThemeScope.disabled,
       ...theme.scopes.base.disabled,
-      ...themeScope.disabled
+      ...themeScope.disabled,
+      shade: deriveShadeColor(getColor("disabled", "accent"))
     },
     error: {
       ...defaultThemeBase.error,
       ...defaultThemeScope.error,
       ...theme.scopes.base.error,
-      ...themeScope.error
+      ...themeScope.error,
+      shade: deriveShadeColor(getColor("error", "accent"))
     },
     success: {
       ...defaultThemeBase.success,
       ...defaultThemeScope.success,
       ...theme.scopes.base.success,
-      ...themeScope.success
+      ...themeScope.success,
+      shade: deriveShadeColor(getColor("success", "accent"))
     },
     selected: {
       ...defaultThemeBase.selected,
       ...defaultThemeScope.selected,
       ...theme.scopes.base.selected,
-      ...themeScope.selected
+      ...themeScope.selected,
+      shade: deriveShadeColor(getColor("selected", "accent"))
     },
     static: StaticColors
   };
@@ -150,4 +167,8 @@ export function colorsToCSSVariables(colors: Colors, variantKey?: string) {
     root += `--${color}${suffix}: ${colors[color as keyof Colors]};\n`;
   }
   return root;
+}
+
+function deriveShadeColor(color: tc.Instance) {
+  return color.setAlpha(0.04).toHex8String();
 }

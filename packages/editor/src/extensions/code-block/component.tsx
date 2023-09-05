@@ -72,12 +72,12 @@ export function CodeblockComponent(
               borderRadius: `0px !important`,
 
               "::selection,*::selection": {
-                bg: "textSelection",
-                color: "currentColor"
+                bg: "background-selected",
+                color: "paragraph-selected"
               },
               "::-moz-selection,*::-moz-selection": {
-                bg: "textSelection",
-                color: "currentColor"
+                bg: "background-selected",
+                color: "paragraph-selected"
               }
             },
             fontFamily: "monospace",
@@ -139,7 +139,7 @@ export function CodeblockComponent(
               opacity: "1 !important",
               p: 1,
               mr: 1,
-              bg: isOpen ? "textSelection" : "transparent"
+              bg: isOpen ? "background-selected" : "transparent"
             }}
             disabled={!editor.isEditable}
             onClick={() => {
