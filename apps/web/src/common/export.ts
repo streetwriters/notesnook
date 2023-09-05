@@ -47,7 +47,7 @@ export async function exportToPDF(
 
     let html = content.replaceAll(/<p(.+?)><\/p>/gm, "<p$1><br/></p>");
 
-    for (const attribute of Object.keys(replaceableAttributes)) {
+    for (const attribute in replaceableAttributes) {
       html = html.replaceAll(
         attribute,
         replaceableAttributes[attribute as keyof typeof replaceableAttributes]
