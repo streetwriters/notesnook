@@ -120,20 +120,19 @@ Currently, Notesnook has 5 variants:
 
 Each variant further contains a total of 12 Colors:
 
-| Color           | Description                                                                                                        | Transparent |
-| --------------- | ------------------------------------------------------------------------------------------------------------------ | ----------- |
-| `accent`        | Color used to make something stand out (like the primary button in dialogs). Can be both background or foreground. | ❌          |
-| `shade`         | Color used as a background to show prominence.                                                                     | ✅          |
-| `background`    | Background color of elements                                                                                       | ❌          |
-| `paragraph`     | Color of paragraphs and other text                                                                                 | ❌          |
-| `heading`       | Color of headings &amp; titles                                                                                     | ❌          |
-| `backdrop`      | The color of the overlay shown behind dialogs &amp; modals                                                         | ✅          |
-| `textSelection` | The text color of selected text                                                                                    | ✅          |
-| `hover`         | Background color when hovering over elements (that support it)                                                     | ✅          |
-| `border`        | Border color                                                                                                       | ❌          |
-| `separator`     | Color of the separator line between items                                                                          | ❌          |
-| `placeholder`   | Color of the placeholder in input fields                                                                           | ❌          |
-| `icon`          | Color of icons                                                                                                     | ❌          |
+| Color              | Description                                                                                                        | Transparent |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------ | ----------- |
+| `accent`           | Color used to make something stand out (like the primary button in dialogs). Can be both background or foreground. | ❌          |
+| `accentForeground` | Color for icons & text on accent background                                                                        | ❌          |
+| `background`       | Background color of elements                                                                                       | ❌          |
+| `paragraph`        | Color of paragraphs and other text                                                                                 | ❌          |
+| `heading`          | Color of headings &amp; titles                                                                                     | ❌          |
+| `backdrop`         | The color of the overlay shown behind dialogs &amp; modals                                                         | ✅          |
+| `hover`            | Background color when hovering over elements (that support it)                                                     | ✅          |
+| `border`           | Border color                                                                                                       | ❌          |
+| `separator`        | Color of the separator line between items                                                                          | ❌          |
+| `placeholder`      | Color of the placeholder in input fields                                                                           | ❌          |
+| `icon`             | Color of icons                                                                                                     | ❌          |
 
 ### Theme Metadata
 
