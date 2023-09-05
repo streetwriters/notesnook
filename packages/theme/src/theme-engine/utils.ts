@@ -40,7 +40,9 @@ export function getPreviewColors(theme: ThemeDefinition): PreviewColors {
 
   return {
     navigationMenu: {
-      shade: navigationMenu?.primary?.shade || primary.shade,
+      shade: deriveShadeColor(
+        tc(navigationMenu?.primary?.accent || primary.accent)
+      ),
       accent: navigationMenu?.primary?.accent || primary.accent,
       background: navigationMenu?.primary?.background || primary.background,
       icon: navigationMenu?.primary?.icon || primary.icon
