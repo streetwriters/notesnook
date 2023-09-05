@@ -323,6 +323,11 @@ class Sync {
     if (lastSynced > storedLastSynced)
       await this.db.storage.write("lastSynced", lastSynced);
     this.db.eventManager.publish(EVENTS.syncCompleted);
+
+    // refresh monographs on sync completed
+    await this.db.monographs.init();
+    // refresh topic references
+    this.db.notes.topicReferences.rebuild();
   }
 
   async cancel() {
@@ -359,13 +364,13 @@ class Sync {
   /**
    * @private
    */
-  async onPushCompleted(lastSynced) {
-    // refresh monographs on sync completed
-    await this.db.monographs.init();
-    // refresh topic references
-    this.db.notes.topicReferences.rebuild();
-
-    await this.start(false, false, lastSynced);
+  onPushCompleted(lastSynced) {
+    this.db.eventManager.publish(
+      EVENTS.databaseSyncRequested,
+      false,
+      false,
+      lastSynced
+    );
   }
 
   async processChunk(chunk, key, dbLastSynced, notify = false) {

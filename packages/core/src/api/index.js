@@ -284,8 +284,8 @@ class Database {
     return (await this.storage.read("lastSynced")) || 0;
   }
 
-  sync(full = true, force = false) {
-    return this.syncer.start(full, force);
+  sync(full = true, force = false, lastSynced = null) {
+    return this.syncer.start(full, force, lastSynced);
   }
 
   /**
