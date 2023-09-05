@@ -37,9 +37,6 @@ export type ThemeCompatibilityVersion = 1;
  * @description This is a schema for validation of Notesnook themes.
  */
 export type ThemeDefinition = {
-  // we need to allow this to make linters happy.
-  $schema: "https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/schemas/v1.schema.json";
-
   /**
    * Name of the theme
    */
@@ -227,17 +224,9 @@ export type Colors = {
    * Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)
    * @pattern ^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$
    */
-  shade: string;
-  /**
-   * Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)
-   * @pattern ^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$
-   */
   backdrop: string;
-  /**
-   * Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)
-   * @pattern ^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$
-   */
-  textSelection: string;
+
+  shade: string;
 };
 
 export type VariantsWithStaticColors<TRequired extends boolean = false> =
@@ -305,17 +294,11 @@ export const COLORS: readonly (keyof Colors)[] = [
   "separator",
   "placeholder",
   "hover",
-  "shade",
-  "backdrop",
-  "textSelection"
+  "accentForeground",
+  "backdrop"
 ];
 
-export const ALPHA_COLORS: readonly (keyof Colors)[] = [
-  "hover",
-  "shade",
-  "backdrop",
-  "textSelection"
-];
+export const ALPHA_COLORS: readonly (keyof Colors)[] = ["hover", "backdrop"];
 
 export const Variants: readonly (keyof Variants)[] = [
   "primary",

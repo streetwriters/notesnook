@@ -23,7 +23,8 @@ import {
   ThemeDefinition,
   THEME_SCOPES,
   Variants,
-  validateTheme
+  validateTheme,
+  ALPHA_COLORS
 } from "@notesnook/theme";
 import { Button, Flex, Input, Text } from "@theme-ui/components";
 import FileSaver from "file-saver";
@@ -524,9 +525,7 @@ export default function ThemeBuilder() {
                             }
                           }}
                           title={
-                            /hover|shade|backdrop|textSelection/g.test(
-                              colorName
-                            )
+                            ALPHA_COLORS.includes(colorName)
                               ? `Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)`
                               : `Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)`
                           }
@@ -555,9 +554,7 @@ export default function ThemeBuilder() {
                             );
                           }}
                           title={
-                            /hover|shade|backdrop|textSelection/g.test(
-                              colorName
-                            )
+                            ALPHA_COLORS.includes(colorName)
                               ? `Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)`
                               : `Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)`
                           }

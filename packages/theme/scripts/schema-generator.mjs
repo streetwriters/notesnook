@@ -33,8 +33,33 @@ const generator = tsj.createGenerator({
 
 const schema = generator.createSchema("ThemeDefinition");
 
-delete schema.definitions.ThemeDefinition.properties.codeBlockCSS;
-const required = schema.definitions.ThemeDefinition.required;
-required.splice(required.indexOf("codeBlockCSS"), 1);
-
+removeProperty("ThemeDefinition", "codeBlockCSS");
+removeProperty("Colors", "shade");
+removeProperty("PartialOrFullColors<false>", "shade");
+addProperty(
+  "ThemeDefinition",
+  "$schema",
+  {
+    type: "string",
+    const:
+      "https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/schemas/v1.schema.json"
+  },
+  true
+);
 await writeFile(`v1.schema.json`, JSON.stringify(schema, undefined, 2));
+
+function removeProperty(definition, propertyName) {
+  delete schema.definitions[definition].properties[propertyName];
+  const required = schema.definitions[definition].required;
+
+  if (required && required.includes(propertyName)) {
+    required.splice(required.indexOf("shade"), 1);
+  }
+}
+
+function addProperty(definition, propertyName, value, required) {
+  schema.definitions[definition].properties[propertyName] = value;
+  if (required) {
+    schema.definitions[definition].required.push(propertyName);
+  }
+}

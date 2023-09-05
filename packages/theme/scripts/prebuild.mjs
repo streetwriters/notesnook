@@ -24,7 +24,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DEFAULT_THEMES = ["default-light", "default-dark", "default-pitch-black"];
+const DEFAULT_THEMES = ["default-light", "default-dark"];
 
 const THEMES_DIRECTORY = path.resolve(
   path.join(__dirname, "..", "src", "theme-engine", "themes")

@@ -5,10 +5,6 @@
     "ThemeDefinition": {
       "type": "object",
       "properties": {
-        "$schema": {
-          "type": "string",
-          "const": "https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/schemas/v1.schema.json"
-        },
         "name": {
           "type": "string",
           "description": "Name of the theme"
@@ -71,10 +67,13 @@
         "scopes": {
           "$ref": "#/definitions/ThemeScopes",
           "description": "All the theme scopes."
+        },
+        "$schema": {
+          "type": "string",
+          "const": "https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/schemas/v1.schema.json"
         }
       },
       "required": [
-        "$schema",
         "name",
         "id",
         "version",
@@ -83,7 +82,8 @@
         "authors",
         "description",
         "colorScheme",
-        "scopes"
+        "scopes",
+        "$schema"
       ],
       "additionalProperties": false,
       "title": "Notesnook Theme schema",
@@ -206,6 +206,11 @@
           "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
           "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
         },
+        "accentForeground": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
         "paragraph": {
           "type": "string",
           "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
@@ -246,17 +251,7 @@
           "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
           "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
         },
-        "shade": {
-          "type": "string",
-          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
-          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
-        },
         "backdrop": {
-          "type": "string",
-          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
-          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
-        },
-        "textSelection": {
           "type": "string",
           "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
           "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
@@ -264,6 +259,7 @@
       },
       "required": [
         "accent",
+        "accentForeground",
         "paragraph",
         "background",
         "border",
@@ -272,9 +268,7 @@
         "separator",
         "placeholder",
         "hover",
-        "shade",
-        "backdrop",
-        "textSelection"
+        "backdrop"
       ],
       "additionalProperties": false
     },
@@ -310,6 +304,11 @@
           "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
           "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
         },
+        "accentForeground": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
         "paragraph": {
           "type": "string",
           "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
@@ -350,17 +349,7 @@
           "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
           "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
         },
-        "shade": {
-          "type": "string",
-          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
-          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
-        },
         "backdrop": {
-          "type": "string",
-          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
-          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
-        },
-        "textSelection": {
           "type": "string",
           "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
           "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
