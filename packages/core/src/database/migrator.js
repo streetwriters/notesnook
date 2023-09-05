@@ -36,20 +36,13 @@ class Migrator {
       await migrateCollection(collection.dbCollection, version);
 
       const index = (await collection.index()) || [];
+      const toAdd = [];
       for (var i = 0; i < index.length; ++i) {
         let id = index[i];
         let item = get(id, collection.dbCollection.collectionName);
         if (!item) {
           continue;
         }
-
-        if (collection.dbCollection.collectionName)
-          sendMigrationProgressEvent(
-            db.eventManager,
-            collection.dbCollection.collectionName,
-            index.length,
-            i + 1
-          );
 
         // check if item is permanently deleted or just a soft delete
         if (item.deleted && !item.type) {
@@ -68,8 +61,10 @@ class Migrator {
         if (migrated || restore) {
           if (collection.type === "settings") {
             await collection.dbCollection.merge(item);
+          } else if (item.type === "note") {
+            toAdd.push(await db.notes.merge(null, item));
           } else if (collection.dbCollection._collection) {
-            await collection.dbCollection._collection?.addItem(item);
+            toAdd.push(item);
           } else {
             throw new Error(
               `No idea how to handle this kind of item: ${item.type}.`
@@ -78,9 +73,20 @@ class Migrator {
 
           // if id changed after migration, we need to delete the old one.
           if (item.id !== itemId) {
-            await collection.dbCollection?._collection?.deleteItem(itemId);
+            await collection.dbCollection._collection.deleteItem(itemId);
           }
         }
+      }
+
+      if (toAdd.length > 0) {
+        await collection.dbCollection._collection.setItems(toAdd);
+        if (collection.dbCollection.collectionName)
+          sendMigrationProgressEvent(
+            db.eventManager,
+            collection.dbCollection.collectionName,
+            toAdd.length,
+            toAdd.length
+          );
       }
     }
     return true;

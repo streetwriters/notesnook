@@ -40,8 +40,15 @@ export class NodeStorageInterface {
   }
 
   async write(key, data) {
-    return new Promise((resolve) => resolve((this.storage[key] = data)));
+    this.storage[key] = data;
   }
+
+  async writeMulti(entries) {
+    for (const [key, value] of entries) {
+      this.storage[key] = value;
+    }
+  }
+
   remove(key) {
     delete this.storage[key];
   }
