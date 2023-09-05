@@ -255,6 +255,18 @@
           "type": "string",
           "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
           "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
+        },
+        "shade": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$",
+          "deprecated": true
+        },
+        "textSelection": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$",
+          "deprecated": true
         }
       },
       "required": [
@@ -353,6 +365,18 @@
           "type": "string",
           "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
           "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
+        },
+        "shade": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$",
+          "deprecated": true
+        },
+        "textSelection": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$",
+          "deprecated": true
         }
       },
       "additionalProperties": false

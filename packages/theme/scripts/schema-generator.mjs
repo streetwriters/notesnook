@@ -34,8 +34,6 @@ const generator = tsj.createGenerator({
 const schema = generator.createSchema("ThemeDefinition");
 
 removeProperty("ThemeDefinition", "codeBlockCSS");
-removeProperty("Colors", "shade");
-removeProperty("PartialOrFullColors<false>", "shade");
 addProperty(
   "ThemeDefinition",
   "$schema",
@@ -46,14 +44,21 @@ addProperty(
   },
   true
 );
+makePropertyOptional("Colors", "shade");
+makePropertyOptional("PartialOrFullColors<false>", "shade");
+makePropertyOptional("Colors", "textSelection");
+makePropertyOptional("PartialOrFullColors<false>", "textSelection");
 await writeFile(`v1.schema.json`, JSON.stringify(schema, undefined, 2));
 
 function removeProperty(definition, propertyName) {
   delete schema.definitions[definition].properties[propertyName];
-  const required = schema.definitions[definition].required;
+  makePropertyOptional(definition, propertyName);
+}
 
+function makePropertyOptional(definition, propertyName) {
+  const required = schema.definitions[definition].required;
   if (required && required.includes(propertyName)) {
-    required.splice(required.indexOf("shade"), 1);
+    required.splice(required.indexOf(propertyName), 1);
   }
 }
 
