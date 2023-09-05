@@ -33,7 +33,8 @@ export async function exportToPDF(
 
   return new Promise<boolean>((resolve) => {
     const iframe = document.createElement("iframe");
-    iframe.srcdoc = content.replaceAll(/<p(.+?)><\/p>/gm, "<p$1><br/></p>");
+
+    iframe.srcdoc = content;
     iframe.style.position = "fixed";
     iframe.style.right = "0";
     iframe.style.bottom = "0";
