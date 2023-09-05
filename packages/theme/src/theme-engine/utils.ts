@@ -172,5 +172,5 @@ export function colorsToCSSVariables(colors: Colors, variantKey?: string) {
 }
 
 function deriveShadeColor(color: tc.Instance) {
-  return color.setAlpha(0.04).toHex8String();
+  return color.setAlpha(0.1).toHex8String();
 }
