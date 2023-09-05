@@ -226,7 +226,18 @@ export type Colors = {
    */
   backdrop: string;
 
+  /**
+   * Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)
+   * @pattern ^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$
+   * @deprecated true
+   */
   shade: string;
+  /**
+   * Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)
+   * @pattern ^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$
+   * @deprecated true
+   */
+  textSelection: string;
 };
 
 export type VariantsWithStaticColors<TRequired extends boolean = false> =
