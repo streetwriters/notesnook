@@ -167,6 +167,7 @@ function NavigationMenu(props: NavigationMenuProps) {
         }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
         sx={{
+          flex: 1,
           overflow: "hidden",
           flexDirection: "column",
           justifyContent: "space-between"
