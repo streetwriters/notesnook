@@ -140,7 +140,7 @@ const FloatingButton = ({
         >
           <Icon
             name={title === "Clear all trash" ? "delete" : "plus"}
-            color="white"
+            color={colors.primary.accentForeground}
             size={SIZE.xxl}
           />
         </View>

@@ -16,9 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React from "react";
-import { View, ViewStyle } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
+import React from "react";
+import { ViewStyle } from "react-native";
 import { SIZE } from "../../../utils/size";
 import Paragraph from "../typography/paragraph";
 
@@ -50,7 +50,7 @@ export default function Tag({
         textAlign: "center",
         ...style
       }}
-      color={textColor || colors.static.white}
+      color={textColor || colors.primary.accentForeground}
       size={SIZE.xxs}
     >
       {text}

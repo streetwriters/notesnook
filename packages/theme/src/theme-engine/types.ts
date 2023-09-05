@@ -247,6 +247,7 @@ export type VariantsWithStaticColors<TRequired extends boolean = false> =
 
 export type PreviewColors = {
   editor: string;
+  accentForeground: string;
   navigationMenu: {
     shade: string;
     accent: string;

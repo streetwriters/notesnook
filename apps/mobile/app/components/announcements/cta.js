@@ -128,7 +128,9 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 fontSize={SIZE.md}
                 buttonType={{
                   color: color ? color : colors.primary.accent,
-                  text: colors.static.white,
+                  text: color
+                    ? colors.static.white
+                    : colors.primary.accentForeground,
                   selected: color ? color : colors.primary.accent,
                   opacity: 1
                 }}

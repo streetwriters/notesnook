@@ -63,7 +63,8 @@ export function getPreviewColors(theme: ThemeDefinition): PreviewColors {
     border: primary.border,
     paragraph: primary.paragraph,
     background: primary.background,
-    accent: primary.accent
+    accent: primary.accent,
+    accentForeground: primary.accentForeground
   };
 }
 

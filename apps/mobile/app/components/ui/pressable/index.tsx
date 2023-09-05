@@ -108,7 +108,7 @@ export const useButton = ({
     },
     accent: {
       primary: accent || colors.primary.accent,
-      text: text || colors.primary.paragraph,
+      text: text || colors.primary.accentForeground,
       selected: accent || colors.primary.accent
     },
     inverted: {

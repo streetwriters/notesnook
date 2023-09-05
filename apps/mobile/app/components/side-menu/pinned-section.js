@@ -108,9 +108,12 @@ export const PinItem = React.memo(
     alias = item?.alias || item?.title;
     const [visible, setVisible] = useState(false);
     const [headerTextState, setHeaderTextState] = useState(null);
+    const primaryColors =
+      headerTextState?.id === item.id ? colors.selected : colors.primary;
+
     const color =
       headerTextState?.id === item.id
-        ? colors.primary.accent
+        ? colors.selected.accent
         : colors.primary.icon;
     const fwdRef = useRef();
 
@@ -230,7 +233,7 @@ export const PinItem = React.memo(
                   style={{
                     flexWrap: "wrap"
                   }}
-                  color={colors.primary.heading}
+                  color={primaryColors.heading}
                   size={SIZE.md}
                 >
                   {alias}
@@ -238,7 +241,7 @@ export const PinItem = React.memo(
               ) : (
                 <Paragraph
                   numberOfLines={1}
-                  color={colors.primary.paragraph}
+                  color={primaryColors.paragraph}
                   size={SIZE.md}
                 >
                   {alias}
