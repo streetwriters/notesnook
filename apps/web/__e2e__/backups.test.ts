@@ -74,3 +74,30 @@ test("restore an encrypted backup", async ({ page }) => {
   const notebooks = await app.goToNotebooks();
   expect(await notebooks.isEmpty()).toBeFalsy();
 });
+
+test("turning off encrypted backups should ask for password", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.auth.goto();
+  await app.auth.login(USER.CURRENT);
+  const settings = await app.goToSettings();
+
+  await settings.toggleBackupEncryption(USER.CURRENT.password);
+
+  expect(await settings.isBackupEncryptionEnabled(false)).toBe(false);
+});
+
+test("turning on encrypted backups should not ask for password", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.auth.goto();
+  await app.auth.login(USER.CURRENT);
+  const settings = await app.goToSettings();
+  await settings.toggleBackupEncryption(USER.CURRENT.password);
+
+  await settings.toggleBackupEncryption();
+
+  expect(await settings.isBackupEncryptionEnabled(true)).toBe(true);
+});

@@ -476,6 +476,7 @@ function SettingItem(props: { item: Setting }) {
                     disabled={isWorking}
                     onChange={() => workWithLoading(component.toggle)}
                     checked={component.isToggled()}
+                    data-checked={component.isToggled()}
                   />
                 );
               case "dropdown":

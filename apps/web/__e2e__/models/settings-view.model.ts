@@ -84,16 +84,32 @@ export class SettingsViewModel {
     return !!(await item?.getTitle());
   }
 
-  async createBackup(password?: string) {
+  async isBackupEncryptionEnabled(state: boolean) {
+    const encyptBackups = this.page
+      .locator(getTestId("setting-encrypt-backups"))
+      .locator(
+        state ? `input[data-checked="true"]` : `input[data-checked="false"]`
+      );
+    await encyptBackups.waitFor({ state: "visible" });
+    return (await encyptBackups.getAttribute("data-checked")) === "true";
+  }
+
+  async toggleBackupEncryption(password?: string) {
     const item = await this.navigation.findItem("Backup & export");
     await item?.click();
 
-    if (password) {
-      const encyptBackups = this.page
-        .locator(getTestId("setting-encrypt-backups"))
-        .locator("label");
-      await encyptBackups.click();
-    }
+    const encyptBackups = this.page
+      .locator(getTestId("setting-encrypt-backups"))
+      .locator("label");
+
+    await encyptBackups.click();
+
+    if (password) await fillPasswordDialog(this.page, password);
+  }
+
+  async createBackup(password?: string) {
+    const item = await this.navigation.findItem("Backup & export");
+    await item?.click();
 
     const backupData = this.page
       .locator(getTestId("setting-create-backup"))

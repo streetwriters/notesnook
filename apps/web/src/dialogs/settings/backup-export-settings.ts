@@ -50,7 +50,7 @@ export const BackupExportSettings: SettingsGroup[] = [
               )
                 useSettingStore.getState().toggleEncryptBackups();
               const verified =
-                useSettingStore.getState().encryptBackups ||
+                !useSettingStore.getState().encryptBackups ||
                 (await verifyAccount());
               if (verified) await createBackup();
             },
