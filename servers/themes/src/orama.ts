@@ -50,7 +50,6 @@ export async function findTheme(
       compatibilityVersion: { eq: compatibilityVersion }
     }
   });
-  console.log("EHLO");
   return results.hits[0].document as CompiledThemeDefinition;
 }
 
@@ -65,7 +64,9 @@ export async function getThemes(query: (typeof ThemeQuerySchema)["_type"]) {
       compatibilityVersion: {
         eq: query.compatibilityVersion
       }
-    }
+    },
+    limit: query.limit,
+    offset: query.cursor
   };
   for (const filter of query.filters || []) {
     switch (filter.type) {
@@ -88,79 +89,18 @@ export async function getThemes(query: (typeof ThemeQuerySchema)["_type"]) {
     }
   }
   const results = await search(ThemesDatabase!, searchParams);
-  // results.hits = [
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits,
-  //   ...results.hits
-  // ];
-
-  const themes = results.hits
-    .map((hit) => {
-      return {
-        ...(hit.document as CompiledThemeDefinition),
-        scopes: undefined,
-        codeBlockCSS: undefined
-      } as ThemeMetadata;
-    })
-    .slice(from, from + count);
+  const themes = results.hits.map((hit) => {
+    return {
+      ...(hit.document as CompiledThemeDefinition),
+      scopes: undefined,
+      codeBlockCSS: undefined
+    } as ThemeMetadata;
+  });
 
   return {
     themes,
-    nextCursor: (from + count < results.hits.length
-      ? from + count
-      : undefined) as number | undefined
+    nextCursor: (from + count < results.count ? from + count : undefined) as
+      | number
+      | undefined
   };
 }
