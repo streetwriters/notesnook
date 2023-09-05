@@ -104,10 +104,10 @@ class AppStore extends BaseStore {
 
     db.eventManager.subscribe(
       EVENTS.databaseSyncRequested,
-      async (full, force) => {
+      async (full, force, lastSynced) => {
         if (!this.get().isAutoSyncEnabled) return;
 
-        await this.get().sync(full, force);
+        await this.get().sync(full, force, lastSynced);
       }
     );
 
@@ -273,7 +273,7 @@ class AppStore extends BaseStore {
     this.set((state) => (state.lastSynced = lastSynced));
   };
 
-  sync = async (full = true, force = false) => {
+  sync = async (full = true, force = false, lastSynced = null) => {
     if (
       this.isSyncing() ||
       !this.get().isSyncEnabled ||
@@ -287,7 +287,7 @@ class AppStore extends BaseStore {
 
     this.updateSyncStatus("syncing");
     try {
-      const result = await db.sync(full, force);
+      const result = await db.sync(full, force, lastSynced);
 
       if (!result) return this.updateSyncStatus("failed");
       this.updateSyncStatus("completed", true);

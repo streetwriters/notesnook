@@ -43,6 +43,7 @@ import {
 import useStatus from "../../hooks/use-status";
 import { ScopedThemeProvider } from "../theme-provider";
 import { checkForUpdate, installUpdate } from "../../utils/updater";
+import { toTitleCase } from "@notesnook/common";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -230,9 +231,7 @@ function SyncStatus() {
       title={status.tooltip}
       data-test-id={`sync-status-${status.key}`}
     >
-      {syncStatus.progress ? (
-        <Text variant={"subBody"}>{syncStatus.progress}</Text>
-      ) : (
+      {!syncStatus.progress && (
         <status.icon
           size={12}
           rotate={status.loading}
@@ -253,6 +252,9 @@ function SyncStatus() {
           </>
         ) : null}
       </Text>
+      {syncStatus.progress && (
+        <Text variant={"subBody"}>{syncStatus.progress}</Text>
+      )}
     </Button>
   );
 }
@@ -309,7 +311,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
     isActive: (syncStatus) => syncStatus === "syncing",
     icon: Sync,
     loading: true,
-    text: ({ type }) => <>{type || "sync"}ing</>,
+    text: ({ type }) => <>{toTitleCase(type || "sync")}ing</>,
     tooltip: "Syncing your notes..."
   },
   {

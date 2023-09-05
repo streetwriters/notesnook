@@ -19,13 +19,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Button, Flex, Text } from "@theme-ui/components";
 import { Context, useTip } from "../../hooks/use-tip";
-import { Info } from "../icons";
+import { Info, Sync } from "../icons";
+import { useStore as useAppStore } from "../../stores/app-store";
+import { toTitleCase } from "@notesnook/common";
 
 type PlaceholderProps = { context: Context; text?: string };
 function Placeholder(props: PlaceholderProps) {
   const { context, text } = props;
   const tip = useTip(context);
+  const syncStatus = useAppStore((store) => store.syncStatus);
 
+  if (syncStatus.key === "syncing" && context === "notes") {
+    return (
+      <Flex
+        variant="columnCenter"
+        sx={{
+          position: "relative",
+          justifyContent: "flex-start",
+          alignItems: "flex-start",
+          alignSelf: "stretch",
+          px: 6
+        }}
+      >
+        <Flex
+          sx={{
+            border: "1px solid var(--accent)",
+            alignItems: "center",
+            borderRadius: 50,
+            p: 1,
+            py: "1.5px"
+          }}
+        >
+          <Sync color="accent" size={12} sx={{ mr: "small" }} />
+          <Text variant="subBody" sx={{ fontSize: 10 }} color="accent">
+            Syncing your {context}
+          </Text>
+        </Flex>
+
+        <Text variant="subBody" sx={{ fontSize: "body", mt: 1 }}>
+          {toTitleCase(syncStatus.type || "syncing")}ing {syncStatus.progress}{" "}
+          items
+        </Text>
+      </Flex>
+    );
+  }
   if (!tip) return null;
 
   return (
