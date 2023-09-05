@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { httpBatchLink } from "@trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
 import { CheckCircleOutline, Loading } from "../../../components/icons";
 import {
@@ -74,7 +74,6 @@ function ThemesList() {
   );
 
   const [isApplying, setIsApplying] = useState(false);
-  const parentScrollRef = useRef<HTMLElement>();
   const setCurrentTheme = useThemeStore((store) => store.setTheme);
   const user = useUserStore((store) => store.user);
   const darkTheme = useThemeStore((store) => store.darkTheme);
@@ -198,11 +197,6 @@ function ThemesList() {
       </Flex>
 
       <Box
-        ref={(ref) => {
-          if (ref && ref instanceof HTMLElement)
-            parentScrollRef.current =
-              (ref.closest(".ms-container") as HTMLElement) || undefined;
-        }}
         sx={{
           ".virtuoso-grid-list": {
             display: "grid",
@@ -216,7 +210,9 @@ function ThemesList() {
           <Loader title={"Loading themes..."} />
         ) : (
           <VirtuosoGrid
-            customScrollParent={parentScrollRef.current || undefined}
+            customScrollParent={
+              document.getElementById("settings-scrollbar") || undefined
+            }
             data={[
               {
                 ...darkTheme,
