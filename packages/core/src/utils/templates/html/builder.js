@@ -20,6 +20,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { parseHTML } from "../../html-parser";
 import HTMLTemplate from "./template";
 
+const replaceableAttributes = {
+  'data-float="true" data-align="right"': 'align="right"',
+  'data-float="true" data-align="left"': 'align="left"',
+  'data-align="left"':
+    'style="margin-right:auto;margin-left:0;display: block;"',
+  'data-align="right"':
+    'style="margin-left:auto;margin-right:0;display: block;"',
+  'data-align="center"':
+    'style="margin-left:auto;margin-right:auto;display: block;"'
+};
+
 const LANGUAGE_REGEX = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i;
 
 async function buildHTML(templateData) {
@@ -28,9 +39,14 @@ async function buildHTML(templateData) {
 
 async function preprocessHTML(templateData) {
   const { content } = templateData;
-  const doc = parseHTML(
-    content.replaceAll(/<p([^>]*)><\/p>/gm, "<p$1><br/></p>")
-  );
+
+  let html = content.replaceAll(/<p([^>]*)><\/p>/gm, "<p$1><br/></p>");
+  console.log(html);
+  for (const attribute in replaceableAttributes) {
+    html = html.replaceAll(attribute, replaceableAttributes[attribute]);
+  }
+
+  const doc = parseHTML(html);
 
   const mathBlocks = doc.querySelectorAll(".math-block.math-node");
   const mathInlines = doc.querySelectorAll(".math-inline.math-node");

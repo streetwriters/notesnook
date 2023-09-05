@@ -34,27 +34,7 @@ export async function exportToPDF(
   return new Promise<boolean>((resolve) => {
     const iframe = document.createElement("iframe");
 
-    const replaceableAttributes = {
-      'data-align="left"':
-        'style="margin-right:auto;margin-left:0;display: block;"',
-      'data-align="right"':
-        'style="margin-left:auto;margin-right:0;display: block;"',
-      'data-align="center"':
-        'style="margin-left:auto;margin-right:auto;display: block;"',
-      'data-float="true" data-align="right"': 'align="right"',
-      'data-float="true" data-align="left"': 'align="left"'
-    };
-
-    let html = content.replaceAll(/<p(.+?)><\/p>/gm, "<p$1><br/></p>");
-
-    for (const attribute in replaceableAttributes) {
-      html = html.replaceAll(
-        attribute,
-        replaceableAttributes[attribute as keyof typeof replaceableAttributes]
-      );
-    }
-
-    iframe.srcdoc = html;
+    iframe.srcdoc = content;
     iframe.style.position = "fixed";
     iframe.style.right = "0";
     iframe.style.bottom = "0";
