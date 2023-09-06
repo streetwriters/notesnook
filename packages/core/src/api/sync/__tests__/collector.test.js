@@ -41,10 +41,10 @@ test("newly created note should get included in collector", () =>
     }
 
     expect(items).toHaveLength(2);
-    expect(items[0].items[0].id).toBe(noteId);
-    expect(items[0].type).toBe("note");
-    expect(items[1].type).toBe("content");
-    expect(items[1].items[0].id).toBe(db.notes.note(noteId).data.contentId);
+    expect(items[0].type).toBe("content");
+    expect(items[0].items[0].id).toBe(db.notes.note(noteId).data.contentId);
+    expect(items[1].items[0].id).toBe(noteId);
+    expect(items[1].type).toBe("note");
   }));
 
 test("edited note after last synced time should get included in collector", () =>
@@ -103,6 +103,6 @@ test("localOnly note should get included as a deleted item in collector", () =>
 
     expect(items[0].items[0].length).toBe(104);
     expect(items[1].items[0].length).toBe(104);
-    expect(items[0].type).toBe("note");
-    expect(items[1].type).toBe("content");
+    expect(items[0].type).toBe("content");
+    expect(items[1].type).toBe("note");
   }));
