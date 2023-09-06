@@ -39,7 +39,8 @@ const run = async (
   context = "global",
   forced = false,
   full = true,
-  onCompleted
+  onCompleted,
+  lastSyncTime
 ) => {
   if (useUserStore.getState().syncing) {
     DatabaseLogger.log("Sync in progress");
@@ -68,7 +69,7 @@ const run = async (
     try {
       let res = await BackgroundSync.doInBackground(async () => {
         try {
-          await db.sync(full, forced);
+          await db.sync(full, forced, lastSyncTime);
           return true;
         } catch (e) {
           error = e;

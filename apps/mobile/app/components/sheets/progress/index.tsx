@@ -64,7 +64,7 @@ export const Progress = () => {
           width={null}
           animated={true}
           useNativeDriver
-          progress={currentProgress || 0.1}
+          indeterminate
           unfilledColor={colors.secondary.background}
           color={colors.primary.accent}
           borderWidth={0}
@@ -74,7 +74,7 @@ export const Progress = () => {
       {progress ? (
         <Paragraph color={colors.secondary.paragraph}>
           {progress.type?.slice(0, 1).toUpperCase() + progress.type?.slice(1)}
-          ing {progress?.current}/{progress?.total}
+          ing {progress?.current}
         </Paragraph>
       ) : null}
     </View>

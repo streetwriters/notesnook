@@ -167,13 +167,15 @@ const onUserSubscriptionStatusChanged = async (userStatus) => {
   useMessageStore.getState().setAnnouncement();
 };
 
-const onRequestPartialSync = async (full, force) => {
+const onRequestPartialSync = async (full, force, lastSyncTime) => {
   if (SettingsService.get().disableAutoSync) return;
-  DatabaseLogger.info(`onRequestPartialSync full:${full}, force:${force}`);
+  DatabaseLogger.info(
+    `onRequestPartialSync full:${full}, force:${force}, lastSyncTime:${lastSyncTime}`
+  );
   if (full || force) {
-    await Sync.run("global", force, full);
+    await Sync.run("global", force, full, undefined, lastSyncTime);
   } else {
-    await Sync.run("global", false, false);
+    await Sync.run("global", false, false, undefined, lastSyncTime);
   }
 };
 
@@ -253,7 +255,6 @@ export const useAppEvents = () => {
   ]);
 
   const syncedOnLaunch = useRef(false);
-  const { isDark } = useThemeColors();
   const refValues = useRef({
     subsriptionSuccessListener: null,
     subsriptionErrorListener: null,

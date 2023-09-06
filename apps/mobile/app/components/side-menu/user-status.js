@@ -135,7 +135,7 @@ export const UserStatus = () => {
                 ? "Last sync failed, tap to try again"
                 : syncing
                 ? `Syncing your notes${
-                    progress ? ` (${progress.current}/${progress.total})` : ""
+                    progress ? ` (${progress.current})` : ""
                   }`
                 : "Tap here to sync your notes."}
             </Paragraph>
