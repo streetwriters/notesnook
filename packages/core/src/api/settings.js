@@ -172,20 +172,20 @@ class Settings {
   }
 
   async setTitleFormat(format) {
-    this._settings.titleFormat = format || "Note $date$ $time$";
+    this._settings.titleFormat = format;
     await this._saveSettings();
   }
 
   getTitleFormat() {
-    return this._settings.titleFormat;
+    return this._settings.titleFormat || "Note $date$ $time$";
   }
 
   getDateFormat() {
-    return this._settings.dateFormat;
+    return this._settings.dateFormat || "DD-MM-YYYY";
   }
 
   async setDateFormat(format) {
-    this._settings.dateFormat = format || "DD-MM-YYYY";
+    this._settings.dateFormat = format;
     await this._saveSettings();
   }
   /**
