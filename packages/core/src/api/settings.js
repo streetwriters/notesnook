@@ -213,6 +213,7 @@ class Settings {
       this._settings.dateModified = Date.now();
       this._settings.synced = false;
     }
+    delete this._settings.remote;
 
     await this._db.storage.write("settings", this._settings);
     this._db.eventManager.publish(
