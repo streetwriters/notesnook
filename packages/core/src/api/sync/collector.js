@@ -43,21 +43,15 @@ class Collector {
 
   async *collect(chunkSize, lastSyncedTimestamp, isForceSync) {
     const key = await this._db.user.getEncryptionKey();
-    for (const itemType in SYNC_COLLECTIONS_MAP) {
-      const collectionKey = SYNC_COLLECTIONS_MAP[itemType];
-      const collection = this._db[collectionKey]._collection;
-      for (const chunk of collection.iterateSync(chunkSize)) {
-        const items = await this.prepareChunk(
-          chunk,
-          lastSyncedTimestamp,
-          isForceSync,
-          key,
-          itemType
-        );
-        if (!items) continue;
-        yield items;
-      }
-    }
+
+    const attachments = await this.prepareChunk(
+      this._db.attachments.syncable,
+      lastSyncedTimestamp,
+      isForceSync,
+      key,
+      "attachment"
+    );
+    if (attachments) yield attachments;
 
     for (const itemType in ASYNC_COLLECTIONS_MAP) {
       const collectionKey = ASYNC_COLLECTIONS_MAP[itemType];
@@ -75,14 +69,21 @@ class Collector {
       }
     }
 
-    const attachments = await this.prepareChunk(
-      this._db.attachments.syncable,
-      lastSyncedTimestamp,
-      isForceSync,
-      key,
-      "attachment"
-    );
-    if (attachments) yield attachments;
+    for (const itemType in SYNC_COLLECTIONS_MAP) {
+      const collectionKey = SYNC_COLLECTIONS_MAP[itemType];
+      const collection = this._db[collectionKey]._collection;
+      for (const chunk of collection.iterateSync(chunkSize)) {
+        const items = await this.prepareChunk(
+          chunk,
+          lastSyncedTimestamp,
+          isForceSync,
+          key,
+          itemType
+        );
+        if (!items) continue;
+        yield items;
+      }
+    }
 
     const settings = await this.prepareChunk(
       [this._db.settings.raw],
