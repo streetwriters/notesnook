@@ -155,9 +155,6 @@ class Sync {
       if (this.connection.state !== signalr.HubConnectionState.Connected)
         return;
 
-      count += chunk.items.length;
-      sendSyncProgressEvent(this.db.eventManager, "download", count);
-
       clearTimeout(remoteSyncTimeout);
       remoteSyncTimeout = setTimeout(() => {
         this.db.eventManager.publish(EVENTS.syncAborted);
@@ -166,6 +163,9 @@ class Sync {
       const key = await this.db.user.getEncryptionKey();
       const dbLastSynced = await this.db.lastSynced();
       await this.processChunk(chunk, key, dbLastSynced, true);
+
+      count += chunk.items.length;
+      sendSyncProgressEvent(this.db.eventManager, "download", count);
     });
 
     this.connection.on("PushCompleted", (lastSynced) => {
@@ -252,10 +252,10 @@ class Sync {
       if (this.connection.state !== signalr.HubConnectionState.Connected)
         return;
 
+      await this.processChunk(chunk, key, dbLastSynced);
+
       count += chunk.items.length;
       sendSyncProgressEvent(this.db.eventManager, `download`, count);
-
-      await this.processChunk(chunk, key, dbLastSynced);
 
       return true;
     });
