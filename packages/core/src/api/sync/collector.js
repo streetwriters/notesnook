@@ -76,7 +76,7 @@ class Collector {
     }
 
     const attachments = await this.prepareChunk(
-      [this._db.attachments.syncable],
+      this._db.attachments.syncable,
       lastSyncedTimestamp,
       isForceSync,
       key,
