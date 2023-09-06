@@ -47,18 +47,25 @@ class Settings {
 
   async merge(remoteItem, lastSynced) {
     if (this._settings.dateModified > lastSynced) {
-      this._settings.id = remoteItem.id;
-      this._settings.groupOptions = {
-        ...this._settings.groupOptions,
-        ...remoteItem.groupOptions
-      };
-      this._settings.toolbarConfig = {
-        ...this._settings.toolbarConfig,
-        ...remoteItem.toolbarConfig
-      };
-      this._settings.aliases = {
-        ...this._settings.aliases,
-        ...remoteItem.aliases
+      this._settings = {
+        ...this._settings,
+        ...(remoteItem.deleted
+          ? {}
+          : {
+              ...remoteItem,
+              groupOptions: {
+                ...this._settings.groupOptions,
+                ...remoteItem.groupOptions
+              },
+              toolbarConfig: {
+                ...this._settings.toolbarConfig,
+                ...remoteItem.toolbarConfig
+              },
+              aliases: {
+                ...this._settings.aliases,
+                ...remoteItem.aliases
+              }
+            })
       };
       this._settings.dateModified = Date.now();
     } else {
@@ -73,6 +80,7 @@ class Settings {
    * @param {GroupOptions} groupOptions
    */
   async setGroupOptions(key, groupOptions) {
+    if (!this._settings.groupOptions) this._settings.groupOptions = {};
     this._settings.groupOptions[key] = groupOptions;
     await this._saveSettings();
   }
@@ -84,7 +92,7 @@ class Settings {
    */
   getGroupOptions(key) {
     return (
-      this._settings.groupOptions[key] || {
+      (this._settings.groupOptions && this._settings.groupOptions[key]) || {
         groupBy: "default",
         sortBy:
           key === "trash"
@@ -103,6 +111,7 @@ class Settings {
    * @param {{preset: string, config?: any[]}} config
    */
   async setToolbarConfig(key, config) {
+    if (!this._settings.toolbarConfig) this._settings.toolbarConfig = {};
     this._settings.toolbarConfig[key] = config;
     await this._saveSettings();
   }
@@ -113,16 +122,17 @@ class Settings {
    * @returns {{preset: string, config: any[]}}
    */
   getToolbarConfig(key) {
-    return this._settings.toolbarConfig[key];
+    return this._settings.toolbarConfig && this._settings.toolbarConfig[key];
   }
 
   async setAlias(id, name) {
+    if (!this._settings.aliases) this._settings.aliases = {};
     this._settings.aliases[id] = name;
     await this._saveSettings();
   }
 
   getAlias(id) {
-    return this._settings.aliases[id];
+    return this._settings.aliases && this._settings.aliases[id];
   }
   /**
    * Setting to -1 means never clear trash.
@@ -183,11 +193,11 @@ class Settings {
    * @returns {"12-hour" | "24-hour"}
    */
   getTimeFormat() {
-    return this._settings.timeFormat;
+    return this._settings.timeFormat || "12-hour";
   }
 
   async setTimeFormat(format) {
-    this._settings.timeFormat = format || "12-hour";
+    this._settings.timeFormat = format;
     await this._saveSettings();
   }
 
@@ -195,15 +205,8 @@ class Settings {
     this._settings = {
       type: "settings",
       id: getId(),
-      groupOptions: {},
-      toolbarConfig: {},
-      aliases: {},
       dateModified: 0,
       dateCreated: 0,
-      trashCleanupInterval: 7,
-      titleFormat: "Note $date$ $time$",
-      timeFormat: "12-hour",
-      dateFormat: "DD-MM-YYYY",
       ...(settings || {})
     };
   }
