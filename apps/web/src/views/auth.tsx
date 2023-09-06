@@ -352,14 +352,14 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
           <AuthField
             id="password"
             type="password"
-            autoComplete="current-password"
+            autoComplete="new-password"
             label="Set password"
             defaultValue={form?.password}
           />
           <AuthField
             id="confirm-password"
             type="password"
-            autoComplete="confirm-password"
+            autoComplete="new-password"
             label="Confirm password"
             defaultValue={form?.["confirm-password"]}
           />
