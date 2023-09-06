@@ -44,6 +44,15 @@ class Collector {
   async *collect(chunkSize, lastSyncedTimestamp, isForceSync) {
     const key = await this._db.user.getEncryptionKey();
 
+    const settings = await this.prepareChunk(
+      [this._db.settings.raw],
+      lastSyncedTimestamp,
+      isForceSync,
+      key,
+      "settings"
+    );
+    if (settings) yield settings;
+
     const attachments = await this.prepareChunk(
       this._db.attachments.syncable,
       lastSyncedTimestamp,
@@ -84,15 +93,6 @@ class Collector {
         yield items;
       }
     }
-
-    const settings = await this.prepareChunk(
-      [this._db.settings.raw],
-      lastSyncedTimestamp,
-      isForceSync,
-      key,
-      "settings"
-    );
-    if (settings) yield settings;
   }
 
   async prepareChunk(chunk, lastSyncedTimestamp, isForceSync, key, itemType) {
