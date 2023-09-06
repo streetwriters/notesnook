@@ -214,6 +214,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                 code.current = value;
                 //onNext();
               }}
+              caretHidden
               inputStyle={{
                 fontSize: SIZE.lg,
                 height: 60,
