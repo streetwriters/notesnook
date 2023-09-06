@@ -141,6 +141,7 @@ export const useEditor = (
       clearTimeout(timers.current["loading-images"]);
       sessionHistoryId.current = undefined;
       saveCount.current = 0;
+      lock.current = false;
       useEditorStore.getState().setReadonly(false);
       resetContent && postMessage(EditorEvents.title, "");
       lastContentChangeTime.current = 0;

@@ -34,6 +34,7 @@ import PremiumService from "../../../services/premium";
 import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 import { eCloseSheet } from "../../../utils/events";
 import { editorController, editorState } from "./utils";
+import { useSettingStore } from "../../../stores/use-setting-store";
 
 const showEncryptionSheet = (file) => {
   presentSheet({
@@ -62,6 +63,7 @@ const file = async (fileOptions) => {
 
     let file;
     try {
+      useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
       file = await DocumentPicker.pick(options);
     } catch (e) {
       return;
@@ -135,6 +137,7 @@ const file = async (fileOptions) => {
 const camera = async (options) => {
   try {
     await db.attachments.generateKey();
+    useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
     launchCamera(
       {
         includeBase64: true,
@@ -156,6 +159,7 @@ const camera = async (options) => {
 const gallery = async (options) => {
   try {
     await db.attachments.generateKey();
+    useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
     launchImageLibrary(
       {
         includeBase64: true,

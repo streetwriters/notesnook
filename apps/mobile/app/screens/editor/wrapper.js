@@ -55,6 +55,7 @@ export const EditorWrapper = ({ width }) => {
       prevState.current = state;
       return;
     }
+    if (useSettingStore.getState().appDidEnterBackgroundForAction) return;
     if (state === "active") {
       editorController.current.onReady();
       editorController.current.overlay(false);

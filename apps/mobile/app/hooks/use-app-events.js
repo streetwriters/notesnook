@@ -534,6 +534,12 @@ export const useAppEvents = () => {
     if (refValues.current?.isReconnecting || !refValues.current?.isUserReady)
       return;
 
+    if (useSettingStore.getState().appDidEnterBackgroundForAction) {
+      useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
+      console.log("AppDidEnterForegroundAfterAction");
+      return;
+    }
+
     if (SettingsService.get().sessionExpired) {
       refValues.current.isReconnecting = false;
       return;

@@ -103,6 +103,8 @@ export interface SettingStore extends State {
   sheetKeyboardHandler: boolean;
   requestBiometrics: boolean;
   setRequestBiometrics: (requestBiometrics: boolean) => void;
+  appDidEnterBackgroundForAction: boolean;
+  setAppDidEnterBackgroundForAction: (value: boolean) => void;
   insets: Insets;
   setInsets: (insets: Insets) => void;
   timeFormat: string;
@@ -155,7 +157,7 @@ export const defaultSettings: SettingStore["settings"] = {
   darkTheme: ThemeDark
 };
 
-export const useSettingStore = create<SettingStore>((set) => ({
+export const useSettingStore = create<SettingStore>((set, get) => ({
   settings: { ...defaultSettings },
   sheetKeyboardHandler: true,
   fullscreen: false,
@@ -174,6 +176,12 @@ export const useSettingStore = create<SettingStore>((set) => ({
   setInsets: (insets) => set({ insets }),
   timeFormat: "12-hour",
   dateFormat: "DD-MM-YYYY",
+  setAppDidEnterBackgroundForAction: (value: boolean) => {
+    set({
+      appDidEnterBackgroundForAction: value
+    });
+  },
+  appDidEnterBackgroundForAction: false,
   insets: initialWindowMetrics?.insets
     ? initialWindowMetrics.insets
     : { top: 0, right: 0, left: 0, bottom: 0 }
