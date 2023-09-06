@@ -17,7 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { mergeAttributes, wrappingInputRule } from "@tiptap/core";
+import {
+  findParentNode,
+  findParentNodeClosestToPos,
+  mergeAttributes,
+  wrappingInputRule
+} from "@tiptap/core";
 import { TaskList } from "@tiptap/extension-task-list";
 import { createNodeView } from "../react";
 import { TaskListComponent } from "./component";
@@ -26,6 +31,7 @@ import TaskItem, { inputRegex } from "@tiptap/extension-task-item";
 import { dropPoint } from "prosemirror-transform";
 import {
   findChildrenByType,
+  getChangedNodes,
   getParentAttributes,
   hasSameAttributes
 } from "../../utils/prosemirror";
@@ -217,7 +223,7 @@ export const TaskListNode = TaskList.extend({
         key: new PluginKey("task-list-drag-drop"),
         appendTransaction(transactions, oldState, newState) {
           const { from: _from, to: _to, $from: _$from } = oldState.selection;
-          const { from, to, $from } = newState.selection;
+          const { from, to } = newState.selection;
 
           const _isTaskItem =
             newState.doc.slice(_from, _to).content.firstChild?.type.name ===
@@ -228,49 +234,30 @@ export const TaskListNode = TaskList.extend({
             TaskItem.name;
 
           if (_isTaskItem && isTaskItem) {
-            const taskLists = findChildrenByType(newState.doc, thisType, false);
-
-            for (const taskList of taskLists) {
-              const range = {
-                start: taskList.pos,
-                end: taskList.pos + taskList.node.nodeSize
-              };
-
-              const _isWithInList = range.start < _from && range.end > _to;
-              const isWithInList = range.start < from && range.end > to;
-
-              if (_isWithInList && isWithInList && from < _from) {
-                const _itemIndex = _$from.index(_$from.depth - 2) + 1;
-                const _itemSubList = $from.parent.child(_itemIndex).lastChild;
-                const _isItemSubList =
-                  _itemSubList?.type.name === TaskList.name;
-
-                if (!_isItemSubList) return newState.tr;
-
-                const _itemPosition = $from.posAtIndex(
-                  _itemIndex,
-                  _$from.depth - 2
-                );
-
-                let isChecked = true;
-
-                for (let index = 0; index < _itemSubList.childCount; index++) {
-                  if (!_itemSubList.child(index).attrs.checked)
-                    isChecked = false;
-                }
-
-                if (isChecked) {
-                  const transaction = newState.tr.setNodeMarkup(
-                    _itemPosition,
-                    undefined,
-                    {
-                      checked: true
-                    }
-                  );
-
-                  return transaction;
-                }
+            const changedBlocks = getChangedNodes(transactions[0], {
+              descend: true,
+              predicate: (node) => node.type.name === TaskList.name
+            });
+            let position = -1;
+            changedBlocks.forEach((block) => {
+              let isChecked = true;
+              block.node.forEach((child) => {
+                if (!child.attrs.checked) isChecked = false;
+              });
+              if (isChecked) {
+                position =
+                  block.pos - newState.doc.resolve(block.pos).parentOffset - 1;
               }
+            });
+            if (position > -1) {
+              const transaction = newState.tr.setNodeMarkup(
+                position,
+                undefined,
+                {
+                  checked: true
+                }
+              );
+              return transaction;
             }
           }
           return newState.tr;
