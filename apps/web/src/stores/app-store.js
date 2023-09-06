@@ -279,8 +279,17 @@ class AppStore extends BaseStore {
       !this.get().isSyncEnabled ||
       !navigator.onLine ||
       !(await networkCheck.waitForInternet())
-    )
+    ) {
+      logger.info("Ignoring duplicate sync", {
+        full,
+        force,
+        lastSynced,
+        syncing: this.isSyncing(),
+        syncDisabled: !this.get().isSyncEnabled,
+        offline: !navigator.onLine
+      });
       return;
+    }
 
     clearTimeout(syncStatusTimeout);
     this.updateLastSynced();
