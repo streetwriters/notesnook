@@ -17,12 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { PAGE_VISIBILITY_CHANGE } from "./page-visibility";
+
 type FilePickerOptions = { acceptedFileTypes: string };
 
 export function showFilePicker({
   acceptedFileTypes
 }: FilePickerOptions): Promise<File | undefined> {
   return new Promise((resolve) => {
+    PAGE_VISIBILITY_CHANGE.ignore = true;
     const input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("accept", acceptedFileTypes);

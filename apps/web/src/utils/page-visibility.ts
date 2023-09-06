@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { debounce } from "@notesnook/common";
 
+export const PAGE_VISIBILITY_CHANGE = { ignore: false };
 function visibilityChange() {
   return "msHidden" in document
     ? "msvisibilityChange"
@@ -58,6 +59,10 @@ export function onPageVisibilityChanged(
   document.addEventListener(
     visibilityChange(),
     debounce((_) => {
+      if (PAGE_VISIBILITY_CHANGE.ignore) {
+        PAGE_VISIBILITY_CHANGE.ignore = false;
+        return;
+      }
       handler("visibilitychange", isDocumentHidden());
     }, 1000)
   );
@@ -66,6 +71,10 @@ export function onPageVisibilityChanged(
     "focus",
     debounce((_) => {
       if (!window.document.hasFocus()) return;
+      if (PAGE_VISIBILITY_CHANGE.ignore) {
+        PAGE_VISIBILITY_CHANGE.ignore = false;
+        return;
+      }
       handler("focus", false);
     }, 1000)
   );
