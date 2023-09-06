@@ -33,6 +33,8 @@
 		<dict>
 			<key>NSExtensionActivationRule</key>
 			<dict>
+				<key>NSExtensionActivationDictionaryVersion</key>
+				<integer>2</integer>
 				<key>NSExtensionActivationSupportsFileWithMaxCount</key>
 				<integer>5</integer>
 				<key>NSExtensionActivationSupportsImageWithMaxCount</key>
