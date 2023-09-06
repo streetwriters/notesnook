@@ -17,18 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { database } from "@notesnook/common";
-import { initalize, logger as dbLogger } from "@notesnook/core/dist/logger";
+import { logger as dbLogger } from "@notesnook/core/dist/logger";
 import { Platform } from "react-native";
-import { MMKVLoader } from "react-native-mmkv-storage";
-import filesystem from "../filesystem";
+import * as Gzip from "react-native-gzip";
 import EventSource from "../../utils/sse/even-source-ios";
 import AndroidEventSource from "../../utils/sse/event-source";
-import Storage, { KV } from "./storage";
-import * as Gzip from "react-native-gzip";
-
-const LoggerStorage = new MMKVLoader()
-  .withInstanceID("notesnook_logs")
-  .initialize();
+import filesystem from "../filesystem";
+import "./logger";
+import Storage from "./storage";
 
 database.host(
   __DEV__
@@ -62,8 +58,6 @@ database.setup(
     decompress: Gzip.inflate
   }
 );
-
-initalize(new KV(LoggerStorage));
 
 export const db = database;
 export const DatabaseLogger = dbLogger;
