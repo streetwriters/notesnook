@@ -54,10 +54,10 @@ export default class SyncManager {
     this._db = db;
   }
 
-  async start(full, force) {
+  async start(full, force, serverLastSynced) {
     try {
       await this.sync.autoSync.start();
-      await this.sync.start(full, force);
+      await this.sync.start(full, force, serverLastSynced);
       return true;
     } catch (e) {
       var isHubException = e.message.includes("HubException:");
