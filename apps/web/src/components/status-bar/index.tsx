@@ -253,7 +253,10 @@ function SyncStatus() {
         ) : null}
       </Text>
       {syncStatus.progress && (
-        <Text variant={"subBody"}>{syncStatus.progress}</Text>
+        <Text variant={"subBody"} ml={1}>
+          {" "}
+          ({syncStatus.progress})
+        </Text>
       )}
     </Button>
   );
