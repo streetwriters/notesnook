@@ -79,21 +79,19 @@ class DatabaseLogWriter {
 
   async read() {
     const logKeys = await this.storage.getAllKeys();
-    const logs = [];
+    const keys = [];
     for (let key of logKeys) {
-      if (key.startsWith(this.key)) logs.push(await this.storage.read(key));
+      if (key.startsWith(this.key)) keys.push(key);
     }
-    return logs;
+    return Object.values(await this.storage.readMulti(keys));
   }
 
   async flush() {
     if (Object.keys(this.queue).length === 0) return;
-    const queueCopy = { ...this.queue };
+    const queueCopy = Object.entries(this.queue);
     this.queue = {};
 
-    for (let key in queueCopy) {
-      await this.storage.write(key, queueCopy[key]);
-    }
+    await this.storage.writeMulti(queueCopy);
   }
 
   async rotate() {
