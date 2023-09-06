@@ -163,9 +163,6 @@ class Sync {
       const key = await this.db.user.getEncryptionKey();
       const dbLastSynced = await this.db.lastSynced();
       await this.processChunk(chunk, key, dbLastSynced, true);
-
-      count += chunk.items.length;
-      sendSyncProgressEvent(this.db.eventManager, "download", count);
     });
 
     this.connection.on("PushCompleted", (lastSynced) => {
@@ -313,7 +310,7 @@ class Sync {
       }
     }
     if (!isSyncInitialized) return;
-    await this.connection.send("SyncCompleted", newLastSynced);
+    await this.connection.invoke("SyncCompleted", newLastSynced);
     return true;
   }
 
@@ -427,8 +424,9 @@ class Sync {
    */
   async pushItem(item, newLastSynced) {
     await this.checkConnection();
-    await this.connection.send("PushItems", item, newLastSynced);
-    return true; // () === 1;
+    return (
+      (await this.connection.invoke("PushItems", item, newLastSynced)) === 1
+    );
   }
 
   async checkConnection() {
