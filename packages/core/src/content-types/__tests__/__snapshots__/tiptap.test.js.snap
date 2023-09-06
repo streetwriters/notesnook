@@ -9,7 +9,7 @@ hello
 `;
 
 exports[`convert HTML to markdown with codeblocks > html-to-md-codeblocks.md 1`] = `
-"Typescript is one of those languages that appear to be very simple. It's often described as \\"Javascript with types\\" and it fits that name very well. However, what many don't realize starting out with Typescript is that Typescript *is *a language and like all other languages it has it's own \\"secrets\\", it's own set of quirks.
+"Typescript is one of those languages that appear to be very simple. It's often described as \\"Javascript with types\\" and it fits that name very well. However, what many don't realize starting out with Typescript is that Typescript*is *a language and like all other languages it has it's own \\"secrets\\", it's own set of quirks.
 
 When I started out with Typescript a few years back, I absolutely hated it. It was unnecessary, a box of clutter, making me write code that would never actually run. I hated defining interfaces, typing out all my functions, and thinking in terms I was not used to as a Javascript developer. Before Javascript, I had coded in C# and I had never really liked C# (I still don't) mostly for the huge amounts of boilerplate and magic involved. Typescript is heavily inspired by C# and seeing that contaminate the Javascript ecosystem irked me no end.
 
@@ -135,15 +135,15 @@ exports[`convert HTML to markdown with outlinelists > html-to-md-outlinelists.md
 
 - but sometimes
 
-- It doesn't
+    - It doesn't
 
-- what do I do?
+    - what do I do?
 
-- I need to do something!
+    - I need to do something!
 
-<li data-type=\\"outlineListItem\\"><p>Makes no sense!</p></li>
+- Makes no sense!
 
-<li data-type=\\"outlineListItem\\"><p>Yes it doesn't!</p></li>
+- Yes it doesn't!
 
 "
 `;
@@ -151,10 +151,6 @@ exports[`convert HTML to markdown with outlinelists > html-to-md-outlinelists.md
 exports[`convert HTML to markdown with tables > html-to-md-tables.md 1`] = `
 "| Goal                                                                                                          | To introduce various features of the app to the user and to convert a user on trial or basic plan to upgrade. |
 | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Frequency                                                                                                     | 1/week or 2/week                                                                                              |
-| Types                                                                                                         | Feature intro, upgrade promo, one time emails                                                                 |
-|                                                                                                               |                                                                                                               |
-| Goal                                                                                                          | To introduce various features of the app to the user and to convert a user on trial or basic plan to upgrade. |
 | Frequency                                                                                                     | 1/week or 2/week                                                                                              |
 | Types                                                                                                         | Feature intro, upgrade promo, one time emails                                                                 |
 |                                                                                                               |                                                                                                               |
@@ -203,9 +199,6 @@ what
 | -------------- | -------------- | -------------- |
 | dsvsajkdb      | dskajvbsadj    | kjdasvbkj      |
 | daskvbkdsa     | kdsajvbsajkd   | kjdsavbdsa     |
-| sdsdavav       | daskvjbdsva    | vsadjkvsadbvjk |
-| dsvsajkdb      | dskajvbsadj    | kjdasvbkj      |
-| daskvbkdsa     | kdsajvbsajkd   | kjdsavbdsa     |
 
 "
 `;
@@ -221,11 +214,11 @@ exports[`convert HTML to markdown with tasklists > html-to-md-tasklists.md 1`] =
 
 - [ ] Task item 4
 
-- [ ] Sub task item 1
+    - [ ] Sub task item 1
 
-- [ ] Sub task item 2
+    - [ ] Sub task item 2
 
-<li class=\\"checklist--item\\"><p>Task Item 5</p></li>
+- [ ] Task Item 5
 
 Nene
 

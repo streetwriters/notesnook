@@ -20,7 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "isomorphic-fetch";
 import crypto from "crypto";
 import dotenv from "dotenv";
+import { DOMParser } from "linkedom";
 
+globalThis.DOMParser = DOMParser;
 require("abortcontroller-polyfill/dist/polyfill-patch-fetch");
 globalThis.crypto = crypto;
 dotenv.config();

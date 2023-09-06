@@ -23,7 +23,6 @@ const IS_E2E = process.env.IS_E2E === "true";
 
 export default defineConfig({
   test: {
-    environment: "happy-dom",
     setupFiles: ["./globals.setup.js"],
     coverage: {
       reporter: ["text", "html"]
