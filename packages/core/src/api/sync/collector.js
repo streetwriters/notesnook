@@ -21,7 +21,6 @@ import { CURRENT_DATABASE_VERSION } from "../../common";
 import { logger } from "../../logger";
 
 const SYNC_COLLECTIONS_MAP = {
-  attachment: "attachments",
   note: "notes",
   notebook: "notebooks",
   shortcut: "shortcuts",
@@ -76,15 +75,23 @@ class Collector {
       }
     }
 
-    const items = await this.prepareChunk(
+    const attachments = await this.prepareChunk(
+      [this._db.attachments.syncable],
+      lastSyncedTimestamp,
+      isForceSync,
+      key,
+      "attachment"
+    );
+    if (attachments) yield attachments;
+
+    const settings = await this.prepareChunk(
       [this._db.settings.raw],
       lastSyncedTimestamp,
       isForceSync,
       key,
       "settings"
     );
-    if (!items) return;
-    yield items;
+    if (settings) yield settings;
   }
 
   async prepareChunk(chunk, lastSyncedTimestamp, isForceSync, key, itemType) {
