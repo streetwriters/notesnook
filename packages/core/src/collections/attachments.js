@@ -39,7 +39,10 @@ export default class Attachments extends Collection {
   merge(localAttachment, remoteAttachment) {
     if (remoteAttachment.deleted) return remoteAttachment;
 
-    if (remoteAttachment.dateModified > localAttachment.dateModified)
+    if (
+      !localAttachment ||
+      remoteAttachment.dateModified > localAttachment.dateModified
+    )
       return remoteAttachment;
 
     if (localAttachment && localAttachment.noteIds) {
