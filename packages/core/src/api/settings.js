@@ -209,6 +209,12 @@ class Settings {
   }
 
   async _saveSettings(updateDateModified = true) {
+    this._db.eventManager.publish(
+      EVENTS.databaseUpdated,
+      "settings",
+      this._settings
+    );
+
     if (updateDateModified) {
       this._settings.dateModified = Date.now();
       this._settings.synced = false;
@@ -216,11 +222,6 @@ class Settings {
     delete this._settings.remote;
 
     await this._db.storage.write("settings", this._settings);
-    this._db.eventManager.publish(
-      EVENTS.databaseUpdated,
-      "settings",
-      this._settings
-    );
   }
 }
 export default Settings;
