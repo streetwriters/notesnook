@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export type Period = "monthly" | "yearly";
+export type Period = "monthly" | "yearly" | "education";
 
 export enum PaddleEvents {
   /**  Checkout has been initialized on the page  **/

@@ -141,7 +141,11 @@ function RecurringPricing(props: RecurringPricingProps) {
 }
 
 export function formatPeriod(period: Period) {
-  return period === "monthly" ? "/mo" : period === "yearly" ? "/yr" : "";
+  return period === "monthly"
+    ? "/mo"
+    : period === "yearly" || period === "education"
+    ? "/yr"
+    : "";
 }
 
 export function getFullPeriod(period: Period) {

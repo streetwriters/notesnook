@@ -26,6 +26,15 @@ type PlanMetadata = {
   subtitle: string;
 };
 
+export const EDUCATION_PLAN: Plan = {
+  id: import.meta.env.DEV || IS_TESTING ? "50305" : "658759",
+  period: "education",
+  country: "US",
+  currency: "USD",
+  discount: 0,
+  price: { gross: 9.99, net: 0, tax: 0 }
+};
+
 export const DEFAULT_PLANS: Plan[] = [
   {
     period: "monthly",
@@ -42,12 +51,17 @@ export const DEFAULT_PLANS: Plan[] = [
     discount: 0,
     id: import.meta.env.DEV || IS_TESTING ? "50305" : "658759",
     price: { gross: 49.99, net: 0, tax: 0 }
-  }
+  },
+  EDUCATION_PLAN
 ];
 
 export const PLAN_METADATA: Record<Period, PlanMetadata> = {
   monthly: { title: "Monthly", subtitle: `Pay once a month.` },
-  yearly: { title: "Yearly", subtitle: `Pay once a year.` }
+  yearly: { title: "Yearly", subtitle: `Pay once a year.` },
+  education: {
+    title: "Education",
+    subtitle: "Special offer for students & teachers."
+  }
 };
 
 let CACHED_PLANS: Plan[];
@@ -59,6 +73,7 @@ export async function getPlans(): Promise<Plan[] | null> {
   const response = await fetch(url);
   if (!response.ok) return null;
   const plans = (await response.json()) as Plan[];
+  plans.push(EDUCATION_PLAN);
   CACHED_PLANS = plans;
   return plans;
 }

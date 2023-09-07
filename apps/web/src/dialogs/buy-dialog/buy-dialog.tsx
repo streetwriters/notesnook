@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Text, Flex, Button } from "@theme-ui/components";
+import { Text, Flex, Button, Link } from "@theme-ui/components";
 import { Cross, Check, Loading } from "../../components/icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -461,7 +461,21 @@ function SelectedPlan(props: SelectedPlanProps) {
       >
         {metadata.title}
       </Text>
-
+      {plan.period === "education" && (
+        <Link
+          href="https://notesnook.com/education"
+          target="_blank"
+          variant="text.body"
+          mt={1}
+          sx={{
+            textDecorationColor: "primary",
+            color: "primary",
+            textAlign: "center"
+          }}
+        >
+          Apply here to get your Education discount code.
+        </Link>
+      )}
       {pricingInfo ? (
         <>
           <Text data-test-id={`checkout-plan-country-${pricingInfo.country}`} />
@@ -602,7 +616,9 @@ function CheckoutPricing(props: CheckoutPricingProps) {
             {currentTotal}
           </Text>
           <Text as="div" sx={{ fontSize: "body", color: "paragraph" }}>
-            {isDiscounted
+            {period === "education" && discount.amount > 0
+              ? "for one year"
+              : isDiscounted
               ? "forever"
               : `first ${getFullPeriod(period)} then ${recurringTotal}`}
           </Text>
