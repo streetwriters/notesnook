@@ -53,6 +53,13 @@ if (process.platform === "win32") {
   app.setAppUserModelId(app.name);
 }
 
+process.on("uncaughtException", (error) => {
+  console.error("uncaughtException:", error);
+});
+process.on("unhandledRejection", (reason) => {
+  console.error("unhandledRejection:", reason);
+});
+
 app.commandLine.appendSwitch("lang", "en-US");
 
 async function createWindow() {

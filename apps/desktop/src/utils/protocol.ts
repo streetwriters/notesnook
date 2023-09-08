@@ -62,14 +62,9 @@ function registerProtocol() {
         headers: { "Content-Type": extensionToMimeType[fileExtension] }
       });
     } else {
-      try {
-        return net.fetch(request, {
-          bypassCustomProtocolHandlers: true
-        });
-      } catch (e) {
-        console.error(e);
-      }
-      return Response.error();
+      return net.fetch(request, {
+        bypassCustomProtocolHandlers: true
+      });
     }
   });
   console.info(`${SCHEME} protocol inteception "successful"`);
