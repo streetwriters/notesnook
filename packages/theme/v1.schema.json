@@ -218,8 +218,8 @@
         },
         "background": {
           "type": "string",
-          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
-          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
         },
         "border": {
           "type": "string",
@@ -328,8 +328,8 @@
         },
         "background": {
           "type": "string",
-          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
-          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
         },
         "border": {
           "type": "string",

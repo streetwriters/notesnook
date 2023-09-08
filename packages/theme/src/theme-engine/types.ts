@@ -186,8 +186,8 @@ export type Colors = {
    */
   paragraph: string;
   /**
-   * Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)
-   * @pattern ^#(?:[0-9a-fA-F]{3}){1,2}$
+   * Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)
+   * @pattern ^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$
    */
   background: string;
   /**
@@ -310,7 +310,12 @@ export const COLORS: readonly (keyof Colors)[] = [
   "backdrop"
 ];
 
-export const ALPHA_COLORS: readonly (keyof Colors)[] = ["hover", "backdrop"];
+export const ALPHA_COLORS: readonly (keyof Colors)[] = [
+  "hover",
+  "backdrop",
+  "background",
+  "placeholder"
+];
 
 export const Variants: readonly (keyof Variants)[] = [
   "primary",
