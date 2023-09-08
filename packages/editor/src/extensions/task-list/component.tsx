@@ -34,7 +34,7 @@ export function TaskListComponent(
   // const isMobile = useIsMobile();
   const { editor, getPos, node, updateAttributes, forwardRef, pos } = props;
   const taskItemType = getNodeType(TaskItemNode.name, editor.schema);
-  const { title, textDirection } = node.attrs;
+  const { title, textDirection, readonly } = node.attrs;
   const [stats, setStats] = useState({ checked: 0, total: 0, percentage: 0 });
 
   const getParent = useCallback(() => {
@@ -127,6 +127,24 @@ export function TaskListComponent(
             <>
               <ToolButton
                 toggled={false}
+                title="Make tasklist readonly"
+                icon={readonly ? "readonlyOn" : "readonlyOff"}
+                variant="small"
+                sx={{
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  const pos = getPos();
+                  const node = editor.current?.state.doc.nodeAt(pos);
+                  if (!node) return;
+                  updateAttributes(
+                    { readonly: !node.attrs.readonly },
+                    { addToHistory: true, preventUpdate: false }
+                  );
+                }}
+              />
+              <ToolButton
+                toggled={false}
                 title="Move all checked tasks to bottom"
                 icon="sortTaskList"
                 variant="small"
@@ -184,6 +202,7 @@ export function TaskListComponent(
       <Box
         ref={forwardRef}
         dir={textDirection}
+        contentEditable={!readonly}
         sx={{
           ul: {
             display: "block",
