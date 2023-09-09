@@ -244,6 +244,8 @@ class Sync {
 
     const dbLastSynced = await this.db.lastSynced();
     let count = 0;
+    let chunks = (await this.db.storage.read("lastFetchedChunks")) || 0;
+
     this.connection.off("SendItems");
     this.connection.on("SendItems", async (chunk) => {
       if (this.connection.state !== signalr.HubConnectionState.Connected)
@@ -251,15 +253,20 @@ class Sync {
 
       await this.processChunk(chunk, key, dbLastSynced);
 
+      await this.db.storage.write("lastFetchedChunks", chunk.count);
       count += chunk.items.length;
       sendSyncProgressEvent(this.db.eventManager, `download`, count);
 
       return true;
     });
     const serverResponse = await this.connection.invoke(
-      "RequestFetch",
-      lastSynced
+      "RequestResumableFetch",
+      lastSynced,
+      chunks
     );
+    this.connection.off("SendItems");
+
+    await this.db.storage.write("lastFetchedChunks", 0);
 
     if (serverResponse.vaultKey) {
       await this.merger.mergeItem(
@@ -268,8 +275,6 @@ class Sync {
         serverResponse.lastSynced
       );
     }
-
-    this.connection.off("SendItems");
 
     if (await this.conflicts.check()) {
       this.conflicts.throw();
