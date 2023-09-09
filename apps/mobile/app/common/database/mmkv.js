@@ -26,4 +26,5 @@ export const MMKV = new MMKVLoader()
       ? ProcessingModes.MULTI_PROCESS
       : ProcessingModes.SINGLE_PROCESS
   )
+  .disableIndexing()
   .initialize();

@@ -101,13 +101,6 @@ const onSyncAborted = () => {
   useUserStore.getState().setSyncing(false, SyncStatus.Failed);
 };
 
-const onSyncProgress = ({ type, total, current }) => {
-  if (type !== "download") return;
-  if (total < 10 || current % 10 === 0) {
-    initAfterSync();
-  }
-};
-
 const onFileEncryptionProgress = ({ total, progress }) => {
   useAttachmentStore
     .getState()
@@ -279,7 +272,6 @@ export const useAppEvents = () => {
       const eventManager = db?.eventManager;
       eventSubscriptions = [
         eventManager?.subscribe(EVENTS.syncCompleted, onSyncComplete),
-        eventManager?.subscribe(EVENTS.syncProgress, onSyncProgress),
         eventManager?.subscribe(
           EVENTS.databaseSyncRequested,
           onRequestPartialSync
