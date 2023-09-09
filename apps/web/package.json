@@ -1,7 +1,7 @@
 {
   "name": "@notesnook/web",
   "description": "Your private note taking space",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "private": true,
   "main": "./src/app.js",
   "homepage": "https://notesnook.com/",
