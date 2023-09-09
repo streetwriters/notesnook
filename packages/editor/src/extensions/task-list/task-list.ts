@@ -59,7 +59,7 @@ export const TaskListNode = TaskList.extend({
         keepOnSplit: false,
         parseHTML: (element) => element.dataset.readonly,
         renderHTML: (attributes) => {
-          if (!attributes.readonly || attributes.nested) {
+          if (!attributes.readonly) {
             return {};
           }
           return {
