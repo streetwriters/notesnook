@@ -103,7 +103,7 @@ export function TaskListComponent(
             }}
           />
           <Input
-            readOnly={!editor.isEditable}
+            readOnly={!editor.isEditable || readonly}
             value={title || ""}
             variant={"clean"}
             sx={{
@@ -202,7 +202,7 @@ export function TaskListComponent(
       <Box
         ref={forwardRef}
         dir={textDirection}
-        contentEditable={!readonly}
+        contentEditable={editor.isEditable ? !readonly : undefined}
         sx={{
           ul: {
             display: "block",
