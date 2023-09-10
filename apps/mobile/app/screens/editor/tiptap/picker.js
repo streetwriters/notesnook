@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,48 +17,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { Platform, View } from "react-native";
+import Sodium from "@ammarahmed/react-native-sodium";
+import { isImage } from "@notesnook/core/dist/utils/filename";
+import { Platform } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 import DocumentPicker from "react-native-document-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
-import Sodium from "react-native-sodium";
-import RNFetchBlob from "rn-fetch-blob";
 import { db } from "../../../common/database";
-import { AttachmentItem } from "../../../components/attachments/attachment-item";
+import { compressToBase64 } from "../../../common/filesystem/compress";
 import {
+  ToastEvent,
   eSendEvent,
-  presentSheet,
-  ToastEvent
+  presentSheet
 } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
-import { eCloseProgressDialog } from "../../../utils/events";
-import { sleep } from "../../../utils/time";
+import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
+import { eCloseSheet } from "../../../utils/events";
 import { editorController, editorState } from "./utils";
-const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
-const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
+import { useSettingStore } from "../../../stores/use-setting-store";
 
 const showEncryptionSheet = (file) => {
   presentSheet({
     title: "Encrypting attachment",
-    paragraph: "Please wait while we encrypt file for upload",
-    icon: "attachment",
-    component: (
-      <View
-        style={{
-          paddingHorizontal: 12
-        }}
-      >
-        <AttachmentItem
-          attachment={{
-            metadata: {
-              filename: file.name
-            },
-            length: file.size
-          }}
-          encryption
-        />
-      </View>
-    )
+    paragraph: `Please wait while we encrypt ${file.name} file for upload`,
+    icon: "attachment"
   });
 };
 
@@ -74,27 +56,23 @@ const file = async (fileOptions) => {
       mode: "import",
       allowMultiSelection: false
     };
-    if (Platform.OS == "ios") {
+    if (Platform.OS === "ios") {
       options.copyTo = "cachesDirectory";
     }
     await db.attachments.generateKey();
 
     let file;
     try {
+      useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
       file = await DocumentPicker.pick(options);
     } catch (e) {
       return;
     }
 
     file = file[0];
-    if (file.type.startsWith("image")) {
-      ToastEvent.show({
-        title: "Type not supported",
-        message: "Please add images from gallery or camera picker.",
-        type: "error"
-      });
-      return;
-    }
+
+    let uri = Platform.OS === "ios" ? file.fileCopyUri : file.uri;
+
     if (file.size > FILE_SIZE_LIMIT) {
       ToastEvent.show({
         title: "File too large",
@@ -114,7 +92,6 @@ const file = async (fileOptions) => {
       return;
     }
 
-    let uri = Platform.OS === "ios" ? file.fileCopyUri : file.uri;
     console.log("file uri: ", uri);
     uri = Platform.OS === "ios" ? santizeUri(uri) : uri;
     showEncryptionSheet(file);
@@ -124,14 +101,27 @@ const file = async (fileOptions) => {
     });
     if (!(await attachFile(uri, hash, file.type, file.name, fileOptions)))
       return;
-    editorController.current?.commands.insertAttachment({
-      hash: hash,
-      filename: file.name,
-      type: file.type,
-      size: file.size
-    });
+    if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
+    if (isImage(file.type)) {
+      editorController.current?.commands.insertImage({
+        hash: hash,
+        filename: file.name,
+        mime: file.type,
+        size: file.size,
+        dataurl: await db.attachments.read(hash, "base64"),
+        title: file.name
+      });
+    } else {
+      editorController.current?.commands.insertAttachment({
+        hash: hash,
+        filename: file.name,
+        mime: file.type,
+        size: file.size
+      });
+    }
+
     setTimeout(() => {
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
     }, 1000);
   } catch (e) {
     ToastEvent.show({
@@ -147,8 +137,7 @@ const file = async (fileOptions) => {
 const camera = async (options) => {
   try {
     await db.attachments.generateKey();
-    eSendEvent(eCloseProgressDialog);
-    await sleep(400);
+    useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
     launchCamera(
       {
         includeBase64: true,
@@ -170,8 +159,7 @@ const camera = async (options) => {
 const gallery = async (options) => {
   try {
     await db.attachments.generateKey();
-    eSendEvent(eCloseProgressDialog);
-    await sleep(400);
+    useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
     launchImageLibrary(
       {
         includeBase64: true,
@@ -205,7 +193,7 @@ const pick = async (options) => {
     return;
   }
   if (options?.type.startsWith("image") || options?.type === "camera") {
-    if (options.type === "image") {
+    if (options.type.startsWith("image")) {
       gallery(options);
     } else {
       camera(options);
@@ -234,7 +222,7 @@ const handleImageResponse = async (response, options) => {
     });
     return;
   }
-  const b64 = `data:${image.type};base64, ` + image.base64;
+  let b64 = `data:${image.type};base64, ` + image.base64;
   const uri = decodeURI(image.uri);
   const hash = await Sodium.hashFile({
     uri: uri,
@@ -243,18 +231,30 @@ const handleImageResponse = async (response, options) => {
 
   let fileName = image.originalFileName || image.fileName;
   if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
+  const isPng = /(png)/g.test(image.type);
+  const isJpeg = /(jpeg|jpg)/g.test(image.type);
+  if (isPng || isJpeg) {
+    b64 =
+      `data:${image.type};base64, ` +
+      (await compressToBase64(
+        Platform.OS === "ios" ? "file://" + image.uri : image.uri,
+        isPng ? "PNG" : "JPEG"
+      ));
+  }
+
+  if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
 
   editorController.current?.commands.insertImage({
     hash: hash,
-    type: image.type,
+    mime: image.type,
     title: fileName,
-    src: b64,
+    dataurl: b64,
     size: image.fileSize,
     filename: fileName
   });
 };
 
-async function attachFile(uri, hash, type, filename, options) {
+export async function attachFile(uri, hash, type, filename, options) {
   try {
     let exists = db.attachments.exists(hash);
     let encryptionInfo;
@@ -273,7 +273,7 @@ async function attachFile(uri, hash, type, filename, options) {
       let key = await db.attachments.generateKey();
       encryptionInfo = await Sodium.encryptFile(key, {
         uri: uri,
-        type: "url",
+        type: options.type || "url",
         hash: hash
       });
       encryptionInfo.type = type;
@@ -289,7 +289,6 @@ async function attachFile(uri, hash, type, filename, options) {
       encryptionInfo,
       editorController.current?.note?.id
     );
-    if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
 
     return true;
   } catch (e) {

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,9 +32,8 @@ import {
   ForwardRef
 } from "./types";
 import { ReactNodeView } from "./react-node-view";
-import { NodeViewRendererProps } from "@tiptap/core";
-import { Editor } from "../../types";
-import { ThemeProvider } from "../../components/theme-provider";
+import { Editor, NodeViewRendererProps } from "@tiptap/core";
+import { EmotionThemeProvider } from "@notesnook/theme";
 
 /**
  * A ReactNodeView that handles React components sensitive
@@ -92,11 +91,15 @@ export class SelectionBasedNodeView<
   ): React.ReactElement<unknown> | null {
     if (!this.options.component) return null;
     const isSelected =
-      this.editor.isEditable &&
-      (this.insideSelection() || this.nodeInsideSelection());
+      (this.options.forceEnableSelection || this.editor.isEditable) &&
+      this.isSelectedNode(this.editor.view.state.selection);
 
     return (
-      <ThemeProvider>
+      <EmotionThemeProvider
+        key={this.options.componentKey?.(this.node)}
+        scope="editor"
+        injectCssVars={false}
+      >
         <this.options.component
           {...props}
           editor={this.editor}
@@ -114,7 +117,7 @@ export class SelectionBasedNodeView<
             )
           }
         />
-      </ThemeProvider>
+      </EmotionThemeProvider>
     );
   }
 

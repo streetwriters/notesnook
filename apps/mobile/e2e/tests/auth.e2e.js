@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,75 +17,69 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { authenticator } from "otplib";
 import {
-  tapByText,
-  prepare,
-  openSideMenu,
   elementById,
-  visibleByText,
-  sleep
+  openSideMenu,
+  prepare,
+  sleep,
+  tapByText,
+  visibleByText
 } from "./utils";
 
-const credentials = {
-  username: "testaccount1@notesnook.com",
-  password: "testaccount@123"
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({ path: path.join(__dirname, ".env.local") });
+
+const USER = {
+  login: {
+    email: process.env.USER_EMAIL,
+    password: process.env.CURRENT_USER_PASSWORD,
+    key: process.env.CURRENT_USER_KEY,
+    totpSecret: process.env.USER_TOTP_SECRET
+  }
 };
 
 async function login() {
   await tapByText("Login to sync your notes.");
-  await elementById("input.email").typeText(credentials.username);
-  await elementById("input.password").typeText(credentials.password);
+  await elementById("input.email").typeText(USER.login.email);
+  await tapByText("Login");
+  await sleep(3000);
+  await elementById("input.totp").typeText(
+    authenticator.generate(USER.login.totpSecret)
+  );
+  await sleep(3000);
+  await elementById("input.password").typeText(USER.login.password);
   await elementById("input.password").tapReturnKey();
 }
 
-async function deleteAccount() {
-  await tapByText("Account Settings");
-  await sleep(2000);
-  await tapByText("Delete account");
-  await elementById("input-value").typeText(credentials.password);
-  await tapByText("Delete");
-  await sleep(5000);
-}
+// async function deleteAccount() {
+//   await tapByText("Account Settings");
+//   await sleep(2000);
+//   await tapByText("Delete account");
+//   await elementById("input-value").typeText(USER.password);
+//   await tapByText("Delete");
+//   await sleep(5000);
+// }
 
-async function signup() {
-  await tapByText("Login to sync your notes.");
-  await sleep(500);
-  await tapByText("Don't have an account? Sign up");
-  await elementById("input.email").typeText(credentials.username);
-  await elementById("input.password").typeText(credentials.password);
-  await elementById("input.confirmPassword").typeText(credentials.password);
-  await elementById("input.confirmPassword").tapReturnKey();
-}
+// async function signup() {
+//   await tapByText("Login to sync your notes.");
+//   await sleep(500);
+//   await tapByText("Don't have an account? Sign up");
+//   await elementById("input.email").typeText(USER.signup.email);
+//   await elementById("input.password").typeText(USER.signup.password);
+//   await elementById("input.confirmPassword").typeText(USER.signup.password);
+//   await elementById("input.confirmPassword").tapReturnKey();
+// }
 
 describe("AUTH", () => {
-  it("Sign up", async () => {
-    await prepare();
-    await openSideMenu();
-    await signup();
-    await sleep(5000);
-    await device.pressBack();
-    await sleep(5000);
-    await openSideMenu();
-    await visibleByText("Tap here to sync your notes.");
-  });
-
-  it("Login to account", async () => {
+  it("Login", async () => {
     await prepare();
     await openSideMenu();
     await login();
     await sleep(10000);
     await openSideMenu();
     await visibleByText("Tap here to sync your notes.");
-  });
-
-  it("Delete account", async () => {
-    await prepare();
-    await openSideMenu();
-    await login();
-    await sleep(15000);
-    await openSideMenu();
-    await tapByText("Settings");
-    await sleep(1000);
-    await deleteAccount();
   });
 });

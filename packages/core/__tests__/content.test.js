@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,21 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { StorageInterface, databaseTest } from "./utils";
-
-beforeEach(() => {
-  StorageInterface.clear();
-});
+import { databaseTest } from "./utils";
+import { test, expect } from "vitest";
 
 test("adding a deleted content should not throw", () =>
   databaseTest().then(async (db) => {
     await expect(
       db.content.add({
-        remote: true,
         deleted: true,
         dateEdited: new Date(),
         id: "hello",
         data: "YOYO!"
       })
     ).resolves.toBeUndefined();
+  }));
+
+test("tagging an empty note should not create an invalid content item", () =>
+  databaseTest().then(async (db) => {
+    const id = await db.notes.add({ title: "Hello" });
+    const contentId = await db.notes.note(id)._note.contentId;
+    expect(contentId).toBeUndefined();
+    expect(await db.content.all()).toHaveLength(0);
+
+    await db.notes.note(id).tag("tag1");
+
+    expect(await db.content.all()).toHaveLength(0);
   }));

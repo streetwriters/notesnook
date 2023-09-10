@@ -17,30 +17,20 @@
 
       p {
         font-family: "Open Sans";
-        /* color: var(--nn_pri) ## TODO: use fixed color */
+        /* color: var(--nn_primary_paragraph) ## TODO: use fixed color */
       }
 
       ::selection {
         color: white;
-        background-color: var(--nn_accent);
+        background-color: var(--nn_primary_accent);
       }
 
       ::placeholder {
-        color: var(--nn_placeholder);
+        color: var(--nn_primary_placeholder);
       }
 
       p.is-editor-empty:first-child::before {
-        color: var(--nn_placeholder) !important;
-      }
-
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        font-family: "Open Sans";
-        color: var(--nn_heading);
+        color: var(--nn_primary_placeholder) !important;
       }
 
       #root {

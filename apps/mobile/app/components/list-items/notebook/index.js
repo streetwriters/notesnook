@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,22 +22,23 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
-import { useSettingStore } from "../../../stores/use-setting-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
-import { history } from "../../../utils";
+import { useSelectionStore } from "../../../stores/use-selection-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { getFormattedDate } from "@notesnook/common";
+import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 
 const showActionSheet = (item) => {
   Properties.present(item);
 };
 
 const navigateToTopic = (topic) => {
-  if (history.selectedItemsList.length > 0) return;
+  if (useSelectionStore.getState().selectedItemsList.length > 0) return;
   TopicNotes.navigate(topic, true);
 };
 
@@ -48,11 +49,8 @@ export const NotebookItem = ({
   dateBy,
   totalNotes
 }) => {
-  const colors = useThemeStore((state) => state.colors);
-  const notebooksListMode = useSettingStore(
-    (state) => state.settings.notebooksListMode
-  );
-  const compactMode = notebooksListMode === "compact";
+  const { colors } = useThemeColors();
+  const compactMode = useIsCompactModeEnabled(item);
   const topics = item.topics?.slice(0, 3) || [];
 
   return (
@@ -63,15 +61,28 @@ export const NotebookItem = ({
           flexShrink: 1
         }}
       >
-        <Heading
-          size={SIZE.md}
-          numberOfLines={1}
-          style={{
-            flexWrap: "wrap"
-          }}
-        >
-          {item.title}
-        </Heading>
+        {compactMode ? (
+          <Paragraph
+            size={SIZE.sm}
+            numberOfLines={1}
+            style={{
+              flexWrap: "wrap"
+            }}
+          >
+            {item.title}
+          </Paragraph>
+        ) : (
+          <Heading
+            size={SIZE.md}
+            numberOfLines={1}
+            style={{
+              flexWrap: "wrap"
+            }}
+          >
+            {item.title}
+          </Heading>
+        )}
+
         {isTopic || !item.description || compactMode ? null : (
           <Paragraph
             size={SIZE.sm}
@@ -98,8 +109,6 @@ export const NotebookItem = ({
                 key={topic.id}
                 height={null}
                 textStyle={{
-                  fontWeight: "normal",
-                  fontFamily: null,
                   marginRight: 0
                 }}
                 type="grayBg"
@@ -111,7 +120,7 @@ export const NotebookItem = ({
                   maxWidth: 120,
                   borderWidth: 0.5,
                   paddingVertical: 2.5,
-                  borderColor: colors.icon,
+                  borderColor: colors.primary.border,
                   paddingHorizontal: 6,
                   marginVertical: 5,
                   marginRight: 5
@@ -122,101 +131,118 @@ export const NotebookItem = ({
           </View>
         )}
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            marginTop: 5,
-            height: SIZE.md + 2
-          }}
-        >
-          <Paragraph
-            color={colors.accent}
-            size={SIZE.xs}
+        {!compactMode ? (
+          <View
             style={{
-              marginRight: 6
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              marginTop: 5,
+              height: SIZE.md + 2
             }}
           >
-            {isTopic ? "Topic" : "Notebook"}
-          </Paragraph>
-
-          {isTrash ? (
-            <>
+            {isTrash ? (
+              <>
+                <Paragraph
+                  color={colors.secondary.paragraph}
+                  size={SIZE.xs}
+                  style={{
+                    textAlignVertical: "center",
+                    marginRight: 6
+                  }}
+                >
+                  {"Deleted on " +
+                    new Date(item.dateDeleted).toISOString().slice(0, 10)}
+                </Paragraph>
+                <Paragraph
+                  color={colors.primary.accent}
+                  size={SIZE.xs}
+                  style={{
+                    textAlignVertical: "center",
+                    marginRight: 6
+                  }}
+                >
+                  {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
+                </Paragraph>
+              </>
+            ) : (
               <Paragraph
-                color={colors.icon}
+                color={colors.secondary.paragraph}
                 size={SIZE.xs}
                 style={{
-                  textAlignVertical: "center",
                   marginRight: 6
                 }}
               >
-                {"Deleted on " +
-                  new Date(item.dateDeleted).toISOString().slice(0, 10)}
+                {getFormattedDate(item[dateBy], "date")}
               </Paragraph>
-              <Paragraph
-                color={colors.accent}
-                size={SIZE.xs}
-                style={{
-                  textAlignVertical: "center",
-                  marginRight: 6
-                }}
-              >
-                {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
-              </Paragraph>
-            </>
-          ) : (
+            )}
             <Paragraph
-              color={colors.icon}
+              color={colors.secondary.paragraph}
               size={SIZE.xs}
               style={{
                 marginRight: 6
               }}
             >
-              {new Date(item[dateBy]).toDateString().substring(4)}
+              {item && totalNotes > 1
+                ? totalNotes + " notes"
+                : totalNotes === 1
+                ? totalNotes + " note"
+                : "0 notes"}
             </Paragraph>
-          )}
-          <Paragraph
-            color={colors.icon}
-            size={SIZE.xs}
-            style={{
-              marginRight: 6
-            }}
-          >
-            {item && totalNotes > 1
-              ? totalNotes + " notes"
-              : totalNotes === 1
-              ? totalNotes + " note"
-              : "0 notes"}
-          </Paragraph>
 
-          {item.pinned ? (
-            <Icon
-              name="pin-outline"
-              size={SIZE.sm}
-              style={{
-                marginRight: 10,
-                marginTop: 2
-              }}
-              color={colors.accent}
-            />
-          ) : null}
-        </View>
+            {item.pinned ? (
+              <Icon
+                name="pin-outline"
+                size={SIZE.sm}
+                style={{
+                  marginRight: 10,
+                  marginTop: 2
+                }}
+                color={colors.primary.accent}
+              />
+            ) : null}
+          </View>
+        ) : null}
       </View>
-      <IconButton
-        color={colors.heading}
-        name="dots-horizontal"
-        testID={notesnook.ids.notebook.menu}
-        size={SIZE.xl}
-        onPress={() => showActionSheet(item)}
-        customStyle={{
-          justifyContent: "center",
-          height: 35,
-          width: 35,
-          borderRadius: 100,
+      <View
+        style={{
+          flexDirection: "row",
           alignItems: "center"
         }}
-      />
+      >
+        {compactMode ? (
+          <>
+            <Paragraph
+              color={colors.primary.icon}
+              size={SIZE.xs}
+              style={{
+                marginRight: 6
+              }}
+            >
+              {item && totalNotes > 1
+                ? totalNotes + " notes"
+                : totalNotes === 1
+                ? totalNotes + " note"
+                : "0 notes"}
+            </Paragraph>
+          </>
+        ) : null}
+
+        <IconButton
+          color={colors.primary.heading}
+          name="dots-horizontal"
+          testID={notesnook.ids.notebook.menu}
+          size={SIZE.xl}
+          onPress={() => showActionSheet(item)}
+          customStyle={{
+            justifyContent: "center",
+            height: 35,
+            width: 35,
+            borderRadius: 100,
+            alignItems: "center"
+          }}
+        />
+      </View>
     </>
   );
 };

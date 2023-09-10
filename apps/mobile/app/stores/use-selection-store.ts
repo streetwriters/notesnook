@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import create, { State } from "zustand";
-import { history } from "../utils";
 
 type Item = {
   id: string;
@@ -30,23 +29,16 @@ export interface SelectionStore extends State {
   setAll: (all: Array<unknown>) => void;
   setSelectionMode: (mode: boolean) => void;
   setSelectedItem: (item: Item) => void;
-  clearSelection: (noanimation: boolean) => void;
+  clearSelection: () => void;
 }
 
 export const useSelectionStore = create<SelectionStore>((set, get) => ({
   selectedItemsList: [],
   selectionMode: false,
   setAll: (all) => {
-    history.selectedItemsList = all as never[];
     set({ selectedItemsList: all });
   },
   setSelectionMode: (mode) => {
-    if (!mode) {
-      history.selectedItemsList = [];
-      history.selectionMode = false;
-    } else {
-      history.selectionMode = true;
-    }
     set({
       selectionMode: mode,
       selectedItemsList: mode ? get().selectedItemsList : []
@@ -61,17 +53,13 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
       selectedItems.push(item);
     }
     selectedItems = [...new Set(selectedItems)];
-    history.selectedItemsList = selectedItems as never[];
-    history.selectionMode =
-      selectedItems.length > 0 ? get().selectionMode : false;
+
     set({
       selectedItemsList: selectedItems,
-      selectionMode: history.selectionMode
+      selectionMode: get().selectionMode
     });
   },
   clearSelection: () => {
-    history.selectedItemsList = [];
-    history.selectionMode = false;
     set({ selectionMode: false, selectedItemsList: [] });
   }
 }));

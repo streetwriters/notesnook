@@ -1,4 +1,0 @@
-Subtotal: $40.00
-Sales tax: $0.00
-Discount: -$20.00
-Total: $20.00

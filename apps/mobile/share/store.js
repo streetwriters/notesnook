@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,53 +17,76 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ThemeDark, ThemeLight, useThemeEngineStore } from "@notesnook/theme";
 import { Appearance } from "react-native";
 import create from "zustand";
-import {
-  ACCENT,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT
-} from "../app/utils/color-scheme";
+import { db } from "../app/common/database";
 import { MMKV } from "../app/common/database/mmkv";
+export async function initDatabase() {
+  if (!db.isInitialized) {
+    await db.init();
+  } else {
+    await db.initCollections();
+  }
+  await db.notes.init();
+}
+
+const StorageKeys = {
+  appendNote: "shareMenuAppendNote",
+  selectedNotebooks: "shareMenuSelectedNotebooks",
+  selectedTag: "shareMenuSelectedTag",
+  appSettings: "appSettings"
+};
+
+let appSettings = MMKV.getString(StorageKeys.appSettings);
+if (appSettings) {
+  appSettings = JSON.parse(appSettings);
+}
+
+const systemColorScheme = Appearance.getColorScheme();
+const appColorScheme = appSettings?.colorScheme;
+const useSystemTheme = appSettings?.useSystemTheme;
+const currentColorScheme = useSystemTheme ? systemColorScheme : appColorScheme;
+
+const theme =
+  currentColorScheme === "dark"
+    ? appSettings?.darkTheme
+    : appSettings?.lightTheme;
+
+const currentTheme =
+  theme || (currentColorScheme === "dark" ? ThemeDark : ThemeLight);
+
+useThemeEngineStore.getState().setTheme(currentTheme);
 
 export const useShareStore = create((set) => ({
-  colors:
-    Appearance.getColorScheme() === "dark"
-      ? COLOR_SCHEME_DARK
-      : COLOR_SCHEME_LIGHT,
-  accent: ACCENT,
-  setAccent: async () => {
-    let appSettings = MMKV.getString("appSettings");
-
-    if (appSettings) {
-      appSettings = JSON.parse(appSettings);
-      let accentColor = appSettings.theme?.accent || ACCENT.color;
-
-      let accent = {
-        color: accentColor,
-        shade: accentColor + "12"
-      };
-      set({ accent: accent });
-    }
-  },
-  setColors: () => {
-    set({
-      colors:
-        Appearance.getColorScheme() === "dark"
-          ? COLOR_SCHEME_DARK
-          : COLOR_SCHEME_LIGHT
-    });
-  },
+  theme: currentTheme,
   appendNote: null,
   setAppendNote: (note) => {
-    MMKV.setItem("shareMenuAppendNote", JSON.stringify(note));
+    MMKV.setItem(StorageKeys.appendNote, JSON.stringify(note));
     set({ appendNote: note });
   },
-  restoreAppendNote: async () => {
-    let note = MMKV.getString("shareMenuAppendNote");
-    if (note) {
-      note = JSON.parse(note);
-      set({ appendNote: note });
-    }
+  restore: () => {
+    let appendNote = MMKV.getString(StorageKeys.appendNote);
+    let selectedNotebooks = MMKV.getString(StorageKeys.selectedNotebooks);
+    let selectedTags = MMKV.getString(StorageKeys.selectedTag);
+    appendNote = JSON.parse(appendNote);
+    set({
+      appendNote: appendNote ? JSON.parse(appendNote) : null,
+      selectedNotebooks: selectedNotebooks ? JSON.parse(selectedNotebooks) : [],
+      selectedTag: selectedTags ? JSON.parse(selectedTags) : []
+    });
+  },
+  selectedTags: [],
+  selectedNotebooks: [],
+  setSelectedNotebooks: (selectedNotebooks) => {
+    MMKV.setItem(
+      StorageKeys.selectedNotebooks,
+      JSON.stringify(selectedNotebooks)
+    );
+    set({ selectedNotebooks });
+  },
+  setSelectedTags: (selectedTags) => {
+    MMKV.setItem(StorageKeys.selectedTag, JSON.stringify(selectedTags));
+    set({ selectedTags });
   }
 }));

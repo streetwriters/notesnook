@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ const onPressFloatingButton = () => {
     positivePress: async () => {
       await db.trash?.clear();
       useTrashStore.getState().setTrash();
-      useSelectionStore.getState().clearSelection(true);
+      useSelectionStore.getState().clearSelection();
       ToastEvent.show({
         heading: "Trash cleared",
         message:
@@ -60,13 +60,15 @@ const onPressFloatingButton = () => {
     positiveType: "errorShade"
   });
 };
-
-const PLACEHOLDER_DATA = {
+const PLACEHOLDER_DATA = (trashCleanupInterval = 7) => ({
   heading: "Trash",
-  paragraph: "Items in the trash will be permanently deleted after 7 days.",
+  paragraph:
+    trashCleanupInterval === -1
+      ? "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
+      : `Items in the trash will be permanently deleted after after ${trashCleanupInterval} days.`,
   button: null,
   loading: "Loading trash items"
-};
+});
 
 export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
   const trash = useTrashStore((state) => state.trash);
@@ -95,7 +97,9 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         type="trash"
         screen="Trash"
         loading={!isFocused}
-        placeholderData={PLACEHOLDER_DATA}
+        placeholderData={PLACEHOLDER_DATA(
+          db.settings?.getTrashCleanupInterval()
+        )}
         headerProps={{
           heading: "Trash",
           color: null
@@ -110,7 +114,7 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         <FloatingButton
           title="Clear all trash"
           onPress={onPressFloatingButton}
-          shouldShow={true}
+          alwaysVisible={true}
         />
       ) : null}
     </DelayLayout>

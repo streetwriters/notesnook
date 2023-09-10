@@ -1,13 +1,23 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import './globals.js';
 import 'react-native-get-random-values';
-import 'react-native-gesture-handler';
 import React from 'react';
 import { AppRegistry, LogBox, Platform, UIManager } from 'react-native';
 import Config from 'react-native-config';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import appJson from './app.json';
-import Notifications from '../app/services/notifications';
+import Notifications from "../app/services/notifications";
+import NetInfo from "@react-native-community/netinfo";
+NetInfo.configure({
+  reachabilityUrl: "https://notesnook.com",
+  reachabilityTest: (response) => {
+    if (!response) return false;
+    return response?.status >= 200 && response?.status < 300;
+  }
+});
+
+Notifications.init();
+
 const appName = appJson.name;
 if (Config.isTesting) {
   Date.prototype.toLocaleString = () => 'XX-XX-XX';
@@ -20,7 +30,7 @@ if (__DEV__) {
   LogBox.ignoreAllLogs();
 }
 let NotesnookShare;
-Notifications.init();
+
 let QuickNoteIOS;
 
 const AppProvider = () => {
@@ -40,6 +50,8 @@ const ShareProvider = () => {
     <NotesnookShare quicknote={false} />
   );
 };
+
+
 
 AppRegistry.registerComponent('NotesnookShare', () => ShareProvider);
 

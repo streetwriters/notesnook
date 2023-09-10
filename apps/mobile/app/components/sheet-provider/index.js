@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { eCloseProgressDialog, eOpenProgressDialog } from "../../utils/events";
+import { useThemeColors } from "@notesnook/theme";
+import { eCloseSheet, eOpenSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
@@ -34,60 +34,53 @@ import SheetWrapper from "../ui/sheet";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 const SheetProvider = ({ context = "global" }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
-  const [dialogData, setDialogData] = useState(null);
+  const [data, setData] = useState(null);
   const actionSheetRef = useRef();
   const editor = useRef({
     refocus: false
   });
 
   useEffect(() => {
-    eSubscribeEvent(eOpenProgressDialog, open);
-    eSubscribeEvent(eCloseProgressDialog, close);
+    eSubscribeEvent(eOpenSheet, open);
+    eSubscribeEvent(eCloseSheet, close);
     return () => {
-      eUnSubscribeEvent(eOpenProgressDialog, open);
-      eUnSubscribeEvent(eCloseProgressDialog, close);
+      eUnSubscribeEvent(eOpenSheet, open);
+      eUnSubscribeEvent(eCloseSheet, close);
     };
   }, [close, open, visible]);
 
   const open = useCallback(
-    async (data) => {
-      if (!data.context) data.context = "global";
-      if (data.context !== context) return;
-      if (visible || dialogData) {
-        setDialogData(null);
-        setVisible(false);
-        await sleep(500);
-      }
-      setDialogData(data);
+    async (payload) => {
+      if (!payload.context) payload.context = "global";
+      if (payload.context !== context) return;
+      setData(payload);
       setVisible(true);
-      if (data.editor) {
+      if (payload.editor) {
         editor.current.refocus = false;
         if (editorState().keyboardState) {
-          // tiny.call(EditorWebView, tiny.cacheRange + tiny.blur);
           editor.current.refocus = true;
         }
       }
     },
-    [context, dialogData, visible]
+    [context]
   );
 
   useEffect(() => {
     (async () => {
-      if (visible && dialogData) {
-        if (dialogData.editor) await sleep(100);
+      if (visible && data) {
+        if (data.editor) await sleep(100);
         actionSheetRef.current?.setModalVisible(true);
         return;
       } else {
         if (editor.current?.refocus) {
           editorState().isFocused = true;
-          //  tiny.call(EditorWebView, tiny.restoreRange + tiny.clearRange);
           editor.current.refocus = false;
         }
       }
     })();
-  }, [visible, dialogData]);
+  }, [visible, data]);
 
   const close = useCallback(
     (ctx) => {
@@ -98,80 +91,86 @@ const SheetProvider = ({ context = "global" }) => {
     [context]
   );
 
-  return !visible || !dialogData ? null : (
+  return !visible || !data ? null : (
     <SheetWrapper
       fwdRef={actionSheetRef}
-      gestureEnabled={!dialogData?.progress && !dialogData?.disableClosing}
-      closeOnTouchBackdrop={
-        !dialogData?.progress && !dialogData?.disableClosing
-      }
+      gestureEnabled={!data?.progress && !data?.disableClosing}
+      closeOnTouchBackdrop={!data?.progress && !data?.disableClosing}
       onClose={() => {
-        dialogData.onClose && dialogData.onClose();
+        data.onClose && data.onClose();
         setVisible(false);
-        setDialogData(null);
+        setData(null);
       }}
+      bottomPadding={!data.noBottomPadding}
+      enableGesturesInScrollView={
+        typeof data.enableGesturesInScrollView === "undefined"
+          ? true
+          : data.enableGesturesInScrollView
+      }
     >
       <View
         style={{
           justifyContent: "center",
           alignItems: "center",
           marginBottom:
-            !dialogData.progress &&
-            !dialogData.icon &&
-            !dialogData.title &&
-            !dialogData.paragraph
+            !data.progress && !data.icon && !data.title && !data.paragraph
               ? 0
               : 10,
           paddingHorizontal: 12
         }}
       >
-        {dialogData?.progress ? (
+        {data?.progress ? (
           <ActivityIndicator
             style={{
               marginTop: 15
             }}
             size={50}
-            color={colors.accent}
+            color={colors.primary.accent}
           />
         ) : null}
 
-        {dialogData?.icon ? (
+        {data?.icon ? (
           <Icon
-            color={colors[dialogData.iconColor] || colors.accent}
-            name={dialogData.icon}
+            color={colors[data.iconColor] || colors.primary.accent}
+            name={data.icon}
             size={50}
           />
         ) : null}
 
-        {dialogData?.title ? <Heading> {dialogData?.title}</Heading> : null}
+        {data?.title ? <Heading> {data?.title}</Heading> : null}
 
-        {dialogData?.paragraph ? (
+        {data?.paragraph ? (
           <Paragraph style={{ textAlign: "center" }}>
-            {dialogData?.paragraph}
+            {data?.paragraph}
           </Paragraph>
         ) : null}
       </View>
 
-      {typeof dialogData.component === "function"
-        ? dialogData.component(actionSheetRef, close, (data) => {
-            if (!data) return;
-            setDialogData((prevData) => {
-              return {
-                ...prevData,
-                ...data
-              };
-            });
-          })
-        : dialogData.component}
+      {typeof data.component === "function"
+        ? data.component(
+            actionSheetRef,
+            () => close(context),
+            (data) => {
+              if (!data) return;
+              setData((prevData) => {
+                return {
+                  ...prevData,
+                  ...data
+                };
+              });
+            },
+            colors
+          )
+        : data.component}
 
       <View
         style={{
           paddingHorizontal: 12,
-          marginBottom: dialogData.valueArray ? 12 : 0
+          marginBottom: data.valueArray ? 12 : 0
         }}
       >
-        {dialogData.valueArray &&
-          dialogData.valueArray.map((v) => (
+        {data.valueArray &&
+          data.valueArray.map((v) => (
             <Button
               title={v}
               type="gray"
@@ -193,32 +192,30 @@ const SheetProvider = ({ context = "global" }) => {
           paddingHorizontal: 12
         }}
       >
-        {dialogData?.action ? (
+        {data?.action ? (
           <Button
-            onPress={dialogData.action}
-            key={dialogData.actionText}
-            title={dialogData.actionText}
-            accentColor={dialogData.iconColor || "accent"}
+            onPress={data.action}
+            key={data.actionText}
+            title={data.actionText}
+            accentColor={data.iconColor}
             accentText="light"
             type="accent"
-            height={45}
+            height={40}
             width={250}
             style={{
-              borderRadius: 100
+              marginBottom: 25
             }}
-            fontSize={SIZE.md}
           />
         ) : null}
 
-        {dialogData?.actionsArray &&
-          dialogData?.actionsArray.map((item) => (
+        {data?.actionsArray &&
+          data?.actionsArray.map((item) => (
             <Button
               onPress={item.action}
               key={item.accentText}
               title={item.actionText}
               icon={item.icon && item.icon}
               type={item.type || "accent"}
-              height={50}
               style={{
                 marginBottom: 10
               }}
@@ -227,7 +224,7 @@ const SheetProvider = ({ context = "global" }) => {
             />
           ))}
 
-        {dialogData?.learnMore ? (
+        {data?.learnMore ? (
           <Paragraph
             style={{
               alignSelf: "center",
@@ -235,15 +232,15 @@ const SheetProvider = ({ context = "global" }) => {
               textDecorationLine: "underline"
             }}
             size={SIZE.xs}
-            onPress={dialogData.learnMorePress}
-            color={colors.icon}
+            onPress={data.learnMorePress}
+            color={colors.secondary.paragraph}
           >
             <Icon
-              color={colors.icon}
+              color={colors.primary.icon}
               name="information-outline"
               size={SIZE.xs}
             />{" "}
-            {dialogData.learnMore}
+            {data.learnMore}
           </Paragraph>
         ) : null}
       </View>

@@ -4,6 +4,7 @@
 <dict>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
+		<string>com.transistorsoft.fetch</string>
 		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
@@ -100,6 +101,7 @@
 	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>fetch</string>
 		<string>processing</string>
 	</array>
 	<key>UIFileSharingEnabled</key>
@@ -149,5 +151,9 @@
 			</dict>
 		</dict>
 	</array>
+	<key>appGroupId</key>
+	<string>group.org.streetwriters.notesnook</string>
+	<key>disableMMKVBackup</key>
+	<true/>
 </dict>
 </plist>

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,12 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import ShareExtension from "@ammarahmed/react-native-share-extension";
 import { getPreviewData } from "@flyerhq/react-native-link-preview";
-import { parseHTML } from "@notesnook/core/utils/html-parser";
-import React, { useEffect, useRef, useState } from "react";
+import { formatBytes } from "@notesnook/common";
+import { isImage } from "@notesnook/core/dist/utils/filename";
+import { parseHTML } from "@notesnook/core/dist/utils/html-parser";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Dimensions,
+  Image,
   Keyboard,
   Platform,
   SafeAreaView,
@@ -30,26 +35,28 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
-  useWindowDimensions,
-  View
+  View,
+  useWindowDimensions
 } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 import {
   SafeAreaProvider,
   useSafeAreaInsets
 } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import ShareExtension from "rn-extensions-share";
 import isURL from "validator/lib/isURL";
 import { db } from "../app/common/database";
 import Storage from "../app/common/database/storage";
-import Editor from "../app/screens/editor";
 import { eSendEvent } from "../app/services/event-manager";
-import { getElevation } from "../app/utils";
+import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../app/utils/constants";
+import { getElevationStyle } from "../app/utils/elevation";
 import { eOnLoadNote } from "../app/utils/events";
+import { NoteBundle } from "../app/utils/note-bundle";
+import { Editor } from "./editor";
 import { Search } from "./search";
-import { useShareStore } from "./store";
-import { useCallback } from "react";
-import { sleep } from "../app/utils/time";
+import { initDatabase, useShareStore } from "./store";
+import { useThemeColors } from "@notesnook/theme";
+
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
 };
@@ -64,16 +71,15 @@ async function sanitizeHtml(site) {
 }
 
 function makeHtmlFromUrl(url) {
-  return `<a style="overflow-wrap:anywhere;white-space:pre-wrap" href='${url}' target='_blank'>${url}</a>`;
+  return `<a href='${url}' target='_blank'>${url}</a>`;
 }
 
 function makeHtmlFromPlainText(text) {
   if (!text) return "";
 
-  return `<p style="overflow-wrap:anywhere;white-space:pre-wrap" >${text.replace(
-    /(?:\r\n|\r|\n)/g,
-    "<br>"
-  )}</p>`;
+  return `<p>${text
+    .replace(/[\n]+/g, "\n")
+    .replace(/(?:\r\n|\r|\n)/g, "</p><p>")}</p>`;
 }
 
 function getBaseUrl(site) {
@@ -191,12 +197,10 @@ const modes = {
 };
 
 const ShareView = ({ quicknote = false }) => {
-  const colors = useShareStore((state) => state.colors);
-  const accent = useShareStore((state) => state.accent);
+  const { colors } = useThemeColors();
   const appendNote = useShareStore((state) => state.appendNote);
   const [note, setNote] = useState({ ...defaultNote });
-  const noteContent = useRef();
-  const [loadingIntent, setLoadingIntent] = useState(true);
+  const noteContent = useRef("");
   const [loading, setLoading] = useState(false);
   const [loadingExtension, setLoadingExtension] = useState(true);
   const [rawData, setRawData] = useState({
@@ -211,14 +215,15 @@ const ShareView = ({ quicknote = false }) => {
       ? { top: StatusBar.currentHeight }
       : // eslint-disable-next-line react-hooks/rules-of-hooks
         useSafeAreaInsets();
-  const [showSearch, setShowSearch] = useState(false);
-  const [kh, setKh] = useState(0);
-  const editorRef = useRef();
+  const [searchMode, setSearchMode] = useState(null);
+  const [rawFiles, setRawFiles] = useState([]);
 
+  const [kh, setKh] = useState(0);
+  globalThis["IS_SHARE_EXTENSION"] = true;
   const onKeyboardDidShow = (event) => {
-    let kHeight = event.endCoordinates.height;
-    keyboardHeight.current = kHeight;
-    setKh(kHeight);
+    let height = Dimensions.get("window").height - event.endCoordinates.screenY;
+    keyboardHeight.current = height;
+    setKh(height);
   };
 
   const onKeyboardDidHide = () => {
@@ -227,7 +232,6 @@ const ShareView = ({ quicknote = false }) => {
   };
 
   useEffect(() => {
-    useShareStore.getState().setAccent();
     let keyboardDidShow = Keyboard.addListener(
       "keyboardDidShow",
       onKeyboardDidShow
@@ -259,11 +263,11 @@ const ShareView = ({ quicknote = false }) => {
       defaultNote.content.data = null;
       setNote({ ...defaultNote });
       const data = await ShareExtension.data();
+
       if (!data || data.length === 0) {
         setRawData({
           value: ""
         });
-        setLoadingIntent(false);
         return;
       }
       let note = { ...defaultNote };
@@ -276,14 +280,33 @@ const ShareView = ({ quicknote = false }) => {
             note.content.data = makeHtmlFromPlainText(item.value);
           }
           noteContent.current = note.content.data;
+        } else {
+          const user = await db.user.getUser();
+          if (user && user.subscription.type !== 0) {
+            if (
+              (isImage(item.type) && item.size > IMAGE_SIZE_LIMIT) ||
+              (!isImage(item.type) && item.size > FILE_SIZE_LIMIT)
+            )
+              continue;
+
+            setRawFiles((files) => {
+              const index = files.findIndex((file) => file.name === item.name);
+              if (index === -1) {
+                files.push(item);
+                return [...files];
+              } else {
+                return files;
+              }
+            });
+          }
         }
       }
-      setNote({ ...note });
       onLoad();
+
+      setNote({ ...note });
     } catch (e) {
       console.error(e);
     }
-    setLoadingIntent(false);
   }, [onLoad]);
 
   const onLoad = useCallback(() => {
@@ -299,16 +322,15 @@ const ShareView = ({ quicknote = false }) => {
 
   useEffect(() => {
     (async () => {
-      //await loadDatabase();
+      await initDatabase();
       setLoadingExtension(false);
       loadData();
-      useShareStore.getState().restoreAppendNote();
+      useShareStore.getState().restore();
     })();
   }, [loadData]);
 
   const close = async () => {
     setNote({ ...defaultNote });
-    setLoadingIntent(true);
     setLoadingExtension(true);
     if (quicknote) {
       ShareExtension.openURL("ShareMedia://MainApp");
@@ -319,10 +341,10 @@ const ShareView = ({ quicknote = false }) => {
 
   const onPress = async () => {
     setLoading(true);
-    await db.init();
-    await db.notes.init();
-    await sleep(1500);
-    if (!noteContent.current) return;
+    if (!noteContent.current && rawFiles.length === 0) {
+      setLoading(false);
+      return;
+    }
     if (appendNote && !db.notes.note(appendNote.id)) {
       useShareStore.getState().setAppendNote(null);
       Alert.alert("The note you are trying to append to has been deleted.");
@@ -334,7 +356,7 @@ const ShareView = ({ quicknote = false }) => {
       let raw = await db.content.raw(appendNote.contentId);
       _note = {
         content: {
-          data: raw.data + "\n" + noteContent.current,
+          data: (raw?.data || "") + noteContent.current,
           type: "tiptap"
         },
         id: appendNote.id,
@@ -342,18 +364,32 @@ const ShareView = ({ quicknote = false }) => {
       };
     } else {
       _note = { ...note };
+      _note.tags = useShareStore.getState().selectedTags || [];
+
       _note.content.data = noteContent.current;
       _note.sessionId = Date.now();
     }
-    await db.notes.add(_note);
+
+    await NoteBundle.createNotes({
+      files: rawFiles,
+      note: _note,
+      notebooks: useShareStore.getState().selectedNotebooks
+    });
+
+    try {
+      if (!globalThis["IS_MAIN_APP_RUNNING"]) {
+        await db.sync(false, false);
+      } else {
+        console.log("main app running, skipping sync");
+      }
+    } catch (e) {
+      console.log(e, e.stack);
+    }
+
     await Storage.write("notesAddedFromIntent", "added");
     close();
     setLoading(false);
   };
-
-  useEffect(() => {
-    useShareStore.getState().setColors();
-  }, [note]);
 
   const changeMode = async (m) => {
     setMode(m);
@@ -391,6 +427,20 @@ const ShareView = ({ quicknote = false }) => {
     loadData();
   }, [loadData]);
 
+  const onRemoveFile = (item) => {
+    const index = rawFiles.findIndex((file) => file.name === item.name);
+    if (index > -1) {
+      setRawFiles((state) => {
+        const files = [...state];
+        files.splice(index);
+        return files;
+      });
+      RNFetchBlob.fs.unlink(item.value).catch(console.log);
+    }
+  };
+
+  const WrapperView = Platform.OS === "android" ? View : ScrollView;
+
   return loadingExtension ? null : (
     <SafeAreaView
       style={{
@@ -400,14 +450,14 @@ const ShareView = ({ quicknote = false }) => {
         justifyContent: quicknote ? "flex-start" : "flex-end"
       }}
     >
-      {quicknote && !showSearch ? (
+      {quicknote && !searchMode ? (
         <View
           style={{
             width: "100%",
-            backgroundColor: colors.bg,
+            backgroundColor: colors.primary.background,
             height: 50 + insets.top,
             paddingTop: insets.top,
-            ...getElevation(1),
+            ...getElevationStyle(1),
             marginTop: -insets.top,
             flexDirection: "row",
             alignItems: "center",
@@ -417,10 +467,10 @@ const ShareView = ({ quicknote = false }) => {
           <Button
             type="action"
             icon="close"
-            iconColor={colors.pri}
+            iconColor={colors.secondary.icon}
             onPress={() => {
-              if (showSearch) {
-                setShowSearch(false);
+              if (searchMode) {
+                setSearchMode(null);
               } else {
                 close();
               }
@@ -435,9 +485,8 @@ const ShareView = ({ quicknote = false }) => {
 
           <Text
             style={{
-              color: colors.pri,
-              fontSize: 17,
-              fontFamily: "OpenSans-Regular"
+              color: colors.primary.paragraph,
+              fontSize: 17
             }}
           >
             Quick note
@@ -446,7 +495,7 @@ const ShareView = ({ quicknote = false }) => {
           <Button
             type="action"
             icon="check"
-            iconColor={accent.color}
+            iconColor={colors.primary.accent}
             onPress={onPress}
             style={{
               width: 50,
@@ -460,8 +509,8 @@ const ShareView = ({ quicknote = false }) => {
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
-            if (showSearch) {
-              setShowSearch(false);
+            if (searchMode) {
+              setSearchMode(null);
             } else {
               close();
             }
@@ -484,89 +533,33 @@ const ShareView = ({ quicknote = false }) => {
         </TouchableOpacity>
       )}
 
-      {showSearch ? (
+      {searchMode ? (
         <Search
           quicknote={quicknote}
           getKeyboardHeight={() => keyboardHeight.current}
+          mode={searchMode}
           close={() => {
-            setShowSearch(false);
+            setSearchMode(null);
           }}
         />
       ) : null}
 
-      <View
+      <WrapperView
         style={{
-          paddingVertical: 25,
-          backgroundColor: "transparent",
-          marginBottom: insets.top,
-          display: showSearch ? "none" : "flex"
+          paddingVertical: 12,
+          backgroundColor: colors.primary.background,
+          display: searchMode ? "none" : "flex",
+          borderTopRightRadius: Platform.OS === "ios" ? 10 : 15,
+          borderTopLeftRadius: Platform.OS === "ios" ? 10 : 15,
+          maxHeight: Platform.OS === "android" ? undefined : "100%"
         }}
       >
         <View
           style={{
-            maxHeight: "100%",
-            paddingHorizontal: 12
+            maxHeight: "100%"
+            //paddingHorizontal: 12
           }}
         >
-          <ScrollView
-            horizontal
-            contentContainerStyle={{
-              alignItems: "center",
-              height: 50
-            }}
-            style={{
-              width: "100%",
-              height: 50,
-              borderRadius: 10,
-              flexDirection: "row",
-              bottom: -10
-            }}
-          >
-            <Button
-              color={colors.nav}
-              onPress={() => {
-                useShareStore.getState().setAppendNote(null);
-              }}
-              icon="plus"
-              iconSize={18}
-              iconColor={!appendNote ? accent.color : colors.icon}
-              title="New note"
-              textColor={!appendNote ? accent.color : colors.icon}
-              type="rounded"
-              textStyle={{
-                fontSize: 13
-              }}
-              style={{
-                paddingHorizontal: 12,
-                ...getElevation(1),
-                height: 35
-              }}
-            />
-
-            <Button
-              color={colors.nav}
-              onPress={() => {
-                setShowSearch(true);
-              }}
-              icon="text-short"
-              iconSize={18}
-              iconColor={appendNote ? accent.color : colors.icon}
-              title={`${
-                appendNote ? appendNote.title.slice(0, 25) : "Append to note"
-              }`}
-              textColor={appendNote ? accent.color : colors.icon}
-              type="rounded"
-              textStyle={{
-                fontSize: 13
-              }}
-              style={{
-                paddingHorizontal: 12,
-                ...getElevation(1),
-                height: 35
-              }}
-            />
-          </ScrollView>
-
           <View
             style={{
               width: "100%"
@@ -574,20 +567,150 @@ const ShareView = ({ quicknote = false }) => {
           >
             <View
               style={{
-                marginTop: 10,
                 minHeight: 100,
-                borderRadius: 10,
-                ...getElevation(quicknote ? 1 : 5),
-                backgroundColor: colors.bg,
+                backgroundColor: colors.primary.background,
                 overflow: "hidden"
               }}
             >
               <View
                 style={{
+                  justifyContent: "space-between",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  borderBottomWidth: 1,
+                  paddingBottom: 12,
+                  borderBottomColor: colors.secondary.background,
+                  paddingHorizontal: 12
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    color: colors.primary.heading
+                  }}
+                >
+                  Save to Notesnook
+                </Text>
+
+                <Button
+                  title="Done"
+                  style={{
+                    backgroundColor: colors.primary.accent,
+                    height: Platform.OS === "ios" ? 35 : 40,
+                    paddingHorizontal: 15,
+                    marginBottom: 0
+                  }}
+                  loading={loading}
+                  iconColor={colors.primary.accentForeground}
+                  onPress={onPress}
+                  textColor={colors.primary.accentForeground}
+                  textStyle={{
+                    fontSize: 16,
+                    marginLeft: 0
+                  }}
+                />
+              </View>
+
+              {rawFiles?.length > 0 ? (
+                <View
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 12,
+                    backgroundColor: colors.secondary.background
+                  }}
+                >
+                  <Text
+                    style={{ color: colors.primary.paragraph, marginBottom: 6 }}
+                  >
+                    Attaching {rawFiles.length} file(s):
+                  </Text>
+                  <ScrollView horizontal>
+                    {rawFiles.map((item) =>
+                      isImage(item.type) ? (
+                        <TouchableOpacity
+                          onPress={() => onRemoveFile(item)}
+                          key={item.name}
+                          activeOpacity={0.9}
+                        >
+                          <Image
+                            source={{
+                              uri:
+                                Platform.OS === "android"
+                                  ? `file://${item.value}`
+                                  : item.value
+                            }}
+                            style={{
+                              width: 100,
+                              height: 100,
+                              borderRadius: 5,
+                              backgroundColor: "black",
+                              marginRight: 6
+                            }}
+                            resizeMode="cover"
+                          />
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          activeOpacity={0.9}
+                          key={item.name}
+                          source={{
+                            uri: `file://${item.value}`
+                          }}
+                          onPress={() => onRemoveFile(item)}
+                          style={{
+                            borderRadius: 5,
+                            backgroundColor: colors.secondary.background,
+                            flexDirection: "row",
+                            borderWidth: 1,
+                            borderColor: colors.primary.border,
+                            alignItems: "center",
+                            paddingVertical: 5,
+                            paddingHorizontal: 8,
+                            marginRight: 6
+                          }}
+                          resizeMode="cover"
+                        >
+                          <Icon
+                            color={colors.primary.icon}
+                            size={15}
+                            name="file"
+                          />
+
+                          <Text
+                            style={{
+                              marginLeft: 4,
+                              color: colors.primary.paragraph,
+                              paddingRight: 8,
+                              fontSize: 12
+                            }}
+                          >
+                            {item.name} ({formatBytes(item.size)})
+                          </Text>
+                        </TouchableOpacity>
+                      )
+                    )}
+                  </ScrollView>
+
+                  <Text
+                    style={{
+                      color: colors.secondary.paragraph,
+                      marginTop: 6,
+                      fontSize: 11
+                    }}
+                  >
+                    Tap to remove an attachment.
+                  </Text>
+                </View>
+              ) : null}
+              <View
+                style={{
                   width: "100%",
-                  height: height * 0.3,
+                  height: rawFiles.length > 0 ? 100 : 200,
                   paddingBottom: 15,
-                  borderRadius: 10
+                  marginBottom: 10,
+                  borderBottomColor: colors.secondary.background,
+                  borderBottomWidth: 1
                 }}
               >
                 <SafeAreaProvider
@@ -598,15 +721,6 @@ const ShareView = ({ quicknote = false }) => {
                 >
                   {!loadingExtension && (
                     <Editor
-                      ref={editorRef}
-                      theme={{
-                        ...colors,
-                        accent
-                      }}
-                      editorId="shareEditor"
-                      noHeader={true}
-                      noToolbar={true}
-                      readonly={false}
                       onLoad={onLoadEditor}
                       onChange={(html) => {
                         noteContent.current = html;
@@ -620,8 +734,7 @@ const ShareView = ({ quicknote = false }) => {
                 <Text
                   style={{
                     fontSize: 12,
-                    color: colors.icon,
-                    fontFamily: "OpenSans-Regular",
+                    color: colors.secondary.paragraph,
                     paddingHorizontal: 12,
                     marginBottom: 10,
                     flexWrap: "wrap"
@@ -630,8 +743,8 @@ const ShareView = ({ quicknote = false }) => {
                   Above content will append to{" "}
                   <Text
                     style={{
-                      color: accent.color,
-                      fontFamily: "OpenSans-SemiBold"
+                      color: colors.primary.accent,
+                      fontWeight: "bold"
                     }}
                   >
                     {`"${appendNote.title}"`}
@@ -644,61 +757,141 @@ const ShareView = ({ quicknote = false }) => {
                 style={{
                   flexDirection: "row",
                   paddingHorizontal: 12,
-                  alignItems: "flex-end",
-                  justifyContent: "space-between",
-                  width: "100%"
+                  width: "100%",
+                  alignItems: "center"
                 }}
               >
-                <View
+                <Text
                   style={{
-                    flexDirection: "row"
+                    color: colors.primary.paragraph,
+                    marginRight: 10
                   }}
                 >
-                  {rawData.value && isURL(rawData.value) ? (
-                    <Button
-                      color={mode == 2 ? colors.shade : colors.nav}
-                      icon={modes[2].icon}
-                      onPress={() => changeMode(2)}
-                      title={modes[2].title}
-                      iconSize={18}
-                      iconColor={mode == 2 ? accent.color : colors.icon}
-                      textColor={mode == 2 ? accent.color : colors.icon}
-                      type="rounded"
-                      style={{ paddingHorizontal: 12 }}
-                    />
-                  ) : null}
+                  Clip Mode:
+                </Text>
+                {rawData.value && isURL(rawData.value) ? (
                   <Button
-                    color={mode == 1 ? colors.shade : colors.nav}
-                    icon={modes[1].icon}
-                    onPress={() => changeMode(1)}
-                    title={modes[1].title}
-                    iconSize={18}
-                    iconColor={mode == 1 ? accent.color : colors.icon}
-                    textColor={mode == 1 ? accent.color : colors.icon}
-                    type="rounded"
-                    style={{ paddingHorizontal: 12 }}
-                  />
-                </View>
-
-                {!quicknote ? (
-                  <Button
-                    color={accent.color}
-                    onPress={onPress}
-                    loading={loading || loadingIntent}
-                    icon="check"
-                    iconSize={20}
-                    iconColor={colors.light}
+                    color="transparent"
+                    icon={mode === 2 ? "radiobox-marked" : "radiobox-blank"}
+                    onPress={() => changeMode(2)}
+                    title={modes[2].title}
+                    iconSize={16}
+                    fontSize={14}
+                    iconColor={
+                      mode == 2 ? colors.primary.accent : colors.secondary.icon
+                    }
+                    textColor={
+                      mode == 2 ? colors.primary.accent : colors.secondary.icon
+                    }
                     style={{
                       paddingHorizontal: 0,
-                      height: 40,
-                      width: 40,
-                      borderRadius: 100,
-                      minWidth: 0
+                      height: 30,
+                      marginRight: 12,
+                      marginBottom: 0
                     }}
                   />
                 ) : null}
+                <Button
+                  color="transparent"
+                  icon={mode === 1 ? "radiobox-marked" : "radiobox-blank"}
+                  onPress={() => changeMode(1)}
+                  title={modes[1].title}
+                  iconSize={16}
+                  fontSize={14}
+                  iconColor={
+                    mode == 1 ? colors.primary.accent : colors.secondary.icon
+                  }
+                  textColor={
+                    mode == 1 ? colors.primary.accent : colors.secondary.icon
+                  }
+                  style={{ paddingHorizontal: 0, height: 30, marginBottom: 0 }}
+                />
               </View>
             </View>
+          </View>
+
+          <View
+            style={{
+              width: "100%",
+              borderRadius: 10,
+              flexDirection: "column",
+              marginTop: 10,
+              alignSelf: "center",
+              alignItems: "center",
+              paddingHorizontal: 12
+            }}
+          >
+            <Button
+              color={colors.primary.background}
+              onPress={() => {
+                useShareStore.getState().setAppendNote(null);
+              }}
+              icon="plus"
+              iconSize={18}
+              iconColor={
+                !appendNote ? colors.primary.accent : colors.secondary.icon
+              }
+              title="New note"
+              textColor={
+                !appendNote ? colors.primary.accent : colors.secondary.icon
+              }
+              type="button"
+              textStyle={{
+                fontSize: 15
+              }}
+              style={{
+                paddingHorizontal: 12,
+                height: 45,
+                width: "100%",
+                marginRight: 0,
+                borderWidth: 1,
+                borderColor: colors.secondary.background,
+                justifyContent: "flex-start"
+              }}
+            />
+
+            <Button
+              color={colors.primary.bg}
+              onPress={() => {
+                setSearchMode("appendNote");
+              }}
+              icon="text-short"
+              iconSize={18}
+              iconColor={
+                appendNote ? colors.primary.accent : colors.secondary.icon
+              }
+              title={`Append to a note`}
+              textColor={colors.secondary.paragraph}
+              type="button"
+              textStyle={{
+                fontSize: 15
+              }}
+              style={{
+                paddingHorizontal: 12,
+                height: 45,
+                width: "100%",
+                marginRight: 0,
+                borderWidth: 1,
+                borderColor: colors.secondary.background,
+                justifyContent: "flex-start"
+              }}
+            />
+
+            {!appendNote ? (
+              <AddTags
+                onPress={() => {
+                  setSearchMode("selectTags");
+                }}
+              />
+            ) : null}
+
+            {!appendNote ? (
+              <AddNotebooks
+                onPress={() => {
+                  setSearchMode("selectNotebooks");
+                }}
+              />
+            ) : null}
           </View>
 
           <View
@@ -707,8 +900,219 @@ const ShareView = ({ quicknote = false }) => {
             }}
           />
         </View>
-      </View>
+      </WrapperView>
     </SafeAreaView>
+  );
+};
+
+const AddNotebooks = ({ onPress }) => {
+  const { colors } = useThemeColors();
+  const notebooks = useShareStore((state) => state.selectedNotebooks);
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      style={{
+        paddingHorizontal: 12,
+        width: "100%",
+        marginRight: 0,
+        borderWidth: 1,
+        borderColor: colors.secondary.background,
+        justifyContent: "center",
+        borderRadius: 5,
+        marginBottom: 10,
+        paddingVertical: 10,
+        paddingTop: 5
+      }}
+    >
+      {!notebooks || !notebooks.length ? (
+        <>
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              marginTop: 5
+            }}
+          >
+            <Icon
+              name="notebook-outline"
+              size={20}
+              style={{
+                marginRight: 10
+              }}
+              color={colors.secondary.icon}
+            />
+            <Text
+              style={{
+                color: colors.secondary.icon,
+                fontSize: 15
+              }}
+            >
+              Add to notebook
+            </Text>
+          </View>
+        </>
+      ) : (
+        <View
+          style={{
+            flexWrap: "wrap",
+            width: "100%",
+            flexDirection: "row"
+          }}
+        >
+          {notebooks.map((item) => (
+            <Text
+              style={{
+                color: colors.secondary.icon,
+                marginRight: 5,
+                fontSize: 14,
+                borderRadius: 4,
+                paddingHorizontal: 8,
+                backgroundColor: colors.secondary.background,
+                paddingVertical: 5,
+                marginTop: 5
+              }}
+              onPress={() => {
+                const index = notebooks.findIndex(
+                  (nb) => nb.id === item.id && nb.type === item.type
+                );
+                const selectedNotebooks = [...notebooks];
+                selectedNotebooks.splice(index, 1);
+                useShareStore
+                  .getState()
+                  .setSelectedNotebooks(selectedNotebooks);
+              }}
+              key={item.id}
+            >
+              <Icon
+                name={item.type === "topic" ? "bookmark" : "notebook-outline"}
+                size={15}
+              />{" "}
+              {item.title}
+            </Text>
+          ))}
+
+          <Text
+            style={{
+              color: colors.primary.accent,
+              marginRight: 5,
+              fontSize: 14,
+              borderRadius: 4,
+              paddingHorizontal: 8,
+              backgroundColor: colors.secondary.background,
+              paddingVertical: 5,
+              marginTop: 5
+            }}
+            onPress={() => {
+              onPress();
+            }}
+            key="$add-more"
+          >
+            <Icon name="plus" size={16} /> Add more
+          </Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+};
+
+const AddTags = ({ onPress }) => {
+  const { colors } = useThemeColors();
+  const tags = useShareStore((state) => state.selectedTags);
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      style={{
+        paddingHorizontal: 12,
+        minHeight: 45,
+        width: "100%",
+        marginRight: 0,
+        borderWidth: 1,
+        borderColor: colors.secondary.background,
+        justifyContent: "center",
+        borderRadius: 5,
+        marginBottom: 10
+      }}
+    >
+      {!tags || !tags.length ? (
+        <>
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row"
+            }}
+          >
+            <Icon
+              name="pound"
+              size={20}
+              style={{
+                marginRight: 10
+              }}
+              color={colors.secondary.icon}
+            />
+            <Text
+              style={{
+                color: colors.secondary.icon,
+                fontSize: 15
+              }}
+            >
+              Add tags
+            </Text>
+          </View>
+        </>
+      ) : (
+        <View
+          style={{
+            flexWrap: "wrap",
+            width: "100%",
+            flexDirection: "row"
+          }}
+        >
+          {tags.map((tag) => (
+            <Text
+              style={{
+                color: colors.secondary.icon,
+                marginRight: 5,
+                fontSize: 14,
+                borderRadius: 4,
+                paddingHorizontal: 8,
+                backgroundColor: colors.secondary.background,
+                paddingVertical: 5
+              }}
+              onPress={() => {
+                const index = tags.indexOf(tag);
+                const selectedTags = [...tags];
+                selectedTags.splice(index, 1);
+                useShareStore.getState().setSelectedTags(selectedTags);
+              }}
+              key={tag}
+            >
+              #{tag}
+            </Text>
+          ))}
+
+          <Text
+            style={{
+              color: colors.primary.accent,
+              marginRight: 5,
+              fontSize: 14,
+              borderRadius: 4,
+              paddingHorizontal: 8,
+              backgroundColor: colors.secondary.background,
+              paddingVertical: 5
+            }}
+            onPress={() => {
+              onPress();
+            }}
+            key="$add-tag"
+          >
+            <Icon name="plus" size={17} />
+            Add tag
+          </Text>
+        </View>
+      )}
+    </TouchableOpacity>
   );
 };
 
@@ -745,7 +1149,6 @@ const Button = ({
         alignItems: "center",
         flexDirection: "row",
         marginBottom: 10,
-        minWidth: 80,
         paddingHorizontal: 20
       },
       textStyle: {}
@@ -778,11 +1181,9 @@ const Button = ({
           alignItems: "center",
           flexDirection: "row",
           marginBottom: 10,
-          minWidth: 80,
           paddingHorizontal: 20
         },
-        types[type].style,
-        style
+        { ...types[type].style, ...style }
       ]}
     >
       {loading ? <ActivityIndicator color={iconColor} /> : null}
@@ -796,9 +1197,8 @@ const Button = ({
           style={[
             {
               fontSize: fontSize || 18,
-              fontFamily: "OpenSans-Regular",
               color: textColor,
-              marginLeft: loading ? 10 : 0
+              marginLeft: loading ? 10 : 5
             },
             types[type].textStyle,
             textStyle

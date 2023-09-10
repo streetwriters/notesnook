@@ -14,19 +14,27 @@ const SCOPES = [
 
   "mobile",
   "web",
+  "vericrypt",
   "desktop",
   "crypto",
   "editor",
   "logger",
   "theme",
+  "server",
   "core",
+  "fs",
+  "ui",
+  "clipper",
   "config",
   "ci",
   "setup",
   "docs",
   "refactor",
   "misc",
-  "global"
+  "common",
+  "global",
+  "docs",
+  "themebuilder"
 ];
 
 module.exports = {

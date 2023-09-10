@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
 import create, { State } from "zustand";
 import { persist, StateStorage } from "zustand/middleware";
-import { useNoteStore } from "../../../stores/use-notes-store";
-import { useSettingStore } from "../../../stores/use-setting-store";
 import { db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
+import { useNoteStore } from "../../../stores/use-notes-store";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { presets } from "./toolbar-definition";
 export type ToolDefinition = string | string[];
 
@@ -68,6 +68,7 @@ export const useDragState = create<DragState>(
       customPresetData: presets["custom"],
       setData: (data) => {
         const _data = clone(data);
+
         presets["custom"] = _data;
         db.settings?.setToolbarConfig(
           useSettingStore.getState().deviceMode || "mobile",
@@ -105,12 +106,6 @@ export const useDragState = create<DragState>(
           return;
         }
         const preset = toolbarConfig?.preset as DragState["preset"];
-        logger.info(
-          "DragState",
-          "Init user toolbar config",
-          preset,
-          toolbarConfig?.config
-        );
         set({
           preset: preset,
           data:

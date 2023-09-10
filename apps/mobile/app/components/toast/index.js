@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Keyboard, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
@@ -27,31 +27,32 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { getElevation } from "../../utils";
+import { useThemeColors } from "@notesnook/theme";
+import { getElevationStyle } from "../../utils/elevation";
 import { eHideToast, eShowToast } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-let toastMessages = [];
 export const Toast = ({ context = "global" }) => {
-  const colors = useThemeStore((state) => state.colors);
-  const [keyboard, setKeyboard] = useState(false);
+  const { colors } = useThemeColors();
   const [data, setData] = useState({});
   const insets = useGlobalSafeAreaInsets();
   const hideTimeout = useRef();
   const [visible, setVisible] = useState(false);
+  const toastMessages = useRef([]);
 
-  const showToastFunc = useCallback(
+  const show = useCallback(
     async (data) => {
       if (!data) return;
       if (data.context !== context) return;
-      if (toastMessages.findIndex((m) => m.message === data.message) >= 0) {
+      if (
+        toastMessages.current.findIndex((m) => m.message === data.message) >= 0
+      ) {
         return;
       }
-      toastMessages.push(data);
-      if (toastMessages?.length > 1) return;
+      toastMessages.current.push(data);
+      if (toastMessages.current?.length > 1) return;
       setData(data);
 
       setVisible(true);
@@ -59,16 +60,16 @@ export const Toast = ({ context = "global" }) => {
         clearTimeout(hideTimeout.current);
       }
       hideTimeout.current = setTimeout(() => {
-        hideToastFunc();
+        hide();
       }, data.duration);
     },
-    [context, hideToastFunc]
+    [context, hide]
   );
 
-  const showNext = useCallback(
+  const next = useCallback(
     (data) => {
       if (!data) {
-        hideToastFunc();
+        hide();
         return;
       }
       setData(data);
@@ -76,27 +77,28 @@ export const Toast = ({ context = "global" }) => {
         clearTimeout(hideTimeout.current);
       }
       hideTimeout.current = setTimeout(() => {
-        hideToastFunc();
+        hide();
       }, data?.duration);
     },
-    [hideToastFunc]
+    [hide]
   );
 
-  const hideToastFunc = useCallback(() => {
+  const hide = useCallback(() => {
     if (hideTimeout.current) {
       clearTimeout(hideTimeout.current);
     }
-    let msg = toastMessages.length > 1 ? toastMessages.shift() : null;
+    let msg =
+      toastMessages.current.length > 1 ? toastMessages.current.shift() : null;
 
     if (msg) {
       setVisible(false);
-      showNext(msg);
+      next(msg);
       setTimeout(() => {
         setVisible(true);
       }, 300);
     } else {
       setVisible(false);
-      toastMessages.shift();
+      toastMessages.current.shift();
       setTimeout(() => {
         setData({});
         if (hideTimeout.current) {
@@ -104,44 +106,22 @@ export const Toast = ({ context = "global" }) => {
         }
       }, 100);
     }
-  }, [showNext]);
-
-  const _onKeyboardShow = () => {
-    setKeyboard(true);
-  };
-
-  const _onKeyboardHide = () => {
-    setKeyboard(false);
-  };
+  }, [next]);
 
   useEffect(() => {
-    toastMessages = [];
-    let sub1 = Keyboard.addListener("keyboardDidShow", _onKeyboardShow);
-    let sub2 = Keyboard.addListener("keyboardDidHide", _onKeyboardHide);
-    eSubscribeEvent(eShowToast, showToastFunc);
-    eSubscribeEvent(eHideToast, hideToastFunc);
+    eSubscribeEvent(eShowToast, show);
+    eSubscribeEvent(eHideToast, hide);
     return () => {
-      if (hideTimeout.current) {
-        clearTimeout(hideTimeout.current);
-      }
-
-      toastMessages = [];
-      sub1?.remove();
-      sub2?.remove();
-      eUnSubscribeEvent(eShowToast, showToastFunc);
-      eUnSubscribeEvent(eHideToast, hideToastFunc);
+      toastMessages.current = [];
+      eUnSubscribeEvent(eShowToast, show);
+      eUnSubscribeEvent(eHideToast, hide);
     };
-  }, [hideToastFunc, keyboard, showToastFunc]);
+  }, [hide, show]);
 
   return (
     visible && (
       <TouchableOpacity
-        onPress={() => {
-          if (hideTimeout.current) {
-            clearTimeout(hideTimeout.current);
-          }
-          hideToastFunc();
-        }}
+        onPress={hide}
         activeOpacity={1}
         style={{
           width: DDS.isTab ? 400 : "100%",
@@ -156,9 +136,9 @@ export const Toast = ({ context = "global" }) => {
       >
         <View
           style={{
-            ...getElevation(5),
+            ...getElevationStyle(5),
             maxWidth: "95%",
-            backgroundColor: colors.nav,
+            backgroundColor: colors.secondary.background,
             minWidth: data?.func ? "95%" : "50%",
             alignSelf: "center",
             borderRadius: 5,
@@ -193,7 +173,9 @@ export const Toast = ({ context = "global" }) => {
                 name={data?.type === "success" ? "check" : "close"}
                 size={SIZE.lg}
                 color={
-                  data?.type === "error" ? colors.errorText : colors.accent
+                  data?.type === "error"
+                    ? colors.error.icon
+                    : colors.primary.accent
                 }
               />
             </View>
@@ -206,10 +188,10 @@ export const Toast = ({ context = "global" }) => {
             >
               {data?.heading ? (
                 <Heading
-                  color={colors.pri}
+                  color={colors.primary.paragraph}
                   size={SIZE.md}
                   onPress={() => {
-                    hideToastFunc();
+                    hide();
                   }}
                 >
                   {data.heading}
@@ -218,13 +200,13 @@ export const Toast = ({ context = "global" }) => {
 
               {data?.message ? (
                 <Paragraph
-                  color={colors.pri}
+                  color={colors.primary.paragraph}
                   style={{
                     maxWidth: "100%",
                     paddingRight: 10
                   }}
                   onPress={() => {
-                    hideToastFunc();
+                    hide();
                   }}
                 >
                   {data.message}

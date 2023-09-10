@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import Animated, {
   ComplexAnimationBuilder,
   Layout
 } from "react-native-reanimated";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 interface ParagraphProps extends TextProps {
   color?: string;
@@ -39,7 +39,7 @@ const Paragraph = ({
   animated,
   ...restProps
 }: ParagraphProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const Component = useMemo(() => (animated ? AnimatedText : Text), [animated]);
 
   return (
@@ -51,7 +51,7 @@ const Paragraph = ({
       style={[
         {
           fontSize: size || SIZE.sm,
-          color: color || colors.pri,
+          color: color || colors.primary.paragraph,
           fontWeight: "400",
           fontFamily: "OpenSans-Regular"
         },

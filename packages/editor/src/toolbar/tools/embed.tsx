@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import { useMemo, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
 import { MoreTools } from "../components/more-tools";
 import { useToolbarLocation } from "../stores/toolbar-store";
-import { findSelectedNode } from "../utils/prosemirror";
+import { findSelectedNode } from "../../utils/prosemirror";
 import { Embed } from "../../extensions/embed";
 import { EmbedPopup } from "../popups/embed-popup";
 
@@ -37,7 +37,12 @@ export function EmbedSettings(props: ToolProps) {
       {...props}
       autoCloseOnUnmount
       popupId="embedSettings"
-      tools={[]}
+      tools={[
+        "embedAlignLeft",
+        "embedAlignCenter",
+        "embedAlignRight",
+        "embedProperties"
+      ]}
     />
   );
 }

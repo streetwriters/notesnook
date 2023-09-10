@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,15 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import EventManager from "@notesnook/core/dist/utils/event-manager";
 import Clipboard from "@react-native-clipboard/clipboard";
-import EventManager from "@notesnook/core/utils/event-manager";
 import { RefObject } from "react";
-import ActionSheet from "react-native-actions-sheet";
+import { ActionSheetRef } from "react-native-actions-sheet";
 import Config from "react-native-config";
 import {
+  eCloseSheet,
   eHideToast,
   eOnNoteEdited,
-  eOpenProgressDialog,
+  eOpenSheet,
   eOpenVaultDialog,
   eShowToast
 } from "../utils/events";
@@ -61,7 +62,7 @@ export const eSubscribeEvent = <T = unknown>(
   eventName: string,
   action?: (data: T) => void
 ) => {
-  eventManager.subscribe(eventName, action);
+  return eventManager.subscribe(eventName, action);
 };
 
 export const eUnSubscribeEvent = <T = unknown>(
@@ -95,7 +96,11 @@ export type PresentSheetOptions = {
   context: string;
   component:
     | JSX.Element
-    | ((ref: RefObject<ActionSheet>, close?: () => void) => JSX.Element);
+    | ((
+        ref: RefObject<ActionSheetRef>,
+        close?: (ctx?: string) => void,
+        update?: (props: PresentSheetOptions) => void
+      ) => JSX.Element);
   disableClosing: boolean;
   onClose: () => void;
   progress: boolean;
@@ -109,10 +114,16 @@ export type PresentSheetOptions = {
   actionsArray: SheetAction[];
   learnMore: string;
   learnMorePress: () => void;
+  enableGesturesInScrollView?: boolean;
+  noBottomPadding?: boolean;
 };
 
 export function presentSheet(data: Partial<PresentSheetOptions>) {
-  eSendEvent(eOpenProgressDialog, data);
+  eSendEvent(eOpenSheet, data);
+}
+
+export function hideSheet() {
+  eSendEvent(eCloseSheet);
 }
 
 export type ShowToastEvent = {

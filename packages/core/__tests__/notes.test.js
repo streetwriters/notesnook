@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,20 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { groupArray } from "../utils/grouping";
+import { groupArray } from "../src/utils/grouping";
 import {
-  StorageInterface,
   databaseTest,
   noteTest,
   groupedTest,
   TEST_NOTE,
   TEST_NOTEBOOK,
-  IMG_CONTENT
+  IMG_CONTENT,
+  loginFakeUser
 } from "./utils";
-
-beforeEach(async () => {
-  StorageInterface.clear();
-});
+import { test, expect } from "vitest";
 
 test("add invalid note", () =>
   databaseTest().then(async (db) => {
@@ -262,7 +259,7 @@ test("export note to html", () =>
 test("export note to md", () =>
   noteTest().then(async ({ db, id }) => {
     const md = await db.notes.note(id).export("md");
-    expect(md.includes(`Hello  \nThis is colorful\n`)).toBeTruthy();
+    expect(md.includes(`Hello This is colorful\n`)).toBeTruthy();
   }));
 
 test("export note to txt", () =>
@@ -313,40 +310,12 @@ test("grouping items where item.title is empty or undefined shouldn't throw", ()
 
 test("note content should not contain image base64 data after save", () =>
   noteTest().then(async ({ db, id }) => {
-    StorageInterface.write(`_uk_@email@email.com`, {
-      key: { password: "password" }
-    });
-
-    await db.user.setUser({
-      email: "email@email.com",
-      attachmentsKey: {
-        cipher: "{}",
-        iv: "iv",
-        salt: "salt",
-        length: 100,
-        key: { password: "password" }
-      }
-    });
-
-    await db.attachments.add(
-      {
-        iv: "iv",
-        length: 100,
-        alg: "xha-stream",
-        hash: "d3eab72e94e3cd35",
-        hashType: "xxh64",
-        type: "image/jpeg",
-        chunkSize: 512,
-        filename: "hello",
-        key: {},
-        salt: "hellowrold"
-      },
-      id
-    );
+    await loginFakeUser(db);
 
     await db.notes.add({ id, content: { type: "tiptap", data: IMG_CONTENT } });
     const note = db.notes.note(id);
     const content = await note.content();
+
     expect(content).not.toContain(`src="data:image/png;`);
     expect(content).not.toContain(`src=`);
   }));

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,27 +21,29 @@ import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 import config from "../utils/config";
-import { EV, EVENTS } from "@notesnook/core/common";
+import { EV, EVENTS } from "@notesnook/core/dist/common";
 import {
   showAccountLoggedOutNotice,
   showOnboardingDialog
 } from "../common/dialog-controller";
 import Config from "../utils/config";
-import { onPageVisibilityChanged } from "../utils/page-visibility";
 import { hashNavigate } from "../navigation";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
-import { logger } from "../utils/logger";
 
+/**
+ * @extends {BaseStore<UserStore>}
+ */
 class UserStore extends BaseStore {
   isLoggedIn = undefined;
   isLoggingIn = false;
   isSigningIn = false;
   /**
-   * @type {User}
+   * @type {User | undefined}
    */
   user = undefined;
+  counter = 0;
 
   init = () => {
     EV.subscribe(EVENTS.userSessionExpired, async () => {
@@ -100,18 +102,6 @@ class UserStore extends BaseStore {
         }
       });
 
-      onPageVisibilityChanged(async function (type, documentHidden) {
-        if (!documentHidden) {
-          logger.info("Page visibility changed. Reconnecting SSE...");
-          if (type === "online") {
-            // a slight delay to make sure sockets are open and can be connected
-            // to. Otherwise, this fails miserably.
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-          }
-          await db.connectSSE({ force: type === "online" }).catch(logger.error);
-        }
-      });
-
       return true;
     });
   };
@@ -127,11 +117,17 @@ class UserStore extends BaseStore {
     const { email, password, code, method } = form;
 
     try {
-      if (code) await db.user.mfaLogin(email, password, { code, method });
-      else await db.user.login(email, password);
+      if (code) {
+        return await db.user.authenticateMultiFactorCode(code, method);
+      } else if (password) {
+        await db.user.authenticatePassword(email, password, null);
+        Config.set("encryptBackups", true);
 
-      if (skipInit) return true;
-      return this.init();
+        if (skipInit) return true;
+        return this.init();
+      } else if (email) {
+        return await db.user.authenticateEmail(email);
+      }
     } finally {
       this.set((state) => (state.isLoggingIn = false));
     }
@@ -151,8 +147,5 @@ class UserStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<UserStore>, UserStore]}
- */
 const [useStore, store] = createStore(UserStore);
 export { useStore, store };

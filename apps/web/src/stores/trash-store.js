@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,8 +22,11 @@ import createStore from "../common/store";
 import BaseStore from "./index";
 import { store as appStore } from "./app-store";
 import { store as notestore } from "./note-store";
-import { groupArray } from "@notesnook/core/utils/grouping";
+import { groupArray } from "@notesnook/core/dist/utils/grouping";
 
+/**
+ * @extends {BaseStore<TrashStore>}
+ */
 class TrashStore extends BaseStore {
   trash = [];
 
@@ -64,8 +67,5 @@ class TrashStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<TrashStore>, TrashStore]}
- */
 const [useStore, store] = createStore(TrashStore);
 export { useStore, store };

@@ -1,0 +1,6 @@
+- Added background sync support
+- Fix new features sheet showing on every launch
+- Fix permanent reminders removed on rebooting device
+- Fixed unable to unpin/disable reminders from notifications
+
+Thank you for using Notesnook!

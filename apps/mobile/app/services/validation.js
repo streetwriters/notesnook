@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,14 +36,12 @@ export function validatePass(password) {
     SHORT_PASS: false
   };
 
-  if (password?.length <= 0) {
+  if (password?.length < 8) {
     errors.SHORT_PASS = true;
-    return errors;
-  }
-
-  if (password.length >= 8) {
+  } else {
     errors.SHORT_PASS = false;
   }
+
   return errors;
 }
 

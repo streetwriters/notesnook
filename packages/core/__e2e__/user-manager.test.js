@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,12 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { databaseTest } from "../__tests__/utils";
-
-const user = {
-  email: process.env.EMAIL,
-  password: process.env.PASSWORD,
-  hashed: process.env.HASHED_PASSWORD
-};
+import { login, user } from "./utils";
+import { test, expect } from "vitest";
 
 // test("signup user and check for token", async () => {
 //   const db = new DB(StorageInterface);
@@ -40,9 +36,7 @@ test(
   "login user and check for token",
   () =>
     databaseTest().then(async (db) => {
-      await expect(
-        db.user.login(user.email, user.password, user.hashed)
-      ).resolves.not.toThrow();
+      await expect(login(db)).resolves.not.toThrow();
 
       await expect(db.user.tokenManager.getToken()).resolves.toBeDefined();
     }),
@@ -53,7 +47,7 @@ test(
   "login user and get user data",
   () =>
     databaseTest().then(async (db) => {
-      await db.user.login(user.email, user.password, user.hashed);
+      await login(db);
 
       const userData = await db.user.getUser();
       expect(userData.email).toBe(user.email);
@@ -65,7 +59,7 @@ test(
   "login user and logout user",
   () =>
     databaseTest().then(async (db) => {
-      await db.user.login(user.email, user.password, user.hashed);
+      await login(db);
 
       await expect(db.user.logout()).resolves.not.toThrow();
     }),

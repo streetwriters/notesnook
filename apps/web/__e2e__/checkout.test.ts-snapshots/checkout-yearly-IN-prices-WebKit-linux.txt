@@ -1,4 +1,0 @@
-Subtotal: ₹4000.00
-Sales tax: ₹700.00
-Discount: ₹0.00
-Total: ₹4000.00/yr

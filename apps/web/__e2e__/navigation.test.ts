@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,9 +30,9 @@ const routes = [
   createRoute("notebooks", "Notebooks"),
   createRoute("favorites", "Favorites"),
   createRoute("monographs", "Monographs"),
+  createRoute("reminders", "Reminders"),
   createRoute("tags", "Tags"),
-  createRoute("trash", "Trash"),
-  createRoute("settings", "Settings")
+  createRoute("trash", "Trash")
 ];
 
 for (const route of routes) {
@@ -40,8 +40,7 @@ for (const route of routes) {
     const app = new AppModel(page);
     await app.goto();
 
-    const item = await app.navigation.findItem(route.header);
-    await item?.click();
+    await app.navigateTo(route.header);
 
     expect(await app.getRouteHeader()).toBe(route.header);
   });

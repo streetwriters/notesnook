@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import React from "react";
 import { ViewProps } from "react-native";
 import Animated, { FadeOutUp } from "react-native-reanimated";
 import { useDelayLayout } from "../../hooks/use-delay-layout";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { DefaultPlaceholder } from "./default-placeholder";
 import { SettingsPlaceholder } from "./settings-placeholder";
 
@@ -42,7 +42,7 @@ export default function DelayLayout({
   animated = true,
   ...props
 }: IDelayLayoutProps) {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const loading = useDelayLayout(
     !props.delay || props.delay < 300 ? 300 : props.delay
   );
@@ -52,12 +52,12 @@ export default function DelayLayout({
     <Animated.View
       exiting={animated ? FadeOutUp : undefined}
       style={{
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         flex: 1,
         paddingTop: 20
       }}
     >
-      <Placeholder color={props.color || colors.accent} />
+      <Placeholder color={props.color || colors.primary.accent} />
     </Animated.View>
   ) : (
     <>{props.children}</>

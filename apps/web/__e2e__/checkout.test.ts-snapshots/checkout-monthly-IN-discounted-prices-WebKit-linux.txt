@@ -1,4 +1,0 @@
-Subtotal: ₹300.00
-Sales tax: ₹60.00
-Discount: -₹200.00
-Total: ₹200.00

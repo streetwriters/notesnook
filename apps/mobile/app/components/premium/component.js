@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,19 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useState } from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, View } from "react-native";
 import { LAUNCH_ROCKET } from "../../assets/images/assets";
-import umami from "../../common/analytics";
 import { db } from "../../common/database";
 import { usePricing } from "../../hooks/use-pricing";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import {
   eClosePremiumDialog,
-  eCloseProgressDialog,
+  eCloseSheet,
   eOpenLoginDialog
 } from "../../utils/events";
 import { SIZE } from "../../utils/size";
@@ -48,10 +47,9 @@ import { Walkthrough } from "../walkthroughs";
 import { features } from "./features";
 import { Group } from "./group";
 import { PricingPlans } from "./pricing-plans";
-import { Platform } from 'react-native';
 
 export const Component = ({ close, promo }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const userCanRequestTrial =
     user && (!user.subscription || !user.subscription.expiry) ? true : false;
@@ -60,7 +58,6 @@ export const Component = ({ close, promo }) => {
 
   const onPress = async () => {
     if (user) {
-      umami.pageView("/pro-plans", "/pro-screen");
       presentSheet({
         context: "pricing_plans",
         component: (
@@ -69,7 +66,6 @@ export const Component = ({ close, promo }) => {
       });
     } else {
       close();
-      umami.pageView("/signup", "/pro-screen");
       setTimeout(() => {
         eSendEvent(eOpenLoginDialog, AuthMode.trialSignup);
       }, 400);
@@ -91,7 +87,7 @@ export const Component = ({ close, promo }) => {
     <View
       style={{
         width: "100%",
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         justifyContent: "space-between",
         borderRadius: 10,
         maxHeight: "100%"
@@ -110,7 +106,7 @@ export const Component = ({ close, promo }) => {
           width: 50,
           height: 50
         }}
-        color={colors.pri}
+        color={colors.primary.paragraph}
         name="close"
       />
 
@@ -135,7 +131,7 @@ export const Component = ({ close, promo }) => {
           <SvgView
             width={350}
             height={350}
-            src={LAUNCH_ROCKET(colors.accent)}
+            src={LAUNCH_ROCKET(colors.primary.accent)}
           />
         </View>
 
@@ -148,7 +144,7 @@ export const Component = ({ close, promo }) => {
           }}
         >
           Notesnook{" "}
-          <Heading size={SIZE.lg} color={colors.accent}>
+          <Heading size={SIZE.lg} color={colors.primary.accent}>
             Pro
           </Heading>
         </Heading>
@@ -159,7 +155,7 @@ export const Component = ({ close, promo }) => {
               marginBottom: 20
             }}
             size={SIZE.md}
-            color={colors.accent}
+            color={colors.primary.accent}
           />
         ) : (
           <Paragraph
@@ -194,7 +190,7 @@ export const Component = ({ close, promo }) => {
               try {
                 await db.user.activateTrial();
                 eSendEvent(eClosePremiumDialog);
-                eSendEvent(eCloseProgressDialog);
+                eSendEvent(eCloseSheet);
                 await sleep(300);
                 Walkthrough.present("trialstarted", false, true);
               } catch (e) {
@@ -229,7 +225,7 @@ export const Component = ({ close, promo }) => {
 
         {!user || userCanRequestTrial ? (
           <Paragraph
-            color={colors.icon}
+            color={colors.secondary.paragraph}
             size={SIZE.xs}
             style={{
               alignSelf: "center",
@@ -275,7 +271,7 @@ export const Component = ({ close, promo }) => {
             position: "absolute",
             borderRadius: 100,
             bottom: 30,
-            ...getElevation(10)
+            ...getElevationStyle(10)
           }}
         />
       ) : null}

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,15 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex } from "@theme-ui/components";
-import {
-  SelectionBasedNodeView,
-  SelectionBasedReactNodeViewProps
-} from "../react";
+import { ReactNodeView, ReactNodeViewProps } from "../react";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "../../types";
+import { Editor as TiptapEditor } from "@tiptap/core";
 import { useEffect, useRef } from "react";
-import { updateColumnsOnResize } from "@_ueberdosis/prosemirror-tables";
-import { NodeView } from "prosemirror-view";
+import { updateColumnsOnResize } from "@tiptap/pm/tables";
+import { EditorView, NodeView } from "prosemirror-view";
 import {
   InsertColumnRight,
   InsertRowBelow,
@@ -34,15 +32,19 @@ import {
   TableProperties
 } from "../../toolbar/tools/table";
 import { getToolDefinition } from "../../toolbar/tool-definitions";
-import { getPosition } from "../../utils/position";
-import { findSelectedDOMNode } from "../../toolbar/utils/prosemirror";
+import { getPosition } from "@notesnook/ui";
+import {
+  findSelectedDOMNode,
+  hasSameAttributes
+} from "../../utils/prosemirror";
 import { DesktopOnly } from "../../components/responsive";
+import { TextDirections } from "../text-direction";
 
-export function TableComponent(props: SelectionBasedReactNodeViewProps) {
+export function TableComponent(props: ReactNodeViewProps) {
   const { editor, node, forwardRef } = props;
   const colgroupRef = useRef<HTMLTableColElement>(null);
   const tableRef = useRef<HTMLTableElement>();
-  const selected = editor.isActive("table");
+  const { textDirection } = node.attrs;
 
   useEffect(() => {
     if (!colgroupRef.current || !tableRef.current) return;
@@ -53,14 +55,18 @@ export function TableComponent(props: SelectionBasedReactNodeViewProps) {
   return (
     <>
       <DesktopOnly>
-        {selected && (
-          <>
-            <TableRowToolbar editor={editor} table={tableRef.current} />
-            <TableColumnToolbar editor={editor} table={tableRef.current} />
-          </>
-        )}
+        <TableRowToolbar
+          editor={editor}
+          table={tableRef}
+          textDirection={textDirection}
+        />
+        <TableColumnToolbar
+          editor={editor}
+          table={tableRef}
+          textDirection={textDirection}
+        />
       </DesktopOnly>
-      <div className="tableWrapper">
+      <div className="tableWrapper" dir={textDirection}>
         <table
           ref={(ref) => {
             forwardRef?.(ref);
@@ -75,9 +81,9 @@ export function TableComponent(props: SelectionBasedReactNodeViewProps) {
   );
 }
 
-export function TableNodeView(editor: Editor) {
+export function TableNodeView(editor: TiptapEditor) {
   class TableNode
-    extends SelectionBasedNodeView<SelectionBasedReactNodeViewProps<unknown>>
+    extends ReactNodeView<ReactNodeViewProps<unknown>>
     implements NodeView
   {
     constructor(node: ProsemirrorNode) {
@@ -88,7 +94,10 @@ export function TableNodeView(editor: Editor) {
         {
           component: TableComponent,
           shouldUpdate: (prev, next) => {
-            return prev.type === next.type;
+            return (
+              !hasSameAttributes(prev.attrs, next.attrs) ||
+              prev.childCount !== next.childCount
+            );
           },
           contentDOMFactory: () => {
             const dom = document.createElement("tbody");
@@ -104,26 +113,35 @@ export function TableNodeView(editor: Editor) {
       super.init();
     }
   }
-  return TableNode as unknown as NodeView;
+  return TableNode as unknown as new (
+    node: ProsemirrorNode,
+    cellMinWidth: number,
+    view: EditorView
+  ) => NodeView;
 }
 
 type TableToolbarProps = {
   editor: Editor;
-  table?: HTMLTableElement;
+  table?: React.MutableRefObject<HTMLTableElement | undefined>;
+  textDirection: TextDirections;
 };
 
 function TableRowToolbar(props: TableToolbarProps) {
-  const { editor } = props;
+  const { editor, textDirection, table } = props;
   const rowToolsRef = useRef<HTMLDivElement>(null);
 
-  useEffect(
-    () => {
-      if (!rowToolsRef.current) {
+  useEffect(() => {
+    function onSelectionUpdate() {
+      if (!rowToolsRef.current || !table?.current) {
         return;
       }
 
       const currentRow = findSelectedDOMNode(editor, ["tableRow"]);
-      if (!currentRow) return;
+      if (!currentRow || !table.current.contains(currentRow)) {
+        rowToolsRef.current.style.display = "none";
+        return;
+      }
+      rowToolsRef.current.style.display = "flex";
 
       const pos = getPosition(rowToolsRef.current, {
         location: "left",
@@ -132,17 +150,28 @@ function TableRowToolbar(props: TableToolbarProps) {
         xOffset: -5,
         yOffset: -3
       });
+
       rowToolsRef.current.style.top = `${pos.top}px`;
-      rowToolsRef.current.style.left = `${pos.left}px`;
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [editor.state.selection]
-  );
+      if (textDirection) {
+        rowToolsRef.current.style.right = `${pos.left}px`;
+        rowToolsRef.current.style.left = `unset`;
+      } else {
+        rowToolsRef.current.style.left = `${pos.left}px`;
+        rowToolsRef.current.style.right = `unset`;
+      }
+    }
+
+    editor.current?.on("selectionUpdate", onSelectionUpdate);
+    return () => {
+      editor.current?.off("selectionUpdate", onSelectionUpdate);
+    };
+  }, [textDirection]);
 
   return (
     <Flex
       ref={rowToolsRef}
       sx={{
+        display: "none",
         zIndex: 999,
         top: 0,
         left: 0,
@@ -175,9 +204,10 @@ function TableRowToolbar(props: TableToolbarProps) {
 function TableColumnToolbar(props: TableToolbarProps) {
   const { editor, table } = props;
   const columnToolsRef = useRef<HTMLDivElement>(null);
-  useEffect(
-    () => {
-      if (!columnToolsRef.current || !table) {
+
+  useEffect(() => {
+    function onSelectionUpdate() {
+      if (!columnToolsRef.current || !table?.current) {
         return;
       }
 
@@ -185,28 +215,36 @@ function TableColumnToolbar(props: TableToolbarProps) {
         "tableCell",
         "tableHeader"
       ]);
-      if (!currentCell) return;
+      if (!currentCell || !table.current.contains(currentCell)) {
+        columnToolsRef.current.style.display = `none`;
+        return;
+      }
+      columnToolsRef.current.style.display = "flex";
 
       // tableRef.current
       const pos = getPosition(columnToolsRef.current, {
         location: "top",
         align: "center",
         target: currentCell as HTMLElement,
-        yAnchor: table,
+        yAnchor: table.current,
         yOffset: 2
       });
 
       columnToolsRef.current.style.left = `${pos.left}px`;
       columnToolsRef.current.style.top = `${pos.top}px`;
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [editor.state.selection, table]
-  );
+    }
+
+    editor.current?.on("selectionUpdate", onSelectionUpdate);
+    return () => {
+      editor.current?.off("selectionUpdate", onSelectionUpdate);
+    };
+  }, []);
 
   return (
     <Flex
       ref={columnToolsRef}
       sx={{
+        display: "none",
         zIndex: 999,
         top: 0,
         left: 0,
@@ -222,7 +260,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
     >
       <TableProperties
         editor={editor}
-        title="tableProperties"
+        title="Table properties"
         icon="more"
         variant={"small"}
       />

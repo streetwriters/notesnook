@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,12 +34,12 @@ export const Topics = ({ item, close }) => {
       title={topic.title}
       type="grayBg"
       // buttonType={{
-      //   text: colors.accent
+      //   text: colors.primary.accent
       // }}
       height={30}
       onPress={() => open(topic)}
       icon="bookmark-outline"
-      fontSize={SIZE.xs + 1}
+      fontSize={SIZE.xs}
       style={{
         marginRight: 5,
         paddingHorizontal: 8,

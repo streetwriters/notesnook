@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,12 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Dimensions } from "react-native";
+import { Dimensions, PlatformOSType } from "react-native";
 import Config from "react-native-config";
+import { Sound } from "react-native-notification-sounds";
+import { initialWindowMetrics } from "react-native-safe-area-context";
 import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
-import { ACCENT } from "../utils/color-scheme";
-import { initialWindowMetrics } from "react-native-safe-area-context";
+import { Reminder } from "../services/notifications";
+import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
 
 export type Settings = {
   showToolbarOnTop?: boolean;
@@ -52,10 +54,6 @@ export type Settings = {
   lastBackupDate?: number | undefined;
   userEmailConfirmed?: boolean;
   recoveryKeySaved?: boolean;
-  theme: {
-    accent: string;
-    dark: boolean;
-  };
   backupDirectoryAndroid?: FileType | null;
   showBackupCompleteSheet: boolean;
   lastRecoveryEmailTime?: number;
@@ -63,6 +61,19 @@ export type Settings = {
   sessionExpired: boolean;
   version: string | null;
   doubleSpacedLines?: boolean;
+  disableAutoSync?: boolean;
+  disableSync?: boolean;
+  reminderNotifications?: boolean;
+  defaultSnoozeTime?: string;
+  reminderNotificationMode: Reminder["priority"];
+  corsProxy: string;
+  disableRealtimeSync?: boolean;
+  notificationSound?: Sound & { platform: PlatformOSType };
+  defaultFontSize: number;
+  defaultFontFamily: string;
+  colorScheme: "dark" | "light";
+  lighTheme: ThemeDefinition;
+  darkTheme: ThemeDefinition;
 };
 
 type DimensionsType = {
@@ -92,53 +103,65 @@ export interface SettingStore extends State {
   sheetKeyboardHandler: boolean;
   requestBiometrics: boolean;
   setRequestBiometrics: (requestBiometrics: boolean) => void;
+  appDidEnterBackgroundForAction: boolean;
+  setAppDidEnterBackgroundForAction: (value: boolean) => void;
   insets: Insets;
   setInsets: (insets: Insets) => void;
+  timeFormat: string;
+  dateFormat: string;
 }
 
 const { width, height } = Dimensions.get("window");
 
-export const useSettingStore = create<SettingStore>((set) => ({
-  settings: {
-    showToolbarOnTop: false,
-    showKeyboardOnOpen: false,
-    fontScale: 1,
-    forcePortraitOnTablet: false,
-    useSystemTheme: true,
-    reminder: "off",
-    encryptedBackup: false,
-    homepage: "Notes",
-    sort: "default",
-    sortOrder: "desc",
-    screenshotMode: true,
-    privacyScreen: false,
-    appLockMode: "none",
-    telemetry: true,
-    notebooksListMode: "normal",
-    notesListMode: "normal",
-    devMode: false,
-    notifNotes: false,
-    pitchBlack: false,
-    reduceAnimations: false,
-    rateApp: false,
-    migrated: false,
-    introCompleted: Config.isTesting ? true : false,
-    nextBackupRequestTime: undefined,
-    lastBackupDate: undefined,
-    userEmailConfirmed: false,
-    recoveryKeySaved: false,
-    theme: {
-      accent: ACCENT?.color,
-      dark: false
-    },
-    showBackupCompleteSheet: true,
-    sessionExpired: false,
-    version: null,
-    doubleSpacedLines: true
-  },
+export const defaultSettings: SettingStore["settings"] = {
+  showToolbarOnTop: false,
+  showKeyboardOnOpen: false,
+  fontScale: 1,
+  forcePortraitOnTablet: false,
+  useSystemTheme: true,
+  reminder: "off",
+  encryptedBackup: false,
+  homepage: "Notes",
+  sort: "default",
+  sortOrder: "desc",
+  screenshotMode: true,
+  privacyScreen: false,
+  appLockMode: "none",
+  telemetry: false,
+  notebooksListMode: "normal",
+  notesListMode: "normal",
+  devMode: false,
+  notifNotes: false,
+  pitchBlack: false,
+  reduceAnimations: false,
+  rateApp: false,
+  migrated: false,
+  introCompleted: Config.isTesting ? true : false,
+  nextBackupRequestTime: undefined,
+  lastBackupDate: undefined,
+  userEmailConfirmed: false,
+  recoveryKeySaved: false,
+  showBackupCompleteSheet: true,
+  sessionExpired: false,
+  version: null,
+  doubleSpacedLines: true,
+  reminderNotifications: true,
+  defaultSnoozeTime: "5",
+  corsProxy: "https://cors.notesnook.com",
+  reminderNotificationMode: "urgent",
+  notificationSound: undefined,
+  defaultFontFamily: "sans-serif",
+  defaultFontSize: 16,
+  colorScheme: "light",
+  lighTheme: ThemeLight,
+  darkTheme: ThemeDark
+};
+
+export const useSettingStore = create<SettingStore>((set, get) => ({
+  settings: { ...defaultSettings },
   sheetKeyboardHandler: true,
   fullscreen: false,
-  deviceMode: "mobile",
+  deviceMode: null,
   dimensions: { width, height },
   appLoading: true,
   setSettings: (settings) => set({ settings }),
@@ -151,6 +174,14 @@ export const useSettingStore = create<SettingStore>((set) => ({
   requestBiometrics: false,
   setRequestBiometrics: (requestBiometrics) => set({ requestBiometrics }),
   setInsets: (insets) => set({ insets }),
+  timeFormat: "12-hour",
+  dateFormat: "DD-MM-YYYY",
+  setAppDidEnterBackgroundForAction: (value: boolean) => {
+    set({
+      appDidEnterBackgroundForAction: value
+    });
+  },
+  appDidEnterBackgroundForAction: false,
   insets: initialWindowMetrics?.insets
     ? initialWindowMetrics.insets
     : { top: 0, right: 0, left: 0, bottom: 0 }

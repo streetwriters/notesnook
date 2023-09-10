@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,7 +30,11 @@ const initialState = {
   noToolbar: globalThis.noToolbar,
   noHeader: globalThis.noHeader,
   readonly: globalThis.readonly,
-  doubleSpacedLines: true
+  doubleSpacedLines: true,
+  fontFamily: "sans-serif",
+  fontSize: 16,
+  timeFormat: "12-hour",
+  dateFormat: "DD-MM-YYYY"
 };
 
 global.settingsController = {
@@ -62,7 +66,7 @@ global.settingsController.previous.noHeader = globalThis.noHeader;
 global.settingsController.previous.noToolbar = globalThis.noToolbar;
 global.settingsController.previous.readonly = globalThis.readonly;
 
-export const useSettings = ():Settings => {
+export const useSettings = (): Settings => {
   const [settings, setSettings] = useState({
     ...global.settingsController.previous
   });

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -49,7 +49,8 @@ export const EditorEvents: { [name: string]: string } = {
   theme: "native:theme",
   titleplaceholder: "native:titleplaceholder",
   logger: "native:logger",
-  status: "native:status"
+  status: "native:status",
+  keyboardShown: "native:keyboardShown"
 };
 
 export function randId(prefix: string) {
@@ -73,7 +74,8 @@ export async function post<T>(
   ref: RefObject<WebView>,
   sessionId: string,
   type: string,
-  value: T | null = null
+  value: T | null = null,
+  waitFor = 300
 ) {
   if (!sessionId) {
     console.warn("post called without sessionId of type:", type);
@@ -85,7 +87,7 @@ export async function post<T>(
     sessionId: sessionId
   };
   setImmediate(() => ref.current?.postMessage(JSON.stringify(message)));
-  const response = await getResponse(type);
+  const response = await getResponse(type, waitFor);
   return response;
 }
 
@@ -97,7 +99,8 @@ type WebviewResponseData = {
 };
 
 export const getResponse = async (
-  type: string
+  type: string,
+  waitFor = 300
 ): Promise<WebviewResponseData | false> => {
   return new Promise((resolve) => {
     const callback = (data: WebviewResponseData) => {
@@ -107,7 +110,7 @@ export const getResponse = async (
     eSubscribeEvent(type, callback);
     setTimeout(() => {
       resolve(false);
-    }, 5000);
+    }, waitFor);
   });
 };
 

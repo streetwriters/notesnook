@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ export class ToggleModel {
   }
 
   private async waitUntilToggleState(locator: Locator, state: TOGGLE_STATES) {
-    if (this.id.startsWith("menuitem")) await this.page.waitForTimeout(200);
+    if (this.id.startsWith("menu-button")) await this.page.waitForTimeout(200);
     else
       await this.getToggleState(locator, state).waitFor({ state: "visible" });
   }

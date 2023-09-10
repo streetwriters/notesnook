@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,34 +17,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex, Text } from "@theme-ui/components";
-import { ReactNodeViewProps } from "../react";
-import { Node } from "prosemirror-model";
+import { Box, Flex, Input, Text } from "@theme-ui/components";
 import { findChildren, getNodeType } from "@tiptap/core";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
+import { Node } from "prosemirror-model";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Input } from "@theme-ui/components";
+import { ToolButton } from "../../toolbar/components/tool-button";
+import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
+import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
-import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store";
-import { ToolButton } from "../../toolbar/components/tool-button";
-import TaskItem from "@tiptap/extension-task-item";
+import { countCheckedItems, deleteCheckedItems, sortList } from "./utils";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
 ) {
-  const isMobile = useIsMobile();
-  const { editor, getPos, node, updateAttributes, forwardRef } = props;
+  // const isMobile = useIsMobile();
+  const { editor, getPos, node, updateAttributes, forwardRef, pos } = props;
   const taskItemType = getNodeType(TaskItemNode.name, editor.schema);
-  const { title, collapsed } = node.attrs;
+  const { title, textDirection } = node.attrs;
   const [stats, setStats] = useState({ checked: 0, total: 0, percentage: 0 });
 
   const getParent = useCallback(() => {
-    const pos = editor.state.doc.resolve(getPos());
-    return findParentNodeOfTypeClosestToPos(pos, taskItemType);
-  }, [editor.state.doc, getPos, taskItemType]);
+    if (pos === undefined) return;
+    return findParentNodeOfTypeClosestToPos(
+      editor.state.doc.resolve(pos),
+      taskItemType
+    );
+  }, [editor.state.doc, pos, taskItemType]);
 
   const isNested = useMemo(() => {
     return !!getParent();
@@ -68,168 +67,147 @@ export function TaskListComponent(
   }, [editor.commands, editor.state.doc, getParent, node, node.childCount]);
 
   useEffect(() => {
-    let checked = 0;
-    let total = 0;
-    node.forEach((node) => {
-      if (node.type.name === TaskItemNode.name) {
-        if (node.attrs.checked) checked++;
-        total++;
-      }
-    });
+    const { checked, total } = countCheckedItems(node);
     const percentage = Math.round((checked / total) * 100);
     setStats({ checked, total, percentage });
   }, [isNested, node]);
 
   return (
     <>
-      <Flex
-        sx={{
-          flexDirection: "column"
-        }}
-        className="task-list-tools"
-      >
-        {isNested ? (
-          <Flex
+      {!isNested && (
+        <Flex
+          sx={{
+            position: "relative",
+            bg: "var(--background-secondary)",
+            py: 1,
+            borderRadius: "default",
+            mb: 2,
+            alignItems: "center",
+            justifyContent: "end",
+            overflow: "hidden"
+          }}
+          className="task-list-tools"
+          dir={textDirection}
+          contentEditable={false}
+        >
+          <Box
             sx={{
+              height: "100%",
+              width: `${stats.percentage}%`,
               position: "absolute",
-              top: 0,
-              right: 0
-            }}
-            contentEditable={false}
-          >
-            {collapsed && (
-              <Text variant={"body"} sx={{ color: "fontTertiary", mr: 35 }}>
-                {stats.checked}/{stats.total}
-              </Text>
-            )}
-            <Icon
-              className="toggleSublist"
-              path={collapsed ? Icons.chevronDown : Icons.chevronUp}
-              sx={{
-                opacity: isMobile || collapsed ? 1 : 0,
-                position: "absolute",
-                right: 0,
-                alignSelf: "start",
-                mr: 2,
-                cursor: "pointer",
-                ":hover": { opacity: 1 },
-                ".icon:hover path": {
-                  fill: "var(--checked) !important"
-                }
-              }}
-              size={isMobile ? 24 : 20}
-              onClick={() => {
-                updateAttributes(
-                  { collapsed: !collapsed },
-                  { addToHistory: false, preventUpdate: true }
-                );
-              }}
-            />
-          </Flex>
-        ) : (
-          <Flex
-            sx={{
-              position: "relative",
-              bg: "bgSecondary",
-              py: 1,
-              borderRadius: "default",
-              mb: 2,
-              alignItems: "center",
-              justifyContent: "end",
-              overflow: "hidden"
-            }}
-            contentEditable={false}
-          >
-            <Box
-              sx={{
-                height: "100%",
-                width: `${stats.percentage}%`,
-                position: "absolute",
-                bg: "border",
+              bg: "shade",
 
-                zIndex: 0,
-                left: 0,
-                transition: "width 250ms ease-out"
-              }}
-            />
-            <Input
-              readOnly={!editor.isEditable}
-              value={title || ""}
-              variant={"clean"}
-              sx={{
-                p: 0,
-                px: 2,
-                zIndex: 1,
-                color: "fontTertiary",
-                fontSize: "body"
-              }}
-              placeholder="Untitled"
-              onChange={(e) => {
-                updateAttributes(
-                  { title: e.target.value },
-                  { addToHistory: true, preventUpdate: false }
-                );
-              }}
-            />
-            <Flex sx={{ flexShrink: 0, pr: 2 }}>
+              zIndex: 0,
+              left: 0,
+              transition: "width 250ms ease-out"
+            }}
+          />
+          <Input
+            readOnly={!editor.isEditable}
+            value={title || ""}
+            variant={"clean"}
+            sx={{
+              flex: 1,
+              p: 0,
+              px: 2,
+              zIndex: 1,
+              color: "var(--paragraph-secondary)",
+              fontSize: "inherit",
+              fontFamily: "inherit"
+            }}
+            placeholder="Untitled"
+            onChange={(e) => {
+              updateAttributes(
+                { title: e.target.value },
+                { addToHistory: true, preventUpdate: false }
+              );
+            }}
+          />
+          {editor.isEditable && (
+            <>
+              <ToolButton
+                toggled={false}
+                title="Move all checked tasks to bottom"
+                icon="sortTaskList"
+                variant="small"
+                sx={{
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  const pos = getPos();
+                  editor.current
+                    ?.chain()
+                    .focus()
+                    .command(({ tr }) => {
+                      return !!sortList(tr, pos);
+                    })
+                    .run();
+                }}
+              />
               <ToolButton
                 toggled={false}
                 title="Clear completed tasks"
                 icon="clear"
                 variant="small"
+                sx={{
+                  zIndex: 1
+                }}
                 onClick={() => {
-                  if (!editor.current) return;
                   const pos = getPos();
-                  // we need to get a fresh instance of the task list instead
-                  // of using the one we got via props.
-                  const node = editor.current.state.doc.nodeAt(pos);
-                  if (!node) return;
 
-                  editor.current?.commands.command(({ tr }) => {
-                    const taskItems = findChildren(
-                      node,
-                      (n) => n.type.name === TaskItem.name && n.attrs.checked
-                    );
-                    const mapping = tr.mapping;
-                    for (const item of taskItems) {
-                      const childPos = pos + item.pos + 1;
-                      tr.deleteRange(
-                        mapping.map(childPos),
-                        mapping.map(childPos + item.node.nodeSize)
-                      );
-                    }
-                    return true;
-                  });
+                  editor.current
+                    ?.chain()
+                    .focus()
+                    .command(({ tr }) => {
+                      return !!deleteCheckedItems(tr, pos);
+                    })
+                    .run();
                 }}
               />
-              <Icon
-                path={Icons.checkbox}
-                size={15}
-                color="fontTertiary"
-                sx={{ ml: 1 }}
-              />
-              <Text variant={"body"} sx={{ ml: 1, color: "fontTertiary" }}>
-                {stats.checked}/{stats.total}
-              </Text>
-            </Flex>
-          </Flex>
-        )}
-      </Flex>
-      <Text
-        as={"div"}
+            </>
+          )}
+          <Text
+            variant={"body"}
+            sx={{
+              ml: 1,
+              mr: 2,
+              color: "var(--paragraph-secondary)",
+              flexShrink: 0,
+              zIndex: 1,
+              fontFamily: "inherit"
+            }}
+          >
+            {stats.checked}/{stats.total}
+          </Text>
+        </Flex>
+      )}
+      <Box
         ref={forwardRef}
+        dir={textDirection}
         sx={{
           ul: {
-            display: collapsed ? "none" : "block",
+            display: "block",
             paddingInlineStart: 0,
             marginBlockStart: isNested ? 10 : 0,
             marginBlockEnd: 0,
-            marginLeft: isNested ? (editor.isEditable ? -35 : -10) : 0
+            marginLeft: isNested ? (editor.isEditable ? -35 : -10) : 0,
+            padding: 0
           },
           li: {
             listStyleType: "none",
             position: "relative",
-            marginBottom: isNested ? 1 : [2, 1]
+            marginTop: 2,
+            marginBottom: 0,
+
+            display: "flex",
+            bg: "background",
+            borderRadius: "default",
+            ":hover > .dragHandle": {
+              opacity: editor.isEditable ? 1 : 0
+            },
+            ":hover > .taskItemTools": {
+              opacity: 1
+            }
           }
         }}
       />

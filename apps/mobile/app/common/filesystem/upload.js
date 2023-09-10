@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,16 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { db } from "../database";
+import { DatabaseLogger, db } from "../database";
 import { cacheDir } from "./utils";
+import { isImage, isDocument } from "@notesnook/core/dist/utils/filename";
+import { Platform } from "react-native";
+import { IOS_APPGROUPID } from "../../utils/constants";
 
 export async function uploadFile(filename, data, cancelToken) {
   if (!data) return false;
   let { url, headers } = data;
 
-  console.log("uploading file: ", filename, headers);
+  DatabaseLogger.info(`Preparing to upload file: ${filename}`);
+
   try {
     let res = await fetch(url, {
       method: "PUT",
@@ -34,10 +38,22 @@ export async function uploadFile(filename, data, cancelToken) {
     });
     if (!res.ok) throw new Error(`${res.status}: Unable to resolve upload url`);
     const uploadUrl = await res.text();
-    if (!uploadUrl) throw new Error("Unable to resolve upload url");
+    if (!uploadUrl) throw new Error("Unable to resolve attachment upload url");
+    let uploadFilePath = `${cacheDir}/${filename}`;
+
+    const iosAppGroup =
+      Platform.OS === "ios"
+        ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+        : null;
+    const appGroupPath = `${iosAppGroup}/${filename}`;
+    let exists = await RNFetchBlob.fs.exists(uploadFilePath);
+    if (!exists && Platform.OS === "ios") {
+      uploadFilePath = appGroupPath;
+    }
+    DatabaseLogger.info(`Starting upload: ${filename}`);
 
     let request = RNFetchBlob.config({
-      IOSBackgroundTask: true
+      IOSBackgroundTask: !globalThis["IS_SHARE_EXTENSION"]
     })
       .fetch(
         "PUT",
@@ -45,14 +61,17 @@ export async function uploadFile(filename, data, cancelToken) {
         {
           "content-type": ""
         },
-        RNFetchBlob.wrap(`${cacheDir}/${filename}`)
+        RNFetchBlob.wrap(uploadFilePath)
       )
       .uploadProgress((sent, total) => {
         useAttachmentStore
           .getState()
           .setProgress(sent, total, filename, 0, "upload");
-        console.log("uploading: ", sent, total);
+        DatabaseLogger.info(
+          `File upload progress: ${filename}, ${sent}/${total}`
+        );
       });
+
     cancelToken.cancel = request.cancel;
     let response = await request;
 
@@ -61,17 +80,31 @@ export async function uploadFile(filename, data, cancelToken) {
     let result = status >= 200 && status < 300 && text.length === 0;
     useAttachmentStore.getState().remove(filename);
     if (result) {
+      DatabaseLogger.info(
+        `File upload status: ${filename}, ${status}, ${text}`
+      );
       let attachment = db.attachments.attachment(filename);
       if (!attachment) return result;
-      if (!attachment.metadata.type.startsWith("image/")) {
+      if (
+        !isImage(attachment.metadata.type) &&
+        !isDocument(attachment.metadata?.type)
+      ) {
         RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
       }
+    } else {
+      const fileInfo = await RNFetchBlob.fs.stat(uploadFilePath);
+      throw new Error(
+        `${status}, ${text}, name: ${fileInfo.filename}, length: ${
+          fileInfo.size
+        }, info: ${JSON.stringify(response.info())}`
+      );
     }
 
     return result;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
-    console.log("upload file: ", e, url, headers);
+    DatabaseLogger.info(`File upload error: ${filename}, ${e}`);
+    DatabaseLogger.error(e);
     return false;
   }
 }

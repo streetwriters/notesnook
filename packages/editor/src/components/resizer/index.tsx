@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,28 +17,41 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { SchemeColors } from "@notesnook/theme";
 import { Resizable } from "re-resizable";
 import { PropsWithChildren } from "react";
-import { Icon, Icons } from "../../toolbar";
+import { Icons } from "../../toolbar";
+import { Icon } from "@notesnook/ui";
 import { Editor } from "../../types";
+import { Flex } from "@theme-ui/components";
 
 type ResizerProps = {
   editor: Editor;
   selected: boolean;
   width?: number;
   height?: number;
-  handleColor?: keyof SchemeColors;
+  handleColor?: SchemeColors;
   onResize: (width: number, height: number) => void;
+  style?: React.CSSProperties;
 };
 export function Resizer(props: PropsWithChildren<ResizerProps>) {
-  const { editor, selected, onResize, width, height, children, handleColor } =
-    props;
+  const {
+    editor,
+    selected,
+    onResize,
+    width,
+    height,
+    children,
+    handleColor,
+    style
+  } = props;
 
-  if (!editor.isEditable) return <>{children}</>;
+  if (!editor.isEditable)
+    return <Flex sx={{ position: "relative", width }}>{children}</Flex>;
 
   return (
     <Resizable
+      style={style}
       enable={{
         bottom: false,
         left: false,
@@ -53,22 +66,28 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
         height: height || "auto",
         width: width || "auto"
       }}
+      className="resizer"
       maxWidth="100%"
       minWidth={135}
+      handleStyles={{
+        bottomRight: {
+          right: 0,
+          bottom: 0,
+          width: 30,
+          height: 30,
+          zIndex: 2
+        }
+      }}
       handleComponent={{
         bottomRight: (
           <Icon
             sx={{
               width: 25,
-              height: 25,
-              marginLeft: -20,
-              marginTop: -20,
-              borderTopLeftRadius: "default",
-              borderBottomRightRadius: "default"
+              height: 25
             }}
             path={Icons.resize}
             size={25}
-            color={handleColor || "icon"}
+            color={handleColor || "black"}
           />
         )
       }}

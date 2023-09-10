@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,8 +31,7 @@ const config: PlaywrightTestConfig = {
   // Look for test files in thcleare "tests" directory, relative to this configuration file
   testDir: "__e2e__",
 
-  // Each test is given 30 seconds
-  timeout: 30000,
+  timeout: IS_CI ? 60 * 1000 : 30 * 1000,
   workers: IS_CI ? 2 : 2,
   reporter: "list",
   retries: IS_CI ? 1 : 0,

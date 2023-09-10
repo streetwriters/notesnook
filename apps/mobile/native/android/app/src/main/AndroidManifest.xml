@@ -31,6 +31,11 @@
             <intent>
                 <action android:name="android.intent.action.VIEW" />
                 <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+                <data android:mimeType="image/*" />
+            </intent>
+            <intent>
+                <action android:name="android.intent.action.VIEW" />
+                <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
 
                 <data android:mimeType="video/*" />
             </intent>
@@ -51,8 +56,8 @@
         android:theme="@style/BootTheme"
         android:largeHeap="true"
         android:supportsRtl="false"
-        tools:replace="android:supportsRtl"
-        android:usesCleartextTraffic="true">
+        android:networkSecurityConfig="@xml/network_security_config"
+        tools:replace="android:supportsRtl">
     
         <receiver android:exported="false" android:name=".NoteWidget">
             <intent-filter>
@@ -109,13 +114,17 @@
             android:excludeFromRecents="true"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppThemeB">
+
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.SEND" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="text/*" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="application/*" />
             </intent-filter>
+
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.PROCESS_TEXT" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -129,6 +138,8 @@
             android:exported="true"
             android:stopWithTask="false" />
         <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />   
+
+        <service android:name="com.streetwriters.notesnook.BootTaskService" />
 
         <provider
         android:name="androidx.core.content.FileProvider"
@@ -150,22 +161,13 @@
                 android:resource="@xml/file_viewer_provider_paths" />
         </provider>
 
-         <!-- Change the value to true to enable pop-up for in foreground on receiving remote notifications (for prevent duplicating while showing local notifications set this to false) -->
-        <meta-data  android:name="com.dieam.reactnativepushnotification.notification_foreground"
-                    android:value="false"/>
-        <!-- Change the resource name to your App's accent color - or any other color you want -->
-        <meta-data  android:name="com.dieam.reactnativepushnotification.notification_color"
-                    android:resource="@android:color/white"/> <!-- or @android:color/{name} to use a standard color -->
-
-        <receiver android:exported="true" android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationActions" />
-        <receiver android:exported="true" android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationPublisher" />
-        <receiver android:exported="true" android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationBootEventReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
-            </intent-filter>
-        </receiver>
+<!--        <receiver android:exported="true" android:name=".BootRecieverService" >-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.BOOT_COMPLETED" />-->
+<!--                <action android:name="android.intent.action.QUICKBOOT_POWERON" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
+        
 
     </application>
 

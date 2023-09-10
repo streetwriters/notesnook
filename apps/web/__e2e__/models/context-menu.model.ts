@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,18 +21,24 @@ import { Page, Locator } from "@playwright/test";
 import { getTestId } from "../utils";
 
 export class ContextMenuModel {
+  readonly menuContainer: Locator;
   readonly titleText: Locator;
   constructor(private readonly page: Page) {
+    this.menuContainer = this.page.locator(getTestId(`menu-container`));
     this.titleText = this.page.locator(getTestId(`menu-title`));
   }
 
   async title() {
+    if (!(await this.titleText.isVisible())) return null;
     return await this.titleText.textContent();
   }
 
-  async open(locator: Locator) {
-    await locator.click({ button: "right" });
-    await this.titleText.waitFor();
+  async open(
+    locator: Locator,
+    button: "left" | "right" | "middle" | undefined = "right"
+  ) {
+    await locator.click({ button });
+    await this.menuContainer.waitFor();
   }
 
   async clickOnItem(id: string) {
@@ -40,7 +46,14 @@ export class ContextMenuModel {
   }
 
   getItem(id: string) {
-    return this.page.locator(getTestId(`menuitem-${id}`));
+    return this.page.locator(getTestId(`menu-button-${id}`));
+  }
+
+  async hasItem(id: string) {
+    return (
+      (await this.getItem(id).isVisible()) &&
+      (await this.getItem(id).isEnabled())
+    );
   }
 
   async close() {

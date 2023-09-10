@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,25 +16,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+/* eslint-disable no-var */
 
-declare interface Window {
-  native: {
-    static gzip({
-      data,
-      level
-    }: {
-      data: string;
-      level: number;
-    }): Promise<string>;
-    static gunzip({ data }: { data: string }): Promise<string>;
-    static selectDirectory({
-      title,
-      buttonLabel,
-      defaultPath
-    }: {
-      title?: string;
-      buttonLabel?: string;
-      defaultPath?: string;
-    }): Promise<string>;
-  };
+import "vite/client";
+import "vite-plugin-svgr/client";
+
+declare global {
+  var PUBLIC_URL: string;
+  var APP_VERSION: string;
+  var GIT_HASH: string;
+  var IS_DESKTOP_APP: boolean;
+  var IS_TESTING: boolean;
+  var PLATFORM: "web" | "desktop";
+  var IS_BETA: boolean;
+  var APP_TITLE: string;
+  var IS_THEME_BUILDER: boolean;
+
+  interface Window {
+    os?: () => NodeJS.Platform | "mas";
+    NativeNNCrypto?: new () => import("@notesnook/crypto").NNCrypto;
+  }
 }

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,9 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Modal, Platform } from "react-native";
 import ShareView from "./share";
+import { ScopedThemeProvider } from "@notesnook/theme";
+import "./store";
 const Wrapper = Platform.OS === "android" ? Modal : Fragment;
 const outerProps =
   Platform.OS === "android"
@@ -29,11 +31,22 @@ const outerProps =
         visible: true
       }
     : {};
+
 const NotesnookShare = ({ quicknote = false }) => {
+  const [render, setRender] = useState(false);
+  useEffect(() => {
+    setTimeout(() => {
+      setRender(true);
+    }, 1);
+  }, []);
   return (
-    <Wrapper {...outerProps}>
-      <ShareView quicknote={quicknote} />
-    </Wrapper>
+    <ScopedThemeProvider value="base">
+      {!render ? null : (
+        <Wrapper {...outerProps}>
+          <ShareView quicknote={quicknote} />
+        </Wrapper>
+      )}
+    </ScopedThemeProvider>
   );
 };
 

@@ -1,0 +1,78 @@
+{
+  "name": "@notesnook/theme-builder",
+  "description": "Your private note taking space",
+  "version": "1.1.1",
+  "private": true,
+  "main": "./src/app.js",
+  "homepage": "https://notesnook.com/",
+  "repository": "https://github.com/streetwriters/notesnook",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@emotion/react": "11.11.1",
+    "@mdi/js": "^7.2.96",
+    "@mdi/react": "^1.6.1",
+    "@notesnook/common": "file:../../packages/common",
+    "@notesnook/theme": "file:../../packages/theme",
+    "@notesnook/web": "file:../web",
+    "@theme-ui/components": "^0.14.7",
+    "@theme-ui/core": "^0.14.7",
+    "clipboard-polyfill": "^4.0.0",
+    "file-saver": "^2.0.5",
+    "katex": "^0.16.2",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.5",
+    "@types/babel__core": "^7.20.1",
+    "@types/file-saver": "^2.0.5",
+    "@types/react": "17.0.2",
+    "@types/react-dom": "17.0.2",
+    "@vitejs/plugin-react-swc": "^3.3.2",
+    "autoprefixer": "^10.4.14",
+    "buffer": "^6.0.3",
+    "chalk": "^4.1.0",
+    "cross-env": "^7.0.3",
+    "happy-dom": "^8.9.0",
+    "rollup": "^3.27.0",
+    "rollup-plugin-visualizer": "^5.9.2",
+    "swc-plugin-react-remove-properties": "^0.1.4",
+    "vite": "^4.3.9",
+    "vite-plugin-env-compatible": "^1.1.1",
+    "vite-plugin-svgr": "^3.2.0",
+    "vitest": "^0.32.0"
+  },
+  "overrides": {
+    "react@>17": "17.0.2",
+    "react-dom@>17": "17.0.2",
+    "@types/react@>17": "17.0.2",
+    "@types/react-dom@>17": "17.0.2",
+    "@emotion/react@>11": "11.10.5",
+    "@theme-ui/components@>0": "0.14.7",
+    "@theme-ui/core@>0": "0.14.7"
+  },
+  "scripts": {
+    "start": "cross-env PLATFORM=web THEME_BUILDER=true vite -c ../web/vite.config.ts",
+    "build": "cross-env PLATFORM=web THEME_BUILDER=true vite -c ../web/vite.config.ts build"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all",
+      "ie >= 9"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version",
+      "last 3 ie version",
+      "last 4 edge version"
+    ]
+  },
+  "author": {
+    "name": "Streetwriters (Private) Limited",
+    "email": "support@streetwriters.co",
+    "url": "https://streetwriters.co"
+  }
+}

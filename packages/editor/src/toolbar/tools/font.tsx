@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,16 +20,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ToolProps } from "../types";
 import { Editor } from "../../types";
 import { Dropdown } from "../components/dropdown";
-import { MenuItem } from "../../components/menu/types";
+import { MenuItem } from "@notesnook/ui";
 import { useCallback, useMemo } from "react";
 import { Counter } from "../components/counter";
 import { useRefValue } from "../../hooks/use-ref-value";
+import { useToolbarStore } from "../stores/toolbar-store";
+import { getFontById, getFontIds, getFonts } from "../../utils/font";
 
 export function FontSize(props: ToolProps) {
   const { editor } = props;
-  const { fontSize: _fontSize } = editor.getAttributes("textStyle");
-  const fontSize = _fontSize || "16px";
-  const fontSizeAsNumber = useRefValue(parseInt(fontSize.replace("px", "")));
+  const defaultFontSize = useToolbarStore((store) => store.fontSize);
+  const { fontSize } = editor.getAttributes("textStyle");
+  const fontSizeAsNumber = useRefValue(
+    fontSize ? parseInt(fontSize.replace("px", "")) || 16 : defaultFontSize
+  );
 
   const decreaseFontSize = useCallback(() => {
     return Math.max(8, fontSizeAsNumber.current - 1);
@@ -56,27 +60,26 @@ export function FontSize(props: ToolProps) {
           .setFontSize(`${increaseFontSize()}px`)
           .run();
       }}
-      onReset={() => editor.current?.chain().focus().setFontSize("16px").run()}
-      value={fontSize}
+      onReset={() =>
+        editor.current
+          ?.chain()
+          .focus()
+          .setFontSize(`${defaultFontSize}px`)
+          .run()
+      }
+      value={fontSize || `${defaultFontSize}px`}
     />
   );
 }
 
-const fontFamilies = {
-  "Sans-serif": "Open Sans",
-  Serif: "serif",
-  Monospace: "monospace"
-};
 export function FontFamily(props: ToolProps) {
   const { editor } = props;
-
+  const defaultFontFamily = useToolbarStore((store) => store.fontFamily);
   const currentFontFamily =
-    Object.entries(fontFamilies)
-      .find(([_key, value]) =>
-        editor.isActive("textStyle", { fontFamily: value })
-      )
-      ?.map((a) => a)
-      ?.at(0) || "Sans-serif";
+    getFontIds().find((id) =>
+      editor.isActive("textStyle", { fontFamily: id })
+    ) || defaultFontFamily;
+
   const items = useMemo(
     () => toMenuItems(editor, currentFontFamily),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,7 +90,7 @@ export function FontFamily(props: ToolProps) {
     <Dropdown
       id="fontFamily"
       group="font"
-      selectedItem={currentFontFamily}
+      selectedItem={getFontById(currentFontFamily)?.title || defaultFontFamily}
       items={items}
       menuWidth={130}
     />
@@ -96,16 +99,18 @@ export function FontFamily(props: ToolProps) {
 
 function toMenuItems(editor: Editor, currentFontFamily: string): MenuItem[] {
   const menuItems: MenuItem[] = [];
-  for (const key in fontFamilies) {
-    const value = fontFamilies[key as keyof typeof fontFamilies];
+  for (const font of getFonts()) {
     menuItems.push({
-      key,
+      key: font.id,
       type: "button",
-      title: key,
-      isChecked: key === currentFontFamily,
-      onClick: () => editor.current?.chain().focus().setFontFamily(value).run(),
+      title: font.title,
+      isChecked: font.id === currentFontFamily,
+      onClick: () =>
+        editor.current?.chain().focus().setFontFamily(font.id).run(),
       styles: {
-        fontFamily: value
+        title: {
+          fontFamily: font.font
+        }
       }
     });
   }

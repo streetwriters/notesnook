@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { EventTypes } from "../utils";
 import styles from "./styles.module.css";
 
-export default function Tags(): JSX.Element {
+function Tags(): JSX.Element {
   const [tags, setTags] = useState<{ title: string; alias: string }[]>([]);
   const editorTags = useRef({
     setTags: setTags
@@ -39,34 +39,33 @@ export default function Tags(): JSX.Element {
 
   return (
     <div
+      className={styles.container}
       style={{
         padding: "0px 12px",
         display: "flex",
         alignItems: "center",
-        marginTop: 10
+        overflowX: "scroll",
+        minHeight: "40px"
       }}
     >
       <button
         className={styles.btn}
-        onMouseUp={(e) => {
-          e.preventDefault();
-          openManageTagsSheet();
-        }}
-        onMouseDown={(e) => e.preventDefault()}
-        onTouchEnd={(e) => {
+        onClick={(e) => {
           e.preventDefault();
           openManageTagsSheet();
         }}
         style={{
-          borderWidth: 0,
-          backgroundColor: "var(--nn_nav)",
+          border: `1px solid var(--nn_primary_border)`,
+          backgroundColor: "var(--nn_secondary_background)",
           marginRight: 5,
           borderRadius: 100,
           padding: "0px 10px",
           fontFamily: "Open Sans",
           display: "flex",
           alignItems: "center",
-          height: "30px"
+          height: "30px",
+          userSelect: "none",
+          WebkitUserSelect: "none"
         }}
       >
         {tags.length === 0 ? (
@@ -74,7 +73,7 @@ export default function Tags(): JSX.Element {
             style={{
               marginRight: 4,
               fontSize: 13,
-              color: "var(--nn_icon)",
+              color: "var(--nn_primary_icon)",
               userSelect: "none"
             }}
           >
@@ -89,7 +88,7 @@ export default function Tags(): JSX.Element {
           viewBox="0 0 24 24"
         >
           <path
-            fill="var(--nn_accent)"
+            fill="var(--nn_primary_accent)"
             d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
           />
         </svg>
@@ -100,22 +99,19 @@ export default function Tags(): JSX.Element {
           key={tag.title}
           className={styles.btn}
           style={{
-            borderWidth: 0,
-            backgroundColor: "var(--nn_nav)",
+            border: "1px solid var(--nn_primary_border)",
+            backgroundColor: "var(--nn_secondary_background)",
             marginRight: 5,
             borderRadius: 100,
             padding: "0px 10px",
             height: "30px",
             fontFamily: "Open Sans",
             fontSize: 13,
-            color: "var(--nn_icon)"
+            color: "var(--nn_primary_icon)",
+            userSelect: "none",
+            WebkitUserSelect: "none"
           }}
-          onMouseUp={(e) => {
-            e.preventDefault();
-            post(EventTypes.tag, tag.title);
-          }}
-          onMouseDown={(e) => e.preventDefault()}
-          onTouchEnd={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             post(EventTypes.tag, tag.title);
           }}
@@ -126,3 +122,5 @@ export default function Tags(): JSX.Element {
     </div>
   );
 }
+
+export default React.memo(Tags, () => true);

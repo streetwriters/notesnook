@@ -1,0 +1,5 @@
+- Fix a crash when tryin to upload attachments
+- Fix editor not rendered when enter foreground after a long time on iOS
+- Increased hit area for outline list to make toggling outline list items easier
+
+Thank you for using Notesnook!

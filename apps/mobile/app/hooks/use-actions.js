@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,15 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import Share from "react-native-share";
-import { notesnook } from "../../e2e/test.ids";
 import { db } from "../common/database";
+import { AttachmentDialog } from "../components/attachments";
 import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
+import { AddNotebookSheet } from "../components/sheets/add-notebook";
+import MoveNoteSheet from "../components/sheets/add-to";
 import ExportNotesSheet from "../components/sheets/export-notes";
 import { MoveNotes } from "../components/sheets/move-notes/movenote";
+import PublishNoteSheet from "../components/sheets/publish-note";
+import { RelationsList } from "../components/sheets/relations-list/index";
+import ReminderSheet from "../components/sheets/reminder";
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -40,33 +45,36 @@ import Notifications from "../services/notifications";
 import { useEditorStore } from "../stores/use-editor-store";
 import { useMenuStore } from "../stores/use-menu-store";
 import useNavigationStore from "../stores/use-navigation-store";
+import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useTagStore } from "../stores/use-tag-store";
-import { useThemeStore } from "../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../stores/use-user-store";
-import { toTXT } from "../utils";
-import { toggleDarkMode } from "../utils/color-scheme/utils";
+import { convertNoteToText } from "../utils/note-to-text";
+import { toggleDarkMode } from "../utils/colors";
 import {
-  eOpenAddNotebookDialog,
+  eOnTopicSheetUpdate,
   eOpenAddTopicDialog,
-  eOpenAttachmentsDialog, eOpenLoginDialog,
-  eOpenMoveNoteDialog,
-  eOpenPublishNoteDialog
+  eOpenLoginDialog
 } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { sleep } from "../utils/time";
 
 export const useActions = ({ close = () => null, item }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors, isDark } = useThemeColors();
   const clearSelection = useSelectionStore((state) => state.clearSelection);
   const setSelectedItem = useSelectionStore((state) => state.setSelectedItem);
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
   );
+  const processingId = useRef();
   const user = useUserStore((state) => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
   const alias = item.alias || item.title;
+  const [defaultNotebook, setDefaultNotebook] = useState(
+    db.settings.getDefaultNotebook()
+  );
 
   const isPublished =
     item.type === "note" && db.monographs.isPublished(item.id);
@@ -86,7 +94,7 @@ export const useActions = ({ close = () => null, item }) => {
       return;
     }
 
-    let index = pinned.findIndex((notif) => notif.tag === item.id);
+    let index = pinned.findIndex((notif) => notif.id === item.id);
     if (index !== -1) {
       setNotifPinned(pinned[index]);
     } else {
@@ -100,6 +108,15 @@ export const useActions = ({ close = () => null, item }) => {
     return (
       db.notes?.topicReferences?.get(currentScreen.id)?.indexOf(item.id) > -1
     );
+  };
+
+  const isNoteInNotebook = () => {
+    const currentScreen = useNavigationStore.getState().currentScreen;
+    if (item.type !== "note" || currentScreen.name !== "Notebook") return;
+
+    return !!db.relations
+      .to(item, "notebook")
+      .find((notebook) => notebook.id === currentScreen.id);
   };
 
   const onUpdate = useCallback(
@@ -126,25 +143,16 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   function addTo() {
-    close();
     clearSelection(true);
     setSelectedItem(item);
-    setTimeout(() => {
-      eSendEvent(eOpenMoveNoteDialog, item);
-    }, 300);
+    MoveNoteSheet.present(item);
   }
 
   async function addToFavorites() {
     if (!item.id) return;
     close();
     await db.notes.note(item.id).favorite();
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes"
-    );
+    Navigation.queueRoutesForUpdate();
   }
 
   async function pinItem() {
@@ -152,14 +160,7 @@ export const useActions = ({ close = () => null, item }) => {
     close();
     let type = item.type;
     await db[`${type}s`][type](item.id).pin();
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes",
-      "Notebooks"
-    );
+    Navigation.queueRoutesForUpdate();
   }
 
   async function pinToNotifications() {
@@ -173,17 +174,25 @@ export const useActions = ({ close = () => null, item }) => {
       checkNotifPinned();
       return;
     }
-    if (item.locked) return;
-    let html = await db.notes.note(item.id).content();
-    let text = await toTXT(item);
-    Notifications.present({
+    if (item.locked) {
+      ToastEvent.show({
+        heading: "Note is locked",
+        type: "error",
+        message: "Locked notes cannot be pinned to notifications",
+        context: "local"
+      });
+      return;
+    }
+    let text = await convertNoteToText(item, false);
+    let html = text.replace(/\n/g, "<br />");
+    Notifications.displayNotification({
       title: item.title,
       message: item.headline || text,
       subtitle: item.headline || text,
       bigText: html,
       ongoing: true,
       actions: ["UNPIN"],
-      tag: item.id
+      id: item.id
     });
     await sleep(1000);
     await Notifications.get();
@@ -194,15 +203,7 @@ export const useActions = ({ close = () => null, item }) => {
     if (!checkNoteSynced()) return;
     close();
     await db.trash.restore(item.id);
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes",
-      "Notebooks",
-      "Trash"
-    );
+    Navigation.queueRoutesForUpdate();
     let type = item.type === "trash" ? item.itemType : item.type;
     ToastEvent.show({
       heading:
@@ -214,6 +215,14 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   async function copyContent() {
+    if (processingId.current === "copyContent") {
+      ToastEvent.show({
+        heading: "Please wait...",
+        message: "We are preparing your note for copy to clipboard",
+        context: "local"
+      });
+      return;
+    }
     if (!checkNoteSynced()) return;
     if (item.locked) {
       close();
@@ -227,7 +236,9 @@ export const useActions = ({ close = () => null, item }) => {
         description: "Unlock note to copy to clipboard."
       });
     } else {
-      Clipboard.setString(await toTXT(item));
+      processingId.current = "copyContent";
+      Clipboard.setString(await convertNoteToText(item));
+      processingId.current = null;
       ToastEvent.show({
         heading: "Note copied to clipboard",
         type: "success",
@@ -267,9 +278,7 @@ export const useActions = ({ close = () => null, item }) => {
       });
       return;
     }
-    close();
-    await sleep(300);
-    eSendEvent(eOpenPublishNoteDialog, item);
+    PublishNoteSheet.present(item);
   }
 
   const checkNoteSynced = () => {
@@ -320,13 +329,7 @@ export const useActions = ({ close = () => null, item }) => {
       let note = db.notes.note(item.id).data;
       if (note.locked) {
         close();
-        Navigation.queueRoutesForUpdate(
-          "TaggedNotes",
-          "ColoredNotes",
-          "TopicNotes",
-          "Favorites",
-          "Notes"
-        );
+        Navigation.queueRoutesForUpdate();
       }
     } catch (e) {
       close();
@@ -392,16 +395,12 @@ export const useActions = ({ close = () => null, item }) => {
       positivePress: async (value) => {
         if (!value || value === "" || value.trimStart().length == 0) return;
         await db.tags.rename(item.id, db.tags.sanitize(value));
-        useTagStore.getState().setTags();
-        useMenuStore.getState().setMenuPins();
-        Navigation.queueRoutesForUpdate(
-          "TaggedNotes",
-          "ColoredNotes",
-          "TopicNotes",
-          "Favorites",
-          "Notes",
-          "Tags"
-        );
+        setTimeout(() => {
+          useTagStore.getState().setTags();
+          useMenuStore.getState().setMenuPins();
+          Navigation.queueRoutesForUpdate();
+          useRelationStore.getState().update();
+        }, 1);
       },
       input: true,
       defaultValue: alias,
@@ -411,6 +410,14 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   async function shareNote() {
+    if (processingId.current === "shareNote") {
+      ToastEvent.show({
+        heading: "Please wait...",
+        message: "We are preparing your note for sharing",
+        context: "local"
+      });
+      return;
+    }
     if (!checkNoteSynced()) return;
     if (item.locked) {
       close();
@@ -424,10 +431,13 @@ export const useActions = ({ close = () => null, item }) => {
         description: "Unlock note to share it."
       });
     } else {
+      processingId.current = "shareNote";
+      const convertedText = await convertNoteToText(item);
+      processingId.current = null;
       Share.open({
         title: "Share note to",
         failOnCancel: false,
-        message: await toTXT(item)
+        message: convertedText
       });
     }
   }
@@ -435,28 +445,32 @@ export const useActions = ({ close = () => null, item }) => {
   async function deleteItem() {
     if (!checkNoteSynced()) return;
     close();
-    if (item.type === "tag") {
+    if (item.type === "tag" || item.type === "reminder") {
       await sleep(300);
       presentDialog({
-        title: "Delete tag",
-        paragraph: "This tag will be removed from all notes.",
+        title: `Delete ${item.type}`,
+        paragraph:
+          item.type === "reminder"
+            ? "This reminder will be removed"
+            : "This tag will be removed from all notes.",
         positivePress: async () => {
-          await db.tags.remove(item.id);
-          useTagStore.getState().setTags();
-          Navigation.queueRoutesForUpdate(
-            "TaggedNotes",
-            "ColoredNotes",
-            "TopicNotes",
-            "Favorites",
-            "Notes",
-            "Tags"
-          );
+          if (item.type === "reminder") {
+            await db.reminders.remove(item.id);
+          } else {
+            await db.tags.remove(item.id);
+          }
+          setImmediate(() => {
+            useTagStore.getState().setTags();
+            Navigation.queueRoutesForUpdate();
+            useRelationStore.getState().update();
+          });
         },
         positiveText: "Delete",
         positiveType: "errorShade"
       });
       return;
     }
+
     if (item.locked) {
       await sleep(300);
       openVault({
@@ -470,6 +484,7 @@ export const useActions = ({ close = () => null, item }) => {
     } else {
       try {
         close();
+        await sleep(300);
         await deleteItems(item);
       } catch (e) {
         console.error(e);
@@ -486,15 +501,16 @@ export const useActions = ({ close = () => null, item }) => {
       },
       item.id
     );
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes",
-      "Notebook",
-      "Notebooks"
-    );
+    Navigation.queueRoutesForUpdate();
+    eSendEvent(eOnTopicSheetUpdate);
+    close();
+  }
+
+  async function removeNoteFromNotebook() {
+    const currentScreen = useNavigationStore.getState().currentScreen;
+    if (currentScreen.name !== "Notebook") return;
+    await db.relations.unlink({ type: "notebook", id: currentScreen.id }, item);
+    Navigation.queueRoutesForUpdate();
     close();
   }
 
@@ -509,12 +525,14 @@ export const useActions = ({ close = () => null, item }) => {
       negativeText: "Cancel",
       positivePress: async () => {
         await db.trash.delete(item.id);
-        Navigation.queueRoutesForUpdate("Trash");
-        useSelectionStore.getState().setSelectionMode(false);
-        ToastEvent.show({
-          heading: "Permanantly deleted items",
-          type: "success",
-          context: "local"
+        setImmediate(() => {
+          Navigation.queueRoutesForUpdate();
+          useSelectionStore.getState().setSelectionMode(false);
+          ToastEvent.show({
+            heading: "Permanantly deleted items",
+            type: "success",
+            context: "local"
+          });
         });
       },
       positiveType: "errorShade"
@@ -522,35 +540,32 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   async function openHistory() {
-    close();
-    await sleep(300);
     presentSheet({
       component: (ref) => <NoteHistory fwdRef={ref} note={item} />
     });
   }
 
   async function showAttachments() {
-    close();
-    await sleep(300);
-    eSendEvent(eOpenAttachmentsDialog, item);
+    AttachmentDialog.present(item);
   }
 
   async function exportNote() {
-    close();
-    await sleep(300);
+    if (item.locked) {
+      ToastEvent.show({
+        heading: "Note is locked",
+        type: "error",
+        message: "Locked notes cannot be exported",
+        context: "local"
+      });
+      return;
+    }
     ExportNotesSheet.present([item]);
   }
 
   async function toggleLocalOnly() {
     if (!checkNoteSynced() || !user) return;
     db.notes.note(item.id).localOnly();
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes"
-    );
+    Navigation.queueRoutesForUpdate();
     close();
   }
 
@@ -561,92 +576,109 @@ export const useActions = ({ close = () => null, item }) => {
       useEditorStore.getState().setReadonly(current);
       //  tiny.call(EditorWebView, tiny.toogleReadMode(current ? 'readonly' : 'design'));
     }
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes"
-    );
+    Navigation.queueRoutesForUpdate();
     close();
   };
 
   const duplicateNote = async () => {
     if (!checkNoteSynced()) return;
     await db.notes.note(item.id).duplicate();
-    Navigation.queueRoutesForUpdate(
-      "TaggedNotes",
-      "ColoredNotes",
-      "TopicNotes",
-      "Favorites",
-      "Notes"
-    );
+    Navigation.queueRoutesForUpdate();
     close();
   };
   const actions = [
     {
-      name: "Add to notebook",
-      title: "Add to notebook",
+      id: "notebooks",
+      title: "Link Notebooks",
       icon: "book-outline",
       func: addTo
     },
     {
-      name: "Move notes",
-      title: "Add notes",
-      icon: "plus",
-      func: async () => {
-        close();
-        await sleep(500);
-        MoveNotes.present(db.notebooks.notebook(item.notebookId).data, item);
-      }
+      id: "add-tag",
+      title: "Add tags",
+      icon: "pound",
+      func: addTo
+    },
+    {
+      id: "add-reminder",
+      title: "Remind me",
+      icon: "clock-plus-outline",
+      func: () => {
+        ReminderSheet.present(null, { id: item.id, type: "note" });
+      },
+      close: true
+    },
+    {
+      id: "lock-unlock",
+      title: item.locked ? "Unlock" : "Lock",
+      icon: item.locked ? "lock-open-outline" : "key-outline",
+      func: addToVault,
+      on: item.locked
+    },
+    {
+      id: "publish",
+      title: isPublished ? "Published" : "Publish",
+      icon: "cloud-upload-outline",
+      on: isPublished,
+      func: publishNote
     },
 
     {
-      name: "Pin",
-      title: item.pinned ? "Unpin" : "Pin to top",
+      id: "export",
+      title: "Export",
+      icon: "export",
+      func: exportNote
+    },
+    {
+      id: "move-notes",
+      title: "Add notes",
+      icon: "plus",
+      func: async () => {
+        MoveNotes.present(db.notebooks.notebook(item.notebookId).data, item);
+      }
+    },
+    {
+      id: "pin",
+      title: item.pinned ? "Unpin" : "Pin",
       icon: item.pinned ? "pin-off-outline" : "pin-outline",
       func: pinItem,
       close: false,
       check: true,
       on: item.pinned,
-      nopremium: true,
-      id: notesnook.ids.dialogs.actionsheet.pin
+      pro: true
     },
     {
-      name: "Favorite",
-      title: !item.favorite ? "Favorite" : "Unfavorite",
+      id: "favorite",
+      title: item.favorite ? "Unfavorite" : "Favorite",
       icon: item.favorite ? "star-off" : "star-outline",
       func: addToFavorites,
       close: false,
       check: true,
       on: item.favorite,
-      nopremium: true,
-      id: notesnook.ids.dialogs.actionsheet.favorite,
+      pro: true,
       color: "orange"
     },
     {
-      name: "PinToNotif",
+      id: "pin-to-notifications",
       title:
         notifPinned !== null
-          ? "Unpin from Notifications"
-          : "Pin to Notifications",
-      icon: "bell",
+          ? "Unpin from notifications"
+          : "Pin to notifications",
+      icon: "message-badge-outline",
       on: notifPinned !== null,
       func: pinToNotifications
     },
 
     {
-      name: "Edit Notebook",
+      id: "edit-notebook",
       title: "Edit notebook",
       icon: "square-edit-outline",
       func: async () => {
-        close();
-        await sleep(300);
-        eSendEvent(eOpenAddNotebookDialog, item);
+        AddNotebookSheet.present(item);
       }
     },
     {
-      name: "Edit Topic",
+      id: "edit-topic",
       title: "Edit topic",
       icon: "square-edit-outline",
       func: async () => {
@@ -659,77 +691,192 @@ export const useActions = ({ close = () => null, item }) => {
       }
     },
     {
-      name: "Copy",
+      id: "copy",
       title: "Copy",
       icon: "content-copy",
       func: copyContent
     },
     {
-      name: "Restore",
+      id: "restore",
       title: "Restore " + item.itemType,
       icon: "delete-restore",
       func: restoreTrashItem
     },
 
     {
-      name: "Publish",
-      title: isPublished ? "Published" : "Publish",
-      icon: "cloud-upload-outline",
-      on: isPublished,
-      func: publishNote
-    },
-    {
-      name: "Vault",
-      title: item.locked ? "Remove from vault" : "Add to vault",
-      icon: item.locked ? "shield-off-outline" : "shield-outline",
-      func: addToVault,
-      on: item.locked
-    },
-
-    {
-      name: "Add Shortcut",
+      id: "add-shortcut",
       title: isPinnedToMenu ? "Remove Shortcut" : "Add Shortcut",
       icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
       func: createMenuShortcut,
       close: false,
       check: true,
       on: isPinnedToMenu,
-      nopremium: true,
-      id: notesnook.ids.dialogs.actionsheet.pinMenu
+      pro: true
     },
     {
-      name: "Rename Tag",
+      id: "rename-tag",
       title: "Rename tag",
       icon: "square-edit-outline",
       func: renameTag
     },
     {
-      name: "Share",
+      id: "share",
       title: "Share",
       icon: "share-variant",
       func: shareNote
     },
     {
-      name: "Attachments",
+      id: "read-only",
+      title: "Readonly",
+      icon: "pencil-lock",
+      func: toggleReadyOnlyMode,
+      on: item.readonly
+    },
+    {
+      id: "local-only",
+      title: "Local only",
+      icon: "sync-off",
+      func: toggleLocalOnly,
+      on: item.localOnly
+    },
+    {
+      id: "duplicate",
+      title: "Duplicate",
+      icon: "content-duplicate",
+      func: duplicateNote
+    },
+    {
+      id: "dark-mode",
+      title: "Dark mode",
+      icon: "theme-light-dark",
+      func: switchTheme,
+      switch: true,
+      on: isDark ? true : false,
+      close: false,
+      pro: true
+    },
+    {
+      id: "edit-reminder",
+      title: "Edit reminder",
+      icon: "pencil",
+      func: async () => {
+        ReminderSheet.present(item);
+      },
+      close: false
+    },
+
+    {
+      id: "reminders",
+      title: "Reminders",
+      icon: "clock-outline",
+      func: async () => {
+        RelationsList.present({
+          reference: item,
+          referenceType: "reminder",
+          relationType: "from",
+          title: "Reminders",
+          onAdd: () => ReminderSheet.present(null, item, true),
+          button: {
+            title: "Add",
+            type: "accent",
+            onPress: () => ReminderSheet.present(null, item, true),
+            icon: "plus"
+          }
+        });
+      },
+      close: false
+    },
+    {
+      id: "attachments",
       title: "Attachments",
       icon: "attachment",
       func: showAttachments
     },
     {
-      name: "Export",
-      title: "Export",
-      icon: "export",
-      func: exportNote
+      id: "history",
+      title: "History",
+      icon: "history",
+      func: openHistory
+    },
+
+    {
+      id: "default-notebook",
+      title:
+        defaultNotebook?.id === item.id
+          ? "Remove as default"
+          : "Set as default",
+      hidden: item.type !== "notebook",
+      icon: "notebook",
+      func: async () => {
+        if (defaultNotebook?.id === item.id) {
+          await db.settings.setDefaultNotebook();
+          setDefaultNotebook();
+        } else {
+          const notebook = {
+            id: item.id
+          };
+          await db.settings.setDefaultNotebook(notebook);
+          setDefaultNotebook(notebook);
+        }
+        close();
+      },
+      on: defaultNotebook?.topic ? false : defaultNotebook?.id === item.id
     },
     {
-      name: "RemoveTopic",
+      id: "default-topic",
+      title:
+        defaultNotebook?.id === item.id
+          ? "Remove as default"
+          : "Set as default",
+      hidden: item.type !== "topic",
+      icon: "bookmark",
+      func: async () => {
+        if (defaultNotebook?.topic === item.id) {
+          await db.settings.setDefaultNotebook();
+          setDefaultNotebook();
+        } else {
+          const notebook = {
+            id: item.notebookId,
+            topic: item.id
+          };
+          await db.settings.setDefaultNotebook(notebook);
+          setDefaultNotebook(notebook);
+        }
+        close();
+      },
+      on: defaultNotebook?.topic === item.id
+    },
+    {
+      id: "disable-reminder",
+      title: !item.disabled ? "Turn off reminder" : "Turn on reminder",
+      icon: !item.disabled ? "bell-off-outline" : "bell",
+      func: async () => {
+        close();
+        await db.reminders.add({
+          ...item,
+          disabled: !item.disabled
+        });
+        Notifications.scheduleNotification(item);
+        useRelationStore.getState().update();
+        Navigation.queueRoutesForUpdate();
+      }
+    },
+    {
+      id: "remove-from-topic",
       title: "Remove from topic",
       hidden: !isNoteInTopic(),
       icon: "minus-circle-outline",
       func: removeNoteFromTopic
     },
     {
-      name: "Delete",
+      id: "remove-from-notebook",
+      title: "Remove from notebook",
+      hidden: !isNoteInNotebook(),
+      icon: "minus-circle-outline",
+      func: removeNoteFromNotebook
+    },
+    {
+      id: "trash",
       title:
         item.type !== "notebook" && item.type !== "note"
           ? "Delete " + item.type
@@ -739,49 +886,25 @@ export const useActions = ({ close = () => null, item }) => {
       func: deleteItem
     },
     {
-      name: "PermDelete",
+      id: "delete",
       title: "Delete " + item.itemType,
       icon: "delete",
       func: deleteTrashItem
-    },
-    {
-      name: "ReadOnly",
-      title: "Read only",
-      icon: "pencil-lock",
-      func: toggleReadyOnlyMode,
-      on: item.readonly
-    },
-    {
-      name: "Local only",
-      title: "Local only",
-      icon: "sync-off",
-      func: toggleLocalOnly,
-      on: item.localOnly
-    },
-
-    {
-      name: "History",
-      title: "History",
-      icon: "history",
-      func: openHistory
-    },
-    {
-      name: "Duplicate",
-      title: "Duplicate",
-      icon: "content-duplicate",
-      func: duplicateNote
-    },
-    {
-      name: "Dark Mode",
-      title: "Dark mode",
-      icon: "theme-light-dark",
-      func: switchTheme,
-      switch: true,
-      on: colors.night ? true : false,
-      close: false,
-      nopremium: true,
-      id: notesnook.ids.dialogs.actionsheet.night
     }
+    // {
+    //   id: "ReferencedIn",
+    //   title: "References",
+    //   icon: "link",
+    //   func: async () => {
+    //     close();
+    //     RelationsList.present({
+    //       reference: item,
+    //       referenceType: "note",
+    //       title: "Referenced in",
+    //       relationType: "to",
+    //     });
+    //   }
+    // }
   ];
 
   return actions;

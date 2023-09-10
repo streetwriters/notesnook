@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,20 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { RefObject, useEffect, useRef } from "react";
+import { getFontById } from "@notesnook/editor";
+import React, { RefObject, useEffect, useRef } from "react";
 import { EditorController } from "../hooks/useEditorController";
 import styles from "./styles.module.css";
 function Title({
   controller,
   title,
   titlePlaceholder,
-  readonly
+  readonly,
+  fontFamily
 }: {
   controller: RefObject<EditorController>;
   title: string;
   titlePlaceholder: string;
   readonly: boolean;
+  fontFamily: string;
 }) {
   const titleRef = useRef<HTMLInputElement>(null);
   const emitUpdate = useRef(true);
@@ -51,7 +53,7 @@ function Title({
       contentEditable={!readonly}
       disabled={readonly}
       style={{
-        height: 50,
+        height: 40,
         fontSize: 25,
         width: "100%",
         boxSizing: "border-box",
@@ -59,10 +61,11 @@ function Title({
         paddingRight: 12,
         paddingLeft: 12,
         fontWeight: 600,
-        fontFamily: "Open Sans",
+        fontFamily: getFontById(fontFamily)?.font || "Open Sans",
         backgroundColor: "transparent",
-        color: "var(--nn_heading)",
-        caretColor: "var(--nn_accent)"
+        color: "var(--nn_primary_heading)",
+        caretColor: "var(--nn_primary_accent)",
+        borderRadius: 0
       }}
       maxLength={150}
       onChange={(event) => {
@@ -75,8 +78,13 @@ function Title({
 }
 
 export default React.memo(Title, (prev, next) => {
-  if (prev.title !== next.title) return false;
-  if (prev.titlePlaceholder !== next.titlePlaceholder) return false;
-  if (prev.readonly !== next.readonly) return false;
+  if (
+    prev.title !== next.title ||
+    prev.titlePlaceholder !== next.titlePlaceholder ||
+    prev.readonly !== next.readonly ||
+    prev.fontFamily !== next.fontFamily
+  )
+    return false;
+
   return true;
 });

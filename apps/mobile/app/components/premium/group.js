@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { ScrollView, View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
@@ -27,20 +27,20 @@ import { FeatureBlock } from "./feature";
 import { ProTag } from "./pro-tag";
 
 export const Group = ({ item, index }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   return (
     <View
       style={{
         paddingHorizontal: 12,
-        backgroundColor: index % 2 !== 0 ? colors.bg : colors.nav,
+        backgroundColor: index % 2 !== 0 ? colors.primary.background : colors.secondary.background,
         paddingVertical: 40
       }}
     >
       {item?.pro ? (
         <ProTag
           size={SIZE.sm}
-          background={index % 2 === 0 ? colors.bg : colors.nav}
+          background={index % 2 === 0 ? colors.primary.background : colors.secondary.background}
         />
       ) : null}
       <Heading>{item.title}</Heading>
@@ -60,7 +60,7 @@ export const Group = ({ item, index }) => {
               {...item}
               detail={item.detail}
               pro={item.pro}
-              proTagBg={index % 2 === 0 ? colors.bg : colors.nav}
+              proTagBg={index % 2 === 0 ? colors.primary.background : colors.secondary.background}
             />
           ))}
         </ScrollView>
@@ -71,7 +71,7 @@ export const Group = ({ item, index }) => {
             marginTop: 10
           }}
           size={SIZE.xs}
-          color={colors.icon}
+          color={colors.secondary.paragraph}
         >
           {item.info}
         </Paragraph>

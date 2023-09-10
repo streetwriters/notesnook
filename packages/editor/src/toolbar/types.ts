@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Editor } from "../types";
 import { IconNames } from "./icons";
 import { ToolId } from "./tools";
-import { NodeWithOffset } from "./utils/prosemirror";
+import { NodeWithOffset } from "../utils/prosemirror";
 
 export type ToolButtonVariant = "small" | "normal";
 export type ToolProps = ToolDefinition & {

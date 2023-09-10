@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,25 +22,40 @@ import { TaskManager } from "./task-manager";
 import { zip } from "../utils/zip";
 import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
+import { sanitizeFilename } from "@notesnook/common";
+import Vault from "./vault";
 
 export async function exportToPDF(
   title: string,
   content: string
 ): Promise<boolean> {
   if (!content) return false;
-  const { default: printjs } = await import("print-js");
-  return new Promise((resolve) => {
-    printjs({
-      printable: content,
-      type: "raw-html",
-      documentTitle: title,
-      header: '<h3 class="custom-h3">My custom header</h3>',
-      onPrintDialogClose: () => {
-        resolve(false);
-      },
-      onError: () => resolve(false)
-    });
-    resolve(true);
+
+  return new Promise<boolean>((resolve) => {
+    const iframe = document.createElement("iframe");
+
+    iframe.srcdoc = content;
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+
+    iframe.onload = () => {
+      if (!iframe.contentWindow) return;
+      if (iframe.contentDocument) iframe.contentDocument.title = title;
+      iframe.contentWindow.onbeforeunload = () => closePrint(false);
+      iframe.contentWindow.onafterprint = () => closePrint(true);
+      iframe.contentWindow.print();
+    };
+
+    function closePrint(result: boolean) {
+      document.body.removeChild(iframe);
+      resolve(result);
+    }
+
+    document.body.appendChild(iframe);
   });
 }
 
@@ -53,12 +68,18 @@ export async function exportNotes(
     title: "Exporting notes",
     subtitle: "Please wait while your notes are exported.",
     action: async (report) => {
-      if (format === "pdf") {
-        const note = db.notes?.note(noteIds[0]);
-        if (!note) return false;
-        const html = await note.export("html", null);
-        if (!html) return false;
-        return await exportToPDF(note.title, html);
+      let vaultUnlocked = false;
+
+      if (noteIds.length === 1 && db.notes?.note(noteIds[0])?.data.locked) {
+        vaultUnlocked = await Vault.unlockVault();
+        if (!vaultUnlocked) return false;
+      } else if (noteIds.length > 1 && (await db.vault?.exists())) {
+        vaultUnlocked = await Vault.unlockVault();
+        if (!vaultUnlocked)
+          showToast(
+            "error",
+            "Failed to unlock vault. Locked notes will be skipped."
+          );
       }
 
       const files = [];
@@ -66,29 +87,52 @@ export async function exportNotes(
       for (const noteId of noteIds) {
         const note = db.notes?.note(noteId);
         if (!note) continue;
+        if (!vaultUnlocked && note.data.locked) continue;
+
         report({
           current: ++index,
           total: noteIds.length,
           text: `Exporting "${note.title}"...`
         });
-        console.log("Exporting", note.title);
-        const content = await note.export(format, null).catch((e) => {
-          showToast("error", e.message);
-        });
-        if (!content) continue;
-        files.push({ filename: note.title, content });
+
+        const rawContent = await db.content?.raw(note.data.contentId);
+        const content = note.data.locked
+          ? await db.vault?.decryptContent(rawContent)
+          : rawContent;
+
+        const exported = await note
+          .export(format === "pdf" ? "html" : format, content)
+          .catch((e: Error) => {
+            console.error(note.data, e);
+            showToast(
+              "error",
+              `Failed to export note "${note.title}": ${e.message}`
+            );
+          });
+
+        if (typeof exported !== "string") {
+          showToast("error", `Failed to export note "${note.title}"`);
+          continue;
+        }
+
+        if (format === "pdf") {
+          return await exportToPDF(note.title, exported);
+        }
+
+        files.push({ filename: note.title, content: exported });
       }
 
       if (!files.length) return false;
       if (files.length === 1) {
         saveAs(
           new Blob([Buffer.from(files[0].content, "utf-8")]),
-          `${files[0].filename}.${format}`
+          `${sanitizeFilename(files[0].filename)}.${format}`
         );
       } else {
         const zipped = await zip(files, format);
         saveAs(new Blob([zipped.buffer]), "notes.zip");
       }
+
       return true;
     }
   });

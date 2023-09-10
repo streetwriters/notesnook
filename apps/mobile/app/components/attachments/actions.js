@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,12 +33,8 @@ import {
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { formatBytes } from "../../utils";
-import {
-  eCloseAttachmentDialog,
-  eCloseProgressDialog
-} from "../../utils/events";
+import { useThemeColors } from "@notesnook/theme";
+import { eCloseAttachmentDialog, eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
@@ -50,9 +46,10 @@ import { Notice } from "../ui/notice";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { formatBytes } from "@notesnook/common";
 
 const Actions = ({ attachment, setAttachments, fwdRef }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const contextId = attachment.metadata.hash;
   const [filename, setFilename] = useState(attachment.metadata.filename);
   const [currentProgress] = useAttachmentProgress(attachment);
@@ -71,7 +68,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
           useAttachmentStore.getState().remove(attachment.metadata.hash);
         }
         downloadAttachment(attachment.metadata.hash, false);
-        eSendEvent(eCloseProgressDialog, contextId);
+        eSendEvent(eCloseSheet, contextId);
       },
       icon: "download"
     },
@@ -105,15 +102,21 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
         if (res.failed) {
           db.attachments.markAsFailed(attachment.id, res.failed);
           setFailed(res.failed);
+          ToastEvent.show({
+            heading: "File check failed with error: " + res.failed,
+            type: "error",
+            context: "local"
+          });
         } else {
           setFailed(null);
           db.attachments.markAsFailed(attachment.id, null);
+          ToastEvent.show({
+            heading: "File check passed",
+            type: "success",
+            context: "local"
+          });
         }
-        ToastEvent.show({
-          heading: "File check passed",
-          type: "success",
-          context: "local"
-        });
+
         setAttachments([...db.attachments.all]);
         setLoading({
           name: null
@@ -150,7 +153,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
       onPress: async () => {
         await db.attachments.remove(attachment.metadata.hash, false);
         setAttachments([...db.attachments.all]);
-        eSendEvent(eCloseProgressDialog, contextId);
+        eSendEvent(eCloseSheet, contextId);
       },
       icon: "delete-outline"
     }
@@ -191,7 +194,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
       <View
         style={{
           borderBottomWidth: 1,
-          borderBottomColor: colors.nav,
+          borderBottomColor: colors.secondary.background,
           marginBottom: notes && notes.length > 0 ? 0 : 12
         }}
       >
@@ -212,11 +215,11 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
           }}
         >
           <Paragraph
-            size={SIZE.xs + 1}
+            size={SIZE.xs}
             style={{
               marginRight: 10
             }}
-            color={colors.icon}
+            color={colors.secondary.paragraph}
           >
             {attachment.metadata.type}
           </Paragraph>
@@ -224,22 +227,24 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
             style={{
               marginRight: 10
             }}
-            size={SIZE.xs + 1}
-            color={colors.icon}
+            size={SIZE.xs}
+            color={colors.secondary.paragraph}
           >
             {formatBytes(attachment.length)}
           </Paragraph>
 
-          <Paragraph
-            style={{
-              marginRight: 10
-            }}
-            size={SIZE.xs + 1}
-            color={colors.icon}
-          >
-            {attachment.noteIds.length} note
-            {attachment.noteIds.length > 1 ? "s" : ""}
-          </Paragraph>
+          {attachment.noteIds ? (
+            <Paragraph
+              style={{
+                marginRight: 10
+              }}
+              size={SIZE.xs}
+              color={colors.secondary.paragraph}
+            >
+              {attachment.noteIds.length} note
+              {attachment.noteIds.length > 1 ? "s" : ""}
+            </Paragraph>
+          ) : null}
           <Paragraph
             onPress={() => {
               Clipboard.setString(attachment.metadata.hash);
@@ -249,8 +254,8 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
                 context: "local"
               });
             }}
-            size={SIZE.xs + 1}
-            color={colors.icon}
+            size={SIZE.xs}
+            color={colors.secondary.paragraph}
           >
             {attachment.metadata.hash}
           </Paragraph>
@@ -263,7 +268,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
         <View
           style={{
             borderBottomWidth: 1,
-            borderBottomColor: colors.nav,
+            borderBottomColor: colors.secondary.background,
             marginBottom: 12,
             paddingVertical: 12
           }}
@@ -291,7 +296,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
                     });
                     return;
                   }
-                  eSendEvent(eCloseProgressDialog, contextId);
+                  eSendEvent(eCloseSheet, contextId);
                   await sleep(150);
                   eSendEvent(eCloseAttachmentDialog);
                   await sleep(300);
@@ -305,7 +310,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
                 }}
                 key={item.id}
               >
-                <Paragraph size={SIZE.xs + 1}>{item.title}</Paragraph>
+                <Paragraph size={SIZE.xs}>{item.title}</Paragraph>
               </PressableButton>
             ))}
           </>
@@ -317,10 +322,10 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
           key={item.name}
           buttonType={{
             text: item.on
-              ? colors.accent
+              ? colors.primary.accent
               : item.name === "Delete" || item.name === "PermDelete"
-              ? colors.errorText
-              : colors.pri
+              ? colors.error.paragraph
+              : colors.primary.paragraph
           }}
           onPress={item.onPress}
           title={item.name}

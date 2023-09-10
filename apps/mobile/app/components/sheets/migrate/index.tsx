@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EVENTS } from "@notesnook/core/common";
+import { EVENTS } from "@notesnook/core/dist/common";
 import React, { useCallback, useEffect, useState } from "react";
 import { Platform, View } from "react-native";
 import { db } from "../../../common/database";
@@ -29,8 +29,8 @@ import {
   ToastEvent
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
-import { useThemeStore } from "../../../stores/use-theme-store";
-import { eCloseProgressDialog } from "../../../utils/events";
+import { useThemeColors } from "@notesnook/theme";
+import { eCloseSheet } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
@@ -56,7 +56,7 @@ type Progress = {
 };
 
 export default function Migrate() {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [loading, setLoading] = useState(false);
   const [error, _setError] = useState<Error>();
   const [reset, setReset] = useState(false);
@@ -103,7 +103,7 @@ export default function Migrate() {
         return;
       }
       await db.migrations?.migrate();
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
       await sleep(500);
       setLoading(false);
     } catch (e) {
@@ -152,8 +152,8 @@ export default function Migrate() {
               animated={true}
               useNativeDriver
               indeterminate
-              unfilledColor={colors.nav}
-              color={colors.accent}
+              unfilledColor={colors.secondary.background}
+              color={colors.primary.accent}
               borderWidth={0}
             />
 

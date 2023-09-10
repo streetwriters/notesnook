@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/theme",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "main": "./dist/index.js",
   "license": "GPL-3.0-or-later",
   "repository": {
@@ -8,15 +8,29 @@
     "url": "git://github.com/streetwriters/themeprovider.git"
   },
   "dependencies": {
-    "@theme-ui/core": "^0.14.7",
-    "tinycolor2": "^1.4.2"
+    "@emotion/react": "11.11.1",
+    "@theme-ui/color": "^0.16.0",
+    "@theme-ui/components": "0.14.7",
+    "@theme-ui/core": "0.14.7",
+    "tinycolor2": "^1.4.2",
+    "zustand": "^4.3.8"
   },
   "devDependencies": {
+    "@trpc/server": "^10.31.0",
+    "@types/react": "17.0.2",
     "@types/tinycolor2": "^1.4.3",
-    "typescript": "^4.8.2"
+    "isomorphic-fetch": "^3.0.0",
+    "ts-json-schema-generator": "^1.2.0",
+    "react": "17.0.2"
+  },
+  "peerDependencies": {
+    "react": "17.0.2"
   },
   "scripts": {
+    "prebuild": "node ./scripts/prebuild.mjs",
+    "generate": "node ./scripts/schema-generator.mjs",
     "build": "tsc",
-    "pub": "npm run build && npm publish"
+    "prepublishOnly": "npm run build",
+    "watch": "tsc --watch"
   }
 }

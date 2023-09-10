@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { FlashList } from "@shopify/flash-list";
 import { NotebookType, NoteType, TopicType } from "app/utils/types";
 import React, { RefObject, useState } from "react";
 import { Platform, useWindowDimensions, View } from "react-native";
-import ActionSheet from "react-native-actions-sheet";
+import { ActionSheetRef } from "react-native-actions-sheet";
+import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import { db } from "../../../common/database";
 import {
   eSendEvent,
@@ -30,8 +30,8 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SearchService from "../../../services/search";
-import { useThemeStore } from "../../../stores/use-theme-store";
-import { eCloseProgressDialog } from "../../../utils/events";
+import { useThemeColors } from "@notesnook/theme";
+import { eCloseSheet } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
@@ -58,9 +58,9 @@ export const MoveNotes = ({
 }: {
   notebook: NotebookType;
   selectedTopic?: TopicType;
-  fwdRef: RefObject<ActionSheet>;
+  fwdRef: RefObject<ActionSheetRef>;
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [currentNotebook, setCurrentNotebook] = useState(notebook);
   const { height } = useWindowDimensions();
   let notes = db.notes?.all as NoteType[];
@@ -122,15 +122,7 @@ export const MoveNotes = ({
       db.notebooks?.notebook(currentNotebook.id).data as NotebookType
     );
 
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes",
-      "Notebook",
-      "Notebooks"
-    );
+    Navigation.queueRoutesForUpdate();
     return true;
   };
 
@@ -161,15 +153,19 @@ export const MoveNotes = ({
           >
             <Paragraph
               numberOfLines={1}
-              color={item?.id === topic?.id ? colors.accent : colors.pri}
+              color={
+                item?.id === topic?.id
+                  ? colors.primary.accent
+                  : colors.primary.paragraph
+              }
             >
               {item.title}
             </Paragraph>
             {item.type == "note" && item.headline ? (
               <Paragraph
                 numberOfLines={1}
-                color={colors.icon}
-                size={SIZE.xs + 1}
+                color={colors.secondary.paragraph}
+                size={SIZE.xs}
               >
                 {item.headline}
               </Paragraph>
@@ -181,7 +177,7 @@ export const MoveNotes = ({
               style={{
                 fontSize: SIZE.xs
               }}
-              color={colors.icon}
+              color={colors.secondary.paragraph}
             >
               {item.notes?.length} Notes
             </Paragraph>
@@ -195,14 +191,22 @@ export const MoveNotes = ({
                 backgroundColor: "transparent"
               }}
               name="check"
-              type="grayAccent"
-              color={colors.accent}
+              type="selected"
+              color={colors.selected.icon}
             />
           ) : null}
         </PressableButton>
       );
     },
-    [colors.accent, colors.icon, colors.pri, select, selectedNoteIds, topic]
+    [
+      colors.primary.accent,
+      colors.secondary.paragraph,
+      colors.primary.paragraph,
+      colors.selected.icon,
+      select,
+      selectedNoteIds,
+      topic
+    ]
   );
 
   /**
@@ -253,7 +257,9 @@ export const MoveNotes = ({
               marginTop: 5
             }}
           >
-            <Paragraph color={colors.accent}>in {topic.title}</Paragraph>
+            <Paragraph color={colors.selected.paragraph}>
+              in {topic.title}
+            </Paragraph>
 
             <Paragraph
               style={{
@@ -277,10 +283,6 @@ export const MoveNotes = ({
       )}
 
       <FlashList
-        nestedScrollEnabled
-        onMomentumScrollEnd={() => {
-          fwdRef.current?.handleChildScrollEnd();
-        }}
         ListEmptyComponent={
           <View
             style={{
@@ -289,7 +291,7 @@ export const MoveNotes = ({
               alignItems: "center"
             }}
           >
-            <Paragraph color={colors.icon}>
+            <Paragraph color={colors.secondary.paragraph}>
               {topic ? "No notes to show" : "No topics in this notebook"}
             </Paragraph>
 
@@ -322,17 +324,9 @@ export const MoveNotes = ({
               },
               ...selectedNoteIds
             );
-            Navigation.queueRoutesForUpdate(
-              "Notes",
-              "Favorites",
-              "ColoredNotes",
-              "TaggedNotes",
-              "TopicNotes",
-              "Notebook",
-              "Notebooks"
-            );
+            Navigation.queueRoutesForUpdate();
             SearchService.updateAndSearch();
-            eSendEvent(eCloseProgressDialog);
+            eSendEvent(eCloseSheet);
           }}
           title="Move selected notes"
           type="accent"
@@ -345,7 +339,7 @@ export const MoveNotes = ({
 
 MoveNotes.present = (notebook: NotebookType, topic: TopicType) => {
   presentSheet({
-    component: (ref: RefObject<ActionSheet>) => (
+    component: (ref: RefObject<ActionSheetRef>) => (
       <MoveNotes fwdRef={ref} notebook={notebook} selectedTopic={topic} />
     )
   });

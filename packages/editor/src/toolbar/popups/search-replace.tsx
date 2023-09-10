@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import { Editor } from "../../types";
 export type SearchReplacePopupProps = { editor: Editor };
 export function SearchReplacePopup(props: SearchReplacePopupProps) {
   const { editor } = props;
-  const { selectedText, results, selectedIndex } = editor.storage
+  const { selectedText, results, selectedIndex, focusNonce } = editor.storage
     .searchreplace as SearchStorage;
 
   const [isReplacing, setIsReplacing] = useState(false);
@@ -68,6 +68,15 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
     }
   }, [selectedText, search]);
 
+  useEffect(() => {
+    if (searchInputRef.current) {
+      const input = searchInputRef.current;
+      setTimeout(() => {
+        input.focus();
+      }, 0);
+    }
+  }, [focusNonce]);
+
   return (
     <Flex
       sx={{
@@ -92,11 +101,11 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               p: 1,
               py: 0,
               ":focus-within": {
-                outlineColor: "primary",
+                outlineColor: "accent",
                 outlineWidth: "1.8px"
               },
               ":hover": {
-                outlineColor: "primary"
+                outlineColor: "accent"
               }
             }}
           >
@@ -112,7 +121,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  editor.commands.moveToNextResult();
+                  editor.current?.commands.moveToNextResult();
                 }
               }}
             />
@@ -176,7 +185,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 sx={{
                   flexShrink: 0,
                   borderLeft: "1px solid var(--border)",
-                  color: "fontTertiary",
+                  color: "paragraph",
                   px: 1
                 }}
               >
@@ -194,21 +203,23 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
         </Flex>
         <Flex sx={{ flexDirection: "column" }}>
           <Flex sx={{ alignItems: "center", height: "33.2px" }}>
-            <ToolButton
-              toggled={isReplacing}
-              title="Toggle replace"
-              id="toggleReplace"
-              icon="replace"
-              onClick={() => setIsReplacing((s) => !s)}
-              sx={{ mr: 0 }}
-              iconSize={"big"}
-            />
+            {editor.isEditable && (
+              <ToolButton
+                toggled={isReplacing}
+                title="Toggle replace"
+                id="toggleReplace"
+                icon="replace"
+                onClick={() => setIsReplacing((s) => !s)}
+                sx={{ mr: 0 }}
+                iconSize={"big"}
+              />
+            )}
             <ToolButton
               toggled={false}
               title="Previous match"
               id="previousMatch"
               icon="previousMatch"
-              onClick={() => editor.commands.moveToPreviousResult()}
+              onClick={() => editor.current?.commands.moveToPreviousResult()}
               sx={{ mr: 0 }}
               iconSize={"big"}
             />
@@ -217,7 +228,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               title="Next match"
               id="nextMatch"
               icon="nextMatch"
-              onClick={() => editor.commands.moveToNextResult()}
+              onClick={() => editor.current?.commands.moveToNextResult()}
               sx={{ mr: 0 }}
               iconSize={"big"}
             />
@@ -226,7 +237,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               title="Close"
               id="close"
               icon="close"
-              onClick={() => editor.chain().focus().endSearch().run()}
+              onClick={() => editor.current?.chain().focus().endSearch().run()}
               sx={{ mr: 0 }}
               iconSize={"big"}
             />
@@ -238,7 +249,9 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 title="Replace"
                 id="replace"
                 icon="replaceOne"
-                onClick={() => editor.commands.replace(replaceText.current)}
+                onClick={() =>
+                  editor.current?.commands.replace(replaceText.current)
+                }
                 sx={{ mr: 0 }}
                 iconSize={18}
               />
@@ -247,7 +260,9 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 title="Replace all"
                 id="replaceAll"
                 icon="replaceAll"
-                onClick={() => editor.commands.replaceAll(replaceText.current)}
+                onClick={() =>
+                  editor.current?.commands.replaceAll(replaceText.current)
+                }
                 sx={{ mr: 0 }}
                 iconSize={18}
               />

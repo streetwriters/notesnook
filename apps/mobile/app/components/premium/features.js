@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -50,7 +50,6 @@ export const features = [
       }
     ]
   },
-
   {
     title: "No limit on notes or devices",
     detail:
@@ -86,6 +85,45 @@ export const features = [
         highlight: "No restriction",
         content: "on file type",
         icon: "file"
+      }
+    ]
+  },
+  {
+    title: "Cross platform Reminders",
+    detail: "Stay updated on all your upcoming tasks with reminders.",
+    features: [
+      {
+        highlight: "One-time",
+        content: "reminders",
+        icon: "bell"
+      },
+      {
+        highlight: "Daily, weekly & montly",
+        content: "reminders",
+        icon: "refresh",
+        pro: true
+      }
+    ]
+  },
+  {
+    title: "Two-factor authentication",
+    detail:
+      "Improve account security & prevent intruders from accessing your notes",
+    info: "* 2FA via email is enabled by default for all users.",
+    features: [
+      {
+        highlight: "Email *",
+        icon: "bell"
+      },
+      {
+        highlight: "Authentication",
+        content: "app",
+        icon: "refresh"
+      },
+      {
+        highlight: "SMS",
+        icon: "refresh",
+        pro: true
       }
     ]
   },
@@ -128,10 +166,27 @@ export const features = [
   },
 
   {
-    title: "Instant syncing",
+    title: "Instant sync",
     detail:
       "Seamlessly work from anywhere on any device. Every change is synced instantly to all your devices.",
-    pro: true
+    info: "* Disable sync completely, turn off auto sync or disable editor realtime sync.",
+    features: [
+      {
+        highlight: "Sync to unlimited",
+        content: "devices",
+        icon: "cellphone"
+      },
+      {
+        highlight: "Realtime",
+        content: "editor sync",
+        icon: "sync"
+      },
+      {
+        highlight: "Granular sync",
+        content: "controls *",
+        icon: "sync-off"
+      }
+    ]
   },
   {
     title: "Rich tools for rich editing",
@@ -153,6 +208,12 @@ export const features = [
         highlight: "Markdown",
         content: "support",
         icon: "language-markdown",
+        pro: true
+      },
+      {
+        highlight: "Personalized",
+        content: "editor toolbar",
+        icon: "gesture-tap-button",
         pro: true
       },
       {

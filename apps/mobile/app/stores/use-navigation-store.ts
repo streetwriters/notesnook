@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import create, { State } from "zustand";
-import { COLORS_NOTE } from "../utils/color-scheme";
+import { ColorValues } from "../utils/colors";
 import {
   ColorType,
   MonographType,
@@ -68,6 +68,8 @@ export type RouteParams = {
   Monographs: NotesScreenParams;
   AppLock: AppLockRouteParams;
   Auth: AuthParams;
+  Reminders: GenericRouteParam;
+  SettingsGroup: GenericRouteParam;
 };
 
 export type RouteName = keyof RouteParams;
@@ -80,6 +82,7 @@ export type CurrentScreen = {
   color?: string | null;
   alias?: string;
   notebookId?: string;
+  beta?: boolean;
 };
 
 export type HeaderRightButton = {
@@ -112,14 +115,13 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
   canGoBack: false,
   update: (currentScreen, canGoBack, headerRightButtons) => {
     const color =
-      COLORS_NOTE[
-        currentScreen.color?.toLowerCase() as keyof typeof COLORS_NOTE
+      ColorValues[
+        currentScreen.color?.toLowerCase() as keyof typeof ColorValues
       ];
     if (
       JSON.stringify(currentScreen) === JSON.stringify(get().currentScreenRaw)
     )
       return;
-
     set({
       currentScreen: {
         name: currentScreen.name,
@@ -128,7 +130,8 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
         title: currentScreen.alias || currentScreen.title || currentScreen.name,
         type: currentScreen.type,
         color: color,
-        notebookId: currentScreen.notebookId
+        notebookId: currentScreen.notebookId,
+        beta: currentScreen.beta
       },
       currentScreenRaw: currentScreen,
       canGoBack,

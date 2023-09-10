@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,30 +18,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useRef, useState } from "react";
-import { Dimensions, View } from "react-native";
-import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
-import umami from "../../common/analytics";
+import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { ToastEvent } from "../../services/event-manager";
 import { clearMessage, setEmailVerifyMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import BaseDialog from "../dialog/base-dialog";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
-import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { SVG } from "./background";
 import { hideAuth } from "./common";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 export const Signup = ({ changeMode, trial }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const email = useRef();
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -52,7 +48,8 @@ export const Signup = ({ changeMode, trial }) => {
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const setLastSynced = useUserStore((state) => state.setLastSynced);
-
+  const deviceMode = useSettingStore((state) => state.deviceMode);
+  const { width, height } = useWindowDimensions();
   const validateInfo = () => {
     if (!password.current || !email.current || !confirmPassword.current) {
       ToastEvent.show({
@@ -70,6 +67,7 @@ export const Signup = ({ changeMode, trial }) => {
 
   const signup = async () => {
     if (!validateInfo() || error) return;
+    if (loading) return;
     setLoading(true);
     try {
       await db.user.signup(email.current.toLowerCase(), password.current);
@@ -79,7 +77,6 @@ export const Signup = ({ changeMode, trial }) => {
       clearMessage();
       setEmailVerifyMessage();
       hideAuth();
-      umami.pageView("/account-created", "/welcome/signup");
       await sleep(300);
       if (trial) {
         PremiumService.sheet(null, null, true);
@@ -99,70 +96,73 @@ export const Signup = ({ changeMode, trial }) => {
 
   return (
     <>
-      {loading ? (
-        <BaseDialog transparent={true} visible={true} animation="fade" />
-      ) : null}
-      <Animated.View
-        entering={FadeInDown}
-        exiting={FadeOutUp}
+      <View
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           zIndex: 10,
           width: "100%",
-          minHeight: "100%"
+          alignSelf: "center"
         }}
       >
         <View
           style={{
-            height: 250,
-            overflow: "hidden"
+            justifyContent: "flex-end",
+            paddingHorizontal: 20,
+            backgroundColor: colors.secondary.background,
+            marginBottom: 20,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.primary.border,
+            alignSelf: deviceMode !== "mobile" ? "center" : undefined,
+            borderWidth: deviceMode !== "mobile" ? 1 : null,
+            borderColor: deviceMode !== "mobile" ? colors.primary.border : null,
+            borderRadius: deviceMode !== "mobile" ? 20 : null,
+            marginTop: deviceMode !== "mobile" ? 50 : null,
+            width: deviceMode === "mobile" ? null : "50%",
+            minHeight: height * 0.4
           }}
         >
-          <SvgView
-            src={SVG(colors.night ? colors.icon : "black")}
-            height={700}
-          />
+          <View
+            style={{
+              flexDirection: "row"
+            }}
+          >
+            <View
+              style={{
+                width: 100,
+                height: 5,
+                backgroundColor: colors.primary.accent,
+                borderRadius: 2,
+                marginRight: 7
+              }}
+            />
+
+            <View
+              style={{
+                width: 20,
+                height: 5,
+                backgroundColor: colors.secondary.background,
+                borderRadius: 2
+              }}
+            />
+          </View>
+          <Heading
+            extraBold
+            style={{
+              marginBottom: 25,
+              marginTop: 10
+            }}
+            size={SIZE.xxl}
+          >
+            Create your {"\n"}account
+          </Heading>
         </View>
 
         <View
           style={{
-            width: "100%",
-            justifyContent: "center",
-            alignSelf: "center",
-            paddingHorizontal: 12,
-            marginBottom: 30,
-            marginTop: Dimensions.get("window").height < 700 ? -75 : 15
-          }}
-        >
-          <Heading
-            style={{
-              textAlign: "center"
-            }}
-            size={30}
-            color={colors.heading}
-          >
-            Create your account
-          </Heading>
-          <Paragraph
-            style={{
-              textDecorationLine: "underline",
-              textAlign: "center"
-            }}
-            onPress={() => {
-              changeMode(0);
-            }}
-            size={SIZE.md}
-          >
-            Already have an account? Log in
-          </Paragraph>
-        </View>
-        <View
-          style={{
             width: DDS.isTab ? "50%" : "100%",
-            padding: 12,
-            backgroundColor: colors.bg,
-            flexGrow: 1,
+            paddingHorizontal: 20,
+            backgroundColor: colors.primary.background,
             alignSelf: "center"
           }}
         >
@@ -222,37 +222,16 @@ export const Signup = ({ changeMode, trial }) => {
             validationType="confirmPassword"
             customValidator={() => password.current}
             placeholder="Confirm password"
-            marginBottom={5}
+            marginBottom={12}
             onSubmit={signup}
           />
-          <View
-            style={{
-              marginTop: 25,
-              alignSelf: "center"
-            }}
-          >
-            <Button
-              style={{
-                width: 250,
-                borderRadius: 100
-              }}
-              loading={loading}
-              onPress={signup}
-              type="accent"
-              title={loading ? null : "Agree and continue"}
-            />
-          </View>
 
           <Paragraph
             style={{
-              textAlign: "center",
-              position: "absolute",
-              bottom: 0,
-              alignSelf: "center",
-              marginBottom: 20
+              marginBottom: 25
             }}
             size={SIZE.xs}
-            color={colors.icon}
+            color={colors.secondary.paragraph}
           >
             By signing up, you agree to our{" "}
             <Paragraph
@@ -263,9 +242,9 @@ export const Signup = ({ changeMode, trial }) => {
               style={{
                 textDecorationLine: "underline"
               }}
-              color={colors.accent}
+              color={colors.primary.accent}
             >
-              terms of service{" "}
+              Terms of Service{" "}
             </Paragraph>
             and{" "}
             <Paragraph
@@ -276,13 +255,51 @@ export const Signup = ({ changeMode, trial }) => {
               style={{
                 textDecorationLine: "underline"
               }}
-              color={colors.accent}
+              color={colors.primary.accent}
             >
-              privacy policy.
-            </Paragraph>
+              Privacy Policy.
+            </Paragraph>{" "}
+            You also agree to recieve marketing emails from us which you can
+            opt-out of from app settings.
           </Paragraph>
+
+          <Button
+            title={!loading ? "Continue" : null}
+            type="accent"
+            loading={loading}
+            onPress={signup}
+            fontSize={SIZE.md}
+            style={{
+              marginRight: 12,
+              width: 250,
+              borderRadius: 100
+            }}
+          />
+
+          <TouchableOpacity
+            onPress={() => {
+              if (loading) return;
+              changeMode(0);
+            }}
+            activeOpacity={0.8}
+            style={{
+              alignSelf: "center",
+              marginTop: 12,
+              paddingVertical: 12
+            }}
+          >
+            <Paragraph size={SIZE.xs + 1} color={colors.secondary.paragraph}>
+              Already have an account?{" "}
+              <Paragraph
+                size={SIZE.xs + 1}
+                style={{ color: colors.primary.accent }}
+              >
+                Login
+              </Paragraph>
+            </Paragraph>
+          </TouchableOpacity>
         </View>
-      </Animated.View>
+      </View>
     </>
   );
 };

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,12 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Editor, Extension, posToDOMRect } from "@tiptap/core";
 
+type KeepInViewOptions = {
+  scrollIntoViewOnWindowResize: boolean;
+};
+
 let onWindowResize: ((this: Window, ev: UIEvent) => void) | undefined =
   undefined;
-export const KeepInView = Extension.create({
+export const KeepInView = Extension.create<KeepInViewOptions>({
   name: "keepinview",
-
+  addOptions() {
+    return {
+      scrollIntoViewOnWindowResize: true
+    };
+  },
   onCreate() {
+    if (!this.options.scrollIntoViewOnWindowResize) return;
     onWindowResize = () => {
       keepLastLineInView(this.editor);
     };
@@ -49,9 +58,11 @@ export const KeepInView = Extension.create({
   }
 });
 
-export function keepLastLineInView(editor: Editor) {
-  const THRESHOLD = 100;
-
+export function keepLastLineInView(
+  editor: Editor,
+  THRESHOLD = 100,
+  SCROLL_THRESHOLD = 100
+) {
   const node = editor.state.selection.$from;
   const { top } = posToDOMRect(editor.view, node.pos, node.pos + 1);
   const isBelowThreshold = window.innerHeight - top < THRESHOLD;
@@ -63,7 +74,7 @@ export function keepLastLineInView(editor: Editor) {
     if (domNode instanceof HTMLElement) {
       const container = findScrollContainer(domNode);
       if (container) {
-        container.scrollBy({ top: THRESHOLD, behavior: "smooth" });
+        container.scrollBy({ top: SCROLL_THRESHOLD, behavior: "smooth" });
       } else domNode.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }

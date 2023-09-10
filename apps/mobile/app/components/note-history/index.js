@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,21 +23,21 @@ import { FlatList } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { presentSheet } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
-import { timeConverter, timeSince } from "../../utils/time";
 import DialogHeader from "../dialog/dialog-header";
 import SheetProvider from "../sheet-provider";
 import { PressableButton } from "../ui/pressable";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import NotePreview from "./preview";
+import { getFormattedDate, getTimeAgo } from "@notesnook/common";
 
 export default function NoteHistory({ note, fwdRef }) {
   const [history, setHistory] = useState([]);
   const [_loading, setLoading] = useState(true);
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   useEffect(() => {
     (async () => {
@@ -63,15 +63,15 @@ export default function NoteHistory({ note, fwdRef }) {
   }, []);
 
   const getDate = (start, end) => {
-    let _start = timeConverter(start);
-    let _end = timeConverter(end + 60000);
-    if (_start === _end) return _start;
-    let final = _end.lastIndexOf(",");
-    let part = _end.slice(0, final + 1);
-    if (_start.includes(part)) {
-      return _start + " —" + _end.replace(part, "");
-    }
-    return _start + " — " + _end;
+    let _start_date = getFormattedDate(start, "date");
+    let _end_date = getFormattedDate(end + 60000, "date");
+
+    let _start_time = getFormattedDate(start, "time");
+    let _end_time = getFormattedDate(end + 60000, "time");
+
+    return `${_start_date} ${_start_time} - ${
+      _end_date === _start_date ? " " : _end_date + " "
+    }${_end_time}`;
   };
 
   const renderItem = useCallback(
@@ -89,12 +89,12 @@ export default function NoteHistory({ note, fwdRef }) {
         }}
       >
         <Paragraph>{getDate(item.dateCreated, item.dateModified)}</Paragraph>
-        <Paragraph color={colors.icon} size={SIZE.xs}>
-          {timeSince(item.dateModified)}
+        <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+          {getTimeAgo(item.dateModified)}
         </Paragraph>
       </PressableButton>
     ),
-    [colors.icon, preview]
+    [colors.secondary.paragraph, preview]
   );
 
   return (
@@ -115,8 +115,10 @@ export default function NoteHistory({ note, fwdRef }) {
         style={{
           paddingHorizontal: 12
         }}
+        nestedScrollEnabled
         keyExtractor={(item) => item.id}
         data={history}
+        ListFooterComponent={<View style={{ height: 250 }} />}
         ListEmptyComponent={
           <View
             style={{
@@ -126,8 +128,8 @@ export default function NoteHistory({ note, fwdRef }) {
               height: 200
             }}
           >
-            <Icon name="history" size={60} color={colors.icon} />
-            <Paragraph color={colors.icon}>
+            <Icon name="history" size={60} color={colors.primary.icon} />
+            <Paragraph color={colors.secondary.paragraph}>
               No note history found on this device.
             </Paragraph>
           </View>
@@ -136,7 +138,7 @@ export default function NoteHistory({ note, fwdRef }) {
       />
       <Paragraph
         size={SIZE.xs}
-        color={colors.icon}
+        color={colors.secondary.paragraph}
         style={{
           alignSelf: "center"
         }}
@@ -149,7 +151,10 @@ export default function NoteHistory({ note, fwdRef }) {
               colors
             );
           }}
-          style={{ color: colors.accent, textDecorationLine: "underline" }}
+          style={{
+            color: colors.primary.accent,
+            textDecorationLine: "underline"
+          }}
         >
           Learn how this works.
         </Text>

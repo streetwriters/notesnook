@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,18 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Platform } from "react-native";
+import { verifyUser } from "../screens/settings/functions";
 import { useMessageStore } from "../stores/use-message-store";
 import {
   eOpenLoginDialog,
   eOpenRateDialog,
   eOpenRecoveryKeyDialog
 } from "../utils/events";
-import { eSendEvent } from "./event-manager";
+import { eSendEvent, presentSheet } from "./event-manager";
 import PremiumService from "./premium";
-import { verifyUser } from "../screens/settings/functions";
-import { Platform } from "react-native";
-import umami from "../common/analytics";
 import SettingsService from "./settings";
+import { Update } from "../components/sheets/update";
 
 const rateAppMessage = {
   visible: true,
@@ -82,7 +82,6 @@ const loginMessage = {
   message: "You are not logged in",
   actionText: "Login to encrypt and sync notes",
   onPress: () => {
-    umami.pageView("/signup", "/welcome/home");
     eSendEvent(eOpenLoginDialog);
   },
   data: {},
@@ -137,4 +136,22 @@ const autoBackupsOff = {
 
 export function setAutobackOffMessage() {
   useMessageStore.getState().setMessage(autoBackupsOff);
+}
+
+const updateAvailableMessage = (version) => ({
+  visible: true,
+  message: "New update available",
+  actionText: "Tap here to update to the latest version",
+  onPress: () => {
+    presentSheet({
+      component: (ref) => <Update version={version} fwdRef={ref} />
+    });
+  },
+  data: {},
+  icon: "update",
+  type: "normal"
+});
+
+export function setUpdateAvailableMessage(version) {
+  useMessageStore.getState().setMessage(updateAvailableMessage(version));
 }

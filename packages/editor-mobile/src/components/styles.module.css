@@ -1,9 +1,9 @@
 .btn {
-  background-color: var(--nn_nav);
+  background-color: var(--nn_secondary_background);
 }
 
 .btn:active {
-  background-color: var(--nn_transGray);
+  background-color: var(--nn_secondary_hover);
 }
 
 .btn_header {
@@ -13,9 +13,17 @@
 }
 
 .btn_header:active {
-  background-color: var(--nn_transGray);
+  background-color: var(--nn_secondary_hover);
 }
 
 .titleBar::placeholder {
-  color: var(--nn_placeholder);
+  color: var(--nn_primary_placeholder);
+}
+
+.container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.container::-webkit-scrollbar {
+  display: none;
 }

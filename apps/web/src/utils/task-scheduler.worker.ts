@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -50,6 +50,11 @@ const module = {
     if (RUNNING_TASKS[id] && RUNNING_TASKS[id].isRunning) {
       RUNNING_TASKS[id].stop();
       delete RUNNING_TASKS[id];
+    }
+  },
+  stopAllWithPrefix: (prefix: string) => {
+    for (const id in RUNNING_TASKS) {
+      if (id.startsWith(prefix)) module.stop(id);
     }
   },
   stopAll: () => {

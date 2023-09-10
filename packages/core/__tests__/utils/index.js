@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,12 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import DB from "../../api";
-import StorageInterface from "../../__mocks__/storage.mock";
+import DB from "../../src/api";
+import { NodeStorageInterface } from "../../__mocks__/node-storage.mock";
 import dayjs from "dayjs";
-import { groupArray } from "../../utils/grouping";
+import { groupArray } from "../../src/utils/grouping";
 import FS from "../../__mocks__/fs.mock";
 import Compressor from "../../__mocks__/compressor.mock";
+import { expect } from "vitest";
+import EventSource from "eventsource";
+import { randomBytes } from "../../src/utils/random";
 
 const TEST_NOTEBOOK = {
   title: "Test Notebook",
@@ -37,7 +40,8 @@ const TEST_NOTEBOOK2 = {
 };
 
 function databaseTest() {
-  let db = new DB(StorageInterface, null, FS, Compressor);
+  let db = new DB();
+  db.setup(new NodeStorageInterface(), EventSource, FS, Compressor);
   return db.init().then(() => db);
 }
 
@@ -50,7 +54,7 @@ const notebookTest = (notebook = TEST_NOTEBOOK) =>
 var TEST_NOTE = {
   content: {
     type: "tiptap",
-    data: `<p>Hello<br/><span style="color:#f00">This is colorful</span></p>`
+    data: `<p>Hello <span style="color:#f00">This is colorful</span></p>`
   }
 };
 
@@ -92,6 +96,29 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function loginFakeUser(db) {
+  const email = "johndoe@example.com";
+  const userSalt = randomBytes(16).toString("base64");
+  await db.storage.deriveCryptoKey(`_uk_@${email}`, {
+    password: "password",
+    salt: userSalt
+  });
+
+  const userEncryptionKey = await db.storage.getCryptoKey(`_uk_@${email}`);
+
+  const key = await db.storage.generateRandomKey();
+  const attachmentsKey = await db.storage.encrypt(
+    { password: userEncryptionKey },
+    JSON.stringify(key)
+  );
+
+  await db.user.setUser({
+    email,
+    salt: userSalt,
+    attachmentsKey: attachmentsKey
+  });
+}
+
 export {
   databaseTest,
   notebookTest,
@@ -99,10 +126,10 @@ export {
   groupedTest,
   IMG_CONTENT,
   IMG_CONTENT_WITHOUT_HASH,
-  StorageInterface,
   TEST_NOTEBOOK,
   TEST_NOTEBOOK2,
   TEST_NOTE,
   LONG_TEXT,
-  delay
+  delay,
+  loginFakeUser
 };

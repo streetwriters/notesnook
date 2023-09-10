@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,10 +29,9 @@ import {
   ForwardRef,
   ContentDOM
 } from "./types";
-import { NodeViewRendererProps } from "@tiptap/core";
+import { Editor, NodeViewRendererProps } from "@tiptap/core";
 import { __serializeForClipboard, EditorView } from "prosemirror-view";
-import { Editor } from "../../types";
-import { ThemeProvider } from "../../components/theme-provider";
+import { EmotionThemeProvider } from "@notesnook/theme";
 
 // This is hacky workaround to manually handle serialization when
 // drag/dropping on mobile devices.
@@ -104,8 +103,9 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   private renderReactComponent(
     component: () => React.ReactElement<unknown> | null
   ) {
+    if (process.env.NODE_ENV === "test") return;
     if (!this.domRef || !component || !this.portalProviderAPI) {
-      console.warn("Cannot render node view", this.editor.storage);
+      console.warn("Cannot render node view");
       return;
     }
 
@@ -156,9 +156,10 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     if (!this.options.component) return null;
 
     return (
-      <ThemeProvider>
+      <EmotionThemeProvider scope="editor" injectCssVars={false}>
         <this.options.component
           {...props}
+          pos={this.getPos()}
           editor={this.editor}
           getPos={this.getPos}
           node={this.node}
@@ -173,7 +174,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
             )
           }
         />
-      </ThemeProvider>
+      </EmotionThemeProvider>
     );
   }
 

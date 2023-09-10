@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,11 +27,16 @@ export type NoteStatistics = {
 };
 
 export interface IEditor {
-  focus: () => void;
+  focus: (options?: {
+    position?: "start" | "end";
+    scrollIntoView?: boolean;
+  }) => void;
   undo: () => void;
   redo: () => void;
+  getMediaHashes: () => string[];
   updateContent: (content: string) => void;
   attachFile: (file: Attachment) => void;
+  loadWebClip: (hash: string, html: string) => void;
   loadImage: (hash: string, src: string) => void;
   sendAttachmentProgress: (
     hash: string,

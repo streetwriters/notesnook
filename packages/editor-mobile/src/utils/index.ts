@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import { ToolbarGroupDefinition } from "@notesnook/editor";
 import { Editor } from "@notesnook/editor";
 import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
 import { useEditorController } from "../hooks/useEditorController";
+import { ThemeDefinition } from "@notesnook/theme";
 
 export type SafeAreaType = {
   top: number;
@@ -37,8 +38,12 @@ export type Settings = {
   tools: ToolbarGroupDefinition[];
   noToolbar?: boolean;
   noHeader?: boolean;
-  keyboardShown?: boolean;
   doubleSpacedLines?: boolean;
+  corsProxy: string;
+  fontSize: number;
+  fontFamily: string;
+  timeFormat: string;
+  dateFormat: string;
 };
 
 /* eslint-disable no-var */
@@ -50,7 +55,9 @@ declare global {
         saved: string;
       }>
     >;
+    updateWords: () => void;
   }>;
+  var __PLATFORM__: "ios" | "android";
   var readonly: boolean;
   var noToolbar: boolean;
   var noHeader: boolean;
@@ -94,7 +101,6 @@ declare global {
   };
 
   var editorTitle: RefObject<HTMLInputElement>;
-
   /**
    * Global ref to manage tags in editor.
    */
@@ -112,7 +118,7 @@ declare global {
    */
 
   function post<T extends keyof typeof EventTypes>(
-    type: typeof EventTypes[T],
+    type: (typeof EventTypes)[T],
     value?: unknown
   ): void;
   interface Window {
@@ -142,14 +148,21 @@ export const EventTypes = {
   monograph: "editor-event:monograph",
   properties: "editor-event:properties",
   fullscreen: "editor-event:fullscreen",
-  link: "editor-event:link"
+  link: "editor-event:link",
+  contentchange: "editor-event:content-change",
+  reminders: "editor-event:reminders",
+  previewAttachment: "editor-event:preview-attachment",
+  copyToClipboard: "editor-events:copy-to-clipboard"
 } as const;
 
 export function isReactNative(): boolean {
   return !!window.ReactNativeWebView;
 }
 
-export function logger(type: "info" | "warn" | "error", ...logs: unknown[]):void {
+export function logger(
+  type: "info" | "warn" | "error",
+  ...logs: unknown[]
+): void {
   const logString = logs
     .map((log) => {
       return typeof log !== "string" ? JSON.stringify(log) : log;
@@ -160,21 +173,34 @@ export function logger(type: "info" | "warn" | "error", ...logs: unknown[]):void
 }
 
 export function post<T extends keyof typeof EventTypes>(
-  type: typeof EventTypes[T],
-  value?: unknown
-):void {
+  type: (typeof EventTypes)[T],
+  value?: unknown,
+  sessionId?: string
+): void {
   if (isReactNative()) {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type,
         value: value,
-        sessionId: globalThis.sessionId
+        sessionId: sessionId || globalThis.sessionId
       })
     );
   } else {
-    console.log(type, value);
+    // console.log(type, value);
   }
 }
 
 globalThis.logger = logger;
 globalThis.post = post;
+
+export function saveTheme(theme: ThemeDefinition) {
+  localStorage.setItem("editor-theme", JSON.stringify(theme));
+}
+
+export function getTheme() {
+  const json = localStorage.getItem("editor-theme");
+  if (json) {
+    return JSON.parse(json) as ThemeDefinition;
+  }
+  return undefined;
+}

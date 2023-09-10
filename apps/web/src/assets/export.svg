@@ -32,13 +32,13 @@
   <path fill="#3f3d56" d="M366 85a8 8 0 00-7-4H221a8 8 0 00-8 7v176a8 8 0 008 7h138a8 8 0 008-7V88a7 7 0 00-1-3zm-1 179a6 6 0 01-6 5H221a6 6 0 01-6-5V88a6 6 0 016-6h138a6 6 0 016 4 6 6 0 010 1 6 6 0 010 1z" data-name="Path 336"/>
   <path fill="#3f3d56" d="M337 122h-42a3 3 0 010-7h42a3 3 0 110 7z" data-name="Path 337"/>
   <path fill="#3f3d56" d="M337 140h-42a3 3 0 010-7h42a3 3 0 110 7z" data-name="Path 338"/>
-  <path fill="var(--primary)" d="M274 150h-31a4 4 0 01-3-4v-36a4 4 0 013-4h31a4 4 0 014 4v36a4 4 0 01-4 4z" data-name="Path 339"/>
+  <path fill="var(--accent)" d="M274 150h-31a4 4 0 01-3-4v-36a4 4 0 013-4h31a4 4 0 014 4v36a4 4 0 01-4 4z" data-name="Path 339"/>
   <path fill="#e6e6e6" d="M337 175h-94a3 3 0 010-6h94a3 3 0 110 6z" data-name="Path 340"/>
   <path fill="#e6e6e6" d="M337 193h-94a3 3 0 010-7h94a3 3 0 010 7z" data-name="Path 341"/>
   <path fill="#e6e6e6" d="M337 211h-94a3 3 0 010-7h94a3 3 0 110 7z" data-name="Path 342"/>
   <path fill="#e6e6e6" d="M337 228h-94a3 3 0 110-7h94a3 3 0 010 7z" data-name="Path 343"/>
   <path fill="#e6e6e6" d="M337 246h-94a3 3 0 110-7h94a3 3 0 010 7z" data-name="Path 344"/>
-  <circle cx="383.6" cy="67.6" r="54" fill="var(--primary)" data-name="Ellipse 44"/>
+  <circle cx="383.6" cy="67.6" r="54" fill="var(--accent)" data-name="Ellipse 44"/>
   <path fill="#fff" d="M392 69V40h-15v29h-7l7 13 7 13 8-13 7-13z" data-name="Path 692"/>
   <path fill="#e6e6e6" d="M404 513H23a1 1 0 110-2h381a1 1 0 010 2z" data-name="Path 717"/>
   <path fill="#f2f2f2" d="M371 504c-10 7-22 7-34 6h-6c-3-6-6-11-7-18-1-6 1-13 7-16a11 11 0 012-1l1-1a12 12 0 0114 16c5-5 4-13 3-19s-4-14-1-20a13 13 0 019-7h1a18 18 0 0112 3c7 4 11 12 12 21 2 13-2 28-13 36z" data-name="Path 694"/>

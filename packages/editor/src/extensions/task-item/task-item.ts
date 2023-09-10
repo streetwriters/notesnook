@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { mergeAttributes } from "@tiptap/core";
-import { onArrowUpPressed, onBackspacePressed } from "../list-item/commands";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { TaskItemComponent } from "./component";
 import { createNodeView } from "../react";
@@ -57,7 +56,7 @@ export const TaskItemNode = TaskItem.extend({
     return [
       {
         tag: "li",
-        getAttrs: (node) => {
+        getAttrs: (node: any) => {
           if (node instanceof Node && node instanceof HTMLElement) {
             return node.classList.contains("checklist--item") ||
               node.parentElement?.classList.contains("checklist")
@@ -73,22 +72,25 @@ export const TaskItemNode = TaskItem.extend({
 
   addKeyboardShortcuts() {
     return {
-      ...this.parent?.(),
-      Backspace: ({ editor }) =>
-        onBackspacePressed(editor, this.name, this.type),
-      ArrowUp: ({ editor }) => onArrowUpPressed(editor, this.name, this.type)
+      ...this.parent?.()
     };
   },
 
   addNodeView() {
     return createNodeView(TaskItemComponent, {
       contentDOMFactory: true,
-      wrapperFactory: () => document.createElement("li"),
+      wrapperFactory: () => {
+        const li = document.createElement("li");
+        li.dataset.dragImage = "true";
+        return li;
+      },
       shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
-        return (
-          prev.checked !== next.checked || prev.collapsed !== next.collapsed
-        );
+        return prev.checked !== next.checked;
       }
     });
+  },
+
+  addInputRules() {
+    return [];
   }
 });

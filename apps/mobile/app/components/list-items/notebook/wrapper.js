@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ import { ToastEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useTrashStore } from "../../../stores/use-trash-store";
-import { history } from "../../../utils";
 import { db } from "../../../common/database";
 import { presentDialog } from "../../dialog/functions";
 import SelectionWrapper from "../selection-wrapper";
@@ -49,11 +48,13 @@ const navigateToNotebook = (item, canGoBack) => {
 
 export const openNotebookTopic = (item) => {
   const isTrash = item.type === "trash";
-  if (history.selectedItemsList.length > 0 && history.selectionMode) {
-    useSelectionStore.getState().setSelectedItem(item);
+  const { selectedItemsList, setSelectedItem, selectionMode, clearSelection } =
+    useSelectionStore.getState();
+  if (selectedItemsList.length > 0 && selectionMode) {
+    setSelectedItem(item);
     return;
   } else {
-    history.selectedItemsList = [];
+    clearSelection();
   }
 
   if (isTrash) {
@@ -64,16 +65,7 @@ export const openNotebookTopic = (item) => {
       negativeText: "Delete",
       positivePress: async () => {
         await db.trash.restore(item.id);
-        Navigation.queueRoutesForUpdate(
-          "Tags",
-          "Notes",
-          "Notebooks",
-          "Favorites",
-          "Trash",
-          "TaggedNotes",
-          "ColoredNotes",
-          "TopicNotes"
-        );
+        Navigation.queueRoutesForUpdate();
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
           heading: "Restore successful",

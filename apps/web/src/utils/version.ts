@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,15 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export type Platforms = "web" | "desktop";
 export type AppVersion = typeof appVersion;
 export const appVersion = {
-  formatted: format(
-    process.env.REACT_APP_VERSION,
-    process.env.REACT_APP_GIT_HASH,
-    process.env.REACT_APP_PLATFORM as Platforms,
-    process.env.REACT_APP_BETA === "true"
-  ),
-  clean: formatVersion(process.env.REACT_APP_VERSION),
-  numerical: parseInt(process.env.REACT_APP_VERSION || "0"),
-  isBeta: process.env.REACT_APP_BETA === "true"
+  formatted: format(APP_VERSION, GIT_HASH, PLATFORM, IS_BETA),
+  clean: formatVersion(APP_VERSION),
+  numerical: parseInt(APP_VERSION || "0"),
+  hash: GIT_HASH,
+  isBeta: IS_BETA
 };
 
 function format(
@@ -59,11 +55,12 @@ export function getServiceWorkerVersion(
       if (type !== "GET_VERSION") return;
       clearTimeout(timeout);
 
-      const { version } = ev.data;
+      const { version, hash } = ev.data;
       resolve({
         formatted: formatVersion(version),
         numerical: parseInt(version),
         clean: formatVersion(version),
+        hash,
         isBeta: appVersion.isBeta
       });
     });

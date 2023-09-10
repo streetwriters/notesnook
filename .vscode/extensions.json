@@ -1,0 +1,11 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=827846
+  // for the documentation about the extensions.json format
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-playwright.playwright",
+    "firefox-devtools.vscode-firefox-debug",
+    "msjsdiag.vscode-react-native"
+  ]
+}

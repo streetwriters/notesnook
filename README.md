@@ -10,11 +10,11 @@
 
 ## Overview
 
-Notesnook is a free (as in speech) & open source note taking app focused on user privacy & ease of use. To ensure zero knowledge principles, Notesnook encrypts everything on your device using `XChaCha20-Poly1305` & `Argon2`.
+Notesnook is a free (as in speech) & open-source note-taking app focused on user privacy & ease of use. To ensure zero knowledge principles, Notesnook encrypts everything on your device using `XChaCha20-Poly1305` & `Argon2`.
 
-Notesnook is our **proof** that privacy does _not_ (always) have to come at the cost of convenience. Our goal is to provide users peace of mind & 100% confidence that their notes are safe and secure. The decision to go fully open source is one of the most crucial steps towards that.
+Notesnook is our **proof** that privacy does _not_ (always) have to come at the cost of convenience. We aim to provide users peace of mind & 100% confidence that their notes are safe and secure. The decision to go fully open source is one of the most crucial steps towards that.
 
-This repository contains all the code required to build & use the Notesnook web, desktop & mobile clients. If you are looking for a full features list or screenshots, please check the [website](https://notesnook.com/).
+This repository contains all the code required to build & use the Notesnook web, desktop & mobile clients. If you are looking for a full feature list or screenshots, please check the [website](https://notesnook.com/).
 
 ## Developer guide
 
@@ -25,25 +25,29 @@ Notesnook is built using the following technologies:
 1. JavaScript/Typescript — this repo is in a hybrid state. A lot of the newer code is being written in Typescript & the old code is slowly being ported over.
 2. React — the whole front-end across all platforms is built using React.
 3. React Native — For mobile apps we are using React Native
-4. NPM — listed here because we **don't** use Yarn or PNPM or XYZ across any of our projects.
-5. Lerna & Nx — maintaining monorepos is hard but Nx makes it easier.
+4. Electron — For desktop app
+5. NPM — listed here because we **don't** use Yarn or PNPM or XYZ across any of our projects.
+6. Nx — maintaining monorepos is hard but Nx makes it easier.
 
 > **Note: Each project in the monorepo contains its own architecture details which you can refer to.**
 
 ### Monorepo structure
 
-| Name                       | Path                                               | Description                                                       |
-| -------------------------- | -------------------------------------------------- | ----------------------------------------------------------------- |
-| `@notesnook/web`           | [/apps/web](/apps/web)                             | Web/Desktop clients                                               |
-| `@notesnook/mobile`        | [/apps/mobile](/apps/mobile)                       | Android/iOS clients                                               |
-| `@notesnook/core`          | [/packages/core](/packages/core)                   | Shared core between all platforms                                 |
-| `@notesnook/crypto`        | [/packages/crypto](/packages/crypto)               | Cryptography library wrapper around libsodium                     |
-| `@notesnook/editor`        | [/packages/editor](/packages/editor)               | Notesnook editor + all extensions                                 |
-| `@notesnook/editor-mobile` | [/packages/editor-mobile](/packages/editor-mobile) | A very thin wrapper around `@notesnook/editor` for mobile clients |
-| `@notesnook/logger`        | [/packages/logger](/packages/logger)               | Simple & pluggable logger                                         |
-| `@notesnook/crypto-worker` | [/packages/crypto-worker](/packages/crypto-worker) | Helpers to use `@notesnook/crypto` from a Worker                  |
-| `@notesnook/streamable-fs` | [/packages/streamable-fs](/packages/streamable-fs) | Streaming interface around an IndexedDB based file system         |
-| `@notesnook/theme`         | [/packages/theme](/packages/theme)                 | The core theme used in web & desktop clients                      |
+| Name                       | Path                                               | Description                                                          |
+| -------------------------- | -------------------------------------------------- | -------------------------------------------------------------------- |
+| `@notesnook/web`           | [/apps/web](/apps/web)                             | Web client                                                           |
+| `@notesnook/desktop`       | [/apps/desktop](/apps/desktop)                     | Desktop client                                                       |
+| `@notesnook/mobile`        | [/apps/mobile](/apps/mobile)                       | Android/iOS clients                                                  |
+| `@notesnook/web-clipper`   | [/extensions/web-clipper](/extensions/web-clipper) | Web clipper                                                          |
+| `@notesnook/core`          | [/packages/core](/packages/core)                   | Shared core between all platforms                                    |
+| `@notesnook/crypto`        | [/packages/crypto](/packages/crypto)               | Cryptography library wrapper around libsodium                        |
+| `@notesnook/clipper`       | [/packages/clipper](/packages/clipper)             | Web clipper core handling everything related to actual page clipping |
+| `@notesnook/editor`        | [/packages/editor](/packages/editor)               | Notesnook editor + all extensions                                    |
+| `@notesnook/editor-mobile` | [/packages/editor-mobile](/packages/editor-mobile) | A very thin wrapper around `@notesnook/editor` for mobile clients    |
+| `@notesnook/logger`        | [/packages/logger](/packages/logger)               | Simple & pluggable logger                                            |
+| `@notesnook/sodium`        | [/packages/sodium](/packages/sodium)               | Wrapper around libsodium to support Node.js & Browser                |
+| `@notesnook/streamable-fs` | [/packages/streamable-fs](/packages/streamable-fs) | Streaming interface around an IndexedDB based file system            |
+| `@notesnook/theme`         | [/packages/theme](/packages/theme)                 | The core theme used in web & desktop clients                         |
 
 ### Contributing guidelines
 

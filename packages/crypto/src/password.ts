@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import {
   crypto_pwhash,
   crypto_pwhash_ALG_ARGON2ID13,
   crypto_pwhash_SALTBYTES
-} from "libsodium-wrappers";
+} from "@notesnook/sodium";
 
 export default class Password {
   static hash(password: string, salt: string): string {

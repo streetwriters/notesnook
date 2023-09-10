@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,9 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ReactDOM from "react-dom";
-import { Dialogs } from "../components/dialogs";
-import { hardNavigate } from "../navigation";
-import ThemeProvider from "../components/theme-provider";
+import { Dialogs } from "../dialogs";
 import qclone from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as tagStore } from "../stores/tag-store";
@@ -29,21 +27,23 @@ import { store as editorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
-import { Flex, Text } from "@theme-ui/components";
-import * as Icon from "../components/icons";
+import { Text } from "@theme-ui/components";
+import { Topic } from "../components/icons";
 import Config from "../utils/config";
-import { formatDate } from "@notesnook/core/utils/date";
-import downloadUpdate from "../commands/download-update";
-import installUpdate from "../commands/install-update";
 import { AppVersion, getChangelog } from "../utils/version";
-import { Period } from "../components/dialogs/buy-dialog/types";
-import { FeatureKeys } from "../components/dialogs/feature-dialog";
-import { AuthenticatorType } from "../components/dialogs/mfa/types";
+import { Period } from "../dialogs/buy-dialog/types";
+import { FeatureKeys } from "../dialogs/feature-dialog";
+import { AuthenticatorType } from "../dialogs/mfa/types";
 import { Suspense } from "react";
+import { Reminder } from "@notesnook/core/dist/collections/reminders";
+import { ConfirmDialogProps } from "../dialogs/confirm";
+import { getFormattedDate } from "@notesnook/common";
+import { downloadUpdate } from "../utils/updater";
+import { ThemeMetadata } from "@notesnook/themes-server";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
-export type Perform = (result: boolean) => void;
+export type Perform<T = boolean> = (result: T) => void;
 type RenderDialog<TId extends DialogIds, TReturnType> = (
   dialog: DialogTypes[TId],
   perform: (result: TReturnType) => void
@@ -68,11 +68,9 @@ function showDialog<TId extends DialogIds, TReturnType>(
     };
     const PropDialog = () => render(Dialogs[id], perform);
     ReactDOM.render(
-      <ThemeProvider>
-        <Suspense fallback={<div />}>
-          <PropDialog />
-        </Suspense>
-      </ThemeProvider>,
+      <Suspense fallback={<div />}>
+        <PropDialog />
+      </Suspense>,
       container,
       () => (openDialogs[id] = true)
     );
@@ -87,13 +85,21 @@ export function closeOpenedDialog() {
   dialogs.forEach((elem) => elem.remove());
 }
 
+export function showAddTagsDialog(noteIds: string[]) {
+  return showDialog("AddTagsDialog", (Dialog, perform) => (
+    <Dialog onClose={(res) => perform(res)} noteIds={noteIds} />
+  ));
+}
+
 export function showAddNotebookDialog() {
   return showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog
       isOpen={true}
       onDone={async (nb: Record<string, unknown>) => {
         // add the notebook to db
-        await db.notebooks?.add({ ...nb });
+        const notebook = await db.notebooks?.add({ ...nb });
+        if (!notebook) return perform(false);
+
         notebookStore.refresh();
 
         showToast("success", "Notebook added successfully!");
@@ -108,7 +114,7 @@ export function showAddNotebookDialog() {
 
 export function showEditNotebookDialog(notebookId: string) {
   const notebook = db.notebooks?.notebook(notebookId)?.data;
-  if (!notebook) return false;
+  if (!notebook) return;
   return showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog
       isOpen={true}
@@ -153,26 +159,15 @@ export function showBuyDialog(plan?: Period, couponCode?: string) {
   ));
 }
 
-type ConfirmDialogProps = {
-  title?: string;
-  subtitle?: string;
-  message?: string | JSX.Element;
-  yesText?: string;
-  noText?: string;
-  yesAction?: () => void;
-  width?: string;
-};
-export function confirm(props: ConfirmDialogProps) {
-  return showDialog("Confirm", (Dialog, perform) => (
-    <Dialog
-      {...props}
-      onNo={() => perform(false)}
-      onYes={() => {
-        if (props.yesAction) props.yesAction();
-        perform(true);
-      }}
-    />
-  ));
+export function confirm<TCheckId extends string>(
+  props: Omit<ConfirmDialogProps<TCheckId>, "onClose">
+) {
+  return showDialog<"Confirm", false | Record<TCheckId, boolean>>(
+    "Confirm",
+    (Dialog, perform) => (
+      <Dialog {...props} onClose={(result) => perform(result)} />
+    )
+  );
 }
 
 export function showPromptDialog(props: {
@@ -191,49 +186,34 @@ export function showPromptDialog(props: {
   ));
 }
 
-export function showToolbarConfigDialog() {
-  return showDialog<"ToolbarConfigDialog", string | null>(
-    "ToolbarConfigDialog",
-    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
-  );
+export function showEmailChangeDialog() {
+  return showDialog("EmailChangeDialog", (Dialog, perform) => (
+    <Dialog onClose={() => perform(null)} />
+  ));
 }
 
 export function showError(title: string, message: string) {
-  return confirm({ title, message, yesText: "Okay" });
+  return confirm({ title, message, positiveButtonText: "Okay" });
 }
 
 export function showMultiDeleteConfirmation(length: number) {
   return confirm({
     title: `Delete ${length} items?`,
-    message: (
-      <Text as="span">
-        These items will be{" "}
-        <Text as="span" sx={{ color: "primary" }}>
-          kept in your Trash for 7 days
-        </Text>{" "}
-        after which they will be permanently removed.
-      </Text>
-    ),
-    yesText: `Delete selected`,
-    noText: "Cancel"
+    message: `These items will be **kept in your Trash for ${
+      db.settings?.getTrashCleanupInterval() || 7
+    } days** after which they will be permanently deleted.`,
+    positiveButtonText: "Yes",
+    negativeButtonText: "No"
   });
 }
 
 export function showMultiPermanentDeleteConfirmation(length: number) {
   return confirm({
     title: `Permanently delete ${length} items?`,
-    message: (
-      <Text as="span">
-        These items will be{" "}
-        <Text as="span" sx={{ color: "primary" }}>
-          permanently deleted
-        </Text>
-        {". "}
-        This action is IRREVERSIBLE.
-      </Text>
-    ),
-    yesText: `Permanently delete selected`,
-    noText: "Cancel"
+    message:
+      "These items will be **permanently deleted**. This is IRREVERSIBLE.",
+    positiveButtonText: "Yes",
+    negativeButtonText: "No"
   });
 }
 
@@ -242,8 +222,8 @@ export function showLogoutConfirmation() {
     title: `Logout?`,
     message:
       "Logging out will delete all local data and reset the app. Make sure you have synced your data before logging out.",
-    yesText: `Yes`,
-    noText: "No"
+    positiveButtonText: "Yes",
+    negativeButtonText: "No"
   });
 }
 
@@ -252,8 +232,8 @@ export function showClearSessionsConfirmation() {
     title: `Logout from other devices?`,
     message:
       "All other logged-in devices will be forced to logout stopping sync. Use with care lest you lose important notes.",
-    yesText: `Yes`,
-    noText: "No"
+    positiveButtonText: "Yes",
+    negativeButtonText: "No"
   });
 }
 
@@ -261,9 +241,7 @@ export function showAccountLoggedOutNotice(reason?: string) {
   return confirm({
     title: "You were logged out",
     message: reason,
-    noText: "Okay",
-    yesText: `Relogin`,
-    yesAction: () => hardNavigate("/login")
+    negativeButtonText: "Okay"
   });
 }
 
@@ -272,24 +250,13 @@ export function showAppUpdatedNotice(
 ) {
   return confirm({
     title: `Welcome to v${version.formatted}`,
-    message: (
-      <Flex
-        bg="bgSecondary"
-        p={1}
-        sx={{ borderRadius: "default", flexDirection: "column" }}
-      >
-        <Text variant="title">Changelog:</Text>
-        <Text
-          as="pre"
-          variant="body"
-          mt={1}
-          sx={{ fontFamily: "monospace", overflow: "auto" }}
-        >
-          {version.changelog || "No change log."}
-        </Text>
-      </Flex>
-    ),
-    yesText: `Yay!`
+    message: `## Changelog:
+    
+\`\`\`
+${version.changelog || "No change log."}
+\`\`\`
+`,
+    positiveButtonText: `Continue`
   });
 }
 
@@ -305,23 +272,26 @@ export function showMigrationDialog() {
   ));
 }
 
-type LoadingDialogProps = {
+type LoadingDialogProps<T> = {
   title: string;
   message?: string;
   subtitle: string;
-  action: () => void;
+  action: () => T | Promise<T>;
 };
-export function showLoadingDialog(dialogData: LoadingDialogProps) {
+export function showLoadingDialog<T>(dialogData: LoadingDialogProps<T>) {
   const { title, message, subtitle, action } = dialogData;
-  return showDialog("LoadingDialog", (Dialog, perform) => (
-    <Dialog
-      title={title}
-      subtitle={subtitle}
-      message={message}
-      action={action}
-      onDone={(e: boolean) => perform(e)}
-    />
-  ));
+  return showDialog<"LoadingDialog", T | boolean>(
+    "LoadingDialog",
+    (Dialog, perform) => (
+      <Dialog
+        title={title}
+        description={subtitle}
+        message={message}
+        action={action}
+        onClose={(e) => perform(e as T | boolean)}
+      />
+    )
+  );
 }
 
 type ProgressDialogProps = {
@@ -342,6 +312,12 @@ export function showProgressDialog<T>(dialogData: ProgressDialogProps) {
       />
     )
   );
+}
+
+export function showThemeDetails(theme: ThemeMetadata) {
+  return showDialog("ThemeDetailsDialog", (Dialog, perform) => (
+    <Dialog theme={theme} onClose={(res: boolean) => perform(res)} />
+  ));
 }
 
 export function showMoveNoteDialog(noteIds: string[]) {
@@ -418,7 +394,13 @@ function getDialogData(type: string) {
         subtitle: (
           <>
             All your data will be re-encrypted and synced with the new password.
-            <Text as="div" mt={1} p={1} bg="errorBg" sx={{ color: "error" }}>
+            <Text
+              as="div"
+              mt={1}
+              p={1}
+              bg="var(--background-error)"
+              sx={{ color: "var(--paragraph-error)" }}
+            >
               <Text as="p" my={0} sx={{ color: "inherit" }}>
                 It is recommended that you <b>log out from all other devices</b>{" "}
                 before continuing.
@@ -444,7 +426,7 @@ function getDialogData(type: string) {
       return {
         title: "Delete your account",
         subtitle: (
-          <Text as="span" sx={{ color: "error" }}>
+          <Text as="span" sx={{ color: "var(--paragraph-error)" }}>
             All your data will be permanently deleted with{" "}
             <b>no way of recovery</b>. Proceed with caution.
           </Text>
@@ -458,7 +440,13 @@ function getDialogData(type: string) {
 
 export function showPasswordDialog(
   type: string,
-  validate: (password: string) => boolean
+  validate: ({
+    password
+  }: {
+    password?: string;
+    oldPassword?: string;
+    newPassword?: string;
+  }) => boolean | Promise<boolean>
 ) {
   const { title, subtitle, positiveButtonText, checks } = getDialogData(type);
   return showDialog("PasswordDialog", (Dialog, perform) => (
@@ -491,9 +479,10 @@ export function showCreateTopicDialog() {
       }}
       onAction={async (topic: Record<string, unknown>) => {
         if (!topic) return;
-        const notebookId = notebookStore.get().selectedNotebookId;
-        await db.notebooks?.notebook(notebookId).topics.add(topic);
-        notebookStore.setSelectedNotebook(notebookId);
+        const notebook = notebookStore.get().selectedNotebook;
+        if (!notebook) return;
+        await db.notebooks?.notebook(notebook.id).topics.add(topic);
+        notebookStore.setSelectedNotebook(notebook.id);
         showToast("success", "Topic created!");
         perform(true);
       }}
@@ -510,7 +499,7 @@ export function showEditTopicDialog(notebookId: string, topicId: string) {
       title={"Edit topic"}
       subtitle={`You are editing "${topic.title}" topic.`}
       defaultValue={topic.title}
-      icon={Icon.Topic}
+      icon={Topic}
       item={topic}
       onClose={() => perform(false)}
       onAction={async (t: string) => {
@@ -614,24 +603,29 @@ export function showReminderDialog(reminderKey: string) {
   ));
 }
 
-export function showTrackingDetailsDialog() {
-  return showDialog("TrackingDetailsDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} />
+export function showReminderPreviewDialog(reminder: Reminder) {
+  return showDialog("ReminderPreviewDialog", (Dialog, perform) => (
+    <Dialog reminder={reminder} onClose={perform} />
   ));
 }
 
-export function showAnnouncementDialog(
-  announcement: { id: string },
-  remove: (id: string) => void
-) {
+export function showAddReminderDialog(noteId?: string) {
+  return showDialog("AddReminderDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} noteId={noteId} />
+  ));
+}
+
+export function showEditReminderDialog(reminderId: string) {
+  return showDialog("AddReminderDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} reminderId={reminderId} />
+  ));
+}
+
+export function showAnnouncementDialog(announcement: any) {
   return showDialog("AnnouncementDialog", (Dialog, perform) => (
     <Dialog
       announcement={announcement}
-      removeAnnouncement={() => remove(announcement.id)}
-      onClose={(res: boolean) => {
-        remove(announcement.id);
-        perform(res);
-      }}
+      onClose={(res: boolean) => perform(res)}
     />
   ));
 }
@@ -643,12 +637,6 @@ export function showIssueDialog() {
         perform(res);
       }}
     />
-  ));
-}
-
-export function showImportDialog() {
-  return showDialog("ImportDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} />
   ));
 }
 
@@ -670,39 +658,36 @@ export function showAttachmentsDialog() {
   ));
 }
 
-export function showOnboardingDialog(type: string) {
+export function showSettings() {
+  return showDialog("SettingsDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} />
+  ));
+}
+
+export function showOnboardingDialog(type?: string) {
   if (!type) return;
   return showDialog("OnboardingDialog", (Dialog, perform) => (
     <Dialog type={type} onClose={(res: boolean) => perform(res)} />
   ));
 }
 
-export function showInvalidSystemTimeDialog({
+export async function showInvalidSystemTimeDialog({
   serverTime,
   localTime
 }: {
   serverTime: number;
   localTime: number;
 }) {
-  return confirm({
+  const result = await confirm({
     title: "Your system clock is out of sync",
     subtitle:
       "Please correct your system date & time and reload the app to avoid syncing issues.",
-    message: (
-      <>
-        Server time:{" "}
-        {formatDate(serverTime, { dateStyle: "medium", timeStyle: "medium" })}
-        <br />
-        Local time:{" "}
-        {formatDate(localTime, { dateStyle: "medium", timeStyle: "medium" })}
-        <br />
-        Please sync your system time with{" "}
-        <a href="https://time.is">https://time.is/</a>.
-      </>
-    ),
-    yesText: "Reload app",
-    yesAction: () => window.location.reload()
+    message: `Server time: ${getFormattedDate(serverTime)}
+Local time: ${getFormattedDate(localTime)}
+Please sync your system time with [https://time.is](https://time.is).`,
+    positiveButtonText: "Reload app"
   });
+  if (result) window.location.reload();
 }
 
 export async function showUpdateAvailableNotice({
@@ -720,19 +705,6 @@ export async function showUpdateAvailableNotice({
   });
 }
 
-export async function showUpdateReadyNotice({ version }: { version: string }) {
-  const changelog = await getChangelog(version);
-  return await showUpdateDialog({
-    title: `Update ready for installation`,
-    subtitle: `v${version} is ready to be installed.`,
-    changelog,
-    action: {
-      text: "Install now",
-      onClick: () => installUpdate()
-    }
-  });
-}
-
 type UpdateDialogProps = {
   title: string;
   subtitle: string;
@@ -742,37 +714,18 @@ type UpdateDialogProps = {
     onClick: () => void;
   };
 };
-function showUpdateDialog({
+async function showUpdateDialog({
   title,
   subtitle,
   changelog,
   action
 }: UpdateDialogProps) {
-  return confirm({
+  const result = await confirm({
     title,
     subtitle,
-    message: changelog && (
-      <Flex sx={{ borderRadius: "default", flexDirection: "column" }}>
-        <Text
-          as="div"
-          variant="body"
-          sx={{ overflow: "auto", fontFamily: "body" }}
-          css={`
-            h2 {
-              font-size: 1.2em;
-              font-weight: 600;
-            }
-            h3 {
-              font-size: 1em;
-              font-weight: 600;
-            }
-          `}
-          dangerouslySetInnerHTML={{ __html: changelog }}
-        ></Text>
-      </Flex>
-    ),
-    width: "500px",
-    yesText: action.text,
-    yesAction: action.onClick
+    message: changelog,
+    width: 500,
+    positiveButtonText: action.text
   });
+  if (result && action.onClick) action.onClick();
 }

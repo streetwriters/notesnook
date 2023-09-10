@@ -4,5 +4,7 @@ module.exports = {
   semi: true,
   printWidth: 80,
   useTabs: false,
-  tabWidth: 2
+  tabWidth: 2,
+  bracketSpacing: true,
+  endOfLine: "lf"
 };

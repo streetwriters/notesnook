@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import {
   ImageAlignmentOptions,
   ImageSizeOptions
 } from "../../extensions/image";
-import { findSelectedNode } from "../utils/prosemirror";
+import { findSelectedNode } from "../../utils/prosemirror";
 
 export function ImageSettings(props: ToolProps) {
   const { editor } = props;
@@ -43,8 +43,14 @@ export function ImageSettings(props: ToolProps) {
       popupId="imageSettings"
       tools={
         findSelectedNode(editor, "image")?.attrs?.float
-          ? ["imageAlignLeft", "imageAlignRight", "imageProperties"]
+          ? [
+              "downloadAttachment",
+              "imageAlignLeft",
+              "imageAlignRight",
+              "imageProperties"
+            ]
           : [
+              "downloadAttachment",
               "imageAlignLeft",
               "imageAlignCenter",
               "imageAlignRight",

@@ -1,4 +1,0 @@
-Subtotal: ₹300.00
-Sales tax: ₹60.00
-Discount: ₹0.00
-Total: ₹400.00/mo

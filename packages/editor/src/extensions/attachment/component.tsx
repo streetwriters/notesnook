@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Box, Text } from "@theme-ui/components";
 import { AttachmentWithProgress } from "./attachment";
 import { useRef } from "react";
-import { Icon } from "../../toolbar/components/icon";
+import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
@@ -34,72 +34,78 @@ export function AttachmentComponent(
   const elementRef = useRef<HTMLSpanElement>();
 
   return (
-    <>
-      <Box
-        ref={elementRef}
+    <Box
+      ref={elementRef}
+      as="span"
+      contentEditable={false}
+      variant={"body"}
+      sx={{
+        display: "inline-flex",
+        position: "relative",
+        justifyContent: "center",
+        userSelect: "none",
+        alignItems: "center",
+        backgroundColor: "var(--background-secondary)",
+        px: 1,
+        borderRadius: "default",
+        border: "1px solid var(--border)",
+        cursor: "pointer",
+        maxWidth: 250,
+        borderColor: selected ? "accent" : "border",
+        ":hover": {
+          bg: "hover"
+        }
+      }}
+      title={filename}
+    >
+      <Icon path={Icons.attachment} size={14} />
+      <Text
         as="span"
-        contentEditable={false}
-        variant={"body"}
         sx={{
-          display: "inline-flex",
-          position: "relative",
-          justifyContent: "center",
-          userSelect: "none",
-          alignItems: "center",
-          backgroundColor: "bgSecondary",
-          px: 1,
-          borderRadius: "default",
-          border: "1px solid var(--border)",
-          cursor: "pointer",
-          maxWidth: 250,
-          borderColor: selected ? "primary" : "border",
-          ":hover": {
-            bg: "hover"
-          }
+          ml: "small",
+          fontSize: "body",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+          overflow: "hidden"
         }}
-        title={filename}
       >
-        <Icon path={Icons.attachment} size={14} />
-        <Text
-          as="span"
-          sx={{
-            ml: "small",
-            fontSize: "body",
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-            overflow: "hidden"
-          }}
-        >
-          {filename}
-        </Text>
-        <Text
-          as="span"
-          sx={{
-            ml: 1,
-            fontSize: "0.65rem",
-            color: "fontTertiary",
-            flexShrink: 0
-          }}
-        >
-          {progress ? `${progress}%` : formatBytes(size)}
-        </Text>
-        <DesktopOnly>
-          {selected && (
-            <ToolbarGroup
-              editor={editor}
-              tools={["removeAttachment", "downloadAttachment"]}
-              sx={{
-                boxShadow: "menu",
-                borderRadius: "default",
-                bg: "background",
-                position: "absolute",
-                top: -35
-              }}
-            />
-          )}
-        </DesktopOnly>
-      </Box>
-    </>
+        {filename}
+      </Text>
+      <Text
+        as="span"
+        sx={{
+          ml: 1,
+          fontSize: "0.65rem",
+          color: "var(--paragraph-secondary)",
+          flexShrink: 0
+        }}
+      >
+        {progress ? `${progress}%` : formatBytes(size)}
+      </Text>
+      <DesktopOnly>
+        {selected && (
+          <ToolbarGroup
+            editor={editor}
+            tools={
+              editor.isEditable
+                ? [
+                    "removeAttachment",
+                    "downloadAttachment",
+                    "previewAttachment"
+                  ]
+                : ["downloadAttachment", "previewAttachment"]
+            }
+            sx={{
+              boxShadow: "menu",
+              borderRadius: "default",
+              bg: "background",
+              position: "absolute",
+              top: -35
+            }}
+          />
+        )}
+      </DesktopOnly>
+    </Box>
   );
 }
 

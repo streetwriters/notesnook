@@ -17,7 +17,15 @@
         "{projectRoot}/languages"
       ]
     },
+    "release": {
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/build"]
+    },
     "build:test": {
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/build"]
+    },
+    "build:beta": {
       "dependsOn": ["^build"],
       "outputs": ["{projectRoot}/build"]
     },
@@ -26,6 +34,9 @@
       "outputs": ["{projectRoot}/build"]
     },
     "start": {
+      "dependsOn": ["^build"]
+    },
+    "start:desktop": {
       "dependsOn": ["^build"]
     },
     "test:e2e": {

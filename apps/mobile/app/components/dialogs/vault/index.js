@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,7 +34,8 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SearchService from "../../../services/search";
-import { getElevation, toTXT } from "../../../utils";
+import { convertNoteToText } from "../../../utils/note-to-text";
+import { getElevationStyle } from "../../../utils/elevation";
 import {
   eClearEditor,
   eCloseActionSheet,
@@ -207,13 +208,7 @@ export class VaultDialog extends Component {
       return;
     }
 
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "TopicNotes",
-      "TaggedNotes",
-      "ColoredNotes"
-    );
+    Navigation.queueRoutesForUpdate();
 
     this.password = null;
     this.confirmPassword = null;
@@ -570,7 +565,7 @@ export class VaultDialog extends Component {
   }
 
   async _copyNote(note) {
-    Clipboard.setString(await toTXT(note));
+    Clipboard.setString(await convertNoteToText(note));
     ToastEvent.show({
       heading: "Note copied",
       type: "success",
@@ -586,7 +581,7 @@ export class VaultDialog extends Component {
       await Share.open({
         heading: "Share note",
         failOnCancel: false,
-        message: await toTXT(note)
+        message: await convertNoteToText(note)
       });
     } catch (e) {
       console.error(e);
@@ -684,10 +679,10 @@ export class VaultDialog extends Component {
       >
         <View
           style={{
-            ...getElevation(5),
+            ...getElevationStyle(5),
             width: DDS.isTab ? 350 : "85%",
             borderRadius: 10,
-            backgroundColor: colors.bg,
+            backgroundColor: colors.primary.background,
             paddingTop: 12
           }}
         >
@@ -872,7 +867,12 @@ export class VaultDialog extends Component {
                 icon="fingerprint"
                 width="100%"
                 title="Biometric unlocking"
-                type={this.state.biometricUnlock ? "transparent" : "gray"}
+                iconColor={
+                  this.state.biometricUnlock
+                    ? colors.selected.icon
+                    : colors.primary.icon
+                }
+                type={this.state.biometricUnlock ? "transparent" : "selected"}
               />
             ) : null}
           </View>

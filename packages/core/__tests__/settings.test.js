@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,11 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { databaseTest, StorageInterface } from "./utils";
-
-beforeEach(() => {
-  StorageInterface.clear();
-});
+import { databaseTest } from "./utils";
+import { test, expect } from "vitest";
 
 test("settings' dateModified should not update on init", () =>
   databaseTest().then(async (db) => {
@@ -33,10 +30,10 @@ test("settings' dateModified should not update on init", () =>
 
 test("settings' dateModified should update after merge conflict resolve", () =>
   databaseTest().then(async (db) => {
-    await db.storage.write("lastSynced", 0);
-    const beforeDateModified = (db.settings._settings.dateModified = 1);
-    await db.settings.merge({ groupOptions: {}, aliases: {} });
-    const afterDateModified = db.settings._settings.dateModified;
+    // await db.storage.write("lastSynced", 0);
+    const beforeDateModified = (db.settings.raw.dateModified = 1);
+    await db.settings.merge({ groupOptions: {}, aliases: {} }, 0);
+    const afterDateModified = db.settings.raw.dateModified;
     expect(afterDateModified).toBeGreaterThan(beforeDateModified);
   }));
 

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,15 +21,15 @@ import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useMessageStore } from "../../stores/use-message-store";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { hexToRGBA } from "../../utils/color-scheme/utils";
+import { useThemeColors } from "@notesnook/theme";
+import { hexToRGBA } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 
 export const Card = ({ color, warning }) => {
-  const colors = useThemeStore((state) => state.colors);
-  color = color ? color : colors.accent;
+  const { colors } = useThemeColors();
+  color = color ? color : colors.primary.accent;
   const messageBoardState = useMessageStore((state) => state.message);
   const announcement = useMessageStore((state) => state.announcement);
 
@@ -47,50 +47,58 @@ export const Card = ({ color, warning }) => {
           width: "95%",
           flexDirection: "row",
           alignItems: "center",
-          justifyContent: "flex-start",
+          justifyContent: "space-between",
           paddingHorizontal: 0
         }}
       >
         <View
           style={{
-            width: 40,
-            backgroundColor:
-              messageBoardState.type === "error"
-                ? hexToRGBA(colors.red, 0.15)
-                : hexToRGBA(color, 0.15),
-            height: 40,
-            marginLeft: 10,
-            borderRadius: 100,
-            alignItems: "center",
-            justifyContent: "center"
+            flexDirection: "row",
+            alignItems: "center"
           }}
         >
-          <Icon
-            size={SIZE.lg}
-            color={
-              messageBoardState.type === "error" ? colors.errorText : color
-            }
-            name={messageBoardState.icon}
-          />
-        </View>
-
-        <View
-          style={{
-            marginLeft: 10,
-            maxWidth: "70%"
-          }}
-        >
-          <Paragraph color={colors.icon} size={SIZE.xs}>
-            {messageBoardState.message}
-          </Paragraph>
-          <Paragraph
+          <View
             style={{
-              maxWidth: "100%"
+              width: 40,
+              backgroundColor:
+                messageBoardState.type === "error"
+                  ? hexToRGBA(colors.static.red, 0.15)
+                  : hexToRGBA(color, 0.15),
+              height: 40,
+              borderRadius: 100,
+              alignItems: "center",
+              justifyContent: "center"
             }}
-            color={colors.heading}
           >
-            {messageBoardState.actionText}
-          </Paragraph>
+            <Icon
+              size={SIZE.lg}
+              color={
+                messageBoardState.type === "error" ? colors.error.icon : color
+              }
+              name={messageBoardState.icon}
+            />
+          </View>
+
+          <View
+            style={{
+              marginLeft: 10,
+              flexShrink: 1,
+              marginRight: 10
+            }}
+          >
+            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+              {messageBoardState.message}
+            </Paragraph>
+            <Paragraph
+              style={{
+                flexWrap: "wrap",
+                flexShrink: 1
+              }}
+              color={colors.primary.heading}
+            >
+              {messageBoardState.actionText}
+            </Paragraph>
+          </View>
         </View>
 
         <View
@@ -98,14 +106,14 @@ export const Card = ({ color, warning }) => {
             width: 40,
             height: 40,
             justifyContent: "center",
-            alignItems: "center",
-            position: "absolute",
-            right: 6
+            alignItems: "center"
           }}
         >
           <Icon
             name="chevron-right"
-            color={messageBoardState.type === "error" ? colors.red : color}
+            color={
+              messageBoardState.type === "error" ? colors.error.icon : color
+            }
             size={SIZE.lg}
           />
         </View>

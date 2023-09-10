@@ -4,3 +4,9 @@ node_modules
 dist
 .DS_STORE
 nx-cloud.env
+.idea
+.eslintcache
+.env.local
+.nyc_output
+site
+node_modules.backup

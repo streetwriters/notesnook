@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ export function getToolbarElement() {
 
 export function getPopupContainer() {
   return (
-    (document.getElementById("popup-container") as HTMLElement) || undefined
+    (document.getElementById("dialogContainer") as HTMLElement) || undefined
   );
 }
 

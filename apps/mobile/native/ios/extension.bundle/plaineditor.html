@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8" />
+	<title>Note Preview</title>
+	<style>
+		body {
+			background-color: transparent !important;
+			margin: 0px !important;
+			padding: 12px;
+			padding-top: 0px;
+			font-size: 16px;
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+		}
+
+
+		iframe {
+			max-width: 100% !important;
+			background-color: transparent !important;
+		}
+
+		.editor {
+			overflow-x: hidden;
+			overflow-y: scroll;
+			min-height: 150px;
+			outline: none !important;
+			border-width: 0px !important;
+			width: 100%;
+		}
+
+
+		[contenteditable=true]:empty:before {
+			content: attr(placeholder);
+			pointer-events: none;
+			display: block;
+			color: gray;
+		}
+
+	</style>
+</head>
+
+<body>
+	<div aria-autocomplete="none" placeholder="Write something..." contenteditable="true" id="editor" class="editor double-spaced" >
+		
+	</div>
+	<script>
+		function postMessage(type, value) {
+			if (window.ReactNativeWebView) {
+				window.ReactNativeWebView.postMessage(
+					JSON.stringify({
+						type: type,
+						value: value
+					})
+				);
+			}
+		}
+		document.getElementById("editor").addEventListener("input", function (event) {
+			postMessage('content', event.target.innerHTML);
+		}, false);
+
+		
+		attachOnMessage()
+		let styleElementDocument;
+		let doubleSpacedLines = true;
+		function attachOnMessage() {
+			let isSafari = navigator.vendor.match(/apple/i);
+			let listenerHandler = document;
+			if (isSafari) {
+				listenerHandler = window;
+			}
+
+			listenerHandler.addEventListener('message', function (data) { 
+				console.log("message", data);
+				let message = JSON.parse(data.data);
+				let type = message.type;
+				let value = message.value;
+				switch (type) {
+					case 'html':
+						document.getElementById('editor').innerHTML = value;
+						break;
+					case 'theme':
+						if (!styleElementDocument) {
+							styleElementDocument = document.createElement('style');
+							styleElementDocument.type = 'text/css';
+							styleElementDocument.innerHTML = value;
+							document.getElementsByTagName('head')[0].appendChild(styleElementDocument);
+						} else {
+							styleElementDocument.innerHTML = node;
+						}
+						break;
+					case 'line-spacing': {
+						doubleSpacedLines = JSON.parse(value);
+					}
+					default:
+						break;
+				}
+			});
+		}
+
+
+
+	</script>
+</body>
+
+</html>

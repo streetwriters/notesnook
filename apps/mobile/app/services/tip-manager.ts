@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -145,23 +145,23 @@ export const useTip = (
 
 const tips: TTip[] = [
   {
-    text: "You can swipe left anywhere in the app to start a new note",
+    text: "You can swipe left anywhere in the app to start a new note.",
     contexts: ["notes", "first-note"]
   },
   {
-    text: "Long press on any item in list to open quick actions menu.",
+    text: "Long press on any item in list to enter multi-select mode.",
     contexts: ["notes", "notebook", "notebook", "tags", "topics"]
   },
   {
-    text: "Monographs enable you to share your notes in a secure and private way",
+    text: "Monographs enable you to share your notes in a secure and private way.",
     contexts: ["monographs"]
   },
   {
-    text: "Monographs can be encrypted with a secret key and shared with anyone",
+    text: "Monographs can be encrypted with a secret key and shared with anyone.",
     contexts: ["monographs"]
   },
   {
-    text: "Frequently accessed notebooks can be pinned to Side Menu so that they are easily accessible",
+    text: "You can pin frequently used Notebooks to the Side Menu to quickly access them.",
     contexts: ["notebook", "notebooks"]
   },
   {
@@ -173,15 +173,15 @@ const tips: TTip[] = [
     contexts: ["notebook", "topics"]
   },
   {
-    text: "Items in trash are kept for 7 days after which they are permanently deleted.",
-    contexts: ["trash"]
-  },
-  {
-    text: "Mark important notes by adding them to favorites",
+    text: "Mark important notes by adding them to favorites.",
     contexts: ["notes"]
   },
   {
-    text: "Have to scroll down a lot to open a note you are working on? Pin it to top from properties.",
+    text: "Are you scrolling a lot to find a specific note? Pin it to the top from Note properties.",
+    contexts: ["notes"]
+  },
+  {
+    text: "You can view & restore older versions of any note by going to its properties -> History.",
     contexts: ["notes"]
   }
 ];

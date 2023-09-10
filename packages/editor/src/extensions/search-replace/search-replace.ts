@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Editor, Extension } from "@tiptap/core";
+import { Extension } from "@tiptap/core";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import {
   EditorState,
@@ -33,6 +33,7 @@ declare module "@tiptap/core" {
     searchreplace: {
       startSearch: () => ReturnType;
       endSearch: () => ReturnType;
+      refreshSearch: () => ReturnType;
       search: (term: string, options?: SearchSettings) => ReturnType;
       moveToNextResult: () => ReturnType;
       moveToPreviousResult: () => ReturnType;
@@ -61,6 +62,7 @@ export type SearchStorage = SearchSettings & {
   searchTerm: string;
   selectedIndex: number;
   isSearching: boolean;
+  focusNonce: number;
   selectedText?: string;
   results?: Result[];
 };
@@ -80,10 +82,9 @@ const updateView = (state: EditorState, dispatch: DispatchFn) => {
 const regex = (s: string, settings: SearchSettings): RegExp => {
   const { enableRegex, matchCase, matchWholeWord } = settings;
   const boundary = matchWholeWord ? "\\b" : "";
-  console.log(boundary);
   return RegExp(
     boundary +
-      (enableRegex ? s : s.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")) +
+      (enableRegex ? s : s.replace(/[/\\^$*+?.()|[\]]/g, "\\$&")) +
       boundary,
     matchCase ? "gu" : "gui"
   );
@@ -209,6 +210,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
       startSearch:
         () =>
         ({ state }) => {
+          this.storage.focusNonce = Math.random();
           this.storage.isSearching = true;
           if (!state.selection.empty) {
             this.storage.selectedText = state.doc.textBetween(
@@ -227,6 +229,11 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           editor.commands.focus();
           if (dispatch) updateView(state, dispatch);
           return true;
+        },
+      refreshSearch:
+        () =>
+        ({ commands }) => {
+          return commands.search(this.storage.searchTerm, this.storage);
         },
       search:
         (term, options?: SearchSettings) =>
@@ -252,7 +259,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
 
           const { from, to } = results[nextIndex];
           commands.setTextSelection({ from, to });
-          scrollIntoView(this.editor, from);
+          scrollIntoView();
 
           this.storage.selectedIndex = nextIndex;
           if (dispatch) updateView(state, dispatch);
@@ -269,7 +276,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
 
           const { from, to } = results[prevIndex];
           commands.setTextSelection({ from, to });
-          scrollIntoView(this.editor, from);
+          scrollIntoView();
 
           this.storage.selectedIndex = prevIndex;
           if (dispatch) updateView(state, dispatch);
@@ -380,19 +387,14 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
   }
 });
 
-function scrollIntoView(editor: Editor, from: number) {
-  // const { top } = posToDOMRect(editor.view, from, to);
-  let { node: domNode } = editor.view.domAtPos(from);
-  if (domNode.nodeType === Node.TEXT_NODE && domNode.parentNode)
-    domNode = domNode.parentNode;
-  if (!domNode) return;
-
+function scrollIntoView() {
   setTimeout(() => {
+    const domNode = document.querySelector(".search-result.selected");
     if (!(domNode instanceof HTMLElement)) return;
 
     domNode.scrollIntoView({
       behavior: "smooth",
-      block: "nearest"
+      block: "center"
     });
   });
 }

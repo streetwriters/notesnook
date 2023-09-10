@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,13 +22,10 @@ import { Button, Flex, Link, Text } from "@theme-ui/components";
 import {
   CheckCircle,
   Loading,
-  Error as ErrorIcon,
   MfaAuthenticator,
   MfaSms,
   MfaEmail,
   MfaRecoveryCode,
-  ArrowRight,
-  Logout,
   Icon
 } from "../components/icons";
 import Field from "../components/field";
@@ -37,56 +34,59 @@ import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
 import Config from "../utils/config";
 import useDatabase from "../hooks/use-database";
-import Loader from "../components/loader";
+import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
-import { isTesting } from "../utils/platform";
+
 import { useTimer } from "../hooks/use-timer";
-import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
-import { AuthenticatorType } from "../components/dialogs/mfa/types";
+import { AuthenticatorType } from "../dialogs/mfa/types";
 import {
   showLoadingDialog,
   showLogoutConfirmation
 } from "../common/dialog-controller";
+import { ErrorText } from "../components/error-text";
 
-type LoginFormData = {
+type EmailFormData = {
   email: string;
+};
+
+type PasswordFormData = EmailFormData & {
   password: string;
 };
 
-type MFALoginFormData = LoginFormData & {
+type MFALoginFormData = {
   code?: string;
   method?: MFAMethodType;
 };
 
-type SignupFormData = LoginFormData & {
-  "confirm-password": string;
-};
+type SignupFormData = EmailFormData &
+  PasswordFormData & {
+    "confirm-password": string;
+  };
 
 type AccountRecoveryFormData = {
   email: string;
 };
 
-type MFAFormData = LoginFormData & {
+type MFAFormData = EmailFormData & {
   selectedMethod: MFAMethodType;
   primaryMethod: MFAMethodType;
   code?: string;
-  token: string;
   secondaryMethod?: MFAMethodType;
   phoneNumber?: string;
 };
 
 type MFAErrorData = {
   primaryMethod: MFAMethodType;
-  token: string;
   secondaryMethod?: MFAMethodType;
   phoneNumber?: string;
 };
 
 type AuthFormData = {
-  login: LoginFormData;
+  "login:email": EmailFormData;
+  "login:password": PasswordFormData;
   signup: SignupFormData;
-  sessionExpiry: LoginFormData;
+  sessionExpiry: EmailFormData;
   recover: AccountRecoveryFormData;
   "mfa:code": MFAFormData;
   "mfa:select": MFAFormData;
@@ -94,7 +94,8 @@ type AuthFormData = {
 
 type BaseFormData =
   | MFAFormData
-  | LoginFormData
+  | EmailFormData
+  | PasswordFormData
   | AccountRecoveryFormData
   | SignupFormData;
 
@@ -108,7 +109,8 @@ type BaseAuthComponentProps<TRoute extends AuthRoutes> = {
 };
 type AuthRoutes =
   | "sessionExpiry"
-  | "login"
+  | "login:email"
+  | "login:password"
   | "signup"
   | "recover"
   | "mfa:code"
@@ -123,8 +125,10 @@ function getRouteComponent<TRoute extends AuthRoutes>(
   route: TRoute
 ): AuthComponent<TRoute> | undefined {
   switch (route) {
-    case "login":
-      return Login as AuthComponent<TRoute>;
+    case "login:email":
+      return LoginEmail as AuthComponent<TRoute>;
+    case "login:password":
+      return LoginPassword as AuthComponent<TRoute>;
     case "signup":
       return Signup as AuthComponent<TRoute>;
     case "sessionExpiry":
@@ -140,16 +144,18 @@ function getRouteComponent<TRoute extends AuthRoutes>(
 }
 
 const routePaths: Record<AuthRoutes, string> = {
-  login: "/login",
+  "login:email": "/login",
+  "login:password": "/login/password",
+  "mfa:code": "/login/mfa/code",
+  "mfa:select": "/login/mfa/select",
   recover: "/recover",
   sessionExpiry: "/sessionexpired",
-  signup: "/signup",
-  "mfa:code": "/mfa/code",
-  "mfa:select": "/mfa/select"
+  signup: "/signup"
 };
 
 const authorizedRoutes: AuthRoutes[] = [
-  "login",
+  "login:email",
+  "login:password",
   "signup",
   "mfa:code",
   "mfa:select",
@@ -190,53 +196,6 @@ function Auth(props: AuthProps) {
           flexDirection: "column"
         }}
       >
-        {route === "login" || route === "signup" || route === "recover" ? (
-          <Button
-            sx={{
-              display: "flex",
-              mt: 2,
-              mr: 2,
-              alignSelf: "end",
-              alignItems: "center"
-            }}
-            variant={"secondary"}
-            onClick={() => {
-              if (route === "signup")
-                trackEvent(ANALYTICS_EVENTS.signupSkipped);
-              openURL("/notes/");
-            }}
-          >
-            Jump to app <ArrowRight size={18} sx={{ ml: 1 }} />
-          </Button>
-        ) : route === "sessionExpiry" ? (
-          <>
-            <Button
-              variant={"secondary"}
-              sx={{
-                display: "flex",
-                mt: 2,
-                mr: 2,
-                alignSelf: "end",
-                alignItems: "center",
-                color: "error"
-              }}
-              onClick={async () => {
-                if (await showLogoutConfirmation()) {
-                  await showLoadingDialog({
-                    title: "You are being logged out",
-                    action: () => db.user?.logout(true),
-                    subtitle: "Please wait..."
-                  });
-                  openURL("/login");
-                }
-              }}
-            >
-              <Logout size={16} sx={{ mr: 1 }} color="error" /> Logout
-              permanently
-            </Button>
-          </>
-        ) : null}
-
         {Route && (
           <Route
             navigate={(route, formData) => {
@@ -252,13 +211,14 @@ function Auth(props: AuthProps) {
 }
 export default Auth;
 
-function Login(props: BaseAuthComponentProps<"login">) {
+function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
   const { navigate } = props;
 
   return (
     <AuthForm
-      type="login"
+      type="login:email"
       title="Welcome back!"
+      canSkip
       subtitle={
         <SubtitleWithAction
           text="Don't have an account?"
@@ -266,35 +226,82 @@ function Login(props: BaseAuthComponentProps<"login">) {
         />
       }
       loading={{
-        title: "Logging you in",
+        title: "Verifying your email",
         subtitle: "Please wait while you are authenticated."
       }}
-      onSubmit={(form) => login(form, navigate)}
+      onSubmit={async (form) => {
+        const { primaryMethod, phoneNumber, secondaryMethod } =
+          (await userstore.login(form)) as MFAErrorData;
+
+        navigate("mfa:code", {
+          email: form.email,
+          selectedMethod: primaryMethod,
+          primaryMethod,
+          phoneNumber,
+          secondaryMethod
+        });
+      }}
     >
-      {(form?: LoginFormData) => (
+      {(form?: EmailFormData) => (
         <>
           <AuthField
             id="email"
             type="email"
             autoComplete="email"
             label="Enter email"
-            autoFocus={!form?.password}
+            autoFocus
             defaultValue={form?.email}
           />
+          <SubmitButton text="Continue" />
+        </>
+      )}
+    </AuthForm>
+  );
+}
+
+function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
+  const { navigate, formData } = props;
+
+  if (!formData) {
+    openURL("/");
+    return null;
+  }
+
+  return (
+    <AuthForm
+      type="login:password"
+      title="Your account password"
+      subtitle={"Your password is always hashed before leaving this device."}
+      loading={{
+        title: "Logging you in",
+        subtitle: "Please wait while you are authenticated."
+      }}
+      onSubmit={async (form) => {
+        await userstore.login({
+          password: form.password,
+          email: formData.email
+        });
+        Config.set("sessionExpired", false);
+        openURL("/");
+      }}
+    >
+      {(form?: PasswordFormData) => (
+        <>
           <AuthField
             id="password"
             type="password"
             autoComplete="current-password"
             label="Enter password"
-            autoFocus={!!form?.password}
+            autoFocus
+            defaultValue={form?.password}
           />
           <Button
             data-test-id="auth-forgot-password"
             type="button"
             mt={2}
             variant="anchor"
-            onClick={() => navigate("recover")}
-            sx={{ color: "text", alignSelf: "end" }}
+            onClick={() => navigate("recover", { email: formData.email })}
+            sx={{ color: "paragraph", alignSelf: "end" }}
           >
             Forgot password?
           </Button>
@@ -312,10 +319,11 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
     <AuthForm
       type="signup"
       title="Create an account"
+      canSkip
       subtitle={
         <SubtitleWithAction
           text="Already have an account?"
-          action={{ text: "Log in", onClick: () => navigate("login") }}
+          action={{ text: "Log in", onClick: () => navigate("login:email") }}
         />
       }
       loading={{
@@ -344,14 +352,14 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
           <AuthField
             id="password"
             type="password"
-            autoComplete="current-password"
+            autoComplete="new-password"
             label="Set password"
             defaultValue={form?.password}
           />
           <AuthField
             id="confirm-password"
             type="password"
-            autoComplete="confirm-password"
+            autoComplete="new-password"
             label="Confirm password"
             defaultValue={form?.["confirm-password"]}
           />
@@ -366,7 +374,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
               target="_blank"
               rel="noreferrer"
               href="https://notesnook.com/tos"
-              sx={{ color: "primary" }}
+              sx={{ color: "accent" }}
             >
               Terms of Service
             </Link>{" "}
@@ -374,11 +382,12 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
             <Link
               rel="noreferrer"
               href="https://notesnook.com/privacy"
-              sx={{ color: "primary" }}
+              sx={{ color: "accent" }}
             >
               Privacy Policy
             </Link>
-            .
+            . You also agree to receiving marketing emails from us which you can
+            opt-out of from the app settings.
           </Text>
         </>
       )}
@@ -408,7 +417,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
       title="Your session has expired"
       subtitle={
         <Flex bg="shade" p={1} sx={{ borderRadius: "default" }}>
-          <Text as="span" sx={{ fontSize: "body", color: "primary" }}>
+          <Text as="span" sx={{ fontSize: "body", color: "accent" }}>
             <b>
               All your local changes are safe and will be synced after you
               login.
@@ -421,9 +430,19 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         title: "Logging you in",
         subtitle: "Please wait while you are authenticated."
       }}
-      onSubmit={async (form) => {
+      onSubmit={async () => {
         if (!user) return;
-        await login({ email: user.email, password: form.password }, navigate);
+
+        const { primaryMethod, phoneNumber, secondaryMethod } =
+          (await userstore.login(user)) as MFAErrorData;
+
+        navigate("mfa:code", {
+          email: user.email,
+          selectedMethod: primaryMethod,
+          primaryMethod,
+          phoneNumber,
+          secondaryMethod
+        });
       }}
     >
       <AuthField
@@ -431,15 +450,9 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         type="email"
         autoComplete={"false"}
         label="Enter email"
-        defaultValue={user ? maskEmail(user.email) : undefined}
+        placeholder={user ? maskEmail(user.email) : undefined}
         autoFocus
         disabled
-      />
-      <AuthField
-        id="password"
-        type="password"
-        autoComplete="current-password"
-        label="Enter password"
       />
       <Button
         data-test-id="auth-forgot-password"
@@ -447,11 +460,35 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         mt={2}
         variant="anchor"
         onClick={() => user && navigate("recover", { email: user.email })}
-        sx={{ color: "text", alignSelf: "end" }}
+        sx={{ color: "paragraph", alignSelf: "end" }}
       >
         Forgot password?
       </Button>
       <SubmitButton text="Relogin to your account" />
+      <Button
+        type="button"
+        variant="anchor"
+        sx={{
+          mt: 5,
+          color: "var(--paragraph-error)",
+          textDecoration: "none",
+          ":hover": {
+            color: "var(--paragraph-error)"
+          }
+        }}
+        onClick={async () => {
+          if (await showLogoutConfirmation()) {
+            await showLoadingDialog({
+              title: "You are being logged out",
+              action: () => db.user?.logout(true),
+              subtitle: "Please wait..."
+            });
+            openURL("/login");
+          }
+        }}
+      >
+        Logout permanently
+      </Button>
     </AuthForm>
   );
 }
@@ -467,7 +504,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
       subtitle={
         <SubtitleWithAction
           text="Remembered your password?"
-          action={{ text: "Log in", onClick: () => navigate("login") }}
+          action={{ text: "Log in", onClick: () => navigate("login:email") }}
         />
       }
       loading={{
@@ -482,7 +519,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
 
         const url = await db.user?.recoverAccount(form.email.toLowerCase());
         console.log(url);
-        if (isTesting()) {
+        if (IS_TESTING) {
           window.open(url, "_self");
           return;
         }
@@ -494,8 +531,8 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
       {success ? (
         <>
           <Flex bg="background" p={2} mt={2} sx={{ borderRadius: "default" }}>
-            <CheckCircle size={20} color="primary" />
-            <Text variant="body" ml={2} sx={{ color: "primary" }}>
+            <CheckCircle size={20} color="accent" />
+            <Text variant="body" ml={2} sx={{ color: "accent" }}>
               {success}
             </Text>
           </Flex>
@@ -561,10 +598,10 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
   );
 
   const sendCode = useCallback(
-    async (selectedMethod: "sms" | "email", token: string) => {
+    async (selectedMethod: "sms" | "email") => {
       setIsSending(true);
       try {
-        await db.mfa?.sendCode(selectedMethod, token);
+        await db.mfa?.sendCode(selectedMethod);
         setEnabled(false);
       } catch (e) {
         const error = e as Error;
@@ -580,16 +617,14 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
   useEffect(() => {
     if (
       !formData ||
+      !formData.selectedMethod ||
       formData.selectedMethod === "recoveryCode" ||
       formData.selectedMethod === "app"
     )
       return;
 
     (async function () {
-      await sendCode(
-        formData.selectedMethod as "sms" | "email",
-        formData.token
-      );
+      await sendCode(formData.selectedMethod as "sms" | "email");
     })();
   }, [formData, sendCode]);
 
@@ -598,8 +633,10 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
     return null;
   }
 
-  const { selectedMethod, token } = formData;
+  const { selectedMethod } = formData;
   const texts = getTexts(formData)[selectedMethod];
+
+  if (!texts) return null;
 
   return (
     <AuthForm
@@ -607,27 +644,30 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
       title="Two-factor authentication"
       subtitle={texts.subtitle}
       loading={{
-        title: "Logging you in",
+        title: "Verifying 2FA code",
         subtitle: "Please wait while you are authenticated."
       }}
       onSubmit={async (form) => {
         const loginForm: MFALoginFormData = {
-          email: formData.email,
-          password: formData.password,
           code: form.code,
           method: formData.selectedMethod
         };
-        await login(loginForm, navigate);
+        await userstore.login(loginForm);
+        navigate("login:password", {
+          email: formData.email,
+          // TODO
+          password: ""
+        });
       }}
     >
       <AuthField
         id="code"
-        type="number"
+        type={selectedMethod !== "recoveryCode" ? "number" : "text"}
         autoComplete={"one-time-code"}
         label={texts.label}
         autoFocus
-        pattern="[0-9]*"
-        inputMode="numeric"
+        pattern={selectedMethod !== "recoveryCode" ? "[0-9]*" : undefined}
+        inputMode={selectedMethod !== "recoveryCode" ? "numeric" : undefined}
         helpText={texts.instructions}
         action={
           selectedMethod === "sms" || selectedMethod === "email"
@@ -645,7 +685,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                   </Text>
                 ),
                 onClick: async () => {
-                  await sendCode(selectedMethod, token);
+                  await sendCode(selectedMethod);
                 }
               }
             : undefined
@@ -657,7 +697,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
         mt={4}
         variant={"anchor"}
         onClick={() => navigate("mfa:select", formData)}
-        sx={{ color: "text" }}
+        sx={{ color: "paragraph" }}
       >
         {texts.selector}
       </Button>
@@ -714,13 +754,14 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
         (method, index) =>
           isValidMethod(method.type) && (
             <Button
+              key={method.type}
               type="submit"
               variant={"secondary"}
               mt={2}
               sx={{
                 ":first-of-type": { mt: 2 },
                 display: "flex",
-                bg: "bgSecondary",
+                bg: "background",
                 alignSelf: "stretch",
                 alignItems: "center",
                 textAlign: "left",
@@ -737,7 +778,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
                   mr: 2
                 }}
                 size={16}
-                color={selected === index ? "primary" : "text"}
+                color={selected === index ? "accent" : "icon"}
               />
               <Text variant={"title"} sx={{ fontWeight: "body" }}>
                 {method.title}
@@ -750,7 +791,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
         disabled={!isAppLoaded}
         loading={!isAppLoaded}
       /> */}
-      {/* <Button type="button" mt={4} variant={"anchor"}  sx={{color: "text"}}>
+      {/* <Button type="button" mt={4} variant={"anchor"}  sx={{color: "paragraph"}}>
         Don't have access to your {mfaMethodToPhrase(formData.primaryMethod)}?
       </Button> */}
     </AuthForm>
@@ -765,13 +806,14 @@ type AuthFormProps<TType extends AuthRoutes> = {
   loading: { title: string; subtitle: string };
   type: TType;
   onSubmit: (form: AuthFormData[TType]) => Promise<void>;
+  canSkip?: boolean;
   children?:
     | React.ReactNode
     | ((form?: AuthFormData[TType]) => React.ReactNode);
 };
 
 export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
-  const { title, subtitle, children } = props;
+  const { title, subtitle, children, canSkip } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
   const formRef = useRef<HTMLFormElement>(null);
@@ -798,6 +840,12 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
           await props.onSubmit(form);
         } catch (e) {
           const error = e as Error;
+          if (error.message === "invalid_grant") {
+            setError(
+              "Login session has expired. Please refresh this page and try logging in again."
+            );
+            return;
+          }
           setError(error.message);
         } finally {
           setIsSubmitting(false);
@@ -819,19 +867,33 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
         variant="body"
         mt={2}
         mb={35}
-        sx={{ fontSize: "title", textAlign: "center", color: "fontTertiary" }}
+        sx={{
+          fontSize: "title",
+          textAlign: "center",
+          color: "var(--paragraph-secondary)"
+        }}
       >
         {subtitle}
       </Text>
       {typeof children === "function" ? children(form) : children}
-      {error && (
-        <Flex bg="errorBg" p={1} mt={2} sx={{ borderRadius: "default" }}>
-          <ErrorIcon size={15} color="error" />
-          <Text variant="error" ml={1}>
-            {error}
-          </Text>
-        </Flex>
+      {canSkip && (
+        <Button
+          type="button"
+          variant="anchor"
+          sx={{
+            mt: 5,
+            color: "paragraph",
+            textDecoration: "none"
+          }}
+          onClick={() => {
+            openURL("/notes/");
+          }}
+        >
+          Skip & go directly to the app
+        </Button>
       )}
+
+      <ErrorText error={error} mt={5} />
     </Flex>
   );
 }
@@ -847,18 +909,20 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
   return (
     <>
       {props.text}{" "}
-      <Text
+      <Button
+        type="button"
+        variant="anchor"
         sx={{
           textDecoration: "underline",
-          ":hover": { color: "dimPrimary" },
-          cursor: "pointer",
-          color: "text"
+          fontWeight: "bold",
+          fontSize: "subtitle",
+          color: "paragraph",
+          cursor: "pointer"
         }}
-        as="b"
         onClick={props.action.onClick}
       >
         {props.action.text}
-      </Text>
+      </Button>
     </>
   );
 }
@@ -924,7 +988,7 @@ export function SubmitButton(props: SubmitButtonProps) {
       data-test-id="submitButton"
       type="submit"
       mt={50}
-      variant="primary"
+      variant="accent"
       px={50}
       sx={{
         borderRadius: 50,
@@ -935,40 +999,9 @@ export function SubmitButton(props: SubmitButtonProps) {
       }}
       disabled={props.disabled}
     >
-      {props.loading ? <Loading color="static" /> : props.text}
+      {props.loading ? <Loading color="accentForeground" /> : props.text}
     </Button>
   );
-}
-
-async function login(
-  form: LoginFormData | MFALoginFormData,
-  navigate: NavigateFunction
-) {
-  try {
-    await userstore.login(form);
-    Config.set("sessionExpired", false);
-    openURL("/");
-  } catch (e) {
-    const error = e as Error & { code?: string; data?: unknown };
-    if (error.code === "mfa_required") {
-      const { primaryMethod, phoneNumber, secondaryMethod, token } =
-        error.data as MFAErrorData;
-
-      if (!primaryMethod)
-        throw new Error(
-          "Multi-factor is required but the server didn't send a primary MFA method."
-        );
-
-      navigate("mfa:code", {
-        ...form,
-        token,
-        selectedMethod: primaryMethod,
-        primaryMethod,
-        phoneNumber,
-        secondaryMethod
-      });
-    } else throw e;
-  }
 }
 
 function openURL(url: string, force?: boolean) {
@@ -980,13 +1013,14 @@ function openURL(url: string, force?: boolean) {
 
 function maskEmail(email: string) {
   if (!email) return "";
-  const [username, domain] = email.split("@");
-  const maskChars = "*".repeat(
-    username.substring(2, username.length - 2).length
-  );
-  return `${username.substring(0, 2)}${maskChars}${username.substring(
-    username.length - 2
-  )}@${domain}`;
+  const [username, provider] = email.split("@");
+  if (username.length === 1) return `****@${provider}`;
+  return email.replace(/(.{1})(.*)(?=@)/, function (gp1, gp2, gp3) {
+    for (let i = 0; i < gp3.length; i++) {
+      gp2 += "*";
+    }
+    return gp2;
+  });
 }
 
 function isSessionExpired() {

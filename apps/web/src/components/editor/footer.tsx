@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatDate } from "@notesnook/core/utils/date";
 import { Flex, Text } from "@theme-ui/components";
 import { useMemo } from "react";
 import { useStore } from "../../stores/editor-store";
 import { Loading, Saved, NotSaved } from "../icons";
 import { useNoteStatistics } from "./context";
+import { getFormattedDate } from "@notesnook/common";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -50,7 +50,7 @@ function EditorFooter() {
         data-test-id="editor-word-count"
         variant="subBody"
         mr={2}
-        sx={{ color: "bgSecondaryText" }}
+        sx={{ color: "paragraph" }}
       >
         {words.total + " words"}
         {words.selected ? ` (${words.selected} selected)` : ""}
@@ -59,13 +59,24 @@ function EditorFooter() {
         className="selectable"
         variant="subBody"
         mr={2}
-        sx={{ color: "bgSecondaryText" }}
+        sx={{ color: "paragraph" }}
         data-test-id="editor-date-edited"
         title={dateEdited?.toString()}
       >
-        {formatDate(dateEdited || Date.now())}
+        {getFormattedDate(dateEdited || Date.now())}
       </Text>
-      {SaveStateIcon && <SaveStateIcon size={13} color="bgSecondaryText" />}
+      {SaveStateIcon && (
+        <SaveStateIcon
+          size={13}
+          color={
+            saveState === 1
+              ? "accent"
+              : saveState === "-1"
+              ? "red"
+              : "paragraph"
+          }
+        />
+      )}
     </Flex>
   );
 }

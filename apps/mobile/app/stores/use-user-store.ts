@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,17 +19,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import create, { State } from "zustand";
 
+export enum SyncStatus {
+  Passed,
+  Failed,
+  Never
+}
+
 export interface UserStore extends State {
   user: User | null | undefined;
   premium: boolean;
   lastSynced: string;
   syncing: boolean;
+  lastSyncStatus: SyncStatus;
   setUser: (user: User | null | undefined) => void;
   setPremium: (premium: boolean) => void;
-  setSyncing: (syncing: boolean) => void;
+  setSyncing: (syncing: boolean, status?: SyncStatus) => void;
   setLastSynced: (lastSynced: string) => void;
-  verifyUser: boolean;
-  setVerifyUser: (verified: boolean) => void;
+  appLocked: boolean;
+  lockApp: (verified: boolean) => void;
+  disableAppLockRequests: boolean;
+  setDisableAppLockRequests: (shouldBlockVerifyUser: boolean) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -37,10 +46,20 @@ export const useUserStore = create<UserStore>((set) => ({
   premium: false,
   lastSynced: "Never",
   syncing: false,
-  verifyUser: false,
+  appLocked: false,
   setUser: (user) => set({ user: user }),
   setPremium: (premium) => set({ premium: premium }),
-  setSyncing: (syncing) => set({ syncing: syncing }),
+  setSyncing: (syncing, status = SyncStatus.Passed) => {
+    set({ syncing: syncing, lastSyncStatus: status });
+  },
   setLastSynced: (lastSynced) => set({ lastSynced: lastSynced }),
-  setVerifyUser: (verified) => set({ verifyUser: verified })
+  lockApp: (appLocked) => set({ appLocked }),
+  lastSyncStatus: SyncStatus.Never,
+  disableAppLockRequests: false,
+  setDisableAppLockRequests: (disableAppLockRequests) => {
+    set({ disableAppLockRequests });
+    setTimeout(() => {
+      set({ disableAppLockRequests: false });
+    }, 1000);
+  }
 }));

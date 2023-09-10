@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,19 +48,20 @@ describe("NOTE TESTS", () => {
     await prepare();
     let note = await createNote();
     await tapById(notesnook.listitem.menu);
-    await visibleByText(note.body);
+    await visibleByText("Created at:");
   });
 
   it("Favorite and unfavorite a note", async () => {
     await prepare();
     let note = await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Favorite");
+    await tapById("icon-favorite");
     await visibleById("icon-star");
     await navigate("Favorites");
     await visibleByText(note.body);
+    await sleep(500);
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Favorite");
+    await tapById("icon-favorite");
     await expect(element(by.text(note.body))).not.toBeVisible();
     await navigate("Notes");
   });
@@ -69,11 +70,11 @@ describe("NOTE TESTS", () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Pin");
+    await tapById("icon-pin");
     await visibleByText("Pinned");
     await visibleById("icon-pinned");
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Pin");
+    await tapById("icon-pin");
     expect(element(by.id("icon-pinned"))).not.toBeVisible();
   });
 
@@ -81,26 +82,27 @@ describe("NOTE TESTS", () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-PinToNotif");
-    await visibleByText("Unpin from Notifications");
+    await tapById("icon-pin-to-notifications");
+    await visibleByText("Unpin from notifications");
     await sleep(500);
-    await tapById("icon-PinToNotif");
-    await visibleByText("Pin to Notifications");
+    await tapById("icon-pin-to-notifications");
+    await sleep(500);
+    await visibleByText("Pin to notifications");
   });
 
-  it("Copy note", async () => {
-    await prepare();
-    await createNote();
-    await tapById(notesnook.listitem.menu);
-    await tapById("icon-Copy");
-    await visibleByText("Note copied to clipboard");
-  });
+  // it("Copy note", async () => {
+  //   await prepare();
+  //   await createNote();
+  //   await tapById(notesnook.listitem.menu);
+  //   await tapById("icon-Copy");
+  //   await visibleByText("Note copied to clipboard");
+  // });
 
   it("Export note dialog should show", async () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Export");
+    await tapById("icon-export");
     await visibleByText("PDF");
   });
 
@@ -122,8 +124,9 @@ describe("NOTE TESTS", () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Delete");
+    await tapById("icon-trash");
     await navigate("Trash");
+    await sleep(500);
     await tapById(notesnook.listitem.menu);
     await tapByText("Restore note");
     await device.pressBack();

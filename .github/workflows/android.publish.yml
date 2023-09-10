@@ -11,31 +11,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - uses: actions/setup-node@master
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: |
-            apps/mobile/package-lock.json
-            apps/web/package-lock.json
-            packages/core/package-lock.json
-            packages/crypto/package-lock.json
-            packages/crypto-worker/package-lock.json
-            packages/editor-mobile/package-lock.json
-            packages/editor/package-lock.json
-            packages/logger/package-lock.json
-            packages/streamable-fs/package-lock.json
-            packages/theme/package-lock.json
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
 
       - name: Use specific Java version for the builds
         uses: joschi/setup-jdk@v2
         with:
-          java-version: '11'
-          architecture: 'x64'
+          java-version: "11"
+          architecture: "x64"
 
       - name: Install node modules
         run: |
-          npm ci
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=mobile
+
       - name: Make Gradlew Executable
         run: cd apps/mobile/native/android && chmod +x ./gradlew
 
@@ -50,7 +39,18 @@ jobs:
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}        
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Publish to Playstore
+        id: deploy
+        uses: r0adkll/upload-google-play@v1.1.1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: com.streetwriters.notesnook
+          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
+          track: production
+          status: completed
+          whatsNewDirectory: apps/mobile/native/android/releasenotes/
 
       - name: Build apks for Github release
         run: yarn release:android
@@ -63,7 +63,7 @@ jobs:
           signingKeyBase64: ${{ secrets.PUBLIC_SIGNING_KEY }}
           alias: ${{ secrets.PUBLIC_ALIAS }}
           keyStorePassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
-          keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}    
+          keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
 
       - name: Rename apk files
         run: |
@@ -92,14 +92,3 @@ jobs:
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-armeabi-v7a.apk
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86.apk
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86_64.apk
-
-      - name: Publish to Playstore
-        id: deploy
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: com.streetwriters.notesnook
-          releaseFile: ${{steps.sign_app.outputs.signedReleaseFile}}
-          track: production
-          status: completed
-          whatsNewDirectory: apps/mobile/native/android/releasenotes/             

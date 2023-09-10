@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ export function createMathView(inline: boolean) {
   return (
     node: ProseNode,
     view: EditorView,
-    getPos: boolean | (() => number)
+    getPos: boolean | (() => number | undefined)
   ): MathView => {
     /** @todo is this necessary?
      * Docs says that for any function proprs, the current plugin instance

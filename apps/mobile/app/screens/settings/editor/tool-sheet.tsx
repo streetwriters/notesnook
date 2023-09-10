@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,13 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ToolId } from "@notesnook/editor/dist/toolbar";
 import React, { RefObject } from "react";
 import { View } from "react-native";
-import ActionSheet from "react-native-actions-sheet";
-import { ScrollView } from "react-native-gesture-handler";
 import { PressableButton } from "../../../components/ui/pressable";
 import { SvgView } from "../../../components/ui/svg";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import { presentSheet } from "../../../services/event-manager";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { DraggableItem, useDragState } from "./state";
 import {
@@ -34,22 +32,26 @@ import {
   getToolIcon,
   getUngroupedTools
 } from "./toolbar-definition";
+import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 
 export default function ToolSheet({
   group,
   fwdRef
 }: {
   group: DraggableItem;
-  fwdRef: RefObject<ActionSheet>;
+  fwdRef: RefObject<ActionSheetRef>;
 }) {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const data = useDragState((state) => state.data);
   const ungrouped = getUngroupedTools(data) as ToolId[];
 
   const renderTool = React.useCallback(
     (item: ToolId) => {
       const tool = findToolById(item);
-      const iconSvgString = tool ? getToolIcon(tool.icon as ToolId) : null;
+      const iconSvgString = tool
+        ? getToolIcon(tool.icon as ToolId, colors.secondary.icon)
+        : null;
+      if (item === "none") return;
       return (
         <PressableButton
           key={item}
@@ -90,7 +92,7 @@ export default function ToolSheet({
               style={{
                 marginLeft: iconSvgString ? 10 : 0
               }}
-              color={colors.pri}
+              color={colors.primary.paragraph}
               size={SIZE.sm}
             >
               {tool?.title}
@@ -99,7 +101,12 @@ export default function ToolSheet({
         </PressableButton>
       );
     },
-    [colors.pri, group.groupIndex, group.index]
+    [
+      colors.primary.paragraph,
+      colors.secondary.icon,
+      group.groupIndex,
+      group.index
+    ]
   );
 
   return (
@@ -109,18 +116,13 @@ export default function ToolSheet({
         padding: 12
       }}
     >
-      <ScrollView
-        onMomentumScrollEnd={() => {
-          fwdRef.current?.handleChildScrollEnd();
-        }}
-        nestedScrollEnabled={true}
-      >
+      <ScrollView nestedScrollEnabled={true}>
         {!ungrouped || ungrouped.length === 0 ? (
           <Paragraph
             style={{
               alignSelf: "center"
             }}
-            color={colors.icon}
+            color={colors.secondary.paragraph}
           >
             You have grouped all the tools.
           </Paragraph>

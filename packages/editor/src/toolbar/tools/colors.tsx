@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import tinycolor from "tinycolor2";
 import { PopupWrapper } from "../../components/popup-presenter";
 import { config } from "../../utils/config";
@@ -26,6 +26,7 @@ import { ColorPicker, DEFAULT_COLORS } from "../popups/color-picker";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { ToolProps } from "../types";
 import { getToolbarElement } from "../utils/dom";
+import { PositionOptions } from "@notesnook/ui";
 
 type ColorToolProps = ToolProps & {
   onColorChange: (color?: string) => void;
@@ -49,6 +50,15 @@ export function ColorTool(props: ColorToolProps) {
   const [colors, setColors] = useState(
     config.get<string[]>(`custom_${cacheKey}`, []) || []
   );
+  const position: PositionOptions = useMemo(() => {
+    return {
+      isTargetAbsolute: true,
+      target: getToolbarElement(),
+      align: isBottom ? "center" : "end",
+      location: isBottom ? "top" : "below",
+      yOffset: 10
+    };
+  }, [isBottom]);
 
   useEffect(() => {
     config.set(`custom_${cacheKey}`, colors);
@@ -57,11 +67,11 @@ export function ColorTool(props: ColorToolProps) {
   return (
     <SplitButton
       {...toolProps}
-      iconColor={activeColor && tColor.isDark() ? "static" : "icon"}
+      iconColor={activeColor && tColor.isDark() ? "white" : "icon"}
       sx={{
         mr: 0,
         bg: activeColor || "transparent",
-        ":hover": {
+        ":hover:not(:disabled):not(:active)": {
           bg: activeColor ? tColor.darken(5).toRgbString() : "transparent"
         }
       }}
@@ -73,13 +83,7 @@ export function ColorTool(props: ColorToolProps) {
         isOpen={isOpen}
         id={props.icon}
         group={"color"}
-        position={{
-          isTargetAbsolute: true,
-          target: getToolbarElement(),
-          align: isBottom ? "center" : "end",
-          location: isBottom ? "top" : "below",
-          yOffset: 10
-        }}
+        position={position}
         focusOnRender={false}
         blocking={false}
       >

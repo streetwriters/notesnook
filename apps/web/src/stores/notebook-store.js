@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,13 +22,19 @@ import createStore from "../common/store";
 import { store as appStore } from "./app-store";
 import { store as noteStore } from "./note-store";
 import BaseStore from "./index";
-import { groupArray } from "@notesnook/core/utils/grouping";
+import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import Config from "../utils/config";
 
+/**
+ * @extends {BaseStore<NotebookStore>}
+ */
 class NotebookStore extends BaseStore {
   notebooks = [];
+  /**
+   * @type {any | undefined}
+   */
+  selectedNotebook = undefined;
   selectedNotebookTopics = [];
-  selectedNotebookId = 0;
   viewMode = Config.get("notebooks:viewMode", "detailed");
 
   setViewMode = (viewMode) => {
@@ -43,7 +49,7 @@ class NotebookStore extends BaseStore {
         db.settings.getGroupOptions("notebooks")
       );
     });
-    this.setSelectedNotebook(this.get().selectedNotebookId);
+    this.setSelectedNotebook(this.get().selectedNotebook?.id);
   };
 
   delete = async (...ids) => {
@@ -60,20 +66,19 @@ class NotebookStore extends BaseStore {
   };
 
   setSelectedNotebook = (id) => {
-    const topics = db.notebooks.notebook(id)?.topics?.all;
-    if (!topics) return;
+    if (!id) return;
+    const notebook = db.notebooks?.notebook(id)?.data;
+    if (!notebook) return;
+
     this.set((state) => {
+      state.selectedNotebook = notebook;
       state.selectedNotebookTopics = groupArray(
-        topics,
+        notebook.topics,
         db.settings.getGroupOptions("topics")
       );
-      state.selectedNotebookId = id;
     });
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<NotebookStore>, NotebookStore]}
- */
 const [useStore, store] = createStore(NotebookStore);
 export { useStore, store };

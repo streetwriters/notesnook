@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,6 +21,9 @@ import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 
+/**
+ * @extends {BaseStore<SearchStore>}
+ */
 class SearchStore extends BaseStore {
   results = [];
 
@@ -31,8 +34,5 @@ class SearchStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<SearchStore>, SearchStore]}
- */
 const [useStore, store] = createStore(SearchStore);
 export { useStore, store };

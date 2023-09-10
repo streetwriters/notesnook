@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,18 +22,26 @@ import { ThemeUIStyleObject } from "@theme-ui/core";
 const defaultVariant: ThemeUIStyleObject = {
   borderRadius: "default",
   border: "none",
-  // borderColor: "border",
-  boxShadow: "0px 0px 0px 1px var(--border) inset",
+  width: "auto",
+  mx: "2px",
+  outline: "1.5px solid var(--border)",
   fontFamily: "body",
   fontWeight: "body",
   fontSize: "input",
-  color: "text",
-  outline: "none",
+  color: "paragraph",
+  ":-webkit-autofill": {
+    WebkitTextFillColor: "var(--paragraph)",
+    caretColor: "var(--paragraph)",
+    fontSize: "inherit"
+  },
   ":focus": {
-    boxShadow: "0px 0px 0px 1.5px var(--primary) inset"
+    outline: "2px solid var(--accent)"
   },
   ":hover:not(:focus)": {
-    boxShadow: "0px 0px 0px 1px var(--dimPrimary) inset"
+    outline: "1.5px solid var(--accent)"
+  },
+  "::placeholder": {
+    color: "placeholder"
   }
 };
 
@@ -51,13 +59,12 @@ const clean: ThemeUIStyleObject = {
 
 const error: ThemeUIStyleObject = {
   variant: "forms.input",
-  boxShadow: "0px 0px 0px 1px var(--error) inset",
-  outline: "none",
+  outline: "1.5px solid var(--error)",
   ":focus": {
-    boxShadow: "0px 0px 0px 1.5px var(--error) inset"
+    outline: "2px solid var(--error)"
   },
   ":hover:not(:focus)": {
-    boxShadow: "0px 0px 0px 1px var(--error) inset"
+    outline: "1.5px solid var(--error)"
   }
 };
 

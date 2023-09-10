@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, Text } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Loading } from "../icons";
 
 function EditorLoading({ text }: { text?: string }) {
   return (
@@ -30,7 +30,7 @@ function EditorLoading({ text }: { text?: string }) {
         justifyContent: "center"
       }}
     >
-      <Icon.Loading color="primary" sx={{ mt: 2 }} />
+      <Loading color="accent" sx={{ mt: 2 }} />
       <Text variant="body" mt={2} sx={{ textAlign: "center" }}>
         {text || "Loading editor. Please wait..."}
       </Text>

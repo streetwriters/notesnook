@@ -1,7 +1,0 @@
-<resources>
-
-    <style name="ThemeOverlay.Notesnook.AppWidgetContainer" parent="">
-        <item name="appWidgetBackgroundColor">@color/light_blue_900</item>
-        <item name="appWidgetTextColor">@color/light_blue_200</item>
-    </style>
-</resources>

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,17 +18,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, Text } from "@theme-ui/components";
-import ThemeProvider from "../components/theme-provider";
-import { Error, Warn, Success } from "../components/icons";
+import { ScopedThemeProvider } from "../components/theme-provider";
+import { Error, Warn, Success, Info } from "../components/icons";
 import { store as appstore } from "../stores/app-store";
 import toast from "react-hot-toast";
-import { Theme } from "@notesnook/theme";
 
 type ToastType = "success" | "error" | "warn" | "info";
 type ToastAction = {
   text: string;
   onClick: () => void;
-  type?: "primary" | "text";
+  type?: "accent" | "paragraph";
+};
+
+const ToastIcons = {
+  error: Error,
+  success: Success,
+  warn: Warn,
+  info: Info
 };
 
 function showToast(
@@ -39,16 +45,9 @@ function showToast(
 ): { hide: () => void } {
   if (appstore.get().isFocusMode) return { hide: () => {} }; // TODO
 
-  const IconComponent =
-    type === "error" ? Error : type === "success" ? Success : Warn;
-
-  const RenderedIcon = () => (
-    <IconComponent size={28} color={type as keyof Theme["colors"]} />
-  );
-
   const id = toast(<ToastContainer message={message} actions={actions} />, {
     duration: hideAfter || Infinity,
-    icon: <RenderedIcon />,
+    icon: <ToastIcon type={type} />,
     id: message,
     position: "bottom-right",
     style: {
@@ -67,7 +66,7 @@ type ToastContainerProps = {
 function ToastContainer(props: ToastContainerProps) {
   const { message, actions } = props;
   return (
-    <ThemeProvider>
+    <ScopedThemeProvider>
       <Flex
         bg={"background"}
         data-test-id="toast"
@@ -81,22 +80,19 @@ function ToastContainer(props: ToastContainerProps) {
           data-test-id="toast-message"
           variant="body"
           mr={2}
-          sx={{ fontSize: "body", color: "text" }}
+          sx={{ fontSize: "body", color: "paragraph" }}
         >
           {message}
         </Text>
         {actions?.map((action) => (
           <Button
-            variant="primary"
-            bg={"transparent"}
+            variant="dialog"
             sx={{
               py: "7px",
-              ":hover": { bg: "bgSecondary" },
               m: 0,
               flexShrink: 0,
               fontSize: "body",
-              fontWeight: "bold",
-              color: action.type || "primary"
+              color: action.type || "accent"
             }}
             key={action.text}
             onClick={action.onClick}
@@ -105,8 +101,18 @@ function ToastContainer(props: ToastContainerProps) {
           </Button>
         ))}
       </Flex>
-    </ThemeProvider>
+    </ScopedThemeProvider>
   );
 }
 
 export { showToast };
+
+function ToastIcon({ type }: { type: ToastType }) {
+  const IconComponent = ToastIcons[type];
+  return (
+    <IconComponent
+      size={24}
+      color={type === "info" ? "blue" : `var(--icon-${type})`}
+    />
+  );
+}

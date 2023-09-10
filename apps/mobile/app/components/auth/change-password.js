@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import {
   ToastEvent
 } from "../../services/event-manager";
 import { useUserStore } from "../../stores/use-user-store";
-import { eCloseProgressDialog } from "../../utils/events";
+import { eCloseSheet } from "../../utils/events";
 import DialogHeader from "../dialog/dialog-header";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
@@ -72,7 +72,7 @@ export const ChangePassword = () => {
         context: "global"
       });
       setLoading(false);
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
     } catch (e) {
       setLoading(false);
       ToastEvent.show({

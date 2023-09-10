@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,32 +17,46 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
+import React, {
   useEffect,
   useCallback,
   useState,
   useRef,
-  PropsWithChildren
+  PropsWithChildren,
+  Suspense
 } from "react";
-import { Box, Button, Flex, Text } from "@theme-ui/components";
+import ReactDOM from "react-dom";
+import { Box, Button, Flex, Progress, Text } from "@theme-ui/components";
 import Properties from "../properties";
 import { useStore, store as editorstore } from "../../stores/editor-store";
-import { useStore as useAppStore } from "../../stores/app-store";
+import {
+  useStore as useAppStore,
+  store as appstore
+} from "../../stores/app-store";
 import Toolbar from "./toolbar";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
-import { formatDate } from "@notesnook/core/utils/date";
 import Tiptap from "./tiptap";
 import Header from "./header";
 import { Attachment } from "../icons";
 import { useEditorInstance } from "./context";
 import { attachFile, AttachmentProgress, insertAttachment } from "./picker";
-import { downloadAttachment } from "../../common/attachments";
-import { EV, EVENTS } from "@notesnook/core/common";
+import { saveAttachment, downloadAttachment } from "../../common/attachments";
+import { EV, EVENTS } from "@notesnook/core/dist/common";
 import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
 import Titlebox from "./title-box";
 import useTablet from "../../hooks/use-tablet";
+import Config from "../../utils/config";
+import { AnimatedFlex } from "../animated";
+import { EditorLoader } from "../loaders/editor-loader";
+import { ScopedThemeProvider } from "../theme-provider";
+import { Lightbox } from "../lightbox";
+import { Allotment } from "allotment";
+import { showToast } from "../../utils/toast";
+import { getFormattedDate } from "@notesnook/common";
+
+const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
 type PreviewSession = {
   content: { data: string; type: string };
@@ -50,7 +64,16 @@ type PreviewSession = {
   dateEdited: number;
 };
 
-function onEditorChange(noteId: string, sessionId: string, content: string) {
+type DocumentPreview = {
+  url?: string;
+  hash: string;
+};
+
+function onEditorChange(
+  noteId: string | undefined,
+  sessionId: number,
+  content: string
+) {
   if (!content) return;
 
   editorstore.get().saveSessionContent(noteId, sessionId, {
@@ -74,6 +97,9 @@ export default function EditorManager({
   // update.
   const [timestamp, setTimestamp] = useState<number>(0);
 
+  const lastSavedTime = useRef<number>(0);
+  const [docPreview, setDocPreview] = useState<DocumentPreview>();
+
   const previewSession = useRef<PreviewSession>();
   const [dropRef, overlayRef] = useDragOverlay();
   const editorInstance = useEditorInstance();
@@ -90,44 +116,67 @@ export default function EditorManager({
   useEffect(() => {
     const event = db.eventManager.subscribe(
       EVENTS.syncItemMerged,
-      async (item?: Record<string, string>) => {
-        if (!item) return;
+      async (item?: Record<string, string | number>) => {
+        if (
+          !item ||
+          lastSavedTime.current >= (item.dateEdited as number) ||
+          isPreviewSession ||
+          !appstore.get().isRealtimeSyncEnabled
+        )
+          return;
 
         const { id, contentId, locked } = editorstore.get().session;
         const isContent = item.type === "tiptap" && item.id === contentId;
         const isNote = item.type === "note" && item.id === id;
 
-        if (isContent) {
+        if (isContent && editorInstance.current) {
           if (locked) {
             const result = await db.vault?.decryptContent(item).catch(() => {});
             if (result) item.data = result.data;
             else EV.publish(EVENTS.vaultLocked);
           }
+          const oldHashes = editorInstance.current.getMediaHashes();
 
-          editorInstance.current?.updateContent(item.data);
+          editorInstance.current.updateContent(item.data as string);
 
-          db.eventManager.subscribe(
-            EVENTS.syncCompleted,
-            async () => {
-              await db.attachments?.downloadImages(id);
-            },
-            true
+          const newHashes = editorInstance.current.getMediaHashes();
+          const hashesToLoad = newHashes.filter(
+            (hash, index) => hash !== oldHashes[index]
           );
+
+          if (appstore.get().isSyncing()) {
+            db.eventManager.subscribe(
+              EVENTS.syncCompleted,
+              async () => {
+                await db.attachments?.downloadMedia(id, hashesToLoad);
+              },
+              true
+            );
+          } else {
+            await db.attachments?.downloadMedia(id, hashesToLoad);
+          }
         } else if (isNote) {
           if (!locked && item.locked) return EV.publish(EVENTS.vaultLocked);
 
           editorstore.get().updateSession(item);
+          if (item.title)
+            AppEventManager.publish(AppEvents.changeNoteTitle, {
+              title: item.title,
+              preventSave: true
+            });
         }
       }
     );
     return () => {
       event.unsubscribe();
     };
-  }, [editorInstance]);
+  }, [editorInstance, isPreviewSession]);
 
   const openSession = useCallback(async (noteId: string | number) => {
     await editorstore.get().openSession(noteId);
     previewSession.current = undefined;
+
+    lastSavedTime.current = Date.now();
     setTimestamp(Date.now());
   }, []);
 
@@ -139,7 +188,7 @@ export default function EditorManager({
         true
       );
     } else if (noteId && editorstore.get().session.content) {
-      await db.attachments?.downloadImages(noteId);
+      await db.attachments?.downloadMedia(noteId);
     }
   }, [noteId]);
 
@@ -149,6 +198,7 @@ export default function EditorManager({
     (async function () {
       await editorstore.newSession(nonce);
 
+      lastSavedTime.current = 0;
       setTimestamp(Date.now());
     })();
   }, [isNewSession, nonce]);
@@ -160,47 +210,137 @@ export default function EditorManager({
   }, [noteId]);
 
   return (
+    <ScopedThemeProvider scope="editor" sx={{ flex: 1 }}>
+      <Allotment
+        proportionalLayout={true}
+        onDragEnd={(sizes) => {
+          Config.set("editor:panesize", sizes[1]);
+        }}
+      >
+        <Allotment.Pane className="editor-pane">
+          <Flex
+            ref={dropRef}
+            id="editorContainer"
+            sx={{
+              position: "relative",
+              alignSelf: "stretch",
+              overflow: "hidden",
+              flex: 1,
+              flexDirection: "column",
+              background: "background"
+            }}
+          >
+            {previewSession.current && (
+              <PreviewModeNotice
+                {...previewSession.current}
+                onDiscard={() => openSession(noteId)}
+              />
+            )}
+            <Editor
+              nonce={timestamp}
+              content={() =>
+                previewSession.current?.content?.data ||
+                editorstore.get().session?.content?.data
+              }
+              onPreviewDocument={(url) => setDocPreview(url)}
+              onContentChange={() => (lastSavedTime.current = Date.now())}
+              options={{
+                readonly: isReadonly || isPreviewSession,
+                onRequestFocus: () => toggleProperties(false),
+                onLoadMedia: loadMedia,
+                focusMode: isFocusMode,
+                isMobile: isMobile || isTablet
+              }}
+            />
+
+            {arePropertiesVisible && (
+              <Properties
+                onOpenPreviewSession={async (session: PreviewSession) => {
+                  previewSession.current = session;
+                  setTimestamp(Date.now());
+                }}
+              />
+            )}
+            <DropZone overlayRef={overlayRef} />
+          </Flex>
+        </Allotment.Pane>
+        {docPreview && (
+          <Allotment.Pane
+            minSize={450}
+            preferredSize={Config.get("editor:panesize", 500)}
+          >
+            <ScopedThemeProvider
+              scope="editorSidebar"
+              id="editorSidebar"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden",
+                borderLeft: "1px solid var(--border)",
+                height: "100%",
+                bg: "background"
+              }}
+            >
+              {docPreview.url ? (
+                <Suspense
+                  fallback={
+                    <DownloadAttachmentProgress hash={docPreview.hash} />
+                  }
+                >
+                  <PDFPreview
+                    fileUrl={docPreview.url}
+                    hash={docPreview.hash}
+                    onClose={() => setDocPreview(undefined)}
+                  />
+                </Suspense>
+              ) : (
+                <DownloadAttachmentProgress hash={docPreview.hash} />
+              )}
+            </ScopedThemeProvider>
+          </Allotment.Pane>
+        )}
+      </Allotment>
+    </ScopedThemeProvider>
+  );
+}
+
+type DownloadAttachmentProgressProps = {
+  hash: string;
+};
+function DownloadAttachmentProgress(props: DownloadAttachmentProgressProps) {
+  const { hash } = props;
+
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const event = AppEventManager.subscribe(
+      AppEvents.UPDATE_ATTACHMENT_PROGRESS,
+      (progress: AttachmentProgress) => {
+        if (progress.hash === hash) {
+          setProgress(Math.round((progress.loaded / progress.total) * 100));
+        }
+      }
+    );
+
+    return () => {
+      event.unsubscribe();
+    };
+  }, [hash]);
+
+  return (
     <Flex
-      ref={dropRef}
-      id="editorContainer"
       sx={{
-        position: "relative",
-        alignSelf: "stretch",
-        overflow: "hidden",
         flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
         flexDirection: "column"
       }}
     >
-      {/* <UpdatesPendingNotice /> */}
-      {previewSession.current && (
-        <PreviewModeNotice
-          {...previewSession.current}
-          onDiscard={() => openSession(noteId)}
-        />
-      )}
-      <Editor
-        nonce={timestamp}
-        content={
-          previewSession.current?.content?.data ||
-          editorstore.get().session?.content?.data
-        }
-        options={{
-          readonly: isReadonly || isPreviewSession,
-          onRequestFocus: () => toggleProperties(false),
-          onLoadMedia: loadMedia,
-          focusMode: isFocusMode,
-          isMobile: isMobile || isTablet
-        }}
+      <Text variant="title">Downloading attachment ({progress}%)</Text>
+      <Progress
+        value={progress}
+        max={100}
+        sx={{ width: ["90%", "35%"], mt: 1 }}
       />
-      {arePropertiesVisible && (
-        <Properties
-          onOpenPreviewSession={async (session: PreviewSession) => {
-            previewSession.current = session;
-            setTimestamp(Date.now());
-          }}
-        />
-      )}
-      <DropZone overlayRef={overlayRef} />
     </Flex>
   );
 }
@@ -214,18 +354,21 @@ type EditorOptions = {
   onLoadMedia?: () => void;
 };
 type EditorProps = {
-  content: string;
+  content: () => string | undefined;
   nonce?: number;
   options?: EditorOptions;
+  onContentChange?: () => void;
+  onPreviewDocument?: (preview: DocumentPreview) => void;
 };
 export function Editor(props: EditorProps) {
-  const { content, nonce, options } = props;
+  const { content, nonce, options, onContentChange, onPreviewDocument } = props;
   const { readonly, headless, onLoadMedia, isMobile } = options || {
     headless: false,
     readonly: false,
     focusMode: false,
     isMobile: false
   };
+  const [isLoading, setIsLoading] = useState(true);
 
   const editor = useEditorInstance();
 
@@ -246,14 +389,20 @@ export function Editor(props: EditorProps) {
       ({
         groupId,
         hash,
+        attachmentType,
         src
       }: {
         groupId?: string;
+        attachmentType: "image" | "webclip" | "generic";
         hash: string;
         src: string;
       }) => {
         if (groupId?.startsWith("monograph")) return;
-        editor.current?.loadImage(hash, src);
+        if (attachmentType === "image") {
+          editor.current?.loadImage(hash, src);
+        } else if (attachmentType === "webclip") {
+          editor.current?.loadWebClip(hash, src);
+        }
       }
     );
 
@@ -264,20 +413,51 @@ export function Editor(props: EditorProps) {
   }, [editor]);
 
   return (
-    <EditorChrome {...props}>
+    <EditorChrome isLoading={isLoading} {...props}>
       <Tiptap
         isMobile={isMobile}
         nonce={nonce}
         readonly={readonly}
         toolbarContainerId={headless ? undefined : "editorToolbar"}
         content={content}
+        downloadOptions={{
+          corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
+        }}
         onLoad={() => {
           if (onLoadMedia) onLoadMedia();
+          if (nonce && nonce > 0) setIsLoading(false);
         }}
+        onContentChange={onContentChange}
         onChange={onEditorChange}
-        onDownloadAttachment={(attachment) =>
-          downloadAttachment(attachment.hash)
-        }
+        onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
+        onPreviewAttachment={async ({ hash, dataurl }) => {
+          const attachment = db.attachments?.attachment(hash);
+          if (attachment && attachment.metadata.type.startsWith("image/")) {
+            const container = document.getElementById("dialogContainer");
+            if (!(container instanceof HTMLElement)) return;
+
+            dataurl = dataurl || (await downloadAttachment(hash, "base64"));
+            if (!dataurl)
+              return showToast("error", "This image cannot be previewed.");
+
+            ReactDOM.render(
+              <ScopedThemeProvider>
+                <Lightbox
+                  image={dataurl}
+                  onClose={() => {
+                    ReactDOM.unmountComponentAtNode(container);
+                  }}
+                />
+              </ScopedThemeProvider>,
+              container
+            );
+          } else if (attachment && onPreviewDocument) {
+            onPreviewDocument({ hash });
+            const blob = await downloadAttachment(hash, "blob");
+            if (!blob) return;
+            onPreviewDocument({ url: URL.createObjectURL(blob), hash });
+          }
+        }}
         onInsertAttachment={(type) => {
           const mime = type === "file" ? "*/*" : "image/*";
           insertAttachment(mime).then((file) => {
@@ -295,8 +475,10 @@ export function Editor(props: EditorProps) {
   );
 }
 
-function EditorChrome(props: PropsWithChildren<EditorProps>) {
-  const { options, children } = props;
+function EditorChrome(
+  props: PropsWithChildren<EditorProps & { isLoading: boolean }>
+) {
+  const { options, children, isLoading } = props;
   const { readonly, focusMode, headless, onRequestFocus, isMobile } =
     options || {
       headless: false,
@@ -304,11 +486,29 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       focusMode: false,
       isMobile: false
     };
+  const editorMargins = useStore((store) => store.editorMargins);
 
   if (headless) return <>{children}</>;
 
   return (
     <>
+      {isLoading ? (
+        <AnimatedFlex
+          sx={{
+            position: "absolute",
+            overflow: "hidden",
+            flex: 1,
+            flexDirection: "column",
+            width: "100%",
+            height: "100%",
+            zIndex: 999,
+            bg: "background"
+          }}
+        >
+          <EditorLoader />
+        </AnimatedFlex>
+      ) : null}
+
       <Toolbar />
       <FlexScrollContainer
         className="editorScroll"
@@ -319,10 +519,11 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
           className="editor"
           sx={{
             alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
-            maxWidth: "min(100%, 850px)",
+            maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
             width: "100%"
           }}
-          px={6}
+          pl={6}
+          pr={2}
           onClick={onRequestFocus}
         >
           {!isMobile && (
@@ -339,11 +540,17 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
             />
           )}
           <Titlebox readonly={readonly || false} />
-          <Header readonly={readonly} />
-          {children}
+          <Header readonly={readonly || false} />
+          <AnimatedFlex
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isLoading ? 0 : 1 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            sx={{ flex: 1 }}
+          >
+            {children}
+          </AnimatedFlex>
         </Flex>
       </FlexScrollContainer>
-
       {isMobile && (
         <Box
           id="editorToolbar"
@@ -380,7 +587,7 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
 
   return (
     <Flex
-      bg="bgSecondary"
+      bg="var(--background-secondary)"
       p={2}
       sx={{ alignItems: "center", justifyContent: "space-between" }}
       data-test-id="preview-notice"
@@ -388,8 +595,8 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
       <Flex mr={4} sx={{ flexDirection: "column" }}>
         <Text variant={"subtitle"}>Preview</Text>
         <Text variant={"body"}>
-          You are previewing note version edited from {formatDate(dateCreated)}{" "}
-          to {formatDate(dateEdited)}.
+          You are previewing note version edited from{" "}
+          {getFormattedDate(dateCreated)} to {getFormattedDate(dateEdited)}.
         </Text>
       </Flex>
       <Flex>
@@ -403,6 +610,7 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
           Cancel
         </Button>
         <Button
+          variant="accent"
           data-test-id="preview-notice-restore"
           px={4}
           onClick={async () => {
@@ -431,7 +639,7 @@ function DropZone(props: DropZoneProps) {
         position: "absolute",
         width: "100%",
         height: "100%",
-        bg: "overlay",
+        bg: "backdrop",
         zIndex: 3,
         alignItems: "center",
         justifyContent: "center",
@@ -450,7 +658,7 @@ function DropZone(props: DropZoneProps) {
     >
       <Flex
         sx={{
-          border: "2px dashed var(--fontTertiary)",
+          border: "2px dashed var(--border)",
           borderRadius: "default",
           p: 70,
           flexDirection: "column",

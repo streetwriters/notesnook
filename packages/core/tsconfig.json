@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "allowJs": true
+  },
+  "exclude": ["src/**/*.test.js", "src/**/*.test.skip.js"],
+  "include": ["src/"]
+}

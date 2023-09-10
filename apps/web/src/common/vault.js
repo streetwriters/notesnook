@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { db } from "../common/db";
-import { showPasswordDialog } from "../common/dialog-controller";
+import { db } from "./db";
+import { showPasswordDialog } from "./dialog-controller";
 import { showToast } from "../utils/toast";
 
 class Vault {
@@ -55,8 +55,12 @@ class Vault {
     );
   }
 
+  /**
+   *
+   * @returns {Promise<boolean>}
+   */
   static unlockVault() {
-    return showPasswordDialog("lock_note", ({ password }) => {
+    return showPasswordDialog("ask_vault_password", ({ password }) => {
       return db.vault
         .unlock(password)
         .then(() => true)

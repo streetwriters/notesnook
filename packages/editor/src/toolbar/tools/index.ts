@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -71,6 +71,7 @@ import {
 import {
   AttachmentSettings,
   DownloadAttachment,
+  PreviewAttachment,
   RemoveAttachment
 } from "./attachment";
 import {
@@ -80,7 +81,20 @@ import {
   EmbedProperties,
   EmbedSettings
 } from "./embed";
-import { AddLink, EditLink, RemoveLink, LinkSettings, OpenLink } from "./link";
+import {
+  AddLink,
+  EditLink,
+  RemoveLink,
+  LinkSettings,
+  OpenLink,
+  CopyLink
+} from "./link";
+import {
+  WebClipFullScreen,
+  WebClipSettings,
+  WebClipOpenExternal,
+  WebClipOpenSource
+} from "./web-clip";
 
 export type ToolId = keyof typeof tools;
 const tools = {
@@ -96,6 +110,7 @@ const tools = {
   addLink: AddLink,
   editLink: EditLink,
   removeLink: RemoveLink,
+  copyLink: CopyLink,
   linkSettings: LinkSettings,
   openLink: OpenLink,
   insertBlock: InsertBlock,
@@ -122,6 +137,12 @@ const tools = {
   embedProperties: EmbedProperties,
   embedSettings: EmbedSettings,
 
+  webclipFullScreen: WebClipFullScreen,
+  webclipOpenExternal: WebClipOpenExternal,
+  webclipOpenSource: WebClipOpenSource,
+  webclipSettings: WebClipSettings,
+
+  previewAttachment: PreviewAttachment,
   attachmentSettings: AttachmentSettings,
   downloadAttachment: DownloadAttachment,
   removeAttachment: RemoveAttachment,
@@ -149,7 +170,9 @@ const tools = {
   deleteTable: DeleteTable,
 
   outdent: Outdent,
-  indent: Indent
+  indent: Indent,
+
+  none: () => null
 };
 
 export function findTool(id: ToolId): React.FunctionComponent<ToolProps> {

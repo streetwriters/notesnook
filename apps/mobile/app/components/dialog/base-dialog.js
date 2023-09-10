@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import {
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { BouncingView } from "../ui/transitions/bouncing-view";
+import { ScopedThemeProvider } from "@notesnook/theme";
 
 const BaseDialog = ({
   visible,
@@ -46,7 +47,8 @@ const BaseDialog = ({
   animated = true,
   bounce = true,
   closeOnTouch = true,
-  useSafeArea = true
+  useSafeArea = true,
+  avoidKeyboardResize = false
 }) => {
   const floating = useIsFloatingKeyboard();
 
@@ -59,69 +61,71 @@ const BaseDialog = ({
   const Wrapper = useSafeArea ? SafeAreaView : View;
 
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animated
-      statusBarTranslucent={statusBarTranslucent}
-      supportedOrientations={[
-        "portrait",
-        "portrait-upside-down",
-        "landscape",
-        "landscape-left",
-        "landscape-right"
-      ]}
-      onShow={() => {
-        if (onShow) {
-          onShow();
-          useSettingStore.getState().setSheetKeyboardHandler(false);
-        }
-      }}
-      animationType={animation}
-      onRequestClose={() => {
-        if (!closeOnTouch) return null;
-        useSettingStore.getState().setSheetKeyboardHandler(true);
-        onRequestClose && onRequestClose();
-      }}
-    >
-      <Wrapper
-        style={{
-          backgroundColor: background
-            ? background
-            : transparent
-            ? "transparent"
-            : "rgba(0,0,0,0.3)"
+    <ScopedThemeProvider value="dialog">
+      <Modal
+        visible={visible}
+        transparent={true}
+        animated
+        statusBarTranslucent={statusBarTranslucent}
+        supportedOrientations={[
+          "portrait",
+          "portrait-upside-down",
+          "landscape",
+          "landscape-left",
+          "landscape-right"
+        ]}
+        onShow={() => {
+          if (onShow) {
+            onShow();
+            useSettingStore.getState().setSheetKeyboardHandler(false);
+          }
+        }}
+        animationType={animation}
+        onRequestClose={() => {
+          if (!closeOnTouch) return null;
+          useSettingStore.getState().setSheetKeyboardHandler(true);
+          onRequestClose && onRequestClose();
         }}
       >
-        <KeyboardAvoidingView
-          enabled={!floating && Platform.OS === "ios"}
-          behavior="padding"
+        <Wrapper
+          style={{
+            backgroundColor: background
+              ? background
+              : transparent
+              ? "transparent"
+              : "rgba(0,0,0,0.3)"
+          }}
         >
-          <BouncingView
-            duration={400}
-            animated={animated}
-            initialScale={bounce ? 0.9 : 1}
-            style={[
-              styles.backdrop,
-              {
-                justifyContent: centered
-                  ? "center"
-                  : bottom
-                  ? "flex-end"
-                  : "flex-start"
-              }
-            ]}
+          <KeyboardAvoidingView
+            enabled={!floating && Platform.OS === "ios" && !avoidKeyboardResize}
+            behavior="padding"
           >
-            <TouchableOpacity
-              onPress={closeOnTouch ? onRequestClose : null}
-              style={styles.overlayButton}
-            />
-            {premium}
-            {children}
-          </BouncingView>
-        </KeyboardAvoidingView>
-      </Wrapper>
-    </Modal>
+            <BouncingView
+              duration={400}
+              animated={animated}
+              initialScale={bounce ? 0.9 : 1}
+              style={[
+                styles.backdrop,
+                {
+                  justifyContent: centered
+                    ? "center"
+                    : bottom
+                    ? "flex-end"
+                    : "flex-start"
+                }
+              ]}
+            >
+              <TouchableOpacity
+                onPress={closeOnTouch ? onRequestClose : null}
+                style={styles.overlayButton}
+              />
+              {premium}
+              {children}
+            </BouncingView>
+          </KeyboardAvoidingView>
+        </Wrapper>
+      </Modal>
+    </ScopedThemeProvider>
   );
 };
 

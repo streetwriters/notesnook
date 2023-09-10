@@ -10,5 +10,9 @@
 	<array>
 		<string>group.org.streetwriters.notesnook</string>
 	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)group.org.streetwriters.notesnook</string>
+	</array>
 </dict>
 </plist>

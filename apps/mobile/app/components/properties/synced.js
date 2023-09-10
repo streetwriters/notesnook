@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
@@ -29,7 +29,7 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 export const Synced = ({ item, close }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const lastSynced = useUserStore((state) => state.lastSynced);
 
@@ -46,10 +46,10 @@ export const Synced = ({ item, close }) => {
         paddingTop: 10,
         marginTop: 10,
         borderTopWidth: 1,
-        borderTopColor: colors.nav
+        borderTopColor: colors.secondary.background
       }}
     >
-      <Icon name="shield-key-outline" color={colors.accent} size={SIZE.xxxl} />
+      <Icon name="shield-key-outline" color={colors.primary.accent} size={SIZE.xxxl} />
 
       <View
         style={{
@@ -59,7 +59,7 @@ export const Synced = ({ item, close }) => {
         }}
       >
         <Heading
-          color={colors.heading}
+          color={colors.primary.heading}
           size={SIZE.xs}
           style={{
             flexWrap: "wrap"
@@ -72,7 +72,7 @@ export const Synced = ({ item, close }) => {
             flexWrap: "wrap"
           }}
           size={SIZE.xs}
-          color={colors.pri}
+          color={colors.primary.paragraph}
         >
           No one can view this {item.itemType || item.type} except you.
         </Paragraph>
@@ -91,10 +91,10 @@ export const Synced = ({ item, close }) => {
             console.error(e);
           }
         }}
-        fontSize={SIZE.xs + 1}
+        fontSize={SIZE.xs}
         title="Learn more"
         height={30}
-        type="transparent"
+        type="grayAccent"
       />
     </View>
   ) : null;

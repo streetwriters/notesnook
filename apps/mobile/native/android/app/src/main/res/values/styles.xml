@@ -7,6 +7,7 @@
         <item name="android:editTextBackground">@drawable/edit_text</item>
         
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:datePickerDialogTheme">@style/DialogDatePicker.Theme</item>
     </style>
 
      <style name="Share.Window" parent="Theme.AppCompat">
@@ -16,11 +17,11 @@
     </style>
 
       <!-- BootTheme should inherit from Theme.SplashScreen -->
-  <style name="BootTheme" parent="Theme.SplashScreen">
-    <item name="windowSplashScreenBackground">@color/bootsplash_background</item>
-    <item name="windowSplashScreenAnimatedIcon">@mipmap/bootsplash_logo</item>
-    <item name="postSplashScreenTheme">@style/AppTheme</item>
-  </style>
+    <style name="BootTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/bootsplash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/bootsplash_logo</item>
+        <item name="postSplashScreenTheme">@style/AppTheme</item>
+    </style>
 
     <!-- Base application theme. -->
 
@@ -32,6 +33,7 @@
         <item name="android:editTextBackground">@drawable/edit_text</item>
     </style>
 
-
-
+    <style name="DialogDatePicker.Theme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">#2b2b2b</item>
+    </style>
 </resources>

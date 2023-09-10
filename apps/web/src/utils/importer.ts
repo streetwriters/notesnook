@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -101,8 +101,13 @@ async function importNote(note: Note) {
   note.notebooks = [];
   const noteId = await db.notes?.add(note);
 
-  for (const notebook of notebooks) {
-    await db.notes?.addToNotebook(await importNotebook(notebook), noteId);
+  for (const nb of notebooks) {
+    const notebook = await importNotebook(nb);
+    if (!notebook.id) continue;
+    await db.notes?.addToNotebook(
+      { id: notebook.id, topic: notebook.topic },
+      noteId
+    );
   }
 }
 
@@ -111,22 +116,20 @@ async function fileToJson<T>(file: Entry) {
   return JSON.parse(text) as T;
 }
 
-async function importNotebook(notebook: Notebook) {
+async function importNotebook(
+  notebook: Notebook | undefined
+): Promise<{ id?: string; topic?: string }> {
+  if (!notebook) return {};
+
   let nb = db.notebooks?.all.find((nb) => nb.title === notebook.notebook);
   if (!nb) {
     const nbId = await db.notebooks?.add({
       title: notebook.notebook,
-      topics: [notebook.topic]
+      topics: notebook.topic ? [notebook.topic] : []
     });
     nb = db.notebooks?.notebook(nbId).data;
   }
+  const topic = nb?.topics.find((t: any) => t.title === notebook.topic);
 
-  let topic = nb?.topics.find((t: any) => t.title === notebook.topic);
-  if (!topic) {
-    const topics = db.notebooks?.notebook(nb).topics;
-    await topics?.add(notebook.topic);
-    topic = topics?.all.find((t) => t.title === notebook.topic);
-  }
-
-  return { id: nb.id, topic: topic.id };
+  return { id: nb ? nb.id : undefined, topic: topic ? topic.id : undefined };
 }

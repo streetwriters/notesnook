@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { db } from "../../common/database";
 import { normalize, SIZE } from "../../utils/size";
 import { Properties } from "../properties";
@@ -103,12 +103,18 @@ export const TagsSection = React.memo(
 
 export const PinItem = React.memo(
   function PinItem({ item, onPress, placeholder, alias }) {
-    const colors = useThemeStore((state) => state.colors);
+    const { colors } = useThemeColors();
     const setMenuPins = useMenuStore((state) => state.setMenuPins);
     alias = item?.alias || item?.title;
     const [visible, setVisible] = useState(false);
     const [headerTextState, setHeaderTextState] = useState(null);
-    const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
+    const primaryColors =
+      headerTextState?.id === item.id ? colors.selected : colors.primary;
+
+    const color =
+      headerTextState?.id === item.id
+        ? colors.selected.accent
+        : colors.primary.icon;
     const fwdRef = useRef();
 
     const onHeaderStateChange = useCallback(
@@ -164,7 +170,6 @@ export const PinItem = React.memo(
               }}
               fontSize={SIZE.md}
               width="95%"
-              height={50}
               customStyle={{
                 marginBottom: 30
               }}
@@ -172,7 +177,7 @@ export const PinItem = React.memo(
           </SheetWrapper>
         )}
         <PressableButton
-          type={headerTextState?.id === item.id ? "grayBg" : "gray"}
+          type={headerTextState?.id === item.id ? "selected" : "gray"}
           onLongPress={() => {
             if (placeholder) return;
             Properties.present(item);
@@ -228,13 +233,17 @@ export const PinItem = React.memo(
                   style={{
                     flexWrap: "wrap"
                   }}
-                  color={colors.heading}
+                  color={primaryColors.heading}
                   size={SIZE.md}
                 >
                   {alias}
                 </Heading>
               ) : (
-                <Paragraph numberOfLines={1} color={colors.pri} size={SIZE.md}>
+                <Paragraph
+                  numberOfLines={1}
+                  color={primaryColors.paragraph}
+                  size={SIZE.md}
+                >
                   {alias}
                 </Paragraph>
               )}

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import fs from "fs";
 import dotenv from "dotenv";
 import path from "path";
 import { Locator, Page } from "@playwright/test";
+import { GroupByOptions, OrderByOptions, SortByOptions } from "../models/types";
 
 type Note = {
   title: string;
@@ -33,12 +34,14 @@ const USER = {
   NEW: {
     email: process.env.USER_EMAIL,
     password: process.env.NEW_USER_PASSWORD,
-    key: process.env.NEW_USER_KEY
+    key: process.env.NEW_USER_KEY,
+    totpSecret: process.env.USER_TOTP_SECRET
   },
   CURRENT: {
     email: process.env.USER_EMAIL,
-    password: process.env.CURRENT_USER_PASSWORD,
-    key: process.env.CURRENT_USER_KEY
+    password: process.env.USER_PASSWORD,
+    key: process.env.USER_KEY,
+    totpSecret: process.env.USER_TOTP_SECRET
   }
 };
 
@@ -104,9 +107,34 @@ async function downloadAndReadFile(
   return fs.readFileSync(path, { encoding });
 }
 
+async function uploadFile(page: Page, action: Locator, filename: string) {
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent("filechooser"),
+    await action.click()
+  ]);
+
+  await fileChooser.setFiles(path.join(__dirname, "../data", filename));
+}
+
 function isTestAll() {
   return process.env.TEST_ALL === "true";
 }
+
+const orderByOptions: OrderByOptions[] = ["asc", "desc"];
+const sortByOptions: SortByOptions[] = [
+  "dateCreated",
+  "dateEdited",
+  "dateModified",
+  "dateDeleted"
+];
+const groupByOptions: GroupByOptions[] = [
+  "abc",
+  "none",
+  "default",
+  "year",
+  "month",
+  "week"
+];
 
 export {
   USER,
@@ -118,5 +146,9 @@ export {
   createNote,
   editNote,
   downloadAndReadFile,
-  isTestAll
+  uploadFile,
+  isTestAll,
+  orderByOptions,
+  sortByOptions,
+  groupByOptions
 };

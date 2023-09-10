@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,10 +21,9 @@ import { ToolProps } from "../types";
 import { Editor } from "../../types";
 import { Icons } from "../icons";
 import { useMemo, useRef, useState } from "react";
-import { Icon } from "../components/icon";
 import { EmbedPopup } from "../popups/embed-popup";
 import { TablePopup } from "../popups/table-popup";
-import { MenuItem } from "../../components/menu/types";
+import { MenuItem, Icon } from "@notesnook/ui";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
 import { ResponsivePresenter } from "../../components/responsive";
 import { showPopup } from "../../components/popup-presenter";
@@ -61,14 +60,14 @@ export function InsertBlock(props: ToolProps) {
     <>
       <Button
         ref={buttonRef}
+        variant="secondary"
         sx={{
           p: 1,
           m: 0,
-          bg: isOpen ? "hover" : "transparent",
+          bg: isOpen ? "var(--background-secondary)" : "transparent",
           mr: 1,
           display: "flex",
           alignItems: "center",
-          ":hover": { bg: "hover" },
           ":last-of-type": {
             mr: 0
           }
@@ -76,7 +75,7 @@ export function InsertBlock(props: ToolProps) {
         onMouseDown={(e) => e.preventDefault()}
         onClick={() => setIsOpen((s) => !s)}
       >
-        <Icon path={Icons.plus} size={18} color={"primary"} />
+        <Icon path={Icons.plus} size={18} color={"accent"} />
       </Button>
 
       <ResponsivePresenter
@@ -101,7 +100,7 @@ const horizontalRule = (editor: Editor): MenuItem => ({
   key: "hr",
   type: "button",
   title: "Horizontal rule",
-  icon: "horizontalRule",
+  icon: Icons.horizontalRule,
   isChecked: editor?.isActive("horizontalRule"),
   onClick: () => editor.current?.chain().focus().setHorizontalRule().run()
 });
@@ -110,34 +109,37 @@ const codeblock = (editor: Editor): MenuItem => ({
   key: "codeblock",
   type: "button",
   title: "Code block",
-  icon: "codeblock",
+  icon: Icons.codeblock,
   isChecked: editor?.isActive("codeBlock"),
-  onClick: () => editor.current?.chain().focus().toggleCodeBlock().run()
+  onClick: () => editor.current?.chain().focus().toggleCodeBlock().run(),
+  modifier: "Mod-Shift-C"
 });
 
 const blockquote = (editor: Editor): MenuItem => ({
   key: "blockquote",
   type: "button",
   title: "Quote",
-  icon: "blockquote",
+  icon: Icons.blockquote,
   isChecked: editor?.isActive("blockQuote"),
-  onClick: () => editor.current?.chain().focus().toggleBlockquote().run()
+  onClick: () => editor.current?.chain().focus().toggleBlockquote().run(),
+  modifier: "Mod-Shift-B"
 });
 
 const mathblock = (editor: Editor): MenuItem => ({
   key: "math",
   type: "button",
   title: "Math & formulas",
-  icon: "mathBlock",
+  icon: Icons.mathBlock,
   isChecked: editor?.isActive("mathBlock"),
-  onClick: () => editor.current?.chain().focus().insertMathBlock().run()
+  onClick: () => editor.current?.chain().focus().insertMathBlock().run(),
+  modifier: "Mod-Shift-M"
 });
 
 const image = (editor: Editor, isMobile: boolean): MenuItem => ({
   key: "image",
   type: "button",
   title: "Image",
-  icon: "image",
+  icon: Icons.image,
   menu: {
     title: "Insert an image",
     items: [
@@ -145,15 +147,16 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
         key: "upload-from-disk",
         type: "button",
         title: "Upload from disk",
-        icon: "upload",
+        icon: Icons.upload,
         onClick: () =>
-          editor.current?.chain().focus().openAttachmentPicker("image").run()
+          editor.current?.chain().focus().openAttachmentPicker("image").run(),
+        modifier: "Mod-Shift-I"
       },
       {
         key: "camera",
         type: "button",
         title: "Take a photo using camera",
-        icon: "camera",
+        icon: Icons.camera,
         isHidden: !isMobile,
         onClick: () =>
           editor.current?.chain().focus().openAttachmentPicker("camera").run()
@@ -167,7 +170,7 @@ const table = (editor: Editor): MenuItem => ({
   key: "table",
   type: "button",
   title: "Table",
-  icon: "table",
+  icon: Icons.table,
   menu: {
     title: "Insert a table",
     items: [
@@ -198,7 +201,7 @@ const embedMobile = (editor: Editor): MenuItem => ({
   key: "embed",
   type: "button",
   title: "Embed",
-  icon: "embed",
+  icon: Icons.embed,
   menu: {
     title: "Insert an embed",
     items: [
@@ -226,7 +229,7 @@ const embedDesktop = (editor: Editor): MenuItem => ({
   key: "embed",
   type: "button",
   title: "Embed",
-  icon: "embed",
+  icon: Icons.embed,
   onClick: () => {
     if (!editor) return;
     showPopup({
@@ -248,35 +251,38 @@ const attachment = (editor: Editor): MenuItem => ({
   key: "attachment",
   type: "button",
   title: "Attachment",
-  icon: "attachment",
+  icon: Icons.attachment,
   isChecked: editor?.isActive("attachment"),
   onClick: () =>
-    editor.current?.chain().focus().openAttachmentPicker("file").run()
+    editor.current?.chain().focus().openAttachmentPicker("file").run(),
+  modifier: "Mod-Shift-A"
 });
 
 const tasklist = (editor: Editor): MenuItem => ({
   key: "tasklist",
   type: "button",
   title: "Task list",
-  icon: "checkbox",
+  icon: Icons.checkbox,
   isChecked: editor?.isActive("taskList"),
-  onClick: () => editor.current?.chain().focus().toggleTaskList().run()
+  onClick: () => editor.current?.chain().focus().toggleTaskList().run(),
+  modifier: "Mod-Shift-T"
 });
 
 const outlinelist = (editor: Editor): MenuItem => ({
   key: "outlinelist",
   type: "button",
   title: "Outline list",
-  icon: "outlineList",
+  icon: Icons.outlineList,
   isChecked: editor?.isActive("outlineList"),
-  onClick: () => editor.current?.chain().focus().toggleOutlineList().run()
+  onClick: () => editor.current?.chain().focus().toggleOutlineList().run(),
+  modifier: "Mod-Shift-O"
 });
 
 const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({
   key: "upload-from-url",
   type: "button",
   title: "Attach from URL",
-  icon: "link",
+  icon: Icons.link,
   menu: {
     title: "Attach image from URL",
     items: [
@@ -308,7 +314,7 @@ const uploadImageFromURL = (editor: Editor): MenuItem => ({
   key: "upload-from-url",
   type: "button",
   title: "Attach from URL",
-  icon: "link",
+  icon: Icons.link,
   onClick: () => {
     showPopup({
       popup: (hide) => (

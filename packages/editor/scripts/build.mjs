@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,22 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import "zx/globals";
+import "isomorphic-fetch";
+import path from "path";
+import fs from "fs";
 import { langen } from "./langen.mjs";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(path.join(__dirname, ".."));
 
 const pathsToCopy = {
   "katex.min.css": "node_modules/katex/dist/katex.min.css",
-  "fonts/": "node_modules/katex/dist/fonts/",
-  "prism-theme.css": "node_modules/prism-themes/themes/prism-dracula.min.css"
+  "fonts/": "node_modules/katex/dist/fonts/"
 };
 
 for (const name in pathsToCopy) {
   const src = pathsToCopy[name];
   const fullPath = path.join(ROOT_DIR, src);
-  fs.copySync(fullPath, path.join(ROOT_DIR, "styles", name), {
-    overwrite: true,
+  fs.cpSync(fullPath, path.join(ROOT_DIR, "styles", name), {
+    force: true,
     recursive: true,
     errorOnExist: false
   });
@@ -44,5 +48,3 @@ fs.writeFileSync(
   path.join(ROOT_DIR, "src", "extensions", "code-block", "languages.json"),
   JSON.stringify(languagesList)
 );
-
-await $`cd ${ROOT_DIR} && npx tsc ${process.argv.slice(3)}`;

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,13 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { ScrollView } from "react-native";
 import { FeatureBlock } from "./feature";
+import { ScrollView } from "react-native-actions-sheet";
 
 export const CompactFeatures = ({
   vertical,
   features = [],
-  maxHeight = 500,
+  maxHeight = 600,
   scrollRef
 }) => {
   let data = vertical
@@ -56,6 +56,11 @@ export const CompactFeatures = ({
           icon: "shield"
         },
         {
+          highlight: "Daily, weekly & montly",
+          content: "recurring reminders",
+          icon: "bell"
+        },
+        {
           highlight: "Rich text",
           content: "editing",
           icon: "square-edit-outline"
@@ -75,14 +80,11 @@ export const CompactFeatures = ({
   return (
     <ScrollView
       horizontal={!vertical}
-      nestedScrollEnabled
-      onMomentumScrollEnd={() => {
-        scrollRef?.current?.handleChildScrollEnd();
-      }}
       showsHorizontalScrollIndicator={false}
       style={{
         width: "100%",
-        maxHeight: maxHeight
+        maxHeight: maxHeight,
+        paddingHorizontal: 12
       }}
     >
       {data.map((item) => (

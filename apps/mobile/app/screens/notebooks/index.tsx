@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,11 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
+import { Config } from "react-native-config";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
-import { AddNotebookEvent } from "../../components/dialog-provider/recievers";
 import List from "../../components/list";
+import { AddNotebookSheet } from "../../components/sheets/add-notebook";
 import { Walkthrough } from "../../components/walkthroughs";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
@@ -30,8 +31,9 @@ import SearchService from "../../services/search";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotebookStore } from "../../stores/use-notebook-store";
+
 const onPressFloatingButton = () => {
-  AddNotebookEvent();
+  AddNotebookSheet.present();
 };
 
 const prepareSearch = () => {
@@ -68,7 +70,7 @@ export const Notebooks = ({
       SearchService.prepareSearch = prepareSearch;
       useNavigationStore.getState().setButtonAction(onPressFloatingButton);
       //@ts-ignore need to update typings in core to fix this
-      if (db.notebooks.all.length === 0) {
+      if (db.notebooks.all.length === 0 && !Config.isTesting) {
         Walkthrough.present("notebooks");
       } else {
         Walkthrough.update("notebooks");
@@ -81,7 +83,7 @@ export const Notebooks = ({
   });
 
   return (
-    <DelayLayout>
+    <DelayLayout delay={1}>
       <List
         listData={notebooks}
         type="notebooks"

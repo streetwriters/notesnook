@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,11 +34,12 @@ import {
   LightMode,
   Login,
   Circle,
-  Icon
+  Icon,
+  Reminders
 } from "../icons";
 import { AnimatedFlex } from "../animated";
 import NavigationItem from "./navigation-item";
-import { hardNavigate, navigate } from "../../navigation";
+import { hardNavigate, hashNavigate, navigate } from "../../navigation";
 import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
 import { showRenameColorDialog } from "../../common/dialog-controller";
@@ -47,12 +48,13 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import useLocation from "../../hooks/use-location";
 import { FlexScrollContainer } from "../scroll-container";
+import { ScopedThemeProvider } from "../theme-provider";
 
 type Route = {
   title: string;
   path: string;
   icon: Icon;
-  isNew?: boolean;
+  tag?: string;
 };
 
 const navigationHistory = new Map();
@@ -88,6 +90,12 @@ const routes: Route[] = [
     path: "/monographs",
     icon: Monographs
   },
+  {
+    title: "Reminders",
+    path: "/reminders",
+    icon: Reminders,
+    tag: "Beta"
+  },
   { title: "Trash", path: "/trash", icon: Trash }
 ];
 
@@ -111,8 +119,8 @@ function NavigationMenu(props: NavigationMenuProps) {
   const refreshNavItems = useAppStore((store) => store.refreshNavItems);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const isMobile = useMobile();
-  const theme = useThemeStore((store) => store.theme);
-  const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
+  const theme = useThemeStore((store) => store.colorScheme);
+  const toggleNightMode = useThemeStore((store) => store.toggleColorScheme);
   const setFollowSystemTheme = useThemeStore(
     (store) => store.setFollowSystemTheme
   );
@@ -133,170 +141,192 @@ function NavigationMenu(props: NavigationMenuProps) {
   }, [location, previousLocation, state]);
 
   return (
-    <AnimatedFlex
-      id="navigation-menu"
-      data-test-id="navigation-menu"
-      initial={{
-        opacity: 1
-      }}
-      animate={{
-        opacity: isFocusMode ? 0 : 1,
-        visibility: isFocusMode ? "collapse" : "visible"
-      }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+    <ScopedThemeProvider
+      scope="navigationMenu"
       sx={{
+        display: "flex",
         zIndex: 1,
-        height: "auto",
         position: "relative",
         flex: 1,
         flexDirection: "column",
-        justifyContent: "space-between"
+        height: "100%",
+        overflow: "hidden",
+        bg: "background",
+        borderRight: "1px solid var(--separator)"
       }}
-      bg={"bgSecondary"}
-      px={0}
     >
-      <FlexScrollContainer>
-        <Flex sx={{ flexDirection: "column" }}>
-          {routes.map((item) => (
-            <NavigationItem
-              isTablet={isTablet}
-              key={item.path}
-              title={item.title}
-              icon={item.icon}
-              isNew={item.isNew}
-              selected={
-                item.path === "/"
-                  ? location === item.path
-                  : location.startsWith(item.path)
-              }
-              onClick={() => {
-                if (!isMobile && location === item.path)
-                  return toggleNavigationContainer();
-                _navigate(item.path);
-              }}
-            />
-          ))}
-          {colors.map((color) => (
-            <NavigationItem
-              isTablet={isTablet}
-              key={color.id}
-              title={db.colors?.alias(color.id)}
-              icon={Circle}
-              selected={location === `/colors/${color.id}`}
-              color={color.title.toLowerCase()}
-              onClick={() => {
-                _navigate(`/colors/${color.id}`);
-              }}
-              menuItems={[
-                {
-                  key: "rename",
-                  title: () => "Rename color",
-                  onClick: async () => {
-                    await showRenameColorDialog(color.id);
-                  }
-                }
-              ]}
-            />
-          ))}
-          <Box
-            bg="border"
-            my={1}
-            sx={{ width: "85%", height: "0.8px", alignSelf: "center" }}
-          />
-          {shortcuts.map((item) => (
-            <NavigationItem
-              isTablet={isTablet}
-              key={item.id}
-              title={item.type === "tag" ? db.tags?.alias(item.id) : item.title}
-              menuItems={[
-                {
-                  key: "removeshortcut",
-                  title: () => "Remove shortcut",
-                  onClick: async () => {
-                    await db.shortcuts?.remove(item.id);
-                    refreshNavItems();
-                  }
-                }
-              ]}
-              icon={
-                item.type === "notebook"
-                  ? Notebook2
-                  : item.type === "tag"
-                  ? Tag2
-                  : Topic
-              }
-              isShortcut
-              selected={shouldSelectNavItem(location, item)}
-              onClick={() => {
-                if (item.type === "notebook") {
-                  _navigate(`/notebooks/${item.id}`);
-                } else if (item.type === "topic") {
-                  _navigate(`/notebooks/${item.notebookId}/${item.id}`);
-                } else if (item.type === "tag") {
-                  _navigate(`/tags/${item.id}`);
-                }
-              }}
-            />
-          ))}
-        </Flex>
-      </FlexScrollContainer>
-      <Flex sx={{ flexDirection: "column" }}>
-        {isLoggedIn === false && (
-          <NavigationItem
-            isTablet={isTablet}
-            title="Login"
-            icon={Login}
-            onClick={() => hardNavigate("/login")}
-          />
-        )}
-        {isTablet && (
-          <NavigationItem
-            isTablet={isTablet}
-            title={theme === "dark" ? "Light mode" : "Dark mode"}
-            icon={theme === "dark" ? LightMode : DarkMode}
-            onClick={() => {
-              setFollowSystemTheme(false);
-              toggleNightMode();
-            }}
-          />
-        )}
-        <NavigationItem
-          isTablet={isTablet}
-          key={settings.path}
-          title={settings.title}
-          icon={settings.icon}
-          onClick={() => {
-            _navigate(settings.path);
+      <AnimatedFlex
+        id="navigation-menu"
+        data-test-id="navigation-menu"
+        initial={{
+          opacity: 0
+        }}
+        animate={{
+          opacity: isFocusMode ? 0 : 1,
+          visibility: isFocusMode ? "collapse" : "visible"
+        }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
+        sx={{
+          flex: 1,
+          overflow: "hidden",
+          flexDirection: "column",
+          justifyContent: "space-between"
+        }}
+        px={0}
+      >
+        <FlexScrollContainer
+          style={{
+            flexDirection: "column",
+            display: "flex"
           }}
-          selected={location.startsWith(settings.path)}
+          suppressScrollX={true}
         >
-          {isTablet ? null : (
-            <Button
-              variant={"icon"}
-              title="Toggle dark/light mode"
-              sx={{
-                bg: "transparent",
-                borderRadius: "default",
-                ":hover:not(disabled)": {
-                  bg: "bgSecondaryHover",
-                  filter: "brightness(100%)"
+          <Flex sx={{ flexDirection: "column" }}>
+            {routes.map((item) => (
+              <NavigationItem
+                isTablet={isTablet}
+                key={item.path}
+                title={item.title}
+                icon={item.icon}
+                tag={item.tag}
+                selected={
+                  item.path === "/"
+                    ? location === item.path
+                    : location.startsWith(item.path)
                 }
-              }}
+                onClick={() => {
+                  if (!isMobile && location === item.path)
+                    return toggleNavigationContainer();
+                  _navigate(item.path);
+                }}
+              />
+            ))}
+            {colors.map((color, index) => (
+              <NavigationItem
+                animate={!IS_DESKTOP_APP}
+                index={index}
+                isTablet={isTablet}
+                key={color.id}
+                title={db.colors?.alias(color.id)}
+                icon={Circle}
+                selected={location === `/colors/${color.id}`}
+                color={color.title.toLowerCase()}
+                onClick={() => {
+                  _navigate(`/colors/${color.id}`);
+                }}
+                menuItems={[
+                  {
+                    type: "button",
+                    key: "rename",
+                    title: "Rename color",
+                    onClick: async () => {
+                      await showRenameColorDialog(color.id);
+                    }
+                  }
+                ]}
+              />
+            ))}
+            <Box
+              bg="separator"
+              my={1}
+              sx={{ width: "85%", height: "0.8px", alignSelf: "center" }}
+            />
+            {shortcuts.map((item, index) => (
+              <NavigationItem
+                animate={!IS_DESKTOP_APP}
+                index={colors.length - 1 + index}
+                isTablet={isTablet}
+                key={item.id}
+                title={
+                  item.type === "tag" ? db.tags?.alias(item.id) : item.title
+                }
+                menuItems={[
+                  {
+                    type: "button",
+                    key: "removeshortcut",
+                    title: "Remove shortcut",
+                    onClick: async () => {
+                      await db.shortcuts?.remove(item.id);
+                      refreshNavItems();
+                    }
+                  }
+                ]}
+                icon={
+                  item.type === "notebook"
+                    ? Notebook2
+                    : item.type === "tag"
+                    ? Tag2
+                    : Topic
+                }
+                isShortcut
+                selected={shouldSelectNavItem(location, item)}
+                onClick={() => {
+                  if (item.type === "notebook") {
+                    _navigate(`/notebooks/${item.id}`);
+                  } else if (item.type === "topic") {
+                    _navigate(`/notebooks/${item.notebookId}/${item.id}`);
+                  } else if (item.type === "tag") {
+                    _navigate(`/tags/${item.id}`);
+                  }
+                }}
+              />
+            ))}
+          </Flex>
+        </FlexScrollContainer>
+
+        <Flex sx={{ flexDirection: "column" }}>
+          {isLoggedIn === false && (
+            <NavigationItem
+              isTablet={isTablet}
+              title="Login"
+              icon={Login}
+              onClick={() => hardNavigate("/login")}
+            />
+          )}
+          {isTablet && (
+            <NavigationItem
+              isTablet={isTablet}
+              title={theme === "dark" ? "Light mode" : "Dark mode"}
+              icon={theme === "dark" ? LightMode : DarkMode}
               onClick={() => {
                 setFollowSystemTheme(false);
                 toggleNightMode();
               }}
-            >
-              {theme === "dark" ? (
-                <LightMode size={16} />
-              ) : (
-                <DarkMode size={16} />
-              )}
-            </Button>
+            />
           )}
-        </NavigationItem>
-      </Flex>
-    </AnimatedFlex>
+          <NavigationItem
+            isTablet={isTablet}
+            key={settings.path}
+            title={settings.title}
+            icon={settings.icon}
+            onClick={() => {
+              if (!isMobile && location === settings.path)
+                return toggleNavigationContainer();
+              hashNavigate("/settings");
+            }}
+            selected={location.startsWith(settings.path)}
+          >
+            {isTablet ? null : (
+              <Button
+                variant={"icon"}
+                title="Toggle dark/light mode"
+                sx={{ borderLeft: "1px solid var(--separator)" }}
+                onClick={() => {
+                  setFollowSystemTheme(false);
+                  toggleNightMode();
+                }}
+              >
+                {theme === "dark" ? (
+                  <LightMode size={16} />
+                ) : (
+                  <DarkMode size={16} />
+                )}
+              </Button>
+            )}
+          </NavigationItem>
+        </Flex>
+      </AnimatedFlex>
+    </ScopedThemeProvider>
   );
 }
 export default NavigationMenu;

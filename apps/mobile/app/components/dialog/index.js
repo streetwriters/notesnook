@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { getElevation } from "../../utils";
+import { useThemeColors } from "@notesnook/theme";
+import { getElevationStyle } from "../../utils/elevation";
 import { eCloseSimpleDialog, eOpenSimpleDialog } from "../../utils/events";
 import { sleep } from "../../utils/time";
 import { Toast } from "../toast";
@@ -35,9 +35,10 @@ import BaseDialog from "./base-dialog";
 import DialogButtons from "./dialog-buttons";
 import DialogHeader from "./dialog-header";
 import { useCallback } from "react";
+import { Button } from "../ui/button";
 
 export const Dialog = ({ context = "global" }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [inputValue, setInputValue] = useState(null);
   const inputRef = useRef();
@@ -50,11 +51,15 @@ export const Dialog = ({ context = "global" }) => {
     onClose: () => {},
     positiveType: "transparent",
     icon: null,
-    paragraphColor: colors.pri,
+    paragraphColor: colors.primary.paragraph,
     input: false,
     inputPlaceholder: "Enter some text",
     defaultValue: "",
-    disableBackdropClosing: false
+    disableBackdropClosing: false,
+    check: {
+      info: "Check",
+      type: "transparent"
+    }
   });
 
   useEffect(() => {
@@ -87,6 +92,7 @@ export const Dialog = ({ context = "global" }) => {
       if (data.context !== context) return;
       setDialogInfo(data);
       setVisible(true);
+      setInputValue(data.defaultValue);
     },
     [context]
   );
@@ -105,11 +111,11 @@ export const Dialog = ({ context = "global" }) => {
   };
 
   const style = {
-    ...getElevation(5),
+    ...getElevationStyle(5),
     width: DDS.isTab ? 400 : "85%",
     maxHeight: 450,
     borderRadius: 5,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.primary.background,
     paddingTop: 12
   };
 
@@ -137,6 +143,9 @@ export const Dialog = ({ context = "global" }) => {
           paragraph={dialogInfo.paragraph}
           paragraphColor={dialogInfo.paragraphColor}
           padding={12}
+          style={{
+            minHeight: 0
+          }}
         />
         <Seperator half />
 
@@ -161,6 +170,28 @@ export const Dialog = ({ context = "global" }) => {
               placeholder={dialogInfo.inputPlaceholder}
             />
           </View>
+        ) : null}
+
+        {dialogInfo.check ? (
+          <>
+            <Button
+              onPress={() => {
+                setInputValue(!inputValue);
+              }}
+              icon={
+                inputValue
+                  ? "check-circle-outline"
+                  : "checkbox-blank-circle-outline"
+              }
+              style={{
+                justifyContent: "flex-start"
+              }}
+              height={35}
+              width="100%"
+              title={dialogInfo.check.info}
+              type={inputValue ? dialogInfo.check.type : "gray"}
+            />
+          </>
         ) : null}
 
         <DialogButtons

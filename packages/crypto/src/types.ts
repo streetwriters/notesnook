@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,23 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { StringOutputFormat, Uint8ArrayOutputFormat } from "libsodium-wrappers";
+import { StringOutputFormat, Uint8ArrayOutputFormat } from "@notesnook/sodium";
 
-export type OutputFormat = Uint8ArrayOutputFormat | StringOutputFormat;
+export type DataFormat = Uint8ArrayOutputFormat | StringOutputFormat;
 
-export type Cipher = {
-  format: OutputFormat;
+export type Cipher<TFormat extends DataFormat> = {
+  format: TFormat;
   alg: string;
-  cipher: string | Uint8Array;
+  cipher: Output<TFormat>;
   iv: string;
   salt: string;
   length: number;
 };
 
-export type Plaintext = {
-  format: OutputFormat;
-  data: string | Uint8Array;
-};
+export type Output<TFormat extends DataFormat> =
+  TFormat extends StringOutputFormat ? string : Uint8Array;
+export type Input<TFormat extends DataFormat> = Output<TFormat>;
 
 export type SerializedKey = {
   password?: string;

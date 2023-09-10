@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,48 +20,69 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
-import { AppEventManager, AppEvents } from "../common/app-events";
 import { store as editorStore } from "./editor-store";
 import { checkAttachment } from "../common/attachments";
 import { showToast } from "../utils/toast";
+import { register } from "../utils/stream-saver/mitm";
+import { AttachmentStream } from "../utils/streams/attachment-stream";
+import { ZipStream } from "../utils/streams/zip-stream";
+import { createWriteStream } from "../utils/stream-saver";
 
+let abortController = undefined;
+/**
+ * @extends {BaseStore<AttachmentStore>}
+ */
 class AttachmentStore extends BaseStore {
   attachments = [];
-
-  init = () => {
-    AppEventManager.subscribe(
-      AppEvents.UPDATE_ATTACHMENT_PROGRESS,
-      ({ hash, type, total, loaded }) => {
-        this.set((state) => {
-          const index = state.attachments.findIndex(
-            (a) => a.metadata.hash === hash
-          );
-          if (index <= -1) return;
-          const percent = Math.round((loaded / total) * 100);
-          const status =
-            percent < 100 ? { type, loaded, total, progress: percent } : null;
-          if (!status) return this.refresh();
-          state.attachments[index] = {
-            ...state.attachments[index],
-            status
-          };
-        });
-      }
-    );
-    this.refresh();
-  };
+  /**
+   * @type {{current: number, total: number}}
+   */
+  status = undefined;
 
   refresh = () => {
     this.set((state) => (state.attachments = db.attachments.all));
   };
 
-  filter = (query) => {
-    if (!query || !query.trim().length) return this.refresh();
+  init = () => {
+    this.refresh();
+  };
+
+  download = async (attachments) => {
+    if (this.get().status)
+      throw new Error(
+        "Please wait for the previous download to finish or cancel it."
+      );
 
     this.set(
-      (state) =>
-        (state.attachments = db.lookup.attachments(db.attachments.all, query))
+      (state) => (state.status = { current: 0, total: attachments.length })
     );
+
+    await register();
+    abortController = new AbortController();
+    const attachmentStream = new AttachmentStream(
+      attachments,
+      abortController.signal,
+      (current) => {
+        this.set(
+          (state) => (state.status = { current, total: attachments.length })
+        );
+      }
+    );
+    await attachmentStream
+      .pipeThrough(new ZipStream())
+      .pipeTo(
+        createWriteStream("attachments.zip", { signal: abortController.signal })
+      );
+
+    this.set((state) => (state.status = undefined));
+  };
+
+  cancel = async () => {
+    if (abortController) {
+      await abortController.abort();
+      abortController = undefined;
+      this.set((state) => (state.status = undefined));
+    }
   };
 
   recheck = async (hashes) => {
@@ -127,8 +148,5 @@ class AttachmentStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<AttachmentStore>, AttachmentStore]}
- */
 const [useStore, store] = createStore(AttachmentStore);
 export { useStore, store };

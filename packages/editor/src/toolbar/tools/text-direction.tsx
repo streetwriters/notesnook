@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,10 +21,13 @@ import { ToolProps } from "../types";
 import { ToolButton } from "../components/tool-button";
 import { IconNames } from "../icons";
 import { useRefValue } from "../../hooks/use-ref-value";
+import {
+  getTextDirection,
+  TextDirections
+} from "../../extensions/text-direction";
 
-type TextDirection = "ltr" | "rtl";
 type TextDirectionToolProps = ToolProps & {
-  direction: TextDirection;
+  direction: TextDirections;
 };
 function TextDirectionTool(props: TextDirectionToolProps) {
   const { editor, direction, ...toolProps } = props;
@@ -47,15 +50,11 @@ function TextDirectionTool(props: TextDirectionToolProps) {
 
 export function TextDirection(props: ToolProps) {
   const { editor } = props;
-  const { textDirection } = {
-    ...editor.getAttributes("paragraph"),
-    ...editor.getAttributes("heading")
-  } as { textDirection: TextDirection };
+  const textDirection = getTextDirection(editor);
 
-  const newTextDirection: TextDirection =
-    textDirection === "ltr" ? "rtl" : "ltr";
+  const newTextDirection: TextDirections = textDirection ? undefined : "rtl";
 
-  const icon: IconNames = textDirection === "ltr" ? "ltr" : "rtl";
+  const icon: IconNames = textDirection ? "rtl" : "ltr";
 
   return (
     <TextDirectionTool direction={newTextDirection} {...props} icon={icon} />

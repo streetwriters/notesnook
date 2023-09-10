@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -47,11 +47,14 @@ export class DeviceDetectionService {
   }
 
   setSize(size, orientation) {
-    windowSize = size;
+    windowSize = size || windowSize;
     this.width = windowSize.width;
     this.height = windowSize.height;
     this.adjustedWidth = this.width * this.pixelDensity;
     this.adjustedHeight = this.height * this.pixelDensity;
+    screenSize = Dimensions.get("screen");
+    this.screenWidth = screenSize.width;
+    this.screenHeight = screenSize.height;
     this.isPhoneOrTablet();
     this.isIosOrAndroid();
     this.detectIphoneX();
@@ -70,22 +73,19 @@ export class DeviceDetectionService {
 
   checkSmallTab(orientation) {
     let deviceSize = this.getDeviceSize();
-    let screenSize = this.getScreenSize();
-    console.log(orientation);
+
+    const isLandscape = orientation?.startsWith("LANDSCAPE");
+    const isValidTabletSize = deviceSize > 5.5;
+    const isValidLargeTabletSize = deviceSize > 9;
+
     if (
-      (!this.isTablet() && orientation?.startsWith("LANDSCAPE")) ||
-      (this.isTablet() &&
-        (orientation === "PORTRAIT" ||
-          (deviceSize < screenSize - 1 && deviceSize > 5.5)))
+      (!this.isTablet() && isLandscape && isValidTabletSize) ||
+      (this.isTablet() && isValidTabletSize && !isValidLargeTabletSize)
     ) {
       this.isTab = true;
       this.isPhone = false;
       this.isSmallTab = true;
-    } else if (
-      DeviceInfo.isTablet() &&
-      orientation === "LANDSCAPE" &&
-      deviceSize > 9
-    ) {
+    } else if (this.isTablet() && isLandscape && isValidLargeTabletSize) {
       this.isTab = true;
       this.isPhone = false;
       this.isSmallTab = false;
@@ -96,8 +96,8 @@ export class DeviceDetectionService {
         this.isSmallTab = false;
       } else {
         this.isTab = true;
-        this.isSmallTab = false;
-        this.isPhone = true;
+        this.isSmallTab = true;
+        this.isPhone = false;
       }
     }
   }

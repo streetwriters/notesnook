@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,19 +19,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Editor } from "@notesnook/editor";
 import {
+  ThemeDefinition,
+  useThemeColors,
+  useThemeEngineStore
+} from "@notesnook/theme";
+import {
   MutableRefObject,
   useCallback,
   useEffect,
   useRef,
   useState
 } from "react";
-import { useEditorThemeStore } from "../state/theme";
-import { EventTypes, isReactNative, post } from "../utils";
+import { EventTypes, isReactNative, post, saveTheme } from "../utils";
+import { injectCss, transform } from "../utils/css";
 
 type Attachment = {
   hash: string;
   filename: string;
-  type: string;
+  mime: string;
   size: number;
 };
 
@@ -47,7 +52,38 @@ export type Selection = {
 type Timers = {
   selectionChange: NodeJS.Timeout | null;
   change: NodeJS.Timeout | null;
+  wordCounter: NodeJS.Timeout | null;
 };
+
+function isInViewport(element: any) {
+  const rect = element.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <=
+      (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+  );
+}
+
+function scrollIntoView(editor: Editor) {
+  setTimeout(() => {
+    const node = editor?.state.selection.$from;
+    const dom = node ? editor?.view?.domAtPos(node.pos) : null;
+    let domNode = dom?.node;
+
+    if (domNode) {
+      if (domNode.nodeType === Node.TEXT_NODE && domNode.parentNode) {
+        domNode = domNode.parentNode;
+      }
+      if (isInViewport(domNode)) return;
+      (domNode as HTMLElement).scrollIntoView({
+        behavior: "smooth",
+        block: "end"
+      });
+    }
+  }, 100);
+}
 
 export type EditorController = {
   selectionChange: (editor: Editor) => void;
@@ -58,38 +94,66 @@ export type EditorController = {
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   openFilePicker: (type: "image" | "file" | "camera") => void;
   downloadAttachment: (attachment: Attachment) => void;
+  previewAttachment: (attachment: Attachment) => void;
   content: MutableRefObject<string | null>;
   onUpdate: () => void;
   titlePlaceholder: string;
   openLink: (url: string) => boolean;
   setTitlePlaceholder: React.Dispatch<React.SetStateAction<string>>;
+  countWords: (ms: number) => void;
+  copyToClipboard: (text: string) => void;
 };
 
 export function useEditorController(update: () => void): EditorController {
+  const setTheme = useThemeEngineStore((store) => store.setTheme);
+  const { colors } = useThemeColors("editor");
   const [title, setTitle] = useState("");
   const [titlePlaceholder, setTitlePlaceholder] = useState("Note title");
   const htmlContentRef = useRef<string | null>(null);
   const timers = useRef<Timers>({
     selectionChange: null,
-    change: null
+    change: null,
+    wordCounter: null
   });
 
   const selectionChange = useCallback((_editor: Editor) => {}, []);
 
   const titleChange = useCallback((title: string) => {
+    post(EventTypes.contentchange);
     post(EventTypes.title, title);
   }, []);
 
-  const contentChange = useCallback((editor: Editor) => {
-    if (!editor) return;
-    if (typeof timers.current.change === "number") {
-      clearTimeout(timers.current?.change);
-    }
-    timers.current.change = setTimeout(() => {
-      htmlContentRef.current = editor.getHTML();
-      post(EventTypes.content, htmlContentRef.current);
-    }, 300);
+  const countWords = useCallback((ms = 300) => {
+    if (typeof timers.current.wordCounter === "number")
+      clearTimeout(timers.current.wordCounter);
+    timers.current.wordCounter = setTimeout(() => {
+      console.time("wordCounter");
+      statusBar?.current?.updateWords();
+      console.timeEnd("wordCounter");
+    }, ms);
   }, []);
+
+  useEffect(() => {
+    injectCss(transform(colors));
+  }, [colors]);
+
+  const contentChange = useCallback(
+    (editor: Editor) => {
+      const currentSessionId = globalThis.sessionId;
+      post(EventTypes.contentchange);
+      if (!editor) return;
+      if (typeof timers.current.change === "number") {
+        clearTimeout(timers.current?.change);
+      }
+      timers.current.change = setTimeout(() => {
+        htmlContentRef.current = editor.getHTML();
+        post(EventTypes.content, htmlContentRef.current, currentSessionId);
+      }, 300);
+
+      countWords(5000);
+    },
+    [countWords]
+  );
 
   const scroll = useCallback(
     (_event: React.UIEvent<HTMLDivElement, UIEvent>) => {},
@@ -113,20 +177,26 @@ export function useEditorController(update: () => void): EditorController {
           htmlContentRef.current = value;
           if (!editor) break;
           const { from, to } = editor.state.selection;
-          editor?.commands.setContent(htmlContentRef.current, false);
+          editor?.commands.setContent(htmlContentRef.current, false, {
+            preserveWhitespace: true
+          });
           editor.commands.setTextSelection({
             from,
             to
           });
-
+          countWords();
           break;
         }
         case "native:html":
           htmlContentRef.current = value;
           update();
+          countWords();
           break;
         case "native:theme":
-          useEditorThemeStore.getState().setColors(message.value);
+          setTheme(message.value);
+          setTimeout(() => {
+            saveTheme(message.value as ThemeDefinition);
+          });
           break;
         case "native:title":
           setTitle(value);
@@ -136,12 +206,17 @@ export function useEditorController(update: () => void): EditorController {
           break;
         case "native:status":
           break;
+        case "native:keyboardShown":
+          if (editor?.current) {
+            scrollIntoView(editor?.current as any);
+          }
+          break;
         default:
           break;
       }
       post(type); // Notify that message was delivered successfully.
     },
-    [update]
+    [update, countWords, setTheme]
   );
 
   useEffect(() => {
@@ -151,7 +226,6 @@ export function useEditorController(update: () => void): EditorController {
     if (isSafari) {
       root = window;
     }
-    console.log("recreating messaging");
     root.addEventListener("message", onMessage);
 
     return () => {
@@ -166,11 +240,17 @@ export function useEditorController(update: () => void): EditorController {
   const downloadAttachment = useCallback((attachment: Attachment) => {
     post(EventTypes.download, attachment);
   }, []);
-
+  const previewAttachment = useCallback((attachment: Attachment) => {
+    post(EventTypes.previewAttachment, attachment);
+  }, []);
   const openLink = useCallback((url: string) => {
     post(EventTypes.link, url);
     return true;
   }, []);
+
+  const copyToClipboard = (text: string) => {
+    post(EventTypes.copyToClipboard, text);
+  };
 
   return {
     contentChange,
@@ -183,8 +263,11 @@ export function useEditorController(update: () => void): EditorController {
     setTitlePlaceholder,
     openFilePicker,
     downloadAttachment,
+    previewAttachment,
     content: htmlContentRef,
     openLink,
-    onUpdate: onUpdate
+    onUpdate: onUpdate,
+    countWords,
+    copyToClipboard
   };
 }

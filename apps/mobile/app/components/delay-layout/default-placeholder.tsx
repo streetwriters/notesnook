@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,21 +20,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import { useMessageStore } from "../../stores/use-message-store";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { COLORS_NOTE } from "../../utils/color-scheme";
-import { hexToRGBA } from "../../utils/color-scheme/utils";
+import { useThemeColors } from "@notesnook/theme";
+import { ColorValues } from "../../utils/colors";
+import { hexToRGBA } from "../../utils/colors";
 
 export const DefaultPlaceholder = ({ color }: { color: string }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const message = useMessageStore((state) => state.message);
   const annoucements = useMessageStore((state) => state.announcements);
   const hasAnnoucements = annoucements.length > 0;
   const shadeColor = color
     ? hexToRGBA(
-        COLORS_NOTE[color?.toLowerCase() as keyof typeof COLORS_NOTE],
+        ColorValues[color?.toLowerCase() as keyof typeof ColorValues],
         0.15
       )
-    : colors.shade;
+    : colors.primary.shade;
 
   return (
     <View
@@ -50,7 +50,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             height: 100,
             borderRadius: 10,
             marginBottom: 20,
-            backgroundColor: colors.nav,
+            backgroundColor: colors.secondary.background,
             padding: 12
           }}
         >
@@ -58,7 +58,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             style={{
               width: 150,
               height: 20,
-              backgroundColor: colors.transGray,
+              backgroundColor: colors.primary.hover,
               borderRadius: 5,
               marginBottom: 10
             }}
@@ -67,7 +67,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             style={{
               width: 250,
               height: 14,
-              backgroundColor: colors.transGray,
+              backgroundColor: colors.primary.hover,
               borderRadius: 5
             }}
           />
@@ -110,7 +110,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
               style={{
                 width: 150,
                 height: 12,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 borderRadius: 5,
                 marginBottom: 10
               }}
@@ -119,7 +119,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
               style={{
                 width: 250,
                 height: 16,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 borderRadius: 5
               }}
             />
@@ -131,7 +131,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
         style={{
           width: "100%",
           height: 30,
-          backgroundColor: colors.nav,
+          backgroundColor: colors.secondary.background,
           borderRadius: 10,
           marginBottom: 20,
           padding: 5,
@@ -158,7 +158,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             style={{
               width: 15,
               height: 15,
-              backgroundColor: colors.transGray,
+              backgroundColor: colors.primary.hover,
               borderRadius: 100,
               marginRight: 10
             }}
@@ -167,7 +167,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             style={{
               width: 60,
               height: 15,
-              backgroundColor: colors.transGray,
+              backgroundColor: colors.primary.hover,
               borderRadius: 3
             }}
           />
@@ -178,7 +178,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
         style={{
           width: 200,
           height: 16,
-          backgroundColor: colors.nav,
+          backgroundColor: colors.secondary.background,
           borderRadius: 5
         }}
       />
@@ -186,7 +186,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
         style={{
           width: "85%",
           height: 13,
-          backgroundColor: colors.nav,
+          backgroundColor: colors.secondary.background,
           borderRadius: 5,
           marginTop: 10
         }}
@@ -202,7 +202,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
           style={{
             width: 50,
             height: 10,
-            backgroundColor: colors.nav,
+            backgroundColor: colors.secondary.background,
             borderRadius: 5
           }}
         />
@@ -210,7 +210,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
           style={{
             width: 60,
             height: 10,
-            backgroundColor: colors.nav,
+            backgroundColor: colors.secondary.background,
             borderRadius: 5,
             marginLeft: 10
           }}

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import { getToolbarElement } from "../utils/dom";
 import { PopupWrapper } from "../../components/popup-presenter";
 import React from "react";
 import { ToolButton } from "../components/tool-button";
-import { findListItemType, isListActive } from "../utils/prosemirror";
+import { findListItemType, isListActive } from "../../utils/prosemirror";
 
 type ListSubType<TListStyleTypes> = {
   items: string[];
@@ -97,7 +97,7 @@ function _ListTool<TListStyleTypes extends string>(
                   if (type === "bulletList") chain = chain.toggleBulletList();
                   else chain = chain.toggleOrderedList();
                 }
-
+                setIsOpen(false);
                 return chain
                   .updateAttributes(type, { listType: item.type })
                   .run();
@@ -220,7 +220,8 @@ function ListThumbnail(props: ListThumbnailProps) {
         flexDirection: "column",
         flex: 1,
         p: 0,
-        listStyleType
+        listStyleType,
+        gap: 1
       }}
       onMouseDown={(e) => e.preventDefault()}
     >
@@ -230,9 +231,8 @@ function ListThumbnail(props: ListThumbnailProps) {
           as="li"
           sx={{
             display: "list-item",
-            color: "text",
-            fontSize: 8,
-            mb: "1px"
+            color: "paragraph",
+            fontSize: 8
           }}
         >
           <Flex
@@ -244,8 +244,8 @@ function ListThumbnail(props: ListThumbnailProps) {
               sx={{
                 width: "100%",
                 flexShrink: 0,
-                height: 4,
-                bg: "#cbcbcb",
+                height: 5,
+                bg: "border",
                 borderRadius: "small"
               }}
             />

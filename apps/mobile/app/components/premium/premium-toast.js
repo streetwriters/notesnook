@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,20 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
-import { editorState } from "../../screens/editor/tiptap/utils";
+import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { getElevation } from "../../utils";
+import { useThemeColors } from "@notesnook/theme";
+import { getElevationStyle } from "../../utils/elevation";
 import {
   eCloseActionSheet,
+  eCloseSheet,
   eOpenPremiumDialog,
   eShowGetPremium
 } from "../../utils/events";
@@ -39,12 +40,12 @@ import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useCallback } from "react";
 
 export const PremiumToast = ({ context = "global", offset = 0 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [msg, setMsg] = useState(null);
   const timer = useRef();
+  const keyboard = useKeyboard();
 
   const open = useCallback(
     (event) => {
@@ -72,7 +73,6 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
   useEffect(() => {
     eSubscribeEvent(eShowGetPremium, open);
     return () => {
-      clearTimeout(timer.current);
       eUnSubscribeEvent(eShowGetPremium, open);
     };
   }, [open]);
@@ -80,9 +80,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
   const onPress = async () => {
     open(null);
     eSendEvent(eCloseActionSheet);
-    if (editorState().isFocused) {
-      //tiny.call(EditorWebView, tiny.blur);
-    }
+    eSendEvent(eCloseSheet);
     await sleep(300);
     eSendEvent(eOpenPremiumDialog);
   };
@@ -94,16 +92,20 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
         exiting={FadeOutUp}
         style={{
           position: "absolute",
-          backgroundColor: colors.nav,
+          backgroundColor: colors.secondary.background,
           zIndex: 999,
-          ...getElevation(20),
+          ...getElevationStyle(20),
           padding: 12,
           borderRadius: 10,
           flexDirection: "row",
           alignSelf: "center",
           justifyContent: "space-between",
-          top: offset,
+          top: offset + keyboard.keyboardHeight,
           maxWidth: DDS.isLargeTablet() ? 400 : "98%"
+        }}
+        onTouchEnd={() => {
+          setMsg(null);
+          clearTimeout(timer.current);
         }}
       >
         <View
@@ -117,7 +119,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
             style={{
               flexWrap: "wrap"
             }}
-            color={colors.accent}
+            color={colors.primary.accent}
             size={SIZE.md}
           >
             {msg.title}
@@ -128,7 +130,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
               flexWrap: "wrap"
             }}
             size={SIZE.sm}
-            color={colors.pri}
+            color={colors.primary.paragraph}
           >
             {msg.desc}
           </Paragraph>

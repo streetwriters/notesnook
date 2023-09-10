@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,12 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import Heading from "../../components/ui/typography/heading";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { SectionItem } from "./section-item";
 import { SettingSection } from "./types";
 export const SectionGroup = ({ item }: { item: SettingSection }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const current = item.useHook && item.useHook();
   const isHidden = item.hidden && item.hidden(current);
   return isHidden ? null : (
@@ -39,15 +39,15 @@ export const SectionGroup = ({ item }: { item: SettingSection }) => {
           style={{
             paddingHorizontal: 12
           }}
-          color={colors.accent}
+          color={colors.primary.accent}
           size={SIZE.xs}
         >
-          {item.name.toUpperCase()}
+          {(item.name as string).toUpperCase()}
         </Heading>
       ) : null}
 
       {item.sections?.map((item) => (
-        <SectionItem key={item.name} item={item} />
+        <SectionItem key={item.name as string} item={item} />
       ))}
     </View>
   );

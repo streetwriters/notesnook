@@ -1,18 +1,20 @@
-let env = process.env.BABEL_ENV;
+const env = process.env.BABEL_ENV || process.env.NODE_ENV;
 const configs = {
   env: {
     development: {
       presets: ['module:metro-react-native-babel-preset'],
       plugins: [
         '@babel/plugin-transform-named-capturing-groups-regex',
-        'react-native-reanimated/plugin'
+        'react-native-reanimated/plugin',
+        "@babel/plugin-transform-export-namespace-from"
       ]
     },
     test: {
       presets: ['module:metro-react-native-babel-preset'],
       plugins: [
         '@babel/plugin-transform-named-capturing-groups-regex',
-        'react-native-reanimated/plugin'
+        'react-native-reanimated/plugin',
+        ["@babel/plugin-transform-private-methods", { "loose": true }]
       ]
     },
     production: {
@@ -20,7 +22,8 @@ const configs = {
       plugins: [
         'transform-remove-console',
         '@babel/plugin-transform-named-capturing-groups-regex',
-        'react-native-reanimated/plugin'
+        'react-native-reanimated/plugin',
+        "@babel/plugin-transform-export-namespace-from"
       ]
     }
   }

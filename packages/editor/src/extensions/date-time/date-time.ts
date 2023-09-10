@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,6 +23,9 @@ import {
   InputRuleFinder,
   ExtendedRegExpMatchArray
 } from "@tiptap/core";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { formatDate } from "@notesnook/core/dist/utils/date";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -44,8 +47,21 @@ declare module "@tiptap/core" {
   }
 }
 
-export const DateTime = Extension.create({
+export type DateTimeOptions = {
+  dateFormat: string;
+  timeFormat: "12-hour" | "24-hour";
+};
+
+export const DateTime = Extension.create<DateTimeOptions>({
   name: "datetime",
+
+  addOptions() {
+    return {
+      dateFormat: "DD-MM-YYYY",
+      timeFormat: "12-hour"
+    };
+  },
+
   addKeyboardShortcuts() {
     return {
       "Alt-t": ({ editor }) => editor.commands.insertTime(),
@@ -59,15 +75,31 @@ export const DateTime = Extension.create({
       insertDate:
         () =>
         ({ commands }) =>
-          commands.insertContent(currentDate()),
+          commands.insertContent(
+            formatDate(Date.now(), {
+              dateFormat: this.options.dateFormat,
+              type: "date"
+            })
+          ),
       insertTime:
         () =>
         ({ commands }) =>
-          commands.insertContent(currentTime()),
+          commands.insertContent(
+            formatDate(Date.now(), {
+              timeFormat: this.options.timeFormat,
+              type: "time"
+            })
+          ),
       insertDateTime:
         () =>
         ({ commands }) =>
-          commands.insertContent(currentDateTime())
+          commands.insertContent(
+            formatDate(Date.now(), {
+              dateFormat: this.options.dateFormat,
+              timeFormat: this.options.timeFormat,
+              type: "date-time"
+            })
+          )
     };
   },
 
@@ -76,43 +108,34 @@ export const DateTime = Extension.create({
       shortcutInputRule({
         shortcut: "/time",
         replace: () => {
-          return currentTime();
+          return formatDate(Date.now(), {
+            timeFormat: this.options.timeFormat,
+            type: "time"
+          });
         }
       }),
       shortcutInputRule({
         shortcut: "/date",
         replace: () => {
-          return currentDate();
+          return formatDate(Date.now(), {
+            dateFormat: this.options.dateFormat,
+            type: "date"
+          });
         }
       }),
       shortcutInputRule({
         shortcut: "/now",
         replace: () => {
-          return currentDateTime();
+          return formatDate(Date.now(), {
+            dateFormat: this.options.dateFormat,
+            timeFormat: this.options.timeFormat,
+            type: "date-time"
+          });
         }
       })
     ];
   }
 });
-
-function currentTime() {
-  return new Date().toLocaleTimeString(window.navigator.languages.slice(), {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
-
-function currentDateTime() {
-  return `${currentDate()}, ${currentTime()}`;
-}
-
-function currentDate() {
-  return new Date().toLocaleDateString(window.navigator.languages.slice(), {
-    month: "long",
-    day: "2-digit",
-    year: "numeric"
-  });
-}
 
 function shortcutInputRule(config: {
   shortcut: string;

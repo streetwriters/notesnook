@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,9 +23,15 @@ import {
   mergeAttributes,
   findChildren
 } from "@tiptap/core";
+import { Attrs } from "@tiptap/pm/model";
+import { Plugin } from "@tiptap/pm/state";
+import { hasSameAttributes } from "../../utils/prosemirror";
 import { Attachment, getDataAttribute } from "../attachment";
 import { createSelectionBasedNodeView } from "../react";
+import { TextDirections } from "../text-direction";
 import { ImageComponent } from "./component";
+
+type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 export interface ImageOptions {
   inline: boolean;
@@ -33,11 +39,33 @@ export interface ImageOptions {
   HTMLAttributes: Record<string, unknown>;
 }
 
+/**
+ * We have two attributes that store the source of an image:
+ *
+ * 1. `src`
+ * 2. `dataurl`
+ *
+ * `src` is the image's inherent source. This can contain a URL, a base64-dataurl,
+ * a blob...etc. We should never touch this attribute. This is also where we store
+ * the data that we want to upload so after we download a pasted image, its base64
+ * dataurl goes in this attribute.
+ *
+ * `dataurl` should never get added to the final HTML. This attribute is where we
+ * restore an image's data after loading a note.
+ *
+ * The reason we have 2 instead of a single attribute is to avoid unnecessary processing.
+ * Keeping everything in the `src` attribute requires us to always send the rendered image
+ * along with everything else. This is pointless because we already have the image's rendered
+ * data.
+ */
 export type ImageAttributes = Partial<ImageSizeOptions> &
-  Partial<Attachment> & {
+  Attachment & {
     src: string;
+    dataurl?: string;
     alt?: string;
     title?: string;
+    textDirection?: TextDirections;
+    aspectRatio?: number;
   };
 
 export type ImageAlignmentOptions = {
@@ -56,10 +84,10 @@ declare module "@tiptap/core" {
       /**
        * Add an image
        */
-      insertImage: (options: ImageAttributes) => ReturnType;
+      insertImage: (options: Partial<ImageAttributes>) => ReturnType;
       updateImage: (
         query: { src?: string; hash?: string },
-        options: ImageAttributes & { preventUpdate?: boolean }
+        options: Partial<ImageAttributes> & { preventUpdate?: boolean }
       ) => ReturnType;
       setImageAlignment: (options: ImageAlignmentOptions) => ReturnType;
       setImageSize: (options: ImageSizeOptions) => ReturnType;
@@ -106,12 +134,30 @@ export const ImageNode = Node.create<ImageOptions>({
 
       // TODO: maybe these should be stored as styles?
       float: getDataAttribute("float", false),
-      align: getDataAttribute("align", "left"),
+      align: getDataAttribute("align"),
 
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),
-      type: getDataAttribute("mime"),
-      size: getDataAttribute("size")
+      mime: getDataAttribute("mime"),
+      size: getDataAttribute("size"),
+      aspectRatio: {
+        default: undefined,
+        parseHTML: (element) => element.dataset.aspectRatio,
+        renderHTML: (attributes) => {
+          if (!attributes.aspectRatio) {
+            return {};
+          }
+
+          return {
+            [`data-aspect-ratio`]: attributes.aspectRatio
+          };
+        }
+      },
+
+      dataurl: {
+        ...getDataAttribute("dataurl"),
+        rendered: false
+      }
     };
   },
 
@@ -131,14 +177,49 @@ export const ImageNode = Node.create<ImageOptions>({
   },
 
   addNodeView() {
-    return createSelectionBasedNodeView(ImageComponent);
+    return createSelectionBasedNodeView(ImageComponent, {
+      componentKey: (node) => node.attrs.hash,
+      shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs),
+      forceEnableSelection: true
+    });
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        props: {
+          transformCopied: (content) => {
+            content.content.descendants((node) => {
+              if (
+                node.type.name === this.name &&
+                typeof node.attrs.dataurl === "string"
+              ) {
+                const attrs = node.attrs as Writeable<Attrs>;
+                attrs.src = attrs.dataurl;
+                delete attrs.dataurl;
+              }
+            });
+            return content;
+          }
+        }
+      })
+    ];
   },
 
   addCommands() {
     return {
       insertImage:
         (options) =>
-        ({ commands }) => {
+        ({ commands, state }) => {
+          const { $from } = state.selection;
+          const maybeImageNode = state.doc.nodeAt($from.pos);
+          if (maybeImageNode?.type === this.type) {
+            return commands.insertContentAt($from.pos + 1, {
+              type: this.name,
+              attrs: options
+            });
+          }
+
           return commands.insertContent({
             type: this.name,
             attrs: options
@@ -164,7 +245,7 @@ export const ImageNode = Node.create<ImageOptions>({
         },
       updateImage:
         (query, options) =>
-        ({ state, tr, dispatch }) => {
+        ({ state, tr }) => {
           const keyedQuery = query.hash
             ? { key: "hash", value: query.hash }
             : query.src
@@ -186,7 +267,6 @@ export const ImageNode = Node.create<ImageOptions>({
           }
           tr.setMeta("preventUpdate", options.preventUpdate || false);
           tr.setMeta("addToHistory", false);
-          if (dispatch) dispatch(tr);
           return true;
         }
     };
@@ -204,5 +284,11 @@ export const ImageNode = Node.create<ImageOptions>({
         }
       })
     ];
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      "Mod-Shift-I": () => this.editor.commands.openAttachmentPicker("image")
+    };
   }
 });

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,13 +26,15 @@ import {
   Transaction,
   Selection
 } from "prosemirror-state";
-import { ResolvedPos, Node as ProsemirrorNode } from "prosemirror-model";
+import { ResolvedPos, Node as ProsemirrorNode, Slice } from "prosemirror-model";
 import { CodeblockComponent } from "./component";
 import { HighlighterPlugin } from "./highlighter";
 import { createNodeView } from "../react";
 import detectIndent from "detect-indent";
 import redent from "redent";
 import stripIndent from "strip-indent";
+import { nanoid } from "nanoid";
+import Languages from "./languages.json";
 
 interface Indent {
   type: "tab" | "space";
@@ -122,6 +124,11 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
   addAttributes() {
     return {
+      id: {
+        default: undefined,
+        rendered: false,
+        parseHTML: () => createCodeblockId()
+      },
       caretPosition: {
         default: undefined,
         rendered: false
@@ -165,8 +172,8 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         parseHTML: (element) => {
           const { languageClassPrefix } = this.options;
           const classNames = [
-            ...(element.classList || []),
-            ...(element?.firstElementChild?.classList || [])
+            ...element.classList.values(),
+            ...(element?.firstElementChild?.classList?.values() || [])
           ];
           const languages = classNames
             .filter((className) => className.startsWith(languageClassPrefix))
@@ -220,13 +227,18 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
       setCodeBlock:
         (attributes) =>
         ({ commands }) => {
-          return commands.setNode(this.name, attributes);
+          return commands.setNode(this.name, {
+            ...attributes,
+            id: createCodeblockId()
+          });
         },
       toggleCodeBlock:
         (attributes) =>
         ({ commands }) => {
-          console.log("TOGGLING!");
-          return commands.toggleNode(this.name, "paragraph", attributes);
+          return commands.toggleNode(this.name, "paragraph", {
+            ...attributes,
+            id: createCodeblockId()
+          });
         },
       changeCodeBlockIndentation:
         (options) =>
@@ -270,7 +282,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-Alt-c": () => this.editor.commands.toggleCodeBlock(),
+      "Mod-Shift-C": () => this.editor.commands.toggleCodeBlock(),
       "Mod-a": ({ editor }) => {
         const { $anchor } = this.editor.state.selection;
         if ($anchor.parent.type.name !== this.name) {
@@ -287,43 +299,6 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           to: codeblock.pos + codeblock.node.nodeSize - 1
         });
       },
-      // remove code block when at start of document or code block is empty
-      Backspace: ({ editor }) => {
-        const { empty, $anchor } = editor.state.selection;
-
-        const currentNode = $anchor.parent;
-        const nextNode = editor.state.doc.nodeAt($anchor.pos + 1);
-        const isCodeBlock = (node: ProsemirrorNode | null) =>
-          node && node.type.name === this.name;
-        const isAtStart = $anchor.pos === 1;
-
-        if (!empty) {
-          return false;
-        }
-
-        if (
-          isAtStart ||
-          (isCodeBlock(currentNode) && !currentNode.textContent.length)
-        ) {
-          return this.editor.commands.deleteNode(this.type);
-        }
-        // on android due to composition issues with various keyboards,
-        // sometimes backspace is detected one node behind. We need to
-        // manually handle this case.
-        else if (
-          nextNode &&
-          isCodeBlock(nextNode) &&
-          !nextNode.textContent.length
-        ) {
-          return this.editor.commands.command(({ tr }) => {
-            tr.delete($anchor.pos + 1, $anchor.pos + 1 + nextNode.nodeSize);
-            return true;
-          });
-        }
-
-        return false;
-      },
-
       // exit node on triple enter
       Enter: ({ editor }) => {
         const { state } = editor;
@@ -341,28 +316,6 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
         if (indentation) return indentOnEnter(editor, $from, indentation);
         return false;
-      },
-
-      // exit node on arrow up
-      ArrowUp: ({ editor }) => {
-        if (!this.options.exitOnArrowUp) {
-          return false;
-        }
-
-        const { state } = editor;
-        const { selection } = state;
-        const { $anchor, empty } = selection;
-
-        if (!empty || $anchor.parent.type !== this.type) {
-          return false;
-        }
-
-        const isAtStart = $anchor.pos === 1;
-        if (!isAtStart) {
-          return false;
-        }
-
-        return editor.commands.insertContentAt(0, "<p></p>");
       },
       // exit node on arrow down
       ArrowDown: ({ editor }) => {
@@ -470,14 +423,16 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         find: backtickInputRegex,
         type: this.type,
         getAttributes: (match) => ({
-          language: match[1]
+          language: match[1],
+          id: createCodeblockId()
         })
       }),
       textblockTypeInputRule({
         find: tildeInputRegex,
         type: this.type,
         getAttributes: (match) => ({
-          language: match[1]
+          language: match[1],
+          id: createCodeblockId()
         })
       })
     ];
@@ -494,15 +449,18 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             if (!event.clipboardData) {
               return false;
             }
+            const { isCode, language } = detectCodeBlock(event.clipboardData);
 
-            const text = event.clipboardData.getData("text/plain");
-            const vscode = event.clipboardData.getData("vscode-editor-data");
-            const vscodeData = vscode ? JSON.parse(vscode) : undefined;
-            const language = vscodeData?.mode;
-
-            if (!text || !language) {
+            const isInsideCodeBlock = this.editor.isActive(this.type.name);
+            if (!isInsideCodeBlock && !isCode) {
               return false;
             }
+
+            const text = event.clipboardData
+              .getData("text/plain")
+              // strip carriage return chars from text pasted as code
+              // see: https://github.com/ProseMirror/prosemirror-view/commit/a50a6bcceb4ce52ac8fcc6162488d8875613aacd
+              .replace(/\r\n?/g, "\n");
 
             const indent = fixIndentation(
               text,
@@ -511,28 +469,36 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
             const { tr } = view.state;
 
-            // create an empty code block if not already within one
-            if (!this.editor.isActive(this.type.name)) {
-              tr.replaceSelectionWith(
-                this.type.create({
-                  language,
-                  indentType: indent.type,
-                  indentLength: indent.amount
+            const isInlineCode =
+              indent.code.length < 80 &&
+              indent.code.split(/[\r\n]/).length === 1;
+            if (isInlineCode && !isInsideCodeBlock) {
+              tr.replaceSelection(
+                Slice.fromJSON(this.editor.view.state.schema, {
+                  content: [
+                    {
+                      type: "text",
+                      text: indent.code,
+                      marks: [{ type: "code" }]
+                    }
+                  ]
                 })
               );
+            } else {
+              // create an empty code block if not already within one
+              if (!isInsideCodeBlock)
+                tr.replaceSelectionWith(
+                  this.type.create({
+                    id: createCodeblockId(),
+                    language,
+                    indentType: indent.type,
+                    indentLength: indent.amount
+                  })
+                );
+
+              // add text to code block
+              tr.insertText(indent.code);
             }
-
-            // // put cursor inside the newly created code block
-            // tr.setSelection(
-            //   TextSelection.near(
-            //     tr.doc.resolve(Math.max(0, tr.selection.from - 2))
-            //   )
-            // );
-
-            // add text to code block
-            // strip carriage return chars from text pasted as code
-            // see: https://github.com/ProseMirror/prosemirror-view/commit/a50a6bcceb4ce52ac8fcc6162488d8875613aacd
-            tr.insertText(indent.code.replace(/\r\n?/g, "\n"));
 
             // store meta information
             // this is useful for other plugins that depends on the paste event
@@ -552,9 +518,10 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
   addNodeView() {
     return createNodeView(CodeblockComponent, {
       contentDOMFactory: () => {
-        const content = document.createElement("div");
+        const content = document.createElement("pre");
         content.classList.add("node-content-wrapper");
-        content.style.whiteSpace = "inherit";
+        content.classList.add("language-xyz");
+        content.style.whiteSpace = "pre";
         // caret is not visible if content element width is 0px
         content.style.minWidth = "20px";
         return { dom: content };
@@ -631,7 +598,7 @@ function indentOnEnter(editor: Editor, $from: ResolvedPos, options: Indent) {
   return editor
     .chain()
     .insertContent(`${newline}${indentation}`, {
-      parseOptions: { preserveWhitespace: "full" }
+      parseOptions: { preserveWhitespace: true }
     })
     .focus()
     .run();
@@ -765,4 +732,48 @@ function fixIndentation(
     indent: type === "space" ? " " : "\t"
   });
   return { code: stripIndent(fixed), amount, type };
+}
+
+function detectCodeBlock(dataTransfer: DataTransfer) {
+  const html = dataTransfer.getData("text/html") || "";
+  const vscode = dataTransfer.getData("vscode-editor-data");
+  const vscodeData = vscode ? JSON.parse(vscode) : undefined;
+
+  const document = new DOMParser().parseFromString(html, "text/html");
+
+  const isGitHub = !!document.querySelector(
+    ".react-code-text.react-code-line-contents"
+  );
+  const isVSCode =
+    vscode ||
+    (document.body.firstElementChild instanceof HTMLDivElement &&
+      document.body.firstElementChild.style.fontFamily.includes("monospace") &&
+      document.body.firstElementChild.style.whiteSpace.includes("pre"));
+
+  const language =
+    vscodeData?.mode ||
+    (document.body.firstElementChild
+      ? inferLanguage(document.body.firstElementChild)
+      : undefined);
+
+  return { isCode: isVSCode || isGitHub || !!language, language };
+}
+
+const LANGUAGE_CLASS_REGEX = /(?:language|lang|brush)[-:](\s+\w+|\w+)/;
+export function inferLanguage(node: Element) {
+  const matches = LANGUAGE_CLASS_REGEX.exec(node.className);
+  let lang =
+    matches && matches.length > 1 ? matches[1] : node.getAttribute("lang");
+
+  if (!lang) return;
+
+  lang = lang.trim();
+  const language = Languages.find(
+    (l) => l.filename === lang || l.alias?.some((a) => a === lang)
+  );
+  return language?.filename;
+}
+
+function createCodeblockId() {
+  return `codeblock-${nanoid(12)}`;
 }

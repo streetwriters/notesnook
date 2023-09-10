@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import { SafeAreaView } from "react-native";
 import Container from "../components/container";
 import DelayLayout from "../components/delay-layout";
 import Intro from "../components/intro";
+import { TopicsSheet } from "../components/sheets/topic-sheet";
 import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import Favorites from "../screens/favorites";
@@ -34,6 +35,7 @@ import { ColoredNotes } from "../screens/notes/colored";
 import { Monographs } from "../screens/notes/monographs";
 import { TaggedNotes } from "../screens/notes/tagged";
 import { TopicNotes } from "../screens/notes/topic-notes";
+import Reminders from "../screens/reminders";
 import { Search } from "../screens/search";
 import Settings from "../screens/settings";
 import AppLock from "../screens/settings/app-lock";
@@ -45,9 +47,9 @@ import useNavigationStore from "../stores/use-navigation-store";
 import { useNoteStore } from "../stores/use-notes-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { useThemeStore } from "../stores/use-theme-store";
-import { history } from "../utils";
+import { useThemeColors } from "@notesnook/theme";
 import { rootNavigatorRef } from "../utils/global-refs";
+import Auth from "../components/auth";
 const NativeStack = createNativeStackNavigator();
 const IntroStack = createNativeStackNavigator();
 
@@ -61,7 +63,8 @@ const IntroStack = createNativeStackNavigator();
  */
 
 const IntroStackNavigator = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
+  const height = useSettingStore((state) => state.dimensions.height);
   return (
     <IntroStack.Navigator
       screenOptions={{
@@ -69,19 +72,21 @@ const IntroStackNavigator = () => {
         lazy: false,
         animation: "none",
         contentStyle: {
-          backgroundColor: colors.bg
+          backgroundColor: colors.primary.background,
+          minHeight: height
         }
       }}
       initialRouteName={"Intro"}
     >
       <NativeStack.Screen name="Intro" component={Intro} />
+      <NativeStack.Screen name="Auth" component={Auth} />
       <NativeStack.Screen name="AppLock" component={AppLock} />
     </IntroStack.Navigator>
   );
 };
 
 const _Tabs = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const homepage = SettingsService.get().homepage;
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
@@ -101,7 +106,7 @@ const _Tabs = () => {
       <SafeAreaView
         style={{
           flex: 1,
-          backgroundColor: colors.bg
+          backgroundColor: colors.primary.background
         }}
       >
         <DelayLayout animated={false} wait={loading} />
@@ -117,8 +122,8 @@ const _Tabs = () => {
         lazy: false,
         animation: "none",
         contentStyle: {
-          backgroundColor: colors.bg,
-          height: !introCompleted ? undefined : screenHeight
+          backgroundColor: colors.primary.background,
+          minHeight: !introCompleted ? undefined : screenHeight
         }
       }}
     >
@@ -158,7 +163,17 @@ const _Tabs = () => {
       />
       <NativeStack.Screen
         options={{ lazy: true }}
+        name="Reminders"
+        component={Reminders}
+      />
+      <NativeStack.Screen
+        options={{ lazy: true }}
         name="Monographs"
+        initialParams={{
+          item: { type: "monograph" },
+          canGoBack: false,
+          title: "Monographs"
+        }}
         component={Monographs}
       />
       <NativeStack.Screen
@@ -178,9 +193,9 @@ const Tabs = React.memo(_Tabs, () => true);
 
 const _NavigationStack = () => {
   const clearSelection = useSelectionStore((state) => state.clearSelection);
-
+  const loading = useNoteStore((state) => state.loading);
   const onStateChange = React.useCallback(() => {
-    if (history.selectionMode) {
+    if (useSelectionStore.getState().selectionMode) {
       clearSelection(true);
     }
     hideAllTooltips();
@@ -192,6 +207,7 @@ const _NavigationStack = () => {
       <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
         <Tabs />
       </NavigationContainer>
+      {loading ? null : <TopicsSheet />}
     </Container>
   );
 };

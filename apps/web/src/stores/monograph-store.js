@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,10 @@ import { db } from "../common/db";
 import BaseStore from "./index";
 import { store as notestore } from "./note-store";
 
-class TagStore extends BaseStore {
+/**
+ * @extends {BaseStore<MonographStore>}
+ */
+class MonographStore extends BaseStore {
   monographs = [];
 
   refresh = () => {
@@ -43,8 +46,5 @@ class TagStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<TagStore>, TagStore]}
- */
-const [useStore, store] = createStore(TagStore);
+const [useStore, store] = createStore(MonographStore);
 export { useStore, store };

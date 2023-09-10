@@ -1,3 +1,13 @@
+
+
+.ProseMirror span * {
+  font-family: inherit;
+}
+
+.ProseMirror {
+  font-family: inherit;
+}
+
 .ProseMirror p.is-editor-empty:first-child::before {
   color: var(--placeholder);
   content: attr(data-placeholder);
@@ -6,8 +16,8 @@
   pointer-events: none;
 }
 
-.ProseMirror code:not(pre code) {
-  background-color: var(--bgSecondary);
+.ProseMirror p code {
+  background-color: var(--background-secondary);
 }
 
 .ProseMirror:first-child {
@@ -23,6 +33,8 @@
   padding-bottom: 10px;
   cursor: pointer;
   position: relative;
+  margin-top: 4px;
+  margin-bottom: -10px;
 }
 
 .ProseMirror hr::after {
@@ -34,11 +46,11 @@
 }
 
 .ProseMirror hr.ProseMirror-selectednode::after {
-  border: 2px solid var(--primary);
+  border: 2px solid var(--accent);
 }
 
-.ProseMirror code:not(pre code){
-  background-color: var(--bgSecondary);
+.ProseMirror p code {
+  background-color: var(--background);
   border: 1px solid var(--border);
   border-radius: 5px;
   padding: 3px 5px 0px 5px;
@@ -47,7 +59,7 @@
   font-size: 10pt !important;
 }
 
-.ProseMirror code > span  {
+.ProseMirror code > span {
   font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
     Menlo, monospace !important;
 }
@@ -60,8 +72,18 @@
   margin-bottom: 5px;
 }
 
+.ProseMirror ul.tasklist-content-wrapper {
+  padding-left: 0px;
+}
+
+.ProseMirror ul ul,
+.ProseMirror ol ol {
+  margin-top: 5px;
+  padding-left: 15px;
+}
+
 .ProseMirror a {
-  color: var(--primary);
+  color: var(--accent);
   cursor: pointer;
 }
 
@@ -71,6 +93,7 @@
 
 .ProseMirror p {
   margin-bottom: 0px;
+  font-family: inherit;
 }
 
 .ProseMirror > p[data-spacing="double"] {
@@ -83,7 +106,7 @@
 
 .ProseMirror > div.codeblock-view-content-wrap,
 .ProseMirror > div.taskList-view-content-wrap,
-.ProseMirror > div.outlineList-view-content-wrap {
+.ProseMirror > div.math-block.math-node {
   margin-top: 1em;
   margin-bottom: 1em;
 }
@@ -143,7 +166,7 @@ img.ProseMirror-separator {
   position: absolute;
   top: -2px;
   width: 20px;
-  border-top: 1px solid var(--text);
+  border-top: 1px solid var(--paragraph);
   animation: ProseMirror-cursor-blink 1.1s steps(2, start) infinite;
 }
 @keyframes ProseMirror-cursor-blink {
@@ -153,11 +176,11 @@ img.ProseMirror-separator {
 }
 .ProseMirror-hideselection *::selection {
   background: transparent;
-  color: var(--text);
+  color: var(--paragraph);
 }
 .ProseMirror-hideselection *::-moz-selection {
   background: transparent;
-  color: var(--text);
+  color: var(--paragraph);
 }
 .ProseMirror-hideselection * {
   caret-color: transparent;
@@ -190,19 +213,22 @@ img.ProseMirror-separator {
   vertical-align: top;
 }
 
+.ProseMirror table .selectedCell {
+  border-color: var(--accent);
+}
+
 .ProseMirror table td > *,
 .ProseMirror table th > * {
   margin-bottom: 0;
 }
 
 .ProseMirror table th {
-  background-color: var(--bgSecondary);
   font-weight: bold;
   text-align: left;
 }
 
 .ProseMirror table .selectedCell:after {
-  background: var(--primary);
+  background: var(--accent);
   content: "";
   left: 0;
   right: 0;
@@ -215,10 +241,10 @@ img.ProseMirror-separator {
 }
 
 .ProseMirror table .column-resize-handle {
-  background-color: var(--primary);
+  background-color: var(--accent);
   bottom: -2px;
   position: absolute;
-  right: -2px;
+  right: 0px;
   pointer-events: none;
   top: 0;
   width: 5px;
@@ -239,18 +265,18 @@ img.ProseMirror-separator {
 }
 
 .drop-cursor {
-  background-color: var(--text) !important;
+  background-color: var(--paragraph) !important;
 }
 
 .search-result.selected {
-  background-color: var(--dimPrimary) !important;
+  background-color: var(--accent-secondary) !important;
 }
 
 .search-result {
-  background-color: var(--disabled);
+  background-color: var(--background-secondary);
 }
 
-.line-number-widget,
+/* .line-number-widget,
 .line-number::before {
   color: var(--codeFg);
   pointer-events: none;
@@ -275,23 +301,25 @@ img.ProseMirror-separator {
   position: absolute;
   left: 0;
   pointer-events: none;
-  background-color: var(--overlay);
-}
-
-pre::selection,
-pre *::selection {
-  background-color: var(--codeSelection) !important;
-  color: currentColor;
-}
+  background-color: var(--backdrop);
+} */
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
 .ProseMirror blockquote {
-  border-left: 5px solid var(--border);
-  padding-left: 15px;
+  border-inline-start: 5px solid var(--border);
+  padding-inline-start: 15px;
 }
+
+@media screen and (max-width: 480px) {
+  .ProseMirror blockquote {
+    margin-inline: 5px;
+    padding-inline-start: 10px;
+}
+}
+
 
 /****************************************************************/
 /* Styles taken from https://github.com/curvenote/prosemirror-codemark/blob/main/src/codemark.css */
@@ -343,12 +371,12 @@ span:focus .fake-cursor {
 
 .math-node.empty-math .math-render::before {
   content: "(empty)";
-  color: red;
+  color: var(--paragraph-error);
 }
 
 .math-node .math-render.parse-error::before {
   content: "(math error)";
-  color: red;
+  color: var(--paragraph-error);
   cursor: help;
 }
 
@@ -358,7 +386,7 @@ span:focus .fake-cursor {
 
 .math-node .math-src {
   display: none;
-  color: var(--text);
+  color: var(--paragraph);
   tab-size: 4;
 }
 
@@ -392,7 +420,7 @@ span:focus .fake-cursor {
 }
 
 .math-inline.ProseMirror-selectednode {
-  background-color: var(--bgSecondary);
+  background-color: var(--background-secondary);
   padding: 3px;
   border-radius: 5px;
   border: 1px solid var(--border);
@@ -401,7 +429,7 @@ span:focus .fake-cursor {
 .math-inline .math-src::after,
 .math-inline .math-src::before {
   content: "$$";
-  color: var(--disabled);
+  color: var(--paragraph-secondary);
 }
 
 /* -- Block Math ---------------------------------------- */
@@ -415,7 +443,7 @@ span:focus .fake-cursor {
 }
 
 .math-block.ProseMirror-selectednode {
-  background-color: var(--bgSecondary);
+  background-color: var(--background-secondary);
   padding: 10px;
   border-radius: 5px;
   border: 1px solid var(--border);
@@ -433,7 +461,7 @@ span:focus .fake-cursor {
 .math-block .math-src::before {
   content: "Math";
   text-align: left;
-  color: var(--disabled);
+  color: var(--paragraph-secondary);
   margin-bottom: 10px;
 }
 
@@ -462,3 +490,111 @@ p > *::selection {
 .math-inline.math-select .math-render {
   padding-top: 2px;
 } */
+
+/* Outline lists */
+
+.outline-list {
+  list-style-type: none;
+  position: relative;
+}
+
+.outline-list li ul {
+  padding-left: 25px;
+}
+
+.outline-list li.collapsed .outline-list {
+  display: none;
+}
+.outline-list li > :first-child {
+  position: relative;
+}
+
+.outline-list li > :first-child::before {
+  position: absolute;
+  top: 3px;
+  cursor: pointer;
+  content: "";
+  background-size: 18px;
+  width: 18px;
+  height: 18px;
+
+  background-color: var(--icon);
+  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik03LjQxIDguNThMMTIgMTMuMTdsNC41OS00LjU5TDE4IDEwbC02IDZsLTYtNmwxLjQxLTEuNDJaIi8+PC9zdmc+)
+    no-repeat 50% 50%;
+  mask-size: cover;
+  border: 1px solid var(--background);
+
+  transform: rotate(0);
+  transition: transform 250ms ease;
+  left: -22px;
+}
+
+.outline-list li:not(.nested) > :first-child::before {
+  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik0xMiAyQTEwIDEwIDAgMCAwIDIgMTJhMTAgMTAgMCAwIDAgMTAgMTBhMTAgMTAgMCAwIDAgMTAtMTBBMTAgMTAgMCAwIDAgMTIgMloiLz48L3N2Zz4=)
+    no-repeat 50% 50%;
+  scale: 0.4;
+}
+
+.outline-list li.collapsed > :first-child::before {
+  transform: rotate(-90deg);
+}
+
+.outline-list li .outline-list::before {
+  content: " ";
+  position: absolute;
+  height: 100%;
+  transition: border 200ms ease-in-out;
+  left: -14px;
+  border-left: 1px solid var(--border);
+}
+
+.outline-list li .outline-list:hover:before {
+  border-left: 1px solid var(--hover);
+}
+
+/* IMAGE */
+
+.image-view-content-wrap.ProseMirror-selectednode .resizer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  background-image: linear-gradient(135deg, #ffffffaa 0%, #ffffff88 5%, transparent 12%, transparent 91%, #ffffff88 97%, #ffffffaa 100%);
+  pointer-events: none;
+}
+
+/* RTL */
+
+[dir="rtl"] * {
+  direction: rtl;
+}
+
+[dir="rtl"] ul {
+  margin-left: 0px !important;
+}
+
+.outline-list[dir="rtl"] li > p::before {
+  right: -22px;
+  left: unset;
+}
+
+.outline-list[dir="rtl"] li .outline-list::before {
+  border-left: unset;
+  border-right: 1px solid var(--border);
+  left: unset;
+  right: -14px;
+}
+
+.outline-list[dir="rtl"] li .outline-list:hover:before {
+  border-right: 1px solid var(--hover);
+  border-left: unset;
+}
+
+.outline-list[dir="rtl"] li.collapsed > p::before {
+  transform: rotate(90deg);
+}
+
+[dir="rtl"] .taskItemTools { right: unset; left: 0 }

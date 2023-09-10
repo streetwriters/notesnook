@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ToolProps } from "../types";
 import { Editor } from "../../types";
 import { Dropdown } from "../components/dropdown";
-import { MenuItem } from "../../components/menu/types";
+import { MenuItem } from "@notesnook/ui";
 import { ToolbarLocation, useToolbarLocation } from "../stores/toolbar-store";
 import { useMemo } from "react";
 
@@ -62,6 +62,7 @@ function toMenuItems(
     key: `heading-${level}`,
     title: toolbarLocation === "bottom" ? `H${level}` : `Heading ${level}`,
     isChecked: level === currentHeadingLevel,
+    modifier: `Mod-Alt-${level}`,
     onClick: () =>
       editor.current
         ?.chain()
@@ -75,6 +76,7 @@ function toMenuItems(
     type: "button",
     title: "Paragraph",
     isChecked: !currentHeadingLevel,
+    modifier: `Mod-Alt-0`,
     onClick: () => editor.current?.chain().focus().setParagraph().run()
   };
   return [paragraph, ...menuItems];

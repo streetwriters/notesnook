@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import RNFetchBlob from "rn-fetch-blob";
+import * as ScopedStorage from "react-native-scoped-storage";
+import { Platform } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 
 export const cacheDir = RNFetchBlob.fs.dirs.CacheDir;
 
@@ -61,4 +63,23 @@ export function cancelable(operation) {
       }
     };
   };
+}
+
+export function copyFileAsync(source, dest) {
+  return new Promise((resolve) => {
+    ScopedStorage.copyFile(source, dest, (e, r) => {
+      console.log(e, r);
+      resolve();
+    });
+  });
+}
+
+export async function releasePermissions(path) {
+  if (Platform.OS === "ios") return;
+  const uris = await ScopedStorage.getPersistedUriPermissions();
+  for (let uri of uris) {
+    if (path.startsWith(uri)) {
+      await ScopedStorage.releasePersistableUriPermission(uri);
+    }
+  }
 }

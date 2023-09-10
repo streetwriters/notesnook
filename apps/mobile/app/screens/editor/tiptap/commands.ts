@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ const fn = (fn: string) => {
   const id = randId("fn_");
   return {
     job: `(async () => {
+      if (typeof __PLATFORM__ === "undefined") __PLATFORM__ = "${Platform.OS}";
       try {
         let response = true;
         ${fn}
@@ -57,7 +58,7 @@ const fn = (fn: string) => {
         if (DEV_MODE && typeof logger !== "undefined") logger('error', "webview: ", e.message, e.stack);
       }
       return true;
-    })();`,
+    })();true;`,
     id: id
   };
 };
@@ -86,7 +87,7 @@ class Commands {
         this.ref?.current?.requestFocus();
       }, 1);
     } else {
-      await sleep(200);
+      await sleep(400);
       await this.doAsync("editor.commands.focus()");
     }
   };
@@ -105,6 +106,7 @@ typeof globalThis.editorTitle !== "undefined" && editorTitle.current && editorTi
 if (editorController.content) editorController.content.current = null;
 editorController.onUpdate();
 editorController.setTitle(null);
+editorController.countWords(0);
 typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",saved:""});
         `
     );
@@ -128,7 +130,6 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
   };
 
   setInsets = async (insets: EdgeInsets) => {
-    logger.info("setInsets", insets);
     await this.doAsync(`
       if (typeof safeAreaController !== "undefined") {
         safeAreaController.update(${JSON.stringify(insets)}) 
@@ -216,11 +217,19 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     );
   };
 
-  updateImage = async ({ src, hash }: ImageAttributes) => {
+  updateWebclip = async ({ src, hash }: Partial<ImageAttributes>) => {
+    await this.doAsync(
+      `editor && editor.commands.updateWebClip(${JSON.stringify({
+        hash
+      })},${JSON.stringify({ src })})`
+    );
+  };
+
+  updateImage = async ({ src, hash }: Partial<ImageAttributes>) => {
     await this.doAsync(
       `editor && editor.commands.updateImage(${JSON.stringify({
         hash
-      })},${JSON.stringify({ src, hash, preventUpdate: true })})`
+      })},${JSON.stringify({ dataurl: src, hash, preventUpdate: true })})`
     );
   };
 
@@ -228,6 +237,10 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     return this.doAsync<boolean>(
       'response = window.dispatchEvent(new Event("handleBackPress",{cancelable:true}));'
     );
+  };
+
+  keyboardShown = async (keyboardShown: boolean) => {
+    return this.doAsync(`globalThis['keyboardShown']=${keyboardShown};`);
   };
   //todo add replace image function
 }

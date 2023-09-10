@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,21 +33,27 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { eClearEditor, eOnLoadNote } from "../../utils/events";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { useThemeColors } from "@notesnook/theme";
+import { eClearEditor } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { editorState } from "./tiptap/utils";
 const EditorOverlay = ({ editorId = "", editor }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [error, setError] = useState(false);
   const opacity = useSharedValue(1);
-  const translateValue = useSharedValue(6000);
+  const translateValue = useSharedValue(0);
+  const deviceMode = useSettingStore((state) => state.deviceMode);
+  const isTablet = deviceMode !== "mobile";
   const insets = useGlobalSafeAreaInsets();
   const isDefaultEditor = editorId === "";
   const timers = useRef({
     loading: 0,
     error: 0,
     closing: 0
+  });
+  const loadingState = useRef({
+    startTime: 0
   });
 
   const clearTimers = () => {
@@ -61,19 +67,22 @@ const EditorOverlay = ({ editorId = "", editor }) => {
       editorState().overlay = true;
       clearTimers();
       if (_loading) {
+        loadingState.current.startTime = Date.now();
         opacity.value = 1;
         translateValue.value = 0;
         timers.current.error = setTimeout(() => {
-          if (_loading) {
-            let note = _loading;
-            note.forced = true;
-            eSendEvent(eOnLoadNote + editorId, note);
-          }
           setError(true);
-        }, 4000);
+        }, 60 * 1000);
       } else {
         clearTimers();
-        setTimeout(() => {
+        const timeDiffSinceLoadStarted =
+          Date.now() - loadingState.current.startTime > 300 ? 300 : 0;
+        if (!timeDiffSinceLoadStarted) {
+          setError(false);
+          editorState().overlay = false;
+          opacity.value = 0;
+          translateValue.value = 6000;
+        } else {
           setError(false);
           editorState().overlay = false;
           opacity.value = withTiming(0, {
@@ -82,19 +91,25 @@ const EditorOverlay = ({ editorId = "", editor }) => {
           setTimeout(() => {
             translateValue.value = 6000;
           }, 500);
-        }, 100);
+        }
       }
     },
-    [editorId, opacity, translateValue]
+    [opacity, translateValue]
   );
 
   useEffect(() => {
+    setTimeout(() => {
+      if (!loadingState.current.startTime) {
+        translateValue.value = 6000;
+        opacity.value = 0;
+      }
+    }, 3000);
     eSubscribeEvent("loadingNote" + editorId, load);
     return () => {
       clearTimers();
       eUnSubscribeEvent("loadingNote" + editorId, load);
     };
-  }, [editorId, load]);
+  }, [editorId, load, translateValue, opacity]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -114,7 +129,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
           position: "absolute",
           width: "100%",
           height: "100%",
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           justifyContent: "center",
           alignItems: "center",
           zIndex: 100
@@ -125,7 +140,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
       <View
         style={{
           width: "100%",
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           borderRadius: 5,
           height: "100%",
           alignItems: "flex-start",
@@ -144,15 +159,19 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               paddingRight: 12
             }}
           >
-            <IconButton
-              onPress={() => {
-                eSendEvent(eClearEditor);
-                opacity.value = 0;
-                translateValue.value = 6000;
-              }}
-              name="arrow-left"
-              color={colors.pri}
-            />
+            {isTablet ? (
+              <View />
+            ) : (
+              <IconButton
+                onPress={() => {
+                  eSendEvent(eClearEditor);
+                  opacity.value = 0;
+                  translateValue.value = 6000;
+                }}
+                name="arrow-left"
+                color={colors.primary.paragraph}
+              />
+            )}
 
             <View
               style={{
@@ -161,7 +180,10 @@ const EditorOverlay = ({ editorId = "", editor }) => {
                 alignItems: "center"
               }}
             >
-              <IconButton name="dots-horizontal" color={colors.pri} />
+              <IconButton
+                name="dots-horizontal"
+                color={colors.primary.paragraph}
+              />
             </View>
           </View>
         ) : null}
@@ -177,17 +199,19 @@ const EditorOverlay = ({ editorId = "", editor }) => {
             <View
               style={{
                 height: 30,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 borderRadius: 100,
                 marginBottom: 10,
                 justifyContent: "flex-start",
                 alignItems: "center",
                 flexDirection: "row",
                 paddingHorizontal: 10,
-                marginTop: 10
+                marginTop: 5,
+                borderWidth: 1,
+                borderColor: colors.primary.border
               }}
             >
-              <Paragraph color={colors.icon} size={13}>
+              <Paragraph color={colors.secondary.paragraph} size={13}>
                 Add a tag
               </Paragraph>
               <IconButton
@@ -197,7 +221,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
                   height: 26
                 }}
                 name="plus"
-                color={colors.accent}
+                color={colors.primary.accent}
               />
             </View>
           ) : null}
@@ -206,7 +230,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
             style={{
               height: 25,
               width: "100%",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5
             }}
           />
@@ -223,7 +247,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               style={{
                 height: 12,
                 width: 60,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 borderRadius: 5,
                 marginRight: 10
               }}
@@ -232,7 +256,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               style={{
                 height: 12,
                 width: 60,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 borderRadius: 5,
                 marginRight: 10
               }}
@@ -241,7 +265,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               style={{
                 height: 12,
                 width: 60,
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 borderRadius: 5,
                 marginRight: 10
               }}
@@ -252,7 +276,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
             style={{
               height: 16,
               width: "100%",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginTop: 10
             }}
@@ -262,7 +286,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
             style={{
               height: 16,
               width: "100%",
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginTop: 10
             }}
@@ -272,7 +296,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
             style={{
               height: 16,
               width: 200,
-              backgroundColor: colors.nav,
+              backgroundColor: colors.secondary.background,
               borderRadius: 5,
               marginTop: 10
             }}
@@ -298,7 +322,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               <Paragraph
                 textBreakStrategy="balanced"
                 size={SIZE.xs}
-                color={colors.icon}
+                color={colors.secondary.paragraph}
                 style={{
                   maxWidth: "100%",
                   marginTop: 5

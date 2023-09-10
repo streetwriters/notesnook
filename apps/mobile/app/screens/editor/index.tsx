@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,33 +18,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { EV, EVENTS } from "@notesnook/core/common";
+import { EV, EVENTS } from "@notesnook/core/dist/common";
 import React, {
   forwardRef,
   useCallback,
   useEffect,
   useImperativeHandle,
-  useState
+  useLayoutEffect,
+  useRef
 } from "react";
 import { Platform, ViewStyle } from "react-native";
 import WebView from "react-native-webview";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from "../../services/event-manager";
+import { IconButton } from "../../components/ui/icon-button";
+import useKeyboard from "../../hooks/use-keyboard";
+import { eSubscribeEvent } from "../../services/event-manager";
 import { useEditorStore } from "../../stores/use-editor-store";
-import { getElevation } from "../../utils";
+import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
 import { NoteType } from "../../utils/types";
+import EditorOverlay from "./loading";
 import { EDITOR_URI } from "./source";
 import { EditorProps, useEditorType } from "./tiptap/types";
 import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { editorController } from "./tiptap/utils";
-import { useLayoutEffect } from "react";
 
 const style: ViewStyle = {
   height: "100%",
@@ -78,18 +78,17 @@ const Editor = React.memo(
         withController = true,
         editorId = "",
         onLoad,
-        onChange,
-        theme
+        onChange
       },
       ref
     ) => {
-      const editor = useEditor(editorId || "", readonly, onChange, theme);
+      const editor = useEditor(editorId || "", readonly, onChange);
       const onMessage = useEditorEvents(editor, {
         readonly,
         noToolbar,
         noHeader
       });
-
+      const renderKey = useRef(`editor-0`);
       useImperativeHandle(ref, () => ({
         get: () => editor
       }));
@@ -98,38 +97,55 @@ const Editor = React.memo(
         ({
           hash,
           groupId,
-          src
+          src,
+          attachmentType
         }: {
           hash: string;
           groupId: string;
           src: string;
+          attachmentType: string;
         }) => {
           if (groupId !== editor.note.current?.id) return;
-          editor.commands.updateImage({
-            hash: hash,
-            src: src
-          });
+          editorController.current.markImageLoaded(hash);
+          if (attachmentType === "webclip") {
+            editor.commands.updateWebclip({
+              hash: hash,
+              src: src
+            });
+          } else {
+            editor.commands.updateImage({
+              hash: hash,
+              src: src
+            });
+          }
         },
         [editor.commands, editor.note]
       );
 
       const onError = useCallback(() => {
+        renderKey.current =
+          renderKey.current === `editor-0` ? `editor-1` : `editor-0`;
+        editor.state.current.ready = false;
         editor.setLoading(true);
-        setTimeout(() => editor.setLoading(false), 10);
       }, [editor]);
 
       useEffect(() => {
-        eSubscribeEvent("webview_reset", onError);
-        EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
+        const sub = [
+          eSubscribeEvent("webview_reset", onError),
+          EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded)
+        ];
+
         return () => {
-          eUnSubscribeEvent("webview_reset", onError);
+          sub.forEach((s) => s.unsubscribe());
           EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
         };
       }, [onError, onMediaDownloaded]);
 
       useLayoutEffect(() => {
-        onLoad && onLoad();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+        setImmediate(() => {
+          onLoad && onLoad();
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [onLoad]);
 
       if (withController) {
@@ -142,6 +158,7 @@ const Editor = React.memo(
             testID={notesnook.editor.id}
             ref={editor.ref}
             onLoad={editor.onLoad}
+            key={renderKey.current}
             onRenderProcessGone={onError}
             nestedScrollEnabled
             onError={onError}
@@ -153,6 +170,7 @@ const Editor = React.memo(
             injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
             javaScriptEnabled={true}
             focusable={true}
+            onContentProcessDidTerminate={onError}
             setSupportMultipleWindows={false}
             overScrollMode="never"
             scrollEnabled={false}
@@ -167,6 +185,7 @@ const Editor = React.memo(
             allowFileAccess={true}
             scalesPageToFit={true}
             hideKeyboardAccessoryView={false}
+            allowsFullscreenVideo={true}
             allowFileAccessFromFileURLs={true}
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={["*"]}
@@ -177,9 +196,8 @@ const Editor = React.memo(
             autoManageStatusBarEnabled={false}
             onMessage={onMessage || undefined}
           />
-          {editorId === "shareEditor" ? null : (
-            <AppSection editor={editor} editorId={editorId} />
-          )}
+          <EditorOverlay editorId={editorId || ""} editor={editor} />
+          <ReadonlyButton editor={editor} />
         </>
       );
     }
@@ -189,34 +207,10 @@ const Editor = React.memo(
 
 export default Editor;
 
-let EditorOverlay: React.ElementType;
-let IconButton: React.ElementType;
-const AppSection = ({
-  editor,
-  editorId
-}: {
-  editor: useEditorType;
-  editorId: string;
-}) => {
-  const [loaded, setLoaded] = useState(false);
-  useEffect(() => {
-    EditorOverlay = require("./loading.js").default;
-    IconButton =
-      require("../../components/ui/icon-button/index.tsx").IconButton;
-    setLoaded(true);
-  }, []);
-  return loaded ? (
-    <>
-      {EditorOverlay ? (
-        <EditorOverlay editorId={editorId || ""} editor={editor} />
-      ) : null}
-      <ReadonlyButton editor={editor} />
-    </>
-  ) : null;
-};
-
 const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
   const readonly = useEditorStore((state) => state.readonly);
+  const keyboard = useKeyboard();
+
   const onPress = async () => {
     if (editor.note.current) {
       await db.notes?.note(editor.note.current.id).readonly();
@@ -226,7 +220,7 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
     }
   };
 
-  return readonly && IconButton ? (
+  return readonly && !keyboard.keyboardShown ? (
     <IconButton
       name="pencil-lock"
       type="grayBg"
@@ -234,11 +228,11 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
       color="accent"
       customStyle={{
         position: "absolute",
-        bottom: 20,
+        bottom: 60,
         width: 60,
         height: 60,
         right: 12,
-        ...getElevation(5)
+        ...getElevationStyle(5)
       }}
     />
   ) : null;

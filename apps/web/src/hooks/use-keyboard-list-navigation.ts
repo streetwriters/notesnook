@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ enum DIRECTION {
 type UseKeyboardListNavigationOptions = {
   length: number;
   reset: () => void;
-  select: (index: number) => void;
+  select: (index: number, toggleable?: boolean) => void;
   deselect: (index: number) => void;
   bulkSelect: (indices: number[]) => void;
   focusItemAt: (index: number) => void;
@@ -52,7 +52,6 @@ export function useKeyboardListNavigation(
   } = options;
   const cursor = useRef(-1);
   const anchor = useRef(-1);
-
   // const { reset, select, deselect } = useSelection();
 
   const direction = useCallback(() => {
@@ -83,7 +82,7 @@ export function useKeyboardListNavigation(
   const onMouseDown = useCallback(
     (e: MouseEvent, itemIndex: number) => {
       if (e.ctrlKey || e.metaKey) {
-        select(itemIndex);
+        select(itemIndex, true);
       } else if (e.shiftKey) {
         const startIndex =
           itemIndex > cursor.current ? cursor.current : itemIndex;
@@ -91,6 +90,7 @@ export function useKeyboardListNavigation(
           itemIndex > cursor.current ? itemIndex : cursor.current;
         const indices = [];
         for (let i = startIndex; i <= endIndex; ++i) {
+          if (skip && skip(i)) continue;
           indices.push(i);
         }
         bulkSelect(indices);
@@ -100,7 +100,7 @@ export function useKeyboardListNavigation(
         select(itemIndex);
       }
     },
-    [select, resetSelection, bulkSelect, focusItemAt]
+    [select, resetSelection, bulkSelect, skip, focusItemAt]
   );
 
   const onKeyDown = useCallback(
@@ -114,7 +114,8 @@ export function useKeyboardListNavigation(
           resetSelection();
 
           let nextIndex = moveUpCyclic(cursor.current, max);
-          if (skip && skip(nextIndex)) nextIndex = moveUpCyclic(nextIndex, max);
+          while (skip && skip(nextIndex))
+            nextIndex = moveUpCyclic(nextIndex, max);
           focusItemAt(nextIndex);
           return true;
         },
@@ -122,7 +123,7 @@ export function useKeyboardListNavigation(
           resetSelection();
 
           let nextIndex = moveDownCyclic(cursor.current, max);
-          if (skip && skip(nextIndex))
+          while (skip && skip(nextIndex))
             nextIndex = moveDownCyclic(nextIndex, max);
           focusItemAt(nextIndex);
           return true;

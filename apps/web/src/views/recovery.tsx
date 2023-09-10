@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,17 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { Error as ErrorIcon } from "../components/icons";
 import { makeURL, useQueryParams } from "../navigation";
 import { db } from "../common/db";
 import useDatabase from "../hooks/use-database";
-import Loader from "../components/loader";
+import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { AuthField, SubmitButton } from "./auth";
 import { createBackup, restoreBackupFile, selectBackupFile } from "../common";
 import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import Config from "../utils/config";
+import { EVENTS } from "@notesnook/core/dist/common";
+import { ErrorText } from "../components/error-text";
 
 type RecoveryMethodType = "key" | "backup" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;
@@ -295,7 +296,9 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
             ":first-of-type": { mt: 2 },
             display: "flex",
             flexDirection: "column",
-            bg: method.isDangerous ? "errorBg" : "bgSecondary",
+            bg: method.isDangerous
+              ? "var(--background-secondary)"
+              : "var(--background-error)",
             alignSelf: "stretch",
             // alignItems: "center",
             textAlign: "left",
@@ -305,13 +308,19 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
         >
           <Text
             variant={"title"}
-            sx={{ color: method.isDangerous ? "error" : "text" }}
+            sx={{
+              color: method.isDangerous ? "var(--heading-error)" : "heading"
+            }}
           >
             {method.title}
           </Text>
           <Text
             variant={"body"}
-            sx={{ color: method.isDangerous ? "error" : "fontTertiary" }}
+            sx={{
+              color: method.isDangerous
+                ? "var(--paragraph-error)"
+                : "var(--paragraph-secondary)"
+            }}
           >
             {method.description}
           </Text>
@@ -323,6 +332,27 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
 
 function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
   const { navigate } = props;
+  const [progress, setProgress] = useState("0");
+
+  useEffect(() => {
+    db.eventManager.subscribe(
+      EVENTS.syncProgress,
+      ({
+        type,
+        total,
+        current
+      }: {
+        type: string;
+        total: number;
+        current: number;
+      }) => {
+        if (total === current) return;
+        if (type === "download") {
+          setProgress(((current / total) * 100).toFixed());
+        }
+      }
+    );
+  }, []);
 
   return (
     <RecoveryForm
@@ -331,13 +361,15 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       title="Recover your account"
       subtitle={"Use a data recovery key to reset your account password."}
       loading={{
-        title: "Downloading your data",
+        title: `Downloading your data (${progress}%)`,
         subtitle: "Please wait while your data is downloaded & decrypted."
       }}
       onSubmit={async (form) => {
+        setProgress("0");
+
         const user = await db.user?.getUser();
         if (!user) throw new Error("User not authenticated");
-        await db.storage.write(`_uk_@${user.email}@_k`, form.recoveryKey);
+        await db.storage?.write(`_uk_@${user.email}@_k`, form.recoveryKey);
         await db.sync(true, true);
         navigate("backup");
       }}
@@ -357,7 +389,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         mt={4}
         variant={"anchor"}
         onClick={() => navigate("methods")}
-        sx={{ color: "text" }}
+        sx={{ color: "paragraph" }}
       >
         {`Don't have your recovery key?`}
       </Button>
@@ -370,23 +402,23 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
   const [backupFile, setBackupFile] =
     useState<BackupFileFormData["backupFile"]>();
 
+  useEffect(() => {
+    if (!backupFile) return;
+    const backupFileInput = document.getElementById("backupFile");
+    if (!(backupFileInput instanceof HTMLInputElement)) return;
+    backupFileInput.value = backupFile?.file?.name;
+  }, [backupFile]);
+
   return (
     <RecoveryForm
       testId="step-backup-file"
       type="method:backup"
       title="Recover your account"
       subtitle={
-        <Text
-          variant="body"
-          bg="background"
-          p={2}
-          mt={2}
-          sx={{ borderRadius: "default", color: "error" }}
-          ml={2}
-        >
-          All the data in your account will be overwritten with the data in the
-          backup file. There is no way to reverse this action.
-        </Text>
+        <ErrorText
+          sx={{ fontSize: "body" }}
+          error="All the data in your account will be overwritten with the data in the backup file. There is no way to reverse this action."
+        />
       }
       onSubmit={async () => {
         navigate("new", { backupFile, userResetRequired: true });
@@ -398,7 +430,6 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
         label="Select backup file"
         helpText="Backup files have .nnbackup extension"
         autoComplete="none"
-        defaultValue={backupFile?.file?.name}
         autoFocus
         disabled
         action={{
@@ -415,7 +446,7 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
         mt={4}
         variant={"anchor"}
         onClick={() => navigate("methods")}
-        sx={{ color: "text" }}
+        sx={{ color: "paragraph" }}
       >
         {`Don't have a backup file?`}
       </Button>
@@ -451,6 +482,17 @@ function BackupData(props: BaseRecoveryComponentProps<"backup">) {
 
 function NewPassword(props: BaseRecoveryComponentProps<"new">) {
   const { navigate, formData } = props;
+  const [progress, setProgress] = useState("0");
+
+  useEffect(() => {
+    db.eventManager.subscribe(
+      EVENTS.syncProgress,
+      ({ total, current }: { total: number; current: number }) => {
+        if (total === current) return;
+        setProgress(((current / total) * 100).toFixed());
+      }
+    );
+  }, []);
 
   return (
     <RecoveryForm
@@ -461,10 +503,12 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
         "Notesnook is E2E encrypted — your password never leaves this device."
       }
       loading={{
-        title: "Resetting account password",
+        title: `Resetting account password (${progress}%)`,
         subtitle: "Please wait while we reset your account password."
       }}
       onSubmit={async (form) => {
+        setProgress("0");
+
         if (form.password !== form.confirmPassword)
           throw new Error("Passwords do not match.");
 
@@ -610,19 +654,16 @@ export function RecoveryForm<T extends RecoveryRoutes>(
         variant="body"
         mt={2}
         mb={35}
-        sx={{ fontSize: "title", textAlign: "center", color: "fontTertiary" }}
+        sx={{
+          fontSize: "title",
+          textAlign: "center",
+          color: "var(--paragraph-secondary)"
+        }}
       >
         {subtitle}
       </Text>
       {typeof children === "function" ? children(form) : children}
-      {error && (
-        <Flex bg="errorBg" p={1} mt={2} sx={{ borderRadius: "default" }}>
-          <ErrorIcon size={15} color="error" />
-          <Text variant="error" ml={1}>
-            {error}
-          </Text>
-        </Flex>
-      )}
+      <ErrorText error={error} />
     </Flex>
   );
 }

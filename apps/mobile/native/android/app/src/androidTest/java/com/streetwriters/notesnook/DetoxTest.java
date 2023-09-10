@@ -14,17 +14,11 @@ import androidx.test.rule.ActivityTestRule;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class DetoxTest {
-    // Replace 'MainActivity' with the value of android:name entry in
-    // <activity> in AndroidManifest.xml
-    @Rule
+    @Rule // (2)
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class, false, false);
 
     @Test
     public void runDetoxTests() {
-        // This is optional - in case you've decided to integrate TestButler
-        // See https://github.com/wix/Detox/blob/master/docs/Introduction.Android.md#8-test-butler-support-optional
-        //TestButlerProbe.assertReadyIfInstalled();
-
         DetoxConfig detoxConfig = new DetoxConfig();
         detoxConfig.idlePolicyConfig.masterTimeoutSec = 90;
         detoxConfig.idlePolicyConfig.idleResourceTimeoutSec = 60;

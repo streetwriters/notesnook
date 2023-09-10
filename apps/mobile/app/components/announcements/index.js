@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useMessageStore } from "../../stores/use-message-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import {
   eCloseAnnouncementDialog,
   eOpenAnnouncementDialog
@@ -35,7 +35,7 @@ import { allowedOnPlatform, renderItem } from "./functions";
 import { useCallback } from "react";
 
 export const AnnouncementDialog = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [info, setInfo] = useState(null);
   const remove = useMessageStore((state) => state.remove);
@@ -73,7 +73,7 @@ export const AnnouncementDialog = () => {
       <View
         style={{
           width: DDS.isTab ? 600 : "100%",
-          backgroundColor: colors.bg,
+          backgroundColor: colors.primary.background,
           maxHeight: DDS.isTab ? "90%" : "100%",
           borderRadius: DDS.isTab ? 10 : 0,
           overflow: "hidden",

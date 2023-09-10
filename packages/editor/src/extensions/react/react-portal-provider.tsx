@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -51,7 +51,8 @@ export class PortalProviderAPI extends EventDispatcher {
 
   render(
     children: () => React.ReactChild | JSX.Element | null,
-    container: HTMLElement
+    container: HTMLElement,
+    callback?: () => void
   ) {
     if (!this.context) return;
 
@@ -63,7 +64,8 @@ export class PortalProviderAPI extends EventDispatcher {
     unstable_renderSubtreeIntoContainer(
       this.context,
       wrappedChildren,
-      container
+      container,
+      callback
     );
   }
 

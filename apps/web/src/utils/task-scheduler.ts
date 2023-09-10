@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,9 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Worker from "worker-loader?filename=static/workers/task-scheduler.worker.[contenthash].js!./task-scheduler.worker";
+import TaskSchedulerWorker from "./task-scheduler.worker.ts?worker";
 import type {
   TaskScheduler as TaskSchedulerType,
   TaskSchedulerEvent
@@ -58,11 +56,15 @@ export class TaskScheduler {
     await scheduler?.stopAll();
     worker?.terminate();
   }
+
+  static async stopAllWithPrefix(prefix: string) {
+    await scheduler?.stopAllWithPrefix(prefix);
+  }
 }
 
 function init() {
   if (worker) return;
 
-  worker = new Worker();
+  worker = new TaskSchedulerWorker();
   if (worker) scheduler = wrap<TaskSchedulerType>(worker);
 }

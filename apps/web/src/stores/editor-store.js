@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,9 +24,11 @@ import { store as appStore } from "./app-store";
 import { store as tagStore } from "./tag-store";
 import { db } from "../common/db";
 import BaseStore from ".";
-import { EV, EVENTS } from "@notesnook/core/common";
+import { EV, EVENTS } from "@notesnook/core/dist/common";
 import { hashNavigate } from "../navigation";
 import { logger } from "../utils/logger";
+import Config from "../utils/config";
+import { setDocumentTitle } from "../utils/dom";
 
 const SESSION_STATES = {
   stale: "stale",
@@ -43,9 +45,18 @@ export const getDefaultSession = (sessionId = Date.now()) => {
     state: undefined,
     saveState: 1, // -1 = not saved, 0 = saving, 1 = saved
     sessionId,
+    /**
+     * @type {string  | undefined}
+     */
     contentId: undefined,
+    /**
+     * @type {any[]}
+     */
     notebooks: undefined,
     title: "",
+    /**
+     * @type {string | undefined}
+     */
     id: undefined,
     pinned: false,
     localOnly: false,
@@ -56,13 +67,22 @@ export const getDefaultSession = (sessionId = Date.now()) => {
     color: undefined,
     dateEdited: 0,
     attachmentsLength: 0,
-    isDeleted: false
+    isDeleted: false,
+
+    /**
+     * @type {{data: string; type: "tiptap"} | undefined}
+     */
+    content: undefined
   };
 };
 
+/**
+ * @extends {BaseStore<EditorStore>}
+ */
 class EditorStore extends BaseStore {
   session = getDefaultSession();
   arePropertiesVisible = false;
+  editorMargins = Config.get("editor:margins", true);
 
   init = () => {
     EV.subscribe(EVENTS.userLoggedOut, () => {
@@ -80,6 +100,11 @@ class EditorStore extends BaseStore {
       state.session.tags = state.session.tags.slice();
     });
   };
+
+  async refresh() {
+    const sessionId = this.get().session.id;
+    if (sessionId && !db.notes.note(sessionId)) await this.clearSession();
+  }
 
   updateSession = async (item) => {
     this.set((state) => {
@@ -109,8 +134,6 @@ class EditorStore extends BaseStore {
   };
 
   openSession = async (noteId, force) => {
-    await db.notes.init();
-
     const session = this.get().session;
 
     if (session.id) await db.fs.cancel(session.id);
@@ -125,11 +148,10 @@ class EditorStore extends BaseStore {
     }
 
     const note = db.notes.note(noteId)?.data || db.notes.trashed(noteId);
-    const isDeleted = note.type === "trash";
-
     if (!note) return;
 
     noteStore.setSelectedNote(note.id);
+    setDocumentTitle(note.title);
 
     if (note.locked)
       return hashNavigate(`/notes/${noteId}/unlock`, { replace: true });
@@ -146,12 +168,15 @@ class EditorStore extends BaseStore {
         state: SESSION_STATES.new,
         attachmentsLength: db.attachments.ofNote(note.id, "all")?.length || 0
       };
+
+      const isDeleted = note.type === "trash";
       if (isDeleted) {
         state.session.isDeleted = true;
         state.session.readonly = true;
       }
     });
     appStore.setIsEditorOpen(true);
+    this.toggleProperties(false);
   };
 
   saveSession = async (sessionId, session) => {
@@ -185,11 +210,14 @@ class EditorStore extends BaseStore {
 
       if (currentSession.context) {
         const { type, value } = currentSession.context;
-        if (type === "topic") await db.notes.addToNotebook(value, id);
+        if (type === "topic" || type === "notebook")
+          await db.notes.addToNotebook(value, id);
         else if (type === "color") await db.notes.note(id).color(value);
         else if (type === "tag") await db.notes.note(id).tag(value);
         // update the note.
         note = db.notes.note(id)?.data;
+      } else if (!sessionId && db.settings.getDefaultNotebook()) {
+        await db.notes.addToNotebook(db.settings.getDefaultNotebook(), id);
       }
 
       const shouldRefreshNotes =
@@ -219,6 +247,7 @@ class EditorStore extends BaseStore {
         state.session.dateEdited = note.dateEdited;
         state.session.attachmentsLength = attachments.length;
       });
+      setDocumentTitle(note.title);
 
       this.setSaveState(1);
     } catch (err) {
@@ -245,6 +274,7 @@ class EditorStore extends BaseStore {
     });
     noteStore.setSelectedNote(0);
     appStore.setIsEditorOpen(true);
+    setDocumentTitle();
   };
 
   clearSession = async (shouldNavigate = true) => {
@@ -261,7 +291,8 @@ class EditorStore extends BaseStore {
     this.toggleProperties(false);
     if (shouldNavigate)
       hashNavigate(`/notes/create`, { replace: true, addNonce: true });
-    appStore.setIsEditorOpen(false);
+    setTimeout(() => appStore.setIsEditorOpen(false), 100);
+    setDocumentTitle();
   };
 
   setTitle = (noteId, title) => {
@@ -292,6 +323,14 @@ class EditorStore extends BaseStore {
         (state.arePropertiesVisible =
           toggleState !== undefined ? toggleState : !state.arePropertiesVisible)
     );
+  };
+
+  toggleEditorMargins = (toggleState) => {
+    this.set((state) => {
+      state.editorMargins =
+        toggleState !== undefined ? toggleState : !state.editorMargins;
+      Config.set("editor:margins", state.editorMargins);
+    });
   };
 
   /**
@@ -331,8 +370,5 @@ class EditorStore extends BaseStore {
   }
 }
 
-/**
- * @type {[import("zustand").UseStore<EditorStore>, EditorStore]}
- */
 const [useStore, store] = createStore(EditorStore);
 export { useStore, store, SESSION_STATES };

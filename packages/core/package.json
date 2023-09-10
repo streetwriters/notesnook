@@ -1,61 +1,58 @@
 {
   "name": "@notesnook/core",
-  "version": "7.3.6",
-  "main": "./api/index.js",
+  "version": "7.4.1",
+  "main": "dist/api/index.js",
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "git://github.com/streetwriters/notesnook-core.git"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.9",
-    "@babel/plugin-transform-runtime": "^7.18.9",
-    "@babel/preset-env": "^7.18.9",
-    "@babel/runtime": "^7.18.9",
-    "@notesnook/crypto": "^1.0.1",
-    "@types/jest": "^28.1.6",
+    "@notesnook/crypto": "file:../crypto",
+    "@types/html-to-text": "^9.0.0",
+    "@types/katex": "^0.16.1",
+    "@types/prismjs": "^1.26.0",
     "@types/showdown": "^2.0.0",
+    "@vitest/coverage-v8": "^0.34.1",
     "abortcontroller-polyfill": "^1.7.3",
-    "analyze-es6-modules": "^0.6.2",
-    "babel-jest": "^28.1.3",
-    "babel-plugin-syntax-object-rest-spread": "^6.13.0",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.0.1",
-    "env-cmd": "^10.1.0",
     "eventsource": "^2.0.2",
-    "jest": "^28.1.3",
-    "jest-fetch-mock": "^3.0.3",
-    "jsdom": "^20.0.0"
+    "isomorphic-fetch": "^3.0.0",
+    "jsdom": "^22.1.0",
+    "mockdate": "^3.0.5",
+    "otplib": "^12.0.1",
+    "refractor": "^4.8.1",
+    "vitest": "^0.34.1",
+    "vitest-fetch-mock": "^0.2.2"
   },
   "scripts": {
-    "test:e2e": "env-cmd -e e2e jest --forceExit",
-    "test": "jest --forceExit"
+    "prebuild": "node scripts/prebuild.mjs",
+    "pretest": "node scripts/prebuild.mjs",
+    "pretest:e2e": "node scripts/prebuild.mjs",
+    "build": "tsc",
+    "test:e2e": "cross-env IS_E2E=true vitest run",
+    "test": "vitest run"
   },
   "dependencies": {
-    "@microsoft/signalr": "^6.0.7",
-    "@microsoft/signalr-protocol-msgpack": "^6.0.7",
-    "@notesnook/logger": "*",
-    "@streetwriters/showdown": "^3.0.1-alpha",
+    "@microsoft/signalr": "^7.0.10",
+    "@microsoft/signalr-protocol-msgpack": "^7.0.10",
+    "@notesnook/logger": "file:../logger",
+    "@streetwriters/showdown": "^3.0.1-alpha.2",
     "async-mutex": "^0.3.2",
-    "dayjs": "^1.11.3",
+    "dayjs": "1.11.9",
     "entities": "^4.3.1",
-    "html-to-text": "github:thecodrr/node-html-to-text",
+    "html-to-text": "^9.0.5",
     "htmlparser2": "^8.0.1",
+    "katex": "0.16.2",
     "linkedom": "^0.14.17",
     "liqe": "^1.13.0",
+    "mime-db": "1.52.0",
+    "prismjs": "^1.29.0",
     "qclone": "^1.2.0",
     "spark-md5": "^3.0.2"
   },
   "overrides": {
     "htmlparser2": "^8.0.1"
-  },
-  "np": {
-    "releaseDraft": false,
-    "message": "chore: bump version to %s"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
   }
 }

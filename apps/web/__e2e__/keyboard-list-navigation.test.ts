@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -254,4 +254,72 @@ test("select notes using Shift+Click upwards", async ({ page }, info) => {
     expect(await notesList[i].isSelected()).toBeTruthy();
   }
   expect(await notesList[0].isFocused()).toBeTruthy();
+});
+
+test("using Shift+Click when no notes are selected should not crash the app", async ({
+  page
+}, info) => {
+  info.setTimeout(60 * 1000);
+
+  const { notes } = await populateList(page, 5);
+  await page.reload();
+
+  const note = await notes.findNote({ title: "Test note 3" });
+
+  await page.keyboard.down("Shift");
+  await note?.click();
+  await page.keyboard.up("Shift");
+
+  expect(await notes.isEmpty()).toBeFalsy();
+});
+
+test("Ctrl+Click to select/unselect notes", async ({ page }, info) => {
+  info.setTimeout(60 * 1000);
+  const { notesList, notes } = await populateList(page, 10);
+  await notes.focus();
+
+  await page.keyboard.down("Control");
+  for (let i = 2; i < 10; i += 2) {
+    await notesList[i].click();
+  }
+  await page.keyboard.up("Control");
+
+  for (let i = 2; i < 10; i += 2) {
+    expect(await notesList[i].isSelected()).toBeTruthy();
+  }
+
+  const selectedNote = notesList[2];
+  await selectedNote.contextMenu.open();
+  expect(
+    (await selectedNote.contextMenu.title()) === `5 items selected`
+  ).toBeTruthy();
+  await selectedNote.contextMenu.close();
+
+  await page.keyboard.down("Control");
+  for (let i = 2; i < 10; i += 2) {
+    await notesList[i].click();
+  }
+  await page.keyboard.up("Control");
+
+  for (let i = 2; i < 10; i += 2) {
+    expect(await notesList[i].isSelected()).toBeFalsy();
+  }
+
+  await selectedNote.contextMenu.open();
+  expect(await selectedNote.contextMenu.title()).toBeFalsy();
+});
+
+test("opening a note & right clicking on another note should show note properties menu", async ({
+  page
+}, info) => {
+  info.setTimeout(60 * 1000);
+  const { notesList, notes } = await populateList(page, 10);
+  await notes.focus();
+
+  const noteSelected = 4;
+  const selectedNote = notesList[noteSelected];
+
+  await notesList[0].click();
+  await selectedNote.contextMenu.open();
+  expect(await selectedNote.contextMenu.title()).toBeFalsy();
 });

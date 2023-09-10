@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,7 +48,6 @@ export const ShareComponent = ({ uri, name, padding }) => {
             });
           });
         }}
-        height={50}
       />
       <Button
         title="Share"
@@ -65,7 +64,6 @@ export const ShareComponent = ({ uri, name, padding }) => {
             shareFile: true
           }).catch(console.log);
         }}
-        height={50}
       />
     </View>
   );

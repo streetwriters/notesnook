@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,11 +22,8 @@ import { Linking, View } from "react-native";
 //import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import Sync from "../../services/sync";
-import { useThemeStore } from "../../stores/use-theme-store";
-import {
-  eCloseAnnouncementDialog,
-  eCloseProgressDialog
-} from "../../utils/events";
+import { useThemeColors } from "@notesnook/theme";
+import { eCloseAnnouncementDialog, eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { PricingPlans } from "../premium/pricing-plans";
@@ -36,7 +33,7 @@ import { Button } from "../ui/button";
 import { allowedOnPlatform, getStyle } from "./functions";
 
 export const Cta = ({ actions, style = {}, color, inline }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   let buttons =
     actions.filter((item) => allowedOnPlatform(item.platforms)) || [];
 
@@ -60,11 +57,11 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
         )
       });
     } else if (item.type === "force-sync") {
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
       await sleep(300);
       Progress.present();
       Sync.run("global", true, true, () => {
-        eSendEvent(eCloseProgressDialog);
+        eSendEvent(eCloseSheet);
       });
     }
   };
@@ -95,8 +92,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 style={{
                   height: 30,
                   alignSelf: "flex-start",
-                  paddingHorizontal: 0,
-                  marginTop: -6
+                  paddingHorizontal: 0
                 }}
               />
             ))}
@@ -114,7 +110,6 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 style={{
                   alignSelf: "flex-start",
                   paddingHorizontal: 0,
-                  marginTop: -6,
                   marginLeft: 12
                 }}
                 textStyle={{
@@ -132,9 +127,11 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 title={item.title}
                 fontSize={SIZE.md}
                 buttonType={{
-                  color: color ? color : colors.accent,
-                  text: colors.light,
-                  selected: color ? color : colors.accent,
+                  color: color ? color : colors.primary.accent,
+                  text: color
+                    ? colors.static.white
+                    : colors.primary.accentForeground,
+                  selected: color ? color : colors.primary.accent,
                   opacity: 1
                 }}
                 onPress={() => onPress(item)}
@@ -151,7 +148,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.xs + 1}
+                fontSize={SIZE.xs}
                 type="gray"
                 onPress={() => onPress(item)}
                 width={null}

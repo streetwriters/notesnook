@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Plugin, PluginKey } from "prosemirror-state";
+import { Plugin, PluginKey, EditorState } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import {
   findChildren,
@@ -28,6 +28,9 @@ import { Root, refractor } from "refractor/lib/core";
 import { RootContent } from "hast";
 import { ReplaceAroundStep, ReplaceStep } from "prosemirror-transform";
 import { toCaretPosition, toCodeLines } from "./code-block";
+import Languages from "./languages.json";
+import { isLanguageLoaded, loadLanguage } from "./loader";
+import { getChangedNodes } from "../../utils/prosemirror";
 
 export type ReplaceMergedStep = ReplaceAroundStep | ReplaceStep;
 
@@ -94,6 +97,11 @@ function getDecorations({
   return decorations;
 }
 
+type HighlighterState = {
+  decorations: DecorationSet;
+  languages: Record<string, string>;
+};
+
 export function HighlighterPlugin({
   name,
   defaultLanguage
@@ -101,118 +109,242 @@ export function HighlighterPlugin({
   name: string;
   defaultLanguage: string | null | undefined;
 }) {
-  const key = new PluginKey("highlighter");
-  return new Plugin({
-    key,
+  const HIGHLIGHTER_PLUGIN_KEY = new PluginKey<HighlighterState>("highlighter");
+  const HIGHLIGHTED_BLOCKS: Set<string> = new Set();
 
+  return new Plugin<HighlighterState>({
+    key: HIGHLIGHTER_PLUGIN_KEY,
+    view() {
+      return {
+        destroy() {
+          HIGHLIGHTED_BLOCKS.clear();
+        },
+        async update(view) {
+          const pluginState = HIGHLIGHTER_PLUGIN_KEY.getState(view.state);
+          if (!pluginState) return;
+
+          const changedBlocks: Set<string> = new Set();
+          for (const blockKey in pluginState.languages) {
+            const language = pluginState.languages[blockKey];
+            if (
+              HIGHLIGHTED_BLOCKS.has(blockKey) &&
+              refractor.registered(language)
+            ) {
+              continue;
+            }
+
+            const languageDefinition = Languages.find(
+              (l) =>
+                l.filename === language || l.alias?.some((a) => a === language)
+            );
+            if (!languageDefinition) continue;
+
+            if (
+              isLanguageLoaded(languageDefinition.filename) ||
+              refractor.registered(languageDefinition.filename)
+            ) {
+              if (!HIGHLIGHTED_BLOCKS.has(blockKey)) {
+                HIGHLIGHTED_BLOCKS.add(blockKey);
+                changedBlocks.add(blockKey);
+              }
+              continue;
+            }
+
+            changedBlocks.add(blockKey);
+            HIGHLIGHTED_BLOCKS.add(blockKey);
+
+            try {
+              const syntax = await loadLanguage(languageDefinition.filename);
+              if (!syntax) {
+                throw new Error(
+                  "Failed to load language definition for " +
+                    languageDefinition.filename
+                );
+              }
+
+              refractor.register(syntax);
+            } catch (err) {
+              console.error(err);
+              HIGHLIGHTED_BLOCKS.delete(blockKey);
+              changedBlocks.delete(blockKey);
+            }
+          }
+
+          if (changedBlocks.size > 0) {
+            const { tr } = view.state;
+            const changedNodes = findChildren(
+              tr.doc,
+              (n) => n.type.name === name && changedBlocks.has(n.attrs.id)
+            );
+            changedNodes.forEach(({ node, pos }) => {
+              tr.setNodeMarkup(pos, node.type, node.attrs);
+            });
+            tr.setMeta("preventUpdate", true);
+            tr.setMeta("addToHistory", false);
+            view.dispatch(tr);
+          }
+        }
+      };
+    },
     state: {
-      init: (config, state) => {
-        const allDecorations: Decoration[] = [];
+      init: (_config, state) => {
+        const languages: Record<string, string> = {};
         findChildren(state.doc, (node) => node.type.name === name).forEach(
           (block) => {
-            allDecorations.push(
-              ...(getDecorations({ block, defaultLanguage }) || [])
-            );
+            const { id, language } = block.node.attrs;
+            if (id && language) languages[id] = language;
           }
         );
-        return DecorationSet.create(state.doc, allDecorations);
+        return { decorations: DecorationSet.empty, languages };
       },
-      apply: (
-        transaction,
-        decorationSet: DecorationSet,
-        oldState,
-        newState
-      ) => {
-        const oldNodeName = oldState.selection.$head.parent.type.name;
-        const newNodeName = newState.selection.$head.parent.type.name;
+      apply: (tr, pluginState) => {
+        let { decorations } = pluginState;
+        const { languages } = pluginState;
 
-        const isInsideCodeblock = oldNodeName === name || newNodeName === name;
-        const isDocChanged = transaction.docChanged;
-        const isForceUpdate = transaction.getMeta("forceUpdate");
-        // TODO: we need to find a way to trigger decoration changes
-        // when user pastes something.
-        if (isForceUpdate) {
-          const allDecorations: Decoration[] = [];
-          findChildren(newState.doc, (node) => node.type.name === name).forEach(
-            (block) => {
-              allDecorations.push(
-                ...(getDecorations({ block, defaultLanguage }) || [])
-              );
-            }
-          );
-          return DecorationSet.create(newState.doc, allDecorations);
-        }
-
-        if (isDocChanged && isInsideCodeblock) {
-          const block = findParentNodeClosestToPos(
-            newState.selection.$head,
-            (node) => node.type.name === name
-          );
-          if (!block)
-            return decorationSet.map(transaction.mapping, transaction.doc);
-
-          const newDecorations = getDecorations({
-            block,
-            defaultLanguage
+        if (tr.docChanged && !tr.getMeta("selectionUpdate")) {
+          const changedBlocks = getChangedNodes(tr, {
+            descend: true,
+            predicate: (n) => n.type.name === name
           });
-          if (!newDecorations)
-            return decorationSet.map(transaction.mapping, transaction.doc);
+          if (changedBlocks.length > 0) {
+            const updated: Set<number> = new Set();
+            let hasChanges = false;
 
-          return decorationSet
-            .map(transaction.mapping, transaction.doc)
-            .add(transaction.doc, newDecorations);
+            changedBlocks.forEach((block) => {
+              if (updated.has(block.pos)) return;
+              updated.add(block.pos);
+
+              const { id, language } = block.node.attrs;
+
+              if (
+                !languages[id] ||
+                (language && !refractor.registered(language))
+              ) {
+                languages[id] = language;
+                hasChanges = true;
+              } else {
+                const newDecorations = getDecorations({
+                  block,
+                  defaultLanguage
+                });
+                if (!newDecorations) return;
+
+                decorations = decorations.map(tr.mapping, tr.doc);
+
+                const oldDecorations = decorations.find(
+                  block.pos,
+                  block.pos + block.node.nodeSize
+                );
+
+                const { toAdd, toRemove } = diffDecorations(
+                  oldDecorations,
+                  newDecorations
+                );
+
+                if (toRemove.length > 0)
+                  decorations = decorations.remove(toRemove);
+                if (toAdd.length > 0)
+                  decorations = decorations.add(tr.doc, toAdd);
+
+                hasChanges = true;
+              }
+            });
+
+            if (hasChanges) {
+              return { decorations, languages };
+            }
+          }
         }
 
-        return decorationSet.map(transaction.mapping, transaction.doc);
+        return {
+          decorations: decorations.map(tr.mapping, tr.doc),
+          languages
+        };
       }
     },
 
     props: {
       decorations(state) {
-        return key.getState(state);
+        return HIGHLIGHTER_PLUGIN_KEY.getState(state)?.decorations;
       }
     },
-
-    appendTransaction: (transactions, oldState, newState) => {
-      const oldNodeName = oldState.selection.$head.parent.type.name;
-      const newNodeName = newState.selection.$head.parent.type.name;
-
-      const isDocChanged = transactions.some(
-        (transaction) => transaction.docChanged
-      );
-      const isInsideCodeblock = oldNodeName === name || newNodeName === name;
-      const isSelectionChanged =
-        isInsideCodeblock && !oldState.selection.eq(newState.selection);
-
-      if (isDocChanged || isSelectionChanged) {
-        const block = findParentNodeClosestToPos(
-          newState.selection.$head,
-          (node) => node.type.name === name
-        );
-        if (!block) return null;
-        const { tr } = newState;
-        const { node, pos } = block;
-        const attributes = { ...node.attrs };
-
-        if (isDocChanged || !attributes.lines?.length) {
-          const lines = toCodeLines(node.textContent, pos);
-          attributes.lines = lines.slice();
-        }
-
-        if (isDocChanged) {
-          const position = toCaretPosition(
-            newState.selection,
-            isDocChanged ? toCodeLines(node.textContent, pos) : undefined
-          );
-          attributes.caretPosition = position;
-        }
-
-        if (isDocChanged || isSelectionChanged) {
-          tr.setNodeMarkup(pos, node.type, attributes);
-        }
-
-        return tr;
-      }
+    appendTransaction(transactions, oldState, newState) {
+      const isDocChanged = transactions.some((tr) => tr.docChanged);
+      return updateSelection(name, oldState, newState, isDocChanged);
     }
   });
+}
+
+function updateSelection(
+  name: string,
+  oldState: EditorState,
+  newState: EditorState,
+  isDocChanged: boolean
+) {
+  const oldNodeName = oldState.selection.$head.parent.type.name;
+  const newNodeName = newState.selection.$head.parent.type.name;
+
+  const isInsideCodeblock = oldNodeName === name || newNodeName === name;
+  const isSelectionChanged =
+    isInsideCodeblock && !oldState.selection.eq(newState.selection);
+
+  if (isDocChanged || isSelectionChanged) {
+    const block = findParentNodeClosestToPos(
+      newState.selection.$head,
+      (node) => node.type.name === name
+    );
+    if (!block) return null;
+    const { node, pos } = block;
+    const attributes = { ...node.attrs };
+
+    if (isDocChanged || !attributes.lines?.length) {
+      const lines = toCodeLines(node.textContent, pos);
+      attributes.lines = lines.slice();
+    }
+
+    const position = toCaretPosition(
+      newState.selection,
+      isDocChanged ? toCodeLines(node.textContent, pos) : undefined
+    );
+    attributes.caretPosition = position;
+
+    const { tr } = newState;
+    tr.setMeta("preventUpdate", true);
+    tr.setMeta("addToHistory", false);
+    tr.setMeta("selectionUpdate", true);
+    tr.setNodeMarkup(pos, node.type, attributes);
+    return tr;
+  }
+}
+
+function diffDecorations(
+  oldDecorations: Decoration[],
+  newDecorations: Decoration[]
+) {
+  const toAdd: Decoration[] = [];
+  const toRemove: Decoration[] = [];
+
+  for (let i = 0; i < oldDecorations.length; ++i) {
+    const oldDecoration = oldDecorations[i];
+    const newDecoration = newDecorations[i];
+
+    if (!newDecoration) {
+      toRemove.push(oldDecoration);
+    } else if (
+      oldDecoration.from !== newDecoration.from ||
+      oldDecoration.to !== newDecoration.to ||
+      oldDecoration.spec.class !== newDecoration.spec.class
+    ) {
+      toAdd.push(newDecoration);
+      toRemove.push(oldDecoration);
+    }
+  }
+
+  const extraDecorations = newDecorations.length - oldDecorations.length;
+  if (extraDecorations > 0) {
+    toAdd.push(
+      ...newDecorations.slice(newDecorations.length - extraDecorations)
+    );
+  }
+  return { toAdd, toRemove };
 }

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,27 +17,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
+import { NotesScreenParams } from "../../stores/use-navigation-store";
 import { useTagStore } from "../../stores/use-tag-store";
-import { db } from "../../common/database";
-import { eOnLoadNote } from "../../utils/events";
+import { eOnLoadNote, eOnTopicSheetUpdate } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
 import { tabBarRef } from "../../utils/global-refs";
-import { editorController, editorState } from "../editor/tiptap/utils";
-import { NotesScreenParams } from "../../stores/use-navigation-store";
 import { TopicType } from "../../utils/types";
+import { editorController, editorState } from "../editor/tiptap/utils";
 
 export function toCamelCase(title: string) {
+  if (!title) return "";
   return title.slice(0, 1).toUpperCase() + title.slice(1);
 }
 
 export function getAlias(params: Partial<NotesScreenParams>) {
   if (!params) return "";
   const { item } = params;
-  return (item as TopicType)?.alias || item?.title;
+  return (item as TopicType)?.alias || item?.title || "";
 }
 
 export function openMonographsWebpage() {
@@ -80,12 +81,22 @@ export const setOnFirstSave = (
     editorState().onNoteCreated = null;
     return;
   }
-  editorState().onNoteCreated = (id) => onNoteCreated(id, data);
+  setTimeout(() => {
+    editorState().onNoteCreated = (id) => onNoteCreated(id, data);
+  }, 0);
 };
 
-async function onNoteCreated(id: string, params: FirstSaveData) {
+export async function onNoteCreated(id: string, params: FirstSaveData) {
   if (!params) return;
   switch (params.type) {
+    case "notebook": {
+      await db.relations?.add(
+        { type: "notebook", id: params.id },
+        { type: "note", id: id }
+      );
+      editorState().onNoteCreated = null;
+      break;
+    }
     case "topic": {
       if (!params.notebook) break;
       await db.notes?.addToNotebook(
@@ -96,40 +107,18 @@ async function onNoteCreated(id: string, params: FirstSaveData) {
         id
       );
       editorState().onNoteCreated = null;
-      Navigation.queueRoutesForUpdate(
-        "TaggedNotes",
-        "ColoredNotes",
-        "TopicNotes",
-        "Favorites",
-        "Notes",
-        "Notebook",
-        "Notebooks"
-      );
+      eSendEvent(eOnTopicSheetUpdate);
       break;
     }
     case "tag": {
       await db.notes?.note(id).tag(params.id);
       editorState().onNoteCreated = null;
-      Navigation.queueRoutesForUpdate(
-        "TaggedNotes",
-        "ColoredNotes",
-        "TopicNotes",
-        "Favorites",
-        "Notes"
-      );
       useTagStore.getState().setTags();
       break;
     }
     case "color": {
       await db.notes?.note(id).color(params.color);
       editorState().onNoteCreated = null;
-      Navigation.queueRoutesForUpdate(
-        "TaggedNotes",
-        "ColoredNotes",
-        "TopicNotes",
-        "Favorites",
-        "Notes"
-      );
       useMenuStore.getState().setColorNotes();
       break;
     }
@@ -137,4 +126,5 @@ async function onNoteCreated(id: string, params: FirstSaveData) {
       break;
     }
   }
+  Navigation.queueRoutesForUpdate();
 }

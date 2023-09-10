@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,21 +19,93 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { memo } from "react";
 import Skeleton from "react-loading-skeleton";
-import { Box, Flex } from "@theme-ui/components";
+import { Box, Flex, Text } from "@theme-ui/components";
 import "react-loading-skeleton/dist/skeleton.css";
+import Config from "../../utils/config";
+import { TextScramble } from "../text-scramble";
+import useHashLocation from "../../hooks/use-hash-location";
+import makeMatcher from "wouter/matcher";
+import { Lock } from "../icons";
 
+const matcher = makeMatcher();
+const EDITOR_MARGINS = Config.get("editor:margins", true);
 export const EditorLoader = memo(function EditorLoader() {
-  return (
-    <Flex sx={{ flexDirection: "column", p: 2, py: 1 }}>
-      <Flex sx={{ alignItems: "end", justifyContent: "end" }}>
-        <Skeleton width={45} height={30} style={{ marginRight: 5 }} />
-        <Skeleton width={45} height={30} />
+  const [{ location }] = useHashLocation();
+  const [isNoteLoading] = matcher("/notes/:noteId/edit", location);
+  const [isNoteLocked] = matcher("/notes/:noteId/unlock", location);
+
+  if (isNoteLocked) {
+    return (
+      <Flex
+        sx={{
+          flexDirection: "column",
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <Lock size={100} sx={{ opacity: 0.2 }} />
       </Flex>
-      <Skeleton height={39} style={{ marginTop: 20 }} />
-      <Box sx={{ mt: 4, mx: "5%" }}>
-        <Skeleton height={56} width={300} />
-        <Skeleton height={22} style={{ marginTop: 15 }} count={3} />
-      </Box>
+    );
+  }
+
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        p: 2,
+        py: 1
+      }}
+    >
+      <Flex sx={{ alignItems: "end", justifyContent: "end", opacity: 0 }}>
+        <Skeleton enableAnimation={false} width={76} height={33} />
+      </Flex>
+      <Flex
+        sx={{
+          alignSelf: ["stretch", "stretch", "center"],
+          maxWidth: EDITOR_MARGINS ? "min(100%, 850px)" : "auto",
+          px: 6,
+          width: "100%",
+          flexDirection: "column"
+        }}
+      >
+        <Skeleton
+          enableAnimation={false}
+          height={32}
+          style={{ marginTop: 5, opacity: 0 }}
+        />
+        <Box sx={{ mt: 1 }}>
+          <Text
+            sx={{
+              p: 0,
+              fontFamily: "heading",
+              fontSize: ["1.625em", "1.625em", "2.625em"],
+              fontWeight: "heading",
+              width: "100%",
+              color: "placeholder",
+              opacity: 0.8
+            }}
+          >
+            {isNoteLoading ? (
+              <TextScramble text="Loading" nextLetterSpeed={50} />
+            ) : (
+              "Note title"
+            )}
+          </Text>
+          <Skeleton
+            enableAnimation={false}
+            height={22}
+            style={{ marginTop: 16 }}
+            count={2}
+          />
+          <Skeleton
+            enableAnimation={false}
+            height={22}
+            width={25}
+            style={{ marginTop: 16 }}
+          />
+        </Box>
+      </Flex>
     </Flex>
   );
 });

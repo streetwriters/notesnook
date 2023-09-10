@@ -1,0 +1,43 @@
+name: Test @notesnook/editor
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+    paths:
+      - "packages/editor/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/editor.tests.yml"
+  pull_request:
+    types:
+      - "ready_for_review"
+      - "opened"
+      - "synchronize"
+      - "reopened"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=editor
+
+      - name: Setup environment
+        run: |
+          echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Build editor
+        run: npx nx build @notesnook/editor
+
+      - name: Run all @notesnook/editor tests
+        run: npx nx test @notesnook/editor

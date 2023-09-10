@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEditor } from "./use-editor";
 import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
-import { ThemeStore } from "../../../stores/use-theme-store";
 import { NoteType } from "../../../utils/types";
+import { useEditor } from "./use-editor";
 export type useEditorType = ReturnType<typeof useEditor>;
 
 export type EditorState = {
@@ -35,6 +34,7 @@ export type EditorState = {
   keyboardState: boolean;
   ready: boolean;
   saveCount: 0;
+  isAwaitingResult: boolean;
 };
 
 export type Settings = {
@@ -47,6 +47,11 @@ export type Settings = {
   noHeader?: boolean;
   keyboardShown?: boolean;
   doubleSpacedLines?: boolean;
+  corsProxy: string;
+  fontSize: number;
+  fontFamily: string;
+  dateFormat: string;
+  timeFormat: string;
 };
 
 export type EditorProps = {
@@ -57,7 +62,6 @@ export type EditorProps = {
   editorId?: string;
   onLoad?: () => void;
   onChange?: (html: string) => void;
-  theme?: ThemeStore["colors"];
 };
 
 export type EditorMessage = {
@@ -82,6 +86,7 @@ export type Content = {
   data?: string;
   type: string;
   noteId: string;
+  id?: string;
 };
 
 export type SavePayload = {

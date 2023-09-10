@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@ import React, { useState } from "react";
 import { LayoutAnimation, View } from "react-native";
 import { MMKV } from "../../common/database/mmkv";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { eCloseProgressDialog } from "../../utils/events";
+import { useThemeColors } from "@notesnook/theme";
+import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
@@ -36,7 +36,7 @@ export const Walkthrough = ({
   steps: TStep[];
   canSkip: boolean;
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [step, setStep] = useState<TStep>(steps && steps[0]);
 
   const next = () => {
@@ -98,7 +98,7 @@ export const Walkthrough = ({
               next();
               return;
             case "done":
-              eSendEvent(eCloseProgressDialog);
+              eSendEvent(eCloseSheet);
               await sleep(300);
               step.button?.action && step.button.action();
               return;
@@ -119,7 +119,7 @@ export const Walkthrough = ({
             textDecorationLine: "underline"
           }}
           onPress={async () => {
-            eSendEvent(eCloseProgressDialog);
+            eSendEvent(eCloseSheet);
           }}
           type="gray"
           title="Skip introduction"

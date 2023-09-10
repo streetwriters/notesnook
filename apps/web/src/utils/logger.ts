@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,15 +21,15 @@ import {
   initalize,
   logger as _logger,
   logManager
-} from "@notesnook/core/logger";
+} from "@notesnook/core/dist/logger";
 import { LogMessage } from "@notesnook/logger";
 import FileSaver from "file-saver";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { zip } from "./zip";
 
 let logger: typeof _logger;
-function initalizeLogger(persistence: DatabasePersistence = "db") {
-  initalize(new NNStorage("Logs", persistence));
+async function initalizeLogger(persistence: DatabasePersistence = "db") {
+  initalize(await NNStorage.createInstance("Logs", persistence));
   logger = _logger.scope("notesnook-web");
 }
 

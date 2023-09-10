@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useMessageStore } from "../../../stores/use-message-store";
-import { COLORS_NOTE } from "../../../utils/color-scheme";
+import { ColorValues } from "../../../utils/colors";
 import { Announcement } from "../../announcements/announcement";
 import { Card } from "../../list/card";
 import Paragraph from "../../ui/typography/paragraph";
@@ -37,7 +37,7 @@ export const Header = React.memo(
     noAnnouncement,
     warning
   }) => {
-    const colors = useThemeStore((state) => state.colors);
+    const { colors } = useThemeColors();
     const announcements = useMessageStore((state) => state.announcements);
     const selectionMode = useSelectionStore((state) => state.selectionMode);
 
@@ -47,7 +47,7 @@ export const Header = React.memo(
           <View
             style={{
               padding: 12,
-              backgroundColor: colors.errorBg,
+              backgroundColor: colors.error.background,
               width: "95%",
               alignSelf: "center",
               borderRadius: 5,
@@ -55,13 +55,18 @@ export const Header = React.memo(
               alignItems: "center"
             }}
           >
-            <Icon name="sync-alert" size={SIZE.md} color={colors.red} f />
-            <Paragraph style={{ marginLeft: 5 }} color={colors.red}>
+            <Icon
+              name="sync-alert"
+              size={SIZE.md}
+              color={colors.error.icon}
+              f
+            />
+            <Paragraph style={{ marginLeft: 5 }} color={colors.error.icon}>
               {warning.title}
             </Paragraph>
           </View>
         ) : announcements.length !== 0 && !noAnnouncement ? (
-          <Announcement color={color || colors.accent} />
+          <Announcement color={color || colors.primary.accent} />
         ) : type === "search" ? null : !shouldShow ? (
           <View
             style={{
@@ -74,7 +79,9 @@ export const Header = React.memo(
           >
             {messageCard ? (
               <Card
-                color={COLORS_NOTE[color?.toLowerCase()] || colors.accent}
+                color={
+                  ColorValues[color?.toLowerCase()] || colors.primary.accent
+                }
               />
             ) : null}
           </View>

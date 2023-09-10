@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,10 +22,10 @@ import { ToolButton } from "../components/tool-button";
 import { useCallback, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
 import { LinkPopup } from "../popups/link-popup";
-import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
+import { useToolbarLocation } from "../stores/toolbar-store";
 import { MoreTools } from "../components/more-tools";
 import { useRefValue } from "../../hooks/use-ref-value";
-import { findMark, selectionToOffset } from "../utils/prosemirror";
+import { findMark, selectionToOffset } from "../../utils/prosemirror";
 import { TextSelection } from "prosemirror-state";
 import { Flex, Link } from "@theme-ui/components";
 import { ImageNode } from "../../extensions/image";
@@ -38,9 +38,10 @@ export function LinkSettings(props: ToolProps) {
   return (
     <MoreTools
       {...props}
+      autoOpen
       autoCloseOnUnmount
       popupId="linkSettings"
-      tools={["openLink", "editLink", "removeLink"]}
+      tools={["openLink", "editLink", "removeLink", "copyLink"]}
     />
   );
 }
@@ -104,6 +105,8 @@ export function EditLink(props: ToolProps) {
 
   const onDone = useCallback(
     (link: LinkDefinition) => {
+      if (!selectedNode.current) return;
+
       const { href, text, isImage } = link;
       const { from, node, to } = selectedNode.current;
       if (!href || !editor.current || !node) return;
@@ -153,13 +156,15 @@ export function EditLink(props: ToolProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-
+  if (!editor.current?.isEditable) return null;
   return (
     <LinkTool
       {...props}
       isEditing
       onDone={onDone}
       onClick={() => {
+        if (!selectedNode.current) return;
+
         const { node } = selectedNode.current;
         if (!node) return;
 
@@ -179,6 +184,7 @@ export function EditLink(props: ToolProps) {
 
 export function RemoveLink(props: ToolProps) {
   const { editor, selectedNode } = props;
+  if (!editor.current?.isEditable) return null;
   return (
     <ToolButton
       {...props}
@@ -200,7 +206,7 @@ export function OpenLink(props: ToolProps) {
   const selectedNode = useRefValue(
     _selectedNode || selectionToOffset(editor.state)
   );
-  const { node } = selectedNode.current;
+  const { node } = selectedNode.current || {};
   const link = node ? findMark(node, "link") : null;
   if (!link) return null;
   const href = link?.attrs.href;
@@ -215,7 +221,18 @@ export function OpenLink(props: ToolProps) {
         }}
         target="_blank"
         variant="body"
-        sx={{ mr: 1 }}
+        sx={{
+          fontSize: "subBody",
+          fontFamily: "body",
+          mr: 1,
+          color: "primary",
+          maxWidth: [150, 250],
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          ":visited": { color: "accent" },
+          ":hover": { color: "accent", opacity: 0.8 }
+        }}
       >
         {href}
       </Link>
@@ -227,6 +244,27 @@ export function OpenLink(props: ToolProps) {
         }}
       />
     </Flex>
+  );
+}
+
+export function CopyLink(props: ToolProps) {
+  const { editor, selectedNode: _selectedNode } = props;
+  const selectedNode = useRefValue(
+    _selectedNode || selectionToOffset(editor.state)
+  );
+  const { node } = selectedNode.current || {};
+  const link = node ? findMark(node, "link") : null;
+  if (!link) return null;
+  const href = link?.attrs.href;
+
+  return (
+    <ToolButton
+      {...props}
+      toggled={false}
+      onClick={() => {
+        editor.commands.copyToClipboard(href);
+      }}
+    />
   );
 }
 

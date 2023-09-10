@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   Cipher,
   EncryptionKey,
-  OutputFormat,
-  Plaintext,
+  DataFormat,
   SerializedKey,
-  Chunk
+  Chunk,
+  Output,
+  Input
 } from "./types";
 
 export interface IStreamable {
@@ -32,17 +33,31 @@ export interface IStreamable {
 }
 
 export interface INNCrypto {
-  encrypt(
+  encrypt<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    plaintext: Plaintext,
-    outputFormat?: OutputFormat
-  ): Promise<Cipher>;
+    data: Input<DataFormat>,
+    format: DataFormat,
+    outputFormat?: TOutputFormat
+  ): Promise<Cipher<TOutputFormat>>;
 
-  decrypt(
+  encryptMulti<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    cipherData: Cipher,
-    outputFormat?: OutputFormat
-  ): Promise<Plaintext>;
+    data: Input<DataFormat>[],
+    format: DataFormat,
+    outputFormat?: TOutputFormat
+  ): Promise<Cipher<TOutputFormat>[]>;
+
+  decrypt<TOutputFormat extends DataFormat>(
+    key: SerializedKey,
+    cipherData: Cipher<DataFormat>,
+    outputFormat?: TOutputFormat
+  ): Promise<Output<TOutputFormat>>;
+
+  decryptMulti<TOutputFormat extends DataFormat>(
+    key: SerializedKey,
+    cipherData: Cipher<DataFormat>[],
+    outputFormat?: TOutputFormat
+  ): Promise<Output<TOutputFormat>[]>;
 
   hash(password: string, salt: string): Promise<string>;
 
@@ -50,16 +65,12 @@ export interface INNCrypto {
 
   exportKey(password: string, salt?: string): Promise<SerializedKey>;
 
-  encryptStream(
-    key: SerializedKey,
-    stream: IStreamable,
-    streamId?: string
-  ): Promise<string>;
+  createEncryptionStream(
+    key: SerializedKey
+  ): Promise<{ iv: string; stream: TransformStream<Chunk, Uint8Array> }>;
 
-  decryptStream(
+  createDecryptionStream(
     key: SerializedKey,
-    iv: string,
-    stream: IStreamable,
-    streamId?: string
-  ): Promise<void>;
+    iv: string
+  ): Promise<TransformStream<Uint8Array, Uint8Array>>;
 }

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,22 +22,21 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
-import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { dWidth } from "../../utils";
-import { COLORS_NOTE } from "../../utils/color-scheme";
+import { ColorValues } from "../../utils/colors";
 import { refreshNotesPage } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
+import { useThemeColors } from "@notesnook/theme";
+
 export const ColorTags = ({ item }) => {
+  const { colors } = useThemeColors();
   const [note, setNote] = useState(item);
   const setColorNotes = useMenuStore((state) => state.setColorNotes);
-  const dimensions = useSettingStore((state) => state.dimensions);
-  let width = dimensions.width > 600 ? 600 : 500;
-
+  const isTablet = useSettingStore((state) => state.deviceMode) !== "mobile";
   const changeColor = async (color) => {
     if (note.color === color.name) {
       await db.notes.note(note.id).uncolor();
@@ -47,35 +46,31 @@ export const ColorTags = ({ item }) => {
     let _note = db.notes.note(note.id).data;
     setNote({ ..._note });
     setColorNotes();
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes"
-    );
+    Navigation.queueRoutesForUpdate();
     eSendEvent(refreshNotesPage);
   };
 
   const _renderColor = (c) => {
     const color = {
       name: c,
-      value: COLORS_NOTE[c?.toLowerCase()]
+      value: ColorValues[c?.toLowerCase()]
     };
 
     return (
       <PressableButton
         type="accent"
-        accentColor={color.name.toLowerCase()}
+        accentColor={colors.static[color.name?.toLowerCase()]}
+        accentText={colors.static.white}
         testID={notesnook.ids.dialogs.actionsheet.color(c)}
         key={color.value}
         onPress={() => changeColor(color)}
         customStyle={{
-          width: DDS.isTab ? width / 10 : dWidth / 9,
-          height: DDS.isTab ? width / 10 : dWidth / 9,
+          width: 30,
+          height: 30,
           borderRadius: 100,
           justifyContent: "center",
-          alignItems: "center"
+          alignItems: "center",
+          marginRight: isTablet ? 10 : undefined
         }}
       >
         {note.color?.toLowerCase() === color.name ? (
@@ -90,15 +85,14 @@ export const ColorTags = ({ item }) => {
       style={{
         flexDirection: "row",
         flexWrap: "wrap",
+        flexGrow: isTablet ? undefined : 1,
         paddingHorizontal: 12,
-        width: "100%",
-        marginVertical: 10,
-        marginTop: 20,
+        paddingRight: 0,
         alignItems: "center",
-        justifyContent: "space-between"
+        justifyContent: isTablet ? "center" : "space-between"
       }}
     >
-      {Object.keys(COLORS_NOTE).map(_renderColor)}
+      {Object.keys(ColorValues).map(_renderColor)}
     </View>
   );
 };

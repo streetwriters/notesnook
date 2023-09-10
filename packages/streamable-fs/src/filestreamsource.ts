@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,9 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { File } from "./types";
-import { Chunk } from "@notesnook/crypto/dist/src/types";
 
-export default class FileStreamSource implements UnderlyingSource<Chunk> {
+export default class FileStreamSource {
   private storage: LocalForage;
   private file: File;
   private offset = 0;
@@ -32,16 +31,12 @@ export default class FileStreamSource implements UnderlyingSource<Chunk> {
 
   start() {}
 
-  async pull(controller: ReadableStreamController<Chunk>) {
+  async pull(controller: ReadableStreamDefaultController<Uint8Array>) {
     const data = await this.readChunk(this.offset++);
+
+    if (data) controller.enqueue(data);
+
     const isFinalChunk = this.offset === this.file.chunks;
-
-    if (data)
-      controller.enqueue({
-        data,
-        final: isFinalChunk
-      });
-
     if (isFinalChunk || !data) controller.close();
   }
 

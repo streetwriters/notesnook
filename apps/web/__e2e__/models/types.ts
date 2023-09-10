@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,3 +28,24 @@ export type Item = {
 };
 
 export type PriceItem = { label: string; value: string };
+
+export type OrderByOptions = "asc" | "desc";
+export type SortByOptions =
+  | "dateCreated"
+  | "dateEdited"
+  | "dateModified"
+  | "dateDeleted"
+  | "title";
+export type GroupByOptions =
+  | "abc"
+  | "none"
+  | "default"
+  | "year"
+  | "month"
+  | "week";
+
+export type SortOptions = {
+  groupBy?: GroupByOptions;
+  sortBy: SortByOptions;
+  orderBy: OrderByOptions;
+};

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -41,9 +41,7 @@ export class NoteItemModel extends BaseItemModel {
   async openNote() {
     await this.click();
     const title = await this.getTitle();
-    const description = await this.getDescription();
-
-    await this.editor.waitForLoading(title, description);
+    await this.editor.waitForLoading(title);
   }
 
   async openLockedNote(password: string) {

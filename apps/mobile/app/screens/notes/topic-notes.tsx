@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { groupArray } from "@notesnook/core/utils/grouping";
+import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
 import { db } from "../../common/database";
@@ -58,22 +58,28 @@ export const TopicNotes = ({
   route
 }: NavigationProps<"TopicNotes">) => {
   return (
-    <NotesPage
-      navigation={navigation}
-      route={route}
-      get={TopicNotes.get}
-      placeholderData={PLACEHOLDER_DATA}
-      onPressFloatingButton={openEditor}
-      rightButtons={headerRightButtons}
-      canGoBack={route.params.canGoBack}
-      focusControl={true}
-    />
+    <>
+      <NotesPage
+        navigation={navigation}
+        route={route}
+        get={TopicNotes.get}
+        placeholderData={PLACEHOLDER_DATA}
+        onPressFloatingButton={openEditor}
+        rightButtons={headerRightButtons}
+        canGoBack={route.params?.canGoBack}
+        focusControl={true}
+      />
+    </>
   );
 };
 
 TopicNotes.get = (params: NotesScreenParams, grouped = true) => {
   const { id, notebookId } = params.item as TopicType;
-  const notes = db.notebooks?.notebook(notebookId)?.topics.topic(id)?.all || [];
+  const topic = db.notebooks?.notebook(notebookId)?.topics.topic(id);
+  if (!topic) {
+    return null;
+  }
+  const notes = topic?.all || [];
   return grouped
     ? groupArray(notes, db.settings?.getGroupOptions("notes"))
     : notes;

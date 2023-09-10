@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import {
   eOpenPremiumDialog,
   eOpenResultDialog,
@@ -44,7 +44,7 @@ import { CompactFeatures } from "./compact-features";
 import { Offer } from "./offer";
 
 export const Expiring = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState({
     title: "Your trial is ending soon",
@@ -143,10 +143,10 @@ export const Expiring = () => {
                     await sleep(300);
                     eSendEvent(eOpenPremiumDialog, promo);
                   }}
-                  size={SIZE.xs + 1}
+                  size={SIZE.xs}
                   style={{
                     textDecorationLine: "underline",
-                    color: colors.icon,
+                    color: colors.secondary.paragraph,
                     marginTop: 10
                   }}
                 >
@@ -159,7 +159,7 @@ export const Expiring = () => {
 
             <View
               style={{
-                backgroundColor: colors.nav,
+                backgroundColor: colors.secondary.background,
                 width: "100%",
                 borderBottomRightRadius: 10,
                 borderBottomLeftRadius: 10

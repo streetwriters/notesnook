@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,25 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EVENTS } from "@notesnook/core/common";
-import React, { createRef, useCallback, useEffect, useState } from "react";
+import { EVENTS } from "@notesnook/core/dist/common";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
+import { FlatList } from "react-native-actions-sheet";
+import RNFetchBlob from "react-native-blob-util";
 import DocumentPicker from "react-native-document-picker";
-import { FlatList } from "react-native-gesture-handler";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { db } from "../../../common/database";
 import storage from "../../../common/database/storage";
 import {
+  ToastEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
+  eUnSubscribeEvent
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { initialize } from "../../../stores";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { eCloseRestoreDialog, eOpenRestoreDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
-import { sleep, timeConverter } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
@@ -44,12 +44,19 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Paragraph from "../../ui/typography/paragraph";
-const actionSheetRef = createRef();
-let RNFetchBlob;
+import { getFormattedDate } from "@notesnook/common";
+
 const RestoreDataSheet = () => {
   const [visible, setVisible] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const sheet = useRef();
   useEffect(() => {
+    const open = async () => {
+      setVisible(true);
+      setTimeout(() => {
+        sheet.current?.show();
+      }, 1);
+    };
     eSubscribeEvent(eOpenRestoreDialog, open);
     eSubscribeEvent(eCloseRestoreDialog, close);
     return () => {
@@ -58,21 +65,15 @@ const RestoreDataSheet = () => {
     };
   }, [close]);
 
-  const open = async () => {
-    setVisible(true);
-    await sleep(30);
-    actionSheetRef.current?.setModalVisible(true);
-  };
-
   const close = useCallback(() => {
     if (restoring) {
       showIsWorking();
       return;
     }
-    actionSheetRef.current?.setModalVisible(false);
+    sheet.current?.hide();
     setTimeout(() => {
       setVisible(false);
-    }, 300);
+    }, 150);
   }, [restoring]);
 
   const showIsWorking = () => {
@@ -86,15 +87,19 @@ const RestoreDataSheet = () => {
 
   return !visible ? null : (
     <SheetWrapper
-      fwdRef={actionSheetRef}
+      fwdRef={sheet}
       gestureEnabled={!restoring}
       closeOnTouchBackdrop={!restoring}
-      onClose={close}
+      onClose={() => {
+        setVisible(false);
+        close();
+      }}
     >
       <RestoreDataComponent
         close={close}
         restoring={restoring}
         setRestoring={setRestoring}
+        actionSheetRef={sheet}
       />
       <Toast context="local" />
     </SheetWrapper>
@@ -104,12 +109,11 @@ const RestoreDataSheet = () => {
 export default RestoreDataSheet;
 
 const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [backupDirectoryAndroid, setBackupDirectoryAndroid] = useState(false);
   const [progress, setProgress] = useState();
-
   useEffect(() => {
     const subscription = db.eventManager.subscribe(
       EVENTS.migrationProgress,
@@ -123,7 +127,9 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   }, []);
 
   useEffect(() => {
-    checkBackups();
+    setTimeout(() => {
+      checkBackups();
+    }, 300);
   }, []);
 
   const restore = async (item) => {
@@ -208,7 +214,6 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
           return;
         }
       } else {
-        RNFetchBlob = (await import("rn-fetch-blob")).default;
         let path = await storage.checkAndCreateDir("/backups/");
         files = await RNFetchBlob.fs.lstat(path);
       }
@@ -237,7 +242,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         borderRadius: 0,
         flexDirection: "row",
         borderBottomWidth: 0.5,
-        borderBottomColor: colors.nav
+        borderBottomColor: colors.secondary.background
       }}
     >
       <View
@@ -246,7 +251,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         }}
       >
         <Paragraph size={SIZE.sm} style={{ width: "100%", maxWidth: "100%" }}>
-          {timeConverter(item?.lastModified * 1)}
+          {getFormattedDate(item?.lastModified * 1)}
         </Paragraph>
         <Paragraph size={SIZE.xs}>
           {(item.filename || item.name).replace(".nnbackup", "")}
@@ -362,10 +367,6 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         </View>
         <Seperator half />
         <FlatList
-          nestedScrollEnabled
-          onMomentumScrollEnd={() => {
-            actionSheetRef.current?.handleChildScrollEnd();
-          }}
           ListEmptyComponent={
             !restoring ? (
               loading ? (
@@ -376,7 +377,10 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
                     height: 100
                   }}
                 >
-                  <ActivityIndicator color={colors.accent} size={SIZE.lg} />
+                  <ActivityIndicator
+                    color={colors.primary.accent}
+                    size={SIZE.lg}
+                  />
                 </View>
               ) : (
                 <View
@@ -426,14 +430,16 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
                         }}
                         size={SIZE.xs}
                         textBreakStrategy="balanced"
-                        color={colors.icon}
+                        color={colors.secondary.paragraph}
                       >
                         Select the folder that includes your backup files to
                         list them here.
                       </Paragraph>
                     </>
                   ) : (
-                    <Paragraph color={colors.icon}>No backups found</Paragraph>
+                    <Paragraph color={colors.secondary.paragraph}>
+                      No backups found
+                    </Paragraph>
                   )}
                 </View>
               )
@@ -445,8 +451,8 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
                   height: 200
                 }}
               >
-                <ActivityIndicator color={colors.accent} />
-                <Paragraph color={colors.icon}>
+                <ActivityIndicator color={colors.primary.accent} />
+                <Paragraph color={colors.secondary.paragraph}>
                   Restoring {progress ? progress?.collection : null}
                   {progress ? `(${progress.current}/${progress.total}) ` : null}
                   ...Please wait.

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,61 +19,66 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { Flex, Button } from "@theme-ui/components";
-import * as Icon from "../icons";
+import { Plus } from "../icons";
 import { ScrollerProps, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import {
   useStore as useSelectionStore,
   store as selectionStore
 } from "../../stores/selection-store";
 import GroupHeader from "../group-header";
-import {
-  Context,
-  DEFAULT_ITEM_HEIGHT,
-  Item,
-  ListProfiles
-} from "./list-profiles";
-import ReminderBar from "../reminder-bar";
+import { DEFAULT_ITEM_HEIGHT, ListProfiles } from "./list-profiles";
 import Announcements from "../announcements";
-import useAnnouncements from "../../hooks/use-announcements";
 import { ListLoader } from "../loaders/list-loader";
 import ScrollContainer from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
+import { Context, Item } from "./types";
 
-const CustomScrollbarsVirtualList = forwardRef<HTMLDivElement, ScrollerProps>(
-  function CustomScrollbarsVirtualList(props, ref) {
-    return (
-      <ScrollContainer
-        {...props}
-        forwardedRef={(sRef) => {
-          if (typeof ref === "function") ref(sRef);
-          else if (ref) ref.current = sRef;
-        }}
-      />
-    );
-  }
-);
+export const CustomScrollbarsVirtualList = forwardRef<
+  HTMLDivElement,
+  ScrollerProps
+>(function CustomScrollbarsVirtualList(props, ref) {
+  return (
+    <ScrollContainer
+      {...props}
+      forwardedRef={(sRef) => {
+        if (typeof ref === "function") ref(sRef);
+        else if (ref) ref.current = sRef;
+      }}
+    />
+  );
+});
 
 type ListContainerProps = {
   type: keyof typeof ListProfiles;
   items: Item[];
-  groupType: string;
-  context: Context;
+  groupingKey?: GroupingKey;
+  compact?: boolean;
+  context?: Context;
   refresh: () => void;
-  header: JSX.Element;
-  placeholder: () => JSX.Element;
-  isLoading: boolean;
+  header?: JSX.Element;
+  placeholder: JSX.Element;
+  isLoading?: boolean;
   button?: {
     onClick: () => void;
   };
 };
 
 function ListContainer(props: ListContainerProps) {
-  const { type, groupType, items, context, refresh, header, button } = props;
+  const {
+    type,
+    groupingKey,
+    items,
+    context,
+    refresh,
+    header,
+    button,
+    compact
+  } = props;
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
-  const [announcements, removeAnnouncement] = useAnnouncements();
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
+  const isSelected = useSelectionStore((store) => store.isSelected);
   const selectItem = useSelectionStore((store) => store.selectItem);
   const deselectItem = useSelectionStore((store) => store.deselectItem);
   const toggleSelection = useSelectionStore(
@@ -98,24 +103,27 @@ function ListContainer(props: ListContainerProps) {
     length: items.length,
     reset: () => toggleSelection(false),
     deselect: (index) => deselectItem(items[index]),
-    select: (index) => selectItem(items[index]),
+    select: (index, toggleable) =>
+      toggleable && isSelected(items[index])
+        ? deselectItem(items[index])
+        : selectItem(items[index]),
     bulkSelect: (indices) => setSelectedItems(indices.map((i) => items[i])),
     focusItemAt: (index) => {
       const item = items[index];
-      if (!item) return;
+      if (!item || !listRef.current) return;
 
-      const element = document.getElementById(`id_${item.id}`);
-      if (!element) return;
-      element.focus();
+      waitForElement(listRef.current, index, `id_${item.id}`, (element) =>
+        element.focus()
+      );
     },
-    skip: (index) => items[index].type === "header",
+    skip: (index) => !items[index] || items[index].type === "header",
     open: (index) => {
       const item = items[index];
-      if (!item) return;
+      if (!item || !listRef.current) return;
 
-      const element = document.getElementById(`id_${item.id}`);
-      if (!element) return;
-      element.click();
+      waitForElement(listRef.current, index, `id_${item.id}`, (element) =>
+        element.click()
+      );
     }
   });
 
@@ -125,15 +133,13 @@ function ListContainer(props: ListContainerProps) {
     <Flex variant="columnFill">
       {!props.items.length && props.placeholder ? (
         <>
+          {header}
           {props.isLoading ? (
             <ListLoader />
           ) : (
-            <>
-              {header || <ReminderBar />}
-              <Flex variant="columnCenterFill" data-test-id="list-placeholder">
-                <props.placeholder />
-              </Flex>
-            </>
+            <Flex variant="columnCenterFill" data-test-id="list-placeholder">
+              {props.placeholder}
+            </Flex>
           )}
         </>
       ) : (
@@ -141,7 +147,7 @@ function ListContainer(props: ListContainerProps) {
           <Flex
             ref={listContainerRef}
             variant="columnFill"
-            data-test-id="note-list"
+            data-test-id={`${type}-list`}
           >
             <Virtuoso
               ref={listRef}
@@ -151,13 +157,11 @@ function ListContainer(props: ListContainerProps) {
               totalCount={items.length}
               onBlur={() => setFocusedGroupIndex(-1)}
               onKeyDown={(e) => onKeyDown(e.nativeEvent)}
-              overscan={5}
               components={{
                 Scroller: CustomScrollbarsVirtualList,
-                Item: (props) => (
+                Item: ({ item: _item, ...props }) => (
                   <div
                     {...props}
-                    style={{ paddingBottom: 1 }}
                     onFocus={() => onFocus(props["data-item-index"])}
                     onMouseDown={(e) =>
                       onMouseDown(e.nativeEvent, props["data-item-index"])
@@ -166,26 +170,17 @@ function ListContainer(props: ListContainerProps) {
                     {props.children}
                   </div>
                 ),
-                Header: () =>
-                  header ? (
-                    header
-                  ) : announcements.length ? (
-                    <Announcements
-                      announcements={announcements}
-                      removeAnnouncement={removeAnnouncement}
-                    />
-                  ) : (
-                    <ReminderBar />
-                  )
+                Header: () => (header ? header : <Announcements />)
               }}
               itemContent={(index, item) => {
                 if (!item) return null;
 
                 switch (item.type) {
                   case "header":
+                    if (!groupingKey) return null;
                     return (
                       <GroupHeader
-                        type={groupType}
+                        groupingKey={groupingKey}
                         refresh={refresh}
                         title={item.title}
                         isFocused={index === focusedGroupIndex}
@@ -226,8 +221,8 @@ function ListContainer(props: ListContainerProps) {
                       <Component
                         item={item}
                         context={context}
-                        index={index}
                         type={type}
+                        compact={compact}
                       />
                     );
                 }
@@ -238,13 +233,13 @@ function ListContainer(props: ListContainerProps) {
       )}
       {button && (
         <Button
-          variant="primary"
+          variant="accent"
           data-test-id={`${props.type}-action-button`}
           onClick={button.onClick}
           sx={{
             position: "absolute",
             bottom: 0,
-            display: ["block", "block", "none"],
+            display: ["block", "none", "none"],
             alignSelf: "end",
             borderRadius: 100,
             p: 0,
@@ -255,10 +250,45 @@ function ListContainer(props: ListContainerProps) {
             height: 45
           }}
         >
-          <Icon.Plus color="static" />
+          <Plus color="static" />
         </Button>
       )}
     </Flex>
   );
 }
 export default ListContainer;
+
+/**
+ * Scroll the element at the specified index into view and
+ * wait until it renders into the DOM. This function keeps
+ * running until the element is found or the max number of
+ * attempts have been made. Each attempt is separated by a
+ * 50ms interval.
+ */
+function waitForElement(
+  list: VirtuosoHandle,
+  index: number,
+  elementId: string,
+  callback: (element: HTMLElement) => void
+) {
+  let waitInterval = 0;
+  let maxAttempts = 3;
+  list.scrollIntoView({
+    index,
+    done: function scrollDone() {
+      if (!maxAttempts) return;
+      clearTimeout(waitInterval);
+
+      const element = document.getElementById(elementId);
+      if (!element) {
+        --maxAttempts;
+        waitInterval = setTimeout(() => {
+          scrollDone();
+        }, 50) as unknown as number;
+        return;
+      }
+
+      callback(element);
+    }
+  });
+}

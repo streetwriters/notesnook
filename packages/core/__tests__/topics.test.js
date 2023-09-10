@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,15 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  delay,
-  notebookTest,
-  noteTest,
-  StorageInterface,
-  TEST_NOTE
-} from "./utils";
-
-beforeEach(() => StorageInterface.clear());
+import { delay, notebookTest, TEST_NOTE } from "./utils";
+import { test, expect } from "vitest";
 
 test("get empty topic", () =>
   notebookTest().then(({ db, id }) => {
@@ -132,16 +125,15 @@ test("delete a topic", () =>
   }));
 
 test("delete note from edited topic", () =>
-  notebookTest().then(async ({ id }) =>
-    noteTest().then(async ({ db, id: noteId }) => {
-      let topics = db.notebooks.notebook(id).topics;
-      await topics.add("Home");
-      let topic = topics.topic("Home");
-      await db.notes.addToNotebook({ id, topic: topic._topic.title }, noteId);
-      await topics.add({ id: topic._topic.id, title: "Hello22" });
-      await db.notes.delete(noteId);
-    })
-  ));
+  notebookTest().then(async ({ db, id }) => {
+    const noteId = await db.notes.add(TEST_NOTE);
+    let topics = db.notebooks.notebook(id).topics;
+    await topics.add("Home");
+    let topic = topics.topic("Home");
+    await db.notes.addToNotebook({ id, topic: topic._topic.title }, noteId);
+    await topics.add({ id: topic._topic.id, title: "Hello22" });
+    await db.notes.delete(noteId);
+  }));
 
 test("editing one topic should not update dateEdited of all", () =>
   notebookTest().then(async ({ db, id }) => {

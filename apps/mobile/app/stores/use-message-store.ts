@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import PremiumService from "../services/premium";
 import { SUBSCRIPTION_STATUS } from "../utils/constants";
-import layoutmanager from "../utils/layout-manager";
 export interface MessageStore extends State {
   message: Message;
   setMessage: (message: Message) => void;
@@ -96,13 +95,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     icon: "account-outline"
   },
   setMessage: (message) => {
-    setTimeout(() => {
-      if (get().message.visible || message.visible) {
-        layoutmanager.withAnimation();
-      }
-
-      set({ message: { ...message } });
-    }, 1);
+    set({ message: { ...message } });
   },
   announcements: [],
   remove: async (id) => {

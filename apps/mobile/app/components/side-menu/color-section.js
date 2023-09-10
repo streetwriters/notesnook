@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useNoteStore } from "../../stores/use-notes-store";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { COLORS_NOTE } from "../../utils/color-scheme";
+import { useThemeColors } from "@notesnook/theme";
+import { ColorValues } from "../../utils/colors";
 import { db } from "../../common/database";
 import { normalize, SIZE } from "../../utils/size";
 import { presentDialog } from "../dialog/functions";
@@ -58,7 +58,7 @@ export const ColorSection = React.memo(
 
 const ColorItem = React.memo(
   function ColorItem({ item, alias }) {
-    const colors = useThemeStore((state) => state.colors);
+    const { colors, isDark } = useThemeColors();
     const setColorNotes = useMenuStore((state) => state.setColorNotes);
     const [headerTextState, setHeaderTextState] = useState(null);
     alias = db.colors.alias(item.id) || "";
@@ -116,8 +116,8 @@ const ColorItem = React.memo(
           headerTextState?.id === item.id ? "rgba(0,0,0,0.04)" : "transparent"
         }
         onLongPress={onLongPress}
-        customSelectedColor={COLORS_NOTE[item.title.toLowerCase()]}
-        customAlpha={!colors.night ? -0.02 : 0.02}
+        customSelectedColor={ColorValues[item.title.toLowerCase()]}
+        customAlpha={!isDark ? -0.02 : 0.02}
         customOpacity={0.12}
         onPress={() => onPress(item)}
         customStyle={{
@@ -149,7 +149,7 @@ const ColorItem = React.memo(
               style={{
                 width: SIZE.lg - 2,
                 height: SIZE.lg - 2,
-                backgroundColor: COLORS_NOTE[item.title.toLowerCase()],
+                backgroundColor: ColorValues[item.title.toLowerCase()],
                 borderRadius: 100,
                 justifyContent: "center",
                 marginRight: 10
@@ -157,11 +157,11 @@ const ColorItem = React.memo(
             />
           </View>
           {headerTextState?.id === item.id ? (
-            <Heading color={colors.heading} size={SIZE.md}>
+            <Heading color={colors.selected.heading} size={SIZE.md}>
               {alias.slice(0, 1).toUpperCase() + alias.slice(1)}
             </Heading>
           ) : (
-            <Paragraph color={colors.pri} size={SIZE.md}>
+            <Paragraph color={colors.primary.paragraph} size={SIZE.md}>
               {alias.slice(0, 1).toUpperCase() + alias.slice(1)}
             </Paragraph>
           )}

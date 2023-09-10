@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useRef, useState } from "react";
 import { TouchableOpacity, useWindowDimensions, View } from "react-native";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import {
   eSendEvent,
@@ -29,7 +29,7 @@ import {
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { GROUP } from "../../../utils/constants";
-import { COLORS_NOTE } from "../../../utils/color-scheme";
+import { ColorValues } from "../../../utils/colors";
 import { db } from "../../../common/database";
 import { eOpenJumpToDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
@@ -41,7 +41,7 @@ import { useCallback } from "react";
 
 export const SectionHeader = React.memo(
   function SectionHeader({ item, index, type, color, screen }) {
-    const colors = useThemeStore((state) => state.colors);
+    const { colors } = useThemeColors();
     const { fontScale } = useWindowDimensions();
     const [groupOptions, setGroupOptions] = useState(
       db.settings?.getGroupOptions(type)
@@ -85,7 +85,7 @@ export const SectionHeader = React.memo(
           justifyContent: "space-between",
           paddingHorizontal: 12,
           height: 35 * fontScale,
-          backgroundColor: colors.nav,
+          backgroundColor: colors.secondary.background,
           alignSelf: "center",
           borderRadius: 5,
           marginVertical: 5
@@ -104,7 +104,7 @@ export const SectionHeader = React.memo(
           }}
         >
           <Heading
-            color={COLORS_NOTE[color?.toLowerCase()] || colors.accent}
+            color={ColorValues[color?.toLowerCase()] || colors.primary.accent}
             size={SIZE.sm}
             style={{
               minWidth: 60,
@@ -122,7 +122,7 @@ export const SectionHeader = React.memo(
             alignItems: "center"
           }}
         >
-          {index === 0 ? (
+          {index === 0 && (
             <>
               <Button
                 onPress={() => {
@@ -130,6 +130,7 @@ export const SectionHeader = React.memo(
                     component: <Sort screen={screen} type={type} />
                   });
                 }}
+                hidden={screen === "Reminders"}
                 tooltipText="Change sorting of items in list"
                 fwdRef={sortRef}
                 title={groupBy}
@@ -152,38 +153,35 @@ export const SectionHeader = React.memo(
                 iconPosition="right"
               />
 
-              {type === "notes" || type === "notebooks" || type === "home" ? (
-                <IconButton
-                  customStyle={{
-                    width: 25,
-                    height: 25
-                  }}
-                  testID="icon-compact-mode"
-                  tooltipText={
-                    listMode == "compact"
-                      ? "Switch to normal mode"
-                      : "Switch to compact mode"
-                  }
-                  fwdRef={compactModeRef}
-                  color={colors.icon}
-                  name={
-                    listMode == "compact" ? "view-list" : "view-list-outline"
-                  }
-                  onPress={() => {
-                    let settings = {};
-                    settings[
-                      type !== "notebooks"
-                        ? "notesListMode"
-                        : "notebooksListMode"
-                    ] = listMode === "normal" ? "compact" : "normal";
+              <IconButton
+                customStyle={{
+                  width: 25,
+                  height: 25
+                }}
+                hidden={
+                  type !== "notes" && type !== "notebooks" && type !== "home"
+                }
+                testID="icon-compact-mode"
+                tooltipText={
+                  listMode == "compact"
+                    ? "Switch to normal mode"
+                    : "Switch to compact mode"
+                }
+                fwdRef={compactModeRef}
+                color={colors.secondary.icon}
+                name={listMode == "compact" ? "view-list" : "view-list-outline"}
+                onPress={() => {
+                  let settings = {};
+                  settings[
+                    type !== "notebooks" ? "notesListMode" : "notebooksListMode"
+                  ] = listMode === "normal" ? "compact" : "normal";
 
-                    SettingsService.set(settings);
-                  }}
-                  size={SIZE.lg - 2}
-                />
-              ) : null}
+                  SettingsService.set(settings);
+                }}
+                size={SIZE.lg - 2}
+              />
             </>
-          ) : null}
+          )}
         </View>
       </View>
     );

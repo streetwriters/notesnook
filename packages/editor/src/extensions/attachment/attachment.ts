@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ export interface AttachmentOptions {
   HTMLAttributes: Record<string, unknown>;
   onDownloadAttachment: (editor: Editor, attachment: Attachment) => boolean;
   onOpenAttachmentPicker: (editor: Editor, type: AttachmentType) => boolean;
+  onPreviewAttachment: (editor: Editor, attachment: Attachment) => boolean;
 }
 
 export type AttachmentWithProgress = AttachmentProgress & Attachment;
@@ -34,7 +35,7 @@ export type AttachmentWithProgress = AttachmentProgress & Attachment;
 export type Attachment = {
   hash: string;
   filename: string;
-  type: string;
+  mime: string;
   size: number;
 };
 
@@ -52,6 +53,7 @@ declare module "@tiptap/core" {
       removeAttachment: () => ReturnType;
       downloadAttachment: (attachment: Attachment) => ReturnType;
       setAttachmentProgress: (progress: AttachmentProgress) => ReturnType;
+      previewAttachment: (options: Attachment) => ReturnType;
     };
   }
 }
@@ -67,7 +69,8 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return {
       HTMLAttributes: {},
       onDownloadAttachment: () => false,
-      onOpenAttachmentPicker: () => false
+      onOpenAttachmentPicker: () => false,
+      onPreviewAttachment: () => false
     };
   },
 
@@ -85,7 +88,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
       },
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),
-      type: getDataAttribute("mime"),
+      mime: getDataAttribute("mime"),
       size: getDataAttribute("size")
     };
   },
@@ -109,7 +112,8 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return createSelectionBasedNodeView(AttachmentComponent, {
       shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
         return prev.progress !== next.progress;
-      }
+      },
+      forceEnableSelection: true
     });
   },
 
@@ -117,7 +121,18 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return {
       insertAttachment:
         (attachment) =>
-        ({ commands }) => {
+        ({ commands, state }) => {
+          const { $from } = state.selection;
+          const maybeAttachmentNode = state.doc.nodeAt($from.pos);
+          if (maybeAttachmentNode?.type === this.type) {
+            return commands.insertContentAt(
+              $from.pos + maybeAttachmentNode.nodeSize,
+              {
+                type: this.name,
+                attrs: attachment
+              }
+            );
+          }
           return commands.insertContent({
             type: this.name,
             attrs: attachment
@@ -158,7 +173,20 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
           tr.setMeta("addToHistory", false);
           if (dispatch) dispatch(tr);
           return true;
+        },
+
+      previewAttachment:
+        (attachment) =>
+        ({ editor }) => {
+          if (!this.options.onPreviewAttachment) return false;
+          return this.options.onPreviewAttachment(editor, attachment);
         }
+    };
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      "Mod-Shift-A": () => this.editor.commands.openAttachmentPicker("file")
     };
   }
 

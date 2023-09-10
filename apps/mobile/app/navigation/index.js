@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,12 +21,14 @@ import React from "react";
 import DialogProvider from "../components/dialog-provider";
 import { Toast } from "../components/toast";
 import { TabHolder } from "./tabs-holder";
-
+import { ScopedThemeProvider } from "@notesnook/theme";
 const _ApplicationHolder = () => {
   return (
     <>
       <TabHolder />
-      <Toast />
+      <ScopedThemeProvider value="dialog">
+        <Toast />
+      </ScopedThemeProvider>
       <DialogProvider />
     </>
   );

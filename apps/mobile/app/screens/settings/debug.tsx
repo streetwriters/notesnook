@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Clipboard from "@react-native-clipboard/clipboard";
-import { LogMessage } from "@streetwriters/logger";
-import { format, LogLevel, logManager } from "@notesnook/core/logger";
-import React, { useEffect, useState } from "react";
+import { LogMessage } from "@notesnook/logger";
+import { format, LogLevel, logManager } from "@notesnook/core/dist/logger";
+import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Platform, TouchableOpacity, View } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";
-import RNFetchBlob from "rn-fetch-blob";
+import RNFetchBlob from "react-native-blob-util";
 import Storage from "../../common/database/storage";
 import { presentDialog } from "../../components/dialog/functions";
 import { IconButton } from "../../components/ui/icon-button";
@@ -31,29 +31,15 @@ import { Notice } from "../../components/ui/notice";
 import Paragraph from "../../components/ui/typography/paragraph";
 import useTimer from "../../hooks/use-timer";
 import { ToastEvent } from "../../services/event-manager";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { hexToRGBA } from "../../utils/color-scheme/utils";
-import { sanitizeFilename } from "../../utils/sanitizer";
-// function getLevelString(level: number) {
-//   switch (level) {
-//     case LogLevel.Debug:
-//       return 'DEBUG';
-//     case LogLevel.Info:
-//       return 'INFO';
-//     case LogLevel.Log:
-//       return 'LOG';
-//     case LogLevel.Error:
-//       return 'ERROR';
-//     case LogLevel.Warn:
-//       return 'WARN';
-//     case LogLevel.Fatal:
-//       return 'FATAL';
-//   }
-// }
+import { useThemeColors } from "@notesnook/theme";
+import { hexToRGBA } from "../../utils/colors";
+import { sanitizeFilename } from "@notesnook/common";
 
 export default function DebugLogs() {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const { seconds, start } = useTimer("debug_logs_timer");
+  const listRef = useRef<FlatList>(null);
+  const currentOffset = useRef(0);
   const [logs, setLogs] = useState<
     {
       key: string;
@@ -85,17 +71,17 @@ export default function DebugLogs() {
     ({ item }: { item: LogMessage; index: number }) => {
       const background =
         item.level === LogLevel.Error || item.level === LogLevel.Fatal
-          ? hexToRGBA(colors.red, 0.2)
+          ? hexToRGBA(colors.error.paragraph, 0.2)
           : item.level === LogLevel.Warn
-          ? hexToRGBA(colors.orange, 0.2)
+          ? hexToRGBA(colors.static.orange, 0.2)
           : "transparent";
 
       const color =
         item.level === LogLevel.Error || item.level === LogLevel.Fatal
-          ? colors.red
+          ? colors.error.paragraph
           : item.level === LogLevel.Warn
-          ? colors.orange
-          : colors.pri;
+          ? colors.static.black
+          : colors.primary.paragraph;
 
       return !item ? null : (
         <TouchableOpacity
@@ -114,7 +100,7 @@ export default function DebugLogs() {
             backgroundColor: background,
             flexShrink: 1,
             borderBottomWidth: 1,
-            borderBottomColor: colors.nav
+            borderBottomColor: colors.secondary.background
           }}
         >
           <Paragraph
@@ -131,7 +117,13 @@ export default function DebugLogs() {
         </TouchableOpacity>
       );
     },
-    [colors.nav, colors.orange, colors.pri, colors.red]
+    [
+      colors.secondary.background,
+      colors.primary.paragraph,
+      colors.error.paragraph,
+      colors.static.black,
+      colors.static.orange
+    ]
   );
 
   const downloadLogs = React.useCallback(async () => {
@@ -228,6 +220,7 @@ export default function DebugLogs() {
 
       {currentLog && (
         <FlatList
+          ref={listRef}
           ListHeaderComponent={
             <View
               style={{
@@ -235,7 +228,7 @@ export default function DebugLogs() {
                 marginBottom: 10,
                 flexDirection: "row",
                 alignItems: "center",
-                backgroundColor: colors.bg,
+                backgroundColor: colors.primary.background,
                 justifyContent: "space-between"
               }}
             >
@@ -262,7 +255,7 @@ export default function DebugLogs() {
                   }}
                   size={20}
                   name="chevron-left"
-                  color={colors.icon}
+                  color={colors.primary.icon}
                 />
 
                 <IconButton
@@ -279,7 +272,7 @@ export default function DebugLogs() {
                   }}
                   size={20}
                   name="chevron-right"
-                  color={colors.icon}
+                  color={colors.primary.icon}
                 />
               </View>
 
@@ -297,7 +290,7 @@ export default function DebugLogs() {
                     marginRight: 5
                   }}
                   name="content-copy"
-                  color={colors.gray}
+                  color={colors.secondary.paragraph}
                 />
                 <IconButton
                   onPress={downloadLogs}
@@ -308,7 +301,7 @@ export default function DebugLogs() {
                   }}
                   size={20}
                   name="download"
-                  color={colors.gray}
+                  color={colors.secondary.paragraph}
                 />
 
                 <IconButton
@@ -320,7 +313,7 @@ export default function DebugLogs() {
                   }}
                   size={20}
                   name="delete"
-                  color={colors.gray}
+                  color={colors.secondary.paragraph}
                 />
               </View>
             </View>

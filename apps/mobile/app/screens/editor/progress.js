@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,10 +22,10 @@ import { View } from "react-native";
 import { ProgressBarComponent } from "../../components/ui/svg/lazy";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 export const ProgressBar = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const loading = useAttachmentStore((state) => state.loading);
   const [prog, setProg] = useState(0);
   const [visible, setVisible] = useState(false);
@@ -71,7 +71,7 @@ export const ProgressBar = () => {
       <ProgressBarComponent
         size={SIZE.xxl}
         progress={prog}
-        color={colors.accent}
+        color={colors.primary.accent}
         borderWidth={0}
         height={1}
         width={width || 400}

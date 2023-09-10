@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ import { sleep } from "./utils";
 
 async function lockNote() {
   await tapById(notesnook.listitem.menu);
-  await tapById("icon-Vault");
+  await tapById("icon-lock-unlock");
   await sleep(1000);
   await visibleByText("Lock");
   await elementById(notesnook.ids.dialogs.vault.pwd).typeText("1234");
@@ -46,7 +46,7 @@ async function lockNote() {
 
 async function removeFromVault() {
   await tapById(notesnook.listitem.menu);
-  await tapById("icon-Vault");
+  await tapById("icon-lock-unlock");
   await sleep(1000);
   await elementById(notesnook.ids.dialogs.vault.pwd).typeText("1234");
   await tapByText("Unlock");
@@ -60,13 +60,14 @@ async function openLockedNote(pwd) {
   await visibleByText("Open");
   await elementById(notesnook.ids.dialogs.vault.pwd).typeText(pwd || "1234");
   await tapByText("Open");
-  await sleep(1000);
+  await sleep(3000);
   await matchSnapshot(elementById("editor-wrapper"), "note-after-vault-unlock");
 }
 
 async function goToPrivacySecuritySettings() {
   await navigate("Settings");
   await tapByText("Vault");
+  await sleep(500);
 }
 
 describe("VAULT", () => {

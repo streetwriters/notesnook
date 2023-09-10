@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -40,8 +40,15 @@ export class NodeStorageInterface {
   }
 
   async write(key, data) {
-    return new Promise((resolve) => resolve((this.storage[key] = data)));
+    this.storage[key] = data;
   }
+
+  async writeMulti(entries) {
+    for (const [key, value] of entries) {
+      this.storage[key] = value;
+    }
+  }
+
   remove(key) {
     delete this.storage[key];
   }
@@ -53,17 +60,16 @@ export class NodeStorageInterface {
   }
 
   async encrypt(password, data) {
-    return await this.crypto.encrypt(
-      password,
-      { format: "text", data },
-      "base64"
-    );
+    return await this.crypto.encrypt(password, data, "text", "base64");
+  }
+
+  async encryptMulti(password, items) {
+    return await this.crypto.encryptMulti(password, items, "text", "base64");
   }
 
   async decrypt(key, cipherData) {
     cipherData.format = "base64";
-    const result = await this.crypto.decrypt(key, cipherData);
-    if (typeof result.data === "string") return result.data;
+    return await this.crypto.decrypt(key, cipherData, "text");
   }
 
   async deriveCryptoKey(name, { password, salt }) {

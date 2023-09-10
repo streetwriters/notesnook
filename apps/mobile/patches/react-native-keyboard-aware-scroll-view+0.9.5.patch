@@ -1,0 +1,17 @@
+diff --git a/node_modules/react-native-keyboard-aware-scroll-view/lib/KeyboardAwareHOC.js b/node_modules/react-native-keyboard-aware-scroll-view/lib/KeyboardAwareHOC.js
+index 03f46af..cad9ec7 100644
+--- a/node_modules/react-native-keyboard-aware-scroll-view/lib/KeyboardAwareHOC.js
++++ b/node_modules/react-native-keyboard-aware-scroll-view/lib/KeyboardAwareHOC.js
+@@ -423,11 +423,8 @@ function KeyboardAwareHOC(
+                     if (textInputBottomPosition > keyboardPosition) {
+                       // Since the system already scrolled the whole view up
+                       // we should reduce that amount
+-                      keyboardSpace =
+-                        keyboardSpace -
+-                        (textInputBottomPosition - keyboardPosition)
+                       this.setState({ keyboardSpace })
+-                      this.scrollForExtraHeightOnAndroid(totalExtraHeight)
++                      this.scrollForExtraHeightOnAndroid(totalExtraHeight + (textInputBottomPosition - keyboardPosition))
+                     } else if (
+                       textInputBottomPosition >
+                       keyboardPosition - totalExtraHeight

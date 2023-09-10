@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,8 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
-import { groupArray } from "@notesnook/core/utils/grouping";
+import { groupArray } from "@notesnook/core/dist/utils/grouping";
 
+/**
+ * @extends {BaseStore<TagStore>}
+ */
 class TagStore extends BaseStore {
   tags = [];
 
@@ -36,8 +39,5 @@ class TagStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<TagStore>, TagStore]}
- */
 const [useStore, store] = createStore(TagStore);
 export { useStore, store };

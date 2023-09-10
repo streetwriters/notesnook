@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@ import { presentDialog } from "../../../components/dialog/functions";
 import { IconButton } from "../../../components/ui/icon-button";
 import { SvgView } from "../../../components/ui/svg";
 import Paragraph from "../../../components/ui/typography/paragraph";
-import { useThemeStore } from "../../../stores/use-theme-store";
-import { getElevation } from "../../../utils";
+import { useThemeColors } from "@notesnook/theme";
+import { getElevationStyle } from "../../../utils/elevation";
 import { SIZE } from "../../../utils/size";
 import { renderGroup } from "./common";
 import { DraggableItem, useDragState } from "./state";
@@ -35,6 +35,7 @@ import ToolSheet from "./tool-sheet";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ToolId } from "@notesnook/editor/dist/toolbar/tools";
+import PremiumService from "../../../services/premium";
 
 export const Tool = ({
   item,
@@ -49,7 +50,7 @@ export const Tool = ({
   ]);
   const [_recieving, setRecieving] = React.useState(false);
   const [recievePosition, setRecievePosition] = React.useState("above");
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const isSubgroup = typeof item === "object";
   const isDragged = !dragged
     ? false
@@ -64,7 +65,9 @@ export const Tool = ({
   const tool =
     isSubgroup || item === "dummy" ? null : findToolById(item as ToolId);
   const iconSvgString =
-    isSubgroup || !tool ? null : getToolIcon(tool.icon as ToolId);
+    isSubgroup || !tool
+      ? null
+      : getToolIcon(tool.icon as ToolId, colors.secondary.icon);
 
   const buttons = React.useCallback(() => {
     const btns = isSubgroup
@@ -72,6 +75,10 @@ export const Tool = ({
           {
             name: "minus",
             onPress: () => {
+              if (!PremiumService.get()) {
+                PremiumService.sheet("global");
+                return;
+              }
               presentDialog({
                 context: "global",
                 title: "Delete collapsed section?",
@@ -90,6 +97,10 @@ export const Tool = ({
           {
             name: "plus",
             onPress: () => {
+              if (!PremiumService.get()) {
+                PremiumService.sheet("global");
+                return;
+              }
               ToolSheet.present({
                 item,
                 index,
@@ -103,13 +114,16 @@ export const Tool = ({
           {
             name: "minus",
             onPress: () => {
+              if (!PremiumService.get()) {
+                PremiumService.sheet("global");
+                return;
+              }
               if (typeof groupIndex !== "number") return;
               const _data = useDragState.getState().data.slice();
               if (typeof parentIndex !== "number") {
-                const index =
-                  _data[groupIndex]?.findIndex(
-                    (tool: ToolId) => tool === item
-                  );
+                const index = _data[groupIndex]?.findIndex(
+                  (tool: any) => tool === item
+                );
                 _data[groupIndex]?.splice(index, 1);
               } else {
                 const index = (
@@ -160,9 +174,11 @@ export const Tool = ({
             if (!isDragged) dimensions.current = event.nativeEvent.layout;
           }}
           style={{
-            backgroundColor: isSubgroup ? colors.bg : colors.nav,
+            backgroundColor: isSubgroup
+              ? colors.primary.background
+              : colors.secondary.background,
             borderWidth: isSubgroup ? 0 : 1,
-            borderColor: isSubgroup ? undefined : colors.nav,
+            borderColor: isSubgroup ? undefined : colors.secondary.background,
             marginBottom: 10,
             width: isDragged ? dimensions.current.width : "100%",
             paddingTop: isSubgroup ? 15 : 0,
@@ -174,7 +190,7 @@ export const Tool = ({
             alignItems: "center",
             justifyContent: "space-between",
             paddingLeft: isSubgroup ? 30 : 12,
-            ...getElevation(hover ? 3 : 0)
+            ...getElevationStyle(hover ? 3 : 0)
           }}
         >
           <View
@@ -191,14 +207,18 @@ export const Tool = ({
                 style={{ marginRight: 5 }}
                 size={SIZE.md}
                 name="drag"
-                color={colors.icon}
+                color={colors.primary.icon}
               />
             )}
             <Paragraph
               style={{
                 marginLeft: iconSvgString ? 10 : 0
               }}
-              color={isSubgroup ? colors.icon : colors.pri}
+              color={
+                isSubgroup
+                  ? colors.secondary.paragraph
+                  : colors.primary.paragraph
+              }
               size={isSubgroup ? SIZE.xs : SIZE.sm - 1}
             >
               {isSubgroup ? "COLLAPSED" : tool?.title}
@@ -223,7 +243,7 @@ export const Tool = ({
                   marginLeft: 10
                 }}
                 name={btn.name}
-                color={colors.icon}
+                color={colors.primary.icon}
                 size={SIZE.lg}
               />
             ))}
@@ -243,10 +263,11 @@ export const Tool = ({
     ),
     [
       buttons,
-      colors.bg,
-      colors.icon,
-      colors.nav,
-      colors.pri,
+      colors.primary.background,
+      colors.primary.icon,
+      colors.secondary.background,
+      colors.primary.paragraph,
+      colors.secondary.paragraph,
       groupIndex,
       iconSvgString,
       index,
@@ -258,6 +279,10 @@ export const Tool = ({
   );
 
   const onDrop = (data: DraxDragWithReceiverEventData) => {
+    if (!PremiumService.get()) {
+      PremiumService.sheet("global");
+      return;
+    }
     const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;
     const dragged = data.dragged.payload;
     const reciever = data.receiver.payload;
@@ -294,7 +319,6 @@ export const Tool = ({
           : _data.splice(dragged.groupIndex, 1);
       }
     }
-
     setData(_data);
     setRecieving(false);
     return data.dragAbsolutePosition;
@@ -341,7 +365,9 @@ export const Tool = ({
           paddingBottom: recievePosition === "below" ? 50 : 0,
           paddingTop: recievePosition === "above" ? 50 : 0,
           backgroundColor:
-            dragged?.type === "subgroup" ? colors.nav : undefined,
+            dragged?.type === "subgroup"
+              ? colors.secondary.background
+              : undefined,
           marginTop: recievePosition === "above" ? 5 : 0,
           marginBottom: recievePosition === "below" ? 5 : 0,
           borderRadius: 10

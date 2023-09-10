@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -275,4 +275,17 @@ test("creating a new note and toggling read-only mode should not empty editor co
   expect(await note?.properties.isReadonly()).toBeTruthy();
   expect(await notes.editor.getContent("text")).not.toHaveLength(0);
   expect(await notes.editor.getContent("text")).toBe(NOTE.content);
+});
+
+test("#1468 count words separated by newlines", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+
+  await notes.createNote({
+    content: "1\n2\n3\na\nb\nc\nd\ne\nali\nwaqar",
+    title: NOTE.title
+  });
+
+  expect((await notes.editor.getWordCount()) === 10).toBeTruthy();
 });

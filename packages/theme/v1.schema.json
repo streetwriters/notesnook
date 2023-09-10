@@ -1,0 +1,385 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/ThemeDefinition",
+  "definitions": {
+    "ThemeDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the theme"
+        },
+        "id": {
+          "type": "string",
+          "description": "ID of the theme. Must be unique across all other themes.",
+          "pattern": "^[a-z0-9_-]+$"
+        },
+        "version": {
+          "type": "number",
+          "description": "Version of the theme."
+        },
+        "compatibilityVersion": {
+          "$ref": "#/definitions/ThemeCompatibilityVersion",
+          "description": "The compatibility version of the theme used by the client to decide whether the theme is compatible with the current app version."
+        },
+        "license": {
+          "type": "string",
+          "description": "The license under which the theme can be shared, modified etc.",
+          "examples": [
+            "GPL-3.0-or-later",
+            "Apache-2.0",
+            "BSD-3-Clause",
+            "MIT",
+            "MPL-2.0"
+          ]
+        },
+        "authors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ThemeAuthor"
+          },
+          "description": "Author(s) of the theme."
+        },
+        "homepage": {
+          "type": "string",
+          "description": "Website or homepage of the theme.",
+          "format": "uri"
+        },
+        "description": {
+          "type": "string",
+          "description": "A short description of the theme."
+        },
+        "colorScheme": {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark"
+          ],
+          "description": "Whether the theme has a dark color scheme or light."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Keywords to help categorize the theme & improve search results."
+        },
+        "scopes": {
+          "$ref": "#/definitions/ThemeScopes",
+          "description": "All the theme scopes."
+        },
+        "$schema": {
+          "type": "string",
+          "const": "https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/schemas/v1.schema.json"
+        }
+      },
+      "required": [
+        "name",
+        "id",
+        "version",
+        "compatibilityVersion",
+        "license",
+        "authors",
+        "description",
+        "colorScheme",
+        "scopes",
+        "$schema"
+      ],
+      "additionalProperties": false,
+      "title": "Notesnook Theme schema",
+      "description": "This is a schema for validation of Notesnook themes."
+    },
+    "ThemeCompatibilityVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "ThemeAuthor": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the author."
+        },
+        "email": {
+          "type": "string",
+          "description": "Contact email of the author."
+        },
+        "url": {
+          "type": "string",
+          "description": "Website or support page of the author."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "ThemeScopes": {
+      "type": "object",
+      "properties": {
+        "base": {
+          "$ref": "#/definitions/Variants%3Ctrue%3E",
+          "description": "Base theme scope is the only scope that must be 100% specified. There are no optional variants or colors in this scope and it acts as a fallback for all the other scopes in case a color or variant is missing in them."
+        },
+        "statusBar": {
+          "$ref": "#/definitions/PartialVariants",
+          "description": "Scope for the status bar on Desktop & mobile. On mobile, the status bar can be found at the bottom of the side navigation menu which includes the sync status, logged in status etc."
+        },
+        "list": {
+          "$ref": "#/definitions/PartialVariants",
+          "description": "Scope for the central list view containing your notes, notebooks, tags etc."
+        },
+        "editor": {
+          "$ref": "#/definitions/PartialVariants",
+          "description": "Scope for everything inside the editor excluding the toolbar which has its own scope."
+        },
+        "editorToolbar": {
+          "$ref": "#/definitions/PartialVariants",
+          "description": "Scope specific to the Editor Toolbar."
+        },
+        "editorSidebar": {
+          "$ref": "#/definitions/PartialVariants",
+          "description": "Scope for all the Editor side bars include note properties, attachment previews etc."
+        },
+        "dialog": {
+          "$ref": "#/definitions/PartialVariants",
+          "description": "Scope for all the dialogs in the app."
+        },
+        "navigationMenu": {
+          "$ref": "#/definitions/PartialVariants",
+          "description": "Scope for the side navigation menu."
+        },
+        "contextMenu": {
+          "$ref": "#/definitions/PartialVariants",
+          "description": "Scope for all the context menus in the app. This is desktop/web only since the mobile clients do not have context menus."
+        },
+        "sheet": {
+          "$ref": "#/definitions/PartialVariants",
+          "description": "Scope for all the bottom sheets shown in the app. This scope only applies on the mobile clients & the mobile version of the web app."
+        }
+      },
+      "required": [
+        "base"
+      ],
+      "additionalProperties": false
+    },
+    "Variants<true>": {
+      "type": "object",
+      "properties": {
+        "primary": {
+          "$ref": "#/definitions/PartialOrFullColors%3Ctrue%3E"
+        },
+        "secondary": {
+          "$ref": "#/definitions/PartialOrFullColors%3Ctrue%3E"
+        },
+        "disabled": {
+          "$ref": "#/definitions/PartialOrFullColors%3Ctrue%3E"
+        },
+        "selected": {
+          "$ref": "#/definitions/PartialOrFullColors%3Ctrue%3E"
+        },
+        "error": {
+          "$ref": "#/definitions/PartialOrFullColors%3Ctrue%3E"
+        },
+        "success": {
+          "$ref": "#/definitions/PartialOrFullColors%3Ctrue%3E"
+        }
+      },
+      "required": [
+        "primary",
+        "secondary",
+        "disabled",
+        "selected",
+        "error",
+        "success"
+      ],
+      "additionalProperties": false
+    },
+    "PartialOrFullColors<true>": {
+      "$ref": "#/definitions/Colors"
+    },
+    "Colors": {
+      "type": "object",
+      "properties": {
+        "accent": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "accentForeground": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "paragraph": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "background": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
+        },
+        "border": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "heading": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "separator": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "placeholder": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
+        },
+        "hover": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
+        },
+        "backdrop": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
+        },
+        "shade": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$",
+          "deprecated": true
+        },
+        "textSelection": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$",
+          "deprecated": true
+        }
+      },
+      "required": [
+        "accent",
+        "accentForeground",
+        "paragraph",
+        "background",
+        "border",
+        "heading",
+        "icon",
+        "separator",
+        "placeholder",
+        "hover",
+        "backdrop"
+      ],
+      "additionalProperties": false
+    },
+    "PartialVariants": {
+      "type": "object",
+      "properties": {
+        "primary": {
+          "$ref": "#/definitions/PartialOrFullColors%3Cfalse%3E"
+        },
+        "secondary": {
+          "$ref": "#/definitions/PartialOrFullColors%3Cfalse%3E"
+        },
+        "disabled": {
+          "$ref": "#/definitions/PartialOrFullColors%3Cfalse%3E"
+        },
+        "selected": {
+          "$ref": "#/definitions/PartialOrFullColors%3Cfalse%3E"
+        },
+        "error": {
+          "$ref": "#/definitions/PartialOrFullColors%3Cfalse%3E"
+        },
+        "success": {
+          "$ref": "#/definitions/PartialOrFullColors%3Cfalse%3E"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PartialOrFullColors<false>": {
+      "type": "object",
+      "properties": {
+        "accent": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "accentForeground": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "paragraph": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "background": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
+        },
+        "border": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "heading": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "separator": {
+          "type": "string",
+          "description": "Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)",
+          "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        },
+        "placeholder": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
+        },
+        "hover": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
+        },
+        "backdrop": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$"
+        },
+        "shade": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$",
+          "deprecated": true
+        },
+        "textSelection": {
+          "type": "string",
+          "description": "Hex RGB & ARGB values both are supported. (e.g. #dbdbdb99)",
+          "pattern": "^#(?:(?:[\\da-fA-F]{3}){1,2}|(?:[\\da-fA-F]{4}){1,2})$",
+          "deprecated": true
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

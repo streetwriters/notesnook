@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -67,8 +67,7 @@ export class TaskManager {
           updateStatus({
             key: statusTask.id,
             status: progress.text,
-            progress: percentage,
-            icon: null
+            progress: percentage
           });
         });
         removeStatus(statusTask.id);

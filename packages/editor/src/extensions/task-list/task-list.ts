@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,32 +17,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { mergeAttributes } from "@tiptap/core";
+import { mergeAttributes, wrappingInputRule } from "@tiptap/core";
 import { TaskList } from "@tiptap/extension-task-list";
 import { createNodeView } from "../react";
 import { TaskListComponent } from "./component";
 import { Plugin, PluginKey, NodeSelection } from "prosemirror-state";
-import TaskItem from "@tiptap/extension-task-item";
+import TaskItem, { inputRegex } from "@tiptap/extension-task-item";
 import { dropPoint } from "prosemirror-transform";
-import { findChildrenByType } from "prosemirror-utils";
+import {
+  findChildrenByType,
+  getParentAttributes,
+  hasSameAttributes
+} from "../../utils/prosemirror";
+import { countCheckedItems } from "./utils";
 
 export type TaskListAttributes = {
   title: string;
-  collapsed: boolean;
 };
 
 const stateKey = new PluginKey("task-item-drop-override");
 export const TaskListNode = TaskList.extend({
   addAttributes() {
     return {
-      collapsed: {
-        default: false,
-        keepOnSplit: false,
-        parseHTML: (element) => element.dataset.collapsed === "true",
-        renderHTML: (attributes) => ({
-          "data-collapsed": attributes.collapsed === true
-        })
-      },
       title: {
         default: null,
         keepOnSplit: false,
@@ -89,9 +85,18 @@ export const TaskListNode = TaskList.extend({
     return {
       toggleTaskList:
         () =>
-        ({ editor, commands, state, tr }) => {
+        ({ editor, chain, state, tr }) => {
           const { $from, $to } = state.selection;
-          commands.toggleList(this.name, this.options.itemTypeName);
+
+          chain()
+            .toggleList(
+              this.name,
+              this.options.itemTypeName,
+              true,
+              getParentAttributes(this.editor, true, true)
+            )
+            .run();
+
           const position = {
             from: tr.mapping.map($from.pos),
             to: tr.mapping.map($to.pos)
@@ -115,6 +120,13 @@ export const TaskListNode = TaskList.extend({
         content.classList.add(`${this.name.toLowerCase()}-content-wrapper`);
         content.style.whiteSpace = "inherit";
         return { dom: content };
+      },
+      shouldUpdate: (prev, next) => {
+        return (
+          !hasSameAttributes(prev.attrs, next.attrs) ||
+          prev.childCount !== next.childCount ||
+          countCheckedItems(prev).checked !== countCheckedItems(next).checked
+        );
       }
     });
   },
@@ -183,6 +195,31 @@ export const TaskListNode = TaskList.extend({
         }
       })
     ];
+  },
+
+  addInputRules() {
+    const inputRule = wrappingInputRule({
+      find: inputRegex,
+      type: this.type,
+      getAttributes: () => {
+        return getParentAttributes(this.editor, true, true);
+      }
+    });
+    const oldHandler = inputRule.handler;
+    inputRule.handler = ({ state, range, match, chain, can, commands }) => {
+      oldHandler({ state, range, match, chain, can, commands });
+
+      state.tr.setNodeMarkup(state.tr.selection.to - 2, undefined, {
+        checked: match[match.length - 1] === "x"
+      });
+    };
+    return [inputRule];
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      "Mod-Shift-T": () => this.editor.commands.toggleTaskList()
+    };
   }
 });
 

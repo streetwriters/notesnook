@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,24 +19,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
+import Clipboard from "@react-native-clipboard/clipboard";
 import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
 import { useCallback, useEffect, useRef } from "react";
 import {
   BackHandler,
   InteractionManager,
+  Keyboard,
+  KeyboardEventListener,
   NativeEventSubscription
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
-import umami from "../../../common/analytics/index";
 import { db } from "../../../common/database";
-import useKeyboard from "../../../hooks/use-keyboard";
+import ManageTagsSheet from "../../../components/sheets/manage-tags";
+import { RelationsList } from "../../../components/sheets/relations-list";
+import ReminderSheet from "../../../components/sheets/reminder";
 import { DDS } from "../../../services/device-detection";
 import {
+  ToastEvent,
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
+  eUnSubscribeEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useEditorStore } from "../../../stores/use-editor-store";
@@ -50,34 +54,17 @@ import {
   eOpenFullscreenEditor,
   eOpenLoginDialog,
   eOpenPremiumDialog,
-  eOpenPublishNoteDialog,
-  eOpenTagsDialog
+  eOpenPublishNoteDialog
 } from "../../../utils/events";
+import { openLinkInBrowser } from "../../../utils/functions";
 import { tabBarRef } from "../../../utils/global-refs";
 import { NoteType } from "../../../utils/types";
 import { useDragState } from "../../settings/editor/state";
+import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { EditorEvents, editorState } from "./utils";
-import { openLinkInBrowser } from "../../../utils/functions";
-
-export const EventTypes = {
-  selection: "editor-event:selection",
-  content: "editor-event:content",
-  title: "editor-event:title",
-  scroll: "editor-event:scroll",
-  history: "editor-event:history",
-  newtag: "editor-event:newtag",
-  tag: "editor-event:tag",
-  filepicker: "editor-event:picker",
-  download: "editor-event:download-attachment",
-  logger: "native:logger",
-  back: "editor-event:back",
-  pro: "editor-event:pro",
-  monograph: "editor-event:monograph",
-  properties: "editor-event:properties",
-  fullscreen: "editor-event:fullscreen",
-  link: "editor-event:link"
-};
+import { useNoteStore } from "../../../stores/use-notes-store";
+import SettingsService from "../../../services/settings";
 
 const publishNote = async (editor: useEditorType) => {
   const user = useUserStore.getState().user;
@@ -145,16 +132,53 @@ export const useEditorEvents = (
 ) => {
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
+  const corsProxy = useSettingStore((state) => state.settings.corsProxy);
+  const loading = useNoteStore((state) => state.loading);
+  const [dateFormat, timeFormat] = useSettingStore((state) => [
+    state.dateFormat,
+    state.timeFormat
+  ]);
+
   const handleBack = useRef<NativeEventSubscription>();
   const readonly = useEditorStore((state) => state.readonly);
   const isPremium = useUserStore((state) => state.premium);
   const doubleSpacedLines = useSettingStore(
     (state) => state.settings?.doubleSpacedLines
   );
+  const defaultFontSize = useSettingStore(
+    (state) => state.settings.defaultFontSize
+  );
+  const defaultFontFamily = useSettingStore(
+    (state) => state.settings.defaultFontFamily
+  );
+
   const tools = useDragState((state) => state.data);
-  const { keyboardShown } = useKeyboard();
 
   useEffect(() => {
+    const handleKeyboardDidShow: KeyboardEventListener = () => {
+      editor.commands.keyboardShown(true);
+      editor.postMessage(EditorEvents.keyboardShown, undefined);
+    };
+    const handleKeyboardDidHide: KeyboardEventListener = () => {
+      editor.commands.keyboardShown(false);
+    };
+    const subscriptions = [
+      Keyboard.addListener("keyboardDidShow", handleKeyboardDidShow),
+      Keyboard.addListener("keyboardDidHide", handleKeyboardDidHide)
+    ];
+    return () => {
+      subscriptions.forEach((subscription) => subscription.remove());
+    };
+  }, [editor.commands, editor.postMessage]);
+
+  useEffect(() => {
+    if (loading) return;
+    if (typeof defaultFontFamily === "object") {
+      SettingsService.set({
+        defaultFontFamily: (defaultFontFamily as any).id
+      });
+    }
+
     editor.commands.setSettings({
       deviceMode: deviceMode || "mobile",
       fullscreen: fullscreen || false,
@@ -163,8 +187,15 @@ export const useEditorEvents = (
       tools: tools || getDefaultPresets().default,
       noHeader: noHeader,
       noToolbar: readonly || editorPropReadonly || noToolbar,
-      keyboardShown: keyboardShown || false,
-      doubleSpacedLines: doubleSpacedLines
+      doubleSpacedLines: doubleSpacedLines,
+      corsProxy: corsProxy,
+      fontSize:
+        typeof defaultFontSize === "string"
+          ? parseInt(defaultFontSize)
+          : defaultFontSize,
+      fontFamily: SettingsService.get().defaultFontFamily,
+      dateFormat: db.settings?.getDateFormat(),
+      timeFormat: db.settings?.getTimeFormat()
     });
   }, [
     fullscreen,
@@ -175,11 +206,16 @@ export const useEditorEvents = (
     deviceMode,
     tools,
     editor.commands,
-    keyboardShown,
     doubleSpacedLines,
     editorPropReadonly,
     noHeader,
-    noToolbar
+    noToolbar,
+    corsProxy,
+    defaultFontSize,
+    defaultFontFamily,
+    dateFormat,
+    timeFormat,
+    loading
   ]);
 
   const onBackPress = useCallback(async () => {
@@ -203,12 +239,7 @@ export const useEditorEvents = (
       setImmediate(() => {
         useEditorStore.getState().setCurrentlyEditingNote(null);
         setTimeout(() => {
-          Navigation.queueRoutesForUpdate(
-            "ColoredNotes",
-            "Notes",
-            "TaggedNotes",
-            "TopicNotes"
-          );
+          Navigation.queueRoutesForUpdate();
         }, 500);
       });
       editorState().currentlyEditing = false;
@@ -233,8 +264,11 @@ export const useEditorEvents = (
       }
     });
   }, [onHardwareBackPress]);
-  const onCallClear = useCallback(
+
+  const onClearEditorSessionRequest = useCallback(
     async (value: string) => {
+      if (editorState()?.isAwaitingResult) return;
+
       if (value === "removeHandler") {
         if (handleBack.current) {
           handleBack.current.remove();
@@ -276,44 +310,77 @@ export const useEditorEvents = (
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote + editor.editorId, onLoadNote);
-    eSubscribeEvent(eClearEditor + editor.editorId, onCallClear);
+    eSubscribeEvent(
+      eClearEditor + editor.editorId,
+      onClearEditorSessionRequest
+    );
     return () => {
-      eUnSubscribeEvent(eClearEditor, onCallClear);
+      eUnSubscribeEvent(eClearEditor, onClearEditorSessionRequest);
       eUnSubscribeEvent(eOnLoadNote, onLoadNote);
     };
-  }, [editor.editorId, onCallClear, onLoadNote]);
+  }, [editor.editorId, onClearEditorSessionRequest, onLoadNote]);
 
   const onMessage = useCallback(
     (event: WebViewMessageEvent) => {
       const data = event.nativeEvent.data;
       const editorMessage = JSON.parse(data) as EditorMessage;
+
+      if (editorMessage.type === EventTypes.content) {
+        editor.saveContent({
+          type: editorMessage.type,
+          content: editorMessage.value as string,
+          forSessionId: editorMessage.sessionId
+        });
+      } else if (editorMessage.type === EventTypes.title) {
+        editor.saveContent({
+          type: editorMessage.type,
+          title: editorMessage.value as string,
+          forSessionId: editorMessage.sessionId
+        });
+      }
+
       if (
         editorMessage.sessionId !== editor.sessionId &&
         editorMessage.type !== EditorEvents.status
       ) {
         return;
       }
+
       switch (editorMessage.type) {
         case EventTypes.logger:
           logger.info("[WEBVIEW LOG]", editorMessage.value);
           break;
-        case EventTypes.content:
-          editor.saveContent({
-            type: editorMessage.type,
-            content: editorMessage.value as string
-          });
+        case EventTypes.contentchange:
+          editor.onContentChanged();
           break;
         case EventTypes.selection:
           break;
-        case EventTypes.title:
-          editor.saveContent({
-            type: editorMessage.type,
-            title: editorMessage.value as string
+        case EventTypes.reminders:
+          if (!editor.note.current) {
+            ToastEvent.show({
+              heading: "Create a note first to add a reminder",
+              type: "success"
+            });
+            return;
+          }
+          RelationsList.present({
+            reference: editor.note.current as any,
+            referenceType: "reminder",
+            relationType: "from",
+            title: "Reminders",
+            onAdd: () =>
+              ReminderSheet.present(undefined, editor.note.current as any, true)
           });
           break;
         case EventTypes.newtag:
-          if (!editor.note.current) return;
-          eSendEvent(eOpenTagsDialog, editor.note.current);
+          if (!editor.note.current) {
+            ToastEvent.show({
+              heading: "Create a note first to add a tag",
+              type: "success"
+            });
+            return;
+          }
+          ManageTagsSheet.present([editor.note.current]);
           break;
         case EventTypes.tag:
           if (editorMessage.value) {
@@ -324,19 +391,17 @@ export const useEditorEvents = (
               .then(async () => {
                 useTagStore.getState().setTags();
                 await editor.commands.setTags(editor.note.current);
-                Navigation.queueRoutesForUpdate(
-                  "ColoredNotes",
-                  "Notes",
-                  "TaggedNotes",
-                  "TopicNotes",
-                  "Tags"
-                );
+                Navigation.queueRoutesForUpdate();
               });
           }
           break;
         case EventTypes.filepicker:
+          editorState().isAwaitingResult = true;
           const { pick } = require("./picker.js").default;
           pick({ type: editorMessage.value });
+          setTimeout(() => {
+            editorState().isAwaitingResult = false;
+          }, 1000);
           break;
         case EventTypes.download: {
           const downloadAttachment =
@@ -349,7 +414,6 @@ export const useEditorEvents = (
           if (editor.state.current?.isFocused) {
             editor.state.current.isFocused = true;
           }
-          umami.pageView("/pro-screen", "/editor");
           eSendEvent(eOpenPremiumDialog);
           break;
         case EventTypes.monograph:
@@ -368,6 +432,24 @@ export const useEditorEvents = (
         case EventTypes.link:
           openLinkInBrowser(editorMessage.value as string);
           break;
+
+        case EventTypes.previewAttachment: {
+          const hash = (editorMessage.value as Attachment)?.hash;
+          const attachment = db.attachments?.attachment(hash);
+          if (!attachment) return;
+          if (attachment.metadata.type.startsWith("image/")) {
+            eSendEvent("ImagePreview", editorMessage.value);
+          } else {
+            eSendEvent("PDFPreview", attachment);
+          }
+
+          break;
+        }
+        case EventTypes.copyToClipboard: {
+          Clipboard.setString(editorMessage.value as string);
+          break;
+        }
+
         default:
           break;
       }

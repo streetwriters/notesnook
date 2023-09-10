@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,9 +23,10 @@ import { Flex, Text } from "@theme-ui/components";
 import { ImageAttributes } from "../../extensions/image";
 import { Popup } from "../components/popup";
 import { downloadImage, toDataURL } from "../../utils/downloader";
+import { useToolbarStore } from "../stores/toolbar-store";
 
 export type ImageUploadPopupProps = {
-  onInsert: (image: ImageAttributes) => void;
+  onInsert: (image: Partial<ImageAttributes>) => void;
   onClose: () => void;
 };
 export function ImageUploadPopup(props: ImageUploadPopupProps) {
@@ -33,6 +34,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string>();
   const [url, setUrl] = useState<string>("");
+  const downloadOptions = useToolbarStore((store) => store.downloadOptions);
 
   return (
     <Popup
@@ -47,8 +49,11 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
           setError(undefined);
 
           try {
-            const { blob, size, type } = await downloadImage(url);
-            onInsert({ src: await toDataURL(blob), size, type });
+            const { blob, size, type } = await downloadImage(
+              url,
+              downloadOptions
+            );
+            onInsert({ src: await toDataURL(blob), size, mime: type });
           } catch (e) {
             if (e instanceof Error) setError(e.message);
           } finally {
@@ -73,7 +78,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
           <Text
             variant={"error"}
             sx={{
-              bg: "errorBg",
+              bg: "var(--background-error)",
               mt: 1,
               p: 1,
               borderRadius: "default"
@@ -86,7 +91,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
             variant={"subBody"}
             sx={{
               bg: "shade",
-              color: "primary",
+              color: "accent",
               mt: 1,
               p: 1,
               borderRadius: "default"

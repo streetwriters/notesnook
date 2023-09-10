@@ -6,32 +6,96 @@
  * -------------------------- */
 @font-face {
   font-family: "Hack";
+  font-display: swap;
   src: url("fonts/hack-regular.woff2") format("woff2"),
-    url("fonts/hack-regular.woff") format("woff");
+    url("fonts/hack-regular.woff") format("woff"),
+    url("fonts/hack-regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Hack";
+  font-display: swap;
   src: url("fonts/hack-bold.woff2") format("woff2"),
-    url("fonts/hack-bold.woff") format("woff");
+    url("fonts/hack-bold.woff") format("woff"),
+    url("fonts/hack-bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Hack";
+  font-display: swap;
   src: url("fonts/hack-italic.woff2") format("woff2"),
-    url("fonts/hack-italic.woff") format("woff");
+    url("fonts/hack-italic.woff") format("woff"),
+    url("fonts/hack-italic.ttf") format("truetype");
   font-weight: 400;
   font-style: italic;
 }
 
 @font-face {
   font-family: "Hack";
+  font-display: swap;
   src: url("fonts/hack-bolditalic.woff2") format("woff2"),
-    url("fonts/hack-bolditalic.woff") format("woff");
+    url("fonts/hack-bolditalic.woff") format("woff"),
+    url("fonts/hack-bolditalic.ttf") format("truetype");
   font-weight: 700;
   font-style: italic;
+}
+
+/* noto-serif-regular - vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic */
+@font-face {
+  font-family: "Noto Serif";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local(""),
+    url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-regular.woff2") format("woff2"),
+    /* Super Modern Browsers */
+    url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-regular.woff") format("woff"),
+    /* Modern Browsers */
+    url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-regular.ttf") format("truetype"),
+}
+
+/* noto-serif-italic - vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic */
+@font-face {
+  font-family: "Noto Serif";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local(""),
+    url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-italic.woff2") format("woff2"),
+    /* Super Modern Browsers */
+    url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-italic.woff") format("woff"),
+    /* Modern Browsers */
+    url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-italic.ttf") format("truetype"),
+}
+
+/* noto-serif-700 - vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic */
+@font-face {
+  font-family: "Noto Serif";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local(""),
+    url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-700.woff2") format("woff2"),
+    /* Super Modern Browsers */
+    url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-700.woff") format("woff"),
+    /* Modern Browsers */
+    url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-700.ttf") format("truetype"),
+}
+
+/* noto-serif-700italic - vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic */
+@font-face {
+  font-family: "Noto Serif";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: local(""),
+    url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-700italic.woff2") format("woff2"),
+    /* Super Modern Browsers */
+    url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-700italic.woff") format("woff"),
+    /* Modern Browsers */
+    url("fonts/noto-serif-v21-vietnamese_latin-ext_latin_greek-ext_greek_cyrillic-ext_cyrillic-700italic.ttf") format("truetype"),
 }

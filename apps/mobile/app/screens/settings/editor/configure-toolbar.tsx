@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,14 +24,15 @@ import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { Button } from "../../../components/ui/button";
 import { Notice } from "../../../components/ui/notice";
 import Paragraph from "../../../components/ui/typography/paragraph";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import PremiumService from "../../../services/premium";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { Group } from "./group";
 import { DragState, useDragState } from "./state";
 export const ConfigureToolbar = () => {
   const data = useDragState((state) => state.data);
   const preset = useDragState((state) => state.preset);
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   const renderGroups = () => {
     return data?.map((item, index) => (
@@ -61,7 +62,7 @@ export const ConfigureToolbar = () => {
               marginTop: 10
             }}
             size={SIZE.xs}
-            color={colors.icon}
+            color={colors.secondary.paragraph}
           >
             PRESETS
           </Paragraph>
@@ -85,7 +86,8 @@ export const ConfigureToolbar = () => {
               },
               {
                 id: "custom",
-                name: "Custom"
+                name: "Custom",
+                pro: true
               }
             ].map((item) => (
               <Button
@@ -95,7 +97,12 @@ export const ConfigureToolbar = () => {
                   height: 35,
                   marginRight: 10
                 }}
+                proTag={item.pro}
                 onPress={() => {
+                  if (item.id === "custom" && !PremiumService.get()) {
+                    PremiumService.sheet("global");
+                    return;
+                  }
                   useDragState
                     .getState()
                     .setPreset(item.id as DragState["preset"]);

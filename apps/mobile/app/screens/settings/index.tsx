@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import Group from "./group";
 import Home from "./home";
 import { RouteParams } from "./types";
@@ -55,13 +55,13 @@ const SettingsStack = createNativeStackNavigator<RouteParams>();
 // };
 
 export const Settings = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   return (
     <SettingsStack.Navigator
       initialRouteName="SettingsHome"
       screenListeners={{
-        beforeRemove: (e) => {
-          if (e.target?.startsWith("SettingsGroup")) {
+        focus: (e) => {
+          if (e.target?.startsWith("SettingsHome-")) {
             useNavigationStore.getState().update({ name: "Settings" }, false);
           }
         }
@@ -70,7 +70,7 @@ export const Settings = () => {
         animation: "none",
         headerShown: false,
         contentStyle: {
-          backgroundColor: colors.bg
+          backgroundColor: colors.primary.background
         }
       }}
     >

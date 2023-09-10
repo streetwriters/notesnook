@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,7 +42,9 @@ const getDpi = (pd) => {
 };
 const correction = (size, multiplier) => {
   let dSize = getDeviceSize();
-  if (dSize >= 4 && dSize <= 5.3 && pixelDensity <= 3) {
+  if (dSize <= 4.5 && pixelDensity <= 3) {
+    return size * 0.85;
+  } else if (dSize <= 5.3 && pixelDensity <= 3) {
     return size * 0.93;
   } else if (dSize > 5.3 && dSize < 7 && pixelDensity < 3 && !DDS.isTab) {
     if (Platform.OS === "ios") {
@@ -54,9 +56,9 @@ const correction = (size, multiplier) => {
   } else if (dSize >= 6.5 && dSize <= 7.2 && DDS.isTab) {
     return size * multiplier;
   } else if (dSize > 7.2 && dSize <= 8.5 && DDS.isTab) {
-    return size * 0.85;
+    return size * 0.92;
   } else if (dSize > 8.5 && dSize <= 9.2 && DDS.isTab) {
-    return size * 0.9;
+    return size * 0.92;
   } else if (dSize > 9.2 && dSize <= 10.5 && DDS.isTab) {
     return size * 0.95;
   } else if (dSize > 10.5) {
@@ -80,10 +82,10 @@ export const normalize = (size) => {
   }
 };
 export const SIZE = {
-  xxs: normalize(10.5) * scale.fontScale,
-  xs: normalize(12) * scale.fontScale,
-  sm: normalize(14.5) * scale.fontScale,
-  md: normalize(16) * scale.fontScale,
+  xxs: normalize(11) * scale.fontScale,
+  xs: normalize(12.5) * scale.fontScale,
+  sm: normalize(15) * scale.fontScale,
+  md: normalize(16.5) * scale.fontScale,
   lg: normalize(22) * scale.fontScale,
   xl: normalize(24) * scale.fontScale,
   xxl: normalize(28) * scale.fontScale,
@@ -91,10 +93,10 @@ export const SIZE = {
 };
 
 export function updateSize() {
-  SIZE.xxs = normalize(10.5) * scale.fontScale;
-  SIZE.xs = normalize(12) * scale.fontScale;
-  SIZE.sm = normalize(14.5) * scale.fontScale;
-  SIZE.md = normalize(16) * scale.fontScale;
+  SIZE.xxs = normalize(11) * scale.fontScale;
+  SIZE.xs = normalize(12.5) * scale.fontScale;
+  SIZE.sm = normalize(15) * scale.fontScale;
+  SIZE.md = normalize(16.5) * scale.fontScale;
   SIZE.lg = normalize(22) * scale.fontScale;
   SIZE.xl = normalize(24) * scale.fontScale;
   SIZE.xxl = normalize(28) * scale.fontScale;

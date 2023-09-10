@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import { Flex, FlexProps } from "@theme-ui/components";
 import { Editor } from "../../types";
 import { MoreTools } from "./more-tools";
 import { getToolDefinition } from "../tool-definitions";
-import { NodeWithOffset } from "../utils/prosemirror";
+import { NodeWithOffset } from "../../utils/prosemirror";
 
 export type ToolbarGroupProps = FlexProps & {
   tools: ToolbarGroupDefinition;
@@ -33,10 +33,19 @@ export type ToolbarGroupProps = FlexProps & {
   selectedNode?: NodeWithOffset;
 };
 export function ToolbarGroup(props: ToolbarGroupProps) {
-  const { tools, editor, force, selectedNode, ...flexProps } = props;
+  const { tools, editor, force, selectedNode, sx, ...flexProps } = props;
 
   return (
-    <Flex className="toolbar-group" {...flexProps}>
+    <Flex
+      className="toolbar-group"
+      sx={{
+        gap: [0, 0, "small"],
+        p: ["4px", "4px", "small"],
+        flexShrink: 0,
+        ...sx
+      }}
+      {...flexProps}
+    >
       {tools.map((toolId) => {
         if (Array.isArray(toolId)) {
           return (

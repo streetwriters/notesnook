@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,7 +23,8 @@ import { ContextMenuModel } from "./context-menu.model";
 import { ToggleModel } from "./toggle.model";
 import { ItemsViewModel } from "./items-view.model";
 import { Notebook } from "./types";
-import { fillNotebookDialog } from "./utils";
+import { confirmDialog, fillNotebookDialog } from "./utils";
+import { NotesViewModel } from "./notes-view.model";
 
 export class NotebookItemModel extends BaseItemModel {
   private readonly contextMenu: ContextMenuModel;
@@ -34,7 +35,10 @@ export class NotebookItemModel extends BaseItemModel {
 
   async openNotebook() {
     await this.locator.click();
-    return new ItemsViewModel(this.page, "topics");
+    return {
+      topics: new ItemsViewModel(this.page, "topics"),
+      notes: new NotesViewModel(this.page, "notebook")
+    };
   }
 
   async editNotebook(notebook: Notebook) {
@@ -44,27 +48,33 @@ export class NotebookItemModel extends BaseItemModel {
     await fillNotebookDialog(this.page, notebook, true);
   }
 
-  async moveToTrash() {
+  async moveToTrash(deleteContainedNotes = false) {
     await this.contextMenu.open(this.locator);
-    await Promise.all([
-      this.contextMenu.clickOnItem("movetotrash"),
-      this.waitFor("detached")
-    ]);
+    await this.contextMenu.clickOnItem("movetotrash");
+
+    if (deleteContainedNotes)
+      await this.page.locator("#deleteContainingNotes").check({ force: true });
+
+    await confirmDialog(this.page);
+    await this.waitFor("detached");
   }
 
   async pin() {
     await this.contextMenu.open(this.locator);
-    await new ToggleModel(this.page, "menuitem-pin").on();
+    await new ToggleModel(this.page, "menu-button-pin").on();
   }
 
   async unpin() {
     await this.contextMenu.open(this.locator);
-    await new ToggleModel(this.page, "menuitem-pin").off();
+    await new ToggleModel(this.page, "menu-button-pin").off();
   }
 
   async isPinned() {
     await this.contextMenu.open(this.locator);
-    const state = await new ToggleModel(this.page, "menuitem-pin").isToggled();
+    const state = await new ToggleModel(
+      this.page,
+      "menu-button-pin"
+    ).isToggled();
     await this.contextMenu.close();
     return state;
   }

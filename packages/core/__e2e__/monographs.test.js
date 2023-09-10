@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,30 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { databaseTest, noteTest, StorageInterface } from "../__tests__/utils";
+import { databaseTest, noteTest } from "../__tests__/utils";
+import { login, logout } from "./utils";
+import { test, expect, afterAll } from "vitest";
 
-const user = {
-  email: process.env.EMAIL,
-  password: process.env.PASSWORD,
-  hashedPassword: process.env.HASHED_PASSWORD
-};
-
-jest.setTimeout(15 * 1000);
-
-beforeEach(() => {
-  StorageInterface.clear();
-});
+const TEST_TIMEOUT = 30 * 1000;
 
 afterAll(async () => {
   const db = await databaseTest();
+  await login(db);
   await db.monographs.init();
 
   for (const id of db.monographs.monographs) {
     await db.monographs.unpublish(id);
   }
 
-  StorageInterface.clear();
-});
+  await logout(db);
+}, TEST_TIMEOUT);
 
 // test("get monographs", () =>
 //   databaseTest().then(async (db) => {
@@ -51,46 +44,64 @@ afterAll(async () => {
 //     expect(db.monographs.all).toBeGreaterThanOrEqual(0);
 //   }));
 
-test("publish a monograph", () =>
-  noteTest().then(async ({ db, id }) => {
-    await db.user.login(user.email, user.password, user.hashedPassword);
-    await db.monographs.init();
+test(
+  "publish a monograph",
+  () =>
+    noteTest().then(async ({ db, id }) => {
+      await login(db);
+      await db.monographs.init();
 
-    const monographId = await db.monographs.publish(id);
+      const monographId = await db.monographs.publish(id);
 
-    expect(db.monographs.all.find((m) => m.id === id)).toBeDefined();
+      expect(db.monographs.all.find((m) => m.id === id)).toBeDefined();
 
-    const monograph = await db.monographs.get(monographId);
-    const note = db.notes.note(id);
-    expect(monograph.id).toBe(monographId);
-    expect(monograph.title).toBe(note.title);
-  }));
+      const monograph = await db.monographs.get(monographId);
+      const note = db.notes.note(id);
+      expect(monograph.id).toBe(monographId);
+      expect(monograph.title).toBe(note.title);
 
-test("update a published monograph", () =>
-  noteTest().then(async ({ db, id }) => {
-    await db.user.login(user.email, user.password, user.hashedPassword);
-    await db.monographs.init();
+      await logout(db);
+    }),
+  TEST_TIMEOUT
+);
 
-    const monographId = await db.monographs.publish(id);
-    let monograph = await db.monographs.get(monographId);
-    const note = db.notes.note(id);
-    expect(monograph.title).toBe(note.title);
+test(
+  "update a published monograph",
+  () =>
+    noteTest().then(async ({ db, id }) => {
+      await login(db);
+      await db.monographs.init();
 
-    const editedTitle = "EDITED TITLE OF MY NOTE!";
-    await db.notes.add({ id, title: editedTitle });
-    await db.monographs.publish(id);
-    monograph = await db.monographs.get(monographId);
-    expect(monograph.title).toBe(editedTitle);
-  }));
+      const monographId = await db.monographs.publish(id);
+      let monograph = await db.monographs.get(monographId);
+      const note = db.notes.note(id);
+      expect(monograph.title).toBe(note.title);
 
-test("unpublish a monograph", () =>
-  noteTest().then(async ({ db, id }) => {
-    await db.user.login(user.email, user.password, user.hashedPassword);
-    await db.monographs.init();
+      const editedTitle = "EDITED TITLE OF MY NOTE!";
+      await db.notes.add({ id, title: editedTitle });
+      await db.monographs.publish(id);
+      monograph = await db.monographs.get(monographId);
+      expect(monograph.title).toBe(editedTitle);
 
-    await db.monographs.publish(id);
-    expect(db.monographs.all.find((m) => m.id === id)).toBeDefined();
+      await logout(db);
+    }),
+  TEST_TIMEOUT
+);
 
-    await db.monographs.unpublish(id);
-    expect(db.monographs.all.find((m) => m.id === id)).toBeUndefined();
-  }));
+test(
+  "unpublish a monograph",
+  () =>
+    noteTest().then(async ({ db, id }) => {
+      await login(db);
+      await db.monographs.init();
+
+      await db.monographs.publish(id);
+      expect(db.monographs.all.find((m) => m.id === id)).toBeDefined();
+
+      await db.monographs.unpublish(id);
+      expect(db.monographs.all.find((m) => m.id === id)).toBeUndefined();
+
+      await logout(db);
+    }),
+  TEST_TIMEOUT
+);

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@ import { getVersion } from "react-native-device-info";
 import { db } from "../../../common/database";
 import { eSendEvent, ToastEvent } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../../stores/use-user-store";
-import { eCloseProgressDialog } from "../../../utils/events";
+import { eCloseSheet } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
@@ -35,10 +35,14 @@ import { presentDialog } from "../../dialog/functions";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
+import { useStoredRef } from "../../../hooks/use-stored-ref";
+
 export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
-  const colors = useThemeStore((state) => state.colors);
-  const body = useRef(defaultBody);
-  const title = useRef(defaultTitle);
+  const { colors } = useThemeColors();
+
+  const body = useStoredRef("issueBody", defaultBody);
+  const title = useStoredRef("issueTitle", defaultTitle);
+
   const user = useUserStore((state) => state.user);
   const [loading, setLoading] = useState(false);
   const bodyRef = useRef();
@@ -69,7 +73,9 @@ Logged in: ${user ? "yes" : "no"}`,
         userId: user?.id
       });
       setLoading(false);
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
+      body.reset();
+      title.reset();
       await sleep(300);
       presentDialog({
         title: "Issue reported",
@@ -79,7 +85,7 @@ Logged in: ${user ? "yes" : "no"}`,
             <Text
               style={{
                 textDecorationLine: "underline",
-                color: colors.accent
+                color: colors.primary.accent
               }}
               onPress={() => {
                 Linking.openURL(issue_url);
@@ -136,15 +142,15 @@ Logged in: ${user ? "yes" : "no"}`,
         defaultValue={title.current}
         style={{
           borderWidth: 1,
-          borderColor: colors.nav,
+          borderColor: colors.secondary.background,
           borderRadius: 5,
           padding: 12,
           fontFamily: "OpenSans-Regular",
           marginBottom: 10,
           fontSize: SIZE.md,
-          color: colors.heading
+          color: colors.primary.heading
         }}
-        placeholderTextColor={colors.placeholder}
+        placeholderTextColor={colors.primary.placeholder}
       />
 
       <TextInput
@@ -173,20 +179,20 @@ For example:
         }}
         style={{
           borderWidth: 1,
-          borderColor: colors.nav,
+          borderColor: colors.secondary.background,
           borderRadius: 5,
           padding: 12,
           fontFamily: "OpenSans-Regular",
           maxHeight: 200,
           fontSize: SIZE.sm,
           marginBottom: 2.5,
-          color: colors.pri
+          color: colors.primary.paragraph
         }}
-        placeholderTextColor={colors.placeholder}
+        placeholderTextColor={colors.primary.placeholder}
       />
       <Paragraph
         size={SIZE.xs}
-        color={colors.icon}
+        color={colors.secondary.paragraph}
       >{`App version: ${getVersion()} Platform: ${Platform.OS} Model: ${
         Platform.constants.Brand
       }-${Platform.constants.Model}-${Platform.constants.Version}`}</Paragraph>
@@ -196,13 +202,12 @@ For example:
         onPress={onPress}
         title={loading ? null : "Submit"}
         loading={loading}
-        height={50}
         width="100%"
         type="accent"
       />
 
       <Paragraph
-        color={colors.icon}
+        color={colors.secondary.paragraph}
         size={SIZE.xs}
         style={{
           marginTop: 10,
@@ -216,7 +221,7 @@ For example:
           }}
           style={{
             textDecorationLine: "underline",
-            color: colors.accent
+            color: colors.primary.accent
           }}
         >
           github.com/streetwriters/notesnook.
@@ -226,7 +231,7 @@ For example:
         <Text
           style={{
             textDecorationLine: "underline",
-            color: colors.accent
+            color: colors.primary.accent
           }}
           onPress={async () => {
             try {

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { Flex } from "@theme-ui/components";
-import { Button } from "../../components/button";
+import { Flex, Text } from "@theme-ui/components";
 import { ToolButton } from "./tool-button";
+import { useIsMobile } from "../stores/toolbar-store";
 
 export type CounterProps = {
   title: string;
@@ -31,47 +31,55 @@ export type CounterProps = {
 };
 function _Counter(props: CounterProps) {
   const { title, onDecrease, onIncrease, onReset, value } = props;
+  const isMobile = useIsMobile();
 
   return (
     <Flex
       sx={{
-        alignItems: "center",
-        mr: 1,
-        ":last-of-type": {
-          mr: 0
+        alignItems: "stretch",
+        borderRadius: "default",
+        overflow: "hidden",
+        cursor: "pointer",
+        height: "100%",
+        ":hover": {
+          bg: isMobile ? "transparent" : "hover-secondary"
         }
       }}
+      onClick={onReset}
+      title={`Click to reset ${title}`}
     >
       <ToolButton
         toggled={false}
         title={`Decrease ${title}`}
         icon="minus"
         variant={"small"}
-        onClick={onDecrease}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDecrease();
+        }}
       />
 
-      <Button
+      <Text
         sx={{
-          color: "text",
-          bg: "transparent",
-          px: 0,
+          color: "paragraph",
           fontSize: "subBody",
+          alignSelf: "center",
           mx: 1,
-          textAlign: "center",
-          ":hover": { bg: "transparent" }
+          textAlign: "center"
         }}
-        onClick={onReset}
-        title={`Reset ${title}`}
       >
         {value}
-      </Button>
+      </Text>
 
       <ToolButton
         toggled={false}
         title={`Increase ${title}`}
         icon="plus"
         variant={"small"}
-        onClick={onIncrease}
+        onClick={(e) => {
+          e.stopPropagation();
+          onIncrease();
+        }}
       />
     </Flex>
   );

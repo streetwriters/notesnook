@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { Text } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import Paragraph from "../ui/typography/paragraph";
 
@@ -28,7 +28,7 @@ export const Offer = ({
   text = "on yearly plan, offer ends soon",
   padding = 0
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   return (
     <Paragraph
@@ -39,8 +39,8 @@ export const Offer = ({
       size={SIZE.xxxl}
     >
       GET {off}
-      <Text style={{ color: colors.accent }}>%</Text> OFF!{"\n"}
-      <Paragraph color={colors.icon}>{text}</Paragraph>
+      <Text style={{ color: colors.primary.accent }}>%</Text> OFF!{"\n"}
+      <Paragraph color={colors.secondary.paragraph}>{text}</Paragraph>
     </Paragraph>
   );
 };

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import BaseStore from "./index";
 
+/**
+ * @extends {BaseStore<SelectionStore>}
+ */
 class SelectionStore extends BaseStore {
   selectedItems = [];
   shouldSelectAll = false;
@@ -57,6 +60,10 @@ class SelectionStore extends BaseStore {
     }
   };
 
+  isSelected = (item) => {
+    return this.get().selectedItems.indexOf(item) > -1;
+  };
+
   setSelectedItems = (items) => {
     this.set((state) => (state.selectedItems = items));
   };
@@ -67,8 +74,5 @@ class SelectionStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<SelectionStore>, SelectionStore]}
- */
 const [useStore, store] = createStore(SelectionStore);
 export { useStore, store };

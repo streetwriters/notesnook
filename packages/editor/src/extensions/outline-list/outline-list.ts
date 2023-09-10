@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,9 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getParentAttributes } from "../../utils/prosemirror";
 import { Node, mergeAttributes, wrappingInputRule } from "@tiptap/core";
-import { createNodeView } from "../react";
-import { OutlineListComponent } from "./component";
 
 export type OutlineListAttributes = {
   collapsed: boolean;
@@ -27,6 +26,8 @@ export type OutlineListAttributes = {
 
 export interface OutlineListOptions {
   HTMLAttributes: Record<string, unknown>;
+  keepMarks: boolean;
+  keepAttributes: boolean;
 }
 
 declare module "@tiptap/core" {
@@ -47,20 +48,9 @@ export const OutlineList = Node.create<OutlineListOptions>({
 
   addOptions() {
     return {
-      HTMLAttributes: {}
-    };
-  },
-
-  addAttributes() {
-    return {
-      collapsed: {
-        default: false,
-        keepOnSplit: false,
-        parseHTML: (element) => element.dataset.collapsed === "true",
-        renderHTML: (attributes) => ({
-          "data-collapsed": attributes.collapsed === true
-        })
-      }
+      HTMLAttributes: {},
+      keepMarks: false,
+      keepAttributes: false
     };
   },
 
@@ -91,8 +81,19 @@ export const OutlineList = Node.create<OutlineListOptions>({
     return {
       toggleOutlineList:
         () =>
-        ({ commands }) => {
-          return commands.toggleList(this.name, outlineListItemName);
+        ({ chain }) => {
+          return chain()
+            .toggleList(
+              this.name,
+              outlineListItemName,
+              this.options.keepMarks,
+              getParentAttributes(
+                this.editor,
+                this.options.keepMarks,
+                this.options.keepAttributes
+              )
+            )
+            .run();
         }
     };
   },
@@ -107,19 +108,29 @@ export const OutlineList = Node.create<OutlineListOptions>({
     return [
       wrappingInputRule({
         find: inputRegex,
-        type: this.type
+        type: this.type,
+        keepMarks: this.options.keepMarks,
+        keepAttributes: this.options.keepAttributes,
+        editor: this.editor,
+        getAttributes: () => {
+          return getParentAttributes(
+            this.editor,
+            this.options.keepMarks,
+            this.options.keepAttributes
+          );
+        }
       })
     ];
   },
-
   addNodeView() {
-    return createNodeView(OutlineListComponent, {
-      contentDOMFactory: () => {
-        const content = document.createElement("ul");
-        content.classList.add(`${this.name.toLowerCase()}-content-wrapper`);
-        content.style.whiteSpace = "inherit";
-        return { dom: content };
-      }
-    });
+    return ({ node }) => {
+      const ul = document.createElement("ul");
+      ul.classList.add("outline-list");
+      if (node.attrs.textDirection) ul.dir = node.attrs.textDirection;
+      return {
+        dom: ul,
+        contentDOM: ul
+      };
+    };
   }
 });

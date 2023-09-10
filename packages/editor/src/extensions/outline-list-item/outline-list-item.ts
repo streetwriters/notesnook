@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,13 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Node, mergeAttributes, findChildren, Editor } from "@tiptap/core";
+import {
+  Node,
+  mergeAttributes,
+  findChildren,
+  Editor,
+  findParentNode
+} from "@tiptap/core";
 import { NodeType } from "prosemirror-model";
-import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
-import { onArrowUpPressed, onBackspacePressed } from "../list-item/commands";
+import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { OutlineList } from "../outline-list/outline-list";
-import { createNodeView } from "../react";
-import { OutlineListItemComponent } from "./component";
 
 export interface ListItemOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -46,7 +49,20 @@ export const OutlineListItem = Node.create<ListItemOptions>({
     };
   },
 
-  content: "heading* paragraph block*",
+  addAttributes() {
+    return {
+      collapsed: {
+        default: false,
+        keepOnSplit: false,
+        parseHTML: (element) => element.dataset.collapsed === "true",
+        renderHTML: (attributes) => ({
+          "data-collapsed": attributes.collapsed === true
+        })
+      }
+    };
+  },
+
+  content: "paragraph+ list?",
 
   defining: true,
 
@@ -93,10 +109,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
         return this.editor.commands.splitListItem(this.name);
       },
       Tab: () => this.editor.commands.sinkListItem(this.name),
-      "Shift-Tab": () => this.editor.commands.liftListItem(this.name),
-      Backspace: ({ editor }) =>
-        onBackspacePressed(editor, this.name, this.type),
-      ArrowUp: ({ editor }) => onArrowUpPressed(editor, this.name, this.type)
+      "Shift-Tab": () => this.editor.commands.liftListItem(this.name)
     };
   },
 
@@ -114,10 +127,82 @@ export const OutlineListItem = Node.create<ListItemOptions>({
   },
 
   addNodeView() {
-    return createNodeView(OutlineListItemComponent, {
-      contentDOMFactory: true,
-      wrapperFactory: () => document.createElement("li")
-    });
+    return ({ node, getPos, editor }) => {
+      const isNested = node.lastChild?.type.name === OutlineList.name;
+
+      const li = document.createElement("li");
+
+      if (node.attrs.collapsed) li.classList.add("collapsed");
+      else li.classList.remove("collapsed");
+
+      if (isNested) li.classList.add("nested");
+      else li.classList.remove("nested");
+
+      function onClick(e: MouseEvent | TouchEvent) {
+        if (e instanceof MouseEvent && e.button !== 0) return;
+        if (!(e.target instanceof HTMLParagraphElement)) return;
+        if (!li.classList.contains("nested")) return;
+
+        const { x, y, right } = li.getBoundingClientRect();
+
+        const clientX =
+          e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+
+        const clientY =
+          e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
+
+        const hitArea = { width: 40, height: 40 };
+
+        const selection = editor.state.selection;
+        const parent = findParentNode((node) => !!node.attrs.textDirection)(
+          selection
+        );
+
+        let xStart = clientX >= x - hitArea.width;
+        let xEnd = clientX <= x;
+        const yStart = clientY >= y;
+        const yEnd = clientY <= y + hitArea.height;
+
+        if (parent && parent.node.attrs.textDirection === "rtl") {
+          xEnd = clientX <= right + hitArea.width;
+          xStart = clientX >= right;
+        }
+
+        if (xStart && xEnd && yStart && yEnd) {
+          const pos = typeof getPos === "function" ? getPos() : 0;
+          if (!pos) return;
+
+          e.preventDefault();
+          editor.commands.toggleOutlineCollapse(
+            pos,
+            !li.classList.contains("collapsed")
+          );
+        }
+      }
+
+      li.onmousedown = onClick;
+      li.ontouchstart = onClick;
+
+      return {
+        dom: li,
+        contentDOM: li,
+        update: (updatedNode) => {
+          if (updatedNode.type !== this.type) {
+            return false;
+          }
+          const isNested =
+            updatedNode.lastChild?.type.name === OutlineList.name;
+
+          if (updatedNode.attrs.collapsed) li.classList.add("collapsed");
+          else li.classList.remove("collapsed");
+
+          if (isNested) li.classList.add("nested");
+          else li.classList.remove("nested");
+
+          return true;
+        }
+      };
+    };
   }
 });
 
@@ -139,17 +224,4 @@ function findSublist(editor: Editor, type: NodeType) {
   const subListPos = listItem.pos + subList.pos + 1;
 
   return { isCollapsed, isNested, subListPos };
-  // return (
-  //   this.editor
-  //     .chain()
-  //     .command(({ tr }) => {
-  //       tr.setNodeMarkup(listItem.pos + subList.pos + 1, undefined, {
-  //         collapsed: !isCollapsed,
-  //       });
-  //       return true;
-  //     })
-  //     //.setTextSelection(listItem.pos + subList.pos + 1)
-  //     //.splitListItem(this.name)
-  //     .run()
-  // );
 }

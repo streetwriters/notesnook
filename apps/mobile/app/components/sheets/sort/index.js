@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,26 +22,25 @@ import { View } from "react-native";
 import { db } from "../../../common/database";
 import { eSendEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { GROUP, SORT } from "../../../utils/constants";
 import { refreshNotesPage } from "../../../utils/events";
-import layoutmanager from "../../../utils/layout-manager";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 const Sort = ({ type, screen }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const isTopicSheet = screen === "TopicSheet";
+  const { colors } = useThemeColors();
   const [groupOptions, setGroupOptions] = useState(
     db.settings.getGroupOptions(type)
   );
   const updateGroupOptions = async (_groupOptions) => {
     await db.settings.setGroupOptions(type, _groupOptions);
 
-    layoutmanager.withSpringAnimation(600);
     setGroupOptions(_groupOptions);
     setTimeout(() => {
-      Navigation.queueRoutesForUpdate(screen);
+      if (screen !== "TopicSheet") Navigation.queueRoutesForUpdate(screen);
       eSendEvent("groupOptionsUpdate");
       eSendEvent(refreshNotesPage);
     }, 1);
@@ -52,6 +51,9 @@ const Sort = ({ type, screen }) => {
       ...groupOptions,
       sortDirection: groupOptions.sortDirection === "asc" ? "desc" : "asc"
     };
+    if (type === "topics") {
+      _groupOptions.groupBy = "none";
+    }
     await updateGroupOptions(_groupOptions);
   };
 
@@ -59,7 +61,7 @@ const Sort = ({ type, screen }) => {
     <View
       style={{
         width: "100%",
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         justifyContent: "space-between"
       }}
     >
@@ -100,9 +102,9 @@ const Sort = ({ type, screen }) => {
           height={25}
           iconPosition="right"
           fontSize={SIZE.sm - 1}
-          type="grayBg"
+          type="transparent"
           buttonType={{
-            text: colors.accent
+            text: colors.primary.accent
           }}
           style={{
             borderRadius: 100,
@@ -119,8 +121,8 @@ const Sort = ({ type, screen }) => {
           flexDirection: "row",
           justifyContent: "flex-start",
           flexWrap: "wrap",
-          borderBottomWidth: 1,
-          borderBottomColor: colors.nav,
+          borderBottomWidth: isTopicSheet ? 0 : 1,
+          borderBottomColor: colors.secondary.background,
           marginBottom: 12,
           paddingHorizontal: 12,
           paddingBottom: 12,
@@ -134,18 +136,20 @@ const Sort = ({ type, screen }) => {
             height={40}
             iconPosition="left"
             icon={"check"}
-            buttonType={{ text: colors.accent }}
+            buttonType={{ text: colors.primary.accent }}
             fontSize={SIZE.sm}
             iconSize={SIZE.md}
           />
         ) : (
           Object.keys(SORT).map((item) =>
             (item === "title" && groupOptions.groupBy !== "none") ||
-            (screen !== "Tags" && item === "dateModified") ||
-            (screen === "Tags" && item === "dateEdited") ? null : (
+            ((screen !== "Tags" || screen !== "Reminders") &&
+              item === "dateModified") ||
+            ((screen === "Tags" || screen === "Reminders") &&
+              item === "dateEdited") ? null : (
               <Button
                 key={item}
-                type={groupOptions.sortBy === item ? "grayBg" : "gray"}
+                type={groupOptions.sortBy === item ? "selected" : "gray"}
                 title={SORT[item]}
                 height={40}
                 iconPosition="left"
@@ -156,7 +160,9 @@ const Sort = ({ type, screen }) => {
                 }}
                 buttonType={{
                   text:
-                    groupOptions.sortBy === item ? colors.accent : colors.icon
+                    groupOptions.sortBy === item
+                      ? colors.primary.accent
+                      : colors.secondary.paragraph
                 }}
                 fontSize={SIZE.sm}
                 onPress={async () => {
@@ -164,6 +170,9 @@ const Sort = ({ type, screen }) => {
                     ...groupOptions,
                     sortBy: type === "trash" ? "dateDeleted" : item
                   };
+                  if (type === "topics") {
+                    _groupOptions.groupBy = "none";
+                  }
                   await updateGroupOptions(_groupOptions);
                 }}
                 iconSize={SIZE.md}
@@ -173,64 +182,72 @@ const Sort = ({ type, screen }) => {
         )}
       </View>
 
-      <Heading
-        style={{
-          marginLeft: 12
-        }}
-        size={SIZE.lg}
-      >
-        Group by
-      </Heading>
-
-      <Seperator />
-
-      <View
-        style={{
-          borderRadius: 0,
-          flexDirection: "row",
-          flexWrap: "wrap",
-          paddingHorizontal: 12
-        }}
-      >
-        {Object.keys(GROUP).map((item) => (
-          <Button
-            key={item}
-            testID={"btn-" + item}
-            type={groupOptions.groupBy === GROUP[item] ? "grayBg" : "gray"}
-            buttonType={{
-              text:
-                groupOptions.groupBy === GROUP[item]
-                  ? colors.accent
-                  : colors.icon
-            }}
-            onPress={async () => {
-              let _groupOptions = {
-                ...groupOptions,
-                groupBy: GROUP[item]
-              };
-
-              if (item === "abc") {
-                _groupOptions.sortBy = "title";
-                _groupOptions.sortDirection = "asc";
-              } else {
-                if (groupOptions.sortBy === "title") {
-                  _groupOptions.sortBy = "dateEdited";
-                  _groupOptions.sortDirection = "desc";
-                }
-              }
-              updateGroupOptions(_groupOptions);
-            }}
-            height={40}
-            icon={groupOptions.groupBy === GROUP[item] ? "check" : null}
-            title={item.slice(0, 1).toUpperCase() + item.slice(1, item.length)}
+      {isTopicSheet ? null : (
+        <>
+          <Heading
             style={{
-              paddingHorizontal: 8,
-              marginBottom: 10,
-              marginRight: 10
+              marginLeft: 12
             }}
-          />
-        ))}
-      </View>
+            size={SIZE.lg}
+          >
+            Group by
+          </Heading>
+
+          <Seperator />
+
+          <View
+            style={{
+              borderRadius: 0,
+              flexDirection: "row",
+              flexWrap: "wrap",
+              paddingHorizontal: 12
+            }}
+          >
+            {Object.keys(GROUP).map((item) => (
+              <Button
+                key={item}
+                testID={"btn-" + item}
+                type={
+                  groupOptions.groupBy === GROUP[item] ? "selected" : "gray"
+                }
+                buttonType={{
+                  text:
+                    groupOptions.groupBy === GROUP[item]
+                      ? colors.primary.accent
+                      : colors.secondary.paragraph
+                }}
+                onPress={async () => {
+                  let _groupOptions = {
+                    ...groupOptions,
+                    groupBy: GROUP[item]
+                  };
+
+                  if (item === "abc") {
+                    _groupOptions.sortBy = "title";
+                    _groupOptions.sortDirection = "asc";
+                  } else {
+                    if (groupOptions.sortBy === "title") {
+                      _groupOptions.sortBy = "dateEdited";
+                      _groupOptions.sortDirection = "desc";
+                    }
+                  }
+                  updateGroupOptions(_groupOptions);
+                }}
+                height={40}
+                icon={groupOptions.groupBy === GROUP[item] ? "check" : null}
+                title={
+                  item.slice(0, 1).toUpperCase() + item.slice(1, item.length)
+                }
+                style={{
+                  paddingHorizontal: 8,
+                  marginBottom: 10,
+                  marginRight: 10
+                }}
+              />
+            ))}
+          </View>
+        </>
+      )}
     </View>
   );
 };

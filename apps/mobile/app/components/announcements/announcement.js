@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,18 +21,18 @@ import React from "react";
 import { FlatList, View } from "react-native";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useMessageStore } from "../../stores/use-message-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { allowedOnPlatform, renderItem } from "./functions";
 
 export const Announcement = ({ color }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const announcements = useMessageStore((state) => state.announcements);
   let announcement = announcements.length > 0 ? announcements[0] : null;
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   return !announcement || selectionMode ? null : (
     <View
       style={{
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         width: "100%",
         paddingHorizontal: 12,
         paddingTop: 12,
@@ -44,28 +44,26 @@ export const Announcement = ({ color }) => {
           width: "100%",
           borderRadius: 10,
           overflow: "hidden",
-          backgroundColor: colors.nav,
+          backgroundColor: colors.secondary.background,
           paddingBottom: 12
         }}
       >
-        <View>
-          <FlatList
-            style={{
-              width: "100%",
-              marginTop: 12
-            }}
-            data={announcement?.body.filter((item) =>
-              allowedOnPlatform(item.platforms)
-            )}
-            renderItem={({ item, index }) =>
+        <View
+          style={{
+            width: "100%",
+            marginTop: 12
+          }}
+        >
+          {announcement?.body
+            .filter((item) => allowedOnPlatform(item.platforms))
+            .map((item, index) =>
               renderItem({
                 item: item,
                 index: index,
                 color: colors[color],
                 inline: true
               })
-            }
-          />
+            )}
         </View>
       </View>
     </View>

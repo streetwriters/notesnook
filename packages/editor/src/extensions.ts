@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ import "./extensions/ordered-list";
 import "@tiptap/extension-color";
 import "@tiptap/extension-table-row";
 import "./extensions/table-cell";
-import "@tiptap/extension-table-header";
+import "./extensions/table-header";
 import "./extensions/image";
 import "./extensions/attachment";
 import "./extensions/task-list";

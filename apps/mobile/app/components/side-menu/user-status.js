@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useSyncProgress from "../../hooks/use-sync-progress";
 import { eSendEvent } from "../../services/event-manager";
 import Sync from "../../services/sync";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { useUserStore } from "../../stores/use-user-store";
+import { useThemeColors } from "@notesnook/theme";
+import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { eOpenLoginDialog } from "../../utils/events";
 import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
@@ -33,12 +33,16 @@ import { PressableButton } from "../ui/pressable";
 import { TimeSince } from "../ui/time-since";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { useNetInfo } from "@react-native-community/netinfo";
 export const UserStatus = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const syncing = useUserStore((state) => state.syncing);
+  const lastSyncStatus = useUserStore((state) => state.lastSyncStatus);
   const lastSynced = useUserStore((state) => state.lastSynced);
   const insets = useGlobalSafeAreaInsets();
+  const { isInternetReachable } = useNetInfo();
+  const isOffline = !isInternetReachable;
   const { progress } = useSyncProgress();
   return (
     <View
@@ -47,7 +51,7 @@ export const UserStatus = () => {
         alignSelf: "center",
         paddingBottom: Platform.OS === "ios" ? insets.bottom / 2 : null,
         borderTopWidth: 1,
-        borderTopColor: colors.nav
+        borderTopColor: colors.secondary.background
       }}
     >
       <View
@@ -86,31 +90,36 @@ export const UserStatus = () => {
                 flexWrap: "wrap"
               }}
               size={SIZE.xs}
-              color={colors.icon}
+              color={colors.secondary.heading}
             >
               {!user ? (
                 "You are not logged in"
-              ) : !syncing ? (
-                lastSynced && lastSynced !== "Never" ? (
-                  <>
-                    Last synced{" "}
-                    <TimeSince
-                      style={{ fontSize: SIZE.xs, color: colors.icon }}
-                      time={lastSynced}
-                    />
-                  </>
-                ) : (
-                  "never"
-                )
+              ) : lastSynced && lastSynced !== "Never" ? (
+                <>
+                  Synced{" "}
+                  <TimeSince
+                    style={{
+                      fontSize: SIZE.xs,
+                      color: colors.secondary.paragraph
+                    }}
+                    time={lastSynced}
+                    bold={true}
+                  />
+                  {isOffline ? " (offline)" : ""}
+                </>
               ) : (
-                `Syncing your notes${
-                  progress ? ` (${progress.current}/${progress.total})` : ""
-                }`
+                "never"
               )}{" "}
               <Icon
                 name="checkbox-blank-circle"
-                size={9}
-                color={!user ? colors.red : colors.green}
+                size={11}
+                color={
+                  !user || lastSyncStatus === SyncStatus.Failed
+                    ? colors.error.icon
+                    : isOffline
+                    ? colors.static.orange
+                    : colors.success.icon
+                }
               />
             </Heading>
 
@@ -118,21 +127,31 @@ export const UserStatus = () => {
               style={{
                 flexWrap: "wrap"
               }}
-              color={colors.heading}
+              color={colors.primary.heading}
             >
               {!user
                 ? "Login to sync your notes."
+                : lastSyncStatus === SyncStatus.Failed
+                ? "Last sync failed, tap to try again"
+                : syncing
+                ? `Syncing your notes${
+                    progress ? ` (${progress.current})` : ""
+                  }`
                 : "Tap here to sync your notes."}
             </Paragraph>
           </View>
 
           {user ? (
             syncing ? (
-              <>
-                <ActivityIndicator color={colors.accent} size={SIZE.xl} />
-              </>
+              <ActivityIndicator color={colors.primary.accent} size={SIZE.xl} />
+            ) : lastSyncStatus === SyncStatus.Failed ? (
+              <Icon
+                color={colors.error.icon}
+                name="sync-alert"
+                size={SIZE.lg}
+              />
             ) : (
-              <Icon color={colors.accent} name="sync" size={SIZE.lg} />
+              <Icon color={colors.primary.accent} name="sync" size={SIZE.lg} />
             )
           ) : null}
         </PressableButton>

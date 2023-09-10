@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,23 +18,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor } from "../../types";
-import { MenuButton } from "../../components/menu/types";
+import { MenuButtonItem } from "@notesnook/ui";
 import { ToolButton } from "../components/tool-button";
-import { ToolProps } from "../types";
+import { ToolDefinition, ToolProps } from "../types";
+import { IconNames, Icons } from "../icons";
 
 export function menuButtonToTool(
-  constructItem: (editor: Editor) => MenuButton
+  constructItem: (editor: Editor) => MenuButtonItem
 ) {
-  return function Tool(props: ToolProps) {
+  return function Tool(props: ToolProps & { icon: IconNames }) {
     const item = constructItem(props.editor);
     return (
       <ToolButton
         {...props}
-        icon={item.icon || props.icon}
+        icon={props.icon}
         toggled={item.isChecked || false}
         title={item.title}
         onClick={item.onClick}
       />
     );
+  };
+}
+
+export function toolToMenuButton(tool: ToolDefinition): MenuButtonItem {
+  return {
+    ...tool,
+    type: "button",
+    icon: Icons[tool.icon],
+    key: tool.title
   };
 }

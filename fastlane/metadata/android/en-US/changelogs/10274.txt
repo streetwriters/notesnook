@@ -1,0 +1,8 @@
+- Add clipboard button in Codeblock
+- Do not show update available dialog on startup
+- Fix editor crashing after changing font family in Settings
+- Fix app UI on tablets incorrect on launch sometimes
+- Optimize app screens for smaller displays
+- Fix notes created from share extension get saved over & over
+
+Thank you for using Notesnook!

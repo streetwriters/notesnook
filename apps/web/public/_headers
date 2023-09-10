@@ -2,4 +2,4 @@
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
-  Content-Security-Policy: script-src 'self' 'nonce-7WIq8hRwApoXhctoGZZthMLYQLRNiprTwcPi6Azdf' 'unsafe-eval'; frame-ancestors 'none';
+  frame-ancestors 'none';

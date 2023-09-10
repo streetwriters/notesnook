@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
-import { timeConverter } from "../../utils/time";
 import Paragraph from "../ui/typography/paragraph";
+import { getFormattedDate } from "@notesnook/common";
 export const DateMeta = ({ item }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   const getNameFromKey = (key) => {
     switch (key) {
@@ -43,24 +43,33 @@ export const DateMeta = ({ item }) => {
     }
   };
 
-  const renderItem = (key) =>
-    key.startsWith("date") ? (
-      <View
-        key={key}
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingVertical: 3
-        }}
-      >
-        <Paragraph size={SIZE.xs} color={colors.icon}>
-          {getNameFromKey(key)}
-        </Paragraph>
-        <Paragraph size={SIZE.xs} color={colors.icon}>
-          {timeConverter(item[key])}
-        </Paragraph>
-      </View>
-    ) : null;
+  function getDateMeta() {
+    let keys = Object.keys(item);
+    if (keys.includes("dateEdited"))
+      keys.splice(
+        keys.findIndex((k) => k === "dateModified"),
+        1
+      );
+    return keys.filter((key) => key.startsWith("date") && key !== "date");
+  }
+
+  const renderItem = (key) => (
+    <View
+      key={key}
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingVertical: 3
+      }}
+    >
+      <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
+        {getNameFromKey(key)}
+      </Paragraph>
+      <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
+        {getFormattedDate(item[key], "date-time")}
+      </Paragraph>
+    </View>
+  );
 
   return (
     <View
@@ -68,11 +77,11 @@ export const DateMeta = ({ item }) => {
         paddingVertical: 5,
         marginTop: 5,
         borderTopWidth: 1,
-        borderTopColor: colors.nav,
+        borderTopColor: colors.secondary.background,
         paddingHorizontal: 12
       }}
     >
-      {Object.keys(item).map(renderItem)}
+      {getDateMeta().map(renderItem)}
     </View>
   );
 };

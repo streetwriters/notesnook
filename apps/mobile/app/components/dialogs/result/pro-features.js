@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { eSendEvent } from "../../../services/event-manager";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import {
-  eCloseProgressDialog,
+  eCloseSheet,
   eCloseResultDialog,
   eOpenPremiumDialog
 } from "../../../utils/events";
@@ -31,7 +31,7 @@ import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import Paragraph from "../../ui/typography/paragraph";
 export const ProFeatures = ({ count = 6 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   return (
     <>
@@ -73,7 +73,7 @@ export const ProFeatures = ({ count = 6 }) => {
               justifyContent: "flex-start"
             }}
           >
-            <Icon size={SIZE.lg} color={colors.accent} name="check" />
+            <Icon size={SIZE.lg} color={colors.primary.accent} name="check" />
             <Paragraph style={{ marginLeft: 5, flexShrink: 1 }}>
               {item.content}
             </Paragraph>
@@ -82,14 +82,14 @@ export const ProFeatures = ({ count = 6 }) => {
       <Paragraph
         onPress={async () => {
           eSendEvent(eCloseResultDialog);
-          eSendEvent(eCloseProgressDialog);
+          eSendEvent(eCloseSheet);
           await sleep(300);
           eSendEvent(eOpenPremiumDialog);
         }}
-        size={SIZE.xs + 1}
+        size={SIZE.xs}
         style={{
           textDecorationLine: "underline",
-          color: colors.icon
+          color: colors.secondary.paragraph
         }}
       >
         See all features included in Notesnook Pro

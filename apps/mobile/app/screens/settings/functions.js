@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,7 +42,8 @@ export async function verifyUser(
     negativeText: closeText || "Cancel",
     positivePress: async (value) => {
       try {
-        let verified = await db.user.verifyPassword(value);
+        const user = await db.user.getUser();
+        let verified = !user ? true : await db.user.verifyPassword(value);
         if (verified) {
           sleep(300).then(async () => {
             await onsuccess();
@@ -58,7 +59,7 @@ export async function verifyUser(
         }
       } catch (e) {
         ToastEvent.show({
-          heading: "Failed to backup data",
+          heading: "Failed to verify",
           message: e.message,
           type: "error",
           context: "global"

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,47 +20,109 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import BaseStore from "./index";
 import Config from "../utils/config";
-import changeAppTheme from "../commands/change-app-theme";
-import { getDefaultAccentColor } from "@notesnook/theme";
+import { desktop } from "../common/desktop-bridge";
+import {
+  THEME_COMPATIBILITY_VERSION,
+  ThemeDark,
+  ThemeLight
+} from "@notesnook/theme";
+import { ThemesRouter } from "../common/themes-router";
 
+/**
+ * @extends {BaseStore<ThemeStore>}
+ */
 class ThemeStore extends BaseStore {
   /**
    * @type {"dark" | "light"}
    */
-  theme = Config.get("theme", "light");
-  accent = Config.get("accent", getDefaultAccentColor());
+  colorScheme = Config.get("colorScheme", "light");
+  darkTheme = getTheme("dark");
+  lightTheme = getTheme("light");
   followSystemTheme = Config.get("followSystemTheme", false);
 
+  init = async () => {
+    const { darkTheme, lightTheme } = this.get();
+    this.set({
+      darkTheme: await updateTheme(darkTheme),
+      lightTheme: await updateTheme(lightTheme)
+    });
+  };
+
+  /**
+   * @param {import("@notesnook/theme").ThemeDefinition} theme
+   */
   setTheme = (theme) => {
-    if (!this.get().followSystemTheme) changeAppTheme(theme);
-    this.set((state) => (state.theme = theme));
-    Config.set("theme", theme);
+    Config.set(`theme:${theme.colorScheme}`, theme);
+    this.set({
+      [getKey(theme)]: theme,
+      colorScheme: theme.colorScheme
+    });
   };
 
-  toggleNightMode = () => {
-    const theme = this.get().theme;
-    this.setTheme(theme === "dark" ? "light" : "dark");
+  setColorScheme = async (colorScheme) => {
+    if (!this.get().followSystemTheme)
+      await desktop?.integration.changeTheme.mutate(colorScheme);
+    const theme = getTheme(colorScheme);
+    this.set({
+      colorScheme,
+      theme
+    });
+    Config.set("colorScheme", colorScheme);
+
+    updateTheme(theme).then((theme) =>
+      this.set({
+        [getKey(theme)]: theme
+      })
+    );
   };
 
-  setAccent = (accent) => {
-    this.set((state) => (state.accent = accent));
-    Config.set("accent", accent);
+  toggleColorScheme = () => {
+    const theme = this.get().colorScheme;
+    this.setColorScheme(theme === "dark" ? "light" : "dark");
   };
 
-  setFollowSystemTheme = (followSystemTheme) => {
-    this.set((state) => (state.followSystemTheme = followSystemTheme));
+  setFollowSystemTheme = async (followSystemTheme) => {
+    this.set({ followSystemTheme });
     Config.set("followSystemTheme", followSystemTheme);
-    changeAppTheme(followSystemTheme ? "system" : "light");
+    await desktop?.integration.changeTheme.mutate(
+      followSystemTheme ? "system" : "light"
+    );
   };
 
   toggleFollowSystemTheme = () => {
     const followSystemTheme = this.get().followSystemTheme;
     this.setFollowSystemTheme(!followSystemTheme);
   };
+
+  isThemeCurrentlyApplied = (id) => {
+    return this.get().darkTheme.id === id || this.get().lightTheme.id === id;
+  };
 }
 
-/**
- * @type {[import("zustand").UseStore<ThemeStore>, ThemeStore]}
- */
 const [useStore, store] = createStore(ThemeStore);
 export { useStore, store };
+
+function getKey(theme) {
+  return theme.colorScheme === "dark" ? "darkTheme" : "lightTheme";
+}
+
+function getTheme(colorScheme) {
+  return colorScheme === "dark"
+    ? Config.get("theme:dark", ThemeDark)
+    : Config.get("theme:light", ThemeLight);
+}
+
+async function updateTheme(theme) {
+  const { id, version } = theme;
+  try {
+    const updatedTheme = await ThemesRouter.updateTheme.query({
+      compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+      id,
+      version
+    });
+    if (!updatedTheme) return theme;
+    return updatedTheme;
+  } catch (e) {
+    return theme;
+  }
+}

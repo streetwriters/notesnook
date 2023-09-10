@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ import { notesnook } from "../../../e2e/test.ids";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useTip } from "../../services/tip-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { COLORS_NOTE } from "../../utils/color-scheme";
+import { useThemeColors } from "@notesnook/theme";
+import { ColorValues } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 import { Tip } from "../tip";
 import { Button } from "../ui/button";
@@ -40,7 +40,7 @@ export const Empty = React.memo(
     type,
     screen
   }) {
-    const colors = useThemeStore((state) => state.colors);
+    const { colors } = useThemeColors();
     const insets = useGlobalSafeAreaInsets();
     const { height } = useWindowDimensions();
     const introCompleted = useSettingStore(
@@ -69,7 +69,7 @@ export const Empty = React.memo(
           <>
             <Tip
               color={
-                COLORS_NOTE[headerProps.color?.toLowerCase()]
+                ColorValues[headerProps.color?.toLowerCase()]
                   ? headerProps.color
                   : "accent"
               }
@@ -87,12 +87,10 @@ export const Empty = React.memo(
                 iconPosition="right"
                 icon="arrow-right"
                 onPress={placeholderData.action}
-                accentColor={
-                  COLORS_NOTE[headerProps.color?.toLowerCase()]
-                    ? headerProps.color
-                    : "accent"
-                }
-                accentText="light"
+                buttonType={{
+                  text:
+                    colors.static[headerProps.color] || colors.primary.accent
+                }}
                 style={{
                   alignSelf: "flex-start",
                   borderRadius: 5,
@@ -118,7 +116,8 @@ export const Empty = React.memo(
               <ActivityIndicator
                 size={SIZE.lg}
                 color={
-                  COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent
+                  ColorValues[headerProps.color?.toLowerCase()] ||
+                  colors.primary.accent
                 }
               />
             </View>

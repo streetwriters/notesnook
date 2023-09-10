@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile",
-  "version": "2.2.6",
+  "version": "2.6.3",
   "private": true,
   "license": "GPL-3.0-or-later",
   "workspaces": [
@@ -8,14 +8,14 @@
     "app/"
   ],
   "scripts": {
-    "postinstall": "patch-package",
+    "postinstall": "patch-package && node ./scripts/optimize-fonts.mjs",
     "run-android": "cd native && react-native run-android --active-arch-only",
     "run-ios": "cd native && react-native run-ios",
     "start": "cd native && react-native start",
     "repack": "cd native && react-native webpack-start",
     "install-pods": "cd native/ios && pod install",
     "build-ios": "cd native && detox build -c ios.sim.release",
-    "build-android": "cd native && detox build -c android.emu.release",
+    "build-android": " cd native && detox build -c android.emu.release",
     "e2e-android": "cd native && detox test --configuration android.emu.release --detectOpenHandles",
     "e2e-ios": "cd native && detox test -c ios.sim.release --detectOpenHandles",
     "bump": "cd native && npx react-native bump-version --skip-semver-for android",
@@ -23,16 +23,24 @@
     "release-android-bundle": "cd native/android && ./gradlew bundleRelease --no-daemon"
   },
   "devDependencies": {
-    "patch-package": "^6.4.7",
-    "typescript": "^4.8.2"
+    "fonteditor-core": "^2.1.11",
+    "otplib": "12.0.1",
+    "patch-package": "7.0.0",
+    "react-refresh": "0.14.0"
   },
   "dependencies": {
-    "@notesnook/core": "*",
-    "@notesnook/editor": "*",
-    "@notesnook/editor-mobile": "*",
-    "fflate": "^0.7.3",
-    "react-native-actions-shortcuts": "^1.0.1",
-    "react-native-fingerprint-scanner": "https://github.com/ammarahm-ed/react-native-fingerprint-scanner.git",
-    "react-native-iap":"7.5.6"
+    "@azure/core-asynciterator-polyfill": "^1.0.2",
+    "@notesnook/common": "file:../../packages/common",
+    "@notesnook/core": "file:../../packages/core",
+    "@notesnook/editor": "file:../../packages/editor",
+    "@notesnook/editor-mobile": "file:../../packages/editor-mobile",
+    "@notesnook/logger": "file:../../packages/logger",
+    "@notesnook/themes-server": "file:../../servers/themes",
+    "@tanstack/react-query": "^4.29.19",
+    "@trpc/client": "10.31.0",
+    "@trpc/react-query": "10.31.0",
+    "@trpc/server": "^10.31.0",
+    "react": "18.2.0",
+    "react-native": "0.72.0"
   }
 }

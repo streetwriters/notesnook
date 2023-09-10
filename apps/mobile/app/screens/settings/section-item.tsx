@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,30 +22,38 @@ import {
   StackActions,
   useNavigation
 } from "@react-navigation/native";
-import React from "react";
-import { View } from "react-native";
+import React, { useRef, useState } from "react";
+import { View, TextInput, ActivityIndicator } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ToggleSwitch from "toggle-switch-react-native";
+import Input from "../../components/ui/input";
 import { PressableButton } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
 import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
+import { IconButton } from "../../components/ui/icon-button";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const settings = useSettingStore((state) => state.settings);
   const navigation = useNavigation<NavigationProp<RouteParams>>();
   const current = item.useHook && item.useHook(item);
   const isHidden = item.hidden && item.hidden(item.property || current);
-  const onChangeSettings = () => {
+  const inputRef = useRef<TextInput>(null);
+  const [loading, setLoading] = useState(false);
+
+  const onChangeSettings = async () => {
+    if (loading) return;
     if (item.modifer) {
-      item.modifer(item.property || current);
+      setLoading(true);
+      await item.modifer(item.property || current);
+      setLoading(false);
       return;
     }
     if (!item.property) return;
@@ -58,9 +66,29 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   const styles =
     item.type === "danger"
       ? {
-          backgroundColor: colors.errorBg
+          backgroundColor: colors.error.background
         }
       : {};
+
+  const updateInput = (value: any) => {
+    inputRef?.current?.setNativeProps({
+      text: value + ""
+    });
+  };
+
+  const onChangeInputSelectorValue = (text: any) => {
+    if (text) {
+      const min = item.minInputValue || 0;
+      const max = item.maxInputValue || 0;
+      const value = parseInt(text);
+      text =
+        Number.isNaN(value) || value < min ? min : value > max ? max : text;
+
+      SettingsService.set({
+        [item.property as string]: `${text}`
+      });
+    }
+  };
 
   return isHidden ? null : (
     <PressableButton
@@ -72,7 +100,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         paddingVertical: 20,
-        borderRadius:0,
+        borderRadius: 0,
         ...styles
       }}
       onPress={() => {
@@ -81,7 +109,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             navigation.dispatch(StackActions.push("SettingsGroup", item));
             useNavigationStore.getState().update(
               {
-                name: "SettingsGroup",
+                name: "SettingsGroup" as never,
                 title:
                   typeof item.name === "function"
                     ? item.name(current)
@@ -113,13 +141,19 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             alignItems: "center",
             marginRight: 12,
             backgroundColor:
-              item.component === "colorpicker" ? colors.accent : undefined,
+              item.component === "colorpicker"
+                ? colors.primary.accent
+                : undefined,
             borderRadius: 100
           }}
         >
           {!!item.icon && (
             <Icon
-              color={item.type === "danger" ? colors.errorText : colors.icon}
+              color={
+                item.type === "danger"
+                  ? colors.error.icon
+                  : colors.secondary.icon
+              }
               name={item.icon}
               size={30}
             />
@@ -133,14 +167,22 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           }}
         >
           <Paragraph
-            color={item.type === "danger" ? colors.errorText : colors.heading}
+            color={
+              item.type === "danger"
+                ? colors.error.paragraph
+                : colors.primary.heading
+            }
             size={SIZE.md + 1}
           >
             {typeof item.name === "function" ? item.name(current) : item.name}
           </Paragraph>
           {!!item.description && (
             <Paragraph
-              color={item.type === "danger" ? colors.errorText : colors.pri}
+              color={
+                item.type === "danger"
+                  ? colors.error.paragraph
+                  : colors.primary.paragraph
+              }
               size={SIZE.sm}
             >
               {typeof item.description === "function"
@@ -155,23 +197,138 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               {components[item.component]}
             </>
           )}
+
+          {item.type === "input" && (
+            <Input
+              {...item.inputProperties}
+              onSubmit={(e) => {
+                if (e.nativeEvent.text) {
+                  SettingsService.set({
+                    [item.property as string]: e.nativeEvent.text
+                  });
+                }
+                item.inputProperties?.onSubmitEditing?.(e);
+              }}
+              onChangeText={(text) => {
+                if (text) {
+                  SettingsService.set({
+                    [item.property as string]: text
+                  });
+                }
+                item.inputProperties?.onSubmitEditing?.(text as any);
+              }}
+              containerStyle={{ marginTop: 12 }}
+              fwdRef={inputRef}
+              onLayout={() => {
+                inputRef?.current?.setNativeProps({
+                  text:
+                    SettingsService.get()[
+                      item.property as keyof SettingStore["settings"]
+                    ] + ""
+                });
+              }}
+              defaultValue={item.inputProperties?.defaultValue}
+            />
+          )}
+
+          {item.type === "input-selector" && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 12
+              }}
+            >
+              <IconButton
+                name="minus"
+                color={colors.primary.icon}
+                onPress={() => {
+                  const rawValue = SettingsService.get()[
+                    item.property as keyof SettingStore["settings"]
+                  ] as string;
+                  if (rawValue) {
+                    const currentValue = parseInt(rawValue);
+                    const minValue = item.minInputValue || 0;
+                    if (currentValue <= minValue) return;
+                    const nextValue = currentValue - 1;
+                    SettingsService.set({
+                      [item.property as string]: nextValue
+                    });
+                    updateInput(nextValue);
+                  }
+                }}
+                size={SIZE.xl}
+              />
+              <Input
+                {...item.inputProperties}
+                onSubmit={(e) => {
+                  onChangeInputSelectorValue(e.nativeEvent.text);
+                  item.inputProperties?.onSubmitEditing?.(e);
+                }}
+                onChangeText={(text) => {
+                  onChangeInputSelectorValue(text);
+                  item.inputProperties?.onSubmitEditing?.(text as any);
+                }}
+                keyboardType="decimal-pad"
+                containerStyle={{
+                  width: 65
+                }}
+                wrapperStyle={{
+                  maxWidth: 65,
+                  marginBottom: 0,
+                  marginHorizontal: 6
+                }}
+                fwdRef={inputRef}
+                onLayout={() => {
+                  if (item.property) {
+                    updateInput(SettingsService.get()[item.property]);
+                  }
+                }}
+                defaultValue={item.inputProperties?.defaultValue}
+              />
+              <IconButton
+                name="plus"
+                color={colors.primary.icon}
+                onPress={() => {
+                  const rawValue = SettingsService.get()[
+                    item.property as keyof SettingStore["settings"]
+                  ] as string;
+                  if (rawValue) {
+                    const currentValue = parseInt(rawValue);
+                    const max = item.maxInputValue || 0;
+                    if (currentValue >= max) return;
+                    const nextValue = currentValue + 1;
+                    SettingsService.set({
+                      [item.property as string]: nextValue
+                    });
+                    updateInput(nextValue);
+                  }
+                }}
+                size={SIZE.xl}
+              />
+            </View>
+          )}
         </View>
       </View>
 
-      {item.type === "switch" && item.property && (
+      {item.type === "switch" && !loading && (
         <ToggleSwitch
           isOn={
             item.getter
               ? item.getter(item.property || current)
-              : settings[item.property]
+              : settings[item?.property as never]
           }
-          onColor={colors.accent}
-          offColor={colors.icon}
+          onColor={colors.primary.accent}
+          offColor={colors.secondary.icon}
           size="small"
           animationSpeed={150}
           onToggle={onChangeSettings}
         />
       )}
+
+      {loading ? (
+        <ActivityIndicator size={SIZE.xxl} color={colors.primary.accent} />
+      ) : null}
     </PressableButton>
   );
 };

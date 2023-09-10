@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,23 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  checkAttachment, downloadFile,
-  getUploadedFileSize
-} from "./download";
+import { checkAttachment, downloadFile, getUploadedFileSize } from "./download";
 import {
   clearFileStorage,
   deleteFile,
   exists,
   readEncrypted,
-  writeEncrypted
+  writeEncryptedBase64,
+  hashBase64
 } from "./io";
 import { uploadFile } from "./upload";
 import { cancelable } from "./utils";
 
 export default {
   readEncrypted,
-  writeEncrypted,
+  writeEncryptedBase64,
+  hashBase64,
   uploadFile: cancelable(uploadFile),
   downloadFile: cancelable(downloadFile),
   deleteFile,

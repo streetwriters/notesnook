@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,34 +17,37 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
+import { useThemeColors } from "@notesnook/theme";
+import React, { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ToggleSwitch from "toggle-switch-react-native";
 import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { normalize, SIZE } from "../../utils/size";
+import { SIZE, normalize } from "../../utils/size";
 import { Button } from "../ui/button";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useCallback } from "react";
 
 export const MenuItem = React.memo(
   function MenuItem({ item, index, testID, rightBtn }) {
-    const colors = useThemeStore((state) => state.colors);
+    const { colors } = useThemeColors();
     const [headerTextState, setHeaderTextState] = useState(
       useNavigationStore.getState().currentScreen
     );
     const screenId = item.name.toLowerCase() + "_navigation";
     let isFocused = headerTextState?.id === screenId;
+    const primaryColors = isFocused ? colors.selected : colors.primary;
 
     const _onPress = () => {
       if (item.func) {
         item.func();
       } else {
-        Navigation.navigate({ name: item.name }, { canGoBack: false });
+        Navigation.navigate(
+          { name: item.name, beta: item.isBeta },
+          { canGoBack: false }
+        );
       }
       if (item.close) {
         setImmediate(() => {
@@ -81,7 +84,7 @@ export const MenuItem = React.memo(
         testID={testID}
         key={item.name + index}
         onPress={_onPress}
-        type={!isFocused ? "gray" : "grayBg"}
+        type={isFocused ? "selected" : "gray"}
         customStyle={{
           width: "100%",
           alignSelf: "center",
@@ -109,27 +112,43 @@ export const MenuItem = React.memo(
             name={item.icon}
             color={
               item.icon === "crown"
-                ? colors.yellow
+                ? colors.static.yellow
                 : isFocused
-                ? colors.accent
-                : colors.pri
+                ? colors.selected.icon
+                : colors.secondary.icon
             }
             size={SIZE.lg - 2}
           />
           {isFocused ? (
-            <Heading color={colors.heading} size={SIZE.md}>
+            <Heading color={colors.selected.heading} size={SIZE.md}>
               {item.name}
             </Heading>
           ) : (
             <Paragraph size={SIZE.md}>{item.name}</Paragraph>
           )}
+
+          {item.isBeta ? (
+            <View
+              style={{
+                borderRadius: 100,
+                backgroundColor: primaryColors.accent,
+                paddingHorizontal: 4,
+                marginLeft: 5,
+                paddingVertical: 2
+              }}
+            >
+              <Paragraph color={primaryColors.accentForeground} size={SIZE.xxs}>
+                BETA
+              </Paragraph>
+            </View>
+          ) : null}
         </View>
 
         {item.switch ? (
           <ToggleSwitch
             isOn={item.on}
-            onColor={colors.accent}
-            offColor={colors.icon}
+            onColor={primaryColors.accent}
+            offColor={primaryColors.icon}
             size="small"
             animationSpeed={150}
             onToggle={_onPress}

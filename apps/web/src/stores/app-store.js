@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,60 +26,113 @@ import { store as tagStore } from "./tag-store";
 import { store as editorstore } from "./editor-store";
 import { store as attachmentStore } from "./attachment-store";
 import { store as monographStore } from "./monograph-store";
+import { store as reminderStore } from "./reminder-store";
+import { store as announcementStore } from "./announcement-store";
+import { store as settingStore } from "./setting-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
-import { resetReminders } from "../common/reminders";
-import { EV, EVENTS } from "@notesnook/core/common";
+import { resetNotices } from "../common/notices";
+import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/dist/common";
 import { logger } from "../utils/logger";
+import Config from "../utils/config";
+import { onPageVisibilityChanged } from "../utils/page-visibility";
+import { NetworkCheck } from "../utils/network-check";
 
+const networkCheck = new NetworkCheck();
 var syncStatusTimeout = 0;
 const BATCH_SIZE = 50;
+
+/**
+ * @extends {BaseStore<AppStore>}
+ */
 class AppStore extends BaseStore {
   // default state
   isSideMenuOpen = false;
   isFocusMode = false;
   isEditorOpen = false;
   isVaultCreated = false;
+  isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
+  isSyncEnabled = Config.get("syncEnabled", true);
+  isRealtimeSyncEnabled = Config.get("isRealtimeSyncEnabled", true);
   syncStatus = {
-    key: "synced",
+    key: navigator.onLine
+      ? Config.get("syncEnabled", true)
+        ? "synced"
+        : "disabled"
+      : "offline",
     progress: null,
     type: null
   };
   colors = [];
   globalMenu = { items: [], data: {} };
-  reminders = [];
+  /**
+   * @type {import("../common/notices").Notice[]}
+   */
+  notices = [];
   shortcuts = [];
   lastSynced = 0;
 
   init = () => {
-    let count = 0;
+    settingStore.refresh();
+    // this needs to happen here so reminders can be set on app load.
+    reminderStore.refresh();
+    announcementStore.refresh();
+
     EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
 
-    db.eventManager.subscribe(
-      EVENTS.syncProgress,
-      ({ type, total, current }) => {
-        if (total === current) return;
-        this.set((state) => {
-          state.syncStatus = {
-            key: "syncing",
-            progress: ((current / total) * 100).toFixed(),
-            type
-          };
-        });
+    db.eventManager.subscribe(EVENTS.syncProgress, ({ type, current }) => {
+      this.set((state) => {
+        state.syncStatus = {
+          key: "syncing",
+          progress: current,
+          type
+        };
+      });
+    });
 
-        if (type === "download" && ++count >= BATCH_SIZE) {
-          count = 0;
-          this.refresh();
-        }
+    EV.subscribe(EVENTS.syncCheckStatus, async (type) => {
+      const { isAutoSyncEnabled, isSyncEnabled } = this.get();
+      switch (type) {
+        case SYNC_CHECK_IDS.sync:
+          return { type, result: isSyncEnabled };
+        case SYNC_CHECK_IDS.autoSync:
+          return { type, result: isAutoSyncEnabled };
+        default:
+          return { type, result: true };
+      }
+    });
+
+    db.eventManager.subscribe(
+      EVENTS.databaseSyncRequested,
+      async (full, force, lastSynced) => {
+        if (!this.get().isAutoSyncEnabled) return;
+
+        await this.get().sync(full, force, lastSynced);
       }
     );
 
-    db.eventManager.subscribe(EVENTS.syncCompleted, () => {
-      this.set((state) => {
-        state.syncStatus = { key: "synced" };
-      });
-      count = 0;
+    db.eventManager.subscribe(EVENTS.syncAborted, () => {
+      this.updateSyncStatus("failed");
+    });
+
+    db.eventManager.subscribe(EVENTS.syncCompleted, async () => {
+      await this.updateLastSynced();
+      this.updateSyncStatus("completed", true);
       this.refresh();
+    });
+
+    onPageVisibilityChanged(async (type, documentHidden) => {
+      if (!documentHidden && type !== "offline") {
+        logger.info("Page visibility changed. Reconnecting SSE...");
+        if (type === "online") {
+          // a slight delay to make sure sockets are open and can be connected
+          // to. Otherwise, this fails miserably.
+          await networkCheck.waitForInternet();
+        }
+        await db.connectSSE({ force: type === "online" }).catch(logger.error);
+      } else if (type === "offline") {
+        await this.abortSync("offline");
+      }
     });
   };
 
@@ -87,13 +140,17 @@ class AppStore extends BaseStore {
     logger.measure("refreshing app");
 
     await this.updateLastSynced();
-    await resetReminders();
+    await resetNotices();
     noteStore.refresh();
     notebookStore.refresh();
+    reminderStore.refresh();
     trashStore.refresh();
     tagStore.refresh();
     attachmentStore.refresh();
     monographStore.refresh();
+    settingStore.refresh();
+    await editorstore.refresh();
+
     this.refreshNavItems();
 
     logger.measure("refreshing app");
@@ -108,6 +165,29 @@ class AppStore extends BaseStore {
 
   toggleFocusMode = () => {
     this.set((state) => (state.isFocusMode = !state.isFocusMode));
+  };
+
+  toggleAutoSync = () => {
+    Config.set("autoSyncEnabled", !this.get().isAutoSyncEnabled);
+    this.set((state) => (state.isAutoSyncEnabled = !state.isAutoSyncEnabled));
+  };
+
+  toggleSync = () => {
+    const { isSyncEnabled } = this.get();
+    Config.set("syncEnabled", !isSyncEnabled);
+    this.set((state) => (state.isSyncEnabled = !state.isSyncEnabled));
+
+    if (isSyncEnabled) {
+      this.abortSync("disabled");
+    }
+  };
+
+  toggleRealtimeSync = () => {
+    const { isRealtimeSyncEnabled } = this.get();
+    Config.set("realtimeSyncEnabled", !isRealtimeSyncEnabled);
+    this.set(
+      (state) => (state.isRealtimeSyncEnabled = !state.isRealtimeSyncEnabled)
+    );
   };
 
   toggleSideMenu = (toggleState) => {
@@ -132,28 +212,22 @@ class AppStore extends BaseStore {
 
   /**
    *
-   * @param {"backup"|"signup"|"email"|"recoverykey"} type
-   * @param {string} title
-   * @param {string} detail
-   * @param {"high"|"medium"|"low"} priority
+   * @param {import("../common/notices").Notice[]} notices
    */
-  setReminders = (...reminders) => {
+  setNotices = (...notices) => {
     this.set((state) => {
-      state.reminders = [];
-      for (let reminder of reminders) {
-        const { priority, type } = reminder;
-        state.reminders.push({
-          type,
-          priority: priority === "high" ? 1 : priority === "medium" ? 2 : 1
-        });
+      for (const notice of notices) {
+        const oldIndex = state.notices.findIndex((a) => a.type === notice.type);
+        if (oldIndex > -1) state.notices.splice(oldIndex, 1);
+        state.notices.push(notice);
       }
     });
   };
 
-  dismissReminders = (...reminders) => {
+  dismissNotices = (...reminders) => {
     this.set((state) => {
       for (let reminder of reminders) {
-        state.reminders.splice(state.reminders.indexOf(reminder), 1);
+        state.notices.splice(state.notices.indexOf(reminder), 1);
       }
     });
   };
@@ -199,23 +273,38 @@ class AppStore extends BaseStore {
     this.set((state) => (state.lastSynced = lastSynced));
   };
 
-  sync = async (full = true, force = false) => {
-    if (this.isSyncing()) return;
+  sync = async (full = true, force = false, lastSynced = null) => {
+    if (
+      this.isSyncing() ||
+      !this.get().isSyncEnabled ||
+      !navigator.onLine ||
+      !(await networkCheck.waitForInternet())
+    ) {
+      logger.info("Ignoring duplicate sync", {
+        full,
+        force,
+        lastSynced,
+        syncing: this.isSyncing(),
+        syncDisabled: !this.get().isSyncEnabled,
+        offline: !navigator.onLine
+      });
+      return;
+    }
 
     clearTimeout(syncStatusTimeout);
     this.updateLastSynced();
 
     this.updateSyncStatus("syncing");
     try {
-      const result = await db.sync(full, force);
+      const result = await db.sync(full, force, lastSynced);
 
       if (!result) return this.updateSyncStatus("failed");
-      else if (full) this.updateSyncStatus("completed");
+      this.updateSyncStatus("completed", true);
 
       await this.updateLastSynced();
     } catch (err) {
       logger.error(err);
-      if (err.code === "MERGE_CONFLICT") {
+      if (err.cause === "MERGE_CONFLICT") {
         if (editorstore.get().session.id)
           editorstore.openSession(editorstore.get().session.id, true);
         await this.refresh();
@@ -224,24 +313,37 @@ class AppStore extends BaseStore {
         this.updateSyncStatus("failed");
       }
 
-      if (err?.message?.indexOf("Failed to fetch") > -1) return;
+      if (
+        err?.message?.indexOf("Failed to fetch") > -1 ||
+        err?.message?.indexOf("Could not connect to the Sync server.") > -1
+      )
+        return;
 
       showToast("error", err.message);
-    } finally {
-      if (this.get().syncStatus.key !== "conflicts")
-        syncStatusTimeout = setTimeout(() => {
-          this.updateSyncStatus("synced");
-        }, 3000);
     }
+  };
+
+  abortSync = async (status = "offline") => {
+    if (this.isSyncing()) this.updateSyncStatus("failed");
+    else this.updateSyncStatus(status);
+
+    await db.syncer.stop();
   };
 
   /**
    *
-   * @param {"synced" | "syncing" | "conflicts" | "failed" | "completed"} key
+   * @param {"synced" | "syncing" | "conflicts" | "failed" | "completed" | "offline" | "disabled"} key
    */
-  updateSyncStatus = (key) => {
+  updateSyncStatus = (key, reset = false) => {
     logger.info(`Sync status updated: ${key}`);
     this.set((state) => (state.syncStatus = { key }));
+
+    if (reset) {
+      syncStatusTimeout = setTimeout(() => {
+        if (this.get().syncStatus.key === key)
+          this.updateSyncStatus("synced", false);
+      }, 3000);
+    }
   };
 
   isSyncing = () => {
@@ -250,8 +352,5 @@ class AppStore extends BaseStore {
   };
 }
 
-/**
- * @type {[import("zustand").UseStore<AppStore>, AppStore]}
- */
 const [useStore, store] = createStore(AppStore);
 export { useStore, store };

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAHUUExURUxpcf////////////////////////////////////////////////////////////////////////////////////39/f39/f////////////////////////////////z8/O3s7P7+/vTz8wAAAPz7++/v7/Py8u/u7vDv7+7t7dfX1/79/ezr66Kiovv6+vf29vX09OTj4w0NDfv7++Ti4vr6+vT09Ovq6vn5+f39/fb19dnX1/b29tvb29/f3xMTE/j4+Pn4+O7s7MnJyerq6uno6M/Pz8jIyN3d3dnZ2d7e3kZGRvj39/38/Pf39+zs7PDw8OPi4ubl5cvLy+rp6czMzPLy8vPz887Ozujo6MrKyuDf3+fn59PT0+bm5uXl5c3NzfX19evr6wsLC+/t7ePj4/Ty8u3r6/Lx8eXk5OPh4dDQ0Nza2tjX19vZ2fHw8Nva2tLR0djW1tbW1tra2tLS0uHh4evp6eLi4tXV1djY2L+/vysrK7q6utHR0aGhoa6urrm5uQICAigoKCEhIZCQkFxcXBgYGFRUVBISEm1tbQ4ODklJSbu7uyAgID09PZqamkVFRXh4eLGxsTg4OOTk5FFRUQEBAQoKCnx8fBcXF7/+rP8AAAAfdFJOUwBOqO2h6KT9Mtyr5+w3Str+6TTZOjXb31M24O8BOd0PapSsAAABxElEQVQ4y2NgYOBgYWWXxwLYBdmEGICAjx9Z1NJJVQfB42QE6hdG0RaoaaCqhKSCl4EF1VxNVAXyTAzcaArUUBXwMLBjKDBBViDAII+uwBZFgTy6AjU1awIKNKz1aa0g1VBfB58CDS08CuIb40AKzLAqsJKXN2tXacChwKS+rTtB3tJHRU9ewxmbFZ6tKiqTrSAKdIO1LDEUaPeoqMzsUwAp0NIt8Uj0ijJXQFVgnDJVZcK0XrACXcXY0sjoHM8AfyUkBbOn9KvMmgRSYFEW4hUVqJagHeaShqTAwX7ijJQusAkW5VXRHu6eruFqaigKkqarqAAVKFbYxWiYq1XGedijuMHBWz6xo7m2Rl7RwtvdJaw6NjzCFl2BVVNdshJQgbqBsqtdpIu7nasjXIFXS2cyRL2CW6i6JTCgFCLitUPs4QrM7cDmKZi7FRYVm6o5QeLbDGICLNEqJAVk59rk2djY5Me4FThawQOKFSzrrxmaZWpqBAamQUGmwRaakNTNzMAm7+ekrKmlqOjsrIgAGcAA1ci0NVPiYhAV8zVURgbp6nBg7isuwsDAKKfkp4AEVOHASklKApS9JZmY5bECaS5ZGQYA3vqpy6NoYh0AAABXelRYdFJhdyBwcm9maWxlIHR5cGUgaXB0YwAAeJzj8gwIcVYoKMpPy8xJ5VIAAyMLLmMLEyMTS5MUAxMgRIA0w2QDI7NUIMvY1MjEzMQcxAfLgEigSi4A6hcRdPJCNZUAAAAASUVORK5CYII="
+    />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <!-- <link rel="manifest" href="/site.webmanifest" /> -->
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#01c352" />
+    <meta name="msapplication-TileColor" content="#01c352" />
+    <meta name="theme-color" content="#01c352" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <!-- <link rel="manifest" href="/manifest.json" /> -->
+    <!--
+      Notice the use of  in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <meta name="description" content="Your private note taking space" />
+    <meta property="og:title" content="Notesnook Theme Builder" />
+    <meta
+      property="og:description"
+      content="A fully open source & end-to-end encrypted note taking alternative to Evernote."
+    />
+    <meta property="og:image" content="https://app.notesnook.com/banner.jpg" />
+    <meta
+      property="og:image:alt"
+      content="A fully open source & end-to-end encrypted note taking alternative to Evernote."
+    />
+    <meta property="og:url" content="https://app.notesnook.com/" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:site_name"
+      content="Notesnook Theme Builder by Streetwriters LLC"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Notesnook Theme Builder</title>
+
+    <script nonce="7WIq8hRwApoXhctoGZZthMLYQLRNiprTwcPi6Azdf">
+      const colorScheme = JSON.parse(
+        window.localStorage.getItem("colorScheme") || '"light"'
+      );
+      const root = document.querySelector("html");
+      if (root) root.setAttribute("data-theme", colorScheme);
+    </script>
+    <script type="module" src="/index.tsx"></script>
+    <style>
+      html {
+        overscroll-behavior: none;
+      }
+
+      html[data-theme="dark"] {
+        --bg: #0f0f0f;
+        --fg: #fff;
+        --three-bars-bg: #494949;
+        --gradient-stop-color: #111111;
+        --n-letter-color: #e1e1e1;
+      }
+
+      html[data-theme="light"] {
+        --bg: #fff;
+        --three-bars-bg: #bebebe;
+        --gradient-stop-color: #fff9f9;
+        --n-letter-color: #000;
+      }
+
+      html[data-theme="light"] .react-loading-skeleton {
+        --base-color: var(--background-secondary);
+        --highlight-color: #var(--background-secondary);
+      }
+
+      html[data-theme="dark"] .react-loading-skeleton {
+        --base-color: var(--background-secondary);
+        --highlight-color: var(--background-secondary);
+      }
+
+      #splash svg {
+        transform: scale(1);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(0.95);
+        }
+
+        70% {
+          transform: scale(1);
+        }
+
+        100% {
+          transform: scale(0.95);
+        }
+      }
+
+      html,
+      body {
+        font-size: 16px;
+      }
+
+      @media only screen and (max-width: 480px) {
+        html,
+        body {
+          font-size: 18px;
+          background-color: var(--background);
+        }
+      }
+
+      :root,
+      body,
+      #root {
+        margin: 0 !important;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      @keyframes fadeUp {
+        0% {
+          transform: translateY(500px);
+          opacity: 0;
+        }
+
+        80% {
+          transform: translateY(0px);
+          opacity: 0.7;
+        }
+
+        100% {
+          opacity: 1;
+        }
+      }
+
+      /* svg {
+  width: 1.5rem;
+} */
+      .ReactModal__Overlay {
+        opacity: 0;
+        transition: opacity 200ms ease-in-out;
+      }
+
+      .ReactModal__Overlay--after-open {
+        opacity: 1;
+      }
+
+      .ReactModal__Overlay--before-close {
+        opacity: 0;
+      }
+
+      .slide {
+        background-color: transparent !important;
+      }
+
+      .carousel.carousel-slider {
+        display: flex;
+        flex-direction: row;
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <!--     <script src="https://cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+ -->
+    <div id="root"></div>
+    <div
+      id="splash"
+      style="
+        background-color: var(--bg);
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <svg viewBox="0 0 339 339" style="width: 150px">
+        <defs />
+        <defs>
+          <linearGradient
+            xlink:href="#a"
+            id="b"
+            x1="188.61227"
+            x2="193.54405"
+            y1="165.2058"
+            y2="216.81519"
+            gradientTransform="rotate(5 4448 -4204) scale(2.93671)"
+            gradientUnits="userSpaceOnUse"
+          />
+
+          <linearGradient id="a">
+            <stop offset="0" />
+            <stop
+              offset="1"
+              stop-color="var(--gradient-stop-color)"
+              stop-opacity="0"
+            />
+          </linearGradient>
+          <linearGradient
+            id="c"
+            x1="167.8"
+            x2="270.6"
+            y1="76.9"
+            y2="64.2"
+            gradientTransform="rotate(5 465 -2050) scale(1.50082)"
+            gradientUnits="userSpaceOnUse"
+            xlink:href="#a"
+          />
+        </defs>
+        <g transform="translate(0 42)">
+          <path fill="url(#b)" d="M160 205l154 42-141 44-155-42z" />
+          <path fill="url(#c)" d="M160-35v240l154 42 1-253z" />
+          <path
+            fill="none"
+            stroke-width="1.2"
+            d="M160 205V-35m0 240L18 249m142-44l154 41"
+          />
+          <path
+            fill="var(--n-letter-color)"
+            d="M84 109l35 54V98l21-7v91l-27 9-35-54v65l-21 6v-91z"
+          />
+          <rect
+            width="86.1"
+            height="12.6"
+            x="185"
+            y="97"
+            fill="var(--three-bars-bg)"
+            ry="2.3"
+            transform="skewY(15) scale(.9669 1)"
+          />
+          <path
+            fill="var(--three-bars-bg)"
+            d="M181 169l99 26 2 3v8c0 1-1 2-2 1l-99-26-2-3v-7c0-2 1-2 2-2zm0-47l99 27 2 2v8l-2 2-99-27c-1 0-2-1-2-3v-7l2-2z"
+          />
+        </g>
+      </svg>
+    </div>
+    <div id="dialogContainer"></div>
+    <div id="floatingViewContainer"></div>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+  </body>
+</html>

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,21 +17,48 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ThemeDefinition } from "@notesnook/theme";
 import { Appearance } from "react-native";
 import create, { State } from "zustand";
-import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from "../utils/color-scheme";
+import SettingsService from "../services/settings";
 
-const darkScheme = Appearance.getColorScheme() === "dark";
 export interface ThemeStore extends State {
-  colors: typeof COLOR_SCHEME_LIGHT;
-  setColors: (colors: typeof COLOR_SCHEME_LIGHT) => void;
+  lightTheme: ThemeDefinition;
+  darkTheme: ThemeDefinition;
+  colorScheme: "dark" | "light";
+  setDarkTheme: (theme: ThemeDefinition) => void;
+  setLightTheme: (theme: ThemeDefinition) => void;
+  setColorScheme: (colorScheme?: "dark" | "light") => void;
 }
 
-export const useThemeStore = create<ThemeStore>((set) => ({
-  colors: darkScheme ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT,
-  setColors: (colors) => {
-    set({ colors });
+export const useThemeStore = create<ThemeStore>((set, get) => ({
+  lightTheme: SettingsService.get().lighTheme,
+  darkTheme: SettingsService.get().darkTheme,
+  colorScheme: SettingsService.get().useSystemTheme
+    ? (Appearance.getColorScheme() as "dark" | "light")
+    : SettingsService.get().colorScheme,
+  setDarkTheme: (darkTheme) => {
+    set({ darkTheme });
+    SettingsService.setProperty("darkTheme", darkTheme);
+  },
+  setLightTheme: (lightTheme) => {
+    set({ lightTheme });
+    SettingsService.setProperty("lighTheme", lightTheme);
+  },
+  setColorScheme: (colorScheme) => {
+    const nextColorScheme =
+      colorScheme === undefined
+        ? get().colorScheme === "dark"
+          ? "light"
+          : "dark"
+        : colorScheme;
+    set({
+      colorScheme: nextColorScheme
+    });
+    if (!SettingsService.getProperty("useSystemTheme")) {
+      SettingsService.set({
+        colorScheme: nextColorScheme
+      });
+    }
   }
 }));
-
-export type ColorKey = keyof ThemeStore["colors"];

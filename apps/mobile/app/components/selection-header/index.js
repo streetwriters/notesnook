@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,23 +21,25 @@ import React, { useCallback, useEffect } from "react";
 import { BackHandler, Platform, View } from "react-native";
 import { db } from "../../common/database";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import { eSendEvent, ToastEvent } from "../../services/event-manager";
+import { ToastEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
+import SearchService from "../../services/search";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { eOpenMoveNoteDialog } from "../../utils/events";
+import { useThemeColors } from "@notesnook/theme";
 import { deleteItems } from "../../utils/functions";
 import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { presentDialog } from "../dialog/functions";
+import MoveNoteSheet from "../sheets/add-to";
 import ExportNotesSheet from "../sheets/export-notes";
 import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
+import ManageTagsSheet from "../sheets/manage-tags";
 
 export const SelectionHeader = React.memo(() => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const selectedItemsList = useSelectionStore(
     (state) => state.selectedItemsList
@@ -47,7 +49,9 @@ export const SelectionHeader = React.memo(() => {
   const currentScreen = useNavigationStore((state) => state.currentScreen);
   const screen = currentScreen.name;
   const insets = useGlobalSafeAreaInsets();
-
+  SearchService.prepareSearch?.();
+  const allItems = SearchService.getSearchInformation()?.get() || [];
+  const allSelected = allItems.length === selectedItemsList.length;
   useEffect(() => {
     if (selectionMode) {
       tabBarRef.current?.lock();
@@ -61,13 +65,7 @@ export const SelectionHeader = React.memo(() => {
       selectedItemsList.forEach((item) => {
         db.notes.note(item.id).favorite();
       });
-      Navigation.queueRoutesForUpdate(
-        "Notes",
-        "Favorites",
-        "ColoredNotes",
-        "TaggedNotes",
-        "TopicNotes"
-      );
+      Navigation.queueRoutesForUpdate();
       clearSelection();
     }
   };
@@ -79,16 +77,7 @@ export const SelectionHeader = React.memo(() => {
         noteIds.push(item.id);
       });
       await db.trash.restore(...noteIds);
-      Navigation.queueRoutesForUpdate(
-        "Notes",
-        "Favorites",
-        "ColoredNotes",
-        "TaggedNotes",
-        "TopicNotes",
-        "Trash",
-        "Notebooks",
-        "Tags"
-      );
+      Navigation.queueRoutesForUpdate();
 
       clearSelection();
       ToastEvent.show({
@@ -115,16 +104,7 @@ export const SelectionHeader = React.memo(() => {
             noteIds.push(item.id);
           });
           await db.trash.delete(...noteIds);
-          Navigation.queueRoutesForUpdate(
-            "Notes",
-            "Favorites",
-            "ColoredNotes",
-            "TaggedNotes",
-            "TopicNotes",
-            "Trash",
-            "Notebooks",
-            "Tags"
-          );
+          Navigation.queueRoutesForUpdate();
           clearSelection();
         }
       },
@@ -149,14 +129,15 @@ export const SelectionHeader = React.memo(() => {
     <View
       style={{
         width: "100%",
-        height: 50 + insets.top,
+        height: Platform.OS === "android" ? 50 + insets.top : 50,
         paddingTop: Platform.OS === "android" ? insets.top : null,
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: "row",
         zIndex: 999,
-        paddingHorizontal: 12
+        paddingHorizontal: 12,
+        marginVertical: 10
       }}
     >
       <View
@@ -181,13 +162,13 @@ export const SelectionHeader = React.memo(() => {
             setSelectionMode(!selectionMode);
           }}
           size={SIZE.xl}
-          color={colors.icon}
+          color={colors.primary.icon}
           name="close"
         />
 
         <View
           style={{
-            backgroundColor: colors.nav,
+            backgroundColor: colors.secondary.background,
             height: 40,
             borderRadius: 100,
             paddingHorizontal: 16,
@@ -196,8 +177,8 @@ export const SelectionHeader = React.memo(() => {
             alignItems: "center"
           }}
         >
-          <Heading size={SIZE.md} color={colors.accent}>
-            {selectedItemsList.length + " Selected"}
+          <Heading size={SIZE.md} color={colors.primary.accent}>
+            {selectedItemsList.length}
           </Heading>
         </View>
       </View>
@@ -208,83 +189,110 @@ export const SelectionHeader = React.memo(() => {
           alignItems: "center"
         }}
       >
-        {/* <ActionIcon
+        <IconButton
           onPress={async () => {
-            // await sleep(100);
-            // eSendEvent(eOpenMoveNoteDialog);
-            useSelectionStore.getState().setAll([...SearchService.getSearchInformation().data]);
-
+            useSelectionStore
+              .getState()
+              .setAll(allSelected ? [] : [...allItems]);
           }}
+          tooltipText="Select all"
+          tooltipPosition={4}
           customStyle={{
             marginLeft: 10
           }}
-          color={colors.pri}
+          color={colors.primary.paragraph}
           name="select-all"
           size={SIZE.xl}
-        /> */}
+        />
 
         {screen === "Trash" ||
         screen === "Notebooks" ||
-        screen === "Notebook" ? null : (
+        screen === "Notebook" ||
+        screen === "Reminders" ? null : (
           <>
             <IconButton
               onPress={async () => {
-                //setSelectionMode(false);
                 await sleep(100);
-                eSendEvent(eOpenMoveNoteDialog);
+                ManageTagsSheet.present(selectedItemsList);
               }}
               customStyle={{
                 marginLeft: 10
               }}
-              color={colors.pri}
-              name="plus"
+              color={colors.primary.icon}
+              tooltipText="Manage tags"
+              tooltipPosition={4}
+              name="pound"
               size={SIZE.xl}
             />
             <IconButton
               onPress={async () => {
-                ExportNotesSheet.present(selectedItemsList);
+                //setSelectionMode(false);
+                await sleep(100);
+                MoveNoteSheet.present();
               }}
               customStyle={{
                 marginLeft: 10
               }}
-              color={colors.pri}
+              tooltipText="Add to notebooks"
+              tooltipPosition={4}
+              color={colors.primary.paragraph}
+              name="plus"
+              size={SIZE.xl}
+            />
+
+            <IconButton
+              onPress={async () => {
+                ExportNotesSheet.present(selectedItemsList);
+              }}
+              tooltipText="Export"
+              tooltipPosition={4}
+              customStyle={{
+                marginLeft: 10
+              }}
+              color={colors.primary.paragraph}
               name="export"
               size={SIZE.xl}
             />
           </>
         )}
 
-        {screen === "TopicNotes" ? (
+        {screen === "TopicNotes" || screen === "Notebook" ? (
           <IconButton
             onPress={async () => {
               if (selectedItemsList.length > 0) {
-                const currentTopic =
+                const currentScreen =
                   useNavigationStore.getState().currentScreen;
-                await db.notes.removeFromNotebook(
-                  {
-                    id: currentTopic.notebookId,
-                    topic: currentTopic.id
-                  },
-                  ...selectedItemsList.map((item) => item.id)
-                );
 
-                Navigation.queueRoutesForUpdate(
-                  "Notes",
-                  "Favorites",
-                  "ColoredNotes",
-                  "TaggedNotes",
-                  "TopicNotes",
-                  "Notebooks",
-                  "Notebook"
-                );
+                if (screen === "Notebook") {
+                  for (const item of selectedItemsList) {
+                    await db.relations.unlink(
+                      { type: "notebook", id: currentScreen.id },
+                      item
+                    );
+                  }
+                } else {
+                  await db.notes.removeFromNotebook(
+                    {
+                      id: currentScreen.notebookId,
+                      topic: currentScreen.id
+                    },
+                    ...selectedItemsList.map((item) => item.id)
+                  );
+                }
+
+                Navigation.queueRoutesForUpdate();
                 clearSelection();
               }
             }}
             customStyle={{
               marginLeft: 10
             }}
+            tooltipText={`Remove from ${
+              screen === "Notebook" ? "notebook" : "topic"
+            }`}
+            tooltipPosition={4}
             testID="select-minus"
-            color={colors.pri}
+            color={colors.primary.paragraph}
             name="minus"
             size={SIZE.xl}
           />
@@ -296,7 +304,9 @@ export const SelectionHeader = React.memo(() => {
             customStyle={{
               marginLeft: 10
             }}
-            color={colors.pri}
+            tooltipText="Remove from favorites"
+            tooltipPosition={4}
+            color={colors.primary.paragraph}
             name="star-off"
             size={SIZE.xl}
           />
@@ -325,7 +335,9 @@ export const SelectionHeader = React.memo(() => {
 
               return;
             }}
-            color={colors.pri}
+            tooltipText="Move to trash"
+            tooltipPosition={1}
+            color={colors.primary.paragraph}
             name="delete"
             size={SIZE.xl}
           />
@@ -337,9 +349,11 @@ export const SelectionHeader = React.memo(() => {
               customStyle={{
                 marginLeft: 10
               }}
-              color={colors.pri}
+              color={colors.primary.paragraph}
               onPress={restoreItem}
               name="delete-restore"
+              tooltipText="Restore"
+              tooltipPosition={4}
               size={SIZE.xl - 3}
             />
 
@@ -347,8 +361,10 @@ export const SelectionHeader = React.memo(() => {
               customStyle={{
                 marginLeft: 10
               }}
-              color={colors.pri}
+              color={colors.primary.paragraph}
               onPress={deleteItem}
+              tooltipText="Delete"
+              tooltipPosition={4}
               name="delete"
               size={SIZE.xl - 3}
             />

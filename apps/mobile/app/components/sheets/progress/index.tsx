@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,14 +21,14 @@ import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import useSyncProgress from "../../../hooks/use-sync-progress";
 import { presentSheet } from "../../../services/event-manager";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import Seperator from "../../ui/seperator";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 export const Progress = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const { progress } = useSyncProgress();
   const [currentProgress, setCurrentProgress] = useState(0.1);
 
@@ -64,17 +64,17 @@ export const Progress = () => {
           width={null}
           animated={true}
           useNativeDriver
-          progress={currentProgress || 0.1}
-          unfilledColor={colors.nav}
-          color={colors.accent}
+          indeterminate
+          unfilledColor={colors.secondary.background}
+          color={colors.primary.accent}
           borderWidth={0}
         />
       </View>
 
       {progress ? (
-        <Paragraph color={colors.icon}>
+        <Paragraph color={colors.secondary.paragraph}>
           {progress.type?.slice(0, 1).toUpperCase() + progress.type?.slice(1)}
-          ing {progress?.current}/{progress?.total}
+          ing {progress?.current}
         </Paragraph>
       ) : null}
     </View>

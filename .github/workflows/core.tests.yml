@@ -8,7 +8,7 @@ on:
     paths:
       - "packages/core/**"
       # re-run workflow if workflow file changes
-      - ".github/workflows/core.tests.yml" 
+      - ".github/workflows/core.tests.yml"
   pull_request:
     types:
       - "ready_for_review"
@@ -24,30 +24,18 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-          cache: "npm"
-          cache-dependency-path: |
-            apps/mobile/package-lock.json
-            apps/web/package-lock.json
-            packages/core/package-lock.json
-            packages/crypto/package-lock.json
-            packages/crypto-worker/package-lock.json
-            packages/editor-mobile/package-lock.json
-            packages/editor/package-lock.json
-            packages/logger/package-lock.json
-            packages/streamable-fs/package-lock.json
-            packages/theme/package-lock.json
+        uses: ./.github/actions/setup-node-with-cache
 
       - name: Prepare environment
         run: |
-          npm ci --prefer-offline --no-audit
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=core
       - name: Add environment variables
         run: |
-          echo "EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
-          echo "PASSWORD='${{ secrets.USER_PASSWORD }}'" >> $GITHUB_ENV
-          echo "HASHED_PASSWORD=${{ secrets.USER_HASHED_PASSWORD }}" >> $GITHUB_ENV
+          echo "USER_EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
+          echo "USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
+          echo "USER_TOTP_SECRET=${{ secrets.USER_TOTP_SECRET }}" >> $GITHUB_ENV
+          echo "USER_HASHED_PASSWORD=${{ secrets.USER_HASHED_PASSWORD }}" >> $GITHUB_ENV
           echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
       - name: Run all @notesnook/core tests

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import type { Colors } from "../state/theme";
+import { Colors, Variants } from "@notesnook/theme";
 
 export function removeCss(id: string): void {
   const link = document.getElementById(id);
@@ -62,10 +62,15 @@ export function changeSvgTheme(newAccent: string): void {
     nodes[n].setAttribute("fill", newAccent);
 }
 
-export function transform(colors: Colors):string {
+export function transform(variants: Variants): string {
   let root = ":root {";
-  for (const color in colors) {
-    root += `--nn_${color}: ${colors[color as keyof Colors]};`;
+  for (const variant in variants) {
+    const variantColors = variants[variant as keyof Variants];
+    for (const color in variantColors) {
+      root += `--nn_${variant}_${color}: ${
+        variantColors[color as keyof Colors]
+      };`;
+    }
   }
   return root + "}";
 }

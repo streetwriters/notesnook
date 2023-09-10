@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,13 +23,14 @@ import {
 } from "@sayem314/react-native-keep-awake";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, StatusBar, View } from "react-native";
+import changeNavigationBarColor from "react-native-navigation-bar-color";
 import {
+  addOrientationListener,
   addSpecificOrientationListener,
   getInitialOrientation,
   getSpecificOrientation,
-  removeSpecificOrientationListener,
-  addOrientationListener,
-  removeOrientationListener
+  removeOrientationListener,
+  removeSpecificOrientationListener
 } from "react-native-orientation";
 import Animated, {
   useAnimatedStyle,
@@ -58,8 +59,7 @@ import {
 } from "../services/event-manager";
 import { useEditorStore } from "../stores/use-editor-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { useThemeStore } from "../stores/use-theme-store";
-import { setWidthHeight } from "../utils";
+import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -71,8 +71,7 @@ import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
 
 const _TabsHolder = () => {
-  const colors = useThemeStore((state) => state.colors);
-
+  const { colors, isDark } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const setFullscreen = useSettingStore((state) => state.setFullscreen);
   const fullscreen = useSettingStore((state) => state.fullscreen);
@@ -133,7 +132,7 @@ const _TabsHolder = () => {
   const showFullScreenEditor = useCallback(() => {
     setFullscreen(true);
     if (deviceMode === "smallTablet") {
-      tabBarRef.current?.openDrawer();
+      tabBarRef.current?.openDrawer(false);
     }
     editorRef.current?.setNativeProps({
       style: {
@@ -147,30 +146,38 @@ const _TabsHolder = () => {
     });
   }, [deviceMode, dimensions.width, setFullscreen]);
 
-  const closeFullScreenEditor = useCallback(() => {
-    if (deviceMode === "smallTablet") {
-      tabBarRef.current?.closeDrawer();
-    }
-    setFullscreen(false);
-    editorController.current?.commands.updateSettings({
-      fullscreen: false
-    });
-    editorRef.current?.setNativeProps({
-      style: {
-        width:
-          deviceMode === "smallTablet"
-            ? dimensions.width - valueLimiter(dimensions.width * 0.4, 300, 450)
-            : dimensions.width * 0.55,
-        zIndex: null,
-        paddingHorizontal: 0
+  const closeFullScreenEditor = useCallback(
+    (current) => {
+      const _deviceMode = current || deviceMode;
+      if (_deviceMode === "smallTablet") {
+        tabBarRef.current?.closeDrawer(false);
       }
-    });
-    if (deviceMode === "smallTablet") {
-      setTimeout(() => {
-        tabBarRef.current?.goToIndex(1);
-      }, 100);
-    }
-  }, [deviceMode, dimensions.width, setFullscreen]);
+      setFullscreen(false);
+      editorController.current?.commands.updateSettings({
+        fullscreen: false
+      });
+      editorRef.current?.setNativeProps({
+        style: {
+          width:
+            _deviceMode === "smallTablet"
+              ? dimensions.width -
+                valueLimiter(dimensions.width * 0.4, 300, 450)
+              : dimensions.width > 1100
+              ? dimensions.width * 0.55
+              : dimensions.width * 0.5,
+          zIndex: null,
+          paddingHorizontal: 0
+        }
+      });
+      if (_deviceMode === "smallTablet") {
+        tabBarRef.current?.goToIndex(1, false);
+      }
+      if (_deviceMode === "mobile") {
+        tabBarRef.current?.goToIndex(2, false);
+      }
+    },
+    [deviceMode, dimensions.width, setFullscreen]
+  );
 
   useEffect(() => {
     if (!tabBarRef.current?.isDrawerOpen()) {
@@ -192,11 +199,7 @@ const _TabsHolder = () => {
     toggleView
   ]);
 
-  const _onLayout = async (event) => {
-    if (layoutTimer) {
-      clearTimeout(layoutTimer);
-      layoutTimer = null;
-    }
+  const _onLayout = (event) => {
     let size = event?.nativeEvent?.layout;
     if (!size || (size.width === dimensions.width && deviceMode !== null)) {
       DDS.setSize(size, orientation);
@@ -205,9 +208,7 @@ const _TabsHolder = () => {
       return;
     }
 
-    layoutTimer = setTimeout(async () => {
-      checkDeviceType(size);
-    }, 500);
+    checkDeviceType(size);
   };
 
   function checkDeviceType(size) {
@@ -215,49 +216,43 @@ const _TabsHolder = () => {
       width: size.width,
       height: size.height
     });
-    setWidthHeight(size);
     DDS.setSize(size, orientation);
-    if (DDS.isLargeTablet()) {
-      setDeviceMode("tablet", size);
-      setTimeout(() => {
-        introCompleted && tabBarRef.current?.goToIndex(0);
-      }, 500);
-    } else if (DDS.isSmallTab) {
-      setDeviceMode("smallTablet", size);
-      if (!fullscreen) {
-        setTimeout(() => {
-          introCompleted && tabBarRef.current?.closeDrawer();
-        }, 500);
-      } else {
-        setTimeout(() => {
-          introCompleted && tabBarRef.current?.openDrawer();
-        }, 500);
-      }
-    } else {
-      setDeviceMode("mobile", size);
-    }
+    const nextDeviceMode = DDS.isLargeTablet()
+      ? "tablet"
+      : DDS.isSmallTab
+      ? "smallTablet"
+      : "mobile";
+
+    setDeviceMode(nextDeviceMode, size);
   }
 
   function setDeviceMode(current, size) {
     setDeviceModeState(current);
+
     let needsUpdate = current !== deviceMode;
 
-    if (fullscreen) {
-      editorRef.current?.setNativeProps({
-        style: {
-          width: size.width,
-          zIndex: 999,
-          paddingHorizontal:
-            current === "smallTablet" ? size.width * 0 : size.width * 0.15
-        }
-      });
+    if (fullscreen && current !== "mobile") {
+      // Runs after size is set via state.
+      setTimeout(() => {
+        editorRef.current?.setNativeProps({
+          style: {
+            width: size.width,
+            zIndex: 999,
+            paddingHorizontal:
+              current === "smallTablet" ? size.width * 0 : size.width * 0.15
+          }
+        });
+      }, 1);
     } else {
+      if (fullscreen) eSendEvent(eCloseFullscreenEditor, current);
       editorRef.current?.setNativeProps({
         style: {
           position: "relative",
           width:
             current === "tablet"
-              ? size.width * 0.55
+              ? size.width > 1100
+                ? size.width * 0.55
+                : size.width * 0.5
               : current === "smallTablet"
               ? size.width - valueLimiter(size.width * 0.4, 300, 450)
               : size.width,
@@ -270,16 +265,29 @@ const _TabsHolder = () => {
       return;
     }
     setTimeout(() => {
-      if (current === "tablet") {
-        tabBarRef.current?.goToIndex(0);
-      } else {
-        if (!editorState().movedAway) {
-          tabBarRef.current?.goToIndex(2);
-        } else {
-          tabBarRef.current?.goToIndex(1);
-        }
+      switch (current) {
+        case "tablet":
+          tabBarRef.current?.goToIndex(0, false);
+          break;
+        case "smallTablet":
+          if (!fullscreen) {
+            tabBarRef.current?.closeDrawer(false);
+          } else {
+            tabBarRef.current?.openDrawer(false);
+          }
+          break;
+        case "mobile":
+          if (
+            !editorState().movedAway &&
+            useEditorStore.getState().currentEditingNote
+          ) {
+            tabBarRef.current?.goToIndex(2, false);
+          } else {
+            tabBarRef.current?.goToIndex(1, false);
+          }
+          break;
       }
-    }, 1);
+    }, 1000);
   }
 
   const onScroll = (scrollOffset) => {
@@ -340,7 +348,6 @@ const _TabsHolder = () => {
       c: 0
     }
   };
-
   const widths = {
     mobile: {
       a: dimensions.width * 0.75,
@@ -353,9 +360,15 @@ const _TabsHolder = () => {
       c: dimensions.width - valueLimiter(dimensions.width * 0.4, 300, 450)
     },
     tablet: {
-      a: dimensions.width * 0.15,
+      a:
+        dimensions.width > 1100
+          ? dimensions.width * 0.15
+          : dimensions.width * 0.2,
       b: dimensions.width * 0.3,
-      c: dimensions.width * 0.55
+      c:
+        dimensions.width > 1100
+          ? dimensions.width * 0.55
+          : dimensions.width * 0.5
     }
   };
 
@@ -370,6 +383,10 @@ const _TabsHolder = () => {
     };
   }, []);
 
+  useEffect(() => {
+    changeNavigationBarColor(colors.primary.background, isDark, true);
+  }, [colors.primary.background, isDark]);
+
   return (
     <View
       onLayout={_onLayout}
@@ -377,7 +394,7 @@ const _TabsHolder = () => {
       style={{
         height: "100%",
         width: "100%",
-        backgroundColor: colors.bg,
+        backgroundColor: colors.primary.background,
         paddingBottom: Platform.OS === "android" ? insets?.bottom : 0,
         marginRight:
           orientation === "LANDSCAPE-RIGHT" && Platform.OS === "ios"
@@ -390,75 +407,81 @@ const _TabsHolder = () => {
       }}
     >
       <StatusBar
-        barStyle={colors.night ? "light-content" : "dark-content"}
+        barStyle={isDark ? "light-content" : "dark-content"}
         translucent={true}
         backgroundColor="transparent"
       />
 
-      {deviceMode && widths[deviceMode] ? (
-        <FluidTabs
-          ref={tabBarRef}
-          dimensions={dimensions}
-          widths={!introCompleted ? widths["mobile"] : widths[deviceMode]}
-          enabled={deviceMode !== "tablet" && !fullscreen}
-          onScroll={onScroll}
-          onChangeTab={onChangeTab}
-          onDrawerStateChange={() => true}
-        >
-          <View
-            key="1"
-            style={{
-              height: "100%",
-              width: fullscreen
-                ? 0
-                : widths[!introCompleted ? "mobile" : deviceMode]?.a
-            }}
-          >
-            <SideMenu />
-          </View>
-
-          <View
-            key="2"
-            style={{
-              height: "100%",
-              width: fullscreen
-                ? 0
-                : widths[!introCompleted ? "mobile" : deviceMode]?.b
-            }}
-          >
-            {deviceMode === "mobile" ? (
-              <Animated.View
-                onTouchEnd={() => {
-                  tabBarRef.current?.closeDrawer();
-                  animatedOpacity.value = withTiming(0);
-                  animatedTranslateY.value = withTiming(-9999);
+      {!introCompleted ? (
+        <NavigationStack />
+      ) : (
+        <>
+          {deviceMode && widths[deviceMode] ? (
+            <FluidTabs
+              ref={tabBarRef}
+              dimensions={dimensions}
+              widths={widths[deviceMode]}
+              enabled={deviceMode !== "tablet" && !fullscreen}
+              onScroll={onScroll}
+              onChangeTab={onChangeTab}
+              onDrawerStateChange={() => true}
+            >
+              <View
+                key="1"
+                style={{
+                  height: "100%",
+                  width: fullscreen ? 0 : widths[deviceMode]?.a
                 }}
-                style={[
-                  {
-                    position: "absolute",
-                    width: "100%",
-                    height: "100%",
-                    zIndex: 999,
-                    backgroundColor: "rgba(0,0,0,0.2)"
-                  },
-                  animatedStyle
-                ]}
-                ref={overlayRef}
-              />
-            ) : null}
+              >
+                <ScopedThemeProvider value="navigationMenu">
+                  <SideMenu />
+                </ScopedThemeProvider>
+              </View>
 
-            <NavigationStack />
-          </View>
+              <View
+                key="2"
+                style={{
+                  height: "100%",
+                  width: fullscreen ? 0 : widths[deviceMode]?.b
+                }}
+              >
+                <ScopedThemeProvider value="list">
+                  {deviceMode === "mobile" ? (
+                    <Animated.View
+                      onTouchEnd={() => {
+                        tabBarRef.current?.closeDrawer();
+                        animatedOpacity.value = withTiming(0);
+                        animatedTranslateY.value = withTiming(-9999);
+                      }}
+                      style={[
+                        {
+                          position: "absolute",
+                          width: "100%",
+                          height: "100%",
+                          zIndex: 999,
+                          backgroundColor: colors.primary.backdrop
+                        },
+                        animatedStyle
+                      ]}
+                      ref={overlayRef}
+                    />
+                  ) : null}
 
-          <EditorWrapper key="3" width={widths} dimensions={dimensions} />
-        </FluidTabs>
-      ) : null}
+                  <NavigationStack />
+                </ScopedThemeProvider>
+              </View>
+
+              <ScopedThemeProvider value="editor">
+                <EditorWrapper key="3" width={widths} dimensions={dimensions} />
+              </ScopedThemeProvider>
+            </FluidTabs>
+          ) : null}
+        </>
+      )}
     </View>
   );
 };
 export const TabHolder = React.memo(_TabsHolder, () => true);
-
-let layoutTimer = null;
 
 const onChangeTab = async (obj) => {
   if (obj.i === 2) {

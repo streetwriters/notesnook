@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,21 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Table as TiptapTable, TableOptions } from "@tiptap/extension-table";
-import { columnResizing, tableEditing } from "@_ueberdosis/prosemirror-tables";
-import { Editor } from "../../types";
+import { tableEditing, columnResizing, TableView } from "@tiptap/pm/tables";
 import { TableNodeView } from "./component";
-import { Plugin } from "prosemirror-state";
-import { NodeView } from "prosemirror-view";
-
-// TODO: send PR
-declare module "@_ueberdosis/prosemirror-tables" {
-  export function columnResizing(props: {
-    handleWidth?: number;
-    cellMinWidth?: number;
-    View?: NodeView;
-    lastColumnResizable?: boolean;
-  }): Plugin;
-}
+import { Plugin, PluginKey } from "prosemirror-state";
 
 export const Table = TiptapTable.extend<TableOptions>({
   addProseMirrorPlugins() {
@@ -44,14 +32,24 @@ export const Table = TiptapTable.extend<TableOptions>({
             columnResizing({
               handleWidth: this.options.handleWidth,
               cellMinWidth: this.options.cellMinWidth,
-              View: TableNodeView(this.editor as Editor),
+              View: TableNodeView(this.editor),
               lastColumnResizable: this.options.lastColumnResizable
             })
           ]
-        : []),
+        : [tiptapTableView(this.options.cellMinWidth)]),
       tableEditing({
         allowTableNodeSelection: this.options.allowTableNodeSelection
       })
     ];
   }
 });
+
+const TiptapTableViewPluginKey = new PluginKey("TiptapTableView");
+function tiptapTableView(cellMinWidth: number): Plugin {
+  return new Plugin({
+    key: TiptapTableViewPluginKey,
+    props: {
+      nodeViews: { [Table.name]: (node) => new TableView(node, cellMinWidth) }
+    }
+  });
+}

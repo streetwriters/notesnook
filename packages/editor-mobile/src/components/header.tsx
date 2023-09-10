@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ArrowBackIcon from "mdi-react/ArrowBackIcon";
-import CloudUploadOutlineIcon from "mdi-react/CloudUploadOutlineIcon";
 import CrownIcon from "mdi-react/CrownIcon";
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import ArrowULeftTopIcon from "mdi-react/ArrowULeftTopIcon";
@@ -55,7 +54,7 @@ const Button = ({
   );
 };
 
-export default function Header({
+function Header({
   noHeader,
   settings,
   hasUndo,
@@ -73,11 +72,10 @@ export default function Header({
         display: "flex",
         alignItems: "center",
         height: noHeader ? `${insets.top}px` : `${50 + insets.top}px`,
-        backgroundColor: "var(--nn_bg)",
+        backgroundColor: "var(--nn_primary_background)",
         position: "sticky",
         width: "100vw"
       }}
-   
     >
       {noHeader ? null : (
         <div
@@ -90,7 +88,7 @@ export default function Header({
             height: 50,
             alignItems: "center"
           }}
-          id='header'
+          id="header"
         >
           {settings.deviceMode !== "mobile" && !settings.fullscreen ? (
             <div />
@@ -103,7 +101,7 @@ export default function Header({
               style={{
                 borderWidth: 0,
                 borderRadius: 100,
-                color: "var(--nn_icon)",
+                color: "var(--nn_primary_icon)",
                 marginLeft: 6,
                 width: 40,
                 height: 40,
@@ -119,7 +117,7 @@ export default function Header({
                 style={{
                   position: "absolute"
                 }}
-                color="var(--nn_pri)"
+                color="var(--nn_primary_paragraph)"
               />
             </Button>
           )}
@@ -138,7 +136,7 @@ export default function Header({
               style={{
                 borderWidth: 0,
                 borderRadius: 100,
-                color: "var(--nn_icon)",
+                color: "var(--nn_primary_icon)",
                 marginRight: 10,
                 width: 39,
                 height: 39,
@@ -149,7 +147,11 @@ export default function Header({
               }}
             >
               <ArrowULeftTopIcon
-                color={!hasUndo ? "var(--nn_nav)" : "var(--nn_pri)"}
+                color={
+                  !hasUndo
+                    ? "var(--nn_secondary_background)"
+                    : "var(--nn_primary_paragraph)"
+                }
                 size={25}
                 style={{
                   position: "absolute"
@@ -164,7 +166,7 @@ export default function Header({
               style={{
                 borderWidth: 0,
                 borderRadius: 100,
-                color: "var(--nn_icon)",
+                color: "var(--nn_primary_icon)",
                 marginRight: 10,
                 width: 39,
                 height: 39,
@@ -175,7 +177,11 @@ export default function Header({
               }}
             >
               <ArrowURightTopIcon
-                color={!hasRedo ? "var(--nn_nav)" : "var(--nn_pri)"}
+                color={
+                  !hasRedo
+                    ? "var(--nn_secondary_background)"
+                    : "var(--nn_primary_paragraph)"
+                }
                 size={25}
                 style={{
                   position: "absolute"
@@ -191,7 +197,7 @@ export default function Header({
                 style={{
                   borderWidth: 0,
                   borderRadius: 100,
-                  color: "var(--nn_icon)",
+                  color: "var(--nn_primary_icon)",
                   marginRight: 10,
                   width: 39,
                   height: 39,
@@ -218,7 +224,7 @@ export default function Header({
               style={{
                 borderWidth: 0,
                 borderRadius: 100,
-                color: "var(--nn_icon)",
+                color: "var(--nn_primary_icon)",
                 marginRight: 10,
                 width: 39,
                 height: 39,
@@ -233,33 +239,7 @@ export default function Header({
                 style={{
                   position: "absolute"
                 }}
-                color="var(--nn_pri)"
-              />
-            </Button>
-            <Button
-              onPress={() => {
-                post(EventTypes.monograph);
-              }}
-              preventDefault={false}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_icon)",
-                marginRight: 10,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
-              }}
-            >
-              <CloudUploadOutlineIcon
-                size={25}
-                style={{
-                  position: "absolute"
-                }}
-                color="var(--nn_pri)"
+                color="var(--nn_primary_paragraph)"
               />
             </Button>
 
@@ -272,7 +252,7 @@ export default function Header({
                 style={{
                   borderWidth: 0,
                   borderRadius: 100,
-                  color: "var(--nn_icon)",
+                  color: "var(--nn_primary_icon)",
                   marginRight: 10,
                   width: 39,
                   height: 39,
@@ -287,7 +267,7 @@ export default function Header({
                   style={{
                     position: "absolute"
                   }}
-                  color="var(--nn_pri)"
+                  color="var(--nn_primary_paragraph)"
                 />
               </Button>
             ) : null}
@@ -300,7 +280,7 @@ export default function Header({
               style={{
                 borderWidth: 0,
                 borderRadius: 100,
-                color: "var(--nn_icon)",
+                color: "var(--nn_primary_icon)",
                 marginRight: 12,
                 width: 39,
                 height: 39,
@@ -315,7 +295,7 @@ export default function Header({
                 style={{
                   position: "absolute"
                 }}
-                color="var(--nn_pri)"
+                color="var(--nn_primary_paragraph)"
               />
             </Button>
           </div>
@@ -324,3 +304,17 @@ export default function Header({
     </div>
   );
 }
+
+export default React.memo(Header, (prev, next) => {
+  if (
+    prev.settings.deviceMode !== next.settings.deviceMode ||
+    prev.settings.fullscreen !== next.settings.fullscreen ||
+    prev.settings.premium !== next.settings.premium ||
+    prev.noHeader !== next.noHeader ||
+    prev.hasRedo !== next.hasRedo ||
+    prev.hasUndo !== next.hasUndo
+  )
+    return false;
+
+  return true;
+});

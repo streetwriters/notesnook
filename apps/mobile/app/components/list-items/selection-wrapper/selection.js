@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,67 +17,43 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
+import { useThemeColors } from "@notesnook/theme";
+import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
+import useIsSelected from "../../../hooks/use-selected";
 import { useSelectionStore } from "../../../stores/use-selection-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
 
-export const SelectionIcon = ({ setActionStrip, item }) => {
-  const colors = useThemeStore((state) => state.colors);
-
+export const SelectionIcon = ({ item }) => {
+  const { colors } = useThemeColors();
   const selectionMode = useSelectionStore((state) => state.selectionMode);
-  const selectedItemsList = useSelectionStore(
-    (state) => state.selectedItemsList
-  );
-  const [selected, setSelected] = useState(false);
+  const [selected] = useIsSelected(item);
 
-  useEffect(() => {
-    if (selectionMode) {
-      setActionStrip(false);
-      let exists = selectedItemsList.filter(
-        (o) => o.dateCreated === item.dateCreated
-      );
+  const compactMode = useIsCompactModeEnabled(item);
 
-      if (exists[0]) {
-        if (!selected) {
-          setSelected(true);
-        }
-      } else {
-        if (selected) {
-          setSelected(false);
-        }
-      }
-    }
-  }, [
-    selectedItemsList,
-    item.id,
-    selectionMode,
-    setActionStrip,
-    item.dateCreated,
-    selected
-  ]);
-
-  return selectionMode && selected ? (
+  return selectionMode ? (
     <View
       style={{
-        width: 40,
-        height: 40,
+        width: compactMode ? 30 : 40,
+        height: compactMode ? 30 : 40,
         justifyContent: "center",
         alignItems: "center",
         marginRight: 10,
         borderWidth: 1,
         borderRadius: 100,
-        borderColor: colors.border
+        borderColor: colors.primary.border
       }}
       pointerEvents="none"
     >
-      <Icon
-        size={SIZE.xl}
-        color={selected ? colors.accent : colors.icon}
-        name="check"
-      />
+      {selected ? (
+        <Icon
+          size={compactMode ? SIZE.xl - 2 : SIZE.xl}
+          color={selected ? colors.selected.accent : colors.primary.icon}
+          name={"check"}
+        />
+      ) : null}
     </View>
   ) : null;
 };

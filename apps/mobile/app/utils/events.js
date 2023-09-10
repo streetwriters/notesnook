@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -117,9 +117,9 @@ export const eOpenPremiumStatusDialog = "549";
 
 export const eClosePremiumStatusDialog = "550";
 
-export const eOpenProgressDialog = "551";
+export const eOpenSheet = "551";
 
-export const eCloseProgressDialog = "552";
+export const eCloseSheet = "552";
 
 export const eOpenRestoreDialog = "553";
 
@@ -158,3 +158,9 @@ export const eCloseAnnouncementDialog = "604";
 
 export const eOpenLoading = "605";
 export const eCloseLoading = "606";
+
+export const eOnTopicSheetUpdate = "607";
+
+export const eUserLoggedIn = "608";
+
+export const eLoginSessionExpired = "609";

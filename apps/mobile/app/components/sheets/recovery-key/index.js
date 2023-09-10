@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ import SettingsService from "../../../services/settings";
 import { db } from "../../../common/database";
 import Storage from "../../../common/database/storage";
 import { eOpenRecoveryKeyDialog } from "../../../utils/events";
-import { sanitizeFilename } from "../../../utils/sanitizer";
 import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import DialogHeader from "../../dialog/dialog-header";
@@ -43,8 +42,8 @@ import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import { QRCode } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
-
-let RNFetchBlob;
+import RNFetchBlob from "react-native-blob-util";
+import { sanitizeFilename } from "@notesnook/common";
 
 class RecoveryKeySheet extends React.Component {
   constructor(props) {
@@ -115,7 +114,6 @@ class RecoveryKeySheet extends React.Component {
     this.svg.current?.toDataURL(async (data) => {
       try {
         let path;
-        RNFetchBlob = (await import("rn-fetch-blob")).default;
         let fileName = "nn_" + this.user.email + "_recovery_key_qrcode";
         fileName = sanitizeFilename(fileName, { replacement: "_" });
         fileName = fileName + ".png";
@@ -151,7 +149,6 @@ class RecoveryKeySheet extends React.Component {
       fileName = sanitizeFilename(fileName, { replacement: "_" });
       fileName = fileName + ".txt";
 
-      RNFetchBlob = (await import("rn-fetch-blob")).default;
       if (Platform.OS === "android") {
         let file = await ScopedStorage.createDocument(
           fileName,
@@ -223,7 +220,7 @@ class RecoveryKeySheet extends React.Component {
         <View
           style={{
             width: "100%",
-            backgroundColor: colors.bg,
+            backgroundColor: colors.primary.background,
             justifyContent: "space-between",
             paddingHorizontal: 12,
             borderRadius: 10,
@@ -244,7 +241,7 @@ class RecoveryKeySheet extends React.Component {
             }}
           >
             <Paragraph
-              color={colors.pri}
+              color={colors.primary.paragraph}
               size={SIZE.sm}
               numberOfLines={2}
               selectable
@@ -298,7 +295,6 @@ class RecoveryKeySheet extends React.Component {
             width="100%"
             type="grayAccent"
             fontSize={SIZE.md}
-            height={50}
           />
           <Seperator />
           <Button
@@ -308,7 +304,6 @@ class RecoveryKeySheet extends React.Component {
             type="grayAccent"
             fontSize={SIZE.md}
             icon="qrcode"
-            height={50}
           />
           <Seperator />
           <Button
@@ -318,7 +313,6 @@ class RecoveryKeySheet extends React.Component {
             type="grayAccent"
             icon="text"
             fontSize={SIZE.md}
-            height={50}
           />
           <Seperator />
 
@@ -329,12 +323,11 @@ class RecoveryKeySheet extends React.Component {
             type="grayAccent"
             icon="cloud"
             fontSize={SIZE.md}
-            height={50}
           />
           <Seperator />
 
           <Paragraph
-            color={colors.icon}
+            color={colors.secondary.paragraph}
             size={SIZE.sm}
             numberOfLines={2}
             style={{
@@ -349,7 +342,6 @@ class RecoveryKeySheet extends React.Component {
           <Button
             title="I have saved the key."
             width="100%"
-            height={50}
             type="error"
             fontSize={SIZE.md}
             onPress={this.close}

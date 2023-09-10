@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ export type ContentDOM =
   | undefined;
 
 export type ReactNodeViewProps<TAttributes = Attrs> = {
+  pos: number | undefined;
   getPos: GetPosNode;
   node: NodeWithAttrs<TAttributes>;
   editor: Editor;
@@ -59,7 +60,9 @@ export type SelectionBasedReactNodeViewProps<TAttributes = Attrs> =
 export type ReactNodeViewOptions<P> = {
   props?: P;
   component?: React.ComponentType<P>;
+  componentKey?: (node: PMNode) => string;
   shouldUpdate?: ShouldUpdate;
   contentDOMFactory?: (() => ContentDOM) | boolean;
   wrapperFactory?: () => HTMLElement;
+  forceEnableSelection?: boolean;
 };

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Platform, Text, View } from "react-native";
 import * as RNIap from "react-native-iap";
-import umami from "../../common/analytics";
 import { db } from "../../common/database";
 import { usePricing } from "../../hooks/use-pricing";
 import {
@@ -29,11 +28,11 @@ import {
   ToastEvent
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import {
   eClosePremiumDialog,
-  eCloseProgressDialog,
+  eCloseSheet,
   eCloseSimpleDialog,
   eOpenLoginDialog
 } from "../../utils/events";
@@ -48,7 +47,6 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import { PricingItem } from "./pricing-item";
-import { useCallback } from "react";
 
 const promoCyclesMonthly = {
   1: "first month",
@@ -68,7 +66,7 @@ export const PricingPlans = ({
   heading = true,
   compact = false
 }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const [product, setProduct] = useState(null);
   const [buying, setBuying] = useState(false);
@@ -141,10 +139,6 @@ export const PricingPlans = ({
         setBuying(false);
         return;
       }
-      umami.pageView(
-        "/iap-native",
-        `${compact ? "pro-sheet" : "pro-screen"}/pro-plans`
-      );
       await RNIap.requestSubscription(
         product?.productId,
         false,
@@ -154,7 +148,7 @@ export const PricingPlans = ({
         user.id
       );
       setBuying(false);
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
       eSendEvent(eClosePremiumDialog);
       await sleep(500);
       presentSheet({
@@ -162,7 +156,7 @@ export const PricingPlans = ({
         paragraph:
           "Your Notesnook Pro subscription will be activated soon. If your account is not upgraded to Notesnook Pro, your money will be refunded to you. In case of any issues, please reach out to us at support@streetwriters.co",
         action: async () => {
-          eSendEvent(eCloseProgressDialog);
+          eSendEvent(eCloseSheet);
         },
         icon: "check",
         actionText: "Continue"
@@ -182,7 +176,7 @@ export const PricingPlans = ({
         height: 100
       }}
     >
-      <ActivityIndicator color={colors.accent} size={25} />
+      <ActivityIndicator color={colors.primary.accent} size={25} />
     </View>
   ) : (
     <View
@@ -226,7 +220,7 @@ export const PricingPlans = ({
               try {
                 await db.user.activateTrial();
                 eSendEvent(eClosePremiumDialog);
-                eSendEvent(eCloseProgressDialog);
+                eSendEvent(eCloseSheet);
                 await sleep(300);
                 Walkthrough.present("trialstarted", false, true);
               } catch (e) {
@@ -238,8 +232,7 @@ export const PricingPlans = ({
             width={250}
             style={{
               paddingHorizontal: 12,
-              marginBottom: 15,
-              borderRadius: 100
+              marginBottom: 15
             }}
           />
         </>
@@ -258,7 +251,7 @@ export const PricingPlans = ({
               <Paragraph
                 style={{
                   textDecorationLine: "line-through",
-                  color: colors.icon
+                  color: colors.secondary.paragraph
                 }}
                 size={SIZE.sm}
               >
@@ -280,7 +273,7 @@ export const PricingPlans = ({
                         marginBottom: 20
                       }}
                     >
-                      <Heading color={colors.accent}>
+                      <Heading color={colors.primary.accent}>
                         Get {monthlyPlan?.info?.discount}% off in{" "}
                         {monthlyPlan?.info?.country}
                       </Heading>
@@ -393,7 +386,7 @@ export const PricingPlans = ({
                   <Button
                     onPress={() => {
                       eSendEvent(eClosePremiumDialog);
-                      eSendEvent(eCloseProgressDialog);
+                      eSendEvent(eCloseSheet);
                       setTimeout(() => {
                         eSendEvent(eOpenLoginDialog, 1);
                       }, 400);
@@ -404,8 +397,7 @@ export const PricingPlans = ({
                     style={{
                       paddingHorizontal: 12,
                       marginTop: 30,
-                      marginBottom: 10,
-                      borderRadius: 100
+                      marginBottom: 10
                     }}
                   />
                   {Platform.OS !== "ios" &&
@@ -463,7 +455,7 @@ export const PricingPlans = ({
 
       {!user || !upgrade ? (
         <Paragraph
-          color={colors.icon}
+          color={colors.secondary.paragraph}
           size={SIZE.xs}
           style={{
             alignSelf: "center",
@@ -487,7 +479,7 @@ export const PricingPlans = ({
             <Paragraph
               textBreakStrategy="balanced"
               size={SIZE.xs}
-              color={colors.icon}
+              color={colors.secondary.paragraph}
               style={{
                 alignSelf: "center",
                 marginTop: 10,
@@ -501,7 +493,7 @@ export const PricingPlans = ({
           ) : (
             <Paragraph
               size={SIZE.xs}
-              color={colors.icon}
+              color={colors.secondary.paragraph}
               style={{
                 alignSelf: "center",
                 marginTop: 10,
@@ -521,7 +513,7 @@ export const PricingPlans = ({
           >
             <Paragraph
               size={SIZE.xs}
-              color={colors.icon}
+              color={colors.secondary.paragraph}
               style={{
                 maxWidth: "100%",
                 textAlign: "center"
@@ -538,7 +530,7 @@ export const PricingPlans = ({
                 style={{
                   textDecorationLine: "underline"
                 }}
-                color={colors.accent}
+                color={colors.primary.accent}
               >
                 Terms of Service{" "}
               </Paragraph>
@@ -553,7 +545,7 @@ export const PricingPlans = ({
                 style={{
                   textDecorationLine: "underline"
                 }}
-                color={colors.accent}
+                color={colors.primary.accent}
               >
                 Privacy Policy.
               </Paragraph>

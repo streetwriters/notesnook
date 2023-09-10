@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,6 +21,10 @@ import { ToolbarDefinition, ToolDefinition } from "./types";
 import { ToolId } from "./tools";
 
 const tools: Record<ToolId, ToolDefinition> = {
+  none: {
+    icon: "none",
+    title: ""
+  },
   bold: {
     icon: "bold",
     title: "Bold"
@@ -54,6 +58,11 @@ const tools: Record<ToolId, ToolDefinition> = {
   openLink: {
     icon: "openLink",
     title: "Open link",
+    conditional: true
+  },
+  copyLink: {
+    icon: "copyLink",
+    title: "Copy link",
     conditional: true
   },
   linkSettings: {
@@ -233,7 +242,6 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: "Cell border width",
     conditional: true
   },
-
   imageSettings: {
     icon: "imageSettings",
     title: "Image settings",
@@ -257,6 +265,11 @@ const tools: Record<ToolId, ToolDefinition> = {
   imageProperties: {
     icon: "more",
     title: "Image properties",
+    conditional: true
+  },
+  previewAttachment: {
+    icon: "previewAttachment",
+    title: "Preview attachment",
     conditional: true
   },
   attachmentSettings: {
@@ -299,6 +312,26 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: "Embed properties",
     conditional: true
   },
+  webclipSettings: {
+    icon: "webclipSettings",
+    title: "Web clip settings",
+    conditional: true
+  },
+  webclipFullScreen: {
+    icon: "fullscreen",
+    title: "Full screen",
+    conditional: true
+  },
+  webclipOpenExternal: {
+    icon: "openLink",
+    title: "Open in new tab",
+    conditional: true
+  },
+  webclipOpenSource: {
+    icon: "openSource",
+    title: "Open source",
+    conditional: true
+  },
   outdent: {
     icon: "outdent",
     title: "Lift list item",
@@ -327,14 +360,19 @@ export const STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
   [
     "insertBlock",
     "tableSettings",
+    "cellProperties",
     "imageSettings",
     "embedSettings",
     "attachmentSettings",
     "linkSettings",
     "codeRemove",
     "outdent",
-    "indent"
+    "indent",
+    "webclipSettings"
   ]
+];
+export const MOBILE_STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
+  [...STATIC_TOOLBAR_GROUPS[0], "previewAttachment"]
 ];
 
 const defaultPresets: Record<"default" | "minimal", ToolbarDefinition> = {

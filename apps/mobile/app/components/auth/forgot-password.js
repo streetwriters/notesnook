@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { ToastEvent } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import DialogHeader from "../dialog/dialog-header";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
@@ -34,7 +34,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
 export const ForgotPassword = () => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors("sheet");
   const email = useRef();
   const emailInputRef = useRef();
   const [error, setError] = useState(false);
@@ -97,6 +97,9 @@ export const ForgotPassword = () => {
             text: email.current
           });
         }}
+        indicatorStyle={{
+          width: 100
+        }}
         gestureEnabled
         id="forgotpassword_sheet"
       >
@@ -114,7 +117,7 @@ export const ForgotPassword = () => {
                 width: null,
                 height: null
               }}
-              color={colors.accent}
+              color={colors.primary.accent}
               name="email"
               size={50}
             />
@@ -131,7 +134,7 @@ export const ForgotPassword = () => {
           <View
             style={{
               borderRadius: DDS.isTab ? 5 : 0,
-              backgroundColor: colors.bg,
+              backgroundColor: colors.primary.background,
               zIndex: 10,
               width: "100%",
               padding: 12

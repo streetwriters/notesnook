@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@ import { eSendEvent, ToastEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useEditorStore } from "../../stores/use-editor-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { useTrashStore } from "../../stores/use-trash-store";
-import { eCloseProgressDialog, eOnLoadNote } from "../../utils/events";
+import { eCloseSheet, eOnLoadNote } from "../../utils/events";
 import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
 import DialogHeader from "../dialog/dialog-header";
@@ -38,28 +38,19 @@ import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
 
 export default function NotePreview({ session, content, note }) {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
   const editorId = ":noteHistory";
 
   async function restore() {
     if (note && note.type === "trash") {
       await db.trash.restore(note.id);
-      Navigation.queueRoutesForUpdate(
-        "Tags",
-        "Notes",
-        "Notebooks",
-        "Favorites",
-        "Trash",
-        "TaggedNotes",
-        "ColoredNotes",
-        "TopicNotes"
-      );
+      Navigation.queueRoutesForUpdate();
       useSelectionStore.getState().setSelectionMode(false);
       ToastEvent.show({
         heading: "Restore successful",
         type: "success"
       });
-      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eCloseSheet);
       return;
     }
     await db.noteHistory.restore(session.id);
@@ -71,15 +62,9 @@ export default function NotePreview({ session, content, note }) {
         });
       }
     }
-    eSendEvent(eCloseProgressDialog, "note_history");
-    eSendEvent(eCloseProgressDialog);
-    Navigation.queueRoutesForUpdate(
-      "Notes",
-      "Favorites",
-      "ColoredNotes",
-      "TaggedNotes",
-      "TopicNotes"
-    );
+    eSendEvent(eCloseSheet, "note_history");
+    eSendEvent(eCloseSheet);
+    Navigation.queueRoutesForUpdate();
 
     ToastEvent.show({
       heading: "Note restored successfully",
@@ -93,7 +78,7 @@ export default function NotePreview({ session, content, note }) {
       paragraph: `Are you sure you want to delete this note from trash permanentaly`,
       positiveText: "Delete",
       negativeText: "Cancel",
-      context:"local",
+      context: "local",
       positivePress: async () => {
         await db.trash.delete(note.id);
         useTrashStore.getState().setTrash();
@@ -103,9 +88,9 @@ export default function NotePreview({ session, content, note }) {
           type: "success",
           context: "local"
         });
-        eSendEvent(eCloseProgressDialog);
+        eSendEvent(eCloseSheet);
       },
-      positiveType:"error"
+      positiveType: "error"
     });
   };
 
@@ -124,7 +109,6 @@ export default function NotePreview({ session, content, note }) {
             flex: 1
           }}
         >
-          <EditorOverlay editorId={editorId} />
           <Editor
             noHeader
             noToolbar
@@ -132,7 +116,6 @@ export default function NotePreview({ session, content, note }) {
             editorId={editorId}
             onLoad={async () => {
               const _note = note || db.notes.note(session?.noteId)?.data;
-              await sleep(1000);
               eSendEvent(eOnLoadNote + editorId, {
                 ..._note,
                 content: {
@@ -152,7 +135,7 @@ export default function NotePreview({ session, content, note }) {
             alignItems: "center"
           }}
         >
-          <Paragraph color={colors.icon}>
+          <Paragraph color={colors.secondary.paragraph}>
             Preview not available, content is encrypted.
           </Paragraph>
         </View>

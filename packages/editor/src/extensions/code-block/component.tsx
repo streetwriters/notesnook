@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,19 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useRef, useState } from "react";
-import { isLanguageLoaded, loadLanguage } from "./loader";
-import { refractor } from "refractor/lib/core";
-import { Flex, Text } from "@theme-ui/components";
-import Languages from "./languages.json";
-import { Input } from "@theme-ui/components";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
-import { CodeBlockAttributes } from "./code-block";
-import { ReactNodeViewProps } from "../react/types";
-import { ResponsivePresenter } from "../../components/responsive";
-import { Popup } from "../../toolbar/components/popup";
+import { Flex, Input, Text } from "@theme-ui/components";
+import { useRef, useState } from "react";
 import { Button } from "../../components/button";
+import { ResponsivePresenter } from "../../components/responsive";
+import { useTimer } from "../../hooks/use-timer";
+import { Icon } from "@notesnook/ui";
+import { Popup } from "../../toolbar/components/popup";
+import { Icons } from "../../toolbar/icons";
+import { ReactNodeViewProps } from "../react/types";
+import { CodeBlockAttributes } from "./code-block";
+import Languages from "./languages.json";
+import { useThemeEngineStore } from "@notesnook/theme";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
@@ -37,33 +36,16 @@ export function CodeblockComponent(
   const { editor, updateAttributes, node, forwardRef } = props;
   const { language, indentLength, indentType, caretPosition } = node.attrs;
 
-  const [isOpen, setIsOpen] = useState(false);
   // const [caretPosition, setCaretPosition] = useState<CaretPosition>();
+  const [isOpen, setIsOpen] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const theme = useThemeEngineStore((store) => store.theme);
+
+  const { enabled, start } = useTimer(1000);
 
   const languageDefinition = Languages.find(
     (l) => l.filename === language || l.alias?.some((a) => a === language)
   );
-
-  useEffect(() => {
-    (async function () {
-      if (!language || !languageDefinition || isLanguageLoaded(language))
-        return;
-
-      const syntax = await loadLanguage(languageDefinition.filename);
-      if (!syntax) return;
-
-      refractor.register(syntax);
-
-      const preventUpdate = language === languageDefinition.filename;
-      updateAttributes(
-        {
-          language: languageDefinition.filename
-        },
-        { preventUpdate, addToHistory: false, forceUpdate: true }
-      );
-    })();
-  }, [language, languageDefinition, updateAttributes]);
 
   return (
     <>
@@ -76,27 +58,38 @@ export function CodeblockComponent(
       >
         <Text
           ref={forwardRef}
-          as="pre"
           autoCorrect="off"
           autoCapitalize="none"
-          css={{}}
+          css={theme.codeBlockCSS}
           sx={{
-            "div, span.token, span.line-number-widget, span.line-number::before":
-              {
-                fontFamily: "monospace",
-                fontSize: "code",
-                whiteSpace: "pre", // TODO !important
-                tabSize: 1
+            pre: {
+              fontFamily: "inherit !important",
+              tabSize: "inherit !important",
+              // background: "transparent !important",
+              padding: "10px !important",
+              margin: "0px !important",
+              width: "100%",
+              borderRadius: `0px !important`,
+
+              "::selection,*::selection": {
+                bg: "background-selected",
+                color: "paragraph-selected"
               },
+              "::-moz-selection,*::-moz-selection": {
+                bg: "background-selected",
+                color: "paragraph-selected"
+              }
+            },
+            fontFamily: "monospace",
+            fontSize: "code",
+            whiteSpace: "pre", // TODO !important
+            tabSize: 1,
             position: "relative",
             lineHeight: "20px",
-            bg: "codeBg",
-            color: "static",
-            overflowX: "auto",
-            display: "flex",
-            px: 2,
-            pt: 2,
-            pb: 1
+            // bg: "var(--background-secondary)",
+            // color: "white",
+            overflowX: "hidden",
+            display: "flex"
           }}
           spellCheck={false}
         />
@@ -104,27 +97,26 @@ export function CodeblockComponent(
           ref={toolbarRef}
           contentEditable={false}
           sx={{
-            bg: "codeBg",
+            bg: "var(--background-secondary)",
             alignItems: "center",
             justifyContent: "flex-end",
-            borderTop: "1px solid var(--codeBorder)"
+            borderTop: "1px solid var(--border-secondary)"
           }}
         >
           {caretPosition ? (
-            <Text variant={"subBody"} sx={{ mr: 2, color: "codeFg" }}>
+            <Text variant={"subBody"} sx={{ mr: 1, mt: "2px" }}>
               Line {caretPosition.line}, Column {caretPosition.column}{" "}
               {caretPosition.selected
                 ? `(${caretPosition.selected} selected)`
                 : ""}
             </Text>
           ) : null}
+
           <Button
             variant={"icon"}
             sx={{
               p: 1,
-              mr: 1,
-              opacity: "1 !important",
-              ":hover": { bg: "codeSelection" }
+              opacity: "1 !important"
             }}
             title="Toggle indentation mode"
             disabled={!editor.isEditable}
@@ -136,18 +128,18 @@ export function CodeblockComponent(
               });
             }}
           >
-            <Text variant={"subBody"} sx={{ color: "codeFg" }}>
+            <Text variant={"subBody"}>
               {indentType === "space" ? "Spaces" : "Tabs"}: {indentLength}
             </Text>
           </Button>
+
           <Button
             variant={"icon"}
             sx={{
               opacity: "1 !important",
               p: 1,
               mr: 1,
-              bg: isOpen ? "codeSelection" : "transparent",
-              ":hover": { bg: "codeSelection" }
+              bg: isOpen ? "background-selected" : "transparent"
             }}
             disabled={!editor.isEditable}
             onClick={() => {
@@ -157,14 +149,35 @@ export function CodeblockComponent(
             }}
             title="Change language"
           >
-            <Text
-              variant={"subBody"}
-              spellCheck={false}
-              sx={{ color: "codeFg" }}
-            >
+            <Text variant={"subBody"} spellCheck={false}>
               {languageDefinition?.title || "Plaintext"}
             </Text>
           </Button>
+
+          {node.textContent?.length > 0 ? (
+            <Button
+              variant={"icon"}
+              sx={{
+                opacity: "1 !important",
+                p: 1,
+                mr: 1,
+                bg: "transparent"
+              }}
+              onClick={() => {
+                editor.commands.copyToClipboard(node.textContent);
+                start();
+              }}
+              title="Copy to clipboard"
+            >
+              <Text
+                variant={"subBody"}
+                spellCheck={false}
+                sx={{ color: "codeFg" }}
+              >
+                {enabled ? "Copied!" : "Copy"}
+              </Text>
+            </Button>
+          ) : null}
         </Flex>
       </Flex>
       <ResponsivePresenter
@@ -228,9 +241,6 @@ function LanguageSelector(props: LanguageSelectorProps) {
         }}
       >
         <Input
-          onFocus={() => {
-            console.log("EHLLO!");
-          }}
           autoFocus
           placeholder="Search languages"
           sx={{

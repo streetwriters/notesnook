@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { SchemeColors } from "@notesnook/theme";
 import { Flex, FlexProps, Text } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "../icons";
@@ -25,8 +25,10 @@ import { ChevronDown, ChevronUp } from "../icons";
 export type AccordionProps = {
   title: string;
   isClosed: boolean;
-  color?: keyof SchemeColors;
+  color?: SchemeColors;
   testId?: string;
+  buttonSx?: FlexProps["sx"];
+  titleSx?: FlexProps["sx"];
 };
 
 export default function Accordion(
@@ -46,16 +48,17 @@ export default function Accordion(
           justifyContent: "space-between",
           alignItems: "center",
           cursor: "pointer",
-          bg: "bgSecondary",
+          bg: "var(--background-secondary)",
           p: 1,
-          borderRadius: "default"
+          borderRadius: "default",
+          ...props.buttonSx
         }}
         onClick={() => {
           setIsContentHidden((state) => !state);
         }}
         data-test-id={testId}
       >
-        <Text variant="subtitle" sx={{ color }}>
+        <Text variant="subtitle" sx={{ color, ...props.titleSx }}>
           {title}
         </Text>
         {isContentHidden ? (
@@ -64,7 +67,14 @@ export default function Accordion(
           <ChevronUp size={16} color={color} />
         )}
       </Flex>
-      {!isContentHidden && children}
+      <Flex
+        sx={{
+          display: isContentHidden ? "none" : "flex",
+          flexDirection: "column"
+        }}
+      >
+        {children}
+      </Flex>
     </Flex>
   );
 }

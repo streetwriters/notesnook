@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -200,7 +200,7 @@ export class NotePropertiesModel extends BaseProperties {
 export class NoteContextMenuModel extends BaseProperties {
   private readonly menu: ContextMenuModel;
   constructor(page: Page, noteLocator: Locator) {
-    super(page, noteLocator, "menuitem");
+    super(page, noteLocator, "menu-button");
     this.menu = new ContextMenuModel(page);
   }
 
@@ -209,7 +209,7 @@ export class NoteContextMenuModel extends BaseProperties {
     await this.menu.clickOnItem("colors");
     const state = await new ToggleModel(
       this.page,
-      `menuitem-${color}`
+      `menu-button-${color}`
     ).isToggled();
     await this.close();
     return state;
@@ -218,7 +218,7 @@ export class NoteContextMenuModel extends BaseProperties {
   async color(color: string) {
     await this.open();
     await this.menu.clickOnItem("colors");
-    await new ToggleModel(this.page, `menuitem-${color}`).on();
+    await new ToggleModel(this.page, `menu-button-${color}`).on();
     await this.close();
   }
 
@@ -234,23 +234,24 @@ export class NoteContextMenuModel extends BaseProperties {
     await this.open();
     await this.menu.clickOnItem("export");
 
-    // we need to override date time so
-    // date created & date edited remain fixed.
-    await this.noteLocator.evaluate(() => {
-      // eslint-disable-next-line no-extend-native
-      Date.prototype.toLocaleString = () => "xxx";
-    });
-
-    return await downloadAndReadFile(
+    const content = await downloadAndReadFile(
       this.noteLocator.page(),
       this.menu.getItem(format),
       "utf-8"
     );
+    if (format === "html") {
+      return content
+        .replace(/(name="created-on" content=")(.+?)"/, '$1xxx"')
+        .replace(/(name="last-edited-on" content=")(.+?)"/, '$1xxx"');
+    }
+    return content;
   }
 
   async addToNotebook(notebook: Notebook) {
     await this.open();
-    await this.menu.clickOnItem("addtonotebook");
+
+    await this.menu.clickOnItem("notebooks");
+    await this.menu.clickOnItem("link-notebooks");
 
     const filterInput = this.page.locator(getTestId("filter-input"));
     await filterInput.type(notebook.title);
@@ -263,14 +264,15 @@ export class NoteContextMenuModel extends BaseProperties {
 
     const notebookItems = this.page.locator(getTestId("notebook"));
     for await (const item of iterateList(notebookItems)) {
-      const treeItem = item.locator(getTestId(`tree-item`));
-      const title = treeItem.locator(getTestId("title"));
-      const newItemButton = treeItem.locator(getTestId("tree-item-new"));
+      await item.locator(getTestId("notebook-tools")).click();
+      const title = item.locator(getTestId("notebook-title"));
+      const createTopicButton = item.locator(getTestId("create-topic"));
+      const notebookTitle = await title.textContent();
 
-      if ((await title.textContent()) === notebook.title) {
+      if (notebookTitle?.includes(notebook.title)) {
         for (const topic of notebook.topics) {
-          await newItemButton.click();
-          const newItemInput = item.locator(getTestId("new-tree-item-input"));
+          await createTopicButton.click();
+          const newItemInput = item.locator(getTestId("new-topic-input"));
 
           await newItemInput.waitFor({ state: "visible" });
           await newItemInput.fill(topic);
@@ -281,8 +283,9 @@ export class NoteContextMenuModel extends BaseProperties {
 
         const topicItems = item.locator(getTestId("topic"));
         for await (const topicItem of iterateList(topicItems)) {
-          const treeItem = topicItem.locator(getTestId(`tree-item`));
-          await treeItem.click();
+          await this.page.keyboard.down("Control");
+          await topicItem.click();
+          await this.page.keyboard.up("Control");
         }
       }
     }

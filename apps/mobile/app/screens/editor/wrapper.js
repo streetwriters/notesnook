@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   AppState,
   KeyboardAvoidingView,
@@ -32,12 +32,14 @@ import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { editorRef } from "../../utils/global-refs";
 import { ProgressBar } from "./progress";
-import { editorController, editorState, textInput } from "./tiptap/utils";
+import { editorController, textInput } from "./tiptap/utils";
+
 export const EditorWrapper = ({ width }) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
+  const { colors: toolBarColors } = useThemeColors("editorToolbar");
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const loading = false;
   const insets = useGlobalSafeAreaInsets();
@@ -46,11 +48,19 @@ export const EditorWrapper = ({ width }) => {
     (state) => state.settings.introCompleted
   );
   const keyboard = useKeyboard();
+  const prevState = useRef();
 
   const onAppStateChanged = async (state) => {
-    if (editorState().movedAway) return;
+    if (!prevState.current) {
+      prevState.current = state;
+      return;
+    }
+    if (useSettingStore.getState().appDidEnterBackgroundForAction) return;
     if (state === "active") {
       editorController.current.onReady();
+      editorController.current.overlay(false);
+    } else {
+      prevState.current = state;
     }
   };
 
@@ -63,7 +73,8 @@ export const EditorWrapper = ({ width }) => {
   }, [loading]);
 
   const getMarginBottom = () => {
-    const bottomInsets = Platform.OS === "android" ? 12 : insets.bottom || 14;
+    const bottomInsets =
+      Platform.OS === "android" ? 12 : insets.bottom + 16 || 14;
     if (!keyboard.keyboardShown) return bottomInsets / 1.5;
     if (Platform.isPad && !floating) return bottomInsets;
     if (Platform.OS === "ios") return bottomInsets / 1.5;
@@ -81,9 +92,9 @@ export const EditorWrapper = ({ width }) => {
         width: width[!introCompleted ? "mobile" : deviceMode]?.c,
         height: "100%",
         minHeight: "100%",
-        backgroundColor: colors.bg,
+        backgroundColor: toolBarColors.primary.background,
         borderLeftWidth: DDS.isTab ? 1 : 0,
-        borderLeftColor: DDS.isTab ? colors.nav : "transparent"
+        borderLeftColor: DDS.isTab ? colors.secondary.background : "transparent"
       }}
     >
       {loading || !introCompleted ? null : (
@@ -91,6 +102,7 @@ export const EditorWrapper = ({ width }) => {
           behavior="padding"
           style={{
             marginBottom: getMarginBottom(),
+            backgroundColor: colors.primary.background,
             flex: 1
           }}
           enabled={!floating}

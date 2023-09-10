@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,33 +16,38 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+import "@azure/core-asynciterator-polyfill";
+import SettingsService from "./services/settings";
+import {
+  THEME_COMPATIBILITY_VERSION,
+  useThemeEngineStore
+} from "@notesnook/theme";
 import React, { useEffect } from "react";
+import { View } from "react-native";
+import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import AppLockedOverlay from "./components/app-lock-overlay";
 import { withErrorBoundry } from "./components/exception-handler";
 import GlobalSafeAreaProvider from "./components/globalsafearea";
-import Launcher from "./components/launcher";
 import { useAppEvents } from "./hooks/use-app-events";
 import { ApplicationHolder } from "./navigation";
 import Notifications from "./services/notifications";
-import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
+import { useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
-import { View } from "react-native";
-import { useState } from "react";
+import { themeTrpcClient } from "./screens/settings/theme-selector";
 
-SettingsService.init();
 SettingsService.checkOrientation();
 const App = () => {
-  useAppEvents();
-  const [init, setInit] = useState(false);
+  const init = useAppEvents();
   useEffect(() => {
     let { appLockMode } = SettingsService.get();
     if (appLockMode && appLockMode !== "none") {
-      useUserStore.getState().setVerifyUser(true);
+      useUserStore.getState().lockApp(true);
     }
-    setInit(true);
+    globalThis["IS_MAIN_APP_RUNNING"] = true;
+    init();
     setTimeout(async () => {
       SettingsService.onFirstLaunch();
       await Notifications.get();
@@ -51,7 +56,10 @@ const App = () => {
       }
       TipManager.init();
     }, 100);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return (
     <View
       style={{
@@ -80,10 +88,59 @@ const App = () => {
         }}
       >
         <ApplicationHolder />
-        {init && <Launcher />}
       </GestureHandlerRootView>
+      <AppLockedOverlay />
     </View>
   );
 };
 
-export default withErrorBoundry(App, "App");
+let currTheme =
+  useThemeStore.getState().colorScheme === "dark"
+    ? SettingsService.getProperty("darkTheme")
+    : SettingsService.getProperty("lightTheme");
+useThemeEngineStore.getState().setTheme(currTheme);
+
+export const withTheme = (Element) => {
+  return function AppWithThemeProvider() {
+    const [colorScheme, darkTheme, lightTheme] = useThemeStore((state) => [
+      state.colorScheme,
+      state.darkTheme,
+      state.lightTheme
+    ]);
+
+    useEffect(() => {
+      setTimeout(() => {
+        const currentTheme = colorScheme === "dark" ? darkTheme : lightTheme;
+        if (!currentTheme) return;
+        themeTrpcClient.updateTheme
+          .query({
+            version: currentTheme.version,
+            compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+            id: currentTheme.id
+          })
+          .then((theme) => {
+            if (theme) {
+              console.log(theme.version, "theme updated");
+              theme.colorScheme === "dark"
+                ? useThemeStore.getState().setDarkTheme(theme)
+                : useThemeStore.getState().setLightTheme(theme);
+            }
+          })
+          .catch(console.log);
+      }, 1000);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const nextTheme = colorScheme === "dark" ? darkTheme : lightTheme;
+    if (JSON.stringify(nextTheme) !== JSON.stringify(currTheme)) {
+      useThemeEngineStore
+        .getState()
+        .setTheme(colorScheme === "dark" ? darkTheme : lightTheme);
+      currTheme = nextTheme;
+    }
+
+    return <Element />;
+  };
+};
+
+export default withTheme(withErrorBoundry(App, "App"));

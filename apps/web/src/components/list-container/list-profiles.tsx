@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,93 +17,68 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { navigate } from "../../navigation";
 import Note from "../note";
 import Notebook from "../notebook";
 import Tag from "../tag";
 import Topic from "../topic";
 import TrashItem from "../trash-item";
-import Attachment from "../attachment";
 import { db } from "../../common/db";
-import { getTotalNotes } from "../../common";
+import { getTotalNotes } from "@notesnook/common";
+import Reminder from "../reminder";
+import { useMemo } from "react";
+import {
+  ReferencesWithDateEdited,
+  ItemWrapper,
+  Item,
+  NotebookReference,
+  NotebookType,
+  Reference
+} from "./types";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
   (document.getElementById("p")?.clientHeight || 16) - 1;
 export const DEFAULT_ITEM_HEIGHT = SINGLE_LINE_HEIGHT * 2 * DEFAULT_LINE_HEIGHT;
-// const MAX_HEIGHTS = {
-//   note: SINGLE_LINE_HEIGHT * 7 * DEFAULT_LINE_HEIGHT,
-//   notebook: SINGLE_LINE_HEIGHT * 7 * DEFAULT_LINE_HEIGHT,
-//   generic: SINGLE_LINE_HEIGHT * 4 * DEFAULT_LINE_HEIGHT
-// };
 
-export type Item = { id: string; type: string; title: string } & Record<
-  string,
-  unknown
->;
+const NotesProfile: ItemWrapper = ({ item, type, context, compact }) => {
+  const references = useMemo(
+    () => getReferences(item.id, item.notebooks as Item[], context?.type),
+    [item, context]
+  );
 
-type NotebookReference = Item & { topics: string[] };
-type NotebookType = Item & { topics: Item[] };
-
-export type Context = { type: string } & Record<string, unknown>;
-type ItemWrapperProps = {
-  index: number;
-  item: Item;
-  type: keyof typeof ListProfiles;
-  context: Context;
+  return (
+    <Note
+      compact={compact}
+      item={item}
+      tags={getTags(item)}
+      references={references}
+      reminder={getReminder(item.id)}
+      date={getDate(item, type)}
+      context={context}
+    />
+  );
 };
 
-type ItemWrapper = (props: ItemWrapperProps) => JSX.Element;
-
-const NotesProfile: ItemWrapper = ({ index, item, type, context }) => (
-  <Note
-    index={index}
-    pinnable={!context}
-    item={item}
-    tags={getTags(item)}
-    notebook={getNotebook(item.notebooks as Item[], context?.type)}
-    date={getDate(item, type)}
-    context={context}
-  />
-);
-
-const NotebooksProfile: ItemWrapper = ({ index, item, type }) => (
+const NotebooksProfile: ItemWrapper = ({ item, type }) => (
   <Notebook
-    index={index}
     item={item}
     totalNotes={getTotalNotes(item)}
     date={getDate(item, type)}
   />
 );
 
-const TagsProfile: ItemWrapper = ({ index, item }) => (
-  <Tag item={item} index={index} />
-);
-
-const TopicsProfile: ItemWrapper = ({ index, item, context }) => (
-  <Topic
-    index={index}
-    item={item}
-    onClick={() => navigate(`/notebooks/${context.notebookId}/${item.id}`)}
-  />
-);
-
-const TrashProfile: ItemWrapper = ({ index, item, type }) => (
-  <TrashItem index={index} item={item} date={getDate(item, type)} />
-);
-
-const AttachmentProfile: ItemWrapper = ({ index, item }) => (
-  <Attachment index={index} item={item} isCompact={false} />
+const TrashProfile: ItemWrapper = ({ item, type }) => (
+  <TrashItem item={item} date={getDate(item, type)} />
 );
 
 export const ListProfiles = {
   home: NotesProfile,
   notebooks: NotebooksProfile,
   notes: NotesProfile,
-  tags: TagsProfile,
-  topics: TopicsProfile,
-  trash: TrashProfile,
-  attachments: AttachmentProfile
+  reminders: Reminder,
+  tags: Tag,
+  topics: Topic,
+  trash: TrashProfile
 } as const;
 
 function getTags(item: Item) {
@@ -117,26 +92,30 @@ function getTags(item: Item) {
   return tags || [];
 }
 
-type NotebookResult =
-  | {
-      id: string;
-      title: string;
-      dateEdited: number;
-      topic: { id: string; title: string };
-    }
-  | undefined;
-
-function getNotebook(
+function getReferences(
+  noteId: string,
   notebooks: Item[],
-  contextType: string
-): NotebookResult | undefined {
-  if (contextType === "topic" || !notebooks?.length) return;
+  contextType?: string
+): ReferencesWithDateEdited | undefined {
+  if (["topic", "notebook"].includes(contextType || "")) return;
 
-  return notebooks.reduce<NotebookResult>(function (
-    prev: NotebookResult,
-    curr
-  ): NotebookResult {
-    if (prev) return prev;
+  const references: Reference[] = [];
+  let latestDateEdited = 0;
+
+  db.relations
+    ?.to({ id: noteId, type: "note" }, "notebook")
+    ?.forEach((notebook: any) => {
+      references.push({
+        type: "notebook",
+        url: `/notebooks/${notebook.id}`,
+        title: notebook.title
+      } as Reference);
+
+      if (latestDateEdited < notebook.dateEdited)
+        latestDateEdited = notebook.dateEdited;
+    });
+
+  notebooks?.forEach((curr) => {
     const topicId = (curr as NotebookReference).topics[0];
     const notebook = db.notebooks?.notebook(curr.id)?.data as NotebookType;
     if (!notebook) return;
@@ -144,19 +123,23 @@ function getNotebook(
     const topic = notebook.topics.find((t: Item) => t.id === topicId);
     if (!topic) return;
 
-    return {
-      id: notebook.id,
-      title: notebook.title,
-      dateEdited: notebook.dateEdited,
-      topic: { id: topicId, title: topic.title }
-    } as NotebookResult;
-  },
-  undefined as NotebookResult);
+    references.push({
+      url: `/notebooks/${curr.id}/${topicId}`,
+      title: topic.title,
+      type: "topic"
+    });
+    if (latestDateEdited < (topic.dateEdited as number))
+      latestDateEdited = topic.dateEdited as number;
+  });
+
+  return { dateEdited: latestDateEdited, references: references.slice(0, 3) };
 }
 
-function getDate(item: Item, groupType: keyof typeof ListProfiles) {
-  if (groupType === "attachments") return item.dateCreated;
+function getReminder(noteId: string) {
+  return db.relations?.from({ id: noteId, type: "note" }, "reminder")[0];
+}
 
+function getDate(item: Item, groupType: keyof typeof ListProfiles): number {
   const sortBy = db.settings?.getGroupOptions(groupType).sortBy;
   switch (sortBy) {
     case "dateEdited":

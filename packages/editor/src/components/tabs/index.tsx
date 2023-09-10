@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ export function Tabs(props: PropsWithChildren<TabsProps>) {
       >
         {tabs?.map((tab, index) => (
           <Button
+            variant="secondary"
             key={index.toString()}
             sx={{
               flex: 1,
@@ -60,16 +61,15 @@ export function Tabs(props: PropsWithChildren<TabsProps>) {
               borderRadius: 0,
               borderTopLeftRadius: "default",
               borderTopRightRadius: "default",
-              bg: activeTab === index ? "bgSecondary" : "transparent",
+              bg:
+                activeTab === index
+                  ? "var(--background-secondary)"
+                  : "transparent",
               fontWeight: activeTab === index ? "bold" : "normal",
-              color: "text",
+              color: "paragraph",
               ":last-of-type": { mr: 0 },
               borderBottom: "2px solid",
-              borderBottomColor:
-                activeTab === index ? "primary" : "transparent",
-              ":hover": {
-                bg: "hover"
-              }
+              borderBottomColor: activeTab === index ? "accent" : "transparent"
             }}
             onClick={() => {
               setActiveTab(index);

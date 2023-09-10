@@ -1,0 +1,37 @@
+{
+  "name": "@notesnook/clipper",
+  "version": "1.0.0",
+  "description": "Web clipper core used by the Notesnook Web Clipper",
+  "keywords": [
+    "web-clipper"
+  ],
+  "author": "Abdullah Atta <abdullahatta@streetwriters.co>",
+  "homepage": "https://notesnook.com/",
+  "license": "GPL-3.0-or-later",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@playwright/test": "^1.27.1",
+    "slugify": "^1.6.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/streetwriters/notesnook.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "playwright test",
+    "postinstall": "patch-package"
+  },
+  "bugs": {
+    "url": "https://github.com/streetwriters/notesnook/issues"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.4.2",
+    "css-what": "6.1.0",
+    "hyperapp": "^2.0.22",
+    "specificity": "^0.4.1"
+  }
+}

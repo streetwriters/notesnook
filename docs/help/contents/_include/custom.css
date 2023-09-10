@@ -1,0 +1,186 @@
+/* open-sans-regular - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: local(""),
+    url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.woff2")
+      format("woff2"),
+    /* Super Modern Browsers */
+      url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.woff")
+      format("woff"),
+    /* Modern Browsers */
+      url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.ttf")
+      format("truetype");
+}
+/* open-sans-600 - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local(""),
+    url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.woff2")
+      format("woff2"),
+    /* Super Modern Browsers */
+      url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.woff")
+      format("woff"),
+    /* Modern Browsers */
+      url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.ttf")
+      format("truetype");
+}
+/* open-sans-700 - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local(""),
+    url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-700.woff2")
+      format("woff2"),
+    /* Super Modern Browsers */
+      url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-700.woff")
+      format("woff"),
+    /* Modern Browsers */
+      url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-700.ttf")
+      format("truetype");
+}
+/* open-sans-italic - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
+@font-face {
+  font-family: "Open Sans";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local(""),
+    url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-italic.woff2")
+      format("woff2"),
+    /* Super Modern Browsers */
+      url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-italic.woff")
+      format("woff"),
+    /* Modern Browsers */
+      url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-italic.ttf")
+      format("truetype");
+}
+/* open-sans-600italic - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
+@font-face {
+  font-family: "Open Sans";
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: local(""),
+    url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600italic.woff2")
+      format("woff2"),
+    /* Super Modern Browsers */
+      url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600italic.woff")
+      format("woff"),
+    /* Modern Browsers */
+      url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600italic.ttf")
+      format("truetype");
+}
+/* open-sans-700italic - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
+@font-face {
+  font-family: "Open Sans";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: local(""),
+    url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-700italic.woff2")
+      format("woff2"),
+    /* Super Modern Browsers */
+      url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-700italic.woff")
+      format("woff"),
+    /* Modern Browsers */
+      url("/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-700italic.ttf")
+      format("truetype");
+}
+
+/* fira-code-regular - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: "Fira Code";
+  font-style: normal;
+  font-weight: 400;
+  src: url("/fonts/fira-code-v21-latin-regular.woff2") format("woff2"),
+    /* Super Modern Browsers */ url("/fonts/fira-code-v21-latin-regular.woff")
+      format("woff"),
+    /* Modern Browsers */ url("/fonts/fira-code-v21-latin-regular.ttf")
+      format("truetype"); /* Safari, Android, iOS */
+}
+
+html.light {
+  --font-family: "Open Sans", sans-serif;
+  --monospace-font-family: "Fira Code", monospace;
+  --primary: #008837;
+  --primary-fg: #fff;
+  --header-fg: #008837;
+  --link: #008837;
+  --heading: #000;
+  --page-bg: #ffffff;
+  --document-bg: #f7f7f7;
+  --selection-bg: #00883766;
+  --selection-fg: #fff;
+  --border: #e8e8e8;
+  --input-border: #e8e8e8;
+
+  --hover-bg: #e8e8e8;
+  --info-dim: #00883720;
+
+  --fg: #403f53;
+  --fg-dim: #403f53cc;
+  --fg-dimmer: #403f53bb;
+  --code-bg: #e8e8e8;
+}
+
+html.dark {
+  --font-family: "Open Sans", sans-serif;
+  --monospace-font-family: "Fira Code", monospace;
+  --primary: #008837;
+  --primary-fg: #fff;
+  --header-fg: #008837;
+  --link: #008837;
+  --page-bg: #0d0d0d;
+  --document-bg: #151515;
+  --border: #383838;
+
+  --info-dim: #00883720;
+
+  --button-bg: #3b3b3b;
+  --hover-bg: #202020;
+  --button-fg: #fff;
+
+  --input-bg: #2b2b2b;
+  --input-placeholder: #ababab;
+
+  --code-bg: #202020;
+  --selection-bg: #00883766;
+  --selection-fg: #fff;
+  --border-dim: #383838;
+  --input-border: #383838;
+  --input-bg: #151515;
+}
+nav li {
+  line-height: 24px;
+}
+
+nav li li:not(li.nested):hover {
+  background-color: var(--hover-bg);
+}
+
+pre {
+  border: 1px solid var(--border);
+}
+
+.project-title a {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.project-subtitle {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.docgen-content {
+  box-shadow: none;
+}

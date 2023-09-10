@@ -6,11 +6,16 @@
     "baseUrl": "./",
     "jsx": "react-native",
     "noEmit": true,
-    "maxNodeModuleJsDepth": 6,
     "types": ["node", "jest", "detox"],
     "paths": {
-      "@notesnook/*": ["../../packages"]
-    }
+      "@notesnook/*": ["../../packages"],
+      "@notifee/react-native": [
+        "./node_modules/@ammarahmed/notifee-react-native"
+      ],
+      "@notesnook/theme": ["../../packages/theme"],
+      "@types/react": ["./node_modules/@types/react"]
+    },
+    "incremental": true
   },
   "exclude": ["native"]
 }

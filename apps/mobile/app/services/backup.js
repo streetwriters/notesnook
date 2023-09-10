@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,20 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { sanitizeFilename } from "@notesnook/common";
 import { Platform } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 import FileViewer from "react-native-file-viewer";
 import * as ScopedStorage from "react-native-scoped-storage";
 import Share from "react-native-share";
-import RNFetchBlob from "rn-fetch-blob";
-import { presentDialog } from "../components/dialog/functions";
 import { DatabaseLogger, db } from "../common/database";
 import storage from "../common/database/storage";
-import { eCloseProgressDialog } from "../utils/events";
-import { sanitizeFilename } from "../utils/sanitizer";
+import { presentDialog } from "../components/dialog/functions";
+import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
-import { eSendEvent, presentSheet, ToastEvent } from "./event-manager";
+import { ToastEvent, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
-import PremiumService from "./premium";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -116,7 +115,7 @@ async function presentBackupCompleteSheet(backupFilePath) {
           if (Platform.OS === "ios") {
             Share.open({
               url: backupFilePath,
-              failOnCancel: false,
+              failOnCancel: false
             }).catch(console.log);
           } else {
             FileViewer.open(backupFilePath, {
@@ -130,7 +129,7 @@ async function presentBackupCompleteSheet(backupFilePath) {
       },
       {
         action: async () => {
-          eSendEvent(eCloseProgressDialog);
+          eSendEvent(eCloseSheet);
           SettingsService.set({
             showBackupCompleteSheet: false
           });
@@ -165,15 +164,14 @@ async function run(progress, context) {
   }
 
   try {
-
     backup = await db.backup.export(
       "mobile",
-      PremiumService.get() ? SettingsService.get().encryptedBackup : false
+      SettingsService.get().encryptedBackup
     );
     if (!backup) throw new Error("Backup returned empty.");
   } catch (e) {
     await sleep(300);
-    eSendEvent(eCloseProgressDialog);
+    eSendEvent(eCloseSheet);
     ToastEvent.error(e, "Backup failed!");
     return null;
   }
@@ -216,11 +214,11 @@ async function run(progress, context) {
     if (showBackupCompleteSheet) {
       presentBackupCompleteSheet(backupFilePath);
     } else {
-      progress && eSendEvent(eCloseProgressDialog);
+      progress && eSendEvent(eCloseSheet);
     }
     return backupFilePath;
   } catch (e) {
-    progress && eSendEvent(eCloseProgressDialog);
+    progress && eSendEvent(eCloseSheet);
     ToastEvent.error(e, "Backup failed!");
     return null;
   }

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,22 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { EVENTS } from "@notesnook/core/dist/common";
 import NetInfo from "@react-native-community/netinfo";
-import { EVENTS } from "@notesnook/core/common";
-import { initAfterSync } from "../stores/index";
-import { useUserStore } from "../stores/use-user-store";
-import { doInBackground } from "../utils";
 import { db } from "../common/database";
 import { DatabaseLogger } from "../common/database/index";
+import { initAfterSync } from "../stores/index";
+import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { ToastEvent } from "./event-manager";
-
-NetInfo.configure({
-  reachabilityUrl: "https://notesnook.com",
-  reachabilityTest: (response) => {
-    if (!response) return false;
-    return response?.status >= 200 && response?.status < 300;
-  }
-});
+import SettingsService from "./settings";
+import BackgroundSync from "./background-sync";
 
 export const ignoredMessages = [
   "Sync already running",
@@ -46,8 +39,14 @@ const run = async (
   context = "global",
   forced = false,
   full = true,
-  onCompleted
+  onCompleted,
+  lastSyncTime
 ) => {
+  if (useUserStore.getState().syncing) {
+    DatabaseLogger.log("Sync in progress");
+    console.log("Sync in progress");
+    return;
+  }
   clearTimeout(syncTimer);
   syncTimer = setTimeout(async () => {
     const status = await NetInfo.fetch();
@@ -56,7 +55,11 @@ const run = async (
     if (!status.isInternetReachable) {
       DatabaseLogger.warn("Internet not reachable");
     }
-    if (!user || !status.isInternetReachable) {
+    if (
+      !user ||
+      !status.isInternetReachable ||
+      SettingsService.get().disableSync
+    ) {
       initAfterSync();
       return onCompleted?.(false);
     }
@@ -64,9 +67,9 @@ const run = async (
     let error = null;
 
     try {
-      let res = await doInBackground(async () => {
+      let res = await BackgroundSync.doInBackground(async () => {
         try {
-          await db.sync(full, forced);
+          await db.sync(full, forced, lastSyncTime);
           return true;
         } catch (e) {
           error = e;
@@ -75,18 +78,19 @@ const run = async (
       });
       if (!res) {
         initAfterSync();
-        userstore.setSyncing(false);
+        userstore.setSyncing(false, SyncStatus.Failed);
         return onCompleted?.(false);
       }
       if (typeof res === "string") throw error;
       userstore.setSyncing(false);
       return onCompleted?.(true);
     } catch (e) {
+      error = e;
       if (
         !ignoredMessages.find((im) => e.message?.includes(im)) &&
         userstore.user
       ) {
-        userstore.setSyncing(false);
+        userstore.setSyncing(false, SyncStatus.Failed);
         if (status.isConnected && status.isInternetReachable) {
           ToastEvent.error(e, "Sync failed", context);
         }
@@ -94,12 +98,15 @@ const run = async (
       DatabaseLogger.error(e, "[Client] Failed to sync");
       onCompleted?.(false);
     } finally {
-      userstore.setSyncing(false);
+      userstore.setSyncing(
+        false,
+        error ? SyncStatus.Failed : SyncStatus.Passed
+      );
       if (full || forced) {
         db.eventManager.publish(EVENTS.syncCompleted);
       }
     }
-  }, 1000);
+  }, 300);
 };
 
 const Sync = {

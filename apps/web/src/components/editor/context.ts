@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,27 +21,35 @@ import { useCallback, useEffect, useRef } from "react";
 import { IEditor, NoteStatistics } from "./types";
 import createStore from "../../common/store";
 import BaseStore from "../../stores";
-import { UseBoundStore } from "zustand";
-import shallow from "zustand/shallow";
+import { shallow } from "zustand/shallow";
 import type { ToolbarDefinition } from "@notesnook/editor";
+import Config from "../../utils/config";
 
+type EditorConfig = { fontFamily: string; fontSize: number };
 type EditorSubState = {
   editor?: IEditor;
   canUndo?: boolean;
   canRedo?: boolean;
   searching?: boolean;
   toolbarConfig?: ToolbarDefinition;
+  editorConfig: EditorConfig;
   statistics?: NoteStatistics;
 };
-class EditorContext extends BaseStore {
-  subState: EditorSubState = {};
+
+class EditorContext extends BaseStore<EditorContext> {
+  subState: EditorSubState = {
+    editorConfig: Config.get("editorConfig", {
+      fontFamily: "sans-serif",
+      fontSize: 16
+    })
+  };
 
   configure = (
     partial:
       | Partial<EditorSubState>
       | ((oldState: EditorSubState) => Partial<EditorSubState>)
   ) => {
-    this.set((state: EditorContext) => {
+    this.set((state) => {
       const newPartialState =
         typeof partial === "function" ? partial(state.subState) : partial;
       state.subState = { ...state.subState, ...newPartialState };
@@ -49,10 +57,7 @@ class EditorContext extends BaseStore {
   };
 }
 
-const [useEditorContext] = createStore(EditorContext) as [
-  UseBoundStore<EditorContext>,
-  EditorContext
-];
+const [useEditorContext] = createStore(EditorContext);
 
 export function useEditorInstance() {
   const editor = useEditorContext((store) => store.subState.editor);
@@ -116,3 +121,38 @@ export function useNoteStatistics(): NoteStatistics {
       }
   );
 }
+
+export function useEditorConfig() {
+  const editorConfig = useEditorContext((store) => store.subState.editorConfig);
+  return { editorConfig, setEditorConfig };
+}
+
+export const editorConfig = () =>
+  useEditorContext.getState().subState.editorConfig;
+
+export const setEditorConfig = (config: Partial<EditorConfig>) => {
+  const oldConfig = editorConfig();
+  if (oldConfig)
+    Config.set("editorConfig", {
+      ...oldConfig,
+      ...config
+    });
+
+  useEditorContext.getState().configure({
+    editorConfig: {
+      ...oldConfig,
+      ...config
+    }
+  });
+};
+export const onEditorConfigChange = (
+  selector: (editorConfig: EditorConfig) => any,
+  listener: (
+    selectedState: EditorConfig,
+    previousSelectedState: EditorConfig
+  ) => void
+) =>
+  useEditorContext.subscribe(
+    (s) => selector(s.subState.editorConfig),
+    listener
+  );

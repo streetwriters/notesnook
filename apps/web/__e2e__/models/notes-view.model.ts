@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,9 +32,12 @@ export class NotesViewModel extends BaseViewModel {
   private readonly createButton: Locator;
   readonly editor: EditorModel;
 
-  constructor(page: Page, pageId: "home" | "notes") {
-    super(page, pageId);
-    this.createButton = page.locator(getTestId("notes-action-button"));
+  constructor(page: Page, pageId: "home" | "notes" | "notebook") {
+    super(page, pageId, pageId === "home" ? "home" : "notes");
+    this.createButton = page.locator(
+      // TODO:
+      getTestId(`notes-action-button`)
+    );
     this.editor = new EditorModel(page);
   }
 

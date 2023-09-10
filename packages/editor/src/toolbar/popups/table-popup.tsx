@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -117,11 +117,14 @@ export function TablePopup(props: TablePopupProps) {
                 data-index={index}
                 sx={{
                   height: cellSize || 15,
-                  border: "1px solid var(--disabled)",
                   borderRadius: "small",
-                  bg: isCellHighlighted(index, cellLocation, tableSize)
-                    ? "disabled"
-                    : "transparent"
+                  border: "1px solid",
+                  ...(isCellHighlighted(index, cellLocation, tableSize)
+                    ? {
+                        bg: "background-selected",
+                        borderColor: "transparent"
+                      }
+                    : { bg: "transparent", borderColor: "border" })
                 }}
                 onTouchStart={() => {
                   setCellLocation(getCellLocation(index, tableSize));

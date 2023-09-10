@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,12 +24,9 @@ import React, {
   useState,
   useEffect
 } from "react";
-import { MenuItem } from "../menu/types";
+import { MenuItem, Icon, MenuButton, MenuSeparator } from "@notesnook/ui";
 import { Box, Button, Flex, Text, FlexProps } from "@theme-ui/components";
-import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { MenuButton } from "../menu/menu-button";
-import { MenuSeparator } from "../menu/menu-separator";
 import Modal from "react-modal";
 import {
   motion,
@@ -38,7 +35,8 @@ import {
   useTransform,
   useAnimation
 } from "framer-motion";
-import { useTheme } from "../../toolbar/stores/toolbar-store";
+import { useTheme } from "@emotion/react";
+import { EmotionThemeProvider, Theme } from "@notesnook/theme";
 
 const AnimatedFlex = motion(
   Flex as React.FunctionComponent<Omit<FlexProps, "onDrag" | "onDragEnd">>
@@ -69,7 +67,6 @@ function useHistory<T>(initial: T) {
   }, [canGoBack]);
 
   const navigate = useCallback((state: T) => {
-    console.log("NAVI", state);
     setCurrent((prev) => {
       if (prev) stack.current.push(prev);
       return state;
@@ -104,7 +101,7 @@ export function ActionSheetPresenter(
     draggable = true,
     children
   } = props;
-  const theme = useTheme();
+  const theme = useTheme() as Theme;
   const contentRef = useRef<HTMLDivElement>();
 
   const y = useMotionValue(0);
@@ -161,13 +158,13 @@ export function ActionSheetPresenter(
       onRequestClose={() => onBeforeClose()}
       portalClassName={"bottom-sheet-presenter-portal"}
       onAfterOpen={() => {
-        console.log("OPEGN!");
-        animation.start({ transition: TRANSITION, y: 0 });
+        setTimeout(() => animation.start({ transition: TRANSITION, y: 0 }));
       }}
       overlayElement={(overlayElementProps, contentEl) => {
         return (
-          <Box
+          <EmotionThemeProvider
             {...overlayElementProps}
+            scope="sheet"
             style={{
               ...overlayElementProps.style,
               position: blocking ? "fixed" : "sticky",
@@ -184,13 +181,13 @@ export function ActionSheetPresenter(
                   width: "100%",
                   opacity,
                   position: "absolute",
-                  backgroundColor: "var(--overlay)"
+                  backgroundColor: "var(--backdrop)"
                 }}
                 tabIndex={-1}
               />
             )}
             {contentEl}
-          </Box>
+          </EmotionThemeProvider>
         );
       }}
       contentElement={(props, children) => (
@@ -219,6 +216,8 @@ export function ActionSheetPresenter(
     >
       <AnimatedFlex
         animate={animation}
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         style={{ y }}
         initial={{ y: 1000 }}
         sx={{
@@ -241,7 +240,9 @@ export function ActionSheetPresenter(
                 onClose?.();
                 return;
               }
-              const sheetEl = contentRef.current as HTMLDivElement;
+              const sheetEl = contentRef.current;
+              if (!sheetEl) return;
+
               const contentHeight = sheetEl.offsetHeight;
               const threshold = 30;
               const closingHeight = (contentHeight * threshold) / 100;
@@ -249,7 +250,9 @@ export function ActionSheetPresenter(
               if (y.get() >= closingHeight) {
                 onBeforeClose();
               } else {
-                animation.start({ transition: TRANSITION, y: 0 });
+                setTimeout(() =>
+                  animation.start({ transition: TRANSITION, y: 0 })
+                );
               }
             }}
             dragConstraints={{ top: 0, bottom: 0 }}
@@ -265,7 +268,7 @@ export function ActionSheetPresenter(
             <Box
               id="pill"
               sx={{
-                backgroundColor: "hover",
+                bg: "background-secondary",
                 width: 60,
                 height: 8,
                 borderRadius: 100

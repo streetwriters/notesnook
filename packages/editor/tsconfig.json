@@ -3,7 +3,13 @@
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
-    "outDir": "./dist/"
+    "outDir": "./dist/",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["*"]
+    },
+    "incremental": true
   },
-  "include": ["src/"]
+  "exclude": ["src/**/*.test.ts"],
+  "include": ["src/**/*"]
 }

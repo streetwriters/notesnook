@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { Text, View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { Text, View, ViewStyle } from "react-native";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import { PressableButtonProps } from "../ui/pressable";
@@ -35,11 +35,13 @@ type DialogHeaderProps = {
     loading?: boolean;
     title?: string;
     type?: PressableButtonProps["type"];
+    icon?: string;
   };
   paragraphColor?: string;
   padding?: number;
   centered?: boolean;
   titlePart?: string;
+  style?: ViewStyle;
 };
 
 const DialogHeader = ({
@@ -49,9 +51,10 @@ const DialogHeader = ({
   paragraphColor,
   padding,
   centered,
-  titlePart
+  titlePart,
+  style
 }: DialogHeaderProps) => {
-  const colors = useThemeStore((state) => state.colors);
+  const { colors } = useThemeColors();
 
   return (
     <>
@@ -61,7 +64,8 @@ const DialogHeader = ({
           alignItems: "center",
           justifyContent: "space-between",
           minHeight: 50,
-          paddingHorizontal: padding
+          paddingHorizontal: padding,
+          ...style
         }}
       >
         <View
@@ -82,7 +86,7 @@ const DialogHeader = ({
             >
               {title}{" "}
               {titlePart ? (
-                <Text style={{ color: colors.accent }}>{titlePart}</Text>
+                <Text style={{ color: colors.primary.accent }}>{titlePart}</Text>
               ) : null}
             </Heading>
 
@@ -96,6 +100,7 @@ const DialogHeader = ({
                 loading={button.loading}
                 fontSize={13}
                 title={button.title}
+                icon={button.icon}
                 type={button.type || "grayBg"}
                 height={25}
               />
@@ -109,7 +114,7 @@ const DialogHeader = ({
                 maxWidth: centered ? "90%" : "100%",
                 alignSelf: centered ? "center" : "flex-start"
               }}
-              color={paragraphColor || colors.icon}
+              color={paragraphColor || colors.secondary.paragraph}
             >
               {paragraph}
             </Paragraph>

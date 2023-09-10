@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,9 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
+import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import List from "../../components/list";
+import { IconButton } from "../../components/ui/icon-button";
+import Paragraph from "../../components/ui/typography/paragraph";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import {
   eSubscribeEvent,
@@ -34,7 +38,9 @@ import useNavigationStore, {
   RouteName
 } from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
+import { SIZE } from "../../utils/size";
 import { NoteType, TopicType } from "../../utils/types";
+import Notebook from "../notebook/index";
 import {
   getAlias,
   openEditor,
@@ -98,7 +104,11 @@ const NotesPage = ({
   const [loadingNotes, setLoadingNotes] = useState(false);
   const alias = getAlias(params.current);
   const isMonograph = route.name === "Monographs";
-
+  const notebook =
+    route.name === "TopicNotes" && (params.current.item as TopicType).notebookId
+      ? db.notebooks?.notebook((params.current.item as TopicType).notebookId)
+          ?.data
+      : null;
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
       Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
@@ -171,11 +181,13 @@ const NotesPage = ({
         if (isNew) setLoadingNotes(true);
         const notes = get(params.current, true) as NoteType[];
         if (
-          (item.type === "tag" || item.type === "color") &&
-          (!notes || notes.length === 0)
+          ((item.type === "tag" || item.type === "color") &&
+            (!notes || notes.length === 0)) ||
+          (item.type === "topic" && !notes)
         ) {
           return Navigation.goBack();
         }
+        if (notes.length === 0) setLoadingNotes(false);
         setNotes(notes);
         syncWithNavigation();
       } catch (e) {
@@ -187,7 +199,7 @@ const NotesPage = ({
 
   useEffect(() => {
     if (loadingNotes) {
-      setTimeout(() => setLoadingNotes(false), 300);
+      setTimeout(() => setLoadingNotes(false), 50);
     }
   }, [loadingNotes, notes]);
 
@@ -208,6 +220,49 @@ const NotesPage = ({
       }
       wait={loading || loadingNotes}
     >
+      {route.name === "TopicNotes" ? (
+        <View
+          style={{
+            width: "100%",
+            paddingHorizontal: 12,
+            flexDirection: "row",
+            alignItems: "center"
+            // borderBottomWidth: 1,
+            // borderBottomColor: colors.secondary.background
+          }}
+        >
+          <Paragraph
+            onPress={() => {
+              Navigation.navigate(
+                {
+                  name: "Notebooks"
+                },
+                {}
+              );
+            }}
+            size={SIZE.xs}
+          >
+            Notebooks
+          </Paragraph>
+          {notebook ? (
+            <>
+              <IconButton
+                name="chevron-right"
+                size={14}
+                customStyle={{ width: 25, height: 25 }}
+              />
+              <Paragraph
+                onPress={() => {
+                  Notebook.navigate(notebook, true);
+                }}
+                size={SIZE.xs}
+              >
+                {notebook.title}
+              </Paragraph>
+            </>
+          ) : null}
+        </View>
+      ) : null}
       <List
         listData={notes}
         type="notes"
@@ -224,7 +279,9 @@ const NotesPage = ({
         placeholderData={placeholderData}
       />
 
-      {notes?.length > 0 || (isFocused && !isMonograph) ? (
+      {!isMonograph &&
+      route.name !== "TopicNotes" &&
+      (notes?.length > 0 || isFocused) ? (
         <FloatingButton title="Create a note" onPress={onPressFloatingButton} />
       ) : null}
     </DelayLayout>

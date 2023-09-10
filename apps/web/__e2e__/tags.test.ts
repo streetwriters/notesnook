@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { Item } from "./models/types";
-import { NOTE } from "./utils";
+import { groupByOptions, NOTE, orderByOptions, sortByOptions } from "./utils";
 
 const TAG: Item = { title: "hello-world" };
 const EDITED_TAG: Item = { title: "hello-world-2" };
@@ -175,4 +175,34 @@ test("delete the last note of a tag that is also a shortcut", async ({
   await note?.contextMenu.moveToTrash();
 
   expect(await app.getRouteHeader()).toBe("Notes");
+});
+
+test(`sort tags`, async ({ page }, info) => {
+  info.setTimeout(2 * 60 * 1000);
+
+  const app = new AppModel(page);
+  await app.goto();
+  const tags = await app.goToTags();
+  const titles = ["G", "C", "Gz", "2", "A"];
+  for (const title of titles) {
+    const tag = await tags.createItem({ title: `${title}` });
+    if (!tag) continue;
+  }
+
+  for (const groupBy of groupByOptions) {
+    for (const sortBy of sortByOptions) {
+      for (const orderBy of orderByOptions) {
+        await test.step(`group by ${groupBy}, sort by ${sortBy}, order by ${orderBy}`, async () => {
+          const sortResult = await tags?.sort({
+            groupBy,
+            orderBy,
+            sortBy
+          });
+          if (!sortResult) return;
+
+          expect(await tags.isEmpty()).toBeFalsy();
+        });
+      }
+    }
+  }
 });

@@ -1,0 +1,24 @@
+diff --git a/node_modules/css-what/lib/commonjs/stringify.js b/node_modules/css-what/lib/commonjs/stringify.js
+index 158b180..89b5b6c 100644
+--- a/node_modules/css-what/lib/commonjs/stringify.js
++++ b/node_modules/css-what/lib/commonjs/stringify.js
+@@ -11,7 +11,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.stringify = void 0;
+ var types_1 = require("./types");
+-var attribValChars = ["\\", '"'];
++var attribValChars = ["\\", '"', "%", "'"];
+ var pseudoValChars = __spreadArray(__spreadArray([], attribValChars, true), ["(", ")"], false);
+ var charsToEscapeInAttributeValue = new Set(attribValChars.map(function (c) { return c.charCodeAt(0); }));
+ var charsToEscapeInPseudoValue = new Set(pseudoValChars.map(function (c) { return c.charCodeAt(0); }));
+diff --git a/node_modules/css-what/lib/es/stringify.js b/node_modules/css-what/lib/es/stringify.js
+index 5f3b8ef..0ec34f7 100644
+--- a/node_modules/css-what/lib/es/stringify.js
++++ b/node_modules/css-what/lib/es/stringify.js
+@@ -1,5 +1,5 @@
+ import { SelectorType, AttributeAction } from "./types";
+-const attribValChars = ["\\", '"'];
++const attribValChars = ["\\", '"', "%", "'"];
+ const pseudoValChars = [...attribValChars, "(", ")"];
+ const charsToEscapeInAttributeValue = new Set(attribValChars.map((c) => c.charCodeAt(0)));
+ const charsToEscapeInPseudoValue = new Set(pseudoValChars.map((c) => c.charCodeAt(0)));

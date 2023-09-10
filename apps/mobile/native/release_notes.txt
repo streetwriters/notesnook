@@ -1,7 +1,0 @@
-- Preview notes in trash
-- Improved editor performance
-- Attachments will now download in realtime sync
-- Improved sync performance & fixed "Failed to sync"
-errors on app launch
-
-Thank you for using Notesnook!

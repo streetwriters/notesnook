@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import React from "react";
 import { View } from "react-native";
 import { notesnook } from "../../../../e2e/test.ids";
 import { TaggedNotes } from "../../../screens/notes/tagged";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { IconButton } from "../../ui/icon-button";
@@ -31,7 +31,7 @@ import Paragraph from "../../ui/typography/paragraph";
 
 const TagItem = React.memo(
   ({ item, index }) => {
-    const colors = useThemeStore((state) => state.colors);
+    const { colors, isDark } = useThemeColors();
     const onPress = () => {
       TaggedNotes.navigate(item, true);
     };
@@ -39,9 +39,9 @@ const TagItem = React.memo(
     return (
       <PressableButton
         onPress={onPress}
-        selectedColor={colors.nav}
+        selectedColor={colors.secondary.background}
         testID={notesnook.ids.tag.get(index)}
-        alpha={!colors.night ? -0.02 : 0.02}
+        alpha={!isDark ? -0.02 : 0.02}
         opacity={1}
         customStyle={{
           paddingHorizontal: 12,
@@ -61,7 +61,7 @@ const TagItem = React.memo(
             <Heading
               size={SIZE.md}
               style={{
-                color: colors.accent
+                color: colors.primary.accent
               }}
             >
               #
@@ -69,7 +69,7 @@ const TagItem = React.memo(
             {item.alias}
           </Heading>
           <Paragraph
-            color={colors.icon}
+            color={colors.secondary.paragraph}
             size={SIZE.xs}
             style={{
               marginTop: 5
@@ -84,7 +84,7 @@ const TagItem = React.memo(
         </View>
 
         <IconButton
-          color={colors.heading}
+          color={colors.primary.heading}
           name="dots-horizontal"
           size={SIZE.xl}
           onPress={() => {

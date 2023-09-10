@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,16 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { formatBytes } from "@notesnook/common";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
-import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { formatBytes } from "../../utils";
+import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
-import SheetProvider from "../sheet-provider";
 import { IconButton } from "../ui/icon-button";
 import { ProgressCircleComponent } from "../ui/svg/lazy";
 import Paragraph from "../ui/typography/paragraph";
@@ -37,20 +35,26 @@ function getFileExtension(filename) {
   return ext == null ? "" : ext[1];
 }
 
-export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
-  const colors = useThemeStore((state) => state.colors);
+export const AttachmentItem = ({
+  attachment,
+  encryption,
+  setAttachments,
+  pressable = true,
+  hideWhenNotDownloading,
+  context
+}) => {
+  const { colors } = useThemeColors();
   const [currentProgress, setCurrentProgress] = useAttachmentProgress(
     attachment,
     encryption
   );
-  const encryptionProgress = useAttachmentStore(
-    (state) => state.encryptionProgress
-  );
-
   const onPress = () => {
-    Actions.present(attachment, setAttachments, attachment.metadata.hash);
+    if (!pressable) return;
+    Actions.present(attachment, setAttachments, context);
   };
-  return (
+
+  return hideWhenNotDownloading &&
+    (!currentProgress || !currentProgress.value) ? null : (
     <TouchableOpacity
       activeOpacity={0.9}
       onPress={onPress}
@@ -61,11 +65,10 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
         padding: 12,
         paddingVertical: 6,
         borderRadius: 5,
-        backgroundColor: colors.nav
+        backgroundColor: colors.secondary.background
       }}
       type="grayBg"
     >
-      <SheetProvider context={attachment.metadata.hash} />
       <View
         style={{
           flexShrink: 1,
@@ -80,12 +83,12 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
             marginLeft: -5
           }}
         >
-          <Icon name="file" size={SIZE.xxxl} color={colors.icon} />
+          <Icon name="file" size={SIZE.xxxl} color={colors.primary.icon} />
 
           <Paragraph
             adjustsFontSizeToFit
             size={6}
-            color={colors.light}
+            color={colors.static.white}
             style={{
               position: "absolute"
             }}
@@ -108,25 +111,27 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
             }}
             numberOfLines={1}
             lineBreakMode="middle"
-            color={colors.pri}
+            color={colors.primary.paragraph}
           >
             {attachment.metadata.filename}
           </Paragraph>
 
-          <Paragraph color={colors.icon} size={SIZE.xs}>
-            {formatBytes(attachment.length)}{" "}
-            {currentProgress?.type
-              ? "(" + currentProgress.type + "ing - tap to cancel)"
-              : ""}
-          </Paragraph>
+          {!hideWhenNotDownloading ? (
+            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+              {formatBytes(attachment.length)}{" "}
+              {currentProgress?.type
+                ? "(" + currentProgress.type + "ing - tap to cancel)"
+                : ""}
+            </Paragraph>
+          ) : null}
         </View>
       </View>
 
-      {currentProgress || encryptionProgress || encryption ? (
+      {currentProgress ? (
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={() => {
-            if (encryption) return;
+            if (encryption || !pressable) return;
             db.fs.cancel(attachment.metadata.hash);
             setCurrentProgress(null);
           }}
@@ -139,18 +144,12 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
         >
           <ProgressCircleComponent
             size={SIZE.xxl}
-            progress={
-              encryptionProgress
-                ? encryptionProgress
-                : currentProgress?.value
-                ? currentProgress?.value / 100
-                : 0
-            }
+            progress={currentProgress?.value ? currentProgress?.value / 100 : 0}
             showsText
             textStyle={{
               fontSize: 10
             }}
-            color={colors.accent}
+            color={colors.primary.accent}
             formatText={(progress) => (progress * 100).toFixed(0)}
             borderWidth={0}
             thickness={2}
@@ -162,7 +161,7 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
             <IconButton
               onPress={onPress}
               name="alert-circle-outline"
-              color={colors.errorText}
+              color={colors.error.paragraph}
             />
           ) : null}
         </>

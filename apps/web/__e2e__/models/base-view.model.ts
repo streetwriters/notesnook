@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,17 +20,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { iterateList } from "./utils";
+import { ContextMenuModel } from "./context-menu.model";
+import { SortOptions } from "./types";
 
 export class BaseViewModel {
   protected readonly page: Page;
   protected readonly list: Locator;
   private readonly listPlaceholder: Locator;
+  private readonly sortByButton: Locator;
 
-  constructor(page: Page, pageId: string) {
+  constructor(page: Page, pageId: string, listType: string) {
     this.page = page;
-    this.list = page.locator(`#${pageId} >> ${getTestId("note-list")}`);
+    this.list = page.locator(`#${pageId} >> ${getTestId(`${listType}-list`)}`);
     this.listPlaceholder = page.locator(
       `#${pageId} >> ${getTestId("list-placeholder")}`
+    );
+
+    this.sortByButton = this.page.locator(
+      // TODO:
+      getTestId(`${pageId === "notebook" ? "notes" : pageId}-sort-button`)
     );
   }
 
@@ -93,5 +101,45 @@ export class BaseViewModel {
     const itemList = this.list.locator(getTestId(`virtuoso-item-list`));
     await itemList.press(key);
     await this.page.waitForTimeout(300);
+  }
+
+  async sort(sort: SortOptions) {
+    const contextMenu: ContextMenuModel = new ContextMenuModel(this.page);
+
+    if (sort.groupBy) {
+      await contextMenu.open(this.sortByButton, "left");
+      await contextMenu.clickOnItem("groupBy");
+      if (!(await contextMenu.hasItem(sort.groupBy))) {
+        await contextMenu.close();
+        return false;
+      }
+      await contextMenu.clickOnItem(sort.groupBy);
+    }
+
+    await contextMenu.open(this.sortByButton, "left");
+    await contextMenu.clickOnItem("sortDirection");
+    if (!(await contextMenu.hasItem(sort.orderBy))) {
+      await contextMenu.close();
+      return false;
+    }
+    await contextMenu.clickOnItem(sort.orderBy);
+
+    await contextMenu.open(this.sortByButton, "left");
+    await contextMenu.clickOnItem("sortBy");
+    if (!(await contextMenu.hasItem(sort.sortBy))) {
+      await contextMenu.close();
+      return false;
+    }
+    await contextMenu.clickOnItem(sort.sortBy);
+
+    return true;
+  }
+
+  async isEmpty() {
+    const items = this.list.locator(
+      `${getTestId(`virtuoso-item-list`)} >> ${getTestId("list-item")}`
+    );
+    const totalItems = await items.count();
+    return totalItems <= 0;
   }
 }

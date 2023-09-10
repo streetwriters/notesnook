@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,37 +17,36 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
+import useIsSelected from "../../../hooks/use-selected";
 import { useEditorStore } from "../../../stores/use-editor-store";
-import { useThemeStore } from "../../../stores/use-theme-store";
-import { hexToRGBA } from "../../../utils/color-scheme/utils";
 
 export const Filler = ({ item }) => {
-  const colors = useThemeStore((state) => state.colors);
-
+  const { colors } = useThemeColors();
   const currentEditingNote = useEditorStore(
     (state) => state.currentEditingNote
   );
 
-  const color = "gray";
+  const [selected] = useIsSelected(item);
 
-  return currentEditingNote === item.id ? (
+  return currentEditingNote === item.id || selected ? (
     <View
       style={{
         position: "absolute",
         width: "110%",
         height: "150%",
-        backgroundColor:
-          currentEditingNote === item.id
-            ? hexToRGBA(colors[color], 0.12)
-            : null,
+        backgroundColor: colors.selected.background,
         borderLeftWidth: 5,
         borderLeftColor:
           currentEditingNote === item.id
-            ? colors[item.color || "accent"]
+            ? item.color
+              ? colors.static[item.color]
+              : colors.selected.accent
             : "transparent"
       }}
-    ></View>
+      collapsable={false}
+    />
   ) : null;
 };

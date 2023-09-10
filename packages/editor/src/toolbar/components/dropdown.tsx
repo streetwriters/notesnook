@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,12 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef, useState } from "react";
 import { Text } from "@theme-ui/components";
-import { Icon } from "./icon";
+import { Icon, MenuItem, MenuPresenter } from "@notesnook/ui";
 import { Icons } from "../icons";
-// import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
-import { MenuItem } from "../../components/menu/types";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
-import { MenuPresenter } from "../../components/menu";
 import { getToolbarElement } from "../utils/dom";
 import { Button } from "../../components/button";
 import { usePopupHandler } from "../../components/popup-presenter";
@@ -45,7 +42,7 @@ export function Dropdown(props: DropdownProps) {
   const isMobile = useIsMobile();
   const isBottom = toolbarLocation === "bottom";
 
-  const { closePopup, isPopupOpen } = usePopupHandler({
+  const { isPopupOpen } = usePopupHandler({
     group,
     id,
     isOpen,
@@ -55,6 +52,7 @@ export function Dropdown(props: DropdownProps) {
   return (
     <>
       <Button
+        variant="secondary"
         ref={(ref) => {
           internalRef.current = ref || undefined;
           if (buttonRef) buttonRef.current = ref || undefined;
@@ -63,35 +61,55 @@ export function Dropdown(props: DropdownProps) {
           p: 1,
           m: 0,
           bg: isPopupOpen ? "hover" : "transparent",
-          mr: 1,
+          height: "100%",
+          flexShrink: 0,
           display: "flex",
           alignItems: "center",
-          ":hover": { bg: "hover" },
           ":last-of-type": {
             mr: 0
-          }
+          },
+          ":hover:not(:disabled):not(:active)": !isMobile
+            ? undefined
+            : {
+                bg: "transparent"
+              }
         }}
         onClick={() => setIsOpen((s) => !s)}
         onMouseDown={(e) => e.preventDefault()}
       >
         {typeof selectedItem === "string" ? (
-          <Text sx={{ fontSize: "subBody", mr: 1, color: "text" }}>
+          <Text
+            sx={{
+              fontSize: "subBody",
+              mr: 1,
+              color: isPopupOpen ? "accent" : "paragraph",
+              flexShrink: 0
+            }}
+          >
             {selectedItem}
           </Text>
         ) : (
           selectedItem
         )}
         <Icon
-          path={isBottom ? Icons.chevronUp : Icons.chevronDown}
+          path={
+            isBottom
+              ? isPopupOpen
+                ? Icons.chevronDown
+                : Icons.chevronUp
+              : isPopupOpen
+              ? Icons.chevronUp
+              : Icons.chevronDown
+          }
+          color={isPopupOpen ? "accent" : "paragraph"}
           size={"small"}
-          color={"text"}
         />
       </Button>
 
       <MenuPresenter
         isOpen={isPopupOpen}
         items={items}
-        onClose={() => closePopup(id)}
+        onClose={() => setIsOpen(false)}
         position={{
           target: isBottom
             ? getToolbarElement()

@@ -1,7 +1,7 @@
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
-Copyright (C) 2022 Streetwriters (Private) Limited
+Copyright (C) 2023 Streetwriters (Private) Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,21 +24,15 @@ import {
   to_base64,
   from_base64,
   base64_variants,
-  StateAddress,
   to_string,
+  crypto_secretstream_xchacha20poly1305_TAG_FINAL,
   from_hex
-} from "libsodium-wrappers";
+} from "@notesnook/sodium";
 import KeyUtils from "./keyutils";
-import {
-  Cipher,
-  EncryptionKey,
-  OutputFormat,
-  Plaintext,
-  SerializedKey
-} from "./types";
+import { Cipher, Output, DataFormat, SerializedKey } from "./types";
 
 export default class Decryption {
-  private static transformInput(cipherData: Cipher): Uint8Array {
+  private static transformInput(cipherData: Cipher<DataFormat>): Uint8Array {
     let input: Uint8Array | null = null;
     if (
       typeof cipherData.cipher === "string" &&
@@ -60,11 +54,11 @@ export default class Decryption {
     return input;
   }
 
-  static decrypt(
+  static decrypt<TOutputFormat extends DataFormat>(
     key: SerializedKey,
-    cipherData: Cipher,
-    outputFormat: OutputFormat = "text"
-  ): Plaintext {
+    cipherData: Cipher<DataFormat>,
+    outputFormat: TOutputFormat = "text" as TOutputFormat
+  ): Output<TOutputFormat> {
     if (!key.salt && cipherData.salt) key.salt = cipherData.salt;
     const encryptionKey = KeyUtils.transform(key);
 
@@ -77,37 +71,37 @@ export default class Decryption {
       encryptionKey.key
     );
 
-    return {
-      format: outputFormat,
-      data:
-        outputFormat === "base64"
-          ? to_base64(plaintext, base64_variants.ORIGINAL)
-          : outputFormat === "text"
-          ? to_string(plaintext)
-          : plaintext
-    };
+    return (
+      outputFormat === "base64"
+        ? to_base64(plaintext, base64_variants.ORIGINAL)
+        : outputFormat === "text"
+        ? to_string(plaintext)
+        : plaintext
+    ) as Output<TOutputFormat>;
   }
 
-  static createStream(header: string, key: SerializedKey): DecryptionStream {
-    return new DecryptionStream(header, KeyUtils.transform(key));
-  }
-}
-
-class DecryptionStream {
-  state: StateAddress;
-  constructor(header: string, key: EncryptionKey) {
-    this.state = crypto_secretstream_xchacha20poly1305_init_pull(
+  static createStream(
+    header: string,
+    key: SerializedKey
+  ): TransformStream<Uint8Array, Uint8Array> {
+    const { key: _key } = KeyUtils.transform(key);
+    const state = crypto_secretstream_xchacha20poly1305_init_pull(
       from_base64(header),
-      key.key
+      _key
     );
-  }
 
-  read(chunk: Uint8Array): Uint8Array {
-    const { message } = crypto_secretstream_xchacha20poly1305_pull(
-      this.state,
-      chunk,
-      null
-    );
-    return message;
+    return new TransformStream<Uint8Array, Uint8Array>({
+      start() {},
+      transform(chunk, controller) {
+        const { message, tag } = crypto_secretstream_xchacha20poly1305_pull(
+          state,
+          chunk,
+          null
+        );
+        controller.enqueue(message);
+        if (tag === crypto_secretstream_xchacha20poly1305_TAG_FINAL)
+          controller.terminate();
+      }
+    });
   }
 }
