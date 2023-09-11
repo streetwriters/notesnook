@@ -84,14 +84,12 @@ export default class Indexer extends Storage {
    * @returns
    */
   async writeMulti(items) {
-    const entries = items.reduce((array, item) => {
-      if (!item) return array;
-      if (!this.indices.includes(item.id)) this.indices.push(item.id);
-      array.push([this.makeId(item.id), item]);
-      return array;
-    }, []);
+    const entries = items.map(([id, item]) => {
+      if (!this.indices.includes(id)) this.indices.push(id);
+      return [this.makeId(id), item];
+    });
+    entries.push([this.type, this.indices]);
     await super.writeMulti(entries);
-    await super.write(this.type, this.indices);
   }
 
   async migrateIndices() {

@@ -50,6 +50,7 @@ export default class Attachments extends Collection {
         remoteAttachment.noteIds,
         localAttachment.noteIds
       );
+      remoteAttachment.remote = false;
     }
 
     return remoteAttachment;

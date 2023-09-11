@@ -315,16 +315,16 @@ class Sync {
   }
 
   async stop(lastSynced) {
+    // refresh topic references
+    this.db.notes.topicReferences.rebuild();
+    // refresh monographs on sync completed
+    await this.db.monographs.init();
+
     this.logger.info("Stopping sync", { lastSynced });
     const storedLastSynced = await this.db.lastSynced();
     if (lastSynced > storedLastSynced)
       await this.db.storage.write("lastSynced", lastSynced);
     this.db.eventManager.publish(EVENTS.syncCompleted);
-
-    // refresh monographs on sync completed
-    await this.db.monographs.init();
-    // refresh topic references
-    this.db.notes.topicReferences.rebuild();
   }
 
   async cancel() {
@@ -361,13 +361,19 @@ class Sync {
   /**
    * @private
    */
-  onPushCompleted(lastSynced) {
+  async onPushCompleted(lastSynced) {
+    // refresh topic references
+    this.db.notes.topicReferences.rebuild();
+
     this.db.eventManager.publish(
       EVENTS.databaseSyncRequested,
       false,
       false,
       lastSynced
     );
+
+    // refresh monographs on sync completed
+    await this.db.monographs.init();
   }
 
   async processChunk(chunk, key, dbLastSynced, notify = false) {
@@ -412,8 +418,9 @@ class Sync {
     }
 
     const collectionType = this.itemTypeToCollection[chunk.type];
-    if (collectionType && this.db[collectionType])
+    if (collectionType && this.db[collectionType]) {
       await this.db[collectionType]._collection.setItems(items);
+    }
   }
 
   /**
