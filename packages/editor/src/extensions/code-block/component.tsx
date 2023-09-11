@@ -73,11 +73,11 @@ export function CodeblockComponent(
 
               "::selection,*::selection": {
                 bg: "background-selected",
-                color: "paragraph-selected"
+                color: "inherit"
               },
               "::-moz-selection,*::-moz-selection": {
                 bg: "background-selected",
-                color: "paragraph-selected"
+                color: "inherit"
               }
             },
             fontFamily: "monospace",
@@ -202,7 +202,7 @@ export function CodeblockComponent(
           location: "top",
           yOffset: 5
         }}
-        title="Change code block language"
+        title="Select language"
       >
         <LanguageSelector
           selectedLanguage={languageDefinition?.filename || "Plaintext"}
@@ -230,13 +230,12 @@ function LanguageSelector(props: LanguageSelectorProps) {
   const [languages, setLanguages] = useState(Languages);
 
   return (
-    <Popup title="Select language" onClose={onClose}>
+    <Popup onClose={onClose}>
       <Flex
         sx={{
           flexDirection: "column",
           height: 200,
           width: ["auto", 300],
-          overflowY: "auto",
           bg: "background"
         }}
       >
@@ -245,12 +244,11 @@ function LanguageSelector(props: LanguageSelectorProps) {
           placeholder="Search languages"
           sx={{
             width: "auto",
-            position: "sticky",
-            top: 0,
             bg: "background",
             mx: 2,
             p: "7px",
-            zIndex: 999
+            zIndex: 999,
+            mt: 1
           }}
           onChange={(e) => {
             if (!e.target.value) return setLanguages(Languages);
@@ -271,7 +269,8 @@ function LanguageSelector(props: LanguageSelectorProps) {
           sx={{
             flexDirection: "column",
             pt: 1,
-            mt: 1
+            mt: 1,
+            overflowY: "auto"
           }}
         >
           {languages.map((lang) => (
@@ -292,7 +291,7 @@ function LanguageSelector(props: LanguageSelectorProps) {
                 <Icon path={Icons.check} size="small" />
               ) : lang.alias ? (
                 <Text variant={"subBody"} sx={{ fontSize: "10px" }}>
-                  {lang.alias.slice(0, 3).join(", ")}
+                  {lang.alias.slice(0, 3).join(", ").toUpperCase()}
                 </Text>
               ) : null}
             </Button>
