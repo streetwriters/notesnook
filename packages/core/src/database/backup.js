@@ -20,8 +20,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import SparkMD5 from "spark-md5";
 import { CURRENT_DATABASE_VERSION } from "../common.js";
 import Migrator from "./migrator.js";
+import { toChunks } from "../utils/array.js";
 
-const invalidKeys = ["user", "t", "v", "lastBackupTime", "lastSynced"];
+const invalidKeys = [
+  "user",
+  "t",
+  "v",
+  "lastBackupTime",
+  "lastSynced",
+  // all indexes
+  "notes",
+  "notebooks",
+  "content",
+  "tags",
+  "colors",
+  "attachments",
+  "relations",
+  "reminders",
+  "sessioncontent",
+  "notehistory",
+  "shortcuts"
+];
 const invalidIndices = ["tags", "colors"];
 const validTypes = ["mobile", "web", "node"];
 export default class Backup {
@@ -46,35 +65,63 @@ export default class Backup {
    * @param {"web"|"mobile"|"node"} type
    * @param {boolean} encrypt
    */
-  async export(type, encrypt = false) {
+  async *export(type, encrypt = false) {
     if (!validTypes.some((t) => t === type))
       throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
     if (encrypt && !(await this._db.user.getUser()))
       throw new Error("Please login to create encrypted backups.");
 
     let keys = await this._db.storage.getAllKeys();
-    let data = filterData(
-      Object.fromEntries(await this._db.storage.readMulti(keys))
-    );
+    const key = await this._db.user.getEncryptionKey();
+    const chunks = toChunks(keys, 20);
+    let buffer = [];
+    let bufferLength = 0;
+    const MAX_CHUNK_SIZE = 10 * 1024 * 1024;
+    let chunkIndex = 0;
+    for (const chunk of chunks) {
+      if (bufferLength >= MAX_CHUNK_SIZE) {
+        let itemsJSON = `[${buffer.join(",")}]`;
 
-    let hash = {};
+        buffer = [];
+        bufferLength = 0;
 
-    if (encrypt) {
-      const key = await this._db.user.getEncryptionKey();
-      data = await this._db.storage.encrypt(key, JSON.stringify(data));
-    } else {
-      hash = { hash: SparkMD5.hash(JSON.stringify(data)), hash_type: "md5" };
+        itemsJSON = await this._db.compressor.compress(itemsJSON);
+
+        const hash = SparkMD5.hash(itemsJSON);
+
+        if (encrypt)
+          itemsJSON = JSON.stringify(
+            await this._db.storage.encrypt(key, itemsJSON)
+          );
+
+        yield {
+          path: `${chunkIndex++}-${encrypt ? "encrypted" : "plain"}-${hash}`,
+          data: `{
+  "version": ${CURRENT_DATABASE_VERSION},
+  "type": "${type}",
+  "date": ${Date.now()},
+  "data": ${itemsJSON},
+  "hash": "${hash}",
+  "hash_type": "md5",
+}`
+        };
+      }
+
+      const items = await this._db.storage.readMulti(chunk);
+      items.forEach(([id, item]) => {
+        if (invalidKeys.includes(id) || item.deleted) return;
+        const data = JSON.stringify(item);
+        buffer.push(data);
+        bufferLength += data.length;
+      });
     }
 
-    // save backup time
+    yield {
+      path: ".nnbackup",
+      data: ""
+    };
+
     await this.updateBackupTime();
-    return JSON.stringify({
-      version: CURRENT_DATABASE_VERSION,
-      type,
-      date: Date.now(),
-      data,
-      ...hash
-    });
   }
 
   /**
