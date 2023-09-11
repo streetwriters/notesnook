@@ -27,7 +27,6 @@ import {
   MaybeDeletedItem,
   Notebook,
   Topic,
-  TrashItem,
   TrashOrItem,
   isDeleted,
   isTrashItem
@@ -52,15 +51,23 @@ export class Notebooks implements ICollection {
     return this.collection.init();
   }
 
-  async merge(remoteNotebook: MaybeDeletedItem<TrashOrItem<Notebook>>) {
+  merge(
+    localNotebook: MaybeDeletedItem<TrashOrItem<Notebook>> | undefined,
+    remoteNotebook: MaybeDeletedItem<TrashOrItem<Notebook>>,
+    lastSyncedTimestamp: number
+  ) {
     if (isDeleted(remoteNotebook) || isTrashItem(remoteNotebook))
-      return await this.collection.add(remoteNotebook);
+      return remoteNotebook;
 
-    const id = remoteNotebook.id;
-    const localNotebook = this.collection.get(id);
+    if (
+      localNotebook &&
+      (isTrashItem(localNotebook) || isDeleted(localNotebook))
+    ) {
+      if (localNotebook.dateModified > remoteNotebook.dateModified) return;
+      return remoteNotebook;
+    }
 
     if (localNotebook && localNotebook.topics?.length) {
-      const lastSyncedTimestamp = await this.db.lastSynced();
       let isChanged = false;
       // merge new and old topics
       for (const oldTopic of localNotebook.topics) {
@@ -93,7 +100,7 @@ export class Notebooks implements ICollection {
       }
       remoteNotebook.remote = !isChanged;
     }
-    return await this.collection.add(remoteNotebook);
+    return remoteNotebook;
   }
 
   async add(

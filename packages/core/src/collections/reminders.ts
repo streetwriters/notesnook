@@ -36,7 +36,7 @@ dayjs.extend(isToday);
 
 export class Reminders implements ICollection {
   name = "reminders";
-  private readonly collection: CachedCollection<"reminders", Reminder>;
+  readonly collection: CachedCollection<"reminders", Reminder>;
   constructor(private readonly db: Database) {
     this.collection = new CachedCollection(
       db.storage,
