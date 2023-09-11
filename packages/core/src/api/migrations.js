@@ -66,11 +66,7 @@ class Migrations {
           dbCollection: this._db.colors
         },
         {
-          index: () => this._db.trash.raw,
-          dbCollection: this._db.trash
-        },
-        {
-          index: () => this._db.content.all(),
+          iterate: true,
           dbCollection: this._db.content
         },
         {
@@ -91,11 +87,11 @@ class Migrations {
           dbCollection: this._db.relations
         },
         {
-          index: () => this._db.noteHistory.sessionContent.all(),
+          iterate: true,
           dbCollection: this._db.noteHistory
         },
         {
-          index: () => this._db.noteHistory.sessionContent.all(),
+          iterate: true,
           dbCollection: this._db.noteHistory.sessionContent
         },
         {
