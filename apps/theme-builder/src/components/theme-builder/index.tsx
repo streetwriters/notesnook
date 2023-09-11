@@ -45,14 +45,15 @@ const JSON_SCHEMA_URL =
   "https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/schemas/v1.schema.json";
 const ThemeInfoTemplate: Omit<
   ThemeDefinition,
-  "authors" | "compatibilityVersion" | "colorScheme" | "codeBlockCSS" | "scopes"
+  "authors" | "compatibilityVersion" | "colorScheme" | "scopes"
 > = {
   name: "",
   id: "",
   version: 0,
   license: "",
   homepage: "",
-  description: ""
+  description: "",
+  codeBlockCSS: "https://github.com/PrismJS/prism-themes/tree/master/themes"
 };
 
 export default function ThemeBuilder() {
@@ -303,7 +304,7 @@ export default function ThemeBuilder() {
           paddingX: "10px"
         }}
       >
-        {Object.keys(ThemeInfoTemplate).map((key) => {
+        {Object.keys(ThemeInfoTemplate).map((key: string) => {
           return (
             <Field
               key={`${getThemeKey(currentTheme)}-${key}`}
@@ -356,7 +357,7 @@ export default function ThemeBuilder() {
           key="compatibilityVersion"
         />
 
-        {authors.map((author, index) => (
+        {authors.map((author, index: number) => (
           <Flex
             key={`${getThemeKey(currentTheme)}-${author.name}`}
             sx={{
@@ -695,7 +696,10 @@ function getThemeFromFormData(
 function toTitleCase(value: string) {
   return (
     value.slice(0, 1).toUpperCase() +
-    value.slice(1).replace(/([A-Z]+)*([A-Z][a-z])/g, "$1 $2")
+    value
+      .slice(1)
+      .replace(/([A-Z]+)/g, " $1")
+      .replace(/([A-Z][a-z])/g, " $1")
   );
 }
 
