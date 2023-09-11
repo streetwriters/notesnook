@@ -209,7 +209,7 @@ export default class Vault {
     return await this.lockNote(note, await this.getVaultPassword());
   }
 
-  async exists(vaultKey?: Cipher) {
+  async exists(vaultKey?: Cipher<"base64">) {
     if (!vaultKey) vaultKey = await this.getKey();
     return vaultKey && isCipher(vaultKey);
   }
@@ -370,10 +370,10 @@ export default class Vault {
   }
 
   async getKey() {
-    return await this.db.storage().read<Cipher>("vaultKey");
+    return await this.db.storage().read<Cipher<"base64">>("vaultKey");
   }
 
-  async setKey(vaultKey: Cipher) {
+  async setKey(vaultKey: Cipher<"base64">) {
     await this.db.storage().write("vaultKey", vaultKey);
   }
 }

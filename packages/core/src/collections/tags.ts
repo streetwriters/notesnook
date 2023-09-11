@@ -25,7 +25,7 @@ import { ICollection } from "./collection";
 
 export class Tags implements ICollection {
   name = "tags";
-  private readonly collection: CachedCollection<"tags", Tag>;
+  readonly collection: CachedCollection<"tags", Tag>;
   constructor(private readonly db: Database) {
     this.collection = new CachedCollection(db.storage, "tags", db.eventManager);
   }

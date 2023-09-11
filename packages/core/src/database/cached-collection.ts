@@ -28,7 +28,7 @@ import {
 } from "../types";
 import { StorageAccessor } from "../interfaces";
 import EventManager from "../utils/event-manager";
-import { toChunks } from "../utils/array";
+import { chunkedIterate } from "../utils/array";
 
 export class CachedCollection<
   TCollectionType extends CollectionType,
@@ -109,6 +109,11 @@ export class CachedCollection<
     return item;
   }
 
+  getRaw(id: string) {
+    const item = this.cache.get(id);
+    return item;
+  }
+
   raw() {
     return Array.from(this.cache.values());
   }
@@ -140,10 +145,7 @@ export class CachedCollection<
   }
 
   *iterateSync(chunkSize: number) {
-    const chunks = toChunks(Array.from(this.cache.values()), chunkSize);
-    for (const chunk of chunks) {
-      yield chunk;
-    }
+    yield* chunkedIterate(Array.from(this.cache.values()), chunkSize);
   }
 
   invalidateCache() {
