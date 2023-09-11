@@ -19,103 +19,131 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Cipher, SerializedKey } from "@notesnook/crypto";
 import Database from "..";
-import { CURRENT_DATABASE_VERSION } from "../../common";
+import { CURRENT_DATABASE_VERSION, EV, EVENTS } from "../../common";
+import { logger } from "../../logger";
+import { SYNC_COLLECTIONS_MAP, SyncItem, SyncTransferItem } from "./types";
 import { Item, MaybeDeletedItem } from "../../types";
 
-export type SyncableItemType =
-  | "note"
-  | "shortcut"
-  | "notebook"
-  | "content"
-  | "attachment"
-  | "reminder"
-  | "relation"
-  | "color"
-  | "tag"
-  | "settings";
-export type CollectedResult = {
-  items: (MaybeDeletedItem<Item> | Cipher)[];
-  types: (SyncableItemType | "vaultKey")[];
-};
-
-export type SyncItem = {
-  id: string;
-  v: number;
-} & Cipher;
-
+const ASYNC_COLLECTIONS_MAP = {
+  content: "content"
+} as const;
 class Collector {
-  private lastSyncedTimestamp = 0;
-  private key?: SerializedKey;
+  logger = logger.scope("SyncCollector");
   constructor(private readonly db: Database) {}
 
-  async collect(lastSyncedTimestamp: number, isForceSync?: boolean) {
-    await this.db.notes.init();
-
-    this.lastSyncedTimestamp = lastSyncedTimestamp;
-    this.key = await this.db.user.getEncryptionKey();
-    const vaultKey = await this.db.vault.getKey();
-
-    const collections = {
-      note: this.db.notes.raw,
-      shortcut: this.db.shortcuts.raw,
-      notebook: this.db.notebooks.raw,
-      content: await this.db.content.all(),
-      attachment: this.db.attachments.syncable,
-      reminder: this.db.reminders.raw,
-      relation: this.db.relations.raw,
-      color: this.db.colors.raw,
-      tag: this.db.tags.raw,
-      settings: [this.db.settings.raw]
-    };
-
-    const result: CollectedResult = {
-      items: [],
-      types: []
-    };
-    for (const type in collections) {
-      this.collectInternal(
-        type as SyncableItemType,
-        collections[type as SyncableItemType],
-        result,
-        isForceSync
-      );
+  async *collect(
+    chunkSize: number,
+    lastSyncedTimestamp: number,
+    isForceSync = false
+  ): AsyncGenerator<SyncTransferItem, void, unknown> {
+    const key = await this.db.user.getEncryptionKey();
+    if (!key || !key.key || !key.salt) {
+      EV.publish(EVENTS.userSessionExpired);
+      throw new Error("User encryption key not generated. Please relogin.");
     }
 
-    if (vaultKey) {
-      result.items.push(vaultKey);
-      result.types.push("vaultKey");
+    const settings = await this.prepareChunk(
+      [this.db.settings.raw],
+      lastSyncedTimestamp,
+      isForceSync,
+      key
+    );
+    if (settings) yield { items: settings, type: "settings" };
+
+    const attachments = await this.prepareChunk(
+      this.db.attachments.syncable,
+      lastSyncedTimestamp,
+      isForceSync,
+      key
+    );
+    if (attachments) yield { items: attachments, type: "attachment" };
+
+    for (const itemType in ASYNC_COLLECTIONS_MAP) {
+      const collectionKey =
+        ASYNC_COLLECTIONS_MAP[itemType as keyof typeof ASYNC_COLLECTIONS_MAP];
+      const collection = this.db[collectionKey].collection;
+      for await (const chunk of collection.iterate(chunkSize)) {
+        const items = await this.prepareChunk(
+          chunk.map((item) => item[1]),
+          lastSyncedTimestamp,
+          isForceSync,
+          key
+        );
+        if (!items) continue;
+        yield { items, type: itemType as keyof typeof ASYNC_COLLECTIONS_MAP };
+      }
     }
 
-    return result;
+    for (const itemType in SYNC_COLLECTIONS_MAP) {
+      const collectionKey =
+        SYNC_COLLECTIONS_MAP[itemType as keyof typeof SYNC_COLLECTIONS_MAP];
+      const collection = this.db[collectionKey].collection;
+      for (const chunk of collection.iterateSync(chunkSize)) {
+        const items = await this.prepareChunk(
+          chunk,
+          lastSyncedTimestamp,
+          isForceSync,
+          key
+        );
+        if (!items) continue;
+        yield { items, type: itemType as keyof typeof SYNC_COLLECTIONS_MAP };
+      }
+    }
   }
 
-  private serialize(item: MaybeDeletedItem<Item>) {
-    if (!this.key) throw new Error("No encryption key found.");
-    return this.db.storage().encrypt(this.key, JSON.stringify(item));
-  }
-
-  encrypt(array: MaybeDeletedItem<Item>[]) {
-    if (!array.length) return [];
-    return Promise.all(array.map(this.map, this));
-  }
-
-  private collectInternal(
-    itemType: SyncableItemType,
-    items: MaybeDeletedItem<Item>[],
-    result: CollectedResult,
-    isForceSync?: boolean
+  async prepareChunk(
+    chunk: MaybeDeletedItem<Item>[],
+    lastSyncedTimestamp: number,
+    isForceSync: boolean,
+    key: SerializedKey
   ) {
-    if (!items || !items.length) return;
+    const { ids, items } = filterSyncableItems(
+      chunk,
+      lastSyncedTimestamp,
+      isForceSync
+    );
+    if (!ids.length) return;
+    const ciphers = await this.db.storage().encryptMulti(key, items);
+    return toPushItem(ids, ciphers);
+  }
+}
+export default Collector;
 
-    for (const item of items) {
-      if (!item) continue;
+function toPushItem(ids: string[], ciphers: Cipher<"base64">[]) {
+  if (ids.length !== ciphers.length)
+    throw new Error("ids.length must be equal to ciphers.length");
 
-      const isSyncable = !item.synced || isForceSync;
-      const isUnsynced =
-        item.dateModified > this.lastSyncedTimestamp || isForceSync;
+  const items: SyncItem[] = [];
+  for (let i = 0; i < ids.length; ++i) {
+    const id = ids[i];
+    const cipher = ciphers[i];
+    items.push({ ...cipher, v: CURRENT_DATABASE_VERSION, id });
+  }
+  return items;
+}
 
-      if (isUnsynced && isSyncable) {
-        result.items.push(
+function filterSyncableItems(
+  items: MaybeDeletedItem<Item>[],
+  lastSyncedTimestamp: number,
+  isForceSync = false
+): { items: string[]; ids: string[] } {
+  if (!items || !items.length) return { items: [], ids: [] };
+
+  const ids = [];
+  const syncableItems = [];
+  for (const item of items) {
+    if (!item) continue;
+
+    const isSyncable = !item.synced || isForceSync;
+    const isUnsynced = item.dateModified > lastSyncedTimestamp || isForceSync;
+
+    // synced is a local only property
+    delete item.synced;
+
+    if (isUnsynced && isSyncable) {
+      ids.push(item.id);
+      syncableItems.push(
+        JSON.stringify(
           "localOnly" in item && item.localOnly
             ? {
                 id: item.id,
@@ -124,21 +152,9 @@ class Collector {
                 deleteReason: "localOnly"
               }
             : item
-        );
-        result.types.push(itemType);
-      }
+        )
+      );
     }
   }
-
-  private async map(item: MaybeDeletedItem<Item>) {
-    // synced is a local only property
-    delete item.synced;
-
-    return {
-      id: item.id,
-      v: CURRENT_DATABASE_VERSION,
-      ...(await this.serialize(item))
-    };
-  }
+  return { items: syncableItems, ids };
 }
-export default Collector;

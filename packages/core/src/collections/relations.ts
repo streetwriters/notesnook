@@ -29,7 +29,7 @@ type RelationsArray<TType extends keyof ItemMap> = Relation[] & {
 
 export class Relations implements ICollection {
   name = "relations";
-  private readonly collection: CachedCollection<"relations", Relation>;
+  readonly collection: CachedCollection<"relations", Relation>;
   constructor(private readonly db: Database) {
     this.collection = new CachedCollection(
       db.storage,
