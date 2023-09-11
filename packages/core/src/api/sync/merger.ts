@@ -17,292 +17,215 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { migrateItem } from "../../migrations";
 import { set } from "../../utils/set";
 import { logger } from "../../logger";
 import { isHTMLEqual } from "../../utils/html-diff";
-import { EV, EVENTS } from "../../common";
 import Database from "..";
-import { SyncItem, SyncableItemType } from "./collector";
-import { Item, ItemMap, MaybeDeletedItem, isDeleted } from "../../types";
-import { SerializedKey } from "@notesnook/crypto";
-import { isCipher } from "../../database/crypto";
-
-type Conflict<P extends SyncableItemType> = (
-  local: MaybeDeletedItem<ItemMap[P]>,
-  remote: MaybeDeletedItem<ItemMap[P]>
-) => Promise<void>;
-
-type Set<P extends SyncableItemType> = (
-  item: MaybeDeletedItem<ItemMap[P]>
-) => Promise<void>;
-
-type Get<P extends SyncableItemType> = (
-  id: string
-) =>
-  | MaybeDeletedItem<ItemMap[P]>
-  | undefined
-  | Promise<MaybeDeletedItem<ItemMap[P]> | undefined>;
-
-type MergeDefinition = {
-  [P in SyncableItemType]: {
-    threshold?: number;
-    get?: Get<P>;
-    set: Set<P>;
-    conflict?: Conflict<P>;
-  };
-};
+import { SYNC_COLLECTIONS_MAP } from "./types";
+import {
+  Attachment,
+  ContentItem,
+  Item,
+  ItemMap,
+  MaybeDeletedItem,
+  Note,
+  Notebook,
+  SettingsItem,
+  TrashOrItem,
+  isDeleted
+} from "../../types";
 
 class Merger {
-  private mergeDefinition: MergeDefinition;
-  private logger = logger.scope("Merger");
-  private lastSynced = 0;
-  private key?: SerializedKey;
-  constructor(private readonly db: Database) {
-    this.mergeDefinition = {
-      settings: {
-        threshold: 1000,
-        get: () => this.db.settings.raw,
-        set: (item) => this.db.settings.merge(item),
-        conflict: (_local, remote) => this.db.settings.merge(remote)
-      },
-      note: {
-        get: (id) => this.db.notes.note(id)?.data,
-        set: (item) => this.db.notes.merge(item)
-      },
-      shortcut: {
-        get: (id) => this.db.shortcuts.shortcut(id),
-        set: (item) => this.db.shortcuts.merge(item)
-      },
-      reminder: {
-        get: (id) => this.db.reminders.reminder(id),
-        set: (item) => this.db.reminders.merge(item)
-      },
-      relation: {
-        get: (id) => this.db.relations.relation(id),
-        set: (item) => this.db.relations.merge(item)
-      },
-      tag: {
-        get: (id) => this.db.tags.tag(id),
-        set: (item) => this.db.tags.merge(item)
-      },
-      color: {
-        get: (id) => this.db.colors.color(id),
-        set: (item) => this.db.colors.merge(item)
-      },
-      notebook: {
-        threshold: 1000,
-        get: (id) => this.db.notebooks.notebook(id)?.data,
-        set: (item) => this.db.notebooks.merge(item),
-        conflict: (_local, remote) => this.db.notebooks.merge(remote)
-      },
-      content: {
-        threshold: process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000,
-        get: (id) => this.db.content.raw(id),
-        set: async (item) => {
-          await this.db.content.merge(item);
-        },
-        conflict: async (local, remote) => {
-          if (isDeleted(local) || isDeleted(remote)) {
-            if (remote.dateModified > local.dateModified)
-              await db.content.merge(remote);
-            return;
-          }
+  logger = logger.scope("Merger");
+  constructor(private readonly db: Database) {}
 
-          const note = this.db.notes.note(local.noteId);
-          if (!note || !note.data) return;
+  isSyncCollection(type: string): type is keyof typeof SYNC_COLLECTIONS_MAP {
+    return type in SYNC_COLLECTIONS_MAP;
+  }
 
-          // if hashes are equal do nothing
-          if (
-            !note.locked &&
-            (!remote ||
-              !local ||
-              !local.data ||
-              !remote.data ||
-              isHTMLEqual(local.data, remote.data))
-          )
-            return;
+  isConflicted(
+    localItem: MaybeDeletedItem<Item>,
+    remoteItem: MaybeDeletedItem<Item>,
+    lastSynced: number,
+    conflictThreshold: number
+  ) {
+    const isResolved =
+      "dateResolved" in localItem &&
+      localItem.dateResolved === remoteItem.dateModified;
+    const isModified =
+      // the local item is modified if it was changed/modified after the last
+      // sync i.e. it wasn't synced yet.
+      // However, in case a sync is interrupted the local item's date modified
+      // will be ahead of last sync. In that case, we also have to check if the
+      // synced flag is false (it is only false if a user makes edits on the
+      // local device).
+      localItem.dateModified > lastSynced && !localItem.synced;
+    if (isModified && !isResolved) {
+      // If time difference between local item's edits & remote item's edits
+      // is less than threshold, we shouldn't trigger a merge conflict; instead
+      // we will keep the most recently changed item.
+      const timeDiff =
+        Math.max(remoteItem.dateModified, localItem.dateModified) -
+        Math.min(remoteItem.dateModified, localItem.dateModified);
 
-          if (note.locked) {
-            // if note is locked or content is deleted we keep the most recent version.
-            if (remote.dateModified > local.dateModified)
-              await this.db.content.merge({ ...remote, id: local.id });
-          } else {
-            // otherwise we trigger the conflicts
-            await this.db.content.merge({ ...local, conflicted: remote });
-            await this.db.notes.add({ id: local.noteId, conflicted: true });
-            await this.db.storage().write("hasConflicts", true);
-          }
+      if (timeDiff < conflictThreshold) {
+        if (remoteItem.dateModified > localItem.dateModified) {
+          return "merge";
         }
-      },
-      attachment: {
-        set: async (remoteAttachment) => {
-          if (isDeleted(remoteAttachment)) {
-            await this.db.attachments.merge(remoteAttachment);
-            return;
-          }
+        return;
+      }
 
-          const localAttachment = this.db.attachments.attachment(
-            remoteAttachment.metadata.hash
+      return "conflict";
+    } else if (!isResolved) {
+      return "merge";
+    }
+  }
+
+  mergeItemSync<TType extends keyof typeof SYNC_COLLECTIONS_MAP>(
+    remoteItem: MaybeDeletedItem<
+      ItemMap[TType] | TrashOrItem<Note> | TrashOrItem<Notebook>
+    >,
+    type: TType,
+    lastSynced: number
+  ) {
+    switch (type) {
+      case "shortcut":
+      case "reminder":
+      case "tag":
+      case "color":
+      case "note":
+      case "relation": {
+        const localItem = this.db[SYNC_COLLECTIONS_MAP[type]].collection.getRaw(
+          remoteItem.id
+        );
+        if (!localItem || remoteItem.dateModified > localItem.dateModified) {
+          return remoteItem;
+        }
+        break;
+      }
+      // case "note": {
+      //   const localItem = this.db.notes.collection.getRaw(remoteItem.id);
+      //   if (!localItem || remoteItem.dateModified > localItem.dateModified) {
+      //     return this.db.notes.merge(
+      //       localItem,
+      //       remoteItem as MaybeDeletedItem<TrashOrItem<Note>>
+      //     );
+      //   }
+      //   break;
+      // }
+      case "notebook": {
+        const THRESHOLD = 1000;
+        const localItem = this.db.notebooks.collection.getRaw(remoteItem.id);
+        if (
+          !localItem ||
+          this.isConflicted(localItem, remoteItem, lastSynced, THRESHOLD)
+        ) {
+          return this.db.notebooks.merge(
+            localItem,
+            remoteItem as MaybeDeletedItem<TrashOrItem<Notebook>>,
+            lastSynced
           );
-          if (
-            localAttachment &&
-            localAttachment.dateUploaded !== remoteAttachment.dateUploaded
-          ) {
-            const noteIds = localAttachment.noteIds.slice();
-            const isRemoved = await this.db.attachments.remove(
-              localAttachment.metadata.hash,
-              true
-            );
-            if (!isRemoved)
-              throw new Error(
-                "Conflict could not be resolved in one of the attachments."
-              );
-            remoteAttachment.noteIds = set.union(
-              remoteAttachment.noteIds,
-              noteIds
-            );
-          }
-          await this.db.attachments.merge(remoteAttachment);
         }
+        break;
       }
-    };
-  }
-
-  async _migrate(deserialized: Item, version: number) {
-    // it is a locked note, bail out.
-    if (isCipher(deserialized) && deserialized.alg && deserialized.cipher)
-      return deserialized;
-
-    return migrateItem(deserialized, version, deserialized.type, this.db);
-  }
-
-  async _deserialize(item: SyncItem, migrate = true) {
-    if (!this.key) throw new Error("User encryption key not found.");
-
-    const decrypted = await this.db.storage().decrypt(this.key, item);
-    if (!decrypted) {
-      throw new Error("Decrypted item cannot be undefined or empty.");
-    }
-
-    const deserialized = JSON.parse(decrypted);
-    deserialized.remote = true;
-    deserialized.synced = true;
-    if (!migrate) return deserialized;
-    await this._migrate(deserialized, item.v);
-    return deserialized;
-  }
-
-  async _mergeItem<TItemType extends SyncableItemType>(
-    syncItem: SyncItem,
-    get: Get<TItemType>,
-    add: Set<TItemType>
-  ) {
-    const remoteItem = (await this._deserialize(syncItem)) as MaybeDeletedItem<
-      ItemMap[TItemType]
-    >;
-    const localItem = await get(remoteItem.id);
-    if (!localItem || remoteItem.dateModified > localItem.dateModified) {
-      await add(remoteItem);
-      return remoteItem;
     }
   }
 
-  async _mergeItemWithConflicts<TItemType extends SyncableItemType>(
-    syncItem: SyncItem,
-    get: Get<TItemType>,
-    add: Set<TItemType>,
-    markAsConflicted: Conflict<TItemType>,
-    threshold: number
+  async mergeContent(
+    remoteItem: MaybeDeletedItem<ContentItem>,
+    localItem: MaybeDeletedItem<ContentItem>,
+    lastSynced: number
   ) {
-    const remoteItem = (await this._deserialize(syncItem)) as MaybeDeletedItem<
-      ItemMap[TItemType]
-    >;
-    const localItem = await get(remoteItem.id);
+    if (localItem && "localOnly" in localItem && localItem.localOnly) return;
 
-    if (!localItem || isDeleted(localItem)) {
-      await add(remoteItem);
+    const THRESHOLD = process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000;
+    const conflicted =
+      localItem &&
+      this.isConflicted(localItem, remoteItem, lastSynced, THRESHOLD);
+    if (!localItem || conflicted === "merge") {
       return remoteItem;
-    } else {
-      const isResolved =
-        "dateResolved" in localItem &&
-        localItem.dateResolved === remoteItem.dateModified;
-      const isModified =
-        // the local item is modified if it was changed/modified after the last sync
-        // i.e. it wasn't synced yet.
-        // However, in case a sync is interrupted the local item's date modified will
-        // be ahead of last sync. In that case, we also have to check if the synced flag
-        // is false (it is only false if a user makes edits on the local device).
-        localItem.dateModified > this.lastSynced && !localItem.synced;
-      if (isModified && !isResolved) {
-        // If time difference between local item's edits & remote item's edits
-        // is less than threshold, we shouldn't trigger a merge conflict; instead
-        // we will keep the most recently changed item.
-        const timeDiff =
-          Math.max(remoteItem.dateModified, localItem.dateModified) -
-          Math.min(remoteItem.dateModified, localItem.dateModified);
+    } else if (conflicted === "conflict") {
+      if (isDeleted(localItem) || isDeleted(remoteItem)) {
+        if (remoteItem.dateModified > localItem.dateModified) return remoteItem;
+        return;
+      }
 
-        if (timeDiff < threshold) {
-          if (remoteItem.dateModified > localItem.dateModified) {
-            await add(remoteItem);
-            return remoteItem;
-          }
-          return;
-        }
+      const note = this.db.notes.collection.get(localItem.noteId);
+      if (!note) return;
 
-        this.logger.info("Conflict detected", {
-          itemId: remoteItem.id,
-          isResolved,
-          isModified,
-          timeDiff,
-          remote: remoteItem.dateModified,
-          local: localItem.dateModified,
-          lastSynced: this.lastSynced
+      // if hashes are equal do nothing
+      if (
+        !note.locked &&
+        (!remoteItem ||
+          !remoteItem ||
+          !localItem.data ||
+          !remoteItem.data ||
+          isHTMLEqual(localItem.data, remoteItem.data))
+      )
+        return;
+
+      if (note.locked) {
+        // if note is locked or content is deleted we keep the most recent version.
+        if (remoteItem.dateModified > localItem.dateModified) return remoteItem;
+      } else {
+        // otherwise we trigger the conflicts
+        await this.db.notes.add({
+          id: localItem.noteId,
+          conflicted: true
         });
-
-        await markAsConflicted(localItem, remoteItem);
-      } else if (!isResolved) {
-        await add(remoteItem);
-        return remoteItem;
+        await this.db.storage().write("hasConflicts", true);
+        return {
+          ...localItem,
+          conflicted: remoteItem
+        };
       }
     }
   }
 
-  async mergeItem<TItemType extends SyncableItemType>(
-    type: TItemType | "vaultKey",
-    item: SyncItem
+  async mergeItem(
+    remoteItem: SettingsItem | MaybeDeletedItem<Attachment>,
+    type: "settings" | "attachment",
+    lastSynced: number
   ) {
-    this.lastSynced = await this.db.lastSynced();
+    switch (type) {
+      case "settings": {
+        if (isDeleted(remoteItem) || remoteItem.type !== "settings") return;
 
-    if (!this.key) this.key = await this.db.user.getEncryptionKey();
-    if (!this.key || !this.key.key || !this.key.salt) {
-      EV.publish(EVENTS.userSessionExpired);
-      throw new Error("User encryption key not generated. Please relogin.");
-    }
+        const localItem = this.db.settings.raw;
+        if (
+          !localItem ||
+          this.isConflicted(localItem, remoteItem, lastSynced, 1000)
+        ) {
+          await this.db.settings.merge(remoteItem, lastSynced);
+        }
+        break;
+      }
+      case "attachment": {
+        if (isDeleted(remoteItem)) {
+          return this.db.attachments.merge(undefined, remoteItem);
+        }
+        if (remoteItem.type !== "attachment") return;
 
-    if (type === "vaultKey") {
-      await this.db.vault.setKey(await this._deserialize(item, false));
-      return;
-    }
-
-    const definition = this.mergeDefinition[type];
-    if (definition.conflict && definition.get && definition.threshold) {
-      return await this._mergeItemWithConflicts<TItemType>(
-        item,
-        definition.get,
-        definition.set,
-        definition.conflict,
-        definition.threshold
-      );
-    } else if (definition.get && definition.set) {
-      return await this._mergeItem<TItemType>(
-        item,
-        definition.get,
-        definition.set
-      );
-    } else if (!definition.get && !!definition.set) {
-      const remote = await this._deserialize(item);
-      await definition.set(remote);
+        const localAttachment = this.db.attachments.attachment(
+          remoteItem.metadata.hash
+        );
+        if (
+          localAttachment &&
+          localAttachment.dateUploaded !== remoteItem.dateUploaded
+        ) {
+          const noteIds = localAttachment.noteIds.slice();
+          const isRemoved = await this.db.attachments.remove(
+            localAttachment.metadata.hash,
+            true
+          );
+          if (!isRemoved)
+            throw new Error(
+              "Conflict could not be resolved in one of the attachments."
+            );
+          remoteItem.noteIds = set.union(remoteItem.noteIds, noteIds);
+        }
+        return this.db.attachments.merge(undefined, remoteItem);
+      }
     }
   }
 }

@@ -49,7 +49,7 @@ export const EMPTY_CONTENT = (noteId: string): UnencryptedContentItem => ({
 
 export class Content implements ICollection {
   name = "content";
-  private readonly collection: IndexedCollection<"content", ContentItem>;
+  readonly collection: IndexedCollection<"content", ContentItem>;
   constructor(private readonly db: Database) {
     this.collection = new IndexedCollection(
       db.storage,
@@ -130,7 +130,7 @@ export class Content implements ICollection {
   async get(id: string) {
     const content = await this.raw(id);
     if (!content || isDeleted(content)) return;
-    return content.data;
+    return content;
   }
 
   async raw(id: string) {

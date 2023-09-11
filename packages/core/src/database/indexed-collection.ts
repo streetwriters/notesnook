@@ -108,7 +108,7 @@ export class IndexedCollection<
     return Object.fromEntries(data);
   }
 
-  setItems(items) {
+  setItems(items: (MaybeDeletedItem<T> | undefined)[]) {
     const entries = items.reduce((array, item) => {
       if (!item) return array;
 
@@ -120,7 +120,7 @@ export class IndexedCollection<
 
       array.push([item.id, item]);
       return array;
-    }, []);
+    }, [] as [string, MaybeDeletedItem<T>][]);
     return this.indexer.writeMulti(entries);
   }
 

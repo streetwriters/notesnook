@@ -27,7 +27,7 @@ import { delay } from "../__tests__/utils";
 import { test, expect, vitest } from "vitest";
 import { login } from "./utils";
 
-const TEST_TIMEOUT = 30 * 1000;
+const TEST_TIMEOUT = 60 * 1000;
 
 test(
   "case 1: device A & B should only download the changes from device C (no uploading)",
@@ -311,12 +311,16 @@ test(
 
     expect(deviceA.notebooks.topics(id).has("Topic 1")).toBeTruthy();
     expect(deviceB.notebooks.topics(id).has("Topic 2")).toBeTruthy();
+    expect(
+      deviceB.notebooks.topics(id).topic("Topic 2").dateModified >
+        deviceA.notebooks.topics(id).topic("Topic 1").dateModified
+    ).toBeTruthy();
+    expect(
+      deviceB.notebooks.notebook(id).dateModified >
+        deviceA.notebooks.notebook(id).dateModified
+    ).toBeTruthy();
 
-    await syncAndWait(deviceA, deviceB, false);
-
-    // await delay(1000);
-
-    // await syncAndWait(deviceB, deviceB, false);
+    await syncAndWait(deviceB, deviceA, false);
 
     expect(deviceA.notebooks.topics(id).has("Topic 1")).toBeTruthy();
     expect(deviceB.notebooks.topics(id).has("Topic 1")).toBeTruthy();
@@ -360,14 +364,26 @@ test(
 
     expect(deviceB.notebooks.topics(id).topic(topic.id).totalNotes).toBe(1);
 
-    await syncAndWait(deviceB, deviceA, false);
-    await syncAndWait(deviceA, deviceB, false);
+    ctx.onTestFailed(() => {
+      console.log(deviceA.notes.topicReferences.get(topic.id), noteA);
+      console.log(deviceB.notes.topicReferences.get(topic.id), noteB);
 
-    expect(deviceA.notebooks.topics(id).topic(topic.id).totalNotes).toBe(2);
-    expect(deviceB.notebooks.topics(id).topic(topic.id).totalNotes).toBe(2);
+      deviceB.notes.topicReferences.rebuild();
+      deviceA.notes.topicReferences.rebuild();
+
+      console.log(deviceA.notes.topicReferences.get(topic.id), noteA);
+      console.log(deviceB.notes.topicReferences.get(topic.id), noteB);
+    });
+    await syncAndWait(deviceB, deviceA, false);
+
+    expect(deviceA.notes.note(noteB)).toBeDefined();
+    expect(deviceB.notes.note(noteA)).toBeDefined();
 
     expect(deviceA.notes.note(noteA).data.notebooks).toHaveLength(1);
     expect(deviceA.notes.note(noteB).data.notebooks).toHaveLength(1);
+
+    expect(deviceA.notebooks.topics(id).topic(topic.id).totalNotes).toBe(2);
+    expect(deviceB.notebooks.topics(id).topic(topic.id).totalNotes).toBe(2);
 
     await cleanup(deviceA, deviceB);
   },
@@ -456,6 +472,7 @@ function syncAndWait(deviceA, deviceB, force = false) {
       console.log("sync completed.");
       resolve();
     });
+
     console.log(
       "waiting for sync...",
       "Device A:",

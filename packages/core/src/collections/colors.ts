@@ -36,7 +36,7 @@ export const DefaultColors: Record<string, string> = {
 
 export class Colors implements ICollection {
   name = "colors";
-  private readonly collection: CachedCollection<"colors", Color>;
+  readonly collection: CachedCollection<"colors", Color>;
   constructor(private readonly db: Database) {
     this.collection = new CachedCollection(
       db.storage,

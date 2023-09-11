@@ -86,13 +86,15 @@ export default class Indexer<T> {
    * @param {any[]} items
    * @returns
    */
-  async writeMulti(items) {
-    const entries = items.map(([id, item]) => {
-      if (!this.indices.includes(id)) this.indices.push(id);
-      return [this.makeId(id), item];
-    });
+  async writeMulti(items: [string, MaybeDeletedItem<T>][]) {
+    const entries: [string, MaybeDeletedItem<T> | string[]][] = items.map(
+      ([id, item]) => {
+        if (!this.indices.includes(id)) this.indices.push(id);
+        return [this.makeId(id), item];
+      }
+    );
     entries.push([this.type, this.indices]);
-    await super.writeMulti(entries);
+    await this.storage().writeMulti(entries);
   }
 
   async migrateIndices() {

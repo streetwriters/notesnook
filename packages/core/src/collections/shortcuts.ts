@@ -25,7 +25,7 @@ import { ICollection } from "./collection";
 const ALLOWED_SHORTCUT_TYPES = ["notebook", "topic", "tag"];
 export class Shortcuts implements ICollection {
   name = "shortcuts";
-  private readonly collection: CachedCollection<"shortcuts", Shortcut>;
+  readonly collection: CachedCollection<"shortcuts", Shortcut>;
   constructor(private readonly db: Database) {
     this.collection = new CachedCollection(
       db.storage,

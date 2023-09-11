@@ -18,24 +18,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Cipher } from "@notesnook/crypto";
-import { StorageAccessor } from "../interfaces";
-import { randomBytes } from "../utils/random";
 
-export type CryptoAccessor = () => Crypto;
-export class Crypto {
-  constructor(private readonly storage: StorageAccessor) {}
-  async generateRandomKey() {
-    const passwordBytes = randomBytes(124);
-    const password = passwordBytes.toString("base64");
-    return await this.storage().generateCryptoKey(password);
-  }
-}
+export type SyncableItemType =
+  | "note"
+  | "shortcut"
+  | "notebook"
+  | "content"
+  | "attachment"
+  | "reminder"
+  | "relation"
+  | "color"
+  | "tag"
+  | "settings";
 
-export function isCipher(item: any): item is Cipher<"base64"> {
-  return (
-    typeof item === "object" &&
-    "cipher" in item &&
-    "iv" in item &&
-    "salt" in item
-  );
-}
+export type SyncItem = {
+  id: string;
+  v: number;
+} & Cipher<"base64">;
+
+export const SYNC_COLLECTIONS_MAP = {
+  note: "notes",
+  notebook: "notebooks",
+  shortcut: "shortcuts",
+  reminder: "reminders",
+  relation: "relations",
+  tag: "tags",
+  color: "colors"
+} as const;
+
+export type SyncTransferItem = {
+  items: SyncItem[];
+  type: SyncableItemType;
+};

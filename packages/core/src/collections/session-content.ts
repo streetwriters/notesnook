@@ -27,7 +27,7 @@ import Database from "../api";
 import { ContentType, SessionContentItem, isDeleted } from "../types";
 
 export type NoteContent<TLocked extends boolean> = {
-  data: TLocked extends true ? Cipher : string;
+  data: TLocked extends true ? Cipher<"base64"> : string;
   type: ContentType;
 };
 

@@ -17,48 +17,58 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export function findItemAndDelete(array, predicate) {
+export function findItemAndDelete<T>(
+  array: T[],
+  predicate: (item: T) => boolean
+) {
   return deleteAtIndex(array, array.findIndex(predicate));
 }
 
-export function addItem(array, item) {
+export function addItem<T>(array: T[], item: T) {
   const index = array.indexOf(item);
   if (index > -1) return false;
   array.push(item);
   return true;
 }
 
-export function deleteItem(array, item) {
+export function deleteItem<T>(array: T[], item: T) {
   return deleteAtIndex(array, array.indexOf(item));
 }
 
-export function deleteItems(array, ...items) {
-  for (let item of items) {
+export function deleteItems<T>(array: T[], ...items: T[]) {
+  for (const item of items) {
     deleteItem(array, item);
   }
 }
 
-export function findById(array, id) {
+export function findById<T extends { id: string }>(array: T[], id: string) {
   if (!array) return false;
   return array.find((item) => item.id === id);
 }
 
-export function hasItem(array, item) {
+export function hasItem<T>(array: T[], item: T) {
   if (!array) return false;
   return array.indexOf(item) > -1;
 }
 
-function deleteAtIndex(array, index) {
+function deleteAtIndex<T>(array: T[], index: number) {
   if (index === -1) return false;
   array.splice(index, 1);
   return true;
 }
 
-export function toChunks(array, chunkSize) {
-  let chunks = [];
+export function toChunks<T>(array: T[], chunkSize: number) {
+  const chunks: T[][] = [];
   for (let i = 0; i < array.length; i += chunkSize) {
     const chunk = array.slice(i, i + chunkSize);
     chunks.push(chunk);
   }
   return chunks;
+}
+
+export function* chunkedIterate<T>(array: T[], chunkSize: number) {
+  for (let i = 0; i < array.length; i += chunkSize) {
+    const chunk = array.slice(i, i + chunkSize);
+    yield chunk;
+  }
 }
