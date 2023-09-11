@@ -86,7 +86,7 @@ export default class Topics {
         notebook.topics.push(topic);
       }
     }
-    return this._db.notebooks.add(notebook);
+    return this._db.notebooks._collection.updateItem(notebook);
   }
 
   /**
@@ -110,7 +110,8 @@ export default class Topics {
   }
 
   async delete(...topicIds) {
-    let allTopics = qclone(this.all);
+    const notebook = qclone(this._db.notebooks.notebook(this._notebookId).data);
+    let allTopics = notebook.topics;
 
     for (let topicId of topicIds) {
       const topic = this.topic(topicId);
@@ -125,7 +126,7 @@ export default class Topics {
       allTopics.splice(topicIndex, 1);
     }
 
-    await this._db.notebooks.add({ id: this._notebookId, topics: allTopics });
+    await this._db.notebooks._collection.updateItem(notebook);
   }
 }
 

@@ -109,7 +109,19 @@ export default class IndexedCollection {
   }
 
   setItems(items) {
-    return this.indexer.writeMulti(items);
+    const entries = items.reduce((array, item) => {
+      if (!item) return array;
+
+      if (!item.remote) {
+        item.dateModified = Date.now();
+        item.synced = false;
+      }
+      delete item.remote;
+
+      array.push([item.id, item]);
+      return array;
+    }, []);
+    return this.indexer.writeMulti(entries);
   }
 
   async getEncryptionKey() {

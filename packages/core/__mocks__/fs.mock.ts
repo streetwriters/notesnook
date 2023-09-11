@@ -17,44 +17,55 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var fs = {};
+import { DataFormat, SerializedKey } from "@notesnook/crypto";
+import { xxhash64 } from "hash-wasm";
+import { IDataType } from "hash-wasm/dist/lib/util";
+
+let fs = {};
 
 function hasItem(key) {
   return !!fs[key];
 }
 
-/**
- * We perform 4 steps here:
- * 1. We convert base64 to Uint8Array (if we get base64, that is)
- * 2. We hash the Uint8Array.
- * 3. We encrypt the Uint8Array
- * 4. We save the encrypted Uint8Array
- */
-async function writeEncrypted(filename, { data }) {
-  const { hash, type: hashType } = hashBuffer(data);
-  if (!filename) filename = hash;
-  if (hasItem(filename)) return { hash, hashType };
-  fs[filename] = data;
+async function writeEncryptedBase64(
+  data: string,
+  key: SerializedKey,
+  _mimeType: string
+) {
+  const bytes = new Uint8Array(Buffer.from(data, "base64"));
+
+  const { hash, type: hashType } = await hashBuffer(bytes);
+
+  if (hasItem(hash)) delete fs[hash];
+
+  fs[hash] = data;
   return {
     chunkSize: 512,
     alg: "xcha-stream",
     hash,
     hashType,
     iv: "some iv",
-    cipher: data,
-    salt: "i am some salt",
+    salt: key.salt!,
     length: data.length
   };
 }
 
-function hashBuffer(data) {
+function hashBase64(data: string) {
+  return hashBuffer(Buffer.from(data, "base64"));
+}
+
+export async function hashBuffer(data: IDataType) {
   return {
-    hash: hashCode(data).toString(16),
-    type: "xxh3"
+    hash: await xxhash64(data),
+    type: "xxh64"
   };
 }
 
-async function readEncrypted(filename) {
+async function readEncrypted<TOutputFormat extends DataFormat>(
+  filename: string,
+  _key: SerializedKey,
+  _cipherData: any
+) {
   const cipher = fs[filename];
   if (!cipher) {
     console.error(`File not found. Filename: ${filename}`);
@@ -63,23 +74,23 @@ async function readEncrypted(filename) {
   return cipher.data;
 }
 
-async function uploadFile(filename) {
-  let cipher = fs[filename];
+async function uploadFile(filename: string, _requestOptions: any) {
+  const cipher = fs[filename];
   if (!cipher) throw new Error(`File not found. Filename: ${filename}`);
   return true;
 }
 
-async function downloadFile(filename) {
+async function downloadFile(filename: string, _requestOptions: any) {
   return hasItem(filename);
 }
 
-async function deleteFile(filename) {
+async function deleteFile(filename: string, _requestOptions: any) {
   if (!hasItem(filename)) return true;
   delete fs[filename];
   return true;
 }
 
-function exists(filename) {
+async function exists(filename) {
   return hasItem(filename);
 }
 
@@ -87,34 +98,27 @@ async function clearFileStorage() {
   fs = {};
 }
 
-module.exports = {
-  writeEncrypted,
+export const FS = {
+  writeEncryptedBase64,
   readEncrypted,
   uploadFile: cancellable(uploadFile),
   downloadFile: cancellable(downloadFile),
   deleteFile,
   exists,
-  clearFileStorage
+  clearFileStorage,
+  hashBase64
 };
 
-function cancellable(operation) {
-  return function (filename, requestOptions) {
+function cancellable<T>(
+  operation: (filename: string, requestOptions: any) => Promise<T>
+) {
+  return function (filename: string, requestOptions: any) {
+    const abortController = new AbortController();
     return {
       execute: () => operation(filename, requestOptions),
-      cancel: () => {}
+      cancel: async (message: string) => {
+        abortController.abort(message);
+      }
     };
   };
-}
-
-function hashCode(str) {
-  var hash = 0,
-    i,
-    chr;
-  if (str.length === 0) return hash;
-  for (i = 0; i < str.length; i++) {
-    chr = str.charCodeAt(i);
-    hash = (hash << 5) - hash + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
 }

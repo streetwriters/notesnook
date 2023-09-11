@@ -182,6 +182,7 @@ class Merger {
             remoteItem.noteIds,
             noteIds
           );
+          remoteItem.remote = false;
         }
         return this._db.attachments.merge(localItem, remoteItem);
       }

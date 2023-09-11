@@ -26,6 +26,15 @@ import qclone from "qclone";
 export default class Notebooks extends Collection {
   merge(localNotebook, remoteNotebook, lastSyncedTimestamp) {
     if (remoteNotebook.deleted) return remoteNotebook;
+
+    if (
+      localNotebook &&
+      (localNotebook.type === "trash" || localNotebook.deleted)
+    ) {
+      if (localNotebook.dateModified > remoteNotebook.dateModified) return;
+      return remoteNotebook;
+    }
+
     if (localNotebook && localNotebook.topics?.length) {
       let isChanged = false;
       // merge new and old topics
@@ -82,7 +91,8 @@ export default class Notebooks extends Collection {
 
     let notebook = {
       ...oldNotebook,
-      ...notebookArg
+      ...notebookArg,
+      topics: oldNotebook?.topics || []
     };
 
     if (!notebook.title) throw new Error("Notebook must contain a title.");
@@ -102,8 +112,8 @@ export default class Notebooks extends Collection {
 
     await this._collection.addItem(notebook);
 
-    if (!oldNotebook) {
-      await this.notebook(notebook).topics.add(...notebook.topics);
+    if (!oldNotebook && notebookArg.topics) {
+      await this.notebook(id).topics.add(...notebookArg.topics);
     }
     return id;
   }
