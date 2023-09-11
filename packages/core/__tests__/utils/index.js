@@ -21,7 +21,7 @@ import DB from "../../src/api";
 import { NodeStorageInterface } from "../../__mocks__/node-storage.mock";
 import dayjs from "dayjs";
 import { groupArray } from "../../src/utils/grouping";
-import FS from "../../__mocks__/fs.mock";
+import { FS } from "../../__mocks__/fs.mock";
 import Compressor from "../../__mocks__/compressor.mock";
 import { expect } from "vitest";
 import EventSource from "eventsource";
