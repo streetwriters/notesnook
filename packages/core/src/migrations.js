@@ -138,6 +138,7 @@ const migrations = [
     items: {
       all: (item) => {
         delete item.remote;
+        return true;
       }
     }
   },
