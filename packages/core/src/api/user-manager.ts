@@ -32,7 +32,7 @@ export type User = {
   email: string;
   isEmailConfirmed: boolean;
   salt: string;
-  attachmentsKey?: Cipher;
+  attachmentsKey?: Cipher<"base64">;
   marketingConsent?: boolean;
   mfa: {
     isEnabled: boolean;

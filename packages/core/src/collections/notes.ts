@@ -27,13 +27,7 @@ import { Tiptap } from "../content-types/tiptap";
 import { EMPTY_CONTENT, isUnencryptedContent } from "./content";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { buildFromTemplate } from "../utils/templates";
-import {
-  Note,
-  TrashOrItem,
-  isTrashItem,
-  MaybeDeletedItem,
-  isDeleted
-} from "../types";
+import { Note, TrashOrItem, isTrashItem, isDeleted } from "../types";
 import Database from "../api";
 import { CachedCollection } from "../database/cached-collection";
 import { ICollection } from "./collection";
@@ -65,17 +59,6 @@ export class Notes implements ICollection {
   async init() {
     await this.collection.init();
     this.topicReferences.rebuild();
-  }
-
-  async merge(remoteNote: MaybeDeletedItem<TrashOrItem<Note>>) {
-    if (!remoteNote) return;
-
-    const id = remoteNote.id;
-    const localNote = this.collection.get(id);
-
-    if (localNote && localNote.localOnly) return;
-
-    return await this.collection.add(remoteNote);
   }
 
   async add(
@@ -429,6 +412,9 @@ export class Notes implements ICollection {
     this.topicReferences.rebuild();
   }
 
+  /**
+   * @internal
+   */
   async _clearAllNotebookReferences(notebookId: string) {
     const notes = this.db.notes.all;
 
@@ -481,7 +467,7 @@ class NoteIdCache {
 
     for (const note of notes) {
       const { notebooks } = note;
-      if (!notebooks) continue;
+      if (!notebooks) return;
 
       for (const notebook of notebooks) {
         for (const topic of notebook.topics) {

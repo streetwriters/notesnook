@@ -43,7 +43,7 @@ import Database from "../api";
 export class Attachments implements ICollection {
   name = "attachments";
   key: Cipher<"base64"> | null = null;
-  private readonly collection: CachedCollection<"attachments", Attachment>;
+  readonly collection: CachedCollection<"attachments", Attachment>;
   constructor(private readonly db: Database) {
     this.collection = new CachedCollection(
       db.storage,
@@ -109,7 +109,7 @@ export class Attachments implements ICollection {
   }
 
   merge(
-    localAttachment: MaybeDeletedItem<Attachment>,
+    localAttachment: MaybeDeletedItem<Attachment> | undefined,
     remoteAttachment: MaybeDeletedItem<Attachment>
   ) {
     if (isDeleted(remoteAttachment)) return remoteAttachment;
@@ -323,7 +323,10 @@ export class Attachments implements ICollection {
 
     return (
       outputType === "base64"
-        ? dataurl.fromObject({ type: attachment.metadata.type, data })
+        ? dataurl.fromObject({
+            type: attachment.metadata.type,
+            data
+          })
         : data
     ) as Output<TOutputFormat>;
   }
