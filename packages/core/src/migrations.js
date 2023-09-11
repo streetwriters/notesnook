@@ -133,7 +133,15 @@ const migrations = [
       }
     }
   },
-  { version: 5.8, items: {} }
+  {
+    version: 5.8,
+    items: {
+      all: (item) => {
+        delete item.remote;
+      }
+    }
+  },
+  { version: 5.9, items: {} }
 ];
 
 export async function migrateItem(item, version, type, database) {
@@ -151,7 +159,9 @@ export async function migrateItem(item, version, type, database) {
     const migration = migrations[migrationStartIndex];
     if (migration.version === CURRENT_DATABASE_VERSION) break;
 
-    const itemMigrator = migration.items && migration.items[type];
+    const itemMigrator = migration.items
+      ? migration.items[type] || migration.items.all
+      : null;
     if (!itemMigrator) continue;
     if (await itemMigrator(item, database)) count++;
   }

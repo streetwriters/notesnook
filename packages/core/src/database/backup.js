@@ -127,6 +127,7 @@ export default class Backup {
 
     switch (version) {
       case CURRENT_DATABASE_VERSION:
+      case 5.8:
       case 5.7:
       case 5.6:
       case 5.5:

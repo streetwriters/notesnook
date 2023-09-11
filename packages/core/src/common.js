@@ -125,4 +125,4 @@ export const DATE_FORMATS = [
 
 export const TIME_FORMATS = ["12-hour", "24-hour"];
 
-export const CURRENT_DATABASE_VERSION = 5.8;
+export const CURRENT_DATABASE_VERSION = 5.9;
