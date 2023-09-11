@@ -643,13 +643,25 @@ function exportTheme(theme: ThemeDefinition) {
     }),
     `${theme.id}.json`
   );
+  const confirmed = window.confirm(
+    "Do you also want to download code-block.css for this theme?"
+  );
+  if (confirmed) {
+    FileSaver.saveAs(
+      new Blob([theme.codeBlockCSS], {
+        type: "text/plain"
+      }),
+      `code-block.css`
+    );
+  }
 }
 
 function themeToJSON(theme: ThemeDefinition) {
   return JSON.stringify(
     {
       $schema: JSON_SCHEMA_URL,
-      ...theme
+      ...theme,
+      codeBlockCSS: undefined
     },
     undefined,
     2
