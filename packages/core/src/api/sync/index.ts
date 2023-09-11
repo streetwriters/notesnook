@@ -26,11 +26,7 @@ import {
 } from "../../common";
 import Constants from "../../utils/constants";
 import TokenManager from "../token-manager";
-import Collector, {
-  CollectedResult,
-  SyncableItemType,
-  SyncItem
-} from "./collector";
+import Collector from "./collector";
 import * as signalr from "@microsoft/signalr";
 import Merger from "./merger";
 import Conflicts from "./conflicts";
@@ -41,6 +37,14 @@ import { Mutex } from "async-mutex";
 import Database from "..";
 import { migrateItem } from "../../migrations";
 import { SerializedKey } from "@notesnook/crypto";
+import {
+  ItemMap,
+  MaybeDeletedItem,
+  Note,
+  Notebook,
+  TrashOrItem
+} from "../../types";
+import { SyncableItemType, SyncTransferItem } from "./types";
 
 const ITEM_TYPE_TO_COLLECTION_TYPE = {
   note: "notes",
@@ -49,13 +53,10 @@ const ITEM_TYPE_TO_COLLECTION_TYPE = {
   attachment: "attachments",
   relation: "relations",
   reminder: "reminders",
-  shortcut: "shortcuts"
-};
-
-type SyncTransferItem = {
-  items: SyncItem[];
-  type: SyncableItemType;
-};
+  shortcut: "shortcuts",
+  tag: "tags",
+  color: "colors"
+} as const;
 
 export default class SyncManager {
   sync = new Sync(this.db);
@@ -164,6 +165,11 @@ class Sync {
       }, 15000) as unknown as number;
 
       const key = await this.db.user.getEncryptionKey();
+      if (!key || !key.key || !key.salt) {
+        EV.publish(EVENTS.userSessionExpired);
+        throw new Error("User encryption key not generated. Please relogin.");
+      }
+
       const dbLastSynced = await this.db.lastSynced();
       await this.processChunk(chunk, key, dbLastSynced, true);
     });
@@ -198,7 +204,7 @@ class Sync {
     const serverResponse = full ? await this.fetch(lastSynced) : null;
     this.logger.info("Data fetched", serverResponse || {});
 
-    if (await this.send(lastSynced, force, newLastSynced)) {
+    if (await this.send(lastSynced, newLastSynced, force)) {
       this.logger.info("New data sent");
       await this.stop(newLastSynced);
     } else if (serverResponse) {
@@ -267,7 +273,7 @@ class Sync {
       serverResponse.vaultKey.salt !== null &&
       serverResponse.vaultKey.length > 0
     ) {
-      await this.db.vault._setKey(serverResponse.vaultKey);
+      await this.db.vault.setKey(serverResponse.vaultKey);
     }
 
     this.connection.off("SendItems");
@@ -317,7 +323,7 @@ class Sync {
     // return true;
   }
 
-  async stop(lastSynced) {
+  async stop(lastSynced: number) {
     // refresh topic references
     this.db.notes.topicReferences.rebuild();
     // refresh monographs on sync completed
@@ -355,7 +361,7 @@ class Sync {
   /**
    * @private
    */
-  async onPushCompleted(lastSynced) {
+  async onPushCompleted(lastSynced: number) {
     // refresh topic references
     this.db.notes.topicReferences.rebuild();
 
@@ -384,12 +390,14 @@ class Sync {
       )
     );
 
-    let items = [];
-    if (this.merger.isSyncCollection(chunk.type)) {
-      items = deserialized.map((item) =>
-        this.merger.mergeItemSync(item, chunk.type, dbLastSynced)
-      );
-    } else if (chunk.type === "content") {
+    const itemType = chunk.type;
+    let items: (
+      | MaybeDeletedItem<
+          ItemMap[SyncableItemType] | TrashOrItem<Note> | TrashOrItem<Notebook>
+        >
+      | undefined
+    )[] = [];
+    if (itemType === "content") {
       const localItems = await this.db.content.multi(
         chunk.items.map((i) => i.id)
       );
@@ -398,27 +406,32 @@ class Sync {
           this.merger.mergeContent(item, localItems[item.id], dbLastSynced)
         )
       );
+    } else if (itemType === "settings") {
+      await this.merger.mergeItem(deserialized[0], itemType, dbLastSynced);
+      return;
     } else {
-      items = await Promise.all(
-        deserialized.map((item) =>
-          this.merger.mergeItem(item, chunk.type, dbLastSynced)
-        )
-      );
+      items = this.merger.isSyncCollection(itemType)
+        ? deserialized.map((item) =>
+            this.merger.mergeItemSync(item, itemType, dbLastSynced)
+          )
+        : await Promise.all(
+            deserialized.map((item) =>
+              this.merger.mergeItem(item, itemType, dbLastSynced)
+            )
+          );
     }
+
+    const collectionType = ITEM_TYPE_TO_COLLECTION_TYPE[itemType];
+    await this.db[collectionType].collection.setItems(items as any);
 
     if (
       notify &&
-      (chunk.type === "content" || chunk.type === "note") &&
+      (itemType === "note" || itemType === "content") &&
       items.length > 0
     ) {
       items.forEach((item) =>
         this.db.eventManager.publish(EVENTS.syncItemMerged, item)
       );
-    }
-
-    const collectionType = this.itemTypeToCollection[chunk.type];
-    if (collectionType && this.db[collectionType]) {
-      await this.db[collectionType]._collection.setItems(items);
     }
   }
 
@@ -466,7 +479,11 @@ function promiseTimeout(ms: number, promise: Promise<unknown>) {
   return Promise.race([promise, timeout]);
 }
 
-async function deserializeItem(decryptedItem, version, database) {
+async function deserializeItem(
+  decryptedItem: string,
+  version: number,
+  database: Database
+) {
   const deserialized = JSON.parse(decryptedItem);
   deserialized.remote = true;
   deserialized.synced = true;
