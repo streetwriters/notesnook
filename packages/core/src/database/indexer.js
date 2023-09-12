@@ -56,7 +56,6 @@ export default class Indexer extends Storage {
   }
 
   read(key, isArray = false) {
-    if (!this.exists(key)) return;
     return super.read(this.makeId(key), isArray);
   }
 
@@ -69,9 +68,7 @@ export default class Indexer extends Storage {
   }
 
   async readMulti(keys) {
-    const entries = await super.readMulti(
-      keys.filter(this.exists, this).map(this.makeId, this)
-    );
+    const entries = await super.readMulti(keys.map(this.makeId, this));
     entries.forEach((entry) => {
       entry[0] = entry[0].replace(`_${this.type}`, "");
     });
