@@ -107,46 +107,43 @@ export const deleteItems = async (item, context) => {
 
   if (topics?.length > 0) {
     const result = await confirmDeleteAllNotes(topics, "topic", context);
-    if (result.delete) {
-      for (const topic of topics) {
-        if (result.deleteNotes) {
+    if (!result.delete) return;
+    for (const topic of topics) {
+      if (result.deleteNotes) {
+        const notes = db.notebooks
+          .notebook(topic.notebookId)
+          .topics.topic(topic.id).all;
+        await db.notes.delete(...notes.map((note) => note.id));
+      }
+      await db.notebooks.notebook(topic.notebookId).topics.delete(topic.id);
+    }
+    useMenuStore.getState().setMenuPins();
+    ToastEvent.show({
+      heading: `${topics.length > 1 ? "Topics" : "Topic"} deleted`,
+      type: "success"
+    });
+  }
+
+  if (notebooks?.length > 0) {
+    const result = await confirmDeleteAllNotes(notebooks, "notebook", context);
+    if (!result.delete) return;
+    let ids = notebooks.map((i) => i.id);
+    if (result.deleteNotes) {
+      for (let id of ids) {
+        const notebook = db.notebooks.notebook(id);
+        const topics = notebook.topics.all;
+        for (let topic of topics) {
           const notes = db.notebooks
             .notebook(topic.notebookId)
             .topics.topic(topic.id).all;
           await db.notes.delete(...notes.map((note) => note.id));
         }
-        await db.notebooks.notebook(topic.notebookId).topics.delete(topic.id);
+        const notes = db.relations.from(notebook.data, "note");
+        await db.notes.delete(...notes.map((note) => note.id));
       }
-      useMenuStore.getState().setMenuPins();
-      ToastEvent.show({
-        heading: `${topics.length > 1 ? "Topics" : "Topic"} deleted`,
-        type: "success"
-      });
     }
-  }
-
-  if (notebooks?.length > 0) {
-    const result = await confirmDeleteAllNotes(notebooks, "notebook", context);
-
-    if (result.delete) {
-      let ids = notebooks.map((i) => i.id);
-      if (result.deleteNotes) {
-        for (let id of ids) {
-          const notebook = db.notebooks.notebook(id);
-          const topics = notebook.topics.all;
-          for (let topic of topics) {
-            const notes = db.notebooks
-              .notebook(topic.notebookId)
-              .topics.topic(topic.id).all;
-            await db.notes.delete(...notes.map((note) => note.id));
-          }
-          const notes = db.relations.from(notebook.data, "note");
-          await db.notes.delete(...notes.map((note) => note.id));
-        }
-      }
-      await db.notebooks.delete(...ids);
-      useMenuStore.getState().setMenuPins();
-    }
+    await db.notebooks.delete(...ids);
+    useMenuStore.getState().setMenuPins();
   }
 
   Navigation.queueRoutesForUpdate();

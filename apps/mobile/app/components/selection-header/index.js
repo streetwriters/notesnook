@@ -317,23 +317,8 @@ export const SelectionHeader = React.memo(() => {
             customStyle={{
               marginLeft: 10
             }}
-            onPress={async () => {
-              presentDialog({
-                title: `Delete ${
-                  selectedItemsList.length > 1 ? "items" : "item"
-                }`,
-                paragraph: `Are you sure you want to delete ${
-                  selectedItemsList.length > 1 ? "these items?" : "this item?"
-                }`,
-                positiveText: "Delete",
-                negativeText: "Cancel",
-                positivePress: () => {
-                  deleteItems();
-                },
-                positiveType: "errorShade"
-              });
-
-              return;
+            onPress={() => {
+              deleteItems();
             }}
             tooltipText="Move to trash"
             tooltipPosition={1}
