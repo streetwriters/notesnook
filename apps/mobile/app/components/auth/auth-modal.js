@@ -91,6 +91,7 @@ const AuthModal = () => {
           width: "100%"
         }}
         keyboardShouldPersistTaps="handled"
+        enableAutomaticScroll={false}
       >
         {currentAuthMode !== AuthMode.login ? (
           <Signup

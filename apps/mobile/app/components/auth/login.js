@@ -71,7 +71,7 @@ export const Login = ({ changeMode }) => {
     }, 5000);
   });
   const deviceMode = useSettingStore((state) => state.deviceMode);
-  const { width, height } = useWindowDimensions();
+  const { height } = useWindowDimensions();
   useEffect(() => {
     async () => {
       setStep(LoginSteps.emailAuth);
