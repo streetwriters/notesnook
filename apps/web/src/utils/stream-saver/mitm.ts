@@ -16,10 +16,25 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-export {};
 
 let sw: ServiceWorker | null = null;
 let scope = "";
+
+let keepAlive = () => {
+  keepAlive = () => {};
+  const interval = setInterval(() => {
+    if (sw) {
+      sw.postMessage("ping");
+    } else {
+      const ping =
+        location.href.substr(0, location.href.lastIndexOf("/")) + "/ping";
+      fetch(ping).then((res) => {
+        !res.ok && clearInterval(interval);
+        return res.text();
+      });
+    }
+  }, 10000);
+};
 
 function registerWorker() {
   return navigator.serviceWorker
@@ -104,8 +119,11 @@ export function postMessage(
   // messageChannel.port2 to the service worker. The service worker can
   // then use the transferred port to reply via postMessage(), which
   // will in turn trigger the onmessage handler on messageChannel.port1.
-
   const transferable = [ports[0]];
+
+  if (!data.transferringReadable) {
+    keepAlive();
+  }
 
   return sw?.postMessage(data, transferable);
 }
@@ -114,4 +132,8 @@ export async function register() {
   if (navigator.serviceWorker) {
     await registerWorker();
   }
+  // FF v102 just started to supports transferable streams, but still needs to ping sw.js
+  // even tough the service worker dose not have to do any kind of work and listen to any
+  // messages... #305
+  keepAlive();
 }

@@ -40,10 +40,7 @@ type RecoveryKeyFormData = {
 };
 
 type BackupFileFormData = {
-  backupFile: {
-    file: File;
-    backup: Record<string, unknown>;
-  };
+  backupFile: File;
 };
 
 type NewPasswordFormData = BackupFileFormData & {
@@ -406,7 +403,7 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
     if (!backupFile) return;
     const backupFileInput = document.getElementById("backupFile");
     if (!(backupFileInput instanceof HTMLInputElement)) return;
-    backupFileInput.value = backupFile?.file?.name;
+    backupFileInput.value = backupFile?.name;
   }, [backupFile]);
 
   return (
@@ -519,7 +516,7 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
           throw new Error("Could not reset account password.");
 
         if (formData?.backupFile) {
-          await restoreBackupFile(formData?.backupFile.backup);
+          await restoreBackupFile(formData?.backupFile);
           await db.sync(true, true);
         }
 

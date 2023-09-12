@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { createWriteStream } from "../../utils/stream-saver";
 import { type desktop as bridge } from "./index.desktop";
 
 export const desktop: typeof bridge | undefined = undefined;
+export async function createWritableStream(filename: string) {
+  return createWriteStream(filename);
+}

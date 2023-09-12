@@ -117,6 +117,14 @@ export const osIntegrationRouter = t.router({
       writeFileSync(resolvedPath, data);
     }),
 
+  resolvePath: t.procedure
+    .input(z.object({ filePath: z.string() }))
+    .query(({ input }) => {
+      const { filePath } = input;
+      if (!filePath) return;
+      return resolvePath(filePath);
+    }),
+
   showNotification: t.procedure
     .input(NotificationOptions)
     .query(({ input }) => {
