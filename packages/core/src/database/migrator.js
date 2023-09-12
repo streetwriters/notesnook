@@ -21,7 +21,7 @@ import { sendMigrationProgressEvent } from "../common";
 import { migrateCollection, migrateItem } from "../migrations";
 
 class Migrator {
-  async migrate(db, collections, get, version, restore = false) {
+  async migrate(db, collections, get, version) {
     for (let collection of collections) {
       if (
         (!collection.iterate && !collection.index) ||
@@ -45,21 +45,20 @@ class Migrator {
           collection,
           collection.index(),
           get,
-          version,
-          restore
+          version
         );
       } else if (collection.iterate) {
         for await (const index of collection.dbCollection._collection.iterate(
           100
         )) {
-          await this.migrateItems(db, collection, index, get, version, restore);
+          await this.migrateItems(db, collection, index, get, version);
         }
       }
     }
     return true;
   }
 
-  async migrateItems(db, collection, index, get, version, restore) {
+  async migrateItems(db, collection, index, get, version) {
     const toAdd = [];
     for (var i = 0; i < index.length; ++i) {
       let id = index[i];
@@ -82,7 +81,7 @@ class Migrator {
         db
       );
 
-      if (migrated || restore) {
+      if (migrated) {
         if (collection.type === "settings") {
           await collection.dbCollection.merge(item);
         } else if (item.type === "note") {

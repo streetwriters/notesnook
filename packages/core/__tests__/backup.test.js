@@ -33,10 +33,19 @@ import { test, expect, describe } from "vitest";
 test("export backup", () =>
   noteTest().then(() =>
     notebookTest().then(async ({ db }) => {
-      const exp = await db.backup.export("node");
-      let backup = JSON.parse(exp);
+      const exp = [];
+      for await (const file of db.backup.export("node", false)) {
+        exp.push(file);
+      }
+
+      let backup = JSON.parse(exp[1].data);
+      expect(exp.length).toBe(2);
+      expect(exp[0].path).toBe(".nnbackup");
       expect(backup.type).toBe("node");
       expect(backup.date).toBeGreaterThan(0);
+      expect(backup.data).toBeTypeOf("string");
+      expect(backup.compressed).toBe(true);
+      expect(backup.encrypted).toBe(false);
     })
   ));
 
@@ -44,19 +53,34 @@ test("export encrypted backup", () =>
   notebookTest().then(async ({ db }) => {
     await loginFakeUser(db);
     await db.notes.add(TEST_NOTE);
-    const exp = await db.backup.export("node", true);
-    let backup = JSON.parse(exp);
+
+    const exp = [];
+    for await (const file of db.backup.export("node", true)) {
+      exp.push(file);
+    }
+
+    const backup = JSON.parse(exp[1].data);
+    expect(exp.length).toBe(2);
+    expect(exp[0].path).toBe(".nnbackup");
     expect(backup.type).toBe("node");
     expect(backup.date).toBeGreaterThan(0);
     expect(backup.data.iv).not.toBeUndefined();
+    expect(backup.data).toBeTypeOf("object");
+    expect(backup.compressed).toBe(true);
+    expect(backup.encrypted).toBe(true);
   }));
 
 test("import backup", () =>
   notebookTest().then(async ({ db, id }) => {
     await db.notes.add(TEST_NOTE);
-    const exp = await db.backup.export("node");
+
+    const exp = [];
+    for await (const file of db.backup.export("node", false)) {
+      exp.push(file);
+    }
+
     await db.storage.clear();
-    await db.backup.import(JSON.parse(exp));
+    await db.backup.import(JSON.parse(exp[1].data));
     expect(db.notebooks.notebook(id).data.id).toBe(id);
   }));
 
@@ -64,19 +88,29 @@ test("import encrypted backup", () =>
   notebookTest().then(async ({ db, id }) => {
     await loginFakeUser(db);
     await db.notes.add(TEST_NOTE);
-    const exp = await db.backup.export("node", true);
+
+    const exp = [];
+    for await (const file of db.backup.export("node", true)) {
+      exp.push(file);
+    }
+
     await db.storage.clear();
-    await db.backup.import(JSON.parse(exp), "password");
+    await db.backup.import(JSON.parse(exp[1].data), "password");
     expect(db.notebooks.notebook(id).data.id).toBe(id);
   }));
 
 test("import tempered backup", () =>
   notebookTest().then(async ({ db }) => {
     await db.notes.add(TEST_NOTE);
-    const exp = await db.backup.export("node");
+
+    const exp = [];
+    for await (const file of db.backup.export("node", false)) {
+      exp.push(file);
+    }
+
     await db.storage.clear();
-    const backup = JSON.parse(exp);
-    backup.data.hello = "world";
+    const backup = JSON.parse(exp[1].data);
+    backup.data += "hello";
     await expect(db.backup.import(backup)).rejects.toThrow(/tempered/);
   }));
 
@@ -147,21 +181,20 @@ describe.each([
     return databaseTest().then(async (db) => {
       await db.backup.import(qclone(data));
 
-      verifyIndex(data, db, "notes", "notes");
-      verifyIndex(data, db, "notebooks", "notebooks");
-      verifyIndex(data, db, "content", "content");
-      verifyIndex(data, db, "attachments", "attachments");
-      // verifyIndex(data, db, "trash", "trash");
+      const keys = await db.storage.getAllKeys();
+      for (let key in data.data) {
+        const item = data.data[key];
+        if (item && !item.type && item.deleted) continue;
+        if (
+          key.startsWith("_uk_") ||
+          key === "hasConflicts" ||
+          key === "monographs" ||
+          key === "token"
+        )
+          continue;
+
+        expect(keys.some((k) => k.startsWith(key))).toBeTruthy();
+      }
     });
   });
 });
-
-function verifyIndex(backup, db, backupCollection, collection) {
-  if (!backup.data[backupCollection]) return;
-
-  expect(
-    backup.data[backupCollection].every(
-      (v) => db[collection]._collection.indexer.indices.indexOf(v) > -1
-    )
-  ).toBeTruthy();
-}

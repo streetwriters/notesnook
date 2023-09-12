@@ -21,6 +21,8 @@ import SparkMD5 from "spark-md5";
 import { CURRENT_DATABASE_VERSION } from "../common.js";
 import Migrator from "./migrator.js";
 import { toChunks } from "../utils/array.js";
+import { migrateItem } from "../migrations.js";
+import Indexer from "./indexer.js";
 
 const invalidKeys = [
   "user",
@@ -39,9 +41,30 @@ const invalidKeys = [
   "reminders",
   "sessioncontent",
   "notehistory",
-  "shortcuts"
+  "shortcuts",
+  "vaultKey",
+  "hasConflict",
+  "token",
+  "monographs"
 ];
-const invalidIndices = ["tags", "colors"];
+
+const itemTypeToCollectionKey = {
+  note: "notes",
+  notebook: "notebooks",
+  tiptap: "content",
+  tiny: "content",
+  tag: "tags",
+  color: "colors",
+  attachment: "attachments",
+  relation: "relations",
+  reminder: "reminders",
+  sessioncontent: "sessioncontent",
+  session: "notehistory",
+  notehistory: "notehistory",
+  content: "content",
+  shortcut: "shortcuts"
+};
+
 const validTypes = ["mobile", "web", "node"];
 export default class Backup {
   /**
@@ -71,6 +94,11 @@ export default class Backup {
     if (encrypt && !(await this._db.user.getUser()))
       throw new Error("Please login to create encrypted backups.");
 
+    yield {
+      path: ".nnbackup",
+      data: ""
+    };
+
     let keys = await this._db.storage.getAllKeys();
     const key = await this._db.user.getEncryptionKey();
     const chunks = toChunks(keys, 20);
@@ -78,8 +106,25 @@ export default class Backup {
     let bufferLength = 0;
     const MAX_CHUNK_SIZE = 10 * 1024 * 1024;
     let chunkIndex = 0;
-    for (const chunk of chunks) {
-      if (bufferLength >= MAX_CHUNK_SIZE) {
+
+    while (chunks.length > 0) {
+      const chunk = chunks.pop();
+
+      const items = await this._db.storage.readMulti(chunk);
+      items.forEach(([id, item]) => {
+        if (
+          invalidKeys.includes(id) ||
+          (item.deleted && !item.type) ||
+          id.startsWith("_uk_")
+        )
+          return;
+
+        const data = JSON.stringify(item);
+        buffer.push(data);
+        bufferLength += data.length;
+      });
+
+      if (bufferLength >= MAX_CHUNK_SIZE || chunks.length === 0) {
         let itemsJSON = `[${buffer.join(",")}]`;
 
         buffer = [];
@@ -89,37 +134,26 @@ export default class Backup {
 
         const hash = SparkMD5.hash(itemsJSON);
 
-        if (encrypt)
-          itemsJSON = JSON.stringify(
-            await this._db.storage.encrypt(key, itemsJSON)
-          );
+        if (encrypt) itemsJSON = await this._db.storage.encrypt(key, itemsJSON);
 
         yield {
           path: `${chunkIndex++}-${encrypt ? "encrypted" : "plain"}-${hash}`,
           data: `{
-  "version": ${CURRENT_DATABASE_VERSION},
-  "type": "${type}",
-  "date": ${Date.now()},
-  "data": ${itemsJSON},
-  "hash": "${hash}",
-  "hash_type": "md5",
+"version": ${CURRENT_DATABASE_VERSION},
+"type": "${type}",
+"date": ${Date.now()},
+"data": ${JSON.stringify(itemsJSON)},
+"hash": "${hash}",
+"hash_type": "md5",
+"compressed": true,
+"encrypted": ${encrypt ? "true" : "false"}
 }`
         };
       }
-
-      const items = await this._db.storage.readMulti(chunk);
-      items.forEach(([id, item]) => {
-        if (invalidKeys.includes(id) || item.deleted) return;
-        const data = JSON.stringify(item);
-        buffer.push(data);
-        bufferLength += data.length;
-      });
     }
 
-    yield {
-      path: ".nnbackup",
-      data: ""
-    };
+    if (bufferLength > 0 || buffer.length > 0)
+      throw new Error("Buffer not empty.");
 
     await this.updateBackupTime();
   }
@@ -137,7 +171,7 @@ export default class Backup {
 
     let db = backup.data;
     const isEncrypted = db.salt && db.iv && db.cipher;
-    if (isEncrypted) {
+    if (backup.encrypted || isEncrypted) {
       if (!password)
         throw new Error(
           "Please provide a password to decrypt this backup & restore it."
@@ -148,8 +182,7 @@ export default class Backup {
         throw new Error("Could not generate encryption key for backup.");
 
       try {
-        const decrypted = await this._db.storage.decrypt(key, db);
-        backup.data = JSON.parse(decrypted);
+        backup.data = await this._db.storage.decrypt(key, db);
       } catch (e) {
         if (
           e.message.includes("ciphertext cannot be decrypted") ||
@@ -159,8 +192,15 @@ export default class Backup {
 
         throw new Error(`Could not decrypt backup: ${e.message}`);
       }
-    } else if (!this._verify(backup))
+    }
+
+    if (backup.hash && !this._verify(backup))
       throw new Error("Backup file has been tempered, aborting...");
+
+    if (backup.compressed)
+      backup.data = await this._db.compressor.decompress(backup.data);
+    backup.data =
+      typeof backup.data === "string" ? JSON.parse(backup.data) : backup.data;
 
     await this._migrateData(backup);
   }
@@ -169,7 +209,7 @@ export default class Backup {
     const { version = 0 } = backup;
     if (version > CURRENT_DATABASE_VERSION)
       throw new Error(
-        "This backup was made from a newer version of Notesnook. Cannot migrate."
+        "This backup was made from a newer version of Notesnook. Cannot restore."
       );
 
     switch (version) {
@@ -193,66 +233,32 @@ export default class Backup {
   async _migrateData(backup) {
     const { data, version = 0 } = backup;
 
-    if (version > CURRENT_DATABASE_VERSION)
-      throw new Error(
-        "This backup was made from a newer version of Notesnook. Cannot migrate."
-      );
+    const toAdd = {};
+    for (const item of Array.isArray(data) ? data : Object.values(data)) {
+      // we do not want to restore deleted items
+      if (!item.type && item.deleted) continue;
+      // in v5.6 of the database, we did not set note history session's type
+      if (!item.type && item.sessionContentId) item.type = "notehistory";
 
-    const collections = [
-      {
-        index: () => data["attachments"],
-        dbCollection: this._db.attachments
-      },
-      {
-        index: () => data["notebooks"],
-        dbCollection: this._db.notebooks
-      },
-      {
-        index: () => data["content"],
-        dbCollection: this._db.content
-      },
-      {
-        index: () => data["shortcuts"],
-        dbCollection: this._db.shortcuts
-      },
-      {
-        index: () => data["reminders"],
-        dbCollection: this._db.reminders
-      },
-      {
-        index: () => data["relations"],
-        dbCollection: this._db.relations
-      },
-      {
-        index: () => data["notehistory"],
-        dbCollection: this._db.noteHistory,
-        type: "notehistory"
-      },
-      {
-        index: () => data["sessioncontent"],
-        dbCollection: this._db.noteHistory.sessionContent,
-        type: "sessioncontent"
-      },
-      {
-        index: () => data["notes"],
-        dbCollection: this._db.notes
-      },
-      {
-        index: () => ["settings"],
-        dbCollection: this._db.settings,
-        type: "settings"
-      }
-    ];
+      await migrateItem(item, version, item.type, this._db);
+      // since items in trash can have their own set of migrations,
+      // we have to run the migration again to account for that.
+      if (item.type === "trash" && item.itemType)
+        await migrateItem(item, version, item.itemType, this._db);
 
-    await this._db.syncer.acquireLock(async () => {
-      await this._migrator.migrate(
-        this._db,
-        collections,
-        (id, type) => (version < 5.8 ? data[id] : data[`${id}_${type}`]),
-        version,
-        true
+      const collectionKey = itemTypeToCollectionKey[item.itemType || item.type];
+      if (collectionKey) {
+        toAdd[collectionKey] = toAdd[collectionKey] || [];
+        toAdd[collectionKey].push([item.id, item]);
+      } else if (item.type === "settings")
+        await this._db.storage.write("settings", item);
+    }
+
+    for (const collectionKey in toAdd) {
+      await new Indexer(this._db.storage, collectionKey).writeMulti(
+        toAdd[collectionKey]
       );
-    });
+    }
   }
 
   _validate(backup) {
@@ -265,26 +271,14 @@ export default class Backup {
   }
 
   _verify(backup) {
-    const { hash, hash_type, data: db } = backup;
+    const { compressed, hash, hash_type, data: db } = backup;
     switch (hash_type) {
       case "md5": {
-        return hash === SparkMD5.hash(JSON.stringify(db));
+        return hash === SparkMD5.hash(compressed ? db : JSON.stringify(db));
       }
       default: {
         return false;
       }
     }
   }
-}
-
-function filterData(data) {
-  let skippedKeys = [...invalidKeys, ...invalidIndices];
-  invalidIndices.forEach((key) => {
-    const index = data[key];
-    if (!index) return;
-    skippedKeys.push(...index);
-  });
-
-  skippedKeys.forEach((key) => delete data[key]);
-  return data;
 }
