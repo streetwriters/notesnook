@@ -255,9 +255,9 @@ export default class Backup {
     }
 
     for (const collectionKey in toAdd) {
-      await new Indexer(this._db.storage, collectionKey).writeMulti(
-        toAdd[collectionKey]
-      );
+      const indexer = new Indexer(this._db.storage, collectionKey);
+      await indexer.init();
+      await indexer.writeMulti(toAdd[collectionKey]);
     }
   }
 
