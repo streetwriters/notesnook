@@ -31,7 +31,6 @@ declare global {
 }
 
 process.once("loaded", async () => {
-  console.log("HELLO!");
   const electronTRPC: RendererGlobalElectronTRPC = {
     sendMessage: (operation) =>
       ipcRenderer.send(ELECTRON_TRPC_CHANNEL, operation),

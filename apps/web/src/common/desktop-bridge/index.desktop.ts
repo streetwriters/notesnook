@@ -63,3 +63,17 @@ function attachListener(event: string) {
     }
   };
 }
+
+export async function createWritableStream(path: string) {
+  const resolvedPath = await desktop.integration.resolvePath.query({
+    filePath: path
+  });
+  if (!resolvedPath) throw new Error("invalid path.");
+  const fs = require("fs");
+  const { Writable } = require("stream");
+  return new WritableStream(
+    Writable.toWeb(
+      fs.createWriteStream(resolvedPath, { encoding: "utf-8" })
+    ).getWriter()
+  );
+}
