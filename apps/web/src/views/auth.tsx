@@ -272,6 +272,7 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
       type="login:password"
       title="Your account password"
       subtitle={"Your password is always hashed before leaving this device."}
+      loadForever
       loading={{
         title: "Logging you in",
         subtitle: "Please wait while you are authenticated."
@@ -806,6 +807,7 @@ type AuthFormProps<TType extends AuthRoutes> = {
   loading: { title: string; subtitle: string };
   type: TType;
   onSubmit: (form: AuthFormData[TType]) => Promise<void>;
+  loadForever?: boolean;
   canSkip?: boolean;
   children?:
     | React.ReactNode
@@ -813,7 +815,7 @@ type AuthFormProps<TType extends AuthRoutes> = {
 };
 
 export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
-  const { title, subtitle, children, canSkip } = props;
+  const { title, subtitle, children, canSkip, loadForever } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
   const formRef = useRef<HTMLFormElement>(null);
@@ -838,7 +840,9 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
         try {
           setForm(form);
           await props.onSubmit(form);
+          if (!loadForever) setIsSubmitting(false);
         } catch (e) {
+          setIsSubmitting(false);
           const error = e as Error;
           if (error.message === "invalid_grant") {
             setError(
@@ -847,8 +851,6 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
             return;
           }
           setError(error.message);
-        } finally {
-          setIsSubmitting(false);
         }
       }}
       sx={{
