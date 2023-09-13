@@ -92,16 +92,16 @@ export default function Migrate() {
     try {
       setLoading(true);
       await sleep(1000);
-      // const backupSaved = await BackupService.run(false, "local");
-      // if (!backupSaved) {
-      //   ToastEvent.show({
-      //     heading: "Migration failed",
-      //     message: "You must download a backup of your data before migrating.",
-      //     context: "local"
-      //   });
-      //   setLoading(false);
-      //   return;
-      // }
+      const backupSaved = await BackupService.run(false, "local");
+      if (!backupSaved) {
+        ToastEvent.show({
+          heading: "Migration failed",
+          message: "You must download a backup of your data before migrating.",
+          context: "local"
+        });
+        setLoading(false);
+        return;
+      }
       await db.migrations?.migrate();
       eSendEvent(eCloseSheet);
       await sleep(500);
