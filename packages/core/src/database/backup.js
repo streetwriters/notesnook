@@ -251,9 +251,6 @@ export default class Backup {
       if (!item || (!item.type && item.deleted)) continue;
       // in v5.6 of the database, we did not set note history session's type
       if (!item.type && item.sessionContentId) item.type = "notehistory";
-      // colors are naively of type "tag" instead of "color" so we have to fix that.
-      if (item.type === "tag" && COLORS.includes(item.title.toLowerCase()))
-        item.type = "color";
 
       await migrateItem(item, version, item.type, this._db, "backup");
       // since items in trash can have their own set of migrations,
@@ -261,7 +258,13 @@ export default class Backup {
       if (item.type === "trash" && item.itemType)
         await migrateItem(item, version, item.itemType, this._db, "backup");
 
-      const collectionKey = itemTypeToCollectionKey[item.itemType || item.type];
+      // colors are naively of type "tag" instead of "color" so we have to fix that.
+      const itemType =
+        item.type === "tag" && COLORS.includes(item.title.toLowerCase())
+          ? "color"
+          : item.itemType || item.type;
+
+      const collectionKey = itemTypeToCollectionKey[itemType];
       if (collectionKey) {
         toAdd[collectionKey] = toAdd[collectionKey] || [];
         toAdd[collectionKey].push([item.id, item]);
