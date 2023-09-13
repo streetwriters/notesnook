@@ -66,9 +66,12 @@ export function cancelable(operation) {
 }
 
 export function copyFileAsync(source, dest) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     ScopedStorage.copyFile(source, dest, (e, r) => {
-      console.log(e, r);
+      if (e) {
+        reject(e);
+        return;
+      }
       resolve();
     });
   });

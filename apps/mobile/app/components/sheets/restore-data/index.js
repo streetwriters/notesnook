@@ -22,7 +22,9 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import RNFetchBlob from "react-native-blob-util";
-import DocumentPicker from "react-native-document-picker";
+import DocumentPicker, {
+  DocumentPickerResponse
+} from "react-native-document-picker";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { db } from "../../../common/database";
 import storage from "../../../common/database/storage";
@@ -45,6 +47,8 @@ import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Paragraph from "../../ui/typography/paragraph";
 import { getFormattedDate } from "@notesnook/common";
+import { unzip } from "react-native-zip-archive";
+import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
 
 const RestoreDataSheet = () => {
   const [visible, setVisible] = useState(false);
@@ -129,75 +133,71 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   useEffect(() => {
     setTimeout(() => {
       checkBackups();
-    }, 300);
+    }, 1000);
   }, []);
 
   const restore = async (item) => {
     if (restoring) {
       return;
     }
-    try {
-      setRestoring(true);
-      let prefix = Platform.OS === "ios" ? "" : "file:/";
-      let backup;
-      if (Platform.OS === "android") {
-        backup = await ScopedStorage.readFile(item.uri, "utf8");
-      } else {
-        backup = await RNFetchBlob.fs.readFile(prefix + item.path, "utf8");
-      }
-      backup = JSON.parse(backup);
 
-      if (backup.data.iv && backup.data.salt) {
-        withPassword(
-          async (value) => {
-            try {
-              await restoreBackup(backup, value);
-              close();
-              setRestoring(false);
-              return true;
-            } catch (e) {
-              backupError(e);
-              return false;
-            }
-          },
-          () => {
-            setRestoring(false);
+    try {
+      const file = Platform.OS === "ios" ? item.path : item.uri;
+      console.log(file);
+      if (file.endsWith(".nnbackupz")) {
+        setRestoring(true);
+
+        if (Platform.OS === "android") {
+          const cacheFile = `file://${RNFetchBlob.fs.dirs.CacheDir}/backup.zip`;
+          if (await RNFetchBlob.fs.exists(cacheFile)) {
+            await RNFetchBlob.fs.unlink(cacheFile);
           }
-        );
-      } else {
-        await restoreBackup(backup);
-        close();
+          await RNFetchBlob.fs.createFile(cacheFile, "", "utf8");
+          console.log("copying");
+          await copyFileAsync(file, cacheFile);
+          console.log("copied");
+          await restoreFromZip(cacheFile);
+        } else {
+          await restoreFromZip(file, false);
+        }
+      } else if (file.endsWith(".nnbackup")) {
+        let backup;
+        if (Platform.OS === "android") {
+          backup = await ScopedStorage.readFile(file, "utf8");
+        } else {
+          backup = await RNFetchBlob.fs.readFile(file, "utf8");
+        }
+        await restoreFromNNBackup(JSON.parse(backup));
       }
     } catch (e) {
+      console.log("error", e);
       setRestoring(false);
       backupError(e);
     }
   };
 
-  const withPassword = (onsubmit, onclose = () => {}) => {
-    presentDialog({
-      context: "local",
-      title: "Encrypted backup",
-      input: true,
-      inputPlaceholder: "Password",
-      paragraph: "Please enter password of this backup file to restore it",
-      positiveText: "Restore",
-      secureTextEntry: true,
-      onClose: onclose,
-      negativeText: "Cancel",
-      positivePress: async (password) => {
-        try {
-          return await onsubmit(password);
-        } catch (e) {
-          ToastEvent.show({
-            heading: "Failed to backup data",
-            message: e.message,
-            type: "error",
-            context: "global"
-          });
-          return false;
+  const withPassword = () => {
+    return new Promise((resolve) => {
+      let resolved = false;
+      presentDialog({
+        context: "local",
+        title: "Encrypted backup",
+        input: true,
+        inputPlaceholder: "Password",
+        paragraph: "Please enter password of this backup file to restore it",
+        positiveText: "Restore",
+        secureTextEntry: true,
+        onClose: () => {
+          if (resolved) return;
+          resolve(undefined);
+        },
+        negativeText: "Cancel",
+        positivePress: async (password) => {
+          resolve(password);
+          resolved = true;
+          return true;
         }
-      }
+      });
     });
   };
 
@@ -217,18 +217,161 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         let path = await storage.checkAndCreateDir("/backups/");
         files = await RNFetchBlob.fs.lstat(path);
       }
-      files = files.sort(function (a, b) {
-        let timeA = a.lastModified;
-        let timeB = b.lastModified;
-        return timeB - timeA;
-      });
+      files = files
+        .filter((file) => {
+          const name = Platform.OS === "android" ? file.name : file.filename;
+          return name.endsWith(".nnbackup") || name.endsWith(".nnbackupz");
+        })
+        .sort(function (a, b) {
+          let timeA = a.lastModified;
+          let timeB = b.lastModified;
+          return timeB - timeA;
+        });
       setFiles(files);
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
+      setLoading(false);
     } catch (e) {
       console.log(e);
       setLoading(false);
+    }
+  };
+
+  const restoreBackup = async (backup, password) => {
+    await db.backup.import(backup, password);
+    await db.initCollections();
+    initialize();
+    ToastEvent.show({
+      heading: "Backup restored successfully.",
+      type: "success",
+      context: "global"
+    });
+    return true;
+  };
+
+  const backupError = (e) => {
+    ToastEvent.show({
+      heading: "Restore failed",
+      message:
+        e.message ||
+        "The selected backup data file is invalid. You must select a *.nnbackup file to restore.",
+      type: "error",
+      context: "local"
+    });
+  };
+
+  /**
+   *
+   * @param {string} file
+   */
+  async function restoreFromZip(file, remove) {
+    try {
+      const zipOutputFolder = `${cacheDir}/backup_extracted`;
+      if (await RNFetchBlob.fs.exists(zipOutputFolder)) {
+        await RNFetchBlob.fs.unlink(zipOutputFolder);
+        await RNFetchBlob.fs.mkdir(zipOutputFolder);
+      }
+      await unzip(file, zipOutputFolder);
+      console.log("Unzipped files successfully to", zipOutputFolder);
+
+      const backupFiles = await RNFetchBlob.fs.ls(zipOutputFolder);
+
+      if (backupFiles.findIndex((file) => file === ".nnbackup") === -1) {
+        throw new Error("Backup file is invalid");
+      }
+
+      let password;
+
+      console.log(`Found ${backupFiles?.length} files to restore from backup`);
+      for (const path of backupFiles) {
+        if (path === ".nnbackup") continue;
+        const filePath = `${zipOutputFolder}/${path}`;
+        const data = await RNFetchBlob.fs.readFile(filePath, "utf8");
+        const parsed = JSON.parse(data);
+
+        if (parsed.encrypted && !password) {
+          console.log("Backup is encrypted...", "requesting password");
+          password = await withPassword();
+          if (!password) throw new Error("Failed to decrypt backup");
+        }
+        await db.backup.import(parsed, password);
+        console.log("Imported", path);
+      }
+      // Remove files from cache
+      RNFetchBlob.fs.unlink(zipOutputFolder).catch(console.log);
+      if (remove) {
+        RNFetchBlob.fs.unlink(file).catch(console.log);
+      }
+
+      await db.initCollections();
+      initialize();
+      setRestoring(false);
+      close();
+      ToastEvent.show({
+        heading: "Backup restored successfully.",
+        type: "success",
+        context: "global"
+      });
+    } catch (e) {
+      backupError(e);
+      setRestoring(false);
+    }
+  }
+
+  /**
+   *
+   * @param {string} file
+   */
+  async function restoreFromNNBackup(backup) {
+    try {
+      if (backup.data.iv && backup.data.salt) {
+        const password = await withPassword();
+        if (password) {
+          try {
+            await restoreBackup(backup, password);
+            close();
+            setRestoring(false);
+          } catch (e) {
+            setRestoring(false);
+            backupError(e);
+          }
+        } else {
+          setRestoring(false);
+        }
+      } else {
+        await restoreBackup(backup);
+        setRestoring(false);
+        close();
+      }
+    } catch (e) {
+      setRestoring(false);
+      backupError(e);
+    }
+  }
+
+  const button = {
+    title: "Restore from files",
+    onPress: async () => {
+      if (restoring) {
+        return;
+      }
+      try {
+        const file = await DocumentPicker.pickSingle({
+          copyTo: "cachesDirectory"
+        });
+
+        if (file.name.endsWith(".nnbackupz")) {
+          setRestoring(true);
+          await restoreFromZip(file.fileCopyUri, true);
+        } else if (file.name.endsWith(".nnbackup")) {
+          RNFetchBlob.fs.unlink(file.fileCopyUri).catch(console.log);
+          setRestoring(true);
+          const data = await fetch(file.uri);
+          await restoreFromNNBackup(await data.json());
+        }
+      } catch (e) {
+        console.log("error", e.stack);
+        setRestoring(false);
+        backupError(e);
+      }
     }
   };
 
@@ -270,76 +413,6 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
       />
     </View>
   );
-
-  const restoreBackup = async (backup, password) => {
-    await db.backup.import(backup, password);
-    setRestoring(false);
-    initialize();
-    ToastEvent.show({
-      heading: "Backup restored successfully.",
-      type: "success",
-      context: "global"
-    });
-  };
-
-  const backupError = (e) => {
-    ToastEvent.show({
-      heading: "Restore failed",
-      message:
-        e.message ||
-        "The selected backup data file is invalid. You must select a *.nnbackup file to restore.",
-      type: "error",
-      context: "local"
-    });
-  };
-
-  const button = {
-    title: "Restore from files",
-    onPress: () => {
-      if (restoring) {
-        return;
-      }
-
-      DocumentPicker.pickSingle()
-        .then((r) => {
-          setRestoring(true);
-          fetch(r.uri)
-            .then(async (r) => {
-              try {
-                let backup = await r.json();
-                if (backup.data.iv && backup.data.salt) {
-                  withPassword(
-                    async (value) => {
-                      try {
-                        restoreBackup(backup, value).then(() => {
-                          close();
-                          setRestoring(false);
-                        });
-                        return true;
-                      } catch (e) {
-                        backupError(e);
-                        setRestoring(false);
-                        return false;
-                      }
-                    },
-                    () => {
-                      setRestoring(false);
-                    }
-                  );
-                } else {
-                  await restoreBackup(backup);
-                  close();
-                }
-              } catch (e) {
-                setRestoring(false);
-                backupError(e);
-              }
-            })
-            .catch(console.log);
-        })
-        .catch(console.log);
-    }
-  };
 
   return (
     <>

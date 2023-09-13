@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { sanitizeFilename } from "@notesnook/common";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import FileViewer from "react-native-file-viewer";
@@ -30,6 +29,8 @@ import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
 import { ToastEvent, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
+import { cacheDir, copyFileAsync } from "../common/filesystem/utils";
+import { zip } from "react-native-zip-archive";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -152,8 +153,6 @@ async function run(progress, context) {
   let androidBackupDirectory = await checkBackupDirExists(false, context);
   if (!androidBackupDirectory) return;
 
-  let backup;
-
   if (progress) {
     presentSheet({
       title: "Backing up your data",
@@ -163,42 +162,66 @@ async function run(progress, context) {
     });
   }
 
-  try {
-    backup = await db.backup.export(
-      "mobile",
-      SettingsService.get().encryptedBackup
-    );
-    if (!backup) throw new Error("Backup returned empty.");
-  } catch (e) {
-    await sleep(300);
-    eSendEvent(eCloseSheet);
-    ToastEvent.error(e, "Backup failed!");
-    return null;
+  let path;
+  let backupFilePath;
+  let backupFileName = "notesnook_backup_" + Date.now();
+
+  if (Platform.OS === "ios") {
+    path = await storage.checkAndCreateDir("/backups/");
   }
 
-  try {
-    let backupName = "notesnook_backup_" + Date.now();
-    backupName =
-      sanitizeFilename(backupName, { replacement: "_" }) + ".nnbackup";
-    let path;
-    let backupFilePath;
+  const zipSourceFolder = `${cacheDir}/${backupFileName}`;
+  const zipOutputFile =
+    Platform.OS === "ios"
+      ? `${path}/${backupFileName}.nnbackupz`
+      : `${cacheDir}/${backupFileName}.nnbackupz`;
 
-    if (Platform.OS === "ios") {
-      path = await storage.checkAndCreateDir("/backups/");
-      await RNFetchBlob.fs.writeFile(path + backupName, backup, "utf8");
-      backupFilePath = path + backupName;
-    } else {
-      backupFilePath = await ScopedStorage.writeFile(
-        androidBackupDirectory.uri,
-        backup,
-        backupName,
-        "nnbackup/json",
-        "utf8",
-        false
+  if (await RNFetchBlob.fs.exists(zipSourceFolder))
+    await RNFetchBlob.fs.unlink(zipSourceFolder);
+
+  await RNFetchBlob.fs.mkdir(zipSourceFolder);
+
+  try {
+    for await (const file of db.backup.export(
+      "mobile",
+      SettingsService.get().encryptedBackup
+    )) {
+      console.log("Writing backup chunk of size...", file?.data?.length);
+      await RNFetchBlob.fs.writeFile(
+        `${zipSourceFolder}/${file.path}`,
+        file.data,
+        "utf8"
       );
     }
 
+    await zip(zipSourceFolder, zipOutputFile);
+
+    console.log("Final zip:", await RNFetchBlob.fs.stat(zipOutputFile));
+
+    if (Platform.OS === "android") {
+      // Move the zip to user selected directory.
+      const file = await ScopedStorage.createFile(
+        androidBackupDirectory.uri,
+        `${backupFileName}.nnbackupz`,
+        "application/nnbackupz"
+      );
+      await copyFileAsync(`file://${zipOutputFile}`, file.uri);
+      path = file.uri;
+    } else {
+      path = zipOutputFile;
+    }
+    RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
     updateNextBackupTime();
+
+    let showBackupCompleteSheet = SettingsService.get().showBackupCompleteSheet;
+
+    if (context) return path;
+    await sleep(300);
+    if (showBackupCompleteSheet) {
+      presentBackupCompleteSheet(backupFilePath);
+    } else {
+      progress && eSendEvent(eCloseSheet);
+    }
 
     ToastEvent.show({
       heading: "Backup successful",
@@ -207,18 +230,10 @@ async function run(progress, context) {
       context: "global"
     });
 
-    let showBackupCompleteSheet = SettingsService.get().showBackupCompleteSheet;
-
-    if (context) return backupFilePath;
-    await sleep(300);
-    if (showBackupCompleteSheet) {
-      presentBackupCompleteSheet(backupFilePath);
-    } else {
-      progress && eSendEvent(eCloseSheet);
-    }
-    return backupFilePath;
+    return path;
   } catch (e) {
-    progress && eSendEvent(eCloseSheet);
+    await sleep(300);
+    eSendEvent(eCloseSheet);
     ToastEvent.error(e, "Backup failed!");
     return null;
   }
