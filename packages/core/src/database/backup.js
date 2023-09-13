@@ -248,7 +248,7 @@ export default class Backup {
     const toAdd = {};
     for (const item of Array.isArray(data) ? data : Object.values(data)) {
       // we do not want to restore deleted items
-      if (!item.type && item.deleted) continue;
+      if (!item || (!item.type && item.deleted)) continue;
       // in v5.6 of the database, we did not set note history session's type
       if (!item.type && item.sessionContentId) item.type = "notehistory";
       // colors are naively of type "tag" instead of "color" so we have to fix that.
