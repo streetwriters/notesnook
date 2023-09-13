@@ -51,7 +51,13 @@ class Migrator {
         for await (const index of collection.dbCollection._collection.iterate(
           100
         )) {
-          await this.migrateItems(db, collection, index, get, version);
+          await this.migrateItems(
+            db,
+            collection,
+            index.map((item) => item[1]),
+            get,
+            version
+          );
         }
       }
     }
