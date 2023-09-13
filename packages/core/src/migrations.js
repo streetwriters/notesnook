@@ -168,9 +168,13 @@ export async function migrateItem(
     const migration = migrations[migrationStartIndex];
     if (migration.version === CURRENT_DATABASE_VERSION) break;
 
-    const itemMigrator = migration.items
-      ? migration.items[type] || migration.items.all
-      : null;
+    if (
+      migration.items.all &&
+      (await migration.items.all(item, database, migrationType))
+    )
+      count++;
+
+    const itemMigrator = migration.items[type];
     if (!itemMigrator) continue;
     if (await itemMigrator(item, database, migrationType)) count++;
   }
