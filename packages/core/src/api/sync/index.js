@@ -476,7 +476,13 @@ async function deserializeItem(decryptedItem, version, database) {
   deserialized.synced = true;
 
   if (!deserialized.alg && !deserialized.cipher) {
-    await migrateItem(deserialized, version, deserialized.type, database);
+    await migrateItem(
+      deserialized,
+      version,
+      deserialized.type,
+      database,
+      "sync"
+    );
   }
   return deserialized;
 }

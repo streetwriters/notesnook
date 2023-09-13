@@ -259,7 +259,7 @@ export default class Backup {
       // since items in trash can have their own set of migrations,
       // we have to run the migration again to account for that.
       if (item.type === "trash" && item.itemType)
-        await migrateItem(item, version, item.itemType, this._db);
+        await migrateItem(item, version, item.itemType, this._db, "backup");
 
       const collectionKey = itemTypeToCollectionKey[item.itemType || item.type];
       if (collectionKey) {

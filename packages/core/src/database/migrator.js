@@ -78,7 +78,8 @@ class Migrator {
         item,
         version,
         item.type || collection.type || collection.dbCollection.type,
-        db
+        db,
+        "local"
       );
 
       if (migrated) {

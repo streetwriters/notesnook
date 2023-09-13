@@ -136,16 +136,24 @@ const migrations = [
   {
     version: 5.8,
     items: {
-      all: (item) => {
-        delete item.remote;
-        return true;
+      all: (item, _db, migrationType) => {
+        if (migrationType === "local") {
+          delete item.remote;
+          return true;
+        }
       }
     }
   },
   { version: 5.9, items: {} }
 ];
 
-export async function migrateItem(item, version, type, database) {
+export async function migrateItem(
+  item,
+  version,
+  type,
+  database,
+  migrationType
+) {
   let migrationStartIndex = migrations.findIndex((m) => m.version === version);
   if (migrationStartIndex <= -1) {
     throw new Error(
@@ -164,7 +172,7 @@ export async function migrateItem(item, version, type, database) {
       ? migration.items[type] || migration.items.all
       : null;
     if (!itemMigrator) continue;
-    if (await itemMigrator(item, database)) count++;
+    if (await itemMigrator(item, database, migrationType)) count++;
   }
 
   return count > 0;
