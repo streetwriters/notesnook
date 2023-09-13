@@ -198,7 +198,6 @@ const SheetProvider = ({ context = "global" }) => {
             key={data.actionText}
             title={data.actionText}
             accentColor={data.iconColor}
-            accentText="light"
             type="accent"
             height={40}
             width={250}
