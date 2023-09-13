@@ -97,6 +97,7 @@ jobs:
       - name: Get App Store Version
         id: appstore
         uses: streetwriters/appstore-connect-app-version@develop
+        if: inputs.publish-apple
         with:
           app-id: ${{ steps.app_metadata.outputs.apple_app_id }}
           key-id: ${{ secrets.api_key_id }}
