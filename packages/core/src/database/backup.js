@@ -24,6 +24,18 @@ import { toChunks } from "../utils/array.js";
 import { migrateItem } from "../migrations.js";
 import Indexer from "./indexer.js";
 
+const COLORS = [
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "purple",
+  "gray",
+  "black",
+  "white"
+];
+
 const invalidKeys = [
   "user",
   "t",
@@ -239,6 +251,9 @@ export default class Backup {
       if (!item.type && item.deleted) continue;
       // in v5.6 of the database, we did not set note history session's type
       if (!item.type && item.sessionContentId) item.type = "notehistory";
+      // colors are naively of type "tag" instead of "color" so we have to fix that.
+      if (item.type === "tag" && COLORS.includes(item.title.toLowerCase()))
+        item.type = "color";
 
       await migrateItem(item, version, item.type, this._db);
       // since items in trash can have their own set of migrations,
