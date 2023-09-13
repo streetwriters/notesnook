@@ -255,7 +255,7 @@ export default class Backup {
       if (item.type === "tag" && COLORS.includes(item.title.toLowerCase()))
         item.type = "color";
 
-      await migrateItem(item, version, item.type, this._db);
+      await migrateItem(item, version, item.type, this._db, "backup");
       // since items in trash can have their own set of migrations,
       // we have to run the migration again to account for that.
       if (item.type === "trash" && item.itemType)
