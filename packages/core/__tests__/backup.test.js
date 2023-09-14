@@ -24,7 +24,7 @@ import v56BackupCopy from "./__fixtures__/backup.v5.6.json";
 import v58BackupCopy from "./__fixtures__/backup.v5.8.json";
 import qclone from "qclone";
 import { test, expect, describe } from "vitest";
-import { makeId } from "../src/utils/id";
+import { getId, makeId } from "../src/utils/id";
 
 test("export backup", () =>
   notebookTest().then(async ({ db }) => {
@@ -79,7 +79,7 @@ test("import backup", () =>
       exp.push(file);
     }
 
-    await db.storage.clear();
+    await db.storage().clear();
     await db.backup.import(JSON.parse(exp[1].data));
     expect(db.notebooks.notebook(id).data.id).toBe(id);
   }));
@@ -94,7 +94,7 @@ test("import encrypted backup", () =>
       exp.push(file);
     }
 
-    await db.storage.clear();
+    await db.storage().clear();
     await db.backup.import(JSON.parse(exp[1].data), "password");
     expect(db.notebooks.notebook(id).data.id).toBe(id);
   }));
@@ -108,7 +108,7 @@ test("import tempered backup", () =>
       exp.push(file);
     }
 
-    await db.storage.clear();
+    await db.storage().clear();
     const backup = JSON.parse(exp[1].data);
     backup.data += "hello";
     await expect(db.backup.import(backup)).rejects.toThrow(/tempered/);
@@ -198,7 +198,7 @@ describe.each([
     return databaseTest().then(async (db) => {
       await db.backup.import(qclone(data));
 
-      const keys = await db.storage.getAllKeys();
+      const keys = await db.storage().getAllKeys();
       for (let key in data.data) {
         const item = data.data[key];
         if (item && !item.type && item.deleted) continue;
@@ -209,7 +209,6 @@ describe.each([
           key === "token"
         )
           continue;
-
         expect(keys.some((k) => k.startsWith(key))).toBeTruthy();
       }
     });

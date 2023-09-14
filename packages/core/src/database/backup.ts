@@ -178,6 +178,7 @@ export default class Backup {
 
     while (chunks.length > 0) {
       const chunk = chunks.pop();
+      if (!chunk) break;
 
       const items = await this.db.storage().readMulti(chunk);
       items.forEach(([id, item]) => {
@@ -276,7 +277,7 @@ export default class Backup {
 
     if (!decryptedData) return;
 
-    if ("hash" in backup && !this.verify(backup))
+    if ("hash" in backup && !this.verify(backup, decryptedData))
       throw new Error("Backup file has been tempered, aborting...");
 
     if ("compressed" in backup && typeof decryptedData === "string")
@@ -336,10 +337,6 @@ export default class Backup {
       if ("sessionContentId" in item && item.type !== "session")
         (item as any).type = "notehistory";
 
-      // colors are naively of type "tag" instead of "color" so we have to fix that.
-      if (item.type === "tag" && COLORS.includes(item.title.toLowerCase()))
-        (item as any).type = "color";
-
       await migrateItem(item, version, item.type, this.db, "backup");
       // since items in trash can have their own set of migrations,
       // we have to run the migration again to account for that.
@@ -389,7 +386,13 @@ export default class Backup {
       if (item.type === "settings")
         await this.db.storage().write("settings", item);
       else {
-        const itemType = "itemType" in item ? item.itemType : item.type;
+        const itemType =
+          // colors are naively of type "tag" instead of "color" so we have to fix that.
+          item.type === "tag" && COLORS.includes(item.title.toLowerCase())
+            ? "color"
+            : "itemType" in item
+            ? item.itemType
+            : item.type;
         const collectionKey = itemTypeToCollectionKey[itemType];
         if (collectionKey) {
           toAdd[collectionKey] = toAdd[collectionKey] || [];
@@ -417,17 +420,16 @@ export default class Backup {
     );
   }
 
-  private verify(backup: BackupFile | LegacyUnencryptedBackupFile) {
-    const { hash, hash_type, data } = backup;
+  private verify(
+    backup: BackupFile | LegacyUnencryptedBackupFile,
+    data: string | Record<string, BackupDataItem>
+  ) {
+    const { hash, hash_type } = backup;
     switch (hash_type) {
       case "md5": {
         return (
           hash ===
-          SparkMD5.hash(
-            "compressed" in backup && backup.compressed
-              ? data
-              : JSON.stringify(data)
-          )
+          SparkMD5.hash(typeof data === "string" ? data : JSON.stringify(data))
         );
       }
       default: {
