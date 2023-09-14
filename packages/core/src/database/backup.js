@@ -125,6 +125,7 @@ export default class Backup {
       const items = await this._db.storage.readMulti(chunk);
       items.forEach(([id, item]) => {
         if (
+          !item ||
           invalidKeys.includes(id) ||
           (item.deleted && !item.type) ||
           id.startsWith("_uk_")
