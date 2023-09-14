@@ -38,6 +38,12 @@ export class Tags implements ICollection {
     return this.collection.get(id);
   }
 
+  find(idOrTitle: string) {
+    return this.all.find(
+      (tag) => tag.title === idOrTitle || tag.id === idOrTitle
+    );
+  }
+
   async merge(remoteTag: MaybeDeletedItem<Tag>) {
     if (!remoteTag) return;
 
