@@ -21,7 +21,8 @@ import SparkMD5 from "spark-md5";
 import ObjectID from "./object-id";
 
 export function getId(time?: number) {
-  if (time) return ObjectID.createFromTime(time).toHexString();
+  if (time)
+    return new ObjectID(new ObjectID().generate(time / 1000)).toHexString();
   return new ObjectID().toHexString();
 }
 
