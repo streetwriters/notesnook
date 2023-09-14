@@ -46,6 +46,7 @@ function registerWorker() {
       );
     })
     .then((swReg) => {
+      console.log("Stream saver service worker registered!");
       const swRegTmp = swReg.installing || swReg.waiting;
 
       scope = swReg.scope;

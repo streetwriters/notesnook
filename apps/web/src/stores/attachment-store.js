@@ -23,7 +23,6 @@ import BaseStore from "./index";
 import { store as editorStore } from "./editor-store";
 import { checkAttachment } from "../common/attachments";
 import { showToast } from "../utils/toast";
-import { register } from "../utils/stream-saver/mitm";
 import { AttachmentStream } from "../utils/streams/attachment-stream";
 import { ZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
@@ -57,7 +56,6 @@ class AttachmentStore extends BaseStore {
       (state) => (state.status = { current: 0, total: attachments.length })
     );
 
-    await register();
     abortController = new AbortController();
     const attachmentStream = new AttachmentStream(
       attachments,

@@ -23,6 +23,7 @@ import { logger } from "./utils/logger";
 import { loadDatabase } from "./hooks/use-database";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { BaseThemeProvider } from "./components/theme-provider";
+import { register } from "./utils/stream-saver/mitm";
 
 renderApp();
 
@@ -50,6 +51,8 @@ async function renderApp() {
 const serviceWorkerWhitelist: Routes[] = ["default"];
 async function initializeServiceWorker() {
   if (!IS_DESKTOP_APP) {
+    await register();
+
     logger.info("Initializing service worker...");
     const serviceWorker = await import("./service-worker-registration");
 

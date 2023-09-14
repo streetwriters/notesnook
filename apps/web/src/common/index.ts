@@ -37,7 +37,6 @@ import { EVENTS } from "@notesnook/core/dist/common";
 import { getFormattedDate } from "@notesnook/common";
 import { createWritableStream } from "./desktop-bridge";
 import { ZipStream } from "../utils/streams/zip-stream";
-import { register } from "../utils/stream-saver/mitm";
 import { FeatureKeys } from "../dialogs/feature-dialog";
 import { Reader } from "../utils/zip-reader";
 
@@ -79,7 +78,6 @@ export async function introduceFeatures() {
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
 
 export async function createBackup() {
-  await register();
   const encryptBackups =
     userstore.get().isLoggedIn && Config.get("encryptBackups", false);
 
