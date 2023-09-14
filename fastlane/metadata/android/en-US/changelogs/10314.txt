@@ -1,0 +1,3 @@
+- New backup format nnbackupz with upto 90% smaller backups
+- Improve UI of code blocks & language selection popup
+- Fixed some bugs in sync v2
