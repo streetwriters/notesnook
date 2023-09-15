@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Database from "../api";
-import Topics from "../collections/topics";
 import { Notebook } from "../types";
 
 export function createNotebookModel(notebook: Notebook, db: Database) {
@@ -34,10 +33,6 @@ export function createNotebookModel(notebook: Notebook, db: Database) {
     totalNotes: (function () {
       return db.notebooks.totalNotes(notebook.id);
     })(),
-    /**
-     * @deprecated please use `db.notebooks.topics()` instead
-     */
-    topics: new Topics(notebook.id, db),
     /**
      * @deprecated please use `db.notebooks.pin()` & `db.notebooks.unpin()` instead.
      */

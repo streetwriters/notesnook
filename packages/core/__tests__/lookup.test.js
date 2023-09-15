@@ -64,10 +64,3 @@ test("search notebooks", () =>
     let filtered = db.lookup.notebooks(db.notebooks.all, "Description");
     expect(filtered.length).toBeGreaterThan(0);
   }));
-
-test("search topics", () =>
-  notebookTest().then(async ({ db, id }) => {
-    const topics = db.notebooks.topics(id).all;
-    let filtered = db.lookup.topics(topics, "hello");
-    expect(filtered).toHaveLength(1);
-  }));
