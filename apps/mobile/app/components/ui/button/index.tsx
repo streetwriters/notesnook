@@ -134,6 +134,7 @@ export const Button = ({
       {icon && !loading && iconPosition === "left" ? (
         <Icon
           name={icon}
+          allowFontScaling
           style={[{ marginRight: 0 }, iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
@@ -170,6 +171,7 @@ export const Button = ({
       {icon && !loading && iconPosition === "right" ? (
         <Icon
           name={icon}
+          allowFontScaling
           style={[{ marginLeft: 0 }, iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}

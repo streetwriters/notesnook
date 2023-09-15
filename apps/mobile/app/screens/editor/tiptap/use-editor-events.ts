@@ -28,7 +28,8 @@ import {
   InteractionManager,
   Keyboard,
   KeyboardEventListener,
-  NativeEventSubscription
+  NativeEventSubscription,
+  useWindowDimensions
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
 import { db } from "../../../common/database";
@@ -142,6 +143,8 @@ export const useEditorEvents = (
   const handleBack = useRef<NativeEventSubscription>();
   const readonly = useEditorStore((state) => state.readonly);
   const isPremium = useUserStore((state) => state.premium);
+  const { fontScale } = useWindowDimensions();
+
   const doubleSpacedLines = useSettingStore(
     (state) => state.settings?.doubleSpacedLines
   );
@@ -195,7 +198,8 @@ export const useEditorEvents = (
           : defaultFontSize,
       fontFamily: SettingsService.get().defaultFontFamily,
       dateFormat: db.settings?.getDateFormat(),
-      timeFormat: db.settings?.getTimeFormat()
+      timeFormat: db.settings?.getTimeFormat(),
+      fontScale
     });
   }, [
     fullscreen,
@@ -215,7 +219,8 @@ export const useEditorEvents = (
     defaultFontFamily,
     dateFormat,
     timeFormat,
-    loading
+    loading,
+    fontScale
   ]);
 
   const onBackPress = useCallback(async () => {

@@ -45,8 +45,6 @@ const Paragraph = ({
   return (
     <Component
       layout={restProps.layout || Layout}
-      allowFontScaling
-      maxFontSizeMultiplier={1}
       {...restProps}
       style={[
         {

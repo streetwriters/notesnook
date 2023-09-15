@@ -209,13 +209,19 @@ export const PinItem = React.memo(
                 justifyContent: "center"
               }}
             >
-              <Icon color={color} size={SIZE.lg - 2} name={icons[item.type]} />
+              <Icon
+                allowFontScaling
+                color={color}
+                size={SIZE.lg - 2}
+                name={icons[item.type]}
+              />
               <Icon
                 style={{
                   position: "absolute",
                   bottom: -6,
                   left: -6
                 }}
+                allowFontScaling
                 color={color}
                 size={SIZE.xs}
                 name="arrow-top-right-thick"

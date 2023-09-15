@@ -59,7 +59,6 @@ const Heading = ({
     <Component
       layout={restProps.layout || Layout}
       allowFontScaling={true}
-      maxFontSizeMultiplier={1}
       {...restProps}
       style={[
         {

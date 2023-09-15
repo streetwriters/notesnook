@@ -113,7 +113,7 @@ function Header({
               }}
             >
               <ArrowBackIcon
-                size={27}
+                size={27 * settings.fontScale}
                 style={{
                   position: "absolute"
                 }}
@@ -152,7 +152,7 @@ function Header({
                     ? "var(--nn_secondary_background)"
                     : "var(--nn_primary_paragraph)"
                 }
-                size={25}
+                size={25 * settings.fontScale}
                 style={{
                   position: "absolute"
                 }}
@@ -182,7 +182,7 @@ function Header({
                     ? "var(--nn_secondary_background)"
                     : "var(--nn_primary_paragraph)"
                 }
-                size={25}
+                size={25 * settings.fontScale}
                 style={{
                   position: "absolute"
                 }}
@@ -208,7 +208,7 @@ function Header({
                 }}
               >
                 <CrownIcon
-                  size={25}
+                  size={25 * settings.fontScale}
                   style={{
                     position: "absolute"
                   }}
@@ -235,7 +235,7 @@ function Header({
               }}
             >
               <MagnifyIcon
-                size={25}
+                size={25 * settings.fontScale}
                 style={{
                   position: "absolute"
                 }}
@@ -263,7 +263,7 @@ function Header({
                 }}
               >
                 <FullscreenIcon
-                  size={25}
+                  size={25 * settings.fontScale}
                   style={{
                     position: "absolute"
                   }}
@@ -291,7 +291,7 @@ function Header({
               }}
             >
               <DotsHorizontalIcon
-                size={25}
+                size={25 * settings.fontScale}
                 style={{
                   position: "absolute"
                 }}
@@ -310,6 +310,7 @@ export default React.memo(Header, (prev, next) => {
     prev.settings.deviceMode !== next.settings.deviceMode ||
     prev.settings.fullscreen !== next.settings.fullscreen ||
     prev.settings.premium !== next.settings.premium ||
+    prev.settings.fontScale !== next.settings.fontScale ||
     prev.noHeader !== next.noHeader ||
     prev.hasRedo !== next.hasRedo ||
     prev.hasUndo !== next.hasUndo

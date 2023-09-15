@@ -52,6 +52,7 @@ export type Settings = {
   fontFamily: string;
   dateFormat: string;
   timeFormat: string;
+  fontScale: number;
 };
 
 export type EditorProps = {

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { View } from "react-native";
+import { Dimensions, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useMessageStore } from "../../stores/use-message-store";
 import { useThemeColors } from "@notesnook/theme";
@@ -32,6 +32,7 @@ export const Card = ({ color, warning }) => {
   color = color ? color : colors.primary.accent;
   const messageBoardState = useMessageStore((state) => state.message);
   const announcement = useMessageStore((state) => state.announcement);
+  const fontScale = Dimensions.get("window").fontScale;
 
   return !messageBoardState.visible || announcement || warning ? null : (
     <View
@@ -44,7 +45,6 @@ export const Card = ({ color, warning }) => {
         type="gray"
         customStyle={{
           paddingVertical: 12,
-          width: "95%",
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
@@ -54,17 +54,18 @@ export const Card = ({ color, warning }) => {
         <View
           style={{
             flexDirection: "row",
-            alignItems: "center"
+            alignItems: "center",
+            flexShrink: 1
           }}
         >
           <View
             style={{
-              width: 40,
+              width: 40 * fontScale,
               backgroundColor:
                 messageBoardState.type === "error"
                   ? hexToRGBA(colors.static.red, 0.15)
                   : hexToRGBA(color, 0.15),
-              height: 40,
+              height: 40 * fontScale,
               borderRadius: 100,
               alignItems: "center",
               justifyContent: "center"
@@ -75,6 +76,7 @@ export const Card = ({ color, warning }) => {
               color={
                 messageBoardState.type === "error" ? colors.error.icon : color
               }
+              allowFontScaling
               name={messageBoardState.icon}
             />
           </View>
@@ -91,7 +93,7 @@ export const Card = ({ color, warning }) => {
             </Paragraph>
             <Paragraph
               style={{
-                flexWrap: "wrap",
+                flexWrap: "no-wrap",
                 flexShrink: 1
               }}
               color={colors.primary.heading}
@@ -101,22 +103,24 @@ export const Card = ({ color, warning }) => {
           </View>
         </View>
 
-        <View
-          style={{
-            width: 40,
-            height: 40,
-            justifyContent: "center",
-            alignItems: "center"
-          }}
-        >
-          <Icon
-            name="chevron-right"
-            color={
-              messageBoardState.type === "error" ? colors.error.icon : color
-            }
-            size={SIZE.lg}
-          />
-        </View>
+        {fontScale > 1 ? null : (
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Icon
+              name="chevron-right"
+              color={
+                messageBoardState.type === "error" ? colors.error.icon : color
+              }
+              size={SIZE.lg}
+            />
+          </View>
+        )}
       </PressableButton>
     </View>
   );
