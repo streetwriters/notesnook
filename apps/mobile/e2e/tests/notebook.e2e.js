@@ -33,7 +33,7 @@ import {
   visibleById
 } from "./utils";
 
-async function createNotebook(
+export async function createNotebook(
   title = "Notebook 1",
   description = true,
   topic = true,

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { notesnook } from "../test.ids";
+import { createNotebook } from "./notebook.e2e";
 import {
   tapById,
   visibleByText,
@@ -25,7 +26,8 @@ import {
   prepare,
   tapByText,
   notVisibleByText,
-  sleep
+  sleep,
+  navigate
 } from "./utils";
 
 async function sortBy(sorting, elementText = "Default") {
@@ -102,6 +104,23 @@ describe("Sort & filter", () => {
     await sortBy("Month");
     await sleep(300);
     await visibleByText("Month");
+  });
+
+  it("Sort notes in topic", async () => {
+    await prepare();
+    await navigate("Notebooks");
+    await sleep(500);
+    await createNotebook("Notebook 1", true, true);
+    await sleep(500);
+    await device.pressBack();
+    await sleep(500);
+    await tapByText("Topic");
+    await createNote("A", "A letter");
+    await sleep(500);
+    await createNote("B", "B letter");
+    await sortBy("Abc");
+    await sleep(300);
+    await visibleByText("N");
   });
 
   it("Compact mode", async () => {
