@@ -227,14 +227,14 @@ function getUpcomingReminderTime(reminder) {
       return relativeTime.day(sorted[0]).add(1, "week").valueOf();
     else {
       for (const day of reminder.selectedDays)
-        if (now.day() < day) return relativeTime.day(day).valueOf();
+        if (now.day() <= day) return relativeTime.day(day).valueOf();
     }
   } else if (isMonth) {
     if (now.date() > lastSelectedDay || isPast)
       return relativeTime.date(sorted[0]).add(1, "month").valueOf();
     else {
       for (const day of reminder.selectedDays)
-        if (now.date() < day) return relativeTime.date(day).valueOf();
+        if (now.date() <= day) return relativeTime.date(day).valueOf();
     }
   }
 
