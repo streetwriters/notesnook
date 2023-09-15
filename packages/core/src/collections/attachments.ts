@@ -19,11 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ICollection } from "./collection";
 import { getId } from "../utils/id";
-import { deleteItem, hasItem } from "../utils/array";
+import { hasItem } from "../utils/array";
 import { EV, EVENTS } from "../common";
 import dataurl from "../utils/dataurl";
 import dayjs from "dayjs";
-import { set } from "../utils/set";
 import {
   getFileNameWithExtension,
   isImage,
@@ -32,12 +31,7 @@ import {
 import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
 import { CachedCollection } from "../database/cached-collection";
 import { Output } from "../interfaces";
-import {
-  Attachment,
-  AttachmentMetadata,
-  MaybeDeletedItem,
-  isDeleted
-} from "../types";
+import { Attachment, AttachmentMetadata, isDeleted } from "../types";
 import Database from "../api";
 
 export class Attachments implements ICollection {
@@ -108,27 +102,6 @@ export class Attachments implements ICollection {
     await this.collection.init();
   }
 
-  merge(
-    localAttachment: MaybeDeletedItem<Attachment> | undefined,
-    remoteAttachment: MaybeDeletedItem<Attachment>
-  ) {
-    if (isDeleted(remoteAttachment)) return remoteAttachment;
-
-    if (
-      localAttachment &&
-      !isDeleted(localAttachment) &&
-      localAttachment.noteIds
-    ) {
-      remoteAttachment.noteIds = set.union(
-        remoteAttachment.noteIds,
-        localAttachment.noteIds
-      );
-      remoteAttachment.remote = false;
-    }
-
-    return remoteAttachment;
-  }
-
   async add(
     item: Partial<
       Omit<Attachment, "key" | "metadata"> & {
@@ -145,7 +118,6 @@ export class Attachments implements ICollection {
       (a) => a.metadata.hash === item.metadata?.hash
     );
     const id = oldAttachment?.id || getId();
-    const noteIds = set.union(oldAttachment?.noteIds || [], item.noteIds || []);
 
     const encryptedKey = item.key
       ? await this.encryptKey(item.key)
@@ -154,7 +126,6 @@ export class Attachments implements ICollection {
       ...oldAttachment,
       ...oldAttachment?.metadata,
       ...item,
-      noteIds,
       key: encryptedKey
     };
 
@@ -193,7 +164,6 @@ export class Attachments implements ICollection {
     return this.collection.add({
       type: "attachment",
       id,
-      noteIds,
       iv,
       salt,
       length,
@@ -226,21 +196,11 @@ export class Attachments implements ICollection {
     return JSON.parse(plainData);
   }
 
-  async delete(hashOrId: string, noteId: string) {
-    const attachment = this.attachment(hashOrId);
-    if (!attachment || !deleteItem(attachment.noteIds, noteId)) return;
-    if (!attachment.noteIds.length) {
-      attachment.dateDeleted = Date.now();
-      EV.publish(EVENTS.attachmentDeleted, attachment);
-    }
-    return await this.collection.update(attachment);
-  }
-
   async remove(hashOrId: string, localOnly: boolean) {
     const attachment = this.attachment(hashOrId);
     if (!attachment) return false;
 
-    if (!localOnly && !(await this._canDetach(attachment)))
+    if (!localOnly && !(await this.canDetach(attachment)))
       throw new Error("This attachment is inside a locked note.");
 
     if (
@@ -261,38 +221,37 @@ export class Attachments implements ICollection {
   }
 
   async detach(attachment: Attachment) {
-    for (const noteId of attachment.noteIds) {
-      const note = this.db.notes.note(noteId);
-      if (!note || !note.data.contentId) continue;
-      await this.db.content.removeAttachments(note.data.contentId, [
+    for (const note of this.db.relations.from(attachment, "note").resolved()) {
+      if (!note || !note.contentId) continue;
+      await this.db.content.removeAttachments(note.contentId, [
         attachment.metadata.hash
       ]);
     }
   }
 
-  async _canDetach(attachment: Attachment) {
-    for (const noteId of attachment.noteIds) {
-      const note = this.db.notes?.note(noteId);
-      if (note && note.data.locked) return false;
-    }
-
-    return true;
+  private async canDetach(attachment: Attachment) {
+    return this.db.relations
+      .from(attachment, "note")
+      .resolved()
+      .every((note) => !note.locked);
   }
 
   ofNote(
     noteId: string,
-    type: "files" | "images" | "webclips" | "all"
+    ...types: ("files" | "images" | "webclips" | "all")[]
   ): Attachment[] {
-    let attachments: Attachment[] = [];
+    const noteAttachments = this.db.relations
+      .from({ type: "note", id: noteId }, "attachment")
+      .resolved();
 
-    if (type === "files") attachments = this.files;
-    else if (type === "images") attachments = this.images;
-    else if (type === "webclips") attachments = this.webclips;
-    else if (type === "all") attachments = this.all;
+    if (types.includes("all")) return noteAttachments;
 
-    return attachments.filter((attachment) =>
-      hasItem(attachment.noteIds, noteId)
-    );
+    return noteAttachments.filter((a) => {
+      if (isImage(a.metadata.type) && types.includes("images")) return true;
+      else if (isWebClip(a.metadata.type) && types.includes("webclips"))
+        return true;
+      else if (types.includes("files")) return true;
+    });
   }
 
   exists(hash: string) {
@@ -387,11 +346,11 @@ export class Attachments implements ICollection {
   }
 
   async downloadMedia(noteId: string, hashesToLoad?: string[]) {
-    const attachments = this.media.filter(
-      (attachment) =>
-        hasItem(attachment.noteIds, noteId) &&
-        (!hashesToLoad || hasItem(hashesToLoad, attachment.metadata.hash))
-    );
+    let attachments = this.ofNote(noteId, "images", "webclips");
+    if (hashesToLoad)
+      attachments = attachments.filter((a) =>
+        hasItem(hashesToLoad, a.metadata.hash)
+      );
 
     await this.db.fs().queueDownloads(
       attachments.map((a) => ({
