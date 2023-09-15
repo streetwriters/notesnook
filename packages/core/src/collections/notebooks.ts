@@ -19,18 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { createNotebookModel } from "../models/notebook";
 import { getId } from "../utils/id";
-import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { CachedCollection } from "../database/cached-collection";
-import Topics from "./topics";
 import Database from "../api";
-import {
-  MaybeDeletedItem,
-  Notebook,
-  Topic,
-  TrashOrItem,
-  isDeleted,
-  isTrashItem
-} from "../types";
+import { BaseTrashItem, Notebook, TrashOrItem, isTrashItem } from "../types";
 import { ICollection } from "./collection";
 
 export class Notebooks implements ICollection {
@@ -51,63 +42,7 @@ export class Notebooks implements ICollection {
     return this.collection.init();
   }
 
-  merge(
-    localNotebook: MaybeDeletedItem<TrashOrItem<Notebook>> | undefined,
-    remoteNotebook: MaybeDeletedItem<TrashOrItem<Notebook>>,
-    lastSyncedTimestamp: number
-  ) {
-    if (isDeleted(remoteNotebook) || isTrashItem(remoteNotebook))
-      return remoteNotebook;
-
-    if (
-      localNotebook &&
-      (isTrashItem(localNotebook) || isDeleted(localNotebook))
-    ) {
-      if (localNotebook.dateModified > remoteNotebook.dateModified) return;
-      return remoteNotebook;
-    }
-
-    if (localNotebook && localNotebook.topics?.length) {
-      let isChanged = false;
-      // merge new and old topics
-      for (const oldTopic of localNotebook.topics) {
-        const newTopicIndex = remoteNotebook.topics.findIndex(
-          (t) => t.id === oldTopic.id
-        );
-        const newTopic = remoteNotebook.topics[newTopicIndex];
-
-        // CASE 1: if topic exists in old notebook but not in new notebook, it's deleted.
-        // However, if the dateEdited of topic in the old notebook is > lastSyncedTimestamp
-        // it was newly added or edited so add it to the new notebook.
-        if (!newTopic && oldTopic.dateEdited > lastSyncedTimestamp) {
-          remoteNotebook.topics.push({ ...oldTopic, dateEdited: Date.now() });
-          isChanged = true;
-        }
-
-        // CASE 2: if topic exists in new notebook but not in old notebook, it's new.
-        // This case will be automatically handled as the new notebook is our source of truth.
-
-        // CASE 3: if topic exists in both notebooks:
-        //      if oldTopic.dateEdited > newTopic.dateEdited: we keep oldTopic
-        //      and merge the notes of both topics.
-        else if (newTopic && oldTopic.dateEdited > newTopic.dateEdited) {
-          remoteNotebook.topics[newTopicIndex] = {
-            ...oldTopic,
-            dateEdited: Date.now()
-          };
-          isChanged = true;
-        }
-      }
-      remoteNotebook.remote = !isChanged;
-    }
-    return remoteNotebook;
-  }
-
-  async add(
-    notebookArg: Partial<
-      Omit<Notebook, "topics"> & { topics: Partial<Topic>[] }
-    >
-  ) {
+  async add(notebookArg: Partial<Notebook>) {
     if (!notebookArg) throw new Error("Notebook cannot be undefined or null.");
     if (notebookArg.remote)
       throw new Error(
@@ -121,17 +56,9 @@ export class Notebooks implements ICollection {
     if (oldNotebook && isTrashItem(oldNotebook))
       throw new Error("Cannot modify trashed notebooks.");
 
-    if (
-      !oldNotebook &&
-      this.all.length >= 3 &&
-      !(await checkIsUserPremium(CHECK_IDS.notebookAdd))
-    )
-      return;
-
     const mergedNotebook: Partial<Notebook> = {
       ...oldNotebook,
-      ...notebookArg,
-      topics: oldNotebook?.topics || []
+      ...notebookArg
     };
 
     if (!mergedNotebook.title)
@@ -143,7 +70,6 @@ export class Notebooks implements ICollection {
       title: mergedNotebook.title,
       description: mergedNotebook.description,
       pinned: !!mergedNotebook.pinned,
-      topics: mergedNotebook.topics || [],
 
       dateCreated: mergedNotebook.dateCreated || Date.now(),
       dateModified: mergedNotebook.dateModified || Date.now(),
@@ -151,10 +77,6 @@ export class Notebooks implements ICollection {
     };
 
     await this.collection.add(notebook);
-
-    if (!oldNotebook && notebookArg.topics) {
-      await this.topics(id).add(...notebookArg.topics);
-    }
     return id;
   }
 
@@ -175,7 +97,7 @@ export class Notebooks implements ICollection {
   get trashed() {
     return this.raw.filter((item) =>
       isTrashItem(item)
-    ) as TrashOrItem<Notebook>[];
+    ) as BaseTrashItem<Notebook>[];
   }
 
   async pin(...ids: string[]) {
@@ -192,18 +114,17 @@ export class Notebooks implements ICollection {
     }
   }
 
-  topics(id: string) {
-    return new Topics(id, this.db);
-  }
-
   totalNotes(id: string) {
-    const notebook = this.collection.get(id);
-    if (!notebook || isTrashItem(notebook)) return 0;
     let count = 0;
-    for (const topic of notebook.topics) {
-      count += this.db.notes.topicReferences.count(topic.id);
+    const subNotebooks = this.db.relations.from(
+      { type: "notebook", id },
+      "notebook"
+    );
+    for (const notebook of subNotebooks) {
+      count += this.totalNotes(notebook.to.id);
     }
-    return count + this.db.relations.from(notebook, "note").resolved().length;
+    count += this.db.relations.from({ type: "notebook", id }, "note").length;
+    return count;
   }
 
   notebook(idOrNotebook: string | Notebook) {

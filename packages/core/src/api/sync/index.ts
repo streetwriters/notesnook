@@ -335,8 +335,6 @@ class Sync {
   }
 
   async stop(lastSynced: number) {
-    // refresh topic references
-    this.db.notes.topicReferences.rebuild();
     // refresh monographs on sync completed
     await this.db.monographs.init();
 
@@ -373,9 +371,6 @@ class Sync {
    * @private
    */
   async onPushCompleted(lastSynced: number) {
-    // refresh topic references
-    this.db.notes.topicReferences.rebuild();
-
     this.db.eventManager.publish(
       EVENTS.databaseSyncRequested,
       false,

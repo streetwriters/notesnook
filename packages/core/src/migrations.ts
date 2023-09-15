@@ -246,6 +246,15 @@ const migrations: Migration[] = [
             await db.colors.delete(oldColorId);
           }
         }
+
+        if (item.notebooks) {
+          for (const notebook of item.notebooks) {
+            for (const topic of notebook.topics) {
+              await db.relations.add({ type: "notebook", id: topic }, item);
+            }
+          }
+        }
+
         delete item.tags;
         delete item.color;
         return true;
@@ -259,6 +268,27 @@ const migrations: Migration[] = [
         }
         delete item.noteIds;
         return true;
+      },
+      notebook: async (item, db) => {
+        for (const topic of item.topics || []) {
+          const subNotebookId = await db.notebooks.add({
+            id: topic.id,
+            title: topic.title,
+            dateCreated: topic.dateCreated,
+            dateEdited: topic.dateEdited,
+            dateModified: topic.dateModified
+          });
+          if (!subNotebookId) continue;
+          await db.relations.add(item, { id: subNotebookId, type: "notebook" });
+        }
+        delete item.topics;
+        return true;
+      },
+      shortcut: (item) => {
+        if (item.item.type === "topic") {
+          item.item = { type: "notebook", id: item.item.id };
+          return true;
+        }
       }
     }
   },

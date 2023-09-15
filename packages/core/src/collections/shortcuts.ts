@@ -96,13 +96,6 @@ export class Shortcuts implements ICollection {
           item = notebook ? notebook.data : null;
           break;
         }
-        case "topic": {
-          const topic = this.db.notebooks
-            .topics(shortcut.item.notebookId)
-            .topic(id);
-          if (topic) item = topic._topic;
-          break;
-        }
         case "tag":
           item = this.db.tags.tag(id);
           break;
