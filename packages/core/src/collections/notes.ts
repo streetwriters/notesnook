@@ -302,11 +302,7 @@ export class Notes implements ICollection {
 
       await this.db.relations.unlinkAll(item, "tag");
       await this.db.relations.unlinkAll(item, "color");
-
-      const attachments = this.db.attachments.ofNote(itemData.id, "all");
-      for (const attachment of attachments) {
-        await this.db.attachments.delete(attachment.metadata.hash, itemData.id);
-      }
+      await this.db.relations.unlinkAll(item, "attachment");
 
       if (moveToTrash && !isTrashItem(itemData))
         await this.db.trash.add(itemData);
