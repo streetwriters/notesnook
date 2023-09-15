@@ -94,6 +94,16 @@ describe("format reminder time", () => {
     expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 09:00 PM");
   });
 
+  test("weekly reminder [current week, today with multiple days]", () => {
+    const reminder = {
+      recurringMode: "week",
+      date: new Date(5).setHours(21),
+      selectedDays: [1, 2, 5, 6],
+      mode: "repeat"
+    };
+    expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 09:00 PM");
+  });
+
   test("monthly reminder [current month]", () => {
     const reminder = {
       recurringMode: "month",
@@ -123,6 +133,16 @@ describe("format reminder time", () => {
       recurringMode: "month",
       date: new Date(0).setHours(21),
       selectedDays: [6],
+      mode: "repeat"
+    };
+    expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 09:00 PM");
+  });
+
+  test("monthly reminder [current month, today with multiple days]", () => {
+    const reminder = {
+      recurringMode: "month",
+      date: new Date(0).setHours(21),
+      selectedDays: [6, 7, 8],
       mode: "repeat"
     };
     expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 09:00 PM");
