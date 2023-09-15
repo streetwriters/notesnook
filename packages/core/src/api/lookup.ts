@@ -26,7 +26,6 @@ import {
   Notebook,
   Reminder,
   Tag,
-  Topic,
   TrashItem,
   isDeleted
 } from "../types";
@@ -55,16 +54,7 @@ export default class Lookup {
   }
 
   notebooks(array: Notebook[], query: string) {
-    return search(
-      array,
-      query,
-      (n) =>
-        `${n.title} ${n.description} ${n.topics.map((t) => t.title).join(" ")}`
-    );
-  }
-
-  topics(array: Topic[], query: string) {
-    return this.byTitle(array, query);
+    return search(array, query, (n) => `${n.title} ${n.description}}`);
   }
 
   tags(array: GroupedItems<Tag>, query: string) {
