@@ -53,7 +53,7 @@ function Title({
       contentEditable={!readonly}
       disabled={readonly}
       style={{
-        height: 40,
+        height: 40 * (settingsController.previous?.fontScale || 1),
         fontSize: 25,
         width: "100%",
         boxSizing: "border-box",

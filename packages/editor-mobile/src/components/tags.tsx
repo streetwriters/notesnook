@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useRef, useState } from "react";
-import { EventTypes } from "../utils";
+import { EventTypes, Settings } from "../utils";
 import styles from "./styles.module.css";
 
-function Tags(): JSX.Element {
+function Tags(props: { settings: Settings }): JSX.Element {
   const [tags, setTags] = useState<{ title: string; alias: string }[]>([]);
   const editorTags = useRef({
     setTags: setTags
@@ -36,6 +36,7 @@ function Tags(): JSX.Element {
     }
     post(EventTypes.newtag);
   };
+  const fontScale = props.settings?.fontScale || 1;
 
   return (
     <div
@@ -83,9 +84,9 @@ function Tags(): JSX.Element {
         <svg
           xmlns="http://www.w3.org/2000/svg"
           version="1.1"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
+          width={20 * fontScale}
+          height={20 * fontScale}
+          viewBox={`0 0 24 24`}
         >
           <path
             fill="var(--nn_primary_accent)"
@@ -123,4 +124,7 @@ function Tags(): JSX.Element {
   );
 }
 
-export default React.memo(Tags, () => true);
+export default React.memo(Tags, (prev, next) => {
+  if (prev.settings.fontScale !== next.settings.fontScale) return false;
+  return true;
+});

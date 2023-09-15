@@ -649,7 +649,7 @@ export const useActions = ({ close = () => null, item }) => {
     },
     {
       id: "favorite",
-      title: item.favorite ? "Unfavorite" : "Favorite",
+      title: item.favorite ? "Unfav" : "Fav",
       icon: item.favorite ? "star-off" : "star-outline",
       func: addToFavorites,
       close: false,

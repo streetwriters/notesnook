@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { FlatList, ScrollView, View } from "react-native";
+import { Dimensions, FlatList, ScrollView, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useActions } from "../../hooks/use-actions";
 import { DDS } from "../../services/device-detection";
@@ -33,9 +33,11 @@ export const Items = ({ item, buttons, close }) => {
   const dimensions = useSettingStore((state) => state.dimensions);
   const actions = useActions({ item, close });
   const data = actions.filter((i) => buttons.indexOf(i.id) > -1 && !i.hidden);
-
   let width = dimensions.width > 600 ? 600 : dimensions.width;
-  let columnItemsCount = DDS.isLargeTablet() ? 7 : 5;
+  const shouldShrink =
+    Dimensions.get("window").fontScale > 1 &&
+    Dimensions.get("window").width < 450;
+  let columnItemsCount = DDS.isLargeTablet() ? 7 : shouldShrink ? 4 : 5;
   let columnItemWidth = DDS.isTab
     ? (width - 12) / columnItemsCount
     : (width - 12) / columnItemsCount;
@@ -66,6 +68,7 @@ export const Items = ({ item, buttons, close }) => {
         }}
       >
         <Icon
+          allowFontScaling
           name={item.icon}
           size={DDS.isTab ? SIZE.xxl : SIZE.lg}
           color={
@@ -78,7 +81,11 @@ export const Items = ({ item, buttons, close }) => {
         />
       </PressableButton>
 
-      <Paragraph size={SIZE.xs} style={{ textAlign: "center" }}>
+      <Paragraph
+        size={SIZE.xs}
+        textBreakStrategy="simple"
+        style={{ textAlign: "center" }}
+      >
         {item.title}
       </Paragraph>
     </View>
@@ -139,6 +146,7 @@ export const Items = ({ item, buttons, close }) => {
         >
           <Icon
             name={item.icon}
+            allowFontScaling
             size={DDS.isTab ? SIZE.xxl : SIZE.md + 4}
             color={
               item.on
@@ -150,7 +158,11 @@ export const Items = ({ item, buttons, close }) => {
           />
         </PressableButton>
 
-        <Paragraph size={SIZE.xxs + 1} style={{ textAlign: "center" }}>
+        <Paragraph
+          textBreakStrategy="simple"
+          size={SIZE.xxs + 1}
+          style={{ textAlign: "center" }}
+        >
           {item.title}
         </Paragraph>
       </PressableButton>
@@ -163,9 +175,12 @@ export const Items = ({ item, buttons, close }) => {
     "copy",
     "share",
     "export",
-    "lock-unlock",
-    "publish"
+    "lock-unlock"
   ];
+  if (!shouldShrink) {
+    topBarItemsList.push("publish");
+  }
+
   const topBarItems = data.filter(
     (item) => topBarItemsList.indexOf(item.id) > -1
   );

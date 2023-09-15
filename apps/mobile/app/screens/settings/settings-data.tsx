@@ -628,7 +628,9 @@ export const settingsGroups: SettingSection[] = [
         name: "CORS bypass proxy",
         description: "You can set a custom proxy URL to increase your privacy.",
         inputProperties: {
-          defaultValue: "https://cors.notesnook.com"
+          defaultValue: "https://cors.notesnook.com",
+          autoCorrect: false,
+          keyboardType: "url"
         },
         property: "corsProxy",
         icon: "arrow-decision-outline"

@@ -202,7 +202,7 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
         >
           {settings.noHeader ? null : (
             <>
-              <Tags />
+              <Tags settings={settings} />
               <Title
                 titlePlaceholder={controller.titlePlaceholder}
                 readonly={settings.readonly}

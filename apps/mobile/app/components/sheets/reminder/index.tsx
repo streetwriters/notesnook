@@ -253,6 +253,57 @@ export default function ReminderSheet({
           marginBottom: DDS.isTab ? 25 : undefined
         }}
       >
+        {reminderMode === ReminderModes.Permanent ? null : (
+          <ScrollView
+            style={{
+              flexDirection: "row",
+              borderWidth: 1,
+              marginTop: 12,
+              borderRadius: 5,
+              borderColor: colors.primary.border,
+              paddingLeft: 12,
+              height: 50
+            }}
+            horizontal
+          >
+            {Object.keys(ReminderNotificationModes).map((mode) => (
+              <Button
+                key={mode}
+                title={mode}
+                style={{
+                  marginRight: 12,
+                  borderRadius: 100
+                }}
+                icon={
+                  mode === "Silent"
+                    ? "minus-circle"
+                    : mode === "Vibrate"
+                    ? "vibrate"
+                    : "volume-high"
+                }
+                height={35}
+                type={
+                  reminderNotificationMode ===
+                  ReminderNotificationModes[
+                    mode as keyof typeof ReminderNotificationModes
+                  ]
+                    ? "grayAccent"
+                    : "gray"
+                }
+                onPress={() => {
+                  const _mode = ReminderNotificationModes[
+                    mode as keyof typeof ReminderNotificationModes
+                  ] as Reminder["priority"];
+                  SettingsService.set({
+                    reminderNotificationMode: _mode
+                  });
+                  setReminderNotificatioMode(_mode);
+                }}
+              />
+            ))}
+          </ScrollView>
+        )}
+
         <Input
           fwdRef={titleRef}
           defaultValue={reminder?.title || referencedItem?.title}
@@ -280,15 +331,21 @@ export default function ReminderSheet({
           }}
           height={80}
           wrapperStyle={{
-            marginBottom: 20
+            marginBottom: 12
           }}
         />
 
-        <View
+        <ScrollView
           style={{
             flexDirection: "row",
-            marginBottom: 12
+            marginBottom: 12,
+            height: 50,
+            borderWidth: 1,
+            borderRadius: 5,
+            borderColor: colors.primary.border,
+            paddingLeft: 12
           }}
+          horizontal
         >
           {Object.keys(ReminderModes).map((mode) => (
             <Button
@@ -327,7 +384,7 @@ export default function ReminderSheet({
               }}
             />
           ))}
-        </View>
+        </ScrollView>
 
         {reminderMode === ReminderModes.Repeat ? (
           <View
@@ -498,53 +555,6 @@ export default function ReminderSheet({
           </View>
         )}
 
-        {reminderMode === ReminderModes.Permanent ? null : (
-          <View
-            style={{
-              flexDirection: "row",
-              marginBottom: 12,
-              paddingTop: 12,
-              borderTopWidth: 1,
-              borderTopColor: colors.secondary.background
-            }}
-          >
-            {Object.keys(ReminderNotificationModes).map((mode) => (
-              <Button
-                key={mode}
-                title={mode}
-                style={{
-                  marginRight: 12,
-                  borderRadius: 100
-                }}
-                icon={
-                  mode === "Silent"
-                    ? "minus-circle"
-                    : mode === "Vibrate"
-                    ? "vibrate"
-                    : "volume-high"
-                }
-                height={35}
-                type={
-                  reminderNotificationMode ===
-                  ReminderNotificationModes[
-                    mode as keyof typeof ReminderNotificationModes
-                  ]
-                    ? "grayAccent"
-                    : "gray"
-                }
-                onPress={() => {
-                  const _mode = ReminderNotificationModes[
-                    mode as keyof typeof ReminderNotificationModes
-                  ] as Reminder["priority"];
-                  SettingsService.set({
-                    reminderNotificationMode: _mode
-                  });
-                  setReminderNotificatioMode(_mode);
-                }}
-              />
-            ))}
-          </View>
-        )}
         {reminderMode === ReminderModes.Once ||
         reminderMode === ReminderModes.Permanent ? null : (
           <View
@@ -595,6 +605,11 @@ export default function ReminderSheet({
           }}
         />
       </ScrollView>
+      <View
+        style={{
+          height: 10
+        }}
+      />
     </View>
   );
 }

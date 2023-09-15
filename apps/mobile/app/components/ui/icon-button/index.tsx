@@ -92,6 +92,7 @@ export const IconButton = ({
         layout={Layout}
         name={name}
         style={iconStyle as any}
+        allowFontScaling
         color={
           restProps.disabled
             ? RGB_Linear_Shade(-0.05, hexToRGBA(colors.secondary.background))

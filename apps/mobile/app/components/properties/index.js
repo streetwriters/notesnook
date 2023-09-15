@@ -16,8 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React from "react";
-import { Platform, View } from "react-native";
+import React, { useRef } from "react";
+import { Dimensions, Platform, View, useWindowDimensions } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
@@ -54,7 +54,6 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   const { colors } = useThemeColors();
   const alias = item.alias || item.title;
   const isColor = !!ColorValues[item.title];
-
   if (!item || !item.id) {
     return (
       <Paragraph style={{ marginVertical: 10, alignSelf: "center" }}>
@@ -62,6 +61,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
       </Paragraph>
     );
   }
+
   return (
     <FlatList
       keyboardShouldPersistTaps="always"
@@ -135,6 +135,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
               }, 1000);
             }}
           />
+
           <Synced item={item} close={close} />
 
           {DDS.isTab ? (

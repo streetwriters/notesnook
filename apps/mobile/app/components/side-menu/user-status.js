@@ -113,6 +113,7 @@ export const UserStatus = () => {
               <Icon
                 name="checkbox-blank-circle"
                 size={11}
+                allowFontScaling
                 color={
                   !user || lastSyncStatus === SyncStatus.Failed
                     ? colors.error.icon
@@ -149,9 +150,15 @@ export const UserStatus = () => {
                 color={colors.error.icon}
                 name="sync-alert"
                 size={SIZE.lg}
+                allowFontScaling
               />
             ) : (
-              <Icon color={colors.primary.accent} name="sync" size={SIZE.lg} />
+              <Icon
+                allowFontScaling
+                color={colors.primary.accent}
+                name="sync"
+                size={SIZE.lg}
+              />
             )
           ) : null}
         </PressableButton>

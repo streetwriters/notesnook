@@ -44,6 +44,7 @@ export type Settings = {
   fontFamily: string;
   timeFormat: string;
   dateFormat: string;
+  fontScale: number;
 };
 
 /* eslint-disable no-var */

@@ -50,7 +50,7 @@ export function setRateAppMessage() {
 
 const recoveryKeyMessage = {
   visible: true,
-  message: "Keep your data safe if you lose password",
+  message: "Keep your data safe",
   actionText: "Save your account recovery key",
   onPress: () => {
     verifyUser(

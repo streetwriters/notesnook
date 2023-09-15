@@ -30,11 +30,13 @@ const modifyToolbarTheme = (toolbarTheme: Theme) => {
     paddingX: "20px",
     borderBottomWidth: 0
   };
-
+  const fontScale = settingsController.previous?.fontScale
+    ? settingsController.previous?.fontScale
+    : 1;
   toolbarTheme.iconSizes = {
-    big: 20,
-    medium: 18,
-    small: 18
+    big: 20 * fontScale,
+    medium: 18 * fontScale,
+    small: 18 * fontScale
   };
   toolbarTheme.fontSizes = {
     ...toolbarTheme.fontSizes,
