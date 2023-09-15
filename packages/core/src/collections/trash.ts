@@ -19,7 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import dayjs from "dayjs";
 import Database from "../api";
-import { BaseTrashItem, Note, Notebook, isTrashItem } from "../types";
+import {
+  BaseTrashItem,
+  Note,
+  Notebook,
+  TrashItem,
+  isTrashItem
+} from "../types";
 
 function toTrashItem<T extends Note | Notebook>(item: T): BaseTrashItem<T> {
   return {
@@ -33,10 +39,12 @@ function toTrashItem<T extends Note | Notebook>(item: T): BaseTrashItem<T> {
 
 export default class Trash {
   collections = ["notes", "notebooks"] as const;
+  cache: string[] = [];
   constructor(private readonly db: Database) {}
 
   async init() {
     await this.cleanup();
+    this.cache = this.all.map((t) => t.id);
   }
 
   async cleanup() {
@@ -54,8 +62,8 @@ export default class Trash {
     }
   }
 
-  get all() {
-    const trashItems = [];
+  get all(): TrashItem[] {
+    const trashItems: TrashItem[] = [];
     for (const key of this.collections) {
       const collection = this.db[key];
       trashItems.push(...collection.trashed);
@@ -78,22 +86,22 @@ export default class Trash {
     } else if (item.type === "notebook") {
       await this.db.notebooks.collection.update(toTrashItem(item));
     }
+    this.cache.push(item.id);
   }
 
   async delete(...ids: string[]) {
     for (const id of ids) {
-      if (!id) continue;
       const [item, collection] = this.getItem(id);
       if (!item || !collection) continue;
       if (item.itemType === "note") {
         if (item.contentId) await this.db.content.remove(item.contentId);
         await this.db.noteHistory.clearSessions(id);
       } else if (item.itemType === "notebook") {
-        await this.db.notes._clearAllNotebookReferences(item.id);
+        await this.db.relations.unlinkAll({ type: "notebook", id: item.id });
       }
       await collection.remove(id);
+      this.cache.splice(this.cache.indexOf(id), 1);
     }
-    this.db.notes.topicReferences.rebuild();
   }
 
   async restore(...ids: string[]) {
@@ -108,14 +116,15 @@ export default class Trash {
           type: "notebook"
         });
       }
+      this.cache.splice(this.cache.indexOf(id), 1);
     }
-    this.db.notes.topicReferences.rebuild();
   }
 
   async clear() {
     for (const item of this.all) {
       await this.delete(item.id);
     }
+    this.cache = [];
   }
 
   synced(id: string) {
@@ -131,6 +140,6 @@ export default class Trash {
    * @param {string} id
    */
   exists(id: string) {
-    return this.all.findIndex((item) => item.id === id) > -1;
+    return this.cache.includes(id);
   }
 }

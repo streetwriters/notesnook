@@ -43,18 +43,6 @@ test("create a duplicate shortcut of notebook", () =>
     expect(db.shortcuts.all[0].item.id).toBe(id);
   }));
 
-test("create shortcut of a topic", () =>
-  notebookTest().then(async ({ db, id }) => {
-    const notebook = db.notebooks.notebook(id).data;
-    const topic = notebook.topics[0];
-    await db.shortcuts.add({
-      item: { type: "topic", id: topic.id, notebookId: id }
-    });
-
-    expect(db.shortcuts.all).toHaveLength(1);
-    expect(db.shortcuts.all[0].item.id).toBe(topic.id);
-  }));
-
 test("pin a tag", () =>
   databaseTest().then(async (db) => {
     const tagId = await db.tags.add({ title: "HELLO!" });

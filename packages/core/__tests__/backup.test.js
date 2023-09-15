@@ -166,9 +166,7 @@ describe.each([
         db.notebooks.all.every((v) => v.title != null && v.dateModified > 0)
       ).toBeTruthy();
 
-      expect(
-        db.notebooks.all.every((v) => v.topics.every((topic) => !topic.notes))
-      ).toBeTruthy();
+      expect(db.notebooks.all.every((v) => !v.topics)).toBeTruthy();
 
       expect(
         db.attachments.all.every((v) => v.dateModified > 0 && !v.dateEdited)

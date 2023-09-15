@@ -25,6 +25,7 @@ import Database from "../api";
 
 type RelationsArray<TType extends keyof ItemMap> = Relation[] & {
   resolved: (limit?: number) => ItemMap[TType][];
+  has: (id: string) => boolean;
 };
 
 export class Relations implements ICollection {
@@ -71,9 +72,18 @@ export class Relations implements ICollection {
     reference: ItemReference,
     type: TType
   ): RelationsArray<TType> {
-    const relations = this.all.filter(
-      (a) => compareItemReference(a.from, reference) && a.to.type === type
-    );
+    const relations =
+      type === "note" || type === "notebook"
+        ? this.all.filter(
+            (a) =>
+              compareItemReference(a.from, reference) &&
+              a.to.type === type &&
+              !this.db.trash.exists(a.to.id)
+          )
+        : this.all.filter(
+            (a) => compareItemReference(a.from, reference) && a.to.type === type
+          );
+
     Object.defineProperties(relations, {
       resolved: {
         writable: false,
@@ -81,6 +91,12 @@ export class Relations implements ICollection {
         configurable: false,
         value: (limit?: number) =>
           this.resolve(limit ? relations.slice(0, limit) : relations, "to")
+      },
+      has: {
+        writable: false,
+        enumerable: false,
+        configurable: false,
+        value: (id: string) => relations.some((rel) => rel.to.id === id)
       }
     });
     return relations as RelationsArray<TType>;
@@ -90,9 +106,17 @@ export class Relations implements ICollection {
     reference: ItemReference,
     type: TType
   ): RelationsArray<TType> {
-    const relations = this.all.filter(
-      (a) => compareItemReference(a.to, reference) && a.from.type === type
-    );
+    const relations =
+      type === "note" || type === "notebook"
+        ? this.all.filter(
+            (a) =>
+              compareItemReference(a.to, reference) &&
+              a.from.type === type &&
+              !this.db.trash.exists(a.from.id)
+          )
+        : this.all.filter(
+            (a) => compareItemReference(a.to, reference) && a.from.type === type
+          );
     Object.defineProperties(relations, {
       resolved: {
         writable: false,
@@ -100,6 +124,12 @@ export class Relations implements ICollection {
         configurable: false,
         value: (limit?: number) =>
           this.resolve(limit ? relations.slice(0, limit) : relations, "from")
+      },
+      has: {
+        writable: false,
+        enumerable: false,
+        configurable: false,
+        value: (id: string) => relations.some((rel) => rel.from.id === id)
       }
     });
     return relations as RelationsArray<TType>;
@@ -133,9 +163,9 @@ export class Relations implements ICollection {
     await this.remove(relation.id);
   }
 
-  async unlinkAll(to: ItemReference, type: keyof ItemMap) {
+  async unlinkAll(to: ItemReference, type?: keyof ItemMap) {
     for (const relation of this.all.filter(
-      (a) => compareItemReference(a.to, to) && a.from.type === type
+      (a) => compareItemReference(a.to, to) && (!type || a.from.type === type)
     )) {
       await this.remove(relation.id);
     }
