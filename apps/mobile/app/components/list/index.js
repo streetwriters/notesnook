@@ -99,7 +99,7 @@ const List = ({
     type === "notebooks" ||
     notebooksListMode === "compact";
   const groupType =
-    screen === "Notes" ? "home" : screen === "Favorites" ? "favorites" : type;
+    screen === "Home" ? "home" : screen === "Favorites" ? "favorites" : type;
 
   const groupOptions = db.settings?.getGroupOptions(groupType);
   const dateBy =
@@ -114,7 +114,7 @@ const List = ({
         title={headerProps?.heading}
         dateBy={dateBy}
         type={
-          screen === "Notes"
+          screen === "Home"
             ? "home"
             : screen === "Favorites"
             ? "favorites"
@@ -230,7 +230,7 @@ const List = ({
         <JumpToSectionDialog
           screen={screen}
           data={listData}
-          type={screen === "Notes" ? "home" : type}
+          type={screen === "Home" ? "home" : type}
           scrollRef={scrollRef}
         />
       ) : null}

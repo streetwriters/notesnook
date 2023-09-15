@@ -71,7 +71,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
       <List
         listData={notes}
         type="notes"
-        screen="Notes"
+        screen="Home"
         loading={loading || !isFocused}
         headerProps={{
           heading: "Notes"
