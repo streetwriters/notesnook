@@ -139,6 +139,9 @@ export interface Note extends BaseItem<"note"> {
    * @deprecated only kept here for migration purposes.
    */
   color?: string;
+  /**
+   * @deprecated only kept here for migration purposes.
+   */
   notebooks?: NotebookReference[];
 
   pinned: boolean;
@@ -156,9 +159,15 @@ export interface Notebook extends BaseItem<"notebook"> {
   description?: string;
   dateEdited: number;
   pinned: boolean;
-  topics: Topic[];
+  /**
+   * @deprecated only kept here for migration purposes.
+   */
+  topics?: Topic[];
 }
 
+/**
+ * @deprecated only kept here for migration purposes.
+ */
 export interface Topic extends BaseItem<"topic"> {
   title: string;
   notebookId: string;
@@ -235,6 +244,9 @@ type TagNotebookShortcutReference = BaseShortcutReference & {
   type: "tag" | "notebook";
 };
 
+/**
+ * @deprecated only kept here for migration purposes
+ */
 type TopicShortcutReference = BaseShortcutReference & {
   type: "topic";
   notebookId: string;

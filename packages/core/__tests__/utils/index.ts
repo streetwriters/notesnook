@@ -26,23 +26,17 @@ import Compressor from "../../__mocks__/compressor.mock";
 import { expect } from "vitest";
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { randomBytes } from "../../src/utils/random";
-import { GroupOptions, Note, Notebook, Topic } from "../../src/types";
+import { GroupOptions, Note, Notebook } from "../../src/types";
 import { NoteContent } from "../../src/collections/session-content";
 
-const TEST_NOTEBOOK: Partial<
-  Omit<Notebook, "topics"> & { topics: Partial<Topic>[] }
-> = {
+const TEST_NOTEBOOK: Partial<Notebook> = {
   title: "Test Notebook",
-  description: "Test Description",
-  topics: [{ title: "hello" }]
+  description: "Test Description"
 };
 
-const TEST_NOTEBOOK2: Partial<
-  Omit<Notebook, "topics"> & { topics: Partial<Topic>[] }
-> = {
+const TEST_NOTEBOOK2: Partial<Notebook> = {
   title: "Test Notebook 2",
-  description: "Test Description 2",
-  topics: [{ title: "Home2" }]
+  description: "Test Description 2"
 };
 
 function databaseTest() {
