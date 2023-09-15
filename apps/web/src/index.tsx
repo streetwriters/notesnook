@@ -51,8 +51,6 @@ async function renderApp() {
 const serviceWorkerWhitelist: Routes[] = ["default"];
 async function initializeServiceWorker() {
   if (!IS_DESKTOP_APP) {
-    await register();
-
     logger.info("Initializing service worker...");
     const serviceWorker = await import("./service-worker-registration");
 
@@ -69,6 +67,9 @@ async function initializeServiceWorker() {
         AppEventManager.publish(AppEvents.updateDownloadCompleted, {
           version: formatted
         });
+      },
+      onSuccess(registration) {
+        register(registration);
       }
     });
     // window.addEventListener("beforeinstallprompt", () => showInstallNotice());

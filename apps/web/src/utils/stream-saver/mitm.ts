@@ -24,7 +24,7 @@ let keepAlive = () => {
   keepAlive = () => {};
   const interval = setInterval(() => {
     if (sw) {
-      sw.postMessage("ping");
+      sw.postMessage({ type: "PING" });
     } else {
       const ping =
         location.href.substr(0, location.href.lastIndexOf("/")) + "/ping";
@@ -35,39 +35,6 @@ let keepAlive = () => {
     }
   }, 10000);
 };
-
-function registerWorker() {
-  return navigator.serviceWorker
-    .getRegistration("./")
-    .then((swReg) => {
-      return (
-        swReg ||
-        navigator.serviceWorker.register("stream-saver-sw.js", { scope: "./" })
-      );
-    })
-    .then((swReg) => {
-      console.log("Stream saver service worker registered!");
-      const swRegTmp = swReg.installing || swReg.waiting;
-
-      scope = swReg.scope;
-      let fn: () => void;
-      return (
-        (sw = swReg.active) ||
-        new Promise((resolve) => {
-          swRegTmp?.addEventListener(
-            "statechange",
-            (fn = () => {
-              if (swRegTmp.state === "activated") {
-                swRegTmp.removeEventListener("statechange", fn);
-                sw = swReg.active;
-                resolve(undefined);
-              }
-            })
-          );
-        })
-      );
-    });
-}
 
 // Now that we have the Service Worker registered we can process messages
 export function postMessage(
@@ -81,6 +48,7 @@ export function postMessage(
   },
   ports: MessagePort[]
 ) {
+  if (!sw) throw new Error("No service worker registered.");
   // It's important to have a messageChannel, don't want to interfere
   // with other simultaneous downloads
   if (!ports || !ports.length) {
@@ -120,19 +88,32 @@ export function postMessage(
   // messageChannel.port2 to the service worker. The service worker can
   // then use the transferred port to reply via postMessage(), which
   // will in turn trigger the onmessage handler on messageChannel.port1.
+
   const transferable = [ports[0]];
 
   if (!data.transferringReadable) {
     keepAlive();
   }
 
-  return sw?.postMessage(data, transferable);
+  return sw.postMessage({ type: "REGISTER_DOWNLOAD", ...data }, transferable);
 }
 
-export async function register() {
-  if (navigator.serviceWorker) {
-    await registerWorker();
+export async function register(registration: ServiceWorkerRegistration) {
+  sw = registration.active;
+  scope = registration.scope;
+  if (!sw) {
+    const registrations =
+      (await navigator.serviceWorker?.getRegistrations()) || [];
+    for (const registration of registrations) {
+      if (registration.active) {
+        sw = registration.active;
+        scope = registration.scope;
+      }
+    }
   }
+  if (sw) console.log("Registered stream saver!");
+  else console.error("Failed to register stream saver!");
+
   // FF v102 just started to supports transferable streams, but still needs to ping sw.js
   // even tough the service worker dose not have to do any kind of work and listen to any
   // messages... #305
