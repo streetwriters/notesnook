@@ -174,6 +174,8 @@ describe.each([
         db.attachments.all.every((v) => v.dateModified > 0 && !v.dateEdited)
       ).toBeTruthy();
 
+      expect(db.attachments.all.every((a) => !a.noteIds)).toBeTruthy();
+
       if (data.data.settings.pins)
         expect(db.shortcuts.all).toHaveLength(data.data.settings.pins.length);
 

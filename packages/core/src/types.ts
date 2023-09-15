@@ -178,7 +178,6 @@ export type AttachmentMetadata = {
 };
 
 export interface Attachment extends BaseItem<"attachment"> {
-  noteIds: string[];
   iv: string;
   salt: string;
   length: number;
@@ -189,6 +188,11 @@ export interface Attachment extends BaseItem<"attachment"> {
   dateUploaded?: number;
   failed?: string;
   dateDeleted?: number;
+
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  noteIds?: string[];
 }
 
 export interface Color extends BaseItem<"color"> {

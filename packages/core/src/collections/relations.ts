@@ -168,6 +168,12 @@ export class Relations implements ICollection {
           item = notebook.data;
           break;
         }
+        case "attachment": {
+          const attachment = this.db.attachments.attachment(reference.id);
+          if (!attachment) continue;
+          item = attachment;
+          break;
+        }
       }
       if (item) items.push(item);
     }

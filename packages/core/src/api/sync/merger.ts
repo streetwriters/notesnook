@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { set } from "../../utils/set";
 import { logger } from "../../logger";
 import { isHTMLEqual } from "../../utils/html-diff";
 import Database from "..";
@@ -201,9 +200,8 @@ class Merger {
         break;
       }
       case "attachment": {
-        if (isDeleted(remoteItem)) {
-          return this.db.attachments.merge(undefined, remoteItem);
-        }
+        if (isDeleted(remoteItem)) return remoteItem;
+
         if (remoteItem.type !== "attachment") return;
 
         const localAttachment = this.db.attachments.attachment(
@@ -213,7 +211,6 @@ class Merger {
           localAttachment &&
           localAttachment.dateUploaded !== remoteItem.dateUploaded
         ) {
-          const noteIds = localAttachment.noteIds.slice();
           const isRemoved = await this.db.attachments.remove(
             localAttachment.metadata.hash,
             true
@@ -222,9 +219,8 @@ class Merger {
             throw new Error(
               "Conflict could not be resolved in one of the attachments."
             );
-          remoteItem.noteIds = set.union(remoteItem.noteIds, noteIds);
         }
-        return this.db.attachments.merge(undefined, remoteItem);
+        return remoteItem;
       }
     }
   }

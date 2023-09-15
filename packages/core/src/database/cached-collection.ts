@@ -20,9 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { IndexedCollection } from "./indexed-collection";
 import MapStub from "../utils/map";
 import {
-  BaseItem,
   CollectionType,
   Collections,
+  ItemMap,
   MaybeDeletedItem,
   isDeleted
 } from "../types";
@@ -32,7 +32,7 @@ import { chunkedIterate } from "../utils/array";
 
 export class CachedCollection<
   TCollectionType extends CollectionType,
-  T extends BaseItem<Collections[TCollectionType]>
+  T extends ItemMap[Collections[TCollectionType]]
 > {
   private collection: IndexedCollection<TCollectionType, T>;
   private cache = new Map<string, MaybeDeletedItem<T>>();
