@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ICollection } from "./collection";
 import { getId } from "../utils/id";
 import { getContentFromData } from "../content-types";
-import { hasItem } from "../utils/array";
 import { ResolveHashes } from "../content-types/tiptap";
 import { isCipher } from "../database/crypto";
 import {
@@ -238,16 +237,15 @@ export class Content implements ICollection {
   async extractAttachments(contentItem: UnencryptedContentItem) {
     if (contentItem.localOnly) return contentItem;
 
-    const allAttachments = this.db.attachments?.all;
     const content = getContentFromData(contentItem.type, contentItem.data);
     if (!content) return contentItem;
     const { data, hashes } = await content.extractAttachments(
       this.db.attachments.save
     );
 
-    const noteAttachments = allAttachments.filter((attachment) =>
-      hasItem(attachment.noteIds, contentItem.noteId)
-    );
+    const noteAttachments = this.db.relations
+      .from({ type: "note", id: contentItem.noteId }, "attachment")
+      .resolved();
 
     const toDelete = noteAttachments.filter((attachment) => {
       return hashes.every((hash) => hash !== attachment.metadata.hash);
@@ -258,17 +256,25 @@ export class Content implements ICollection {
     });
 
     for (const attachment of toDelete) {
-      await this.db.attachments.delete(
-        attachment.metadata.hash,
-        contentItem.noteId
+      await this.db.relations.unlink(
+        {
+          id: contentItem.noteId,
+          type: "note"
+        },
+        attachment
       );
     }
 
     for (const hash of toAdd) {
-      await this.db.attachments.add({
-        noteIds: [contentItem.noteId],
-        metadata: { hash }
-      });
+      const attachment = this.db.attachments.attachment(hash);
+      if (!attachment) continue;
+      await this.db.relations.add(
+        {
+          id: contentItem.noteId,
+          type: "note"
+        },
+        attachment
+      );
     }
 
     if (toAdd.length > 0) {

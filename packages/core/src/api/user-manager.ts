@@ -221,7 +221,7 @@ class UserManager {
       password,
       salt: user.salt
     });
-    await this._storage.write("lastSynced", 0);
+    await this.db.storage().write("lastSynced", 0);
 
     EV.publish(EVENTS.userLoggedIn, user);
   }
