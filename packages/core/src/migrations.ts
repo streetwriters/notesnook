@@ -249,6 +249,16 @@ const migrations: Migration[] = [
         delete item.tags;
         delete item.color;
         return true;
+      },
+      attachment: async (item, db) => {
+        for (const noteId of item.noteIds || []) {
+          await db.relations.add(
+            { type: "attachment", id: item.id },
+            { type: "note", id: noteId }
+          );
+        }
+        delete item.noteIds;
+        return true;
       }
     }
   },
