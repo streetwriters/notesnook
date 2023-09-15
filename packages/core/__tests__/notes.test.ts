@@ -35,35 +35,37 @@ async function createAndAddNoteToNotebook(
   noteId: string,
   options: {
     notebookTitle: string;
-    topicTitle: string;
+    subNotebookTitle: string;
   }
 ) {
-  const { notebookTitle, topicTitle } = options;
+  const { notebookTitle, subNotebookTitle } = options;
   const notebookId = await db.notebooks.add({ title: notebookTitle });
   if (!notebookId) throw new Error("Could not create notebook");
 
-  const topics = db.notebooks.topics(notebookId);
-  await topics.add({ title: topicTitle });
+  const subNotebookId = await db.notebooks.add({ title: subNotebookTitle });
+  if (!subNotebookId) throw new Error("Could not create sub notebook");
 
-  const topic = topics.topic(topicTitle);
-  if (!topic) throw new Error("Could not find topic.");
-  await db.notes.addToNotebook({ id: notebookId, topic: topic.id }, noteId);
+  await db.relations.add(
+    { type: "notebook", id: notebookId },
+    { type: "notebook", id: subNotebookId }
+  );
 
-  return { topic, topics, notebookId };
+  await db.notes.addToNotebook(subNotebookId, noteId);
+
+  return { subNotebookId, notebookId };
 }
 
 test("add invalid note", () =>
   databaseTest().then(async (db) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    let id = await db.notes.add();
-    expect(id).toBeUndefined();
-    id = await db.notes.add({});
-    expect(id).toBeUndefined();
+    expect(db.notes.add()).rejects.toThrow();
+
+    expect(db.notes.add({})).rejects.toThrow();
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    id = await db.notes.add({ hello: "world" });
-    expect(id).toBeUndefined();
+    expect(db.notes.add({ hello: "world" })).rejects.toThrow();
   }));
 
 test("add note", () =>
@@ -84,23 +86,21 @@ test("delete note", () =>
     const notebookId = await db.notebooks.add(TEST_NOTEBOOK);
     if (!notebookId) throw new Error("Could not create notebook.");
 
-    const topics = db.notebooks.topics(notebookId);
+    const subNotebookId = await db.notebooks.add({ title: "hello" });
+    if (!notebookId) throw new Error("Could not create sub notebook.");
 
-    let topic = topics.topic("hello");
-    if (!topic) throw new Error("Could not find topic.");
+    await db.relations.add(
+      { type: "notebook", id: notebookId },
+      { type: "notebook", id: subNotebookId }
+    );
 
-    await db.notes.addToNotebook({ id: notebookId, topic: topic.id }, id);
+    await db.notes.addToNotebook(subNotebookId, id);
 
-    topic = topics.topic("hello");
-    if (!topic) throw new Error("Could not find topic.");
-
-    expect(topic.all.findIndex((v) => v.id === id)).toBeGreaterThan(-1);
     await db.notes.delete(id);
-    expect(db.notes.note(id)).toBeUndefined();
-    expect(topic.all.findIndex((v) => v.id === id)).toBe(-1);
 
+    expect(db.notes.note(id)).toBeUndefined();
     expect(db.notebooks.totalNotes(notebookId)).toBe(0);
-    expect(topics.topic("hello")?.totalNotes).toBe(0);
+    expect(db.notebooks.totalNotes(subNotebookId)).toBe(0);
   }));
 
 test("get all notes", () =>
@@ -217,57 +217,67 @@ test("favorite note", () =>
     expect(note?.data.favorite).toBe(true);
   }));
 
-test("add note to topic", () =>
+test("add note to subnotebook", () =>
   noteTest().then(async ({ db, id }) => {
-    const { topic, notebookId } = await createAndAddNoteToNotebook(db, id, {
-      notebookTitle: "Hello",
-      topicTitle: "Home"
-    });
-
-    expect(topic.all).toHaveLength(1);
-    expect(topic.totalNotes).toBe(1);
-    expect(db.notebooks.totalNotes(notebookId)).toBe(1);
-    expect(db.notes.note(id)?.notebooks?.some((n) => n.id === notebookId)).toBe(
-      true
+    const { subNotebookId, notebookId } = await createAndAddNoteToNotebook(
+      db,
+      id,
+      {
+        notebookTitle: "Hello",
+        subNotebookTitle: "Home"
+      }
     );
+
+    expect(
+      db.relations.from({ type: "notebook", id: notebookId }, "notebook")
+    ).toHaveLength(1);
+    expect(db.notebooks.totalNotes(subNotebookId)).toBe(1);
+    expect(db.notebooks.totalNotes(notebookId)).toBe(1);
   }));
 
 test("duplicate note to topic should not be added", () =>
   noteTest().then(async ({ db, id }) => {
-    const { topics } = await createAndAddNoteToNotebook(db, id, {
+    const { subNotebookId } = await createAndAddNoteToNotebook(db, id, {
       notebookTitle: "Hello",
-      topicTitle: "Home"
+      subNotebookTitle: "Home"
     });
-    expect(topics.topic("Home")?.all).toHaveLength(1);
+    expect(db.notebooks.totalNotes(subNotebookId)).toBe(1);
   }));
 
 test("add the same note to 2 notebooks", () =>
   noteTest().then(async ({ db, id }) => {
     const nb1 = await createAndAddNoteToNotebook(db, id, {
       notebookTitle: "Hello",
-      topicTitle: "Home"
+      subNotebookTitle: "Home"
     });
     const nb2 = await createAndAddNoteToNotebook(db, id, {
       notebookTitle: "Hello2",
-      topicTitle: "Home2"
+      subNotebookTitle: "Home2"
     });
 
-    expect(nb1.topics.topic(nb1.topic.id)?.has(id)).toBe(true);
-    expect(nb2.topics.topic(nb2.topic.id)?.has(id)).toBe(true);
-    expect(db.notes.note(id)?.notebooks).toHaveLength(2);
+    expect(
+      db.relations
+        .from({ type: "notebook", id: nb1.subNotebookId }, "note")
+        .has(id)
+    ).toBe(true);
+    expect(
+      db.relations
+        .from({ type: "notebook", id: nb2.subNotebookId }, "note")
+        .has(id)
+    ).toBe(true);
+    expect(db.relations.to({ type: "note", id }, "notebook")).toHaveLength(2);
   }));
 
 test("moving note to same notebook and topic should do nothing", () =>
   noteTest().then(async ({ db, id }) => {
-    const { notebookId, topic } = await createAndAddNoteToNotebook(db, id, {
+    const { subNotebookId } = await createAndAddNoteToNotebook(db, id, {
       notebookTitle: "Home",
-      topicTitle: "Hello"
+      subNotebookTitle: "Hello"
     });
-    await db.notes.addToNotebook({ id: notebookId, topic: topic.id }, id);
 
-    expect(db.notes.note(id)?.notebooks?.some((n) => n.id === notebookId)).toBe(
-      true
-    );
+    await db.notes.addToNotebook(subNotebookId, id);
+
+    expect(db.relations.to({ type: "note", id }, "notebook")).toHaveLength(1);
   }));
 
 test("export note to html", () =>
@@ -308,19 +318,14 @@ test("deleting a colored note should remove it from that color", () =>
     );
 
     expect(
-      db.relations
-        .from({ id: colorId, type: "color" }, "note")
-        .findIndex((r) => r.to.id === id)
-    ).toBe(0);
+      db.relations.from({ id: colorId, type: "color" }, "note").has(id)
+    ).toBe(true);
 
     await db.notes.delete(id);
 
     expect(
-      db.relations
-        .from({ id: colorId, type: "color" }, "note")
-        .findIndex((r) => r.to.id === id)
-    ).toBe(-1);
-    // TODO expect(color.noteIds.indexOf(id)).toBe(-1);
+      db.relations.from({ id: colorId, type: "color" }, "note").has(id)
+    ).toBe(false);
   }));
 
 test("note's content should follow note's localOnly property", () =>
@@ -330,7 +335,7 @@ test("note's content should follow note's localOnly property", () =>
     if (!note?.contentId) throw new Error("No content in note.");
 
     expect(note?.data.localOnly).toBe(true);
-    let content = await db.content.raw(note.contentId);
+    let content = await db.content.get(note.contentId);
     expect(content?.localOnly).toBe(true);
 
     await db.notes.note(id)?.localOnly();
@@ -338,7 +343,7 @@ test("note's content should follow note's localOnly property", () =>
     if (!note?.contentId) throw new Error("No content in note.");
 
     expect(note?.data.localOnly).toBe(false);
-    content = await db.content.raw(note.contentId);
+    content = await db.content.get(note.contentId);
     expect(content?.localOnly).toBe(false);
   }));
 

@@ -85,7 +85,7 @@ class Merger {
       ItemMap[TType] | TrashOrItem<Note> | TrashOrItem<Notebook>
     >,
     type: TType,
-    lastSynced: number
+    _lastSynced: number
   ) {
     switch (type) {
       case "shortcut":
@@ -93,37 +93,13 @@ class Merger {
       case "tag":
       case "color":
       case "note":
-      case "relation": {
+      case "relation":
+      case "notebook": {
         const localItem = this.db[SYNC_COLLECTIONS_MAP[type]].collection.getRaw(
           remoteItem.id
         );
         if (!localItem || remoteItem.dateModified > localItem.dateModified) {
           return remoteItem;
-        }
-        break;
-      }
-      // case "note": {
-      //   const localItem = this.db.notes.collection.getRaw(remoteItem.id);
-      //   if (!localItem || remoteItem.dateModified > localItem.dateModified) {
-      //     return this.db.notes.merge(
-      //       localItem,
-      //       remoteItem as MaybeDeletedItem<TrashOrItem<Note>>
-      //     );
-      //   }
-      //   break;
-      // }
-      case "notebook": {
-        const THRESHOLD = 1000;
-        const localItem = this.db.notebooks.collection.getRaw(remoteItem.id);
-        if (
-          !localItem ||
-          this.isConflicted(localItem, remoteItem, lastSynced, THRESHOLD)
-        ) {
-          return this.db.notebooks.merge(
-            localItem,
-            remoteItem as MaybeDeletedItem<TrashOrItem<Notebook>>,
-            lastSynced
-          );
         }
         break;
       }

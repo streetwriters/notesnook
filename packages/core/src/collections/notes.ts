@@ -20,20 +20,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { createNoteModel } from "../models/note";
 import { getId } from "../utils/id";
 import { getContentFromData } from "../content-types";
-import { deleteItem, findById } from "../utils/array";
 import { NEWLINE_STRIP_REGEX, formatTitle } from "../utils/title-format";
 import { clone } from "../utils/clone";
 import { Tiptap } from "../content-types/tiptap";
 import { EMPTY_CONTENT, isUnencryptedContent } from "./content";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { buildFromTemplate } from "../utils/templates";
-import { Note, TrashOrItem, isTrashItem, isDeleted } from "../types";
+import {
+  Note,
+  TrashOrItem,
+  isTrashItem,
+  isDeleted,
+  BaseTrashItem
+} from "../types";
 import Database from "../api";
 import { CachedCollection } from "../database/cached-collection";
 import { ICollection } from "./collection";
 import { NoteContent } from "./session-content";
 
-type NotebookReference = { id: string; topic?: string; rebuildCache?: boolean };
 type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
   contentItem?: NoteContent<false>;
@@ -43,7 +47,6 @@ type ExportOptions = {
 
 export class Notes implements ICollection {
   name = "notes";
-  topicReferences = new NoteIdCache(this);
   /**
    * @internal
    */
@@ -58,13 +61,11 @@ export class Notes implements ICollection {
 
   async init() {
     await this.collection.init();
-    this.topicReferences.rebuild();
   }
 
   async add(
     item: Partial<Note & { content: NoteContent<false>; sessionId: string }>
-  ): Promise<string | undefined> {
-    if (!item) return;
+  ): Promise<string> {
     if (item.remote)
       throw new Error("Please use db.notes.merge to merge remote notes.");
 
@@ -80,7 +81,8 @@ export class Notes implements ICollection {
 
     if (oldNote) note.contentId = oldNote.contentId;
 
-    if (!oldNote && !item.content && !item.contentId && !item.title) return;
+    if (!oldNote && !item.content && !item.contentId && !item.title)
+      throw new Error("Note must have a title or content.");
 
     if (item.content && item.content.data && item.content.type) {
       const { type, data } = item.content;
@@ -159,7 +161,9 @@ export class Notes implements ICollection {
   }
 
   get trashed() {
-    return this.raw.filter((item) => isTrashItem(item)) as TrashOrItem<Note>[];
+    return this.raw.filter((item) =>
+      isTrashItem(item)
+    ) as BaseTrashItem<Note>[];
   }
 
   get pinned() {
@@ -288,142 +292,45 @@ export class Notes implements ICollection {
       if (!item) continue;
       const itemData = clone(item);
 
-      if (itemData.notebooks && !moveToTrash) {
-        for (const notebook of itemData.notebooks) {
-          for (const topicId of notebook.topics) {
-            await this.removeFromNotebook(
-              { id: notebook.id, topic: topicId, rebuildCache: false },
-              id
-            );
-          }
-        }
-      }
-
-      await this.db.relations.unlinkAll(item, "tag");
-      await this.db.relations.unlinkAll(item, "color");
-      await this.db.relations.unlinkAll(item, "attachment");
-
       if (moveToTrash && !isTrashItem(itemData))
         await this.db.trash.add(itemData);
       else {
+        await this.db.relations.unlinkAll(item, "tag");
+        await this.db.relations.unlinkAll(item, "color");
+        await this.db.relations.unlinkAll(item, "attachment");
+        await this.db.relations.unlinkAll(item, "notebook");
+
         await this.collection.remove(id);
         if (itemData.contentId)
           await this.db.content.remove(itemData.contentId);
       }
     }
-    this.topicReferences.rebuild();
   }
 
-  async addToNotebook(to: NotebookReference, ...noteIds: string[]) {
-    if (!to) throw new Error("The destination notebook cannot be undefined.");
-    if (!to.id) throw new Error("The destination notebook must contain id.");
-
-    const { id: notebookId, topic: topicId } = to;
-
+  async addToNotebook(notebookId: string, ...noteIds: string[]) {
     for (const noteId of noteIds) {
-      const note = this.collection.get(noteId);
-      if (!note || isTrashItem(note)) continue;
-
-      if (topicId) {
-        const notebooks = note.notebooks || [];
-
-        const noteNotebook = notebooks.find((nb) => nb.id === notebookId);
-        const noteHasNotebook = !!noteNotebook;
-        const noteHasTopic =
-          noteHasNotebook && noteNotebook.topics.indexOf(topicId) > -1;
-        if (noteHasNotebook && !noteHasTopic) {
-          // 1 note can be inside multiple topics
-          noteNotebook.topics.push(topicId);
-        } else if (!noteHasNotebook) {
-          notebooks.push({
-            id: notebookId,
-            topics: [topicId]
-          });
-        }
-
-        if (!noteHasNotebook || !noteHasTopic) {
-          await this.db.notes.add({
-            id: noteId,
-            notebooks
-          });
-          this.topicReferences.add(topicId, noteId);
-        }
-      } else {
-        await this.db.relations.add({ id: notebookId, type: "notebook" }, note);
-      }
+      await this.db.relations.add(
+        { id: notebookId, type: "notebook" },
+        { type: "note", id: noteId }
+      );
     }
   }
 
-  async removeFromNotebook(to: NotebookReference, ...noteIds: string[]) {
-    if (!to) throw new Error("The destination notebook cannot be undefined.");
-    if (!to.id) throw new Error("The destination notebook must contain id.");
-
-    const { id: notebookId, topic: topicId, rebuildCache = true } = to;
-
+  async removeFromNotebook(notebookId: string, ...noteIds: string[]) {
     for (const noteId of noteIds) {
-      const note = this.collection.get(noteId);
-      if (!note || isTrashItem(note)) {
-        continue;
-      }
-
-      if (topicId) {
-        if (!note.notebooks) continue;
-        const { notebooks } = note;
-
-        const notebook = findById(notebooks, notebookId);
-        if (!notebook) continue;
-
-        const { topics } = notebook;
-        if (!deleteItem(topics, topicId)) continue;
-
-        if (topics.length <= 0) deleteItem(notebooks, notebook);
-
-        await this.db.notes.add({
-          id: noteId,
-          notebooks
-        });
-      } else {
-        await this.db.relations.unlink(
-          { id: notebookId, type: "notebook" },
-          note
-        );
-      }
+      await this.db.relations.unlink(
+        { id: notebookId, type: "notebook" },
+        { type: "note", id: noteId }
+      );
     }
-    if (rebuildCache) this.topicReferences.rebuild();
   }
 
   async removeFromAllNotebooks(...noteIds: string[]) {
     for (const noteId of noteIds) {
-      const note = this.collection.get(noteId);
-      if (!note || isTrashItem(note)) {
-        continue;
-      }
-
-      await this.db.notes.add({
-        id: noteId,
-        notebooks: []
-      });
-      await this.db.relations.unlinkAll(note, "notebook");
-    }
-    this.topicReferences.rebuild();
-  }
-
-  /**
-   * @internal
-   */
-  async _clearAllNotebookReferences(notebookId: string) {
-    const notes = this.db.notes.all;
-
-    for (const note of notes) {
-      const { notebooks } = note;
-      if (!notebooks) continue;
-
-      for (const notebook of notebooks) {
-        if (notebook.id !== notebookId) continue;
-        if (!deleteItem(notebooks, notebook)) continue;
-      }
-
-      await this.collection.update(note);
+      await this.db.relations.unlinkAll(
+        { type: "note", id: noteId },
+        "notebook"
+      );
     }
   }
 
@@ -451,49 +358,4 @@ export class Notes implements ICollection {
 
 function getNoteHeadline(content: Tiptap) {
   return content.toHeadline();
-}
-
-class NoteIdCache {
-  private cache = new Map<string, string[]>();
-  constructor(private readonly notes: Notes) {}
-
-  rebuild() {
-    this.cache = new Map();
-    const notes = this.notes.all;
-
-    for (const note of notes) {
-      const { notebooks } = note;
-      if (!notebooks) return;
-
-      for (const notebook of notebooks) {
-        for (const topic of notebook.topics) {
-          this.add(topic, note.id);
-        }
-      }
-    }
-  }
-
-  add(topicId: string, noteId: string) {
-    let noteIds = this.cache.get(topicId);
-    if (!noteIds) noteIds = [];
-    if (noteIds.includes(noteId)) return;
-    noteIds.push(noteId);
-    this.cache.set(topicId, noteIds);
-  }
-
-  has(topicId: string, noteId: string) {
-    const noteIds = this.cache.get(topicId);
-    if (!noteIds) return false;
-    return noteIds.includes(noteId);
-  }
-
-  count(topicId: string) {
-    const noteIds = this.cache.get(topicId);
-    if (!noteIds) return 0;
-    return noteIds.length;
-  }
-
-  get(topicId: string) {
-    return this.cache.get(topicId) || [];
-  }
 }
