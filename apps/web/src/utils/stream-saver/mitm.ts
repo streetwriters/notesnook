@@ -17,12 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-let sw: ServiceWorker | null = null;
-let scope = "";
-
 let keepAlive = () => {
   keepAlive = () => {};
-  const interval = setInterval(() => {
+  const interval = setInterval(async () => {
+    const { sw } = await findServiceWorker();
     if (sw) {
       sw.postMessage({ type: "PING" });
     } else {
@@ -37,7 +35,7 @@ let keepAlive = () => {
 };
 
 // Now that we have the Service Worker registered we can process messages
-export function postMessage(
+export async function postMessage(
   data: {
     origin?: string;
     referrer?: string;
@@ -48,7 +46,9 @@ export function postMessage(
   },
   ports: MessagePort[]
 ) {
+  const { scope, sw } = await findServiceWorker();
   if (!sw) throw new Error("No service worker registered.");
+
   // It's important to have a messageChannel, don't want to interfere
   // with other simultaneous downloads
   if (!ports || !ports.length) {
@@ -98,24 +98,25 @@ export function postMessage(
   return sw.postMessage({ type: "REGISTER_DOWNLOAD", ...data }, transferable);
 }
 
-export async function register(registration: ServiceWorkerRegistration) {
-  sw = registration.active;
-  scope = registration.scope;
-  if (!sw) {
-    const registrations =
-      (await navigator.serviceWorker?.getRegistrations()) || [];
-    for (const registration of registrations) {
-      if (registration.active) {
-        sw = registration.active;
-        scope = registration.scope;
-      }
-    }
-  }
-  if (sw) console.log("Registered stream saver!");
-  else console.error("Failed to register stream saver!");
-
+export function register() {
   // FF v102 just started to supports transferable streams, but still needs to ping sw.js
   // even tough the service worker dose not have to do any kind of work and listen to any
   // messages... #305
   keepAlive();
+}
+
+export async function findServiceWorker(): Promise<{
+  sw?: ServiceWorker;
+  scope?: string;
+}> {
+  if (!("serviceWorker" in navigator)) return {};
+
+  const registrations =
+    (await navigator.serviceWorker?.getRegistrations()) || [];
+  for (const registration of registrations) {
+    if (registration.active)
+      return { sw: registration.active, scope: registration.scope };
+  }
+
+  return {};
 }

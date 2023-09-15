@@ -68,8 +68,8 @@ async function initializeServiceWorker() {
           version: formatted
         });
       },
-      onSuccess(registration) {
-        register(registration);
+      onSuccess() {
+        register();
       }
     });
     // window.addEventListener("beforeinstallprompt", () => showInstallNotice());

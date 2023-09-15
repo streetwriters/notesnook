@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { postMessage } from "./mitm";
+import { findServiceWorker, postMessage } from "./mitm";
 
 let supportsTransferable = false;
 
@@ -66,26 +66,21 @@ function checkSupportsTransferable() {
 }
 checkSupportsTransferable();
 
-/**
- * @param  {string} filename filename that should be used
- * @param  {object} options  [description]
- * @param  {number} size     deprecated
- * @return {WritableStream<Uint8Array>}
- */
-export function createWriteStream(
+export async function createWriteStream(
   filename: string,
   opts: {
     size?: number;
     pathname?: string;
     signal?: AbortSignal;
   } = {}
-): WritableStream<Uint8Array> {
+): Promise<WritableStream<Uint8Array>> {
+  const { sw } = await findServiceWorker();
   // let bytesWritten = 0; // by StreamSaver.js (not the service worker)
   let downloadUrl: string | null = null;
   let channel: MessageChannel | null = null;
   let ts: TransformStream | null = null;
   let frame: HTMLIFrameElement | null = null;
-  if (!useBlobFallback) {
+  if (sw && !useBlobFallback) {
     channel = new MessageChannel();
 
     // Make filename RFC5987 compatible
@@ -137,19 +132,20 @@ export function createWriteStream(
       }
     };
 
-    postMessage(response, [channel.port2]);
+    await postMessage(response, [channel.port2]);
   }
 
   let chunks: Uint8Array[] = [];
-
   return (
-    (!useBlobFallback && ts && ts.writable) ||
+    (sw && !useBlobFallback && ts && ts.writable) ||
     new WritableStream({
       write(chunk) {
+        if (opts.signal?.aborted) return;
+
         if (!(chunk instanceof Uint8Array)) {
           throw new TypeError("Can only write Uint8Arrays");
         }
-        if (useBlobFallback) {
+        if (!sw || useBlobFallback) {
           // Safari... The new IE6
           // https://github.com/jimmywarting/StreamSaver.js/issues/69
           //
@@ -178,14 +174,21 @@ export function createWriteStream(
         }
       },
       close() {
-        if (useBlobFallback) {
+        if (opts.signal?.aborted) return;
+        if (!sw || useBlobFallback) {
           const blob = new Blob(chunks, {
             type: "application/octet-stream; charset=utf-8"
           });
           const link = document.createElement("a");
           link.href = URL.createObjectURL(blob);
           link.download = filename;
+          link.addEventListener("click", () => {
+            // `setTimeout()` due to
+            // https://github.com/LLK/scratch-gui/issues/1783#issuecomment-426286393
+            setTimeout(() => URL.revokeObjectURL(link.href), 30 * 1000);
+          });
           link.click();
+          chunks = [];
         } else {
           channel?.port1.postMessage("end");
         }
