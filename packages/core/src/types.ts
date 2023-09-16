@@ -33,7 +33,7 @@ export type GroupingKey =
   | "notes"
   | "notebooks"
   | "tags"
-  | "topics"
+  //| "topics"
   | "trash"
   | "reminders"
   | "favorites";
@@ -49,7 +49,6 @@ export type GroupHeader = {
 export type Collections = {
   notes: "note" | "trash";
   notebooks: "notebook" | "trash";
-  topics: "topic";
   attachments: "attachment";
   reminders: "reminder";
   relations: "relation";
@@ -59,17 +58,21 @@ export type Collections = {
   colors: "color";
   notehistory: "session";
   sessioncontent: "sessioncontent";
+  settingsv2: "settingitem";
+
+  /**
+   * @deprecated only kept here for migration purposes
+   */
   settings: "settings";
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  topics: "topic";
 };
 
 export type CollectionType = keyof Collections;
 
-export type ItemType =
-  | ValueOf<Collections>
-  // TODO: ideally there should be no extra types here.
-  // everything should have its own collection
-  | "topic"
-  | "settings";
+export type ItemType = ValueOf<Collections>;
 
 export type Item = ValueOf<ItemMap>;
 export type GroupableItem = ValueOf<
@@ -83,13 +86,13 @@ export type GroupableItem = ValueOf<
     | "session"
     | "sessioncontent"
     | "settings"
+    | "settingsv2"
   >
 >;
 
 export type ItemMap = {
   note: Note;
   notebook: Notebook;
-  topic: Topic;
   attachment: Attachment;
   tag: Tag;
   color: Color;
@@ -102,7 +105,16 @@ export type ItemMap = {
   content: ContentItem;
   session: HistorySession;
   sessioncontent: SessionContentItem;
-  settings: SettingsItem;
+  settingitem: SettingItem;
+
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  topic: Topic;
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  settings: LegacySettingsItem;
 };
 
 /**
@@ -307,9 +319,12 @@ export interface SessionContentItem extends BaseItem<"sessioncontent"> {
 export type TrashCleanupInterval = 1 | 7 | 30 | 365 | -1;
 export type ToolbarConfig = { preset: string; config?: any[] };
 export type DefaultNotebook = { id: string; topic?: string };
-export interface SettingsItem extends BaseItem<"settings"> {
+/**
+ * @deprecated only kept here for migration purposes
+ */
+export interface LegacySettingsItem extends BaseItem<"settings"> {
   groupOptions?: Partial<Record<GroupingKey, GroupOptions>>;
-  toolbarConfig?: Record<string, ToolbarConfig>;
+  toolbarConfig?: Record<ToolbarConfigPlatforms, ToolbarConfig>;
   trashCleanupInterval?: TrashCleanupInterval;
   titleFormat?: string;
   timeFormat?: TimeFormat;
@@ -327,6 +342,23 @@ export interface SettingsItem extends BaseItem<"settings"> {
     type: "tag" | "topic" | "notebook";
     data: { id: string; notebookId: string };
   }[];
+}
+
+export type ToolbarConfigPlatforms = "desktop" | "mobile";
+export type SettingItemMap = {
+  trashCleanupInterval: TrashCleanupInterval;
+  titleFormat: string;
+  timeFormat: TimeFormat;
+  dateFormat: string;
+  defaultNotebook: DefaultNotebook | undefined;
+} & Record<`groupOptions:${GroupingKey}`, GroupOptions> &
+  Record<`toolbarConfig:${ToolbarConfigPlatforms}`, ToolbarConfig | undefined>;
+
+export interface SettingItem<
+  TKey extends keyof SettingItemMap = keyof SettingItemMap
+> extends BaseItem<"settingitem"> {
+  key: TKey;
+  value: SettingItemMap[TKey];
 }
 
 export interface DeletedItem {
