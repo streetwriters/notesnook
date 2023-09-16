@@ -101,7 +101,7 @@ declare global {
     >;
   };
 
-  var editorTitle: RefObject<HTMLInputElement>;
+  var editorTitle: RefObject<HTMLTextAreaElement>;
   /**
    * Global ref to manage tags in editor.
    */

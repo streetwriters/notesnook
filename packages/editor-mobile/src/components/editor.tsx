@@ -195,9 +195,8 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
           ref={containerRef}
           style={{
             overflowY: "scroll",
-            flexDirection: "column",
             height: "100%",
-            display: "flex"
+            display: "block"
           }}
         >
           {settings.noHeader ? null : (

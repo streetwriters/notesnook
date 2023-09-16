@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getFontById } from "@notesnook/editor";
-import React, { RefObject, useEffect, useRef } from "react";
+import React, { RefObject, useCallback, useEffect, useRef } from "react";
 import { EditorController } from "../hooks/useEditorController";
 import styles from "./styles.module.css";
 function Title({
@@ -34,46 +34,98 @@ function Title({
   readonly: boolean;
   fontFamily: string;
 }) {
-  const titleRef = useRef<HTMLInputElement>(null);
+  const titleRef = useRef<HTMLTextAreaElement>(null);
+  const titleSizeDiv = useRef<HTMLDivElement>(null);
   const emitUpdate = useRef(true);
   global.editorTitle = titleRef;
+
+  const resizeTextarea = useCallback(() => {
+    if (!titleSizeDiv.current || !titleRef.current) return;
+    titleSizeDiv.current.innerText = titleRef.current.value;
+    titleRef.current.style.height = `${titleSizeDiv.current.clientHeight}px`;
+    titleSizeDiv.current.style.width = `${titleRef.current.clientWidth}px`;
+  }, []);
 
   useEffect(() => {
     if (titleRef.current) {
       emitUpdate.current = false;
       titleRef.current.value = title;
+      resizeTextarea();
       emitUpdate.current = true;
     }
-  }, [title]);
+
+    window.addEventListener("resize", resizeTextarea);
+    return () => {
+      window.removeEventListener("resize", resizeTextarea);
+    };
+  }, [resizeTextarea, title]);
 
   return (
-    <input
-      ref={titleRef}
-      className={styles.titleBar}
-      contentEditable={!readonly}
-      disabled={readonly}
-      style={{
-        height: 40 * (settingsController.previous?.fontScale || 1),
-        fontSize: 25,
-        width: "100%",
-        boxSizing: "border-box",
-        borderWidth: 0,
-        paddingRight: 12,
-        paddingLeft: 12,
-        fontWeight: 600,
-        fontFamily: getFontById(fontFamily)?.font || "Open Sans",
-        backgroundColor: "transparent",
-        color: "var(--nn_primary_heading)",
-        caretColor: "var(--nn_primary_accent)",
-        borderRadius: 0
-      }}
-      maxLength={150}
-      onChange={(event) => {
-        if (!emitUpdate.current) return;
-        controller.current?.titleChange(event.target.value);
-      }}
-      placeholder={titlePlaceholder}
-    />
+    <>
+      <div
+        ref={titleSizeDiv}
+        style={{
+          width: "100%",
+          maxWidth: "100%",
+          minHeight: 40,
+          opacity: 0,
+          paddingRight: 10,
+          paddingLeft: 10,
+          fontWeight: 600,
+          fontFamily: getFontById(fontFamily)?.font || "Open Sans",
+          boxSizing: "border-box",
+          fontSize: 25,
+          zIndex: -1,
+          position: "absolute",
+          userSelect: "none",
+          WebkitUserSelect: "none",
+          pointerEvents: "none",
+          overflowWrap: "anywhere",
+          paddingTop: 3,
+          whiteSpace: "break-spaces"
+        }}
+      />
+      <textarea
+        ref={titleRef}
+        className={styles.titleBar}
+        rows={1}
+        contentEditable={!readonly}
+        disabled={readonly}
+        style={{
+          height: 40,
+          minHeight: 40,
+          fontSize: 25,
+          width: "100%",
+          boxSizing: "border-box",
+          border: 0,
+          opacity: 1,
+          paddingRight: 10,
+          paddingLeft: 10,
+          fontWeight: 600,
+          fontFamily: getFontById(fontFamily)?.font || "Open Sans",
+          backgroundColor: "transparent",
+          color: "var(--nn_primary_heading)",
+          caretColor: "var(--nn_primary_accent)",
+          borderRadius: 0,
+          overflow: "hidden",
+          overflowX: "hidden",
+          overflowY: "hidden"
+        }}
+        maxLength={150}
+        onInput={() => {
+          resizeTextarea();
+        }}
+        onPaste={() => {
+          resizeTextarea();
+        }}
+        onChange={(event) => {
+          resizeTextarea();
+          if (!emitUpdate.current) return;
+          controller.current?.titleChange(event.target.value);
+        }}
+        placeholder={titlePlaceholder}
+      />
+    </>
   );
 }
 
