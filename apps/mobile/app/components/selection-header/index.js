@@ -207,7 +207,6 @@ export const SelectionHeader = React.memo(() => {
 
         {screen === "Trash" ||
         screen === "Notebooks" ||
-        screen === "Notebook" ||
         screen === "Reminders" ? null : (
           <>
             <IconButton
@@ -224,6 +223,21 @@ export const SelectionHeader = React.memo(() => {
               name="pound"
               size={SIZE.xl}
             />
+
+            <IconButton
+              onPress={async () => {
+                ExportNotesSheet.present(selectedItemsList);
+              }}
+              tooltipText="Export"
+              tooltipPosition={4}
+              customStyle={{
+                marginLeft: 10
+              }}
+              color={colors.primary.paragraph}
+              name="export"
+              size={SIZE.xl}
+            />
+
             <IconButton
               onPress={async () => {
                 //setSelectionMode(false);
@@ -237,20 +251,6 @@ export const SelectionHeader = React.memo(() => {
               tooltipPosition={4}
               color={colors.primary.paragraph}
               name="plus"
-              size={SIZE.xl}
-            />
-
-            <IconButton
-              onPress={async () => {
-                ExportNotesSheet.present(selectedItemsList);
-              }}
-              tooltipText="Export"
-              tooltipPosition={4}
-              customStyle={{
-                marginLeft: 10
-              }}
-              color={colors.primary.paragraph}
-              name="export"
               size={SIZE.xl}
             />
           </>
