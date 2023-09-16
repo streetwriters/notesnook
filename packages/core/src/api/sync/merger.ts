@@ -29,7 +29,6 @@ import {
   MaybeDeletedItem,
   Note,
   Notebook,
-  SettingsItem,
   TrashOrItem,
   isDeleted
 } from "../../types";
@@ -94,7 +93,8 @@ class Merger {
       case "color":
       case "note":
       case "relation":
-      case "notebook": {
+      case "notebook":
+      case "settingitem": {
         const localItem = this.db[SYNC_COLLECTIONS_MAP[type]].collection.getRaw(
           remoteItem.id
         );
@@ -158,23 +158,11 @@ class Merger {
   }
 
   async mergeItem(
-    remoteItem: SettingsItem | MaybeDeletedItem<Attachment>,
+    remoteItem: MaybeDeletedItem<Attachment>,
     type: "settings" | "attachment",
-    lastSynced: number
+    _lastSynced: number
   ) {
     switch (type) {
-      case "settings": {
-        if (isDeleted(remoteItem) || remoteItem.type !== "settings") return;
-
-        const localItem = this.db.settings.raw;
-        if (
-          !localItem ||
-          this.isConflicted(localItem, remoteItem, lastSynced, 1000)
-        ) {
-          await this.db.settings.merge(remoteItem, lastSynced);
-        }
-        break;
-      }
       case "attachment": {
         if (isDeleted(remoteItem)) return remoteItem;
 

@@ -32,7 +32,7 @@ import Backup from "../database/backup";
 import Session from "./session";
 import Hosts from "../utils/constants";
 import { EV, EVENTS } from "../common";
-import Settings from "../collections/settings";
+import { LegacySettings } from "../collections/legacy-settings";
 import Migrations from "./migrations";
 import UserManager from "./user-manager";
 import http from "../utils/http";
@@ -59,6 +59,7 @@ import {
 } from "../interfaces";
 import TokenManager from "./token-manager";
 import { Attachment } from "../types";
+import { Settings } from "../collections/settings";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -127,6 +128,7 @@ class Database {
   vault = new Vault(this);
   lookup = new Lookup(this);
   backup = new Backup(this);
+  legacySettings = new LegacySettings(this);
   settings = new Settings(this);
   migrations = new Migrations(this);
   monographs = new Monographs(this);
@@ -189,9 +191,10 @@ class Database {
   }
 
   async initCollections() {
-    await this.settings.init();
+    await this.legacySettings.init();
     // collections
 
+    await this.settings.init();
     await this.notebooks.init();
     await this.tags.init();
     await this.colors.init();
