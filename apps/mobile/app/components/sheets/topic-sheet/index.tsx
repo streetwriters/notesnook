@@ -336,23 +336,10 @@ export const TopicsSheet = () => {
                   useSelectionStore.setState({
                     selectedItemsList: selection
                   });
-                  presentDialog({
-                    title: `Delete ${
-                      selection.length > 1 ? "topics" : "topics"
-                    }`,
-                    paragraph: `Are you sure you want to delete ${
-                      selection.length > 1 ? "these topics?" : "this topic?"
-                    }`,
-                    positiveText: "Delete",
-                    negativeText: "Cancel",
-                    positivePress: async () => {
-                      await deleteItems();
-                      useSelectionStore.getState().clearSelection();
-                      setEnabled(false);
-                      setSelection([]);
-                    },
-                    positiveType: "errorShade"
-                  });
+                  await deleteItems();
+                  useSelectionStore.getState().clearSelection();
+                  setEnabled(false);
+                  setSelection([]);
                   return;
                 }}
                 color={colors.primary.icon}
