@@ -29,7 +29,8 @@ export type SyncableItemType =
   | "relation"
   | "color"
   | "tag"
-  | "settings";
+  | "settings"
+  | "settingitem";
 
 export type SyncItem = {
   id: string;
@@ -43,7 +44,8 @@ export const SYNC_COLLECTIONS_MAP = {
   reminder: "reminders",
   relation: "relations",
   tag: "tags",
-  color: "colors"
+  color: "colors",
+  settingitem: "settings"
 } as const;
 
 export type SyncTransferItem = {

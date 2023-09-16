@@ -17,192 +17,156 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EV, EVENTS } from "../common";
-import { getId } from "../utils/id";
+import { makeId } from "../utils/id";
 import Database from "../api";
 import {
   DefaultNotebook,
   GroupOptions,
   GroupingKey,
-  SettingsItem,
+  SettingItem,
+  SettingItemMap,
   ToolbarConfig,
-  TrashCleanupInterval,
-  isDeleted
+  ToolbarConfigPlatforms,
+  TrashCleanupInterval
 } from "../types";
 import { ICollection } from "./collection";
+import { CachedCollection } from "../database/cached-collection";
 import { TimeFormat } from "../utils/date";
 
-class Settings implements ICollection {
-  name = "settings";
-  private settings: SettingsItem = {
-    type: "settings",
-    dateModified: 0,
-    dateCreated: 0,
-    id: getId()
-  };
-  constructor(private readonly db: Database) {}
+const DEFAULT_GROUP_OPTIONS = (key: GroupingKey) =>
+  ({
+    groupBy: "default",
+    sortBy:
+      key === "trash"
+        ? "dateDeleted"
+        : key === "tags"
+        ? "dateCreated"
+        : key === "reminders"
+        ? "dueDate"
+        : "dateEdited",
+    sortDirection: key === "reminders" ? "asc" : "desc"
+  } satisfies GroupOptions);
 
-  async init() {
-    const settings = await this.db.storage().read<SettingsItem>("settings");
-    this.reset(settings);
-    await this.save(false);
+const defaultSettings: SettingItemMap = {
+  timeFormat: "12-hour",
+  dateFormat: "DD-MM-YYYY",
+  titleFormat: "Note $date$ $time$",
+  defaultNotebook: undefined,
+  trashCleanupInterval: 7,
 
-    EV.subscribe(EVENTS.userLoggedOut, async () => {
-      this.reset();
-      await this.save(false);
-    });
+  "groupOptions:trash": DEFAULT_GROUP_OPTIONS("trash"),
+  "groupOptions:tags": DEFAULT_GROUP_OPTIONS("tags"),
+  "groupOptions:notes": DEFAULT_GROUP_OPTIONS("notes"),
+  "groupOptions:notebooks": DEFAULT_GROUP_OPTIONS("notebooks"),
+  "groupOptions:favorites": DEFAULT_GROUP_OPTIONS("favorites"),
+  "groupOptions:home": DEFAULT_GROUP_OPTIONS("home"),
+  "groupOptions:reminders": DEFAULT_GROUP_OPTIONS("reminders"),
+
+  "toolbarConfig:desktop": undefined,
+  "toolbarConfig:mobile": undefined
+};
+
+export class Settings implements ICollection {
+  name = "settingsv2";
+  readonly collection: CachedCollection<"settingsv2", SettingItem>;
+  constructor(db: Database) {
+    this.collection = new CachedCollection(
+      db.storage,
+      "settingsv2",
+      db.eventManager
+    );
+  }
+
+  init() {
+    return this.collection.init();
   }
 
   get raw() {
-    return this.settings;
+    return this.collection.raw();
   }
 
-  async merge(remoteItem: SettingsItem, lastSynced: number) {
-    if (this.settings.dateModified > lastSynced) {
-      this.settings = {
-        ...this.settings,
-        ...(isDeleted(remoteItem)
-          ? {}
-          : {
-              ...remoteItem,
-              groupOptions: {
-                ...this.settings.groupOptions,
-                ...remoteItem.groupOptions
-              },
-              toolbarConfig: {
-                ...this.settings.toolbarConfig,
-                ...remoteItem.toolbarConfig
-              },
-              aliases: {
-                ...this.settings.aliases,
-                ...remoteItem.aliases
-              }
-            })
-      };
-      this.settings.dateModified = Date.now();
-    } else {
-      this.reset(remoteItem);
-    }
-    await this.save(false);
+  private async set<TKey extends keyof SettingItemMap>(
+    key: TKey,
+    value: SettingItemMap[TKey]
+  ) {
+    const id = makeId(key);
+    const oldItem = this.collection.get(id);
+    if (oldItem && oldItem.key !== key) throw new Error("Key conflict.");
+
+    await this.collection.add({
+      id,
+      key,
+      value,
+      type: "settingitem",
+      dateCreated: oldItem?.dateCreated || Date.now(),
+      dateModified: oldItem?.dateCreated || Date.now()
+    });
+    return id;
   }
 
-  async setGroupOptions(key: GroupingKey, groupOptions: GroupOptions) {
-    if (!this.settings.groupOptions) this.settings.groupOptions = {};
-    this.settings.groupOptions[key] = groupOptions;
-    await this.save();
+  private get<TKey extends keyof SettingItemMap>(
+    key: TKey
+  ): SettingItemMap[TKey] {
+    const item = this.collection.get(makeId(key)) as
+      | SettingItem<TKey>
+      | undefined;
+    if (!item || item.key !== key) return defaultSettings[key];
+    return item.value;
   }
 
   getGroupOptions(key: GroupingKey) {
-    return (
-      (this.settings.groupOptions && this.settings.groupOptions[key]) || {
-        groupBy: "default",
-        sortBy:
-          key === "trash"
-            ? "dateDeleted"
-            : key === "tags"
-            ? "dateCreated"
-            : key === "reminders"
-            ? "dueDate"
-            : "dateEdited",
-        sortDirection: key === "reminders" ? "asc" : "desc"
-      }
-    );
+    return this.get(`groupOptions:${key}`);
   }
 
-  async setToolbarConfig(key: string, config: ToolbarConfig) {
-    if (!this.settings.toolbarConfig) this.settings.toolbarConfig = {};
-    this.settings.toolbarConfig[key] = config;
-    await this.save();
+  setGroupOptions(key: GroupingKey, groupOptions: GroupOptions) {
+    return this.set(`groupOptions:${key}`, groupOptions);
   }
 
-  getToolbarConfig(key: string) {
-    return this.settings.toolbarConfig && this.settings.toolbarConfig[key];
+  setToolbarConfig(platform: ToolbarConfigPlatforms, config: ToolbarConfig) {
+    return this.set(`toolbarConfig:${platform}`, config);
   }
 
-  /**
-   * Setting to -1 means never clear trash.
-   */
-  async setTrashCleanupInterval(interval: TrashCleanupInterval) {
-    this.settings.trashCleanupInterval = interval;
-    await this.save();
+  getToolbarConfig(platform: ToolbarConfigPlatforms) {
+    return this.get(`toolbarConfig:${platform}`);
+  }
+
+  setTrashCleanupInterval(interval: TrashCleanupInterval) {
+    return this.set("trashCleanupInterval", interval);
   }
 
   getTrashCleanupInterval() {
-    return this.settings.trashCleanupInterval || 7;
+    return this.get("trashCleanupInterval");
   }
 
-  async setDefaultNotebook(item: DefaultNotebook | undefined) {
-    this.settings.defaultNotebook = !item
-      ? undefined
-      : {
-          id: item.id,
-          topic: item.topic
-        };
-    await this.save();
+  setDefaultNotebook(item: DefaultNotebook | undefined) {
+    return this.set("defaultNotebook", item);
   }
 
   getDefaultNotebook() {
-    return this.settings.defaultNotebook;
+    return this.get("defaultNotebook");
   }
 
-  async setTitleFormat(format: string) {
-    this.settings.titleFormat = format;
-    await this.save();
+  setTitleFormat(format: string) {
+    return this.set("titleFormat", format);
   }
 
   getTitleFormat() {
-    return this.settings.titleFormat || "Note $date$ $time$";
+    return this.get("titleFormat");
   }
 
   getDateFormat() {
-    return this.settings.dateFormat || "DD-MM-YYYY";
+    return this.get("dateFormat");
   }
 
-  async setDateFormat(format: string) {
-    this.settings.dateFormat = format;
-    await this.save();
+  setDateFormat(format: string) {
+    return this.set("dateFormat", format);
   }
 
   getTimeFormat() {
-    return this.settings.timeFormat || "12-hour";
+    return this.get("timeFormat");
   }
 
-  async setTimeFormat(format: TimeFormat) {
-    this.settings.timeFormat = format || "12-hour";
-    await this.save();
-  }
-
-  /**
-   * @deprecated only kept here for migration purposes.
-   */
-  getAlias(id: string) {
-    return this.settings.aliases && this.settings.aliases[id];
-  }
-
-  private reset(settings?: Partial<SettingsItem>) {
-    this.settings = {
-      type: "settings",
-      id: getId(),
-      dateModified: 0,
-      dateCreated: 0,
-      ...(settings || {})
-    };
-  }
-
-  private async save(updateDateModified = true) {
-    this.db.eventManager.publish(
-      EVENTS.databaseUpdated,
-      "settings",
-      this.settings
-    );
-
-    if (updateDateModified) {
-      this.settings.dateModified = Date.now();
-      this.settings.synced = false;
-    }
-    delete this.settings.remote;
-
-    await this.db.storage().write("settings", this.settings);
+  setTimeFormat(format: TimeFormat) {
+    return this.set("timeFormat", format);
   }
 }
-export default Settings;
