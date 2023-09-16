@@ -19,6 +19,10 @@
 .titleBar::placeholder {
   color: var(--nn_primary_placeholder);
 }
+.titleBar {
+  resize: none;
+  outline: none;
+}
 
 .container {
   -ms-overflow-style: none;
