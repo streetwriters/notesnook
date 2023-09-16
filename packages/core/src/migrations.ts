@@ -25,10 +25,12 @@ import { getId, makeId } from "./utils/id";
 import {
   Color,
   ContentItem,
+  GroupingKey,
   HistorySession,
   Item,
   ItemMap,
-  ItemType
+  ItemType,
+  ToolbarConfigPlatforms
 } from "./types";
 import { isCipher } from "./database/crypto";
 import { IndexedCollection } from "./database/indexed-collection";
@@ -188,7 +190,7 @@ const migrations: Migration[] = [
     version: 5.9,
     items: {
       tag: async (item, db) => {
-        const alias = db.settings.getAlias(item.id);
+        const alias = db.legacySettings.getAlias(item.id);
         item.title = alias || item.title;
         item.id = getId(item.dateCreated);
 
@@ -207,7 +209,7 @@ const migrations: Migration[] = [
         for (const tag of item.tags || []) {
           const oldTagId = makeId(tag);
           const oldTag = db.tags.tag(oldTagId);
-          const alias = db.settings.getAlias(oldTagId);
+          const alias = db.legacySettings.getAlias(oldTagId);
           const newTag = db.tags.all.find(
             (t) => [alias, tag].includes(t.title) && t.id !== oldTagId
           );
@@ -228,7 +230,7 @@ const migrations: Migration[] = [
         if (item.color) {
           const oldColorId = makeId(item.color);
           const oldColor = db.tags.tag(oldColorId);
-          const alias = db.settings.getAlias(oldColorId);
+          const alias = db.legacySettings.getAlias(oldColorId);
           const newColor = db.tags.all.find(
             (t) => [alias, item.color].includes(t.title) && t.id !== oldColorId
           );
@@ -289,6 +291,36 @@ const migrations: Migration[] = [
           item.item = { type: "notebook", id: item.item.id };
           return true;
         }
+      },
+      settings: async (item, db) => {
+        if (item.trashCleanupInterval)
+          await db.settings.setTrashCleanupInterval(item.trashCleanupInterval);
+        if (item.defaultNotebook)
+          await db.settings.setDefaultNotebook(item.defaultNotebook);
+
+        if (item.titleFormat)
+          await db.settings.setTitleFormat(item.titleFormat);
+        if (item.dateFormat) await db.settings.setDateFormat(item.dateFormat);
+        if (item.timeFormat) await db.settings.setTimeFormat(item.timeFormat);
+
+        if (item.groupOptions) {
+          for (const key in item.groupOptions) {
+            const value = item.groupOptions[key as GroupingKey];
+            if (!value) continue;
+            await db.settings.setGroupOptions(key as GroupingKey, value);
+          }
+        }
+        if (item.toolbarConfig) {
+          for (const key in item.toolbarConfig) {
+            const value = item.toolbarConfig[key as ToolbarConfigPlatforms];
+            if (!value) continue;
+            await db.settings.setToolbarConfig(
+              key as ToolbarConfigPlatforms,
+              value
+            );
+          }
+        }
+        return true;
       }
     }
   },
