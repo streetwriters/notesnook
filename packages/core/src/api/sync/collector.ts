@@ -42,14 +42,6 @@ class Collector {
       throw new Error("User encryption key not generated. Please relogin.");
     }
 
-    const settings = await this.prepareChunk(
-      [this.db.settings.raw],
-      lastSyncedTimestamp,
-      isForceSync,
-      key
-    );
-    if (settings) yield { items: settings, type: "settings" };
-
     const attachments = await this.prepareChunk(
       this.db.attachments.syncable,
       lastSyncedTimestamp,
