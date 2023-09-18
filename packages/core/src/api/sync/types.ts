@@ -48,6 +48,12 @@ export const SYNC_COLLECTIONS_MAP = {
   settingitem: "settings"
 } as const;
 
+export const MERGE_COLLECTIONS_MAP = {
+  ...SYNC_COLLECTIONS_MAP,
+  attachment: "attachments",
+  content: "content"
+} as const;
+
 export type SyncTransferItem = {
   items: SyncItem[];
   type: SyncableItemType;

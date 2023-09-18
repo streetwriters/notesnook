@@ -86,7 +86,7 @@ export type GroupableItem = ValueOf<
     | "session"
     | "sessioncontent"
     | "settings"
-    | "settingsv2"
+    | "settingitem"
   >
 >;
 
@@ -324,7 +324,7 @@ export type DefaultNotebook = { id: string; topic?: string };
  */
 export interface LegacySettingsItem extends BaseItem<"settings"> {
   groupOptions?: Partial<Record<GroupingKey, GroupOptions>>;
-  toolbarConfig?: Record<ToolbarConfigPlatforms, ToolbarConfig>;
+  toolbarConfig?: Partial<Record<ToolbarConfigPlatforms, ToolbarConfig>>;
   trashCleanupInterval?: TrashCleanupInterval;
   titleFormat?: string;
   timeFormat?: TimeFormat;
@@ -350,7 +350,7 @@ export type SettingItemMap = {
   titleFormat: string;
   timeFormat: TimeFormat;
   dateFormat: string;
-  defaultNotebook: DefaultNotebook | undefined;
+  defaultNotebook: string | undefined;
 } & Record<`groupOptions:${GroupingKey}`, GroupOptions> &
   Record<`toolbarConfig:${ToolbarConfigPlatforms}`, ToolbarConfig | undefined>;
 
@@ -389,9 +389,7 @@ export function isDeleted<T extends BaseItem<ItemType>>(
   return "deleted" in item;
 }
 
-export function isTrashItem(
-  item: MaybeDeletedItem<TrashOrItem<BaseItem<"note" | "notebook">>>
-): item is TrashItem {
+export function isTrashItem(item: MaybeDeletedItem<Item>): item is TrashItem {
   return !isDeleted(item) && item.type === "trash";
 }
 
