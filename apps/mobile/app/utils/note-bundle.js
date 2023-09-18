@@ -24,6 +24,12 @@ import RNFetchBlob from "react-native-blob-util";
 import { db } from "../common/database";
 import { IOS_APPGROUPID } from "./constants";
 
+const santizeUri = (uri) => {
+  uri = decodeURI(uri);
+  uri = Platform.OS === "ios" ? uri.replace("file:///", "/") : uri;
+  return uri;
+};
+
 export async function attachFile(uri, hash, type, filename, options) {
   try {
     let exists = db.attachments.exists(hash);
@@ -76,9 +82,7 @@ async function createNotes(bundle) {
 
   for (const file of bundle.files) {
     const uri =
-      Platform.OS === "ios"
-        ? `${file.value.replace("file://", "")}`
-        : `${file.value}`;
+      Platform.OS === "ios" ? santizeUri(file.value) : `${file.value}`;
     const hash = await Sodium.hashFile({
       uri: uri,
       type: "cache"
