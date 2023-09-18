@@ -11,7 +11,9 @@
   "main": "dist/index.js",
   "devDependencies": {
     "@playwright/test": "^1.27.1",
-    "slugify": "^1.6.5"
+    "slugify": "^1.6.5",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
   },
   "publishConfig": {
     "access": "public"
@@ -21,7 +23,7 @@
     "url": "git+https://github.com/streetwriters/notesnook.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && yarn webpack -c webpack.config.js",
     "test": "playwright test",
     "postinstall": "patch-package"
   },

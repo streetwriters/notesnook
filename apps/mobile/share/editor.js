@@ -167,10 +167,9 @@ export const Editor = ({ onChange, onLoad }) => {
         }}
         nestedScrollEnabled
         javaScriptEnabled={true}
-        focusable={true}
         setSupportMultipleWindows={false}
         overScrollMode="never"
-        scrollEnabled={false}
+        scrollEnabled={Platform.OS === "ios"}
         keyboardDisplayRequiresUserAction={false}
         cacheMode="LOAD_DEFAULT"
         cacheEnabled={true}
