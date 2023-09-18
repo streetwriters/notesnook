@@ -18,7 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Database from "../api";
-import { sendMigrationProgressEvent } from "../common";
+import {
+  CURRENT_DATABASE_VERSION,
+  sendMigrationProgressEvent
+} from "../common";
 import { migrateCollection, migrateItem } from "../migrations";
 import {
   CollectionType,
@@ -99,17 +102,31 @@ class Migrator {
       }
 
       const itemId = item.id;
-      const migrated = await migrateItem(
+      let migrated = await migrateItem(
         item,
         version,
+        CURRENT_DATABASE_VERSION,
         item.type || type,
         db,
         "local"
       );
 
+      // trash item is also a notebook or a note so we have to migrate it separately.
+      if (isTrashItem(item)) {
+        migrated = await migrateItem(
+          item as any,
+          version,
+          CURRENT_DATABASE_VERSION,
+          item.itemType,
+          db,
+          "local"
+        );
+      }
+
       if (migrated) {
-        if (item.type === "settings") {
-          await db.settings.merge(item, Infinity);
+        if (item.type !== "settings") {
+          // we are removing the old settings.
+          await db.storage().remove("settings");
         } else toAdd.push(item);
 
         // if id changed after migration, we need to delete the old one.

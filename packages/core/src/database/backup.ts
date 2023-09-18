@@ -137,6 +137,7 @@ const itemTypeToCollectionKey = {
   notehistory: "notehistory",
   content: "content",
   shortcut: "shortcuts",
+  settingitem: "settingsv2",
 
   // to make ts happy
   topic: "topics"
@@ -337,13 +338,21 @@ export default class Backup {
       if ("sessionContentId" in item && item.type !== "session")
         (item as any).type = "notehistory";
 
-      await migrateItem(item, version, item.type, this.db, "backup");
+      await migrateItem(
+        item,
+        version,
+        CURRENT_DATABASE_VERSION,
+        item.type,
+        this.db,
+        "backup"
+      );
       // since items in trash can have their own set of migrations,
       // we have to run the migration again to account for that.
       if (item.type === "trash" && item.itemType)
         await migrateItem(
           item as unknown as Note | Notebook,
           version,
+          CURRENT_DATABASE_VERSION,
           item.itemType,
           this.db,
           "backup"
