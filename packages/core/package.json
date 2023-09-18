@@ -12,6 +12,7 @@
     "@types/event-source-polyfill": "^1.0.1",
     "@types/html-to-text": "^9.0.0",
     "@types/katex": "^0.16.2",
+    "@types/mime-db": "^1.43.1",
     "@types/prismjs": "^1.26.0",
     "@types/spark-md5": "^3.0.2",
     "@types/streetwriters__showdown": "npm:@types/showdown@^2.0.0",
