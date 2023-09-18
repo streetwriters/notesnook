@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { makeId } from "../utils/id";
 import Database from "../api";
 import {
-  DefaultNotebook,
   GroupOptions,
   GroupingKey,
   SettingItem,
@@ -136,7 +135,7 @@ export class Settings implements ICollection {
     return this.get("trashCleanupInterval");
   }
 
-  setDefaultNotebook(item: DefaultNotebook | undefined) {
+  setDefaultNotebook(item: string | undefined) {
     return this.set("defaultNotebook", item);
   }
 
