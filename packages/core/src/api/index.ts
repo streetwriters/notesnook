@@ -36,7 +36,7 @@ import { LegacySettings } from "../collections/legacy-settings";
 import Migrations from "./migrations";
 import UserManager from "./user-manager";
 import http from "../utils/http";
-import Monographs from "./monographs";
+import { Monographs } from "./monographs";
 import { Offers } from "./offers";
 import { Attachments } from "../collections/attachments";
 import { Debug } from "./debug";
@@ -174,7 +174,7 @@ class Database {
       await this.fs().cancel(attachment.metadata.hash, "download");
     });
     EV.subscribe(EVENTS.userLoggedOut, async () => {
-      await this.monographs.deinit();
+      await this.monographs.clear();
       await this.fs().clear();
       this.disconnectSSE();
     });
@@ -208,7 +208,9 @@ class Database {
 
     await this.trash.init();
 
-    this.monographs.init().catch(console.error);
+    // we must not wait on network requests that's why
+    // no await
+    this.monographs.refresh();
   }
 
   disconnectSSE() {
