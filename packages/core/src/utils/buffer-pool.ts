@@ -17,15 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var map = Map;
-class MapStub {
-  override(replacement) {
-    map = replacement;
+export class BufferPool {
+  private freeBuffers: Buffer[] = [];
+  constructor(private readonly size: number) {}
+
+  alloc() {
+    return this.freeBuffers.pop() || this.allocNew();
   }
 
-  get Map() {
-    return map;
+  private allocNew() {
+    return Buffer.alloc(this.size);
+  }
+
+  free(buf: Buffer) {
+    this.freeBuffers.push(buf);
+    return true;
   }
 }
-
-export default new MapStub();

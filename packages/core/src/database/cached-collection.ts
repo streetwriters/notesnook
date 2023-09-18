@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { IndexedCollection } from "./indexed-collection";
-import MapStub from "../utils/map";
 import {
   CollectionType,
   Collections,
@@ -51,9 +50,7 @@ export class CachedCollection<
     const data = await this.collection.indexer.readMulti(
       this.collection.indexer.indices
     );
-    if ("dispose" in this.cache && typeof this.cache.dispose === "function")
-      this.cache.dispose();
-    this.cache = new MapStub.Map(data);
+    this.cache = new Map(data);
   }
 
   async add(item: MaybeDeletedItem<T>) {
