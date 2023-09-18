@@ -16,22 +16,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 import db from "mime-db";
 
-// type MimeTypeInfo = {
-//   source: string;
-//   extensions?: string[];
-//   charset?: string;
-//   compressible?: boolean;
-// };
-
-/**
- *
- * @param {string} filename
- * @param {string | undefined} mime
- * @returns {string}
- */
-export function getFileNameWithExtension(filename, mime) {
+export function getFileNameWithExtension(
+  filename: string,
+  mime: string | undefined
+): string {
   if (!mime || mime === "application/octet-stream") return filename;
   const mimeData = db[mime];
   if (!mimeData || !mimeData.extensions || mimeData.extensions.length === 0)
@@ -59,24 +50,23 @@ export const DocumentMimeTypes = [
   "application/vnd.oasis.opendocument.presentation"
 ];
 
-export const WebClipMimeType = "application/vnd.notesnook.web-clip";
-
-export function isDocument(mime) {
+export function isDocument(mime: string) {
   return DocumentMimeTypes.some((a) => a.startsWith(mime));
 }
 
-export function isWebClip(mime) {
+export const WebClipMimeType = "application/vnd.notesnook.web-clip";
+export function isWebClip(mime: string) {
   return mime === WebClipMimeType;
 }
 
-export function isImage(mime) {
+export function isImage(mime: string) {
   return mime.startsWith("image/");
 }
 
-export function isVideo(mime) {
+export function isVideo(mime: string) {
   return mime.startsWith("video/");
 }
 
-export function isAudio(mime) {
+export function isAudio(mime: string) {
   return mime.startsWith("audio/");
 }
