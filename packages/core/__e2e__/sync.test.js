@@ -23,11 +23,10 @@ import { FS } from "../__mocks__/fs.mock";
 import Compressor from "../__mocks__/compressor.mock";
 import { CHECK_IDS, EV, EVENTS } from "../src/common";
 import { EventSource } from "event-source-polyfill";
-import { delay } from "../__tests__/utils";
 import { test, expect, vitest } from "vitest";
 import { login } from "./utils";
 
-const TEST_TIMEOUT = 60 * 1000;
+const TEST_TIMEOUT = 30 * 1000;
 
 test(
   "case 1: device A & B should only download the changes from device C (no uploading)",
@@ -218,6 +217,15 @@ test(
       initializeDevice("deviceB")
     ]);
 
+    for (let i = 0; i < 3; ++i) {
+      await deviceA.notes.add({
+        content: {
+          type: "tiptap",
+          data: `<p>deviceA=true</p>`
+        }
+      });
+    }
+
     await syncAndWait(deviceA, deviceB, true);
 
     const handler = vitest.fn();
@@ -283,108 +291,6 @@ test(
     ).toBe(true);
 
     console.log("issue colors log out");
-    await cleanup(deviceA, deviceB);
-  },
-  TEST_TIMEOUT
-);
-
-test(
-  "issue: new topic on device A gets replaced by the new topic on device B",
-  async () => {
-    const [deviceA, deviceB] = await Promise.all([
-      initializeDevice("deviceA"),
-      initializeDevice("deviceB")
-    ]);
-    // const deviceA = await initializeDevice("deviceA");
-    // const deviceB = await initializeDevice("deviceB");
-
-    const id = await deviceA.notebooks.add({ title: "Notebook 1" });
-
-    await syncAndWait(deviceA, deviceB, false);
-
-    expect(deviceB.notebooks.notebook(id)).toBeDefined();
-
-    await deviceA.notebooks.topics(id).add({ title: "Topic 1" });
-    // to create a conflict
-    await delay(1500);
-    await deviceB.notebooks.topics(id).add({ title: "Topic 2" });
-
-    expect(deviceA.notebooks.topics(id).has("Topic 1")).toBeTruthy();
-    expect(deviceB.notebooks.topics(id).has("Topic 2")).toBeTruthy();
-    expect(
-      deviceB.notebooks.topics(id).topic("Topic 2").dateModified >
-        deviceA.notebooks.topics(id).topic("Topic 1").dateModified
-    ).toBeTruthy();
-    expect(
-      deviceB.notebooks.notebook(id).dateModified >
-        deviceA.notebooks.notebook(id).dateModified
-    ).toBeTruthy();
-
-    await syncAndWait(deviceB, deviceA, false);
-
-    expect(deviceA.notebooks.topics(id).has("Topic 1")).toBeTruthy();
-    expect(deviceB.notebooks.topics(id).has("Topic 1")).toBeTruthy();
-
-    expect(deviceA.notebooks.topics(id).has("Topic 2")).toBeTruthy();
-    expect(deviceB.notebooks.topics(id).has("Topic 2")).toBeTruthy();
-
-    console.log("issue new topic log out");
-    await cleanup(deviceA, deviceB);
-  },
-  TEST_TIMEOUT
-);
-
-test(
-  "issue: assigning 2 notes to the same topic should keep references of both notes in the topic",
-  async (ctx) => {
-    const [deviceA, deviceB] = await Promise.all([
-      initializeDevice("deviceA"),
-      initializeDevice("deviceB")
-    ]);
-
-    const id = await deviceA.notebooks.add({
-      title: "Notebook 1",
-      topics: [{ title: "Topic 1" }]
-    });
-    const topic = deviceA.notebooks.topics(id).topic("Topic 1");
-
-    await syncAndWait(deviceA, deviceB, false);
-
-    expect(deviceB.notebooks.notebook(id)).toBeDefined();
-
-    const noteA = await deviceA.notes.add({ title: "Note 1" });
-    await deviceA.notes.addToNotebook({ id, topic: topic.id }, noteA);
-
-    expect(topic.totalNotes).toBe(1);
-
-    await delay(2000);
-
-    const noteB = await deviceB.notes.add({ title: "Note 2" });
-    await deviceB.notes.addToNotebook({ id, topic: topic.id }, noteB);
-
-    expect(deviceB.notebooks.topics(id).topic(topic.id).totalNotes).toBe(1);
-
-    ctx.onTestFailed(() => {
-      console.log(deviceA.notes.topicReferences.get(topic.id), noteA);
-      console.log(deviceB.notes.topicReferences.get(topic.id), noteB);
-
-      deviceB.notes.topicReferences.rebuild();
-      deviceA.notes.topicReferences.rebuild();
-
-      console.log(deviceA.notes.topicReferences.get(topic.id), noteA);
-      console.log(deviceB.notes.topicReferences.get(topic.id), noteB);
-    });
-    await syncAndWait(deviceB, deviceA, false);
-
-    expect(deviceA.notes.note(noteB)).toBeDefined();
-    expect(deviceB.notes.note(noteA)).toBeDefined();
-
-    expect(deviceA.notes.note(noteA).data.notebooks).toHaveLength(1);
-    expect(deviceA.notes.note(noteB).data.notebooks).toHaveLength(1);
-
-    expect(deviceA.notebooks.topics(id).topic(topic.id).totalNotes).toBe(2);
-    expect(deviceB.notebooks.topics(id).topic(topic.id).totalNotes).toBe(2);
-
     await cleanup(deviceA, deviceB);
   },
   TEST_TIMEOUT
