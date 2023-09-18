@@ -17,20 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export function extractHostname(url) {
-  var hostname;
+export function extractHostname(url: string) {
   //find & remove protocol (http, ftp, etc.) and get hostname
-
-  if (url.indexOf("//") > -1) {
-    hostname = url.split("/")[2];
-  } else {
-    hostname = url.split("/")[0];
-  }
+  const hostname: string =
+    url.indexOf("//") > -1 ? url.split("/")[2] : url.split("/")[0];
 
   //find & remove port number
   // hostname = hostname.split(":")[0];
   //find & remove "?"
-  hostname = hostname.split("?")[0];
-
-  return hostname;
+  return hostname.split("?")[0];
 }
