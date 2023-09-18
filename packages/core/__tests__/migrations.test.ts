@@ -575,13 +575,14 @@ describe("[5.9] move topics out of notebooks & use relations", () => {
       };
       await migrateItem(notebook, 5.9, 6.0, "notebook", db, "backup");
 
-      const linkedNotebooks = db.relations
-        .from({ type: "notebook", id: "parent_notebook" }, "notebook")
-        .sort((a, b) => a.to.id.localeCompare(b.to.id));
+      const linkedNotebooks = db.relations.from(
+        { type: "notebook", id: "parent_notebook" },
+        "notebook"
+      );
       expect(notebook.topics).toBeUndefined();
       expect(linkedNotebooks).toHaveLength(2);
-      expect(linkedNotebooks[0].to.id).toBe("topics1");
-      expect(linkedNotebooks[1].to.id).toBe("topics2");
+      expect(linkedNotebooks.some((a) => a.to.id === "topics1")).toBeTruthy();
+      expect(linkedNotebooks.some((a) => a.to.id === "topics2")).toBeTruthy();
       expect(db.notebooks.all).toHaveLength(2);
       expect(db.notebooks.notebook("topics1")).toBeDefined();
       expect(db.notebooks.notebook("topics2")).toBeDefined();
@@ -614,11 +615,11 @@ describe("[5.9] move topics out of notebooks & use relations", () => {
 
       const linkedNotebooks = db.relations
         .to({ type: "note", id: "note1" }, "notebook")
-        .sort();
+        .sort((a, b) => a.to.id.localeCompare(b.to.id));
       expect(note.notebooks).toBeUndefined();
       expect(linkedNotebooks).toHaveLength(2);
-      expect(linkedNotebooks[0].from.id).toBe("topic1");
-      expect(linkedNotebooks[1].from.id).toBe("topic2");
+      expect(linkedNotebooks.some((a) => a.from.id === "topic1")).toBeTruthy();
+      expect(linkedNotebooks.some((a) => a.from.id === "topic2")).toBeTruthy();
     }));
 });
 
