@@ -320,7 +320,7 @@ class Sync {
 
   async stop(lastSynced: number) {
     // refresh monographs on sync completed
-    await this.db.monographs.init();
+    await this.db.monographs.refresh();
 
     this.logger.info("Stopping sync", { lastSynced });
     const storedLastSynced = await this.db.lastSynced();
@@ -361,9 +361,6 @@ class Sync {
       false,
       lastSynced
     );
-
-    // refresh monographs on sync completed
-    await this.db.monographs.init();
   }
 
   async processChunk(
