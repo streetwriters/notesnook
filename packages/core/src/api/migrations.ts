@@ -46,6 +46,14 @@ class Migrations {
 
       const collections: MigratableCollections = [
         {
+          items: () => [this.db.legacySettings.raw],
+          type: "settings"
+        },
+        {
+          items: () => this.db.settings.raw,
+          type: "settingsv2"
+        },
+        {
           items: () => this.db.attachments.all,
           type: "attachments"
         },
@@ -64,10 +72,6 @@ class Migrations {
         {
           iterate: true,
           type: "content"
-        },
-        {
-          items: () => [this.db.settings.raw],
-          type: "settings"
         },
         {
           items: () => this.db.shortcuts.raw,

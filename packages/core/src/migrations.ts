@@ -76,7 +76,7 @@ const migrations: Migration[] = [
       notebook: replaceDateEditedWithDateModified(false),
       tag: replaceDateEditedWithDateModified(true),
       attachment: replaceDateEditedWithDateModified(true),
-      trash: replaceDateEditedWithDateModified(),
+      trash: replaceDateEditedWithDateModified(false),
       tiny: (item) => {
         replaceDateEditedWithDateModified(false)(item);
 
@@ -147,12 +147,10 @@ const migrations: Migration[] = [
     version: 5.7,
     items: {
       tiny: (item) => {
-        if (!item.data || isCipher(item.data)) return false;
         item.type = "tiptap";
         return changeSessionContentType(item);
       },
       content: (item) => {
-        if (!item.data || isCipher(item.data)) return false;
         const oldType = item.type;
         item.type = "tiptap";
         return oldType !== item.type;
@@ -190,15 +188,27 @@ const migrations: Migration[] = [
     version: 5.9,
     items: {
       tag: async (item, db) => {
+        const oldTagId = makeId(item.title);
         const alias = db.legacySettings.getAlias(item.id);
-        item.title = alias || item.title;
-        item.id = getId(item.dateCreated);
+        if (
+          !alias &&
+          (db.tags.all.find(
+            (t) => item.title === t.title && t.id !== oldTagId
+          ) ||
+            db.colors.all.find(
+              (t) => item.title === t.title && t.id !== oldTagId
+            ))
+        )
+          return false;
 
         const colorCode = ColorToHexCode[item.title];
         if (colorCode) {
           (item as unknown as Color).type = "color";
           (item as unknown as Color).colorCode = colorCode;
         }
+
+        item.title = alias || item.title;
+        item.id = getId(item.dateCreated);
 
         delete item.localOnly;
         delete item.noteIds;
@@ -229,9 +239,9 @@ const migrations: Migration[] = [
 
         if (item.color) {
           const oldColorId = makeId(item.color);
-          const oldColor = db.tags.tag(oldColorId);
+          const oldColor = db.colors.color(oldColorId);
           const alias = db.legacySettings.getAlias(oldColorId);
-          const newColor = db.tags.all.find(
+          const newColor = db.colors.all.find(
             (t) => [alias, item.color].includes(t.title) && t.id !== oldColorId
           );
           const newColorId =
@@ -257,6 +267,7 @@ const migrations: Migration[] = [
           }
         }
 
+        delete item.notebooks;
         delete item.tags;
         delete item.color;
         return true;
@@ -296,7 +307,11 @@ const migrations: Migration[] = [
         if (item.trashCleanupInterval)
           await db.settings.setTrashCleanupInterval(item.trashCleanupInterval);
         if (item.defaultNotebook)
-          await db.settings.setDefaultNotebook(item.defaultNotebook);
+          await db.settings.setDefaultNotebook(
+            item.defaultNotebook
+              ? item.defaultNotebook.topic || item.defaultNotebook.id
+              : undefined
+          );
 
         if (item.titleFormat)
           await db.settings.setTitleFormat(item.titleFormat);
@@ -332,15 +347,18 @@ const migrations: Migration[] = [
 
 export async function migrateItem<TItemType extends MigrationItemType>(
   item: MigrationItemMap[TItemType],
-  version: number,
+  itemVersion: number,
+  databaseVersion: number,
   type: TItemType,
   database: Database,
   migrationType: MigrationType
 ) {
-  let migrationStartIndex = migrations.findIndex((m) => m.version === version);
+  let migrationStartIndex = migrations.findIndex(
+    (m) => m.version === itemVersion
+  );
   if (migrationStartIndex <= -1) {
     throw new Error(
-      version > CURRENT_DATABASE_VERSION
+      itemVersion > databaseVersion
         ? `Please update the app to the latest version.`
         : `You seem to be on a very outdated version. Please update the app to the latest version.`
     );
@@ -349,7 +367,7 @@ export async function migrateItem<TItemType extends MigrationItemType>(
   let count = 0;
   for (; migrationStartIndex < migrations.length; ++migrationStartIndex) {
     const migration = migrations[migrationStartIndex];
-    if (migration.version === CURRENT_DATABASE_VERSION) break;
+    if (migration.version === databaseVersion) break;
 
     if (
       migration.items.all &&
