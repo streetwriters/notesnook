@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   checkSyncStatus,
+  CURRENT_DATABASE_VERSION,
   EV,
   EVENTS,
   sendSyncProgressEvent,
@@ -44,19 +45,11 @@ import {
   Notebook,
   TrashOrItem
 } from "../../types";
-import { SyncableItemType, SyncTransferItem } from "./types";
-
-const ITEM_TYPE_TO_COLLECTION_TYPE = {
-  note: "notes",
-  notebook: "notebooks",
-  content: "content",
-  attachment: "attachments",
-  relation: "relations",
-  reminder: "reminders",
-  shortcut: "shortcuts",
-  tag: "tags",
-  color: "colors"
-} as const;
+import {
+  MERGE_COLLECTIONS_MAP,
+  SyncableItemType,
+  SyncTransferItem
+} from "./types";
 
 export default class SyncManager {
   sync = new Sync(this.db);
@@ -379,6 +372,9 @@ class Sync {
     dbLastSynced: number,
     notify = false
   ) {
+    const itemType = chunk.type;
+    if (itemType === "settings") return;
+
     const decrypted = await this.db.storage().decryptMulti(key, chunk.items);
 
     const deserialized = await Promise.all(
@@ -387,7 +383,6 @@ class Sync {
       )
     );
 
-    const itemType = chunk.type;
     let items: (
       | MaybeDeletedItem<
           ItemMap[SyncableItemType] | TrashOrItem<Note> | TrashOrItem<Notebook>
@@ -403,9 +398,6 @@ class Sync {
           this.merger.mergeContent(item, localItems[item.id], dbLastSynced)
         )
       );
-    } else if (itemType === "settings") {
-      await this.merger.mergeItem(deserialized[0], itemType, dbLastSynced);
-      return;
     } else {
       items = this.merger.isSyncCollection(itemType)
         ? deserialized.map((item) =>
@@ -418,7 +410,7 @@ class Sync {
           );
     }
 
-    const collectionType = ITEM_TYPE_TO_COLLECTION_TYPE[itemType];
+    const collectionType = MERGE_COLLECTIONS_MAP[itemType];
     await this.db[collectionType].collection.setItems(items as any);
 
     if (
@@ -489,6 +481,7 @@ async function deserializeItem(
     await migrateItem(
       deserialized,
       version,
+      CURRENT_DATABASE_VERSION,
       deserialized.type,
       database,
       "sync"
