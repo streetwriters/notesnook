@@ -34,7 +34,6 @@ import Hosts from "../utils/constants";
 import { EV, EVENTS } from "../common";
 import { LegacySettings } from "../collections/legacy-settings";
 import Migrations from "./migrations";
-import Outbox from "./outbox";
 import UserManager from "./user-manager";
 import http from "../utils/http";
 import { Monographs } from "./monographs";
@@ -132,7 +131,6 @@ class Database {
   legacySettings = new LegacySettings(this);
   settings = new Settings(this);
   migrations = new Migrations(this);
-  outbox = new Outbox(this);
   monographs = new Monographs(this);
   trash = new Trash(this);
 
@@ -185,7 +183,6 @@ class Database {
 
     await this.initCollections();
 
-    await this.outbox.init();
     await this.migrations.init();
     this.isInitialized = true;
     if (this.migrations.required()) {
