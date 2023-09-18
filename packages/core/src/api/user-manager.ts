@@ -483,42 +483,40 @@ class UserManager {
 
     const attachmentsKey = await this.getAttachmentsKey();
     data.encryptionKey = data.encryptionKey || (await this.getEncryptionKey());
-    await this.db.outbox.add(type, data, async () => {
-      if (data.encryptionKey) await this.db.sync(true, true);
+    if (data.encryptionKey) await this.db.sync(true, true);
 
-      await this.db.storage().deriveCryptoKey(`_uk_@${email}`, {
-        password: new_password,
-        salt
-      });
-
-      if (!(await this.resetUser(false))) return;
-
-      if (attachmentsKey) {
-        const userEncryptionKey = await this.getEncryptionKey();
-        if (!userEncryptionKey) return;
-        user.attachmentsKey = await this.db
-          .storage()
-          .encrypt(userEncryptionKey, JSON.stringify(attachmentsKey));
-        await this.updateUser(user);
-      }
-
-      await this.db.sync(false, true);
-
-      if (old_password)
-        old_password = await this.db.storage().hash(old_password, email);
-      if (new_password)
-        new_password = await this.db.storage().hash(new_password, email);
-
-      await http.patch(
-        `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
-        {
-          type,
-          old_password,
-          new_password
-        },
-        token
-      );
+    await this.db.storage().deriveCryptoKey(`_uk_@${email}`, {
+      password: new_password,
+      salt
     });
+
+    if (!(await this.resetUser(false))) return;
+
+    if (attachmentsKey) {
+      const userEncryptionKey = await this.getEncryptionKey();
+      if (!userEncryptionKey) return;
+      user.attachmentsKey = await this.db
+        .storage()
+        .encrypt(userEncryptionKey, JSON.stringify(attachmentsKey));
+      await this.updateUser(user);
+    }
+
+    await this.db.sync(false, true);
+
+    if (old_password)
+      old_password = await this.db.storage().hash(old_password, email);
+    if (new_password)
+      new_password = await this.db.storage().hash(new_password, email);
+
+    await http.patch(
+      `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
+      {
+        type,
+        old_password,
+        new_password
+      },
+      token
+    );
 
     return true;
   }
