@@ -18,13 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  ILogReporter,
   LogLevel,
+  LogMessage,
   Logger,
   NoopLogger,
   combineReporters,
   consoleReporter,
-  format
+  format,
+  ILogger
 } from "@notesnook/logger";
+import { IStorage } from "./interfaces";
 
 const WEEK = 86400000 * 7;
 
@@ -35,32 +39,21 @@ const WEEK = 86400000 * 7;
 // 4. Implement functions for log retrieval & filtering
 
 class DatabaseLogReporter {
-  /**
-   *
-   * @param {import("./database/crypto").default} storage
-   */
-  constructor(storage) {
+  writer: DatabaseLogWriter;
+  constructor(storage: IStorage) {
     this.writer = new DatabaseLogWriter(storage);
   }
 
-  /**
-   *
-   * @param {import("@notesnook/logger").LogMessage} log
-   */
-  write(log) {
+  write(log: LogMessage) {
     this.writer.push(log);
   }
 }
 
 class DatabaseLogWriter {
-  /**
-   *
-   * @param {import("./database/crypto").default} storage
-   */
-  constructor(storage) {
-    this.storage = storage;
-    this.queue = new Map();
-    this.hasCleared = false;
+  private queue: Map<string, LogMessage> = new Map();
+  private hasCleared = false;
+
+  constructor(private readonly storage: IStorage) {
     setInterval(() => {
       setTimeout(() => {
         if (!this.hasCleared) {
@@ -72,7 +65,7 @@ class DatabaseLogWriter {
     }, 10000);
   }
 
-  push(message) {
+  push(message: LogMessage) {
     const key = new Date(message.timestamp).toLocaleDateString();
     this.queue.set(`${key}:${message.timestamp}`, message);
   }
@@ -100,33 +93,27 @@ class DatabaseLogWriter {
 }
 
 class DatabaseLogManager {
-  /**
-   *
-   * @param {import("./database/crypto").default} storage
-   */
-  constructor(storage) {
-    this.storage = storage;
-  }
+  constructor(private readonly storage: IStorage) {}
 
   async get() {
     const logKeys = await this.storage.getAllKeys();
-    const logs = await this.storage.readMulti(logKeys);
-    const logGroups = {};
+    const logEntries = await this.storage.readMulti<LogMessage>(logKeys);
+    const logs: Record<string, LogMessage[]> = {};
 
-    for (const [key, log] of logs) {
-      const keyParts = key.split(":");
+    for (const [logKey, log] of logEntries) {
+      const keyParts = logKey.split(":");
       if (keyParts.length === 1) continue;
 
-      const groupKey = keyParts[0];
-      if (!logGroups[groupKey]) logGroups[groupKey] = [];
-      logGroups[groupKey].push(log);
+      const key = keyParts[0];
+      if (!logs[key]) logs[key] = [];
+      logs[key].push(log);
     }
 
-    return Object.keys(logGroups)
+    return Object.keys(logs)
       .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
       .map((key) => ({
         key,
-        logs: logGroups[key]?.sort((a, b) => a.timestamp - b.timestamp)
+        logs: logs[key]?.sort((a, b) => a.timestamp - b.timestamp)
       }));
   }
 
@@ -135,7 +122,7 @@ class DatabaseLogManager {
     await this.storage.removeMulti(logKeys);
   }
 
-  async delete(key) {
+  async delete(key: string) {
     const logKeys = await this.storage.getAllKeys();
     const keysToRemove = [];
     for (const logKey of logKeys) {
@@ -148,9 +135,9 @@ class DatabaseLogManager {
   }
 }
 
-function initialize(storage, disableConsoleLogs) {
+function initialize(storage: IStorage, disableConsoleLogs?: boolean) {
   if (storage) {
-    let reporters = [new DatabaseLogReporter(storage)];
+    const reporters: ILogReporter[] = [new DatabaseLogReporter(storage)];
     if (process.env.NODE_ENV !== "production" && !disableConsoleLogs)
       reporters.push(consoleReporter);
     logger = new Logger({
@@ -161,14 +148,7 @@ function initialize(storage, disableConsoleLogs) {
   }
 }
 
-/**
- * @type {import("@notesnook/logger").ILogger}
- */
-var logger = new NoopLogger();
-
-/**
- * @type {DatabaseLogManager | undefined}
- */
-var logManager;
+let logger: ILogger = new NoopLogger();
+let logManager: DatabaseLogManager | undefined = undefined;
 
 export { LogLevel, format, initialize, logManager, logger };
