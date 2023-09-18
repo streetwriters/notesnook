@@ -44,16 +44,10 @@ const inlineOptions: InlineOptions = {
 
 async function clipPage(
   document: Document,
-  withStyles: boolean,
   onlyVisible: boolean,
   config?: Config
 ): Promise<string | null> {
-  const { body, head } = await getPage(
-    document,
-    withStyles,
-    config,
-    onlyVisible
-  );
+  const { body, head } = await getPage(document, config, onlyVisible);
   if (!body || !head) return null;
   const result = toDocument(head, body).documentElement.outerHTML;
   return `<!doctype html>\n${result}`;
@@ -61,10 +55,9 @@ async function clipPage(
 
 async function clipArticle(
   doc: Document,
-  withStyles: boolean,
   config?: Config
 ): Promise<string | null> {
-  const { body, head } = await getPage(doc, withStyles, config);
+  const { body, head } = await getPage(doc, config);
   if (!body || !head) return null;
   const newDoc = toDocument(head, body);
 
@@ -454,7 +447,6 @@ function cleanup() {
 
 async function getPage(
   document: Document,
-  styles: boolean,
   config?: Config,
   onlyVisible = false
 ) {
@@ -463,10 +455,10 @@ async function getPage(
     fetchOptions: resolveFetchOptions(config),
     inlineOptions: {
       fonts: false,
-      images: styles,
-      stylesheets: styles
+      images: config?.images,
+      stylesheets: config?.styles
     },
-    styles,
+    styles: config?.styles,
     filter: (node) => {
       return !onlyVisible || isElementInViewport(node);
     }

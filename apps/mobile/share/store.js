@@ -90,3 +90,7 @@ export const useShareStore = create((set) => ({
     set({ selectedTags });
   }
 }));
+
+export const Config = {
+  corsProxy: appSettings?.corsProxy
+};

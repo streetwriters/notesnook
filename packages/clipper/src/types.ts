@@ -52,4 +52,6 @@ export type Options = {
 
 export type Config = {
   corsProxy?: string;
+  images?: boolean;
+  styles?: boolean;
 };

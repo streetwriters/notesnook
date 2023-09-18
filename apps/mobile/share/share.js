@@ -56,15 +56,15 @@ import { Editor } from "./editor";
 import { Search } from "./search";
 import { initDatabase, useShareStore } from "./store";
 import { useThemeColors } from "@notesnook/theme";
+import { HtmlLoadingWebViewAgent, fetchHandle } from "./fetch-webview";
 
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
 };
 async function sanitizeHtml(site) {
   try {
-    let html = await fetch(site);
-    html = await html.text();
-    return sanitize(html, site);
+    let html = await fetchHandle.current?.processUrl(site);
+    return html;
   } catch (e) {
     return "";
   }
@@ -80,93 +80,6 @@ function makeHtmlFromPlainText(text) {
   return `<p>${text
     .replace(/[\n]+/g, "\n")
     .replace(/(?:\r\n|\r|\n)/g, "</p><p>")}</p>`;
-}
-
-function getBaseUrl(site) {
-  var url = site.split("/").slice(0, 3).join("/");
-  return url;
-}
-
-function wrapTablesWithDiv(document) {
-  const tables = document.getElementsByTagName("table");
-  for (let table of tables) {
-    table.setAttribute("contenteditable", "true");
-    const div = document.createElement("div");
-    div.setAttribute("contenteditable", "false");
-    div.innerHTML = table.outerHTML;
-    div.classList.add("table-container");
-    table.replaceWith(div);
-  }
-  return document;
-}
-
-let elementBlacklist = [
-  "script",
-  "button",
-  "input",
-  "textarea",
-  "style",
-  "form",
-  "link",
-  "head",
-  "nav",
-  "iframe",
-  "canvas",
-  "select",
-  "dialog",
-  "footer"
-];
-
-function removeInvalidElements(document) {
-  let elements = document.querySelectorAll(elementBlacklist.join(","));
-  for (let element of elements) {
-    element.remove();
-  }
-  return document;
-}
-
-function replaceSrcWithAbsoluteUrls(document, baseUrl) {
-  let images = document.querySelectorAll("img");
-
-  for (var i = 0; i < images.length; i++) {
-    let img = images[i];
-    let url = getBaseUrl(baseUrl);
-    let src = img.getAttribute("src");
-    if (src.startsWith("/")) {
-      if (src.startsWith("//")) {
-        src = src.replace("//", "https://");
-      } else {
-        src = url + src;
-      }
-    }
-    if (src.startsWith("data:")) {
-      img.remove();
-    } else {
-      img.setAttribute("src", src);
-    }
-  }
-
-  return document;
-}
-
-function fixCodeBlocks(document) {
-  let elements = document.querySelectorAll("code,pre");
-
-  for (let element of elements) {
-    element.classList.add(".hljs");
-  }
-  return document;
-}
-
-function sanitize(html, baseUrl) {
-  let parser = parseHTML(html);
-  parser = wrapTablesWithDiv(parser);
-  parser = removeInvalidElements(parser);
-  parser = replaceSrcWithAbsoluteUrls(parser, baseUrl);
-  parser = fixCodeBlocks(parser);
-  let htmlString = parser.body.outerHTML;
-  htmlString = htmlString + `<hr>${makeHtmlFromUrl(baseUrl)}`;
-  return htmlString;
 }
 
 let defaultNote = {
@@ -210,6 +123,7 @@ const ShareView = ({ quicknote = false }) => {
   const [mode, setMode] = useState(1);
   const keyboardHeight = useRef(0);
   const { width, height } = useWindowDimensions();
+  const [loadingPage, setLoadingPage] = useState(false);
   const insets =
     Platform.OS === "android"
       ? { top: StatusBar.currentHeight }
@@ -260,6 +174,10 @@ const ShareView = ({ quicknote = false }) => {
 
   const loadData = useCallback(async () => {
     try {
+      if (noteContent.current) {
+        onLoad();
+        return;
+      }
       defaultNote.content.data = null;
       setNote({ ...defaultNote });
       const data = await ShareExtension.data();
@@ -310,6 +228,7 @@ const ShareView = ({ quicknote = false }) => {
   }, [onLoad]);
 
   const onLoad = useCallback(() => {
+    console.log("sending event...");
     eSendEvent(eOnLoadNote + "shareEditor", {
       id: null,
       content: {
@@ -397,11 +316,13 @@ const ShareView = ({ quicknote = false }) => {
     setLoading(true);
     try {
       if (m === 2) {
+        setLoadingPage(true);
         let html = await sanitizeHtml(rawData.value);
+        noteContent.current = html;
+        setLoadingPage(false);
+        onLoad();
         setNote((note) => {
           note.content.data = html;
-          noteContent.current = html;
-          onLoad();
           return { ...note };
         });
       } else {
@@ -423,6 +344,7 @@ const ShareView = ({ quicknote = false }) => {
   };
 
   const onLoadEditor = useCallback(() => {
+    console.log("ON LOAD");
     Storage.write("shareExtensionOpened", "opened");
     loadData();
   }, [loadData]);
@@ -450,6 +372,8 @@ const ShareView = ({ quicknote = false }) => {
         justifyContent: quicknote ? "flex-start" : "flex-end"
       }}
     >
+      <HtmlLoadingWebViewAgent />
+
       {quicknote && !searchMode ? (
         <View
           style={{
@@ -716,16 +640,27 @@ const ShareView = ({ quicknote = false }) => {
                 <SafeAreaProvider
                   style={{
                     flex: 1,
-                    paddingTop: 10
+                    paddingTop: 10,
+                    justifyContent: loadingPage ? "center" : undefined,
+                    alignItems: loadingPage ? "center" : undefined
                   }}
                 >
-                  {!loadingExtension && (
+                  {!loadingExtension && !loadingPage ? (
                     <Editor
                       onLoad={onLoadEditor}
                       onChange={(html) => {
                         noteContent.current = html;
                       }}
                     />
+                  ) : (
+                    <>
+                      {loadingPage ? (
+                        <>
+                          <ActivityIndicator />
+                          <Text>Preparing web clip...</Text>
+                        </>
+                      ) : null}
+                    </>
                   )}
                 </SafeAreaProvider>
               </View>
