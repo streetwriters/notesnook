@@ -18,12 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import SparkMD5 from "spark-md5";
-import ObjectID from "./object-id";
+import { createObjectId } from "./object-id";
 
 export function getId(time?: number) {
-  if (time)
-    return new ObjectID(new ObjectID().generate(time / 1000)).toHexString();
-  return new ObjectID().toHexString();
+  return createObjectId(time);
 }
 
 export function makeId(text: string) {
