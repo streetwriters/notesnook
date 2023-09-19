@@ -34,6 +34,7 @@ import { router, api } from "./api";
 import { config } from "./utils/config";
 import path from "path";
 import { bringToFront } from "./utils/bring-to-front";
+import { bridge } from "./api/bridge";
 
 // only run a single instance
 if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
@@ -63,7 +64,7 @@ process.on("unhandledRejection", (reason) => {
 app.commandLine.appendSwitch("lang", "en-US");
 
 async function createWindow() {
-  const cliOptions = await parseArguments();
+  const cliOptions = await parseArguments(process.argv);
   setTheme(getTheme());
 
   const mainWindowState = new WindowState({});
@@ -146,8 +147,12 @@ app.once("window-all-closed", () => {
   }
 });
 
-app.on("second-instance", () => {
+app.on("second-instance", async (_ev, argv) => {
   if (!globalThis.window) return;
+  const cliOptions = await parseArguments(argv);
+  if (cliOptions.note) bridge.onCreateItem("note");
+  if (cliOptions.notebook) bridge.onCreateItem("notebook");
+  if (cliOptions.reminder) bridge.onCreateItem("reminder");
   bringToFront();
 });
 
