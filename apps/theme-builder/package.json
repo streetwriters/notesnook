@@ -16,6 +16,7 @@
     "@notesnook/web": "file:../web",
     "@theme-ui/components": "^0.14.7",
     "@theme-ui/core": "^0.14.7",
+    "@trpc/client": "^10.38.3",
     "clipboard-polyfill": "^4.0.0",
     "file-saver": "^2.0.5",
     "katex": "^0.16.2",

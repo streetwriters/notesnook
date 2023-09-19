@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@orama/orama": "^1.0.8",
-    "@trpc/server": "10.31.0",
+    "@trpc/server": "10.38.3",
     "async-mutex": "^0.4.0",
     "cors": "^2.8.5",
     "util": "^0.12.5",

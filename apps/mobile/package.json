@@ -37,9 +37,9 @@
     "@notesnook/logger": "file:../../packages/logger",
     "@notesnook/themes-server": "file:../../servers/themes",
     "@tanstack/react-query": "^4.29.19",
-    "@trpc/client": "10.31.0",
-    "@trpc/react-query": "10.31.0",
-    "@trpc/server": "^10.31.0",
+    "@trpc/client": "10.38.3",
+    "@trpc/react-query": "10.38.3",
+    "@trpc/server": "10.38.3",
     "react": "18.2.0",
     "react-native": "0.72.0"
   }
