@@ -200,7 +200,7 @@ export function isReminderToday(reminder) {
 /**
  * @param {Reminder} reminder
  */
-function getUpcomingReminderTime(reminder) {
+export function getUpcomingReminderTime(reminder) {
   if (reminder.mode === "once") return reminder.date;
   // this is only the time (hour & minutes); date is not included
   const time = dayjs(reminder.date);

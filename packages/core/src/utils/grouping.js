@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { isReminderActive } from "../collections/reminders";
+import {
+  getUpcomingReminderTime,
+  isReminderActive
+} from "../collections/reminders";
 import "../types";
 import { getWeekGroupFromTimestamp, MONTHS_FULL } from "./date";
 
@@ -146,7 +149,13 @@ export function groupReminders(array) {
     ["Inactive", []]
   ]);
 
-  array.forEach((item) => {
+  const sorted = array.sort((a, b) => {
+    const d1 = a.mode === "repeat" ? getUpcomingReminderTime(a) : a.date;
+    const d2 = b.mode === "repeat" ? getUpcomingReminderTime(b) : b.date;
+    return !d1 || !d2 ? 0 : d1 - d2;
+  });
+
+  sorted.forEach((item) => {
     const groupTitle = isReminderActive(item) ? "Active" : "Inactive";
     addToGroup(groups, groupTitle, item);
   });
