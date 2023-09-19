@@ -314,7 +314,7 @@ function GroupHeader(props: GroupHeaderProps) {
 
       {index === 0 && (
         <Flex mr={1}>
-          {groupingKey && (
+          {groupingKey && groupingKey !== "reminders" && (
             <IconButton
               testId={`${groupingKey}-sort-button`}
               icon={groupOptions.sortDirection === "asc" ? SortAsc : SortDesc}
