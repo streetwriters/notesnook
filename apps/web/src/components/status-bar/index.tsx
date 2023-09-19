@@ -147,7 +147,7 @@ function StatusBar() {
           );
         })}
 
-        {updateStatus && (
+        {updateStatus && updateStatus.type !== "updated" && (
           <Button
             variant="statusitem"
             onClick={async () => {
@@ -168,7 +168,6 @@ function StatusBar() {
           >
             <Update
               rotate={
-                updateStatus.type !== "updated" &&
                 updateStatus.type !== "completed" &&
                 updateStatus.type !== "available"
               }
@@ -192,8 +191,6 @@ function statusToInfoText(status: UpdateStatus) {
   const { type } = status;
   return type === "checking"
     ? "Checking for updates..."
-    : type === "updated"
-    ? "You are on latest version"
     : type === "downloading"
     ? `${Math.round(status.progress)}% updating...`
     : type === "completed"
