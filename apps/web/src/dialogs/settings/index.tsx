@@ -379,7 +379,7 @@ function SettingsGroupComponent(props: { item: SettingsGroup }) {
 function SettingItem(props: { item: Setting }) {
   const { item } = props;
   const [state, setState] = useState<unknown>();
-  const [isWorking, setIsWorking] = useState(false);
+  const [workIndex, setWorkIndex] = useState<number>();
   const isUserPremium = useIsUserPremium();
 
   useEffect(() => {
@@ -388,16 +388,16 @@ function SettingItem(props: { item: Setting }) {
   }, [item]);
 
   const workWithLoading = useCallback(
-    async (action) => {
-      if (isWorking) return;
+    async (index: number, action: () => Promise<unknown> | void) => {
+      if (workIndex) return;
       try {
-        setIsWorking(true);
+        setWorkIndex(index);
         await action();
       } finally {
-        setIsWorking(false);
+        setWorkIndex(undefined);
       }
     },
-    [isWorking]
+    [workIndex]
   );
 
   if (item.isHidden && item.isHidden(state)) return null;
@@ -447,17 +447,17 @@ function SettingItem(props: { item: Setting }) {
             "& > label": { width: "auto" }
           }}
         >
-          {components.map((component) => {
+          {components.map((component, index) => {
             switch (component.type) {
               case "button":
                 return (
                   <Button
-                    disabled={isWorking}
+                    disabled={workIndex === index}
                     title={component.title}
                     variant={component.variant}
-                    onClick={() => workWithLoading(component.action)}
+                    onClick={() => workWithLoading(index, component.action)}
                   >
-                    {isWorking ? (
+                    {workIndex ? (
                       <Loading size={18} sx={{ mr: 2 }} />
                     ) : (
                       component.title
@@ -473,8 +473,8 @@ function SettingItem(props: { item: Setting }) {
                         ? "accent"
                         : "icon-secondary"
                     }}
-                    disabled={isWorking}
-                    onChange={() => workWithLoading(component.toggle)}
+                    disabled={workIndex === index}
+                    onChange={() => workWithLoading(index, component.toggle)}
                     checked={component.isToggled()}
                     data-checked={component.isToggled()}
                   />
