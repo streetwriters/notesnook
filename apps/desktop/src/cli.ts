@@ -27,19 +27,23 @@ export type CLIOptions = {
   hidden: boolean;
 };
 
-export async function parseArguments(): Promise<CLIOptions> {
+export async function parseArguments(argv: string[]): Promise<CLIOptions> {
   const result: CLIOptions = {
     note: false,
     notebook: false,
     reminder: false,
     hidden: false
   };
-  const { hidden } = await yargs(hideBin(process.argv))
+  const { hidden } = await yargs(hideBin(argv))
     .boolean("hidden")
+    // have to account for this flag added on Windows when launching
+    // via Jumplist
+    .boolean("allow-file-access-from-files")
     .command("new", "Create a new item", (yargs) => {
       return yargs
         .command("note", "Create a new note", {}, () => {
           result.note = true;
+          console.log("HERE!");
         })
         .command("notebook", "Create a new notebook", {}, () => {
           result.notebook = true;
