@@ -191,6 +191,7 @@
       "allowNativeWayland": true
     },
     "extraResources": [
+      "app-update.yml",
       "./assets/**"
     ],
     "extraMetadata": {

@@ -21,40 +21,43 @@ import { createTRPCProxyClient } from "@trpc/client";
 import { ipcLink } from "electron-trpc/renderer";
 import type { AppRouter } from "@notesnook/desktop";
 import { AppEventManager, AppEvents } from "../app-events";
+import { checkForUpdate } from "../../utils/updater";
 
 export const desktop = createTRPCProxyClient<AppRouter>({
   links: [ipcLink()]
 });
 
-desktop.updater.onChecking.subscribe(
-  undefined,
-  attachListener(AppEvents.checkingForUpdate)
-);
+document.addEventListener("readystatechange", async () => {
+  desktop.updater.onChecking.subscribe(
+    undefined,
+    attachListener(AppEvents.checkingForUpdate)
+  );
 
-desktop.updater.onAvailable.subscribe(
-  undefined,
-  attachListener(AppEvents.updateAvailable)
-);
+  desktop.updater.onAvailable.subscribe(
+    undefined,
+    attachListener(AppEvents.updateAvailable)
+  );
 
-desktop.updater.onDownloaded.subscribe(
-  undefined,
-  attachListener(AppEvents.updateDownloadCompleted)
-);
+  desktop.updater.onDownloaded.subscribe(
+    undefined,
+    attachListener(AppEvents.updateDownloadCompleted)
+  );
 
-desktop.updater.onDownloadProgress.subscribe(
-  undefined,
-  attachListener(AppEvents.updateDownloadProgress)
-);
+  desktop.updater.onDownloadProgress.subscribe(
+    undefined,
+    attachListener(AppEvents.updateDownloadProgress)
+  );
 
-desktop.updater.onNotAvailable.subscribe(
-  undefined,
-  attachListener(AppEvents.updateNotAvailable)
-);
+  desktop.updater.onNotAvailable.subscribe(
+    undefined,
+    attachListener(AppEvents.updateNotAvailable)
+  );
 
-desktop.updater.onError.subscribe(
-  undefined,
-  attachListener(AppEvents.updateError)
-);
+  desktop.updater.onError.subscribe(
+    undefined,
+    attachListener(AppEvents.updateError)
+  );
+});
 
 function attachListener(event: string) {
   return {
