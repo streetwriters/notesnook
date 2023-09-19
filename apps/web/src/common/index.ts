@@ -38,7 +38,7 @@ import { getFormattedDate } from "@notesnook/common";
 import { createWritableStream } from "./desktop-bridge";
 import { ZipStream } from "../utils/streams/zip-stream";
 import { FeatureKeys } from "../dialogs/feature-dialog";
-import { Reader } from "../utils/zip-reader";
+import { Entry, Reader } from "../utils/zip-reader";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -165,12 +165,20 @@ export async function restoreBackupFile(backupFile: File) {
       action: async (report) => {
         let cachedPassword: string | undefined = undefined;
         const { read, totalFiles } = await Reader(backupFile);
+        const entries: Entry[] = [];
         let filesProcessed = 0;
-        for await (const entry of read()) {
-          if (filesProcessed++ === 0 && entry.name !== ".nnbackup")
-            throw new Error("Invalid backup.");
-          else if (entry.name === ".nnbackup") continue;
 
+        let isValid = false;
+        for await (const entry of read()) {
+          if (entry.name === ".nnbackup") {
+            isValid = true;
+            continue;
+          }
+          entries.push(entry);
+        }
+        if (!isValid) throw new Error("Invalid backup.");
+
+        for (const entry of entries) {
           const backup = JSON.parse(await entry.text());
           if (backup.encrypted) {
             if (!cachedPassword) {
@@ -192,7 +200,7 @@ export async function restoreBackupFile(backupFile: File) {
           report({
             total: totalFiles,
             text: `Processed ${entry.name}`,
-            current: filesProcessed
+            current: filesProcessed++
           });
         }
         await db.initCollections();
