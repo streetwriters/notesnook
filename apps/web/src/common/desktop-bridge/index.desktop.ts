@@ -21,6 +21,7 @@ import { createTRPCProxyClient } from "@trpc/client";
 import { ipcLink } from "electron-trpc/renderer";
 import type { AppRouter } from "@notesnook/desktop";
 import { AppEventManager, AppEvents } from "../app-events";
+import { TaskScheduler } from "../../utils/task-scheduler";
 import { checkForUpdate } from "../../utils/updater";
 
 export const desktop = createTRPCProxyClient<AppRouter>({
@@ -57,6 +58,10 @@ document.addEventListener("readystatechange", async () => {
     undefined,
     attachListener(AppEvents.updateError)
   );
+
+  TaskScheduler.register("updateCheck", "0 0 */12 * * * *", () => {
+    checkForUpdate();
+  });
 });
 
 function attachListener(event: string) {
