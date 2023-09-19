@@ -21,10 +21,11 @@ import { SettingsGroup } from "./types";
 import { appVersion } from "../../utils/version";
 import { writeText } from "clipboard-polyfill";
 import { showToast } from "../../utils/toast";
-import { checkForUpdate } from "../../utils/updater";
+import { checkForUpdate, downloadUpdate } from "../../utils/updater";
 import { isMacStoreApp } from "../../utils/platform";
 import { showIssueDialog } from "../../common/dialog-controller";
 import { clearLogs, downloadLogs } from "../../utils/logger";
+import { useAutoUpdateStore } from "../../hooks/use-auto-updater";
 
 export const AboutSettings: SettingsGroup[] = [
   {
@@ -35,24 +36,41 @@ export const AboutSettings: SettingsGroup[] = [
       {
         key: "version",
         title: "Version",
-        description: appVersion.formatted,
-        components: [
-          {
-            type: "button",
-            action: checkForUpdate,
-            title: "Check for updates",
-            variant: "secondary"
-          },
-          {
-            type: "button",
-            action: async () => {
-              await writeText(appVersion.formatted);
-              showToast("info", "Copied to clipboard!");
-            },
-            title: "Copy",
-            variant: "secondary"
-          }
-        ]
+        description: () => {
+          const status = useAutoUpdateStore.getState().status;
+          if (status?.type === "available")
+            return `New version (v${status.version}) is available for download.`;
+          return appVersion.formatted;
+        },
+        onStateChange: (listener) =>
+          useAutoUpdateStore.subscribe((s) => s.status, listener),
+        components: () => {
+          const status = useAutoUpdateStore.getState().status;
+          return [
+            status?.type === "available"
+              ? {
+                  type: "button",
+                  action: downloadUpdate,
+                  title: `Install update`,
+                  variant: "secondary"
+                }
+              : {
+                  type: "button",
+                  action: checkForUpdate,
+                  title: "Check for updates",
+                  variant: "secondary"
+                },
+            {
+              type: "button",
+              action: async () => {
+                await writeText(appVersion.formatted);
+                showToast("info", "Copied to clipboard!");
+              },
+              title: "Copy",
+              variant: "secondary"
+            }
+          ];
+        }
       },
       {
         key: "roadmap",
@@ -119,7 +137,8 @@ export const AboutSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
-            action: () => void window.open("https://fosstodon.org/@notesnook", "_blank"),
+            action: () =>
+              void window.open("https://fosstodon.org/@notesnook", "_blank"),
             title: "Follow",
             variant: "secondary"
           }

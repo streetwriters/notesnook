@@ -17,10 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { checkForUpdate } from "../utils/updater";
 import { AppEventManager, AppEvents } from "../common/app-events";
+import BaseStore from "../stores";
+import createStore from "../common/store";
 
 type CompletedUpdateStatus = { type: "completed"; version: string };
 type DownloadingUpdateStatus = { type: "downloading"; progress: number };
@@ -32,9 +34,18 @@ export type UpdateStatus =
   | DownloadingUpdateStatus
   | GenericUpdateStatus;
 
+class AutoUpdateStore extends BaseStore<AutoUpdateStore> {
+  status?: UpdateStatus;
+  setStatus = (status?: UpdateStatus) => {
+    this.set({ status });
+  };
+}
+
+const [useAutoUpdateStore] = createStore(AutoUpdateStore);
+
 let checkingForUpdateTimeout = 0;
 export function useAutoUpdater() {
-  const [status, setStatus] = useState<UpdateStatus>();
+  const { status, setStatus } = useAutoUpdateStore();
 
   useEffect(() => {
     function changeStatus(status?: UpdateStatus) {
@@ -104,3 +115,5 @@ export function useAutoUpdater() {
 
   return status;
 }
+
+export { useAutoUpdateStore };
