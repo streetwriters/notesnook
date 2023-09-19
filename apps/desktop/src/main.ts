@@ -90,6 +90,7 @@ async function createWindow() {
     }
   });
 
+  createIPCHandler({ router, windows: [mainWindow] });
   globalThis.window = mainWindow;
   mainWindowState.manage(mainWindow);
 
@@ -105,7 +106,6 @@ async function createWindow() {
 
   await AssetManager.loadIcons();
   setupDesktopIntegration();
-  createIPCHandler({ router, windows: [mainWindow] });
 
   mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
     "http://dictionaries.notesnook.com/"
