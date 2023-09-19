@@ -73,7 +73,11 @@ export function convertBrToSingleSpacedParagraphs(dom: HTMLElement | Document) {
       paragraph = p;
     }
 
-    if (paragraph && paragraph.childNodes.length === 1) continue;
+    if (
+      (paragraph && paragraph.childNodes.length === 1) ||
+      paragraph?.textContent?.trim()?.length === 0
+    )
+      continue;
     if (paragraph) {
       splitOn(paragraph, br);
       const children = Array.from(paragraph.childNodes.values());
