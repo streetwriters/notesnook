@@ -147,6 +147,9 @@ export const useEditor = (
       lastContentChangeTime.current = 0;
       resetContent && (await commands.clearContent());
       resetContent && (await commands.clearTags());
+      const newSessionId = makeSessionId();
+      await commands.setSessionId(newSessionId);
+      setSessionId(newSessionId);
       if (resetState) {
         isDefaultEditor &&
           useEditorStore.getState().setCurrentlyEditingNote(null);
@@ -272,6 +275,7 @@ export const useEditor = (
 
   const loadContent = useCallback(async (note: NoteType) => {
     currentNote.current = note;
+    console.log(note, note.contentId);
     if (note.locked || note.content) {
       currentContent.current = {
         data: note.content?.data,
@@ -279,6 +283,7 @@ export const useEditor = (
         noteId: currentNote.current?.id as string
       };
     } else {
+      if (!note.contentId) return;
       currentContent.current = await db.content?.raw(note.contentId);
     }
   }, []);
@@ -351,6 +356,7 @@ export const useEditor = (
       ) {
         state.current.ready = true;
       }
+      console.log(currentNote.current?.id, currentNote.current?.title);
 
       if (item && item.type === "new") {
         currentNote.current && (await reset());
@@ -369,7 +375,11 @@ export const useEditor = (
         isDefaultEditor && editorState.setCurrentlyEditingNote(item.id);
         currentNote.current && (await reset(false, false));
         await loadContent(item as NoteType);
-        if (loadingState.current === currentContent.current?.data) {
+        if (
+          loadingState.current &&
+          currentContent.current?.data &&
+          loadingState.current === currentContent.current?.data
+        ) {
           return;
         }
         if (
@@ -389,17 +399,23 @@ export const useEditor = (
         lockedSessionId.current = nextSessionId;
         sessionHistoryId.current = Date.now();
         setSessionId(nextSessionId);
+
+        console.log("nextSessionId", nextSessionId);
         commands.setSessionId(nextSessionId);
         sessionIdRef.current = nextSessionId;
         currentNote.current = item as NoteType;
         await commands.setStatus(getFormattedDate(item.dateEdited), "Saved");
         await postMessage(EditorEvents.title, item.title);
         loadingState.current = currentContent.current?.data;
-        await postMessage(
-          EditorEvents.html,
-          currentContent.current?.data,
-          10000
-        );
+        console.log("setting html...");
+        if (currentContent.current?.data) {
+          await postMessage(
+            EditorEvents.html,
+            currentContent.current?.data,
+            10000
+          );
+        }
+        console.log("set html done...");
         loadingState.current = undefined;
         useEditorStore.getState().setReadonly(item.readonly);
         await commands.setTags(currentNote.current);
