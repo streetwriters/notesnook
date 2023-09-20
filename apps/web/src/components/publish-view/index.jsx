@@ -49,17 +49,17 @@ function PublishView(props) {
   }, [noteId]);
 
   useEffect(() => {
-    const attachmentsLoadingEvent = EV.subscribe(
-      EVENTS.attachmentsLoading,
-      ({ type, groupId, total, current }) => {
-        if (!groupId || !groupId.includes(noteId) || type !== "download")
-          return;
+    const fileDownloadedEvent = EV.subscribe(
+      EVENTS.fileDownloaded,
+      ({ total, current, groupId }) => {
+        if (!groupId || !groupId.includes(noteId)) return;
         if (current === total) setProcessingStatus();
         else setProcessingStatus({ total, current });
       }
     );
+
     return () => {
-      attachmentsLoadingEvent.unsubscribe();
+      fileDownloadedEvent.unsubscribe();
     };
   }, [noteId]);
 
