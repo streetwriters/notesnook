@@ -122,28 +122,35 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
     //   }
     // );
 
-    const attachmentsLoadingEvent = EV.subscribe(
-      EVENTS.attachmentsLoading,
-      ({
-        type,
-        total,
-        current
-      }: {
-        type: ProcessingType;
-        total: number;
-        current: number;
-      }) => {
-        const [key, status] = getProcessingStatusFromType(type);
+    function handleDownloadUploadProgress(
+      type: "download" | "upload",
+      total: number,
+      current: number
+    ) {
+      const [key, status] = getProcessingStatusFromType(type);
 
-        if (current === total) {
-          removeStatus(key);
-        } else {
-          updateStatus({
-            key,
-            status: `${status} attachments (${current}/${total})`,
-            progress: 0
-          });
-        }
+      if (current === total) {
+        removeStatus(key);
+      } else {
+        updateStatus({
+          key,
+          status: `${status} attachments (${current}/${total})`,
+          progress: 0
+        });
+      }
+    }
+
+    const fileDownloadedEvent = EV.subscribe(
+      EVENTS.fileDownloaded,
+      ({ total, current }: { total: number; current: number }) => {
+        handleDownloadUploadProgress("download", total, current);
+      }
+    );
+
+    const fileUploadedEvent = EV.subscribe(
+      EVENTS.fileUploaded,
+      ({ total, current }: { total: number; current: number }) => {
+        handleDownloadUploadProgress("upload", total, current);
       }
     );
 
@@ -174,7 +181,8 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
 
     registerKeyMap();
     return () => {
-      attachmentsLoadingEvent.unsubscribe();
+      fileUploadedEvent.unsubscribe();
+      fileDownloadedEvent.unsubscribe();
       progressEvent.unsubscribe();
       //  systemTimeInvalidEvent.unsubscribe();
     };
