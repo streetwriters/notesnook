@@ -504,8 +504,12 @@ async function downloadFile(filename: string, requestOptions: RequestOptions) {
   }
 }
 
-function exists(filename: string) {
-  return streamablefs.exists(filename);
+async function exists(filename: string) {
+  const handle = await streamablefs.readFile(filename);
+  return (
+    handle &&
+    handle.file.size === (await handle.size()) - handle.file.chunks * ABYTES
+  );
 }
 
 type FileMetadata = {
