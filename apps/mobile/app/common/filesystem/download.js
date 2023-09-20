@@ -60,7 +60,10 @@ export async function downloadFile(filename, data, cancelToken) {
         console.log("downloading: ", recieved, total);
       });
 
-    cancelToken.cancel = request.cancel;
+    cancelToken.cancel = () => {
+      useAttachmentStore.getState().remove(filename);
+      request.cancel();
+    };
     let response = await request;
     await fileCheck(response, totalSize);
     let status = response.info().status;
