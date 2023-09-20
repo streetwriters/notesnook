@@ -36,6 +36,16 @@ export default class FileStorage {
     this.downloads.set(groupId, files);
     for (const file of files) {
       const { filename, metadata, chunkSize } = file;
+      if (await this.exists(filename)) {
+        EV.publish(EVENTS.fileDownloaded, {
+          success: true,
+          groupId,
+          filename,
+          eventData
+        });
+        continue;
+      }
+
       const url = `${hosts.API_HOST}/s3?name=${filename}`;
       const { execute, cancel } = this.fs.downloadFile(filename, {
         metadata,
