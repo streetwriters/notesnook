@@ -40,7 +40,9 @@ import { requestInAppReview } from "../../../services/app-review";
 const PublishNoteSheet = ({ note: item, update }) => {
   const { colors } = useThemeColors();
   const actionSheetRef = useRef();
-  const loading = useAttachmentStore((state) => state.loading);
+
+  const attachmentDownloads = useAttachmentStore((state) => state.downloading);
+  const downloading = attachmentDownloads[`monograph-${item.id}`];
   const [selfDestruct, setSelfDestruct] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [note, setNote] = useState(item);
@@ -137,9 +139,9 @@ const PublishNoteSheet = ({ note: item, update }) => {
             }}
           >
             Please wait...
-            {loading && loading.current && loading.total
+            {downloading && downloading.current && downloading.total
               ? `\nDownloading attachments (${
-                  loading?.current / loading?.total
+                  downloading?.current / downloading?.total
                 })`
               : ""}
           </Paragraph>
