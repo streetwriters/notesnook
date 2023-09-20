@@ -27,9 +27,7 @@ class EventManager {
   }
 
   subscribeMulti(names, handler, thisArg) {
-    names.forEach((name) => {
-      this.subscribe(name, handler.bind(thisArg));
-    });
+    return names.map((name) => this.subscribe(name, handler.bind(thisArg)));
   }
 
   subscribe(name, handler, once = false) {

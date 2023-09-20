@@ -24,6 +24,7 @@ export const AppEvents = {
   UPDATE_ATTACHMENT_PROGRESS: "updateAttachmentProgress",
   UPDATE_STATUS: "updateStatus",
   REMOVE_STATUS: "removeStatus",
+  fileEncrypted: "file:encrypted",
 
   checkingForUpdate: "checkingForUpdate",
   updateAvailable: "updateAvailable",

@@ -40,7 +40,7 @@ import {
   showIssueDialog,
   showUpdateAvailableNotice
 } from "../../common/dialog-controller";
-import useStatus from "../../hooks/use-status";
+import useStatus, { statusToString } from "../../hooks/use-status";
 import { ScopedThemeProvider } from "../theme-provider";
 import { checkForUpdate, installUpdate } from "../../utils/updater";
 import { toTitleCase } from "@notesnook/common";
@@ -132,7 +132,8 @@ function StatusBar() {
             Report an issue
           </Text>
         </Button>
-        {statuses?.map(({ key, status, progress, icon: Icon }) => {
+        {statuses?.map((status) => {
+          const { key, icon: Icon } = status;
           return (
             <Flex
               key={key}
@@ -141,7 +142,7 @@ function StatusBar() {
             >
               {Icon ? <Icon size={12} /> : <Loading size={12} />}
               <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-                {progress ? `${progress}% ${status}` : status}
+                {statusToString(status)}
               </Text>
             </Flex>
           );
