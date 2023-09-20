@@ -100,7 +100,7 @@ export class Tiptap {
     return tokens.some((token) => lowercase.indexOf(token) > -1);
   }
 
-  async insertMedia(getData) {
+  async insertMedia(resolve) {
     let hashes = [];
     new HTMLParser({
       ontag: (name, attr) => {
@@ -108,21 +108,9 @@ export class Tiptap {
         if (name === "img" && hash) hashes.push(hash);
       }
     }).parse(this.data);
+    if (!hashes.length) return this.data;
 
-    const images = {};
-    let hasImages = false;
-    for (let i = 0; i < hashes.length; ++i) {
-      const hash = hashes[i];
-      const src = await getData(hash, {
-        total: hashes.length,
-        current: i
-      });
-      if (!src) continue;
-      images[hash] = src;
-      hasImages = true;
-    }
-
-    if (!hasImages) return this.data;
+    const images = await resolve(hashes);
     return new HTMLRewriter({
       ontag: (name, attr) => {
         const hash = attr[ATTRIBUTES.hash];

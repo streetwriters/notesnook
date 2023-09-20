@@ -41,7 +41,13 @@ test("img src is present after insert attachments", async () => {
     return { key: "hello", metadata: {} };
   });
   const tiptap2 = new Tiptap(result.data);
-  const result2 = await tiptap2.insertMedia(() => "i am a data");
+  const result2 = await tiptap2.insertMedia((hashes) => {
+    const images = {};
+    for (const hash of hashes) {
+      images[hash] = "i am a data";
+    }
+    return images;
+  });
   expect(result2).toContain(`src="i am a data"`);
 });
 

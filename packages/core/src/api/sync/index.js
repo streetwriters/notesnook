@@ -21,7 +21,6 @@ import {
   checkSyncStatus,
   EV,
   EVENTS,
-  sendAttachmentsProgressEvent,
   sendSyncProgressEvent,
   SYNC_CHECK_IDS
 } from "../../common";
@@ -339,23 +338,10 @@ class Sync {
     const attachments = this.db.attachments.pending;
     this.logger.info("Uploading attachments...", { total: attachments.length });
 
-    for (var i = 0; i < attachments.length; ++i) {
-      const attachment = attachments[i];
-      const { hash } = attachment.metadata;
-      sendAttachmentsProgressEvent("upload", hash, attachments.length, i);
-
-      try {
-        const isUploaded = await this.db.fs.uploadFile(hash, hash);
-        if (!isUploaded) throw new Error("Failed to upload file.");
-
-        await this.db.attachments.markAsUploaded(attachment.id);
-      } catch (e) {
-        logger.error(e, { attachment });
-        const error = e.message;
-        await this.db.attachments.markAsFailed(attachment.id, error);
-      }
-    }
-    sendAttachmentsProgressEvent("upload", null, attachments.length);
+    await this.db.fs.queueUploads(
+      attachments.map((a) => ({ filename: a.metadata.hash })),
+      "sync-uploads"
+    );
   }
 
   /**

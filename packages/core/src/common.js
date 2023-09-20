@@ -36,15 +36,6 @@ export async function checkSyncStatus(type) {
   return results.some((r) => r.type === type && r.result === true);
 }
 
-export function sendAttachmentsProgressEvent(type, groupId, total, current) {
-  EV.publish(EVENTS.attachmentsLoading, {
-    type,
-    groupId,
-    total,
-    current: current === undefined ? total : current
-  });
-}
-
 export function sendSyncProgressEvent(EV, type, current) {
   EV.publish(EVENTS.syncProgress, {
     type,
@@ -98,7 +89,8 @@ export const EVENTS = {
   noteRemoved: "note:removed",
   tokenRefreshed: "token:refreshed",
   userUnauthorized: "user:unauthorized",
-  attachmentsLoading: "attachments:loading",
+  fileDownloaded: "file:downloaded",
+  fileUploaded: "file:uploaded",
   attachmentDeleted: "attachment:deleted",
   mediaAttachmentDownloaded: "attachments:mediaDownloaded",
   vaultLocked: "vault:locked",
