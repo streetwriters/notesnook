@@ -37,6 +37,7 @@ export async function downloadFile(filename, data, cancelToken) {
   try {
     let exists = await RNFetchBlob.fs.exists(path);
     if (exists) {
+      console.log("exists", filename);
       return true;
     }
 
@@ -74,22 +75,24 @@ export async function downloadFile(filename, data, cancelToken) {
     useAttachmentStore.getState().remove(filename);
     return status >= 200 && status < 300;
   } catch (e) {
-    ToastEvent.show({
-      heading: "Error downloading file",
-      message: e.message,
-      type: "error",
-      context: "global"
-    });
-    ToastEvent.show({
-      heading: "Error downloading file",
-      message: e.message,
-      type: "error",
-      context: "local"
-    });
+    if (e.message !== "canceled") {
+      ToastEvent.show({
+        heading: "Error downloading file",
+        message: e.message,
+        type: "error",
+        context: "global"
+      });
+      ToastEvent.show({
+        heading: "Error downloading file",
+        message: e.message,
+        type: "error",
+        context: "local"
+      });
+    }
 
     useAttachmentStore.getState().remove(filename);
     RNFetchBlob.fs.unlink(path).catch(console.log);
-    console.log("download file error: ", e, url, headers);
+    console.log("Download file error:", e, url, headers);
     return false;
   }
 }

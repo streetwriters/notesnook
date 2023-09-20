@@ -29,6 +29,7 @@ export async function readEncrypted(filename, key, cipherData) {
   await migrateFilesFromCache();
   console.log("read encrypted file...");
   let path = `${cacheDir}/${filename}`;
+
   try {
     const iosAppGroup =
       Platform.OS === "ios"
@@ -41,6 +42,7 @@ export async function readEncrypted(filename, key, cipherData) {
       (Platform.OS === "ios" && (await RNFetchBlob.fs.exists(appGroupPath)));
 
     if (!exists) {
+      console.log("Will download file...", filename);
       return false;
     } else {
       RNFetchBlob.fs.stat(path).then((r) => {

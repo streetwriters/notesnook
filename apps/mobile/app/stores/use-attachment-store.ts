@@ -20,6 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import create from "zustand";
 import { editorController } from "../screens/editor/tiptap/utils";
 
+export type AttachmentGroupProgress = {
+  total: number;
+  current: number;
+  groupId: string;
+  filename: string;
+  canceled?: boolean;
+  success?: boolean;
+};
+
 interface AttachmentStore {
   progress?: {
     [name: string]: {
@@ -30,6 +39,7 @@ interface AttachmentStore {
       type: "upload" | "download";
     } | null;
   };
+
   encryptionProgress: number;
   setEncryptionProgress: (encryptionProgress: number) => void;
   remove: (hash: string) => void;
@@ -40,8 +50,14 @@ interface AttachmentStore {
     recieved: number,
     type: "upload" | "download"
   ) => void;
-  loading: { total: number; current: number };
-  setLoading: (data: { total: number; current: number }) => void;
+  downloading?: {
+    [groupId: string]: AttachmentGroupProgress | undefined;
+  };
+  setDownloading: (data: AttachmentGroupProgress) => void;
+  uploading?: {
+    [groupId: string]: AttachmentGroupProgress | undefined;
+  };
+  setUploading: (data: AttachmentGroupProgress) => void;
 }
 
 export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
@@ -73,6 +89,21 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   encryptionProgress: 0,
   setEncryptionProgress: (encryptionProgress) =>
     set({ encryptionProgress: encryptionProgress }),
-  loading: { total: 0, current: 0 },
-  setLoading: (data) => set({ loading: data ? { ...data } : data })
+
+  downloading: {},
+  setDownloading: (data) =>
+    set({
+      downloading: {
+        ...get().downloading,
+        [data.groupId]: data?.canceled ? undefined : data
+      }
+    }),
+  uploading: {},
+  setUploading: (data) =>
+    set({
+      uploading: {
+        ...get().uploading,
+        [data.groupId]: data?.canceled ? undefined : data
+      }
+    })
 }));

@@ -83,7 +83,6 @@ import {
 import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
-import { useThemeColors } from "@notesnook/theme";
 
 const onCheckSyncStatus = async (type) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -107,10 +106,20 @@ const onFileEncryptionProgress = ({ total, progress }) => {
     .setEncryptionProgress((progress / total).toFixed(2));
 };
 
-const onLoadingAttachmentProgress = (data) => {
-  useAttachmentStore
-    .getState()
-    .setLoading(data.total === data.current ? null : data);
+const onDownloadingAttachmentProgress = (data) => {
+  useAttachmentStore.getState().setDownloading(data);
+};
+
+const onUploadingAttachmentProgress = (data) => {
+  useAttachmentStore.getState().setUploading(data);
+};
+
+const onDownloadedAttachmentProgress = (data) => {
+  useAttachmentStore.getState().setDownloading(data);
+};
+
+const onUploadedAttachmentProgress = (data) => {
+  useAttachmentStore.getState().setUploading(data);
 };
 
 const onUserSessionExpired = async () => {
@@ -301,7 +310,16 @@ export const useAppEvents = () => {
         EVENTS.userSubscriptionUpdated,
         onUserSubscriptionStatusChanged
       ),
-      EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachmentProgress),
+      EV.subscribe(EVENTS.fileDownload, onDownloadingAttachmentProgress),
+      EV.subscribe(EVENTS.fileUpload, onUploadingAttachmentProgress),
+      EV.subscribe(EVENTS.fileDownloaded, onDownloadedAttachmentProgress),
+      EV.subscribe(EVENTS.fileUploaded, onUploadedAttachmentProgress),
+      EV.subscribe(EVENTS.downloadCanceled, (data) => {
+        useAttachmentStore.getState().setDownloading(data);
+      }),
+      EV.subscribe(EVENTS.uploadCanceled, (data) => {
+        useAttachmentStore.getState().setUploading(data);
+      }),
       eSubscribeEvent(eUserLoggedIn, onUserUpdated)
     ];
 
