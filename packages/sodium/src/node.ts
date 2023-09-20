@@ -364,7 +364,7 @@ export function to_base64(
   input: string | Uint8Array,
   variant: base64_variants = base64_variants.URLSAFE_NO_PADDING
 ): string {
-  const base64 = Buffer.from(toBuffer(input)).toString(
+  const base64 = toBuffer(input).toString(
     variant === base64_variants.URLSAFE ||
       variant === base64_variants.URLSAFE_NO_PADDING
       ? "base64url"
@@ -383,7 +383,9 @@ export function from_hex(input: string): Uint8Array {
 }
 
 export function to_string(input: Uint8Array): string {
-  return Buffer.from(input).toString("utf-8");
+  return Buffer.from(input, input.byteOffset, input.byteLength).toString(
+    "utf-8"
+  );
 }
 
 export {
@@ -413,7 +415,7 @@ function toBuffer<TInput extends ToBufferInput>(
   input: TInput
 ): ToBufferResult<TInput> {
   if (input instanceof Uint8Array) {
-    return Buffer.from(input.buffer, 0, input.byteLength);
+    return Buffer.from(input.buffer, input.byteOffset, input.byteLength);
   } else if (typeof input === "undefined" || input === null) {
     return undefined as ToBufferResult<TInput>;
   } else {
