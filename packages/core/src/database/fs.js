@@ -45,8 +45,14 @@ export default class FileStorage {
       });
       file.cancel = cancel;
 
-      const result = await execute().catch(() => false);
+      EV.publish(EVENTS.fileDownload, {
+        total,
+        current,
+        groupId,
+        filename
+      });
 
+      const result = await execute().catch(() => false);
       if (eventData)
         EV.publish(EVENTS.fileDownloaded, {
           success: result,
@@ -74,6 +80,13 @@ export default class FileStorage {
         headers: { Authorization: `Bearer ${token}` }
       });
       file.cancel = cancel;
+
+      EV.publish(EVENTS.fileUpload, {
+        total,
+        current,
+        groupId,
+        filename
+      });
 
       let error = null;
       const result = await execute().catch((e) => {
@@ -111,7 +124,7 @@ export default class FileStorage {
 
   async cancel(groupId, type) {
     const queue =
-      type === "downloads"
+      type === "download"
         ? this.downloads.get(groupId)
         : this.uploads.get(groupId);
     if (!queue) return;
@@ -120,8 +133,13 @@ export default class FileStorage {
       if (file.cancel) await file.cancel("Operation canceled.");
       queue.splice(i, 1);
     }
-    if (type === "download") this.downloads.delete(groupId);
-    else if (type === "upload") this.uploads.delete(groupId);
+    if (type === "download") {
+      this.downloads.delete(groupId);
+      EV.publish(EVENTS.downloadCanceled, { groupId, canceled: true });
+    } else if (type === "upload") {
+      this.uploads.delete(groupId);
+      EV.publish(EVENTS.uploadCanceled, { groupId, canceled: true });
+    }
   }
 
   readEncrypted(filename, encryptionKey, cipherData) {
