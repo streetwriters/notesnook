@@ -37,6 +37,7 @@ export default class FileStorage {
     for (const file of files) {
       const { filename, metadata, chunkSize } = file;
       if (await this.exists(filename)) {
+        current++;
         EV.publish(EVENTS.fileDownloaded, {
           success: true,
           groupId,
