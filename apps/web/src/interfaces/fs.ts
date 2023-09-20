@@ -37,6 +37,12 @@ import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
 import { IDataType } from "hash-wasm/dist/lib/util";
 import { IndexedDBKVStore } from "./key-value";
 import FileHandle from "@notesnook/streamable-fs/dist/src/filehandle";
+import {
+  CacheStorageFileStore,
+  IndexedDBFileStore,
+  OriginPrivateFileSystem
+} from "./file-store";
+import { isFeatureSupported } from "../utils/feature-check";
 
 const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
@@ -45,7 +51,13 @@ const UPLOAD_PART_REQUIRED_CHUNKS = Math.ceil(
   (5 * 1024 * 1024) / ENCRYPTED_CHUNK_SIZE
 );
 const MINIMUM_MULTIPART_FILE_SIZE = 25 * 1024 * 1024;
-const streamablefs = new StreamableFS("streamable-fs");
+const streamablefs = new StreamableFS(
+  isFeatureSupported("opfs")
+    ? new OriginPrivateFileSystem("streamable-fs")
+    : isFeatureSupported("cache")
+    ? new CacheStorageFileStore("streamable-fs")
+    : new IndexedDBFileStore("streamable-fs")
+);
 
 async function writeEncryptedFile(
   file: File,
@@ -69,7 +81,12 @@ async function writeEncryptedFile(
   const { iv, stream } = await NNCrypto.createEncryptionStream(key);
   await file
     .stream()
-    .pipeThrough(new ChunkedStream(CHUNK_SIZE))
+    .pipeThrough(
+      new ChunkedStream(
+        CHUNK_SIZE,
+        isFeatureSupported("opfs") ? "copy" : "nocopy"
+      )
+    )
     .pipeThrough(new IntoChunks(file.size))
     .pipeThrough(stream)
     .pipeThrough(
@@ -500,11 +517,17 @@ async function downloadFile(filename: string, requestOptions: RequestOptions) {
           );
         })
       )
-      .pipeThrough(new ChunkedStream(chunkSize + ABYTES))
+      .pipeThrough(
+        new ChunkedStream(
+          chunkSize + ABYTES,
+          isFeatureSupported("opfs") ? "copy" : "nocopy"
+        )
+      )
       .pipeTo(fileHandle.writeable);
 
     return true;
   } catch (e) {
+    console.error(e);
     showError(toS3Error(e), "Could not download file");
     reportProgress(undefined, { type: "download", hash: filename });
     return false;
@@ -542,8 +565,6 @@ export async function decryptFile(
 }
 
 async function saveFile(filename: string, fileMetadata: FileMetadata) {
-  if (!fileMetadata) return false;
-
   const { name, type, isUploaded } = fileMetadata;
 
   const decrypted = await decryptFile(filename, fileMetadata);

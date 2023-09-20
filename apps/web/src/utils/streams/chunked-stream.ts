@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Chunk } from "@notesnook/crypto";
 
 export class ChunkedStream extends TransformStream<Uint8Array, Uint8Array> {
-  constructor(chunkSize: number) {
+  constructor(chunkSize: number, mode: "nocopy" | "copy") {
     let backBuffer: Uint8Array | null = null;
     super({
       start() {},
@@ -38,7 +38,13 @@ export class ChunkedStream extends TransformStream<Uint8Array, Uint8Array> {
             const start = backBuffer.length - remainingBytes;
             const end = start + chunkSize;
 
-            controller.enqueue(backBuffer.subarray(start, end));
+            // TODO: find a way to support sending the chunked
+            // buffer to web workers without copying.
+            controller.enqueue(
+              mode === "copy"
+                ? new Uint8Array(backBuffer.buffer.slice(start, end))
+                : backBuffer.subarray(start, end)
+            );
             remainingBytes -= chunkSize;
           }
 
