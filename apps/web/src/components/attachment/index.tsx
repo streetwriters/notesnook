@@ -290,7 +290,6 @@ const AttachmentMenuItems: (
       key: "download",
       title: status?.type === "download" ? "Cancel download" : "Download",
       icon: Download.path,
-      isDisabled: !attachment.dateUploaded,
       onClick: async () => {
         const isDownloading = status?.type === "download";
         if (isDownloading) {
