@@ -17,24 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import localforage from "localforage";
 import FileHandle from "./src/filehandle";
-import { IStreamableFS } from "./src/interfaces";
+import { IFileStorage, IStreamableFS } from "./src/interfaces";
 import { File } from "./src/types";
 
 export class StreamableFS implements IStreamableFS {
-  private storage: LocalForage;
-
   /**
    * @param db name of the indexeddb database
    */
-  constructor(db: string) {
-    this.storage = localforage.createInstance({
-      storeName: "streamable-fs",
-      name: db,
-      driver: [localforage.INDEXEDDB]
-    });
-  }
+  constructor(private readonly storage: IFileStorage) {}
 
   async createFile(
     filename: string,
@@ -43,23 +34,24 @@ export class StreamableFS implements IStreamableFS {
   ): Promise<FileHandle> {
     if (await this.exists(filename)) throw new Error("File already exists.");
 
-    const file: File = await this.storage.setItem<File>(filename, {
+    const file: File = {
       filename,
       size,
       type,
       chunks: 0
-    });
+    };
+    await this.storage.setMetadata(filename, file);
     return new FileHandle(this.storage, file);
   }
 
   async readFile(filename: string): Promise<FileHandle | undefined> {
-    const file = await this.storage.getItem<File>(filename);
+    const file = await this.storage.getMetadata(filename);
     if (!file) return undefined;
     return new FileHandle(this.storage, file);
   }
 
   async exists(filename: string): Promise<boolean> {
-    const file = await this.storage.getItem<File>(filename);
+    const file = await this.storage.getMetadata(filename);
     return !!file;
   }
 
