@@ -18,16 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { File } from "./types";
+import { IFileStorage } from "./interfaces";
 
 export default class FileStreamSource {
-  private storage: LocalForage;
-  private file: File;
   private offset = 0;
 
-  constructor(storage: LocalForage, file: File) {
-    this.storage = storage;
-    this.file = file;
-  }
+  constructor(
+    private readonly storage: IFileStorage,
+    private readonly file: File
+  ) {}
 
   start() {}
 
@@ -42,7 +41,7 @@ export default class FileStreamSource {
 
   private readChunk(offset: number) {
     if (offset > this.file.chunks) return;
-    return this.storage.getItem<Uint8Array>(this.getChunkKey(offset));
+    return this.storage.readChunk(this.getChunkKey(offset));
   }
 
   private getChunkKey(offset: number): string {

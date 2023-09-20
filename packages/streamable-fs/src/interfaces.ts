@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import FileHandle from "./filehandle";
+import { File } from "./types";
 
 export interface IStreamableFS {
   createFile(filename: string, size: number, type: string): Promise<FileHandle>;
@@ -25,4 +26,14 @@ export interface IStreamableFS {
   exists(filename: string): Promise<boolean>;
   deleteFile(filename: string): Promise<boolean>;
   clear(): Promise<void>;
+}
+
+export interface IFileStorage {
+  clear(): Promise<void>;
+  setMetadata(filename: string, metadata: File): Promise<void>;
+  getMetadata(filename: string): Promise<File | undefined>;
+  deleteMetadata(filename: string): Promise<void>;
+  writeChunk(chunkName: string, data: Uint8Array): Promise<void>;
+  deleteChunk(chunkName: string): Promise<void>;
+  readChunk(chunkName: string): Promise<Uint8Array | undefined>;
 }
