@@ -24,6 +24,7 @@ import Config from "./utils/config";
 
 import { initalizeLogger, logger } from "./utils/logger";
 import { AuthProps } from "./views/auth";
+import { initializeFeatureChecks } from "./utils/feature-check";
 
 type Route<TProps = null> = {
   component: () => Promise<{
@@ -142,6 +143,8 @@ function isSessionExpired(path: Routes): RouteWithPath<AuthProps> | null {
 
 export async function init() {
   await initalizeLogger();
+  await initializeFeatureChecks();
+
   const { path, route } = getRoute();
   return { ...route, path };
 }
