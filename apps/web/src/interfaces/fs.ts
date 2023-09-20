@@ -24,7 +24,6 @@ import { AppEventManager, AppEvents } from "../common/app-events";
 import { StreamableFS } from "@notesnook/streamable-fs";
 import { NNCrypto } from "./nncrypto";
 import hosts from "@notesnook/core/dist/utils/constants";
-import { sendAttachmentsProgressEvent } from "@notesnook/core/dist/common";
 import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
 import { db } from "../common/db";
@@ -61,7 +60,11 @@ async function writeEncryptedFile(
   // let offset = 0;
   // let encrypted = 0;
   const fileHandle = await streamablefs.createFile(hash, file.size, file.type);
-  sendAttachmentsProgressEvent("encrypt", hash, 1, 0);
+  AppEventManager.publish(AppEvents.fileEncrypted, {
+    hash,
+    total: 1,
+    current: 0
+  });
 
   const { iv, stream } = await NNCrypto.createEncryptionStream(key);
   await file
@@ -82,7 +85,11 @@ async function writeEncryptedFile(
     )
     .pipeTo(fileHandle.writeable);
 
-  sendAttachmentsProgressEvent("encrypt", hash, 1, 1);
+  AppEventManager.publish(AppEvents.fileEncrypted, {
+    hash,
+    total: 1,
+    current: 1
+  });
 
   return {
     chunkSize: CHUNK_SIZE,

@@ -123,34 +123,46 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
     // );
 
     function handleDownloadUploadProgress(
-      type: "download" | "upload",
+      type: ProcessingType,
       total: number,
       current: number
     ) {
       const [key, status] = getProcessingStatusFromType(type);
 
+      console.log("handleDownloadUploadProgresss", key, status, current, total);
       if (current === total) {
         removeStatus(key);
       } else {
         updateStatus({
           key,
-          status: `${status} attachments (${current}/${total})`,
+          status: `${status} attachments`,
+          current,
+          total,
           progress: 0
         });
       }
     }
 
-    const fileDownloadedEvent = EV.subscribe(
-      EVENTS.fileDownloaded,
+    const fileDownloadEvents = EV.subscribeMulti(
+      [EVENTS.fileDownloaded, EVENTS.fileDownload],
       ({ total, current }: { total: number; current: number }) => {
         handleDownloadUploadProgress("download", total, current);
-      }
+      },
+      null
     );
 
-    const fileUploadedEvent = EV.subscribe(
-      EVENTS.fileUploaded,
+    const fileUploadEvents = EV.subscribeMulti(
+      [EVENTS.fileUploaded, EVENTS.fileUpload],
       ({ total, current }: { total: number; current: number }) => {
         handleDownloadUploadProgress("upload", total, current);
+      },
+      null
+    );
+
+    const fileEncrypted = AppEventManager.subscribe(
+      AppEvents.fileEncrypted,
+      ({ total, current }: { total: number; current: number }) => {
+        handleDownloadUploadProgress("encrypt", total, current);
       }
     );
 
@@ -169,21 +181,36 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
         if (!key) return;
 
         const percent = Math.round((loaded / total) * 100);
-        const text = getStatus(key)?.status || `${status} attachment`;
+        const oldStatus = getStatus(key);
+        const text = oldStatus?.status || `${status} attachment`;
 
-        updateStatus({
-          key,
-          status: text,
-          progress: loaded === total ? 100 : percent
-        });
+        if (
+          (!oldStatus ||
+            (oldStatus.total === undefined &&
+              oldStatus.current === undefined) ||
+            oldStatus.total === oldStatus.current) &&
+          loaded === total
+        ) {
+          removeStatus(key);
+        } else {
+          updateStatus({
+            ...oldStatus,
+            key,
+            status: text,
+            progress: loaded === total ? 100 : percent
+          });
+        }
       }
     );
 
     registerKeyMap();
     return () => {
-      fileUploadedEvent.unsubscribe();
-      fileDownloadedEvent.unsubscribe();
-      progressEvent.unsubscribe();
+      [
+        ...fileDownloadEvents,
+        ...fileUploadEvents,
+        progressEvent,
+        fileEncrypted
+      ].forEach((e) => e.unsubscribe());
       //  systemTimeInvalidEvent.unsubscribe();
     };
   }, []);
