@@ -72,7 +72,10 @@ export async function uploadFile(filename, data, cancelToken) {
         );
       });
 
-    cancelToken.cancel = request.cancel;
+    cancelToken.cancel = () => {
+      useAttachmentStore.getState().remove(filename);
+      request.cancel();
+    };
     let response = await request;
 
     let status = response.info().status;
