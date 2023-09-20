@@ -22,7 +22,7 @@ import { EVENTS } from "@notesnook/core/dist/common";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import WebView from "react-native-webview";
-import { db } from "../../../common/database";
+import { DatabaseLogger, db } from "../../../common/database";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../../services/device-detection";
 import {
@@ -147,10 +147,12 @@ export const useEditor = (
       lastContentChangeTime.current = 0;
       resetContent && (await commands.clearContent());
       resetContent && (await commands.clearTags());
-      const newSessionId = makeSessionId();
-      await commands.setSessionId(newSessionId);
-      setSessionId(newSessionId);
+
       if (resetState) {
+        const newSessionId = makeSessionId();
+        await commands.setSessionId(newSessionId);
+        setSessionId(newSessionId);
+
         isDefaultEditor &&
           useEditorStore.getState().setCurrentlyEditingNote(null);
         placeholderTip.current = TipManager.placeholderTip();
@@ -267,7 +269,8 @@ export const useEditor = (
         saveCount.current++;
         return id;
       } catch (e) {
-        console.log("Error saving note: ", e);
+        console.error(e);
+        DatabaseLogger.error(e as Error);
       }
     },
     [commands, isDefaultEditor, postMessage, readonly, reset]
@@ -275,7 +278,6 @@ export const useEditor = (
 
   const loadContent = useCallback(async (note: NoteType) => {
     currentNote.current = note;
-    console.log(note, note.contentId);
     if (note.locked || note.content) {
       currentContent.current = {
         data: note.content?.data,
@@ -356,7 +358,6 @@ export const useEditor = (
       ) {
         state.current.ready = true;
       }
-      console.log(currentNote.current?.id, currentNote.current?.title);
 
       if (item && item.type === "new") {
         currentNote.current && (await reset());
@@ -372,16 +373,23 @@ export const useEditor = (
         if (!item.forced && currentNote.current?.id === item.id) return;
         state.current.movedAway = false;
         state.current.currentlyEditing = true;
-        isDefaultEditor && editorState.setCurrentlyEditingNote(item.id);
-        currentNote.current && (await reset(false, false));
+
+        if (currentNote.current?.id !== item.id) {
+          currentNote.current && (await reset(false, false));
+          isDefaultEditor && editorState.setCurrentlyEditingNote(item.id);
+        }
+
         await loadContent(item as NoteType);
+
         if (
+          currentNote.current?.id === item.id &&
           loadingState.current &&
           currentContent.current?.data &&
           loadingState.current === currentContent.current?.data
         ) {
           return;
         }
+
         if (
           !currentContent.current?.data ||
           currentContent.current?.data.length < 50000
@@ -400,14 +408,12 @@ export const useEditor = (
         sessionHistoryId.current = Date.now();
         setSessionId(nextSessionId);
 
-        console.log("nextSessionId", nextSessionId);
         commands.setSessionId(nextSessionId);
         sessionIdRef.current = nextSessionId;
         currentNote.current = item as NoteType;
         await commands.setStatus(getFormattedDate(item.dateEdited), "Saved");
         await postMessage(EditorEvents.title, item.title);
         loadingState.current = currentContent.current?.data;
-        console.log("setting html...");
         if (currentContent.current?.data) {
           await postMessage(
             EditorEvents.html,
@@ -415,7 +421,6 @@ export const useEditor = (
             10000
           );
         }
-        console.log("set html done...");
         loadingState.current = undefined;
         useEditorStore.getState().setReadonly(item.readonly);
         await commands.setTags(currentNote.current);
@@ -541,6 +546,14 @@ export const useEditor = (
     }) => {
       if (lock.current || lockedSessionId.current === forSessionId) return;
       lastContentChangeTime.current = Date.now();
+
+      if (
+        sessionHistoryId.current &&
+        Date.now() - sessionHistoryId.current > 5 * 60 * 1000
+      ) {
+        sessionHistoryId.current = Date.now();
+      }
+
       if (type === EditorEvents.content) {
         currentContent.current = {
           data: content,
