@@ -21,6 +21,7 @@ import Collection from "./collection";
 import { getId } from "../utils/id";
 import { getContentFromData } from "../content-types";
 import { hasItem } from "../utils/array";
+import { getOutputType } from "./attachments";
 
 export default class Content extends Collection {
   async add(content) {
@@ -116,17 +117,27 @@ export default class Content extends Collection {
 
   async downloadMedia(groupId, contentItem, notify = true) {
     const content = getContentFromData(contentItem.type, contentItem.data);
-    contentItem.data = await content.insertMedia((hash, { total, current }) => {
-      const attachment = this._db.attachments.attachment(hash);
-      if (!attachment) return;
-
-      const progressData = {
-        total,
-        current,
-        groupId
-      };
-
-      return this._db.attachments._download(attachment, progressData, notify);
+    contentItem.data = await content.insertMedia(async (hashes) => {
+      const attachments = hashes.map((h) => this._db.attachments.attachment(h));
+      await this._db.fs.queueDownloads(
+        attachments.map((a) => ({
+          filename: a.metadata.hash,
+          metadata: a.metadata,
+          chunkSize: a.chunkSize
+        })),
+        groupId,
+        notify ? { readOnDownload: false } : undefined
+      );
+      const sources = {};
+      for (const attachment of attachments) {
+        const src = await this._db.attachments.read(
+          attachment.metadata.hash,
+          getOutputType(attachment)
+        );
+        if (!src) continue;
+        sources[attachment.metadata.hash] = src;
+      }
+      return sources;
     });
     return contentItem;
   }

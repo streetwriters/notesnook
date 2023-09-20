@@ -19,12 +19,79 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import hosts from "../utils/constants";
 import TokenManager from "../api/token-manager";
+import { EV, EVENTS } from "../common";
 
 export default class FileStorage {
   constructor(fs, storage) {
     this.fs = fs;
     this.tokenManager = new TokenManager(storage);
-    this._queue = [];
+    this.downloads = new Map();
+    this.uploads = new Map();
+  }
+
+  async queueDownloads(files, groupId, eventData) {
+    const token = await this.tokenManager.getAccessToken();
+    const total = files.length;
+    let current = 0;
+    this.downloads.set(groupId, files);
+    for (const file of files) {
+      const { filename, metadata, chunkSize } = file;
+      const url = `${hosts.API_HOST}/s3?name=${filename}`;
+      const { execute, cancel } = this.fs.downloadFile(filename, {
+        metadata,
+        url,
+        chunkSize,
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      file.cancel = cancel;
+
+      const result = await execute().catch(() => false);
+
+      if (eventData)
+        EV.publish(EVENTS.fileDownloaded, {
+          success: result,
+          total,
+          current: ++current,
+          groupId,
+          filename,
+          eventData
+        });
+    }
+    this.downloads.delete(groupId);
+  }
+
+  async queueUploads(files, groupId) {
+    const token = await this.tokenManager.getAccessToken();
+    const total = files.length;
+    let current = 0;
+    this.uploads.set(groupId, files);
+
+    for (const file of files) {
+      const { filename } = file;
+      const url = `${hosts.API_HOST}/s3?name=${filename}`;
+      const { execute, cancel } = this.fs.uploadFile(filename, {
+        url,
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      file.cancel = cancel;
+
+      let error = null;
+      const result = await execute().catch((e) => {
+        console.error("Failed to upload attachment:", e);
+        error = e;
+        return false;
+      });
+
+      EV.publish(EVENTS.fileUploaded, {
+        error,
+        success: result,
+        total,
+        current: ++current,
+        groupId,
+        filename
+      });
+    }
+    this.uploads.delete(groupId);
   }
 
   async downloadFile(groupId, filename, chunkSize, metadata) {
@@ -36,37 +103,25 @@ export default class FileStorage {
       chunkSize,
       headers: { Authorization: `Bearer ${token}` }
     });
-    this._queue.push({ groupId, filename, cancel, type: "download" });
+    this.downloads.set(groupId, [{ cancel }]);
     const result = await execute();
-    this._deleteOp(groupId, "download");
-    return result;
-  }
-
-  async uploadFile(groupId, filename) {
-    const token = await this.tokenManager.getAccessToken();
-    const url = `${hosts.API_HOST}/s3?name=${filename}`;
-    const { execute, cancel } = this.fs.uploadFile(filename, {
-      url,
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    this._queue.push({ groupId, filename, cancel, type: "upload" });
-    const result = await execute();
-    this._deleteOp(groupId, "upload");
+    this.downloads.delete(groupId);
     return result;
   }
 
   async cancel(groupId, type) {
-    const [op] = this._deleteOp(groupId, type);
-    if (!op) return;
-    await op.cancel("Operation canceled.");
-  }
-
-  _deleteOp(groupId, type) {
-    const opIndex = this._queue.findIndex(
-      (item) => item.groupId === groupId && (!type || item.type === type)
-    );
-    if (opIndex < 0) return [];
-    return this._queue.splice(opIndex, 1);
+    const queue =
+      type === "downloads"
+        ? this.downloads.get(groupId)
+        : this.uploads.get(groupId);
+    if (!queue) return;
+    for (let i = 0; i < queue.length; ++i) {
+      const file = queue[i];
+      if (file.cancel) await file.cancel("Operation canceled.");
+      queue.splice(i, 1);
+    }
+    if (type === "download") this.downloads.delete(groupId);
+    else if (type === "upload") this.uploads.delete(groupId);
   }
 
   readEncrypted(filename, encryptionKey, cipherData) {

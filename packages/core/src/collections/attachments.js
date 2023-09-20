@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Collection from "./collection";
 import { getId } from "../utils/id";
 import { deleteItem, hasItem } from "../utils/array";
-import { EV, EVENTS, sendAttachmentsProgressEvent } from "../common";
+import { EV, EVENTS } from "../common";
 import dataurl from "../utils/dataurl";
 import dayjs from "dayjs";
 import setManipulator from "../utils/set";
@@ -34,6 +34,36 @@ export default class Attachments extends Collection {
   constructor(db, name, cached) {
     super(db, name, cached);
     this.key = null;
+
+    EV.subscribe(
+      EVENTS.fileDownloaded,
+      async ({ success, filename, groupId, eventData }) => {
+        if (!success || !eventData || !eventData.readOnDownload) return;
+        const attachment = this.attachment(filename);
+        if (!attachment) return;
+
+        const src = await this.read(filename, getOutputType(attachment));
+        if (!src) return;
+
+        EV.publish(EVENTS.mediaAttachmentDownloaded, {
+          groupId,
+          hash: attachment.metadata.hash,
+          attachmentType: getAttachmentType(attachment),
+          src
+        });
+      }
+    );
+
+    EV.subscribe(EVENTS.fileUploaded, async ({ success, error, filename }) => {
+      const attachment = this.attachment(filename);
+      if (!attachment) return;
+      if (success) await this.markAsUploaded(attachment.id);
+      else
+        await this.markAsFailed(
+          attachment.id,
+          error || "Failed to upload attachment."
+        );
+    });
   }
 
   merge(localAttachment, remoteAttachment) {
@@ -317,47 +347,15 @@ export default class Attachments extends Collection {
         (!hashesToLoad || hasItem(hashesToLoad, attachment.metadata.hash))
     );
 
-    try {
-      for (let i = 0; i < attachments.length; i++) {
-        const attachment = attachments[i];
-        await this._download(attachment, {
-          total: attachments.length,
-          current: i,
-          groupId: noteId
-        });
-      }
-    } finally {
-      sendAttachmentsProgressEvent("download", noteId, attachments.length);
-    }
-  }
-
-  async _download(attachment, { total, current, groupId }, notify = true) {
-    const { metadata, chunkSize } = attachment;
-    const filename = metadata.hash;
-
-    if (notify)
-      sendAttachmentsProgressEvent("download", groupId, total, current);
-
-    const isDownloaded = await this._db.fs.downloadFile(
-      groupId,
-      filename,
-      chunkSize,
-      metadata
+    await this._db.fs.queueDownloads(
+      attachments.map((a) => ({
+        filename: a.metadata.hash,
+        metadata: a.metadata,
+        chunkSize: a.chunkSize
+      })),
+      noteId,
+      { readOnDownload: true }
     );
-    if (!isDownloaded) return;
-
-    const src = await this.read(metadata.hash, getOutputType(attachment));
-    if (!src) return;
-
-    if (notify)
-      EV.publish(EVENTS.mediaAttachmentDownloaded, {
-        groupId,
-        hash: metadata.hash,
-        attachmentType: getAttachmentType(attachment),
-        src
-      });
-
-    return src;
   }
 
   async cleanup() {
@@ -451,7 +449,7 @@ export default class Attachments extends Collection {
   }
 }
 
-function getOutputType(attachment) {
+export function getOutputType(attachment) {
   if (attachment.metadata.type === "application/vnd.notesnook.web-clip")
     return "text";
   else if (attachment.metadata.type.startsWith("image/")) return "base64";
