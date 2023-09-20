@@ -40,7 +40,7 @@ import { NetworkCheck } from "../utils/network-check";
 
 const networkCheck = new NetworkCheck();
 var syncStatusTimeout = 0;
-const BATCH_SIZE = 50;
+let pendingSync = false;
 
 /**
  * @extends {BaseStore<AppStore>}
@@ -288,8 +288,10 @@ class AppStore extends BaseStore {
         syncDisabled: !this.get().isSyncEnabled,
         offline: !navigator.onLine
       });
+      if (this.isSyncing()) pendingSync = { full };
       return;
     }
+    pendingSync = false;
 
     clearTimeout(syncStatusTimeout);
     this.updateLastSynced();
@@ -302,6 +304,12 @@ class AppStore extends BaseStore {
       this.updateSyncStatus("completed", true);
 
       await this.updateLastSynced();
+
+      if (pendingSync) {
+        logger.info("Running pending sync", pendingSync);
+        pendingSync = false;
+        await this.get().sync(pendingSync.full, false);
+      }
     } catch (err) {
       logger.error(err);
       if (err.cause === "MERGE_CONFLICT") {
