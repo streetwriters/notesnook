@@ -18,14 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Flex, Input, Text } from "@theme-ui/components";
-import { findChildren, getNodeType } from "@tiptap/core";
+import {
+  findChildren,
+  findParentNodeClosestToPos,
+  getNodeType
+} from "@tiptap/core";
 import { Node } from "prosemirror-model";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
-import { TaskListAttributes } from "./task-list";
+import { TaskListAttributes, TaskListNode } from "./task-list";
 import { countCheckedItems, deleteCheckedItems, sortList } from "./utils";
 
 export function TaskListComponent(
@@ -48,6 +52,18 @@ export function TaskListComponent(
   const isNested = useMemo(() => {
     return !!getParent();
   }, [getParent]);
+
+  const isReadonly = useMemo(() => {
+    console.log("HEERE!");
+    const isParentReadonly =
+      !!isNested &&
+      !!pos &&
+      !!findParentNodeClosestToPos(
+        editor.state.doc.resolve(pos),
+        (node) => node.type.name === TaskListNode.name && node.attrs.readonly
+      );
+    return readonly || isParentReadonly;
+  }, [isNested, readonly, editor.state.doc, pos]);
 
   useEffect(() => {
     const parent = getParent();
@@ -202,7 +218,7 @@ export function TaskListComponent(
       <Box
         ref={forwardRef}
         dir={textDirection}
-        contentEditable={editor.isEditable ? !readonly : undefined}
+        contentEditable={editor.isEditable && !isReadonly}
         sx={{
           ul: {
             display: "block",
