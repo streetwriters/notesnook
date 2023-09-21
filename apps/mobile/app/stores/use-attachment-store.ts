@@ -27,6 +27,7 @@ export type AttachmentGroupProgress = {
   filename: string;
   canceled?: boolean;
   success?: boolean;
+  error?: any;
 };
 
 interface AttachmentStore {

@@ -31,18 +31,7 @@ export async function readEncrypted(filename, key, cipherData) {
   let path = `${cacheDir}/${filename}`;
 
   try {
-    const iosAppGroup =
-      Platform.OS === "ios"
-        ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
-        : null;
-
-    const appGroupPath = `${iosAppGroup}/${filename}`;
-    let exists =
-      (await RNFetchBlob.fs.exists(path)) ||
-      (Platform.OS === "ios" && (await RNFetchBlob.fs.exists(appGroupPath)));
-
-    if (!exists) {
-      console.log("Will download file...", filename);
+    if (!(await exists(filename))) {
       return false;
     } else {
       RNFetchBlob.fs.stat(path).then((r) => {
@@ -183,7 +172,42 @@ export async function migrateFilesFromCache() {
   }
 }
 
+const ABYTES = 17;
 export async function exists(filename) {
-  let exists = await RNFetchBlob.fs.exists(`${cacheDir}/${filename}`);
+  let path = `${cacheDir}/${filename}`;
+
+  const iosAppGroup =
+    Platform.OS === "ios"
+      ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+      : null;
+  const appGroupPath = `${iosAppGroup}/${filename}`;
+
+  let exists = await RNFetchBlob.fs.exists(path);
+
+  // Check if file is present in app group path.
+  let existsInAppGroup = false;
+  if (!exists && Platform.OS === "ios") {
+    existsInAppGroup = await RNFetchBlob.fs.exists(appGroupPath);
+  }
+
+  if (exists || existsInAppGroup) {
+    const attachment = db.attachments.attachment(filename);
+    const totalChunks = Math.ceil(attachment.length / attachment.chunkSize);
+    const totalAbytes = totalChunks * ABYTES;
+    const expectedFileSize = attachment.length + totalAbytes;
+
+    const stat = await RNFetchBlob.fs.stat(
+      existsInAppGroup ? appGroupPath : path
+    );
+
+    if (stat.size !== expectedFileSize) {
+      RNFetchBlob.fs
+        .unlink(existsInAppGroup ? appGroupPath : path)
+        .catch(console.log);
+      return false;
+    }
+
+    exists = true;
+  }
   return exists;
 }
