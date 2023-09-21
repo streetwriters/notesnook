@@ -99,8 +99,10 @@ class Settings {
             ? "dateDeleted"
             : key === "tags"
             ? "dateCreated"
+            : key === "reminders"
+            ? "dueDate"
             : "dateEdited",
-        sortDirection: "desc"
+        sortDirection: key === "reminders" ? "asc" : "desc"
       }
     );
   }
