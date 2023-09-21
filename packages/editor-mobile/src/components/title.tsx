@@ -111,7 +111,7 @@ function Title({
           overflowX: "hidden",
           overflowY: "hidden"
         }}
-        maxLength={150}
+        maxLength={1000}
         onInput={() => {
           resizeTextarea();
         }}
