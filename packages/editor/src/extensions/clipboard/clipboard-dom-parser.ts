@@ -73,13 +73,17 @@ export function convertBrToSingleSpacedParagraphs(dom: HTMLElement | Document) {
       paragraph = p;
     }
 
+    // if paragraph is empty, we clean out the paragraph and move on.
     if (
       paragraph &&
       (paragraph.childNodes.length === 1 ||
         !paragraph.textContent ||
         paragraph.textContent.trim().length === 0)
-    )
+    ) {
+      paragraph.innerHTML = "";
       continue;
+    }
+
     if (paragraph) {
       splitOn(paragraph, br);
       const children = Array.from(paragraph.childNodes.values());

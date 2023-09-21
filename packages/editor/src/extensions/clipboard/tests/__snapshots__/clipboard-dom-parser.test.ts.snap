@@ -8,7 +8,7 @@ exports[`convert br tags to paragraphs 3`] = `"<p>line <span><em>1</em></span></
 
 exports[`convert br tags to paragraphs 4`] = `"<p>line <span><em>1</em></span></p><p data-spacing=\\"single\\"><span><em>line</em></span> 2</p>"`;
 
-exports[`convert br tags to paragraphs 5`] = `"<p><br></p>"`;
+exports[`convert br tags to paragraphs 5`] = `"<p></p>"`;
 
 exports[`convert br tags to paragraphs 6`] = `
 "<p>
@@ -41,6 +41,17 @@ exports[`convert br tags to paragraphs 8`] = `
     LibreOffice Slow &amp; buggy
     
     Switched to Brave for the better Android app, more private out of the box &amp; unsure if uBlock Origin closes gap</span><!--EndFragment-->"
+`;
+
+exports[`convert br tags to paragraphs 9`] = `
+"<div>
+  <p style=\\"line-height: 100%; margin-bottom: 0in\\">
+  I am not talk9ing to you</p>
+  <p style=\\"line-height: 100%; margin-bottom: 0in\\"></p>
+  <p style=\\"line-height: 100%; margin-bottom: 0in\\">I am not talk9ing to
+  you</p>
+  
+  </div>"
 `;
 
 exports[`properly format codeblocks 1`] = `
