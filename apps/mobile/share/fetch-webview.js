@@ -16,12 +16,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React, { useEffect } from "react";
-import { createRef, useImperativeHandle, useRef, useState } from "react";
+import React, {
+  createRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState
+} from "react";
+import { Platform } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 import WebView from "react-native-webview";
 import { Config } from "./store";
-import RNFetchBlob from "react-native-blob-util";
-import { Platform } from "react-native";
+import { db } from "../app/common/database";
+import { SUBSCRIPTION_STATUS } from "../app/utils/constants";
 
 export const fetchHandle = createRef();
 export const HtmlLoadingWebViewAgent = React.memo(
@@ -31,13 +38,15 @@ export const HtmlLoadingWebViewAgent = React.memo(
     const loadHandler = useRef();
     const htmlHandler = useRef();
     const webview = useRef();
+    const premium = useRef(false);
+    const corsProxy = Config.corsProxy;
+
     useImperativeHandle(
       fetchHandle,
       () => ({
         processUrl: (url) => {
           return new Promise((resolve) => {
             setSource(url);
-            console.log("processing...", url);
             let resolved = false;
             htmlHandler.current = (html) => {
               if (resolved) return;
@@ -53,7 +62,6 @@ export const HtmlLoadingWebViewAgent = React.memo(
                 resolve(null);
                 return;
               }
-              console.log("loaded event fired");
             };
           });
         }
@@ -62,14 +70,26 @@ export const HtmlLoadingWebViewAgent = React.memo(
     );
 
     useEffect(() => {
-      const clipperPath =
-        Platform.OS === "ios"
-          ? RNFetchBlob.fs.dirs.MainBundleDir +
-            "/extension.bundle/clipper.bundle.js"
-          : RNFetchBlob.fs.asset("clipper.bundle.js");
-      RNFetchBlob.fs.readFile(clipperPath, "utf8").then((clipper) => {
-        setClipper(clipper);
-      });
+      (async () => {
+        const user = await db.user.getUser();
+        const subscriptionStatus =
+          user?.subscription?.type || SUBSCRIPTION_STATUS.BASIC;
+        premium.current =
+          user && subscriptionStatus !== SUBSCRIPTION_STATUS.BASIC;
+
+        const clipperPath =
+          Platform.OS === "ios"
+            ? RNFetchBlob.fs.dirs.MainBundleDir +
+              "/extension.bundle/clipper.bundle.js"
+            : "bundle-assets://clipper.bundle.js";
+
+        RNFetchBlob.fs
+          .readFile(clipperPath, "utf8")
+          .then((clipper) => {
+            setClipper(clipper);
+          })
+          .catch((e) => console.log(e));
+      })();
     }, []);
 
     return !source || !clipper ? null : (
@@ -95,6 +115,7 @@ export const HtmlLoadingWebViewAgent = React.memo(
               htmlHandler.current?.(data.value);
             } else {
               if (data.type === "error") {
+                console.log("error", data.value);
                 htmlHandler.current?.(null);
               }
             }
@@ -102,9 +123,9 @@ export const HtmlLoadingWebViewAgent = React.memo(
             console.log("Error handling webview message", e);
           }
         }}
-        injectedJavaScript={`
+        injectedJavaScriptBeforeContentLoaded={`
         ${clipper}
-        window.onload = () => {
+        window.addEventListener("load",() => {
           function postMessage(type, value) {
             if (window.ReactNativeWebView) {
               window.ReactNativeWebView.postMessage(
@@ -115,17 +136,20 @@ export const HtmlLoadingWebViewAgent = React.memo(
               );
             }
           }
-          
-          globalThis.Clipper.clipArticle(document, {
-            images: true,
-            corsProxy: false
-          }).then(result => {
-            postMessage("html", result);
-          }).catch(e => {
-            postMessage("error");
-          })
-
-        };`}
+          if (!globalThis.Clipper.clipPage) {
+            postMessage("error", globalThis.Clipper.clipPage);
+          } else {
+            globalThis.Clipper.clipPage(document,false, {
+              images: false,
+              styles: false,
+              corsProxy: undefined
+            }).then(result => {
+              postMessage("html", result);
+            }).catch(e => {
+              postMessage("error");
+            });
+          }
+        }, false);`}
         onError={() => {
           console.log("Error loading page");
           loadHandler.current?.();
@@ -138,100 +162,5 @@ export const HtmlLoadingWebViewAgent = React.memo(
   },
   () => true
 );
-HtmlLoadingWebViewAgent.displayName = "HtmlLoadingWebViewAgent";
 
-const old = `
-window.onload = () => {
-        // Function to convert relative URLs to absolute URLs
-        function fixRelativeUrls(baseUrl, elements, attribute) {
-          elements.forEach((element) => {
-            const relativeUrl = element.getAttribute(attribute);
-            if (relativeUrl) {
-              const absoluteUrl = new URL(relativeUrl, baseUrl).href;
-              element.setAttribute(attribute, absoluteUrl);
-            }
-          });
-        }
-      
-        // Function to remove unnecessary attributes from elements
-        function removeUnnecessaryAttributes(elements) {
-          elements.forEach((element) => {
-            // Remove unnecessary attributes
-            const unnecessaryAttributes = ["class", "id", "style", "data-*"];
-            unnecessaryAttributes.forEach((attr) => element.removeAttribute(attr));
-          });
-        }
-      
-        // Function to exclude specific tags
-        function excludeTags(elements) {
-          elements.forEach((element) => {
-            element.remove();
-          });
-        }
-      
-        // Extract the HTML content and modify it
-        function extractAndModifyHtml() {
-          const baseUrl = window.location.href;
-          const htmlContent = document.documentElement.outerHTML;
-      
-          // Exclude specific tags (e.g., styles, scripts, and others)
-          const tagsToExclude = [
-            "style",
-            "script",
-            "head",
-            "button",
-            "select",
-            "form",
-            "link",
-            "canvas",
-            "nav",
-            "svg",
-            "audio",
-            "video",
-            "iframe",
-            "object",
-            "input",
-            "textarea",
-            "footer",
-            "dialog"
-          ];
-          const elementsToExclude = tagsToExclude
-            .map((tagName) => [...document.querySelectorAll(tagName)])
-            .flat();
-          excludeTags(elementsToExclude);
-      
-          // Select the remaining elements after excluding specific tags
-          const remainingElements = [...document.querySelectorAll("*")];
-      
-          // Remove unnecessary attributes from the remaining elements
-          removeUnnecessaryAttributes(remainingElements);
-      
-          // Convert relative URLs to absolute URLs in links, images, and other attributes
-          const elementsToFixUrls = [
-            ...document.querySelectorAll(
-              "a[href], img[src], link[href], script[src], iframe[src], form[action], object[data]"
-            )
-          ];
-          fixRelativeUrls(baseUrl, elementsToFixUrls, "href");
-          fixRelativeUrls(baseUrl, elementsToFixUrls, "src");
-          fixRelativeUrls(baseUrl, elementsToFixUrls, "action");
-          fixRelativeUrls(baseUrl, elementsToFixUrls, "data");
-      
-          return document.documentElement.outerHTML;
-        }
-      
-        function postMessage(type, value) {
-          if (window.ReactNativeWebView) {
-            window.ReactNativeWebView.postMessage(
-              JSON.stringify({
-                type: type,
-                value: value
-              })
-            );
-          }
-        }
-      
-        const html = extractAndModifyHtml();
-        postMessage("html", html);
-      };
-`;
+HtmlLoadingWebViewAgent.displayName = "HtmlLoadingWebViewAgent";

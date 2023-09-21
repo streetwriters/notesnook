@@ -317,15 +317,18 @@ const ShareView = ({ quicknote = false }) => {
     try {
       if (m === 2) {
         setLoadingPage(true);
-        let html = await sanitizeHtml(rawData.value);
-        noteContent.current = html;
-        setLoadingPage(false);
-        onLoad();
-        setNote((note) => {
-          note.content.data = html;
-          return { ...note };
-        });
+        setTimeout(async () => {
+          let html = await sanitizeHtml(rawData.value);
+          noteContent.current = html;
+          setLoadingPage(false);
+          onLoad();
+          setNote((note) => {
+            note.content.data = html;
+            return { ...note };
+          });
+        }, 300);
       } else {
+        setLoadingPage(false);
         let html = isURL(rawData.value)
           ? makeHtmlFromUrl(rawData.value)
           : makeHtmlFromPlainText(rawData.value);
@@ -344,7 +347,6 @@ const ShareView = ({ quicknote = false }) => {
   };
 
   const onLoadEditor = useCallback(() => {
-    console.log("ON LOAD");
     Storage.write("shareExtensionOpened", "opened");
     loadData();
   }, [loadData]);
@@ -372,7 +374,7 @@ const ShareView = ({ quicknote = false }) => {
         justifyContent: quicknote ? "flex-start" : "flex-end"
       }}
     >
-      <HtmlLoadingWebViewAgent />
+      {loadingPage ? <HtmlLoadingWebViewAgent /> : null}
 
       {quicknote && !searchMode ? (
         <View
