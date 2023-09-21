@@ -457,7 +457,7 @@ function SettingItem(props: { item: Setting }) {
                     variant={component.variant}
                     onClick={() => workWithLoading(index, component.action)}
                   >
-                    {workIndex ? (
+                    {workIndex === index ? (
                       <Loading size={18} sx={{ mr: 2 }} />
                     ) : (
                       component.title
