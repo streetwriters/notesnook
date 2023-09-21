@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Box, Text } from "@theme-ui/components";
 import { AttachmentWithProgress } from "./attachment";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons";
 import { SelectionBasedReactNodeViewProps } from "../react";
@@ -32,6 +32,7 @@ export function AttachmentComponent(
   const { editor, node, selected } = props;
   const { filename, size, progress } = node.attrs;
   const elementRef = useRef<HTMLSpanElement>();
+  const [isDragging, setIsDragging] = useState(false);
 
   return (
     <Box
@@ -57,6 +58,9 @@ export function AttachmentComponent(
         }
       }}
       title={filename}
+      onDragStart={() => setIsDragging(true)}
+      onDragEnd={() => setIsDragging(false)}
+      data-drag-handle
     >
       <Icon path={Icons.attachment} size={14} />
       <Text
@@ -83,7 +87,7 @@ export function AttachmentComponent(
         {progress ? `${progress}%` : formatBytes(size)}
       </Text>
       <DesktopOnly>
-        {selected && (
+        {selected && !isDragging && (
           <ToolbarGroup
             editor={editor}
             tools={
