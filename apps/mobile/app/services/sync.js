@@ -17,15 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EVENTS } from "@notesnook/core/dist/common";
 import NetInfo from "@react-native-community/netinfo";
 import { db } from "../common/database";
 import { DatabaseLogger } from "../common/database/index";
 import { initAfterSync } from "../stores/index";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
+import BackgroundSync from "./background-sync";
 import { ToastEvent } from "./event-manager";
 import SettingsService from "./settings";
-import BackgroundSync from "./background-sync";
 
 export const ignoredMessages = [
   "Sync already running",
@@ -33,7 +32,7 @@ export const ignoredMessages = [
   "WebSocket failed to connect",
   "Failed to start the HttpConnection before"
 ];
-
+let pendingSync = undefined;
 let syncTimer = 0;
 const run = async (
   context = "global",
@@ -43,10 +42,18 @@ const run = async (
   lastSyncTime
 ) => {
   if (useUserStore.getState().syncing) {
-    DatabaseLogger.log("Sync in progress");
-    console.log("Sync in progress");
+    DatabaseLogger.info("Sync in progress");
+    pendingSync = {
+      full: full
+    };
     return;
   }
+
+  if (pendingSync) {
+    pendingSync = undefined;
+    DatabaseLogger.info("Running pending sync...");
+  }
+
   clearTimeout(syncTimer);
   syncTimer = setTimeout(async () => {
     const status = await NetInfo.fetch();
@@ -55,56 +62,54 @@ const run = async (
     if (!status.isInternetReachable) {
       DatabaseLogger.warn("Internet not reachable");
     }
+
     if (
       !user ||
       !status.isInternetReachable ||
       SettingsService.get().disableSync
     ) {
       initAfterSync();
+      pendingSync = undefined;
       return onCompleted?.(false);
     }
     userstore.setSyncing(true);
+
     let error = null;
 
     try {
-      let res = await BackgroundSync.doInBackground(async () => {
+      await BackgroundSync.doInBackground(async () => {
         try {
           await db.sync(full, forced, lastSyncTime);
-          return true;
         } catch (e) {
           error = e;
-          return e.message;
         }
       });
-      if (!res) {
-        initAfterSync();
-        userstore.setSyncing(false, SyncStatus.Failed);
-        return onCompleted?.(false);
+
+      if (error) {
+        throw error;
       }
-      if (typeof res === "string") throw error;
-      userstore.setSyncing(false);
-      return onCompleted?.(true);
     } catch (e) {
       error = e;
       if (
-        !ignoredMessages.find((im) => e.message?.includes(im)) &&
-        userstore.user
+        !ignoredMessages.find((message) => e.message?.includes(message)) &&
+        userstore.user &&
+        status.isConnected &&
+        status.isInternetReachable
       ) {
-        userstore.setSyncing(false, SyncStatus.Failed);
-        if (status.isConnected && status.isInternetReachable) {
-          ToastEvent.error(e, "Sync failed", context);
-        }
+        ToastEvent.error(e, "Sync failed", context);
       }
+
       DatabaseLogger.error(e, "[Client] Failed to sync");
-      onCompleted?.(false);
     } finally {
+      initAfterSync();
       userstore.setSyncing(
         false,
         error ? SyncStatus.Failed : SyncStatus.Passed
       );
-      if (full || forced) {
-        db.eventManager.publish(EVENTS.syncCompleted);
-      }
+      onCompleted?.(error ? SyncStatus.Failed : SyncStatus.Passed);
+      setImmediate(() => {
+        if (pendingSync) Sync.run("global", false, pendingSync.full);
+      });
     }
   }, 300);
 };
