@@ -21,7 +21,12 @@ import * as ScopedStorage from "react-native-scoped-storage";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 
-export const cacheDir = RNFetchBlob.fs.dirs.CacheDir;
+export const cacheDirOld = RNFetchBlob.fs.dirs.CacheDir;
+
+export const cacheDir =
+  Platform.OS == "ios"
+    ? RNFetchBlob.fs.dirs.LibraryDir + "/.cache"
+    : RNFetchBlob.fs.dirs.DocumentDir + "/.cache";
 
 export function getRandomId(prefix) {
   return Math.random()

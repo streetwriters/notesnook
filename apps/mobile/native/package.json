@@ -7,7 +7,7 @@
   "dependencies": {
     "@ammarahmed/notifee-react-native": "7.4.4",
     "@ammarahmed/react-native-share-extension": "^2.5.5",
-    "@ammarahmed/react-native-sodium": "1.5.3",
+    "@ammarahmed/react-native-sodium": "1.5.4",
     "@bam.tech/react-native-image-resizer": "3.0.5",
     "@callstack/repack": "^3.2.0",
     "@react-native-clipboard/clipboard": "^1.9.0",

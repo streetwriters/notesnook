@@ -62,6 +62,7 @@ export async function downloadAttachments(
   canceled,
   groupId
 ) {
+  await createCacheDir();
   if (!attachments || !attachments.length) return;
   const result = new Map();
 
@@ -182,6 +183,7 @@ export default async function downloadAttachment(
     groupId: undefined
   }
 ) {
+  await createCacheDir();
   let attachment = db.attachments.attachment(hash);
   if (!attachment) {
     console.log("attachment not found");

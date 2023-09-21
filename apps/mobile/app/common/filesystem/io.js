@@ -20,12 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Platform } from "react-native";
 import Sodium from "@ammarahmed/react-native-sodium";
 import RNFetchBlob from "react-native-blob-util";
-import { cacheDir, getRandomId } from "./utils";
+import { cacheDir, cacheDirOld, getRandomId } from "./utils";
 import { db } from "../database";
 import { compressToBase64 } from "./compress";
 import { IOS_APPGROUPID } from "../../utils/constants";
 
 export async function readEncrypted(filename, key, cipherData) {
+  await migrateFilesFromCache();
+  console.log("read encrypted file...");
   let path = `${cacheDir}/${filename}`;
   try {
     const iosAppGroup =
@@ -40,12 +42,16 @@ export async function readEncrypted(filename, key, cipherData) {
 
     if (!exists) {
       return false;
+    } else {
+      RNFetchBlob.fs.stat(path).then((r) => {
+        console.log(r);
+      });
     }
 
     const attachment = db.attachments.attachment(filename);
     const isPng = /(png)/g.test(attachment?.metadata.type);
     const isJpeg = /(jpeg|jpg)/g.test(attachment?.metadata.type);
-
+    console.log("decrypting....");
     let output = await Sodium.decryptFile(
       key,
       {
@@ -59,6 +65,7 @@ export async function readEncrypted(filename, key, cipherData) {
           : "base64"
         : "text"
     );
+    console.log("file decrypted...");
     if (cipherData.outputType === "base64" && (isPng || isJpeg)) {
       const dCachePath = `${cacheDir}/${output}`;
       output = await compressToBase64(
@@ -70,7 +77,7 @@ export async function readEncrypted(filename, key, cipherData) {
     return output;
   } catch (e) {
     RNFetchBlob.fs.unlink(path).catch(console.log);
-    console.log(e);
+    console.log("readEncrypted", e);
     return false;
   }
 }
@@ -88,6 +95,7 @@ export async function hashBase64(data) {
 }
 
 export async function writeEncryptedBase64({ data, key }) {
+  await createCacheDir();
   let filepath = cacheDir + `/${getRandomId("imagecache_")}`;
   await RNFetchBlob.fs.writeFile(filepath, data, "base64");
   let output = await Sodium.encryptFile(key, {
@@ -103,6 +111,7 @@ export async function writeEncryptedBase64({ data, key }) {
 }
 
 export async function deleteFile(filename, data) {
+  await createCacheDir();
   let delFilePath = cacheDir + `/${filename}`;
   if (!data) {
     if (!filename) return;
@@ -128,15 +137,47 @@ export async function deleteFile(filename, data) {
 export async function clearFileStorage() {
   try {
     let files = await RNFetchBlob.fs.ls(cacheDir);
+    let oldCache = await RNFetchBlob.fs.ls(cacheDirOld);
+
     for (let file of files) {
-      try {
-        await RNFetchBlob.fs.unlink(cacheDir + `/${file}`);
-      } catch (e) {
-        console.log(e);
-      }
+      await RNFetchBlob.fs.unlink(cacheDir + `/${file}`).catch(console.log);
+    }
+    for (let file of oldCache) {
+      await RNFetchBlob.fs.unlink(cacheDirOld + `/${file}`).catch(console.log);
     }
   } catch (e) {
-    console.log(e);
+    console.log("clearFileStorage", e);
+  }
+}
+
+export async function createCacheDir() {
+  if (!(await RNFetchBlob.fs.exists(cacheDir))) {
+    await RNFetchBlob.fs.mkdir(cacheDir);
+    console.log("Cache directory created");
+  }
+}
+
+export async function migrateFilesFromCache() {
+  try {
+    await createCacheDir();
+    const migratedFilesPath = cacheDir + "/.migrated_1";
+    const migrated = await RNFetchBlob.fs.exists(migratedFilesPath);
+    if (migrated) return;
+
+    let files = await RNFetchBlob.fs.ls(cacheDir);
+    console.log("Files to migrate:", files.join(","));
+
+    let oldCache = await RNFetchBlob.fs.ls(cacheDirOld);
+    for (let file of oldCache) {
+      if (file.startsWith("org.") || file.startsWith("com.")) continue;
+      RNFetchBlob.fs
+        .mv(cacheDirOld + `/${file}`, cacheDir + `/${file}`)
+        .catch(console.log);
+      console.log("Moved", file);
+    }
+    await RNFetchBlob.fs.createFile(migratedFilesPath, "1", "utf8");
+  } catch (e) {
+    console.log("migrateFilesFromCache", e);
   }
 }
 
