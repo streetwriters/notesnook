@@ -1,3 +1,19 @@
+diff --git a/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilFS.java b/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilFS.java
+index c75347f..76d9b9e 100644
+--- a/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilFS.java
++++ b/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilFS.java
+@@ -257,9 +257,9 @@ class ReactNativeBlobUtilFS {
+             if (resolved != null && resolved.startsWith(ReactNativeBlobUtilConst.FILE_PREFIX_BUNDLE_ASSET)) {
+                 String assetName = path.replace(ReactNativeBlobUtilConst.FILE_PREFIX_BUNDLE_ASSET, "");
+                 // This fails should an asset file be >2GB
+-                length = (int) ReactNativeBlobUtilImpl.RCTContext.getAssets().openFd(assetName).getLength();
+-                bytes = new byte[length];
+                 InputStream in = ReactNativeBlobUtilImpl.RCTContext.getAssets().open(assetName);
++                length = in.available();
++                bytes = new byte[length];
+                 bytesRead = in.read(bytes, 0, length);
+                 in.close();
+             }
 diff --git a/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilReq.java b/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilReq.java
 index 9aee829..0ecc59b 100644
 --- a/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilReq.java
@@ -109,7 +125,7 @@ index 97e5263..640aaea 100644
              }
  
 diff --git a/node_modules/react-native-blob-util/index.js b/node_modules/react-native-blob-util/index.js
-index ecaddf9..40a5c37 100644
+index ecaddf9..70d6ba5 100644
 --- a/node_modules/react-native-blob-util/index.js
 +++ b/node_modules/react-native-blob-util/index.js
 @@ -14,6 +14,7 @@ import ios from './ios';
