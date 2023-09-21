@@ -85,6 +85,7 @@ function Reminder(props: ReminderProps) {
             gap: 1
           }}
         >
+          {reminder.disabled ? null : <PriorityIcon size={14} />}
           {reminder.disabled ? (
             <IconTag icon={ReminderOff} text={"Disabled"} testId={"disabled"} />
           ) : (
@@ -95,7 +96,6 @@ function Reminder(props: ReminderProps) {
               testId={"reminder-time"}
             />
           )}
-          {reminder.disabled ? null : <PriorityIcon size={14} />}
           {reminder.mode === "repeat" && reminder.recurringMode && (
             <IconTag
               icon={Refresh}

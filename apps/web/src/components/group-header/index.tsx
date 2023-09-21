@@ -56,22 +56,27 @@ type GroupingMenuOptions = {
   isUngrouped: boolean;
 };
 
-const groupByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
-  type: "button",
-  key: "groupBy",
-  title: "Group by",
-  icon: GroupBy.path,
-  menu: {
-    items: map(options, [
-      { key: "none", title: "None" },
-      { key: "default", title: "Default" },
-      { key: "year", title: "Year" },
-      { key: "month", title: "Month" },
-      { key: "week", title: "Week" },
-      { key: "abc", title: "A - Z" }
-    ])
-  }
-});
+const groupByMenu: (options: GroupingMenuOptions) => MenuItem | null = (
+  options
+) =>
+  options.groupingKey === "reminders"
+    ? null
+    : {
+        type: "button",
+        key: "groupBy",
+        title: "Group by",
+        icon: GroupBy.path,
+        menu: {
+          items: map(options, [
+            { key: "none", title: "None" },
+            { key: "default", title: "Default" },
+            { key: "year", title: "Year" },
+            { key: "month", title: "Month" },
+            { key: "week", title: "Week" },
+            { key: "abc", title: "A - Z" }
+          ])
+        }
+      };
 
 const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
   type: "button",
@@ -90,12 +95,20 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
       {
         key: "asc",
         title:
-          options.groupOptions.sortBy === "title" ? "A - Z" : "Oldest - newest"
+          options.groupOptions.sortBy === "title"
+            ? "A - Z"
+            : options.groupOptions.sortBy === "dueDate"
+            ? "Earliest first"
+            : "Oldest - newest"
       },
       {
         key: "desc",
         title:
-          options.groupOptions.sortBy === "title" ? "Z - A" : "Newest - oldest"
+          options.groupOptions.sortBy === "title"
+            ? "Z - A"
+            : options.groupOptions.sortBy === "dueDate"
+            ? "Latest first"
+            : "Newest - oldest"
       }
     ])
   }
@@ -129,6 +142,11 @@ const sortByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
         key: "dateModified",
         title: "Date modified",
         isHidden: options.groupingKey !== "tags"
+      },
+      {
+        key: "dueDate",
+        title: "Due date",
+        isHidden: options.groupingKey !== "reminders"
       },
       {
         key: "title",
@@ -314,7 +332,7 @@ function GroupHeader(props: GroupHeaderProps) {
 
       {index === 0 && (
         <Flex mr={1}>
-          {groupingKey && groupingKey !== "reminders" && (
+          {groupingKey && (
             <IconButton
               testId={`${groupingKey}-sort-button`}
               icon={groupOptions.sortDirection === "asc" ? SortAsc : SortDesc}
@@ -331,26 +349,26 @@ function GroupHeader(props: GroupHeaderProps) {
                   isUngrouped: false,
                   refresh
                 };
+                const groupBy = groupByMenu({
+                  ...menuOptions,
+                  parentKey: "groupBy"
+                });
 
-                openMenu(
-                  [
-                    orderByMenu({
-                      ...menuOptions,
-                      parentKey: "sortDirection"
-                    }),
-                    sortByMenu({
-                      ...menuOptions,
-                      parentKey: "sortBy"
-                    }),
-                    groupByMenu({
-                      ...menuOptions,
-                      parentKey: "groupBy"
-                    })
-                  ],
-                  {
-                    title: "Group & sort"
-                  }
-                );
+                const menuItems = [
+                  orderByMenu({
+                    ...menuOptions,
+                    parentKey: "sortDirection"
+                  }),
+                  sortByMenu({
+                    ...menuOptions,
+                    parentKey: "sortBy"
+                  })
+                ];
+                if (groupBy) menuItems.push(groupBy);
+
+                openMenu(menuItems, {
+                  title: groupBy ? "Group & sort" : "Sort"
+                });
               }}
             />
           )}
