@@ -77,18 +77,22 @@ function clip(message: ClipMessage) {
     const isScreenshot = message.mode === "screenshot";
     const withStyles = message.mode === "complete" || isScreenshot;
 
+    if (config) {
+      config.styles = withStyles;
+    }
+
     if (isScreenshot && message.area === "full-page") {
       return clipScreenshot(document.body, "jpeg", config);
     } else if (message.area === "full-page") {
-      return clipPage(document, withStyles, false, config);
+      return clipPage(document, false, config);
     } else if (message.area === "selection") {
       enterNodeSelectionMode(document, config).then((result) =>
         browser.runtime.sendMessage({ type: "manual", data: result })
       );
     } else if (message.area === "article") {
-      return clipArticle(document, withStyles, config);
+      return clipArticle(document, config);
     } else if (message.area === "visible") {
-      return clipPage(document, withStyles, true, config);
+      return clipPage(document, true, config);
     }
   } catch (e) {
     console.error(e);

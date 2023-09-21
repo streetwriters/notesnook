@@ -23,6 +23,9 @@ module.exports = {
   mode: "production",
   output: {
     filename: "clipper.bundle.js",
-    path: path.resolve(__dirname, "../../apps/mobile/native/ios")
+    path: path.resolve(
+      __dirname,
+      "../../apps/mobile/native/ios/extension.bundle"
+    )
   }
 };
