@@ -24,11 +24,12 @@ import { cacheDir } from "./utils";
 import { isImage, isDocument } from "@notesnook/core/dist/utils/filename";
 import { Platform } from "react-native";
 import { IOS_APPGROUPID } from "../../utils/constants";
+import { createCacheDir } from "./io";
 
 export async function uploadFile(filename, data, cancelToken) {
   if (!data) return false;
   let { url, headers } = data;
-
+  await createCacheDir();
   DatabaseLogger.info(`Preparing to upload file: ${filename}`);
 
   try {
