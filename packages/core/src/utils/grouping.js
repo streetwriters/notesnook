@@ -44,6 +44,10 @@ const comparators = {
     asc: (a, b) => a.dateDeleted - b.dateDeleted,
     desc: (a, b) => b.dateDeleted - a.dateDeleted
   },
+  dueDate: {
+    asc: (a, b) => getUpcomingReminderTime(a) - getUpcomingReminderTime(b),
+    desc: (a, b) => getUpcomingReminderTime(b) - getUpcomingReminderTime(a)
+  },
   title: {
     asc: (a, b) =>
       getTitle(a).localeCompare(getTitle(b), undefined, { numeric: true }),
@@ -143,19 +147,24 @@ export function groupArray(
  * @param {GroupOptions} options
  * @returns {(Reminder | {type: "header", title: string})[]} Grouped array
  */
-export function groupReminders(array) {
+export function groupReminders(
+  array,
+  options = {
+    sortBy: "dateEdited",
+    sortDirection: "desc"
+  }
+) {
   const groups = new Map([
     ["Active", []],
     ["Inactive", []]
   ]);
 
-  const sorted = array.sort((a, b) => {
-    const d1 = a.mode === "repeat" ? getUpcomingReminderTime(a) : a.date;
-    const d2 = b.mode === "repeat" ? getUpcomingReminderTime(b) : b.date;
-    return !d1 || !d2 ? 0 : d1 - d2;
-  });
+  if (options.sortBy && options.sortDirection) {
+    const selector = comparators[options.sortBy][options.sortDirection];
+    array.sort(selector);
+  }
 
-  sorted.forEach((item) => {
+  array.forEach((item) => {
     const groupTitle = isReminderActive(item) ? "Active" : "Inactive";
     addToGroup(groups, groupTitle, item);
   });
