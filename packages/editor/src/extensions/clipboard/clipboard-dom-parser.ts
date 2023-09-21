@@ -74,8 +74,10 @@ export function convertBrToSingleSpacedParagraphs(dom: HTMLElement | Document) {
     }
 
     if (
-      (paragraph && paragraph.childNodes.length === 1) ||
-      paragraph?.textContent?.trim()?.length === 0
+      paragraph &&
+      (paragraph.childNodes.length === 1 ||
+        !paragraph.textContent ||
+        paragraph.textContent.trim().length === 0)
     )
       continue;
     if (paragraph) {
