@@ -39,7 +39,7 @@ export function clipboardTextParser(
 
 export function convertTextToHTML(src: string) {
   return src
-    .split(/[\r\n]/)
+    .split(/\r\n|\n/)
     .map((line) =>
       line
         ? `<p data-spacing="single">${encodeLine(line)}</p>`
