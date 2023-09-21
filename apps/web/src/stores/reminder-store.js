@@ -37,7 +37,13 @@ class ReminderStore extends BaseStore {
 
   refresh = (reset = true) => {
     const reminders = db.reminders.all;
-    this.set((state) => (state.reminders = groupReminders(reminders)));
+    this.set(
+      (state) =>
+        (state.reminders = groupReminders(
+          reminders,
+          db.settings.getGroupOptions("reminders")
+        ))
+    );
     if (reset) {
       resetReminders(reminders);
       notestore.refresh();
