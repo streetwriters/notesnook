@@ -68,8 +68,15 @@ const error: ThemeUIStyleObject = {
   }
 };
 
+const radio: ThemeUIStyleObject = {
+  "input:focus ~ &": {
+    backgroundColor: `border-secondary`
+  }
+};
+
 export const inputVariants = {
   input: defaultVariant,
   error,
-  clean
+  clean,
+  radio
 };
