@@ -215,10 +215,23 @@ function processClone(
     copyStyle(original, clone, options);
     clonePseudoElements(original, clone, options);
   }
-
+  fixRelativeUrl(clone);
   copyUserInput(original, clone);
   fixSvg(clone);
   return clone;
+}
+
+function fixRelativeUrl(node: HTMLElement) {
+  const attributes = ["href", "src"];
+  const baseUrl = window.location.href;
+  for (const attribute of attributes) {
+    const url = node.getAttribute(attribute);
+    const relativeUrl = url?.startsWith("http") ? undefined : url;
+    if (relativeUrl) {
+      const absoluteUrl = new URL(relativeUrl, baseUrl).href;
+      node.setAttribute(attribute, absoluteUrl);
+    }
+  }
 }
 
 function copyFont(source: CSSStyleDeclaration, target: CSSStyleDeclaration) {
