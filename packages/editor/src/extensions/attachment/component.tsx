@@ -32,8 +32,7 @@ export function AttachmentComponent(
   const { editor, node, selected } = props;
   const { filename, size, progress } = node.attrs;
   const elementRef = useRef<HTMLSpanElement>();
-
-  const [clicked, setClicked] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   return (
     <Box
@@ -59,12 +58,8 @@ export function AttachmentComponent(
         }
       }}
       title={filename}
-      onClick={() => {
-        setClicked(true);
-      }}
-      onDragStart={() => {
-        setClicked(false);
-      }}
+      onDragStart={() => setIsDragging(true)}
+      onDragEnd={() => setIsDragging(false)}
       data-drag-handle
     >
       <Icon path={Icons.attachment} size={14} />
@@ -92,7 +87,7 @@ export function AttachmentComponent(
         {progress ? `${progress}%` : formatBytes(size)}
       </Text>
       <DesktopOnly>
-        {selected && clicked && (
+        {selected && !isDragging && (
           <ToolbarGroup
             editor={editor}
             tools={
