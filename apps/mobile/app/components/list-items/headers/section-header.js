@@ -17,35 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
-import { TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
-import { useSettingStore } from "../../../stores/use-setting-store";
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  presentSheet
-} from "../../../services/event-manager";
+import React, { useRef } from "react";
+import { TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
-import { GROUP } from "../../../utils/constants";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { ColorValues } from "../../../utils/colors";
-import { db } from "../../../common/database";
+import { GROUP } from "../../../utils/constants";
 import { eOpenJumpToDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
-import { IconButton } from "../../ui/icon-button";
-import { Button } from "../../ui/button";
 import Sort from "../../sheets/sort";
+import { Button } from "../../ui/button";
+import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
-import { useCallback } from "react";
 
 export const SectionHeader = React.memo(
-  function SectionHeader({ item, index, type, color, screen }) {
+  function SectionHeader({ item, index, type, color, screen, groupOptions }) {
     const { colors } = useThemeColors();
     const { fontScale } = useWindowDimensions();
-    const [groupOptions, setGroupOptions] = useState(
-      db.settings?.getGroupOptions(type)
-    );
     let groupBy = Object.keys(GROUP).find(
       (key) => GROUP[key] === groupOptions.groupBy
     );
@@ -64,17 +54,6 @@ export const SectionHeader = React.memo(
     groupBy = !groupBy
       ? "Default"
       : groupBy.slice(0, 1).toUpperCase() + groupBy.slice(1, groupBy.length);
-
-    const onUpdate = useCallback(() => {
-      setGroupOptions({ ...db.settings?.getGroupOptions(type) });
-    }, [type]);
-
-    useEffect(() => {
-      eSubscribeEvent("groupOptionsUpdate", onUpdate);
-      return () => {
-        eUnSubscribeEvent("groupOptionsUpdate", onUpdate);
-      };
-    }, [onUpdate]);
 
     return (
       <View

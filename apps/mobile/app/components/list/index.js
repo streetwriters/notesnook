@@ -39,6 +39,7 @@ import { Empty } from "./empty";
 import { getTotalNotes } from "@notesnook/common";
 import { useSettingStore } from "../../stores/use-setting-store";
 import ReminderItem from "../list-items/reminder";
+import { useGroupOptions } from "../../hooks/use-group-options";
 
 const renderItems = {
   note: NoteWrapper,
@@ -99,9 +100,10 @@ const List = ({
     type === "notebooks" ||
     notebooksListMode === "compact";
   const groupType =
-    screen === "Notes" ? "home" : screen === "Favorites" ? "favorites" : type;
+    screen === "Home" ? "home" : screen === "Favorites" ? "favorites" : type;
 
-  const groupOptions = db.settings?.getGroupOptions(groupType);
+  const groupOptions = useGroupOptions(groupType);
+
   const dateBy =
     groupOptions.sortBy !== "title" ? groupOptions.sortBy : "dateEdited";
 
@@ -113,18 +115,21 @@ const List = ({
         color={headerProps?.color}
         title={headerProps?.heading}
         dateBy={dateBy}
-        type={
-          screen === "Notes"
-            ? "home"
-            : screen === "Favorites"
-            ? "favorites"
-            : type
-        }
+        type={groupType}
         screen={screen}
         isSheet={isSheet}
+        groupOptions={groupOptions}
       />
     ),
-    [headerProps?.color, headerProps?.heading, screen, type, isSheet, dateBy]
+    [
+      headerProps?.color,
+      headerProps?.heading,
+      screen,
+      isSheet,
+      dateBy,
+      groupType,
+      groupOptions
+    ]
   );
 
   const _onRefresh = async () => {
@@ -230,7 +235,7 @@ const List = ({
         <JumpToSectionDialog
           screen={screen}
           data={listData}
-          type={screen === "Notes" ? "home" : type}
+          type={screen === "Home" ? "home" : type}
           scrollRef={scrollRef}
         />
       ) : null}
