@@ -18,14 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Flex, Input, Text } from "@theme-ui/components";
-import { findChildren, getNodeType } from "@tiptap/core";
+import {
+  findChildren,
+  findParentNodeClosestToPos,
+  getNodeType
+} from "@tiptap/core";
 import { Node } from "prosemirror-model";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
-import { TaskListAttributes } from "./task-list";
+import { TaskListAttributes, TaskListNode } from "./task-list";
 import { countCheckedItems, deleteCheckedItems, sortList } from "./utils";
 
 export function TaskListComponent(
@@ -34,7 +38,7 @@ export function TaskListComponent(
   // const isMobile = useIsMobile();
   const { editor, getPos, node, updateAttributes, forwardRef, pos } = props;
   const taskItemType = getNodeType(TaskItemNode.name, editor.schema);
-  const { title, textDirection } = node.attrs;
+  const { title, textDirection, readonly } = node.attrs;
   const [stats, setStats] = useState({ checked: 0, total: 0, percentage: 0 });
 
   const getParent = useCallback(() => {
@@ -48,6 +52,18 @@ export function TaskListComponent(
   const isNested = useMemo(() => {
     return !!getParent();
   }, [getParent]);
+
+  const isReadonly = useMemo(() => {
+    console.log("HEERE!");
+    const isParentReadonly =
+      !!isNested &&
+      !!pos &&
+      !!findParentNodeClosestToPos(
+        editor.state.doc.resolve(pos),
+        (node) => node.type.name === TaskListNode.name && node.attrs.readonly
+      );
+    return readonly || isParentReadonly;
+  }, [isNested, readonly, editor.state.doc, pos]);
 
   useEffect(() => {
     const parent = getParent();
@@ -103,7 +119,7 @@ export function TaskListComponent(
             }}
           />
           <Input
-            readOnly={!editor.isEditable}
+            readOnly={!editor.isEditable || readonly}
             value={title || ""}
             variant={"clean"}
             sx={{
@@ -125,6 +141,24 @@ export function TaskListComponent(
           />
           {editor.isEditable && (
             <>
+              <ToolButton
+                toggled={false}
+                title="Make tasklist readonly"
+                icon={readonly ? "readonlyOn" : "readonlyOff"}
+                variant="small"
+                sx={{
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  const pos = getPos();
+                  const node = editor.current?.state.doc.nodeAt(pos);
+                  if (!node) return;
+                  updateAttributes(
+                    { readonly: !node.attrs.readonly },
+                    { addToHistory: true, preventUpdate: false }
+                  );
+                }}
+              />
               <ToolButton
                 toggled={false}
                 title="Move all checked tasks to bottom"
@@ -184,6 +218,7 @@ export function TaskListComponent(
       <Box
         ref={forwardRef}
         dir={textDirection}
+        contentEditable={editor.isEditable && !isReadonly}
         sx={{
           ul: {
             display: "block",

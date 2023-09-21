@@ -115,7 +115,9 @@ import {
   mdiTableRowRemove,
   mdiTableSplitCell,
   mdiUploadOutline,
-  mdiWeb
+  mdiWeb,
+  mdiPencilOff,
+  mdiPencil
 } from "@mdi/js";
 
 export const Icons = {
@@ -239,6 +241,8 @@ export const Icons = {
   circle: mdiCircle,
   arrowLeft: mdiArrowLeft,
   resize: mdiResizeBottomRight,
+  readonlyOn: mdiPencilOff,
+  readonlyOff: mdiPencil,
   none: ""
 };
 

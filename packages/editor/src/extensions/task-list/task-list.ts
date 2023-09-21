@@ -33,6 +33,7 @@ import { countCheckedItems } from "./utils";
 
 export type TaskListAttributes = {
   title: string;
+  readonly: boolean;
 };
 
 const stateKey = new PluginKey("task-item-drop-override");
@@ -50,6 +51,19 @@ export const TaskListNode = TaskList.extend({
 
           return {
             "data-title": attributes.title
+          };
+        }
+      },
+      readonly: {
+        default: false,
+        keepOnSplit: false,
+        parseHTML: (element) => element.dataset.readonly,
+        renderHTML: (attributes) => {
+          if (!attributes.readonly) {
+            return {};
+          }
+          return {
+            "data-readonly": attributes.readonly
           };
         }
       }
