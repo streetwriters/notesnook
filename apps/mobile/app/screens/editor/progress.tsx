@@ -54,12 +54,13 @@ export const ProgressBar = () => {
     ? attachmentProgress?.[loading?.filename]
     : undefined;
 
-  console.log(loading);
-
   useEffect(() => {
     if (loading) {
-      if (loading.current === loading.total && loading.success) {
-        console.log("download completed");
+      console.log(loading);
+      if (
+        loading.current === loading.total &&
+        typeof loading.success === "boolean"
+      ) {
         clear();
         return;
       }

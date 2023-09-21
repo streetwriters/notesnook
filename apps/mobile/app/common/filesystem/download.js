@@ -24,7 +24,7 @@ import { ToastEvent } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import { cacheDir, fileCheck } from "./utils";
-import { createCacheDir } from "./io";
+import { createCacheDir, exists } from "./io";
 
 export async function downloadFile(filename, data, cancelToken) {
   if (!data) return false;
@@ -32,12 +32,10 @@ export async function downloadFile(filename, data, cancelToken) {
   await createCacheDir();
 
   let { url, headers } = data;
-
   let path = `${cacheDir}/${filename}`;
+
   try {
-    let exists = await RNFetchBlob.fs.exists(path);
-    if (exists) {
-      console.log("exists", filename);
+    if (await exists(filename)) {
       return true;
     }
 
