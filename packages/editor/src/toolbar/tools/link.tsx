@@ -225,7 +225,7 @@ export function OpenLink(props: ToolProps) {
           fontSize: "subBody",
           fontFamily: "body",
           mr: 1,
-          color: "primary",
+          color: "accent",
           maxWidth: [150, 250],
           overflow: "hidden",
           textOverflow: "ellipsis",
