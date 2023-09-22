@@ -35,6 +35,7 @@ export type InlineOptions = {
   stylesheets?: boolean;
   fonts?: boolean;
   images?: boolean;
+  inlineImages?: boolean;
 };
 
 export type Options = {
@@ -53,5 +54,6 @@ export type Options = {
 export type Config = {
   corsProxy?: string;
   images?: boolean;
+  inlineImages?: boolean;
   styles?: boolean;
 };

@@ -455,6 +455,7 @@ async function getPage(
     fetchOptions: resolveFetchOptions(config),
     inlineOptions: {
       fonts: false,
+      inlineImages: config?.inlineImages,
       images: config?.images,
       stylesheets: config?.styles
     },
