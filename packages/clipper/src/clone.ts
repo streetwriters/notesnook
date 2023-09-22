@@ -112,13 +112,14 @@ type CloneProps = {
     pseudoElement: string
   ) => CSSStyleDeclaration | undefined;
   fetchOptions?: FetchOptions;
+  images?: boolean;
 };
 
 export async function cloneNode(node: HTMLElement, options: CloneProps) {
   const { root, filter } = options;
   if (!root && filter && !filter(node)) return null;
 
-  let clone = await makeNodeCopy(node, options.fetchOptions);
+  let clone = await makeNodeCopy(node, options);
 
   if (!clone) return null;
   clone = await cloneChildren(node, clone, options);
@@ -127,10 +128,22 @@ export async function cloneNode(node: HTMLElement, options: CloneProps) {
   return processed;
 }
 
-function makeNodeCopy(original: HTMLElement, options?: FetchOptions) {
+function makeNodeCopy(original: HTMLElement, options?: CloneProps) {
   try {
-    if (original instanceof HTMLCanvasElement)
-      return createImage(original.toDataURL(), options);
+    if (original instanceof HTMLCanvasElement && options?.images)
+      return createImage(original.toDataURL(), options?.fetchOptions);
+
+    if (!options?.images && original instanceof HTMLImageElement) return null;
+
+    if (
+      !options?.styles &&
+      (original instanceof HTMLButtonElement ||
+        original instanceof HTMLFormElement ||
+        original instanceof HTMLSelectElement ||
+        original instanceof HTMLInputElement ||
+        original instanceof HTMLTextAreaElement)
+    )
+      return null;
 
     if (original.nodeType === Node.COMMENT_NODE) return null;
 

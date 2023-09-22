@@ -30,7 +30,8 @@ const defaultOptions: Options = {
 };
 
 async function getInlinedNode(node: HTMLElement, options: Options) {
-  const { fonts, images, stylesheets } = options.inlineOptions || {};
+  const { fonts, images, stylesheets, inlineImages } =
+    options.inlineOptions || {};
 
   if (stylesheets) await inlineStylesheets(options.fetchOptions);
 
@@ -45,14 +46,15 @@ async function getInlinedNode(node: HTMLElement, options: Options) {
     vector: !options.raster,
     fetchOptions: options.fetchOptions,
     getElementStyles: styleCache?.get,
-    getPseudoElementStyles: styleCache?.getPseudo
+    getPseudoElementStyles: styleCache?.getPseudo,
+    images: images
   });
 
   if (!clone || clone instanceof Text) return;
 
   if (fonts) clone = await embedFonts(clone, options.fetchOptions);
 
-  if (images) await inlineAllImages(clone, options.fetchOptions);
+  if (inlineImages) await inlineAllImages(clone, options.fetchOptions);
 
   finalize(clone);
   return clone;
