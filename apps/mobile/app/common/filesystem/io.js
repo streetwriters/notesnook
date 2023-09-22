@@ -27,16 +27,12 @@ import { IOS_APPGROUPID } from "../../utils/constants";
 
 export async function readEncrypted(filename, key, cipherData) {
   await migrateFilesFromCache();
-  console.log("read encrypted file...");
+  console.log("Read encrypted file...");
   let path = `${cacheDir}/${filename}`;
 
   try {
     if (!(await exists(filename))) {
       return false;
-    } else {
-      RNFetchBlob.fs.stat(path).then((r) => {
-        console.log(r);
-      });
     }
 
     const attachment = db.attachments.attachment(filename);

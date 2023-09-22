@@ -34,6 +34,7 @@ import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import Storage from "../database/storage";
 import { cacheDir, copyFileAsync, releasePermissions } from "./utils";
+import { createCacheDir } from "./io";
 
 export const FileDownloadStatus = {
   Success: 1,
@@ -184,6 +185,7 @@ export default async function downloadAttachment(
   }
 ) {
   await createCacheDir();
+
   let attachment = db.attachments.attachment(hash);
   if (!attachment) {
     console.log("attachment not found");
