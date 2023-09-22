@@ -115,6 +115,13 @@ function Title({
         onInput={() => {
           resizeTextarea();
         }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
+            editor?.commands.focus();
+          }
+        }}
         onPaste={() => {
           resizeTextarea();
         }}
