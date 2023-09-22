@@ -228,7 +228,6 @@ const ShareView = ({ quicknote = false }) => {
   }, [onLoad]);
 
   const onLoad = useCallback(() => {
-    console.log("sending event...");
     eSendEvent(eOnLoadNote + "shareEditor", {
       id: null,
       content: {
@@ -658,7 +657,7 @@ const ShareView = ({ quicknote = false }) => {
                     <>
                       {loadingPage ? (
                         <>
-                          <ActivityIndicator />
+                          <ActivityIndicator color={colors.primary.accent} />
                           <Text>Preparing web clip...</Text>
                         </>
                       ) : null}

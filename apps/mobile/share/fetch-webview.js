@@ -96,7 +96,6 @@ export const HtmlLoadingWebViewAgent = React.memo(
       <WebView
         ref={webview}
         onLoad={() => {
-          console.log("Webview is loaded");
           loadHandler.current?.(true);
         }}
         style={{
@@ -106,6 +105,7 @@ export const HtmlLoadingWebViewAgent = React.memo(
           opacity: 0,
           zIndex: -1
         }}
+        useSharedProcessPool={false}
         pointerEvents="none"
         onMessage={(event) => {
           try {
@@ -123,33 +123,7 @@ export const HtmlLoadingWebViewAgent = React.memo(
             console.log("Error handling webview message", e);
           }
         }}
-        injectedJavaScriptBeforeContentLoaded={`
-        ${clipper}
-        window.addEventListener("load",() => {
-          function postMessage(type, value) {
-            if (window.ReactNativeWebView) {
-              window.ReactNativeWebView.postMessage(
-                JSON.stringify({
-                  type: type,
-                  value: value
-                })
-              );
-            }
-          }
-          if (!globalThis.Clipper.clipPage) {
-            postMessage("error", globalThis.Clipper.clipPage);
-          } else {
-            globalThis.Clipper.clipPage(document,false, {
-              images: false,
-              styles: false,
-              corsProxy: undefined
-            }).then(result => {
-              postMessage("html", result);
-            }).catch(e => {
-              postMessage("error");
-            });
-          }
-        }, false);`}
+        injectedJavaScriptBeforeContentLoaded={script(clipper, premium.current)}
         onError={() => {
           console.log("Error loading page");
           loadHandler.current?.();
@@ -162,5 +136,46 @@ export const HtmlLoadingWebViewAgent = React.memo(
   },
   () => true
 );
+
+const script = (clipper, pro) => `
+${clipper}
+
+function postMessage(type, value) {
+  if (window.ReactNativeWebView) {
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({
+        type: type,
+        value: value
+      })
+    );
+  }
+}
+
+(() => {
+  try {
+    const loadFn = () => {
+      if (!globalThis.Clipper.clipPage) {
+        postMessage("error", globalThis.Clipper.clipPage);
+      } else {
+        globalThis.Clipper.clipPage(document,false, {
+          images: ${pro},
+          inlineImages: false,
+          styles: false,
+          corsProxy: undefined
+        }).then(result => {
+          postMessage("html", result);
+        }).catch(e => {
+          postMessage("error");
+        });
+      }
+    };
+    window.addEventListener("load",loadFn, false);
+  } catch(e) {
+    postMessage("error", e.message);
+  } 
+})();
+
+
+`;
 
 HtmlLoadingWebViewAgent.displayName = "HtmlLoadingWebViewAgent";
