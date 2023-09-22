@@ -20,14 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import TaskList from "@tiptap/extension-task-list";
 import { Transaction } from "@tiptap/pm/state";
 import { Fragment, Node as ProsemirrorNode } from "prosemirror-model";
-import { TaskItemNode } from "../task-item";
 import { NodeWithPos } from "@tiptap/core";
+import { findParentNodeClosestToPos } from "../../utils/prosemirror";
+import TaskItem from "@tiptap/extension-task-item";
 
 export function countCheckedItems(node: ProsemirrorNode) {
   let checked = 0;
   let total = 0;
   node.descendants((node) => {
-    if (node.type.name === TaskItemNode.name) {
+    if (node.type.name === TaskItem.name) {
       if (node.attrs.checked) checked++;
       total++;
     }
@@ -120,4 +121,15 @@ export function sortList(tr: Transaction, pos: number) {
 
   if (!tr.steps.length) return null;
   return tr;
+}
+
+const invalidTaskListParents = [TaskList.name, TaskItem.name];
+export function findRootTaskList(doc: ProsemirrorNode, pos?: number) {
+  if (!pos) return;
+  return findParentNodeClosestToPos(
+    doc.resolve(pos),
+    (node, parent) =>
+      node.type.name === TaskList.name &&
+      (!parent || !invalidTaskListParents.includes(parent.type.name))
+  );
 }

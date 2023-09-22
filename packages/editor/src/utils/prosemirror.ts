@@ -22,7 +22,6 @@ import {
   findParentNode,
   NodeWithPos,
   Predicate,
-  findParentNodeClosestToPos,
   getChangedRanges
 } from "@tiptap/core";
 import {
@@ -31,7 +30,8 @@ import {
   Mark,
   NodeType,
   ResolvedPos,
-  Attrs
+  Attrs,
+  Slice
 } from "prosemirror-model";
 import { EditorState, Selection, Transaction } from "prosemirror-state";
 import { BulletList } from "../extensions/bullet-list";
@@ -165,6 +165,34 @@ export const findParentNodeOfTypeClosestToPos = (
   );
 };
 
+export type NodeWithPosAndDepth = {
+  pos: number;
+  start: number;
+  depth: number;
+  node: ProsemirrorNode;
+};
+type PredicateWithParent = (
+  node: ProsemirrorNode,
+  parent?: ProsemirrorNode
+) => boolean;
+export function findParentNodeClosestToPos(
+  $pos: ResolvedPos,
+  predicate: PredicateWithParent
+): NodeWithPosAndDepth | undefined {
+  for (let i = $pos.depth; i > 0; i -= 1) {
+    const node = $pos.node(i);
+
+    if (predicate(node, i === 1 ? undefined : $pos.node(i - 1))) {
+      return {
+        pos: i > 0 ? $pos.before(i) : 0,
+        start: $pos.start(i),
+        depth: i,
+        node
+      };
+    }
+  }
+}
+
 export function hasParentNode(predicate: Predicate) {
   return function (selection: Selection) {
     return !!findParentNode(predicate)(selection);
@@ -283,22 +311,38 @@ export function getChangedNodes(
 
   // The container for the nodes which have been added..
   const nodes: NodeWithPos[] = [];
-
   for (const range of nodeRange) {
-    const { start, end } = range;
+    const { start } = range;
 
-    // Find all the nodes between the provided node range.
-    tr.doc.nodesBetween(start, end, (node, pos) => {
-      // Check wether this is a node that should be added.
-      const shouldAdd = predicate?.(node, pos, range) ?? true;
-
-      if (shouldAdd) {
-        nodes.push({ node, pos });
-      }
-
-      return descend;
-    });
+    if (nodeRange && nodes.every((n) => n.pos !== start)) {
+      const node = tr.doc.nodeAt(start);
+      if (node && (!predicate || predicate(node, start, range)))
+        nodes.push({ node, pos: start });
+    }
   }
 
+  return nodes;
+}
+
+export function getDeletedNodes(
+  tr: Transaction,
+  predicate: (node: ProsemirrorNode, parent?: ProsemirrorNode) => boolean
+) {
+  const nodes: NodeWithPos[] = [];
+  for (const step of tr.steps) {
+    if (
+      "slice" in step &&
+      step.slice instanceof Slice &&
+      "to" in step &&
+      typeof step.to === "number" &&
+      "from" in step &&
+      typeof step.from === "number" &&
+      step.slice === Slice.empty
+    ) {
+      const $from = tr.doc.resolve(step.from);
+      const node = findParentNodeClosestToPos($from, predicate);
+      if (node) nodes.push(node);
+    }
+  }
   return nodes;
 }
