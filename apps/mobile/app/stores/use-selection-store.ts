@@ -56,7 +56,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
 
     set({
       selectedItemsList: selectedItems,
-      selectionMode: get().selectionMode
+      selectionMode: selectedItems.length === 0 ? false : get().selectionMode
     });
   },
   clearSelection: () => {
