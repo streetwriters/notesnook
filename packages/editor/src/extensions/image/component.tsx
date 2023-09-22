@@ -69,13 +69,14 @@ export function ImageComponent(
   const [source, setSource] = useState<string>();
   const downloadOptions = useToolbarStore((store) => store.downloadOptions);
   const isReadonly = !editor.current?.isEditable;
-
+  const hasOrSrc = hash || src;
   useEffect(
     () => {
       (async () => {
-        if (!src && !dataurl && !IMAGE_SOURCE_CACHE[hash]) return;
+        if (!src && !dataurl && !IMAGE_SOURCE_CACHE[hasOrSrc]) return;
         try {
-          if (IMAGE_SOURCE_CACHE[hash]) setSource(IMAGE_SOURCE_CACHE[hash]);
+          if (IMAGE_SOURCE_CACHE[hasOrSrc])
+            setSource(IMAGE_SOURCE_CACHE[hasOrSrc]);
           else if (dataurl) setSource(await toBlobURL(dataurl));
           else if (isDataUrl(src)) setSource(await toBlobURL(src));
           else if (canParse(src)) {
@@ -101,7 +102,7 @@ export function ImageComponent(
     [src, dataurl, imageRef, downloadOptions]
   );
 
-  if (source && hash) IMAGE_SOURCE_CACHE[hash] = source;
+  if (source && hasOrSrc) IMAGE_SOURCE_CACHE[hasOrSrc] = source;
   const relativeHeight = aspectRatio
     ? editor.view.dom.clientWidth / aspectRatio
     : undefined;
