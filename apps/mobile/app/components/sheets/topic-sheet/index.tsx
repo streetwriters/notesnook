@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { useThemeColors } from "@notesnook/theme";
 import qclone from "qclone";
 import React, {
   createContext,
@@ -26,7 +27,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import { RefreshControl, View } from "react-native";
+import { RefreshControl, useWindowDimensions, View } from "react-native";
 import ActionSheet, {
   ActionSheetRef,
   FlatList
@@ -45,7 +46,6 @@ import {
 import useNavigationStore, {
   NotebookScreenParams
 } from "../../../stores/use-navigation-store";
-import { useThemeColors } from "@notesnook/theme";
 import {
   eOnNewTopicAdded,
   eOnTopicSheetUpdate,
@@ -54,18 +54,17 @@ import {
 import { normalize, SIZE } from "../../../utils/size";
 import { GroupHeader, NotebookType, TopicType } from "../../../utils/types";
 
+import { getTotalNotes } from "@notesnook/common";
 import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import Config from "react-native-config";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { MMKV } from "../../../common/database/mmkv";
 import { openEditor } from "../../../screens/notes/common";
-import { getTotalNotes } from "@notesnook/common";
+import { useSelectionStore } from "../../../stores/use-selection-store";
 import { deleteItems } from "../../../utils/functions";
-import { presentDialog } from "../../dialog/functions";
 import { Properties } from "../../properties";
 import Sort from "../sort";
-import { useSelectionStore } from "../../../stores/use-selection-store";
 
 type ConfigItem = { id: string; type: string };
 class TopicSheetConfig {
@@ -108,7 +107,8 @@ export const TopicsSheet = () => {
         )
       : []
   );
-
+  const currentItem = useRef<string>();
+  const { fontScale } = useWindowDimensions();
   const [groupOptions, setGroupOptions] = useState(
     db.settings?.getGroupOptions("topics")
   );
@@ -206,6 +206,11 @@ export const TopicsSheet = () => {
     if (canShow) {
       setTimeout(() => {
         const id = isTopic ? currentScreen?.notebookId : currentScreen?.id;
+        if (currentItem.current !== id) {
+          setSelection([]);
+          setEnabled(false);
+        }
+        currentItem.id = id;
         const notebook = db.notebooks?.notebook(id as string)?.data;
         const snapPoint = isTopic
           ? 0
@@ -226,6 +231,8 @@ export const TopicsSheet = () => {
         }
       }, 300);
     } else {
+      setSelection([]);
+      setEnabled(false);
       ref.current?.hide();
     }
   }, [
@@ -329,7 +336,9 @@ export const TopicsSheet = () => {
             {enabled ? (
               <IconButton
                 customStyle={{
-                  marginLeft: 10
+                  marginLeft: 10,
+                  width: 40 * fontScale,
+                  height: 40 * fontScale
                 }}
                 onPress={async () => {
                   //@ts-ignore
@@ -365,8 +374,8 @@ export const TopicsSheet = () => {
                   color={colors.primary.icon}
                   size={22}
                   customStyle={{
-                    width: 40,
-                    height: 40
+                    width: 40 * fontScale,
+                    height: 40 * fontScale
                   }}
                 />
                 <IconButton
@@ -376,8 +385,8 @@ export const TopicsSheet = () => {
                   color={colors.primary.icon}
                   size={22}
                   customStyle={{
-                    width: 40,
-                    height: 40
+                    width: 40 * fontScale,
+                    height: 40 * fontScale
                   }}
                 />
 
@@ -395,8 +404,8 @@ export const TopicsSheet = () => {
                   color={colors.primary.icon}
                   size={22}
                   customStyle={{
-                    width: 40,
-                    height: 40
+                    width: 40 * fontScale,
+                    height: 40 * fontScale
                   }}
                 />
               </>
@@ -470,6 +479,7 @@ const TopicItem = ({
     selection.selection.findIndex((selected) => selected.id === item.id) > -1;
   const isFocused = screen.id === item.id;
   const notesCount = getTotalNotes(item);
+  const { fontScale } = useWindowDimensions();
 
   return (
     <PressableButton
@@ -506,6 +516,10 @@ const TopicItem = ({
           <IconButton
             size={SIZE.lg}
             color={isSelected ? colors.selected.icon : colors.primary.icon}
+            top={0}
+            left={0}
+            bottom={0}
+            right={0}
             name={
               isSelected
                 ? "check-circle-outline"
@@ -525,8 +539,8 @@ const TopicItem = ({
       <IconButton
         name="dots-horizontal"
         customStyle={{
-          width: 40,
-          height: 40
+          width: 40 * fontScale,
+          height: 40 * fontScale
         }}
         testID={notesnook.ids.notebook.menu}
         onPress={() => {

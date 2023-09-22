@@ -93,7 +93,7 @@ export const Card = ({ color, warning }) => {
             </Paragraph>
             <Paragraph
               style={{
-                flexWrap: "no-wrap",
+                flexWrap: "nowrap",
                 flexShrink: 1
               }}
               color={colors.primary.heading}

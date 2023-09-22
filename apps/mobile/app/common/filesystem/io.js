@@ -153,7 +153,10 @@ export async function migrateFilesFromCache() {
     await createCacheDir();
     const migratedFilesPath = cacheDir + "/.migrated_1";
     const migrated = await RNFetchBlob.fs.exists(migratedFilesPath);
-    if (migrated) return;
+    if (migrated) {
+      console.log("Files migrated already");
+      return;
+    }
 
     let files = await RNFetchBlob.fs.ls(cacheDir);
     console.log("Files to migrate:", files.join(","));

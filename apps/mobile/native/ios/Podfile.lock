@@ -347,7 +347,7 @@ PODS:
     - ReactCommon/turbomodule/core
   - react-native-share-extension (2.5.6):
     - React
-  - react-native-sodium (1.5.2):
+  - react-native-sodium (1.5.4):
     - React
   - react-native-webview (11.26.1):
     - React-Core
@@ -882,7 +882,7 @@ SPEC CHECKSUMS:
   react-native-pdf: 33c622cbdf776a649929e8b9d1ce2d313347c4fa
   react-native-safe-area-context: 36cc67648134e89465663b8172336a19eeda493d
   react-native-share-extension: df66a2ee48a62277d79898375e2142bde0782063
-  react-native-sodium: 7d2bbb9ca840dc58d63f661b2ff733a38170fec5
+  react-native-sodium: 955bb0dc3ea05f8ea06d5e96cb89d1be7b5d7681
   react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
   React-NativeModulesApple: 1d81d927ef1a67a3545a01e14c2e98500bf9b199
   React-perflogger: 684a11499a0589cc42135d6d5cc04d0e4e0e261a
