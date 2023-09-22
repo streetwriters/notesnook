@@ -318,6 +318,12 @@ img.ProseMirror-separator {
     margin-inline: 5px;
     padding-inline-start: 10px;
 }
+
+.ProseMirror a > span.image-view-content-wrap {
+  display: block;
+  margin-inline: 5px;
+  padding-inline-start: 10px;
+}
 }
 
 
