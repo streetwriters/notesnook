@@ -210,7 +210,7 @@ export const TopicsSheet = () => {
           setSelection([]);
           setEnabled(false);
         }
-        currentItem.id = id;
+        currentItem.current = id;
         const notebook = db.notebooks?.notebook(id as string)?.data;
         const snapPoint = isTopic
           ? 0
@@ -278,7 +278,7 @@ export const TopicsSheet = () => {
         backgroundColor: colors.secondary.background
       }}
       keyboardHandlerEnabled={false}
-      snapPoints={Config.isTesting === "true" ? [100] : [25, 100]}
+      snapPoints={Config.isTesting === "true" ? [100] : [20, 100]}
       initialSnapIndex={1}
       backgroundInteractionEnabled
       gestureEnabled
@@ -312,8 +312,8 @@ export const TopicsSheet = () => {
       </View>
       <View
         style={{
-          maxHeight: 300,
-          height: 300,
+          maxHeight: 450,
+          height: 450,
           width: "100%"
         }}
       >
