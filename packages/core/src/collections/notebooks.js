@@ -143,7 +143,11 @@ export default class Notebooks extends Collection {
    * @returns {Notebook} The notebook of the given id
    */
   notebook(id) {
-    let notebook = id.type ? id : this._collection.getItem(id);
+    if (!id) return;
+    let notebook =
+      typeof id === "object" && "type" in id
+        ? id
+        : this._collection.getItem(id);
     if (!notebook || notebook.deleted) return;
     return new Notebook(notebook, this._db);
   }

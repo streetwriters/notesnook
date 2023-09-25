@@ -146,7 +146,10 @@ export default class Notes extends Collection {
    */
   note(id) {
     if (!id) return;
-    let note = id.type ? id : this._collection.getItem(id);
+    let note =
+      typeof id === "object" && "type" in id
+        ? id
+        : this._collection.getItem(id);
     if (!note || note.deleted) return;
     return new Note(note, this._db);
   }
