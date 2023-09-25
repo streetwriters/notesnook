@@ -1,8 +1,8 @@
 diff --git a/node_modules/@tiptap/extension-link/dist/index.cjs b/node_modules/@tiptap/extension-link/dist/index.cjs
-index 6a1103c..cc4a5bc 100644
+index ecedb96..6c69974 100644
 --- a/node_modules/@tiptap/extension-link/dist/index.cjs
 +++ b/node_modules/@tiptap/extension-link/dist/index.cjs
-@@ -99,6 +99,7 @@ function clickHandler(options) {
+@@ -103,6 +103,7 @@ function clickHandler(options) {
                  const href = (_a = link === null || link === void 0 ? void 0 : link.href) !== null && _a !== void 0 ? _a : attrs.href;
                  const target = (_b = link === null || link === void 0 ? void 0 : link.target) !== null && _b !== void 0 ? _b : attrs.target;
                  if (link && href) {
@@ -11,10 +11,10 @@ index 6a1103c..cc4a5bc 100644
                          window.open(href, target);
                      }
 diff --git a/node_modules/@tiptap/extension-link/dist/index.js b/node_modules/@tiptap/extension-link/dist/index.js
-index 3a42663..874fe33 100644
+index 06aedaf..9c3543c 100644
 --- a/node_modules/@tiptap/extension-link/dist/index.js
 +++ b/node_modules/@tiptap/extension-link/dist/index.js
-@@ -95,6 +95,7 @@ function clickHandler(options) {
+@@ -99,6 +99,7 @@ function clickHandler(options) {
                  const href = (_a = link === null || link === void 0 ? void 0 : link.href) !== null && _a !== void 0 ? _a : attrs.href;
                  const target = (_b = link === null || link === void 0 ? void 0 : link.target) !== null && _b !== void 0 ? _b : attrs.target;
                  if (link && href) {

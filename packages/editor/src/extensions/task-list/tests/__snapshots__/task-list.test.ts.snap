@@ -4,6 +4,7 @@ exports[`delete checked items in a nested task list 1`] = `
 [
   {
     "attrs": {
+      "readonly": false,
       "title": null,
     },
     "content": [
@@ -40,6 +41,7 @@ exports[`delete checked items in a nested task list 1`] = `
           },
           {
             "attrs": {
+              "readonly": false,
               "title": null,
             },
             "content": [
@@ -76,6 +78,7 @@ exports[`delete checked items in a nested task list 1`] = `
                   },
                   {
                     "attrs": {
+                      "readonly": false,
                       "title": null,
                     },
                     "content": [
@@ -95,6 +98,7 @@ exports[`delete checked items in a nested task list 1`] = `
                           },
                           {
                             "attrs": {
+                              "readonly": false,
                               "title": null,
                             },
                             "content": [
@@ -143,6 +147,7 @@ exports[`delete checked items in a task list 1`] = `
 [
   {
     "attrs": {
+      "readonly": false,
       "title": null,
     },
     "content": [
@@ -173,6 +178,7 @@ exports[`sort checked items to the bottom of the task list 1`] = `
 [
   {
     "attrs": {
+      "readonly": false,
       "title": null,
     },
     "content": [
@@ -209,6 +215,7 @@ exports[`sort checked items to the bottom of the task list 1`] = `
           },
           {
             "attrs": {
+              "readonly": false,
               "title": null,
             },
             "content": [
@@ -245,6 +252,7 @@ exports[`sort checked items to the bottom of the task list 1`] = `
                   },
                   {
                     "attrs": {
+                      "readonly": false,
                       "title": null,
                     },
                     "content": [
@@ -264,6 +272,7 @@ exports[`sort checked items to the bottom of the task list 1`] = `
                           },
                           {
                             "attrs": {
+                              "readonly": false,
                               "title": null,
                             },
                             "content": [
