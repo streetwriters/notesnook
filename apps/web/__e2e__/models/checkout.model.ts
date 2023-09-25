@@ -46,7 +46,10 @@ export class CheckoutModel {
     for await (const item of iterateList(
       this.page.locator(getTestId("checkout-plan"))
     )) {
-      plans.push(new Plan(item));
+      const plan = new Plan(item);
+      const planTitle = await plan.getTitle();
+      if (planTitle?.startsWith("Education")) continue;
+      plans.push(plan);
     }
     return plans;
   }
