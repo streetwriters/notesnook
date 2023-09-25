@@ -265,7 +265,7 @@ img.ProseMirror-separator {
 }
 
 .drop-cursor {
-  background-color: var(--paragraph) !important;
+  background-color: var(--paragraph, var(--nn_primary_paragraph)) !important;
 }
 
 .search-result.selected {
