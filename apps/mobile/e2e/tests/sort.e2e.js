@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { notesnook } from "../test.ids";
-import { createNotebook } from "./notebook.e2e";
 import {
   tapById,
   visibleByText,
@@ -27,7 +26,8 @@ import {
   tapByText,
   notVisibleByText,
   sleep,
-  navigate
+  navigate,
+  createNotebook
 } from "./utils";
 
 async function sortBy(sorting, elementText = "Default") {

@@ -129,8 +129,36 @@ async function matchSnapshot(element, name) {
   });
 }
 
+async function createNotebook(
+  title = "Notebook 1",
+  description = true,
+  topic = true,
+  topicCount = 1
+) {
+  await tapByText("Add your first notebook");
+  await elementById(notesnook.ids.dialogs.notebook.inputs.title).typeText(
+    title
+  );
+  if (description) {
+    await elementById(
+      notesnook.ids.dialogs.notebook.inputs.description
+    ).typeText(`Description of ${title}`);
+  }
+  if (topic) {
+    for (let i = 1; i <= topicCount; i++) {
+      await elementById(notesnook.ids.dialogs.notebook.inputs.topic).typeText(
+        i === 1 ? "Topic" : "Topic " + i
+      );
+      await tapById("topic-add-button");
+    }
+  }
+  await tapByText("Save");
+  await sleep(500);
+}
+
 export {
   matchSnapshot,
+  createNotebook,
   prepare,
   LaunchApp,
   createNote,
