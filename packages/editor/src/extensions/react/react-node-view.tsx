@@ -32,6 +32,7 @@ import {
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
 import { __serializeForClipboard, EditorView } from "prosemirror-view";
 import { EmotionThemeProvider } from "@notesnook/theme";
+import { isAndroid, isiOS } from "../../utils/platform";
 
 // This is hacky workaround to manually handle serialization when
 // drag/dropping on mobile devices.
@@ -247,10 +248,27 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
 
     const dragImage = this.dom.querySelector("[data-drag-image]") || this.dom;
 
+    // workaround to prevent opening of keyboard on drag start
+    if (isAndroid || isiOS) {
+      setTimeout(() => {
+        (dragImage as HTMLElement).blur();
+        document.body.focus();
+        this.editor.commands.blur();
+      });
+    }
+
+    // temporary border around the dragged element for better identification
+    (dragImage as HTMLElement).style.border =
+      "2px solid var(--paragraph, var(--nn_primary_paragraph))";
+    setTimeout(function () {
+      (dragImage as HTMLElement).style.border = "none";
+    });
+
     let x = 0;
     let y = 0;
 
-    // calculate offset for drag element if we use a different drag handle element
+    // calculate offset for drag element if we use a different drag handle
+    // element. Unfortunately, this has no effect on Android
     if (dragImage !== dragHandle) {
       const domBox = dragImage.getBoundingClientRect();
       const handleBox = dragHandle.getBoundingClientRect();
@@ -276,8 +294,8 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
 
     view.dispatch(transaction);
 
-    event.dataTransfer?.setDragImage(dragImage, x, y);
     forceHandleDrag(event, this.editor);
+    event.dataTransfer?.setDragImage(dragImage, x, y);
   }
 
   stopEvent(event: Event): boolean {
@@ -292,7 +310,6 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     const target = event.target as HTMLElement;
     const isInElement =
       this.dom.contains(target) && !this.contentDOM?.contains(target);
-
     // any event from child nodes should be handled by ProseMirror
     if (!isInElement) {
       return false;
@@ -308,8 +325,8 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
       return true;
     }
 
-    const { isEditable } = this.editor;
-    const { isDragging } = this;
+    // const { isEditable } = this.editor;
+    // const { isDragging } = this;
     const isDraggable = !!this.node.type.spec.draggable;
     const isSelectable = NodeSelection.isSelectable(this.node);
     const isCopyEvent = event.type === "copy";
@@ -325,42 +342,42 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
       event.preventDefault();
     }
 
-    if (isDraggable && isDragEvent && !isDragging) {
-      event.preventDefault();
-      return false;
-    }
+    // if (isDraggable && isDragEvent && !isDragging) {
+    //   event.preventDefault();
+    //   return false;
+    // }
 
-    // we have to store that dragging started
-    if (isDraggable && isEditable && !isDragging && isClickEvent) {
-      const dragHandle = target.closest("[data-drag-handle]");
-      const isValidDragHandle =
-        dragHandle &&
-        (this.dom === dragHandle || this.dom.contains(dragHandle));
+    // // we have to store that dragging started
+    // if (isDraggable && isEditable && !isDragging && isClickEvent) {
+    //   const dragHandle = target.closest("[data-drag-handle]");
+    //   const isValidDragHandle =
+    //     dragHandle &&
+    //     (this.dom === dragHandle || this.dom.contains(dragHandle));
 
-      if (isValidDragHandle) {
-        this.isDragging = true;
+    //   if (isValidDragHandle) {
+    //     this.isDragging = true;
 
-        document.addEventListener(
-          "dragend",
-          () => {
-            this.isDragging = false;
-          },
-          { once: true }
-        );
+    //     document.addEventListener(
+    //       "dragend",
+    //       () => {
+    //         this.isDragging = false;
+    //       },
+    //       { once: true }
+    //     );
 
-        document.addEventListener(
-          "mouseup",
-          () => {
-            this.isDragging = false;
-          },
-          { once: true }
-        );
-      }
-    }
+    //     document.addEventListener(
+    //       "mouseup",
+    //       () => {
+    //         this.isDragging = false;
+    //       },
+    //       { once: true }
+    //     );
+    //   }
+    // }
 
     // these events are handled by prosemirror
     if (
-      isDragging ||
+      // isDragging ||
       isDropEvent ||
       isCopyEvent ||
       isPasteEvent ||
@@ -488,4 +505,9 @@ function forceHandleDrag(event: DragEvent, editor: Editor) {
   event.dataTransfer.effectAllowed = "copyMove";
 
   view.dragging = { slice, move: true };
+
+  // a small workaround to identity when a nodeView is being dragged
+  if (isAndroid || isiOS) {
+    (view.dragging as any).nodeView = true;
+  }
 }
