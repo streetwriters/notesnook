@@ -54,7 +54,7 @@ export const Synced = ({ item, close }) => {
       <Icon
         name="shield-key-outline"
         color={colors.primary.accent}
-        size={SIZE.xxxl}
+        size={shouldShrink ? SIZE.xxl : SIZE.xxxl}
       />
 
       <View
@@ -99,6 +99,7 @@ export const Synced = ({ item, close }) => {
             console.error(e);
           }
         }}
+        title="Learn more"
         fontSize={SIZE.xs}
         height={30}
         type="grayAccent"
