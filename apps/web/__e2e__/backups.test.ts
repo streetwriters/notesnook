@@ -18,21 +18,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { NOTE, USER } from "./utils";
+import { USER } from "./utils";
 
-test("create a backup", async ({ page }) => {
+test("create an unencrypted backup", async ({ page }) => {
   const app = new AppModel(page);
-  await app.goto();
-  const notes = await app.goToNotes();
-  await notes.createNote(NOTE);
+  await app.auth.goto();
+  await app.auth.login(USER.CURRENT);
   const settings = await app.goToSettings();
+  await settings.toggleBackupEncryption(USER.CURRENT.password);
 
-  const backup = await settings.createBackup();
+  const backup = await settings.createBackup(USER.CURRENT.password);
 
   expect(backup.length > 0).toBeTruthy();
 });
 
-test("restore a backup", async ({ page }) => {
+test("restore an unencrypted backup", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const settings = await app.goToSettings();
@@ -56,7 +56,7 @@ test("create an encrypted backup", async ({ page }, info) => {
   await app.auth.login(USER.CURRENT);
   const settings = await app.goToSettings();
 
-  const backup = await settings.createBackup(USER.CURRENT.password);
+  const backup = await settings.createBackup();
 
   expect(backup.length > 0).toBeTruthy();
 });

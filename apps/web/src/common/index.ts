@@ -157,6 +157,7 @@ export async function restoreBackupFile(backupFile: File) {
     } else {
       await restoreWithProgress(backup);
     }
+    await db.initCollections();
   } else {
     const error = await TaskManager.startTask<Error | void>({
       title: "Restoring backup",
