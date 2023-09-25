@@ -91,9 +91,9 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Much faster & more reliable sync",
+            title: "Write protected task lists",
             subtitle:
-              "Syncing should now work more reliably & also much, much faster. Like 10x faster than before."
+              "You can now write protect specific task lists to prevent any accidental edits."
           }
         ],
     cta: {
