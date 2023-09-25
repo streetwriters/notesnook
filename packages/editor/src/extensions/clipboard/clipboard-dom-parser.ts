@@ -38,6 +38,7 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
 
   parseSlice(dom: Node, options?: ParseOptions | undefined): Slice {
     if (dom instanceof HTMLElement || dom instanceof Document) {
+      convertGoogleDocsChecklist(dom);
       formatCodeblocks(dom);
       convertBrToSingleSpacedParagraphs(dom);
     }
@@ -117,6 +118,18 @@ export function convertBrToSingleSpacedParagraphs(dom: HTMLElement | Document) {
       newParagraph.append(...children.slice(children.indexOf(br) + 1));
       paragraph.insertAdjacentElement("afterend", newParagraph);
       br.remove();
+    }
+  }
+}
+
+export function convertGoogleDocsChecklist(dom: HTMLElement | Document) {
+  for (const li of dom.querySelectorAll(`ul li[role="checkbox"]`)) {
+    if (!li.parentElement?.classList.contains("checklist"))
+      li.parentElement!.classList.add("checklist");
+    li.className = "checklist--item";
+    if (li.firstElementChild?.tagName === "IMG") li.firstElementChild.remove();
+    if (li.getAttribute("aria-checked") === "true") {
+      li.classList.add("checked");
     }
   }
 }

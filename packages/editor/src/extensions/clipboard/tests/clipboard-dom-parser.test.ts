@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { test } from "vitest";
 import {
   formatCodeblocks,
-  convertBrToSingleSpacedParagraphs
+  convertBrToSingleSpacedParagraphs,
+  convertGoogleDocsChecklist
 } from "../clipboard-dom-parser";
 
 const cases = [
@@ -101,7 +102,7 @@ and yet, we somehow manage to get by.<br>
 ];
 
 for (const testCase of cases) {
-  const [html, expected] = testCase;
+  const [html] = testCase;
   test(`convert br tags to paragraphs`, (t) => {
     const element = new DOMParser().parseFromString(html, "text/html");
     convertBrToSingleSpacedParagraphs(element);
@@ -136,6 +137,20 @@ for (const codeBlock of codeBlocks) {
   test(`properly format codeblocks`, (t) => {
     const element = new DOMParser().parseFromString(codeBlock, "text/html");
     formatCodeblocks(element);
+    t.expect(element.body.innerHTML.trim()).toMatchSnapshot();
+  });
+}
+
+const checkLists = [
+  `<div>
+    <!--StartFragment--><meta charset="utf-8"><ul  id="docs-internal-guid-0d9a5db3-7fff-ab55-e7ca-b178e1031970"><li dir="ltr" role="checkbox" aria-checked="false"  aria-level="1"><img    alt="unchecked" aria-roledescription="checkbox" ><p dir="ltr"  role="presentation"><span >Adsjkfhasdf</span></p></li><li dir="ltr" role="checkbox" aria-checked="false"  aria-level="1"><img    alt="unchecked" aria-roledescription="checkbox" ><p dir="ltr"  role="presentation"><span >Asdfsadf</span></p></li><li dir="ltr" role="checkbox" aria-checked="true"  aria-level="1"><img    alt="checked" aria-roledescription="checkbox" ><p dir="ltr"  role="presentation"><span >Asdfsda</span></p></li><li dir="ltr" role="checkbox" aria-checked="true"  aria-level="1"><img    alt="checked" aria-roledescription="checkbox" ><p dir="ltr"  role="presentation"><span >Fasd</span></p></li><li dir="ltr" role="checkbox" aria-checked="true"  aria-level="1"><img    alt="checked" aria-roledescription="checkbox" ><p dir="ltr"  role="presentation"><span >Fasd</span></p></li><li dir="ltr" role="checkbox" aria-checked="false"  aria-level="1"><img    alt="unchecked" aria-roledescription="checkbox" ><p dir="ltr"  role="presentation"><span >F</span></p></li><li dir="ltr" role="checkbox" aria-checked="true"  aria-level="1"><img    alt="checked" aria-roledescription="checkbox" ><p dir="ltr"  role="presentation"><span >akcasb</span></p></li><ul ><li dir="ltr" role="checkbox" aria-checked="true"  aria-level="2"><img    alt="checked" aria-roledescription="checkbox" ><p dir="ltr"  role="presentation"><span >Asdf</span></p></li><li dir="ltr" role="checkbox" aria-checked="false"  aria-level="2"><img    alt="unchecked" aria-roledescription="checkbox" ><p dir="ltr"  role="presentation"><span >Asdcasdc</span></p></li><li dir="ltr" role="checkbox" aria-checked="false"  aria-level="2"><img    alt="unchecked" aria-roledescription="checkbox" ><p dir="ltr"  role="presentation"><span >sdac</span></p></li></ul><li dir="ltr" role="checkbox" aria-checked="false"  aria-level="1"><img    alt="unchecked" aria-roledescription="checkbox" ><p dir="ltr"  role="presentation"><span >Asdfsda</span></p></li></ul><!--EndFragment-->
+    
+    </div>`
+];
+for (const checkList of checkLists) {
+  test(`convert google docs checklist`, (t) => {
+    const element = new DOMParser().parseFromString(checkList, "text/html");
+    convertGoogleDocsChecklist(element);
     t.expect(element.body.innerHTML.trim()).toMatchSnapshot();
   });
 }
