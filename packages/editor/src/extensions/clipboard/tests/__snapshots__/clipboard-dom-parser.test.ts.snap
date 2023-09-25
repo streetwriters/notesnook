@@ -75,6 +75,13 @@ exports[`convert br tags to paragraphs 12`] = `
     </div>"
 `;
 
+exports[`convert google docs checklist 1`] = `
+"<div>
+    <!--StartFragment--><meta charset=\\"utf-8\\"><ul id=\\"docs-internal-guid-0d9a5db3-7fff-ab55-e7ca-b178e1031970\\" class=\\"checklist\\"><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"false\\" aria-level=\\"1\\" class=\\"checklist--item\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Adsjkfhasdf</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"false\\" aria-level=\\"1\\" class=\\"checklist--item\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Asdfsadf</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"true\\" aria-level=\\"1\\" class=\\"checklist--item checked\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Asdfsda</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"true\\" aria-level=\\"1\\" class=\\"checklist--item checked\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Fasd</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"true\\" aria-level=\\"1\\" class=\\"checklist--item checked\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Fasd</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"false\\" aria-level=\\"1\\" class=\\"checklist--item\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>F</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"true\\" aria-level=\\"1\\" class=\\"checklist--item checked\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>akcasb</span></p></li><ul class=\\"checklist\\"><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"true\\" aria-level=\\"2\\" class=\\"checklist--item checked\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Asdf</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"false\\" aria-level=\\"2\\" class=\\"checklist--item\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Asdcasdc</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"false\\" aria-level=\\"2\\" class=\\"checklist--item\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>sdac</span></p></li></ul><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"false\\" aria-level=\\"1\\" class=\\"checklist--item\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Asdfsda</span></p></li></ul><!--EndFragment-->
+    
+    </div>"
+`;
+
 exports[`properly format codeblocks 1`] = `
 "<div>
   <!--StartFragment--><p>Sure! Here's an implementation of a word counter for Thai that considers each syllable consisting of a consonant sound followed by a vowel sound as a word:</p><pre><code>javascript</code></pre><pre class=\\"language-javascript\\"><code>function countThaiWords(text) {
