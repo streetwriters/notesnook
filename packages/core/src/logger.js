@@ -129,7 +129,10 @@ class DatabaseLogManager {
       logs[key].push(log);
     }
 
-    return Object.keys(logs).map((key) => ({ key: key, logs: logs[key] }));
+    return Object.keys(logs).map((key) => ({
+      key: key,
+      logs: logs[key]?.sort((a, b) => a.timestamp - b.timestamp)
+    }));
   }
 
   async clear() {
