@@ -51,6 +51,7 @@ test(
 
     expect(types.every((t) => t === "download")).toBe(true);
 
+    console.log("Case 1 log out");
     await cleanup(deviceA, deviceB, deviceC);
   },
   TEST_TIMEOUT
@@ -78,7 +79,8 @@ test(
     expect(deviceA.notes.note(note1Id)).toBeTruthy();
     expect(deviceB.notes.note(note2Id)).toBeTruthy();
 
-    await cleanup(deviceA, deviceA);
+    console.log("Case 3 log out");
+    await cleanup(deviceA, deviceB);
   },
   TEST_TIMEOUT
 );
@@ -225,7 +227,8 @@ test(
 
     expect(handler).not.toHaveBeenCalled();
 
-    await cleanup(deviceB);
+    console.log("issue force sync log out");
+    await cleanup(deviceA, deviceB);
   },
   TEST_TIMEOUT
 );
@@ -264,6 +267,7 @@ test(
       true
     );
 
+    console.log("issue colors log out");
     await cleanup(deviceA, deviceB);
   },
   TEST_TIMEOUT
@@ -310,6 +314,7 @@ test(
     expect(deviceA.notebooks.notebook(id).topics.has("Topic 2")).toBeTruthy();
     expect(deviceB.notebooks.notebook(id).topics.has("Topic 2")).toBeTruthy();
 
+    console.log("issue new topic log out");
     await cleanup(deviceA, deviceB);
   },
   TEST_TIMEOUT
@@ -375,6 +380,7 @@ test(
       deviceB.notebooks.notebook(id).topics.topic(topic.id).totalNotes
     ).toBe(2);
 
+    console.log("issue assigning 2 notes log out");
     await cleanup(deviceA, deviceB);
   },
   TEST_TIMEOUT
@@ -420,13 +426,12 @@ async function initializeDevice(id, capabilities = []) {
  * @param  {...Database} devices
  */
 async function cleanup(...devices) {
-  await Promise.all([
-    devices.map(async (device) => {
-      await device.syncer.stop();
-      await device.user.logout();
-      device.eventManager.unsubscribeAll();
-    })
-  ]);
+  for (const device of devices) {
+    device.disconnectSSE();
+    await device.syncer.stop();
+    await device.user.logout();
+    device.eventManager.unsubscribeAll();
+  }
   EV.unsubscribeAll();
 }
 

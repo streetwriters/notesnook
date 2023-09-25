@@ -62,20 +62,23 @@ export default class SyncManager {
       var isHubException = e.message.includes("HubException:");
       if (isHubException) {
         var actualError = /HubException: (.*)/gm.exec(e.message);
+        const errorText =
+          actualError && actualError.length > 1 ? actualError[1] : e.message;
 
         // NOTE: sometimes there's the case where the user has already
         // confirmed their email but the server still thinks that it
         // isn't confirmed. This check is added to trigger a force
         // update of the access token.
         if (
-          actualError.includes("Please confirm your email ") &&
+          (errorText.includes("Please confirm your email ") ||
+            errorText.includes("Invalid token.")) &&
           (await this._db.user.getUser()).isEmailConfirmed
         ) {
           await this._db.user.tokenManager._refreshToken(true);
           return false;
         }
 
-        if (actualError.length > 1) throw new Error(actualError[1]);
+        throw new Error(errorText);
       }
       throw e;
     }

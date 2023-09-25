@@ -85,6 +85,7 @@ class TokenManager {
       this.logger.info("Refreshing access token");
 
       const token = await this.getToken(false, false);
+      if (!token) throw new Error("No access token found to refresh.");
       if (!forceRenew && !this._isTokenExpired(token)) {
         return;
       }
@@ -113,6 +114,7 @@ class TokenManager {
     if (!token) return;
     const { access_token } = token;
 
+    await this._storage.remove("token");
     await http.post(
       `${constants.AUTH_HOST}${ENDPOINTS.logout}`,
       null,
