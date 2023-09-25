@@ -40,7 +40,6 @@ interface IconButtonProps extends PressableButtonProps {
   iconStyle?: TextStyle;
 }
 
-const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 export const IconButton = ({
   onPress,
   name,
@@ -88,8 +87,7 @@ export const IconButton = ({
         ...customStyle
       }}
     >
-      <AnimatedIcon
-        layout={Layout}
+      <Icon
         name={name}
         style={iconStyle as any}
         allowFontScaling
