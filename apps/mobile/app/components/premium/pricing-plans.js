@@ -25,7 +25,7 @@ import { usePricing } from "../../hooks/use-pricing";
 import {
   eSendEvent,
   presentSheet,
-  ToastEvent
+  ToastEvent,
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
 import { useThemeColors } from "@notesnook/theme";
@@ -34,7 +34,7 @@ import {
   eClosePremiumDialog,
   eCloseSheet,
   eCloseSimpleDialog,
-  eOpenLoginDialog
+  eOpenLoginDialog,
 } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
@@ -51,20 +51,20 @@ import { PricingItem } from "./pricing-item";
 const promoCyclesMonthly = {
   1: "first month",
   2: "first 2 months",
-  3: "first 3 months"
+  3: "first 3 months",
 };
 
 const promoCyclesYearly = {
   1: "first year",
   2: "first 2 years",
-  3: "first 3 years"
+  3: "first 3 years",
 };
 
 export const PricingPlans = ({
   promo,
   marginTop,
   heading = true,
-  compact = false
+  compact = false,
 }) => {
   const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
@@ -118,7 +118,7 @@ export const PricingPlans = ({
         offerType: isMonthly ? "monthly" : "yearly",
         data: product,
         cycleText: cycleText,
-        info: "Pay monthly, cancel anytime"
+        info: "Pay monthly, cancel anytime",
       });
       return true;
     } catch (e) {
@@ -159,7 +159,7 @@ export const PricingPlans = ({
           eSendEvent(eCloseSheet);
         },
         icon: "check",
-        actionText: "Continue"
+        actionText: "Continue",
       });
     } catch (e) {
       setBuying(false);
@@ -173,7 +173,7 @@ export const PricingPlans = ({
         paddingHorizontal: 12,
         justifyContent: "center",
         alignItems: "center",
-        height: 100
+        height: 100,
       }}
     >
       <ActivityIndicator color={colors.primary.accent} size={25} />
@@ -181,7 +181,7 @@ export const PricingPlans = ({
   ) : (
     <View
       style={{
-        paddingHorizontal: 12
+        paddingHorizontal: 12,
       }}
     >
       {buying ? (
@@ -194,7 +194,7 @@ export const PricingPlans = ({
         <>
           <Paragraph
             style={{
-              alignSelf: "center"
+              alignSelf: "center",
             }}
             size={SIZE.lg}
           >
@@ -211,7 +211,7 @@ export const PricingPlans = ({
               paddingHorizontal: 12,
               marginBottom: 15,
               marginTop: 15,
-              borderRadius: 100
+              borderRadius: 100,
             }}
           />
 
@@ -232,7 +232,7 @@ export const PricingPlans = ({
             width={250}
             style={{
               paddingHorizontal: 12,
-              marginBottom: 15
+              marginBottom: 15,
             }}
           />
         </>
@@ -243,7 +243,7 @@ export const PricingPlans = ({
               style={{
                 paddingVertical: 15,
                 alignSelf: "center",
-                textAlign: "center"
+                textAlign: "center",
               }}
               size={SIZE.lg - 4}
             >
@@ -251,7 +251,7 @@ export const PricingPlans = ({
               <Paragraph
                 style={{
                   textDecorationLine: "line-through",
-                  color: colors.secondary.paragraph
+                  color: colors.secondary.paragraph,
                 }}
                 size={SIZE.sm}
               >
@@ -270,7 +270,7 @@ export const PricingPlans = ({
                       style={{
                         alignSelf: "center",
                         marginTop: marginTop || 20,
-                        marginBottom: 20
+                        marginBottom: 20,
                       }}
                     >
                       <Heading color={colors.primary.accent}>
@@ -283,7 +283,7 @@ export const PricingPlans = ({
                       style={{
                         alignSelf: "center",
                         marginTop: marginTop || 20,
-                        marginBottom: 20
+                        marginBottom: 20,
                       }}
                     >
                       Choose a plan
@@ -296,7 +296,7 @@ export const PricingPlans = ({
                 style={{
                   flexDirection: !compact ? "column" : "row",
                   flexWrap: "wrap",
-                  justifyContent: "space-around"
+                  justifyContent: "space-around",
                 }}
               >
                 <PricingItem
@@ -305,7 +305,7 @@ export const PricingPlans = ({
                   product={{
                     type: "monthly",
                     data: monthlyPlan?.product,
-                    info: "Pay monthly, cancel anytime."
+                    info: "Pay monthly, cancel anytime.",
                   }}
                 />
 
@@ -313,7 +313,7 @@ export const PricingPlans = ({
                   <View
                     style={{
                       height: 1,
-                      marginVertical: 5
+                      marginVertical: 5,
                     }}
                   />
                 )}
@@ -324,7 +324,7 @@ export const PricingPlans = ({
                   product={{
                     type: "yearly",
                     data: yearlyPlan?.product,
-                    info: "Pay yearly"
+                    info: "Pay yearly",
                   }}
                 />
               </View>
@@ -333,7 +333,7 @@ export const PricingPlans = ({
                 <Button
                   height={35}
                   style={{
-                    marginTop: 10
+                    marginTop: 10,
                   }}
                   onPress={() => {
                     presentDialog({
@@ -351,7 +351,7 @@ export const PricingPlans = ({
                           ToastEvent.show({
                             heading: "Discount applied!",
                             type: "success",
-                            context: "local"
+                            context: "local",
                           });
                           setBuying(false);
                         } catch (e) {
@@ -360,13 +360,13 @@ export const PricingPlans = ({
                             heading: "Promo code invalid or expired",
                             message: e.message,
                             type: "error",
-                            context: "local"
+                            context: "local",
                           });
                         }
                       },
                       title: "Have a promo code?",
                       paragraph:
-                        "Enter your promo code to get a special discount."
+                        "Enter your promo code to get a special discount.",
                     });
                   }}
                   title="I have a promo code"
@@ -374,7 +374,7 @@ export const PricingPlans = ({
               ) : (
                 <View
                   style={{
-                    height: 15
+                    height: 15,
                   }}
                 />
               )}
@@ -397,7 +397,7 @@ export const PricingPlans = ({
                     style={{
                       paddingHorizontal: 12,
                       marginTop: 30,
-                      marginBottom: 10
+                      marginBottom: 10,
                     }}
                   />
                   {Platform.OS !== "ios" &&
@@ -409,13 +409,13 @@ export const PricingPlans = ({
                       style={{
                         alignSelf: "center",
                         justifyContent: "center",
-                        textAlign: "center"
+                        textAlign: "center",
                       }}
                     >
                       Use promo code{" "}
                       <Text
                         style={{
-                          fontFamily: "OpenSans-SemiBold"
+                          fontFamily: "OpenSans-SemiBold",
                         }}
                       >
                         {promo.promoCode}
@@ -439,7 +439,7 @@ export const PricingPlans = ({
                       setProduct(null);
                     }}
                     style={{
-                      marginTop: 5
+                      marginTop: 5,
                     }}
                     height={30}
                     fontSize={13}
@@ -461,7 +461,7 @@ export const PricingPlans = ({
             alignSelf: "center",
             textAlign: "center",
             marginTop: 10,
-            maxWidth: "80%"
+            maxWidth: "80%",
           }}
         >
           {user
@@ -483,7 +483,7 @@ export const PricingPlans = ({
               style={{
                 alignSelf: "center",
                 marginTop: 10,
-                textAlign: "center"
+                textAlign: "center",
               }}
             >
               By subscribing, you will be charged to your iTunes Account for the
@@ -497,10 +497,10 @@ export const PricingPlans = ({
               style={{
                 alignSelf: "center",
                 marginTop: 10,
-                textAlign: "center"
+                textAlign: "center",
               }}
             >
-              By subscribing, your will be charged on your Google Account, and
+              By subscribing, you will be charged on your Google Account, and
               your subscription will automatically renew until you cancel prior
               to the end of the then current period.
             </Paragraph>
@@ -508,7 +508,7 @@ export const PricingPlans = ({
 
           <View
             style={{
-              width: "100%"
+              width: "100%",
             }}
           >
             <Paragraph
@@ -516,7 +516,7 @@ export const PricingPlans = ({
               color={colors.secondary.paragraph}
               style={{
                 maxWidth: "100%",
-                textAlign: "center"
+                textAlign: "center",
               }}
             >
               By subscribing, you agree to our{" "}
@@ -528,7 +528,7 @@ export const PricingPlans = ({
                     .then(() => {});
                 }}
                 style={{
-                  textDecorationLine: "underline"
+                  textDecorationLine: "underline",
                 }}
                 color={colors.primary.accent}
               >
@@ -543,7 +543,7 @@ export const PricingPlans = ({
                     .then(() => {});
                 }}
                 style={{
-                  textDecorationLine: "underline"
+                  textDecorationLine: "underline",
                 }}
                 color={colors.primary.accent}
               >
