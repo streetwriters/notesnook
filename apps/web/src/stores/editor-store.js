@@ -22,6 +22,7 @@ import { store as noteStore } from "./note-store";
 import { store as attachmentStore } from "./attachment-store";
 import { store as appStore } from "./app-store";
 import { store as tagStore } from "./tag-store";
+import { store as settingStore } from "./setting-store";
 import { db } from "../common/db";
 import BaseStore from ".";
 import { EV, EVENTS } from "@notesnook/core/dist/common";
@@ -151,7 +152,11 @@ class EditorStore extends BaseStore {
     if (!note) return;
 
     noteStore.setSelectedNote(note.id);
-    setDocumentTitle(note.title);
+    if (!settingStore.get().hideTitle) {
+      setDocumentTitle(note.title);
+    } else {
+      setDocumentTitle();
+    }
 
     if (note.locked)
       return hashNavigate(`/notes/${noteId}/unlock`, { replace: true });
@@ -247,7 +252,11 @@ class EditorStore extends BaseStore {
         state.session.dateEdited = note.dateEdited;
         state.session.attachmentsLength = attachments.length;
       });
-      setDocumentTitle(note.title);
+      if (!settingStore.get().hideTitle) {
+        setDocumentTitle(note.title);
+      } else {
+        setDocumentTitle();
+      }
 
       this.setSaveState(1);
     } catch (err) {
