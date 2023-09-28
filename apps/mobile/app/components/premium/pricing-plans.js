@@ -500,7 +500,7 @@ export const PricingPlans = ({
                 textAlign: "center"
               }}
             >
-              By subscribing, your will be charged on your Google Account, and
+              By subscribing, you will be charged on your Google Account, and
               your subscription will automatically renew until you cancel prior
               to the end of the then current period.
             </Paragraph>
