@@ -75,6 +75,20 @@ What data is collected & when?`,
         ]
       },
       {
+        key: "hide-title",
+        title: "Hide Title",
+        description: "Prevent note title from appearing in page title.",
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.hideTitle, listener),
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => useSettingStore.getState().hideTitle,
+            toggle: () => useSettingStore.getState().toggleHideTitle()
+          }
+        ]
+      },
+      {
         key: "privacy-mode",
         title: "Privacy mode",
         description:
