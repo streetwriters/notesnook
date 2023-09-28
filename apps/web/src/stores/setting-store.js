@@ -24,6 +24,7 @@ import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
 import { isTelemetryEnabled, setTelemetry } from "../utils/telemetry";
+import { isHideTitleEnabled, setHideTitle } from "../utils/hideTitle";
 
 /**
  * @extends {BaseStore<SettingStore>}
@@ -40,6 +41,7 @@ class SettingStore extends BaseStore {
 
   zoomFactor = 1.0;
   privacyMode = false;
+  hideTitle = isHideTitleEnabled();
   telemetry = isTelemetryEnabled();
   /** @type {string} */
   dateFormat = null;
@@ -161,6 +163,12 @@ class SettingStore extends BaseStore {
     const privacyMode = this.get().privacyMode;
     this.set({ privacyMode: !privacyMode });
     await desktop?.integration.setPrivacyMode.mutate({ enabled: !privacyMode });
+  };
+
+  toggleHideTitle = async () => {
+    const hideTitle = this.get().hideTitle;
+    this.set({ hideTitle: !hideTitle });
+    setHideTitle(!hideTitle);
   };
 
   toggleAutoUpdates = async () => {
