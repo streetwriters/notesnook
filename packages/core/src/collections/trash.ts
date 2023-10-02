@@ -19,23 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import dayjs from "dayjs";
 import Database from "../api";
-import {
-  BaseTrashItem,
-  Note,
-  Notebook,
-  TrashItem,
-  isTrashItem
-} from "../types";
-
-function toTrashItem<T extends Note | Notebook>(item: T): BaseTrashItem<T> {
-  return {
-    ...item,
-    id: item.id,
-    type: "trash",
-    itemType: item.type,
-    dateDeleted: Date.now()
-  };
-}
 
 export default class Trash {
   collections = ["notes", "notebooks"] as const;
@@ -44,96 +27,122 @@ export default class Trash {
 
   async init() {
     await this.cleanup();
-    this.cache = this.all.map((t) => t.id);
+    const result = await this.db
+      .sql()
+      .selectNoFrom((eb) => [
+        eb
+          .selectFrom("notes")
+          .where("type", "==", "trash")
+          .select("id")
+          .as("id"),
+        eb
+          .selectFrom("notebooks")
+          .where("type", "==", "trash")
+          .select("id")
+          .as("id")
+      ])
+      .execute();
+
+    this.cache = result.reduce((ids, item) => {
+      if (item.id) ids.push(item.id);
+      return ids;
+    }, [] as string[]);
   }
 
   async cleanup() {
-    const now = dayjs().unix();
     const duration = this.db.settings.getTrashCleanupInterval();
     if (duration === -1 || !duration) return;
-    for (const item of this.all) {
-      if (
-        isTrashItem(item) &&
-        item.dateDeleted &&
-        dayjs(item.dateDeleted).add(duration, "days").unix() > now
-      )
-        continue;
-      await this.delete(item.id);
-    }
+
+    const maxMs = dayjs().subtract(duration, "days").toDate().getTime();
+    const expiredItems = await this.db
+      .sql()
+      .selectNoFrom((eb) => [
+        eb
+          .selectFrom("notes")
+          .where("type", "==", "trash")
+          .where("dateDeleted", "<=", maxMs)
+          .select("id")
+          .as("noteId"),
+        eb
+          .selectFrom("notebooks")
+          .where("type", "==", "trash")
+          .where("dateDeleted", "<=", maxMs)
+          .select("id")
+          .as("notebookId")
+      ])
+      .execute();
+    const { noteIds, notebookIds } = expiredItems.reduce(
+      (ids, item) => {
+        if (item.noteId) ids.noteIds.push(item.noteId);
+        if (item.notebookId) ids.notebookIds.push(item.notebookId);
+        return ids;
+      },
+      { noteIds: [] as string[], notebookIds: [] as string[] }
+    );
+    await this.delete("note", noteIds);
+    await this.delete("note", notebookIds);
   }
 
-  get all(): TrashItem[] {
-    const trashItems: TrashItem[] = [];
-    for (const key of this.collections) {
-      const collection = this.db[key];
-      trashItems.push(...collection.trashed);
+  async add(type: "note" | "notebook", ids: string[]) {
+    if (type === "note") {
+      await this.db.notes.collection.update(ids, {
+        type: "trash",
+        itemType: "note",
+        dateDeleted: Date.now()
+      });
+    } else if (type === "notebook") {
+      await this.db.notebooks.collection.update(ids, {
+        type: "trash",
+        itemType: "notebook",
+        dateDeleted: Date.now()
+      });
     }
-    return trashItems;
+    this.cache.push(...ids);
   }
 
-  private getItem(id: string) {
-    for (const key of this.collections) {
-      const collection = this.db[key].collection;
-      const item = collection.get(id);
-      if (item && isTrashItem(item)) return [item, collection] as const;
+  async delete(type: "note" | "notebook", ids: string[]) {
+    if (type === "note") {
+      await this.db.content.removeByNoteId(...ids);
+      await this.db.noteHistory.clearSessions(...ids);
+      await this.db.notes.delete(...ids);
+    } else if (type === "notebook") {
+      await this.db.relations.unlinkOfType("notebook", ids);
+      await this.db.notebooks.delete(...ids);
     }
-    return [] as const;
+    ids.forEach((id) => this.cache.splice(this.cache.indexOf(id), 1));
   }
 
-  async add(item: Note | Notebook) {
-    if (item.type === "note") {
-      await this.db.notes.collection.update(toTrashItem(item));
-    } else if (item.type === "notebook") {
-      await this.db.notebooks.collection.update(toTrashItem(item));
+  async restore(type: "note" | "notebook", ids: string[]) {
+    if (type === "note") {
+      await this.db.notes.collection.update(ids, {
+        type: "note",
+        dateDeleted: null,
+        itemType: null
+      });
+    } else {
+      await this.db.notebooks.collection.update(ids, {
+        type: "notebook",
+        dateDeleted: null,
+        itemType: null
+      });
     }
-    this.cache.push(item.id);
-  }
-
-  async delete(...ids: string[]) {
-    for (const id of ids) {
-      const [item, collection] = this.getItem(id);
-      if (!item || !collection) continue;
-      if (item.itemType === "note") {
-        if (item.contentId) await this.db.content.remove(item.contentId);
-        await this.db.noteHistory.clearSessions(id);
-      } else if (item.itemType === "notebook") {
-        await this.db.relations.unlinkAll({ type: "notebook", id: item.id });
-      }
-      await collection.remove(id);
-      this.cache.splice(this.cache.indexOf(id), 1);
-    }
-  }
-
-  async restore(...ids: string[]) {
-    for (const id of ids) {
-      const [item] = this.getItem(id);
-      if (!item) continue;
-      if (item.itemType === "note") {
-        await this.db.notes.collection.update({ ...item, type: "note" });
-      } else if (item.itemType === "notebook") {
-        await this.db.notebooks.collection.update({
-          ...item,
-          type: "notebook"
-        });
-      }
-      this.cache.splice(this.cache.indexOf(id), 1);
-    }
+    ids.forEach((id) => this.cache.splice(this.cache.indexOf(id), 1));
   }
 
   async clear() {
-    for (const item of this.all) {
-      await this.delete(item.id);
-    }
+    // for (const item of this.all) {
+    //   await this.delete(item.id);
+    // }
     this.cache = [];
   }
 
-  synced(id: string) {
-    const [item] = this.getItem(id);
-    if (item && item.itemType === "note") {
-      const { contentId } = item;
-      return !contentId || this.db.content.exists(contentId);
-    } else return true;
-  }
+  // synced(id: string) {
+  //   // const [item] = this.getItem(id);
+  //   if (item && item.itemType === "note") {
+  //     const { contentId } = item;
+  //     return !contentId || this.db.content.exists(contentId);
+  //   } else return true;
+  // }
 
   /**
    *

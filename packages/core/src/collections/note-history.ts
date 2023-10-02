@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Database from "../api";
 import { isCipher } from "../database/crypto";
-import { IndexedCollection } from "../database/indexed-collection";
+import { SQLCollection } from "../database/sql-collection";
 import { HistorySession, isDeleted } from "../types";
 import { makeSessionContentId } from "../utils/id";
 import { ICollection } from "./collection";
@@ -29,22 +29,14 @@ export class NoteHistory implements ICollection {
   name = "notehistory";
   versionsLimit = 100;
   sessionContent = new SessionContent(this.db);
-  private readonly collection: IndexedCollection<"notehistory", HistorySession>;
+  private readonly collection: SQLCollection<"notehistory", HistorySession>;
   constructor(private readonly db: Database) {
-    this.collection = new IndexedCollection(
-      db.storage,
-      "notehistory",
-      db.eventManager
-    );
+    this.collection = new SQLCollection(db.sql, "notehistory", db.eventManager);
   }
 
   async init() {
     await this.collection.init();
     await this.sessionContent.init();
-  }
-
-  async merge(item: HistorySession) {
-    await this.collection.addItem(item);
   }
 
   async get(noteId: string) {
@@ -67,7 +59,7 @@ export class NoteHistory implements ICollection {
     content: NoteContent<boolean>
   ) {
     sessionId = `${noteId}_${sessionId}`;
-    const oldSession = await this.collection.getItem(sessionId);
+    const oldSession = await this.collection.get(sessionId);
 
     if (oldSession && isDeleted(oldSession)) return;
 
@@ -82,7 +74,7 @@ export class NoteHistory implements ICollection {
       locked
     };
 
-    await this.collection.addItem(session);
+    await this.collection.upsert(session);
     await this.sessionContent.add(sessionId, content, locked);
     await this.cleanup(noteId);
 
@@ -104,19 +96,18 @@ export class NoteHistory implements ICollection {
   }
 
   async content(sessionId: string) {
-    const session = await this.collection.getItem(sessionId);
+    const session = await this.collection.get(sessionId);
     if (!session || isDeleted(session)) return;
     return await this.sessionContent.get(session.sessionContentId);
   }
 
   async remove(sessionId: string) {
-    const session = await this.collection.getItem(sessionId);
+    const session = await this.collection.get(sessionId);
     if (!session || isDeleted(session)) return;
     await this._remove(session);
   }
 
-  async clearSessions(noteId: string) {
-    if (!noteId) return;
+  async clearSessions(...noteIds: string[]) {
     const history = await this.get(noteId);
     for (const item of history) {
       await this._remove(item);
@@ -124,12 +115,12 @@ export class NoteHistory implements ICollection {
   }
 
   private async _remove(session: HistorySession) {
-    await this.collection.deleteItem(session.id);
+    await this.collection.delete(session.id);
     await this.sessionContent.remove(session.sessionContentId);
   }
 
   async restore(sessionId: string) {
-    const session = await this.collection.getItem(sessionId);
+    const session = await this.collection.get(sessionId);
     if (!session || isDeleted(session)) return;
 
     const content = await this.sessionContent.get(session.sessionContentId);
@@ -153,14 +144,14 @@ export class NoteHistory implements ICollection {
     }
   }
 
-  async all() {
-    return this.getSessions(this.collection.indexer.indices);
-  }
+  // async all() {
+  //   return this.getSessions(this.collection.indexer.indices);
+  // }
 
-  private async getSessions(sessionIds: string[]): Promise<HistorySession[]> {
-    const items = await this.collection.getItems(sessionIds);
-    return Object.values(items).filter(
-      (a) => !isDeleted(a)
-    ) as HistorySession[];
-  }
+  // private async getSessions(sessionIds: string[]): Promise<HistorySession[]> {
+  //   const items = await this.collection.getItems(sessionIds);
+  //   return Object.values(items).filter(
+  //     (a) => !isDeleted(a)
+  //   ) as HistorySession[];
+  // }
 }

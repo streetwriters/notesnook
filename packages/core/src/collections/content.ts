@@ -27,13 +27,12 @@ import {
   ContentItem,
   ContentType,
   EncryptedContentItem,
-  MaybeDeletedItem,
   UnencryptedContentItem,
   isDeleted
 } from "../types";
-import { IndexedCollection } from "../database/indexed-collection";
 import Database from "../api";
 import { getOutputType } from "./attachments";
+import { SQLCollection } from "../database/sql-collection";
 
 export const EMPTY_CONTENT = (noteId: string): UnencryptedContentItem => ({
   noteId,
@@ -48,25 +47,13 @@ export const EMPTY_CONTENT = (noteId: string): UnencryptedContentItem => ({
 
 export class Content implements ICollection {
   name = "content";
-  readonly collection: IndexedCollection<"content", ContentItem>;
+  readonly collection: SQLCollection<"content", ContentItem>;
   constructor(private readonly db: Database) {
-    this.collection = new IndexedCollection(
-      db.storage,
-      "content",
-      db.eventManager
-    );
+    this.collection = new SQLCollection(db.sql, "content", db.eventManager);
   }
 
   async init() {
     await this.collection.init();
-  }
-
-  async merge(content: MaybeDeletedItem<ContentItem>) {
-    return await this.collection.addItem(
-      isDeleted(content) || !isUnencryptedContent(content)
-        ? content
-        : await this.extractAttachments(content)
-    );
   }
 
   async add(content: Partial<ContentItem>) {
@@ -106,7 +93,7 @@ export class Content implements ICollection {
       conflicted: content.conflicted,
       dateResolved: content.dateResolved
     };
-    await this.collection.addItem(
+    await this.collection.upsert(
       isUnencryptedContent(contentItem)
         ? await this.extractAttachments(contentItem)
         : contentItem
@@ -133,29 +120,46 @@ export class Content implements ICollection {
   }
 
   async raw(id: string) {
-    const content = await this.collection.getItem(id);
+    const content = await this.collection.get(id);
     if (!content) return;
     return content;
   }
 
-  remove(id: string) {
-    if (!id) return;
-    return this.collection.removeItem(id);
+  remove(...ids: string[]) {
+    return this.collection.softDelete(ids);
   }
 
-  multi(ids: string[]) {
-    return this.collection.getItems(ids);
+  removeByNoteId(...ids: string[]) {
+    return this.db
+      .sql()
+      .replaceInto("content")
+      .columns(["id", "dateModified", "deleted"])
+      .expression((eb) =>
+        eb
+          .selectFrom("content")
+          .where("noteId", "in", ids)
+          .select((eb) => [
+            "content.id",
+            eb.lit(Date.now()).as("dateModified"),
+            eb.lit(1).as("deleted")
+          ])
+      )
+      .execute();
   }
+
+  // multi(ids: string[]) {
+  //   return this.collection.getItems(ids);
+  // }
 
   exists(id: string) {
     return this.collection.exists(id);
   }
 
-  async all() {
-    return Object.values(
-      await this.collection.getItems(this.collection.indexer.indices)
-    );
-  }
+  // async all() {
+  //   return Object.values(
+  //     await this.collection.getItems(this.collection.indexer.indices)
+  //   );
+  // }
 
   insertMedia(contentItem: UnencryptedContentItem) {
     return this.insert(contentItem, async (hashes) => {
@@ -183,17 +187,16 @@ export class Content implements ICollection {
     const content = getContentFromData(contentItem.type, contentItem.data);
     if (!content) return contentItem;
     contentItem.data = await content.insertMedia(async (hashes) => {
-      const attachments = hashes.reduce((attachments, hash) => {
-        const attachment = this.db.attachments.attachment(hash);
-        if (!attachment) return attachments;
+      const attachments: Attachment[] = [];
+      for (const hash of hashes) {
+        const attachment = await this.db.attachments.attachment(hash);
+        if (!attachment) continue;
         attachments.push(attachment);
-        return attachments;
-      }, [] as Attachment[]);
+      }
 
       await this.db.fs().queueDownloads(
         attachments.map((a) => ({
-          filename: a.metadata.hash,
-          metadata: a.metadata,
+          filename: a.hash,
           chunkSize: a.chunkSize
         })),
         groupId,
@@ -203,11 +206,11 @@ export class Content implements ICollection {
       const sources: Record<string, string> = {};
       for (const attachment of attachments) {
         const src = await this.db.attachments.read(
-          attachment.metadata.hash,
+          attachment.hash,
           getOutputType(attachment)
         );
         if (!src) continue;
-        sources[attachment.metadata.hash] = src;
+        sources[attachment.hash] = src;
       }
       return sources;
     });
@@ -243,16 +246,16 @@ export class Content implements ICollection {
       this.db.attachments.save
     );
 
-    const noteAttachments = this.db.relations
+    const noteAttachments = await this.db.relations
       .from({ type: "note", id: contentItem.noteId }, "attachment")
-      .resolved();
+      .resolve();
 
     const toDelete = noteAttachments.filter((attachment) => {
-      return hashes.every((hash) => hash !== attachment.metadata.hash);
+      return hashes.every((hash) => hash !== attachment.hash);
     });
 
     const toAdd = hashes.filter((hash) => {
-      return hash && noteAttachments.every((a) => hash !== a.metadata.hash);
+      return hash && noteAttachments.every((a) => hash !== a.hash);
     });
 
     for (const attachment of toDelete) {
@@ -266,7 +269,7 @@ export class Content implements ICollection {
     }
 
     for (const hash of toAdd) {
-      const attachment = this.db.attachments.attachment(hash);
+      const attachment = await this.db.attachments.attachment(hash);
       if (!attachment) continue;
       await this.db.relations.add(
         {
@@ -284,24 +287,24 @@ export class Content implements ICollection {
     return contentItem;
   }
 
-  async cleanup() {
-    const indices = this.collection.indexer.indices;
-    await this.db.notes.init();
-    const notes = this.db.notes.all;
-    if (!notes.length && indices.length > 0) return [];
-    const ids = [];
-    for (const contentId of indices) {
-      const noteIndex = notes.findIndex((note) => note.contentId === contentId);
-      const isOrphaned = noteIndex === -1;
-      if (isOrphaned) {
-        ids.push(contentId);
-        await this.collection.deleteItem(contentId);
-      } else if (notes[noteIndex].localOnly) {
-        ids.push(contentId);
-      }
-    }
-    return ids;
-  }
+  // async cleanup() {
+  //   const indices = this.collection.indexer.indices;
+  //   await this.db.notes.init();
+  //   const notes = this.db.notes.all;
+  //   if (!notes.length && indices.length > 0) return [];
+  //   const ids = [];
+  //   for (const contentId of indices) {
+  //     const noteIndex = notes.findIndex((note) => note.contentId === contentId);
+  //     const isOrphaned = noteIndex === -1;
+  //     if (isOrphaned) {
+  //       ids.push(contentId);
+  //       await this.collection.deleteItem(contentId);
+  //     } else if (notes[noteIndex].localOnly) {
+  //       ids.push(contentId);
+  //     }
+  //   }
+  //   return ids;
+  // }
 }
 
 export function isUnencryptedContent(

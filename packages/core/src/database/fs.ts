@@ -25,13 +25,12 @@ import {
   StorageAccessor
 } from "../interfaces";
 import { DataFormat, SerializedKey } from "@notesnook/crypto/dist/src/types";
-import { AttachmentMetadata } from "../types";
 import { EV, EVENTS } from "../common";
 
 export type FileStorageAccessor = () => FileStorage;
 export type DownloadableFile = {
   filename: string;
-  metadata: AttachmentMetadata;
+  // metadata: AttachmentMetadata;
   chunkSize: number;
 };
 export type QueueItem = DownloadableFile & {
@@ -57,7 +56,7 @@ export class FileStorage {
     this.downloads.set(groupId, files);
 
     for (const file of files as QueueItem[]) {
-      const { filename, metadata, chunkSize } = file;
+      const { filename, chunkSize } = file;
       if (await this.exists(filename)) {
         current++;
         EV.publish(EVENTS.fileDownloaded, {
@@ -71,7 +70,6 @@ export class FileStorage {
 
       const url = `${hosts.API_HOST}/s3?name=${filename}`;
       const { execute, cancel } = this.fs.downloadFile(filename, {
-        metadata,
         url,
         chunkSize,
         headers: { Authorization: `Bearer ${token}` }
@@ -106,11 +104,10 @@ export class FileStorage {
     this.uploads.set(groupId, files);
 
     for (const file of files as QueueItem[]) {
-      const { filename, chunkSize, metadata } = file;
+      const { filename, chunkSize } = file;
       const url = `${hosts.API_HOST}/s3?name=${filename}`;
       const { execute, cancel } = this.fs.uploadFile(filename, {
         chunkSize,
-        metadata,
         url,
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -142,21 +139,15 @@ export class FileStorage {
     this.uploads.delete(groupId);
   }
 
-  async downloadFile(
-    groupId: string,
-    filename: string,
-    chunkSize: number,
-    metadata: AttachmentMetadata
-  ) {
+  async downloadFile(groupId: string, filename: string, chunkSize: number) {
     const url = `${hosts.API_HOST}/s3?name=${filename}`;
     const token = await this.tokenManager.getAccessToken();
     const { execute, cancel } = this.fs.downloadFile(filename, {
-      metadata,
       url,
       chunkSize,
       headers: { Authorization: `Bearer ${token}` }
     });
-    this.downloads.set(groupId, [{ cancel, filename, chunkSize, metadata }]);
+    this.downloads.set(groupId, [{ cancel, filename, chunkSize }]);
     const result = await execute();
     this.downloads.delete(groupId);
     return result;

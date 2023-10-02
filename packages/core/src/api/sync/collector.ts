@@ -66,21 +66,21 @@ class Collector {
       }
     }
 
-    for (const itemType in SYNC_COLLECTIONS_MAP) {
-      const collectionKey =
-        SYNC_COLLECTIONS_MAP[itemType as keyof typeof SYNC_COLLECTIONS_MAP];
-      const collection = this.db[collectionKey].collection;
-      for (const chunk of collection.iterateSync(chunkSize)) {
-        const items = await this.prepareChunk(
-          chunk,
-          lastSyncedTimestamp,
-          isForceSync,
-          key
-        );
-        if (!items) continue;
-        yield { items, type: itemType as keyof typeof SYNC_COLLECTIONS_MAP };
-      }
-    }
+    // for (const itemType in SYNC_COLLECTIONS_MAP) {
+    //   const collectionKey =
+    //     SYNC_COLLECTIONS_MAP[itemType as keyof typeof SYNC_COLLECTIONS_MAP];
+    //   const collection = this.db[collectionKey].collection;
+    //   for (const chunk of collection.iterateSync(chunkSize)) {
+    //     const items = await this.prepareChunk(
+    //       chunk,
+    //       lastSyncedTimestamp,
+    //       isForceSync,
+    //       key
+    //     );
+    //     if (!items) continue;
+    //     yield { items, type: itemType as keyof typeof SYNC_COLLECTIONS_MAP };
+    //   }
+    // }
   }
 
   async prepareChunk(

@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createNoteModel } from "../models/note";
 import { getId } from "../utils/id";
 import { getContentFromData } from "../content-types";
 import { NEWLINE_STRIP_REGEX, formatTitle } from "../utils/title-format";
@@ -26,17 +25,11 @@ import { Tiptap } from "../content-types/tiptap";
 import { EMPTY_CONTENT, isUnencryptedContent } from "./content";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { buildFromTemplate } from "../utils/templates";
-import {
-  Note,
-  TrashOrItem,
-  isTrashItem,
-  isDeleted,
-  BaseTrashItem
-} from "../types";
+import { Note, TrashOrItem, isTrashItem, isDeleted } from "../types";
 import Database from "../api";
-import { CachedCollection } from "../database/cached-collection";
 import { ICollection } from "./collection";
 import { NoteContent } from "./session-content";
+import { SQLCollection } from "../database/sql-collection";
 
 type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
@@ -50,17 +43,15 @@ export class Notes implements ICollection {
   /**
    * @internal
    */
-  collection: CachedCollection<"notes", TrashOrItem<Note>>;
+  collection: SQLCollection<"notes", TrashOrItem<Note>>;
+  totalNotes = 0;
   constructor(private readonly db: Database) {
-    this.collection = new CachedCollection(
-      db.storage,
-      "notes",
-      db.eventManager
-    );
+    this.collection = new SQLCollection(db.sql, "notes", db.eventManager);
   }
 
   async init() {
     await this.collection.init();
+    this.totalNotes = await this.collection.count();
   }
 
   async add(
@@ -70,9 +61,7 @@ export class Notes implements ICollection {
       throw new Error("Please use db.notes.merge to merge remote notes.");
 
     const id = item.id || getId();
-    const oldNote = this.collection.get(id);
-    if (oldNote && isTrashItem(oldNote))
-      throw new Error("Cannot modify trashed notes.");
+    const oldNote = await this.note(id);
 
     const note = {
       ...oldNote,
@@ -110,10 +99,10 @@ export class Notes implements ICollection {
       });
     }
 
-    const noteTitle = this.getNoteTitle(note, oldNote, note.headline);
+    const noteTitle = await this.getNoteTitle(note, oldNote, note.headline);
     if (oldNote && oldNote.title !== noteTitle) note.dateEdited = Date.now();
 
-    await this.collection.add({
+    await this.collection.upsert({
       id,
       contentId: note.contentId,
       type: "note",
@@ -136,54 +125,61 @@ export class Notes implements ICollection {
       dateModified: note.dateModified || Date.now()
     });
 
+    if (!oldNote) this.totalNotes++;
     return id;
   }
 
-  note(idOrNote: string | Note) {
-    if (!idOrNote) return;
-    const note =
-      typeof idOrNote === "object" ? idOrNote : this.collection.get(idOrNote);
-    if (!note || isTrashItem(note)) return;
-    return createNoteModel(note, this.db);
+  async note(idOrNote: string) {
+    const note = await this.collection.get(idOrNote);
+    if (!note || isTrashItem(note) || isDeleted(note)) return;
+    return note;
   }
 
-  get raw() {
-    return this.collection.raw();
-  }
+  // note(idOrNote: string | Note) {
+  //   if (!idOrNote) return;
+  //   const note =
+  //     typeof idOrNote === "object" ? idOrNote : this.collection.get(idOrNote);
+  //   if (!note || isTrashItem(note)) return;
+  //   return createNoteModel(note, this.db);
+  // }
 
-  get all() {
-    return this.collection.items((note) =>
-      isTrashItem(note) ? undefined : note
-    ) as Note[];
-  }
+  // get raw() {
+  //   return this.collection.raw();
+  // }
 
-  isTrashed(id: string) {
-    return this.raw.find((item) => item.id === id && isTrashItem(item));
-  }
+  // get all() {
+  //   return this.collection.items((note) =>
+  //     isTrashItem(note) ? undefined : note
+  //   ) as Note[];
+  // }
 
-  get trashed() {
-    return this.raw.filter((item) =>
-      isTrashItem(item)
-    ) as BaseTrashItem<Note>[];
-  }
+  // isTrashed(id: string) {
+  //   return this.raw.find((item) => item.id === id && isTrashItem(item));
+  // }
 
-  get pinned() {
-    return this.all.filter((item) => item.pinned === true);
-  }
+  // get trashed() {
+  //   return this.raw.filter((item) =>
+  //     isTrashItem(item)
+  //   ) as BaseTrashItem<Note>[];
+  // }
 
-  get conflicted() {
-    return this.all.filter((item) => item.conflicted === true);
-  }
+  // get pinned() {
+  //   return this.all.filter((item) => item.pinned === true);
+  // }
 
-  get favorites() {
-    return this.all.filter((item) => item.favorite === true);
-  }
+  // get conflicted() {
+  //   return this.all.filter((item) => item.conflicted === true);
+  // }
 
-  get locked(): Note[] {
-    return this.all.filter(
-      (item) => !isTrashItem(item) && item.locked === true
-    ) as Note[];
-  }
+  // get favorites() {
+  //   return this.all.filter((item) => item.favorite === true);
+  // }
+
+  // get locked(): Note[] {
+  //   return this.all.filter(
+  //     (item) => !isTrashItem(item) && item.locked === true
+  //   ) as Note[];
+  // }
 
   exists(id: string) {
     return this.collection.exists(id);
@@ -202,7 +198,7 @@ export class Notes implements ICollection {
     if (format !== "txt" && !(await checkIsUserPremium(CHECK_IDS.noteExport)))
       return false;
 
-    const note = this.note(id);
+    const note = await this.note(id);
     if (!note) return false;
 
     if (!options.contentItem) {
@@ -239,15 +235,15 @@ export class Notes implements ICollection {
     return options?.disableTemplate
       ? contentString
       : buildFromTemplate(format, {
-          ...note.data,
+          ...note,
           content: contentString
         });
   }
 
   async duplicate(...ids: string[]) {
     for (const id of ids) {
-      const note = this.collection.get(id);
-      if (!note || isTrashItem(note)) continue;
+      const note = await this.note(id);
+      if (!note) continue;
 
       const content = note.contentId
         ? await this.db.content.raw(note.contentId)
@@ -274,13 +270,16 @@ export class Notes implements ICollection {
       });
       if (!duplicateId) return;
 
-      for (const notebook of this.db.relations
+      for (const notebook of await this.db.relations
         .to(note, "notebook")
-        .resolved()) {
-        await this.db.relations.add(notebook, {
-          id: duplicateId,
-          type: "note"
-        });
+        .get()) {
+        await this.db.relations.add(
+          { type: "notebook", id: notebook },
+          {
+            id: duplicateId,
+            type: "note"
+          }
+        );
       }
 
       return duplicateId;
@@ -288,24 +287,17 @@ export class Notes implements ICollection {
   }
 
   private async _delete(moveToTrash = true, ...ids: string[]) {
-    for (const id of ids) {
-      const item = this.collection.get(id);
-      if (!item) continue;
-      const itemData = clone(item);
-
-      if (moveToTrash && !isTrashItem(itemData))
-        await this.db.trash.add(itemData);
-      else {
-        await this.db.relations.unlinkAll(item, "tag");
-        await this.db.relations.unlinkAll(item, "color");
-        await this.db.relations.unlinkAll(item, "attachment");
-        await this.db.relations.unlinkAll(item, "notebook");
-
-        await this.collection.remove(id);
-        if (itemData.contentId)
-          await this.db.content.remove(itemData.contentId);
-      }
+    if (moveToTrash) {
+      await this.db.trash.add("note", ids);
+    } else {
+      await this.db.transaction(async () => {
+        await this.db.relations.unlinkOfType("note", ids);
+        await this.collection.softDelete(ids);
+        await this.db.content.removeByNoteId(...ids);
+      });
     }
+
+    this.totalNotes = Math.max(0, this.totalNotes - ids.length);
   }
 
   async addToNotebook(notebookId: string, ...noteIds: string[]) {
@@ -318,24 +310,31 @@ export class Notes implements ICollection {
   }
 
   async removeFromNotebook(notebookId: string, ...noteIds: string[]) {
-    for (const noteId of noteIds) {
-      await this.db.relations.unlink(
-        { id: notebookId, type: "notebook" },
-        { type: "note", id: noteId }
-      );
-    }
+    await this.db.transaction(async () => {
+      for (const noteId of noteIds) {
+        await this.db.relations.unlink(
+          { id: notebookId, type: "notebook" },
+          { type: "note", id: noteId }
+        );
+      }
+    });
   }
 
   async removeFromAllNotebooks(...noteIds: string[]) {
-    for (const noteId of noteIds) {
-      await this.db.relations.unlinkAll(
-        { type: "note", id: noteId },
-        "notebook"
-      );
-    }
+    await this.db.transaction(async () => {
+      for (const noteId of noteIds) {
+        await this.db.relations
+          .to({ type: "note", id: noteId }, "notebook")
+          .unlink();
+      }
+    });
   }
 
-  private getNoteTitle(note: Partial<Note>, oldNote?: Note, headline?: string) {
+  private async getNoteTitle(
+    note: Partial<Note>,
+    oldNote?: Note,
+    headline?: string
+  ) {
     if (note.title && note.title.trim().length > 0) {
       return note.title.replace(NEWLINE_STRIP_REGEX, " ");
     } else if (
@@ -352,7 +351,7 @@ export class Notes implements ICollection {
       this.db.settings.getDateFormat(),
       this.db.settings.getTimeFormat(),
       headline?.split(" ").splice(0, 10).join(" "),
-      this.collection.count()
+      this.totalNotes
     );
   }
 }

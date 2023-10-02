@@ -131,6 +131,7 @@ export interface BaseItem<TType extends ItemType> {
   migrated?: boolean;
   remote?: boolean;
   synced?: boolean;
+  deleted?: boolean;
 }
 
 export type NotebookReference = {
@@ -164,6 +165,9 @@ export interface Note extends BaseItem<"note"> {
   readonly: boolean;
 
   dateEdited: number;
+
+  dateDeleted: null;
+  itemType: null;
 }
 
 export interface Notebook extends BaseItem<"notebook"> {
@@ -171,6 +175,10 @@ export interface Notebook extends BaseItem<"notebook"> {
   description?: string;
   dateEdited: number;
   pinned: boolean;
+
+  dateDeleted: null;
+  itemType: null;
+
   /**
    * @deprecated only kept here for migration purposes.
    */
@@ -191,6 +199,9 @@ export interface Topic extends BaseItem<"topic"> {
   notes?: string[];
 }
 
+/**
+ * @deprecated only kept here for migration purposes
+ */
 export type AttachmentMetadata = {
   hash: string;
   hashType: string;
@@ -201,15 +212,32 @@ export type AttachmentMetadata = {
 export interface Attachment extends BaseItem<"attachment"> {
   iv: string;
   salt: string;
-  length: number;
   alg: string;
-  key: Cipher<"base64">;
   chunkSize: number;
-  metadata: AttachmentMetadata;
+
   dateUploaded?: number;
   failed?: string;
   dateDeleted?: number;
 
+  filename: string;
+  size: number;
+  hash: string;
+  hashType: string;
+  mimeType: string;
+  encryptionKey: string;
+
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  key?: Cipher<"base64">;
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  length?: number;
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  metadata?: AttachmentMetadata;
   /**
    * @deprecated only kept here for migration purposes
    */
@@ -244,14 +272,31 @@ export type ItemReference = {
 };
 
 export interface Relation extends BaseItem<"relation"> {
-  from: ItemReference;
-  to: ItemReference;
+  fromId: string;
+  fromType: keyof ItemMap;
+  toId: string;
+  toType: keyof ItemMap;
+
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  from?: ItemReference;
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  to?: ItemReference;
 }
 
+/**
+ * @deprecated only kept here for migration purposes
+ */
 type BaseShortcutReference = {
   id: string;
 };
 
+/**
+ * @deprecated only kept here for migration purposes
+ */
 type TagNotebookShortcutReference = BaseShortcutReference & {
   type: "tag" | "notebook";
 };
@@ -265,7 +310,14 @@ type TopicShortcutReference = BaseShortcutReference & {
 };
 
 export interface Shortcut extends BaseItem<"shortcut"> {
-  item: TopicShortcutReference | TagNotebookShortcutReference;
+  itemId: string;
+  itemType: "tag" | "notebook";
+
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  item?: TopicShortcutReference | TagNotebookShortcutReference;
+
   sortIndex: number;
 }
 
@@ -376,17 +428,14 @@ export type TrashOrItem<T extends BaseItem<"note" | "notebook">> =
 
 export type BaseTrashItem<TItem extends BaseItem<"note" | "notebook">> =
   BaseItem<"trash"> & {
-    title: string;
     itemType: TItem["type"];
     dateDeleted: number;
-  } & Omit<TItem, "id" | "type">;
+  } & Omit<TItem, "id" | "type" | "dateDeleted" | "itemType">;
 
 export type TrashItem = BaseTrashItem<Note> | BaseTrashItem<Notebook>;
 
-export function isDeleted<T extends BaseItem<ItemType>>(
-  item: MaybeDeletedItem<T>
-): item is DeletedItem {
-  return "deleted" in item;
+export function isDeleted(item: object): item is DeletedItem {
+  return "deleted" in item && !!item.deleted;
 }
 
 export function isTrashItem(item: MaybeDeletedItem<Item>): item is TrashItem {

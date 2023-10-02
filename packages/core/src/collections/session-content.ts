@@ -22,9 +22,9 @@ import { tinyToTiptap } from "../migrations";
 import { makeSessionContentId } from "../utils/id";
 import { ICollection } from "./collection";
 import { isCipher } from "../database/crypto";
-import { IndexedCollection } from "../database/indexed-collection";
 import Database from "../api";
 import { ContentType, SessionContentItem, isDeleted } from "../types";
+import { SQLCollection } from "../database/sql-collection";
 
 export type NoteContent<TLocked extends boolean> = {
   data: TLocked extends true ? Cipher<"base64"> : string;
@@ -33,13 +33,13 @@ export type NoteContent<TLocked extends boolean> = {
 
 export class SessionContent implements ICollection {
   name = "sessioncontent";
-  private readonly collection: IndexedCollection<
+  private readonly collection: SQLCollection<
     "sessioncontent",
     SessionContentItem
   >;
   constructor(private readonly db: Database) {
-    this.collection = new IndexedCollection(
-      db.storage,
+    this.collection = new SQLCollection(
+      db.sql,
       "sessioncontent",
       db.eventManager
     );
@@ -47,10 +47,6 @@ export class SessionContent implements ICollection {
 
   async init() {
     await this.collection.init();
-  }
-
-  async merge(item: SessionContentItem) {
-    await this.collection.addItem(item);
   }
 
   async add<TLocked extends boolean>(
@@ -64,7 +60,7 @@ export class SessionContent implements ICollection {
         ? content.data
         : await this.db.compressor().compress(content.data);
 
-    await this.collection.addItem({
+    await this.collection.upsert({
       type: "sessioncontent",
       id: makeSessionContentId(sessionId),
       data,
@@ -78,7 +74,7 @@ export class SessionContent implements ICollection {
   }
 
   async get(sessionContentId: string) {
-    const session = await this.collection.getItem(sessionContentId);
+    const session = await this.collection.get(sessionContentId);
     if (!session || isDeleted(session)) return;
 
     if (
@@ -93,7 +89,7 @@ export class SessionContent implements ICollection {
           tinyToTiptap(await this.db.compressor().decompress(session.data))
         );
       session.contentType = "tiptap";
-      await this.collection.addItem(session);
+      await this.collection.upsert(session);
     }
 
     return {
@@ -106,13 +102,13 @@ export class SessionContent implements ICollection {
   }
 
   async remove(sessionContentId: string) {
-    await this.collection.deleteItem(sessionContentId);
+    await this.collection.delete(sessionContentId);
   }
 
-  async all() {
-    const indices = this.collection.indexer.indices;
-    const items = await this.collection.getItems(indices);
+  // async all() {
+  //   const indices = this.collection.indexer.indices;
+  //   const items = await this.collection.getItems(indices);
 
-    return Object.values(items);
-  }
+  //   return Object.values(items);
+  // }
 }

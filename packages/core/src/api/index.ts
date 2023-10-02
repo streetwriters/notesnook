@@ -60,6 +60,9 @@ import {
 import TokenManager from "./token-manager";
 import { Attachment } from "../types";
 import { Settings } from "../collections/settings";
+import { DatabaseAccessor, DatabaseSchema, createDatabase } from "../database";
+import { Kysely, SqliteDriver, Transaction } from "kysely";
+import BetterSQLite3 from "better-sqlite3";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -111,6 +114,32 @@ class Database {
     return this.options.compressor;
   };
 
+  private _sql?: Kysely<DatabaseSchema>;
+  sql: DatabaseAccessor = () => {
+    if (this._transaction) return this._transaction;
+
+    if (!this._sql)
+      throw new Error(
+        "Database not initialized. Did you forget to call db.init()?"
+      );
+    return this._sql;
+  };
+
+  private _transaction?: Transaction<DatabaseSchema>;
+  transaction = (
+    executor: (tr: Transaction<DatabaseSchema>) => void | Promise<void>
+  ) => {
+    if (this._transaction) return executor(this._transaction);
+    return this.sql()
+      .transaction()
+      .execute(async (tr) => {
+        this._transaction = tr;
+        await executor(tr);
+        this._transaction = undefined;
+      })
+      .finally(() => (this._transaction = undefined));
+  };
+
   private options?: Options;
   EventSource?: EventSourceConstructor;
   eventSource?: EventSource | null;
@@ -144,6 +173,7 @@ class Database {
   reminders = new Reminders(this);
   relations = new Relations(this);
   notes = new Notes(this);
+
   // constructor() {
   //   this.sseMutex = new Mutex();
   //   // this.lastHeartbeat = undefined; // { local: 0, server: 0 };
@@ -170,14 +200,18 @@ class Database {
       this
     );
     EV.subscribe(EVENTS.attachmentDeleted, async (attachment: Attachment) => {
-      await this.fs().cancel(attachment.metadata.hash, "upload");
-      await this.fs().cancel(attachment.metadata.hash, "download");
+      await this.fs().cancel(attachment.hash, "upload");
+      await this.fs().cancel(attachment.hash, "download");
     });
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.clear();
       await this.fs().clear();
       this.disconnectSSE();
     });
+
+    this._sql = await createDatabase(
+      new SqliteDriver({ database: BetterSQLite3("nn.db") })
+    );
 
     await this._validate();
 

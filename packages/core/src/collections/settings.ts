@@ -29,8 +29,8 @@ import {
   TrashCleanupInterval
 } from "../types";
 import { ICollection } from "./collection";
-import { CachedCollection } from "../database/cached-collection";
 import { TimeFormat } from "../utils/date";
+import { SQLCachedCollection } from "../database/sql-cached-collection";
 
 const DEFAULT_GROUP_OPTIONS = (key: GroupingKey) =>
   ({
@@ -66,12 +66,12 @@ const defaultSettings: SettingItemMap = {
 };
 
 export class Settings implements ICollection {
-  name = "settingsv2";
-  readonly collection: CachedCollection<"settingsv2", SettingItem>;
+  name = "settings";
+  readonly collection: SQLCachedCollection<"settings", SettingItem>;
   constructor(db: Database) {
-    this.collection = new CachedCollection(
-      db.storage,
-      "settingsv2",
+    this.collection = new SQLCachedCollection(
+      db.sql,
+      "settings",
       db.eventManager
     );
   }
@@ -80,19 +80,19 @@ export class Settings implements ICollection {
     return this.collection.init();
   }
 
-  get raw() {
-    return this.collection.raw();
-  }
+  // get raw() {
+  //   return this.collection.raw();
+  // }
 
   private async set<TKey extends keyof SettingItemMap>(
     key: TKey,
     value: SettingItemMap[TKey]
   ) {
     const id = makeId(key);
-    const oldItem = this.collection.get(id);
+    const oldItem = await this.collection.get(id);
     if (oldItem && oldItem.key !== key) throw new Error("Key conflict.");
 
-    await this.collection.add({
+    await this.collection.upsert({
       id,
       key,
       value,
