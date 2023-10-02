@@ -238,12 +238,7 @@ function SettingsSideBar(props: SettingsSideBarProps) {
             flexDirection: "column",
             display: "flex",
             overflow: "hidden",
-            "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
-              {
-                backgroundColor: alpha("background", 0.6),
-                backdropFilter: "blur(8px)"
-              },
-            backgroundColor: "var(--background-secondary)"
+            backgroundColor: "background"
           }}
         >
           <Input

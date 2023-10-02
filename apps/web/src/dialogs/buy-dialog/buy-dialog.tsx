@@ -99,12 +99,7 @@ export function BuyDialog(props: BuyDialogProps) {
             display: "flex",
             overflow: ["hidden", "hidden", "auto"],
             flexDirection: "column",
-            "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
-              {
-                backgroundColor: alpha("background", 0.8),
-                backdropFilter: "blur(8px)"
-              },
-            backgroundColor: "var(--background-secondary)",
+            backgroundColor: "background",
             flexShrink: 0,
             alignItems: "center",
             justifyContent: "center",
