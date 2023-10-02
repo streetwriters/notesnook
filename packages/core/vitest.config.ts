@@ -27,10 +27,14 @@ export default defineConfig({
     coverage: {
       reporter: ["text", "html"]
     },
+    exclude: ["__benches__/**/*.bench.ts"],
     include: [
       ...(IS_E2E ? ["__e2e__/**/*.test.{js,ts}"] : []),
       "__tests__/**/*.test.{js,ts}",
       "src/**/*.test.{js,ts}"
-    ]
+    ],
+    benchmark: {
+      include: ["__benches__/**/*.bench.ts"]
+    }
   }
 });

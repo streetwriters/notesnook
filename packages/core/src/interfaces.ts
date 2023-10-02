@@ -18,14 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
-import { AttachmentMetadata } from "./types";
 
 export type Output<TOutputFormat extends DataFormat> =
   TOutputFormat extends Omit<DataFormat, "uint8array"> ? string : Uint8Array;
 export type FileEncryptionMetadata = {
   chunkSize: number;
   iv: string;
-  length: number;
+  size: number;
   salt: string;
   alg: string;
 };
@@ -74,7 +73,7 @@ export interface ICompressor {
 
 export type RequestOptions = {
   url: string;
-  metadata?: AttachmentMetadata;
+  // metadata?: AttachmentMetadata;
   chunkSize: number;
   headers: { Authorization: string };
 };

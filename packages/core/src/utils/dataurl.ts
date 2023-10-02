@@ -22,13 +22,13 @@ const REGEX = /^data:(image\/.+);base64,(.+)/;
 function toObject(dataurl: string) {
   const regexResult = REGEX.exec(dataurl);
   if (!regexResult || regexResult.length < 3) return {};
-  const [_, mime, data] = regexResult;
-  return { mime, data };
+  const [_, mimeType, data] = regexResult;
+  return { mimeType, data };
 }
 
-function fromObject({ type, data }: { type: string, data: string }) {
+function fromObject({ mimeType, data }: { mimeType: string; data: string }) {
   if (REGEX.test(data)) return data;
-  return `data:${type};base64,${data}`;
+  return `data:${mimeType};base64,${data}`;
 }
 
 const dataurl = { toObject, fromObject };

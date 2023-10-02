@@ -18,20 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Database from "../api";
-import { CachedCollection } from "../database/cached-collection";
-import { Notebook, Shortcut, Tag, Topic } from "../types";
+import { SQLCollection } from "../database/sql-collection";
+import { Shortcut } from "../types";
 import { ICollection } from "./collection";
 
 const ALLOWED_SHORTCUT_TYPES = ["notebook", "topic", "tag"];
 export class Shortcuts implements ICollection {
   name = "shortcuts";
-  readonly collection: CachedCollection<"shortcuts", Shortcut>;
+  readonly collection: SQLCollection<"shortcuts", Shortcut>;
   constructor(private readonly db: Database) {
-    this.collection = new CachedCollection(
-      db.storage,
-      "shortcuts",
-      db.eventManager
-    );
+    this.collection = new SQLCollection(db.sql, "shortcuts", db.eventManager);
   }
 
   init() {
@@ -45,11 +41,15 @@ export class Shortcuts implements ICollection {
         "Please use db.shortcuts.merge to merge remote shortcuts."
       );
 
-    if (shortcut.item && !ALLOWED_SHORTCUT_TYPES.includes(shortcut.item.type))
+    if (
+      shortcut.itemId &&
+      shortcut.itemType &&
+      !ALLOWED_SHORTCUT_TYPES.includes(shortcut.itemType)
+    )
       throw new Error("Cannot create a shortcut for this type of item.");
 
-    const oldShortcut = shortcut.item
-      ? this.shortcut(shortcut.item.id)
+    const oldShortcut = shortcut.itemId
+      ? this.shortcut(shortcut.itemId)
       : shortcut.id
       ? this.shortcut(shortcut.id)
       : null;
@@ -64,65 +64,72 @@ export class Shortcuts implements ICollection {
 
     const id = shortcut.id || shortcut.item.id;
 
-    await this.collection.add({
+    await this.collection.upsert({
       id,
       type: "shortcut",
-      item: shortcut.item,
+      itemId: shortcut.itemId,
+      itemType: shortcut.itemType,
+      // item: shortcut.item,
       dateCreated: shortcut.dateCreated || Date.now(),
       dateModified: shortcut.dateModified || Date.now(),
-      sortIndex: this.collection.count()
+      sortIndex: await this.collection.count()
     });
     return id;
   }
 
-  get raw() {
-    return this.collection.raw();
-  }
+  // get raw() {
+  //   return this.collection.raw();
+  // }
 
-  get all() {
-    return this.collection.items();
-  }
+  // get all() {
+  //   return this.collection.items();
+  // }
 
-  get resolved() {
-    return this.all.reduce((prev, shortcut) => {
-      const {
-        item: { id }
-      } = shortcut;
-
-      let item: Notebook | Topic | Tag | null | undefined = null;
-      switch (shortcut.item.type) {
-        case "notebook": {
-          const notebook = this.db.notebooks.notebook(id);
-          item = notebook ? notebook.data : null;
-          break;
-        }
-        case "tag":
-          item = this.db.tags.tag(id);
-          break;
-      }
-      if (item) prev.push(item);
-      return prev;
-    }, [] as (Notebook | Topic | Tag)[]);
+  async get() {
+    // return this.all.reduce((prev, shortcut) => {
+    //   const {
+    //     item: { id }
+    //   } = shortcut;
+    //   let item: Notebook | Topic | Tag | null | undefined = null;
+    //   switch (shortcut.item.type) {
+    //     case "notebook": {
+    //       const notebook = this.db.notebooks.notebook(id);
+    //       item = notebook ? notebook.data : null;
+    //       break;
+    //     }
+    //     case "tag":
+    //       item = this.db.tags.tag(id);
+    //       break;
+    //   }
+    //   if (item) prev.push(item);
+    //   return prev;
+    // }, [] as (Notebook | Topic | Tag)[]);
   }
 
   exists(id: string) {
-    return !!this.shortcut(id);
+    return this.collection.exists(id);
   }
 
   shortcut(id: string) {
-    return this.all.find(
-      (shortcut) => shortcut.item.id === id || shortcut.id === id
-    );
+    return this.collection.get(id);
   }
 
   async remove(...shortcutIds: string[]) {
-    const shortcuts = this.all.filter(
-      (shortcut) =>
-        shortcutIds.includes(shortcut.item.id) ||
-        shortcutIds.includes(shortcut.id)
-    );
-    for (const { id } of shortcuts) {
-      await this.collection.remove(id);
-    }
+    await this.collection.softDelete(shortcutIds);
+    // await this.db
+    //   .sql()
+    //   .deleteFrom("shortcuts")
+    //   .where((eb) =>
+    //     eb.or([eb("id", "in", shortcutIds), eb("itemId", "in", shortcutIds)])
+    //   )
+    //   .execute();
+    // const shortcuts = this.all.filter(
+    //   (shortcut) =>
+    //     shortcutIds.includes(shortcut.item.id) ||
+    //     shortcutIds.includes(shortcut.id)
+    // );
+    // for (const { id } of shortcuts) {
+    //   await this.collection.remove(id);
+    // }
   }
 }
