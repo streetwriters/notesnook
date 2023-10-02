@@ -116,6 +116,7 @@ export default class Content extends Collection {
   }
 
   async downloadMedia(groupId, contentItem, notify = true) {
+    if (!contentItem) return contentItem;
     const content = getContentFromData(contentItem.type, contentItem.data);
     contentItem.data = await content.insertMedia(async (hashes) => {
       const attachments = hashes.map((h) => this._db.attachments.attachment(h));

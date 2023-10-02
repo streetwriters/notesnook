@@ -17,15 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
+import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
+import React, { useEffect, useRef } from "react";
 import { Platform, View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import { PremiumToast } from "../../premium/premium-toast";
 import { Toast } from "../../toast";
-import { BouncingView } from "../transitions/bouncing-view";
+import { useAppState } from "../../../hooks/use-app-state";
+import SettingsService from "../../../services/settings";
+import { useUserStore } from "../../../stores/use-user-store";
 
 const SheetWrapper = ({
   children,
@@ -41,6 +43,7 @@ const SheetWrapper = ({
   enableGesturesInScrollView = false,
   bottomPadding = true
 }) => {
+  const localRef = useRef(null);
   const { colors } = useThemeColors("sheet");
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const sheetKeyboardHandler = useSettingStore(
@@ -50,6 +53,8 @@ const SheetWrapper = ({
   const smallTablet = deviceMode === "smallTablet";
   const dimensions = useSettingStore((state) => state.dimensions);
   const insets = useGlobalSafeAreaInsets();
+  const appState = useAppState();
+  const lockEvents = useRef(false);
   let width = dimensions.width > 600 ? 600 : 500;
 
   const style = React.useMemo(() => {
@@ -68,19 +73,40 @@ const SheetWrapper = ({
   }, [colors.primary.background, largeTablet, smallTablet, width]);
 
   const _onOpen = () => {
+    if (lockEvents.current) return;
     onOpen && onOpen();
   };
 
   const _onClose = async () => {
+    if (lockEvents.current) return;
     if (onClose) {
       onClose();
     }
   };
 
+  useEffect(() => {
+    if (SettingsService.get().appLockMode === "background") {
+      if (appState === "background") {
+        const ref = fwdRef || localRef;
+        ref?.current?.hide();
+        if (useUserStore.getState().appLocked) {
+          lockEvents.current = true;
+          const unsub = useUserStore.subscribe((state) => {
+            if (!state.appLocked) {
+              ref?.current?.show();
+              unsub();
+              lockEvents.current = false;
+            }
+          });
+        }
+      }
+    }
+  }, [appState, fwdRef]);
+
   return (
     <ScopedThemeProvider value="sheet">
       <ActionSheet
-        ref={fwdRef}
+        ref={fwdRef || localRef}
         testIDs={{
           backdrop: "sheet-backdrop"
         }}

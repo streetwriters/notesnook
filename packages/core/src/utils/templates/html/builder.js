@@ -114,5 +114,6 @@ async function preprocessHTML(templateData) {
 export default { buildHTML };
 
 function hasRequire() {
-  return typeof require === "function" && !("IS_DESKTOP_APP" in globalThis);
+  // eslint-disable-next-line no-undef
+  return typeof require === "function" && !IS_DESKTOP_APP;
 }

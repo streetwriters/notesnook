@@ -478,6 +478,7 @@ span:focus .fake-cursor {
 .math-block .katex {
   max-width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
 /* -- Selection Plugin ---------------------------------- */

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Modal,
@@ -31,6 +31,9 @@ import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { BouncingView } from "../ui/transitions/bouncing-view";
 import { ScopedThemeProvider } from "@notesnook/theme";
+import SettingsService from "../../services/settings";
+import { useUserStore } from "../../stores/use-user-store";
+import { useAppState } from "../../hooks/use-app-state";
 
 const BaseDialog = ({
   visible,
@@ -51,6 +54,9 @@ const BaseDialog = ({
   avoidKeyboardResize = false
 }) => {
   const floating = useIsFloatingKeyboard();
+  const appState = useAppState();
+  const lockEvents = useRef(false);
+  const [internalVisible, setIntervalVisible] = useState(true);
 
   useEffect(() => {
     return () => {
@@ -58,14 +64,33 @@ const BaseDialog = ({
     };
   }, []);
 
+  useEffect(() => {
+    if (SettingsService.get().appLockMode === "background") {
+      if (appState === "background") {
+        setIntervalVisible(false);
+        if (useUserStore.getState().appLocked) {
+          lockEvents.current = true;
+          const unsub = useUserStore.subscribe((state) => {
+            if (!state.appLocked) {
+              setIntervalVisible(true);
+              unsub();
+              setTimeout(() => {
+                lockEvents.current = false;
+              });
+            }
+          });
+        }
+      }
+    }
+  }, [appState]);
+
   const Wrapper = useSafeArea ? SafeAreaView : View;
 
   return (
     <ScopedThemeProvider value="dialog">
       <Modal
-        visible={visible}
+        visible={visible && internalVisible}
         transparent={true}
-        animated
         statusBarTranslucent={statusBarTranslucent}
         supportedOrientations={[
           "portrait",
@@ -75,6 +100,7 @@ const BaseDialog = ({
           "landscape-right"
         ]}
         onShow={() => {
+          if (lockEvents.current) return;
           if (onShow) {
             onShow();
             useSettingStore.getState().setSheetKeyboardHandler(false);
@@ -82,6 +108,7 @@ const BaseDialog = ({
         }}
         animationType={animation}
         onRequestClose={() => {
+          if (lockEvents.current) return;
           if (!closeOnTouch) return null;
           useSettingStore.getState().setSheetKeyboardHandler(true);
           onRequestClose && onRequestClose();
@@ -133,8 +160,7 @@ const styles = StyleSheet.create({
   backdrop: {
     width: "100%",
     height: "100%",
-    justifyContent: "center",
-    alignItems: "center"
+    justifyContent: "center"
   },
   overlayButton: {
     width: "100%",
