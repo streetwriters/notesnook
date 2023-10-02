@@ -180,7 +180,7 @@ export default class Vault {
     if (!note) return;
     await this._unlockNote(note.data, password, true);
 
-    if (!this.exists()) await this.create(password);
+    if (!(await this.exists())) await this.create(this.password);
   }
 
   /**
@@ -194,7 +194,7 @@ export default class Vault {
 
     const unlockedNote = await this._unlockNote(note.data, password, false);
     this._password = password;
-    if (!this.exists()) await this.create(this._password);
+    if (!(await this.exists())) await this.create(password);
     return unlockedNote;
   }
 
