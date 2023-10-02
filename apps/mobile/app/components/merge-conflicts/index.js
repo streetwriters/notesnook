@@ -245,13 +245,16 @@ const MergeConflicts = () => {
   };
 
   return !visible ? null : (
-    <Modal
+    <BaseDialog
       statusBarTranslucent
       transparent={false}
       animationType="slide"
+      animated={false}
+      bounce={false}
       onRequestClose={() => {
         close();
       }}
+      background={colors?.primary.background}
       supportedOrientations={[
         "portrait",
         "portrait-upside-down",
@@ -363,7 +366,7 @@ const MergeConflicts = () => {
           </Animated.View>
         </View>
       </SafeAreaView>
-    </Modal>
+    </BaseDialog>
   );
 };
 

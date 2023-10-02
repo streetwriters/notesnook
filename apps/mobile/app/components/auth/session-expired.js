@@ -46,6 +46,7 @@ import Input from "../ui/input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { LoginSteps, useLogin } from "./use-login";
+import BaseDialog from "../dialog/base-dialog";
 
 function getObfuscatedEmail(email) {
   if (!email) return "";
@@ -130,7 +131,12 @@ export const SessionExpired = () => {
 
   return (
     visible && (
-      <Modal
+      <BaseDialog
+        transparent={false}
+        background={colors.primary.background}
+        bounce={false}
+        animated={false}
+        centered={false}
         onShow={async () => {
           await sleep(300);
           passwordInputRef.current?.focus();
@@ -231,7 +237,7 @@ export const SessionExpired = () => {
         </View>
         <Toast context="local" />
         <Dialog context="session_expiry" />
-      </Modal>
+      </BaseDialog>
     )
   );
 };

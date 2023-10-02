@@ -467,44 +467,40 @@ export class VaultDialog extends Component {
   }
 
   async _enrollFingerprint(password) {
-    try {
-      this.setState(
-        {
-          loading: true
-        },
-        async () => {
-          try {
-            await db.vault.unlock(password);
-            await BiometricService.storeCredentials(password);
-            this.setState({
-              loading: false
-            });
-            eSendEvent("vaultUpdated");
-            ToastEvent.show({
-              heading: "Biometric unlocking enabled!",
-              message: "Now you can unlock notes in vault with biometrics.",
-              type: "success",
-              context: "global"
-            });
-            this.close();
-          } catch (e) {
-            ToastEvent.show({
-              heading: "Incorrect password",
-              message:
-                "Please enter the correct vault password to enable biometrics.",
-              type: "error",
-              context: "local"
-            });
-            this.setState({
-              loading: false
-            });
-            return;
-          }
+    this.setState(
+      {
+        loading: true
+      },
+      async () => {
+        try {
+          await db.vault.unlock(password);
+          await BiometricService.storeCredentials(password);
+          this.setState({
+            loading: false
+          });
+          eSendEvent("vaultUpdated");
+          ToastEvent.show({
+            heading: "Biometric unlocking enabled!",
+            message: "Now you can unlock notes in vault with biometrics.",
+            type: "success",
+            context: "global"
+          });
+          this.close();
+        } catch (e) {
+          this.close();
+          ToastEvent.show({
+            heading: "Incorrect password",
+            message:
+              "Please enter the correct vault password to enable biometrics.",
+            type: "error",
+            context: "local"
+          });
+          this.setState({
+            loading: false
+          });
         }
-      );
-    } catch (e) {
-      this._takeErrorAction(e);
-    }
+      }
+    );
   }
 
   async _createVault() {
