@@ -273,6 +273,7 @@ export const ListItem = ({
             alignSelf: "flex-end",
             maxHeight: 250
           }}
+          estimatedItemSize={40}
           itemType={sublistItemType}
           hasHeaderSearch={hasHeaderSearch}
           renderItem={({ item, index }) => (

@@ -65,7 +65,9 @@ const EXTRA_ICON_NAMES = [
   "check-circle-outline",
   "chevron-up",
   "chevron-down",
-  "calendar"
+  "calendar",
+  "minus-circle-outline",
+  "close-circle-outline"
 ];
 
 const __filename = fileURLToPath(import.meta.url);
