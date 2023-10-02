@@ -179,6 +179,8 @@ export default class Vault {
     const note = this._db.notes.note(noteId);
     if (!note) return;
     await this._unlockNote(note.data, password, true);
+
+    if (!this.exists()) await this.create(password);
   }
 
   /**
@@ -192,6 +194,7 @@ export default class Vault {
 
     const unlockedNote = await this._unlockNote(note.data, password, false);
     this._password = password;
+    if (!this.exists()) await this.create(this._password);
     return unlockedNote;
   }
 

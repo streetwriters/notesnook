@@ -263,12 +263,14 @@ class Sync {
       lastSynced
     );
 
-    if (serverResponse.vaultKey) {
-      await this.merger.mergeItem(
-        "vaultKey",
-        serverResponse.vaultKey,
-        serverResponse.lastSynced
-      );
+    if (
+      serverResponse.vaultKey &&
+      serverResponse.vaultKey.cipher !== null &&
+      serverResponse.vaultKey.iv !== null &&
+      serverResponse.vaultKey.salt !== null &&
+      serverResponse.vaultKey.length > 0
+    ) {
+      await this.db.vault._setKey(serverResponse.vaultKey);
     }
 
     this.connection.off("SendItems");
