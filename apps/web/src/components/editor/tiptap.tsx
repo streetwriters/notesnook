@@ -154,6 +154,10 @@ function TipTap(props: TipTapProps) {
   const tiptapOptions = useMemo<Partial<TiptapOptions>>(() => {
     return {
       editorProps: {
+        handleKeyDown(view, event) {
+          if ((event.ctrlKey || event.metaKey) && event.key === "s")
+            event.preventDefault();
+        },
         handlePaste: (view, event) => {
           const hasText = event.clipboardData?.types?.some((type) =>
             type.startsWith("text/")
