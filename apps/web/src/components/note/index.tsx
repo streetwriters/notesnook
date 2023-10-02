@@ -86,6 +86,7 @@ import {
   ReferencesWithDateEdited
 } from "../list-container/types";
 import { SchemeColors } from "@notesnook/theme";
+import Vault from "../../common/vault";
 
 type NoteProps = {
   tags: Item[];
@@ -458,10 +459,28 @@ const menuItems: (note: any, items?: any[]) => MenuItem[] = (
     {
       type: "button",
       key: "copy",
-      title: "Copy",
+      title: "Copy as",
       icon: Copy.path,
-      isDisabled: note.locked,
-      menu: { items: copyMenuItem(note) }
+      menu: {
+        items: [
+          {
+            type: "button",
+            key: "copy-as-text",
+            tooltip: `Export as Text`,
+            title: "Text",
+            icon: Plaintext.path,
+            onClick: () => copyNote(note.id, "txt")
+          },
+          {
+            type: "button",
+            key: "copy-as-markdown",
+            tooltip: `Export as Markdown`,
+            title: "Markdown",
+            icon: Markdown.path,
+            onClick: () => copyNote(note.id, "md")
+          }
+        ]
+      }
     },
     {
       type: "button",
@@ -535,36 +554,6 @@ function colorsToMenuItems(note: any): MenuItem[] {
       onClick: () => store.setColor(note.id, lowercase)
     };
   });
-}
-
-function copyMenuItem(note: any): MenuItem[] {
-  const menuItems: MenuItem[] = [];
-
-  menuItems.push({
-    type: "button",
-    key: "copy-text",
-    title: "Copy as Text",
-    icon: Plaintext.path,
-    onClick: async () => {
-      const copied = await getNoteContent("txt", note.id);
-      if (typeof copied === "string") navigator.clipboard.writeText(copied);
-      else return;
-    }
-  });
-
-  menuItems.push({
-    type: "button",
-    key: "copy-markdown",
-    title: "Copy as Markdown",
-    icon: Markdown.path,
-    onClick: async () => {
-      const copied = await getNoteContent("md", note.id);
-      if (typeof copied === "string") navigator.clipboard.writeText(copied);
-      else return;
-    }
-  });
-
-  return menuItems;
 }
 
 function notebooksMenuItems(items: any[]): MenuItem[] {
@@ -707,16 +696,24 @@ function tagsMenuItems(items: any[]): MenuItem[] {
   return menuItems;
 }
 
-async function getNoteContent(type: string, id: any) {
-  const note = db.notes?.note(id);
-  if (!note) return;
+async function copyNote(noteId: string, format: "md" | "txt") {
+  try {
+    const note = db.notes?.note(noteId);
+    if (!note) throw new Error("No note with this id exists.");
+    if (note?.data.locked && !(await Vault.unlockVault()))
+      throw new Error("Please unlock this note to copy it.");
 
-  const content = await db.content?.raw(note.data.contentId);
+    const rawContent = await db.content?.raw(note.data.contentId);
+    const content = note?.data.locked
+      ? await db.vault?.decryptContent(rawContent)
+      : rawContent;
 
-  const copied = await note.export(type, content).catch((e: Error) => {
-    console.error(note.data, e);
-    showToast("error", `Failed to copy note "${note.title}": ${e.message}`);
-  });
-
-  return copied;
+    const text = await note.export(format, content, false);
+    if (!text) throw new Error(`Could not convert note to ${format}.`);
+    await navigator.clipboard.writeText(text);
+    showToast("success", "Copied!");
+  } catch (e) {
+    if (e instanceof Error)
+      showToast("error", `Failed to copy note: ${e.message}.`);
+  }
 }
