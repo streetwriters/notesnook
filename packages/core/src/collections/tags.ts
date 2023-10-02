@@ -18,16 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getId } from "../utils/id";
-import { CachedCollection } from "../database/cached-collection";
-import { MaybeDeletedItem, Tag } from "../types";
+import { Tag } from "../types";
 import Database from "../api";
 import { ICollection } from "./collection";
+import { SQLCollection } from "../database/sql-collection";
 
 export class Tags implements ICollection {
   name = "tags";
-  readonly collection: CachedCollection<"tags", Tag>;
+  readonly collection: SQLCollection<"tags", Tag>;
   constructor(private readonly db: Database) {
-    this.collection = new CachedCollection(db.storage, "tags", db.eventManager);
+    this.collection = new SQLCollection(db.sql, "tags", db.eventManager);
   }
 
   init() {
@@ -38,58 +38,46 @@ export class Tags implements ICollection {
     return this.collection.get(id);
   }
 
-  find(idOrTitle: string) {
-    return this.all.find(
-      (tag) => tag.title === idOrTitle || tag.id === idOrTitle
-    );
-  }
-
-  async merge(remoteTag: MaybeDeletedItem<Tag>) {
-    if (!remoteTag) return;
-
-    const localTag = this.collection.get(remoteTag.id);
-    if (!localTag || remoteTag.dateModified > localTag.dateModified)
-      await this.collection.add(remoteTag);
-  }
+  // find(idOrTitle: string) {
+  //   return this.all.find(
+  //     (tag) => tag.title === idOrTitle || tag.id === idOrTitle
+  //   );
+  // }
 
   async add(item: Partial<Tag>) {
     if (item.remote)
       throw new Error("Please use db.tags.merge to merge remote tags.");
 
     const id = item.id || getId(item.dateCreated);
-    const oldTag = this.tag(id);
+    const oldTag = await this.tag(id);
 
     item.title = item.title ? Tags.sanitize(item.title) : item.title;
     if (!item.title && !oldTag?.title) throw new Error("Title is required.");
 
-    const tag: Tag = {
+    await this.collection.upsert({
       id,
       dateCreated: item.dateCreated || oldTag?.dateCreated || Date.now(),
       dateModified: item.dateModified || oldTag?.dateModified || Date.now(),
       title: item.title || oldTag?.title || "",
       type: "tag",
       remote: false
-    };
-    await this.collection.add(tag);
-    return tag.id;
+    });
+    return id;
   }
 
-  get raw() {
-    return this.collection.raw();
-  }
+  // get raw() {
+  //   return this.collection.raw();
+  // }
 
-  get all() {
-    return this.collection.items();
-  }
+  // get all() {
+  //   return this.collection.items();
+  // }
 
-  async remove(id: string) {
-    await this.collection.remove(id);
-    await this.db.relations.cleanup();
-  }
-
-  async delete(id: string) {
-    await this.collection.delete(id);
-    await this.db.relations.cleanup();
+  async remove(...ids: string[]) {
+    await this.db.transaction(async () => {
+      await this.db.relations.unlinkOfType("tag", ids);
+      await this.collection.softDelete(ids);
+    });
   }
 
   exists(id: string) {

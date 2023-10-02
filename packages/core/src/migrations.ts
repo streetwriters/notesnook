@@ -298,10 +298,17 @@ const migrations: Migration[] = [
         return true;
       },
       shortcut: (item) => {
-        if (item.item.type === "topic") {
+        if (item.item?.type === "topic") {
           item.item = { type: "notebook", id: item.item.id };
-          return true;
         }
+
+        if (item.item) {
+          item.itemId = item.item.id;
+          item.itemType = item.item.type;
+        }
+
+        delete item.item;
+        return true;
       },
       settings: async (item, db) => {
         if (item.trashCleanupInterval)
@@ -335,6 +342,16 @@ const migrations: Migration[] = [
             );
           }
         }
+        return true;
+      },
+      relation: (item) => {
+        item.fromId = item.from!.id;
+        item.fromType = item.from!.type;
+        item.toId = item.to!.id;
+        item.toType = item.to!.type;
+
+        delete item.to;
+        delete item.from;
         return true;
       }
     }
