@@ -193,7 +193,7 @@ function setupDesktopIntegration() {
     app.on("before-quit", () => app.exit(0));
   }
 
-  globalThis.window?.once("close", (e) => {
+  globalThis.window?.on("close", (e) => {
     if (config.desktopSettings.closeToSystemTray) {
       e.preventDefault();
       if (process.platform == "darwin") {
