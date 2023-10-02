@@ -161,9 +161,6 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
           : "deselected";
         if (itemState[notebook.id] === "selected") {
           count++;
-          contextValue.select(notebook);
-        } else {
-          contextValue.deselect(notebook);
         }
         for (let topic of notebook.topics) {
           itemState[topic.id] = state
@@ -176,9 +173,6 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
             : "deselected";
           if (itemState[topic.id] === "selected") {
             count++;
-            contextValue.select(topic);
-          } else {
-            contextValue.deselect(topic);
           }
         }
       }
@@ -189,7 +183,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
       }
       useItemSelectionStore.getState().setItemState(itemState);
     },
-    [contextValue, getSelectedNotesCountInItem, selectedItemsList]
+    [getSelectedNotesCountInItem, selectedItemsList]
   );
 
   const getItemsForItem = (item) => {
@@ -214,7 +208,7 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
   }
 
   const updateItemState = useCallback(function (item, state) {
-    const itemState = useItemSelectionStore.getState().itemState;
+    const itemState = { ...useItemSelectionStore.getState().itemState };
     const mergeState = {
       [item.id]: state
     };
@@ -370,56 +364,93 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
         </View>
 
         <SelectionProvider value={contextValue}>
-          <FilteredList
+          <View
             style={{
               paddingHorizontal: 12,
-              maxHeight: dimensions.height * 0.85
+              maxHeight: dimensions.height * 0.85,
+              height: 50 * (notebooks.length + 2)
             }}
-            ListEmptyComponent={
-              notebooks.length > 0 ? null : (
-                <View
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    justifyContent: "center",
-                    alignItems: "center"
+          >
+            <FilteredList
+              ListEmptyComponent={
+                notebooks.length > 0 ? null : (
+                  <View
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Icon
+                      name="book-outline"
+                      color={colors.primary.icon}
+                      size={100}
+                    />
+                    <Paragraph style={{ marginBottom: 10 }}>
+                      You do not have any notebooks.
+                    </Paragraph>
+                  </View>
+                )
+              }
+              estimatedItemSize={50}
+              data={notebooks}
+              hasHeaderSearch={true}
+              renderItem={({ item, index }) => (
+                <ListItem
+                  item={item}
+                  key={item.id}
+                  index={index}
+                  hasNotes={getSelectedNotesCountInItem(item) > 0}
+                  sheetRef={actionSheetRef}
+                  infoText={
+                    <>
+                      {item.topics.length === 1
+                        ? item.topics.length + " topic"
+                        : item.topics.length + " topics"}
+                    </>
+                  }
+                  getListItems={getItemsForItem}
+                  getSublistItemProps={(topic) => ({
+                    hasNotes: getSelectedNotesCountInItem(topic) > 0,
+                    style: {
+                      marginBottom: 0,
+                      height: 40
+                    },
+                    onPress: (item) => {
+                      const itemState =
+                        useItemSelectionStore.getState().itemState;
+                      const currentState = itemState[item.id];
+                      if (currentState !== "selected") {
+                        resetItemState("deselected");
+                        contextValue.select(item);
+                      } else {
+                        contextValue.deselect(item);
+                      }
+                    },
+                    key: item.id,
+                    type: "transparent"
+                  })}
+                  icon={(expanded) => ({
+                    name: expanded ? "chevron-up" : "chevron-down",
+                    color: expanded
+                      ? colors.primary.accent
+                      : colors.primary.paragraph
+                  })}
+                  onScrollEnd={() => {
+                    actionSheetRef.current?.handleChildScrollEnd();
                   }}
-                >
-                  <Icon
-                    name="book-outline"
-                    color={colors.primary.icon}
-                    size={100}
-                  />
-                  <Paragraph style={{ marginBottom: 10 }}>
-                    You do not have any notebooks.
-                  </Paragraph>
-                </View>
-              )
-            }
-            data={notebooks}
-            hasHeaderSearch={true}
-            renderItem={({ item, index }) => (
-              <ListItem
-                item={item}
-                key={item.id}
-                index={index}
-                hasNotes={getSelectedNotesCountInItem(item) > 0}
-                sheetRef={actionSheetRef}
-                infoText={
-                  <>
-                    {item.topics.length === 1
-                      ? item.topics.length + " topic"
-                      : item.topics.length + " topics"}
-                  </>
-                }
-                getListItems={getItemsForItem}
-                getSublistItemProps={(topic) => ({
-                  hasNotes: getSelectedNotesCountInItem(topic) > 0,
-                  style: {
-                    marginBottom: 0,
-                    height: 40
-                  },
-                  onPress: (item) => {
+                  hasSubList={true}
+                  hasHeaderSearch={false}
+                  type="grayBg"
+                  sublistItemType="topic"
+                  onAddItem={(title) => {
+                    return onAddTopic(title, item);
+                  }}
+                  onAddSublistItem={(item) => {
+                    openAddTopicDialog(item);
+                  }}
+                  onPress={(item) => {
                     const itemState =
                       useItemSelectionStore.getState().itemState;
                     const currentState = itemState[item.id];
@@ -429,47 +460,16 @@ const MoveNoteSheet = ({ note, actionSheetRef }) => {
                     } else {
                       contextValue.deselect(item);
                     }
-                  },
-                  key: item.id,
-                  type: "transparent"
-                })}
-                icon={(expanded) => ({
-                  name: expanded ? "chevron-up" : "chevron-down",
-                  color: expanded
-                    ? colors.primary.accent
-                    : colors.primary.paragraph
-                })}
-                onScrollEnd={() => {
-                  actionSheetRef.current?.handleChildScrollEnd();
-                }}
-                hasSubList={true}
-                hasHeaderSearch={false}
-                type="grayBg"
-                sublistItemType="topic"
-                onAddItem={(title) => {
-                  return onAddTopic(title, item);
-                }}
-                onAddSublistItem={(item) => {
-                  openAddTopicDialog(item);
-                }}
-                onPress={(item) => {
-                  const itemState = useItemSelectionStore.getState().itemState;
-                  const currentState = itemState[item.id];
-                  if (currentState !== "selected") {
-                    resetItemState("deselected");
-                    contextValue.select(item);
-                  } else {
-                    contextValue.deselect(item);
-                  }
-                }}
-              />
-            )}
-            itemType="notebook"
-            onAddItem={async (title) => {
-              return await onAddNotebook(title);
-            }}
-            ListFooterComponent={<View style={{ height: 20 }} />}
-          />
+                  }}
+                />
+              )}
+              itemType="notebook"
+              onAddItem={async (title) => {
+                return await onAddNotebook(title);
+              }}
+              ListFooterComponent={<View style={{ height: 20 }} />}
+            />
+          </View>
         </SelectionProvider>
       </View>
     </>
