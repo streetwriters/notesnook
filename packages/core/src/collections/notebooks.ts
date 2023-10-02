@@ -17,25 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createNotebookModel } from "../models/notebook";
 import { getId } from "../utils/id";
-import { CachedCollection } from "../database/cached-collection";
 import Database from "../api";
-import { BaseTrashItem, Notebook, TrashOrItem, isTrashItem } from "../types";
+import { Notebook, TrashOrItem, isTrashItem } from "../types";
 import { ICollection } from "./collection";
+import { SQLCollection } from "../database/sql-collection";
 
 export class Notebooks implements ICollection {
   name = "notebooks";
   /**
    * @internal
    */
-  collection: CachedCollection<"notebooks", TrashOrItem<Notebook>>;
+  collection: SQLCollection<"notebooks", TrashOrItem<Notebook>>;
   constructor(private readonly db: Database) {
-    this.collection = new CachedCollection(
-      db.storage,
-      "notebooks",
-      db.eventManager
-    );
+    this.collection = new SQLCollection(db.sql, "notebooks", db.eventManager);
   }
 
   init() {
@@ -51,7 +46,7 @@ export class Notebooks implements ICollection {
 
     //TODO reliably and efficiently check for duplicates.
     const id = notebookArg.id || getId();
-    const oldNotebook = this.collection.get(id);
+    const oldNotebook = await this.notebook(id);
 
     if (oldNotebook && isTrashItem(oldNotebook))
       throw new Error("Cannot modify trashed notebooks.");
@@ -64,7 +59,7 @@ export class Notebooks implements ICollection {
     if (!mergedNotebook.title)
       throw new Error("Notebook must contain a title.");
 
-    const notebook: Notebook = {
+    await this.collection.upsert({
       id,
       type: "notebook",
       title: mergedNotebook.title,
@@ -74,79 +69,87 @@ export class Notebooks implements ICollection {
       dateCreated: mergedNotebook.dateCreated || Date.now(),
       dateModified: mergedNotebook.dateModified || Date.now(),
       dateEdited: Date.now()
-    };
-
-    await this.collection.add(notebook);
+    });
     return id;
   }
 
-  get raw() {
-    return this.collection.raw();
-  }
+  // get raw() {
+  //   return this.collection.raw();
+  // }
 
-  get all() {
-    return this.collection.items((note) =>
-      isTrashItem(note) ? undefined : note
-    ) as Notebook[];
-  }
+  // get all() {
+  //   return this.collection.items((note) =>
+  //     isTrashItem(note) ? undefined : note
+  //   ) as Notebook[];
+  // }
 
-  get pinned() {
-    return this.all.filter((item) => item.pinned === true);
-  }
+  // get pinned() {
+  //   return this.all.filter((item) => item.pinned === true);
+  // }
 
-  get trashed() {
-    return this.raw.filter((item) =>
-      isTrashItem(item)
-    ) as BaseTrashItem<Notebook>[];
-  }
+  // get trashed() {
+  //   return this.raw.filter((item) =>
+  //     isTrashItem(item)
+  //   ) as BaseTrashItem<Notebook>[];
+  // }
 
   async pin(...ids: string[]) {
-    for (const id of ids) {
-      if (!this.exists(id)) continue;
-      await this.add({ id, pinned: true });
-    }
+    await this.collection.update(ids, { pinned: true });
   }
 
   async unpin(...ids: string[]) {
-    for (const id of ids) {
-      if (!this.exists(id)) continue;
-      await this.add({ id, pinned: false });
-    }
+    await this.collection.update(ids, { pinned: false });
   }
 
-  totalNotes(id: string) {
-    let count = 0;
-    const subNotebooks = this.db.relations.from(
-      { type: "notebook", id },
-      "notebook"
-    );
-    for (const notebook of subNotebooks) {
-      count += this.totalNotes(notebook.to.id);
-    }
-    count += this.db.relations.from({ type: "notebook", id }, "note").length;
-    return count;
+  async totalNotes(id: string) {
+    const result = await this.db
+      .sql()
+      .withRecursive(`subNotebooks(id)`, (eb) =>
+        eb
+          .selectNoFrom((eb) => eb.val(id).as("id"))
+          .unionAll((eb) =>
+            eb
+              .selectFrom(["relations", "subNotebooks"])
+              .select("relations.toId as id")
+              .where("toType", "==", "notebook")
+              .where("fromType", "==", "notebook")
+              .whereRef("fromId", "==", "subNotebooks.id")
+              .where("toId", "not in", this.db.trash.cache)
+              .$narrowType<{ id: string }>()
+          )
+      )
+      .selectFrom("relations")
+      .where("toType", "==", "note")
+      .where("fromType", "==", "notebook")
+      .where("fromId", "in", (eb) =>
+        eb.selectFrom("subNotebooks").select("subNotebooks.id")
+      )
+      .where("toId", "not in", this.db.trash.cache)
+      .select((eb) => eb.fn.count<number>("id").as("totalNotes"))
+      .executeTakeFirst();
+
+    if (!result) return 0;
+    return result.totalNotes;
   }
 
-  notebook(idOrNotebook: string | Notebook) {
-    const notebook =
-      typeof idOrNotebook === "string"
-        ? this.collection.get(idOrNotebook)
-        : idOrNotebook;
+  async notebook(id: string) {
+    const notebook = await this.collection.get(id);
     if (!notebook || isTrashItem(notebook)) return;
-    return createNotebookModel(notebook, this.db);
+    return notebook;
   }
 
   exists(id: string) {
     return this.collection.exists(id);
   }
 
+  async remove(...ids: string[]) {
+    await this.db.trash.add("notebook", ids);
+  }
+
   async delete(...ids: string[]) {
-    for (const id of ids) {
-      const notebook = this.collection.get(id);
-      if (!notebook || isTrashItem(notebook)) continue;
-      await this.collection.remove(id);
-      await this.db.shortcuts?.remove(id);
-      await this.db.trash?.add(notebook);
-    }
+    await this.db.transaction(async () => {
+      await this.db.relations.unlinkOfType("notebook", ids);
+      await this.collection.softDelete(ids);
+    });
   }
 }
