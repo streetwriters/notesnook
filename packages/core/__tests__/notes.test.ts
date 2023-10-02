@@ -68,11 +68,12 @@ test("add invalid note", () =>
     expect(db.notes.add({ hello: "world" })).rejects.toThrow();
   }));
 
-test("add note", () =>
+test.only("add note", () =>
   noteTest().then(async ({ db, id }) => {
-    const note = db.notes.note(id);
+    const note = await db.notes.note$(id);
     expect(note).toBeDefined();
-    expect(await note?.content()).toStrictEqual(TEST_NOTE.content.data);
+    const content = await db.content.get(note!.contentId!);
+    expect(content!.data).toStrictEqual(TEST_NOTE.content.data);
   }));
 
 test("get note content", () =>

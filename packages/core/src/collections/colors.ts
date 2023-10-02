@@ -19,10 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ICollection } from "./collection";
 import { getId } from "../utils/id";
-import { Color, MaybeDeletedItem } from "../types";
+import { Color } from "../types";
 import Database from "../api";
-import { CachedCollection } from "../database/cached-collection";
 import { Tags } from "./tags";
+import { SQLCollection } from "../database/sql-collection";
 
 export const DefaultColors: Record<string, string> = {
   red: "#f44336",
@@ -36,13 +36,9 @@ export const DefaultColors: Record<string, string> = {
 
 export class Colors implements ICollection {
   name = "colors";
-  readonly collection: CachedCollection<"colors", Color>;
+  readonly collection: SQLCollection<"colors", Color>;
   constructor(private readonly db: Database) {
-    this.collection = new CachedCollection(
-      db.storage,
-      "colors",
-      db.eventManager
-    );
+    this.collection = new SQLCollection(db.sql, "colors", db.eventManager);
   }
 
   init() {
@@ -53,27 +49,27 @@ export class Colors implements ICollection {
     return this.collection.get(id);
   }
 
-  async merge(remoteColor: MaybeDeletedItem<Color>) {
-    if (!remoteColor) return;
+  // async merge(remoteColor: MaybeDeletedItem<Color>) {
+  //   if (!remoteColor) return;
 
-    const localColor = this.collection.get(remoteColor.id);
-    if (!localColor || remoteColor.dateModified > localColor.dateModified)
-      await this.collection.add(remoteColor);
-  }
+  //   const localColor = this.collection.get(remoteColor.id);
+  //   if (!localColor || remoteColor.dateModified > localColor.dateModified)
+  //     await this.collection.add(remoteColor);
+  // }
 
   async add(item: Partial<Color>) {
     if (item.remote)
       throw new Error("Please use db.colors.merge to merge remote colors.");
 
     const id = item.id || getId(item.dateCreated);
-    const oldColor = this.color(id);
+    const oldColor = await this.color(id);
 
     item.title = item.title ? Tags.sanitize(item.title) : item.title;
     if (!item.title && !oldColor?.title) throw new Error("Title is required.");
     if (!item.colorCode && !oldColor?.colorCode)
       throw new Error("Color code is required.");
 
-    const color: Color = {
+    await this.collection.upsert({
       id,
       dateCreated: item.dateCreated || oldColor?.dateCreated || Date.now(),
       dateModified: item.dateModified || oldColor?.dateModified || Date.now(),
@@ -81,34 +77,35 @@ export class Colors implements ICollection {
       colorCode: item.colorCode || oldColor?.colorCode || "",
       type: "color",
       remote: false
-    };
-    await this.collection.add(color);
-    return color.id;
+    });
+    return id;
   }
 
-  get raw() {
-    return this.collection.raw();
+  // get raw() {
+  //   return this.collection.raw();
+  // }
+
+  // get all(): Color[] {
+  //   return this.collection.items();
+  // }
+
+  async remove(...ids: string[]) {
+    await this.db.transaction(async () => {
+      await this.db.relations.unlinkOfType("color", ids);
+      await this.collection.softDelete(ids);
+    });
   }
 
-  get all(): Color[] {
-    return this.collection.items();
-  }
-
-  async remove(id: string) {
-    await this.collection.remove(id);
-    await this.db.relations.cleanup();
-  }
-
-  async delete(id: string) {
-    await this.collection.delete(id);
-    await this.db.relations.cleanup();
-  }
+  // async delete(id: string) {
+  //   await this.collection.delete(id);
+  //   await this.db.relations.cleanup();
+  // }
 
   exists(id: string) {
     return this.collection.exists(id);
   }
 
-  find(idOrTitle: string) {
-    return this.all.find((t) => t.title === idOrTitle || t.id === idOrTitle);
-  }
+  // find(idOrTitle: string) {
+  //   return this.all.find((t) => t.title === idOrTitle || t.id === idOrTitle);
+  // }
 }

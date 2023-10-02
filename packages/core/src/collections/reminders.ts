@@ -25,9 +25,9 @@ import isYesterday from "dayjs/plugin/isYesterday";
 import { TimeFormat, formatDate } from "../utils/date";
 import { getId } from "../utils/id";
 import { ICollection } from "./collection";
-import { CachedCollection } from "../database/cached-collection";
 import { Reminder } from "../types";
 import Database from "../api";
+import { SQLCollection } from "../database/sql-collection";
 
 dayjs.extend(isTomorrow);
 dayjs.extend(isSameOrBefore);
@@ -36,13 +36,9 @@ dayjs.extend(isToday);
 
 export class Reminders implements ICollection {
   name = "reminders";
-  readonly collection: CachedCollection<"reminders", Reminder>;
+  readonly collection: SQLCollection<"reminders", Reminder>;
   constructor(private readonly db: Database) {
-    this.collection = new CachedCollection(
-      db.storage,
-      "reminders",
-      db.eventManager
-    );
+    this.collection = new SQLCollection(db.sql, "reminders", db.eventManager);
   }
 
   async init() {
@@ -65,7 +61,7 @@ export class Reminders implements ICollection {
     if (!reminder.date || !reminder.title)
       throw new Error("date and title are required in a reminder.");
 
-    await this.collection.add({
+    await this.collection.upsert({
       id,
       type: "reminder",
       dateCreated: reminder.dateCreated || Date.now(),
@@ -81,16 +77,16 @@ export class Reminders implements ICollection {
       disabled: reminder.disabled,
       snoozeUntil: reminder.snoozeUntil
     });
-    return reminder.id;
+    return id;
   }
 
-  get raw() {
-    return this.collection.raw();
-  }
+  // get raw() {
+  //   return this.collection.raw();
+  // }
 
-  get all() {
-    return this.collection.items();
-  }
+  // get all() {
+  //   return this.collection.items();
+  // }
 
   exists(itemId: string) {
     return this.collection.exists(itemId);
@@ -101,9 +97,7 @@ export class Reminders implements ICollection {
   }
 
   async remove(...reminderIds: string[]) {
-    for (const id of reminderIds) {
-      await this.collection.remove(id);
-    }
+    await this.collection.softDelete(reminderIds);
   }
 }
 
