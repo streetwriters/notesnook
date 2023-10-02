@@ -89,13 +89,7 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [
-          {
-            title: "Write protected task lists",
-            subtitle:
-              "You can now write protect specific task lists to prevent any accidental edits."
-          }
-        ],
+      : [],
     cta: {
       title: "Got it",
       icon: Checkmark,
