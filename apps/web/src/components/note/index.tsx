@@ -49,7 +49,8 @@ import {
   AddToNotebook,
   RemoveShortcutLink,
   Plus,
-  Tag
+  Tag,
+  Copy
 } from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
@@ -85,6 +86,7 @@ import {
   ReferencesWithDateEdited
 } from "../list-container/types";
 import { SchemeColors } from "@notesnook/theme";
+import Vault from "../../common/vault";
 
 type NoteProps = {
   tags: Item[];
@@ -456,6 +458,32 @@ const menuItems: (note: any, items?: any[]) => MenuItem[] = (
     },
     {
       type: "button",
+      key: "copy",
+      title: "Copy as",
+      icon: Copy.path,
+      menu: {
+        items: [
+          {
+            type: "button",
+            key: "copy-as-text",
+            tooltip: `Export as Text`,
+            title: "Text",
+            icon: Plaintext.path,
+            onClick: () => copyNote(note.id, "txt")
+          },
+          {
+            type: "button",
+            key: "copy-as-markdown",
+            tooltip: `Export as Markdown`,
+            title: "Markdown",
+            icon: Markdown.path,
+            onClick: () => copyNote(note.id, "md")
+          }
+        ]
+      }
+    },
+    {
+      type: "button",
       key: "duplicate",
       title: "Duplicate",
       isDisabled: !isSynced || note.locked,
@@ -666,4 +694,26 @@ function tagsMenuItems(items: any[]): MenuItem[] {
   }
 
   return menuItems;
+}
+
+async function copyNote(noteId: string, format: "md" | "txt") {
+  try {
+    const note = db.notes?.note(noteId);
+    if (!note) throw new Error("No note with this id exists.");
+    if (note?.data.locked && !(await Vault.unlockVault()))
+      throw new Error("Please unlock this note to copy it.");
+
+    const rawContent = await db.content?.raw(note.data.contentId);
+    const content = note?.data.locked
+      ? await db.vault?.decryptContent(rawContent)
+      : rawContent;
+
+    const text = await note.export(format, content, false);
+    if (!text) throw new Error(`Could not convert note to ${format}.`);
+    await navigator.clipboard.writeText(text);
+    showToast("success", "Copied!");
+  } catch (e) {
+    if (e instanceof Error)
+      showToast("error", `Failed to copy note: ${e.message}.`);
+  }
 }
