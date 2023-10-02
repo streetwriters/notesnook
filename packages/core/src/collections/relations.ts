@@ -17,228 +17,145 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { CachedCollection } from "../database/cached-collection";
 import { makeId } from "../utils/id";
 import { ICollection } from "./collection";
-import { Relation, ItemMap, ItemReference, MaybeDeletedItem } from "../types";
+import {
+  Relation,
+  ItemMap,
+  ItemReference,
+  ValueOf,
+  MaybeDeletedItem
+} from "../types";
 import Database from "../api";
-
-type RelationsArray<TType extends keyof ItemMap> = Relation[] & {
-  resolved: (limit?: number) => ItemMap[TType][];
-  has: (id: string) => boolean;
-};
+import { SQLCollection } from "../database/sql-collection";
+import { DatabaseAccessor, DatabaseSchema } from "../database";
+import { SelectQueryBuilder } from "kysely";
 
 export class Relations implements ICollection {
   name = "relations";
-  readonly collection: CachedCollection<"relations", Relation>;
+  readonly collection: SQLCollection<"relations", Relation>;
   constructor(private readonly db: Database) {
-    this.collection = new CachedCollection(
-      db.storage,
-      "relations",
-      db.eventManager
-    );
+    this.collection = new SQLCollection(db.sql, "relations", db.eventManager);
   }
 
-  init() {
-    return this.collection.init();
-  }
-
-  async merge(relation: MaybeDeletedItem<Relation>) {
-    await this.collection.add(relation);
+  async init() {
+    // return this.collection.init();
   }
 
   async add(from: ItemReference, to: ItemReference) {
-    if (
-      this.all.find(
-        (a) =>
-          compareItemReference(a.from, from) && compareItemReference(a.to, to)
-      )
-    )
-      return;
-
-    const relation: Relation = {
+    await this.collection.upsert({
       id: generateId(from, to),
       type: "relation",
       dateCreated: Date.now(),
       dateModified: Date.now(),
-      from: { id: from.id, type: from.type },
-      to: { id: to.id, type: to.type }
-    };
-
-    await this.collection.add(relation);
+      fromId: from.id,
+      fromType: from.type,
+      toId: to.id,
+      toType: to.type
+    });
   }
 
-  from<TType extends keyof ItemMap>(
+  from<TType extends keyof RelatableTable>(
     reference: ItemReference,
     type: TType
-  ): RelationsArray<TType> {
-    const relations =
-      type === "note" || type === "notebook"
-        ? this.all.filter(
-            (a) =>
-              compareItemReference(a.from, reference) &&
-              a.to.type === type &&
-              !this.db.trash.exists(a.to.id)
-          )
-        : this.all.filter(
-            (a) => compareItemReference(a.from, reference) && a.to.type === type
-          );
-
-    Object.defineProperties(relations, {
-      resolved: {
-        writable: false,
-        enumerable: false,
-        configurable: false,
-        value: (limit?: number) =>
-          this.resolve(limit ? relations.slice(0, limit) : relations, "to")
-      },
-      has: {
-        writable: false,
-        enumerable: false,
-        configurable: false,
-        value: (id: string) => relations.some((rel) => rel.to.id === id)
-      }
-    });
-    return relations as RelationsArray<TType>;
+  ) {
+    return new RelationsArray(
+      this.db.sql,
+      this.db.trash.cache,
+      reference,
+      type,
+      "from"
+    );
   }
 
-  to<TType extends keyof ItemMap>(
+  to<TType extends keyof RelatableTable>(
     reference: ItemReference,
     type: TType
-  ): RelationsArray<TType> {
-    const relations =
-      type === "note" || type === "notebook"
-        ? this.all.filter(
-            (a) =>
-              compareItemReference(a.to, reference) &&
-              a.from.type === type &&
-              !this.db.trash.exists(a.from.id)
-          )
-        : this.all.filter(
-            (a) => compareItemReference(a.to, reference) && a.from.type === type
-          );
-    Object.defineProperties(relations, {
-      resolved: {
-        writable: false,
-        enumerable: false,
-        configurable: false,
-        value: (limit?: number) =>
-          this.resolve(limit ? relations.slice(0, limit) : relations, "from")
-      },
-      has: {
-        writable: false,
-        enumerable: false,
-        configurable: false,
-        value: (id: string) => relations.some((rel) => rel.from.id === id)
-      }
-    });
-    return relations as RelationsArray<TType>;
+  ) {
+    return new RelationsArray(
+      this.db.sql,
+      this.db.trash.cache,
+      reference,
+      type,
+      "to"
+    );
   }
 
-  get raw() {
-    return this.collection.raw();
-  }
+  // get raw() {
+  //   return this.collection.raw();
+  // }
 
-  get all(): Relation[] {
-    return this.collection.items();
-  }
+  // get all(): Relation[] {
+  //   return this.collection.items();
+  // }
 
-  relation(id: string) {
-    return this.collection.get(id);
-  }
+  // relation(id: string) {
+  //   return this.collection.get(id);
+  // }
 
   async remove(...ids: string[]) {
-    for (const id of ids) {
-      await this.collection.remove(id);
-    }
+    await this.collection.softDelete(ids);
   }
 
-  async unlink(from: ItemReference, to: ItemReference) {
-    const relation = this.all.find(
-      (a) =>
-        compareItemReference(a.from, from) && compareItemReference(a.to, to)
-    );
-    if (!relation) return;
-
-    await this.remove(relation.id);
+  unlink(from: ItemReference, to: ItemReference) {
+    return this.remove(generateId(from, to));
   }
 
-  async unlinkAll(to: ItemReference, type?: keyof ItemMap) {
-    for (const relation of this.all.filter(
-      (a) => compareItemReference(a.to, to) && (!type || a.from.type === type)
-    )) {
-      await this.remove(relation.id);
-    }
-  }
-
-  private resolve(relations: Relation[], resolveType: "from" | "to") {
-    const items = [];
-    for (const relation of relations) {
-      const reference = resolveType === "from" ? relation.from : relation.to;
-      let item = null;
-      switch (reference.type) {
-        case "tag":
-          item = this.db.tags.tag(reference.id);
-          break;
-        case "color":
-          item = this.db.colors.color(reference.id);
-          break;
-        case "reminder":
-          item = this.db.reminders.reminder(reference.id);
-          break;
-        case "note": {
-          const note = this.db.notes.note(reference.id);
-          if (!note) continue;
-          item = note.data;
-          break;
-        }
-        case "notebook": {
-          const notebook = this.db.notebooks.notebook(reference.id);
-          if (!notebook) continue;
-          item = notebook.data;
-          break;
-        }
-        case "attachment": {
-          const attachment = this.db.attachments.attachment(reference.id);
-          if (!attachment) continue;
-          item = attachment;
-          break;
-        }
-      }
-      if (item) items.push(item);
-    }
-    return items;
+  async unlinkOfType(type: keyof RelatableTable, ids?: string[]) {
+    await this.db
+      .sql()
+      .replaceInto("relations")
+      .columns(["id", "dateModified", "deleted"])
+      .expression((eb) =>
+        eb
+          .selectFrom("relations")
+          .where((eb) =>
+            eb.or([eb("fromType", "==", type), eb("toType", "==", type)])
+          )
+          .$if(ids !== undefined && ids.length > 0, (eb) =>
+            eb.where((eb) =>
+              eb.or([eb("fromId", "in", ids), eb("toId", "in", ids)])
+            )
+          )
+          .select((eb) => [
+            "relations.id",
+            eb.lit(Date.now()).as("dateModified"),
+            eb.lit(1).as("deleted")
+          ])
+      )
+      .execute();
   }
 
   async cleanup() {
-    for (const relation of this.all) {
-      const references = [relation.to, relation.from];
-      for (const reference of references) {
-        let exists: boolean | undefined = false;
-        switch (reference.type) {
-          case "tag":
-            exists = this.db.tags.exists(reference.id);
-            break;
-          case "color":
-            exists = this.db.colors.exists(reference.id);
-            break;
-          case "reminder":
-            exists = this.db.reminders.exists(reference.id);
-            break;
-          case "note":
-            exists =
-              this.db.notes.exists(reference.id) ||
-              this.db.trash.exists(reference.id);
-            break;
-          case "notebook":
-            exists =
-              this.db.notebooks.exists(reference.id) ||
-              this.db.trash.exists(reference.id);
-            break;
-        }
-        if (!exists) await this.remove(relation.id);
-      }
-    }
+    //   for (const relation of this.all) {
+    //     const references = [relation.to, relation.from];
+    //     for (const reference of references) {
+    //       let exists: boolean | undefined = false;
+    //       switch (reference.type) {
+    //         case "tag":
+    //           exists = this.db.tags.exists(reference.id);
+    //           break;
+    //         case "color":
+    //           exists = this.db.colors.exists(reference.id);
+    //           break;
+    //         case "reminder":
+    //           exists = this.db.reminders.exists(reference.id);
+    //           break;
+    //         case "note":
+    //           exists =
+    //             this.db.notes.exists(reference.id) ||
+    //             this.db.trash.exists(reference.id);
+    //           break;
+    //         case "notebook":
+    //           exists =
+    //             this.db.notebooks.exists(reference.id) ||
+    //             this.db.trash.exists(reference.id);
+    //           break;
+    //       }
+    //       if (!exists) await this.remove(relation.id);
+    //     }
+    //   }
+    // }
   }
 }
 
@@ -259,4 +176,133 @@ function compareItemReference(a: ItemReference, b: ItemReference) {
 function generateId(a: ItemReference, b: ItemReference) {
   const str = `${a.id}${b.id}${a.type}${b.type}`;
   return makeId(str);
+}
+
+const TABLE_MAP = {
+  note: "notes",
+  notebook: "notebooks",
+  reminder: "reminders",
+  tag: "tags",
+  color: "colors",
+  attachment: "attachments"
+} as const;
+
+type RelatableTable = typeof TABLE_MAP;
+
+class RelationsArray<TType extends keyof RelatableTable> {
+  private table: ValueOf<RelatableTable> = TABLE_MAP[this.type];
+
+  constructor(
+    private readonly sql: DatabaseAccessor,
+    private readonly trashIds: string[],
+    private readonly reference: ItemReference,
+    private readonly type: TType,
+    private readonly direction: "from" | "to"
+  ) {}
+
+  async resolve(limit?: number): Promise<ItemMap[TType][]> {
+    const items = await this.sql()
+      .selectFrom(this.table)
+      .where("id", "in", (b) =>
+        b
+          .selectFrom("relations")
+          .$call((eb) =>
+            this.buildRelationsQuery()(
+              eb as SelectQueryBuilder<DatabaseSchema, "relations", unknown>
+            )
+          )
+      )
+      .$if(limit !== undefined && limit > 0, (b) => b.limit(limit!))
+      .selectAll()
+      // TODO: check if we need to index deleted field.
+      .where("deleted", "is", null)
+      .execute();
+    return items as unknown as ItemMap[TType][];
+  }
+
+  async unlink() {
+    await this.sql()
+      .replaceInto("relations")
+      .columns(["id", "dateModified", "deleted"])
+      .expression((eb) =>
+        eb
+          .selectFrom("relations")
+          .$call(this.buildRelationsQuery())
+          .clearSelect()
+          .select((eb) => [
+            "relations.id",
+            eb.lit(Date.now()).as("dateModified"),
+            eb.lit(1).as("deleted")
+          ])
+      )
+      .execute();
+  }
+
+  async get() {
+    const ids = await this.sql()
+      .selectFrom("relations")
+      .$call(this.buildRelationsQuery())
+      .execute();
+    return ids.map((i) => i.id);
+  }
+
+  async count() {
+    const result = await this.sql()
+      .selectFrom("relations")
+      .$call(this.buildRelationsQuery())
+      .clearSelect()
+      .select((b) => b.fn.count<number>("relations.id").as("count"))
+      .executeTakeFirst();
+    if (!result) return 0;
+    return result.count;
+  }
+
+  async has(id: string) {
+    const result = await this.sql()
+      .selectFrom("relations")
+      .$call(this.buildRelationsQuery())
+      .clearSelect()
+      .where(this.direction === "from" ? "toId" : "fromId", "==", id)
+      .select((b) => b.fn.count<number>("id").as("count"))
+      .executeTakeFirst();
+    if (!result) return false;
+    return result.count > 0;
+  }
+
+  /**
+   * Build an optimized query for obtaining relations based on the given
+   * parameters. The resulting query uses a covering index (the most
+   * optimizable index) for obtaining relations.
+   */
+  private buildRelationsQuery() {
+    return (
+      builder: SelectQueryBuilder<DatabaseSchema, "relations", unknown>
+    ) => {
+      if (this.direction === "to") {
+        return builder
+          .where("fromType", "==", this.type)
+          .where("toType", "==", this.reference.type)
+          .where("toId", "==", this.reference.id)
+          .$if(
+            (this.type === "note" || this.type === "notebook") &&
+              this.trashIds.length > 0,
+            (b) => b.where("fromId", "not in", this.trashIds)
+          )
+          .select("relations.fromId as id")
+          .$narrowType<{ id: string }>();
+      } else {
+        return builder
+          .where("toType", "==", this.type)
+          .where("fromType", "==", this.reference.type)
+          .where("fromId", "==", this.reference.id)
+          .$if(
+            (this.type === "note" || this.type === "notebook") &&
+              this.trashIds.length > 0,
+            (b) => b.where("toId", "not in", this.trashIds)
+          )
+          .select("relations.toId as id")
+          .$narrowType<{ id: string }>();
+      }
+    };
+  }
 }

@@ -29,21 +29,18 @@ import {
   isWebClip
 } from "../utils/filename";
 import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
-import { CachedCollection } from "../database/cached-collection";
 import { Output } from "../interfaces";
-import { Attachment, AttachmentMetadata, isDeleted } from "../types";
+import { Attachment } from "../types";
 import Database from "../api";
+import { SQLCollection } from "../database/sql-collection";
+import { isCipher } from "../database/crypto";
 
 export class Attachments implements ICollection {
   name = "attachments";
   key: Cipher<"base64"> | null = null;
-  readonly collection: CachedCollection<"attachments", Attachment>;
+  readonly collection: SQLCollection<"attachments", Attachment>;
   constructor(private readonly db: Database) {
-    this.collection = new CachedCollection(
-      db.storage,
-      "attachments",
-      db.eventManager
-    );
+    this.collection = new SQLCollection(db.sql, "attachments", db.eventManager);
     this.key = null;
 
     EV.subscribe(
@@ -60,7 +57,7 @@ export class Attachments implements ICollection {
         eventData: Record<string, unknown>;
       }) => {
         if (!success || !eventData || !eventData.readOnDownload) return;
-        const attachment = this.attachment(filename);
+        const attachment = await this.attachment(filename);
         if (!attachment) return;
 
         const src = await this.read(filename, getOutputType(attachment));
@@ -68,7 +65,7 @@ export class Attachments implements ICollection {
 
         EV.publish(EVENTS.mediaAttachmentDownloaded, {
           groupId,
-          hash: attachment.metadata.hash,
+          hash: attachment.hash,
           attachmentType: getAttachmentType(attachment),
           src
         });
@@ -86,7 +83,7 @@ export class Attachments implements ICollection {
         filename: string;
         error: string;
       }) => {
-        const attachment = this.attachment(filename);
+        const attachment = await this.attachment(filename);
         if (!attachment) return;
         if (success) await this.markAsUploaded(attachment.id);
         else
@@ -104,54 +101,50 @@ export class Attachments implements ICollection {
 
   async add(
     item: Partial<
-      Omit<Attachment, "key" | "metadata"> & {
+      Omit<Attachment, "key" | "encryptionKey"> & {
         key: SerializedKey;
       }
-    > & {
-      metadata: Partial<AttachmentMetadata> & { hash: string };
-    }
+    >
   ) {
     if (!item) return console.error("attachment cannot be undefined");
-    if (!item.metadata.hash) throw new Error("Please provide attachment hash.");
+    if (!item.hash) throw new Error("Please provide attachment hash.");
 
-    const oldAttachment = this.all.find(
-      (a) => a.metadata.hash === item.metadata?.hash
-    );
+    const oldAttachment = await this.attachment(item.hash);
     const id = oldAttachment?.id || getId();
 
     const encryptedKey = item.key
-      ? await this.encryptKey(item.key)
-      : oldAttachment?.key;
+      ? JSON.stringify(await this.encryptKey(item.key))
+      : oldAttachment?.encryptionKey;
     const attachment = {
       ...oldAttachment,
-      ...oldAttachment?.metadata,
       ...item,
-      key: encryptedKey
+      encryptionKey: encryptedKey
     };
 
     const {
       iv,
-      length,
+      size,
       alg,
       hash,
       hashType,
       filename,
+      mimeType,
       salt,
-      type,
       chunkSize,
-      key
+      encryptionKey
     } = attachment;
 
     if (
       !iv ||
-      !length ||
+      !size ||
       !alg ||
       !hash ||
       !hashType ||
-      !filename ||
+      // !filename ||
+      //  !mimeType ||
       !salt ||
       !chunkSize ||
-      !key
+      !encryptionKey
     ) {
       console.error(
         "Attachment is invalid because all properties are required:",
@@ -161,27 +154,33 @@ export class Attachments implements ICollection {
       return;
     }
 
-    return this.collection.add({
+    await this.collection.upsert({
       type: "attachment",
       id,
       iv,
       salt,
-      length,
+      size,
       alg,
-      key,
+      encryptionKey,
       chunkSize,
-      metadata: {
-        hash,
-        hashType,
-        filename: getFileNameWithExtension(filename, type),
-        type: type || "application/octet-stream"
-      },
+
+      filename:
+        filename ||
+        getFileNameWithExtension(
+          filename || hash,
+          mimeType || "application/octet-stream"
+        ),
+      hash,
+      hashType,
+      mimeType: mimeType || "application/octet-stream",
+
       dateCreated: attachment.dateCreated || Date.now(),
       dateModified: attachment.dateModified || Date.now(),
       dateUploaded: attachment.dateUploaded,
-      dateDeleted: undefined,
       failed: attachment.failed
     });
+
+    return id;
   }
 
   async generateKey() {
@@ -189,7 +188,9 @@ export class Attachments implements ICollection {
     return await this.db.crypto().generateRandomKey();
   }
 
-  async decryptKey(key: Cipher<"base64">): Promise<SerializedKey | null> {
+  async decryptKey(keyJSON: string): Promise<SerializedKey | null> {
+    const key = JSON.parse(keyJSON);
+    if (!isCipher(key)) return null;
     const encryptionKey = await this._getEncryptionKey();
     const plainData = await this.db.storage().decrypt(encryptionKey, key);
     if (!plainData) return null;
@@ -197,7 +198,7 @@ export class Attachments implements ICollection {
   }
 
   async remove(hashOrId: string, localOnly: boolean) {
-    const attachment = this.attachment(hashOrId);
+    const attachment = await this.attachment(hashOrId);
     if (!attachment) return false;
 
     if (!localOnly && !(await this.canDetach(attachment)))
@@ -206,116 +207,115 @@ export class Attachments implements ICollection {
     if (
       await this.db
         .fs()
-        .deleteFile(
-          attachment.metadata.hash,
-          localOnly || !attachment.dateUploaded
-        )
+        .deleteFile(attachment.hash, localOnly || !attachment.dateUploaded)
     ) {
       if (!localOnly) {
         await this.detach(attachment);
       }
-      await this.collection.remove(attachment.id);
+      await this.collection.softDelete([attachment.id]);
       return true;
     }
     return false;
   }
 
   async detach(attachment: Attachment) {
-    for (const note of this.db.relations.from(attachment, "note").resolved()) {
+    for (const note of await this.db.relations
+      .from(attachment, "note")
+      .resolve()) {
       if (!note || !note.contentId) continue;
       await this.db.content.removeAttachments(note.contentId, [
-        attachment.metadata.hash
+        attachment.hash
       ]);
     }
   }
 
   private async canDetach(attachment: Attachment) {
-    return this.db.relations
-      .from(attachment, "note")
-      .resolved()
-      .every((note) => !note.locked);
+    return (await this.db.relations.from(attachment, "note").resolve()).every(
+      (note) => !note.locked
+    );
   }
 
-  ofNote(
+  async ofNote(
     noteId: string,
     ...types: ("files" | "images" | "webclips" | "all")[]
-  ): Attachment[] {
-    const noteAttachments = this.db.relations
+  ): Promise<Attachment[]> {
+    const noteAttachments = await this.db.relations
       .from({ type: "note", id: noteId }, "attachment")
-      .resolved();
+      .resolve();
 
     if (types.includes("all")) return noteAttachments;
 
     return noteAttachments.filter((a) => {
-      if (isImage(a.metadata.type) && types.includes("images")) return true;
-      else if (isWebClip(a.metadata.type) && types.includes("webclips"))
-        return true;
+      if (isImage(a.mimeType) && types.includes("images")) return true;
+      else if (isWebClip(a.mimeType) && types.includes("webclips")) return true;
       else if (types.includes("files")) return true;
     });
   }
 
-  exists(hash: string) {
-    const attachment = this.all.find((a) => a.metadata.hash === hash);
-    return !!attachment;
+  async exists(hash: string) {
+    return !!(await this.attachment(hash));
   }
 
   async read<TOutputFormat extends DataFormat>(
     hash: string,
     outputType: TOutputFormat
   ): Promise<Output<TOutputFormat> | undefined> {
-    const attachment = this.all.find((a) => a.metadata.hash === hash);
+    const attachment = await this.attachment(hash);
     if (!attachment) return;
 
-    const key = await this.decryptKey(attachment.key);
+    const key = await this.decryptKey(attachment.encryptionKey);
     if (!key) return;
-    const data = await this.db
-      .fs()
-      .readEncrypted(attachment.metadata.hash, key, {
-        chunkSize: attachment.chunkSize,
-        iv: attachment.iv,
-        salt: attachment.salt,
-        length: attachment.length,
-        alg: attachment.alg,
-        outputType
-      });
+    const data = await this.db.fs().readEncrypted(attachment.hash, key, {
+      chunkSize: attachment.chunkSize,
+      iv: attachment.iv,
+      salt: attachment.salt,
+      size: attachment.size,
+      alg: attachment.alg,
+      outputType
+    });
     if (!data) return;
 
     return (
       outputType === "base64"
         ? dataurl.fromObject({
-            type: attachment.metadata.type,
+            mimeType: attachment.mimeType,
             data
           })
         : data
     ) as Output<TOutputFormat>;
   }
 
-  attachment(hashOrId: string) {
-    return this.all.find(
-      (a) => a.id === hashOrId || a.metadata.hash === hashOrId
-    );
+  async attachment(hashOrId: string): Promise<Attachment | undefined> {
+    return await this.db
+      .sql()
+      .selectFrom("attachments")
+      .selectAll()
+      .where((eb) =>
+        eb.or([eb("id", "==", hashOrId), eb("hash", "==", hashOrId)])
+      )
+      .where("deleted", "is", null)
+      .$narrowType<Attachment>()
+      .executeTakeFirst();
   }
 
   markAsUploaded(id: string) {
-    const attachment = this.attachment(id);
-    if (!attachment) return;
-    attachment.dateUploaded = Date.now();
-    attachment.failed = undefined;
-    return this.collection.update(attachment);
+    return this.collection.update([id], {
+      dateUploaded: Date.now(),
+      failed: null
+    });
   }
 
   reset(id: string) {
-    const attachment = this.attachment(id);
-    if (!attachment) return;
-    attachment.dateUploaded = undefined;
-    return this.collection.update(attachment);
+    return this.collection.update([id], {
+      dateUploaded: null
+    });
   }
 
   markAsFailed(id: string, reason: string) {
-    const attachment = this.attachment(id);
-    if (!attachment) return;
-    attachment.failed = reason;
-    return this.collection.update(attachment);
+    return this.collection.update([id], {
+      dateUploaded: null,
+      failed: reason
+    });
   }
 
   async save(
@@ -325,7 +325,7 @@ export class Attachments implements ICollection {
   ): Promise<string | undefined> {
     const hashResult = await this.db.fs().hashBase64(data);
     if (!hashResult) return;
-    if (this.exists(hashResult.hash)) return hashResult.hash;
+    if (await this.exists(hashResult.hash)) return hashResult.hash;
 
     const key = await this.generateKey();
     const { hash, hashType, ...encryptionMetadata } = await this.db
@@ -335,27 +335,23 @@ export class Attachments implements ICollection {
     await this.add({
       ...encryptionMetadata,
       key,
-      metadata: {
-        filename: filename || hash,
-        hash,
-        hashType,
-        type: mimeType || "application/octet-stream"
-      }
+
+      filename: filename || hash,
+      hash,
+      hashType,
+      mimeType: mimeType || "application/octet-stream"
     });
     return hash;
   }
 
   async downloadMedia(noteId: string, hashesToLoad?: string[]) {
-    let attachments = this.ofNote(noteId, "images", "webclips");
+    let attachments = await this.ofNote(noteId, "images", "webclips");
     if (hashesToLoad)
-      attachments = attachments.filter((a) =>
-        hasItem(hashesToLoad, a.metadata.hash)
-      );
+      attachments = attachments.filter((a) => hasItem(hashesToLoad, a.hash));
 
     await this.db.fs().queueDownloads(
       attachments.map((a) => ({
-        filename: a.metadata.hash,
-        metadata: a.metadata,
+        filename: a.hash,
         chunkSize: a.chunkSize
       })),
       noteId,
@@ -371,58 +367,60 @@ export class Attachments implements ICollection {
       const isDeleted = await this.db.fs().deleteFile(attachment.metadata.hash);
       if (!isDeleted) continue;
 
-      await this.collection.remove(attachment.id);
+      await this.collection.softDelete(attachment.id);
     }
   }
 
-  get pending() {
-    return this.all.filter(
-      (attachment) => !attachment.dateUploaded || attachment.dateUploaded <= 0
-    );
-  }
+  // get pending() {
+  //   return this.all.filter(
+  //     (attachment) =>
+  //       (!attachment.dateUploaded || attachment.dateUploaded <= 0) &&
+  //       this.db.relations.to(attachment, "note").length > 0
+  //   );
+  // }
 
-  get uploaded() {
-    return this.all.filter((attachment) => !!attachment.dateUploaded);
-  }
+  // get uploaded() {
+  //   return this.all.filter((attachment) => !!attachment.dateUploaded);
+  // }
 
-  get syncable() {
-    return this.collection
-      .raw()
-      .filter(
-        (attachment) => isDeleted(attachment) || !!attachment.dateUploaded
-      );
-  }
+  // get syncable() {
+  //   return this.collection
+  //     .raw()
+  //     .filter(
+  //       (attachment) => isDeleted(attachment) || !!attachment.dateUploaded
+  //     );
+  // }
 
-  get deleted() {
-    return this.all.filter((attachment) => !!attachment.dateDeleted);
-  }
+  // get deleted() {
+  //   return this.all.filter((attachment) => !!attachment.dateDeleted);
+  // }
 
-  get images() {
-    return this.all.filter((attachment) => isImage(attachment.metadata.type));
-  }
+  // get images() {
+  //   return this.all.filter((attachment) => isImage(attachment.metadata.type));
+  // }
 
-  get webclips() {
-    return this.all.filter((attachment) => isWebClip(attachment.metadata.type));
-  }
+  // get webclips() {
+  //   return this.all.filter((attachment) => isWebClip(attachment.metadata.type));
+  // }
 
-  get media() {
-    return this.all.filter(
-      (attachment) =>
-        isImage(attachment.metadata.type) || isWebClip(attachment.metadata.type)
-    );
-  }
+  // get media() {
+  //   return this.all.filter(
+  //     (attachment) =>
+  //       isImage(attachment.metadata.type) || isWebClip(attachment.metadata.type)
+  //   );
+  // }
 
-  get files() {
-    return this.all.filter(
-      (attachment) =>
-        !isImage(attachment.metadata.type) &&
-        !isWebClip(attachment.metadata.type)
-    );
-  }
+  // get files() {
+  //   return this.all.filter(
+  //     (attachment) =>
+  //       !isImage(attachment.metadata.type) &&
+  //       !isWebClip(attachment.metadata.type)
+  //   );
+  // }
 
-  get all() {
-    return this.collection.items();
-  }
+  // get all() {
+  //   return this.collection.items();
+  // }
 
   private async encryptKey(key: SerializedKey) {
     const encryptionKey = await this._getEncryptionKey();
@@ -443,15 +441,15 @@ export class Attachments implements ICollection {
 }
 
 export function getOutputType(attachment: Attachment): DataFormat {
-  if (attachment.metadata.type === "application/vnd.notesnook.web-clip")
+  if (attachment.mimeType === "application/vnd.notesnook.web-clip")
     return "text";
-  else if (attachment.metadata.type.startsWith("image/")) return "base64";
+  else if (attachment.mimeType.startsWith("image/")) return "base64";
   return "uint8array";
 }
 
 function getAttachmentType(attachment: Attachment) {
-  if (attachment.metadata.type === "application/vnd.notesnook.web-clip")
+  if (attachment.mimeType === "application/vnd.notesnook.web-clip")
     return "webclip";
-  else if (attachment.metadata.type.startsWith("image/")) return "image";
+  else if (attachment.mimeType.startsWith("image/")) return "image";
   else return "generic";
 }
