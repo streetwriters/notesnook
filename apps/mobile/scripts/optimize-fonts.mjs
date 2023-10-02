@@ -67,7 +67,7 @@ const EXTRA_ICON_NAMES = [
   "chevron-down",
   "calendar",
   "minus-circle-outline",
-  "close-circle-outline"
+  "close-circle-outline",
   "qrcode",
   "text",
   "cloud"

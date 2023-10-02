@@ -442,6 +442,7 @@ export class VaultDialog extends Component {
       if (this.state.biometricUnlock && !this.state.isBiometryEnrolled) {
         await this._enrollFingerprint(this.password);
       }
+
       if (this.state.goToEditor) {
         this._openInEditor(note);
       } else if (this.state.share) {
@@ -452,7 +453,6 @@ export class VaultDialog extends Component {
         await this._copyNote(note);
       }
     } catch (e) {
-      console.log(e);
       this._takeErrorAction(e);
     }
   };

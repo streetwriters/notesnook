@@ -254,6 +254,7 @@ const MergeConflicts = () => {
       onRequestClose={() => {
         close();
       }}
+      centered={false}
       background={colors?.primary.background}
       supportedOrientations={[
         "portrait",

@@ -85,6 +85,7 @@ const AuthModal = () => {
       background={colors.primary.background}
       transparent={false}
       animated={false}
+      centered={false}
     >
       <KeyboardAwareScrollView
         style={{

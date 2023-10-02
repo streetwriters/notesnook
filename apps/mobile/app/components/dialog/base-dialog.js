@@ -134,6 +134,7 @@ const BaseDialog = ({
               style={[
                 styles.backdrop,
                 {
+                  alignItems: centered ? "center" : undefined,
                   justifyContent: centered
                     ? "center"
                     : bottom

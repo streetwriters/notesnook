@@ -7,7 +7,8 @@ index 0000000..0d259dd
 +o/classes
 diff --git a/node_modules/react-native-vector-icons/android/build/.transforms/f1314fc28eaff1170375cbb76465cb24/transformed/classes/classes.dex b/node_modules/react-native-vector-icons/android/build/.transforms/f1314fc28eaff1170375cbb76465cb24/transformed/classes/classes.dex
 new file mode 100644
-index 0000000..e69de29
+index 0000000..d4bdd72
+Binary files /dev/null and b/node_modules/react-native-vector-icons/android/build/.transforms/f1314fc28eaff1170375cbb76465cb24/transformed/classes/classes.dex differ
 diff --git a/node_modules/react-native-vector-icons/android/build/generated/source/buildConfig/debug/com/oblador/vectoricons/BuildConfig.java b/node_modules/react-native-vector-icons/android/build/generated/source/buildConfig/debug/com/oblador/vectoricons/BuildConfig.java
 new file mode 100644
 index 0000000..52a02e0
@@ -84,10 +85,12 @@ index 0000000..9e26dfe
 \ No newline at end of file
 diff --git a/node_modules/react-native-vector-icons/android/build/intermediates/compile_library_classes_jar/debug/classes.jar b/node_modules/react-native-vector-icons/android/build/intermediates/compile_library_classes_jar/debug/classes.jar
 new file mode 100644
-index 0000000..e69de29
+index 0000000..77c2a69
+Binary files /dev/null and b/node_modules/react-native-vector-icons/android/build/intermediates/compile_library_classes_jar/debug/classes.jar differ
 diff --git a/node_modules/react-native-vector-icons/android/build/intermediates/compile_r_class_jar/debug/R.jar b/node_modules/react-native-vector-icons/android/build/intermediates/compile_r_class_jar/debug/R.jar
 new file mode 100644
-index 0000000..e69de29
+index 0000000..bd4434a
+Binary files /dev/null and b/node_modules/react-native-vector-icons/android/build/intermediates/compile_r_class_jar/debug/R.jar differ
 diff --git a/node_modules/react-native-vector-icons/android/build/intermediates/compile_symbol_list/debug/R.txt b/node_modules/react-native-vector-icons/android/build/intermediates/compile_symbol_list/debug/R.txt
 new file mode 100644
 index 0000000..5347f17
@@ -2050,11 +2053,11 @@ index 0000000..5347f17
 +int xml rn_dev_preferences 0x0
 diff --git a/node_modules/react-native-vector-icons/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties b/node_modules/react-native-vector-icons/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
 new file mode 100644
-index 0000000..2dd0b63
+index 0000000..c671bf3
 --- /dev/null
 +++ b/node_modules/react-native-vector-icons/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
 @@ -0,0 +1 @@
-+#Wed Aug 02 11:28:45 PKT 2023
++#Mon Oct 02 09:47:12 PKT 2023
 diff --git a/node_modules/react-native-vector-icons/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml b/node_modules/react-native-vector-icons/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
 new file mode 100644
 index 0000000..08d62cc
@@ -2093,16 +2096,20 @@ index 0000000..ef96fe3
 \ No newline at end of file
 diff --git a/node_modules/react-native-vector-icons/android/build/intermediates/javac/debug/classes/com/oblador/vectoricons/BuildConfig.class b/node_modules/react-native-vector-icons/android/build/intermediates/javac/debug/classes/com/oblador/vectoricons/BuildConfig.class
 new file mode 100644
-index 0000000..e69de29
+index 0000000..1276d6a
+Binary files /dev/null and b/node_modules/react-native-vector-icons/android/build/intermediates/javac/debug/classes/com/oblador/vectoricons/BuildConfig.class differ
 diff --git a/node_modules/react-native-vector-icons/android/build/intermediates/javac/debug/classes/com/oblador/vectoricons/VectorIconsModule$Errors.class b/node_modules/react-native-vector-icons/android/build/intermediates/javac/debug/classes/com/oblador/vectoricons/VectorIconsModule$Errors.class
 new file mode 100644
-index 0000000..e69de29
+index 0000000..3348b06
+Binary files /dev/null and b/node_modules/react-native-vector-icons/android/build/intermediates/javac/debug/classes/com/oblador/vectoricons/VectorIconsModule$Errors.class differ
 diff --git a/node_modules/react-native-vector-icons/android/build/intermediates/javac/debug/classes/com/oblador/vectoricons/VectorIconsModule.class b/node_modules/react-native-vector-icons/android/build/intermediates/javac/debug/classes/com/oblador/vectoricons/VectorIconsModule.class
 new file mode 100644
-index 0000000..e69de29
+index 0000000..de0d974
+Binary files /dev/null and b/node_modules/react-native-vector-icons/android/build/intermediates/javac/debug/classes/com/oblador/vectoricons/VectorIconsModule.class differ
 diff --git a/node_modules/react-native-vector-icons/android/build/intermediates/javac/debug/classes/com/oblador/vectoricons/VectorIconsPackage.class b/node_modules/react-native-vector-icons/android/build/intermediates/javac/debug/classes/com/oblador/vectoricons/VectorIconsPackage.class
 new file mode 100644
-index 0000000..e69de29
+index 0000000..07a935e
+Binary files /dev/null and b/node_modules/react-native-vector-icons/android/build/intermediates/javac/debug/classes/com/oblador/vectoricons/VectorIconsPackage.class differ
 diff --git a/node_modules/react-native-vector-icons/android/build/intermediates/local_only_symbol_list/debug/R-def.txt b/node_modules/react-native-vector-icons/android/build/intermediates/local_only_symbol_list/debug/R-def.txt
 new file mode 100644
 index 0000000..78ac5b8
@@ -2174,7 +2181,8 @@ index 0000000..0be2a09
 \ No newline at end of file
 diff --git a/node_modules/react-native-vector-icons/android/build/intermediates/runtime_library_classes_jar/debug/classes.jar b/node_modules/react-native-vector-icons/android/build/intermediates/runtime_library_classes_jar/debug/classes.jar
 new file mode 100644
-index 0000000..e69de29
+index 0000000..f0a7660
+Binary files /dev/null and b/node_modules/react-native-vector-icons/android/build/intermediates/runtime_library_classes_jar/debug/classes.jar differ
 diff --git a/node_modules/react-native-vector-icons/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt b/node_modules/react-native-vector-icons/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt
 new file mode 100644
 index 0000000..873e0a9
@@ -3661,7 +3669,8 @@ index 0000000..f4f75c1
 +		INJECTED from /Users/ammarahmed/Repos/apps/notesnook/apps/mobile/node_modules/react-native-vector-icons/android/src/main/AndroidManifest.xml
 diff --git a/node_modules/react-native-vector-icons/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin b/node_modules/react-native-vector-icons/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin
 new file mode 100644
-index 0000000..e69de29
+index 0000000..26da0e3
+Binary files /dev/null and b/node_modules/react-native-vector-icons/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin differ
 diff --git a/node_modules/react-native-vector-icons/fonts.gradle b/node_modules/react-native-vector-icons/fonts.gradle
 index 5485fac..ef3ccb3 100644
 --- a/node_modules/react-native-vector-icons/fonts.gradle
@@ -3678,7 +3687,7 @@ index 5485fac..ef3ccb3 100644
          generateAssetsTask.dependsOn(fontCopyTask)
      }
 diff --git a/node_modules/react-native-vector-icons/glyphmaps/MaterialCommunityIcons.json b/node_modules/react-native-vector-icons/glyphmaps/MaterialCommunityIcons.json
-index c06a819..0962de1 100644
+index c06a819..13c76cc 100644
 --- a/node_modules/react-native-vector-icons/glyphmaps/MaterialCommunityIcons.json
 +++ b/node_modules/react-native-vector-icons/glyphmaps/MaterialCommunityIcons.json
 @@ -1,6598 +1 @@
@@ -10281,7 +10290,7 @@ index c06a819..0962de1 100644
 -  "blank": 63116
 -}
 \ No newline at end of file
-+{"menu":983900,"lock-open-outline":983872,"key-outline":986582,"pin-off-outline":985392,"pin-outline":985393,"star-off":984273,"star-outline":984274,"link-variant-remove":987393,"link-variant":983865,"bell":983194,"bell-off-outline":985745,"check":983340,"magnify":983881,"plus":984085,"view-list-outline":988299,"view-list":984434,"play":984074,"pause":984036,"notebook-outline":986815,"text-short":985513,"radiobox-marked":984126,"radiobox-blank":984125,"sort-descending":984253,"information":983804,"sort-ascending":984252,"alert":983078,"arrow-right":983124,"bookmark-outline":983235,"checkbox-marked":983346,"checkbox-blank-outline":983345,"unfold-less-horizontal":984398,"minus-circle":983926,"vibrate":984422,"volume-high":984446,"checkbox-blank-circle-outline":983344,"check-circle-outline":984545,"chevron-up":983363,"chevron-down":983360,"calendar":983277,"book-outline":985956,"pound":984099,"clock-plus-outline":989282,"cloud-upload-outline":985982,"export":983559,"message-badge-outline":989506,"square-edit-outline":985356,"content-copy":983439,"delete-restore":985113,"share-variant":984215,"pencil-lock":984046,"sync-off":984296,"content-duplicate":983441,"theme-light-dark":984334,"pencil":984043,"clock-outline":983376,"attachment":983142,"history":983770,"notebook":985134,"bookmark":983232,"minus-circle-outline":983927,"delete-outline":985575,"delete":983476,"link":983863,"cloud-upload":983399,"star":984270,"key":983814,"account-outline":983059,"email":983534,"backup-restore":983151,"update":984752,"android":983090,"web":984479,"home-variant-outline":986023,"text-box-multiple-outline":985784,"download":983514,"circle-small":985567,"upload":984402,"file-check":983574,"form-textbox":984590,"fingerprint":983607,"file":983572,"alert-circle-outline":984534,"check-all":983341,"shield-key-outline":986053,"arrow-left":983117,"message-plus-outline":987323,"email-outline":983536,"cellphone-key":985422,"dots-vertical":983513,"close":983382,"chevron-right":983362,"emoticon-wink":986232,"sync":984294,"shield":984216,"billboard":987152,"cellphone":983324,"cellphone-lock":985423,"lock":983870,"file-lock":983585,"image-multiple":983801,"harddisk":983754,"file-cabinet":985782,"refresh":984144,"emoticon":986216,"palette":984024,"pin":984067,"format-bold":983652,"table":984299,"language-markdown":983892,"gesture-tap-button":987816,"send-lock":985069,"bomb":984721,"file-pdf-box":983590,"language-html5":983837,"clipboard-text-outline":985656,"invert-colors":983809,"crown":983461,"select-all":984198,"minus":983924,"information-outline":983805,"cog-outline":985275,"arrow-top-right-thick":985542,"checkbox-blank-circle":983343,"sync-alert":984295,"note":983962,"dots-horizontal":983512,"shield-lock":985501,"chevron-left":983361,"account-cog":988016,"two-factor-authentication":985519,"logout":983875,"autorenew":983146,"shape":985137,"circle-half":988053,"brightness-6":983263,"note-edit-outline":989058,"format-line-spacing":983672,"format-size":983679,"format-font":984790,"radar":984119,"arrow-decision-outline":985534,"eye-off-outline":984785,"folder":983627,"bell-outline":983196,"bell-ring":983198,"bug":983268,"mail":986811,"file-document":983577,"mastodon":985809,"twitter":984388,"discord":984687,"open-source-initiative":986030,"monitor":983929,"chart-timeline":984686,"cellphone-arrow-down":985557,"alpha-v":985859,"alert-circle":983080,"reload":984147,"card-text":985975,"open-in-new":984012,"eye":983560,"drag":983515,"menu-down":983901}
++{"menu":983900,"lock-open-outline":983872,"key-outline":986582,"pin-off-outline":985392,"pin-outline":985393,"star-off":984273,"star-outline":984274,"link-variant-remove":987393,"link-variant":983865,"bell":983194,"bell-off-outline":985745,"check":983340,"magnify":983881,"plus":984085,"view-list-outline":988299,"view-list":984434,"play":984074,"pause":984036,"notebook-outline":986815,"text-short":985513,"radiobox-marked":984126,"radiobox-blank":984125,"sort-descending":984253,"information":983804,"sort-ascending":984252,"alert":983078,"arrow-right":983124,"bookmark-outline":983235,"checkbox-marked":983346,"checkbox-blank-outline":983345,"unfold-less-horizontal":984398,"minus-circle":983926,"vibrate":984422,"volume-high":984446,"checkbox-blank-circle-outline":983344,"check-circle-outline":984545,"chevron-up":983363,"chevron-down":983360,"calendar":983277,"minus-circle-outline":983927,"close-circle-outline":983386,"qrcode":984114,"text":985512,"cloud":983391,"book-outline":985956,"pound":984099,"clock-plus-outline":989282,"cloud-upload-outline":985982,"export":983559,"message-badge-outline":989506,"square-edit-outline":985356,"content-copy":983439,"delete-restore":985113,"share-variant":984215,"pencil-lock":984046,"sync-off":984296,"content-duplicate":983441,"theme-light-dark":984334,"pencil":984043,"clock-outline":983376,"attachment":983142,"history":983770,"notebook":985134,"bookmark":983232,"delete-outline":985575,"delete":983476,"link":983863,"cloud-upload":983399,"star":984270,"key":983814,"account-outline":983059,"email":983534,"backup-restore":983151,"update":984752,"android":983090,"web":984479,"home-variant-outline":986023,"text-box-multiple-outline":985784,"download":983514,"arrow-left":983117,"dots-horizontal":983512,"chevron-right":983362,"close":983382,"cellphone-key":985422,"message-plus-outline":987323,"email-outline":983536,"shield-lock":985501,"chevron-left":983361,"minus":983924,"crown":983461,"account-cog":988016,"two-factor-authentication":985519,"information-outline":983805,"logout":983875,"autorenew":983146,"sync-alert":984295,"shape":985137,"circle-half":988053,"brightness-6":983263,"note-edit-outline":989058,"format-line-spacing":983672,"format-size":983679,"format-font":984790,"radar":984119,"arrow-decision-outline":985534,"fingerprint":983607,"eye-off-outline":984785,"folder":983627,"lock":983870,"form-textbox":984590,"bell-outline":983196,"bell-ring":983198,"bug":983268,"mail":986811,"file-document":983577,"mastodon":985809,"twitter":984388,"discord":984687,"open-source-initiative":986030,"monitor":983929,"chart-timeline":984686,"cellphone-arrow-down":985557,"alpha-v":985859,"circle-small":985567,"upload":984402,"file-check":983574,"file":983572,"alert-circle-outline":984534,"check-all":983341,"shield-key-outline":986053,"dots-vertical":983513,"emoticon-wink":986232,"sync":984294,"shield":984216,"billboard":987152,"cellphone":983324,"cellphone-lock":985423,"file-lock":983585,"image-multiple":983801,"harddisk":983754,"file-cabinet":985782,"refresh":984144,"emoticon":986216,"palette":984024,"pin":984067,"format-bold":983652,"table":984299,"language-markdown":983892,"gesture-tap-button":987816,"send-lock":985069,"bomb":984721,"file-pdf-box":983590,"language-html5":983837,"clipboard-text-outline":985656,"invert-colors":983809,"select-all":984198,"cog-outline":985275,"arrow-top-right-thick":985542,"checkbox-blank-circle":983343,"note":983962,"drag":983515,"menu-down":983901,"alert-circle":983080,"reload":984147,"card-text":985975,"open-in-new":984012,"eye":983560}
 \ No newline at end of file
 diff --git a/node_modules/react-native-vector-icons/glyphmaps/MaterialCommunityIcons.old.json b/node_modules/react-native-vector-icons/glyphmaps/MaterialCommunityIcons.old.json
 new file mode 100644
