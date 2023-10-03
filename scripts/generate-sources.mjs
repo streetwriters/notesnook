@@ -17,47 +17,99 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import fs from "fs/promises";
+import os from "os";
 import fsSync from "fs";
 import path from "path";
 import { spawnSync } from "child_process";
 import { fileURLToPath } from "url";
 
-async function move(from, to) {
-  if (!fsSync.existsSync(from) || fsSync.existsSync(to)) return;
-  try {
-    await fs.rename(from, to);
-  } catch {
-    await fs.cp(from, to, { overwrite: true, force: true, recursive: true });
-    await fs.rm(from, { force: true, recursive: true });
-  }
-}
+const customRoot = process.argv[2] === "--root";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT_PATH = customRoot ? process.argv[3] : path.join(__dirname, "..");
+const IS_ROOT_URL = ROOT_PATH.startsWith("https://");
 
 function execute(cmd, args) {
   spawnSync(cmd, args, { env: process.env, stdio: "inherit" });
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+function joinPath(url, ...segments) {
+  if (url) return segments.join("/");
+  return path.join(...segments);
+}
+
+const directoryTree = {
+  "package.json": ["package.json"],
+  "package-lock.json": ["package-lock.json"],
+  apps: {
+    desktop: {
+      "package.json": ["apps", "desktop", "package.json"],
+      "package-lock.json": ["apps", "desktop", "package-lock.json"]
+    }
+  },
+  packages: {
+    sodium: {
+      "package.json": ["packages", "sodium", "package.json"],
+      "package-lock.json": ["packages", "sodium", "package-lock.json"]
+    },
+    crypto: {
+      "package.json": ["packages", "crypto", "package.json"],
+      "package-lock.json": ["packages", "crypto", "package-lock.json"]
+    }
+  }
+};
+
+async function createDirectoryTree(tree, dest) {
+  if (!fsSync.existsSync(dest)) await fs.mkdir(dest, { recursive: true });
+
+  for (const key in tree) {
+    const value = tree[key];
+    if (typeof value === "object" && Array.isArray(value)) {
+      const src = joinPath(IS_ROOT_URL, ROOT_PATH, ...value);
+      if (IS_ROOT_URL) {
+        console.log("Downloading", src);
+        const response = await fetch(src);
+        if (!response.ok) throw new Error(`Failed to download ${src}`);
+        await fs.writeFile(
+          path.join(dest, path.basename(src)),
+          Buffer.from(await response.arrayBuffer())
+        );
+      } else {
+        await fs.copyFile(src, path.join(dest, path.basename(src)));
+      }
+    } else if (typeof value === "object") {
+      await createDirectoryTree(value, path.join(dest, key));
+    }
+  }
+}
+
+const TEMP_FOLDER = await fs.mkdtemp(path.join(os.tmpdir(), "nn-"));
+
+await createDirectoryTree(directoryTree, TEMP_FOLDER);
+
+console.log("Created directory tree at", TEMP_FOLDER);
 
 const lockfiles = [
   {
     name: "main",
-    path: path.join(__dirname, "..", "package-lock.json"),
+    path: path.join(TEMP_FOLDER, "package-lock.json"),
     ignoreDev: true
   },
   {
     name: "desktop",
-    path: path.join(__dirname, "..", "apps", "desktop", "package-lock.json")
+    path: path.join(TEMP_FOLDER, "apps", "desktop", "package-lock.json")
   },
   {
     name: "sodium",
-    path: path.join(__dirname, "..", "packages", "sodium", "package-lock.json")
+    path: path.join(TEMP_FOLDER, "packages", "sodium", "package-lock.json")
   },
   {
     name: "crypto",
-    path: path.join(__dirname, "..", "packages", "crypto", "package-lock.json")
+    path: path.join(TEMP_FOLDER, "packages", "crypto", "package-lock.json")
   }
 ];
+
+process.chdir(TEMP_FOLDER);
 
 let allSources = [];
 for (const lockfile of lockfiles) {
@@ -65,19 +117,10 @@ for (const lockfile of lockfiles) {
     console.error("skipping. lockfile does not exist at", lockfile.path);
     continue;
   }
-  console.log("generating sources for", lockfile.name);
 
-  const nodeModulesPath = path.join(
-    path.dirname(lockfile.path),
-    "node_modules"
-  );
-  console.log("backing up node_modules at", nodeModulesPath);
-  await move(
-    nodeModulesPath,
-    path.join(path.dirname(lockfile.path), "node_modules.backup")
-  );
+  console.log("generating sources for", lockfile.path);
 
-  const output = `${lockfile.name}-sources.json`;
+  const output = path.join(TEMP_FOLDER, `${lockfile.name}-sources.json`);
   execute(
     `flatpak-node-generator`,
     [
@@ -93,12 +136,6 @@ for (const lockfile of lockfiles) {
   allSources = [...allSources, ...sources];
 
   await fs.rm(output, { force: true });
-
-  console.log("recovering node_modules to", nodeModulesPath);
-  await move(
-    path.join(path.dirname(lockfile.path), "node_modules.backup"),
-    nodeModulesPath
-  );
 }
 
 console.log("writing sources");
@@ -117,7 +154,7 @@ for (const source of allSources) {
 }
 
 await fs.writeFile(
-  "generated-sources.json",
+  path.join(__dirname, "..", "generated-sources.json"),
   JSON.stringify(allSources, undefined, 4)
 );
 
