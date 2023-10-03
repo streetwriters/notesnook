@@ -12,7 +12,7 @@ Notesnook allows you to delete your accounts and your data without any questions
 1. Open Notesnook web or desktop app
 2. Make sure you are logged in
 3. Go to Settings
-4. Scroll to the very end & click on `Delete account`
+4. Click on `Delete account` button next to **Account removal** heading
 
 ## [Mobile](#/tab/mobile)
 
@@ -20,7 +20,7 @@ Notesnook allows you to delete your accounts and your data without any questions
 2. Make sure you are logged in
 3. Go to Settings
 4. Go to `Account Settings`
-5. Click on `Delete account`
+5. Tap on `Delete account`
 
 ---
 
@@ -32,4 +32,4 @@ All your notes, notebooks, attachments, and any other data that you created with
 
 ### Is there any way to recover deleted data?
 
-No. Once you delete your account, it's gone for good and there is no way for us or anyone else to recover it. If your data is important to you, make sure to take a [backup](/backup-and-restore-notes-in-notesnook) before deleting your account or [exporting your notes](/export-notes-from-notesnook).
+No. Once you delete your account, it's gone for good and there is no way for us or anyone else to recover it. If your data is important to you, make sure to take a [backup](/backup-and-restore-notes-in-notesnook) or [export your notes](/export-notes-from-notesnook) before deleting your account.

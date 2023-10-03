@@ -13,7 +13,6 @@ footer:
   copyright: Copyright © 2023 Streetwriters (Private) Limited
 
 navigation:
-  - path: installation.md
   - path: create-a-note-in-notesnook.md
   - path: organizing-notes
     children:

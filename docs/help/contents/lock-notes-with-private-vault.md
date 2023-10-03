@@ -13,20 +13,19 @@ Adding notes to private vault is useful when you do not want anyone to read your
 
 # [Desktop/Web](#/tab/web)
 
-1. Go to Settings from Sidebar.
-2. Click on `Create a vault` in `Vault` section.
-3. Enter the password for the vault in dialog.
-4. Click on create to create the vault.
-5. Now you will be able to lock your notes with the password for vault.
+1. Go to Settings
+2. Go to `Vault` in `Security & privacy` section
+3. Click on `Create` button
+4. Enter the password for your vault (this password will be used to open all locked notes)
+5. Click on `Create` in the dialog to create the vault.
 
 # [Mobile](#/tab/mobile)
 
 1. Go to Settings from Sidebar
 2. Scroll down to `Privacy and Security` section
-3. Press on `Create vault`
-4. Enter password for the vault and reenter to confirm.
-5. Press on `Create` button to create the vault.
-6. Now you will be able to lock your notes with the password for vault.
+3. Tap on `Create vault`
+4. Enter password for the vault (this password will be used to open all locked notes)
+5. Tap on `Create` button to create the vault.
 
 ---
 
@@ -35,14 +34,14 @@ Adding notes to private vault is useful when you do not want anyone to read your
 # [Desktop/Web](#/tab/web)
 
 1. Right click on any note
-2. Select `Lock` from the `Note properties` menu
-3. Enter the password for the vault in dialog.
-4. Click on Lock to lock the note.
+2. Select `Lock` from the context menu
+3. Enter the password for the vault
+4. Press `Enter` key to lock the note
 
 # [Mobile](#/tab/mobile)
 
-1. Press on the `three-dot menu` button
-2. Press on `Add to vault` button in `Note properties` menu
+1. Tap the ![Three dot button](/three-dot-button.png) button on a note
+2. Tap on `Lock` button in the note properties
 3. Enter password for the vault
 4. Press on `Lock` to add note to vault.
 
@@ -57,16 +56,16 @@ To open, edit or delete a locked note, you must provide the password for the vau
 # [Desktop/Web](#/tab/web)
 
 1. Right click on any note
-2. Select `Unlock` from the `Note properties` menu
+2. Select `Unlock` from the context menu
 3. Enter the password for the vault in dialog.
 4. Click on Unlock to remove note from vault
 
 # [Mobile](#/tab/mobile)
 
-1. Press on the `three-dot menu` button
-2. Press on `Remove from vault` button in `Note properties` menu
+1. Tap the ![Three dot button](/three-dot-button.png) button on a note
+2. Tap on `Unlock` button in the note properties
 3. Enter password for the vault
-4. Press on `Unlock` to remove note from vault.
+4. Tap on `Unlock` to remove note from vault.
 
 ---
 
@@ -74,19 +73,20 @@ To open, edit or delete a locked note, you must provide the password for the vau
 
 # [Desktop/Web](#/tab/web)
 
-1. Go to Settings from Sidebar.
-2. Click on `Change vault password` in `Vault` section.
-3. Enter the old and new password for the vault in dialog.
-4. Click on Change to update password
-5. All your locked notes will be encrypted with the new password.
+1. Go to Settings
+2. Go to `Vault` in `Security & privacy` section
+3. Click on `Change` button next to `Change vault password` heading
+4. Enter the old and new password for the vault
+5. Click on `Change password` to update the password
 
 # [Mobile](#/tab/mobile)
 
 1. Go to Settings from Sidebar.
 2. Scroll down to `Privacy and Security` section
-3. Press on `Change vault password`
-4. Click on Change to update password
-5. All your locked notes will be encrypted with the new password.
+3. Tap on `Vault`
+4. Press on `Change vault password`
+5. Enter the old and new password for the vault
+6. Click on Change to update password
 
 ---
 
@@ -94,34 +94,38 @@ To open, edit or delete a locked note, you must provide the password for the vau
 
 # [Desktop/Web](#/tab/web)
 
-1. Go to Settings from Sidebar.
-2. Go to `Privacy and Security` section and Click on `Clear vault`.
-3. Enter your vault password and click on clear vault. All notes in the vault will be deleted.
+1. Go to Settings
+2. Go to `Vault` in `Security & privacy` section
+3. Click on `Clear` button next to `Clear vault` heading
+4. Enter your vault password and click on clear vault. All notes in the vault will be deleted.
 
 # [Mobile](#/tab/mobile)
 
 1. Go to Settings from Sidebar.
-2. Scroll down to `Privacy and Security` and go to `Vault`
-3. Tap on `Clear vault`
-4. Enter your vault password and tap on `Clear`. All notes in the vault will be deleted.
+2. Scroll down to `Privacy and Security` section
+3. Tap on `Vault`
+4. Tap on `Clear vault`
+5. Enter your vault password and tap on `Clear`. All notes in the vault will be deleted.
 
 ---
 
 ## Delete vault
 
-In the event that you have forgotten your vault password, you can delete the vault and optionally delete all the notes in it.
+In the event that you have forgotten your vault password, you can delete the vault and (optionally) delete all the notes in it.
 
 # [Desktop/Web](#/tab/web)
 
-1. Go to Settings from Sidebar.
-2. Go to `Privacy and Security` section and Click on `Delete vault`.
-3. Enter your account password and click on clear vault. All notes in the vault will be deleted.
+1. Go to Settings
+2. Go to `Vault` in `Security & privacy` section
+3. Click on `Delete` button next to `Delete vault` heading
+4. Enter your account password and click on `Delete vault` to delete the vault
 
 # [Mobile](#/tab/mobile)
 
 1. Go to Settings from Sidebar.
-2. Scroll down to `Privacy and Security` and go to `Vault`
-3. Tap on `Clear vault`
-4. Enter your account password and tap on `Delete`. The vault will be deleted.
+2. Scroll down to `Privacy and Security` section
+3. Tap on `Vault`
+4. Tap on `Delete vault`
+5. Enter your account password and tap on `Delete` to delete the vault
 
 ---

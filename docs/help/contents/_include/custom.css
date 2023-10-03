@@ -163,6 +163,10 @@ nav li {
   line-height: 24px;
 }
 
+li.nested {
+  min-height: 38px !important;
+}
+
 nav li li:not(li.nested):hover {
   background-color: var(--hover-bg);
 }

@@ -16,13 +16,14 @@ Privacy mode enables some OS specific settings to enhance your privacy while wor
 
 ## [Desktop](#/tab/desktop)
 
-1. Open `Settings`
-2. Click on `Privacy & security`
-3. Click on `Privacy mode` to enable/disable it.
+1. Go to `Settings`
+2. Scroll down to `Security & privacy` section
+3. Click on `Privacy`
+4. Click on toggle next to `Privacy mode` to enable/disable privacy mode.
 
 ## [Mobile](#/tab/mobile)
 
-1. Open `Settings`
+1. Go to `Settings`
 2. Scroll down to `Privacy and Security`
 3. Tap on `Privacy mode` to enable/disable it
 
