@@ -4,7 +4,13 @@ title: Notebooks
 
 # Organizing notes with notebooks
 
-Notebooks consist of topics where you can add/create and edit your notes.
+Notebooks are a quick and easy way for multi-level notes organization. Starting from v2.4.7, topics are now optional in Notebooks and notes can be put directly under a notebook.
+
+If you are coming from Evernote, you can think of Notebooks as "Evernote Stacks" & topics as "Evernote Notebooks". However, keep in mind, that there is a key difference:
+
+> "Evernote Stacks" do not allow putting notes directly under them i.e., a Stack is just a collection of Notebooks and nothing else.
+
+In Notesnook, one note can belong to multiple notebooks & topics. This allows for very flexible organization structures. For example, an author can "link" the character list to all the chapter topics instead of duplicating it for each chapter. Similarly, a user can link common notes between multiple topics without the need for any duplication.
 
 ## Creating a notebook
 
@@ -98,87 +104,78 @@ Notebooks consist of topics where you can add/create and edit your notes.
 # [Desktop/Web](#/tab/web)
 
 1. Go to `Notebooks` and open a notebook
-2. Open the topic in which you want to add a note
-3. Click on the ![Three dot button](/plus-button-desktop.png) button on top right corner
-4. Start writing in editor to create a note in the topic
+2. Click on the ![Three dot button](/plus-button-desktop.png) button on top right corner
+3. Start writing in editor to create a note in the notebook
 
 # [Mobile](#/tab/mobile)
 
 1. Go to `Notebooks` and open a notebook
-2. Open the topic in which you want to add a note
-3. Click on the ![Three dot button](/plus-button-desktop.png) button on bottom right corner to open the editor or just **swipe from right to left** to open editor
-4. Start writing in editor to create a note in the topic
+2. Click on the ![Three dot button](/plus-button-desktop.png) button on bottom right corner to open the editor or just **swipe from right to left** to open editor
+3. Start writing in editor to create a note in the notebook
 
 ---
 
 > info
 >
-> Once a note is added to a notebook, it's references will show on top of the note in the list. Clicking on it will take you to the topic.
+> Once a note is added to a notebook, you will see its path on top of the note in the list. Clicking on it will take you to the respective notebook/topic.
 >
 > ![Notebook reference on a note](/notebook-ref.png)
 
-## Adding a note to a topic
+## Linking an existing note to a notebook/topic
 
 # [Desktop/Web](#/tab/web)
 
 1. Right click on a note
-2. Select `Add to Notebook(s)`
-3. Select the notebook and topic in which you want to add the note
-4. Click "Finish" to add the notes to the topic.
-5. You should now see the notebook/topic below the note title. You can click on it to navigate to the topic directly.
+2. Click on `Notebooks` > `Link to...`
+3. Select the notebook or topic you want to link the note to (you can select multiple)
+4. Click `Done` to save your changes.
 
 # [Mobile](#/tab/mobile)
 
-1. Press the ![Three dot button](/three-dot-button.png) button
-2. Press on `Add to notebook` button.
-3. Select the notebook and topic in which you want to add the note.
-4. Once done, swipe down to close the sheet.
-5. You should now see the notebook/topic on the top left side of the note. You can click on it to navigate to the topic directly.
+1. Tap the ![Three dot button](/three-dot-button.png) button
+2. Tap on `Link Notebooks` button.
+3. Select the notebook or topic you want to link the note to (you can select multiple)
+4. Click the `Save` button at the top right corner to save your changes.
 
 ---
 
 > info
 >
-> In Notesnook a single note can exist in multiple Notebooks and topics. However a note shows at most only one reference on top.
+> In Notesnook a single note can exist in multiple Notebooks and topics. However, a note will show only one reference on top.
 
-## Adding multiple notes to a topic
+## Linking multiple notes to a notebook/topic
 
 # [Desktop/Web](#/tab/web)
 
-1. Hold `Ctrl` key and click on the notes you want to select
+1. Hold `Ctrl` key and click on all the notes you want to link
 2. Right click on selected notes
-3. Click on `Add to notebook(s)`.
-4. Select the notebook and topic in which you want to add the notes
-5. Click "Finish" to add the notes to the topic.
-6. You should now see the notebook/topic below the note title. You can click on it to navigate to the topic directly.
+3. Click on `Notebooks` > `Link to...`
+4. Select the notebook or topic you want to link the note to (you can select multiple)
+5. Click `Done` to save your changes.
 
 # [Mobile](#/tab/mobile)
 
-1. Long press on a note.
-2. Click on `Select` from the `Action bar`.
-3. Select notes & press the ![Three dot button](/plus-button-desktop.png) button in top header
-4. Select the notebook and topic in which you want to add the notes
-5. Once done, swipe down to close the sheet.
+1. Long press on a note to enter multi selection mode.
+2. Tap on all the notes you want to link to select them
+3. Tap the `+` button in top header
+4. Select the notebook or topic you want to link the note to (you can select multiple)
+5. Click the `Save` button at the top right corner to save your changes.
 
 ---
 
-## Remove note from a topic
+## Remove note from a notebook/topic
 
 # [Desktop/Web](#/tab/web)
 
 1. Right click on a note
-2. Select `Add to Notebook(s)`
-3. The notebooks in which the note exists will appear green. Click on the notebook to expand topics
-4. Click on the topics in notebook from which you want to remove th note
-5. Click "Finish" to save changes
+2. Click on `Notebooks` in the context menu
+3. Click on the notebook/topic you want to remove the note from
 
 # [Mobile](#/tab/mobile)
 
 1. Press the ![Three dot button](/three-dot-button.png) button
-2. Press on `Add to notebooks`
-3. The notebook(s) in which the note exists will appear green. Press on a notebook to expand topics
-4. Tap on topics you want to remove the note from
-5. Once done, swipe down to close `Add to notebook(s)` sheet
+2. Click on `See all linked notebooks`
+3. Long press on the notebook or topic you want to removve the note from
 
 ---
 
@@ -189,14 +186,14 @@ Notebooks consist of topics where you can add/create and edit your notes.
 1. Go to `Notebooks` and open the notebook from which you want to delete a topic.
 2. Right click on the topic
 3. Click on `Delete` to delete the topic.
-4. Select whether you also want to delete the notes inside this topic.
+4. (Optional) Select whether you also want to delete the notes inside this topic.
 
 # [Mobile](#/tab/mobile)
 
 1. Go to `Notebooks` from side menu and open the notebook from which you want to delete a topic.
 2. Press the ![Three dot button](/three-dot-button.png) button to open `Topic properties` sheet
 3. Press `Delete topic`
-4. Select whether you also want to delete the notes inside this topic.
+4. (Optional) Select whether you also want to delete the notes inside this topic.
 
 ---
 
@@ -208,7 +205,6 @@ Notebooks consist of topics where you can add/create and edit your notes.
 2. Right click on the notebook
 3. Click on `Move to trash`.
 4. Select whether you also want to delete the notes inside this notebook.
-5. Notebook will be kept in trash for 7 days after which it will be permanently removed.
 
 # [Mobile](#/tab/mobile)
 
@@ -216,6 +212,5 @@ Notebooks consist of topics where you can add/create and edit your notes.
 2. Press the ![Three dot button](/three-dot-button.png) button.
 3. Press `Move to trash` to delete the topic.
 4. Select whether you also want to delete the notes inside this notebook.
-5. Notebook will be kept in trash for 7 days after which it will be permanently removed.
 
 ---
