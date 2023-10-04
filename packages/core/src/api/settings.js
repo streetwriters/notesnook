@@ -190,6 +190,18 @@ class Settings {
   }
   /**
    *
+   * @returns {"Sun" | "Mon"}
+   */
+  getWeekFormat() {
+    return this._settings.weekFromat || "Sun";
+  }
+
+  async setWeekFormat(format) {
+    this._settings.weekFromat = format;
+    await this._saveSettings();
+  }
+  /**
+   *
    * @returns {"12-hour" | "24-hour"}
    */
   getTimeFormat() {
