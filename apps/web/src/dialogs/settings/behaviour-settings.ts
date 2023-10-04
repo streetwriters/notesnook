@@ -99,6 +99,27 @@ export const BehaviourSettings: SettingsGroup[] = [
             ]
           }
         ]
+      },
+      {
+        key: "week-format",
+        title: "Week format",
+        description:
+          "This will set first day of the week for weekly reminders.",
+        keywords: [],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.weekFormat, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: (value) =>
+              useSettingStore.getState().setWeekFormat(value),
+            selectedOption: () => useSettingStore.getState().weekFormat,
+            options: [
+              { value: "Sun", title: "Sunday" },
+              { value: "Mon", title: "Monday" }
+            ]
+          }
+        ]
       }
     ]
   },

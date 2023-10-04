@@ -49,6 +49,8 @@ class SettingStore extends BaseStore {
   /** @type {number} */
   trashCleanupInterval = 7;
   homepage = Config.get("homepage", 0);
+  /**@type {"Sun" | "Mon"} */
+  weekFormat = null;
   /**
    * @type {DesktopIntegrationSettings | undefined}
    */
@@ -59,6 +61,7 @@ class SettingStore extends BaseStore {
     this.set({
       dateFormat: db.settings.getDateFormat(),
       timeFormat: db.settings.getTimeFormat(),
+      weekFormat: db.settings.getWeekFormat(),
       titleFormat: db.settings.getTitleFormat(),
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
       desktopIntegrationSettings:
@@ -77,6 +80,11 @@ class SettingStore extends BaseStore {
   setTimeFormat = async (timeFormat) => {
     await db.settings.setTimeFormat(timeFormat);
     this.set({ timeFormat });
+  };
+
+  setWeekFormat = async (weekFormat) => {
+    await db.settings.setWeekFormat(weekFormat);
+    this.set({ weekFormat });
   };
 
   setTitleFormat = async (titleFormat) => {
