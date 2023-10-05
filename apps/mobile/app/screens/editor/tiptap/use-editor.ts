@@ -63,8 +63,7 @@ export const useEditor = (
   const theme = useThemeEngineStore((state) => state.theme);
 
   const [loading, setLoading] = useState(false);
-  const [sessionId, setSessionId] = useState<string>(makeSessionId());
-  const sessionIdRef = useRef(sessionId);
+  const sessionIdRef = useRef(makeSessionId());
   const editorRef = useRef<WebView>(null);
   const currentNote = useRef<NoteType | null>();
   const currentContent = useRef<Content | null>();
@@ -98,10 +97,6 @@ export const useEditor = (
   useEffect(() => {
     postMessage(EditorEvents.theme, theme);
   }, [theme, postMessage]);
-
-  useEffect(() => {
-    sessionIdRef.current = sessionId;
-  }, [sessionId]);
 
   useEffect(() => {
     commands.setTags(currentNote.current);
@@ -142,6 +137,7 @@ export const useEditor = (
       clearTimeout(timers.current["loading-images"]);
       sessionHistoryId.current = undefined;
       saveCount.current = 0;
+      loadingState.current = undefined;
       lock.current = false;
       useEditorStore.getState().setReadonly(false);
       resetContent && postMessage(EditorEvents.title, "");
@@ -151,8 +147,8 @@ export const useEditor = (
 
       if (resetState) {
         const newSessionId = makeSessionId();
+        sessionIdRef.current = newSessionId;
         await commands.setSessionId(newSessionId);
-        setSessionId(newSessionId);
 
         isDefaultEditor &&
           useEditorStore.getState().setCurrentlyEditingNote(null);
@@ -363,7 +359,6 @@ export const useEditor = (
       if (item && item.type === "new") {
         currentNote.current && (await reset());
         const nextSessionId = makeSessionId(item as NoteType);
-        setSessionId(nextSessionId);
         sessionIdRef.current = nextSessionId;
         sessionHistoryId.current = Date.now();
         await commands.setSessionId(nextSessionId);
@@ -405,12 +400,10 @@ export const useEditor = (
         }
         lastContentChangeTime.current = item.dateEdited;
         const nextSessionId = makeSessionId(item as NoteType);
+        sessionIdRef.current = nextSessionId;
         lockedSessionId.current = nextSessionId;
         sessionHistoryId.current = Date.now();
-        setSessionId(nextSessionId);
-
-        commands.setSessionId(nextSessionId);
-        sessionIdRef.current = nextSessionId;
+        await commands.setSessionId(nextSessionId);
         currentNote.current = item as NoteType;
         await commands.setStatus(getFormattedDate(item.dateEdited), "Saved");
         await postMessage(EditorEvents.title, item.title);
@@ -638,7 +631,7 @@ export const useEditor = (
 
   useEffect(() => {
     state.current.saveCount = 0;
-  }, [sessionId, loading]);
+  }, [loading]);
 
   const onReady = useCallback(async () => {
     if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
@@ -690,8 +683,7 @@ export const useEditor = (
     loading,
     setLoading,
     state,
-    sessionId,
-    setSessionId,
+    sessionId: sessionIdRef,
     note: currentNote,
     onReady,
     saveContent,

@@ -205,7 +205,6 @@ export const useEditorEvents = (
     fullscreen,
     isPremium,
     readonly,
-    editor.sessionId,
     editor.loading,
     deviceMode,
     tools,
@@ -229,6 +228,8 @@ export const useEditorEvents = (
       logger.info("editor handled back event", editorHandledBack);
       return;
     }
+    editorState().currentlyEditing = false;
+    editor.reset();
     setTimeout(async () => {
       if (deviceMode !== "mobile" && fullscreen) {
         if (fullscreen) {
@@ -241,14 +242,10 @@ export const useEditorEvents = (
         editorState().movedAway = true;
         tabBarRef.current?.goToPage(0);
       }
-      setImmediate(() => {
-        useEditorStore.getState().setCurrentlyEditingNote(null);
-        setTimeout(() => {
-          Navigation.queueRoutesForUpdate();
-        }, 500);
-      });
-      editorState().currentlyEditing = false;
-      editor.reset();
+
+      setTimeout(() => {
+        Navigation.queueRoutesForUpdate();
+      }, 500);
     }, 1);
   }, [editor, deviceMode, fullscreen]);
 
@@ -344,8 +341,12 @@ export const useEditorEvents = (
         });
       }
 
+      if (editorMessage.type === EventTypes.back) {
+        return onBackPress();
+      }
+
       if (
-        editorMessage.sessionId !== editor.sessionId &&
+        editorMessage.sessionId !== editor.sessionId.current &&
         editorMessage.type !== EditorEvents.status
       ) {
         return;
@@ -430,9 +431,6 @@ export const useEditorEvents = (
         case EventTypes.fullscreen:
           editorState().isFullscreen = true;
           eSendEvent(eOpenFullscreenEditor);
-          break;
-        case EventTypes.back:
-          onBackPress();
           break;
         case EventTypes.link:
           openLinkInBrowser(editorMessage.value as string);

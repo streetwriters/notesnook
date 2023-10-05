@@ -167,7 +167,7 @@ const Editor = React.memo(
           globalThis.noToolbar=${noToolbar};
           globalThis.noHeader=${noHeader};
           `}
-            injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
+            useSharedProcessPool={false}
             javaScriptEnabled={true}
             focusable={true}
             onContentProcessDidTerminate={onError}
