@@ -171,22 +171,16 @@ test("[5.6] move pins to shortcuts", () =>
     expect(await migrateItem(item, 5.6, 5.7, "settings", db, "local")).toBe(
       true
     );
+    const shortcuts = await db.shortcuts.all.items();
     expect(item.pins).toBeUndefined();
     expect(
-      db.shortcuts.all.find(
-        (s) =>
-          s.item.type === "topic" &&
-          s.item.id === "hello" &&
-          s.item.notebookId === "world"
-      )
+      shortcuts.find((s) => s.itemType === "notebook" && s.itemId === "hello")
     ).toBeDefined();
     expect(
-      db.shortcuts.all.find(
-        (s) => s.item.type === "notebook" && s.item.id === "world"
-      )
+      shortcuts.find((s) => s.itemType === "notebook" && s.itemId === "world")
     ).toBeDefined();
     expect(
-      db.shortcuts.all.find((s) => s.item.type === "tag" && s.item.id === "tag")
+      shortcuts.find((s) => s.itemType === "tag" && s.itemId === "tag")
     ).toBeDefined();
   }));
 
@@ -279,7 +273,7 @@ describe("[5.9] make tags syncable", () => {
     databaseTest().then(async (db) => {
       const noteId = getId();
       const tags = ["hello", "world", "i am here"];
-      await db.notes.collection.add({
+      await db.legacyNotes.add({
         type: "note",
         title: "I am a note",
         tags,
@@ -287,7 +281,7 @@ describe("[5.9] make tags syncable", () => {
       });
 
       for (const tag of tags) {
-        await db.tags.collection.add({
+        await db.legacyTags.add({
           id: makeId(tag),
           noteIds: [noteId],
           type: "tag",
@@ -302,27 +296,24 @@ describe("[5.9] make tags syncable", () => {
       });
       await db.legacySettings.init();
 
-      const note = db.notes.note(noteId);
+      const note = db.legacyNotes.get(noteId);
       if (!note) throw new Error("Failed to find note.");
 
-      expect(await migrateItem(note.data, 5.9, 6.0, "note", db, "backup")).toBe(
+      expect(await migrateItem(note, 5.9, 6.0, "note", db, "backup")).toBe(
         true
       );
 
-      const resolvedTags = db.relations
-        .to({ type: "note", id: noteId }, "tag")
-        .resolved()
-        .sort((a, b) => a.title.localeCompare(b.title));
+      const resolvedTags = (
+        await db.relations.to({ type: "note", id: noteId }, "tag").resolve()
+      ).sort((a, b) => a.title.localeCompare(b.title));
 
-      expect(note.data.tags).toBeUndefined();
-      expect(db.tags.all).toHaveLength(3);
+      expect(note.tags).toBeUndefined();
+      expect(await db.tags.all.count()).toBe(3);
       expect(resolvedTags).toHaveLength(3);
       expect(resolvedTags[0].title).toBe("hello");
       expect(resolvedTags[1].title).toBe("I AM GOOD!");
       expect(resolvedTags[2].title).toBe("i am here");
-      expect(
-        tags.every((t) => !db.tags.collection.exists(makeId(t)))
-      ).toBeTruthy();
+      expect(db.legacyTags.items()).toHaveLength(0);
     }));
 
   test("migrate old tag item to new one", () =>
@@ -367,7 +358,7 @@ describe("[5.9] make tags syncable", () => {
     databaseTest().then(async (db) => {
       const noteId = getId();
       const tags = ["hello", "world", "i am here"];
-      await db.notes.collection.add({
+      await db.legacyNotes.add({
         type: "note",
         title: "I am a note",
         tags,
@@ -388,30 +379,27 @@ describe("[5.9] make tags syncable", () => {
           title: tag
         };
         await migrateItem(item, 5.9, 6.0, "tag", db, "backup");
-        await db.tags.collection.add(item);
+        await db.tags.add(item);
       }
 
-      const note = db.notes.note(noteId);
+      const note = db.legacyNotes.get(noteId);
       if (!note) throw new Error("Failed to find note.");
 
-      expect(await migrateItem(note.data, 5.9, 6.0, "note", db, "backup")).toBe(
+      expect(await migrateItem(note, 5.9, 6.0, "note", db, "backup")).toBe(
         true
       );
 
-      const resolvedTags = db.relations
-        .to({ type: "note", id: noteId }, "tag")
-        .resolved()
-        .sort((a, b) => a.title.localeCompare(b.title));
+      const resolvedTags = (
+        await db.relations.to({ type: "note", id: noteId }, "tag").resolve()
+      ).sort((a, b) => a.title.localeCompare(b.title));
 
-      expect(note.data.tags).toBeUndefined();
-      expect(db.tags.all).toHaveLength(3);
+      expect(note.tags).toBeUndefined();
+      expect(await db.tags.all.count()).toBe(3);
       expect(resolvedTags).toHaveLength(3);
       expect(resolvedTags[0].title).toBe("hello");
       expect(resolvedTags[1].title).toBe("I AM GOOD!");
       expect(resolvedTags[2].title).toBe("i am here");
-      expect(
-        tags.every((t) => !db.tags.collection.exists(makeId(t)))
-      ).toBeTruthy();
+      expect(db.legacyTags.items()).toHaveLength(0);
     }));
 });
 
@@ -419,37 +407,37 @@ describe("[5.9] make colors syncable", () => {
   test("create colors from notes & link to them using relations", () =>
     databaseTest().then(async (db) => {
       const noteId = getId();
-      await db.notes.collection.add({
+      await db.legacyNotes.add({
         type: "note",
         title: "I am a note",
         color: "blue",
         id: noteId
       });
 
-      await db.colors.collection.add({
+      await db.legacyColors.add({
         id: makeId("blue"),
         noteIds: [noteId],
         type: "tag",
         title: "blue"
       });
 
-      const note = db.notes.note(noteId);
+      const note = db.legacyNotes.get(noteId);
       if (!note) throw new Error("Failed to find note.");
 
-      expect(await migrateItem(note.data, 5.9, 6.0, "note", db, "backup")).toBe(
+      expect(await migrateItem(note, 5.9, 6.0, "note", db, "backup")).toBe(
         true
       );
 
-      const resolvedColors = db.relations
+      const resolvedColors = await db.relations
         .to({ type: "note", id: noteId }, "color")
-        .resolved();
+        .resolve();
 
-      expect(note.data.color).toBeUndefined();
-      expect(db.colors.all).toHaveLength(1);
+      expect(note.color).toBeUndefined();
+      expect(await db.colors.all.count()).toBe(1);
       expect(resolvedColors).toHaveLength(1);
       expect(resolvedColors[0].title).toBe("blue");
       expect(resolvedColors[0].colorCode).toBe("#2196F3");
-      expect(db.colors.collection.exists(makeId("blue"))).toBeFalsy();
+      expect(db.legacyColors.exists(makeId("blue"))).toBeFalsy();
     }));
 
   test("migrate old color item to new one", () =>
@@ -501,7 +489,7 @@ describe("[5.9] make colors syncable", () => {
   test("migrate color before notes", () =>
     databaseTest().then(async (db) => {
       const noteId = getId();
-      await db.notes.collection.add({
+      await db.legacyNotes.add({
         type: "note",
         title: "I am a note",
         color: "blue",
@@ -522,25 +510,25 @@ describe("[5.9] make colors syncable", () => {
         title: "blue"
       };
       await migrateItem(color, 5.9, 6.0, "tag", db, "backup");
-      await db.colors.collection.add(color);
+      await db.colors.add(color);
 
-      const note = db.notes.note(noteId);
+      const note = db.legacyNotes.get(noteId);
       if (!note) throw new Error("Failed to find note.");
 
-      expect(await migrateItem(note.data, 5.9, 6.0, "note", db, "backup")).toBe(
+      expect(await migrateItem(note, 5.9, 6.0, "note", db, "backup")).toBe(
         true
       );
 
-      const resolvedColors = db.relations
+      const resolvedColors = await db.relations
         .to({ type: "note", id: noteId }, "color")
-        .resolved();
+        .resolve();
 
-      expect(note.data.color).toBeUndefined();
-      expect(db.colors.all).toHaveLength(1);
+      expect(note.color).toBeUndefined();
+      expect(await db.colors.all.count()).toBe(1);
       expect(resolvedColors).toHaveLength(1);
       expect(resolvedColors[0].title).toBe("I AM GOOD!");
       expect(resolvedColors[0].colorCode).toBe("#2196F3");
-      expect(db.colors.collection.exists(makeId("blue"))).toBeFalsy();
+      expect(db.legacyColors.exists(makeId("blue"))).toBeFalsy();
     }));
 });
 
@@ -553,14 +541,30 @@ test("[5.9] move attachments.noteIds to relations", () =>
     };
     await migrateItem(attachment, 5.9, 6.0, "attachment", db, "backup");
 
-    const linkedNotes = db.relations.from(
-      { type: "attachment", id: "ATTACHMENT_ID" },
-      "note"
-    );
+    const linkedNotes = await db.relations
+      .from({ type: "attachment", id: "ATTACHMENT_ID" }, "note")
+      .get();
     expect(attachment.noteIds).toBeUndefined();
     expect(linkedNotes).toHaveLength(1);
-    expect(linkedNotes[0].to.id).toBe("HELLO_NOTE_ID");
+    expect(linkedNotes[0]).toBe("HELLO_NOTE_ID");
   }));
+
+test.todo("[5.9] flatten attachment object", () =>
+  databaseTest().then(async (db) => {
+    // const attachment = {
+    //   id: "ATTACHMENT_ID",
+    //   type: "attachment",
+    //   noteIds: ["HELLO_NOTE_ID"]
+    // };
+    // await migrateItem(attachment, 5.9, 6.0, "attachment", db, "backup");
+    // const linkedNotes = await db.relations
+    //   .from({ type: "attachment", id: "ATTACHMENT_ID" }, "note")
+    //   .get();
+    // expect(attachment.noteIds).toBeUndefined();
+    // expect(linkedNotes).toHaveLength(1);
+    // expect(linkedNotes[0]).toBe("HELLO_NOTE_ID");
+  })
+);
 
 describe("[5.9] move topics out of notebooks & use relations", () => {
   test("convert topics to subnotebooks", () =>
@@ -575,17 +579,16 @@ describe("[5.9] move topics out of notebooks & use relations", () => {
       };
       await migrateItem(notebook, 5.9, 6.0, "notebook", db, "backup");
 
-      const linkedNotebooks = db.relations.from(
-        { type: "notebook", id: "parent_notebook" },
-        "notebook"
-      );
+      const linkedNotebooks = await db.relations
+        .from({ type: "notebook", id: "parent_notebook" }, "notebook")
+        .get();
       expect(notebook.topics).toBeUndefined();
       expect(linkedNotebooks).toHaveLength(2);
-      expect(linkedNotebooks.some((a) => a.to.id === "topics1")).toBeTruthy();
-      expect(linkedNotebooks.some((a) => a.to.id === "topics2")).toBeTruthy();
-      expect(db.notebooks.all).toHaveLength(2);
-      expect(db.notebooks.notebook("topics1")).toBeDefined();
-      expect(db.notebooks.notebook("topics2")).toBeDefined();
+      expect(linkedNotebooks.some((a) => a === "topics1")).toBeTruthy();
+      expect(linkedNotebooks.some((a) => a === "topics2")).toBeTruthy();
+      expect(await db.notebooks.all.count()).toBe(2);
+      expect(await db.notebooks.notebook("topics1")).toBeDefined();
+      expect(await db.notebooks.notebook("topics2")).toBeDefined();
     }));
 
   test("convert topic shortcuts to notebook shortcuts", () =>
@@ -600,8 +603,8 @@ describe("[5.9] move topics out of notebooks & use relations", () => {
       };
       await migrateItem(shortcut, 5.9, 6.0, "shortcut", db, "backup");
 
-      expect(shortcut.item.type).toBe("notebook");
-      expect(shortcut.item.id).toBe("topics1");
+      expect(shortcut.itemType).toBe("notebook");
+      expect(shortcut.itemId).toBe("topics1");
     }));
 
   test("convert topic links in note to relations", () =>
@@ -613,13 +616,13 @@ describe("[5.9] move topics out of notebooks & use relations", () => {
       };
       await migrateItem(note, 5.9, 6.0, "note", db, "backup");
 
-      const linkedNotebooks = db.relations
+      const linkedNotebooks = await db.relations
         .to({ type: "note", id: "note1" }, "notebook")
-        .sort((a, b) => a.to.id.localeCompare(b.to.id));
+        .get();
       expect(note.notebooks).toBeUndefined();
       expect(linkedNotebooks).toHaveLength(2);
-      expect(linkedNotebooks.some((a) => a.from.id === "topic1")).toBeTruthy();
-      expect(linkedNotebooks.some((a) => a.from.id === "topic2")).toBeTruthy();
+      expect(linkedNotebooks.some((a) => a === "topic1")).toBeTruthy();
+      expect(linkedNotebooks.some((a) => a === "topic2")).toBeTruthy();
     }));
 });
 

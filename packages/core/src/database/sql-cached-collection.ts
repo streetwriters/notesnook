@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { MaybeDeletedItem, isDeleted } from "../types";
+import { GroupOptions, MaybeDeletedItem, isDeleted } from "../types";
 import EventManager from "../utils/event-manager";
 import { DatabaseAccessor, DatabaseCollection, DatabaseSchema } from ".";
 import { SQLCollection } from "./sql-collection";
@@ -107,6 +107,44 @@ export class SQLCachedCollection<
       const item = this.cache.get(id);
       if (!item) continue;
       this.cache.set(id, { ...item, ...partial, dateModified: Date.now() });
+    }
+  }
+
+  ids(_options: GroupOptions): string[] {
+    return Array.from(this.cache.keys());
+  }
+
+  items(
+    ids: string[],
+    _sortOptions?: GroupOptions
+  ): Record<string, MaybeDeletedItem<T> | undefined> {
+    const items: Record<string, MaybeDeletedItem<T> | undefined> = {};
+    for (const id of ids) {
+      items[id] = this.cache.get(id);
+    }
+    return items;
+  }
+
+  *unsynced(
+    after: number,
+    chunkSize: number
+  ): IterableIterator<MaybeDeletedItem<T>[]> {
+    let chunk: MaybeDeletedItem<T>[] = [];
+    for (const [_key, value] of this.cache) {
+      if (value.dateModified && value.dateModified > after) {
+        chunk.push(value);
+        if (chunk.length === chunkSize) {
+          yield chunk;
+          chunk = [];
+        }
+      }
+    }
+    if (chunk.length > 0) yield chunk;
+  }
+
+  *stream(): IterableIterator<T> {
+    for (const [_key, value] of this.cache) {
+      if (!value.deleted) yield value as T;
     }
   }
 
