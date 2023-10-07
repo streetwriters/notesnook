@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import http from "../utils/http";
 import Constants from "../utils/constants";
 import Database from ".";
-import { Note, isDeleted } from "../types";
+import { isDeleted } from "../types";
 import { isUnencryptedContent } from "../collections/content";
 import { Cipher } from "@notesnook/crypto";
 
@@ -93,11 +93,11 @@ export class Monographs {
     const token = await this.db.tokenManager.getAccessToken();
     if (!user || !token) throw new Error("Please login to publish a note.");
 
-    const note = this.db.notes.note(noteId);
+    const note = await this.db.notes.note(noteId);
     if (!note) throw new Error("No such note found.");
-    if (!note.data.contentId) throw new Error("Cannot publish an empty note.");
+    if (!note.contentId) throw new Error("Cannot publish an empty note.");
 
-    const contentItem = await this.db.content.raw(note.data.contentId);
+    const contentItem = await this.db.content.get(note.contentId);
 
     if (!contentItem || isDeleted(contentItem))
       throw new Error("Could not find content for this note.");
@@ -163,12 +163,9 @@ export class Monographs {
     this.monographs.splice(this.monographs.indexOf(noteId), 1);
   }
 
-  get all() {
+  async all() {
     if (!this.monographs.length) return [];
-
-    return this.monographs
-      .map((noteId) => this.db.notes.note(noteId)?.data)
-      .filter(Boolean) as Note[];
+    return await this.db.notes.all.items(this.monographs);
   }
 
   get(monographId: string) {
