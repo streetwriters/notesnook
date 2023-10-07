@@ -17,14 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { TEST_NOTE, loginFakeUser, notebookTest } from "./utils";
-// import v52Backup from "./__fixtures__/backup.v5.2.json";
-// import v52BackupCopy from "./__fixtures__/backup.v5.2.copy.json";
-// import v56BackupCopy from "./__fixtures__/backup.v5.6.json";
-// import v58BackupCopy from "./__fixtures__/backup.v5.8.json";
-// import qclone from "qclone";
+import { TEST_NOTE, databaseTest, loginFakeUser, notebookTest } from "./utils";
 import { test, expect } from "vitest";
-// import { getId, makeId } from "../src/utils/id";
 
 test("export backup", () =>
   notebookTest().then(async ({ db }) => {
@@ -70,34 +64,32 @@ test("export encrypted backup", () =>
     expect(backup.encrypted).toBe(true);
   }));
 
-test("import backup", () =>
-  notebookTest().then(async ({ db, id }) => {
-    await db.notes.add(TEST_NOTE);
+test("import backup", async () => {
+  const { db, id } = await notebookTest();
+  const exp = [];
+  for await (const file of db.backup.export("node", false)) {
+    exp.push(file);
+  }
 
-    const exp = [];
-    for await (const file of db.backup.export("node", false)) {
-      exp.push(file);
-    }
+  const db2 = await databaseTest();
+  await db2.backup.import(JSON.parse(exp[1].data));
+  expect((await db2.notebooks.notebook(id)).id).toBe(id);
+});
 
-    await db.storage().clear();
-    await db.backup.import(JSON.parse(exp[1].data));
-    expect(db.notebooks.notebook(id).data.id).toBe(id);
-  }));
+test("import encrypted backup", async () => {
+  const { db, id } = await notebookTest();
+  await loginFakeUser(db);
+  await db.notes.add(TEST_NOTE);
 
-test("import encrypted backup", () =>
-  notebookTest().then(async ({ db, id }) => {
-    await loginFakeUser(db);
-    await db.notes.add(TEST_NOTE);
+  const exp = [];
+  for await (const file of db.backup.export("node", true)) {
+    exp.push(file);
+  }
 
-    const exp = [];
-    for await (const file of db.backup.export("node", true)) {
-      exp.push(file);
-    }
-
-    await db.storage().clear();
-    await db.backup.import(JSON.parse(exp[1].data), "password");
-    expect(db.notebooks.notebook(id).data.id).toBe(id);
-  }));
+  const db2 = await databaseTest();
+  await db2.backup.import(JSON.parse(exp[1].data), "password");
+  expect((await db2.notebooks.notebook(id)).id).toBe(id);
+});
 
 test("import tempered backup", () =>
   notebookTest().then(async ({ db }) => {
@@ -113,104 +105,3 @@ test("import tempered backup", () =>
     backup.data += "hello";
     await expect(db.backup.import(backup)).rejects.toThrow(/tempered/);
   }));
-
-// describe.each([
-//   ["v5.2", v52Backup],
-//   ["v5.2 copy", v52BackupCopy],
-//   ["v5.6", v56BackupCopy],
-//   ["v5.8", v58BackupCopy]
-// ])("testing backup version: %s", (version, data) => {
-//   test(`import ${version} backup`, () => {
-//     return databaseTest().then(async (db) => {
-//       await db.backup.import(qclone(data));
-
-//       expect(db.settings.raw.id).toBeDefined();
-//       expect(db.settings.raw.dateModified).toBeDefined();
-//       expect(db.settings.raw.dateEdited).toBeUndefined();
-//       expect(db.settings.raw.pins).toBeUndefined();
-
-//       expect(
-//         db.notes.all.every((v) => {
-//           const doesNotHaveContent = !v.content;
-//           const doesNotHaveColors = !v.colors; // && (!v.color || v.color.length);
-//           const hasTopicsInAllNotebooks =
-//             !v.notebooks ||
-//             v.notebooks.every((nb) => !!nb.id && !!nb.topics && !nb.topic);
-//           const hasDateModified = v.dateModified > 0;
-//           const doesNotHaveTags = !v.tags;
-//           const doesNotHaveColor = !v.color;
-//           if (!doesNotHaveTags) console.log(v);
-//           return (
-//             doesNotHaveTags &&
-//             doesNotHaveColor &&
-//             doesNotHaveContent &&
-//             !v.notebook &&
-//             hasTopicsInAllNotebooks &&
-//             doesNotHaveColors &&
-//             hasDateModified
-//           );
-//         })
-//       ).toBeTruthy();
-
-//       expect(
-//         db.tags.all.every((t) => makeId(t.title) !== t.id && !t.noteIds)
-//       ).toBeTruthy();
-
-//       expect(
-//         db.colors.all.every(
-//           (t) => makeId(t.title) !== t.id && !t.noteIds && !!t.colorCode
-//         )
-//       ).toBeTruthy();
-
-//       expect(
-//         db.notebooks.all.every((v) => v.title != null && v.dateModified > 0)
-//       ).toBeTruthy();
-
-//       expect(db.notebooks.all.every((v) => !v.topics)).toBeTruthy();
-
-//       expect(
-//         db.attachments.all.every((v) => v.dateModified > 0 && !v.dateEdited)
-//       ).toBeTruthy();
-
-//       expect(db.attachments.all.every((a) => !a.noteIds)).toBeTruthy();
-
-//       if (data.data.settings.pins)
-//         expect(db.shortcuts.all).toHaveLength(data.data.settings.pins.length);
-
-//       const allContent = await db.content.all();
-//       expect(
-//         allContent.every((v) => v.type === "tiptap" || v.deleted)
-//       ).toBeTruthy();
-//       expect(allContent.every((v) => !v.persistDateEdited)).toBeTruthy();
-//       expect(allContent.every((v) => v.dateModified > 0)).toBeTruthy();
-
-//       expect(
-//         allContent.every(
-//           (v) =>
-//             !v.data.includes("tox-checklist") &&
-//             !v.data.includes("tox-checklist--checked")
-//         )
-//       ).toBeTruthy();
-//     });
-//   });
-
-//   test(`verify indices of ${version} backup`, () => {
-//     return databaseTest().then(async (db) => {
-//       await db.backup.import(qclone(data));
-
-//       const keys = await db.storage().getAllKeys();
-//       for (let key in data.data) {
-//         const item = data.data[key];
-//         if (item && !item.type && item.deleted) continue;
-//         if (
-//           key.startsWith("_uk_") ||
-//           key === "hasConflicts" ||
-//           key === "monographs" ||
-//           key === "token"
-//         )
-//           continue;
-//         expect(keys.some((k) => k.startsWith(key))).toBeTruthy();
-//       }
-//     });
-//   });
-// });

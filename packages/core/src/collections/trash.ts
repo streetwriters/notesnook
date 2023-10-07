@@ -19,10 +19,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import dayjs from "dayjs";
 import Database from "../api";
+import { deleteItems } from "../utils/array";
+import { FilteredSelector } from "../database/sql-collection";
+import { TrashItem } from "../types";
 
 export default class Trash {
   collections = ["notes", "notebooks"] as const;
-  cache: string[] = [];
+  cache: {
+    notes: string[];
+    notebooks: string[];
+  } = {
+    notebooks: [],
+    notes: []
+  };
   constructor(private readonly db: Database) {}
 
   async init() {
@@ -34,19 +43,19 @@ export default class Trash {
           .selectFrom("notes")
           .where("type", "==", "trash")
           .select("id")
-          .as("id"),
+          .as("noteId"),
         eb
           .selectFrom("notebooks")
           .where("type", "==", "trash")
           .select("id")
-          .as("id")
+          .as("notebookId")
       ])
       .execute();
 
-    this.cache = result.reduce((ids, item) => {
-      if (item.id) ids.push(item.id);
-      return ids;
-    }, [] as string[]);
+    for (const { noteId, notebookId } of result) {
+      if (noteId) this.cache.notes.push(noteId);
+      else if (notebookId) this.cache.notebooks.push(notebookId);
+    }
   }
 
   async cleanup() {
@@ -79,8 +88,8 @@ export default class Trash {
       },
       { noteIds: [] as string[], notebookIds: [] as string[] }
     );
-    await this.delete("note", noteIds);
-    await this.delete("note", notebookIds);
+
+    await this._delete(noteIds, notebookIds);
   }
 
   async add(type: "note" | "notebook", ids: string[]) {
@@ -90,50 +99,85 @@ export default class Trash {
         itemType: "note",
         dateDeleted: Date.now()
       });
+      this.cache.notes.push(...ids);
     } else if (type === "notebook") {
       await this.db.notebooks.collection.update(ids, {
         type: "trash",
         itemType: "notebook",
         dateDeleted: Date.now()
       });
+      this.cache.notebooks.push(...ids);
     }
-    this.cache.push(...ids);
   }
 
-  async delete(type: "note" | "notebook", ids: string[]) {
-    if (type === "note") {
-      await this.db.content.removeByNoteId(...ids);
-      await this.db.noteHistory.clearSessions(...ids);
-      await this.db.notes.delete(...ids);
-    } else if (type === "notebook") {
-      await this.db.relations.unlinkOfType("notebook", ids);
-      await this.db.notebooks.delete(...ids);
+  async delete(...items: { id: string; type: "note" | "notebook" }[]) {
+    if (items.length <= 0) return;
+
+    const noteIds = [];
+    const notebookIds = [];
+    for (const item of items) {
+      if (item.type === "note") {
+        noteIds.push(item.id);
+        this.cache.notes.splice(this.cache.notes.indexOf(item.id), 1);
+      } else if (item.type === "notebook") {
+        notebookIds.push(item.id);
+        this.cache.notebooks.splice(this.cache.notebooks.indexOf(item.id), 1);
+      }
     }
-    ids.forEach((id) => this.cache.splice(this.cache.indexOf(id), 1));
+
+    await this._delete(noteIds, notebookIds);
   }
 
-  async restore(type: "note" | "notebook", ids: string[]) {
-    if (type === "note") {
-      await this.db.notes.collection.update(ids, {
+  private async _delete(noteIds: string[], notebookIds: string[]) {
+    if (noteIds.length > 0) {
+      await this.db.content.removeByNoteId(...noteIds);
+      await this.db.noteHistory.clearSessions(...noteIds);
+      await this.db.notes.remove(...noteIds);
+      deleteItems(this.cache.notes, ...noteIds);
+    }
+
+    if (notebookIds.length > 0) {
+      await this.db.relations.unlinkOfType("notebook", notebookIds);
+      await this.db.notebooks.remove(...notebookIds);
+      deleteItems(this.cache.notebooks, ...notebookIds);
+    }
+  }
+
+  async restore(...items: { id: string; type: "note" | "notebook" }[]) {
+    if (items.length <= 0) return;
+
+    const noteIds = [];
+    const notebookIds = [];
+    for (const item of items) {
+      if (item.type === "note") {
+        noteIds.push(item.id);
+        this.cache.notes.splice(this.cache.notes.indexOf(item.id), 1);
+      } else if (item.type === "notebook") {
+        notebookIds.push(item.id);
+        this.cache.notebooks.splice(this.cache.notebooks.indexOf(item.id), 1);
+      }
+    }
+
+    if (noteIds.length > 0) {
+      await this.db.notes.collection.update(noteIds, {
         type: "note",
         dateDeleted: null,
         itemType: null
       });
-    } else {
-      await this.db.notebooks.collection.update(ids, {
+    }
+
+    if (notebookIds.length > 0) {
+      await this.db.notebooks.collection.update(notebookIds, {
         type: "notebook",
         dateDeleted: null,
         itemType: null
       });
     }
-    ids.forEach((id) => this.cache.splice(this.cache.indexOf(id), 1));
   }
 
   async clear() {
-    // for (const item of this.all) {
-    //   await this.delete(item.id);
-    // }
-    this.cache = [];
+    await this._delete(this.cache.notes, this.cache.notebooks);
+    this.cache = { notebooks: [], notes: [] };
   }
 
   // synced(id: string) {
@@ -144,11 +188,31 @@ export default class Trash {
   //   } else return true;
   // }
 
+  async all() {
+    const trashedNotes = await this.db
+      .sql()
+      .selectFrom("notes")
+      .where("type", "==", "trash")
+      .where("id", "in", this.cache.notes)
+      .selectAll()
+      .execute();
+
+    const trashedNotebooks = await this.db
+      .sql()
+      .selectFrom("notebooks")
+      .where("type", "==", "trash")
+      .where("id", "in", this.cache.notebooks)
+      .selectAll()
+      .execute();
+
+    return [...trashedNotes, ...trashedNotebooks] as TrashItem[];
+  }
+
   /**
    *
    * @param {string} id
    */
   exists(id: string) {
-    return this.cache.includes(id);
+    return this.cache.notebooks.includes(id) || this.cache.notes.includes(id);
   }
 }
