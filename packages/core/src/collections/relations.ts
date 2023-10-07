@@ -28,7 +28,7 @@ import {
 } from "../types";
 import Database from "../api";
 import { SQLCollection } from "../database/sql-collection";
-import { DatabaseAccessor, DatabaseSchema } from "../database";
+import { DatabaseAccessor, DatabaseSchema, isFalse } from "../database";
 import { SelectQueryBuilder } from "kysely";
 
 export class Relations implements ICollection {
@@ -203,7 +203,7 @@ class RelationsArray<TType extends keyof RelatableTable> {
       .$if(limit !== undefined && limit > 0, (b) => b.limit(limit!))
       .selectAll()
       // TODO: check if we need to index deleted field.
-      .where("deleted", "is", null)
+      .where(isFalse("deleted"))
       .execute();
     return items as unknown as ItemMap[TType][];
   }
