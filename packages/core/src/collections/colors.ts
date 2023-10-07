@@ -23,6 +23,7 @@ import { Color } from "../types";
 import Database from "../api";
 import { Tags } from "./tags";
 import { SQLCollection } from "../database/sql-collection";
+import { isFalse } from "../database";
 
 export const DefaultColors: Record<string, string> = {
   red: "#f44336",
@@ -87,7 +88,7 @@ export class Colors implements ICollection {
 
   get all() {
     return this.collection.createFilter<Color>((qb) =>
-      qb.where("deleted", "is", null)
+      qb.where(isFalse("deleted"))
     );
   }
 

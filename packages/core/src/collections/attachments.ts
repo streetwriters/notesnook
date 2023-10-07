@@ -33,6 +33,7 @@ import { Output } from "../interfaces";
 import { Attachment } from "../types";
 import Database from "../api";
 import { SQLCollection } from "../database/sql-collection";
+import { isFalse } from "../database";
 
 export class Attachments implements ICollection {
   name = "attachments";
@@ -283,16 +284,9 @@ export class Attachments implements ICollection {
   }
 
   async attachment(hashOrId: string): Promise<Attachment | undefined> {
-    return await this.db
-      .sql()
-      .selectFrom("attachments")
-      .selectAll()
-      .where((eb) =>
-        eb.or([eb("id", "==", hashOrId), eb("hash", "==", hashOrId)])
-      )
-      .where("deleted", "is", null)
-      .$narrowType<Attachment>()
-      .executeTakeFirst();
+    return this.all.find((eb) =>
+      eb.or([eb("id", "==", hashOrId), eb("hash", "==", hashOrId)])
+    );
   }
 
   markAsUploaded(id: string) {
@@ -372,9 +366,7 @@ export class Attachments implements ICollection {
 
   get pending() {
     return this.collection.createFilter<Attachment>((qb) =>
-      qb.where((eb) =>
-        eb.or([eb("dateUploaded", "is", null), eb("dateUploaded", "<=", 0)])
-      )
+      qb.where(isFalse("dateUploaded"))
     );
   }
 
@@ -419,9 +411,11 @@ export class Attachments implements ICollection {
   //   );
   // }
 
-  // get all() {
-  //   return this.collection.items();
-  // }
+  get all() {
+    return this.collection.createFilter<Attachment>((qb) =>
+      qb.where(isFalse("deleted"))
+    );
+  }
 
   private async encryptKey(key: SerializedKey) {
     const encryptionKey = await this._getEncryptionKey();
