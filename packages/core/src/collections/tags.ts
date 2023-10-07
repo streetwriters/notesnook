@@ -22,6 +22,7 @@ import { Tag } from "../types";
 import Database from "../api";
 import { ICollection } from "./collection";
 import { SQLCollection } from "../database/sql-collection";
+import { isFalse } from "../database";
 
 export class Tags implements ICollection {
   name = "tags";
@@ -71,7 +72,7 @@ export class Tags implements ICollection {
 
   get all() {
     return this.collection.createFilter<Tag>((qb) =>
-      qb.where("deleted", "is", null)
+      qb.where(isFalse("deleted"))
     );
   }
 

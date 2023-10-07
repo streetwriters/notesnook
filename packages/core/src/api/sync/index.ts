@@ -218,7 +218,6 @@ class Sync {
   async init(isForceSync?: boolean) {
     await this.checkConnection();
 
-    await this.conflicts.recalculate();
     if (await this.conflicts.check()) {
       this.conflicts.throw();
     }
