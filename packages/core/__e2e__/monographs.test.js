@@ -53,10 +53,12 @@ test(
 
       const monographId = await db.monographs.publish(id);
 
-      expect(db.monographs.all.find((m) => m.id === id)).toBeDefined();
+      expect(
+        (await db.monographs.all()).find((m) => m.id === id)
+      ).toBeDefined();
 
       const monograph = await db.monographs.get(monographId);
-      const note = db.notes.note(id);
+      const note = await db.notes.note(id);
       expect(monograph.id).toBe(monographId);
       expect(monograph.title).toBe(note.title);
 
@@ -74,7 +76,7 @@ test(
 
       const monographId = await db.monographs.publish(id);
       let monograph = await db.monographs.get(monographId);
-      const note = db.notes.note(id);
+      const note = await db.notes.note(id);
       expect(monograph.title).toBe(note.title);
 
       const editedTitle = "EDITED TITLE OF MY NOTE!";
@@ -96,10 +98,14 @@ test(
       await db.monographs.refresh();
 
       await db.monographs.publish(id);
-      expect(db.monographs.all.find((m) => m.id === id)).toBeDefined();
+      expect(
+        (await db.monographs.all()).find((m) => m.id === id)
+      ).toBeDefined();
 
       await db.monographs.unpublish(id);
-      expect(db.monographs.all.find((m) => m.id === id)).toBeUndefined();
+      expect(
+        (await db.monographs.all()).find((m) => m.id === id)
+      ).toBeUndefined();
 
       await logout(db);
     }),
