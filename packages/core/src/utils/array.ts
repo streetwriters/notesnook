@@ -72,3 +72,20 @@ export function* chunkedIterate<T>(array: T[], chunkSize: number) {
     yield chunk;
   }
 }
+
+export async function* chunkify<T>(
+  iterator: AsyncIterableIterator<T> | IterableIterator<T>,
+  chunkSize: number
+) {
+  let chunk: T[] = [];
+  for await (const item of iterator) {
+    chunk.push(item);
+    if (chunk.length === chunkSize) {
+      yield chunk;
+      chunk = [];
+    }
+  }
+  if (chunk.length > 0) {
+    yield chunk;
+  }
+}

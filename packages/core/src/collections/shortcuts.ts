@@ -59,20 +59,19 @@ export class Shortcuts implements ICollection {
       ...shortcut
     };
 
-    if (!shortcut.item)
+    if (!shortcut.itemId || !shortcut.itemType)
       throw new Error("Cannot create a shortcut without an item.");
 
-    const id = shortcut.id || shortcut.item.id;
+    const id = shortcut.id || shortcut.itemId;
 
     await this.collection.upsert({
       id,
       type: "shortcut",
       itemId: shortcut.itemId,
       itemType: shortcut.itemType,
-      // item: shortcut.item,
       dateCreated: shortcut.dateCreated || Date.now(),
       dateModified: shortcut.dateModified || Date.now(),
-      sortIndex: await this.collection.count()
+      sortIndex: -1 // await this.collection.count()
     });
     return id;
   }
@@ -81,9 +80,11 @@ export class Shortcuts implements ICollection {
   //   return this.collection.raw();
   // }
 
-  // get all() {
-  //   return this.collection.items();
-  // }
+  get all() {
+    return this.collection.createFilter<Shortcut>((qb) =>
+      qb.where("deleted", "is", null)
+    );
+  }
 
   async get() {
     // return this.all.reduce((prev, shortcut) => {
@@ -106,7 +107,7 @@ export class Shortcuts implements ICollection {
     // }, [] as (Notebook | Topic | Tag)[]);
   }
 
-  exists(id: string) {
+  async exists(id: string) {
     return this.collection.exists(id);
   }
 

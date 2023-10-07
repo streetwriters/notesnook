@@ -18,14 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { EVENTS } from "../common";
-import { isDeleted } from "../types";
+import { GroupOptions, MaybeDeletedItem, isDeleted } from "../types";
 import EventManager from "../utils/event-manager";
 import {
   DatabaseAccessor,
   DatabaseCollection,
   DatabaseSchema,
-  SQLiteItem
+  SQLiteItem,
+  isFalse
 } from ".";
+import { ExpressionOrFactory, SelectQueryBuilder, SqlBool } from "kysely";
 
 export class SQLCollection<
   TCollectionType extends keyof DatabaseSchema,
@@ -91,6 +93,7 @@ export class SQLCollection<
         .selectFrom<keyof DatabaseSchema>(this.type)
         .select((a) => a.fn.count<number>("id").as("count"))
         .where("id", "==", id)
+        .where("deleted", "is", null)
         .limit(1)
         .executeTakeFirst()) || {};
 
@@ -144,5 +147,174 @@ export class SQLCollection<
         dateModified: Date.now()
       })
       .execute();
+  }
+
+  async ids(sortOptions: GroupOptions): Promise<string[]> {
+    const ids = await this.db()
+      .selectFrom<keyof DatabaseSchema>(this.type)
+      .select("id")
+      .where("deleted", "is", null)
+      .$if(this.type === "notes" || this.type === "notebooks", (eb) =>
+        eb.where("dateDeleted", "is", null)
+      )
+      .orderBy(sortOptions.sortBy, sortOptions.sortDirection)
+      .execute();
+    return ids.map((id) => id.id);
+  }
+
+  async items(
+    ids: string[],
+    sortOptions?: GroupOptions
+  ): Promise<Record<string, MaybeDeletedItem<T> | undefined>> {
+    const results = await this.db()
+      .selectFrom<keyof DatabaseSchema>(this.type)
+      .selectAll()
+      .where("id", "in", ids)
+      .$if(!!sortOptions, (eb) =>
+        eb.orderBy(sortOptions!.sortBy, sortOptions!.sortDirection)
+      )
+      .execute();
+    const items: Record<string, MaybeDeletedItem<T>> = {};
+    for (const item of results) {
+      items[item.id] = item as MaybeDeletedItem<T>;
+    }
+    return items;
+  }
+
+  async *unsynced(
+    after: number,
+    chunkSize: number
+  ): AsyncIterableIterator<MaybeDeletedItem<T>[]> {
+    let index = 0;
+    while (true) {
+      const rows = await this.db()
+        .selectFrom<keyof DatabaseSchema>(this.type)
+        .selectAll()
+        .orderBy("dateModified", "asc")
+        .$if(after > 0, (eb) =>
+          eb
+            .where("dateModified", ">", after)
+            .where((eb) =>
+              eb.or([eb("synced", "is", null), eb("synced", "==", false)])
+            )
+        )
+        .$if(this.type === "attachments", (eb) =>
+          eb.where("dateUploaded", ">", 0)
+        )
+        .offset(index)
+        .limit(chunkSize)
+        .execute();
+      if (rows.length === 0) break;
+      index += chunkSize;
+      yield rows as MaybeDeletedItem<T>[];
+    }
+  }
+
+  async *stream(): AsyncIterableIterator<T> {
+    let index = 0;
+    const chunkSize = 50;
+    while (true) {
+      const rows = await this.db()
+        .selectFrom<keyof DatabaseSchema>(this.type)
+        .where(isFalse("deleted"))
+        .orderBy("dateModified desc")
+        .selectAll()
+        .offset(index)
+        .limit(chunkSize)
+        .execute();
+      if (rows.length === 0) break;
+      index += chunkSize;
+      for (const row of rows) {
+        yield row as T;
+      }
+    }
+  }
+
+  createFilter<T>(
+    selector: (
+      qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, unknown>
+    ) => SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, unknown>,
+    batchSize = 50
+  ) {
+    return new FilteredSelector<T>(
+      this.db().selectFrom<keyof DatabaseSchema>(this.type).$call(selector),
+      batchSize
+    );
+  }
+}
+
+export class FilteredSelector<T> {
+  constructor(
+    readonly filter: SelectQueryBuilder<
+      DatabaseSchema,
+      keyof DatabaseSchema,
+      unknown
+    >,
+    readonly batchSize: number
+  ) {}
+
+  async ids() {
+    return (await this.filter.select("id").execute()).map((i) => i.id);
+  }
+
+  async items(ids?: string[]) {
+    return (await this.filter
+      .$if(!!ids && ids.length > 0, (eb) => eb.where("id", "in", ids!))
+      .selectAll()
+      .execute()) as T[];
+  }
+
+  async has(id: string) {
+    const { count } =
+      (await this.filter
+        .where("id", "==", id)
+        .limit(1)
+        .select((a) => a.fn.count<number>("id").as("count"))
+        .executeTakeFirst()) || {};
+    return count !== undefined && count > 0;
+  }
+
+  async count() {
+    const { count } =
+      (await this.filter
+        .select((a) => a.fn.count<number>("id").as("count"))
+        .executeTakeFirst()) || {};
+    return count || 0;
+  }
+
+  async find(
+    filter: ExpressionOrFactory<DatabaseSchema, keyof DatabaseSchema, SqlBool>
+  ) {
+    const item = await this.filter
+      .where(filter)
+      .limit(1)
+      .selectAll()
+      .executeTakeFirst();
+    return item as T | undefined;
+  }
+
+  async *map<TReturnType>(
+    fn: (item: T) => TReturnType
+  ): AsyncIterableIterator<TReturnType> {
+    for await (const item of this) {
+      yield fn(item);
+    }
+  }
+
+  async *[Symbol.asyncIterator]() {
+    let index = 0;
+    while (true) {
+      const rows = await this.filter
+        .selectAll()
+        .orderBy("dateModified asc")
+        .offset(index)
+        .limit(this.batchSize)
+        .execute();
+      if (rows.length === 0) break;
+      index += this.batchSize;
+      for (const row of rows) {
+        yield row as T;
+      }
+    }
   }
 }

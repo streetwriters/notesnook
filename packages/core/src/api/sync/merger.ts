@@ -20,26 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { logger } from "../../logger";
 import { isHTMLEqual } from "../../utils/html-diff";
 import Database from "..";
-import { SYNC_COLLECTIONS_MAP } from "./types";
-import {
-  Attachment,
-  ContentItem,
-  Item,
-  ItemMap,
-  MaybeDeletedItem,
-  Note,
-  Notebook,
-  TrashOrItem,
-  isDeleted
-} from "../../types";
+import { ContentItem, Item, MaybeDeletedItem, isDeleted } from "../../types";
 
 class Merger {
   logger = logger.scope("Merger");
   constructor(private readonly db: Database) {}
 
-  isSyncCollection(type: string): type is keyof typeof SYNC_COLLECTIONS_MAP {
-    return type in SYNC_COLLECTIONS_MAP;
-  }
+  // isSyncCollection(type: string): type is keyof typeof SYNC_COLLECTIONS_MAP {
+  //   return type in SYNC_COLLECTIONS_MAP;
+  // }
 
   isConflicted(
     localItem: MaybeDeletedItem<Item>,
@@ -79,12 +68,18 @@ class Merger {
     }
   }
 
-  mergeItemSync<TType extends keyof typeof SYNC_COLLECTIONS_MAP>(
-    remoteItem: MaybeDeletedItem<
-      ItemMap[TType] | TrashOrItem<Note> | TrashOrItem<Notebook>
-    >,
-    type: TType,
-    _lastSynced: number
+  mergeItemSync(
+    remoteItem: MaybeDeletedItem<Item>,
+    localItem: MaybeDeletedItem<Item> | undefined,
+    type:
+      | "shortcut"
+      | "reminder"
+      | "tag"
+      | "color"
+      | "note"
+      | "relation"
+      | "notebook"
+      | "settingitem"
   ) {
     switch (type) {
       case "shortcut":
@@ -95,9 +90,6 @@ class Merger {
       case "relation":
       case "notebook":
       case "settingitem": {
-        const localItem = this.db[SYNC_COLLECTIONS_MAP[type]].collection.getRaw(
-          remoteItem.id
-        );
         if (!localItem || remoteItem.dateModified > localItem.dateModified) {
           return remoteItem;
         }
@@ -107,8 +99,8 @@ class Merger {
   }
 
   async mergeContent(
-    remoteItem: MaybeDeletedItem<ContentItem>,
-    localItem: MaybeDeletedItem<ContentItem>,
+    remoteItem: MaybeDeletedItem<Item>,
+    localItem: MaybeDeletedItem<Item> | undefined,
     lastSynced: number
   ) {
     if (localItem && "localOnly" in localItem && localItem.localOnly) return;
@@ -120,63 +112,55 @@ class Merger {
     if (!localItem || conflicted === "merge") {
       return remoteItem;
     } else if (conflicted === "conflict") {
-      if (isDeleted(localItem) || isDeleted(remoteItem)) {
-        if (remoteItem.dateModified > localItem.dateModified) return remoteItem;
-        return;
-      }
-
-      const note = this.db.notes.collection.get(localItem.noteId);
-      if (!note) return;
-
-      // if hashes are equal do nothing
       if (
-        !note.locked &&
-        (!remoteItem ||
-          !remoteItem ||
-          !localItem.data ||
-          !remoteItem.data ||
-          isHTMLEqual(localItem.data, remoteItem.data))
-      )
-        return;
-
-      if (note.locked) {
-        // if note is locked or content is deleted we keep the most recent version.
+        isDeleted(localItem) ||
+        isDeleted(remoteItem) ||
+        remoteItem.type !== "tiptap" ||
+        localItem.type !== "tiptap" ||
+        localItem.locked ||
+        remoteItem.locked ||
+        !localItem.data ||
+        !remoteItem.data ||
+        isHTMLEqual(localItem.data, remoteItem.data)
+      ) {
         if (remoteItem.dateModified > localItem.dateModified) return remoteItem;
-      } else {
-        // otherwise we trigger the conflicts
-        await this.db.notes.add({
-          id: localItem.noteId,
-          conflicted: true
-        });
-        await this.db.storage().write("hasConflicts", true);
-        return {
-          ...localItem,
-          conflicted: remoteItem
-        };
+        return;
       }
+
+      // otherwise we trigger the conflicts
+      await this.db.notes.add({
+        id: localItem.noteId,
+        conflicted: true
+      });
+      return {
+        ...localItem,
+        conflicted: remoteItem
+      } as ContentItem;
     }
   }
 
-  async mergeItem(
-    remoteItem: MaybeDeletedItem<Attachment>,
-    type: "settings" | "attachment",
-    _lastSynced: number
+  async mergeItemAsync(
+    remoteItem: MaybeDeletedItem<Item>,
+    localItem: MaybeDeletedItem<Item> | undefined,
+    type: "attachment"
   ) {
     switch (type) {
       case "attachment": {
-        if (isDeleted(remoteItem)) return remoteItem;
-
-        if (remoteItem.type !== "attachment") return;
-
-        const localAttachment = this.db.attachments.attachment(
-          remoteItem.metadata.hash
-        );
+        if (!localItem) return remoteItem;
         if (
-          localAttachment &&
-          localAttachment.dateUploaded !== remoteItem.dateUploaded
+          isDeleted(localItem) ||
+          isDeleted(remoteItem) ||
+          remoteItem.type !== "attachment" ||
+          localItem.type !== "attachment"
         ) {
+          if (remoteItem.dateModified > localItem.dateModified)
+            return remoteItem;
+          return;
+        }
+
+        if (localItem.dateUploaded !== remoteItem.dateUploaded) {
           const isRemoved = await this.db.attachments.remove(
-            localAttachment.metadata.hash,
+            localItem.hash,
             true
           );
           if (!isRemoved)
