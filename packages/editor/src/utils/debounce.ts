@@ -16,17 +16,56 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-export function debounce<F extends (...args: never[]) => void>(
+interface DebouncedFunction<
+  Args extends any[],
+  F extends (...args: Args) => any
+> {
+  (this: ThisParameterType<F>, ...args: Args & Parameters<F>): void;
+}
+
+interface DebouncedFunctionWithId<
+  Args extends any[],
+  F extends (...args: Args) => any
+> {
+  (
+    this: ThisParameterType<F>,
+    id: string | number,
+    ...args: Args & Parameters<F>
+  ): void;
+}
+
+export function debounce<Args extends any[], F extends (...args: Args) => void>(
   func: F,
   waitFor: number
-) {
+): DebouncedFunction<Args, F> {
   let timeout: number | null;
 
-  const debounced = (...args: Parameters<F>) => {
+  return (...args: Args) => {
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), waitFor) as unknown as number;
   };
+}
 
-  return debounced;
+export function debounceWithId<
+  Args extends any[],
+  F extends (...args: Args) => void
+>(func: F, waitFor: number): DebouncedFunctionWithId<Args, F> {
+  let timeout: number | null;
+  let debounceId: string | number | null = null;
+
+  return (id: string | number, ...args: Parameters<F>) => {
+    if (timeout && id === debounceId) clearTimeout(timeout);
+    debounceId = id;
+    timeout = setTimeout(() => {
+      func(...args);
+    }, waitFor) as unknown as number;
+  };
+}
+
+const DEBOUNCE_TIMEOUTS: Record<string, NodeJS.Timeout> = {};
+export function inlineDebounce(id: string, func: () => void, waitFor: number) {
+  clearTimeout(DEBOUNCE_TIMEOUTS[id]);
+  DEBOUNCE_TIMEOUTS[id] = setTimeout(func, waitFor);
 }
