@@ -85,9 +85,11 @@ export class Colors implements ICollection {
   //   return this.collection.raw();
   // }
 
-  // get all(): Color[] {
-  //   return this.collection.items();
-  // }
+  get all() {
+    return this.collection.createFilter<Color>((qb) =>
+      qb.where("deleted", "is", null)
+    );
+  }
 
   async remove(...ids: string[]) {
     await this.db.transaction(async () => {

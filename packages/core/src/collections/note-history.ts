@@ -20,16 +20,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Database from "../api";
 import { isCipher } from "../database/crypto";
 import { SQLCollection } from "../database/sql-collection";
-import { HistorySession, isDeleted } from "../types";
+import { ContentItem, HistorySession, isDeleted } from "../types";
 import { makeSessionContentId } from "../utils/id";
 import { ICollection } from "./collection";
-import { SessionContent, NoteContent } from "./session-content";
+import { SessionContent } from "./session-content";
 
 export class NoteHistory implements ICollection {
   name = "notehistory";
   versionsLimit = 100;
   sessionContent = new SessionContent(this.db);
-  private readonly collection: SQLCollection<"notehistory", HistorySession>;
+  readonly collection: SQLCollection<"notehistory", HistorySession>;
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(db.sql, "notehistory", db.eventManager);
   }
@@ -39,25 +39,29 @@ export class NoteHistory implements ICollection {
     await this.sessionContent.init();
   }
 
-  async get(noteId: string) {
+  async get(noteId: string, order: "asc" | "desc" = "desc") {
     if (!noteId) return [];
 
-    const indices = this.collection.indexer.indices;
-    const sessionIds = indices.filter((id) => id.startsWith(noteId));
-    if (sessionIds.length === 0) return [];
-    const history = await this.getSessions(sessionIds);
+    // const indices = this.collection.indexer.indices;
+    // const sessionIds = indices.filter((id) => id.startsWith(noteId));
+    // if (sessionIds.length === 0) return [];
+    // const history = await this.getSessions(sessionIds);
 
-    return history.sort(function (a, b) {
-      return b.dateModified - a.dateModified;
-    });
+    // return history.sort(function (a, b) {
+    //   return b.dateModified - a.dateModified;
+    // });
+    const history = await this.db
+      .sql()
+      .selectFrom("notehistory")
+      .where("noteId", "==", noteId)
+      .orderBy(`dateModified ${order}`)
+      .selectAll()
+      .execute();
+    return history as HistorySession[];
   }
 
-  async add(
-    noteId: string,
-    sessionId: string,
-    locked: boolean,
-    content: NoteContent<boolean>
-  ) {
+  async add(sessionId: string, content: ContentItem) {
+    const { noteId, locked } = content;
     sessionId = `${noteId}_${sessionId}`;
     const oldSession = await this.collection.get(sessionId);
 
@@ -82,13 +86,9 @@ export class NoteHistory implements ICollection {
   }
 
   private async cleanup(noteId: string, limit = this.versionsLimit) {
-    const history = await this.get(noteId);
+    const history = await this.get(noteId, "asc");
     if (history.length === 0 || history.length < limit) return;
-    history.sort(function (a, b) {
-      return a.dateModified - b.dateModified;
-    });
     const deleteCount = history.length - limit;
-
     for (let i = 0; i < deleteCount; i++) {
       const session = history[i];
       await this._remove(session);
@@ -108,14 +108,31 @@ export class NoteHistory implements ICollection {
   }
 
   async clearSessions(...noteIds: string[]) {
-    const history = await this.get(noteId);
-    for (const item of history) {
-      await this._remove(item);
-    }
+    await this.db.transaction(async () => {
+      const deletedIds = await this.db
+        .sql()
+        .deleteFrom("notehistory")
+        .where("noteId", "in", noteIds)
+        .returning("sessionContentId as sessionContentId")
+        .execute();
+      await this.db
+        .sql()
+        .deleteFrom("sessioncontent")
+        .where(
+          "id",
+          "in",
+          deletedIds.reduce((arr, item) => {
+            if (item.sessionContentId && !arr.includes(item.sessionContentId))
+              arr.push(item.sessionContentId);
+            return arr;
+          }, [] as string[])
+        )
+        .execute();
+    });
   }
 
   private async _remove(session: HistorySession) {
-    await this.collection.delete(session.id);
+    await this.collection.delete([session.id]);
     await this.sessionContent.remove(session.sessionContentId);
   }
 
