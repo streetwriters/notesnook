@@ -37,8 +37,10 @@ for (const type of ["tag", "color"] as const) {
       const tagId = await db[collection].add(item("hello"));
       await db.relations.add({ id: tagId, type }, { id, type: "note" });
 
-      expect(db[collection].all[0].title).toBe("hello");
-      expect(db.relations.from({ id: tagId, type }, "note")).toHaveLength(1);
+      expect((await db[collection][type](tagId)).title).toBe("hello");
+      expect(await db.relations.from({ id: tagId, type }, "note").count()).toBe(
+        1
+      );
     }));
 
   test(`${type} 2 notes`, () =>
@@ -50,15 +52,17 @@ for (const type of ["tag", "color"] as const) {
       await db.relations.add({ id: tagId, type }, { id, type: "note" });
       await db.relations.add({ id: tagId, type }, { id: id2, type: "note" });
 
-      expect(db[collection].all[0].title).toBe("hello");
-      expect(db.relations.from({ id: tagId, type }, "note")).toHaveLength(2);
+      expect((await db[collection][type](tagId)).title).toBe("hello");
+      expect(await db.relations.from({ id: tagId, type }, "note").count()).toBe(
+        2
+      );
     }));
 
   test(`rename a ${type}`, () =>
     databaseTest().then(async (db) => {
       const tagId = await db[collection].add(item("hello"));
       await db[collection].add({ id: tagId, title: `hello (new)` });
-      expect(db[collection].all[0].title).toBe("hello (new)");
+      expect((await db[collection][type](tagId)).title).toBe("hello (new)");
     }));
 
   test(`remove a ${type}`, () =>
@@ -67,16 +71,20 @@ for (const type of ["tag", "color"] as const) {
       await db.relations.add({ id: tagId, type }, { id, type: "note" });
       await db[collection].remove(tagId);
 
-      expect(db[collection].all).toHaveLength(0);
-      expect(db.relations.from({ id: tagId, type }, "note")).toHaveLength(0);
+      expect(await db[collection].collection.count()).toBe(0);
+      expect(await db.relations.from({ id: tagId, type }, "note").count()).toBe(
+        0
+      );
     }));
 
   test(`invalid characters from ${type} title are removed`, () =>
     databaseTest().then(async (db) => {
-      await db[collection].add(
+      const tagId = await db[collection].add(
         item("    \n\n\n\t\t\thello          l\n\n\n\t\t       ")
       );
-      expect(db[collection].all[0].title).toBe("hello          l");
+      expect((await db[collection][type](tagId)).title).toBe(
+        "hello          l"
+      );
     }));
 
   test(`remove a note from ${type}`, () =>
@@ -85,6 +93,8 @@ for (const type of ["tag", "color"] as const) {
       await db.relations.add({ id: tagId, type }, { id, type: "note" });
 
       await db.relations.unlink({ id: tagId, type }, { id, type: "note" });
-      expect(db.relations.from({ id: tagId, type }, "note")).toHaveLength(0);
+      expect(await db.relations.from({ id: tagId, type }, "note").count()).toBe(
+        0
+      );
     }));
 }

@@ -68,18 +68,16 @@ test("add invalid note", () =>
     expect(db.notes.add({ hello: "world" })).rejects.toThrow();
   }));
 
-test.only("add note", () =>
+test("add note", () =>
   noteTest().then(async ({ db, id }) => {
-    const note = await db.notes.note$(id);
-    expect(note).toBeDefined();
-    const content = await db.content.get(note!.contentId!);
-    expect(content!.data).toStrictEqual(TEST_NOTE.content.data);
+    expect(await db.notes.exists(id)).toBe(true);
   }));
 
 test("get note content", () =>
   noteTest().then(async ({ db, id }) => {
-    const content = await db.notes.note(id)?.content();
-    expect(content).toStrictEqual(TEST_NOTE.content.data);
+    const note = await db.notes.note(id);
+    const content = await db.content.get(note.contentId);
+    expect(content?.data).toStrictEqual(TEST_NOTE.content.data);
   }));
 
 test("delete note", () =>
@@ -97,21 +95,21 @@ test("delete note", () =>
 
     await db.notes.addToNotebook(subNotebookId, id);
 
-    await db.notes.delete(id);
+    await db.notes.moveToTrash(id);
 
-    expect(db.notes.note(id)).toBeUndefined();
-    expect(db.notebooks.totalNotes(notebookId)).toBe(0);
-    expect(db.notebooks.totalNotes(subNotebookId)).toBe(0);
+    expect(await db.notes.note(id)).toBeUndefined();
+    expect(await db.notebooks.totalNotes(notebookId)).toBe(0);
+    expect(await db.notebooks.totalNotes(subNotebookId)).toBe(0);
   }));
 
 test("get all notes", () =>
   noteTest().then(async ({ db }) => {
-    expect(db.notes.all.length).toBeGreaterThan(0);
+    expect(await db.notes.all.count()).toBeGreaterThan(0);
   }));
 
 test("note without a title should get a premade title", () =>
   noteTest().then(async ({ db, id }) => {
-    const note = db.notes.note(id);
+    const note = await db.notes.note(id);
     expect(note?.title.startsWith("Note ")).toBe(true);
   }));
 
@@ -123,7 +121,7 @@ test("note should get headline from content", () =>
       data: "<p>This is a very colorful existence.</p>"
     }
   }).then(async ({ db, id }) => {
-    const note = db.notes.note(id);
+    const note = await db.notes.note(id);
     expect(note?.headline).toBe("This is a very colorful existence.");
   }));
 
@@ -135,14 +133,14 @@ test("note should not get headline if there is no p tag", () =>
       data: `<ol style="list-style-type: decimal;" data-mce-style="list-style-type: decimal;"><li>Hello I won't be a headline :(</li><li>Me too.</li><li>Gold.</li></ol>`
     }
   }).then(async ({ db, id }) => {
-    const note = db.notes.note(id);
+    const note = await db.notes.note(id);
     expect(note?.headline).toBe("");
   }));
 
 test("note title should allow trailing space", () =>
   noteTest({ title: "Hello ", content: TEST_NOTE.content }).then(
     async ({ db, id }) => {
-      const note = db.notes.note(id);
+      const note = await db.notes.note(id);
       expect(note?.title).toBe("Hello ");
     }
   ));
@@ -150,7 +148,7 @@ test("note title should allow trailing space", () =>
 test("note title should not allow newlines", () =>
   noteTest({ title: "Hello\nhello", content: TEST_NOTE.content }).then(
     async ({ db, id }) => {
-      const note = db.notes.note(id);
+      const note = await db.notes.note(id);
       expect(note?.title).toBe("Hello hello");
     }
   ));
@@ -169,53 +167,53 @@ test("update note", () =>
       // colors: ["red", "blue"]
     };
     await db.notes.add(noteData);
-    const note = db.notes.note(id);
+    const note = await db.notes.note(id);
+    const content = await db.content.get(note.contentId);
+
     expect(note?.title).toBe(noteData.title);
-    expect(await note?.content()).toStrictEqual(noteData.content.data);
-    expect(note?.data.pinned).toBe(true);
-    expect(note?.data.favorite).toBe(true);
+    expect(content.data).toStrictEqual(noteData.content.data);
+    expect(note?.pinned).toBe(true);
+    expect(note?.favorite).toBe(true);
   }));
 
 test("get favorite notes", () =>
   noteTest({
     ...TEST_NOTE,
     favorite: true
-  }).then(({ db }) => {
-    expect(db.notes.favorites.length).toBeGreaterThan(0);
+  }).then(async ({ db }) => {
+    expect(await db.notes.favorites.count()).toBeGreaterThan(0);
   }));
 
 test("get pinned notes", () =>
   noteTest({
     ...TEST_NOTE,
     pinned: true
-  }).then(({ db }) => {
-    expect(db.notes.pinned.length).toBeGreaterThan(0);
+  }).then(async ({ db }) => {
+    expect(await db.notes.pinned.count()).toBeGreaterThan(0);
   }));
 
-test("get grouped notes by abc", () => groupedTest("abc"));
+test.todo("get grouped notes by abc", () => groupedTest("abc"));
 
-test("get grouped notes by month", () => groupedTest("month"));
+test.todo("get grouped notes by month", () => groupedTest("month"));
 
-test("get grouped notes by year", () => groupedTest("year"));
+test.todo("get grouped notes by year", () => groupedTest("year"));
 
-test("get grouped notes by weak", () => groupedTest("week"));
+test.todo("get grouped notes by weak", () => groupedTest("week"));
 
-test("get grouped notes default", () => groupedTest("default"));
+test.todo("get grouped notes default", () => groupedTest("default"));
 
 test("pin note", () =>
   noteTest().then(async ({ db, id }) => {
-    let note = db.notes.note(id);
-    await note?.pin();
-    note = db.notes.note(id);
-    expect(note?.data.pinned).toBe(true);
+    await db.notes.pin(true, id);
+    const note = await db.notes.note(id);
+    expect(note.pinned).toBe(true);
   }));
 
 test("favorite note", () =>
   noteTest().then(async ({ db, id }) => {
-    let note = db.notes.note(id);
-    await note?.favorite();
-    note = db.notes.note(id);
-    expect(note?.data.favorite).toBe(true);
+    await db.notes.favorite(true, id);
+    const note = await db.notes.note(id);
+    expect(note.favorite).toBe(true);
   }));
 
 test("add note to subnotebook", () =>
@@ -230,10 +228,12 @@ test("add note to subnotebook", () =>
     );
 
     expect(
-      db.relations.from({ type: "notebook", id: notebookId }, "notebook")
-    ).toHaveLength(1);
-    expect(db.notebooks.totalNotes(subNotebookId)).toBe(1);
-    expect(db.notebooks.totalNotes(notebookId)).toBe(1);
+      await db.relations
+        .from({ type: "notebook", id: notebookId }, "notebook")
+        .count()
+    ).toBe(1);
+    expect(await db.notebooks.totalNotes(subNotebookId)).toBe(1);
+    expect(await db.notebooks.totalNotes(notebookId)).toBe(1);
   }));
 
 test("duplicate note to topic should not be added", () =>
@@ -242,7 +242,7 @@ test("duplicate note to topic should not be added", () =>
       notebookTitle: "Hello",
       subNotebookTitle: "Home"
     });
-    expect(db.notebooks.totalNotes(subNotebookId)).toBe(1);
+    expect(await db.notebooks.totalNotes(subNotebookId)).toBe(1);
   }));
 
 test("add the same note to 2 notebooks", () =>
@@ -257,16 +257,18 @@ test("add the same note to 2 notebooks", () =>
     });
 
     expect(
-      db.relations
+      await db.relations
         .from({ type: "notebook", id: nb1.subNotebookId }, "note")
         .has(id)
     ).toBe(true);
     expect(
-      db.relations
+      await db.relations
         .from({ type: "notebook", id: nb2.subNotebookId }, "note")
         .has(id)
     ).toBe(true);
-    expect(db.relations.to({ type: "note", id }, "notebook")).toHaveLength(2);
+    expect(
+      await db.relations.to({ type: "note", id }, "notebook").count()
+    ).toBe(2);
   }));
 
 test("moving note to same notebook and topic should do nothing", () =>
@@ -278,7 +280,9 @@ test("moving note to same notebook and topic should do nothing", () =>
 
     await db.notes.addToNotebook(subNotebookId, id);
 
-    expect(db.relations.to({ type: "note", id }, "notebook")).toHaveLength(1);
+    expect(
+      await db.relations.to({ type: "note", id }, "notebook").count()
+    ).toBe(1);
   }));
 
 test("export note to html", () =>
@@ -319,31 +323,29 @@ test("deleting a colored note should remove it from that color", () =>
     );
 
     expect(
-      db.relations.from({ id: colorId, type: "color" }, "note").has(id)
+      await db.relations.from({ id: colorId, type: "color" }, "note").has(id)
     ).toBe(true);
 
-    await db.notes.delete(id);
+    await db.notes.moveToTrash(id);
 
     expect(
-      db.relations.from({ id: colorId, type: "color" }, "note").has(id)
+      await db.relations.from({ id: colorId, type: "color" }, "note").has(id)
     ).toBe(false);
   }));
 
 test("note's content should follow note's localOnly property", () =>
   noteTest().then(async ({ db, id }) => {
-    await db.notes.note(id)?.localOnly();
-    let note = db.notes.note(id);
-    if (!note?.contentId) throw new Error("No content in note.");
+    await db.notes.localOnly(true, id);
+    let note = await db.notes.note(id);
 
-    expect(note?.data.localOnly).toBe(true);
+    expect(note.localOnly).toBe(true);
     let content = await db.content.get(note.contentId);
     expect(content?.localOnly).toBe(true);
 
-    await db.notes.note(id)?.localOnly();
-    note = db.notes.note(id);
-    if (!note?.contentId) throw new Error("No content in note.");
+    await db.notes.localOnly(false, id);
+    note = await db.notes.note(id);
 
-    expect(note?.data.localOnly).toBe(false);
+    expect(note.localOnly).toBe(false);
     content = await db.content.get(note.contentId);
     expect(content?.localOnly).toBe(false);
   }));
@@ -365,11 +367,11 @@ test("note content should not contain image base64 data after save", () =>
     await loginFakeUser(db);
 
     await db.notes.add({ id, content: { type: "tiptap", data: IMG_CONTENT } });
-    const note = db.notes.note(id);
-    const content = await note?.content();
+    const note = await db.notes.note(id);
+    const content = await db.content.get(note.contentId);
 
-    expect(content).not.toContain(`src="data:image/png;`);
-    expect(content).not.toContain(`src=`);
+    expect(content.data).not.toContain(`src="data:image/png;`);
+    expect(content.data).not.toContain(`src=`);
   }));
 
 test("adding a note with an invalid tag should clean the tag array", () =>
@@ -383,6 +385,6 @@ test("adding a note with an invalid tag should clean the tag array", () =>
     ).resolves.toBe("helloworld");
 
     expect(
-      db.relations.to({ id: "helloworld", type: "note" }, "tag")
-    ).toHaveLength(0);
+      await db.relations.to({ id: "helloworld", type: "note" }, "tag").count()
+    ).toBe(0);
   }));

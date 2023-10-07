@@ -80,9 +80,8 @@ test("restoring an old session should replace note's content", () =>
     const [, firstVersion] = await db.noteHistory.get(id);
     await db.noteHistory.restore(firstVersion.id);
 
-    await expect(db.notes.note(id).content()).resolves.toBe(
-      TEST_NOTE.content.data
-    );
+    const contentId = (await db.notes.note(id)).contentId;
+    expect((await db.content.get(contentId)).data).toBe(TEST_NOTE.content.data);
   }));
 
 test("date created of session should not change on edit", () =>
@@ -152,7 +151,7 @@ test("auto clear sessions if they exceed the limit", () =>
     await db.noteHistory.cleanup(id, 1);
 
     sessions = await db.noteHistory.get(id);
-    expect(await db.noteHistory.get(id)).toHaveLength(1);
+    expect(sessions).toHaveLength(1);
 
     const content = await db.noteHistory.content(sessions[0].id);
     expect(content.data).toBe(editedContent.data);
@@ -163,7 +162,7 @@ test("save a locked note should add a locked session to note history", () =>
     await db.vault.create("password");
     await db.vault.add(id);
 
-    const note = db.notes.note(id).data;
+    const note = await db.notes.note(id);
     const editedContent = { type: "tiptap", data: "<p>hello world</p>" };
     await db.vault.save({
       ...note,

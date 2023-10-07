@@ -33,10 +33,7 @@ export type NoteContent<TLocked extends boolean> = {
 
 export class SessionContent implements ICollection {
   name = "sessioncontent";
-  private readonly collection: SQLCollection<
-    "sessioncontent",
-    SessionContentItem
-  >;
+  readonly collection: SQLCollection<"sessioncontent", SessionContentItem>;
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
@@ -102,7 +99,7 @@ export class SessionContent implements ICollection {
   }
 
   async remove(sessionContentId: string) {
-    await this.collection.delete(sessionContentId);
+    await this.collection.delete([sessionContentId]);
   }
 
   // async all() {

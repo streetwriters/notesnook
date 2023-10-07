@@ -147,11 +147,11 @@ export class Notes implements ICollection {
   //   return this.collection.raw();
   // }
 
-  // get all() {
-  //   return this.collection.items((note) =>
-  //     isTrashItem(note) ? undefined : note
-  //   ) as Note[];
-  // }
+  get all() {
+    return this.collection.createFilter<Note>((qb) =>
+      qb.where("dateDeleted", "is", null).where("deleted", "is", null)
+    );
+  }
 
   // isTrashed(id: string) {
   //   return this.raw.find((item) => item.id === id && isTrashItem(item));
@@ -163,34 +163,63 @@ export class Notes implements ICollection {
   //   ) as BaseTrashItem<Note>[];
   // }
 
-  // get pinned() {
-  //   return this.all.filter((item) => item.pinned === true);
-  // }
+  get pinned() {
+    return this.collection.createFilter<Note>((qb) =>
+      qb
+        .where("dateDeleted", "is", null)
+        .where("deleted", "is", null)
+        .where("pinned", "==", true)
+    );
+  }
 
   // get conflicted() {
   //   return this.all.filter((item) => item.conflicted === true);
   // }
 
-  // get favorites() {
-  //   return this.all.filter((item) => item.favorite === true);
-  // }
+  get favorites() {
+    return this.collection.createFilter<Note>((qb) =>
+      qb
+        .where("dateDeleted", "is", null)
+        .where("deleted", "is", null)
+        .where("favorite", "==", true)
+    );
+  }
 
-  // get locked(): Note[] {
-  //   return this.all.filter(
-  //     (item) => !isTrashItem(item) && item.locked === true
-  //   ) as Note[];
-  // }
+  get locked() {
+    return this.collection.createFilter<Note>((qb) =>
+      qb
+        .where("dateDeleted", "is", null)
+        .where("deleted", "is", null)
+        .where("locked", "==", true)
+    );
+  }
 
   exists(id: string) {
     return this.collection.exists(id);
   }
 
-  delete(...ids: string[]) {
+  moveToTrash(...ids: string[]) {
     return this._delete(true, ...ids);
   }
 
   remove(...ids: string[]) {
     return this._delete(false, ...ids);
+  }
+
+  pin(state: boolean, ...ids: string[]) {
+    return this.collection.update(ids, { pinned: state });
+  }
+  favorite(state: boolean, ...ids: string[]) {
+    return this.collection.update(ids, { favorite: state });
+  }
+  readonly(state: boolean, ...ids: string[]) {
+    return this.collection.update(ids, { readonly: state });
+  }
+  async localOnly(state: boolean, ...ids: string[]) {
+    await this.db.transaction(async () => {
+      await this.collection.update(ids, { localOnly: state });
+      await this.db.content.updateByNoteId({ localOnly: state }, ...ids);
+    });
   }
 
   async export(id: string, options: ExportOptions) {
@@ -203,13 +232,9 @@ export class Notes implements ICollection {
 
     if (!options.contentItem) {
       const rawContent = note.contentId
-        ? await this.db.content.raw(note.contentId)
+        ? await this.db.content.get(note.contentId)
         : undefined;
-      if (
-        rawContent &&
-        (isDeleted(rawContent) || !isUnencryptedContent(rawContent))
-      )
-        return false;
+      if (rawContent && !isUnencryptedContent(rawContent)) return false;
       options.contentItem = rawContent || EMPTY_CONTENT(note.id);
     }
 
@@ -246,7 +271,7 @@ export class Notes implements ICollection {
       if (!note) continue;
 
       const content = note.contentId
-        ? await this.db.content.raw(note.contentId)
+        ? await this.db.content.get(note.contentId)
         : undefined;
       if (content && (isDeleted(content) || !isUnencryptedContent(content)))
         throw new Error("Cannot duplicate a locked or deleted note.");
