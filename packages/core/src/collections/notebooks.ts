@@ -22,6 +22,7 @@ import Database from "../api";
 import { Notebook, TrashOrItem, isTrashItem } from "../types";
 import { ICollection } from "./collection";
 import { SQLCollection } from "../database/sql-collection";
+import { isFalse } from "../database";
 
 export class Notebooks implements ICollection {
   name = "notebooks";
@@ -79,15 +80,15 @@ export class Notebooks implements ICollection {
 
   get all() {
     return this.collection.createFilter<Notebook>((qb) =>
-      qb.where("dateDeleted", "is", null).where("deleted", "is", null)
+      qb.where(isFalse("dateDeleted")).where(isFalse("deleted"))
     );
   }
 
   get pinned() {
     return this.collection.createFilter<Notebook>((qb) =>
       qb
-        .where("dateDeleted", "is", null)
-        .where("deleted", "is", null)
+        .where(isFalse("dateDeleted"))
+        .where(isFalse("deleted"))
         .where("pinned", "==", true)
     );
   }

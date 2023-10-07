@@ -22,14 +22,8 @@ import Database from "..";
 class Conflicts {
   constructor(private readonly db: Database) {}
 
-  async recalculate() {
-    if (this.db.notes.conflicted.length <= 0) {
-      await this.db.storage().write("hasConflicts", false);
-    }
-  }
-
-  check() {
-    return this.db.storage().read("hasConflicts");
+  async check() {
+    return (await this.db.notes.conflicted.count()) > 0;
   }
 
   throw() {

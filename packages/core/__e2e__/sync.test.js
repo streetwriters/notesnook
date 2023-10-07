@@ -25,6 +25,8 @@ import { CHECK_IDS, EV, EVENTS } from "../src/common";
 import { EventSource } from "event-source-polyfill";
 import { test, expect, vitest } from "vitest";
 import { login } from "./utils";
+import { SqliteDriver } from "kysely";
+import BetterSQLite3 from "better-sqlite3";
 
 const TEST_TIMEOUT = 30 * 1000;
 
@@ -73,10 +75,10 @@ test(
 
     await syncAndWait(deviceA, deviceB);
 
-    expect(deviceA.notes.note(note2Id)).toBeTruthy();
-    expect(deviceB.notes.note(note1Id)).toBeTruthy();
-    expect(deviceA.notes.note(note1Id)).toBeTruthy();
-    expect(deviceB.notes.note(note2Id)).toBeTruthy();
+    expect(await deviceA.notes.note(note2Id)).toBeTruthy();
+    expect(await deviceB.notes.note(note1Id)).toBeTruthy();
+    expect(await deviceA.notes.note(note1Id)).toBeTruthy();
+    expect(await deviceB.notes.note(note2Id)).toBeTruthy();
 
     console.log("Case 3 log out");
     await cleanup(deviceA, deviceB);
@@ -267,12 +269,12 @@ test(
       colorCode: "#ffff22"
     });
     for (let noteId of noteIds) {
-      expect(deviceB.notes.note(noteId)).toBeTruthy();
+      expect(await deviceB.notes.note(noteId)).toBeTruthy();
       expect(
-        deviceB.relations
+        await deviceB.relations
           .from({ id: colorId, type: "color" }, "note")
-          .findIndex((a) => a.to.id === noteId)
-      ).toBe(-1);
+          .has(noteId)
+      ).toBe(false);
 
       await deviceA.relations.add(
         { id: colorId, type: "color" },
@@ -282,10 +284,10 @@ test(
 
     await syncAndWait(deviceA, deviceB);
 
-    expect(deviceB.colors.exists(colorId)).toBeTruthy();
-    const purpleNotes = deviceB.relations
+    expect(await deviceB.colors.exists(colorId)).toBeTruthy();
+    const purpleNotes = await deviceB.relations
       .from({ id: colorId, type: "color" }, "note")
-      .resolved();
+      .resolve();
     expect(
       noteIds.every((id) => purpleNotes.findIndex((p) => p.id === id) > -1)
     ).toBe(true);
@@ -319,6 +321,7 @@ async function initializeDevice(id, capabilities = []) {
   const device = new Database();
   device.setup({
     storage: new NodeStorageInterface(),
+    sqlite: new SqliteDriver({ database: BetterSQLite3(":memory:") }),
     eventsource: EventSource,
     fs: FS,
     compressor: Compressor

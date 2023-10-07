@@ -93,7 +93,7 @@ export class SQLCollection<
         .selectFrom<keyof DatabaseSchema>(this.type)
         .select((a) => a.fn.count<number>("id").as("count"))
         .where("id", "==", id)
-        .where("deleted", "is", null)
+        .where(isFalse("deleted"))
         .limit(1)
         .executeTakeFirst()) || {};
 
@@ -105,7 +105,7 @@ export class SQLCollection<
       (await this.db()
         .selectFrom<keyof DatabaseSchema>(this.type)
         .select((a) => a.fn.count<number>("id").as("count"))
-        .where("deleted", "is", null)
+        .where(isFalse("deleted"))
         .executeTakeFirst()) || {};
     return count || 0;
   }
@@ -132,6 +132,7 @@ export class SQLCollection<
       return array;
     }, [] as SQLiteItem<T>[]);
 
+    if (entries.length <= 0) return;
     await this.db()
       .replaceInto<keyof DatabaseSchema>(this.type)
       .values(entries)
@@ -153,9 +154,9 @@ export class SQLCollection<
     const ids = await this.db()
       .selectFrom<keyof DatabaseSchema>(this.type)
       .select("id")
-      .where("deleted", "is", null)
+      .where(isFalse("deleted"))
       .$if(this.type === "notes" || this.type === "notebooks", (eb) =>
-        eb.where("dateDeleted", "is", null)
+        eb.where(isFalse("dateDeleted"))
       )
       .orderBy(sortOptions.sortBy, sortOptions.sortDirection)
       .execute();
@@ -192,11 +193,7 @@ export class SQLCollection<
         .selectAll()
         .orderBy("dateModified", "asc")
         .$if(after > 0, (eb) =>
-          eb
-            .where("dateModified", ">", after)
-            .where((eb) =>
-              eb.or([eb("synced", "is", null), eb("synced", "==", false)])
-            )
+          eb.where("dateModified", ">", after).where(isFalse("synced"))
         )
         .$if(this.type === "attachments", (eb) =>
           eb.where("dateUploaded", ">", 0)
@@ -217,7 +214,7 @@ export class SQLCollection<
       const rows = await this.db()
         .selectFrom<keyof DatabaseSchema>(this.type)
         .where(isFalse("deleted"))
-        .orderBy("dateModified desc")
+        .orderBy("dateCreated desc")
         .selectAll()
         .offset(index)
         .limit(chunkSize)
@@ -306,7 +303,7 @@ export class FilteredSelector<T> {
     while (true) {
       const rows = await this.filter
         .selectAll()
-        .orderBy("dateModified asc")
+        .orderBy("dateCreated asc")
         .offset(index)
         .limit(this.batchSize)
         .execute();
