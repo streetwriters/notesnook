@@ -22,9 +22,9 @@ import { Crypto, CryptoAccessor } from "../database/crypto";
 import { FileStorage, FileStorageAccessor } from "../database/fs";
 import { Notebooks } from "../collections/notebooks";
 import Trash from "../collections/trash";
-import { Tags } from "../collections/tags";
-import { Colors } from "../collections/colors";
 import Sync, { SyncOptions } from "./sync";
+import {  Tags } from "../collections/tags";
+import { Colors, } from "../collections/colors";
 import Vault from "./vault";
 import Lookup from "./lookup";
 import { Content } from "../collections/content";
@@ -62,13 +62,14 @@ import { Attachment } from "../types";
 import { Settings } from "../collections/settings";
 import { DatabaseAccessor, DatabaseSchema, createDatabase } from "../database";
 import { Kysely, SqliteDriver, Transaction } from "kysely";
-import BetterSQLite3 from "better-sqlite3";
+import { CachedCollection } from "../database/cached-collection";
 
 type EventSourceConstructor = new (
   uri: string,
   init: EventSourceInit & { headers?: Record<string, string> }
 ) => EventSource;
 type Options = {
+  sqlite: SqliteDriver;
   storage: IStorage;
   eventsource?: EventSourceConstructor;
   fs: IFileStorage;
@@ -126,18 +127,20 @@ class Database {
   };
 
   private _transaction?: Transaction<DatabaseSchema>;
+  private transactionMutex = new Mutex();
   transaction = (
     executor: (tr: Transaction<DatabaseSchema>) => void | Promise<void>
   ) => {
-    if (this._transaction) return executor(this._transaction);
-    return this.sql()
-      .transaction()
-      .execute(async (tr) => {
-        this._transaction = tr;
-        await executor(tr);
-        this._transaction = undefined;
-      })
-      .finally(() => (this._transaction = undefined));
+    return this.transactionMutex.runExclusive(() =>
+      this.sql()
+        .transaction()
+        .execute(async (tr) => {
+          this._transaction = tr;
+          await executor(tr);
+          this._transaction = undefined;
+        })
+        .finally(() => (this._transaction = undefined))
+    );
   };
 
   private options?: Options;
@@ -174,6 +177,23 @@ class Database {
   relations = new Relations(this);
   notes = new Notes(this);
 
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  legacyTags = new CachedCollection(this.storage, "tags", this.eventManager);
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  legacyColors = new CachedCollection(
+    this.storage,
+    "colors",
+    this.eventManager
+  );
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  legacyNotes = new CachedCollection(this.storage, "notes", this.eventManager);
+
   // constructor() {
   //   this.sseMutex = new Mutex();
   //   // this.lastHeartbeat = undefined; // { local: 0, server: 0 };
@@ -209,9 +229,7 @@ class Database {
       this.disconnectSSE();
     });
 
-    this._sql = await createDatabase(
-      new SqliteDriver({ database: BetterSQLite3("nn.db") })
-    );
+    if (this.options) this._sql = await createDatabase(this.options.sqlite);
 
     await this._validate();
 
@@ -241,6 +259,11 @@ class Database {
     await this.notes.init();
 
     await this.trash.init();
+
+    // legacy collections
+    await this.legacyTags.init();
+    await this.legacyColors.init();
+    await this.legacyNotes.init();
 
     // we must not wait on network requests that's why
     // no await

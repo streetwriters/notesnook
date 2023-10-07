@@ -42,7 +42,8 @@ export const EMPTY_CONTENT = (noteId: string): UnencryptedContentItem => ({
   id: getId(),
   localOnly: true,
   type: "tiptap",
-  data: "<p></p>"
+  data: "<p></p>",
+  locked: false
 });
 
 export class Content implements ICollection {
@@ -71,59 +72,65 @@ export class Content implements ICollection {
         "Please use db.content.merge for merging remote content."
       );
 
-    const oldContent = content.id ? await this.raw(content.id) : undefined;
-    if (content.id && oldContent) {
-      content = {
-        ...oldContent,
-        ...content
-      };
-    }
-    if (!content.noteId) return;
     const id = content.id || getId();
+    const oldContent = content.id ? await this.get(content.id) : undefined;
+    const noteId = oldContent?.noteId || content.noteId;
+    if (!noteId) throw new Error("No noteId found to link the content to.");
+
+    const encryptedData = isCipher(content.data)
+      ? content.data
+      : oldContent && isCipher(oldContent.data)
+      ? oldContent.data
+      : null;
+
+    const unencryptedData =
+      typeof content.data === "string"
+        ? content.data
+        : oldContent && typeof oldContent.data === "string"
+        ? oldContent.data
+        : "<p></p>";
 
     const contentItem: ContentItem = {
-      noteId: content.noteId,
+      type: "tiptap",
+      noteId,
       id,
-      type: content.type || "tiptap",
-      data: content.data || "<p></p>",
-      dateEdited: content.dateEdited || Date.now(),
-      dateCreated: content.dateCreated || Date.now(),
-      dateModified: content.dateModified || Date.now(),
-      localOnly: !!content.localOnly,
-      conflicted: content.conflicted,
-      dateResolved: content.dateResolved
+
+      dateEdited: content.dateEdited || oldContent?.dateEdited || Date.now(),
+      dateCreated: content.dateCreated || oldContent?.dateCreated || Date.now(),
+      dateModified: Date.now(),
+      localOnly: content.localOnly || !!oldContent?.localOnly,
+
+      conflicted: content.conflicted || oldContent?.conflicted,
+      dateResolved: content.dateResolved || oldContent?.dateResolved,
+
+      ...(encryptedData
+        ? { locked: true, data: encryptedData }
+        : { locked: false, data: unencryptedData })
     };
+
     await this.collection.upsert(
-      isUnencryptedContent(contentItem)
-        ? await this.extractAttachments(contentItem)
-        : contentItem
+      contentItem.locked
+        ? contentItem
+        : await this.extractAttachments(contentItem)
     );
 
-    if (content.sessionId) {
-      await this.db.noteHistory?.add(
-        contentItem.noteId,
-        content.sessionId,
-        isCipher(contentItem.data),
-        {
-          data: contentItem.data,
-          type: contentItem.type
-        }
-      );
-    }
+    if (content.sessionId)
+      await this.db.noteHistory.add(content.sessionId, contentItem);
+
     return id;
   }
 
   async get(id: string) {
-    const content = await this.raw(id);
+    const content = await this.collection.get(id);
     if (!content || isDeleted(content)) return;
     return content;
   }
 
-  async raw(id: string) {
-    const content = await this.collection.get(id);
-    if (!content) return;
-    return content;
-  }
+  // async raw(id: string) {
+  //   const content = await this.collection.get(id);
+  //   if (!content) return;
+  //   return content;
+  // }
 
   remove(...ids: string[]) {
     return this.collection.softDelete(ids);
@@ -147,6 +154,17 @@ export class Content implements ICollection {
       .execute();
   }
 
+  async updateByNoteId(partial: Partial<ContentItem>, ...ids: string[]) {
+    await this.db
+      .sql()
+      .updateTable("content")
+      .where("noteId", "in", ids)
+      .set({
+        ...partial,
+        dateModified: Date.now()
+      })
+      .execute();
+  }
   // multi(ids: string[]) {
   //   return this.collection.getItems(ids);
   // }
@@ -228,9 +246,8 @@ export class Content implements ICollection {
   }
 
   async removeAttachments(id: string, hashes: string[]) {
-    const contentItem = await this.raw(id);
-    if (!contentItem || isDeleted(contentItem) || isCipher(contentItem.data))
-      return;
+    const contentItem = await this.get(id);
+    if (!contentItem || isCipher(contentItem.data)) return;
     const content = getContentFromData(contentItem.type, contentItem.data);
     if (!content) return;
     contentItem.data = content.removeAttachments(hashes);
@@ -310,11 +327,11 @@ export class Content implements ICollection {
 export function isUnencryptedContent(
   content: ContentItem
 ): content is UnencryptedContentItem {
-  return !isCipher(content.data);
+  return content.locked === false;
 }
 
 export function isEncryptedContent(
   content: ContentItem
 ): content is EncryptedContentItem {
-  return isCipher(content.data);
+  return content.locked === true;
 }

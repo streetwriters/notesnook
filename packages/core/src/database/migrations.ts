@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { CreateTableBuilder, Migration, MigrationProvider, sql } from "kysely";
+import {
+  CreateTableBuilder,
+  Kysely,
+  Migration,
+  MigrationProvider,
+  sql
+} from "kysely";
 
 export class NNMigrationProvider implements MigrationProvider {
   async getMigrations(): Promise<Record<string, Migration>> {
@@ -26,8 +32,9 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await db.schema
             .createTable("notes")
-            .modifyEnd(sql`without rowid`)
+            // .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
+            .$call(addTrashColumns)
             .addColumn("title", "text")
             .addColumn("headline", "text")
             .addColumn("contentId", "text")
@@ -38,34 +45,56 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("conflicted", "boolean")
             .addColumn("readonly", "boolean")
             .addColumn("dateEdited", "integer")
-            .addColumn("dateDeleted", "integer")
-            .addColumn("itemType", "text")
-            .addForeignKeyConstraint(
-              "note_has_content",
-              ["contentId"],
-              "content",
-              ["id"],
-              (b) => b.onDelete("restrict").onUpdate("restrict")
-            )
             .execute();
+          await createFTS5Table(db, "notes", ["title"]);
 
           await db.schema
             .createTable("content")
-            .modifyEnd(sql`without rowid`)
+            // .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("noteId", "text")
             .addColumn("data", "text")
+            .addColumn("locked", "boolean")
             .addColumn("localOnly", "boolean")
             .addColumn("conflicted", "text")
             .addColumn("sessionId", "text")
             .addColumn("dateEdited", "integer")
             .addColumn("dateResolved", "integer")
             .execute();
+          await createFTS5Table(
+            db,
+            "content",
+            ["data"],
+            ["noteId"],
+            ["(new.locked is null or new.locked == 0)"]
+          );
+
+          await db.schema
+            .createTable("notehistory")
+            .modifyEnd(sql`without rowid`)
+            .$call(addBaseColumns)
+            .addColumn("noteId", "text")
+            .addColumn("sessionContentId", "text")
+            .addColumn("localOnly", "boolean")
+            .addColumn("locked", "boolean")
+            .execute();
+
+          await db.schema
+            .createTable("sessioncontent")
+            .modifyEnd(sql`without rowid`)
+            .$call(addBaseColumns)
+            .addColumn("data", "text")
+            .addColumn("contentType", "text")
+            .addColumn("locked", "boolean")
+            .addColumn("compressed", "boolean")
+            .addColumn("localOnly", "boolean")
+            .execute();
 
           await db.schema
             .createTable("notebooks")
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
+            .$call(addTrashColumns)
             .addColumn("title", "text")
             .addColumn("description", "text")
             .addColumn("dateEdited", "text")
@@ -116,7 +145,7 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("date", "integer")
             .addColumn("mode", "text")
             .addColumn("recurringMode", "text")
-            .addColumn("selectedDays", "blob")
+            .addColumn("selectedDays", "text")
             .addColumn("localOnly", "boolean")
             .addColumn("disabled", "boolean")
             .addColumn("snoozeUntil", "integer")
@@ -139,6 +168,20 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("dateDeleted", "integer")
             .addColumn("dateUploaded", "integer")
             .addColumn("failed", "text")
+            .execute();
+
+          await db.schema
+            .createTable("settings")
+            .modifyEnd(sql`without rowid`)
+            .$call(addBaseColumns)
+            .addColumn("key", "text")
+            .addColumn("value", "text")
+            .execute();
+
+          await db.schema
+            .createIndex("notehistory_noteid")
+            .on("notehistory")
+            .column("noteId")
             .execute();
 
           await db.schema
@@ -216,3 +259,63 @@ const addBaseColumns = <T extends string, C extends string = never>(
     .addColumn("synced", "boolean")
     .addColumn("deleted", "boolean");
 };
+
+const addTrashColumns = <T extends string, C extends string = never>(
+  builder: CreateTableBuilder<T, C>
+) => {
+  return builder
+
+    .addColumn("dateDeleted", "integer")
+    .addColumn("itemType", "text");
+};
+
+async function createFTS5Table(
+  db: Kysely<any>,
+  table: string,
+  indexedColumns: string[],
+  unindexedColumns: string[] = [],
+  insertConditions: string[] = []
+) {
+  const ref = sql.raw(table);
+  const ref_fts = sql.raw(table + "_fts");
+  const ref_ai = sql.raw(table + "_ai");
+  const ref_ad = sql.raw(table + "_ad");
+  const ref_au = sql.raw(table + "_au");
+
+  const indexed_cols = sql.raw(indexedColumns.join(", "));
+  const unindexed_cols =
+    unindexedColumns.length > 0
+      ? sql.raw(unindexedColumns.join(" UNINDEXED,") + " UNINDEXED,")
+      : sql.raw("");
+  const new_indexed_cols = sql.raw(indexedColumns.join(", new."));
+  const old_indexed_cols = sql.raw(indexedColumns.join(", old."));
+
+  await sql`CREATE VIRTUAL TABLE ${ref_fts} USING fts5(
+    id UNINDEXED, ${unindexed_cols} ${indexed_cols}, content='${sql.raw(table)}'
+  )`.execute(db);
+
+  insertConditions = [
+    "(new.deleted is null or new.deleted == 0)",
+    ...insertConditions
+  ];
+  await sql`CREATE TRIGGER ${ref_ai} AFTER INSERT ON ${ref} WHEN ${sql.raw(
+    insertConditions.join(" AND ")
+  )}
+  BEGIN
+    INSERT INTO ${ref_fts}(rowid, id, ${indexed_cols}) VALUES (new.rowid, new.id, new.${new_indexed_cols});
+  END;`.execute(db);
+
+  await sql`CREATE TRIGGER ${ref_ad} AFTER DELETE ON ${ref}
+  BEGIN
+    INSERT INTO ${ref_fts} (${ref_fts}, rowid, id, ${indexed_cols})
+    VALUES ('delete', old.rowid, old.id, old.${old_indexed_cols});
+  END;`.execute(db);
+
+  await sql`CREATE TRIGGER ${ref_au} AFTER UPDATE ON ${ref}
+  BEGIN
+    INSERT INTO ${ref_fts} (${ref_fts}, rowid, id, ${indexed_cols})
+    VALUES ('delete', old.rowid, old.id, old.${old_indexed_cols});
+    INSERT INTO ${ref_fts} (rowid, id, ${indexed_cols})
+    VALUES (new.rowid, new.id, new.${new_indexed_cols});
+  END;`.execute(db);
+}

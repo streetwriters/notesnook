@@ -21,12 +21,14 @@ import { Cipher, SerializedKey } from "@notesnook/crypto";
 import Database from "..";
 import { CURRENT_DATABASE_VERSION, EV, EVENTS } from "../../common";
 import { logger } from "../../logger";
-import { SYNC_COLLECTIONS_MAP, SyncItem, SyncTransferItem } from "./types";
+import {
+  SyncItem,
+  SyncTransferItem,
+  SYNC_COLLECTIONS_MAP,
+  SYNC_ITEM_TYPES
+} from "./types";
 import { Item, MaybeDeletedItem } from "../../types";
 
-const ASYNC_COLLECTIONS_MAP = {
-  content: "content"
-} as const;
 class Collector {
   logger = logger.scope("SyncCollector");
   constructor(private readonly db: Database) {}
@@ -42,58 +44,22 @@ class Collector {
       throw new Error("User encryption key not generated. Please relogin.");
     }
 
-    const attachments = await this.prepareChunk(
-      this.db.attachments.syncable,
-      lastSyncedTimestamp,
-      isForceSync,
-      key
-    );
-    if (attachments) yield { items: attachments, type: "attachment" };
-
-    for (const itemType in ASYNC_COLLECTIONS_MAP) {
-      const collectionKey =
-        ASYNC_COLLECTIONS_MAP[itemType as keyof typeof ASYNC_COLLECTIONS_MAP];
+    for (const itemType of SYNC_ITEM_TYPES) {
+      const collectionKey = SYNC_COLLECTIONS_MAP[itemType];
       const collection = this.db[collectionKey].collection;
-      for await (const chunk of collection.iterate(chunkSize)) {
-        const items = await this.prepareChunk(
-          chunk.map((item) => item[1]),
-          lastSyncedTimestamp,
-          isForceSync,
-          key
-        );
+      for await (const chunk of collection.unsynced(
+        isForceSync ? 0 : lastSyncedTimestamp,
+        chunkSize
+      )) {
+        const items = await this.prepareChunk(chunk, key);
         if (!items) continue;
-        yield { items, type: itemType as keyof typeof ASYNC_COLLECTIONS_MAP };
+        yield { items, type: itemType };
       }
     }
-
-    // for (const itemType in SYNC_COLLECTIONS_MAP) {
-    //   const collectionKey =
-    //     SYNC_COLLECTIONS_MAP[itemType as keyof typeof SYNC_COLLECTIONS_MAP];
-    //   const collection = this.db[collectionKey].collection;
-    //   for (const chunk of collection.iterateSync(chunkSize)) {
-    //     const items = await this.prepareChunk(
-    //       chunk,
-    //       lastSyncedTimestamp,
-    //       isForceSync,
-    //       key
-    //     );
-    //     if (!items) continue;
-    //     yield { items, type: itemType as keyof typeof SYNC_COLLECTIONS_MAP };
-    //   }
-    // }
   }
 
-  async prepareChunk(
-    chunk: MaybeDeletedItem<Item>[],
-    lastSyncedTimestamp: number,
-    isForceSync: boolean,
-    key: SerializedKey
-  ) {
-    const { ids, items } = filterSyncableItems(
-      chunk,
-      lastSyncedTimestamp,
-      isForceSync
-    );
+  async prepareChunk(chunk: MaybeDeletedItem<Item>[], key: SerializedKey) {
+    const { ids, items } = filterSyncableItems(chunk);
     if (!ids.length) return;
     const ciphers = await this.db.storage().encryptMulti(key, items);
     return toPushItem(ids, ciphers);
@@ -114,39 +80,22 @@ function toPushItem(ids: string[], ciphers: Cipher<"base64">[]) {
   return items;
 }
 
-function filterSyncableItems(
-  items: MaybeDeletedItem<Item>[],
-  lastSyncedTimestamp: number,
-  isForceSync = false
-): { items: string[]; ids: string[] } {
+function filterSyncableItems(items: MaybeDeletedItem<Item>[]): {
+  items: string[];
+  ids: string[];
+} {
   if (!items || !items.length) return { items: [], ids: [] };
 
   const ids = [];
   const syncableItems = [];
   for (const item of items) {
-    if (!item) continue;
+    // const isSyncable = !item.synced || isForceSync;
 
-    const isSyncable = !item.synced || isForceSync;
-    const isUnsynced = item.dateModified > lastSyncedTimestamp || isForceSync;
-
-    // synced is a local only property
+    // synced is a local only property. we don't want to sync it.
     delete item.synced;
 
-    if (isUnsynced && isSyncable) {
-      ids.push(item.id);
-      syncableItems.push(
-        JSON.stringify(
-          "localOnly" in item && item.localOnly
-            ? {
-                id: item.id,
-                deleted: true,
-                dateModified: item.dateModified,
-                deleteReason: "localOnly"
-              }
-            : item
-        )
-      );
-    }
+    ids.push(item.id);
+    syncableItems.push(JSON.stringify(item));
   }
   return { items: syncableItems, ids };
 }

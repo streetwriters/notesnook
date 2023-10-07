@@ -131,11 +131,8 @@ const migrations: Migration[] = [
         for (const pin of item.pins) {
           if (!pin.data) continue;
           await db.shortcuts.add({
-            item: {
-              type: pin.type,
-              id: pin.data.id,
-              notebookId: pin.data.notebookId
-            }
+            itemId: pin.data.id,
+            itemType: pin.type === "topic" ? "notebook" : pin.type
           });
         }
         delete item.pins;
@@ -156,7 +153,7 @@ const migrations: Migration[] = [
         return oldType !== item.type;
       },
       shortcut: (item) => {
-        if (item.id === item.item.id) return false;
+        if (!item.item || item.id === item.item.id) return false;
         item.id = item.item.id;
         return true;
       },
@@ -192,12 +189,12 @@ const migrations: Migration[] = [
         const alias = db.legacySettings.getAlias(item.id);
         if (
           !alias &&
-          (db.tags.all.find(
-            (t) => item.title === t.title && t.id !== oldTagId
-          ) ||
-            db.colors.all.find(
-              (t) => item.title === t.title && t.id !== oldTagId
-            ))
+          (db.legacyTags
+            .items()
+            .find((t) => item.title === t.title && t.id !== oldTagId) ||
+            db.legacyColors
+              .items()
+              .find((t) => item.title === t.title && t.id !== oldTagId))
         )
           return false;
 
@@ -218,10 +215,10 @@ const migrations: Migration[] = [
       note: async (item, db) => {
         for (const tag of item.tags || []) {
           const oldTagId = makeId(tag);
-          const oldTag = db.tags.tag(oldTagId);
+          const oldTag = db.legacyTags.get(oldTagId);
           const alias = db.legacySettings.getAlias(oldTagId);
-          const newTag = db.tags.all.find(
-            (t) => [alias, tag].includes(t.title) && t.id !== oldTagId
+          const newTag = await db.tags.all.find((eb) =>
+            eb.or([eb("title", "in", [alias, tag])])
           );
 
           const newTagId =
@@ -234,16 +231,17 @@ const migrations: Migration[] = [
             }));
           if (!newTagId) continue;
           await db.relations.add({ type: "tag", id: newTagId }, item);
-          await db.tags.delete(oldTagId);
+          await db.legacyTags.delete(oldTagId);
         }
 
         if (item.color) {
           const oldColorId = makeId(item.color);
-          const oldColor = db.colors.color(oldColorId);
+          const oldColor = db.legacyColors.get(oldColorId);
           const alias = db.legacySettings.getAlias(oldColorId);
-          const newColor = db.colors.all.find(
-            (t) => [alias, item.color].includes(t.title) && t.id !== oldColorId
+          const newColor = await db.colors.all.find((eb) =>
+            eb.or([eb("title", "in", [alias, item.color])])
           );
+
           const newColorId =
             newColor?.id ||
             (await db.colors.add({
@@ -255,7 +253,7 @@ const migrations: Migration[] = [
             }));
           if (newColorId) {
             await db.relations.add({ type: "color", id: newColorId }, item);
-            await db.colors.delete(oldColorId);
+            await db.legacyColors.delete(oldColorId);
           }
         }
 
@@ -279,6 +277,18 @@ const migrations: Migration[] = [
             { type: "note", id: noteId }
           );
         }
+
+        if (item.metadata) {
+          item.hash = item.metadata.hash;
+          item.mimeType = item.metadata.type;
+          item.hashType = item.metadata.hashType;
+          item.filename = item.metadata.filename;
+        }
+
+        if (item.length) item.size = item.length;
+
+        delete item.length;
+        delete item.metadata;
         delete item.noteIds;
         return true;
       },
@@ -353,7 +363,12 @@ const migrations: Migration[] = [
         delete item.to;
         delete item.from;
         return true;
-      }
+      },
+      tiptap: (item) => {
+        item.locked = isCipher(item.data);
+        return true;
+      },
+      all: () => true
     }
   },
   {
@@ -394,7 +409,10 @@ export async function migrateItem<TItemType extends MigrationItemType>(
 
     const itemMigrator = migration.items[type];
     if (!itemMigrator) continue;
-    if (await itemMigrator(item, database, migrationType)) count++;
+    if (await itemMigrator(item, database, migrationType)) {
+      if (item.type && item.type !== type) type = item.type as TItemType;
+      count++;
+    }
   }
 
   return count > 0;

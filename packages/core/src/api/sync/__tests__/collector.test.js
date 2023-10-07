@@ -26,7 +26,7 @@ import {
 import Collector from "../collector";
 import { test, expect } from "vitest";
 
-test.only("newly created note should get included in collector", () =>
+test("newly created note should get included in collector", () =>
   databaseTest().then(async (db) => {
     await loginFakeUser(db);
     const collector = new Collector(db);
@@ -42,7 +42,7 @@ test.only("newly created note should get included in collector", () =>
 
     expect(items).toHaveLength(2);
     expect(items[0].type).toBe("content");
-    expect(items[0].items[0].id).toBe(db.notes.note(noteId).data.contentId);
+    expect(items[0].items[0].id).toBe((await db.notes.note(noteId)).contentId);
     expect(items[1].items[0].id).toBe(noteId);
     expect(items[1].type).toBe("note");
   }));

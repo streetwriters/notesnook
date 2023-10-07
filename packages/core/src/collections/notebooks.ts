@@ -77,15 +77,20 @@ export class Notebooks implements ICollection {
   //   return this.collection.raw();
   // }
 
-  // get all() {
-  //   return this.collection.items((note) =>
-  //     isTrashItem(note) ? undefined : note
-  //   ) as Notebook[];
-  // }
+  get all() {
+    return this.collection.createFilter<Notebook>((qb) =>
+      qb.where("dateDeleted", "is", null).where("deleted", "is", null)
+    );
+  }
 
-  // get pinned() {
-  //   return this.all.filter((item) => item.pinned === true);
-  // }
+  get pinned() {
+    return this.collection.createFilter<Notebook>((qb) =>
+      qb
+        .where("dateDeleted", "is", null)
+        .where("deleted", "is", null)
+        .where("pinned", "==", true)
+    );
+  }
 
   // get trashed() {
   //   return this.raw.filter((item) =>
@@ -93,12 +98,8 @@ export class Notebooks implements ICollection {
   //   ) as BaseTrashItem<Notebook>[];
   // }
 
-  async pin(...ids: string[]) {
-    await this.collection.update(ids, { pinned: true });
-  }
-
-  async unpin(...ids: string[]) {
-    await this.collection.update(ids, { pinned: false });
+  async pin(state: boolean, ...ids: string[]) {
+    await this.collection.update(ids, { pinned: state });
   }
 
   async totalNotes(id: string) {
@@ -114,7 +115,7 @@ export class Notebooks implements ICollection {
               .where("toType", "==", "notebook")
               .where("fromType", "==", "notebook")
               .whereRef("fromId", "==", "subNotebooks.id")
-              .where("toId", "not in", this.db.trash.cache)
+              .where("toId", "not in", this.db.trash.cache.notebooks)
               .$narrowType<{ id: string }>()
           )
       )
@@ -124,7 +125,7 @@ export class Notebooks implements ICollection {
       .where("fromId", "in", (eb) =>
         eb.selectFrom("subNotebooks").select("subNotebooks.id")
       )
-      .where("toId", "not in", this.db.trash.cache)
+      .where("toId", "not in", this.db.trash.cache.notes)
       .select((eb) => eb.fn.count<number>("id").as("totalNotes"))
       .executeTakeFirst();
 
@@ -142,11 +143,11 @@ export class Notebooks implements ICollection {
     return this.collection.exists(id);
   }
 
-  async remove(...ids: string[]) {
+  async moveToTrash(...ids: string[]) {
     await this.db.trash.add("notebook", ids);
   }
 
-  async delete(...ids: string[]) {
+  async remove(...ids: string[]) {
     await this.db.transaction(async () => {
       await this.db.relations.unlinkOfType("notebook", ids);
       await this.collection.softDelete(ids);

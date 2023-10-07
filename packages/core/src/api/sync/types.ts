@@ -37,22 +37,46 @@ export type SyncItem = {
   v: number;
 } & Cipher<"base64">;
 
+// export const SYNC_COLLECTIONS_MAP = {
+//   note: "notes",
+//   notebook: "notebooks",
+//   shortcut: "shortcuts",
+//   reminder: "reminders",
+//   relation: "relations",
+//   tag: "tags",
+//   color: "colors",
+//   settingitem: "settings"
+// } as const;
+
+// export const ASYNC_COLLECTIONS_MAP = {
+//   content: "content"
+// } as const;
+
 export const SYNC_COLLECTIONS_MAP = {
-  note: "notes",
+  settingitem: "settings",
+  attachment: "attachments",
+  content: "content",
   notebook: "notebooks",
   shortcut: "shortcuts",
   reminder: "reminders",
   relation: "relations",
   tag: "tags",
   color: "colors",
-  settingitem: "settings"
+  note: "notes"
 } as const;
 
-export const MERGE_COLLECTIONS_MAP = {
-  ...SYNC_COLLECTIONS_MAP,
-  attachment: "attachments",
-  content: "content"
-} as const;
+export const SYNC_ITEM_TYPES = [
+  "settingitem",
+  "attachment",
+  "content",
+  "notebook",
+  "shortcut",
+  "reminder",
+  "relation",
+  "tag",
+  "color",
+  "note"
+] as const;
 
 export type SyncTransferItem = {
   items: SyncItem[];

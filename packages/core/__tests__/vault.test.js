@@ -58,11 +58,11 @@ test("lock a note", () =>
   noteTest().then(async ({ db, id }) => {
     await db.vault.create("password");
     await db.vault.add(id);
-    const note = db.notes.note(id);
+    const note = await db.notes.note(id);
 
     expect(note.headline).toBe("");
 
-    const content = await db.content.raw(note.data.contentId, false);
+    const content = await db.content.get(note.contentId);
     expect(content.noteId).toBeDefined();
     expect(content.data.iv).toBeDefined();
     expect(content.data.cipher).toBeDefined();
@@ -72,9 +72,9 @@ test("locked note is not favorited", () =>
   noteTest().then(async ({ db, id }) => {
     await db.vault.create("password");
     await db.vault.add(id);
-    const note = db.notes.note(id);
+    const note = await db.notes.note(id);
 
-    expect(note.data.favorite).toBeFalsy();
+    expect(note.favorite).toBeFalsy();
   }));
 
 test("unlock a note", () =>
@@ -92,12 +92,12 @@ test("unlock a note permanently", () =>
     await db.vault.create("password");
     await db.vault.add(id);
     await db.vault.remove(id, "password");
-    const note = db.notes.note(id);
+    const note = await db.notes.note(id);
     expect(note.id).toBe(id);
     expect(note.headline).not.toBe("");
-    const content = await db.content.raw(note.data.contentId);
+    const content = await db.content.get(note.contentId);
     expect(content.data).toBeDefined();
-    expect(typeof content.data).toBe("string");
+    expect(typeof content.data).toBe("object");
   }));
 
 test("save a locked note", () =>
@@ -105,13 +105,12 @@ test("save a locked note", () =>
     await db.vault.create("password");
     await db.vault.add(id);
 
-    const note = db.notes.note(id).data;
+    const note = await db.notes.note(id);
     await db.vault.save(note);
 
-    const content = await db.content.raw(note.contentId);
+    const content = await db.content.get(note.contentId);
 
     expect(content.data.cipher).toBeTypeOf("string");
-    expect(() => JSON.parse()).toThrow();
   }));
 
 test("save an edited locked note", () =>
@@ -119,13 +118,13 @@ test("save an edited locked note", () =>
     await db.vault.create("password");
     await db.vault.add(id);
 
-    const note = db.notes.note(id).data;
+    const note = await db.notes.note(id);
     await db.vault.save({
       ...note,
       content: { type: "tiptap", data: "<p>hello world</p>" }
     });
 
-    const content = await db.content.raw(note.contentId);
+    const content = await db.content.get(note.contentId);
 
     expect(content.data.cipher).toBeTypeOf("string");
     expect(() => JSON.parse(content.data.cipher)).toThrow();

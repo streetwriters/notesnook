@@ -35,13 +35,18 @@ import {
   ValueNode,
   PrimitiveValueListNode,
   Transaction,
-  ColumnType
+  ColumnType,
+  ExpressionBuilder,
+  ReferenceExpression
 } from "kysely";
 import {
   Attachment,
   Color,
   ContentItem,
+  GroupOptions,
   HistorySession,
+  ItemType,
+  MaybeDeletedItem,
   Note,
   Notebook,
   Relation,
@@ -67,8 +72,10 @@ export type SQLiteItem<T> = {
   [P in keyof T]?: T[P] | null;
 } & { id: string };
 
+export type SQLiteItemWithRowID<T> = SQLiteItem<T> & { rowid: number };
+
 export interface DatabaseSchema {
-  notes: SQLiteItem<TrashOrItem<Note>>; //| SQLiteItem<BaseTrashItem<Note>>;
+  notes: SQLiteItem<TrashOrItem<Note>>;
   content: SQLiteItem<ContentItem>;
   relations: SQLiteItem<Relation>;
   notebooks: SQLiteItem<TrashOrItem<Notebook>>;
@@ -82,36 +89,77 @@ export interface DatabaseSchema {
   shortcuts: SQLiteItem<Shortcut>;
 }
 
+export type DatabaseSchemaWithFTS = DatabaseSchema & {
+  notes_fts: SQLiteItemWithRowID<{
+    notes_fts: string;
+    title: string;
+    rank: number;
+  }>;
+  content_fts: SQLiteItemWithRowID<{
+    content_fts: string;
+    data: string;
+    rank: number;
+    noteId: string;
+  }>;
+};
+
 type AsyncOrSyncResult<Async extends boolean, Response> = Async extends true
   ? Promise<Response>
   : Response;
 
-export interface DatabaseCollection<T, Async extends boolean> {
+export interface DatabaseCollection<T, IsAsync extends boolean> {
   clear(): Promise<void>;
   init(): Promise<void>;
   upsert(item: T): Promise<void>;
   softDelete(ids: string[]): Promise<void>;
   delete(ids: string[]): Promise<void>;
-  exists(id: string): AsyncOrSyncResult<Async, boolean>;
-  count(): AsyncOrSyncResult<Async, number>;
-  get(id: string): AsyncOrSyncResult<Async, T | undefined>;
+  exists(id: string): AsyncOrSyncResult<IsAsync, boolean>;
+  count(): AsyncOrSyncResult<IsAsync, number>;
+  get(id: string): AsyncOrSyncResult<IsAsync, T | undefined>;
   put(items: (T | undefined)[]): Promise<void>;
   update(ids: string[], partial: Partial<T>): Promise<void>;
+  ids(options: GroupOptions): AsyncOrSyncResult<IsAsync, string[]>;
+  items(
+    ids: string[],
+    sortOptions?: GroupOptions
+  ): AsyncOrSyncResult<
+    IsAsync,
+    Record<string, MaybeDeletedItem<T> | undefined>
+  >;
+  unsynced(
+    after: number,
+    chunkSize: number
+  ): IsAsync extends true
+    ? AsyncIterableIterator<MaybeDeletedItem<T>[]>
+    : IterableIterator<MaybeDeletedItem<T>[]>;
+  stream(): IsAsync extends true
+    ? AsyncIterableIterator<T>
+    : IterableIterator<T>;
 }
 
 export type DatabaseAccessor = () =>
   | Kysely<DatabaseSchema>
   | Transaction<DatabaseSchema>;
 
-type FilterBooleanProperties<T> = keyof {
-  [K in keyof T as T[K] extends boolean | undefined | null ? K : never]: T[K];
+type FilterBooleanProperties<T, Type> = keyof {
+  [K in keyof T as T[K] extends Type ? K : never]: T[K];
 };
 
 type BooleanFields = ValueOf<{
-  [D in keyof DatabaseSchema]: FilterBooleanProperties<DatabaseSchema[D]>;
+  [D in keyof DatabaseSchema]: FilterBooleanProperties<
+    DatabaseSchema[D],
+    boolean | undefined | null
+  >;
 }>;
 
-const BooleanProperties: BooleanFields[] = [
+// type ObjectFields = ValueOf<{
+//   [D in keyof DatabaseSchema]: FilterBooleanProperties<
+//     DatabaseSchema[D],
+//     object | undefined | null
+//   >;
+// }>;
+
+const BooleanProperties: Set<BooleanFields> = new Set([
   "compressed",
   "conflicted",
   "deleted",
@@ -124,7 +172,31 @@ const BooleanProperties: BooleanFields[] = [
   "readonly",
   "remote",
   "synced"
-];
+]);
+
+const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
+  reminder: (row) => {
+    if (row.selectedDays) row.selectedDays = JSON.parse(row.selectedDays);
+  },
+  settingitem: (row) => {
+    if (
+      row.value &&
+      (row.key.startsWith("groupOptions") ||
+        row.key.startsWith("toolbarConfig"))
+    )
+      row.value = JSON.parse(row.value);
+  },
+  tiptap: (row) => {
+    if (row.conflicted) row.conflicted = JSON.parse(row.conflicted);
+    if (row.locked && row.data) row.data = JSON.parse(row.data);
+  },
+  sessioncontent: (row) => {
+    if (row.locked && row.data) row.data = JSON.parse(row.data);
+  },
+  attachment: (row) => {
+    if (row.key) row.key = JSON.parse(row.key);
+  }
+};
 
 export async function createDatabase(driver: Driver) {
   const db = new Kysely<DatabaseSchema>({
@@ -150,6 +222,13 @@ export async function createDatabase(driver: Driver) {
   return db;
 }
 
+export function isFalse<TB extends keyof DatabaseSchema>(
+  column: ReferenceExpression<DatabaseSchema, TB>
+) {
+  return (eb: ExpressionBuilder<DatabaseSchema, TB>) =>
+    eb.or([eb(column, "is", eb.lit(null)), eb(column, "==", eb.lit(0))]);
+}
+
 export class SqliteBooleanPlugin implements KyselyPlugin {
   readonly #transformer = new SqliteBooleanTransformer();
 
@@ -161,9 +240,15 @@ export class SqliteBooleanPlugin implements KyselyPlugin {
     args: PluginTransformResultArgs
   ): Promise<QueryResult<UnknownRow>> {
     for (const row of args.result.rows) {
-      for (const key of BooleanProperties) {
-        const value = row[key];
-        row[key] = value === 1 ? true : false;
+      for (const key in row) {
+        if (BooleanProperties.has(key as BooleanFields)) {
+          row[key] = row[key] === 1 ? true : false;
+        }
+      }
+
+      const mapper = DataMappers[row.type as ItemType];
+      if (row.type && mapper) {
+        mapper(row);
       }
     }
     return Promise.resolve(args.result);
@@ -174,7 +259,7 @@ class SqliteBooleanTransformer extends OperationNodeTransformer {
   transformValue(node: ValueNode): ValueNode {
     return {
       ...super.transformValue(node),
-      value: typeof node.value === "boolean" ? (node.value ? 1 : 0) : node.value
+      value: this.serialize(node.value)
     };
   }
 
@@ -183,9 +268,17 @@ class SqliteBooleanTransformer extends OperationNodeTransformer {
   ): PrimitiveValueListNode {
     return {
       ...super.transformPrimitiveValueList(node),
-      values: node.values.map((value) =>
-        typeof value === "boolean" ? (value ? 1 : 0) : value
-      )
+      values: node.values.map((value) => this.serialize(value))
     };
+  }
+
+  private serialize(value: unknown) {
+    return typeof value === "boolean"
+      ? value
+        ? 1
+        : 0
+      : typeof value === "object" && value !== null
+      ? JSON.stringify(value)
+      : value;
   }
 }

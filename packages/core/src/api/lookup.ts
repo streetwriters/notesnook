@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { filter, parse } from "liqe";
+import uFuzzy from "@leeoniya/ufuzzy";
 import Database from ".";
 import {
   Attachment,
@@ -26,31 +26,41 @@ import {
   Notebook,
   Reminder,
   Tag,
-  TrashItem,
-  isDeleted
+  TrashItem
 } from "../types";
-import { isUnencryptedContent } from "../collections/content";
+import { isFalse } from "../database";
+import { sql } from "kysely";
 
 export default class Lookup {
   constructor(private readonly db: Database) {}
 
-  async notes(notes: Note[], query: string) {
-    const contents = await this.db.content.multi(
-      notes.map((note) => note.contentId || "")
-    );
-
-    return search(notes, query, (note) => {
-      let text = note.title;
-      const noteContent = note.contentId ? contents[note.contentId] : "";
-      if (
-        !note.locked &&
-        noteContent &&
-        !isDeleted(noteContent) &&
-        isUnencryptedContent(noteContent)
+  async notes(
+    query: string,
+    ids?: string[]
+  ): Promise<Note & { rank: number }[]> {
+    return (await this.db
+      .sql()
+      .with("matching", (eb) =>
+        eb
+          .selectFrom("content_fts")
+          .where("data", "match", query)
+          .select(["noteId as id", "rank"])
+          .unionAll(
+            eb
+              .selectFrom("notes_fts")
+              .where("title", "match", query)
+              // add 10 weight to title
+              .select(["id", sql.raw<number>(`rank * 10`).as("rank")])
+          )
       )
-        text += noteContent.data;
-      return text;
-    });
+      .selectFrom("notes")
+      .$if(!!ids && ids.length > 0, (eb) => eb.where("id", "in", ids!))
+      .where(isFalse("notes.deleted"))
+      .where(isFalse("notes.dateDeleted"))
+      .innerJoin("matching", (eb) => eb.onRef("notes.id", "==", "matching.id"))
+      .orderBy("matching.rank")
+      .selectAll()
+      .execute()) as unknown as Note & { rank: number }[];
   }
 
   notebooks(array: Notebook[], query: string) {
@@ -70,11 +80,7 @@ export default class Lookup {
   }
 
   attachments(array: Attachment[], query: string) {
-    return search(
-      array,
-      query,
-      (n) => `${n.metadata.filename} ${n.metadata.type} ${n.metadata.hash}`
-    );
+    return search(array, query, (n) => `${n.filename} ${n.mimeType} ${n.hash}`);
   }
 
   private byTitle<T extends { title: string }>(array: T[], query: string) {
@@ -82,14 +88,16 @@ export default class Lookup {
   }
 }
 
+const uf = new uFuzzy();
 function search<T>(items: T[], query: string, selector: (item: T) => string) {
   try {
-    return filter(
-      parse(`text:"${query.toLowerCase()}"`),
-      items.map((item) => {
-        return { item, text: selector(item).toLowerCase() };
-      })
-    ).map((v) => v.item);
+    const [_idxs, _info, order] = uf.search(items.map(selector), query, true);
+    if (!order) return [];
+    const filtered: T[] = [];
+    for (const i of order) {
+      filtered.push(items[i]);
+    }
+    return filtered;
   } catch (e) {
     return [];
   }

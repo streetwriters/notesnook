@@ -69,11 +69,9 @@ export class Tags implements ICollection {
   //   return this.collection.raw();
   // }
 
-  get all() {
-    return this.collection.createFilter<Tag>((qb) =>
-      qb.where("deleted", "is", null)
-    );
-  }
+  // get all() {
+  //   return this.collection.items();
+  // }
 
   async remove(...ids: string[]) {
     await this.db.transaction(async () => {

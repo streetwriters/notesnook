@@ -22,7 +22,7 @@ import Database from ".";
 import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
 import { tinyToTiptap } from "../migrations";
 import { isCipher } from "../database/crypto";
-import { EncryptedContentItem, Note, isDeleted } from "../types";
+import { EncryptedContentItem, Note } from "../types";
 import {
   EMPTY_CONTENT,
   isEncryptedContent,
@@ -102,14 +102,10 @@ export default class Vault {
   async changePassword(oldPassword: string, newPassword: string) {
     if (await this.unlock(oldPassword)) {
       const contentItems = [];
-      for (const note of this.db.notes.locked) {
+      for await (const note of this.db.notes.locked) {
         if (!note.contentId) continue;
-        const encryptedContent = await this.db.content.raw(note.contentId);
-        if (
-          !encryptedContent ||
-          isDeleted(encryptedContent) ||
-          !isEncryptedContent(encryptedContent)
-        )
+        const encryptedContent = await this.db.content.get(note.contentId);
+        if (!encryptedContent || !isEncryptedContent(encryptedContent))
           continue;
 
         try {
@@ -143,8 +139,7 @@ export default class Vault {
 
   async clear(password: string) {
     if (await this.unlock(password)) {
-      await this.db.notes.init();
-      for (const note of this.db.notes.locked) {
+      for await (const note of this.db.notes.locked) {
         await this.unlockNote(note, password, true);
       }
     }
@@ -152,10 +147,8 @@ export default class Vault {
 
   async delete(deleteAllLockedNotes = false) {
     if (deleteAllLockedNotes) {
-      await this.db.notes.init();
-      await this.db.notes.remove(
-        ...this.db.notes.locked.map((note) => note.id)
-      );
+      const lockedIds = await this.db.notes.locked.ids();
+      await this.db.notes.remove(...lockedIds);
     }
     await this.db.storage().remove("vaultKey");
     this.password = undefined;
@@ -175,9 +168,9 @@ export default class Vault {
    * Permanently unlocks (remove from vault) a note
    */
   async remove(noteId: string, password: string) {
-    const note = this.db.notes.note(noteId);
+    const note = await this.db.notes.note(noteId);
     if (!note) return;
-    await this.unlockNote(note.data, password, true);
+    await this.unlockNote(note, password, true);
 
     if (!(await this.exists())) await this.create(password);
   }
@@ -186,10 +179,10 @@ export default class Vault {
    * Temporarily unlock (open) a note
    */
   async open(noteId: string, password: string) {
-    const note = this.db.notes.note(noteId);
+    const note = await this.db.notes.note(noteId);
     if (!note) return;
 
-    const unlockedNote = await this.unlockNote(note.data, password, false);
+    const unlockedNote = await this.unlockNote(note, password, false);
     this.password = password;
     if (!(await this.exists())) await this.create(password);
     return unlockedNote;
@@ -291,7 +284,7 @@ export default class Vault {
     const { id, content, sessionId, title } = item;
     let { type, data } = content || {};
 
-    const note = this.db.notes.note(id);
+    const note = await this.db.notes.note(id);
     if (!note) return;
 
     const contentId = note.contentId;
@@ -299,12 +292,8 @@ export default class Vault {
 
     // Case: when note is being newly locked
     if (!note.locked && (!data || !type) && !!contentId) {
-      const rawContent = await this.db.content.raw(contentId);
-      if (
-        !rawContent ||
-        isDeleted(rawContent) ||
-        !isUnencryptedContent(rawContent)
-      )
+      const rawContent = await this.db.content.get(contentId);
+      if (!rawContent || !isUnencryptedContent(rawContent))
         return await this.db.notes.add({
           id,
           locked: true
@@ -332,9 +321,9 @@ export default class Vault {
       locked: true,
       headline: "",
       title: title || note.title,
-      favorite: note.data.favorite,
-      localOnly: note.data.localOnly,
-      readonly: note.data.readonly,
+      favorite: note.favorite,
+      localOnly: note.localOnly,
+      readonly: note.readonly,
       dateEdited: Date.now()
     });
   }
@@ -342,13 +331,8 @@ export default class Vault {
   private async unlockNote(note: Note, password: string, perm = false) {
     if (!note.contentId) return;
 
-    const encryptedContent = await this.db.content.raw(note.contentId);
-    if (
-      !encryptedContent ||
-      isDeleted(encryptedContent) ||
-      !isEncryptedContent(encryptedContent)
-    )
-      return;
+    const encryptedContent = await this.db.content.get(note.contentId);
+    if (!encryptedContent || !isEncryptedContent(encryptedContent)) return;
     const content = await this.decryptContent(encryptedContent, password);
 
     if (perm) {

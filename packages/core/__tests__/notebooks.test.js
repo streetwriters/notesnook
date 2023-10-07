@@ -21,35 +21,30 @@ import { notebookTest, TEST_NOTEBOOK } from "./utils";
 import { test, expect } from "vitest";
 
 test("add a notebook", () =>
-  notebookTest().then(({ db, id }) => {
+  notebookTest().then(async ({ db, id }) => {
     expect(id).toBeDefined();
-    let notebook = db.notebooks.notebook(id);
+    const notebook = await db.notebooks.notebook(id);
     expect(notebook).toBeDefined();
     expect(notebook.title).toBe(TEST_NOTEBOOK.title);
   }));
 
 test("get all notebooks", () =>
-  notebookTest().then(({ db }) => {
-    expect(db.notebooks.all.length).toBeGreaterThan(0);
+  notebookTest().then(async ({ db }) => {
+    expect(await db.notebooks.all.count()).toBeGreaterThan(0);
   }));
 
 test("pin a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
-    let notebook = db.notebooks.notebook(id);
-    await notebook.pin();
-    notebook = db.notebooks.notebook(id);
-    expect(notebook.data.pinned).toBe(true);
+    await db.notebooks.pin(true, id);
+    const notebook = await db.notebooks.notebook(id);
+    expect(notebook.pinned).toBe(true);
   }));
 
 test("unpin a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
-    let notebook = db.notebooks.notebook(id);
-    await notebook.pin();
-    notebook = db.notebooks.notebook(id);
-    expect(notebook.data.pinned).toBe(true);
-    await notebook.pin();
-    notebook = db.notebooks.notebook(id);
-    expect(notebook.data.pinned).toBe(false);
+    await db.notebooks.pin(false, id);
+    const notebook = await db.notebooks.notebook(id);
+    expect(notebook.pinned).toBe(false);
   }));
 
 test("updating notebook with empty title should throw", () =>
