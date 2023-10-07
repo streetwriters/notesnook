@@ -30,6 +30,7 @@ import Database from "../api";
 import { ICollection } from "./collection";
 import { NoteContent } from "./session-content";
 import { SQLCollection } from "../database/sql-collection";
+import { isFalse } from "../database";
 
 type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
@@ -149,7 +150,7 @@ export class Notes implements ICollection {
 
   get all() {
     return this.collection.createFilter<Note>((qb) =>
-      qb.where("dateDeleted", "is", null).where("deleted", "is", null)
+      qb.where(isFalse("dateDeleted")).where(isFalse("deleted"))
     );
   }
 
@@ -166,21 +167,26 @@ export class Notes implements ICollection {
   get pinned() {
     return this.collection.createFilter<Note>((qb) =>
       qb
-        .where("dateDeleted", "is", null)
-        .where("deleted", "is", null)
+        .where(isFalse("dateDeleted"))
+        .where(isFalse("deleted"))
         .where("pinned", "==", true)
     );
   }
 
-  // get conflicted() {
-  //   return this.all.filter((item) => item.conflicted === true);
-  // }
+  get conflicted() {
+    return this.collection.createFilter<Note>((qb) =>
+      qb
+        .where(isFalse("dateDeleted"))
+        .where(isFalse("deleted"))
+        .where("conflicted", "==", true)
+    );
+  }
 
   get favorites() {
     return this.collection.createFilter<Note>((qb) =>
       qb
-        .where("dateDeleted", "is", null)
-        .where("deleted", "is", null)
+        .where(isFalse("dateDeleted"))
+        .where(isFalse("deleted"))
         .where("favorite", "==", true)
     );
   }
@@ -188,8 +194,8 @@ export class Notes implements ICollection {
   get locked() {
     return this.collection.createFilter<Note>((qb) =>
       qb
-        .where("dateDeleted", "is", null)
-        .where("deleted", "is", null)
+        .where(isFalse("dateDeleted"))
+        .where(isFalse("deleted"))
         .where("locked", "==", true)
     );
   }
