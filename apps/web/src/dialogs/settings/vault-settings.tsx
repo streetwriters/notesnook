@@ -58,6 +58,8 @@ export const VaultSettings: SettingsGroup[] = [
         title: "Change vault password",
         description: "Set a new password for your vault",
         isHidden: () => !useAppStore.getState().isVaultCreated,
+        onStateChange: (listener) =>
+          useAppStore.subscribe((s) => s.isVaultCreated, listener),
         components: [
           {
             type: "button",
@@ -72,6 +74,8 @@ export const VaultSettings: SettingsGroup[] = [
         title: "Clear vault",
         description: "Unlock all locked notes and clear vault.",
         isHidden: () => !useAppStore.getState().isVaultCreated,
+        onStateChange: (listener) =>
+          useAppStore.subscribe((s) => s.isVaultCreated, listener),
         components: [
           {
             type: "button",
@@ -91,6 +95,8 @@ export const VaultSettings: SettingsGroup[] = [
         title: "Delete vault",
         description: "Delete vault including all locked notes.",
         isHidden: () => !useAppStore.getState().isVaultCreated,
+        onStateChange: (listener) =>
+          useAppStore.subscribe((s) => s.isVaultCreated, listener),
         components: [
           {
             type: "button",
