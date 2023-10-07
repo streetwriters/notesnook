@@ -38,18 +38,9 @@ import { Mutex } from "async-mutex";
 import Database from "..";
 import { migrateItem } from "../../migrations";
 import { SerializedKey } from "@notesnook/crypto";
-import {
-  ItemMap,
-  MaybeDeletedItem,
-  Note,
-  Notebook,
-  TrashOrItem
-} from "../../types";
-import {
-  MERGE_COLLECTIONS_MAP,
-  SyncableItemType,
-  SyncTransferItem
-} from "./types";
+import { Item, MaybeDeletedItem } from "../../types";
+import { SYNC_COLLECTIONS_MAP, SyncTransferItem } from "./types";
+import { DownloadableFile } from "../../database/fs";
 
 export default class SyncManager {
   sync = new Sync(this.db);
@@ -338,14 +329,13 @@ class Sync {
    * @private
    */
   async uploadAttachments() {
-    const attachments = this.db.attachments.pending;
+    const attachments = await this.db.attachments.pending.items();
     this.logger.info("Uploading attachments...", { total: attachments.length });
 
     await this.db.fs().queueUploads(
-      attachments.map((a) => ({
-        filename: a.metadata.hash,
-        chunkSize: a.chunkSize,
-        metadata: a.metadata
+      attachments.map<DownloadableFile>((a) => ({
+        filename: a.hash,
+        chunkSize: a.chunkSize
       })),
       "sync-uploads"
     );
@@ -380,35 +370,28 @@ class Sync {
       )
     );
 
-    let items: (
-      | MaybeDeletedItem<
-          ItemMap[SyncableItemType] | TrashOrItem<Note> | TrashOrItem<Notebook>
-        >
-      | undefined
-    )[] = [];
+    const collectionType = SYNC_COLLECTIONS_MAP[itemType];
+    const collection = this.db[collectionType].collection;
+    const localItems = await collection.items(chunk.items.map((i) => i.id));
+    let items: (MaybeDeletedItem<Item> | undefined)[] = [];
     if (itemType === "content") {
-      const localItems = await this.db.content.multi(
-        chunk.items.map((i) => i.id)
-      );
       items = await Promise.all(
         deserialized.map((item) =>
           this.merger.mergeContent(item, localItems[item.id], dbLastSynced)
         )
       );
     } else {
-      items = this.merger.isSyncCollection(itemType)
-        ? deserialized.map((item) =>
-            this.merger.mergeItemSync(item, itemType, dbLastSynced)
-          )
-        : await Promise.all(
-            deserialized.map((item) =>
-              this.merger.mergeItem(item, itemType, dbLastSynced)
+      items =
+        itemType === "attachment"
+          ? await Promise.all(
+              deserialized.map((item) =>
+                this.merger.mergeItemAsync(item, localItems[item.id], itemType)
+              )
             )
-          );
+          : deserialized.map((item) =>
+              this.merger.mergeItemSync(item, localItems[item.id], itemType)
+            );
     }
-
-    const collectionType = MERGE_COLLECTIONS_MAP[itemType];
-    await this.db[collectionType].collection.setItems(items as any);
 
     if (
       notify &&
@@ -419,6 +402,8 @@ class Sync {
         this.db.eventManager.publish(EVENTS.syncItemMerged, item)
       );
     }
+
+    await collection.put(items as any);
   }
 
   private async pushItem(item: SyncTransferItem, newLastSynced: number) {

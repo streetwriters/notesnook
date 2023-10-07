@@ -224,12 +224,9 @@ export interface Attachment extends BaseItem<"attachment"> {
   hash: string;
   hashType: string;
   mimeType: string;
-  encryptionKey: string;
 
-  /**
-   * @deprecated only kept here for migration purposes
-   */
-  key?: Cipher<"base64">;
+  key: Cipher<"base64">;
+
   /**
    * @deprecated only kept here for migration purposes
    */
@@ -335,23 +332,26 @@ export interface Reminder extends BaseItem<"reminder"> {
 }
 
 export type ContentType = "tiptap" | "tiny";
-export interface ContentItem extends BaseItem<ContentType> {
+export interface BaseContentItem extends BaseItem<ContentType> {
   noteId: string;
-  data: string | Cipher<"base64">;
   dateEdited: number;
   localOnly: boolean;
-  conflicted?: ContentItem;
   dateResolved?: number;
   sessionId?: string;
+  conflicted?: UnencryptedContentItem;
 }
 
-export type UnencryptedContentItem = Omit<ContentItem, "data"> & {
+export type UnencryptedContentItem = BaseContentItem & {
   data: string;
+  locked: false;
 };
 
-export type EncryptedContentItem = Omit<ContentItem, "data"> & {
+export type EncryptedContentItem = BaseContentItem & {
   data: Cipher<"base64">;
+  locked: true;
 };
+
+export type ContentItem = EncryptedContentItem | UnencryptedContentItem;
 
 export interface HistorySession extends BaseItem<"session"> {
   sessionContentId: string;

@@ -33,7 +33,6 @@ import { Output } from "../interfaces";
 import { Attachment } from "../types";
 import Database from "../api";
 import { SQLCollection } from "../database/sql-collection";
-import { isCipher } from "../database/crypto";
 
 export class Attachments implements ICollection {
   name = "attachments";
@@ -113,12 +112,12 @@ export class Attachments implements ICollection {
     const id = oldAttachment?.id || getId();
 
     const encryptedKey = item.key
-      ? JSON.stringify(await this.encryptKey(item.key))
-      : oldAttachment?.encryptionKey;
+      ? await this.encryptKey(item.key)
+      : oldAttachment?.key;
     const attachment = {
       ...oldAttachment,
       ...item,
-      encryptionKey: encryptedKey
+      key: encryptedKey
     };
 
     const {
@@ -131,7 +130,7 @@ export class Attachments implements ICollection {
       mimeType,
       salt,
       chunkSize,
-      encryptionKey
+      key
     } = attachment;
 
     if (
@@ -144,7 +143,7 @@ export class Attachments implements ICollection {
       //  !mimeType ||
       !salt ||
       !chunkSize ||
-      !encryptionKey
+      !key
     ) {
       console.error(
         "Attachment is invalid because all properties are required:",
@@ -161,7 +160,7 @@ export class Attachments implements ICollection {
       salt,
       size,
       alg,
-      encryptionKey,
+      key,
       chunkSize,
 
       filename:
@@ -188,9 +187,7 @@ export class Attachments implements ICollection {
     return await this.db.crypto().generateRandomKey();
   }
 
-  async decryptKey(keyJSON: string): Promise<SerializedKey | null> {
-    const key = JSON.parse(keyJSON);
-    if (!isCipher(key)) return null;
+  async decryptKey(key: Cipher<"base64">): Promise<SerializedKey | null> {
     const encryptionKey = await this._getEncryptionKey();
     const plainData = await this.db.storage().decrypt(encryptionKey, key);
     if (!plainData) return null;
@@ -263,7 +260,7 @@ export class Attachments implements ICollection {
     const attachment = await this.attachment(hash);
     if (!attachment) return;
 
-    const key = await this.decryptKey(attachment.encryptionKey);
+    const key = await this.decryptKey(attachment.key);
     if (!key) return;
     const data = await this.db.fs().readEncrypted(attachment.hash, key, {
       chunkSize: attachment.chunkSize,
@@ -361,23 +358,25 @@ export class Attachments implements ICollection {
 
   async cleanup() {
     const now = dayjs().unix();
-    for (const attachment of this.deleted) {
+    const ids: string[] = [];
+    for await (const attachment of this.deleted) {
       if (dayjs(attachment.dateDeleted).add(7, "days").unix() < now) continue;
 
-      const isDeleted = await this.db.fs().deleteFile(attachment.metadata.hash);
+      const isDeleted = await this.db.fs().deleteFile(attachment.hash);
       if (!isDeleted) continue;
 
-      await this.collection.softDelete(attachment.id);
+      ids.push(attachment.id);
     }
+    await this.collection.softDelete(ids);
   }
 
-  // get pending() {
-  //   return this.all.filter(
-  //     (attachment) =>
-  //       (!attachment.dateUploaded || attachment.dateUploaded <= 0) &&
-  //       this.db.relations.to(attachment, "note").length > 0
-  //   );
-  // }
+  get pending() {
+    return this.collection.createFilter<Attachment>((qb) =>
+      qb.where((eb) =>
+        eb.or([eb("dateUploaded", "is", null), eb("dateUploaded", "<=", 0)])
+      )
+    );
+  }
 
   // get uploaded() {
   //   return this.all.filter((attachment) => !!attachment.dateUploaded);
@@ -391,9 +390,11 @@ export class Attachments implements ICollection {
   //     );
   // }
 
-  // get deleted() {
-  //   return this.all.filter((attachment) => !!attachment.dateDeleted);
-  // }
+  get deleted() {
+    return this.collection.createFilter<Attachment>((qb) =>
+      qb.where("dateDeleted", "is not", null)
+    );
+  }
 
   // get images() {
   //   return this.all.filter((attachment) => isImage(attachment.metadata.type));

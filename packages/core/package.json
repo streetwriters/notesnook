@@ -45,6 +45,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@leeoniya/ufuzzy": "^1.0.10",
     "@microsoft/signalr": "^7.0.10",
     "@microsoft/signalr-protocol-msgpack": "^7.0.10",
     "@notesnook/logger": "file:../logger",

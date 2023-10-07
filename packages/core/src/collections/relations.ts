@@ -59,26 +59,14 @@ export class Relations implements ICollection {
     reference: ItemReference,
     type: TType
   ) {
-    return new RelationsArray(
-      this.db.sql,
-      this.db.trash.cache,
-      reference,
-      type,
-      "from"
-    );
+    return new RelationsArray(this.db, reference, type, "from");
   }
 
   to<TType extends keyof RelatableTable>(
     reference: ItemReference,
     type: TType
   ) {
-    return new RelationsArray(
-      this.db.sql,
-      this.db.trash.cache,
-      reference,
-      type,
-      "to"
-    );
+    return new RelationsArray(this.db, reference, type, "to");
   }
 
   // get raw() {
@@ -193,15 +181,15 @@ class RelationsArray<TType extends keyof RelatableTable> {
   private table: ValueOf<RelatableTable> = TABLE_MAP[this.type];
 
   constructor(
-    private readonly sql: DatabaseAccessor,
-    private readonly trashIds: string[],
+    private readonly db: Database,
     private readonly reference: ItemReference,
     private readonly type: TType,
     private readonly direction: "from" | "to"
   ) {}
 
   async resolve(limit?: number): Promise<ItemMap[TType][]> {
-    const items = await this.sql()
+    const items = await this.db
+      .sql()
       .selectFrom(this.table)
       .where("id", "in", (b) =>
         b
@@ -221,7 +209,8 @@ class RelationsArray<TType extends keyof RelatableTable> {
   }
 
   async unlink() {
-    await this.sql()
+    await this.db
+      .sql()
       .replaceInto("relations")
       .columns(["id", "dateModified", "deleted"])
       .expression((eb) =>
@@ -239,7 +228,8 @@ class RelationsArray<TType extends keyof RelatableTable> {
   }
 
   async get() {
-    const ids = await this.sql()
+    const ids = await this.db
+      .sql()
       .selectFrom("relations")
       .$call(this.buildRelationsQuery())
       .execute();
@@ -247,7 +237,8 @@ class RelationsArray<TType extends keyof RelatableTable> {
   }
 
   async count() {
-    const result = await this.sql()
+    const result = await this.db
+      .sql()
       .selectFrom("relations")
       .$call(this.buildRelationsQuery())
       .clearSelect()
@@ -258,7 +249,8 @@ class RelationsArray<TType extends keyof RelatableTable> {
   }
 
   async has(id: string) {
-    const result = await this.sql()
+    const result = await this.db
+      .sql()
       .selectFrom("relations")
       .$call(this.buildRelationsQuery())
       .clearSelect()
@@ -284,9 +276,13 @@ class RelationsArray<TType extends keyof RelatableTable> {
           .where("toType", "==", this.reference.type)
           .where("toId", "==", this.reference.id)
           .$if(
-            (this.type === "note" || this.type === "notebook") &&
-              this.trashIds.length > 0,
-            (b) => b.where("fromId", "not in", this.trashIds)
+            this.type === "note" && this.db.trash.cache.notes.length > 0,
+            (b) => b.where("fromId", "not in", this.db.trash.cache.notes)
+          )
+          .$if(
+            this.type === "notebook" &&
+              this.db.trash.cache.notebooks.length > 0,
+            (b) => b.where("fromId", "not in", this.db.trash.cache.notebooks)
           )
           .select("relations.fromId as id")
           .$narrowType<{ id: string }>();
@@ -296,9 +292,13 @@ class RelationsArray<TType extends keyof RelatableTable> {
           .where("fromType", "==", this.reference.type)
           .where("fromId", "==", this.reference.id)
           .$if(
-            (this.type === "note" || this.type === "notebook") &&
-              this.trashIds.length > 0,
-            (b) => b.where("toId", "not in", this.trashIds)
+            this.type === "note" && this.db.trash.cache.notes.length > 0,
+            (b) => b.where("toId", "not in", this.db.trash.cache.notes)
+          )
+          .$if(
+            this.type === "notebook" &&
+              this.db.trash.cache.notebooks.length > 0,
+            (b) => b.where("toId", "not in", this.db.trash.cache.notebooks)
           )
           .select("relations.toId as id")
           .$narrowType<{ id: string }>();
