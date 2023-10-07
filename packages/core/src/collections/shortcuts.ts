@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Database from "../api";
+import { isFalse } from "../database";
 import { SQLCollection } from "../database/sql-collection";
 import { Shortcut } from "../types";
 import { ICollection } from "./collection";
@@ -82,7 +83,7 @@ export class Shortcuts implements ICollection {
 
   get all() {
     return this.collection.createFilter<Shortcut>((qb) =>
-      qb.where("deleted", "is", null)
+      qb.where(isFalse("deleted"))
     );
   }
 
