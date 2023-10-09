@@ -32,6 +32,6 @@ describe("objectid", async () => {
   });
 
   bench("nanoid", () => {
-    nanoid(32);
+    nanoid(24);
   });
 });
