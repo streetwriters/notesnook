@@ -17,16 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { randomBytes, randomInt } from "./random";
+import { bench, describe } from "vitest";
+import { createObjectId } from "../src/utils/object-id";
+import boid from "bson-objectid";
+import { nanoid } from "nanoid";
 
-const PROCESS_UNIQUE = randomBytes(5).toString("hex");
-let index = ~~(randomInt() * 0xffffff);
-export function createObjectId(date = Date.now()): string {
-  index++;
-  const time = Math.floor(date / 1000);
-  return time.toString(16) + PROCESS_UNIQUE + swap16(index).toString(16);
-}
+describe("objectid", async () => {
+  bench("custom", () => {
+    createObjectId();
+  });
 
-function swap16(val: number) {
-  return ((val & 0xff) << 16) | (val & 0xff00) | ((val >> 16) & 0xff);
-}
+  bench("bson-objectid", () => {
+    boid().toHexString();
+  });
+
+  bench("nanoid", () => {
+    nanoid(32);
+  });
+});
