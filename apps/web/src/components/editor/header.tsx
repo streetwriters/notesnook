@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useStore } from "../../stores/editor-store";
 import { Input } from "@theme-ui/components";
 import { Tag, Plus } from "../icons";
@@ -86,6 +86,7 @@ type AutosuggestProps = {
 export function Autosuggest(props: AutosuggestProps) {
   const { sessionId, filter, onRemove, onSelect, onAdd, defaultItems } = props;
   const inputRef = useRef<HTMLInputElement>(null);
+  const arrowDown = useRef<boolean>();
   const filteredItems = useRef<any[]>([]);
   const { openMenu, closeMenu, isOpen } = useMenuTrigger();
   const clearInput = useCallback(() => {
@@ -191,22 +192,17 @@ export function Autosuggest(props: AutosuggestProps) {
       }}
       onKeyDown={(e) => {
         const text = getInputValue();
-        if (
-          e.key === "Enter" &&
-          !!text &&
-          isOpen &&
-          filteredItems.current.length <= 0
-        ) {
+        if (e.key === "Enter" && !!text && isOpen && !arrowDown.current) {
           onAction("add", text);
-        } else if (e.key === "Enter" && !!text && isOpen) {
-          onAction("select", filteredItems.current[0]);
         } else if (!text && e.key === "Backspace") {
           onRemove();
           closeMenu();
         } else if (e.key === "Escape") {
+          arrowDown.current = false;
           closeMenu();
           e.stopPropagation();
         } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+          arrowDown.current = true;
           if (e.key === "ArrowDown" && !text) onOpenMenu(defaultItems.slice());
 
           e.preventDefault();
