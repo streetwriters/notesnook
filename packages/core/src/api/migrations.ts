@@ -21,6 +21,61 @@ import Database from ".";
 import { CURRENT_DATABASE_VERSION } from "../common";
 import Migrator, { MigratableCollections } from "../database/migrator";
 
+const collections: MigratableCollections = [
+  {
+    name: "settings",
+    table: "settings"
+  },
+  {
+    name: "settingsv2",
+    table: "settings"
+  },
+  {
+    name: "attachments",
+    table: "attachments"
+  },
+  {
+    name: "notebooks",
+    table: "notebooks"
+  },
+  {
+    name: "tags",
+    table: "tags"
+  },
+  {
+    name: "colors",
+    table: "colors"
+  },
+  {
+    name: "content",
+    table: "content"
+  },
+  {
+    name: "shortcuts",
+    table: "shortcuts"
+  },
+  {
+    name: "reminders",
+    table: "reminders"
+  },
+  {
+    name: "relations",
+    table: "relations"
+  },
+  {
+    name: "notehistory",
+    table: "relations"
+  },
+  {
+    name: "sessioncontent",
+    table: "sessioncontent"
+  },
+  {
+    name: "notes",
+    table: "notes"
+  }
+];
+
 class Migrations {
   private readonly migrator = new Migrator();
   private migrating = false;
@@ -43,61 +98,6 @@ class Migrations {
       this.migrating = true;
 
       await this.db.notes.init();
-
-      const collections: MigratableCollections = [
-        {
-          items: () => [this.db.legacySettings.raw],
-          type: "settings"
-        },
-        {
-          items: () => this.db.settings.raw,
-          type: "settingsv2"
-        },
-        {
-          items: () => this.db.attachments.all,
-          type: "attachments"
-        },
-        {
-          items: () => this.db.notebooks.raw,
-          type: "notebooks"
-        },
-        {
-          items: () => this.db.tags.raw,
-          type: "tags"
-        },
-        {
-          items: () => this.db.colors.raw,
-          type: "colors"
-        },
-        {
-          iterate: true,
-          type: "content"
-        },
-        {
-          items: () => this.db.shortcuts.raw,
-          type: "shortcuts"
-        },
-        {
-          items: () => this.db.reminders.raw,
-          type: "reminders"
-        },
-        {
-          items: () => this.db.relations.raw,
-          type: "relations"
-        },
-        {
-          iterate: true,
-          type: "notehistory"
-        },
-        {
-          iterate: true,
-          type: "sessioncontent"
-        },
-        {
-          items: () => this.db.notes.raw,
-          type: "notes"
-        }
-      ];
 
       await this.migrator.migrate(this.db, collections, this.version);
       await this.db.storage().write("v", CURRENT_DATABASE_VERSION);
