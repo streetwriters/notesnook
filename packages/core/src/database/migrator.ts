@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { DatabaseSchema } from ".";
 import Database from "../api";
 import {
   CURRENT_DATABASE_VERSION,
@@ -32,12 +33,14 @@ import {
   isTrashItem
 } from "../types";
 import { IndexedCollection } from "./indexed-collection";
+import { SQLCollection } from "./sql-collection";
 
 export type RawItem = MaybeDeletedItem<Item>;
 type MigratableCollection = {
-  iterate?: boolean;
-  items?: () => (RawItem | undefined)[];
-  type: CollectionType;
+  // iterate?: boolean;
+  // items?: () => (RawItem | undefined)[];
+  name: CollectionType;
+  table: keyof DatabaseSchema;
 };
 export type MigratableCollections = MigratableCollection[];
 
@@ -48,35 +51,31 @@ class Migrator {
     version: number
   ) {
     for (const collection of collections) {
-      sendMigrationProgressEvent(db.eventManager, collection.type, 0, 0);
+      sendMigrationProgressEvent(db.eventManager, collection.name, 0, 0);
 
       const indexedCollection = new IndexedCollection(
         db.storage,
-        collection.type,
+        collection.name,
+        db.eventManager
+      );
+      const table = new SQLCollection(
+        db.sql,
+        collection.table,
         db.eventManager
       );
 
       await migrateCollection(indexedCollection, version);
 
-      if (collection.items) {
+      await indexedCollection.init();
+      await table.init();
+      for await (const entries of indexedCollection.iterate(100)) {
         await this.migrateItems(
           db,
-          collection.type,
-          indexedCollection,
-          collection.items(),
+          table,
+          collection.name,
+          entries.map((i) => i[1]),
           version
         );
-      } else if (collection.iterate) {
-        await indexedCollection.init();
-        for await (const entries of indexedCollection.iterate(100)) {
-          await this.migrateItems(
-            db,
-            collection.type,
-            indexedCollection,
-            entries.map((i) => i[1]),
-            version
-          );
-        }
       }
     }
     await db.initCollections();
@@ -85,8 +84,8 @@ class Migrator {
 
   async migrateItems(
     db: Database,
+    table: SQLCollection<keyof DatabaseSchema>,
     type: keyof Collections,
-    collection: IndexedCollection,
     items: (RawItem | undefined)[],
     version: number
   ) {
@@ -131,13 +130,14 @@ class Migrator {
 
         // if id changed after migration, we need to delete the old one.
         if (item.id !== itemId) {
-          await collection.deleteItem(itemId);
+          // await collection.deleteItem(itemId);
         }
       }
     }
 
     if (toAdd.length > 0) {
-      await collection.setItems(toAdd);
+      await table.put(toAdd as any);
+      // await collection.setItems(toAdd);
       sendMigrationProgressEvent(
         db.eventManager,
         type,

@@ -28,8 +28,8 @@ import {
   Tag,
   TrashItem
 } from "../types";
-import { isFalse } from "../database";
-import { sql } from "kysely";
+import { DatabaseSchemaWithFTS, isFalse } from "../database";
+import { Kysely, sql } from "kysely";
 
 export default class Lookup {
   constructor(private readonly db: Database) {}
@@ -38,8 +38,8 @@ export default class Lookup {
     query: string,
     ids?: string[]
   ): Promise<Note & { rank: number }[]> {
-    return (await this.db
-      .sql()
+    const db = this.db.sql() as Kysely<DatabaseSchemaWithFTS>;
+    return (await db
       .with("matching", (eb) =>
         eb
           .selectFrom("content_fts")

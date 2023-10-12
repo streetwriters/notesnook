@@ -26,7 +26,7 @@ export function createNoteModel(note: Note, db: Database) {
     data: note,
     async content() {
       if (!note.contentId) return null;
-      const content = await db.content.raw(note.contentId);
+      const content = await db.content.get(note.contentId);
       return content && !isDeleted(content) ? content.data : null;
     },
     synced() {

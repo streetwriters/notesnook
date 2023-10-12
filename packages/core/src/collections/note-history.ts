@@ -141,7 +141,7 @@ export class NoteHistory implements ICollection {
     if (!session || isDeleted(session)) return;
 
     const content = await this.sessionContent.get(session.sessionContentId);
-    const note = this.db.notes.note(session.noteId);
+    const note = await this.db.notes.note(session.noteId);
     if (!note || !content) return;
 
     if (session.locked && isCipher(content.data)) {

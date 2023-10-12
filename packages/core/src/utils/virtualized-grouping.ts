@@ -26,7 +26,7 @@ export class VirtualizedGrouping<T> {
   private groups: Map<number, VirtualizedGroupHeader[]> = new Map();
 
   constructor(
-    private ids: string[],
+    public ids: string[],
     private readonly batchSize: number,
     private readonly fetchItems: (ids: string[]) => Promise<Record<string, T>>,
     private readonly groupItems: (
