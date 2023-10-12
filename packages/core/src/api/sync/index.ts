@@ -54,7 +54,7 @@ export default class SyncManager {
     } catch (e) {
       const isHubException = (e as Error).message.includes("HubException:");
       if (isHubException) {
-        var actualError = /HubException: (.*)/gm.exec((e as Error).message);
+        const actualError = /HubException: (.*)/gm.exec((e as Error).message);
         const errorText =
           actualError && actualError.length > 1
             ? actualError[1]
