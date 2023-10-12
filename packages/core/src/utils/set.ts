@@ -85,14 +85,14 @@ class SetManipulator {
   // Symmetric difference. Items from either set that
   // are not in both sets.
   // Set.difference([1, 1, 2], [2, 3, 3]) => [1, 3]
-  difference<T>(a: T[], b: T[], key: KeySelector<T>) {
-    return this.process(a, b, key, (freq) => freq < 3);
+  difference<T>(a: T[], b: T[], key?: KeySelector<T>) {
+    return <T[]>this.process(a, b, key, (freq) => freq < 3);
   }
 
   // Relative complement. Items from 'a' which are
   // not also in 'b'.
   // Set.complement([1, 2, 2], [2, 2, 3]) => [3]
-  complement<T>(a: T[], b: T[], key: KeySelector<T>) {
+  complement<T>(a: T[], b: T[], key?: KeySelector<T>) {
     return this.process(a, b, key, (freq) => freq === 1);
   }
 
