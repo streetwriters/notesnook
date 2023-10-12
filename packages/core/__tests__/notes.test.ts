@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import dayjs from "dayjs";
 import Database from "../src/api";
 import { groupArray } from "../src/utils/grouping";
 import {
@@ -29,6 +30,7 @@ import {
   loginFakeUser
 } from "./utils";
 import { test, expect } from "vitest";
+import { MONTHS_FULL } from "../src/utils/date";
 
 async function createAndAddNoteToNotebook(
   db: Database,
@@ -191,16 +193,6 @@ test("get pinned notes", () =>
   }).then(async ({ db }) => {
     expect(await db.notes.pinned.count()).toBeGreaterThan(0);
   }));
-
-test.todo("get grouped notes by abc", () => groupedTest("abc"));
-
-test.todo("get grouped notes by month", () => groupedTest("month"));
-
-test.todo("get grouped notes by year", () => groupedTest("year"));
-
-test.todo("get grouped notes by weak", () => groupedTest("week"));
-
-test.todo("get grouped notes default", () => groupedTest("default"));
 
 test("pin note", () =>
   noteTest().then(async ({ db, id }) => {
@@ -387,4 +379,152 @@ test("adding a note with an invalid tag should clean the tag array", () =>
     expect(
       await db.relations.to({ id: "helloworld", type: "note" }, "tag").count()
     ).toBe(0);
+  }));
+
+test("get grouped notes by abc", () =>
+  databaseTest().then(async (db) => {
+    const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for (const letter of alphabet) {
+      for (const letter2 of alphabet) {
+        await db.notes.add({ title: `${letter}${letter2}` });
+      }
+    }
+    await db.notes.add({ title: `Pinned note`, pinned: true });
+    await db.notes.add({
+      title: `Conflicted`,
+      conflicted: true
+    });
+    const { grouping, ids } = await db.notes.all.grouped({
+      groupBy: "abc",
+      sortDirection: "asc",
+      sortBy: "title"
+    });
+
+    expect((await grouping.item(ids[0]))?.group?.title).toBe("Conflicted");
+    expect((await grouping.item(ids[1]))?.group?.title).toBe("Pinned");
+    for (let i = 0; i < alphabet.length; ++i) {
+      expect(
+        (await grouping.item(ids[i * alphabet.length + 2]))?.group?.title
+      ).toBe(alphabet[i]);
+    }
+  }));
+
+test("get grouped notes by month", () =>
+  databaseTest().then(async (db) => {
+    for (let month = 0; month <= 11; ++month) {
+      for (let i = 0; i < 5; ++i) {
+        const date = dayjs().month(month).toDate().getTime();
+        await db.notes.add({
+          title: `Note in ${month} - ${i}`,
+          dateCreated: date
+        });
+      }
+    }
+
+    const { grouping, ids } = await db.notes.all.grouped({
+      groupBy: "month",
+      sortDirection: "desc",
+      sortBy: "dateCreated"
+    });
+
+    for (let month = 11; month >= 0; --month) {
+      expect((await grouping.item(ids[(11 - month) * 5]))?.group?.title).toBe(
+        MONTHS_FULL[month]
+      );
+    }
+  }));
+
+test("get grouped notes by year", () =>
+  databaseTest().then(async (db) => {
+    for (let year = 2020; year <= 2025; ++year) {
+      for (let i = 0; i < 5; ++i) {
+        const date = dayjs().year(year).toDate().getTime();
+        await db.notes.add({
+          title: `Note in ${year} - ${i}`,
+          dateCreated: date
+        });
+      }
+    }
+
+    const { grouping, ids } = await db.notes.all.grouped({
+      groupBy: "year",
+      sortDirection: "desc",
+      sortBy: "dateCreated"
+    });
+
+    for (let year = 2020; year <= 2025; ++year) {
+      expect((await grouping.item(ids[(2025 - year) * 5]))?.group?.title).toBe(
+        year.toString()
+      );
+    }
+  }));
+
+test("get grouped notes by week", () =>
+  databaseTest().then(async (db) => {
+    for (let i = 1; i <= 6; ++i) {
+      for (let week = 1; week <= 4; ++week) {
+        const date = dayjs()
+          .month(i)
+          .date(week * 7)
+          .year(2023)
+          .startOf("week")
+          .toDate()
+          .getTime();
+        await db.notes.add({
+          title: `Note in ${week} - ${i}`,
+          dateCreated: date
+        });
+      }
+    }
+
+    const { grouping, ids } = await db.notes.all.grouped({
+      groupBy: "week",
+      sortDirection: "desc",
+      sortBy: "dateCreated"
+    });
+
+    const weeks = [
+      "19 - 25 Jun, 2023",
+      "22 - 28 May, 2023",
+      "17 - 23 Apr, 2023",
+      "20 - 26 Mar, 2023",
+      "20 - 26 Feb, 2023"
+    ];
+    for (let i = 1; i <= 5; ++i) {
+      expect((await grouping.item(ids[i * 4]))?.group?.title).toBe(
+        weeks[i - 1]
+      );
+    }
+  }));
+
+test("get grouped notes default", () =>
+  databaseTest().then(async (db) => {
+    const ranges = {
+      Recent: [0, 7],
+      "Last week": [7, 14],
+      Older: [14, 28]
+    };
+    for (const key in ranges) {
+      const range = ranges[key];
+      for (let i = range[0]; i < range[1]; i++) {
+        const date = dayjs().subtract(i, "days").toDate().getTime();
+
+        await db.notes.add({
+          title: `Note in ${key} - ${i}`,
+          dateCreated: date
+        });
+      }
+    }
+
+    const { grouping, ids } = await db.notes.all.grouped({
+      groupBy: "default",
+      sortDirection: "desc",
+      sortBy: "dateCreated"
+    });
+
+    let i = 0;
+    for (const key in ranges) {
+      expect((await grouping.item(ids[i * 7]))?.group?.title).toBe(key);
+      ++i;
+    }
   }));

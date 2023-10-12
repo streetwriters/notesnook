@@ -81,6 +81,7 @@ export type GroupableItem = ValueOf<
     | "shortcut"
     | "relation"
     | "tiny"
+    | "topic"
     | "tiptap"
     | "content"
     | "session"

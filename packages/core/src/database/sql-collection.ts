@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { EVENTS } from "../common";
-import { GroupOptions, MaybeDeletedItem, isDeleted } from "../types";
+import { GroupOptions, Item, MaybeDeletedItem, isDeleted } from "../types";
 import EventManager from "../utils/event-manager";
 import {
   DatabaseAccessor,
@@ -28,6 +28,8 @@ import {
   isFalse
 } from ".";
 import { ExpressionOrFactory, SelectQueryBuilder, SqlBool } from "kysely";
+import { VirtualizedGrouping } from "../utils/virtualized-grouping";
+import { groupArray } from "../utils/grouping";
 
 export class SQLCollection<
   TCollectionType extends keyof DatabaseSchema,
@@ -164,16 +166,12 @@ export class SQLCollection<
   }
 
   async items(
-    ids: string[],
-    sortOptions?: GroupOptions
+    ids: string[]
   ): Promise<Record<string, MaybeDeletedItem<T> | undefined>> {
     const results = await this.db()
       .selectFrom<keyof DatabaseSchema>(this.type)
       .selectAll()
       .where("id", "in", ids)
-      .$if(!!sortOptions, (eb) =>
-        eb.orderBy(sortOptions!.sortBy, sortOptions!.sortDirection)
-      )
       .execute();
     const items: Record<string, MaybeDeletedItem<T>> = {};
     for (const item of results) {
@@ -227,7 +225,7 @@ export class SQLCollection<
     }
   }
 
-  createFilter<T>(
+  createFilter<T extends Item>(
     selector: (
       qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, unknown>
     ) => SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, unknown>,
@@ -240,7 +238,7 @@ export class SQLCollection<
   }
 }
 
-export class FilteredSelector<T> {
+export class FilteredSelector<T extends Item> {
   constructor(
     readonly filter: SelectQueryBuilder<
       DatabaseSchema,
@@ -250,13 +248,23 @@ export class FilteredSelector<T> {
     readonly batchSize: number
   ) {}
 
-  async ids() {
-    return (await this.filter.select("id").execute()).map((i) => i.id);
+  async ids(sortOptions?: GroupOptions) {
+    return (
+      await this.filter
+        .$if(!!sortOptions, (eb) =>
+          eb.$call(this.buildSortExpression(sortOptions!))
+        )
+        .select("id")
+        .execute()
+    ).map((i) => i.id);
   }
 
-  async items(ids?: string[]) {
+  async items(ids?: string[], sortOptions?: GroupOptions) {
     return (await this.filter
       .$if(!!ids && ids.length > 0, (eb) => eb.where("id", "in", ids!))
+      .$if(!!sortOptions, (eb) =>
+        eb.$call(this.buildSortExpression(sortOptions!))
+      )
       .selectAll()
       .execute()) as T[];
   }
@@ -296,6 +304,40 @@ export class FilteredSelector<T> {
     for await (const item of this) {
       yield fn(item);
     }
+  }
+
+  async grouped(options: GroupOptions) {
+    const ids = await this.ids(options);
+    return {
+      ids,
+      grouping: new VirtualizedGrouping<T>(
+        ids,
+        this.batchSize,
+        async (ids) => {
+          const results = await this.filter
+            .where("id", "in", ids)
+            .selectAll()
+            .execute();
+          const items: Record<string, T> = {};
+          for (const item of results) {
+            items[item.id] = item as T;
+          }
+          return items;
+        },
+        (ids, items) => groupArray(ids, items, options)
+      )
+    };
+  }
+
+  private buildSortExpression(options: GroupOptions) {
+    return <T>(
+      qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, T>
+    ) => {
+      return qb
+        .orderBy("conflicted desc")
+        .orderBy("pinned desc")
+        .orderBy(options.sortBy, options.sortDirection);
+    };
   }
 
   async *[Symbol.asyncIterator]() {
