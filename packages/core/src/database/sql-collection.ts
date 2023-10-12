@@ -308,25 +308,22 @@ export class FilteredSelector<T extends Item> {
 
   async grouped(options: GroupOptions) {
     const ids = await this.ids(options);
-    return {
+    return new VirtualizedGrouping<T>(
       ids,
-      grouping: new VirtualizedGrouping<T>(
-        ids,
-        this.batchSize,
-        async (ids) => {
-          const results = await this.filter
-            .where("id", "in", ids)
-            .selectAll()
-            .execute();
-          const items: Record<string, T> = {};
-          for (const item of results) {
-            items[item.id] = item as T;
-          }
-          return items;
-        },
-        (ids, items) => groupArray(ids, items, options)
-      )
-    };
+      this.batchSize,
+      async (ids) => {
+        const results = await this.filter
+          .where("id", "in", ids)
+          .selectAll()
+          .execute();
+        const items: Record<string, T> = {};
+        for (const item of results) {
+          items[item.id] = item as T;
+        }
+        return items;
+      },
+      (ids, items) => groupArray(ids, items, options)
+    );
   }
 
   private buildSortExpression(options: GroupOptions) {
