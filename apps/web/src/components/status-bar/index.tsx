@@ -50,6 +50,7 @@ function StatusBar() {
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
   const statuses = useStatus();
   const updateStatus = useAutoUpdater();
+  const isFocusMode = useAppStore((state) => state.isFocusMode);
 
   return (
     <ScopedThemeProvider
@@ -98,7 +99,7 @@ function StatusBar() {
               </Text>
             </Button>
 
-            <SyncStatus />
+            {!isFocusMode && <SyncStatus />}
           </>
         ) : isLoggedIn === false ? (
           <Button
