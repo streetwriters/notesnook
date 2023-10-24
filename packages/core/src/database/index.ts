@@ -20,11 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   Migrator,
   Kysely,
-  SqliteAdapter,
-  SqliteIntrospector,
-  SqliteQueryCompiler,
   sql,
-  Driver,
   KyselyPlugin,
   PluginTransformQueryArgs,
   PluginTransformResultArgs,
@@ -37,7 +33,8 @@ import {
   Transaction,
   ColumnType,
   ExpressionBuilder,
-  ReferenceExpression
+  ReferenceExpression,
+  Dialect
 } from "kysely";
 import {
   Attachment,
@@ -119,9 +116,8 @@ export interface DatabaseCollection<T, IsAsync extends boolean> {
   put(items: (T | undefined)[]): Promise<void>;
   update(ids: string[], partial: Partial<T>): Promise<void>;
   ids(options: GroupOptions): AsyncOrSyncResult<IsAsync, string[]>;
-  items(
-    ids: string[],
-    sortOptions?: GroupOptions
+  records(
+    ids: string[]
   ): AsyncOrSyncResult<
     IsAsync,
     Record<string, MaybeDeletedItem<T> | undefined>
@@ -198,14 +194,17 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
   }
 };
 
-export async function createDatabase(driver: Driver) {
+export type SQLiteOptions = {
+  dialect: Dialect;
+  journalMode?: "WAL" | "MEMORY" | "OFF" | "PERSIST" | "TRUNCATE" | "DELETE";
+  synchronous?: "normal" | "extra" | "full" | "off";
+  lockingMode?: "normal" | "exclusive";
+  cacheSize?: number;
+  pageSize?: number;
+};
+export async function createDatabase(options: SQLiteOptions) {
   const db = new Kysely<DatabaseSchema>({
-    dialect: {
-      createAdapter: () => new SqliteAdapter(),
-      createDriver: () => driver,
-      createIntrospector: (db) => new SqliteIntrospector(db),
-      createQueryCompiler: () => new SqliteQueryCompiler()
-    },
+    dialect: options.dialect,
     plugins: [new SqliteBooleanPlugin()]
   });
 
@@ -214,8 +213,28 @@ export async function createDatabase(driver: Driver) {
     provider: new NNMigrationProvider()
   });
 
-  await sql`PRAGMA journal_mode = WAL`.execute(db);
-  await sql`PRAGMA synchronous = normal`.execute(db);
+  await sql`PRAGMA journal_mode = ${sql.raw(
+    options.journalMode || "WAL"
+  )}`.execute(db);
+
+  await sql`PRAGMA synchronous = ${sql.raw(
+    options.synchronous || "normal"
+  )}`.execute(db);
+
+  if (options.pageSize)
+    await sql`PRAGMA page_size = ${sql.raw(
+      options.pageSize.toString()
+    )}`.execute(db);
+
+  if (options.cacheSize)
+    await sql`PRAGMA cache_size = ${sql.raw(
+      options.cacheSize.toString()
+    )}`.execute(db);
+
+  if (options.lockingMode)
+    await sql`PRAGMA locking_mode = ${sql.raw(options.lockingMode)}`.execute(
+      db
+    );
 
   await migrator.migrateToLatest();
 
@@ -240,6 +259,8 @@ export class SqliteBooleanPlugin implements KyselyPlugin {
     args: PluginTransformResultArgs
   ): Promise<QueryResult<UnknownRow>> {
     for (const row of args.result.rows) {
+      if (typeof row !== "object") continue;
+
       for (const key in row) {
         if (BooleanProperties.has(key as BooleanFields)) {
           row[key] = row[key] === 1 ? true : false;
