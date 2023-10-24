@@ -22,6 +22,12 @@ import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
 import type Database from "@notesnook/core/dist/api";
 import { showMigrationDialog } from "./dialog-controller";
+// import { SQLocalKysely } from "sqlocal/kysely";
+import { WaSqliteWorkerDriver } from "./sqlite/sqlite.kysely";
+import { SqliteAdapter, SqliteQueryCompiler, SqliteIntrospector } from "kysely";
+// import SQLiteESMFactory from "./sqlite/wa-sqlite-async";
+// import * as SQLite from "./sqlite/sqlite-api";
+// import { IDBBatchAtomicVFS } from "./sqlite/IDBBatchAtomicVFS";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -34,6 +40,13 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   const { Compressor } = await import("../utils/compressor");
   db = database;
 
+  // // const ss = wrap<SQLiteWorker>(new Worker());
+  // // await ss.init("test.db", false, uri);
+
+  // const res = await ss.run("query", `.table`);
+  // console.log(res);
+  // await ss.close();
+
   db.host({
     API_HOST: "https://api.notesnook.com",
     AUTH_HOST: "https://auth.streetwriters.co",
@@ -43,10 +56,25 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   });
 
   database.setup({
+    sqliteOptions: {
+      dialect: {
+        createDriver: () =>
+          new WaSqliteWorkerDriver({ async: true, dbName: "test.db" }),
+        createAdapter: () => new SqliteAdapter(),
+        createIntrospector: (db) => new SqliteIntrospector(db),
+        createQueryCompiler: () => new SqliteQueryCompiler()
+      },
+      journalMode: "MEMORY",
+      synchronous: "normal",
+      pageSize: 8192,
+      cacheSize: -16000,
+      lockingMode: "exclusive"
+    },
     storage: await NNStorage.createInstance("Notesnook", persistence),
     eventsource: EventSource,
     fs: FileStorage,
-    compressor: new Compressor()
+    compressor: new Compressor(),
+    batchSize: 500
   });
   // if (IS_TESTING) {
 

@@ -61,7 +61,7 @@ import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 
 type OnChangeHandler = (
   id: string | undefined,
-  sessionId: number,
+  sessionId: string,
   content: string
 ) => void;
 type TipTapProps = {
@@ -87,7 +87,7 @@ type TipTapProps = {
 const SAVE_INTERVAL = IS_TESTING ? 100 : 300;
 
 function save(
-  sessionId: number,
+  sessionId: string,
   noteId: string | undefined,
   editor: Editor,
   content: Fragment,

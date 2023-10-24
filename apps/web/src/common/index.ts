@@ -39,6 +39,7 @@ import { createWritableStream } from "./desktop-bridge";
 import { ZipStream } from "../utils/streams/zip-stream";
 import { FeatureKeys } from "../dialogs/feature-dialog";
 import { Entry, Reader } from "../utils/zip-reader";
+import { IndexedDBKVStore } from "../interfaces/key-value";
 
 export const CREATE_BUTTON_MAP = {
   notes: {

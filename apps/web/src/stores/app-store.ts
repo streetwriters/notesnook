@@ -31,21 +31,32 @@ import { store as announcementStore } from "./announcement-store";
 import { store as settingStore } from "./setting-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
-import { resetNotices } from "../common/notices";
+import { Notice, resetNotices } from "../common/notices";
 import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/dist/common";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
 import { NetworkCheck } from "../utils/network-check";
+import { Color, Notebook, Tag } from "@notesnook/core";
 
+type SyncState =
+  | "synced"
+  | "syncing"
+  | "conflicts"
+  | "failed"
+  | "completed"
+  | "offline"
+  | "disabled";
+type SyncStatus = {
+  key: SyncState;
+  progress: number | null;
+  type: "download" | "upload" | null;
+};
 const networkCheck = new NetworkCheck();
-var syncStatusTimeout = 0;
-let pendingSync = false;
+let syncStatusTimeout = 0;
+let pendingSync: { full: boolean } | undefined = undefined;
 
-/**
- * @extends {BaseStore<AppStore>}
- */
-class AppStore extends BaseStore {
+class AppStore extends BaseStore<AppStore> {
   // default state
   isSideMenuOpen = false;
   isFocusMode = false;
@@ -54,7 +65,7 @@ class AppStore extends BaseStore {
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);
   isRealtimeSyncEnabled = Config.get("isRealtimeSyncEnabled", true);
-  syncStatus = {
+  syncStatus: SyncStatus = {
     key: navigator.onLine
       ? Config.get("syncEnabled", true)
         ? "synced"
@@ -63,13 +74,9 @@ class AppStore extends BaseStore {
     progress: null,
     type: null
   };
-  colors = [];
-  globalMenu = { items: [], data: {} };
-  /**
-   * @type {import("../common/notices").Notice[]}
-   */
-  notices = [];
-  shortcuts = [];
+  colors: Color[] = [];
+  notices: Notice[] = [];
+  shortcuts: (Notebook | Tag)[] = [];
   lastSynced = 0;
 
   init = () => {
@@ -141,7 +148,7 @@ class AppStore extends BaseStore {
 
     await this.updateLastSynced();
     await resetNotices();
-    noteStore.refresh();
+    await noteStore.refresh();
     notebookStore.refresh();
     reminderStore.refresh();
     trashStore.refresh();
@@ -151,15 +158,17 @@ class AppStore extends BaseStore {
     settingStore.refresh();
     await editorstore.refresh();
 
-    this.refreshNavItems();
+    await this.refreshNavItems();
 
     logger.measure("refreshing app");
   };
 
-  refreshNavItems = () => {
+  refreshNavItems = async () => {
+    const shortcuts = await db.shortcuts.resolved();
+    const colors = await db.colors.all.items();
     this.set((state) => {
-      state.shortcuts = db.shortcuts.resolved;
-      state.colors = db.colors.all;
+      state.shortcuts = shortcuts;
+      state.colors = colors;
     });
   };
 
@@ -190,7 +199,7 @@ class AppStore extends BaseStore {
     );
   };
 
-  toggleSideMenu = (toggleState) => {
+  toggleSideMenu = (toggleState: boolean) => {
     this.set(
       (state) =>
         (state.isSideMenuOpen =
@@ -198,23 +207,15 @@ class AppStore extends BaseStore {
     );
   };
 
-  setGlobalMenu = (items, data) => {
-    this.set((state) => (state.globalMenu = { items, data }));
-  };
-
-  setIsEditorOpen = (toggleState) => {
+  setIsEditorOpen = (toggleState: boolean) => {
     this.set((state) => (state.isEditorOpen = toggleState));
   };
 
-  setIsVaultCreated = (toggleState) => {
+  setIsVaultCreated = (toggleState: boolean) => {
     this.set((state) => (state.isVaultCreated = toggleState));
   };
 
-  /**
-   *
-   * @param {import("../common/notices").Notice[]} notices
-   */
-  setNotices = (...notices) => {
+  setNotices = (...notices: Notice[]) => {
     this.set((state) => {
       for (const notice of notices) {
         const oldIndex = state.notices.findIndex((a) => a.type === notice.type);
@@ -224,26 +225,23 @@ class AppStore extends BaseStore {
     });
   };
 
-  dismissNotices = (...reminders) => {
+  dismissNotices = (...notices: Notice[]) => {
     this.set((state) => {
-      for (let reminder of reminders) {
-        state.notices.splice(state.notices.indexOf(reminder), 1);
+      for (const notice of notices) {
+        state.notices.splice(state.notices.indexOf(notice), 1);
       }
     });
   };
 
-  addToShortcuts = async (item) => {
-    if (db.shortcuts.exists(item.id)) {
+  addToShortcuts = async (item: { type: "tag" | "notebook"; id: string }) => {
+    if (await db.shortcuts.exists(item.id)) {
       await db.shortcuts.remove(item.id);
       this.refreshNavItems();
       showToast("success", `Shortcut removed!`);
     } else {
       await db.shortcuts.add({
-        item: {
-          type: item.type,
-          id: item.id,
-          notebookId: item.notebookId
-        }
+        itemType: item.type,
+        itemId: item.id
       });
       this.refreshNavItems();
       showToast("success", `Shortcut created!`);
@@ -253,10 +251,6 @@ class AppStore extends BaseStore {
     switch (item.type) {
       case "notebook": {
         notebookStore.refresh();
-        break;
-      }
-      case "topic": {
-        notebookStore.setSelectedNotebook(item.notebookId);
         break;
       }
       case "tag": {
@@ -273,7 +267,7 @@ class AppStore extends BaseStore {
     this.set((state) => (state.lastSynced = lastSynced));
   };
 
-  sync = async (full = true, force = false, lastSynced = null) => {
+  sync = async (full = true, force = false, lastSynced?: number) => {
     if (
       this.isSyncing() ||
       !this.get().isSyncEnabled ||
@@ -291,7 +285,6 @@ class AppStore extends BaseStore {
       if (this.isSyncing()) pendingSync = { full };
       return;
     }
-    pendingSync = false;
 
     clearTimeout(syncStatusTimeout);
     this.updateLastSynced();
@@ -307,14 +300,20 @@ class AppStore extends BaseStore {
 
       if (pendingSync) {
         logger.info("Running pending sync", pendingSync);
-        pendingSync = false;
-        await this.get().sync(pendingSync.full, false);
+        const isFullSync = pendingSync.full;
+        pendingSync = undefined;
+        await this.get().sync(isFullSync, false);
       }
     } catch (err) {
+      if (!(err instanceof Error)) {
+        console.error(err);
+        return;
+      }
+
       logger.error(err);
       if (err.cause === "MERGE_CONFLICT") {
-        if (editorstore.get().session.id)
-          editorstore.openSession(editorstore.get().session.id, true);
+        const sessionId = editorstore.get().session.id;
+        if (sessionId) await editorstore.openSession(sessionId, true);
         await this.refresh();
         this.updateSyncStatus("conflicts");
       } else {
@@ -331,26 +330,24 @@ class AppStore extends BaseStore {
     }
   };
 
-  abortSync = async (status = "offline") => {
+  abortSync = async (status: SyncState = "offline") => {
     if (this.isSyncing()) this.updateSyncStatus("failed");
     else this.updateSyncStatus(status);
 
     await db.syncer.stop();
   };
 
-  /**
-   *
-   * @param {"synced" | "syncing" | "conflicts" | "failed" | "completed" | "offline" | "disabled"} key
-   */
-  updateSyncStatus = (key, reset = false) => {
+  updateSyncStatus = (key: SyncState, reset = false) => {
     logger.info(`Sync status updated: ${key}`);
-    this.set((state) => (state.syncStatus = { key }));
+    this.set((state) => {
+      state.syncStatus = { key, progress: null, type: null };
+    });
 
     if (reset) {
       syncStatusTimeout = setTimeout(() => {
         if (this.get().syncStatus.key === key)
           this.updateSyncStatus("synced", false);
-      }, 3000);
+      }, 3000) as unknown as number;
     }
   };
 
