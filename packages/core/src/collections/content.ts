@@ -33,6 +33,7 @@ import {
 import Database from "../api";
 import { getOutputType } from "./attachments";
 import { SQLCollection } from "../database/sql-collection";
+import { NoteContent } from "./session-content";
 
 export const EMPTY_CONTENT = (noteId: string): UnencryptedContentItem => ({
   noteId,
@@ -73,49 +74,67 @@ export class Content implements ICollection {
       );
 
     const id = content.id || getId();
-    const oldContent = content.id ? await this.get(content.id) : undefined;
-    const noteId = oldContent?.noteId || content.noteId;
-    if (!noteId) throw new Error("No noteId found to link the content to.");
 
-    const encryptedData = isCipher(content.data)
-      ? content.data
-      : oldContent && isCipher(oldContent.data)
-      ? oldContent.data
-      : null;
+    if (!content.noteId)
+      throw new Error("No noteId found to link the content to.");
+    if (!content.type) throw new Error("Please specify content's type.");
 
-    const unencryptedData =
-      typeof content.data === "string"
-        ? content.data
-        : oldContent && typeof oldContent.data === "string"
-        ? oldContent.data
-        : "<p></p>";
+    const encryptedData = isCipher(content.data) ? content.data : undefined;
+    let unencryptedData =
+      typeof content.data === "string" ? content.data : undefined;
 
-    const contentItem: ContentItem = {
-      type: "tiptap",
-      noteId,
-      id,
+    if (unencryptedData)
+      unencryptedData = await this.extractAttachments({
+        type: content.type,
+        data: unencryptedData,
+        noteId: content.noteId
+      });
 
-      dateEdited: content.dateEdited || oldContent?.dateEdited || Date.now(),
-      dateCreated: content.dateCreated || oldContent?.dateCreated || Date.now(),
-      dateModified: Date.now(),
-      localOnly: content.localOnly || !!oldContent?.localOnly,
+    if (content.id && (await this.exists(content.id))) {
+      const contentData = encryptedData
+        ? { locked: true as const, data: encryptedData }
+        : unencryptedData
+        ? { locked: false as const, data: unencryptedData }
+        : undefined;
 
-      conflicted: content.conflicted || oldContent?.conflicted,
-      dateResolved: content.dateResolved || oldContent?.dateResolved,
+      await this.collection.update([content.id], {
+        dateEdited: content.dateEdited,
+        localOnly: content.localOnly,
+        conflicted: content.conflicted,
+        dateResolved: content.dateResolved,
+        ...contentData
+      });
 
-      ...(encryptedData
-        ? { locked: true, data: encryptedData }
-        : { locked: false, data: unencryptedData })
-    };
+      if (content.sessionId && contentData)
+        await this.db.noteHistory.add(content.sessionId, {
+          noteId: content.noteId,
+          type: content.type,
+          ...contentData
+        });
+    } else {
+      const contentItem: ContentItem = {
+        type: "tiptap",
+        noteId: content.noteId,
+        id,
 
-    await this.collection.upsert(
-      contentItem.locked
-        ? contentItem
-        : await this.extractAttachments(contentItem)
-    );
+        dateEdited: content.dateEdited || Date.now(),
+        dateCreated: content.dateCreated || Date.now(),
+        dateModified: Date.now(),
+        localOnly: !!content.localOnly,
 
-    if (content.sessionId)
-      await this.db.noteHistory.add(content.sessionId, contentItem);
+        conflicted: content.conflicted,
+        dateResolved: content.dateResolved,
+
+        ...(encryptedData
+          ? { locked: true, data: encryptedData }
+          : { locked: false, data: unencryptedData || "<p></p>" })
+      };
+
+      await this.collection.upsert(contentItem);
+
+      if (content.sessionId)
+        await this.db.noteHistory.add(content.sessionId, contentItem);
+    }
 
     return id;
   }
@@ -254,18 +273,21 @@ export class Content implements ICollection {
     await this.add(contentItem);
   }
 
-  async extractAttachments(contentItem: UnencryptedContentItem) {
-    if (contentItem.localOnly) return contentItem;
+  async extractAttachments(
+    contentItem: NoteContent<false> & { noteId: string }
+  ) {
+    // if (contentItem.localOnly) return contentItem;
 
     const content = getContentFromData(contentItem.type, contentItem.data);
-    if (!content) return contentItem;
+    if (!content) return contentItem.data;
     const { data, hashes } = await content.extractAttachments(
       this.db.attachments.save
     );
 
     const noteAttachments = await this.db.relations
       .from({ type: "note", id: contentItem.noteId }, "attachment")
-      .resolve();
+      .selector.filter.select(["id", "hash"])
+      .execute();
 
     const toDelete = noteAttachments.filter((attachment) => {
       return hashes.every((hash) => hash !== attachment.hash);
@@ -281,11 +303,12 @@ export class Content implements ICollection {
           id: contentItem.noteId,
           type: "note"
         },
-        attachment
+        { id: attachment.id, type: "attachment" }
       );
     }
 
     for (const hash of toAdd) {
+      // TODO: only get id instead of the whole object
       const attachment = await this.db.attachments.attachment(hash);
       if (!attachment) continue;
       await this.db.relations.add(
@@ -297,11 +320,11 @@ export class Content implements ICollection {
       );
     }
 
-    if (toAdd.length > 0) {
-      contentItem.dateModified = Date.now();
-    }
-    contentItem.data = data;
-    return contentItem;
+    // if (toAdd.length > 0) {
+    //   contentItem.dateModified = Date.now();
+    // }
+    // contentItem.data = data;
+    return data;
   }
 
   // async cleanup() {
