@@ -71,8 +71,9 @@ export class Tags implements ICollection {
   // }
 
   get all() {
-    return this.collection.createFilter<Tag>((qb) =>
-      qb.where(isFalse("deleted"))
+    return this.collection.createFilter<Tag>(
+      (qb) => qb.where(isFalse("deleted")),
+      this.db.options?.batchSize
     );
   }
 

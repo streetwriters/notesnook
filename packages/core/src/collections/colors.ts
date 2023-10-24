@@ -87,8 +87,9 @@ export class Colors implements ICollection {
   // }
 
   get all() {
-    return this.collection.createFilter<Color>((qb) =>
-      qb.where(isFalse("deleted"))
+    return this.collection.createFilter<Color>(
+      (qb) => qb.where(isFalse("deleted")),
+      this.db.options?.batchSize
     );
   }
 

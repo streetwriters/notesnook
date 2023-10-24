@@ -62,6 +62,7 @@ export class Notes implements ICollection {
       throw new Error("Please use db.notes.merge to merge remote notes.");
 
     const id = item.id || getId();
+
     const oldNote = await this.note(id);
 
     const note = {
@@ -74,59 +75,61 @@ export class Notes implements ICollection {
     if (!oldNote && !item.content && !item.contentId && !item.title)
       throw new Error("Note must have a title or content.");
 
-    if (item.content && item.content.data && item.content.type) {
-      const { type, data } = item.content;
+    await this.db.transaction(async () => {
+      if (item.content && item.content.data && item.content.type) {
+        const { type, data } = item.content;
 
-      const content = getContentFromData(type, data);
-      if (!content) throw new Error("Invalid content type.");
+        const content = getContentFromData(type, data);
+        if (!content) throw new Error("Invalid content type.");
 
-      note.contentId = await this.db.content.add({
-        noteId: id,
-        sessionId: note.sessionId,
-        id: note.contentId,
-        type,
-        data,
-        localOnly: !!note.localOnly
+        note.contentId = await this.db.content.add({
+          noteId: id,
+          sessionId: note.sessionId,
+          id: note.contentId,
+          type,
+          data,
+          localOnly: !!note.localOnly
+        });
+
+        note.headline = note.locked ? "" : getNoteHeadline(content);
+        if (oldNote) note.dateEdited = Date.now();
+      }
+
+      if (item.localOnly !== undefined) {
+        await this.db.content.add({
+          id: note.contentId,
+          localOnly: !!item.localOnly
+        });
+      }
+
+      const noteTitle = await this.getNoteTitle(note, oldNote, note.headline);
+      if (oldNote && oldNote.title !== noteTitle) note.dateEdited = Date.now();
+
+      await this.collection.upsert({
+        id,
+        contentId: note.contentId,
+        type: "note",
+
+        title: noteTitle,
+        headline: note.headline,
+
+        notebooks: note.notebooks || undefined,
+
+        pinned: !!note.pinned,
+        locked: !!note.locked,
+        favorite: !!note.favorite,
+        localOnly: !!note.localOnly,
+        conflicted: !!note.conflicted,
+        readonly: !!note.readonly,
+
+        dateCreated: note.dateCreated || Date.now(),
+        dateEdited:
+          item.dateEdited || note.dateEdited || note.dateCreated || Date.now(),
+        dateModified: note.dateModified || Date.now()
       });
 
-      note.headline = note.locked ? "" : getNoteHeadline(content);
-      if (oldNote) note.dateEdited = Date.now();
-    }
-
-    if (item.localOnly !== undefined) {
-      await this.db.content.add({
-        id: note.contentId,
-        localOnly: !!item.localOnly
-      });
-    }
-
-    const noteTitle = await this.getNoteTitle(note, oldNote, note.headline);
-    if (oldNote && oldNote.title !== noteTitle) note.dateEdited = Date.now();
-
-    await this.collection.upsert({
-      id,
-      contentId: note.contentId,
-      type: "note",
-
-      title: noteTitle,
-      headline: note.headline,
-
-      notebooks: note.notebooks || undefined,
-
-      pinned: !!note.pinned,
-      locked: !!note.locked,
-      favorite: !!note.favorite,
-      localOnly: !!note.localOnly,
-      conflicted: !!note.conflicted,
-      readonly: !!note.readonly,
-
-      dateCreated: note.dateCreated || Date.now(),
-      dateEdited:
-        item.dateEdited || note.dateEdited || note.dateCreated || Date.now(),
-      dateModified: note.dateModified || Date.now()
+      if (!oldNote) this.totalNotes++;
     });
-
-    if (!oldNote) this.totalNotes++;
     return id;
   }
 
@@ -149,8 +152,9 @@ export class Notes implements ICollection {
   // }
 
   get all() {
-    return this.collection.createFilter<Note>((qb) =>
-      qb.where(isFalse("dateDeleted")).where(isFalse("deleted"))
+    return this.collection.createFilter<Note>(
+      (qb) => qb.where(isFalse("dateDeleted")).where(isFalse("deleted")),
+      this.db.options?.batchSize
     );
   }
 
@@ -165,38 +169,46 @@ export class Notes implements ICollection {
   // }
 
   get pinned() {
-    return this.collection.createFilter<Note>((qb) =>
-      qb
-        .where(isFalse("dateDeleted"))
-        .where(isFalse("deleted"))
-        .where("pinned", "==", true)
+    return this.collection.createFilter<Note>(
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where("pinned", "==", true),
+      this.db.options?.batchSize
     );
   }
 
   get conflicted() {
-    return this.collection.createFilter<Note>((qb) =>
-      qb
-        .where(isFalse("dateDeleted"))
-        .where(isFalse("deleted"))
-        .where("conflicted", "==", true)
+    return this.collection.createFilter<Note>(
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where("conflicted", "==", true),
+      this.db.options?.batchSize
     );
   }
 
   get favorites() {
-    return this.collection.createFilter<Note>((qb) =>
-      qb
-        .where(isFalse("dateDeleted"))
-        .where(isFalse("deleted"))
-        .where("favorite", "==", true)
+    return this.collection.createFilter<Note>(
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where("favorite", "==", true),
+      this.db.options?.batchSize
     );
   }
 
   get locked() {
-    return this.collection.createFilter<Note>((qb) =>
-      qb
-        .where(isFalse("dateDeleted"))
-        .where(isFalse("deleted"))
-        .where("locked", "==", true)
+    return this.collection.createFilter<Note>(
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where("locked", "==", true),
+      this.db.options?.batchSize
     );
   }
 
@@ -299,21 +311,19 @@ export class Notes implements ICollection {
         dateCreated: undefined,
         dateModified: undefined
       });
-      if (!duplicateId) return;
+      if (!duplicateId) continue;
 
-      for (const notebook of await this.db.relations
+      for (const relation of await this.db.relations
         .to(note, "notebook")
         .get()) {
         await this.db.relations.add(
-          { type: "notebook", id: notebook },
+          { type: "notebook", id: relation.fromId },
           {
             id: duplicateId,
             type: "note"
           }
         );
       }
-
-      return duplicateId;
     }
   }
 

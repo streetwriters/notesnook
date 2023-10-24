@@ -369,7 +369,7 @@ class Sync {
 
     const collectionType = SYNC_COLLECTIONS_MAP[itemType];
     const collection = this.db[collectionType].collection;
-    const localItems = await collection.items(chunk.items.map((i) => i.id));
+    const localItems = await collection.records(chunk.items.map((i) => i.id));
     let items: (MaybeDeletedItem<Item> | undefined)[] = [];
     if (itemType === "content") {
       items = await Promise.all(
