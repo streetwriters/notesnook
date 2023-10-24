@@ -206,7 +206,7 @@ export default class Backup {
     collection: DatabaseCollection<T, B>,
     state: BackupState
   ) {
-    for await (const item of collection.stream()) {
+    for await (const item of collection.stream() as any) {
       const data = JSON.stringify(item);
       state.buffer.push(data);
       state.bufferLength += data.length;
