@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor, Extension, posToDOMRect } from "@tiptap/core";
+import { inlineDebounce } from "../../utils/debounce";
 
 type KeepInViewOptions = {
   scrollIntoViewOnWindowResize: boolean;
@@ -45,28 +46,35 @@ export const KeepInView = Extension.create<KeepInViewOptions>({
     window.removeEventListener("resize", onWindowResize);
     onWindowResize = undefined;
   },
-
-  addKeyboardShortcuts() {
-    return {
-      Enter: ({ editor }) => {
-        setTimeout(() => {
-          keepLastLineInView(editor);
-        });
-        return false;
-      }
-    };
+  onSelectionUpdate() {
+    inlineDebounce(
+      "keep_in_view",
+      () => {
+        keepLastLineInView(this.editor);
+      },
+      100
+    );
   }
 });
 
 export function keepLastLineInView(
   editor: Editor,
-  THRESHOLD = 100,
+  THRESHOLD = 80,
   SCROLL_THRESHOLD = 100
 ) {
+  if (!editor.state.selection.empty) return;
+
   const node = editor.state.selection.$from;
   const { top } = posToDOMRect(editor.view, node.pos, node.pos + 1);
   const isBelowThreshold = window.innerHeight - top < THRESHOLD;
-  if (isBelowThreshold) {
+  const isAboveThreshold = top < THRESHOLD;
+  const DIFF_BOTTOM = THRESHOLD - (window.innerHeight - top);
+
+  let DIFF_TOP = THRESHOLD - top;
+
+  if (DIFF_TOP > 0) DIFF_TOP = DIFF_TOP * -1;
+
+  if (isBelowThreshold || isAboveThreshold) {
     let { node: domNode } = editor.view.domAtPos(node.pos);
     if (domNode.nodeType === Node.TEXT_NODE && domNode.parentNode)
       domNode = domNode.parentNode;
@@ -74,7 +82,10 @@ export function keepLastLineInView(
     if (domNode instanceof HTMLElement) {
       const container = findScrollContainer(domNode);
       if (container) {
-        container.scrollBy({ top: SCROLL_THRESHOLD, behavior: "smooth" });
+        container.scrollBy({
+          top: isAboveThreshold ? DIFF_TOP + 10 : DIFF_BOTTOM,
+          behavior: "smooth"
+        });
       } else domNode.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }
