@@ -21,7 +21,7 @@ import ShareExtension from "@ammarahmed/react-native-share-extension";
 import { getPreviewData } from "@flyerhq/react-native-link-preview";
 import { formatBytes } from "@notesnook/common";
 import { isImage } from "@notesnook/core/dist/utils/filename";
-import { parseHTML } from "@notesnook/core/dist/utils/html-parser";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -53,10 +53,9 @@ import { getElevationStyle } from "../app/utils/elevation";
 import { eOnLoadNote } from "../app/utils/events";
 import { NoteBundle } from "../app/utils/note-bundle";
 import { Editor } from "./editor";
+import { HtmlLoadingWebViewAgent, fetchHandle } from "./fetch-webview";
 import { Search } from "./search";
 import { initDatabase, useShareStore } from "./store";
-import { useThemeColors } from "@notesnook/theme";
-import { HtmlLoadingWebViewAgent, fetchHandle } from "./fetch-webview";
 
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
