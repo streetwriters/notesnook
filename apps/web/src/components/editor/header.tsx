@@ -34,7 +34,7 @@ function Header(props: HeaderProps) {
   const id = useStore((store) => store.session.id);
   const tags = useStore((store) => store.tags);
   const setTag = useStore((store) => store.setTag);
-  console.log(tags);
+
   return (
     <>
       {id && (

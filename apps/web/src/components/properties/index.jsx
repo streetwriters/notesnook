@@ -45,7 +45,6 @@ import { Attachment } from "../attachment";
 import { formatBytes } from "@notesnook/common";
 import { getTotalSize } from "../../common/attachments";
 import Notebook from "../notebook";
-import { getTotalNotes } from "@notesnook/common";
 import Reminder from "../reminder";
 import { getFormattedDate } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
@@ -282,7 +281,7 @@ function Properties(props) {
                   key={notebook.id}
                   item={notebook}
                   date={notebook.dateCreated}
-                  totalNotes={getTotalNotes(notebook)}
+                  totalNotes={0} // getTotalNotes(notebook)}
                   simplified
                 />
               ))}

@@ -22,14 +22,14 @@ import Field from "../field";
 import { Plus, Search } from "../icons";
 import { Button, Flex, Text } from "@theme-ui/components";
 
-type FilterableItem = {
-  id: string;
-  title: string;
-};
+// type FilterableItem = {
+//   id: string;
+//   title: string;
+// };
 
-type FilteredListProps<T extends FilterableItem> = {
+type FilteredListProps<T> = {
   placeholders: { filter: string; empty: string };
-  items: () => T[];
+  items: () => Promise<T[]>;
   filter: (items: T[], query: string) => T[];
   onCreateNewItem: (title: string) => Promise<void>;
   renderItem: (
@@ -40,9 +40,7 @@ type FilteredListProps<T extends FilterableItem> = {
   ) => JSX.Element;
 };
 
-export function FilteredList<T extends FilterableItem>(
-  props: FilteredListProps<T>
-) {
+export function FilteredList<T>(props: FilteredListProps<T>) {
   const {
     items: _items,
     filter,
@@ -56,8 +54,8 @@ export function FilteredList<T extends FilterableItem>(
   const noItemsFound = items.length <= 0 && query && query.length > 0;
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const refresh = useCallback(() => {
-    setItems(_items());
+  const refresh = useCallback(async () => {
+    setItems(await _items());
   }, [_items]);
 
   useEffect(() => {
@@ -65,14 +63,10 @@ export function FilteredList<T extends FilterableItem>(
   }, [refresh]);
 
   const _filter = useCallback(
-    (query) => {
-      setItems(() => {
-        const items = _items();
-        if (!query) {
-          return items;
-        }
-        return filter(items, query);
-      });
+    async (query) => {
+      const items = await _items();
+      if (!query) return;
+      setItems(filter(items, query));
       setQuery(query);
     },
     [_items, filter]
@@ -81,7 +75,7 @@ export function FilteredList<T extends FilterableItem>(
   const _createNewItem = useCallback(
     async (title) => {
       await onCreateNewItem(title);
-      refresh();
+      await refresh();
       setQuery(undefined);
       if (inputRef.current) inputRef.current.value = "";
     },

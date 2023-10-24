@@ -60,7 +60,7 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 
 type OnChangeHandler = (
   id: string | undefined,
-  sessionId: number,
+  sessionId: string,
   content: string,
   ignoreEdit: boolean
 ) => void;
@@ -88,7 +88,7 @@ type TipTapProps = {
 const SAVE_INTERVAL = IS_TESTING ? 100 : 300;
 
 function save(
-  sessionId: number,
+  sessionId: string,
   noteId: string | undefined,
   editor: Editor,
   content: Fragment,

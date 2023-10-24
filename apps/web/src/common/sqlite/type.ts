@@ -17,17 +17,43 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Notebook, Tag } from "@notesnook/core";
+import type { QueryResult } from "kysely";
 
-export type Context =
+export type Promisable<T> = T | Promise<T>;
+
+export type RunMode = "exec" | "query" | "raw";
+
+export type MainMsg =
   | {
-      type: "notebook" | "tag" | "color";
-      id: string;
+      type: "run";
+      mode: RunMode;
+      sql: string;
+      parameters?: readonly unknown[];
     }
   | {
-      type: "favorite" | "monographs";
+      type: "close";
+    }
+  | {
+      type: "init";
+      url?: string;
+      dbName: string;
     };
 
-export type WithDateEdited<T> = { items: T[]; dateEdited: number };
-export type NotebooksWithDateEdited = WithDateEdited<Notebook>;
-export type TagsWithDateEdited = WithDateEdited<Tag>;
+export type WorkerMsg = {
+  [K in keyof Events]: {
+    type: K;
+    data: Events[K];
+    err: unknown;
+  };
+}[keyof Events];
+type Events = {
+  run: QueryResult<any> | null;
+  init: null;
+  close: null;
+};
+export type EventWithError = {
+  [K in keyof Events]: {
+    data: Events[K];
+    err: unknown;
+  };
+};

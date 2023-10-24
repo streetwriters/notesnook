@@ -31,7 +31,6 @@ import {
   ShortcutLink,
   SortAsc
 } from "../components/icons";
-import { getTotalNotes } from "@notesnook/common";
 import { pluralize } from "@notesnook/common";
 import { Allotment } from "allotment";
 import { Plus } from "../components/icons";
@@ -272,7 +271,7 @@ function NotebookHeader({ notebook }) {
   const [isShortcut, setIsShortcut] = useState(false);
   const shortcuts = useAppStore((store) => store.shortcuts);
   const addToShortcuts = useAppStore((store) => store.addToShortcuts);
-  const totalNotes = getTotalNotes(notebook);
+  const totalNotes = 0; // getTotalNotes(notebook);
 
   useEffect(() => {
     setIsShortcut(shortcuts.findIndex((p) => p.id === notebook.id) > -1);

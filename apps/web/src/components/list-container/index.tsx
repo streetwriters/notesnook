@@ -20,7 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { Flex, Button } from "@theme-ui/components";
 import { Plus } from "../icons";
-import { ScrollerProps, Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import {
+  ItemProps,
+  ScrollerProps,
+  Virtuoso,
+  VirtuosoHandle
+} from "react-virtuoso";
 import {
   useStore as useSelectionStore,
   store as selectionStore
@@ -33,12 +38,12 @@ import ScrollContainer from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import { Context } from "./types";
 import {
+  VirtualizedGrouping,
   GroupHeader as GroupHeaderType,
-  GroupedItems,
   GroupingKey,
   Item,
   isGroupHeader
-} from "@notesnook/core/dist/types";
+} from "@notesnook/core";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
@@ -57,7 +62,7 @@ export const CustomScrollbarsVirtualList = forwardRef<
 
 type ListContainerProps = {
   group?: GroupingKey;
-  items: GroupedItems<Item>;
+  items: VirtualizedGrouping<Item>;
   compact?: boolean;
   context?: Context;
   refresh: () => void;
@@ -92,28 +97,28 @@ function ListContainer(props: ListContainerProps) {
   }, []);
 
   const { onFocus, onMouseDown, onKeyDown } = useKeyboardListNavigation({
-    length: items.length,
+    length: items.ids.length,
     reset: () => toggleSelection(false),
-    deselect: (index) => deselectItem(items[index]),
+    deselect: (index) => deselectItem(items.ids[index]),
     select: (index, toggleable) =>
-      toggleable && isSelected(items[index])
-        ? deselectItem(items[index])
-        : selectItem(items[index]),
-    bulkSelect: (indices) => setSelectedItems(indices.map((i) => items[i])),
+      toggleable && isSelected(items.ids[index])
+        ? deselectItem(items.ids[index])
+        : selectItem(items.ids[index]),
+    bulkSelect: (indices) => setSelectedItems(indices.map((i) => items.ids[i])),
     focusItemAt: (index) => {
-      const item = items[index];
+      const item = items.ids[index];
       if (!item || !listRef.current) return;
 
-      waitForElement(listRef.current, index, `id_${item.id}`, (element) =>
+      waitForElement(listRef.current, index, `id_${item}`, (element) =>
         element.focus()
       );
     },
-    skip: (index) => !items[index] || items[index].type === "header",
+    skip: (index) => !items.ids[index] || isGroupHeader(items.ids[index]),
     open: (index) => {
-      const item = items[index];
+      const item = items.ids[index];
       if (!item || !listRef.current) return;
 
-      waitForElement(listRef.current, index, `id_${item.id}`, (element) =>
+      waitForElement(listRef.current, index, `id_${item}`, (element) =>
         element.click()
       );
     }
@@ -121,7 +126,7 @@ function ListContainer(props: ListContainerProps) {
 
   return (
     <Flex variant="columnFill">
-      {!props.items.length && props.placeholder ? (
+      {!props.items.ids.length && props.placeholder ? (
         <>
           {header}
           {props.isLoading ? (
@@ -141,85 +146,79 @@ function ListContainer(props: ListContainerProps) {
           >
             <Virtuoso
               ref={listRef}
-              data={items}
-              computeItemKey={(index) => items[index].id}
+              data={items.ids}
+              computeItemKey={(index) => items.getKey(index)}
               defaultItemHeight={DEFAULT_ITEM_HEIGHT}
-              totalCount={items.length}
+              totalCount={items.ids.length}
               onBlur={() => setFocusedGroupIndex(-1)}
               onKeyDown={(e) => onKeyDown(e.nativeEvent)}
               components={{
                 Scroller: CustomScrollbarsVirtualList,
-                Item: ({ item: _item, ...props }) => (
-                  <div
-                    {...props}
-                    onFocus={() => onFocus(props["data-item-index"])}
-                    onMouseDown={(e) =>
-                      onMouseDown(e.nativeEvent, props["data-item-index"])
-                    }
-                  >
-                    {props.children}
-                  </div>
-                ),
+                Item: VirtuosoItem,
                 Header: () => (header ? header : <Announcements />)
               }}
+              context={{
+                onMouseDown,
+                onFocus
+              }}
               itemContent={(index, item) => {
-                if (!item) return null;
-
-                switch (item.type) {
-                  case "header":
-                    if (!group) return null;
-                    return (
-                      <GroupHeader
-                        groupingKey={group}
-                        refresh={refresh}
-                        title={item.title}
-                        isFocused={index === focusedGroupIndex}
-                        index={index}
-                        onSelectGroup={() => {
-                          let endIndex;
-                          for (let i = index + 1; i < props.items.length; ++i) {
-                            if (props.items[i].type === "header") {
-                              endIndex = i;
-                              break;
-                            }
+                if (isGroupHeader(item)) {
+                  if (!group)
+                    return <div style={{ height: 28, width: "100%" }} />;
+                  return (
+                    <GroupHeader
+                      groupingKey={group}
+                      refresh={refresh}
+                      title={item.title}
+                      isFocused={index === focusedGroupIndex}
+                      index={index}
+                      onSelectGroup={() => {
+                        let endIndex;
+                        for (
+                          let i = index + 1;
+                          i < props.items.ids.length;
+                          ++i
+                        ) {
+                          if (typeof props.items.ids[i] === "object") {
+                            endIndex = i;
+                            break;
                           }
-                          setSelectedItems([
-                            ...selectionStore.get().selectedItems,
-                            ...props.items.slice(
-                              index,
-                              endIndex || props.items.length
-                            )
-                          ]);
-                        }}
-                        groups={
-                          props.items.filter((v) =>
-                            isGroupHeader(v)
-                          ) as GroupHeaderType[]
                         }
-                        onJump={(title: string) => {
-                          const index = props.items.findIndex(
-                            (v) => isGroupHeader(v) && v.title === title
-                          );
-                          if (index < 0) return;
-                          listRef.current?.scrollToIndex({
+                        setSelectedItems([
+                          ...selectionStore.get().selectedItems,
+                          ...props.items.ids.slice(
                             index,
-                            align: "center",
-                            behavior: "auto"
-                          });
-                          setFocusedGroupIndex(index);
-                        }}
-                      />
-                    );
-                  default:
-                    return (
-                      <ListItemWrapper
-                        item={item}
-                        context={context}
-                        group={group}
-                        compact={compact}
-                      />
-                    );
+                            endIndex || props.items.ids.length
+                          )
+                        ]);
+                      }}
+                      groups={props.items.groups}
+                      onJump={(title: string) => {
+                        const index = props.items.ids.findIndex(
+                          (v) => isGroupHeader(v) && v.title === title
+                        );
+                        if (index < 0) return;
+                        listRef.current?.scrollToIndex({
+                          index,
+                          align: "center",
+                          behavior: "auto"
+                        });
+                        setFocusedGroupIndex(index);
+                      }}
+                    />
+                  );
                 }
+
+                return (
+                  <ListItemWrapper
+                    key={item}
+                    items={items}
+                    id={item}
+                    context={context}
+                    group={group}
+                    compact={compact}
+                  />
+                );
               }}
             />
           </Flex>
@@ -251,6 +250,29 @@ function ListContainer(props: ListContainerProps) {
   );
 }
 export default ListContainer;
+
+function VirtuosoItem({
+  item: _item,
+  context,
+  ...props
+}: ItemProps<string | GroupHeaderType> & {
+  context?: {
+    onMouseDown: (e: MouseEvent, itemIndex: number) => void;
+    onFocus: (itemIndex: number) => void;
+  };
+}) {
+  return (
+    <div
+      {...props}
+      onFocus={() => context?.onFocus(props["data-item-index"])}
+      onMouseDown={(e) =>
+        context?.onMouseDown(e.nativeEvent, props["data-item-index"])
+      }
+    >
+      {props.children}
+    </div>
+  );
+}
 
 /**
  * Scroll the element at the specified index into view and
