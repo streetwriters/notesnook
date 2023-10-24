@@ -18,17 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Database from "../api";
-import { isFalse } from "../database";
-import { SQLCollection } from "../database/sql-collection";
+import { SQLCachedCollection } from "../database/sql-cached-collection";
 import { Shortcut } from "../types";
 import { ICollection } from "./collection";
 
 const ALLOWED_SHORTCUT_TYPES = ["notebook", "topic", "tag"];
 export class Shortcuts implements ICollection {
   name = "shortcuts";
-  readonly collection: SQLCollection<"shortcuts", Shortcut>;
+  readonly collection: SQLCachedCollection<"shortcuts", Shortcut>;
   constructor(private readonly db: Database) {
-    this.collection = new SQLCollection(db.sql, "shortcuts", db.eventManager);
+    this.collection = new SQLCachedCollection(
+      db.sql,
+      "shortcuts",
+      db.eventManager
+    );
   }
 
   init() {
@@ -82,33 +85,25 @@ export class Shortcuts implements ICollection {
   // }
 
   get all() {
-    return this.collection.createFilter<Shortcut>((qb) =>
-      qb.where(isFalse("deleted"))
-    );
+    return this.collection.items();
   }
 
-  async get() {
-    // return this.all.reduce((prev, shortcut) => {
-    //   const {
-    //     item: { id }
-    //   } = shortcut;
-    //   let item: Notebook | Topic | Tag | null | undefined = null;
-    //   switch (shortcut.item.type) {
-    //     case "notebook": {
-    //       const notebook = this.db.notebooks.notebook(id);
-    //       item = notebook ? notebook.data : null;
-    //       break;
-    //     }
-    //     case "tag":
-    //       item = this.db.tags.tag(id);
-    //       break;
-    //   }
-    //   if (item) prev.push(item);
-    //   return prev;
-    // }, [] as (Notebook | Topic | Tag)[]);
+  async resolved() {
+    const tagIds: string[] = [];
+    const notebookIds: string[] = [];
+    for (const shortcut of this.all) {
+      if (shortcut.itemType === "notebook") notebookIds.push(shortcut.itemId);
+      else if (shortcut.itemType === "tag") tagIds.push(shortcut.itemId);
+    }
+    return [
+      ...(notebookIds.length > 0
+        ? await this.db.notebooks.all.items(notebookIds)
+        : []),
+      ...(tagIds.length > 0 ? await this.db.tags.all.items(tagIds) : [])
+    ];
   }
 
-  async exists(id: string) {
+  exists(id: string) {
     return this.collection.exists(id);
   }
 

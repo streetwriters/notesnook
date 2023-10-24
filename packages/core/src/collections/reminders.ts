@@ -28,6 +28,7 @@ import { ICollection } from "./collection";
 import { Reminder } from "../types";
 import Database from "../api";
 import { SQLCollection } from "../database/sql-collection";
+import { isFalse } from "../database";
 
 dayjs.extend(isTomorrow);
 dayjs.extend(isSameOrBefore);
@@ -84,9 +85,12 @@ export class Reminders implements ICollection {
   //   return this.collection.raw();
   // }
 
-  // get all() {
-  //   return this.collection.items();
-  // }
+  get all() {
+    return this.collection.createFilter<Reminder>(
+      (qb) => qb.where(isFalse("deleted")),
+      this.db.options?.batchSize
+    );
+  }
 
   exists(itemId: string) {
     return this.collection.exists(itemId);

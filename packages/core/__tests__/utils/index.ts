@@ -28,7 +28,7 @@ import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { randomBytes } from "../../src/utils/random";
 import { GroupOptions, Note, Notebook } from "../../src/types";
 import { NoteContent } from "../../src/collections/session-content";
-import { SqliteDriver } from "kysely";
+import { SqliteDialect } from "kysely";
 import BetterSQLite3 from "better-sqlite3";
 
 const TEST_NOTEBOOK: Partial<Notebook> = {
@@ -48,7 +48,7 @@ function databaseTest() {
     eventsource: EventSource,
     fs: FS,
     compressor: Compressor,
-    sqlite: new SqliteDriver({ database: BetterSQLite3(":memory:") })
+    dialect: new SqliteDialect({ database: BetterSQLite3(":memory:") })
   });
   return db.init().then(() => db);
 }

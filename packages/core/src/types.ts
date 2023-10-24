@@ -39,6 +39,8 @@ export type GroupingKey =
   | "reminders";
 
 export type ValueOf<T> = T[keyof T];
+export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+export type RequiredBy<T, K extends keyof T> = Partial<Omit<T, K>> & Pick<T, K>; // Pick<, K> & Omit<T, K>;
 
 export type GroupHeader = {
   type: "header";
@@ -443,6 +445,6 @@ export function isTrashItem(item: MaybeDeletedItem<Item>): item is TrashItem {
   return !isDeleted(item) && item.type === "trash";
 }
 
-export function isGroupHeader(item: GroupHeader | Item): item is GroupHeader {
+export function isGroupHeader(item: any): item is GroupHeader {
   return item.type === "header";
 }

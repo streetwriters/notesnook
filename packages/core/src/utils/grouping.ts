@@ -18,15 +18,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { isReminderActive } from "../collections/reminders";
-import { GroupOptions, Item } from "../types";
+import { GroupHeader, GroupOptions, ItemType } from "../types";
 import { getWeekGroupFromTimestamp, MONTHS_FULL } from "./date";
-import { VirtualizedGroupHeader } from "./virtualized-grouping";
 
+type PartialGroupableItem = {
+  id: string;
+  type?: ItemType | null;
+  dateDeleted?: number | null;
+  title?: string | null;
+  filename?: string | null;
+  dateEdited?: number | null;
+  dateCreated?: number | null;
+};
 type EvaluateKeyFunction<T> = (item: T) => string;
 
-export const getSortValue = <T extends Item>(
+export const getSortValue = (
   options: GroupOptions,
-  item: T
+  item: PartialGroupableItem
 ) => {
   if (
     options.sortBy === "dateDeleted" &&
@@ -43,18 +51,20 @@ export const getSortValue = <T extends Item>(
 const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
 const MILLISECONDS_IN_WEEK = MILLISECONDS_IN_DAY * 7;
 
-function getKeySelector(options: GroupOptions): EvaluateKeyFunction<Item> {
-  return (item: Item) => {
+function getKeySelector(
+  options: GroupOptions
+): EvaluateKeyFunction<PartialGroupableItem> {
+  return (item) => {
     if ("pinned" in item && item.pinned) return "Pinned";
     else if ("conflicted" in item && item.conflicted) return "Conflicted";
 
     const date = new Date();
     if (item.type === "reminder")
-      return isReminderActive(item) ? "Active" : "Inactive";
+      return "Active"; // isReminderActive(item) ? "Active" : "Inactive";
     else if (options.sortBy === "title")
       return getFirstCharacter(getTitle(item));
     else {
-      const value = getSortValue(options, item);
+      const value = getSortValue(options, item) || 0;
       switch (options.groupBy) {
         case "none":
           return "All";
@@ -80,36 +90,42 @@ function getKeySelector(options: GroupOptions): EvaluateKeyFunction<Item> {
 }
 
 export function groupArray(
-  ids: string[],
-  items: Record<string, Item>,
+  items: PartialGroupableItem[],
   options: GroupOptions = {
     groupBy: "default",
     sortBy: "dateEdited",
     sortDirection: "desc"
   }
-): VirtualizedGroupHeader[] {
-  const groups = new Map<string, VirtualizedGroupHeader>([
-    ["Conflicted", { title: "Conflicted", id: "" }],
-    ["Pinned", { title: "Pinned", id: "" }],
-    ["Active", { title: "Active", id: "" }],
-    ["Inactive", { title: "Inactive", id: "" }]
+): (string | GroupHeader)[] {
+  const groups = new Map<string, string[]>([
+    ["Conflicted", []],
+    ["Pinned", []]
   ]);
 
   const keySelector = getKeySelector(options);
-  for (const id of ids) {
-    const item = items[id];
-    if (!item) continue;
-
+  for (const item of items) {
     const groupTitle = keySelector(item);
-    const group = groups.get(groupTitle) || {
-      title: groupTitle,
-      id: ""
-    };
-    if (group.id === "") group.id = id;
+    const group = groups.get(groupTitle) || [];
+    group.push(item.id);
     groups.set(groupTitle, group);
   }
 
-  return Array.from(groups.values());
+  return flattenGroups(groups);
+}
+
+function flattenGroups(groups: Map<string, string[]>) {
+  const items: (string | GroupHeader)[] = [];
+  groups.forEach((groupItems, groupTitle) => {
+    if (groupItems.length <= 0) return;
+    items.push({
+      title: groupTitle,
+      id: groupTitle.toLowerCase(),
+      type: "header"
+    });
+    items.push(...groupItems);
+  });
+
+  return items;
 }
 
 function getFirstCharacter(str: string) {
@@ -119,10 +135,6 @@ function getFirstCharacter(str: string) {
   return str[0].toUpperCase();
 }
 
-function getTitle(item: Item): string {
-  return item.type === "attachment"
-    ? item.filename
-    : "title" in item
-    ? item.title
-    : "Unknown";
+function getTitle(item: PartialGroupableItem): string {
+  return item.filename || item.title || "Unknown";
 }

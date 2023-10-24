@@ -19,18 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { makeId } from "../utils/id";
 import { ICollection } from "./collection";
-import {
-  Relation,
-  ItemMap,
-  ItemReference,
-  ValueOf,
-  MaybeDeletedItem
-} from "../types";
+import { Relation, ItemMap, ItemReference, ValueOf, ItemType } from "../types";
 import Database from "../api";
-import { SQLCollection } from "../database/sql-collection";
-import { DatabaseAccessor, DatabaseSchema, isFalse } from "../database";
+import { FilteredSelector, SQLCollection } from "../database/sql-collection";
+import { DatabaseSchema, isFalse } from "../database";
 import { SelectQueryBuilder } from "kysely";
 
+type ItemReferences = { type: ItemType; ids: string[] };
 export class Relations implements ICollection {
   name = "relations";
   readonly collection: SQLCollection<"relations", Relation>;
@@ -39,6 +34,7 @@ export class Relations implements ICollection {
   }
 
   async init() {
+    await this.buildCache();
     // return this.collection.init();
   }
 
@@ -55,18 +51,71 @@ export class Relations implements ICollection {
     });
   }
 
+  from(
+    reference: ItemReference | ItemReferences,
+    types: (keyof RelatableTable)[]
+  ): RelationsArray<keyof RelatableTable>;
   from<TType extends keyof RelatableTable>(
-    reference: ItemReference,
+    reference: ItemReference | ItemReferences,
     type: TType
+  ): RelationsArray<TType>;
+  from<TType extends keyof RelatableTable = keyof RelatableTable>(
+    reference: ItemReference | ItemReferences,
+    type: TType | keyof RelatableTable[]
   ) {
-    return new RelationsArray(this.db, reference, type, "from");
+    return new RelationsArray(
+      this.db,
+      reference,
+      Array.isArray(type) ? type : [type],
+      "from"
+    );
   }
 
+  to(
+    reference: ItemReference | ItemReferences,
+    types: (keyof RelatableTable)[]
+  ): RelationsArray<keyof RelatableTable>;
   to<TType extends keyof RelatableTable>(
-    reference: ItemReference,
+    reference: ItemReference | ItemReferences,
     type: TType
+  ): RelationsArray<TType>;
+  to<TType extends keyof RelatableTable = keyof RelatableTable>(
+    reference: ItemReference | ItemReferences,
+    type: TType | keyof RelatableTable[]
   ) {
-    return new RelationsArray(this.db, reference, type, "to");
+    return new RelationsArray(
+      this.db,
+      reference,
+      Array.isArray(type) ? type : [type],
+      "to"
+    );
+  }
+
+  fromCache: Map<string, string[]> = new Map();
+  toCache: Map<string, string[]> = new Map();
+  async buildCache() {
+    console.time("cache build");
+    this.fromCache.clear();
+    this.toCache.clear();
+
+    console.time("query");
+    const relations = await this.db
+      .sql()
+      .selectFrom("relations")
+      .select(["toId", "fromId"])
+      .$narrowType<{ toId: string; fromId: string }>()
+      .execute();
+    console.timeEnd("query");
+    for (const { fromId, toId } of relations) {
+      const fromIds = this.fromCache.get(fromId) || [];
+      fromIds.push(toId);
+      this.fromCache.set(fromId, fromIds);
+
+      const toIds = this.toCache.get(toId) || [];
+      toIds.push(fromId);
+      this.toCache.set(toId, toIds);
+    }
+    console.timeEnd("cache build");
   }
 
   // get raw() {
@@ -146,32 +195,40 @@ const TABLE_MAP = {
 type RelatableTable = typeof TABLE_MAP;
 
 class RelationsArray<TType extends keyof RelatableTable> {
-  private table: ValueOf<RelatableTable> = TABLE_MAP[this.type];
+  private table: ValueOf<RelatableTable> = TABLE_MAP[this.types[0]];
 
   constructor(
     private readonly db: Database,
-    private readonly reference: ItemReference,
-    private readonly type: TType,
+    private readonly reference: ItemReference | ItemReferences,
+    private readonly types: TType[],
     private readonly direction: "from" | "to"
   ) {}
 
-  async resolve(limit?: number): Promise<ItemMap[TType][]> {
-    const items = await this.db
-      .sql()
-      .selectFrom(this.table)
-      .where("id", "in", (b) =>
-        b
-          .selectFrom("relations")
-          .$call((eb) =>
-            this.buildRelationsQuery()(
-              eb as SelectQueryBuilder<DatabaseSchema, "relations", unknown>
+  get selector() {
+    return new FilteredSelector<ItemMap[TType]>(
+      this.table,
+      this.db
+        .sql()
+        .selectFrom<keyof DatabaseSchema>(this.table)
+        .where("id", "in", (b) =>
+          b
+            .selectFrom("relations")
+            .$call((eb) =>
+              this.buildRelationsQuery()(
+                eb as SelectQueryBuilder<DatabaseSchema, "relations", unknown>
+              )
             )
-          )
-      )
+        )
+        // TODO: check if we need to index deleted field.
+        .where(isFalse("deleted")),
+      this.db.options?.batchSize
+    );
+  }
+
+  async resolve(limit?: number) {
+    const items = await this.selector.filter
       .$if(limit !== undefined && limit > 0, (b) => b.limit(limit!))
       .selectAll()
-      // TODO: check if we need to index deleted field.
-      .where(isFalse("deleted"))
       .execute();
     return items as unknown as ItemMap[TType][];
   }
@@ -196,12 +253,20 @@ class RelationsArray<TType extends keyof RelatableTable> {
   }
 
   async get() {
-    const ids = await this.db
+    const relations = await this.db
       .sql()
       .selectFrom("relations")
       .$call(this.buildRelationsQuery())
+      .clearSelect()
+      .select(["fromId", "toId", "fromType", "toType"])
+      .$narrowType<{
+        fromId: string;
+        toId: string;
+        fromType: keyof ItemMap;
+        toType: keyof ItemMap;
+      }>()
       .execute();
-    return ids.map((i) => i.id);
+    return relations;
   }
 
   async count() {
@@ -216,13 +281,13 @@ class RelationsArray<TType extends keyof RelatableTable> {
     return result.count;
   }
 
-  async has(id: string) {
+  async has(...ids: string[]) {
     const result = await this.db
       .sql()
       .selectFrom("relations")
       .$call(this.buildRelationsQuery())
       .clearSelect()
-      .where(this.direction === "from" ? "toId" : "fromId", "==", id)
+      .where(this.direction === "from" ? "toId" : "fromId", "in", ids)
       .select((b) => b.fn.count<number>("id").as("count"))
       .executeTakeFirst();
     if (!result) return false;
@@ -240,15 +305,26 @@ class RelationsArray<TType extends keyof RelatableTable> {
     ) => {
       if (this.direction === "to") {
         return builder
-          .where("fromType", "==", this.type)
+          .where(
+            "fromType",
+            this.types.length > 1 ? "in" : "==",
+            this.types.length > 1 ? this.types : this.types[0]
+          )
           .where("toType", "==", this.reference.type)
-          .where("toId", "==", this.reference.id)
+          .where(
+            "toId",
+            isItemReferences(this.reference) ? "in" : "==",
+            isItemReferences(this.reference)
+              ? this.reference.ids
+              : this.reference.id
+          )
           .$if(
-            this.type === "note" && this.db.trash.cache.notes.length > 0,
+            this.types.includes("note" as TType) &&
+              this.db.trash.cache.notes.length > 0,
             (b) => b.where("fromId", "not in", this.db.trash.cache.notes)
           )
           .$if(
-            this.type === "notebook" &&
+            this.types.includes("notebook" as TType) &&
               this.db.trash.cache.notebooks.length > 0,
             (b) => b.where("fromId", "not in", this.db.trash.cache.notebooks)
           )
@@ -256,15 +332,26 @@ class RelationsArray<TType extends keyof RelatableTable> {
           .$narrowType<{ id: string }>();
       } else {
         return builder
-          .where("toType", "==", this.type)
+          .where(
+            "toType",
+            this.types.length > 1 ? "in" : "==",
+            this.types.length > 1 ? this.types : this.types[0]
+          )
           .where("fromType", "==", this.reference.type)
-          .where("fromId", "==", this.reference.id)
+          .where(
+            "fromId",
+            isItemReferences(this.reference) ? "in" : "==",
+            isItemReferences(this.reference)
+              ? this.reference.ids
+              : this.reference.id
+          )
           .$if(
-            this.type === "note" && this.db.trash.cache.notes.length > 0,
+            this.types.includes("note" as TType) &&
+              this.db.trash.cache.notes.length > 0,
             (b) => b.where("toId", "not in", this.db.trash.cache.notes)
           )
           .$if(
-            this.type === "notebook" &&
+            this.types.includes("notebook" as TType) &&
               this.db.trash.cache.notebooks.length > 0,
             (b) => b.where("toId", "not in", this.db.trash.cache.notebooks)
           )
@@ -273,4 +360,10 @@ class RelationsArray<TType extends keyof RelatableTable> {
       }
     };
   }
+}
+
+function isItemReferences(
+  ref: ItemReference | ItemReferences
+): ref is ItemReferences {
+  return "ids" in ref;
 }

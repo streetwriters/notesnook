@@ -281,7 +281,6 @@ async function createFTS5Table(
   const ref_ai = sql.raw(table + "_ai");
   const ref_ad = sql.raw(table + "_ad");
   const ref_au = sql.raw(table + "_au");
-
   const indexed_cols = sql.raw(indexedColumns.join(", "));
   const unindexed_cols =
     unindexedColumns.length > 0
@@ -289,11 +288,9 @@ async function createFTS5Table(
       : sql.raw("");
   const new_indexed_cols = sql.raw(indexedColumns.join(", new."));
   const old_indexed_cols = sql.raw(indexedColumns.join(", old."));
-
   await sql`CREATE VIRTUAL TABLE ${ref_fts} USING fts5(
     id UNINDEXED, ${unindexed_cols} ${indexed_cols}, content='${sql.raw(table)}'
   )`.execute(db);
-
   insertConditions = [
     "(new.deleted is null or new.deleted == 0)",
     ...insertConditions
@@ -304,13 +301,11 @@ async function createFTS5Table(
   BEGIN
     INSERT INTO ${ref_fts}(rowid, id, ${indexed_cols}) VALUES (new.rowid, new.id, new.${new_indexed_cols});
   END;`.execute(db);
-
   await sql`CREATE TRIGGER ${ref_ad} AFTER DELETE ON ${ref}
   BEGIN
     INSERT INTO ${ref_fts} (${ref_fts}, rowid, id, ${indexed_cols})
     VALUES ('delete', old.rowid, old.id, old.${old_indexed_cols});
   END;`.execute(db);
-
   await sql`CREATE TRIGGER ${ref_au} AFTER UPDATE ON ${ref}
   BEGIN
     INSERT INTO ${ref_fts} (${ref_fts}, rowid, id, ${indexed_cols})

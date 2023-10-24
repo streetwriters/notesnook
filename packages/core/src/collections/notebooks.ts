@@ -79,17 +79,20 @@ export class Notebooks implements ICollection {
   // }
 
   get all() {
-    return this.collection.createFilter<Notebook>((qb) =>
-      qb.where(isFalse("dateDeleted")).where(isFalse("deleted"))
+    return this.collection.createFilter<Notebook>(
+      (qb) => qb.where(isFalse("dateDeleted")).where(isFalse("deleted")),
+      this.db.options?.batchSize
     );
   }
 
   get pinned() {
-    return this.collection.createFilter<Notebook>((qb) =>
-      qb
-        .where(isFalse("dateDeleted"))
-        .where(isFalse("deleted"))
-        .where("pinned", "==", true)
+    return this.collection.createFilter<Notebook>(
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where("pinned", "==", true),
+      this.db.options?.batchSize
     );
   }
 

@@ -20,9 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import http from "../utils/http";
 import Constants from "../utils/constants";
 import Database from ".";
-import { isDeleted } from "../types";
+import { Note, isDeleted } from "../types";
 import { isUnencryptedContent } from "../collections/content";
 import { Cipher } from "@notesnook/crypto";
+import { isFalse } from "../database";
 
 type BaseMonograph = {
   id: string;
@@ -163,9 +164,15 @@ export class Monographs {
     this.monographs.splice(this.monographs.indexOf(noteId), 1);
   }
 
-  async all() {
-    if (!this.monographs.length) return [];
-    return await this.db.notes.all.items(this.monographs);
+  get all() {
+    return this.db.notes.collection.createFilter<Note>(
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where("id", "in", this.monographs),
+      this.db.options?.batchSize
+    );
   }
 
   get(monographId: string) {
