@@ -113,7 +113,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
   };
 
   setSessionId = async (id: string | null) =>
-    await this.doAsync(`globalThis.sessionId = "${id}"`);
+    await this.doAsync(`globalThis.sessionId = "${id}";`);
 
   setStatus = async (date: string | undefined, saved: string) =>
     await this.doAsync(
