@@ -17,27 +17,5 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { randomBytes, randomInt } from "./random";
-
-const PROCESS_UNIQUE = randomBytes(5).toString("hex");
-let index = ~~(randomInt() * 0xffffff);
-export function createObjectId(date = Date.now()): string {
-  index++;
-  const time = Math.floor(date / 1000);
-  return time.toString(16) + PROCESS_UNIQUE + swap16(index).toString(16);
-}
-
-function swap16(val: number) {
-  return ((val & 0xff) << 16) | (val & 0xff00) | ((val >> 16) & 0xff);
-}
-
-export function getObjectIdTimestamp(id: string) {
-  const timestamp = new Date();
-  const time =
-    id.charCodeAt(3) |
-    (id.charCodeAt(2) << 8) |
-    (id.charCodeAt(1) << 16) |
-    (id.charCodeAt(0) << 24);
-  timestamp.setTime(Math.floor(time) * 1000);
-  return timestamp;
-}
+export * from "./types";
+export { VirtualizedGrouping } from "./utils/virtualized-grouping";

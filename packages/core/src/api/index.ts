@@ -60,8 +60,13 @@ import {
 import TokenManager from "./token-manager";
 import { Attachment } from "../types";
 import { Settings } from "../collections/settings";
-import { DatabaseAccessor, DatabaseSchema, createDatabase } from "../database";
-import { Kysely, SqliteDriver, Transaction } from "kysely";
+import {
+  DatabaseAccessor,
+  DatabaseSchema,
+  SQLiteOptions,
+  createDatabase
+} from "../database";
+import { Kysely, Transaction } from "kysely";
 import { CachedCollection } from "../database/cached-collection";
 
 type EventSourceConstructor = new (
@@ -69,11 +74,12 @@ type EventSourceConstructor = new (
   init: EventSourceInit & { headers?: Record<string, string> }
 ) => EventSource;
 type Options = {
-  sqlite: SqliteDriver;
+  sqliteOptions: SQLiteOptions;
   storage: IStorage;
   eventsource?: EventSourceConstructor;
   fs: IFileStorage;
   compressor: ICompressor;
+  batchSize: number;
 };
 
 // const DIFFERENCE_THRESHOLD = 20 * 1000;
@@ -131,6 +137,7 @@ class Database {
   transaction = (
     executor: (tr: Transaction<DatabaseSchema>) => void | Promise<void>
   ) => {
+    console.time("transaction");
     return this.transactionMutex.runExclusive(() =>
       this.sql()
         .transaction()
@@ -139,11 +146,14 @@ class Database {
           await executor(tr);
           this._transaction = undefined;
         })
-        .finally(() => (this._transaction = undefined))
+        .finally(() => {
+          console.timeEnd("transaction");
+          this._transaction = undefined;
+        })
     );
   };
 
-  private options?: Options;
+  options?: Options;
   EventSource?: EventSourceConstructor;
   eventSource?: EventSource | null;
 
@@ -160,7 +170,6 @@ class Database {
   vault = new Vault(this);
   lookup = new Lookup(this);
   backup = new Backup(this);
-  legacySettings = new LegacySettings(this);
   settings = new Settings(this);
   migrations = new Migrations(this);
   monographs = new Monographs(this);
@@ -193,7 +202,10 @@ class Database {
    * @deprecated only kept here for migration purposes
    */
   legacyNotes = new CachedCollection(this.storage, "notes", this.eventManager);
-
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  legacySettings = new LegacySettings(this);
   // constructor() {
   //   this.sseMutex = new Mutex();
   //   // this.lastHeartbeat = undefined; // { local: 0, server: 0 };
@@ -229,7 +241,8 @@ class Database {
       this.disconnectSSE();
     });
 
-    if (this.options) this._sql = await createDatabase(this.options.sqlite);
+    if (this.options)
+      this._sql = await createDatabase(this.options.sqliteOptions);
 
     await this._validate();
 

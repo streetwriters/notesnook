@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Database from "../api";
 import { isCipher } from "../database/crypto";
 import { SQLCollection } from "../database/sql-collection";
-import { ContentItem, HistorySession, isDeleted } from "../types";
+import { HistorySession, isDeleted } from "../types";
 import { makeSessionContentId } from "../utils/id";
 import { ICollection } from "./collection";
-import { SessionContent } from "./session-content";
+import { NoteContent, SessionContent } from "./session-content";
 
 export class NoteHistory implements ICollection {
   name = "notehistory";
@@ -60,39 +60,56 @@ export class NoteHistory implements ICollection {
     return history as HistorySession[];
   }
 
-  async add(sessionId: string, content: ContentItem) {
+  async add(
+    sessionId: string,
+    content: NoteContent<boolean> & { noteId: string; locked: boolean }
+  ) {
     const { noteId, locked } = content;
     sessionId = `${noteId}_${sessionId}`;
-    const oldSession = await this.collection.get(sessionId);
 
-    if (oldSession && isDeleted(oldSession)) return;
-
-    const session: HistorySession = {
-      type: "session",
-      id: sessionId,
-      sessionContentId: makeSessionContentId(sessionId),
-      noteId,
-      dateCreated: oldSession ? oldSession.dateCreated : Date.now(),
-      dateModified: Date.now(),
-      localOnly: true,
-      locked
-    };
-
-    await this.collection.upsert(session);
+    if (await this.collection.exists(sessionId)) {
+      await this.collection.update([sessionId], { locked });
+    } else {
+      await this.collection.upsert({
+        type: "session",
+        id: sessionId,
+        sessionContentId: makeSessionContentId(sessionId),
+        noteId,
+        dateCreated: Date.now(),
+        dateModified: Date.now(),
+        localOnly: true,
+        locked
+      });
+    }
     await this.sessionContent.add(sessionId, content, locked);
     await this.cleanup(noteId);
 
-    return session;
+    return sessionId;
   }
 
   private async cleanup(noteId: string, limit = this.versionsLimit) {
-    const history = await this.get(noteId, "asc");
-    if (history.length === 0 || history.length < limit) return;
-    const deleteCount = history.length - limit;
-    for (let i = 0; i < deleteCount; i++) {
-      const session = history[i];
+    const history = await this.db
+      .sql()
+      .selectFrom("notehistory")
+      .where("noteId", "==", noteId)
+      .orderBy(`dateModified asc`)
+      .select(["id", "sessionContentId"])
+      .offset(limit)
+      .limit(10)
+      .$narrowType<{ id: string; sessionContentId: string }>()
+      .execute();
+
+    for (const session of history) {
       await this._remove(session);
     }
+
+    // const history = await this.get(noteId, "asc");
+    // if (history.length === 0 || history.length < limit) return;
+    // const deleteCount = history.length - limit;
+    // for (let i = 0; i < deleteCount; i++) {
+    //   const session = history[i];
+    //   await this._remove(session);
+    // }
   }
 
   async content(sessionId: string) {
@@ -131,7 +148,7 @@ export class NoteHistory implements ICollection {
     });
   }
 
-  private async _remove(session: HistorySession) {
+  private async _remove(session: { id: string; sessionContentId: string }) {
     await this.collection.delete([session.id]);
     await this.sessionContent.remove(session.sessionContentId);
   }

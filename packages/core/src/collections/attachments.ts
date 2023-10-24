@@ -365,8 +365,9 @@ export class Attachments implements ICollection {
   }
 
   get pending() {
-    return this.collection.createFilter<Attachment>((qb) =>
-      qb.where(isFalse("dateUploaded"))
+    return this.collection.createFilter<Attachment>(
+      (qb) => qb.where(isFalse("dateUploaded")),
+      this.db.options?.batchSize
     );
   }
 
@@ -383,8 +384,9 @@ export class Attachments implements ICollection {
   // }
 
   get deleted() {
-    return this.collection.createFilter<Attachment>((qb) =>
-      qb.where("dateDeleted", "is not", null)
+    return this.collection.createFilter<Attachment>(
+      (qb) => qb.where("dateDeleted", "is not", null),
+      this.db.options?.batchSize
     );
   }
 
@@ -412,8 +414,9 @@ export class Attachments implements ICollection {
   // }
 
   get all() {
-    return this.collection.createFilter<Attachment>((qb) =>
-      qb.where(isFalse("deleted"))
+    return this.collection.createFilter<Attachment>(
+      (qb) => qb.where(isFalse("deleted")),
+      this.db.options?.batchSize
     );
   }
 

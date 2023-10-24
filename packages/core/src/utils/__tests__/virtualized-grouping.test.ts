@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { expect, test, vi } from "vitest";
+import { test, vi } from "vitest";
 import { VirtualizedGrouping } from "../virtualized-grouping";
 
 function item<T>(value: T) {
@@ -122,41 +122,4 @@ test("reloading ids should clear all cached batches", async (t) => {
 
   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
   t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
-});
-
-test("merge groups if last & first groups are the same (sequential)", async (t) => {
-  const mocked = createMock();
-  const grouping = new VirtualizedGrouping<string>(
-    ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-    3,
-    mocked,
-    (ids) => [{ title: "Hello", id: ids[0] }]
-  );
-  expect((await grouping.item("1"))?.group?.title).toBe("Hello");
-  expect((await grouping.item("4"))?.group).toBeUndefined();
-});
-
-test("merge groups if last & first groups are the same (random)", async (t) => {
-  const mocked = createMock();
-  const grouping = new VirtualizedGrouping<string>(
-    ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-    3,
-    mocked,
-    (ids) => [{ title: "Hello", id: ids[0] }]
-  );
-  expect((await grouping.item("1"))?.group?.title).toBe("Hello");
-  expect((await grouping.item("7"))?.group).toBeUndefined();
-});
-
-test("merge groups if last & first groups are the same (reverse)", async (t) => {
-  const mocked = createMock();
-  const grouping = new VirtualizedGrouping<string>(
-    ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-    3,
-    mocked,
-    (ids) => [{ title: "Hello", id: ids[0] }]
-  );
-  expect((await grouping.item("7"))?.group?.title).toBe("Hello");
-  expect((await grouping.item("1"))?.group?.title).toBe("Hello");
-  expect((await grouping.item("7"))?.group).toBeUndefined();
 });
