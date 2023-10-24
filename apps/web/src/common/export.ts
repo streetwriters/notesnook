@@ -159,7 +159,8 @@ export async function exportNote(
   const exported = await db.notes
     .export(note.id, {
       format: format === "pdf" ? "html" : format,
-      contentItem: content
+      contentItem: content,
+      disableTemplate
     })
     .catch((e: Error) => {
       console.error(note, e);
