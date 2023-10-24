@@ -263,7 +263,7 @@ const useTiptap = (
         OutlineListItem,
         OutlineList.configure({ keepAttributes: true, keepMarks: true }),
         ListItem,
-        Code.extend({ excludes: "" }),
+        Code.extend({ excludes: "link" }),
         Codemark,
         MathInline,
         MathBlock,
