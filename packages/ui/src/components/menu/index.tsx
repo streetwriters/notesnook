@@ -21,11 +21,12 @@ import React, {
   useCallback,
   useRef,
   useEffect,
-  PropsWithChildren
+  PropsWithChildren,
+  useState
 } from "react";
 import { Box, FlexProps, Text } from "@theme-ui/components";
 import { getPosition } from "../../utils/position";
-import { MenuButtonItem, MenuItem } from "./types";
+import { LazyMenuItemsLoader, MenuButtonItem, MenuItem } from "./types";
 import { useFocus } from "./use-focus";
 import { MenuSeparator } from "./menu-separator";
 import { MenuButton } from "./menu-button";
@@ -90,10 +91,12 @@ export function Menu(props: MenuProps) {
   return (
     <>
       <MenuContainer {...containerProps}>
-        {items.map((item, index) => {
+        {items.map(function mapper(item, index) {
           if (item.isHidden) return null;
 
           switch (item.type) {
+            case "lazy-loader":
+              return <LazyLoader key={item.key} item={item} mapper={mapper} />;
             case "separator":
               return <MenuSeparator key={item.key} />;
             case "button":
@@ -244,6 +247,24 @@ export function MenuPresenter(props: PropsWithChildren<MenuPresenterProps>) {
       )}
     </PopupPresenter>
   );
+}
+
+function LazyLoader(props: {
+  item: LazyMenuItemsLoader;
+  mapper: (item: MenuItem, index: number) => JSX.Element | null;
+}) {
+  const { item, mapper } = props;
+  const [isLoading, setIsLoading] = useState(true);
+  const [items, setItems] = useState<MenuItem[]>([]);
+
+  useEffect(() => {
+    (async function () {
+      setItems(await item.items());
+      setIsLoading(false);
+    })();
+  }, [item]);
+
+  return isLoading ? <></> : <>{items.map(mapper)}</>;
 }
 
 export * from "./types";
