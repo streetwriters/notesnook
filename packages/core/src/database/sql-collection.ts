@@ -27,7 +27,7 @@ import {
   SQLiteItem,
   isFalse
 } from ".";
-import { ExpressionOrFactory, SelectQueryBuilder, SqlBool } from "kysely";
+import { ExpressionOrFactory, SelectQueryBuilder, SqlBool, sql } from "kysely";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 import { groupArray } from "../utils/grouping";
 
@@ -165,13 +165,13 @@ export class SQLCollection<
     return ids.map((id) => id.id);
   }
 
-  async items(
+  async records(
     ids: string[]
   ): Promise<Record<string, MaybeDeletedItem<T> | undefined>> {
     const results = await this.db()
       .selectFrom<keyof DatabaseSchema>(this.type)
       .selectAll()
-      .where("id", "in", ids)
+      .$if(ids.length > 0, (eb) => eb.where("id", "in", ids))
       .execute();
     const items: Record<string, MaybeDeletedItem<T>> = {};
     for (const item of results) {
@@ -229,9 +229,10 @@ export class SQLCollection<
     selector: (
       qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, unknown>
     ) => SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, unknown>,
-    batchSize = 50
+    batchSize?: number
   ) {
     return new FilteredSelector<T>(
+      this.type,
       this.db().selectFrom<keyof DatabaseSchema>(this.type).$call(selector),
       batchSize
     );
@@ -240,12 +241,13 @@ export class SQLCollection<
 
 export class FilteredSelector<T extends Item> {
   constructor(
+    readonly type: keyof DatabaseSchema,
     readonly filter: SelectQueryBuilder<
       DatabaseSchema,
       keyof DatabaseSchema,
       unknown
     >,
-    readonly batchSize: number
+    readonly batchSize: number = 500
   ) {}
 
   async ids(sortOptions?: GroupOptions) {
@@ -267,6 +269,15 @@ export class FilteredSelector<T extends Item> {
       )
       .selectAll()
       .execute()) as T[];
+  }
+
+  async records(ids?: string[], sortOptions?: GroupOptions) {
+    const results = await this.items(ids, sortOptions);
+    const items: Record<string, T> = {};
+    for (const item of results) {
+      items[item.id] = item as T;
+    }
+    return items;
   }
 
   async has(id: string) {
@@ -307,7 +318,14 @@ export class FilteredSelector<T extends Item> {
   }
 
   async grouped(options: GroupOptions) {
-    const ids = await this.ids(options);
+    console.time("getting items");
+    const items = await this.filter
+      .$call(this.buildSortExpression(options))
+      .select(["id", options.sortBy, "type"])
+      .execute();
+    console.timeEnd("getting items");
+    console.log(items.length);
+    const ids = groupArray(items, options);
     return new VirtualizedGrouping<T>(
       ids,
       this.batchSize,
@@ -321,8 +339,8 @@ export class FilteredSelector<T extends Item> {
           items[item.id] = item as T;
         }
         return items;
-      },
-      (ids, items) => groupArray(ids, items, options)
+      }
+      //(ids, items) => groupArray(ids, items, options)
     );
   }
 
@@ -331,9 +349,20 @@ export class FilteredSelector<T extends Item> {
       qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, T>
     ) => {
       return qb
-        .orderBy("conflicted desc")
-        .orderBy("pinned desc")
-        .orderBy(options.sortBy, options.sortDirection);
+        .$if(this.type === "notes", (eb) => eb.orderBy("conflicted desc"))
+        .$if(this.type === "notes" || this.type === "notebooks", (eb) =>
+          eb.orderBy("pinned desc")
+        )
+        .$if(options.sortBy === "title", (eb) =>
+          eb.orderBy(
+            sql`${sql.raw(options.sortBy)} COLLATE NOCASE ${sql.raw(
+              options.sortDirection
+            )}`
+          )
+        )
+        .$if(options.sortBy !== "title", (eb) =>
+          eb.orderBy(options.sortBy, options.sortDirection)
+        );
     };
   }
 

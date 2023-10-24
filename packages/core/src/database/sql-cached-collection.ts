@@ -28,7 +28,7 @@ export class SQLCachedCollection<
 > implements DatabaseCollection<T, false>
 {
   private collection: SQLCollection<TCollectionType, T>;
-  private cache = new Map<string, MaybeDeletedItem<T>>();
+  private cache = new Map<string, MaybeDeletedItem<T> | undefined>();
   // private cachedItems?: T[];
 
   constructor(
@@ -41,6 +41,8 @@ export class SQLCachedCollection<
 
   async init() {
     await this.collection.init();
+    const records = await this.collection.records([]);
+    this.cache = new Map(Object.entries(records));
     // const data = await this.collection.indexer.readMulti(
     //   this.collection.indexer.indices
     // );
@@ -114,13 +116,27 @@ export class SQLCachedCollection<
     return Array.from(this.cache.keys());
   }
 
-  items(
-    ids: string[],
-    _sortOptions?: GroupOptions
-  ): Record<string, MaybeDeletedItem<T> | undefined> {
+  records(ids: string[]): Record<string, MaybeDeletedItem<T> | undefined> {
     const items: Record<string, MaybeDeletedItem<T> | undefined> = {};
     for (const id of ids) {
       items[id] = this.cache.get(id);
+    }
+    return items;
+  }
+
+  items(ids?: string[]): T[] {
+    const items: T[] = [];
+    if (ids) {
+      for (const id of ids) {
+        const item = this.cache.get(id);
+        if (!item || isDeleted(item)) continue;
+        items.push(item);
+      }
+    } else {
+      for (const [_key, value] of this.cache) {
+        if (!value || isDeleted(value)) continue;
+        items.push(value);
+      }
     }
     return items;
   }
@@ -131,7 +147,7 @@ export class SQLCachedCollection<
   ): IterableIterator<MaybeDeletedItem<T>[]> {
     let chunk: MaybeDeletedItem<T>[] = [];
     for (const [_key, value] of this.cache) {
-      if (value.dateModified && value.dateModified > after) {
+      if (value && value.dateModified && value.dateModified > after) {
         chunk.push(value);
         if (chunk.length === chunkSize) {
           yield chunk;
@@ -144,7 +160,7 @@ export class SQLCachedCollection<
 
   *stream(): IterableIterator<T> {
     for (const [_key, value] of this.cache) {
-      if (!value.deleted) yield value as T;
+      if (value && !value.deleted) yield value as T;
     }
   }
 

@@ -52,17 +52,17 @@ export class SessionContent implements ICollection {
     locked: TLocked
   ) {
     if (!sessionId || !content) return;
-    const data =
-      locked || isCipher(content.data)
-        ? content.data
-        : await this.db.compressor().compress(content.data);
+    // const data =
+    //   locked || isCipher(content.data)
+    //     ? content.data
+    //     :  await this.db.compressor().compress(content.data);
 
     await this.collection.upsert({
       type: "sessioncontent",
       id: makeSessionContentId(sessionId),
-      data,
+      data: content.data,
       contentType: content.type,
-      compressed: !locked,
+      compressed: false,
       localOnly: true,
       locked,
       dateCreated: Date.now(),

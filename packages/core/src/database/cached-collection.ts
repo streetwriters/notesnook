@@ -29,6 +29,9 @@ import { StorageAccessor } from "../interfaces";
 import EventManager from "../utils/event-manager";
 import { chunkedIterate } from "../utils/array";
 
+/**
+ * @deprecated only kept here for migration purposes
+ */
 export class CachedCollection<
   TCollectionType extends CollectionType,
   T extends ItemMap[Collections[TCollectionType]]
