@@ -142,9 +142,9 @@ export const SessionExpired = () => {
           passwordInputRef.current?.focus();
           setFocused(true);
         }}
+        enableSheetKeyboardHandler={true}
         visible={true}
       >
-        <SheetProvider context="two_factor_verify" />
         <View
           style={{
             width: focused ? "100%" : "99.9%",
@@ -237,6 +237,8 @@ export const SessionExpired = () => {
         </View>
         <Toast context="local" />
         <Dialog context="session_expiry" />
+
+        <SheetProvider context="two_factor_verify" />
       </BaseDialog>
     )
   );
