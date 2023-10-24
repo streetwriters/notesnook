@@ -58,14 +58,9 @@ type Route = {
 };
 
 const navigationHistory = new Map();
-function shouldSelectNavItem(
-  route: string,
-  pin: { type: string; id: string; notebookId: string }
-) {
+function shouldSelectNavItem(route: string, pin: { type: string; id: string }) {
   if (pin.type === "notebook") {
     return route === `/notebooks/${pin.id}`;
-  } else if (pin.type === "topic") {
-    return route === `/notebooks/${pin.notebookId}/${pin.id}`;
   } else if (pin.type === "tag") {
     return route === `/tags/${pin.id}`;
   }
@@ -261,8 +256,6 @@ function NavigationMenu(props: NavigationMenuProps) {
                 onClick={() => {
                   if (item.type === "notebook") {
                     _navigate(`/notebooks/${item.id}`);
-                  } else if (item.type === "topic") {
-                    _navigate(`/notebooks/${item.notebookId}/${item.id}`);
                   } else if (item.type === "tag") {
                     _navigate(`/tags/${item.id}`);
                   }

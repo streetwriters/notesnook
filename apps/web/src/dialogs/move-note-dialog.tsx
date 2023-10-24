@@ -35,20 +35,23 @@ import { useStore, store } from "../stores/notebook-store";
 import { store as notestore } from "../stores/note-store";
 import { Perform } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
-import { pluralize } from "@notesnook/common";
 import { isMac } from "../utils/platform";
 import { create } from "zustand";
 import { FilteredList } from "../components/filtered-list";
-import { Topic, Notebook, GroupHeader } from "@notesnook/core/dist/types";
+import {
+  Notebook,
+  GroupHeader,
+  isGroupHeader
+} from "@notesnook/core/dist/types";
 
 type MoveDialogProps = { onClose: Perform; noteIds: string[] };
 type NotebookReference = {
   id: string;
-  topic?: string;
+  //topic?: string;
   new: boolean;
   op: "add" | "remove";
 };
-type Item = Topic | Notebook | GroupHeader;
+type Item = Notebook | GroupHeader;
 
 interface ISelectionStore {
   selected: NotebookReference[];
@@ -70,51 +73,71 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
 
   const refreshNotebooks = useStore((store) => store.refresh);
   const notebooks = useStore((store) => store.notebooks);
-  const getAllNotebooks = useCallback(() => {
-    refreshNotebooks();
-    return store.get().notebooks.filter((a) => a.type !== "header");
+  const getAllNotebooks = useCallback(async () => {
+    await refreshNotebooks();
+    return (store.get().notebooks?.ids.filter((a) => !isGroupHeader(a)) ||
+      []) as string[];
   }, [refreshNotebooks]);
 
   useEffect(() => {
     if (!notebooks) return;
 
-    const selected: NotebookReference[] = useSelectionStore
-      .getState()
-      .selected.slice();
-    for (const notebook of notebooks) {
-      if (notebook.type === "header") continue;
-      for (const topic of notebook.topics) {
+    // for (const notebook of notebooks.ids) {
+    //   if (isGroupHeader(notebook)) continue;
+    //   // for (const topic of notebook.topics) {
+    //   //   const isSelected =
+    //   //     selected.findIndex(
+    //   //       (item) => item.id === notebook.id && item.topic === topic.id
+    //   //     ) > -1;
+    //   //   if (!isSelected && topicHasNotes(topic, noteIds)) {
+    //   //     selected.push({
+    //   //       id: notebook.id,
+    //   //       topic: topic.id,
+    //   //       op: "add",
+    //   //       new: false
+    //   //     });
+    //   //   }
+    //   // }
+    // }
+
+    (async function () {
+      const selected: NotebookReference[] = useSelectionStore
+        .getState()
+        .selected.slice();
+
+      for (const { fromId: notebookId } of await db.relations
+        .to({ type: "note", ids: noteIds }, "notebook")
+        .get()) {
         const isSelected =
-          selected.findIndex(
-            (item) => item.id === notebook.id && item.topic === topic.id
-          ) > -1;
-        if (!isSelected && topicHasNotes(topic, noteIds)) {
+          selected.findIndex((item) => item.id === notebookId) > -1;
+        if (isSelected) continue;
+
+        if (await notebookHasNotes(notebookId, noteIds)) {
           selected.push({
-            id: notebook.id,
-            topic: topic.id,
+            id: notebookId,
             op: "add",
             new: false
           });
         }
       }
-    }
 
-    for (const notebook of noteIds
-      .map((id) => db.relations.to({ id, type: "note" }, "notebook"))
-      .flat()) {
-      const isSelected =
-        notebook && selected.findIndex((item) => item.id === notebook.id) > -1;
-      if (!notebook || isSelected) continue;
+      setSelected(selected);
+      setIsMultiselect(selected.length > 1);
+    })();
 
-      selected.push({
-        id: notebook.id,
-        op: "add",
-        new: false
-      });
-    }
+    // for (const notebook of noteIds
+    //   .map((id) => db.relations.to({ id, type: "note" }, "notebook"))
+    //   .flat()) {
+    // const isSelected =
+    //   notebook && selected.findIndex((item) => item.id === notebook.id) > -1;
+    // if (!notebook || isSelected) continue;
 
-    setSelected(selected);
-    setIsMultiselect(selected.length > 1);
+    // selected.push({
+    //   id: notebook.id,
+    //   op: "add",
+    //   new: false
+    // });
+    // }
   }, [noteIds, notebooks, setSelected, setIsMultiselect]);
 
   const _onClose = useCallback(
@@ -142,9 +165,9 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
           for (const item of selected) {
             try {
               if (item.op === "remove") {
-                await db.notes.removeFromNotebook(item, ...noteIds);
+                await db.notes.removeFromNotebook(item.id, ...noteIds);
               } else if (item.op === "add") {
-                await db.notes.addToNotebook(item, ...noteIds);
+                await db.notes.addToNotebook(item.id, ...noteIds);
               }
             } catch (e) {
               if (e instanceof Error) showToast("error", e.message);
@@ -154,13 +177,13 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
 
           notestore.refresh();
 
-          const stringified = stringifySelected(selected);
-          if (stringified) {
-            showToast(
-              "success",
-              `${pluralize(noteIds.length, "note")} ${stringified}`
-            );
-          }
+          // const stringified = stringifySelected(selected);
+          // if (stringified) {
+          //   showToast(
+          //     "success",
+          //     `${pluralize(noteIds.length, "note")} ${stringified}`
+          //   );
+          // }
 
           _onClose(true);
         }
@@ -197,8 +220,10 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
             filter: "Search or add a new notebook"
           }}
           items={getAllNotebooks}
-          filter={(notebooks, query) =>
-            db.lookup.notebooks(notebooks, query) || []
+          filter={
+            (notebooks, query) => []
+
+            //db.lookup.notebooks(notebooks, query) || []
           }
           onCreateNewItem={async (title) => {
             await db.notebooks.add({
@@ -207,12 +232,13 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
           }}
           renderItem={(notebook, _index, refresh, isSearching) => (
             <NotebookItem
-              key={notebook.id}
-              notebook={notebook}
+              key={notebook}
+              id={notebook}
+              resolve={(id) => notebooks?.item(id)}
               isSearching={isSearching}
               onCreateItem={async (title) => {
-                await db.notebooks.topics(notebook.id).add({ title });
-                refresh();
+                // await db.notebooks.topics(notebook).add({ title });
+                // refresh();
               }}
             />
           )}
@@ -223,18 +249,27 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
 }
 
 function NotebookItem(props: {
-  notebook: Notebook;
+  id: string;
   isSearching: boolean;
+  resolve: (id: string) => Promise<Notebook | undefined> | undefined;
   onCreateItem: (title: string) => void;
 }) {
-  const { notebook, isSearching, onCreateItem } = props;
+  const { id, resolve, isSearching, onCreateItem } = props;
 
   const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [notebook, setNotebook] = useState<Notebook>();
 
   const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
   const setSelected = useSelectionStore((store) => store.setSelected);
   const isMultiselect = useSelectionStore((store) => store.isMultiselect);
 
+  useEffect(() => {
+    (async function () {
+      setNotebook(await resolve(id));
+    })();
+  }, [id, resolve]);
+
+  if (!notebook) return null;
   return (
     <Box as="li" data-test-id="notebook">
       <Box
@@ -286,10 +321,10 @@ function NotebookItem(props: {
               sx={{ fontWeight: "body" }}
             >
               {notebook.title}
-              <Text variant="subBody" sx={{ fontWeight: "body" }}>
+              {/* <Text variant="subBody" sx={{ fontWeight: "body" }}>
                 {" "}
                 ({pluralize(notebook.topics.length, "topic")})
-              </Text>
+              </Text> */}
             </Text>
           </Flex>
           <Flex data-test-id="notebook-tools" sx={{ alignItems: "center" }}>
@@ -359,9 +394,9 @@ function NotebookItem(props: {
               />
             </Flex>
           )}
-          {notebook.topics.map((topic) => (
+          {/* {notebook.topics.map((topic) => (
             <TopicItem key={topic.id} topic={topic} />
-          ))}
+          ))} */}
         </Box>
       </Box>
     </Box>
@@ -370,54 +405,52 @@ function NotebookItem(props: {
 
 function TopicSelectionIndicator({ notebook }: { notebook: Notebook }) {
   const hasSelectedTopics = useSelectionStore(
-    (store) =>
-      store.selected.filter((nb) => nb.id === notebook.id && !!nb.topic)
-        .length > 0
+    (store) => store.selected.filter((nb) => nb.id === notebook.id).length > 0
   );
 
   if (!hasSelectedTopics) return null;
   return <Circle size={8} color="accent" sx={{ mr: 1 }} />;
 }
 
-function TopicItem(props: { topic: Topic }) {
-  const { topic } = props;
+// function TopicItem(props: { topic: Topic }) {
+//   const { topic } = props;
 
-  const setSelected = useSelectionStore((store) => store.setSelected);
-  const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
-  const isMultiselect = useSelectionStore((store) => store.isMultiselect);
+//   const setSelected = useSelectionStore((store) => store.setSelected);
+//   const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
+//   const isMultiselect = useSelectionStore((store) => store.isMultiselect);
 
-  return (
-    <Flex
-      as="li"
-      key={topic.id}
-      data-test-id="topic"
-      sx={{
-        alignItems: "center",
-        p: "small",
-        borderRadius: "default",
-        cursor: "pointer",
-        ":hover": { bg: "hover" }
-      }}
-      onClick={(e) => {
-        const { selected } = useSelectionStore.getState();
+//   return (
+//     <Flex
+//       as="li"
+//       key={topic.id}
+//       data-test-id="topic"
+//       sx={{
+//         alignItems: "center",
+//         p: "small",
+//         borderRadius: "default",
+//         cursor: "pointer",
+//         ":hover": { bg: "hover" }
+//       }}
+//       onClick={(e) => {
+//         const { selected } = useSelectionStore.getState();
 
-        const isCtrlPressed = e.ctrlKey || e.metaKey;
-        if (isCtrlPressed) setIsMultiselect(true);
+//         const isCtrlPressed = e.ctrlKey || e.metaKey;
+//         if (isCtrlPressed) setIsMultiselect(true);
 
-        if (isMultiselect || isCtrlPressed) {
-          setSelected(selectMultiple(topic, selected));
-        } else {
-          setSelected(selectSingle(topic, selected));
-        }
-      }}
-    >
-      <SelectedCheck item={topic} />
-      <Text variant="body" sx={{ fontSize: "subtitle" }}>
-        {topic.title}
-      </Text>
-    </Flex>
-  );
-}
+//         if (isMultiselect || isCtrlPressed) {
+//           setSelected(selectMultiple(topic, selected));
+//         } else {
+//           setSelected(selectSingle(topic, selected));
+//         }
+//       }}
+//     >
+//       <SelectedCheck item={topic} />
+//       <Text variant="body" sx={{ fontSize: "subtitle" }}>
+//         {topic.title}
+//       </Text>
+//     </Flex>
+//   );
+// }
 
 export default MoveDialog;
 
@@ -425,7 +458,7 @@ function SelectedCheck({
   item,
   size = 20
 }: {
-  item?: Topic | Notebook;
+  item?: Notebook;
   size?: number;
 }) {
   const selectedItems = useSelectionStore((store) => store.selected);
@@ -450,35 +483,28 @@ function SelectedCheck({
   );
 }
 
-function createSelection(topic: Topic | Notebook): NotebookReference {
+function createSelection(notebook: Notebook): NotebookReference {
   return {
-    id: "notebookId" in topic ? topic.notebookId : topic.id,
-    topic: "notebookId" in topic ? topic.id : undefined,
+    id: notebook.id,
     op: "add",
     new: true
   };
 }
 
 function findSelectionIndex(
-  topic: Topic | NotebookReference | Notebook,
+  ref: NotebookReference | Notebook,
   array: NotebookReference[]
 ) {
-  return "op" in topic
-    ? array.findIndex((a) => a.id === topic.id && a.topic === topic.topic)
-    : "notebookId" in topic
-    ? array.findIndex((a) => a.id === topic.notebookId && a.topic === topic.id)
-    : array.findIndex((a) => a.id === topic.id && !a.topic);
+  return array.findIndex((a) => a.id === ref.id);
 }
 
-function topicHasNotes(topic: Item, noteIds: string[]) {
-  const notes: string[] = db.notes.topicReferences.get(topic.id) || [];
-  return noteIds.some((id) => notes.indexOf(id) > -1);
+function notebookHasNotes(notebookId: string, noteIds: string[]) {
+  return db.relations
+    .from({ type: "notebook", id: notebookId }, "note")
+    .has(...noteIds);
 }
 
-function selectMultiple(
-  topic: Topic | Notebook,
-  selected: NotebookReference[]
-) {
+function selectMultiple(topic: Notebook, selected: NotebookReference[]) {
   const index = findSelectionIndex(topic, selected);
   const isSelected = index > -1;
   const item = selected[index];
@@ -494,7 +520,7 @@ function selectMultiple(
   return selected;
 }
 
-function selectSingle(topic: Topic | Notebook, array: NotebookReference[]) {
+function selectSingle(topic: Notebook, array: NotebookReference[]) {
   const selected: NotebookReference[] = array.filter((ref) => !ref.new);
 
   const index = findSelectionIndex(topic, array);
@@ -511,39 +537,39 @@ function selectSingle(topic: Topic | Notebook, array: NotebookReference[]) {
   return selected;
 }
 
-function stringifySelected(suggestion: NotebookReference[]) {
-  const added = suggestion
-    .filter((a) => a.new && a.op === "add")
-    .map(resolveReference)
-    .filter(Boolean);
-  const removed = suggestion
-    .filter((a) => a.op === "remove")
-    .map(resolveReference)
-    .filter(Boolean);
-  if (!added.length && !removed.length) return;
+// function stringifySelected(suggestion: NotebookReference[]) {
+//   const added = suggestion
+//     .filter((a) => a.new && a.op === "add")
+//     .map(resolveReference)
+//     .filter(Boolean);
+//   const removed = suggestion
+//     .filter((a) => a.op === "remove")
+//     .map(resolveReference)
+//     .filter(Boolean);
+//   if (!added.length && !removed.length) return;
 
-  const parts = [];
-  if (added.length > 0) parts.push("added to");
-  if (added.length >= 1) parts.push(added[0]);
-  if (added.length > 1) parts.push(`and ${added.length - 1} others`);
+//   const parts = [];
+//   if (added.length > 0) parts.push("added to");
+//   if (added.length >= 1) parts.push(added[0]);
+//   if (added.length > 1) parts.push(`and ${added.length - 1} others`);
 
-  if (removed.length >= 1) {
-    if (parts.length > 0) parts.push("&");
-    parts.push("removed from");
-    parts.push(removed[0]);
-  }
-  if (removed.length > 1) parts.push(`and ${removed.length - 1} others`);
+//   if (removed.length >= 1) {
+//     if (parts.length > 0) parts.push("&");
+//     parts.push("removed from");
+//     parts.push(removed[0]);
+//   }
+//   if (removed.length > 1) parts.push(`and ${removed.length - 1} others`);
 
-  return parts.join(" ") + ".";
-}
+//   return parts.join(" ") + ".";
+// }
 
-function resolveReference(ref: NotebookReference): string | undefined {
-  const notebook = db.notebooks.notebook(ref.id);
-  if (!notebook) return undefined;
+// function resolveReference(ref: NotebookReference): string | undefined {
+//   const notebook = db.notebooks.notebook(ref.id);
+//   if (!notebook) return undefined;
 
-  if (ref.topic) {
-    return notebook.topics.topic(ref.topic)?._topic?.title;
-  } else {
-    return notebook.title;
-  }
-}
+//   // if (ref.topic) {
+//   //   return notebook.topics.topic(ref.topic)?._topic?.title;
+//   // } else {
+//   return notebook.title;
+//   // }
+// }

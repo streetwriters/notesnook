@@ -83,10 +83,10 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
 
       initStore();
       initAttachments();
-      refreshNavItems();
       initEditorStore();
 
       (async function () {
+        await refreshNavItems();
         await updateLastSynced();
         if (await initUser()) {
           showUpgradeReminderDialogs();
