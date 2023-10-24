@@ -23,7 +23,7 @@ export type MenuItemComponentProps = {
   onClick?: (e?: Event) => void;
 };
 
-export type MenuItemTypes = "button" | "separator" | "popup";
+export type MenuItemTypes = "button" | "separator" | "popup" | "lazy-loader";
 export type BaseMenuItem<TType extends MenuItemTypes> = {
   type: TType;
   key: string;
@@ -35,6 +35,10 @@ export type MenuSeperatorItem = BaseMenuItem<"separator">;
 
 export type MenuPopupItem = BaseMenuItem<"popup"> & {
   component: (props: MenuItemComponentProps) => JSX.Element;
+};
+
+export type LazyMenuItemsLoader = BaseMenuItem<"lazy-loader"> & {
+  items: () => Promise<MenuItem[]>;
 };
 
 export type MenuButtonItem = BaseMenuItem<"button"> & {
@@ -54,4 +58,8 @@ export type MenuButtonItem = BaseMenuItem<"button"> & {
   };
 };
 
-export type MenuItem = MenuButtonItem | MenuSeperatorItem | MenuPopupItem;
+export type MenuItem =
+  | MenuButtonItem
+  | MenuSeperatorItem
+  | MenuPopupItem
+  | LazyMenuItemsLoader;
