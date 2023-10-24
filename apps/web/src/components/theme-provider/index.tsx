@@ -59,6 +59,16 @@ export function BaseThemeProvider(
 
   useEffect(() => {
     useThemeEngineStore.getState().setTheme(theme);
+
+    const themeColorElement = document.head.querySelector(
+      "meta[name='theme-color']"
+    );
+    if (themeColorElement) {
+      themeColorElement.setAttribute(
+        "content",
+        theme.scopes.base.primary.accent
+      );
+    }
   }, [theme]);
 
   return (
