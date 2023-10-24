@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export * from "./file";
 export * from "./number";
-export * from "./total-notes";
 export * from "./time";
 export * from "./debounce";
 export * from "./random";
