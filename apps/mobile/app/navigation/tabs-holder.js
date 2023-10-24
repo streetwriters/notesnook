@@ -384,7 +384,16 @@ const _TabsHolder = () => {
   }, []);
 
   useEffect(() => {
-    changeNavigationBarColor(colors.primary.background, isDark, true);
+    function updateSystemBars() {
+      changeNavigationBarColor(colors.primary.background, isDark, true);
+      StatusBar.setBackgroundColor("transparent");
+      StatusBar.setTranslucent(true);
+      StatusBar.setBarStyle(isDark ? "light-content" : "dark-content");
+    }
+    updateSystemBars();
+    setTimeout(() => {
+      updateSystemBars();
+    }, 1000);
   }, [colors.primary.background, isDark]);
 
   return (
@@ -406,11 +415,7 @@ const _TabsHolder = () => {
             : 0
       }}
     >
-      <StatusBar
-        barStyle={isDark ? "light-content" : "dark-content"}
-        translucent={true}
-        backgroundColor="transparent"
-      />
+      <StatusBar translucent={true} backgroundColor="transparent" />
 
       {!introCompleted ? (
         <NavigationStack />
