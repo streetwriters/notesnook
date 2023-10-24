@@ -51,7 +51,8 @@ const BaseDialog = ({
   bounce = true,
   closeOnTouch = true,
   useSafeArea = true,
-  avoidKeyboardResize = false
+  avoidKeyboardResize = false,
+  enableSheetKeyboardHandler = false
 }) => {
   const floating = useIsFloatingKeyboard();
   const appState = useAppState();
@@ -103,7 +104,9 @@ const BaseDialog = ({
           if (lockEvents.current) return;
           if (onShow) {
             onShow();
-            useSettingStore.getState().setSheetKeyboardHandler(false);
+            if (!enableSheetKeyboardHandler) {
+              useSettingStore.getState().setSheetKeyboardHandler(false);
+            }
           }
         }}
         animationType={animation}
