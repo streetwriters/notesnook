@@ -31,11 +31,10 @@ import { pluralize } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Tag } from "@notesnook/core/dist/types";
 
-type TagProps = { item: Tag };
+type TagProps = { item: Tag; totalNotes: number };
 function Tag(props: TagProps) {
-  const { item } = props;
+  const { item, totalNotes } = props;
   const { id, title } = item;
-  const totalNotes = db.relations.to(item, "note").length;
 
   return (
     <ListItem
@@ -63,10 +62,7 @@ function Tag(props: TagProps) {
 }
 export default Tag;
 
-const menuItems: (tag: Tag, items?: Tag[]) => MenuItem[] = (
-  tag,
-  items = []
-) => {
+const menuItems: (tag: Tag, ids?: string[]) => MenuItem[] = (tag, ids = []) => {
   return [
     {
       type: "button",
@@ -94,13 +90,11 @@ const menuItems: (tag: Tag, items?: Tag[]) => MenuItem[] = (
       title: "Delete",
       icon: DeleteForver.path,
       onClick: async () => {
-        for (const tag of items) {
-          await db.tags.remove(tag.id);
-        }
-        showToast("success", `${pluralize(items.length, "tag")} deleted`);
-        editorStore.refreshTags();
-        tagStore.refresh();
-        noteStore.refresh();
+        await db.tags.remove(...ids);
+        showToast("success", `${pluralize(ids.length, "tag")} deleted`);
+        await editorStore.refreshTags();
+        await tagStore.refresh();
+        await noteStore.refresh();
       },
       multiSelect: true
     }

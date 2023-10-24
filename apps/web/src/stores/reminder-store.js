@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
-import { groupReminders } from "@notesnook/core/dist/utils/grouping";
 import { TaskScheduler } from "../utils/task-scheduler";
 import { showReminderPreviewDialog } from "../common/dialog-controller";
 import dayjs from "dayjs";
@@ -36,12 +35,12 @@ class ReminderStore extends BaseStore {
   reminders = [];
 
   refresh = (reset = true) => {
-    const reminders = db.reminders.all;
-    this.set((state) => (state.reminders = groupReminders(reminders)));
-    if (reset) {
-      resetReminders(reminders);
-      notestore.refresh();
-    }
+    // const reminders = db.reminders.all;
+    // this.set((state) => (state.reminders = groupReminders(reminders)));
+    // if (reset) {
+    //   resetReminders(reminders);
+    //   notestore.refresh();
+    // }
   };
 
   delete = async (...ids) => {
