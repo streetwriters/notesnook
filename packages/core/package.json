@@ -33,6 +33,7 @@
     "pretest": "node scripts/prebuild.mjs",
     "pretest:e2e": "node scripts/prebuild.mjs",
     "build": "tsc",
+    "watch": "tsc --watch",
     "test:e2e": "cross-env IS_E2E=true vitest run",
     "test": "vitest run"
   },
