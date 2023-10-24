@@ -240,8 +240,11 @@ class Sync {
 
     const key = await this.db.user.getEncryptionKey();
     if (!key || !key.key || !key.salt) {
+      this.logger.error(
+        new Error("User encryption key not generated. Please relogin.")
+      );
       EV.publish(EVENTS.userSessionExpired);
-      throw new Error("User encryption key not generated. Please relogin.");
+      return;
     }
 
     const dbLastSynced = await this.db.lastSynced();
