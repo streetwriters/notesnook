@@ -34,14 +34,14 @@ type Item = {
   metadata?: Record<string, unknown>;
 };
 
-async function moveNotesToTrash(notes: Item[], confirm = true) {
-  if (confirm && !(await showMultiDeleteConfirmation(notes.length))) return;
-  if (notes.some((n) => n.locked) && !(await Vault.unlockVault())) return;
+async function moveNotesToTrash(ids: string[], confirm = true) {
+  if (confirm && !(await showMultiDeleteConfirmation(ids.length))) return;
 
-  const items = notes.map((item) => {
-    if (db.monographs?.isPublished(item.id)) return 0;
-    return item.id;
-  });
+  const lockedIds = await db.notes.locked.ids();
+  if (ids.some((id) => lockedIds.includes(id)) && !(await Vault.unlockVault()))
+    return;
+
+  const items = ids.filter((id) => !db.monographs.isPublished(id));
 
   await TaskManager.startTask({
     type: "status",
@@ -57,10 +57,10 @@ async function moveNotesToTrash(notes: Item[], confirm = true) {
   showToast("success", `${pluralize(items.length, "note")} moved to trash`);
 }
 
-async function moveNotebooksToTrash(notebooks: Item[]) {
-  const isMultiselect = notebooks.length > 1;
+async function moveNotebooksToTrash(ids: string[]) {
+  const isMultiselect = ids.length > 1;
   if (isMultiselect) {
-    if (!(await showMultiDeleteConfirmation(notebooks.length))) return;
+    if (!(await showMultiDeleteConfirmation(ids.length))) return;
   }
 
   await TaskManager.startTask({
@@ -68,16 +68,13 @@ async function moveNotebooksToTrash(notebooks: Item[]) {
     id: "deleteNotebooks",
     action: async (report) => {
       report({
-        text: `Deleting ${pluralize(notebooks.length, "notebook")}...`
+        text: `Deleting ${pluralize(ids.length, "notebook")}...`
       });
-      await notebookStore.delete(...notebooks.map((i) => i.id));
+      await notebookStore.delete(...ids);
     }
   });
 
-  showToast(
-    "success",
-    `${pluralize(notebooks.length, "notebook")} moved to trash`
-  );
+  showToast("success", `${pluralize(ids.length, "notebook")} moved to trash`);
 }
 
 async function deleteTopics(notebookId: string, topics: Item[]) {

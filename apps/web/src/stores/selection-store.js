@@ -39,7 +39,8 @@ class SelectionStore extends BaseStore {
   };
 
   selectItem = (item) => {
-    const index = this.get().selectedItems.findIndex((v) => item.id === v.id);
+    console.log(this.get().selectedItems, item);
+    const index = this.get().selectedItems.findIndex((v) => item === v);
     this.set((state) => {
       if (index <= -1) {
         state.selectedItems.push(item);
@@ -49,7 +50,7 @@ class SelectionStore extends BaseStore {
 
   deselectItem = (item) => {
     this.set((state) => {
-      const index = state.selectedItems.findIndex((v) => item.id === v.id);
+      const index = state.selectedItems.findIndex((v) => item === v);
       if (index >= 0) {
         state.selectedItems.splice(index, 1);
       }

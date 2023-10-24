@@ -48,9 +48,7 @@ import { defineRoutes } from "./types";
 
 const hashroutes = defineRoutes({
   "/": () => {
-    return (
-      !editorStore.get().session.state && <Editor noteId={0} nonce={"-1"} />
-    );
+    return !editorStore.get().session.state && <Editor nonce={"-1"} />;
   },
   "/email/verify": () => {
     showEmailVerificationDialog().then(afterAction);
@@ -91,7 +89,7 @@ const hashroutes = defineRoutes({
   },
   "/notes/create/:nonce": ({ nonce }) => {
     closeOpenedDialog();
-    return <Editor noteId={0} nonce={nonce} />;
+    return <Editor nonce={nonce} />;
   },
   "/notes/:noteId/edit": ({ noteId }) => {
     closeOpenedDialog();

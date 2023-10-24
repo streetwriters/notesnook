@@ -23,15 +23,22 @@ import Tag from "../tag";
 import Topic from "../topic";
 import TrashItem from "../trash-item";
 import { db } from "../../common/db";
-import { getTotalNotes } from "@notesnook/common";
 import Reminder from "../reminder";
-import { ReferencesWithDateEdited, Reference, Context } from "./types";
+import {
+  Context,
+  TagsWithDateEdited,
+  WithDateEdited,
+  NotebooksWithDateEdited
+} from "./types";
+import { getSortValue } from "@notesnook/core/dist/utils/grouping";
 import {
   GroupingKey,
   Item,
-  NotebookReference
-} from "@notesnook/core/dist/types";
-import { getSortValue } from "@notesnook/core/dist/utils/grouping";
+  VirtualizedGrouping,
+  Color,
+  Reminder as ReminderItem
+} from "@notesnook/core";
+import { useEffect, useRef, useState } from "react";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
@@ -40,27 +47,53 @@ export const DEFAULT_ITEM_HEIGHT = SINGLE_LINE_HEIGHT * 2 * DEFAULT_LINE_HEIGHT;
 
 type ListItemWrapperProps<TItem = Item> = {
   group?: GroupingKey;
-  item: TItem;
+  items: VirtualizedGrouping<TItem>;
+  id: string;
   context?: Context;
   compact?: boolean;
 };
-export function ListItemWrapper(props: ListItemWrapperProps) {
-  const { item, group, compact, context } = props;
-  const { type } = item;
 
+export function ListItemWrapper(props: ListItemWrapperProps) {
+  const { id, items, group, compact, context } = props;
+  const [item, setItem] = useState<Item>();
+  const tags = useRef<TagsWithDateEdited>();
+  const notebooks = useRef<NotebooksWithDateEdited>();
+  const reminder = useRef<ReminderItem>();
+  const color = useRef<Color>();
+  const totalNotes = useRef<number>(0);
+
+  useEffect(() => {
+    (async function () {
+      const { item, data } = (await items.item(id, resolveItems)) || {};
+      if (!item) return;
+      if (item.type === "note" && isNoteResolvedData(data)) {
+        tags.current = data.tags;
+        notebooks.current = data.notebooks;
+        reminder.current = data.reminder;
+        color.current = data.color;
+      } else if (item.type === "notebook" && typeof data === "number") {
+        totalNotes.current = data;
+      } else if (item.type === "tag" && typeof data === "number") {
+        totalNotes.current = data;
+      }
+      setItem(item);
+    })();
+  }, [id, items]);
+
+  if (!item)
+    return <div style={{ height: DEFAULT_ITEM_HEIGHT, width: "100%" }} />;
+
+  const { type } = item;
   switch (type) {
     case "note": {
-      const tags = db.relations.to(item, "tag").resolved(3) || [];
-      const color = db.relations.to(item, "color").resolved(1)?.[0];
-      const references = getReferences(item.id, item.notebooks, context?.type);
       return (
         <Note
           compact={compact}
           item={item}
-          tags={tags}
-          color={color}
-          references={references}
-          reminder={getReminder(item.id)}
+          tags={tags.current}
+          color={color.current}
+          notebooks={notebooks.current}
+          reminder={reminder.current}
           date={getDate(item, group)}
           context={context}
         />
@@ -70,7 +103,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
       return (
         <Notebook
           item={item}
-          totalNotes={getTotalNotes(item)}
+          totalNotes={totalNotes.current}
           date={getDate(item, group)}
         />
       );
@@ -81,71 +114,148 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
     case "topic":
       return <Topic item={item} />;
     case "tag":
-      return <Tag item={item} />;
+      return <Tag item={item} totalNotes={totalNotes.current} />;
     default:
       return null;
   }
 }
 
-function getReferences(
-  noteId: string,
-  notebooks?: NotebookReference[],
-  contextType?: string
-): ReferencesWithDateEdited | undefined {
-  if (["topic", "notebook"].includes(contextType || "")) return;
-
-  const references: Reference[] = [];
+function withDateEdited<
+  T extends { dateEdited: number } | { dateModified: number }
+>(items: T[]): WithDateEdited<T> {
   let latestDateEdited = 0;
-
-  db.relations
-    ?.to({ id: noteId, type: "note" }, "notebook")
-    ?.resolved()
-    .forEach((notebook) => {
-      references.push({
-        type: "notebook",
-        url: `/notebooks/${notebook.id}`,
-        title: notebook.title
-      });
-
-      if (latestDateEdited < notebook.dateEdited)
-        latestDateEdited = notebook.dateEdited;
-    });
-
-  notebooks?.forEach((curr) => {
-    const topicId = (curr as NotebookReference).topics[0];
-    const notebook = db.notebooks.notebook(curr.id)?.data;
-    if (!notebook) return;
-
-    const topic = notebook.topics.find((t) => t.id === topicId);
-    if (!topic) return;
-
-    references.push({
-      url: `/notebooks/${curr.id}/${topicId}`,
-      title: topic.title,
-      type: "topic"
-    });
-    if (latestDateEdited < (topic.dateEdited as number))
-      latestDateEdited = topic.dateEdited as number;
+  items.forEach((item) => {
+    const date = "dateEdited" in item ? item.dateEdited : item.dateModified;
+    if (latestDateEdited < date) latestDateEdited = date;
   });
-
-  return { dateEdited: latestDateEdited, references: references.slice(0, 3) };
-}
-
-function getReminder(noteId: string) {
-  return db.relations
-    ?.from({ id: noteId, type: "note" }, "reminder")
-    .resolved(1)[0];
+  return { dateEdited: latestDateEdited, items };
 }
 
 function getDate(item: Item, groupType?: GroupingKey): number {
-  return getSortValue(
-    groupType
-      ? db.settings.getGroupOptions(groupType)
-      : {
-          groupBy: "default",
-          sortBy: "dateEdited",
-          sortDirection: "desc"
-        },
-    item
+  return (
+    getSortValue(
+      groupType
+        ? db.settings.getGroupOptions(groupType)
+        : {
+            groupBy: "default",
+            sortBy: "dateEdited",
+            sortDirection: "desc"
+          },
+      item
+    ) || 0
+  );
+}
+
+async function resolveItems(ids: string[], items: Record<string, Item>) {
+  const { type } = items[ids[0]];
+  if (type === "note") return resolveNotes(ids);
+  else if (type === "notebook") {
+    const data: Record<string, number> = {};
+    for (const id of ids) data[id] = await db.notebooks.totalNotes(id);
+    return data;
+  } else if (type === "tag") {
+    const data: Record<string, number> = {};
+    for (const id of ids)
+      data[id] = await db.relations.from({ id, type: "tag" }, "note").count();
+    return data;
+  }
+  return {};
+}
+
+type NoteResolvedData = {
+  notebooks?: NotebooksWithDateEdited;
+  reminder?: ReminderItem;
+  color?: Color;
+  tags?: TagsWithDateEdited;
+};
+async function resolveNotes(ids: string[]) {
+  console.time("relations");
+  const relations = [
+    ...(await db.relations
+      .to({ type: "note", ids }, ["notebook", "tag", "color"])
+      .get()),
+    ...(await db.relations.from({ type: "note", ids }, "reminder").get())
+  ];
+  console.timeEnd("relations");
+
+  const relationIds: {
+    notebooks: Set<string>;
+    colors: Set<string>;
+    tags: Set<string>;
+    reminders: Set<string>;
+  } = {
+    colors: new Set(),
+    notebooks: new Set(),
+    tags: new Set(),
+    reminders: new Set()
+  };
+
+  const grouped: Record<
+    string,
+    {
+      notebooks: string[];
+      color?: string;
+      tags: string[];
+      reminder?: string;
+    }
+  > = {};
+  for (const relation of relations) {
+    const noteId =
+      relation.toType === "relation" ? relation.fromId : relation.toId;
+    const data = grouped[noteId] || {
+      notebooks: [],
+      tags: []
+    };
+
+    if (relation.toType === "relation" && !data.reminder) {
+      data.reminder = relation.fromId;
+      relationIds.reminders.add(relation.fromId);
+    } else if (relation.fromType === "notebook" && data.notebooks.length < 2) {
+      data.notebooks.push(relation.fromId);
+      relationIds.notebooks.add(relation.fromId);
+    } else if (relation.fromType === "tag" && data.tags.length < 3) {
+      data.tags.push(relation.fromId);
+      relationIds.tags.add(relation.fromId);
+    } else if (relation.fromType === "color" && !data.color) {
+      data.color = relation.fromId;
+      relationIds.colors.add(relation.fromId);
+    }
+    grouped[relation.toId] = data;
+  }
+
+  console.time("resolve");
+  const resolved = {
+    notebooks: await db.notebooks.all.records(
+      Array.from(relationIds.notebooks)
+    ),
+    tags: await db.tags.all.records(Array.from(relationIds.tags)),
+    colors: await db.colors.all.records(Array.from(relationIds.colors)),
+    reminders: await db.reminders.all.records(Array.from(relationIds.reminders))
+  };
+  console.timeEnd("resolve");
+
+  const data: Record<string, NoteResolvedData> = {};
+  for (const noteId in grouped) {
+    const group = grouped[noteId];
+    data[noteId] = {
+      color: group.color ? resolved.colors[group.color] : undefined,
+      reminder: group.reminder ? resolved.reminders[group.reminder] : undefined,
+      tags: withDateEdited(group.tags.map((id) => resolved.tags[id])),
+      notebooks: withDateEdited(
+        group.notebooks.map((id) => resolved.notebooks[id])
+      )
+    };
+  }
+  return data;
+}
+
+function isNoteResolvedData(data: unknown): data is NoteResolvedData {
+  return (
+    typeof data === "object" &&
+    !!data &&
+    "notebooks" in data &&
+    "reminder" in data &&
+    "color" in data &&
+    "tags" in data
   );
 }

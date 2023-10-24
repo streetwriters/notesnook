@@ -31,18 +31,12 @@ import { store as notestore } from "../stores/note-store";
 import { store as editorstore } from "../stores/editor-store";
 import { Perform } from "../common/dialog-controller";
 import { FilteredList } from "../components/filtered-list";
-import { ItemReference, Tag } from "@notesnook/core/dist/types";
+import { ItemReference, Tag, isGroupHeader } from "@notesnook/core/dist/types";
 
 type SelectedReference = {
   id: string;
   new: boolean;
   op: "add" | "remove";
-};
-
-type Item = {
-  id: string;
-  type: "tag" | "header";
-  title: string;
 };
 
 export type AddTagsDialogProps = {
@@ -62,29 +56,30 @@ function AddTagsDialog(props: AddTagsDialogProps) {
 
   const [selected, setSelected] = useState<SelectedReference[]>([]);
 
-  const getAllTags = useCallback(() => {
-    refreshTags();
-    return store.get().tags.filter((a) => a.type !== "header");
+  const getAllTags = useCallback(async () => {
+    await refreshTags();
+    return (store.get().tags?.ids.filter((a) => !isGroupHeader(a)) ||
+      []) as string[];
   }, [refreshTags]);
 
   useEffect(() => {
     if (!tags) return;
+    (async function () {
+      const copy = selected.slice();
+      for (const tag of tags.ids) {
+        if (isGroupHeader(tag)) continue;
+        if (copy.findIndex((a) => a.id === tag) > -1) continue;
 
-    setSelected((s) => {
-      const selected = s.slice();
-      for (const tag of tags) {
-        if (tag.type === "header") continue;
-        if (selected.findIndex((a) => a.id === tag.id) > -1) continue;
-        if (tagHasNotes(tag, noteIds)) {
-          selected.push({
-            id: tag.id,
+        if (await tagHasNotes(tag, noteIds)) {
+          copy.push({
+            id: tag,
             op: "add",
             new: false
           });
         }
       }
-      return selected;
-    });
+      setSelected(copy);
+    })();
   }, [noteIds, tags, setSelected]);
 
   return (
@@ -127,7 +122,8 @@ function AddTagsDialog(props: AddTagsDialogProps) {
             empty: "Add a new tag",
             filter: "Search or add a new tag"
           }}
-          filter={(tags, query) => db.lookup.tags(tags, query) || []}
+          filter={(tags, query) => []}
+          // db.lookup.tags(tags, query) || []}
           onCreateNewItem={async (title) => {
             const tagId = await db.tags.add({ title });
             if (!tagId) return;
@@ -136,17 +132,18 @@ function AddTagsDialog(props: AddTagsDialogProps) {
               { id: tagId, new: true, op: "add" }
             ]);
           }}
-          renderItem={(tag, _index) => {
-            const selectedTag = selected.find((item) => item.id === tag.id);
+          renderItem={(tagId, _index) => {
+            const selectedTag = selected.find((item) => item.id === tagId);
             return (
               <TagItem
-                key={tag.id}
-                tag={tag}
+                key={tagId}
+                id={tagId}
+                resolve={(id) => tags?.item(id)}
                 selected={selectedTag ? selectedTag.op : false}
                 onSelect={() => {
                   setSelected((selected) => {
                     const copy = selected.slice();
-                    const index = copy.findIndex((item) => item.id === tag.id);
+                    const index = copy.findIndex((item) => item.id === tagId);
                     const isNew = copy[index] && copy[index].new;
                     if (isNew) {
                       copy.splice(index, 1);
@@ -156,7 +153,7 @@ function AddTagsDialog(props: AddTagsDialogProps) {
                         op: copy[index].op === "add" ? "remove" : "add"
                       };
                     } else {
-                      copy.push({ id: tag.id, new: true, op: "add" });
+                      copy.push({ id: tagId, new: true, op: "add" });
                     }
                     return copy;
                   });
@@ -171,12 +168,22 @@ function AddTagsDialog(props: AddTagsDialogProps) {
 }
 
 function TagItem(props: {
-  tag: Item;
+  id: string;
+  resolve: (id: string) => Promise<Tag | undefined> | undefined;
   selected: boolean | SelectedReference["op"];
   onSelect: () => void;
 }) {
-  const { tag, selected, onSelect } = props;
+  const { id, resolve, selected, onSelect } = props;
 
+  const [tag, setTag] = useState<Tag>();
+
+  useEffect(() => {
+    (async function () {
+      setTag(await resolve(id));
+    })();
+  }, [id, resolve]);
+
+  if (!tag) return null;
   return (
     <Flex
       as="li"
@@ -224,8 +231,6 @@ function SelectedCheck({
   );
 }
 
-function tagHasNotes(tag: Tag, noteIds: string[]) {
-  return db.relations
-    ?.from(tag, "note")
-    ?.some((r) => noteIds.indexOf(r.to.id) > -1);
+function tagHasNotes(tagId: string, noteIds: string[]) {
+  return db.relations.from({ type: "tag", id: tagId }, "note").has(...noteIds);
 }

@@ -29,7 +29,7 @@ import { MenuItem } from "@notesnook/ui";
 import { alpha } from "@theme-ui/color";
 import { Item } from "@notesnook/core/dist/types";
 
-type ListItemProps = {
+type ListItemProps<TItem extends Item, TContext> = {
   colors?: {
     heading: SchemeColors;
     accent: SchemeColors;
@@ -39,7 +39,7 @@ type ListItemProps = {
   isCompact?: boolean;
   isDisabled?: boolean;
   isSimple?: boolean;
-  item: Item;
+  item: TItem;
 
   onKeyPress?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   onClick?: () => void;
@@ -48,10 +48,13 @@ type ListItemProps = {
   body?: JSX.Element | string;
   footer?: JSX.Element;
 
-  menuItems?: (item: any, items?: any[]) => MenuItem[];
+  context?: TContext;
+  menuItems?: (item: TItem, items?: string[], context?: TContext) => MenuItem[];
 };
 
-function ListItem(props: ListItemProps) {
+function ListItem<TItem extends Item, TContext>(
+  props: ListItemProps<TItem, TContext>
+) {
   const {
     colors: { heading, background, accent } = {
       heading: "heading",
@@ -71,7 +74,7 @@ function ListItem(props: ListItemProps) {
 
   const isSelected = useSelectionStore((store) => {
     const isInSelection =
-      store.selectedItems.findIndex((item) => item.id === props.item.id) > -1;
+      store.selectedItems.findIndex((item) => item === props.item.id) > -1;
     return isFocused
       ? store.selectedItems.length > 1 && isInSelection
       : isInSelection;
@@ -88,11 +91,9 @@ function ListItem(props: ListItemProps) {
         e.stopPropagation();
 
         let title = undefined;
-        let selectedItems = selectionStore
-          .get()
-          .selectedItems.filter((i) => i.type === item.type);
+        let selectedItems = selectionStore.get().selectedItems; // .filter((i) => i.type === item.type);
 
-        if (selectedItems.findIndex((i) => i.id === item.id) === -1) {
+        if (selectedItems.findIndex((i) => i === item.id) === -1) {
           selectedItems = [];
           selectedItems.push(item);
         }

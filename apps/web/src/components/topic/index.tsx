@@ -28,7 +28,6 @@ import { Multiselect } from "../../common/multi-select";
 import { confirm } from "../../common/dialog-controller";
 import { useStore as useNotesStore } from "../../stores/note-store";
 import { pluralize } from "@notesnook/common";
-import { getTotalNotes } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Note, Topic } from "@notesnook/core/dist/types";
 
@@ -46,7 +45,7 @@ function Topic(props: TopicProps) {
       item={topic}
       onClick={() => navigate(`/notebooks/${topic.notebookId}/${topic.id}`)}
       title={topic.title}
-      footer={<Text variant="subBody">{getTotalNotes(topic)}</Text>}
+      footer={<Text variant="subBody">0</Text>} // getTotalNotes(topic)}
       menuItems={menuItems}
     />
   );

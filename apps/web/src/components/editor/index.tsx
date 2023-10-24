@@ -78,7 +78,7 @@ type DocumentPreview = {
 
 function onEditorChange(
   noteId: string | undefined,
-  sessionId: number,
+  sessionId: string,
   content: string,
   ignoreEdit: boolean
 ) {
@@ -94,10 +94,10 @@ export default function EditorManager({
   noteId,
   nonce
 }: {
-  noteId: string | number;
+  noteId?: string;
   nonce?: string;
 }) {
-  const isNewSession = !!nonce && noteId === 0;
+  const isNewSession = !!nonce && !noteId;
   const isOldSession = !nonce && !!noteId;
 
   // the only state that changes. Everything else is
@@ -166,7 +166,7 @@ export default function EditorManager({
     };
   }, [editorInstance, isPreviewSession]);
 
-  const openSession = useCallback(async (noteId: string | number) => {
+  const openSession = useCallback(async (noteId: string) => {
     await editorstore.get().openSession(noteId);
     previewSession.current = undefined;
 
@@ -212,7 +212,7 @@ export default function EditorManager({
               background: "background"
             }}
           >
-            {previewSession.current && (
+            {previewSession.current && noteId && (
               <PreviewModeNotice
                 {...previewSession.current}
                 onDiscard={() => openSession(noteId)}
@@ -390,8 +390,8 @@ export function Editor(props: EditorProps) {
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
         onPreviewAttachment={async (data) => {
           const { hash } = data;
-          const attachment = db.attachments.attachment(hash);
-          if (attachment && attachment.metadata.type.startsWith("image/")) {
+          const attachment = await db.attachments.attachment(hash);
+          if (attachment && attachment.mimeType.startsWith("image/")) {
             const container = document.getElementById("dialogContainer");
             if (!(container instanceof HTMLElement)) return;
 
@@ -600,7 +600,8 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
         <Text variant={"subtitle"}>Preview</Text>
         <Text variant={"body"}>
           You are previewing note version edited from{" "}
-          {getFormattedDate(dateCreated)} to {getFormattedDate(dateEdited)}.
+          {getFormattedDate(dateCreated, "date-time")} to{" "}
+          {getFormattedDate(dateEdited, "date-time")}.
         </Text>
       </Flex>
       <Flex>

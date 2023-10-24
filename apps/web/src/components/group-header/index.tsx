@@ -188,7 +188,7 @@ export function showSortMenu(groupingKey: GroupingKey, refresh: () => void) {
   );
 }
 
-function changeGroupOptions(
+async function changeGroupOptions(
   options: GroupingMenuOptions,
   item: Omit<MenuButtonItem, "type">
 ) {
@@ -201,7 +201,7 @@ function changeGroupOptions(
     if (item.key === "abc") groupOptions.sortBy = "title";
     else groupOptions.sortBy = "dateEdited";
   }
-  db.settings.setGroupOptions(options.groupingKey, groupOptions);
+  await db.settings.setGroupOptions(options.groupingKey, groupOptions);
   options.refresh();
 }
 

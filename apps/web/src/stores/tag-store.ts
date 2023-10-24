@@ -20,20 +20,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
-import { GroupedItems, Tag } from "@notesnook/core/dist/types";
+import { Tag } from "@notesnook/core/dist/types";
+import { VirtualizedGrouping } from "@notesnook/core";
 
 class TagStore extends BaseStore<TagStore> {
-  tags: GroupedItems<Tag> = [];
+  tags?: VirtualizedGrouping<Tag>;
 
-  refresh = () => {
-    this.set(
-      (state) =>
-        (state.tags = groupArray(
-          db.tags.all || [],
-          db.settings.getGroupOptions("tags")
-        ))
-    );
+  refresh = async () => {
+    this.set({
+      tags: await db.tags.all.grouped(db.settings.getGroupOptions("tags"))
+    });
   };
 }
 

@@ -21,12 +21,11 @@ import { useEffect } from "react";
 import ListContainer from "../components/list-container";
 import { useStore as useNotesStore } from "../stores/note-store";
 import { hashNavigate, navigate } from "../navigation";
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
-import { db } from "../common/db";
 import Placeholder from "../components/placeholders";
 
 function Notes() {
   const context = useNotesStore((store) => store.context);
+  const contextNotes = useNotesStore((store) => store.contextNotes);
   const refreshContext = useNotesStore((store) => store.refreshContext);
   const type = context?.type === "favorite" ? "favorites" : "notes";
   const isCompact = useNotesStore((store) => store.viewMode === "compact");
@@ -34,25 +33,21 @@ function Notes() {
   useEffect(() => {
     if (
       context?.type === "color" &&
-      context.notes &&
-      context.notes.length <= 0
+      contextNotes &&
+      contextNotes.ids.length <= 0
     ) {
       navigate("/", true);
     }
-  }, [context]);
+  }, [context, contextNotes]);
 
-  if (!context) return null;
+  if (!context || !contextNotes) return <Placeholder context="notes" />;
   return (
     <ListContainer
       group={type}
       refresh={refreshContext}
       compact={isCompact}
-      context={{ ...context, notes: undefined }}
-      items={
-        context.notes
-          ? groupArray(context.notes, db.settings.getGroupOptions(type))
-          : []
-      }
+      context={context}
+      items={contextNotes}
       placeholder={
         <Placeholder
           context={

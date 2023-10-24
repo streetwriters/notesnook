@@ -26,6 +26,8 @@ function Tags() {
   useNavigate("tags", () => store.refresh());
   const tags = useStore((store) => store.tags);
   const refresh = useStore((store) => store.refresh);
+
+  if (!tags) return <Placeholder context="tags" />;
   return (
     <ListContainer
       group="tags"

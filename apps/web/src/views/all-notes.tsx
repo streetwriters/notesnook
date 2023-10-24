@@ -25,16 +25,16 @@ import useNavigate from "../hooks/use-navigate";
 import Placeholder from "../components/placeholders";
 
 function Home() {
-  useStore((store) => store.nonce);
   const notes = useStore((store) => store.notes);
   const isCompact = useStore((store) => store.viewMode === "compact");
   const refresh = useStore((store) => store.refresh);
-  const clearContext = useStore((store) => store.clearContext);
+  const setContext = useStore((store) => store.setContext);
 
-  useNavigate("home", clearContext);
+  useNavigate("home", setContext);
 
   useEffect(() => {
     (async function () {
+      await refresh();
       // const note = db.notes.note("62bc3f28a1a1a10000707077").data;
       // const data = await db.content.raw(note.contentId);
       // const note2 = db.notes.note("62bc3f1ca1a1a10000707075").data;
@@ -44,8 +44,9 @@ function Home() {
       // await db.notes.add({ id: note.id, conflicted: true, resolved: false });
       // console.log(data3);
     })();
-  }, []);
+  }, [refresh]);
 
+  if (!notes) return <Placeholder context="notes" />;
   return (
     <ListContainer
       group="home"

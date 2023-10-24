@@ -147,10 +147,7 @@ export class NNStorage implements IStorage {
     return NNCrypto.encryptMulti(key, items, "text", "base64");
   }
 
-  decrypt(
-    key: SerializedKey,
-    cipherData: Cipher<"base64">
-  ): Promise<string | undefined> {
+  decrypt(key: SerializedKey, cipherData: Cipher<"base64">): Promise<string> {
     cipherData.format = "base64";
     return NNCrypto.decrypt(key, cipherData, "text");
   }
@@ -158,7 +155,7 @@ export class NNStorage implements IStorage {
   decryptMulti(
     key: SerializedKey,
     items: Cipher<"base64">[]
-  ): Promise<string[] | undefined> {
+  ): Promise<string[]> {
     items.forEach((c) => (c.format = "base64"));
     return NNCrypto.decryptMulti(key, items, "text");
   }

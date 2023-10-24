@@ -20,14 +20,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/notebook-store";
 import { hashNavigate } from "../navigation";
-import useNavigate from "../hooks/use-navigate";
 import Placeholder from "../components/placeholders";
+import { useEffect } from "react";
 
 function Notebooks() {
-  useNavigate("notebooks", () => store.refresh());
+  // useNavigate("notebooks", () => store.refresh());
   const notebooks = useStore((state) => state.notebooks);
   const refresh = useStore((state) => state.refresh);
 
+  useEffect(() => {
+    store.get().refresh();
+  }, []);
+
+  if (!notebooks) return <Placeholder context="notebooks" />;
   return (
     <>
       <ListContainer
