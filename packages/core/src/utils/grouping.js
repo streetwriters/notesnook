@@ -57,7 +57,7 @@ const KEY_SELECTORS = {
   abc: (item) => getFirstCharacter(item.alias || item.title),
   month: (item, groupBy, dateNow) => {
     dateNow.setTime(item[groupBy]);
-    return MONTHS_FULL[dateNow.getMonth()];
+    return `${MONTHS_FULL[dateNow.getMonth()]} ${dateNow.getFullYear()}`;
   },
   week: (item, groupBy) => getWeekGroupFromTimestamp(item[groupBy]),
   year: (item, groupBy, dateNow) => {
