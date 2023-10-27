@@ -67,7 +67,6 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
         width: width || "auto"
       }}
       className="resizer"
-      maxWidth="100%"
       minWidth={135}
       handleStyles={{
         bottomRight: {
@@ -97,6 +96,9 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
         } catch {
           // ignore
         }
+      }}
+      onResizeStart={(_e, _dir, _ref) => {
+        _e.preventDefault();
       }}
       lockAspectRatio={true}
     >
