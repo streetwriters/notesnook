@@ -93,6 +93,7 @@ class TokenManager {
       const { refresh_token, scope } = token;
       if (!refresh_token || !scope) {
         EV.publish(EVENTS.userSessionExpired);
+        this.logger.error(new Error("Token not found."));
         return;
       }
 
@@ -124,7 +125,15 @@ class TokenManager {
   }
 
   saveToken(tokenResponse) {
-    if (!tokenResponse) return;
+    this.logger.info("Saving new token", tokenResponse);
+    if (
+      !tokenResponse ||
+      !tokenResponse.refresh_token ||
+      !tokenResponse.access_token ||
+      !tokenResponse.scope ||
+      !tokenResponse.expires_in
+    )
+      return;
     let token = { ...tokenResponse, t: Date.now() };
     return this._storage.write("token", token);
   }
