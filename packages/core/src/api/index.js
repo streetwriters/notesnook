@@ -256,16 +256,8 @@ class Database {
             EV.publish(EVENTS.userSubscriptionUpdated, data);
             break;
           }
-          case "userDeleted": {
-            await this.user.logout(false, "Account Deleted");
-            break;
-          }
-          case "userEmailChanged": {
-            await this.user.logout(true, "Email changed");
-            break;
-          }
-          case "userPasswordChanged": {
-            await this.user.logout(true, "Password changed");
+          case "logout": {
+            await this.user.logout(true, data.reason || "Unknown.");
             break;
           }
           case "emailConfirmed": {

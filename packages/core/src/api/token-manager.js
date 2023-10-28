@@ -92,7 +92,8 @@ class TokenManager {
 
       const { refresh_token, scope } = token;
       if (!refresh_token || !scope) {
-        throw new Error("Token not found.");
+        EV.publish(EVENTS.userSessionExpired);
+        return;
       }
 
       const refreshTokenResponse = await http.post(
