@@ -531,9 +531,7 @@ export default function ReminderSheet({
               androidVariant="nativeAndroid"
               is24hourSource="locale"
               locale={
-                db.settings?.getTimeFormat() === "24-hour"
-                  ? "en_GB.UTF8"
-                  : "en_US.UTF8"
+                db.settings?.getTimeFormat() === "24-hour" ? "en_GB" : "en_US"
               }
               mode={reminderMode === ReminderModes.Repeat ? "time" : "datetime"}
             />
