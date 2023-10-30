@@ -67,15 +67,10 @@ export const deleteItems = async (item, context) => {
     });
     return;
   }
-  if (
-    item &&
-    item.id &&
-    useSelectionStore.getState().selectedItemsList.length === 0
-  ) {
-    useSelectionStore.getState().setSelectedItem(item);
-  }
 
-  const { selectedItemsList } = useSelectionStore.getState();
+  const selectedItemsList = item
+    ? [item]
+    : useSelectionStore.getState().selectedItemsList;
 
   let notes = selectedItemsList.filter((i) => i.type === "note");
   let notebooks = selectedItemsList.filter((i) => i.type === "notebook");
@@ -179,7 +174,9 @@ export const deleteItems = async (item, context) => {
     });
   }
   Navigation.queueRoutesForUpdate();
-  useSelectionStore.getState().clearSelection();
+  if (!item) {
+    useSelectionStore.getState().clearSelection();
+  }
   useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();
   SearchService.updateAndSearch();
