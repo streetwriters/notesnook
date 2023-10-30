@@ -33,7 +33,7 @@ export const LoginSteps = {
   passwordAuth: 3
 };
 
-export const useLogin = (onFinishLogin) => {
+export const useLogin = (onFinishLogin, sessionExpired = false) => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
@@ -69,6 +69,7 @@ export const useLogin = (onFinishLogin) => {
       switch (step) {
         case LoginSteps.emailAuth: {
           const mfaInfo = await db.user.authenticateEmail(email.current);
+          console.log("email auth", mfaInfo);
           if (mfaInfo) {
             TwoFactorVerification.present(async (mfa, callback) => {
               try {
@@ -101,7 +102,12 @@ export const useLogin = (onFinishLogin) => {
           break;
         }
         case LoginSteps.passwordAuth: {
-          await db.user.authenticatePassword(email.current, password.current);
+          await db.user.authenticatePassword(
+            email.current,
+            password.current,
+            null,
+            sessionExpired
+          );
           finishLogin();
           break;
         }

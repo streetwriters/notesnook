@@ -69,7 +69,8 @@ export const SessionExpired = () => {
       eSendEvent(eUserLoggedIn, true);
       setVisible(false);
       setFocused(false);
-    }
+    },
+    true
   );
 
   const logout = async () => {
