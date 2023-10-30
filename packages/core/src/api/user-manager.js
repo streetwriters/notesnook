@@ -121,7 +121,12 @@ class UserManager {
     return true;
   }
 
-  async authenticatePassword(email, password, hashedPassword = null) {
+  async authenticatePassword(
+    email,
+    password,
+    hashedPassword = null,
+    sessionExpired = false
+  ) {
     if (!email || !password) throw new Error("email & password are required.");
 
     const token = await this.tokenManager.getAccessToken();
@@ -152,7 +157,9 @@ class UserManager {
       password,
       salt: user.salt
     });
-    await this._storage.write("lastSynced", 0);
+    if (!sessionExpired) {
+      await this._storage.write("lastSynced", 0);
+    }
 
     EV.publish(EVENTS.userLoggedIn, user);
   }
