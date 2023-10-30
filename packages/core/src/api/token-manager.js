@@ -126,14 +126,7 @@ class TokenManager {
 
   saveToken(tokenResponse) {
     this.logger.info("Saving new token", tokenResponse);
-    if (
-      !tokenResponse ||
-      !tokenResponse.refresh_token ||
-      !tokenResponse.access_token ||
-      !tokenResponse.scope ||
-      !tokenResponse.expires_in
-    )
-      return;
+    if (!tokenResponse || !tokenResponse.access_token) return;
     let token = { ...tokenResponse, t: Date.now() };
     return this._storage.write("token", token);
   }
