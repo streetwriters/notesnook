@@ -188,7 +188,7 @@ export const useActions = ({ close = () => null, item }) => {
     Notifications.displayNotification({
       title: item.title,
       message: item.headline || text,
-      subtitle: item.headline || text,
+      subtitle: "",
       bigText: html,
       ongoing: true,
       actions: ["UNPIN"],
