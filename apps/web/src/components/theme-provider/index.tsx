@@ -66,7 +66,7 @@ export function BaseThemeProvider(
     if (themeColorElement) {
       themeColorElement.setAttribute(
         "content",
-        theme.scopes.base.primary.accent
+        theme.scopes.base.primary.background
       );
     }
   }, [theme]);
