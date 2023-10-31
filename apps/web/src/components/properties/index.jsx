@@ -110,10 +110,11 @@ function Properties(props) {
     "reminder"
   );
   const allNotebooks = useMemo(
-    () => [
-      ...notebooks.map((ref) => db.notebooks.notebook(ref.id)?.data),
-      ...db.relations.to({ id: sessionId, type: "note" }, "notebook")
-    ],
+    () =>
+      [
+        ...notebooks.map((ref) => db.notebooks.notebook(ref.id)?.data),
+        ...db.relations.to({ id: sessionId, type: "note" }, "notebook")
+      ].filter(Boolean),
     [sessionId, notebooks]
   );
 
