@@ -23,7 +23,9 @@ import { desktop } from "../common/desktop-bridge";
 import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
+import { store as editorStore } from "./editor-store";
 import { isTelemetryEnabled, setTelemetry } from "../utils/telemetry";
+import { setDocumentTitle } from "../utils/dom";
 
 /**
  * @extends {BaseStore<SettingStore>}
@@ -165,9 +167,12 @@ class SettingStore extends BaseStore {
   };
 
   toggleHideTitle = async () => {
-    const hideTitle = this.get().hideNoteTitle;
-    this.set({ hideNoteTitle: !hideTitle });
-    Config.set("hideNoteTitle", !hideTitle);
+    const { hideNoteTitle } = this.get();
+    this.set({ hideNoteTitle: !hideNoteTitle });
+    Config.set("hideNoteTitle", !hideNoteTitle);
+    setDocumentTitle(
+      !hideNoteTitle ? undefined : editorStore.get().session.title
+    );
   };
 
   toggleAutoUpdates = async () => {
