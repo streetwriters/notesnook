@@ -64,124 +64,130 @@ function StatusBar() {
       }}
       px={2}
     >
-      <Flex>
-        {isLoggedIn ? (
-          <>
+      {isFocusMode ? (
+        <Flex />
+      ) : (
+        <Flex>
+          {isLoggedIn ? (
+            <>
+              <Button
+                onClick={() =>
+                  user?.isEmailConfirmed
+                    ? navigate("/settings")
+                    : hashNavigate("/email/verify")
+                }
+                variant="statusitem"
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  display: "flex"
+                }}
+              >
+                <Circle
+                  size={7}
+                  color={
+                    user?.isEmailConfirmed
+                      ? "var(--icon-success)"
+                      : "var(--icon-error)"
+                  }
+                />
+                <Text
+                  className="selectable"
+                  variant="subBody"
+                  ml={1}
+                  sx={{ color: "paragraph" }}
+                >
+                  {user?.email}
+                  {user?.isEmailConfirmed ? "" : " (not verified)"}
+                </Text>
+              </Button>
+
+              <SyncStatus />
+            </>
+          ) : isLoggedIn === false ? (
             <Button
-              onClick={() =>
-                user?.isEmailConfirmed
-                  ? navigate("/settings")
-                  : hashNavigate("/email/verify")
-              }
               variant="statusitem"
+              onClick={() => hardNavigate("/login")}
               sx={{
                 alignItems: "center",
                 justifyContent: "center",
                 display: "flex"
               }}
+              data-test-id="not-logged-in"
             >
-              <Circle
-                size={7}
-                color={
-                  user?.isEmailConfirmed
-                    ? "var(--icon-success)"
-                    : "var(--icon-error)"
-                }
-              />
-              <Text
-                className="selectable"
-                variant="subBody"
-                ml={1}
-                sx={{ color: "paragraph" }}
-              >
-                {user?.email}
-                {user?.isEmailConfirmed ? "" : " (not verified)"}
+              <Circle size={7} color="var(--icon-error)" />
+              <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
+                Not logged in
               </Text>
             </Button>
-
-            {!isFocusMode && <SyncStatus />}
-          </>
-        ) : isLoggedIn === false ? (
+          ) : null}
           <Button
             variant="statusitem"
-            onClick={() => hardNavigate("/login")}
+            onClick={() => showIssueDialog()}
             sx={{
               alignItems: "center",
               justifyContent: "center",
               display: "flex"
             }}
-            data-test-id="not-logged-in"
+            title="Facing an issue? Click here to create a bug report."
           >
-            <Circle size={7} color="var(--icon-error)" />
+            <Issue size={12} />
             <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-              Not logged in
+              Report an issue
             </Text>
           </Button>
-        ) : null}
-        <Button
-          variant="statusitem"
-          onClick={() => showIssueDialog()}
-          sx={{
-            alignItems: "center",
-            justifyContent: "center",
-            display: "flex"
-          }}
-          title="Facing an issue? Click here to create a bug report."
-        >
-          <Issue size={12} />
-          <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-            Report an issue
-          </Text>
-        </Button>
-        {statuses?.map((status) => {
-          const { key, icon: Icon } = status;
-          return (
-            <Flex
-              key={key}
-              ml={1}
-              sx={{ alignItems: "center", justifyContent: "center" }}
+          {statuses?.map((status) => {
+            const { key, icon: Icon } = status;
+            return (
+              <Flex
+                key={key}
+                ml={1}
+                sx={{ alignItems: "center", justifyContent: "center" }}
+              >
+                {Icon ? <Icon size={12} /> : <Loading size={12} />}
+                <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
+                  {statusToString(status)}
+                </Text>
+              </Flex>
+            );
+          })}
+
+          {updateStatus && updateStatus.type !== "updated" && (
+            <Button
+              variant="statusitem"
+              onClick={async () => {
+                if (updateStatus.type === "available") {
+                  await showUpdateAvailableNotice(updateStatus);
+                } else if (updateStatus.type === "completed") {
+                  installUpdate();
+                } else {
+                  checkForUpdate();
+                }
+              }}
+              sx={{
+                ml: 1,
+                alignItems: "center",
+                justifyContent: "center",
+                display: "flex"
+              }}
             >
-              {Icon ? <Icon size={12} /> : <Loading size={12} />}
+              <Update
+                rotate={
+                  updateStatus.type !== "completed" &&
+                  updateStatus.type !== "available"
+                }
+                color={
+                  updateStatus.type === "available" ? "accent" : "paragraph"
+                }
+                size={12}
+              />
               <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-                {statusToString(status)}
+                {statusToInfoText(updateStatus)}
               </Text>
-            </Flex>
-          );
-        })}
-
-        {updateStatus && updateStatus.type !== "updated" && (
-          <Button
-            variant="statusitem"
-            onClick={async () => {
-              if (updateStatus.type === "available") {
-                await showUpdateAvailableNotice(updateStatus);
-              } else if (updateStatus.type === "completed") {
-                installUpdate();
-              } else {
-                checkForUpdate();
-              }
-            }}
-            sx={{
-              ml: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              display: "flex"
-            }}
-          >
-            <Update
-              rotate={
-                updateStatus.type !== "completed" &&
-                updateStatus.type !== "available"
-              }
-              color={updateStatus.type === "available" ? "accent" : "paragraph"}
-              size={12}
-            />
-            <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-              {statusToInfoText(updateStatus)}
-            </Text>
-          </Button>
-        )}
-      </Flex>
+            </Button>
+          )}
+        </Flex>
+      )}
       <EditorFooter />
     </ScopedThemeProvider>
   );
