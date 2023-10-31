@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useUserStore } from "../../stores/user-store";
-import { getPlatform, isDesktop } from "../../utils/platform";
+import { getPlatform } from "../../utils/platform";
 import { db } from "../../common/db";
 import { showPromptDialog } from "../../common/dialog-controller";
 import Config from "../../utils/config";
@@ -75,15 +75,15 @@ What data is collected & when?`,
         ]
       },
       {
-        key: "hide-title",
-        title: "Hide Title",
-        description: "Prevent note title from appearing in page title.",
+        key: "hide-note-title",
+        title: "Hide note title",
+        description: "Prevent note title from appearing in tab/window title.",
         onStateChange: (listener) =>
-          useSettingStore.subscribe((s) => s.hideTitle, listener),
+          useSettingStore.subscribe((s) => s.hideNoteTitle, listener),
         components: [
           {
             type: "toggle",
-            isToggled: () => useSettingStore.getState().hideTitle,
+            isToggled: () => useSettingStore.getState().hideNoteTitle,
             toggle: () => useSettingStore.getState().toggleHideTitle()
           }
         ]

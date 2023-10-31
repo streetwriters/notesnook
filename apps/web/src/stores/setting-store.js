@@ -24,7 +24,6 @@ import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
 import { isTelemetryEnabled, setTelemetry } from "../utils/telemetry";
-import { isHideTitleEnabled, setHideTitle } from "../utils/hideTitle";
 
 /**
  * @extends {BaseStore<SettingStore>}
@@ -41,7 +40,7 @@ class SettingStore extends BaseStore {
 
   zoomFactor = 1.0;
   privacyMode = false;
-  hideTitle = isHideTitleEnabled();
+  hideNoteTitle = Config.get("hideNoteTitle", false);
   telemetry = isTelemetryEnabled();
   /** @type {string} */
   dateFormat = null;
@@ -166,9 +165,9 @@ class SettingStore extends BaseStore {
   };
 
   toggleHideTitle = async () => {
-    const hideTitle = this.get().hideTitle;
-    this.set({ hideTitle: !hideTitle });
-    setHideTitle(!hideTitle);
+    const hideTitle = this.get().hideNoteTitle;
+    this.set({ hideNoteTitle: !hideTitle });
+    Config.set("hideNoteTitle", !hideTitle);
   };
 
   toggleAutoUpdates = async () => {

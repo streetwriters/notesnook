@@ -152,11 +152,7 @@ class EditorStore extends BaseStore {
     if (!note) return;
 
     noteStore.setSelectedNote(note.id);
-    if (!settingStore.get().hideTitle) {
-      setDocumentTitle(note.title);
-    } else {
-      setDocumentTitle();
-    }
+    setDocumentTitle(settingStore.get().hideNoteTitle ? undefined : note.title);
 
     if (note.locked)
       return hashNavigate(`/notes/${noteId}/unlock`, { replace: true });
@@ -252,11 +248,9 @@ class EditorStore extends BaseStore {
         state.session.dateEdited = note.dateEdited;
         state.session.attachmentsLength = attachments.length;
       });
-      if (!settingStore.get().hideTitle) {
-        setDocumentTitle(note.title);
-      } else {
-        setDocumentTitle();
-      }
+      setDocumentTitle(
+        settingStore.get().hideNoteTitle ? undefined : note.title
+      );
 
       this.setSaveState(1);
     } catch (err) {
