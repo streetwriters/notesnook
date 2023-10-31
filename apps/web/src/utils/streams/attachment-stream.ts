@@ -29,12 +29,13 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
     signal?: AbortSignal,
     onProgress?: (current: number) => void
   ) {
+    let index = 0;
+    const counters: Record<string, number> = {};
     if (signal)
       signal.onabort = async () => {
         await db.fs?.cancel(GROUP_ID, "download");
       };
 
-    let index = 0;
     super({
       start() {},
       async pull(controller) {
@@ -63,9 +64,10 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
         });
 
         if (file) {
-          const filePath = attachment.metadata.filename;
+          const filePath: string = attachment.metadata.filename;
+
           controller.enqueue({
-            path: filePath,
+            path: makeUniqueFilename(filePath, counters),
             data: new Uint8Array(await file.arrayBuffer())
           });
         } else {
@@ -78,4 +80,17 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
       }
     });
   }
+}
+
+function makeUniqueFilename(
+  filePath: string,
+  counters: Record<string, number>
+) {
+  counters[filePath] = (counters[filePath] || 0) + 1;
+  if (counters[filePath] === 1) return filePath;
+
+  const parts = filePath.split(".");
+  return `${parts.slice(0, -1).join(".")}-${counters[filePath]}.${
+    parts[parts.length - 1]
+  }`;
 }
