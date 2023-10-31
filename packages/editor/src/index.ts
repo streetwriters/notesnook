@@ -226,7 +226,8 @@ const useTiptap = (
           inclusive: true
         }).configure({
           openOnClick: !isMobile,
-          autolink: false
+          autolink: false,
+          linkOnPaste: true
         }),
         Table.configure({
           resizable: true,
