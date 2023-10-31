@@ -105,7 +105,11 @@ function PasswordDialog(props) {
             <Label
               key={check.key}
               mt={2}
-              sx={{ fontSize: "title", alignItems: "center" }}
+              sx={{
+                fontSize: "body",
+                fontFamily: "body",
+                alignItems: "center"
+              }}
             >
               <Checkbox id={check.key} name={check.key} />
               {check.title}
