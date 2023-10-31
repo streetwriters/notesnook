@@ -40,6 +40,7 @@ class SettingStore extends BaseStore {
 
   zoomFactor = 1.0;
   privacyMode = false;
+  hideNoteTitle = Config.get("hideNoteTitle", false);
   telemetry = isTelemetryEnabled();
   /** @type {string} */
   dateFormat = null;
@@ -161,6 +162,12 @@ class SettingStore extends BaseStore {
     const privacyMode = this.get().privacyMode;
     this.set({ privacyMode: !privacyMode });
     await desktop?.integration.setPrivacyMode.mutate({ enabled: !privacyMode });
+  };
+
+  toggleHideTitle = async () => {
+    const hideTitle = this.get().hideNoteTitle;
+    this.set({ hideNoteTitle: !hideTitle });
+    Config.set("hideNoteTitle", !hideTitle);
   };
 
   toggleAutoUpdates = async () => {
