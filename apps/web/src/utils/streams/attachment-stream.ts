@@ -85,6 +85,7 @@ function makeUniqueFilename(
   filePath: string,
   counters: Record<string, number>
 ) {
+  filePath = filePath.toLowerCase();
   counters[filePath] = (counters[filePath] || 0) + 1;
   if (counters[filePath] === 1) return filePath;
 
