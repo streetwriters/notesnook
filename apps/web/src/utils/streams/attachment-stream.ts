@@ -65,7 +65,6 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
 
         if (file) {
           const filePath: string = attachment.metadata.filename;
-
           controller.enqueue({
             path: makeUniqueFilename(filePath, counters),
             data: new Uint8Array(await file.arrayBuffer())
