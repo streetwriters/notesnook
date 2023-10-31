@@ -73,6 +73,23 @@ export const AboutSettings: SettingsGroup[] = [
         }
       },
       {
+        key: "source-code",
+        title: "Source Code",
+        description: "Check out our source code",
+        components: [
+          {
+            type: "button",
+            action: () =>
+              void window.open(
+                "https://github.com/streetwriters/notesnook",
+                "_blank"
+              ),
+            title: "Check Source Code",
+            variant: "secondary"
+          }
+        ]
+      },
+      {
         key: "roadmap",
         title: "Roadmap",
         description:
