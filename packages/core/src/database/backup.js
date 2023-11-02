@@ -249,7 +249,8 @@ export default class Backup {
     const toAdd = {};
     for (const item of Array.isArray(data) ? data : Object.values(data)) {
       // we do not want to restore deleted items
-      if (!item || (!item.type && item.deleted)) continue;
+      if (!item || (!item.type && item.deleted) || typeof item !== "object")
+        continue;
       // in v5.6 of the database, we did not set note history session's type
       if (!item.type && item.sessionContentId) item.type = "notehistory";
 
@@ -264,6 +265,10 @@ export default class Backup {
         item.type === "tag" && COLORS.includes(item.title.toLowerCase())
           ? "color"
           : item.itemType || item.type;
+
+      // items should sync immediately after getting restored
+      item.dateModified = Date.now();
+      item.synced = false;
 
       const collectionKey = itemTypeToCollectionKey[itemType];
       if (collectionKey) {
