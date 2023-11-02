@@ -454,43 +454,44 @@ class UserManager {
 
     const attachmentsKey = await this.getAttachmentsKey();
     data.encryptionKey = data.encryptionKey || (await this.getEncryptionKey());
-    await this._db.outbox.add(type, data, async () => {
-      if (data.encryptionKey) await this._db.sync(true, true);
 
-      await this._storage.deriveCryptoKey(`_uk_@${email}`, {
-        password: new_password,
-        salt
-      });
+    await this.clearSessions();
 
-      if (!(await this.resetUser(false))) return;
+    if (data.encryptionKey) await this._db.sync({ type: "fetch", force: true });
 
-      if (attachmentsKey) {
-        const userEncryptionKey = await this.getEncryptionKey();
-        if (!userEncryptionKey) return;
-        user.attachmentsKey = await this._storage.encrypt(
-          userEncryptionKey,
-          JSON.stringify(attachmentsKey)
-        );
-        await this.updateUser(user);
-      }
-
-      await this._db.sync(false, true);
-
-      if (old_password)
-        old_password = await this._storage.hash(old_password, email);
-      if (new_password)
-        new_password = await this._storage.hash(new_password, email);
-
-      await http.patch(
-        `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
-        {
-          type,
-          old_password,
-          new_password
-        },
-        token
-      );
+    await this._storage.deriveCryptoKey(`_uk_@${email}`, {
+      password: new_password,
+      salt
     });
+
+    if (!(await this.resetUser(false))) return;
+
+    await this._db.sync({ type: "send", force: true });
+
+    if (attachmentsKey) {
+      const userEncryptionKey = await this.getEncryptionKey();
+      if (!userEncryptionKey) return;
+      user.attachmentsKey = await this._storage.encrypt(
+        userEncryptionKey,
+        JSON.stringify(attachmentsKey)
+      );
+      await this.updateUser(user);
+    }
+
+    if (old_password)
+      old_password = await this._storage.hash(old_password, email);
+    if (new_password)
+      new_password = await this._storage.hash(new_password, email);
+
+    await http.patch(
+      `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
+      {
+        type,
+        old_password,
+        new_password
+      },
+      token
+    );
 
     return true;
   }

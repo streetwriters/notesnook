@@ -53,10 +53,10 @@ export default class SyncManager {
     this._db = db;
   }
 
-  async start(full, force, serverLastSynced) {
+  async start(options) {
     try {
       await this.sync.autoSync.start();
-      await this.sync.start(full, force, serverLastSynced);
+      await this.sync.start(options);
       return true;
     } catch (e) {
       var isHubException = e.message.includes("HubException:");
@@ -176,18 +176,20 @@ class Sync {
 
   /**
    *
-   * @param {boolean} full
-   * @param {boolean} force
-   * @param {number} serverLastSynced
+   * @param {{
+   *    type: "full" | "fetch" | "send";
+   *    force?: boolean;
+   *    serverLastSynced?: number;
+   * }} options
    */
-  async start(full, force, serverLastSynced) {
+  async start(options) {
     if (!(await checkSyncStatus(SYNC_CHECK_IDS.sync))) {
       await this.connection.stop();
       return;
     }
     if (!(await this.db.user.getUser())) return;
 
-    this.logger.info("Starting sync", { full, force, serverLastSynced });
+    this.logger.info("Starting sync", options);
 
     this.connection.onclose((error) => {
       this.db.eventManager.publish(EVENTS.syncAborted);
@@ -196,15 +198,21 @@ class Sync {
       throw new Error("Connection closed.");
     });
 
-    const { lastSynced, oldLastSynced } = await this.init(force);
+    const { lastSynced, oldLastSynced } = await this.init(options.force);
     this.logger.info("Initialized sync", { lastSynced, oldLastSynced });
 
     const newLastSynced = Date.now();
 
-    const serverResponse = full ? await this.fetch(lastSynced) : null;
+    const serverResponse =
+      options.type === "fetch" || options.type === "full"
+        ? await this.fetch(lastSynced)
+        : null;
     this.logger.info("Data fetched", serverResponse);
 
-    if (await this.send(lastSynced, force, newLastSynced)) {
+    if (
+      (options.type === "send" || options.type === "full") &&
+      (await this.send(lastSynced, options.force, newLastSynced))
+    ) {
       this.logger.info("New data sent");
       await this.stop(newLastSynced);
     } else if (serverResponse) {
@@ -212,7 +220,7 @@ class Sync {
       await this.stop(serverResponse.lastSynced);
     } else {
       this.logger.info("Nothing to do.");
-      await this.stop(serverLastSynced || oldLastSynced);
+      await this.stop(options.serverLastSynced || oldLastSynced);
     }
 
     if (!(await checkSyncStatus(SYNC_CHECK_IDS.autoSync))) {

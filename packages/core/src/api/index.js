@@ -33,7 +33,6 @@ import Constants from "../utils/constants";
 import { EV, EVENTS } from "../common";
 import Settings from "./settings";
 import Migrations from "./migrations";
-import Outbox from "./outbox";
 import UserManager from "./user-manager";
 import http from "../utils/http";
 import Monographs from "./monographs";
@@ -90,7 +89,6 @@ class Database {
     this.backup = new Backup(this);
     this.settings = new Settings(this);
     this.migrations = new Migrations(this);
-    this.outbox = new Outbox(this);
     this.monographs = new Monographs(this);
     this.offers = new Offers();
     this.debug = new Debug();
@@ -127,7 +125,6 @@ class Database {
 
     await this.initCollections();
 
-    await this.outbox.init();
     await this.migrations.init();
     this.isInitialized = true;
     if (this.migrations.required()) {
@@ -275,8 +272,17 @@ class Database {
     return (await this.storage.read("lastSynced")) || 0;
   }
 
-  sync(full = true, force = false, lastSynced = null) {
-    return this.syncer.start(full, force, lastSynced);
+  /**
+   *
+   * @param {{
+   *    type: "full" | "fetch" | "send";
+   *    force?: boolean;
+   *    serverLastSynced?: number;
+   * }} options
+   * @returns
+   */
+  sync(options) {
+    return this.syncer.start(options);
   }
 
   /**
