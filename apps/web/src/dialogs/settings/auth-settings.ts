@@ -19,11 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SettingsGroup } from "./types";
 import { useStore as useUserStore } from "../../stores/user-store";
-import { verifyAccount } from "../../common";
+import { createBackup, verifyAccount } from "../../common";
 import {
   show2FARecoveryCodesDialog,
   showMultifactorDialog,
-  showPasswordDialog
+  showPasswordDialog,
+  showRecoveryKeyDialog
 } from "../../common/dialog-controller";
 import { db } from "../../common/db";
 import { showToast } from "../../utils/toast";
@@ -45,19 +46,22 @@ export const AuthenticationSettings: SettingsGroup[] = [
             title: "Change password",
             variant: "secondary",
             action: async () => {
+              await createBackup();
               const result = await showPasswordDialog(
                 "change_account_password",
                 async (data) => {
-                  await db.user?.clearSessions();
                   return (
-                    db.user?.changePassword(
+                    (await db.user?.changePassword(
                       data.oldPassword,
                       data.newPassword
-                    ) || false
+                    )) || false
                   );
                 }
               );
-              if (result) showToast("success", "Account password changed!");
+              if (result) {
+                showToast("success", "Account password changed!");
+                await showRecoveryKeyDialog();
+              }
             }
           }
         ]
