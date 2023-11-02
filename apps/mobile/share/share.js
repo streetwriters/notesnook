@@ -295,7 +295,7 @@ const ShareView = ({ quicknote = false }) => {
 
     try {
       if (!globalThis["IS_MAIN_APP_RUNNING"]) {
-        await db.sync(false, false);
+        await db.sync({ type: "send", force: false });
       } else {
         console.log("main app running, skipping sync");
       }
