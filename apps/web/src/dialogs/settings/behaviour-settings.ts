@@ -139,6 +139,7 @@ export const BehaviourSettings: SettingsGroup[] = [
     key: "updates",
     section: "behaviour",
     header: "Updates",
+    isHidden: () => useSettingStore.getState().isFlatpak,
     settings: [
       {
         key: "auto-updates",

@@ -57,6 +57,7 @@ class SettingStore extends BaseStore {
    */
   desktopIntegrationSettings = undefined;
   autoUpdates = true;
+  isFlatpak = false;
 
   refresh = async () => {
     this.set({
@@ -64,6 +65,7 @@ class SettingStore extends BaseStore {
       timeFormat: db.settings.getTimeFormat(),
       titleFormat: db.settings.getTitleFormat(),
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
+      isFlatpak: await desktop?.integration.isFlatpak.query(),
       desktopIntegrationSettings:
         await desktop?.integration.desktopIntegration.query(),
       privacyMode: await desktop?.integration.privacyMode.query(),

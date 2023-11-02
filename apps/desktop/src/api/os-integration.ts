@@ -29,6 +29,7 @@ import { dirname } from "path";
 import { resolvePath } from "../utils/resolve-path";
 import { observable } from "@trpc/server/observable";
 import { AssetManager } from "../utils/asset-manager";
+import { isFlatpak } from "../utils";
 
 const t = initTRPC.create();
 
@@ -44,6 +45,8 @@ const NotificationOptions = z.object({
 });
 
 export const osIntegrationRouter = t.router({
+  isFlatpak: t.procedure.query(() => isFlatpak()),
+
   zoomFactor: t.procedure.query(() => config.zoomFactor),
   setZoomFactor: t.procedure.input(z.number()).mutation(({ input: factor }) => {
     globalThis.window?.webContents.setZoomFactor(factor);
