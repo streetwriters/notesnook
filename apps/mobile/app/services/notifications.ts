@@ -262,7 +262,7 @@ const onEvent = async ({ type, detail }: Event) => {
         if (status.isInternetReachable) {
           try {
             if (!globalThis["IS_MAIN_APP_RUNNING" as never]) {
-              await db.sync(false, false);
+              await db.sync({ type: "send", force: false });
             } else {
               console.log("main app running, skipping sync");
             }
@@ -904,7 +904,7 @@ async function pinNote(id: string) {
     const note = db.notes?.note(id as string) as any;
     let text = await convertNoteToText(note as any, false);
     if (!text) text = "";
-    let html = text.replace(/\n/g, "<br />");
+    const html = text.replace(/\n/g, "<br />");
     Notifications.displayNotification({
       title: note.title,
       message: note.headline || text,

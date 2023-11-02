@@ -79,7 +79,11 @@ const run = async (
     try {
       await BackgroundSync.doInBackground(async () => {
         try {
-          await db.sync(full, forced, lastSyncTime);
+          await db.sync({
+            type: full ? "full" : "send",
+            force: forced,
+            lastSyncTime
+          });
         } catch (e) {
           error = e;
         }
