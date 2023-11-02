@@ -358,7 +358,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         const user = await db.user?.getUser();
         if (!user) throw new Error("User not authenticated");
         await db.storage?.write(`_uk_@${user.email}@_k`, form.recoveryKey);
-        await db.sync(true, true);
+        await db.sync({ type: "fetch", force: true });
         navigate("backup");
       }}
     >
@@ -507,7 +507,7 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
 
         if (formData?.backupFile) {
           await restoreBackupFile(formData?.backupFile);
-          await db.sync(true, true);
+          await db.sync({ type: "full", force: true });
         }
 
         navigate("final");

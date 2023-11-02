@@ -298,7 +298,11 @@ class AppStore extends BaseStore {
 
     this.updateSyncStatus("syncing");
     try {
-      const result = await db.sync(full, force, lastSynced);
+      const result = await db.sync({
+        type: full ? "full" : "send",
+        force,
+        serverLastSynced: lastSynced
+      });
 
       if (!result) return this.updateSyncStatus("failed");
       this.updateSyncStatus("completed", true);
@@ -307,7 +311,6 @@ class AppStore extends BaseStore {
 
       if (pendingSync) {
         logger.info("Running pending sync", pendingSync);
-        pendingSync = false;
         await this.get().sync(pendingSync.full, false);
       }
     } catch (err) {
