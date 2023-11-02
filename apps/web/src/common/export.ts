@@ -119,7 +119,11 @@ export async function exportNotes(
           return await exportToPDF(note.title, exported);
         }
 
-        files.push({ filename: note.title, content: exported });
+        files.push({
+          filename: note.title,
+          content: exported,
+          date: note.dateEdited
+        });
       }
 
       if (!files.length) return false;
