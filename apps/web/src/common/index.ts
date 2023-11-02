@@ -26,7 +26,8 @@ import Config from "../utils/config";
 import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
 import { sanitizeFilename } from "@notesnook/common";
-import { store as userstore } from "../stores/user-store";
+import { useStore as useUserStore } from "../stores/user-store";
+import { useStore as useSettingStore } from "../stores/setting-store";
 import { showToast } from "../utils/toast";
 import { SUBSCRIPTION_STATUS } from "./constants";
 import { readFile, showFilePicker } from "../utils/file-picker";
@@ -78,8 +79,17 @@ export async function introduceFeatures() {
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
 
 export async function createBackup() {
-  const encryptBackups =
-    userstore.get().isLoggedIn && Config.get("encryptBackups", false);
+  const { isLoggedIn } = useUserStore.getState();
+  const { encryptBackups, toggleEncryptBackups } = useSettingStore.getState();
+  if (!isLoggedIn && encryptBackups) toggleEncryptBackups();
+
+  const verified = encryptBackups || (await verifyAccount());
+  if (!verified) {
+    showToast("error", "Could not create a backup: user verification failed.");
+    return;
+  }
+
+  const encryptedBackups = isLoggedIn && encryptBackups;
 
   const filename = sanitizeFilename(
     `notesnook-backup-${getFormattedDate(Date.now())}`
@@ -101,7 +111,7 @@ export async function createBackup() {
       await new ReadableStream({
         start() {},
         async pull(controller) {
-          for await (const file of db.backup!.export("web", encryptBackups)) {
+          for await (const file of db.backup!.export("web", encryptedBackups)) {
             report({
               text: `Saving chunk ${file.path}`
             });
@@ -270,7 +280,7 @@ export function totalSubscriptionConsumed(user: User) {
 export async function showUpgradeReminderDialogs() {
   if (IS_TESTING) return;
 
-  const user = userstore.get().user;
+  const user = useUserStore.getState().user;
   if (!user || !user.subscription || user.subscription?.expiry === 0) return;
 
   const consumed = totalSubscriptionConsumed(user);

@@ -43,17 +43,7 @@ export const BackupExportSettings: SettingsGroup[] = [
           {
             type: "button",
             title: "Create backup",
-            action: async () => {
-              if (
-                !useUserStore.getState().isLoggedIn &&
-                useSettingStore.getState().encryptBackups
-              )
-                useSettingStore.getState().toggleEncryptBackups();
-              const verified =
-                useSettingStore.getState().encryptBackups ||
-                (await verifyAccount());
-              if (verified) await createBackup();
-            },
+            action: createBackup,
             variant: "secondary"
           }
         ]
