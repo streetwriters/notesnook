@@ -63,7 +63,11 @@ function PasswordDialog(props) {
         loading: isLoading,
         disabled: isLoading
       }}
-      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+      negativeButton={{
+        text: "Cancel",
+        onClick: () => props.onClose(false),
+        disabled: isLoading
+      }}
     >
       <Box
         id="passwordForm"
