@@ -79,6 +79,7 @@ import Clipboard, { ClipboardOptions } from "./extensions/clipboard";
 import Blockquote from "./extensions/blockquote";
 import { Quirks } from "./extensions/quirks";
 import { LIST_NODE_TYPES } from "./utils/node-types";
+import { Callout } from "./extensions/callout";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -274,6 +275,7 @@ const useTiptap = (
         DateTime.configure({ dateFormat, timeFormat }),
         KeyMap,
         WebClipNode,
+        Callout,
 
         // Quirks handlers
         Quirks.configure({
