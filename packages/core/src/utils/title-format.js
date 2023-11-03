@@ -52,7 +52,7 @@ export function formatTitle(
     .replace(NEWLINE_STRIP_REGEX, " ")
     .replace(DATE_REGEX, date)
     .replace(TIME_REGEX, time)
-    .replace(HEADLINE_REGEX, headline)
+    .replace(HEADLINE_REGEX, headline || "")
     .replace(TIMESTAMP_REGEX, timestamp)
     .replace(COUNT_REGEX, totalNotes + 1);
 }
