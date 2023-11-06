@@ -27,8 +27,13 @@ const template = (data) => `<!DOCTYPE html>
       content="${data.headline}"
     />
     <title>${data.title} - Notesnook</title>
-    <meta name="created-on" content="${data.createdOn}" />
-    <meta name="last-edited-on" content="${data.editedOn}" />
+    <meta name="created-at" content="${data.createdOn}" />
+    <meta name="updated-at" content="${data.editedOn}" />
+    ${data.pinned ? `<meta name="pinned" content="${data.pinned}" />` : ""}
+    ${
+      data.favorite ? `<meta name="favorite" content="${data.favorite}" />` : ""
+    }
+    ${data.color ? `<meta name="color" content="${data.color}" />` : ""}
     ${data.tags ? `<meta name="tags" content="${data.tags}" />` : ""}
     <link rel="stylesheet" href="https://app.notesnook.com/assets/editor-styles.css?d=${
       process.env.NN_BUILD_TIMESTAMP || "1690887574068"

@@ -17,10 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const template = (data) => `# ${data.title}
+export const template = (data) => `# ${data.title}
 
-${data.content}
+${data.content}`;
+
+export const templateWithFrontmatter = (data) => `---
+title: ${JSON.stringify(data.title || "")}
+created_at: ${data.createdOn}
+updated_at: ${data.editedOn}
+pinned: ${data.metadata.pinned}
+favorite: ${data.metadata.favorite}
+color: ${data.metadata.color}
+tags: ${data.tags}
 ---
 
-${data.tags ? `${data.tags}` : ""}`;
-export default template;
+# ${data.title}
+
+${data.content}`;
