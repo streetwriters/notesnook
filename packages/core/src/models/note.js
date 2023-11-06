@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import MarkdownBuilder from "../utils/templates/markdown/builder";
+import * as MarkdownBuilder from "../utils/templates/markdown/builder";
 import HTMLBuilder from "../utils/templates/html/builder";
 import TextBuilder from "../utils/templates/text/builder";
 import { getContentFromData } from "../content-types";
@@ -79,7 +79,7 @@ export default class Note {
 
   /**
    *
-   * @param {"html"|"md"|"txt"} format - Format to export into
+   * @param {"html"|"md"|"md-frontmatter"|"txt"} format - Format to export into
    * @param {string} [contentItem=undefined]
    * @param {boolean} [template=true]
    * @param {string} [rawHTML=undefined] rawHTML - Use this raw content instead of generating itself
@@ -131,6 +131,11 @@ export default class Note {
         templateData.content = rawHTML || content.toMD();
         return template
           ? MarkdownBuilder.buildMarkdown(templateData)
+          : templateData.content;
+      case "md-frontmatter":
+        templateData.content = rawHTML || content.toMD();
+        return template
+          ? MarkdownBuilder.buildMarkdownWithFrontmatter(templateData)
           : templateData.content;
       default:
         throw new Error("Export format not supported.");
