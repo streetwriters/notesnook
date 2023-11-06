@@ -88,6 +88,7 @@ export async function inlineStylesheets(options?: FetchOptions) {
 
 async function resolveImports(options?: FetchOptions) {
   let index = 0;
+  const problemIndices = [];
   for (const sheet of document.styleSheets) {
     if (skipStyleSheet(sheet)) continue;
 
@@ -98,12 +99,13 @@ async function resolveImports(options?: FetchOptions) {
         if (result) {
           if (sheet.ownerNode) sheet.ownerNode.before(result);
           else document.head.appendChild(result);
-
-          sheet.deleteRule(index);
+          problemIndices.push(index);
         }
       }
       ++index;
     }
+
+    for (const _index of problemIndices) sheet.deleteRule(_index);
   }
 }
 
