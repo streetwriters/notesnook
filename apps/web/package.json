@@ -14,6 +14,7 @@
     "@dnd-kit/modifiers": "^6.0.0",
     "@dnd-kit/sortable": "^7.0.1",
     "@emotion/react": "11.11.1",
+    "@hazae41/foras": "^2.1.4",
     "@mdi/js": "^7.2.96",
     "@mdi/react": "^1.6.1",
     "@notesnook-importer/core": "^1.7.1",
