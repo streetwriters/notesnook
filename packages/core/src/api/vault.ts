@@ -24,7 +24,6 @@ import { tinyToTiptap } from "../migrations";
 import { isCipher } from "../database/crypto";
 import { EncryptedContentItem, Note } from "../types";
 import {
-  EMPTY_CONTENT,
   isEncryptedContent,
   isUnencryptedContent
 } from "../collections/content";
@@ -300,13 +299,11 @@ export default class Vault {
       data = rawContent.data;
       type = rawContent.type;
     } else if (data && type) {
-      const content = await this.db.content.extractAttachments({
-        ...EMPTY_CONTENT(id),
+      data = await this.db.content.extractAttachments({
         data,
-        type
+        type,
+        noteId: id
       });
-      data = content.data;
-      type = content.type;
     }
 
     if (data && type)
