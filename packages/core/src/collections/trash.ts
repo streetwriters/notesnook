@@ -20,8 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import dayjs from "dayjs";
 import Database from "../api";
 import { deleteItems } from "../utils/array";
-import { FilteredSelector } from "../database/sql-collection";
-import { TrashItem } from "../types";
+import { GroupOptions, TrashItem } from "../types";
+import { VirtualizedGrouping } from "../utils/virtualized-grouping";
+import { groupArray } from "../utils/grouping";
 
 export default class Trash {
   collections = ["notes", "notebooks"] as const;
@@ -110,18 +111,19 @@ export default class Trash {
     }
   }
 
-  async delete(...items: { id: string; type: "note" | "notebook" }[]) {
-    if (items.length <= 0) return;
+  async delete(...ids: string[]) {
+    if (ids.length <= 0) return;
 
     const noteIds = [];
     const notebookIds = [];
-    for (const item of items) {
-      if (item.type === "note") {
-        noteIds.push(item.id);
-        this.cache.notes.splice(this.cache.notes.indexOf(item.id), 1);
-      } else if (item.type === "notebook") {
-        notebookIds.push(item.id);
-        this.cache.notebooks.splice(this.cache.notebooks.indexOf(item.id), 1);
+    for (const id of ids) {
+      const isNote = this.cache.notes.includes(id);
+      if (isNote) {
+        noteIds.push(id);
+        this.cache.notes.splice(this.cache.notes.indexOf(id), 1);
+      } else if (!isNote) {
+        notebookIds.push(id);
+        this.cache.notebooks.splice(this.cache.notebooks.indexOf(id), 1);
       }
     }
 
@@ -143,18 +145,19 @@ export default class Trash {
     }
   }
 
-  async restore(...items: { id: string; type: "note" | "notebook" }[]) {
-    if (items.length <= 0) return;
+  async restore(...ids: string[]) {
+    if (ids.length <= 0) return;
 
     const noteIds = [];
     const notebookIds = [];
-    for (const item of items) {
-      if (item.type === "note") {
-        noteIds.push(item.id);
-        this.cache.notes.splice(this.cache.notes.indexOf(item.id), 1);
-      } else if (item.type === "notebook") {
-        notebookIds.push(item.id);
-        this.cache.notebooks.splice(this.cache.notebooks.indexOf(item.id), 1);
+    for (const id of ids) {
+      const isNote = this.cache.notes.includes(id);
+      if (isNote) {
+        noteIds.push(id);
+        this.cache.notes.splice(this.cache.notes.indexOf(id), 1);
+      } else if (!isNote) {
+        notebookIds.push(id);
+        this.cache.notebooks.splice(this.cache.notebooks.indexOf(id), 1);
       }
     }
 
@@ -206,6 +209,23 @@ export default class Trash {
       .execute();
 
     return [...trashedNotes, ...trashedNotebooks] as TrashItem[];
+  }
+
+  async grouped(options: GroupOptions) {
+    const items = await this.all();
+    const ids = groupArray(items, options);
+    const records: Record<string, TrashItem> = {};
+    for (const item of items) records[item.id] = item;
+
+    return new VirtualizedGrouping<TrashItem>(
+      ids,
+      this.db.options?.batchSize || 500,
+      async (ids: string[]) => {
+        const items: Record<string, TrashItem> = {};
+        for (const id of ids) items[id] = records[id];
+        return items;
+      }
+    );
   }
 
   /**
