@@ -157,5 +157,26 @@ export const BehaviourSettings: SettingsGroup[] = [
         ]
       }
     ]
+  },
+  {
+    key: "menu-bar",
+    section: "behaviour",
+    isHidden: () => !IS_DESKTOP_APP,
+    header: "Menu bar",
+    settings: [
+      {
+        key: "menu-bar",
+        title: "Disable menu bar",
+        description:
+          "Disable menu bar so that it remians hidden at pressing alt key. (requires restart)",
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => useSettingStore.getState().disableMenuBar,
+            toggle: () => useSettingStore.getState().toggleMenuBar()
+          }
+        ]
+      }
+    ]
   }
 ];
