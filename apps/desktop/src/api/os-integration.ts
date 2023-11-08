@@ -30,6 +30,7 @@ import { resolvePath } from "../utils/resolve-path";
 import { observable } from "@trpc/server/observable";
 import { AssetManager } from "../utils/asset-manager";
 import { isFlatpak } from "../utils";
+import { setupDesktopIntegration } from "../utils/desktop-integration";
 
 const t = initTRPC.create();
 
@@ -82,6 +83,7 @@ export const osIntegrationRouter = t.router({
         AutoLaunch.disable();
       }
       config.desktopSettings = settings;
+      setupDesktopIntegration();
     }),
 
   selectDirectory: t.procedure

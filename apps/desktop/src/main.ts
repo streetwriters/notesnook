@@ -24,7 +24,6 @@ import { configureAutoUpdater } from "./utils/autoupdater";
 import { getBackgroundColor, getTheme, setTheme } from "./utils/theme";
 import { setupMenu } from "./utils/menu";
 import { WindowState } from "./utils/window-state";
-import { AutoLaunch } from "./utils/autolaunch";
 import { setupJumplist } from "./utils/jumplist";
 import { setupTray } from "./utils/tray";
 import { CLIOptions, parseArguments } from "./cli";
@@ -35,6 +34,7 @@ import { config } from "./utils/config";
 import path from "path";
 import { bringToFront } from "./utils/bring-to-front";
 import { bridge } from "./api/bridge";
+import { setupDesktopIntegration } from "./utils/desktop-integration";
 
 // only run a single instance
 if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
@@ -142,6 +142,7 @@ app.once("ready", async () => {
 });
 
 app.once("window-all-closed", () => {
+  console.log("cross button is pressed");
   if (process.platform !== "darwin" || MAC_APP_STORE) {
     app.quit();
   }
@@ -175,50 +176,4 @@ function createURL(options: CLIOptions, path = "/") {
     url.hash = `/notebooks/${options.notebook}`;
 
   return url;
-}
-
-function setupDesktopIntegration() {
-  const desktopIntegration = config.desktopSettings;
-
-  if (
-    desktopIntegration.closeToSystemTray ||
-    desktopIntegration.minimizeToSystemTray
-  ) {
-    setupTray();
-  }
-
-  // when close to system tray is enabled, it becomes nigh impossible
-  // to "quit" the app. This is necessary in order to fix that.
-  if (desktopIntegration.closeToSystemTray) {
-    app.on("before-quit", () => app.exit(0));
-  }
-
-  globalThis.window?.on("close", (e) => {
-    if (config.desktopSettings.closeToSystemTray) {
-      e.preventDefault();
-      if (process.platform == "darwin") {
-        // on macOS window cannot be minimized/hidden if it is already fullscreen
-        // so we just close it.
-        if (globalThis.window?.isFullScreen()) app.exit(0);
-        else app.hide();
-      } else {
-        globalThis.window?.minimize();
-        globalThis.window?.hide();
-      }
-    }
-  });
-
-  globalThis.window?.on("minimize", () => {
-    if (config.desktopSettings.minimizeToSystemTray) {
-      if (process.platform == "darwin") {
-        app.hide();
-      } else {
-        globalThis.window?.hide();
-      }
-    }
-  });
-
-  if (desktopIntegration.autoStart) {
-    AutoLaunch.enable(!!desktopIntegration.startMinimized);
-  }
 }
