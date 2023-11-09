@@ -30,6 +30,7 @@ function Trash() {
   const refresh = useStore((store) => store.refresh);
   const clearTrash = useStore((store) => store.clear);
 
+  if (!items) return <Placeholder context="trash" />;
   return (
     <ListContainer
       group="trash"
