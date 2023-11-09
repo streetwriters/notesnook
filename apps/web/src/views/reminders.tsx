@@ -27,7 +27,7 @@ function Reminders() {
   useNavigate("reminders", () => store.refresh());
   const reminders = useStore((state) => state.reminders);
   const refresh = useStore((state) => state.refresh);
-  console.log(reminders);
+  if (!reminders) return <Placeholder context="reminders" />;
   return (
     <>
       <ListContainer
