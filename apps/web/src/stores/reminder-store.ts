@@ -24,26 +24,28 @@ import { TaskScheduler } from "../utils/task-scheduler";
 import { showReminderPreviewDialog } from "../common/dialog-controller";
 import dayjs from "dayjs";
 import Config from "../utils/config";
-import { store as notestore } from "./note-store";
-
 import { desktop } from "../common/desktop-bridge";
+import { Reminder, VirtualizedGrouping } from "@notesnook/core";
+import { store as noteStore } from "./note-store";
+import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
 
-/**
- * @extends {BaseStore<ReminderStore>}
- */
-class ReminderStore extends BaseStore {
-  reminders = [];
+class ReminderStore extends BaseStore<ReminderStore> {
+  reminders: VirtualizedGrouping<Reminder> | undefined = undefined;
 
-  refresh = (reset = true) => {
-    // const reminders = db.reminders.all;
-    // this.set((state) => (state.reminders = groupReminders(reminders)));
-    // if (reset) {
-    //   resetReminders(reminders);
-    //   notestore.refresh();
-    // }
+  refresh = async (reset = true) => {
+    const reminders = db.reminders.all;
+    this.set({
+      reminders: await reminders.grouped(
+        db.settings.getGroupOptions("reminders")
+      )
+    });
+    if (reset) {
+      await resetReminders(reminders);
+      await noteStore.refresh();
+    }
   };
 
-  delete = async (...ids) => {
+  delete = async (...ids: string[]) => {
     await db.reminders.remove(...ids);
     this.refresh();
   };
@@ -52,7 +54,7 @@ class ReminderStore extends BaseStore {
 const [useStore, store] = createStore(ReminderStore);
 export { useStore, store };
 
-async function resetReminders(reminders) {
+async function resetReminders(reminders: FilteredSelector<Reminder>) {
   await TaskScheduler.stopAllWithPrefix("reminder:");
 
   if (
@@ -61,15 +63,19 @@ async function resetReminders(reminders) {
   )
     return;
 
-  for (const reminder of reminders) {
+  for await (const reminder of reminders) {
     if (reminder.disabled) continue;
 
     // set a one time reminder at the snoozed date
-    if (reminder.snoozeUntil > Date.now()) {
+    if (reminder.snoozeUntil && reminder.snoozeUntil > Date.now()) {
       await scheduleReminder(
         `${reminder.id}-snoozed`,
         reminder,
-        reminderToCronExpression({ mode: "once", date: reminder.snoozeUntil })
+        reminderToCronExpression({
+          ...reminder,
+          mode: "once",
+          date: reminder.snoozeUntil
+        })
       );
     }
 
@@ -81,14 +87,7 @@ async function resetReminders(reminders) {
   }
 }
 
-/**
- *
- * @param {string} id
- * @param {import("@notesnook/core/dist/collections/reminders").Reminder} reminder
- * @param {string} cron
- * @returns
- */
-function scheduleReminder(id, reminder, cron) {
+function scheduleReminder(id: string, reminder: Reminder, cron: string) {
   return TaskScheduler.register(`reminder:${id}`, cron, async () => {
     if (!Config.get("reminderNotifications", true)) return;
 
@@ -109,7 +108,6 @@ function scheduleReminder(id, reminder, cron) {
             : reminder.priority === "vibrate"
             ? "normal"
             : "low",
-        focusOnClick: true,
         tag: id
       });
 
@@ -120,7 +118,7 @@ function scheduleReminder(id, reminder, cron) {
     } else {
       const notification = new Notification(reminder.title, {
         body: reminder.description,
-        vibrate: reminder.priority === "vibrate",
+        vibrate: reminder.priority === "vibrate" ? 200 : undefined,
         silent: reminder.priority === "silent",
         tag: id,
         renotify: true,
@@ -137,11 +135,11 @@ function scheduleReminder(id, reminder, cron) {
   });
 }
 
-function reminderToCronExpression(reminder) {
+function reminderToCronExpression(reminder: Reminder) {
   const { date, recurringMode, selectedDays, mode } = reminder;
   const dateTime = dayjs(date);
 
-  if (mode === "once") {
+  if (mode === "once" || !selectedDays) {
     return dateTime.format("ss mm HH DD MM * YYYY");
   } else {
     const cron = dateTime.format("ss mm HH").split(" ");
