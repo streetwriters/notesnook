@@ -21,49 +21,36 @@ import { db } from "../common/db";
 import createStore from "../common/store";
 import BaseStore from "./index";
 import { store as appStore } from "./app-store";
-import { store as notestore } from "./note-store";
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
+import { store as noteStore } from "./note-store";
+import { store as notebookStore } from "./notebook-store";
+import { TrashItem, VirtualizedGrouping } from "@notesnook/core";
 
-/**
- * @extends {BaseStore<TrashStore>}
- */
-class TrashStore extends BaseStore {
-  trash = [];
+class TrashStore extends BaseStore<TrashStore> {
+  trash: VirtualizedGrouping<TrashItem> | undefined = undefined;
 
-  refresh = () => {
-    this.set(
-      (state) =>
-        (state.trash = groupArray(
-          db.trash.all,
-          db.settings.getGroupOptions("trash")
-        ))
+  refresh = async () => {
+    const grouping = await db.trash.grouped(
+      db.settings.getGroupOptions("trash")
     );
+    this.set({ trash: grouping });
   };
 
-  delete = (ids, commit = false) => {
-    if (!commit) {
-      return this.set((state) => {
-        for (let id of ids) {
-          const index = state.trash.findIndex((item) => item.id === id);
-          if (index > -1) state.trash.splice(index, 1);
-        }
-      });
-    }
-    return db.trash.delete(...ids);
+  delete = async (...ids: string[]) => {
+    await db.trash.delete(...ids);
+    await this.get().refresh();
   };
 
-  restore = (ids) => {
-    return db.trash.restore(...ids).then(() => {
-      this.refresh();
-      appStore.refreshNavItems();
-      notestore.refresh();
-    });
+  restore = async (...ids: string[]) => {
+    await db.trash.restore(...ids);
+    await this.get().refresh();
+    await appStore.refreshNavItems();
+    await noteStore.refresh();
+    await notebookStore.refresh();
   };
 
-  clear = () => {
-    return db.trash.clear().then(() => {
-      this.set((state) => (state.trash = []));
-    });
+  clear = async () => {
+    await db.trash.clear();
+    await this.get().refresh();
   };
 }
 
