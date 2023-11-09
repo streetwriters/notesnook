@@ -41,6 +41,12 @@ import { motion } from "framer-motion";
 const IMAGE_SOURCE_CACHE: Record<string, string | undefined> = {};
 export const AnimatedImage = motion(Image);
 
+type imageInfo = {
+  size: number;
+  blob: Blob;
+  type: string;
+};
+
 export function ImageComponent(
   props: SelectionBasedReactNodeViewProps<
     ImageAttributes & ImageAlignmentOptions
@@ -65,8 +71,10 @@ export function ImageComponent(
   if (!align) align = textDirection ? "right" : "left";
 
   const imageRef = useRef<HTMLImageElement>(null);
+  const imageInfoRef = useRef<imageInfo>();
   const [error, setError] = useState<string>();
   const [source, setSource] = useState<string>();
+  const [imageInfo, setImageInfo] = useState<imageInfo>();
   const downloadOptions = useToolbarStore((store) => store.downloadOptions);
   const isReadonly = !editor.current?.isEditable;
   const hasOrSrc = hash || src;
@@ -85,10 +93,8 @@ export function ImageComponent(
               downloadOptions
             );
             setSource(url);
-            editor.current?.commands.updateImage(
-              { src },
-              { src: await toDataURL(blob), size, mime: type }
-            );
+            imageInfoRef.current = { size, blob, type };
+            //setImageInfo({ size, blob, type });
           } else {
             setError("Failed to parse source url.");
           }
@@ -271,12 +277,17 @@ export function ImageComponent(
               onDoubleClick={() =>
                 editor.current?.commands.previewAttachment(node.attrs)
               }
-              onLoad={(e) => {
+              onLoad={async (e) => {
                 const { clientHeight, clientWidth } = e.currentTarget;
-                if (!height && !width && !aspectRatio) {
+                if (!height && !width && !aspectRatio && imageInfoRef.current) {
                   editor.current?.commands.updateImage(
-                    { src, hash },
-                    { aspectRatio: clientWidth / clientHeight }
+                    { src },
+                    {
+                      src: await toDataURL(imageInfoRef.current.blob),
+                      size: imageInfoRef.current.size,
+                      mime: imageInfoRef.current.type,
+                      aspectRatio: clientWidth / clientHeight
+                    }
                   );
                 }
               }}
