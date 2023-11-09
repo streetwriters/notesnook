@@ -109,8 +109,17 @@ type NoteProps = {
 };
 
 function Note(props: NoteProps) {
-  const { tags, color, notebooks, item, date, reminder, simplified, compact } =
-    props;
+  const {
+    tags,
+    color,
+    notebooks,
+    item,
+    date,
+    reminder,
+    simplified,
+    compact,
+    context
+  } = props;
   const note = item;
 
   const isOpened = useStore((store) => store.selectedNote === note.id);
@@ -163,16 +172,17 @@ function Note(props: NoteProps) {
         <Flex
           sx={{ alignItems: "center", flexWrap: "wrap", gap: 1, mt: "small" }}
         >
-          {notebooks?.items.map((notebook) => (
-            <IconTag
-              key={notebook.id}
-              onClick={() => {
-                navigate(`/notebooks/${notebook.id}`);
-              }}
-              text={notebook.title}
-              icon={Notebook}
-            />
-          ))}
+          {context?.type !== "notebook" &&
+            notebooks?.items.map((notebook) => (
+              <IconTag
+                key={notebook.id}
+                onClick={() => {
+                  navigate(`/notebooks/${notebook.id}`);
+                }}
+                text={notebook.title}
+                icon={Notebook}
+              />
+            ))}
           {reminder && isReminderActive(reminder) && (
             <IconTag
               icon={Reminder}
@@ -577,6 +587,7 @@ function colorsToMenuItems(
 }
 
 function notebooksMenuItems(ids: string[]): MenuItem[] {
+  console.log("NOTE IDS", ids);
   return [
     {
       type: "button",
