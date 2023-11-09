@@ -18,12 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Notebook, Tag } from "@notesnook/core";
-
+export type NotebookContext = {
+  type: "notebook";
+  id: string;
+  item?: Notebook;
+  totalNotes?: number;
+};
 export type Context =
   | {
-      type: "notebook" | "tag" | "color";
+      type: "tag" | "color";
       id: string;
     }
+  | NotebookContext
   | {
       type: "favorite" | "monographs";
     };

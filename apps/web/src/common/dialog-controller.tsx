@@ -37,8 +37,7 @@ import { ConfirmDialogProps } from "../dialogs/confirm";
 import { getFormattedDate } from "@notesnook/common";
 import { downloadUpdate } from "../utils/updater";
 import { ThemeMetadata } from "@notesnook/themes-server";
-import { clone } from "@notesnook/core/dist/utils/clone";
-import { Notebook, Reminder } from "@notesnook/core/dist/types";
+import { Reminder } from "@notesnook/core";
 import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
 
 type DialogTypes = typeof Dialogs;
@@ -91,20 +90,10 @@ export function showAddTagsDialog(noteIds: string[]) {
   ));
 }
 
-export function showAddNotebookDialog() {
+export function showAddNotebookDialog(parentId?: string) {
   return showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog
-      isOpen={true}
-      onDone={async (nb: Record<string, unknown>) => {
-        // add the notebook to db
-        const notebook = await db.notebooks.add({ ...nb });
-        if (!notebook) return perform(false);
-
-        notebookStore.refresh();
-
-        showToast("success", "Notebook added successfully!");
-        perform(true);
-      }}
+      parentId={parentId}
       onClose={() => {
         perform(false);
       }}
@@ -112,36 +101,13 @@ export function showAddNotebookDialog() {
   ));
 }
 
-export function showEditNotebookDialog(notebookId: string) {
-  const notebook = db.notebooks.notebook(notebookId)?.data;
+export async function showEditNotebookDialog(notebookId: string) {
+  const notebook = await db.notebooks.notebook(notebookId);
   if (!notebook) return;
-  return showDialog("AddNotebookDialog", (Dialog, perform) => (
+  return await showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog
-      isOpen={true}
       notebook={notebook}
       edit={true}
-      onDone={async (nb: Notebook, deletedTopics: string[]) => {
-        // we remove the topics from notebook
-        // beforehand so we can add them manually, later
-        const topics = clone(nb.topics);
-        nb.topics = [];
-
-        const notebookId = await db.notebooks.add(nb);
-
-        // add or delete topics as required
-        const notebookTopics = notebookId && db.notebooks.topics(notebookId);
-        if (notebookTopics) {
-          await notebookTopics.add(...topics);
-          await notebookTopics.delete(...deletedTopics);
-        }
-
-        notebookStore.refresh();
-        noteStore.refresh();
-        appStore.refreshNavItems();
-
-        showToast("success", "Notebook edited successfully!");
-        perform(true);
-      }}
       onClose={() => {
         perform(false);
       }}
@@ -470,50 +436,6 @@ export function showBackupPasswordDialog(
 export function showRecoveryKeyDialog() {
   return showDialog("RecoveryKeyDialog", (Dialog, perform) => (
     <Dialog onDone={() => perform(true)} />
-  ));
-}
-
-export function showCreateTopicDialog() {
-  return showDialog("ItemDialog", (Dialog, perform) => (
-    <Dialog
-      title={"Create topic"}
-      subtitle={"You can create as many topics as you want."}
-      onClose={() => {
-        perform(false);
-      }}
-      onAction={async (topic: Record<string, unknown>) => {
-        if (!topic) return;
-        const notebook = notebookStore.get().selectedNotebook;
-        if (!notebook) return;
-        await db.notebooks.topics(notebook.id).add(topic);
-        notebookStore.setSelectedNotebook(notebook.id);
-        showToast("success", "Topic created!");
-        perform(true);
-      }}
-    />
-  ));
-}
-
-export function showEditTopicDialog(notebookId: string, topicId: string) {
-  const topic = db.notebooks.topics(notebookId).topic(topicId)?._topic;
-  if (!topic) return;
-
-  return showDialog("ItemDialog", (Dialog, perform) => (
-    <Dialog
-      title={"Edit topic"}
-      subtitle={`You are editing "${topic.title}" topic.`}
-      defaultValue={topic.title}
-      icon={TopicIcon}
-      item={topic}
-      onClose={() => perform(false)}
-      onAction={async (t: string) => {
-        await db.notebooks.topics(topic.notebookId).add({ ...topic, title: t });
-        notebookStore.setSelectedNotebook(topic.notebookId);
-        appStore.refreshNavItems();
-        showToast("success", "Topic edited!");
-        perform(true);
-      }}
-    />
   ));
 }
 
