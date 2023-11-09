@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Flex, Text } from "@theme-ui/components";
+import { ThemeUIStyleObject } from "@theme-ui/css";
 import {
   store as selectionStore,
   useStore as useSelectionStore
@@ -43,13 +44,16 @@ type ListItemProps<TItem extends Item, TContext> = {
 
   onKeyPress?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   onClick?: () => void;
+  onSelect?: () => void;
   title: string | JSX.Element;
   header?: JSX.Element;
   body?: JSX.Element | string;
   footer?: JSX.Element;
 
   context?: TContext;
-  menuItems?: (item: TItem, items?: string[], context?: TContext) => MenuItem[];
+  menuItems?: (item: TItem, ids?: string[], context?: TContext) => MenuItem[];
+
+  sx?: ThemeUIStyleObject;
 };
 
 function ListItem<TItem extends Item, TContext>(
@@ -65,7 +69,9 @@ function ListItem<TItem extends Item, TContext>(
     isCompact,
     isDisabled,
     isSimple,
-    item
+    item,
+    sx,
+    context
   } = props;
 
   const listItemRef = useRef<HTMLDivElement>(null);
@@ -95,10 +101,9 @@ function ListItem<TItem extends Item, TContext>(
 
         if (selectedItems.findIndex((i) => i === item.id) === -1) {
           selectedItems = [];
-          selectedItems.push(item);
+          selectedItems.push(item.id);
         }
-
-        let menuItems = props.menuItems?.(item, selectedItems);
+        let menuItems = props.menuItems?.(item, selectedItems, context);
 
         if (selectedItems.length > 1) {
           title = `${selectedItems.length} items selected`;
@@ -111,13 +116,13 @@ function ListItem<TItem extends Item, TContext>(
           title
         });
       }}
-      pl={1}
-      pr={2}
-      py={1}
-      mb={isCompact ? 0 : 0}
       tabIndex={-1}
       dir="auto"
       sx={{
+        pl: 1,
+        pr: 2,
+        py: 1,
+        mb: "1px",
         height: "inherit",
         cursor: "pointer",
         position: "relative",
@@ -146,7 +151,8 @@ function ListItem<TItem extends Item, TContext>(
           outlineColor: accent === "accent" ? "accent" : alpha("accent", 0.7),
           backgroundColor:
             isSelected || isFocused ? "background-selected" : background
-        }
+        },
+        ...sx
       }}
       onKeyPress={(e) => {
         if (e.key !== "Enter") {
@@ -162,21 +168,27 @@ function ListItem<TItem extends Item, TContext>(
     >
       {!isCompact && props.header}
 
-      <Text
-        data-test-id={`title`}
-        variant={isSimple || isCompact ? "body" : "subtitle"}
-        sx={{
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          fontWeight: isCompact || isSimple ? "body" : "bold",
-          color:
-            selected && heading === "heading" ? `${heading}-selected` : heading,
-          display: "block"
-        }}
-      >
-        {props.title}
-      </Text>
+      {typeof props.title === "string" ? (
+        <Text
+          data-test-id={`title`}
+          variant={isSimple || isCompact ? "body" : "subtitle"}
+          sx={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            fontWeight: isCompact || isSimple ? "body" : "bold",
+            color:
+              selected && heading === "heading"
+                ? `${heading}-selected`
+                : heading,
+            display: "block"
+          }}
+        >
+          {props.title}
+        </Text>
+      ) : (
+        props.title
+      )}
 
       {!isSimple && !isCompact && props.body && (
         <Text

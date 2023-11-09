@@ -59,7 +59,7 @@ function CachedRouter() {
             flex: 1
           }}
         >
-          <Component key={key} />
+          <Component key={key} {...RouteResult.props} />
         </Flex>
       ))}
     </RouteContainer>

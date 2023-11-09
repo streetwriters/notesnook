@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Note from "../note";
 import Notebook from "../notebook";
 import Tag from "../tag";
-import Topic from "../topic";
 import TrashItem from "../trash-item";
 import { db } from "../../common/db";
 import Reminder from "../reminder";
@@ -39,6 +38,7 @@ import {
   Reminder as ReminderItem
 } from "@notesnook/core";
 import { useEffect, useRef, useState } from "react";
+import SubNotebook from "../sub-notebook";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
@@ -100,6 +100,15 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
       );
     }
     case "notebook":
+      if (context?.type === "notebook")
+        return (
+          <SubNotebook
+            item={item}
+            totalNotes={totalNotes.current}
+            notebookId={context.id}
+          />
+        );
+
       return (
         <Notebook
           item={item}
@@ -111,8 +120,6 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
       return <TrashItem item={item} date={getDate(item, type)} />;
     case "reminder":
       return <Reminder item={item} />;
-    case "topic":
-      return <Topic item={item} />;
     case "tag":
       return <Tag item={item} totalNotes={totalNotes.current} />;
     default:
@@ -146,7 +153,7 @@ function getDate(item: Item, groupType?: GroupingKey): number {
   );
 }
 
-async function resolveItems(ids: string[], items: Record<string, Item>) {
+export async function resolveItems(ids: string[], items: Record<string, Item>) {
   const { type } = items[ids[0]];
   if (type === "note") return resolveNotes(ids);
   else if (type === "notebook") {
@@ -177,7 +184,13 @@ async function resolveNotes(ids: string[]) {
     ...(await db.relations.from({ type: "note", ids }, "reminder").get())
   ];
   console.timeEnd("relations");
-
+  console.log(
+    relations,
+    ids,
+    await db.relations
+      .from({ type: "notebook", id: "6549b4c373c7f3a40852f80c" }, "note")
+      .get()
+  );
   const relationIds: {
     notebooks: Set<string>;
     colors: Set<string>;
