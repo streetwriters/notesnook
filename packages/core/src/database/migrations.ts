@@ -97,7 +97,7 @@ export class NNMigrationProvider implements MigrationProvider {
             .$call(addTrashColumns)
             .addColumn("title", "text")
             .addColumn("description", "text")
-            .addColumn("dateEdited", "text")
+            .addColumn("dateEdited", "integer")
             .addColumn("pinned", "boolean")
             .execute();
 
